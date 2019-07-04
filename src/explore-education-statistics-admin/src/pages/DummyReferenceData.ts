@@ -1,16 +1,28 @@
+import groupBy from 'lodash/groupBy';
 import { IdLabelPair } from '@admin/services/publicationService';
 
-interface TimePeriodCoverageGroup {
+export enum DateType {
+  DayMonthYear,
+  Year,
+}
+
+export interface TimePeriodCoverageGroup {
   label: string;
+  startDateLabel: string;
+  startDateType: DateType;
   options: IdLabelPair[];
 }
 
 const createTimePeriodGroupWithQuarterlyPermutations = (
   timePeriodGroup: string,
   code: string,
+  startDateLabel: string,
+  startDateType: DateType,
 ) => {
   return {
     label: timePeriodGroup,
+    startDateLabel,
+    startDateType,
     options: [
       {
         id: code,
@@ -61,12 +73,34 @@ const createTimePeriodGroupWithQuarterlyPermutations = (
 };
 
 const timePeriodCoverageGroups: TimePeriodCoverageGroup[] = [
-  createTimePeriodGroupWithQuarterlyPermutations('Academic year', 'AY'),
-  createTimePeriodGroupWithQuarterlyPermutations('Calendar year', 'CY'),
-  createTimePeriodGroupWithQuarterlyPermutations('Financial year', 'FY'),
-  createTimePeriodGroupWithQuarterlyPermutations('Tax year', 'TY'),
+  createTimePeriodGroupWithQuarterlyPermutations(
+    'Academic year',
+    'AY',
+    'Year',
+    DateType.Year,
+  ),
+  createTimePeriodGroupWithQuarterlyPermutations(
+    'Calendar year',
+    'CY',
+    'Year',
+    DateType.Year,
+  ),
+  createTimePeriodGroupWithQuarterlyPermutations(
+    'Financial year',
+    'FY',
+    'Financial year start',
+    DateType.DayMonthYear,
+  ),
+  createTimePeriodGroupWithQuarterlyPermutations(
+    'Tax year',
+    'TY',
+    'Year',
+    DateType.Year,
+  ),
   {
     label: 'Term',
+    startDateLabel: 'Year',
+    startDateType: DateType.Year,
     options: [
       {
         id: 'T1',
@@ -88,6 +122,8 @@ const timePeriodCoverageGroups: TimePeriodCoverageGroup[] = [
   },
   {
     label: 'Month',
+    startDateLabel: 'Year',
+    startDateType: DateType.Year,
     options: [
       'January',
       'February',
@@ -108,6 +144,8 @@ const timePeriodCoverageGroups: TimePeriodCoverageGroup[] = [
   },
   {
     label: 'Other',
+    startDateLabel: 'Year',
+    startDateType: DateType.Year,
     options: [
       {
         id: 'EOM',
@@ -128,7 +166,14 @@ const releaseTypeOptions: IdLabelPair[] = [
   },
 ];
 
+const findTimePeriodCoverageGroup = (code: string) => {
+  return timePeriodCoverageGroups.find(group =>
+    group.options.map(option => option.id).some(id => id === code),
+  );
+};
+
 export default {
   timePeriodCoverageGroups,
   releaseTypeOptions,
+  findTimePeriodCoverageGroup,
 };

@@ -1,3 +1,4 @@
+import { TimePeriodCoverageGroup } from '@admin/pages/DummyReferenceData';
 import { User } from '@admin/services/PrototypeLoginService';
 
 export interface IdLabelPair {
@@ -89,11 +90,10 @@ export interface Publication {
 export interface ReleaseSetupDetails {
   id: string;
   publicationTitle: string;
-  timePeriodCoverageName: string;
-  timePeriodCoverageType: string;
   timePeriodCoverageCode: string;
   timePeriodCoverageStartDate: Date;
   releaseType: IdLabelPair;
   leadStatisticianName: string;
   scheduledReleaseDate: Date;
+  nextExpectedReleaseDate?: Date;
 }

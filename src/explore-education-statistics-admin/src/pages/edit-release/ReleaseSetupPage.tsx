@@ -1,3 +1,4 @@
+import DummyReferenceData from '@admin/pages/DummyReferenceData';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import { format } from 'date-fns';
@@ -24,6 +25,13 @@ const ReleaseSetupPage = ({ match }: RouteComponentProps<MatchProps>) => {
     );
   }, [releaseId]);
 
+  const selectedTimePeriodCoverageGroup =
+    releaseSetupDetails && releaseSetupDetails.timePeriodCoverageCode
+      ? DummyReferenceData.findTimePeriodCoverageGroup(
+          releaseSetupDetails.timePeriodCoverageCode,
+        )
+      : null;
+
   return (
     <>
       <ReleasePageTemplate
@@ -43,13 +51,25 @@ const ReleaseSetupPage = ({ match }: RouteComponentProps<MatchProps>) => {
             <div className="govuk-summary-list__row">
               <dt className="govuk-summary-list__key">Coverage type</dt>
               <dd className="govuk-summary-list__value">
-                {releaseSetupDetails.timePeriodCoverageType}
+                {selectedTimePeriodCoverageGroup &&
+                  selectedTimePeriodCoverageGroup.label}
               </dd>
             </div>
             <div className="govuk-summary-list__row">
-              <dt className="govuk-summary-list__key">Coverage period</dt>
+              <dt className="govuk-summary-list__key">Release period</dt>
               <dd className="govuk-summary-list__value">
-                {releaseSetupDetails.timePeriodCoverageName}
+                {format(
+                  releaseSetupDetails.timePeriodCoverageStartDate,
+                  'yyyy',
+                )}{' '}
+                to{' '}
+                {format(
+                  releaseSetupDetails.timePeriodCoverageStartDate.setFullYear(
+                    releaseSetupDetails.timePeriodCoverageStartDate.getFullYear() +
+                      1,
+                  ),
+                  'yyyy',
+                )}
               </dd>
             </div>
             <div className="govuk-summary-list__row">

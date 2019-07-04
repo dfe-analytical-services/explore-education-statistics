@@ -1,18 +1,24 @@
-import DummyReferenceData from '@admin/pages/DummyReferenceData';
-import React, { useEffect, useState } from 'react';
-import { RouteComponentProps } from 'react-router';
-import { format } from 'date-fns';
-import ReleasePageTemplate from '@admin/pages/edit-release/components/ReleasePageTemplate';
 import DummyPublicationsData from '@admin/pages/DummyPublicationsData';
+import DummyReferenceData, {
+  DateType,
+  TimePeriodCoverageGroup,
+} from '@admin/pages/DummyReferenceData';
+import ReleasePageTemplate from '@admin/pages/edit-release/components/ReleasePageTemplate';
 import {
   FormFieldset,
   FormGroup,
   FormRadioGroup,
   FormTextInput,
 } from '@common/components/form';
-import { setupEditRoute } from '../../routes/releaseRoutes';
-import { ReleaseSetupDetails } from '../../services/publicationService';
+import { format } from 'date-fns';
+import React, { useEffect, useState } from 'react';
+import { RouteComponentProps } from 'react-router';
 import Link from '../../components/Link';
+import { setupEditRoute } from '../../routes/releaseRoutes';
+import {
+  IdLabelPair,
+  ReleaseSetupDetails,
+} from '../../services/publicationService';
 
 interface MatchProps {
   releaseId: string;
@@ -25,11 +31,26 @@ const ReleaseSetupEditPage = ({ match }: RouteComponentProps<MatchProps>) => {
     ReleaseSetupDetails
   >();
 
+  const [timePeriodCoverageGroups, setTimePeriodCoverageGroups] = useState<
+    TimePeriodCoverageGroup[]
+  >();
+
+  const [releaseTypes, setReleaseTypes] = useState<IdLabelPair[]>();
+
   useEffect(() => {
     setReleaseSetupDetails(
       DummyPublicationsData.getReleaseSetupDetails(releaseId),
     );
+    setTimePeriodCoverageGroups(DummyReferenceData.timePeriodCoverageGroups);
+    setReleaseTypes(DummyReferenceData.releaseTypeOptions);
   }, [releaseId]);
+
+  const selectedTimePeriodCoverageGroup =
+    releaseSetupDetails && releaseSetupDetails.timePeriodCoverageCode
+      ? DummyReferenceData.findTimePeriodCoverageGroup(
+          releaseSetupDetails.timePeriodCoverageCode,
+        )
+      : null;
 
   return (
     <>
@@ -41,20 +62,27 @@ const ReleaseSetupEditPage = ({ match }: RouteComponentProps<MatchProps>) => {
       >
         <h2 className="govuk-heading-m">Edit release setup</h2>
 
-        {releaseSetupDetails && (
+        {releaseSetupDetails && timePeriodCoverageGroups && releaseTypes && (
           <form action={setupEditRoute.generateLink(releaseId)}>
             <FormFieldset id="test" legend="Select time period coverage">
               <FormGroup>
                 <label htmlFor="time-period" className="govuk-label">
                   Type
                 </label>
+                {/*eslint-disable-next-line jsx-a11y/no-onchange*/}
                 <select
                   name="time-period"
                   id="time-period"
                   className="govuk-select"
                   value={releaseSetupDetails.timePeriodCoverageCode}
+                  onChange={event => {
+                    setReleaseSetupDetails({
+                      ...releaseSetupDetails,
+                      timePeriodCoverageCode: event.target.value,
+                    });
+                  }}
                 >
-                  {DummyReferenceData.timePeriodCoverageGroups.map(group => (
+                  {timePeriodCoverageGroups.map(group => (
                     <optgroup key={group.label} label={group.label}>
                       {group.options.map(option => (
                         <option key={option.id} value={option.id}>
@@ -65,97 +93,105 @@ const ReleaseSetupEditPage = ({ match }: RouteComponentProps<MatchProps>) => {
                   ))}
                 </select>
               </FormGroup>
-              <FormGroup>
-                <FormTextInput
-                  id="release-year"
-                  name="release-year"
-                  label="Year"
-                  value={format(
-                    releaseSetupDetails.timePeriodCoverageStartDate,
-                    'yyyy',
-                  )}
-                  width={4}
-                />
-              </FormGroup>
-              <FormGroup>
-                <fieldset className="govuk-fieldset">
-                  <legend className="govuk-heading-s govuk-!-margin-bottom-3">
-                    Financial year start
-                  </legend>
-                  <div className="govuk-form-group">
+              {selectedTimePeriodCoverageGroup &&
+                DateType.Year ===
+                  selectedTimePeriodCoverageGroup.startDateType && (
+                  <FormGroup>
+                    <FormTextInput
+                      id="release-year"
+                      name="release-year"
+                      label={selectedTimePeriodCoverageGroup.startDateLabel}
+                      value={format(
+                        releaseSetupDetails.timePeriodCoverageStartDate,
+                        'yyyy',
+                      )}
+                      width={4}
+                    />
+                  </FormGroup>
+                )}
+              {selectedTimePeriodCoverageGroup &&
+                DateType.DayMonthYear ===
+                  selectedTimePeriodCoverageGroup.startDateType && (
+                  <FormGroup>
                     <fieldset className="govuk-fieldset">
-                      <div
-                        className="govuk-date-input"
-                        id="financial-year-start-date"
-                      >
-                        <div className="govuk-date-input__item">
-                          <div className="govuk-form-group">
-                            <label
-                              htmlFor="financial-year-day"
-                              className="govuk-label govuk-date-input__label"
-                            >
-                              Day
-                            </label>
-                            <input
-                              type="number"
-                              pattern="[0-9]*"
-                              name="financial-year-day"
-                              id="financial-year-day"
-                              className="govuk-input govuk-date-input__input govuk-input--width-2"
-                              value={format(
-                                releaseSetupDetails.timePeriodCoverageStartDate,
-                                'd',
-                              )}
-                            />
+                      <legend className="govuk-heading-s govuk-!-margin-bottom-3">
+                        {selectedTimePeriodCoverageGroup.startDateLabel}
+                      </legend>
+                      <div className="govuk-form-group">
+                        <fieldset className="govuk-fieldset">
+                          <div
+                            className="govuk-date-input"
+                            id="financial-year-start-date"
+                          >
+                            <div className="govuk-date-input__item">
+                              <div className="govuk-form-group">
+                                <label
+                                  htmlFor="financial-year-day"
+                                  className="govuk-label govuk-date-input__label"
+                                >
+                                  Day
+                                </label>
+                                <input
+                                  type="number"
+                                  pattern="[0-9]*"
+                                  name="financial-year-day"
+                                  id="financial-year-day"
+                                  className="govuk-input govuk-date-input__input govuk-input--width-2"
+                                  value={format(
+                                    releaseSetupDetails.timePeriodCoverageStartDate,
+                                    'd',
+                                  )}
+                                />
+                              </div>
+                            </div>
+                            <div className="govuk-date-input__item">
+                              <div className="govuk-form-group">
+                                <label
+                                  htmlFor="financial-year-month"
+                                  className="govuk-label govuk-date-input__label"
+                                >
+                                  Month
+                                </label>
+                                <input
+                                  type="number"
+                                  pattern="[0-9]*"
+                                  name="financial-year-month"
+                                  id="financial-year-month"
+                                  className="govuk-input govuk-date-input__input govuk-input--width-2"
+                                  value={format(
+                                    releaseSetupDetails.timePeriodCoverageStartDate,
+                                    'MM',
+                                  )}
+                                />
+                              </div>
+                            </div>
+                            <div className="govuk-date-input__item">
+                              <div className="govuk-form-group">
+                                <label
+                                  htmlFor="financial-year-year"
+                                  className="govuk-label govuk-date-input__label"
+                                >
+                                  Year
+                                </label>
+                                <input
+                                  type="number"
+                                  pattern="[0-9]*"
+                                  name="financial-year-year"
+                                  id="financial-year-year"
+                                  className="govuk-input govuk-date-input__input govuk-input--width-4"
+                                  value={format(
+                                    releaseSetupDetails.timePeriodCoverageStartDate,
+                                    'yyyy',
+                                  )}
+                                />
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                        <div className="govuk-date-input__item">
-                          <div className="govuk-form-group">
-                            <label
-                              htmlFor="financial-year-month"
-                              className="govuk-label govuk-date-input__label"
-                            >
-                              Month
-                            </label>
-                            <input
-                              type="number"
-                              pattern="[0-9]*"
-                              name="financial-year-month"
-                              id="financial-year-month"
-                              className="govuk-input govuk-date-input__input govuk-input--width-2"
-                              value={format(
-                                releaseSetupDetails.timePeriodCoverageStartDate,
-                                'MM',
-                              )}
-                            />
-                          </div>
-                        </div>
-                        <div className="govuk-date-input__item">
-                          <div className="govuk-form-group">
-                            <label
-                              htmlFor="financial-year-year"
-                              className="govuk-label govuk-date-input__label"
-                            >
-                              Year
-                            </label>
-                            <input
-                              type="number"
-                              pattern="[0-9]*"
-                              name="financial-year-year"
-                              id="financial-year-year"
-                              className="govuk-input govuk-date-input__input govuk-input--width-4"
-                              value={format(
-                                releaseSetupDetails.timePeriodCoverageStartDate,
-                                'yyyy',
-                              )}
-                            />
-                          </div>
-                        </div>
+                        </fieldset>
                       </div>
                     </fieldset>
-                  </div>
-                </fieldset>
-              </FormGroup>
+                  </FormGroup>
+                )}
             </FormFieldset>
 
             <fieldset className="govuk-fieldset">
@@ -177,7 +213,10 @@ const ReleaseSetupEditPage = ({ match }: RouteComponentProps<MatchProps>) => {
                       name="schedule-day"
                       type="number"
                       pattern="[0-9]*"
-                      value="20"
+                      value={format(
+                        releaseSetupDetails.scheduledReleaseDate,
+                        'd',
+                      )}
                     />
                   </div>
                 </div>
@@ -195,7 +234,10 @@ const ReleaseSetupEditPage = ({ match }: RouteComponentProps<MatchProps>) => {
                       name="schedule-month"
                       type="number"
                       pattern="[0-9]*"
-                      value="09"
+                      value={format(
+                        releaseSetupDetails.scheduledReleaseDate,
+                        'MM',
+                      )}
                     />
                   </div>
                 </div>
@@ -213,7 +255,10 @@ const ReleaseSetupEditPage = ({ match }: RouteComponentProps<MatchProps>) => {
                       name="schedule-year"
                       type="number"
                       pattern="[0-9]*"
-                      value="2019"
+                      value={format(
+                        releaseSetupDetails.scheduledReleaseDate,
+                        'yyyy',
+                      )}
                     />
                   </div>
                 </div>
@@ -238,7 +283,10 @@ const ReleaseSetupEditPage = ({ match }: RouteComponentProps<MatchProps>) => {
                       name="schedule-day"
                       type="number"
                       pattern="[0-9]*"
-                      value="20"
+                      value={
+                        releaseSetupDetails.nextExpectedReleaseDate &&
+                        format(releaseSetupDetails.nextExpectedReleaseDate, 'd')
+                      }
                     />
                   </div>
                 </div>
@@ -256,7 +304,13 @@ const ReleaseSetupEditPage = ({ match }: RouteComponentProps<MatchProps>) => {
                       name="schedule-month"
                       type="number"
                       pattern="[0-9]*"
-                      value="09"
+                      value={
+                        releaseSetupDetails.nextExpectedReleaseDate &&
+                        format(
+                          releaseSetupDetails.nextExpectedReleaseDate,
+                          'MM',
+                        )
+                      }
                     />
                   </div>
                 </div>
@@ -274,7 +328,13 @@ const ReleaseSetupEditPage = ({ match }: RouteComponentProps<MatchProps>) => {
                       name="schedule-year"
                       type="number"
                       pattern="[0-9]*"
-                      value="2020"
+                      value={
+                        releaseSetupDetails.nextExpectedReleaseDate &&
+                        format(
+                          releaseSetupDetails.nextExpectedReleaseDate,
+                          'yyyy',
+                        )
+                      }
                     />
                   </div>
                 </div>
@@ -287,11 +347,7 @@ const ReleaseSetupEditPage = ({ match }: RouteComponentProps<MatchProps>) => {
                 id="release-type"
                 name="release-type"
                 value={releaseSetupDetails.releaseType.id}
-                onChange={event => {
-                  // setValue(event.target.value);
-                  alert('hi');
-                }}
-                options={DummyReferenceData.releaseTypeOptions.map(option => ({
+                options={releaseTypes.map(option => ({
                   id: option.id,
                   label: option.label,
                   value: option.id,

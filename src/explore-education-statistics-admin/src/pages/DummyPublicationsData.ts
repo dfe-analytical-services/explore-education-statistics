@@ -286,8 +286,6 @@ const getReleaseSetupDetails = (releaseId: string): ReleaseSetupDetails => {
   return {
     id: release.id,
     publicationTitle: owningPublication.title,
-    timePeriodCoverageType: release.timePeriodCoverage.label,
-    timePeriodCoverageName: release.releaseName,
     timePeriodCoverageCode: release.timePeriodCoverage.code,
     timePeriodCoverageStartDate: release.timePeriodCoverage.startDate,
     releaseType: release.releaseType,
