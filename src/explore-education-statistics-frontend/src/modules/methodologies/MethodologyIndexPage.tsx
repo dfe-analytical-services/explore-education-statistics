@@ -28,10 +28,8 @@ class MethodologyIndexPage extends Component<Props> {
     const { themes } = this.props;
     return (
       <Page
-        title="Education statistics: methodology"
-        breadcrumbLabel="Methodology"
+        title="Methodologies"
         pageMeta={{
-          title: 'Methodology Index',
           description:
             'Browse to find out about the methodology behind specific education statistics and data',
         }}
