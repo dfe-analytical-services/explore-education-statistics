@@ -31,12 +31,12 @@ const Accordion = ({ children, id, onToggleAll }: AccordionProps) => {
   ) as ReactComponentElement<typeof AccordionSection>[];
 
   const getSectionIds = (
-    section: ReactComponentElement<typeof AccordionSection>,
+    sectionProps: AccordionSectionProps,
     index: number,
   ) => {
     return {
-      contentId: section.props.contentId || `${id}-${index + 1}-content`,
-      headingId: section.props.headingId || `${id}-${index + 1}-heading`,
+      contentId: sectionProps.contentId || `${id}-${index + 1}-content`,
+      headingId: sectionProps.headingId || `${id}-${index + 1}-heading`,
     };
   };
 
@@ -74,7 +74,7 @@ const Accordion = ({ children, id, onToggleAll }: AccordionProps) => {
               updateOpenSections(draft => {
                 const openIndex = sections.findIndex((section, index) => {
                   const { contentId, headingId } = getSectionIds(
-                    section,
+                    section.props,
                     index,
                   );
                   const hashId = contentEl.id;
@@ -137,10 +137,7 @@ const Accordion = ({ children, id, onToggleAll }: AccordionProps) => {
       )}
 
       {sections.map((section, index) => {
-        const headingId =
-          section.props.headingId || `${id}-${index + 1}-heading`;
-        const contentId =
-          section.props.contentId || `${id}-${index + 1}-content`;
+        const { headingId, contentId } = getSectionIds(section.props, index);
 
         const isSectionOpen = isAllOpen || openSections[index];
 
