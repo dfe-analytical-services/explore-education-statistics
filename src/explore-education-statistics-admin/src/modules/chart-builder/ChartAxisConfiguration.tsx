@@ -7,34 +7,25 @@ import {
   FormSelect,
 } from '@common/components/form';
 import FormComboBox from '@common/components/form/FormComboBox';
-import { ChartDataSet } from '@common/services/publicationService';
+import {
+  ChartDataSet,
+  AxisConfigurationItem,
+} from '@common/services/publicationService';
 import { DataBlockMetadata } from '@common/services/dataBlockService';
 
 interface Props {
   id: string;
-  title: string;
-  type: string;
   defaultDataType?: string;
-  dataSets: ChartDataSet[];
+  axisConfiguration: AxisConfigurationItem;
   meta: DataBlockMetadata;
 }
 
-const ChartAxisConfiguration = ({
-  id,
-  title,
-  dataSets,
-  meta,
-  type,
-  defaultDataType,
-}: Props) => {
+const ChartAxisConfiguration = ({ id, axisConfiguration, meta }: Props) => {
   const [selectableUnits, setSelectableUtils] = React.useState<string[]>(() => {
-    if (type === 'value') {
-      return dataSets
-        .map(dataSet => meta.indicators[dataSet.indicator])
-        .filter(indicator => indicator !== null)
-        .map(indicator => indicator.unit);
-    }
-    return [];
+    return axisConfiguration.dataSets
+      .map(dataSet => meta.indicators[dataSet.indicator])
+      .filter(indicator => indicator !== null)
+      .map(indicator => indicator.unit);
   });
 
   const [selectedUnit, setSelectedUnit] = React.useState<number>(0);
@@ -44,8 +35,8 @@ const ChartAxisConfiguration = ({
   const [show, setShow] = React.useState<boolean>(true);
 
   return (
-    <FormFieldset id={id} legend={title}>
-      <p>{title} configuration</p>
+    <FormFieldset id={id} legend={axisConfiguration.title}>
+      <p>{axisConfiguration.title} configuration</p>
       <FormGroup>
         <FormCheckbox
           id={`${id}_show`}

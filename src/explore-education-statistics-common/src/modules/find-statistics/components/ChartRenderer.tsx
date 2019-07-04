@@ -32,7 +32,6 @@ export interface ChartRendererProps {
   width?: number;
   stacked?: boolean;
   referenceLines?: ReferenceLine[];
-  dataSets: ChartDataSet[];
   dataLabels: Dictionary<DataLabelConfigurationItem>;
   axes: Dictionary<AxisConfigurationItem>;
 }
@@ -46,7 +45,6 @@ function ChartRenderer(props: ChartRendererProps) {
     referenceLines,
     stacked,
     type,
-    dataSets,
     dataLabels,
     axes,
   } = props;
@@ -77,7 +75,6 @@ function ChartRenderer(props: ChartRendererProps) {
     height,
     width,
     referenceLines,
-    dataSets,
     dataLabels,
     stacked,
   };

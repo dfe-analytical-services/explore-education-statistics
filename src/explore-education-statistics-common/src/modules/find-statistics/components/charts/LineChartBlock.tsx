@@ -75,7 +75,7 @@ export default class LineChartBlock extends Component<ChartProps> {
       {
         id: 'yaxis',
         title: 'Y Axis',
-        type: 'value',
+        type: 'minor',
       },
     ],
   };

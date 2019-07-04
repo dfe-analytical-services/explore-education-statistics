@@ -13,7 +13,6 @@ import {
   AxisConfigurationItem,
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 import styles from './graph-builder.module.scss';
 import ConstData from '../../pages/prototypes/PrototypeData';
 import ChartTypeSelector from './ChartTypeSelector';
@@ -54,45 +53,30 @@ const ChartBuilder = ({ data }: Props) => {
     Dictionary<DataLabelConfigurationItem>
   >({});
 
-  const [axes, setAxes] = React.useState<Dictionary<AxisConfigurationItem>>({
-    major: {
-      name: '',
-      groupBy: ['timePeriod'],
-      dataSets: [],
-    },
-    minor: {
-      name: '',
-      groupBy: [],
-      dataSets: [],
-    },
-  });
+  const [axes, setAxes] = React.useState<Dictionary<AxisConfigurationItem>>({});
 
   React.useEffect(() => {
-    setAxes({
-      major: {
-        name: '',
-        groupBy: ['timePeriod'],
-        dataSets,
-      },
-      minor: {
-        name: '',
-        groupBy: [],
-        dataSets: [],
-      },
-    });
-  }, [dataSets]);
+    if (selectedChartType) {
+      const axiConfiguration = selectedChartType.axes.reduce<
+        Dictionary<AxisConfigurationItem>
+      >(
+        (axesConfigurationDictionary, axisDefinition) => ({
+          ...axesConfigurationDictionary,
 
-  /*
-  React.useEffect(() => {
-    selectChartType(chartTypes[0]);
-    setDataSets([
-      {
-        indicator: '23',
-        filters: ['1', '71'],
-      },
-    ]);
-  }, []);
-   */
+          [axisDefinition.type]: {
+            name: axisDefinition.title,
+            groupBy: axisDefinition.defaultDataType
+              ? [axisDefinition.defaultDataType]
+              : [],
+            dataSets: axisDefinition.type === 'major' ? dataSets : [],
+          },
+        }),
+        {},
+      );
+
+      setAxes(axiConfiguration);
+    }
+  }, [dataSets, selectedChartType]);
 
   return (
     <div className={styles.editor}>
@@ -121,7 +105,6 @@ const ChartBuilder = ({ data }: Props) => {
           <Details summary="Chart preview" open>
             <ChartRenderer
               type={selectedChartType.type}
-              dataSets={dataSets}
               axes={axes}
               data={data}
               meta={data.metaData}
@@ -142,12 +125,12 @@ const ChartBuilder = ({ data }: Props) => {
             <p>
               Add / Remove and update the axes and how they display data ranges
             </p>
-            {selectedChartType.axes.map(axis => (
+            {Object.values(axes).map(axis => (
               <ChartAxisConfiguration
-                dataSets={dataSets}
-                key={axis.id}
+                id={axis.name}
+                axisConfiguration={axis}
+                key={axis.name}
                 meta={data.metaData}
-                {...axis}
               />
             ))}
           </Details>

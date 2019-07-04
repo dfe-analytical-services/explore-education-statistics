@@ -28,7 +28,6 @@ import { Dictionary } from '@common/types';
 export interface ChartProps {
   data: DataBlockData;
   meta: DataBlockMetadata;
-  dataSets: ChartDataSet[];
   dataLabels: Dictionary<DataLabelConfigurationItem>;
   axes: Dictionary<AxisConfigurationItem>;
   height?: number;
@@ -63,8 +62,8 @@ export interface ChartDefinition {
   axes: {
     id: string;
     title: string;
-    type: 'major' | 'value' | 'group';
-    defaultDataType?: 'indicator' | 'filter' | 'location' | 'timePeriod';
+    type: 'major' | 'minor';
+    defaultDataType?: 'timePeriod' | 'location' | 'filters' | 'indicator';
   }[];
 }
 
