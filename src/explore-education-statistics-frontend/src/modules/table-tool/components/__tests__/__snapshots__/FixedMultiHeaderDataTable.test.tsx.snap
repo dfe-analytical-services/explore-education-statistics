@@ -1,133 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`FixedMultiHeaderDataTable renders a sticky column table 1`] = `
-<table
-  aria-hidden="true"
-  aria-labelledby="dataTableCaption"
-  class="govuk-table columnTable"
->
-  <thead>
-    <tr>
-      <td
-        class="borderBottom borderRight"
-        colspan="1"
-        rowspan="2"
-      />
-    </tr>
-    <tr />
-  </thead>
-  <tbody>
-    <tr
-      class="borderBottom"
-    >
-      <th
-        class="govuk-table__cell--numeric borderRight"
-        role="row"
-        rowspan="1"
-      >
-        Row group A
-      </th>
-    </tr>
-    <tr
-      class="borderBottom"
-    >
-      <th
-        class="govuk-table__cell--numeric borderRight borderBottom"
-        role="row"
-        rowspan="1"
-      >
-        Row group B
-      </th>
-    </tr>
-  </tbody>
-</table>
-`;
-
-exports[`FixedMultiHeaderDataTable renders a sticky header table 1`] = `
-<table
-  aria-hidden="true"
-  aria-labelledby="dataTableCaption"
-  class="govuk-table headerTable"
->
-  <thead>
-    <tr>
-      <td
-        class="borderBottom borderRight"
-        colspan="1"
-        rowspan="2"
-      />
-      <th
-        class="govuk-table__header--center borderLeft"
-        colspan="2"
-        scope="colgroup"
-      >
-        Col group A
-      </th>
-      <th
-        class="govuk-table__header--center borderLeft"
-        colspan="2"
-        scope="colgroup"
-      >
-        Col group B
-      </th>
-    </tr>
-    <tr>
-      <th
-        class="govuk-table__header--numeric borderBottom borderLeft"
-        colspan="1"
-        scope="col"
-      >
-        Col group C
-      </th>
-      <th
-        class="govuk-table__header--numeric borderBottom"
-        colspan="1"
-        scope="col"
-      >
-        Col group D
-      </th>
-      <th
-        class="govuk-table__header--numeric borderBottom borderLeft"
-        colspan="1"
-        scope="col"
-      >
-        Col group C
-      </th>
-      <th
-        class="govuk-table__header--numeric borderBottom"
-        colspan="1"
-        scope="col"
-      >
-        Col group D
-      </th>
-    </tr>
-  </thead>
-</table>
-`;
-
-exports[`FixedMultiHeaderDataTable renders a sticky intersection 1`] = `
-<table
-  aria-hidden="true"
-  aria-labelledby="dataTableCaption"
-  class="govuk-table intersectionTable"
->
-  <thead>
-    <tr>
-      <td
-        class="borderBottom borderRight"
-        colspan="1"
-        rowspan="2"
-      />
-    </tr>
-    <tr />
-  </thead>
-</table>
-`;
-
 exports[`FixedMultiHeaderDataTable renders underlying table 1`] = `
 <table
   aria-labelledby="dataTableCaption"
-  class="govuk-table"
+  class="govuk-table table"
 >
   <thead>
     <tr>
@@ -137,14 +13,14 @@ exports[`FixedMultiHeaderDataTable renders underlying table 1`] = `
         rowspan="2"
       />
       <th
-        class="govuk-table__header--center borderLeft"
+        class="govuk-table__header--center borderRight"
         colspan="2"
         scope="colgroup"
       >
         Col group A
       </th>
       <th
-        class="govuk-table__header--center borderLeft"
+        class="govuk-table__header--center borderRight"
         colspan="2"
         scope="colgroup"
       >
@@ -153,28 +29,28 @@ exports[`FixedMultiHeaderDataTable renders underlying table 1`] = `
     </tr>
     <tr>
       <th
-        class="govuk-table__header--numeric borderBottom borderLeft"
+        class="govuk-table__header--numeric borderBottom"
         colspan="1"
         scope="col"
       >
         Col group C
       </th>
       <th
-        class="govuk-table__header--numeric borderBottom"
+        class="govuk-table__header--numeric borderBottom borderRight"
         colspan="1"
         scope="col"
       >
         Col group D
       </th>
       <th
-        class="govuk-table__header--numeric borderBottom borderLeft"
+        class="govuk-table__header--numeric borderBottom"
         colspan="1"
         scope="col"
       >
         Col group C
       </th>
       <th
-        class="govuk-table__header--numeric borderBottom"
+        class="govuk-table__header--numeric borderBottom borderRight"
         colspan="1"
         scope="col"
       >
@@ -183,64 +59,60 @@ exports[`FixedMultiHeaderDataTable renders underlying table 1`] = `
     </tr>
   </thead>
   <tbody>
-    <tr
-      class="borderBottom"
-    >
+    <tr>
       <th
         class="govuk-table__cell--numeric borderRight"
-        role="row"
         rowspan="1"
+        scope="row"
       >
         Row group A
       </th>
       <td
-        class="govuk-table__cell--numeric borderLeft"
+        class="govuk-table__cell--numeric borderBottom"
       >
         1
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric borderRight borderBottom"
       >
         2
       </td>
       <td
-        class="govuk-table__cell--numeric borderLeft"
+        class="govuk-table__cell--numeric borderBottom"
       >
         3
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric borderRight borderBottom"
       >
         4
       </td>
     </tr>
-    <tr
-      class="borderBottom"
-    >
+    <tr>
       <th
         class="govuk-table__cell--numeric borderRight borderBottom"
-        role="row"
         rowspan="1"
+        scope="row"
       >
         Row group B
       </th>
       <td
-        class="govuk-table__cell--numeric borderLeft"
+        class="govuk-table__cell--numeric borderBottom"
       >
         5
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric borderRight borderBottom"
       >
         6
       </td>
       <td
-        class="govuk-table__cell--numeric borderLeft"
+        class="govuk-table__cell--numeric borderBottom"
       >
         7
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric borderRight borderBottom"
       >
         8
       </td>
