@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import DummyPublicationsData from '@admin/pages/DummyPublicationsData';
+import {
+  buildTablesRoute,
+  contentRoute,
+  setupRoute,
+} from '@admin/routes/editReleaseRoutes';
 import EditReleasePageTemplate from '@admin/pages/edit-release/components/EditReleasePageTemplate';
 import { Release } from '../../services/publicationService';
 
@@ -32,12 +37,12 @@ const EditReleaseTablesPage = ({ match }: RouteComponentProps<MatchProps>) => {
       publicationTitle={publicationTitle}
       releaseId={releaseId}
       previousLink={{
-        label: 'build tables',
-        linkTo: `/edit-release/${releaseId}/build-tables`,
+        label: buildTablesRoute.title,
+        linkTo: buildTablesRoute.generateLink(releaseId),
       }}
       nextLink={{
-        label: 'add / edit content',
-        linkTo: `/edit-release/${releaseId}/content`,
+        label: contentRoute.title,
+        linkTo: contentRoute.generateLink(releaseId),
       }}
     >
       {release && <h2 className="govuk-heading-m">View / edit tables</h2>}

@@ -2,6 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import DummyPublicationsData from '@admin/pages/DummyPublicationsData';
 import EditReleasePageTemplate from '@admin/pages/edit-release/components/EditReleasePageTemplate';
+import {
+  buildTablesRoute,
+  publishStatusRoute,
+  tablesRoute,
+} from '@admin/routes/editReleaseRoutes';
 import { Release } from '../../services/publicationService';
 
 interface MatchProps {
@@ -32,12 +37,12 @@ const EditReleaseContentPage = ({ match }: RouteComponentProps<MatchProps>) => {
       publicationTitle={publicationTitle}
       releaseId={releaseId}
       previousLink={{
-        label: 'view / edit tables',
-        linkTo: `/edit-release/${releaseId}/tables`,
+        label: tablesRoute.title,
+        linkTo: tablesRoute.generateLink(releaseId),
       }}
       nextLink={{
-        label: 'set publish status',
-        linkTo: `/edit-release/${releaseId}/publish-status`,
+        label: publishStatusRoute.title,
+        linkTo: publishStatusRoute.generateLink(releaseId),
       }}
     >
       {release && <h2 className="govuk-heading-m">Add / edit content</h2>}

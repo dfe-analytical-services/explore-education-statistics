@@ -4,12 +4,7 @@ import { Route } from 'react-router';
 import './App.scss';
 import { PrototypeLoginService } from '@admin/services/PrototypeLoginService';
 import { BrowserRouter } from 'react-router-dom';
-import EditReleaseSetupPage from '@admin/pages/edit-release/EditReleaseSetupPage';
-import EditReleaseDataPage from '@admin/pages/edit-release/EditReleaseDataPage';
-import EditReleaseBuildTablesPage from '@admin/pages/edit-release/EditReleaseBuildTablesPage';
-import EditReleaseTablesPage from '@admin/pages/edit-release/EditReleaseTablesPage';
-import EditReleaseContentPage from '@admin/pages/edit-release/EditReleaseContentPage';
-import EditReleasePublishStatusPage from '@admin/pages/edit-release/EditReleasePublishStatusPage';
+import editReleaseRoutes from '@admin/routes/editReleaseRoutes';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import PrototypeAdminDashboard from './pages/prototypes/PrototypeAdminDashboard';
 import AdminDocumentationGlossary from './pages/prototypes/PrototypeDocumentationGlossary';
@@ -48,35 +43,13 @@ function App() {
         {/* Non-Prototype Routes*/}
         <Route exact path="/admin-dashboard" component={AdminDashboardPage} />
 
-        <Route
-          path="/edit-release/:releaseId/setup"
-          component={EditReleaseSetupPage}
-        />
-
-        <Route
-          path="/edit-release/:releaseId/data"
-          component={EditReleaseDataPage}
-        />
-
-        <Route
-          path="/edit-release/:releaseId/build-tables"
-          component={EditReleaseBuildTablesPage}
-        />
-
-        <Route
-          path="/edit-release/:releaseId/tables"
-          component={EditReleaseTablesPage}
-        />
-
-        <Route
-          path="/edit-release/:releaseId/content"
-          component={EditReleaseContentPage}
-        />
-
-        <Route
-          path="/edit-release/:releaseId/publish-status"
-          component={EditReleasePublishStatusPage}
-        />
+        {editReleaseRoutes.map(route => (
+          <Route
+            key={route.path}
+            path={route.path}
+            component={route.component}
+          />
+        ))}
 
         {/* Prototype Routes*/}
         <Route exact path="/prototypes/" component={PrototypesIndexPage} />

@@ -3,6 +3,7 @@ import { RouteComponentProps } from 'react-router';
 import { format } from 'date-fns';
 import EditReleasePageTemplate from '@admin/pages/edit-release/components/EditReleasePageTemplate';
 import DummyPublicationsData from '@admin/pages/DummyPublicationsData';
+import { dataRoute } from '@admin/routes/editReleaseRoutes';
 import { ReleaseSetupDetails } from '../../services/publicationService';
 import Link from '../../components/Link';
 
@@ -31,8 +32,8 @@ const EditReleaseSetupPage = ({ match }: RouteComponentProps<MatchProps>) => {
           releaseSetupDetails ? releaseSetupDetails.publicationTitle : ''
         }
         nextLink={{
-          label: 'Add / edit data',
-          linkTo: `/edit-release/${releaseId}/data`,
+          label: dataRoute.title,
+          linkTo: dataRoute.generateLink(releaseId),
         }}
       >
         {releaseSetupDetails && (

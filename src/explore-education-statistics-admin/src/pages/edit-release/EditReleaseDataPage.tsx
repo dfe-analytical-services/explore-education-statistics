@@ -2,6 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import DummyPublicationsData from '@admin/pages/DummyPublicationsData';
 import EditReleasePageTemplate from '@admin/pages/edit-release/components/EditReleasePageTemplate';
+import {
+  buildTablesRoute,
+  dataRoute,
+  setupRoute,
+} from '@admin/routes/editReleaseRoutes';
 import { Release } from '../../services/publicationService';
 
 interface MatchProps {
@@ -32,12 +37,12 @@ const EditReleaseDataPage = ({ match }: RouteComponentProps<MatchProps>) => {
       publicationTitle={publicationTitle}
       releaseId={releaseId}
       previousLink={{
-        label: 'release setup',
-        linkTo: `/edit-release/${releaseId}/setup`,
+        label: setupRoute.title,
+        linkTo: setupRoute.generateLink(releaseId),
       }}
       nextLink={{
-        label: 'build tables',
-        linkTo: `/edit-release/${releaseId}/build-tables`,
+        label: buildTablesRoute.title,
+        linkTo: buildTablesRoute.generateLink(releaseId),
       }}
     >
       {release && <h2 className="govuk-heading-m">Add / edit data</h2>}
