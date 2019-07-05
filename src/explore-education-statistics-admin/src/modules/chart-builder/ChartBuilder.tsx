@@ -2,10 +2,7 @@ import React from 'react';
 
 import Details from '@common/components/Details';
 import ChartRenderer from '@common/modules/find-statistics/components/ChartRenderer';
-import {
-  DataBlockResponse,
-  DataBlockMetadata,
-} from '@common/services/dataBlockService';
+import { DataBlockResponse } from '@common/services/dataBlockService';
 import { ChartDefinition } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import ChartDataSelector, {
   DataUpdatedEvent,
@@ -103,7 +100,7 @@ const ChartBuilder = ({ data }: Props) => {
 
       ...generateAxesMetaData(axes, data),
     });
-  }, [axes, fieldLabels]);
+  }, [axes, fieldLabels, data]);
 
   React.useEffect(() => {
     if (selectedChartType) {

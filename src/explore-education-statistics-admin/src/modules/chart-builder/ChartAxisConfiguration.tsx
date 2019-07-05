@@ -12,14 +12,14 @@ interface Props {
 }
 
 const ChartAxisConfiguration = ({ id, axisConfiguration, meta }: Props) => {
-  const [selectableUnits, setSelectableUtils] = React.useState<string[]>(() => {
+  const [selectableUnits] = React.useState<string[]>(() => {
     return axisConfiguration.dataSets
       .map(dataSet => meta.indicators[dataSet.indicator])
       .filter(indicator => indicator !== null)
       .map(indicator => indicator.unit);
   });
 
-  const [selectedUnit, setSelectedUnit] = React.useState<number>(0);
+  const [selectedUnit] = React.useState<number>(0);
 
   const [selectedValue, setSelectedValue] = React.useState<string>();
 

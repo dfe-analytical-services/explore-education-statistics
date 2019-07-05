@@ -15,19 +15,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
         public IEnumerable<int> Years { get; set; }
         public GeographicLevel? GeographicLevel { get; set; }
         public IEnumerable<long> Indicators { get; set; }
-        public IEnumerable<string> Countries { get; set; }
-        public IEnumerable<string> Institutions { get; set; }
-        public IEnumerable<string> LocalAuthorities { get; set; }
-        public IEnumerable<string> LocalAuthorityDistricts { get; set; }
-        public IEnumerable<string> LocalEnterprisePartnerships { get; set; }
-        public IEnumerable<string> Mats { get; set; }
-        public IEnumerable<string> MayoralCombinedAuthorities { get; set; }
-        public IEnumerable<string> OpportunityAreas { get; set; }
-        public IEnumerable<string> ParliamentaryConstituencies { get; set; }
-        public IEnumerable<string> Regions { get; set; }
-        public IEnumerable<string> RscRegions { get; set; }
-        public IEnumerable<string> Sponsors { get; set; }
-        public IEnumerable<string> Wards { get; set; }
+        public IEnumerable<string> Country { get; set; }
+        public IEnumerable<string> Institution { get; set; }
+        public IEnumerable<string> LocalAuthority { get; set; }
+        public IEnumerable<string> LocalAuthorityDistrict { get; set; }
+        public IEnumerable<string> LocalEnterprisePartnership { get; set; }
+        public IEnumerable<string> MultiAcademyTrust { get; set; }
+        public IEnumerable<string> MayoralCombinedAuthority { get; set; }
+        public IEnumerable<string> OpportunityArea { get; set; }
+        public IEnumerable<string> ParliamentaryConstituency { get; set; }
+        public IEnumerable<string> Region { get; set; }
+        public IEnumerable<string> RscRegion { get; set; }
+        public IEnumerable<string> Sponsor { get; set; }
+        public IEnumerable<string> Ward { get; set; }
 
         public Expression<Func<Observation, bool>> ObservationPredicate()
         {
@@ -46,82 +46,82 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
                 predicate = predicate.And(observation => observation.GeographicLevel == GeographicLevel);
             }
 
-            if (Countries != null && Countries.Any())
+            if (Country != null && Country.Any())
             {
                 predicate = predicate.And(observation =>
-                    Countries.Contains(observation.Location.Country.Code));
+                    Country.Contains(observation.Location.Country.Code));
             }
 
-            if (Institutions != null && Institutions.Any())
+            if (Institution != null && Institution.Any())
             {
                 predicate = predicate.And(observation =>
-                    Institutions.Contains(observation.Location.Institution.Code));
+                    Institution.Contains(observation.Location.Institution.Code));
             }
 
-            if (LocalAuthorities != null && LocalAuthorities.Any())
+            if (LocalAuthority != null && LocalAuthority.Any())
             {
                 predicate = predicate.And(observation =>
-                    LocalAuthorities.Contains(observation.Location.LocalAuthority.Code));
+                    LocalAuthority.Contains(observation.Location.LocalAuthority.Code));
             }
 
-            if (LocalAuthorityDistricts != null && LocalAuthorityDistricts.Any())
+            if (LocalAuthorityDistrict != null && LocalAuthorityDistrict.Any())
             {
                 predicate = predicate.And(observation =>
-                    LocalAuthorityDistricts.Contains(observation.Location.LocalAuthorityDistrict.Code));
+                    LocalAuthorityDistrict.Contains(observation.Location.LocalAuthorityDistrict.Code));
             }
 
-            if (LocalEnterprisePartnerships != null && LocalEnterprisePartnerships.Any())
+            if (LocalEnterprisePartnership != null && LocalEnterprisePartnership.Any())
             {
                 predicate = predicate.And(observation =>
-                    LocalEnterprisePartnerships.Contains(observation.Location.LocalEnterprisePartnership.Code));
+                    LocalEnterprisePartnership.Contains(observation.Location.LocalEnterprisePartnership.Code));
             }
 
-            if (Mats != null && Mats.Any())
+            if (MultiAcademyTrust != null && MultiAcademyTrust.Any())
             {
                 predicate = predicate.And(observation =>
-                    Mats.Contains(observation.Location.MultiAcademyTrust.Code));
+                    MultiAcademyTrust.Contains(observation.Location.MultiAcademyTrust.Code));
             }
 
-            if (MayoralCombinedAuthorities != null && MayoralCombinedAuthorities.Any())
+            if (MayoralCombinedAuthority != null && MayoralCombinedAuthority.Any())
             {
                 predicate = predicate.And(observation =>
-                    MayoralCombinedAuthorities.Contains(observation.Location.MayoralCombinedAuthority.Code));
+                    MayoralCombinedAuthority.Contains(observation.Location.MayoralCombinedAuthority.Code));
             }
 
-            if (OpportunityAreas != null && OpportunityAreas.Any())
+            if (OpportunityArea != null && OpportunityArea.Any())
             {
                 predicate = predicate.And(observation =>
-                    OpportunityAreas.Contains(observation.Location.OpportunityArea.Code));
+                    OpportunityArea.Contains(observation.Location.OpportunityArea.Code));
             }
 
-            if (ParliamentaryConstituencies != null && ParliamentaryConstituencies.Any())
+            if (ParliamentaryConstituency != null && ParliamentaryConstituency.Any())
             {
                 predicate = predicate.And(observation =>
-                    ParliamentaryConstituencies.Contains(observation.Location.ParliamentaryConstituency.Code));
+                    ParliamentaryConstituency.Contains(observation.Location.ParliamentaryConstituency.Code));
             }
 
-            if (Regions != null && Regions.Any())
+            if (Region != null && Region.Any())
             {
                 predicate = predicate.And(observation =>
-                    Regions.Contains(observation.Location.Region.Code));
+                    Region.Contains(observation.Location.Region.Code));
             }
 
-            if (RscRegions != null && RscRegions.Any())
+            if (RscRegion != null && RscRegion.Any())
             {
                 predicate = predicate.And(observation =>
-                    RscRegions.Contains(observation.Location.RscRegion.Code));
+                    RscRegion.Contains(observation.Location.RscRegion.Code));
             }
 
-            if (Sponsors != null && Sponsors.Any())
+            if (Sponsor != null && Sponsor.Any())
             {
                 predicate = predicate.And(observation =>
-                    Sponsors.Contains(observation.Location.Sponsor.Code));
+                    Sponsor.Contains(observation.Location.Sponsor.Code));
             }
-            
-            if (Wards != null && Wards.Any())
+
+            if (Ward != null && Ward.Any())
             {
                 predicate = predicate.And(observation =>
-                    Wards.Contains(observation.Location.Ward.Code));
+                    Ward.Contains(observation.Location.Ward.Code));
             }
 
             return predicate;

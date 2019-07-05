@@ -15,27 +15,27 @@ const data: DataBlockData = {
   releaseDate: new Date(),
   releaseId: '1',
   subjectId: 1,
-  geographicLevel: GeographicLevel.National,
+  geographicLevel: GeographicLevel.Country,
   result: [
     {
       filters: ['1', '2'],
       location: {
         country: {
-          country_code: 'E92000001',
-          country_name: 'England',
+          code: 'E92000001',
+          name: 'England',
         },
         region: {
-          region_code: '',
-          region_name: '',
+          code: '',
+          name: '',
         },
         localAuthority: {
-          new_la_code: '',
-          old_la_code: '',
-          la_name: '',
+          code: '',
+          old_code: '',
+          name: '',
         },
         localAuthorityDistrict: {
-          sch_lad_code: '',
-          sch_lad_name: '',
+          code: '',
+          name: '',
         },
       },
       measures: {
@@ -50,21 +50,21 @@ const data: DataBlockData = {
       filters: ['1', '2'],
       location: {
         country: {
-          country_code: 'E92000001',
-          country_name: 'England',
+          code: 'E92000001',
+          name: 'England',
         },
         region: {
-          region_code: '',
-          region_name: '',
+          code: '',
+          name: '',
         },
         localAuthority: {
-          new_la_code: '',
-          old_la_code: '',
-          la_name: '',
+          code: '',
+          old_code: '',
+          name: '',
         },
         localAuthorityDistrict: {
-          sch_lad_code: '',
-          sch_lad_name: '',
+          code: '',
+          name: '',
         },
       },
       measures: {
@@ -83,27 +83,27 @@ const multipleData: DataBlockData = {
   releaseDate: new Date(),
   releaseId: '1',
   subjectId: 1,
-  geographicLevel: GeographicLevel.National,
+  geographicLevel: GeographicLevel.Country,
   result: [
     {
       filters: ['1', '2'],
       location: {
         country: {
-          country_code: 'E92000001',
-          country_name: 'England',
+          code: 'E92000001',
+          name: 'England',
         },
         region: {
-          region_code: '',
-          region_name: '',
+          code: '',
+          name: '',
         },
         localAuthority: {
-          new_la_code: '',
-          old_la_code: '',
-          la_name: '',
+          code: '',
+          old_code: '',
+          name: '',
         },
         localAuthorityDistrict: {
-          sch_lad_code: '',
-          sch_lad_name: '',
+          code: '',
+          name: '',
         },
       },
       measures: {
@@ -118,21 +118,21 @@ const multipleData: DataBlockData = {
       filters: ['1', '2'],
       location: {
         country: {
-          country_code: 'S92000001',
-          country_name: 'Scotland',
+          code: 'S92000001',
+          name: 'Scotland',
         },
         region: {
-          region_code: '',
-          region_name: '',
+          code: '',
+          name: '',
         },
         localAuthority: {
-          new_la_code: '',
-          old_la_code: '',
-          la_name: '',
+          code: '',
+          old_code: '',
+          name: '',
         },
         localAuthorityDistrict: {
-          sch_lad_code: '',
-          sch_lad_name: '',
+          code: '',
+          name: '',
         },
       },
       measures: {
@@ -2715,7 +2715,7 @@ const responseMetadata: ResponseMetaData = {
     },
     National: {
       hint: '',
-      legend: 'National',
+      legend: 'Country',
       options: [
         {
           label: 'England',

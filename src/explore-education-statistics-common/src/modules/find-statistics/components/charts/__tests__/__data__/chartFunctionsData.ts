@@ -3461,14 +3461,14 @@ const responseData: DataBlockResponse = {
   releaseId: '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5',
   subjectId: 1,
   releaseDate: new Date('2018-04-25T00:00:00'),
-  geographicLevel: GeographicLevel.National,
+  geographicLevel: GeographicLevel.Country,
   result: [
     {
       filters: ['1', '72'],
       location: {
         country: {
-          country_code: 'E92000001',
-          country_name: 'England',
+          code: 'E92000001',
+          name: 'England',
         },
       },
       measures: {
@@ -3483,8 +3483,8 @@ const responseData: DataBlockResponse = {
       filters: ['1', '73'],
       location: {
         country: {
-          country_code: 'E92000001',
-          country_name: 'England',
+          code: 'E92000001',
+          name: 'England',
         },
       },
       measures: {
@@ -3499,8 +3499,8 @@ const responseData: DataBlockResponse = {
       filters: ['1', '71'],
       location: {
         country: {
-          country_code: 'E92000001',
-          country_name: 'England',
+          code: 'E92000001',
+          name: 'England',
         },
       },
       measures: {
@@ -3515,8 +3515,8 @@ const responseData: DataBlockResponse = {
       filters: ['1', '71'],
       location: {
         country: {
-          country_code: 'E92000001',
-          country_name: 'England',
+          code: 'E92000001',
+          name: 'England',
         },
       },
       measures: {
@@ -3531,8 +3531,8 @@ const responseData: DataBlockResponse = {
       filters: ['1', '73'],
       location: {
         country: {
-          country_code: 'E92000001',
-          country_name: 'England',
+          code: 'E92000001',
+          name: 'England',
         },
       },
       measures: {
@@ -3547,8 +3547,8 @@ const responseData: DataBlockResponse = {
       filters: ['1', '71'],
       location: {
         country: {
-          country_code: 'E92000001',
-          country_name: 'England',
+          code: 'E92000001',
+          name: 'England',
         },
       },
       measures: {
@@ -3563,8 +3563,8 @@ const responseData: DataBlockResponse = {
       filters: ['1', '72'],
       location: {
         country: {
-          country_code: 'E92000001',
-          country_name: 'England',
+          code: 'E92000001',
+          name: 'England',
         },
       },
       measures: {
@@ -3579,8 +3579,8 @@ const responseData: DataBlockResponse = {
       filters: ['1', '72'],
       location: {
         country: {
-          country_code: 'E92000001',
-          country_name: 'England',
+          code: 'E92000001',
+          name: 'England',
         },
       },
       measures: {
@@ -3595,8 +3595,8 @@ const responseData: DataBlockResponse = {
       filters: ['1', '73'],
       location: {
         country: {
-          country_code: 'E92000001',
-          country_name: 'England',
+          code: 'E92000001',
+          name: 'England',
         },
       },
       measures: {
@@ -3611,8 +3611,8 @@ const responseData: DataBlockResponse = {
       filters: ['1', '72'],
       location: {
         country: {
-          country_code: 'E92000001',
-          country_name: 'England',
+          code: 'E92000001',
+          name: 'England',
         },
       },
       measures: {
@@ -3627,8 +3627,8 @@ const responseData: DataBlockResponse = {
       filters: ['1', '71'],
       location: {
         country: {
-          country_code: 'E92000001',
-          country_name: 'England',
+          code: 'E92000001',
+          name: 'England',
         },
       },
       measures: {
@@ -3643,8 +3643,8 @@ const responseData: DataBlockResponse = {
       filters: ['1', '72'],
       location: {
         country: {
-          country_code: 'E92000001',
-          country_name: 'England',
+          code: 'E92000001',
+          name: 'England',
         },
       },
       measures: {
@@ -3659,8 +3659,8 @@ const responseData: DataBlockResponse = {
       filters: ['1', '73'],
       location: {
         country: {
-          country_code: 'E92000001',
-          country_name: 'England',
+          code: 'E92000001',
+          name: 'England',
         },
       },
       measures: {
@@ -3675,8 +3675,8 @@ const responseData: DataBlockResponse = {
       filters: ['1', '73'],
       location: {
         country: {
-          country_code: 'E92000001',
-          country_name: 'England',
+          code: 'E92000001',
+          name: 'England',
         },
       },
       measures: {
@@ -3691,8 +3691,8 @@ const responseData: DataBlockResponse = {
       filters: ['1', '71'],
       location: {
         country: {
-          country_code: 'E92000001',
-          country_name: 'England',
+          code: 'E92000001',
+          name: 'England',
         },
       },
       measures: {

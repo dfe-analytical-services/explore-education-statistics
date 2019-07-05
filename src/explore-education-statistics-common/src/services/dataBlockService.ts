@@ -9,36 +9,37 @@ export enum GeographicLevel {
   LocalAuthorityDistrict = 'Local_Authority_District',
   LocalEnterprisePartnership = 'Local_Enterprise_Partnership',
   MATOrSponsor = 'MAT_Or_Sponsor',
-  MayoralCombinedAuthorities = 'Mayoral_Combined_Authorities',
-  National = 'National',
-  OpportunityAreas = 'Opportunity_Areas',
+  MayoralCombinedAuthority = 'Mayoral_Combined_Authority',
+  MultiAcademyTrust = 'Multi_Academy_Trust',
+  Country = 'Country',
+  OpportunityArea = 'OpportunityArea',
   ParliamentaryConstituency = 'Parliamentary_Constituency',
   Provider = 'Provider',
-  Regional = 'Regional',
+  Region = 'Region',
   RSCRegion = 'RSC_Region',
   School = 'School',
   Ward = 'Ward',
 }
 
 export interface Country {
-  country_code: string;
-  country_name: string;
+  code: string;
+  name: string;
 }
 
 interface Region {
-  region_code: string;
-  region_name: string;
+  code: string;
+  name: string;
 }
 
 interface LocalAuthority {
-  new_la_code: string;
-  old_la_code: string;
-  la_name: string;
+  code: string;
+  old_code: string;
+  name: string;
 }
 
 interface LocalAuthorityDistrict {
-  sch_lad_code: string;
-  sch_lad_name: string;
+  code: string;
+  name: string;
 }
 
 export interface DataBlockLocation {
@@ -169,10 +170,18 @@ export interface DataBlockMetadata {
 export interface DataBlockRequest {
   subjectId: number;
   geographicLevel: GeographicLevel;
-  countries?: string[];
-  localAuthorities?: string[];
-  localAuthorityDistricts?: string[];
-  regions?: string[];
+  country?: string[];
+  localAuthority?: string[];
+  localAuthorityDistrict?: string[];
+  localEnterprisePartnership?: string[];
+  multiAcademyTrust?: string[];
+  mayoralCombinedAuthority?: string[];
+  opportunityArea?: string[];
+  parliamentaryConstituency?: string[];
+  region?: string[];
+  rscRegion?: string[];
+  sponsor?: string[];
+  ward?: string[];
   startYear: string;
   endYear: string;
   filters: string[];

@@ -185,27 +185,26 @@ function filterResultsForDataSet(ds: ChartDataSet) {
       if (
         location.country &&
         ds.location.country &&
-        location.country.country_code !== ds.location.country.country_code
+        location.country.code !== ds.location.country.code
       )
         return false;
       if (
         location.region &&
         ds.location.region &&
-        location.region.region_code !== ds.location.region.region_code
+        location.region.code !== ds.location.region.code
       )
         return false;
       if (
         location.localAuthorityDistrict &&
         ds.location.localAuthorityDistrict &&
-        location.localAuthorityDistrict.sch_lad_code !==
-          ds.location.localAuthorityDistrict.sch_lad_code
+        location.localAuthorityDistrict.code !==
+          ds.location.localAuthorityDistrict.code
       )
         return false;
       if (
         location.localAuthority &&
         ds.location.localAuthority &&
-        location.localAuthority.new_la_code !==
-          ds.location.localAuthority.new_la_code
+        location.localAuthority.code !== ds.location.localAuthority.code
       )
         return false;
     }
@@ -233,12 +232,12 @@ export function generateKeyFromDataSet(
   return [
     indicator,
     ...(filters || []),
-    location && location.country && location.country.country_code,
-    location && location.region && location.region.region_code,
+    location && location.country && location.country.code,
+    location && location.region && location.region.code,
     location &&
       location.localAuthorityDistrict &&
-      location.localAuthorityDistrict.sch_lad_code,
-    location && location.localAuthority && location.localAuthority.new_la_code,
+      location.localAuthorityDistrict.code,
+    location && location.localAuthority && location.localAuthority.code,
     (!ignoringFields.includes('timePeriod') && timePeriod) || '',
   ].join('_');
 }

@@ -80,11 +80,10 @@ interface MapClickEvent extends LeafletMouseEvent {
 
 function getLowestLocationCode(location: DataBlockLocation) {
   return (
-    (location.localAuthorityDistrict &&
-      location.localAuthorityDistrict.sch_lad_code) ||
-    (location.localAuthority && location.localAuthority.new_la_code) ||
-    (location.region && location.region.region_code) ||
-    (location.country && location.country.country_code) ||
+    (location.localAuthorityDistrict && location.localAuthorityDistrict.code) ||
+    (location.localAuthority && location.localAuthority.code) ||
+    (location.region && location.region.code) ||
+    (location.country && location.country.code) ||
     ''
   );
 }

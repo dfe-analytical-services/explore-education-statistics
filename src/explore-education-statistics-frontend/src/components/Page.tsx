@@ -4,15 +4,32 @@ import Breadcrumbs, { BreadcrumbsProps } from './Breadcrumbs';
 import PageBanner from './PageBanner';
 import PageFooter from './PageFooter';
 import PageHeader from './PageHeader';
+import PageMeta, { PageMetaProps } from './PageMeta';
+import PageTitle from './PageTitle';
 
 type Props = {
-  children: ReactNode;
+  title: string;
+  caption?: string;
+  breadcrumbLabel?: string;
+  pageMeta?: PageMetaProps;
+  children?: ReactNode;
   wide?: boolean;
+  isHomepage?: boolean;
 } & BreadcrumbsProps;
 
-const Page = ({ children, breadcrumbs = [], wide = false }: Props) => {
+const Page = ({
+  title,
+  caption = '',
+  breadcrumbLabel = '',
+  pageMeta,
+  children = null,
+  wide = false,
+  isHomepage = false,
+  breadcrumbs = [],
+}: Props) => {
   return (
     <>
+      <PageMeta title={title} description={caption} {...pageMeta} />
       <PageHeader wide={wide} />
 
       <div
@@ -21,13 +38,20 @@ const Page = ({ children, breadcrumbs = [], wide = false }: Props) => {
         })}
       >
         <PageBanner />
-        <Breadcrumbs breadcrumbs={breadcrumbs} />
+        <Breadcrumbs
+          breadcrumbs={
+            isHomepage
+              ? undefined
+              : breadcrumbs.concat([{ name: breadcrumbLabel || title }])
+          }
+        />
 
         <main
           className="govuk-main-wrapper app-main-class"
           id="main-content"
           role="main"
         >
+          <PageTitle title={title} caption={caption} />
           {children}
         </main>
       </div>

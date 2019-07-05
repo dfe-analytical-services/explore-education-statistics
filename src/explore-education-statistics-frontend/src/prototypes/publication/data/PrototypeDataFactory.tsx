@@ -9,11 +9,7 @@ export const newApiTest: DataBlockProps = {
   id: 'test',
   dataBlockRequest: {
     subjectId: 1,
-    regions: [],
-    localAuthorityDistricts: [],
-    localAuthorities: [],
-    countries: [],
-    geographicLevel: GeographicLevel.National,
+    geographicLevel: GeographicLevel.Country,
     startYear: '2014',
     endYear: '2017',
     indicators: ['23', '26', '28'],
@@ -27,27 +23,27 @@ export const newApiHorizontalData: ChartProps = {
     releaseDate: new Date(),
     releaseId: '1',
     subjectId: 1,
-    geographicLevel: GeographicLevel.National,
+    geographicLevel: GeographicLevel.Country,
     result: [
       {
         filters: ['1'],
         location: {
           country: {
-            country_code: 'E92000001',
-            country_name: 'England',
+            code: 'E92000001',
+            name: 'England',
           },
           region: {
-            region_code: '',
-            region_name: '',
+            code: '',
+            name: '',
           },
           localAuthority: {
-            new_la_code: '',
-            old_la_code: '',
-            la_name: '',
+            code: '',
+            old_code: '',
+            name: '',
           },
           localAuthorityDistrict: {
-            sch_lad_code: '',
-            sch_lad_name: '',
+            code: '',
+            name: '',
           },
         },
         measures: {
@@ -62,21 +58,21 @@ export const newApiHorizontalData: ChartProps = {
         filters: ['1'],
         location: {
           country: {
-            country_code: 'E92000001',
-            country_name: 'England',
+            code: 'E92000001',
+            name: 'England',
           },
           region: {
-            region_code: '',
-            region_name: '',
+            code: '',
+            name: '',
           },
           localAuthority: {
-            new_la_code: '',
-            old_la_code: '',
-            la_name: '',
+            code: '',
+            old_code: '',
+            name: '',
           },
           localAuthorityDistrict: {
-            sch_lad_code: '',
-            sch_lad_name: '',
+            code: '',
+            name: '',
           },
         },
         measures: {
@@ -168,11 +164,7 @@ export const newChartsApiDataBlock: DataBlockProps = {
   id: 'test',
   dataBlockRequest: {
     subjectId: 1,
-    regions: [],
-    localAuthorityDistricts: [],
-    localAuthorities: [],
-    countries: [],
-    geographicLevel: GeographicLevel.National,
+    geographicLevel: GeographicLevel.Country,
     startYear: '2012',
     endYear: '2017',
     indicators: ['23', '26', '28', '27'],
