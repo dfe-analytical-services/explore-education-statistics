@@ -80,11 +80,10 @@ interface MapClickEvent extends LeafletMouseEvent {
 
 function getLowestLocationCode(location: DataBlockLocation) {
   return (
-    (location.localAuthorityDistrict &&
-      location.localAuthorityDistrict.sch_lad_code) ||
-    (location.localAuthority && location.localAuthority.new_la_code) ||
-    (location.region && location.region.region_code) ||
-    (location.country && location.country.country_code) ||
+    (location.localAuthorityDistrict && location.localAuthorityDistrict.code) ||
+    (location.localAuthority && location.localAuthority.code) ||
+    (location.region && location.region.code) ||
+    (location.country && location.country.code) ||
     ''
   );
 }
@@ -535,7 +534,7 @@ class MapBlock extends Component<MapProps, MapState> {
       width,
       height,
       meta,
-      dataSets = [],
+      axes,
     } = this.props;
 
     const { selected, options, geometry, legend, ukGeometry } = this.state;
@@ -596,7 +595,7 @@ class MapBlock extends Component<MapProps, MapState> {
                 label="Select data to view"
                 value={selected.indicator}
                 onChange={e => this.onSelectIndicator(e.currentTarget.value)}
-                options={dataSets.map(
+                options={axes.major.dataSets.map(
                   indicator => meta.indicators[+indicator.indicator],
                 )}
                 order={[]}

@@ -2,7 +2,7 @@
 
 exports[`dataBlockService calls API /Data endpoint 1`] = `
 Object {
-  "geographicLevel": "National",
+  "geographicLevel": "Country",
   "metaData": Object {
     "filters": Object {
       "1": Object {
@@ -129,21 +129,21 @@ Object {
       ],
       "location": Object {
         "country": Object {
-          "country_code": "E92000001",
-          "country_name": "England",
+          "code": "E92000001",
+          "name": "England",
         },
         "localAuthority": Object {
-          "la_name": "",
-          "new_la_code": "",
-          "old_la_code": "",
+          "code": "",
+          "name": "",
+          "old_code": "",
         },
         "localAuthorityDistrict": Object {
-          "sch_lad_code": "",
-          "sch_lad_name": "",
+          "code": "",
+          "name": "",
         },
         "region": Object {
-          "region_code": "",
-          "region_name": "",
+          "code": "",
+          "name": "",
         },
       },
       "measures": Object {
@@ -161,27 +161,27 @@ Object {
       ],
       "location": Object {
         "country": Object {
-          "country_code": "E92000001",
-          "country_name": "England",
+          "code": "E92000001",
+          "name": "England",
         },
         "localAuthority": Object {
-          "la_name": "",
-          "new_la_code": "",
-          "old_la_code": "",
+          "code": "",
+          "name": "",
+          "old_code": "",
         },
         "localAuthorityDistrict": Object {
-          "sch_lad_code": "",
-          "sch_lad_name": "",
+          "code": "",
+          "name": "",
         },
         "region": Object {
-          "region_code": "",
-          "region_name": "",
+          "code": "",
+          "name": "",
         },
       },
       "measures": Object {
-        "23": "3",
-        "26": "10",
-        "28": "5",
+        "23": "-3",
+        "26": "4",
+        "28": "1",
       },
       "timeIdentifier": "HT6",
       "year": 2015,

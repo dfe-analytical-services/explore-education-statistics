@@ -3,7 +3,6 @@ import AccordionSection from '@common/components/AccordionSection';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
-import PageTitle from '@frontend/components/PageTitle';
 import PrototypeSearchForm from '@frontend/prototypes/components/PrototypeSearchForm';
 import React from 'react';
 

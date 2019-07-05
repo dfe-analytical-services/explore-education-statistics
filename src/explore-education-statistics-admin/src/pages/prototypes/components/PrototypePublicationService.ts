@@ -444,21 +444,12 @@ export default class PrototypePublicationService {
           indicators: ['23', '26', '28'],
           startYear: '2016',
           endYear: '2017',
-          geographicLevel: GeographicLevel.National,
-          countries: [],
-          localAuthorities: [],
-          localAuthorityDistricts: [],
-          regions: [],
+          geographicLevel: GeographicLevel.Country,
         },
 
         charts: [
           {
-            dataSets: [
-              { indicator: '23', filters: ['1', '2'] },
-              { indicator: '26', filters: ['1', '2'] },
-              { indicator: '28', filters: ['1', '2'] },
-            ],
-            dataLabels: {
+            labels: {
               '23_1_2': {
                 name: '23_1_2',
                 unit: '%',
@@ -478,8 +469,22 @@ export default class PrototypePublicationService {
                 label: 'Authorised absence',
               },
             },
-            xAxis: { title: 'School Year' },
-            yAxis: { title: 'Absence Rate' },
+            axes: {
+              major: {
+                name: 'major',
+                groupBy: ['timePeriod'],
+                dataSets: [
+                  { indicator: '23', filters: ['1', '2'] },
+                  { indicator: '26', filters: ['1', '2'] },
+                  { indicator: '28', filters: ['1', '2'] },
+                ],
+              },
+              minor: {
+                name: 'minor',
+                groupBy: [],
+                dataSets: [],
+              },
+            },
             type: 'line',
           },
         ],

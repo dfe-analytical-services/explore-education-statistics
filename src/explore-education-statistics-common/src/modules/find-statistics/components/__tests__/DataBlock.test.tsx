@@ -18,7 +18,7 @@ const dataBlockService = _dataBlockService as jest.Mocked<
 describe('DataBlock', () => {
   const dataBlockRequest: DataBlockRequest = {
     subjectId: 1,
-    geographicLevel: GeographicLevel.National,
+    geographicLevel: GeographicLevel.Country,
     startYear: '2014',
     endYear: '2015',
     filters: ['1', '2'],
@@ -42,12 +42,7 @@ describe('DataBlock', () => {
           {
             type: 'horizontalbar',
             stacked: true,
-            dataSets: [
-              { indicator: '23', filters: ['1', '2'] },
-              { indicator: '26', filters: ['1', '2'] },
-              { indicator: '28', filters: ['1', '2'] },
-            ],
-            dataLabels: {
+            labels: {
               '23_1_2': {
                 name: '23_1_2',
                 label: 'Label 23_1_2',
@@ -67,8 +62,22 @@ describe('DataBlock', () => {
                 unit: '%',
               },
             },
-            xAxis: { title: 'test x axis' },
-            yAxis: { title: 'test y axis' },
+            axes: {
+              major: {
+                name: 'major',
+                groupBy: ['timePeriod'],
+                dataSets: [
+                  { indicator: '23', filters: ['1', '2'] },
+                  { indicator: '26', filters: ['1', '2'] },
+                  { indicator: '28', filters: ['1', '2'] },
+                ],
+              },
+              minor: {
+                name: 'minor',
+                groupBy: [],
+                dataSets: [],
+              },
+            },
             width: 800,
             height: 600,
           },
@@ -107,12 +116,7 @@ describe('DataBlock', () => {
         charts={[
           {
             type: 'verticalbar',
-            dataSets: [
-              { indicator: '23', filters: ['1', '2'] },
-              { indicator: '26', filters: ['1', '2'] },
-              { indicator: '28', filters: ['1', '2'] },
-            ],
-            dataLabels: {
+            labels: {
               '23_1_2': {
                 name: '23_1_2',
                 label: 'Label 23_1_2',
@@ -133,8 +137,22 @@ describe('DataBlock', () => {
               },
             },
 
-            xAxis: { title: 'test x axis' },
-            yAxis: { title: 'test y axis' },
+            axes: {
+              major: {
+                name: 'major',
+                groupBy: ['timePeriod'],
+                dataSets: [
+                  { indicator: '23', filters: ['1', '2'] },
+                  { indicator: '26', filters: ['1', '2'] },
+                  { indicator: '28', filters: ['1', '2'] },
+                ],
+              },
+              minor: {
+                name: 'minor',
+                groupBy: [],
+                dataSets: [],
+              },
+            },
             width: 800,
             height: 600,
           },
@@ -229,12 +247,7 @@ describe('DataBlock', () => {
         charts={[
           {
             type: 'map',
-            dataSets: [
-              { indicator: '23', filters: ['1', '2'] },
-              { indicator: '26', filters: ['1', '2'] },
-              { indicator: '28', filters: ['1', '2'] },
-            ],
-            dataLabels: {
+            labels: {
               '23_1_2': {
                 name: '23_1_2',
                 label: 'Label 23_1_2',
@@ -255,8 +268,22 @@ describe('DataBlock', () => {
               },
             },
 
-            xAxis: { title: 'test x axis' },
-            yAxis: { title: 'test y axis' },
+            axes: {
+              major: {
+                name: 'major',
+                groupBy: ['timePeriod'],
+                dataSets: [
+                  { indicator: '23', filters: ['1', '2'] },
+                  { indicator: '26', filters: ['1', '2'] },
+                  { indicator: '28', filters: ['1', '2'] },
+                ],
+              },
+              minor: {
+                name: 'minor',
+                groupBy: [],
+                dataSets: [],
+              },
+            },
             width: 800,
             height: 600,
           },

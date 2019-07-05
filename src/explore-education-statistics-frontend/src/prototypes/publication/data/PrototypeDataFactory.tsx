@@ -9,11 +9,7 @@ export const newApiTest: DataBlockProps = {
   id: 'test',
   dataBlockRequest: {
     subjectId: 1,
-    regions: [],
-    localAuthorityDistricts: [],
-    localAuthorities: [],
-    countries: [],
-    geographicLevel: GeographicLevel.National,
+    geographicLevel: GeographicLevel.Country,
     startYear: '2014',
     endYear: '2017',
     indicators: ['23', '26', '28'],
@@ -27,27 +23,27 @@ export const newApiHorizontalData: ChartProps = {
     releaseDate: new Date(),
     releaseId: '1',
     subjectId: 1,
-    geographicLevel: GeographicLevel.National,
+    geographicLevel: GeographicLevel.Country,
     result: [
       {
         filters: ['1'],
         location: {
           country: {
-            country_code: 'E92000001',
-            country_name: 'England',
+            code: 'E92000001',
+            name: 'England',
           },
           region: {
-            region_code: '',
-            region_name: '',
+            code: '',
+            name: '',
           },
           localAuthority: {
-            new_la_code: '',
-            old_la_code: '',
-            la_name: '',
+            code: '',
+            old_code: '',
+            name: '',
           },
           localAuthorityDistrict: {
-            sch_lad_code: '',
-            sch_lad_name: '',
+            code: '',
+            name: '',
           },
         },
         measures: {
@@ -62,21 +58,21 @@ export const newApiHorizontalData: ChartProps = {
         filters: ['1'],
         location: {
           country: {
-            country_code: 'E92000001',
-            country_name: 'England',
+            code: 'E92000001',
+            name: 'England',
           },
           region: {
-            region_code: '',
-            region_name: '',
+            code: '',
+            name: '',
           },
           localAuthority: {
-            new_la_code: '',
-            old_la_code: '',
-            la_name: '',
+            code: '',
+            old_code: '',
+            name: '',
           },
           localAuthorityDistrict: {
-            sch_lad_code: '',
-            sch_lad_name: '',
+            code: '',
+            name: '',
           },
         },
         measures: {
@@ -124,26 +120,20 @@ export const newApiHorizontalData: ChartProps = {
     locations: {},
   },
 
-  dataSets: [
-    { indicator: '23', filters: ['1'] },
-    { indicator: '26', filters: ['1'] },
-    { indicator: '28', filters: ['1'] },
-  ],
-
-  dataLabels: {
-    '23_1': {
+  labels: {
+    '23_1_____': {
       value: '23_1',
       unit: '%',
       name: '23_1',
       label: 'Un auth rate',
     },
-    '26_1': {
+    '26_1_____': {
       value: '26_1',
       unit: '%',
       name: '26_1',
       label: 'All rate',
     },
-    '28_1': {
+    '28_1_____': {
       value: '28_1',
       unit: '%',
       name: '28_1',
@@ -151,8 +141,22 @@ export const newApiHorizontalData: ChartProps = {
     },
   },
 
-  xAxis: { title: 'test x axis' },
-  yAxis: { title: 'test y axis' },
+  axes: {
+    major: {
+      name: 'major',
+      groupBy: ['timePeriod'],
+      dataSets: [
+        { indicator: '23', filters: ['1'] },
+        { indicator: '26', filters: ['1'] },
+        { indicator: '28', filters: ['1'] },
+      ],
+    },
+    minor: {
+      name: 'minor',
+      groupBy: [],
+      dataSets: [],
+    },
+  },
 };
 
 export const newChartsApiDataBlock: DataBlockProps = {
@@ -160,11 +164,7 @@ export const newChartsApiDataBlock: DataBlockProps = {
   id: 'test',
   dataBlockRequest: {
     subjectId: 1,
-    regions: [],
-    localAuthorityDistricts: [],
-    localAuthorities: [],
-    countries: [],
-    geographicLevel: GeographicLevel.National,
+    geographicLevel: GeographicLevel.Country,
     startYear: '2012',
     endYear: '2017',
     indicators: ['23', '26', '28', '27'],
@@ -174,45 +174,49 @@ export const newChartsApiDataBlock: DataBlockProps = {
   charts: [
     {
       type: 'verticalbar',
-      xAxis: { title: '' },
-      yAxis: { title: '' },
-
-      dataLabels: {
-        '23_1_2': {
+      axes: {
+        major: {
+          name: 'major',
+          groupBy: ['timePeriod'],
+          dataSets: [
+            { indicator: '23', filters: ['1', '2'] },
+            { indicator: '26', filters: ['1', '2'] },
+            { indicator: '27', filters: ['1', '2'] },
+            { indicator: '28', filters: ['1', '2'] },
+          ],
+        },
+        minor: {
+          name: 'minor',
+          groupBy: [],
+          dataSets: [],
+        },
+      },
+      labels: {
+        '23_1_2_____': {
           value: '23_1_2',
           unit: '%',
           name: '23_1_2',
           label: 'Unauthorised absence rate',
         },
-        '26_1_2': {
+        '26_1_2_____': {
           value: '26_1_2',
           unit: '%',
           name: '26_1_2',
           label: 'Overall absence rate',
         },
-        '28_1_2': {
+        '28_1_2_____': {
           value: '28_1_2',
           unit: '%',
           name: '28_1_2',
           label: 'Authorised absence rate',
         },
-        '27_1_2': {
+        '27_1_2_____': {
           value: '27_1_2',
           unit: '',
           name: '27_1_2',
           label: 'Absence Rate',
         },
       },
-
-      dataSets: [
-        {
-          indicator: '23',
-          filters: ['1', '2'],
-        },
-        { indicator: '26', filters: ['1', '2'] },
-        { indicator: '28', filters: ['1', '2'] },
-        // { indicator: '27', filters: ['1', '2'] },
-      ],
     },
   ],
 };

@@ -30,6 +30,8 @@ import PublicationCreateNewAbsenceStatus from './pages/prototypes/PrototypePubli
 import PrototypesIndexPage from './pages/prototypes/PrototypesIndexPage';
 import IndexPage from './pages/IndexPage';
 
+import PrototypeChartTest from './pages/prototypes/PrototypeChartTest';
+
 import { LoginContext } from './components/Login';
 
 function App() {
@@ -57,6 +59,8 @@ function App() {
           path="/prototypes/admin-dashboard"
           component={PrototypeAdminDashboard}
         />
+
+        <Route exact path="/prototypes/charts" component={PrototypeChartTest} />
 
         <Route
           exact

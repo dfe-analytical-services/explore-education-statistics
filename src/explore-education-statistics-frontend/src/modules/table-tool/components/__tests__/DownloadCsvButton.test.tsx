@@ -110,6 +110,7 @@ describe('DownloadCsvButton', () => {
           {
             filters: ['gender_male', 'school_primary'],
             timeIdentifier: 'AY',
+            location: {},
             measures: {
               authAbsRate: '1.2',
               authAbsSess: '2',
@@ -119,6 +120,7 @@ describe('DownloadCsvButton', () => {
           {
             filters: ['gender_male', 'school_secondary'],
             timeIdentifier: 'AY',
+            location: {},
             measures: {
               authAbsRate: '3.4',
               authAbsSess: '4',
@@ -128,6 +130,7 @@ describe('DownloadCsvButton', () => {
           {
             filters: ['gender_female', 'school_primary'],
             timeIdentifier: 'AY',
+            location: {},
             measures: {
               authAbsRate: '5.6',
               authAbsSess: '6',
@@ -137,6 +140,7 @@ describe('DownloadCsvButton', () => {
           {
             filters: ['gender_female', 'school_secondary'],
             timeIdentifier: 'AY',
+            location: {},
             measures: {
               authAbsRate: '7.8',
               authAbsSess: '8',
@@ -146,6 +150,7 @@ describe('DownloadCsvButton', () => {
           {
             filters: ['gender_male', 'school_primary'],
             timeIdentifier: 'AY',
+            location: {},
             measures: {
               authAbsRate: '9',
               authAbsSess: '10',
@@ -155,6 +160,7 @@ describe('DownloadCsvButton', () => {
           {
             filters: ['gender_male', 'school_secondary'],
             timeIdentifier: 'AY',
+            location: {},
             measures: {
               authAbsRate: '11.2',
               authAbsSess: '12',
@@ -164,6 +170,7 @@ describe('DownloadCsvButton', () => {
           {
             filters: ['gender_female', 'school_primary'],
             timeIdentifier: 'AY',
+            location: {},
             measures: {
               authAbsRate: '13.4',
               authAbsSess: '14',
@@ -173,6 +180,7 @@ describe('DownloadCsvButton', () => {
           {
             filters: ['gender_female', 'school_secondary'],
             timeIdentifier: 'AY',
+            location: {},
             measures: {
               authAbsRate: '15.6',
               authAbsSess: '16',
@@ -297,6 +305,7 @@ describe('DownloadCsvButton', () => {
           {
             filters: ['gender_male', 'school_primary'],
             timeIdentifier: 'AY',
+            location: {},
             measures: {
               authAbsRate: '1.2',
               authAbsSess: '2',
@@ -306,6 +315,7 @@ describe('DownloadCsvButton', () => {
           {
             filters: ['gender_female', 'school_primary'],
             timeIdentifier: 'AY',
+            location: {},
             measures: {
               authAbsRate: '5.6',
               authAbsSess: '6',
@@ -315,6 +325,7 @@ describe('DownloadCsvButton', () => {
           {
             filters: ['gender_female', 'school_secondary'],
             timeIdentifier: 'AY',
+            location: {},
             measures: {
               authAbsRate: '7.8',
               authAbsSess: '8',
@@ -324,6 +335,7 @@ describe('DownloadCsvButton', () => {
           {
             filters: ['gender_male', 'school_primary'],
             timeIdentifier: 'AY',
+            location: {},
             measures: {
               authAbsRate: '9',
               authAbsSess: '10',
@@ -333,6 +345,7 @@ describe('DownloadCsvButton', () => {
           {
             filters: ['gender_male', 'school_secondary'],
             timeIdentifier: 'AY',
+            location: {},
             measures: {
               authAbsRate: '11.2',
               authAbsSess: '12',
@@ -342,6 +355,7 @@ describe('DownloadCsvButton', () => {
           {
             filters: ['gender_female', 'school_primary'],
             timeIdentifier: 'AY',
+            location: {},
             measures: {
               authAbsRate: '13.4',
               authAbsSess: 'x',
@@ -351,6 +365,7 @@ describe('DownloadCsvButton', () => {
           {
             filters: ['gender_female', 'school_secondary'],
             timeIdentifier: 'AY',
+            location: {},
             measures: {
               authAbsRate: '15.6',
               authAbsSess: 'x',

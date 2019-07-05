@@ -3434,19 +3434,41 @@ const responseData: DataBlockResponse = {
         value: 'E92000001',
       },
     },
+    timePeriods: {
+      '2012_HT6': {
+        label: '2012/2013',
+        value: '2012_HT6',
+      },
+      '2013_HT6': {
+        label: '2013/2014',
+        value: '2013_HT6',
+      },
+      '2014_HT6': {
+        label: '2014/2015',
+        value: '2014_HT6',
+      },
+      '2015_HT6': {
+        label: '2015/2016',
+        value: '2015_HT6',
+      },
+      '2016_HT6': {
+        label: '2016/2017',
+        value: '2016_HT6',
+      },
+    },
   },
   publicationId: 'cbbd299f-8297-44bc-92ac-558bcf51f8ad',
   releaseId: '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5',
   subjectId: 1,
   releaseDate: new Date('2018-04-25T00:00:00'),
-  geographicLevel: GeographicLevel.National,
+  geographicLevel: GeographicLevel.Country,
   result: [
     {
       filters: ['1', '72'],
       location: {
         country: {
-          country_code: 'E92000001',
-          country_name: 'England',
+          code: 'E92000001',
+          name: 'England',
         },
       },
       measures: {
@@ -3461,8 +3483,8 @@ const responseData: DataBlockResponse = {
       filters: ['1', '73'],
       location: {
         country: {
-          country_code: 'E92000001',
-          country_name: 'England',
+          code: 'E92000001',
+          name: 'England',
         },
       },
       measures: {
@@ -3477,8 +3499,8 @@ const responseData: DataBlockResponse = {
       filters: ['1', '71'],
       location: {
         country: {
-          country_code: 'E92000001',
-          country_name: 'England',
+          code: 'E92000001',
+          name: 'England',
         },
       },
       measures: {
@@ -3493,8 +3515,8 @@ const responseData: DataBlockResponse = {
       filters: ['1', '71'],
       location: {
         country: {
-          country_code: 'E92000001',
-          country_name: 'England',
+          code: 'E92000001',
+          name: 'England',
         },
       },
       measures: {
@@ -3509,8 +3531,8 @@ const responseData: DataBlockResponse = {
       filters: ['1', '73'],
       location: {
         country: {
-          country_code: 'E92000001',
-          country_name: 'England',
+          code: 'E92000001',
+          name: 'England',
         },
       },
       measures: {
@@ -3525,8 +3547,8 @@ const responseData: DataBlockResponse = {
       filters: ['1', '71'],
       location: {
         country: {
-          country_code: 'E92000001',
-          country_name: 'England',
+          code: 'E92000001',
+          name: 'England',
         },
       },
       measures: {
@@ -3541,8 +3563,8 @@ const responseData: DataBlockResponse = {
       filters: ['1', '72'],
       location: {
         country: {
-          country_code: 'E92000001',
-          country_name: 'England',
+          code: 'E92000001',
+          name: 'England',
         },
       },
       measures: {
@@ -3557,8 +3579,8 @@ const responseData: DataBlockResponse = {
       filters: ['1', '72'],
       location: {
         country: {
-          country_code: 'E92000001',
-          country_name: 'England',
+          code: 'E92000001',
+          name: 'England',
         },
       },
       measures: {
@@ -3573,8 +3595,8 @@ const responseData: DataBlockResponse = {
       filters: ['1', '73'],
       location: {
         country: {
-          country_code: 'E92000001',
-          country_name: 'England',
+          code: 'E92000001',
+          name: 'England',
         },
       },
       measures: {
@@ -3589,8 +3611,8 @@ const responseData: DataBlockResponse = {
       filters: ['1', '72'],
       location: {
         country: {
-          country_code: 'E92000001',
-          country_name: 'England',
+          code: 'E92000001',
+          name: 'England',
         },
       },
       measures: {
@@ -3605,8 +3627,8 @@ const responseData: DataBlockResponse = {
       filters: ['1', '71'],
       location: {
         country: {
-          country_code: 'E92000001',
-          country_name: 'England',
+          code: 'E92000001',
+          name: 'England',
         },
       },
       measures: {
@@ -3621,8 +3643,8 @@ const responseData: DataBlockResponse = {
       filters: ['1', '72'],
       location: {
         country: {
-          country_code: 'E92000001',
-          country_name: 'England',
+          code: 'E92000001',
+          name: 'England',
         },
       },
       measures: {
@@ -3637,8 +3659,8 @@ const responseData: DataBlockResponse = {
       filters: ['1', '73'],
       location: {
         country: {
-          country_code: 'E92000001',
-          country_name: 'England',
+          code: 'E92000001',
+          name: 'England',
         },
       },
       measures: {
@@ -3653,8 +3675,8 @@ const responseData: DataBlockResponse = {
       filters: ['1', '73'],
       location: {
         country: {
-          country_code: 'E92000001',
-          country_name: 'England',
+          code: 'E92000001',
+          name: 'England',
         },
       },
       measures: {
@@ -3669,8 +3691,8 @@ const responseData: DataBlockResponse = {
       filters: ['1', '71'],
       location: {
         country: {
-          country_code: 'E92000001',
-          country_name: 'England',
+          code: 'E92000001',
+          name: 'England',
         },
       },
       measures: {

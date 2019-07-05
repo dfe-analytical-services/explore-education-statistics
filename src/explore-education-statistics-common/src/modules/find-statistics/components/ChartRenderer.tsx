@@ -2,8 +2,7 @@ import HorizontalBarBlock from '@common/modules/find-statistics/components/chart
 import LineChartBlock from '@common/modules/find-statistics/components/charts/LineChartBlock';
 import VerticalBarBlock from '@common/modules/find-statistics/components/charts/VerticalBarBlock';
 import {
-  Axis,
-  ChartDataSet,
+  AxisConfigurationItem,
   ChartType,
   DataLabelConfigurationItem,
   ReferenceLine,
@@ -27,14 +26,12 @@ export interface ChartRendererProps {
   type: ChartType;
   data: DataBlockData;
   meta: DataBlockMetadata;
-  xAxis: Axis;
-  yAxis: Axis;
   height?: number;
   width?: number;
   stacked?: boolean;
   referenceLines?: ReferenceLine[];
-  dataSets: ChartDataSet[];
-  dataLabels: Dictionary<DataLabelConfigurationItem>;
+  labels: Dictionary<DataLabelConfigurationItem>;
+  axes: Dictionary<AxisConfigurationItem>;
 }
 
 function ChartRenderer(props: ChartRendererProps) {
@@ -46,16 +43,9 @@ function ChartRenderer(props: ChartRendererProps) {
     referenceLines,
     stacked,
     type,
-    xAxis = { title: '' },
-    yAxis = { title: '' },
-    dataSets,
-    dataLabels,
+    labels,
+    axes,
   } = props;
-
-  const labels = Object.entries(meta.indicators).reduce(
-    (results, [key, indicator]) => ({ ...results, [key]: indicator.label }),
-    {},
-  );
 
   // TODO : Temporary sort on the results to get them in date order
   data.result.sort((a, b) => {
@@ -74,13 +64,10 @@ function ChartRenderer(props: ChartRendererProps) {
     data,
     meta,
     labels,
-    xAxis,
-    yAxis,
+    axes,
     height,
     width,
     referenceLines,
-    dataSets,
-    dataLabels,
     stacked,
   };
 

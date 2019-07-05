@@ -12,7 +12,6 @@ import TimePeriod from '@common/services/types/TimePeriod';
 import { Dictionary } from '@common/types/util';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
-import PageTitle from '@frontend/components/PageTitle';
 import PreviousStepModalConfirm from '@frontend/modules/table-tool/components/PreviousStepModalConfirm';
 import mapValues from 'lodash/mapValues';
 import { NextContext } from 'next';
@@ -29,7 +28,9 @@ import PublicationSubjectForm, {
   PublicationSubjectFormSubmitHandler,
 } from './components/PublicationSubjectForm';
 import TimePeriodDataTable from './components/TimePeriodDataTable';
-import TimePeriodForm from './components/TimePeriodForm';
+import TimePeriodForm, {
+  TimePeriodFormSubmitHandler,
+} from './components/TimePeriodForm';
 import mapOptionValues from './components/utils/mapOptionValues';
 import Wizard from './components/Wizard';
 import WizardStep from './components/WizardStep';
@@ -143,10 +144,19 @@ class TableToolPage extends Component<Props, State> {
     });
   };
 
-  private handleLocationFiltersFormSubmit: LocationFiltersFormSubmitHandler = values => {
-    const { subjectMeta } = this.state;
+  private handleLocationFiltersFormSubmit: LocationFiltersFormSubmitHandler = async values => {
+    const { subjectId } = this.state;
 
-    this.setState({
+    const subjectMeta = await tableBuilderService.filterPublicationSubjectMeta({
+      ...values,
+      subjectId,
+    });
+
+    this.setState(prevState => ({
+      subjectMeta: {
+        ...prevState.subjectMeta,
+        timePeriod: subjectMeta.timePeriod,
+      },
       locations: mapValuesWithKeys(
         values.locations,
         (locationLevel, locations) =>
@@ -157,22 +167,48 @@ class TableToolPage extends Component<Props, State> {
               ) as FilterOption,
           ),
       ),
+    }));
+  };
+
+  private handleTimePeriodFormSubmit: TimePeriodFormSubmitHandler = async values => {
+    const { subjectId, locations } = this.state;
+
+    const start = TimePeriod.fromString(values.start);
+    const end = TimePeriod.fromString(values.end);
+
+    const subjectMeta = await tableBuilderService.filterPublicationSubjectMeta({
+      ...mapValues(locations, locationLevel =>
+        locationLevel.map(location => location.value),
+      ),
+      subjectId,
+      startYear: start.year,
+      endYear: end.year,
     });
+
+    this.setState(prevState => ({
+      subjectMeta: {
+        ...prevState.subjectMeta,
+        filters: subjectMeta.filters,
+      },
+      timePeriods: TimePeriod.createRange(start, end),
+    }));
   };
 
   private handleFiltersFormSubmit: FilterFormSubmitHandler = async ({
     filters,
     indicators,
   }) => {
-    const { subjectId, timePeriods, subjectMeta } = this.state;
+    const { subjectId, timePeriods, locations, subjectMeta } = this.state;
 
     const { result } = await tableBuilderService.getTableData({
+      ...mapValues(locations, locationLevel =>
+        locationLevel.map(location => location.value),
+      ),
       subjectId,
-      filters: Object.values(filters).flat(),
       indicators,
+      filters: Object.values(filters).flat(),
       startYear: timePeriods[0].year,
       endYear: timePeriods[timePeriods.length - 1].year,
-      geographicLevel: 'National',
     });
 
     const filtersByValue = mapValues(subjectMeta.filters, value =>
@@ -265,14 +301,7 @@ class TableToolPage extends Component<Props, State> {
                     <TimePeriodForm
                       {...stepProps}
                       options={subjectMeta.timePeriod.options}
-                      onSubmit={values => {
-                        this.setState({
-                          timePeriods: TimePeriod.createRange(
-                            TimePeriod.fromString(values.start),
-                            TimePeriod.fromString(values.end),
-                          ),
-                        });
-                      }}
+                      onSubmit={this.handleTimePeriodFormSubmit}
                     />
                   )}
                 </WizardStep>

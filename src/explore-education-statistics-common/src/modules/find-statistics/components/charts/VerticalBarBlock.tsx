@@ -1,7 +1,13 @@
-import ChartFunctions, {
-  ChartData,
+import {
+  calculateMargins,
+  calculateXAxis,
+  calculateYAxis,
+  ChartDataB,
   ChartDefinition,
   ChartProps,
+  createDataForAxis,
+  getKeysForChart,
+  mapNameToNameLabel,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import React, { Component } from 'react';
 import {
@@ -39,41 +45,25 @@ export default class VerticalBarBlock extends Component<ChartProps> {
   };
 
   public render() {
-    const {
-      data,
-      height,
-      xAxis,
-      yAxis,
-      width,
-      meta,
-      dataSets,
-      dataLabels,
-    } = this.props;
+    const { data, height, width, labels, axes } = this.props;
 
-    if (dataSets === undefined) return <div />;
+    const chartData: ChartDataB[] = createDataForAxis(
+      axes.major,
+      data.result,
+    ).map(mapNameToNameLabel(labels));
 
-    const chartData: ChartData[] = ChartFunctions.generateDataGroupedByGroups(
-      ChartFunctions.filterResultsByDataSet(dataSets, data.result),
-      meta,
-    );
+    const keysForChart = getKeysForChart(chartData);
 
-    const chartKeys: Set<string> = chartData.reduce(
-      (keys: Set<string>, next) => {
-        return new Set([
-          ...Array.from(keys),
-          ...(next.data || []).map(({ name }) => name),
-        ]);
-      },
-      new Set<string>(),
-    );
+    const yAxis = { key: undefined, title: '' };
+    const xAxis = { key: undefined, title: '' };
 
     return (
       <ResponsiveContainer width={width || 900} height={height || 300}>
         <BarChart
           data={chartData}
-          margin={ChartFunctions.calculateMargins(xAxis, yAxis, undefined)}
+          margin={calculateMargins(xAxis, yAxis, undefined)}
         >
-          {ChartFunctions.calculateXAxis(xAxis, {
+          {calculateXAxis(xAxis, {
             interval: 0,
             tick: { fontSize: 12 },
             dataKey: 'name',
@@ -81,18 +71,18 @@ export default class VerticalBarBlock extends Component<ChartProps> {
 
           <CartesianGrid />
 
-          {ChartFunctions.calculateYAxis(yAxis, { type: 'number' })}
+          {calculateYAxis(yAxis, { type: 'number' })}
 
           <Tooltip />
           <Legend />
 
-          {Array.from(chartKeys).map((dataKey, index) => (
+          {Array.from(keysForChart).map((dataKey, index) => (
             <Bar
               key={dataKey}
               dataKey={dataKey}
               fill={colours[index]}
-              name={dataLabels[dataKey] && dataLabels[dataKey].label}
-              unit={dataLabels[dataKey] && dataLabels[dataKey].unit}
+              name={labels[dataKey] && labels[dataKey].label}
+              unit={labels[dataKey] && labels[dataKey].unit}
             />
           ))}
         </BarChart>

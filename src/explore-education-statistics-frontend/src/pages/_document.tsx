@@ -59,7 +59,7 @@ class Document extends BaseDocument {
 
           <meta
             property="og:image"
-            content="/assets/images/govuk-opengraph-image.png"
+            content="/static/images/govuk-opengraph-image.png"
           />
         </Head>
 

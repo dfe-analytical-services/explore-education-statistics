@@ -4,10 +4,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
     public class LocalAuthorityDistrict: IObservationalUnit
     {
-        [JsonProperty(PropertyName = "sch_lad_code")]
         public string Code { get; set; }
-
-        [JsonProperty(PropertyName = "sch_lad_name")]
         public string Name { get; set; }
 
         private LocalAuthorityDistrict()
