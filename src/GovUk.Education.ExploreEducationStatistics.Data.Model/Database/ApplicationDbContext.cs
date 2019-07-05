@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Converters;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
@@ -328,7 +328,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 
         private static void ConfigureTimePeriod(ModelBuilder modelBuilder)
         {
-            var timeIdentifierConverter = new EnumToStringConverter<TimeIdentifier>();
+            var timeIdentifierConverter = new EnumToEnumValueConverter<TimeIdentifier>();
 
             modelBuilder.Entity<Observation>()
                 .Property(observation => observation.TimeIdentifier)

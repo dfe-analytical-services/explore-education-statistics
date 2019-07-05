@@ -53,7 +53,7 @@ const StartPage = () => {
             have their own websites to help you explore education statistics.
           </div>
           <Link
-            to="/prototypes/home-v2"
+            to="/prototypes/home"
             className="govuk-button govuk-button--start"
           >
             Start now

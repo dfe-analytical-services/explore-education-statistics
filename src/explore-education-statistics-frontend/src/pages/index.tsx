@@ -1,17 +1,14 @@
 import React from 'react';
-import { Helmet } from 'react-helmet';
 import Link from '../components/Link';
 import Page from '../components/Page';
 
 function HomePage() {
   return (
-    <Page>
-      <Helmet>
-        <title>Explore Education Statistics - GOV.UK</title>
-      </Helmet>
-      <h1 className="govuk-heading-xl">
-        Choose how to explore our statistics and data
-      </h1>
+    <Page
+      title="Choose how to explore our statistics and data"
+      pageMeta={{ title: 'Explore education statistics' }}
+      isHomepage
+    >
       <p className="govuk-body-l">
         Select an option to find the national and regional level statistics and
         data you’re looking for.

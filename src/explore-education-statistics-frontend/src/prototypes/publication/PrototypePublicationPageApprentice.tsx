@@ -6,7 +6,7 @@ import Link from '@frontend/components/Link';
 import PrototypePage from '@frontend/prototypes/components/PrototypePage';
 import React from 'react';
 import PrototypeAbsenceData from './components/PrototypeAbsenceData';
-import PrototypeDataSample from './components/PrototypeDataSample';
+import PrototypeDataSample from './components/PrototypeDataSample-app';
 
 const PublicationPage = () => {
   let mapRef: PrototypeMap | null = null;
@@ -25,7 +25,7 @@ const PublicationPage = () => {
         {' '}
         Latest statistics and data{' '}
       </strong>
-      <h1 className="govuk-heading-xl">Apprenticeship and levy statistics</h1>
+      <h1 className="govuk-heading-xl">Apprenticeship statistics</h1>
       <dl className="dfe-meta-content">
         <dt className="govuk-caption-m">Published: </dt>
         <dd>
@@ -167,9 +167,7 @@ const PublicationPage = () => {
             <nav role="navigation" aria-labelledby="related-content">
               <ul className="govuk-list">
                 <li>
-                  <Link to="/prototypes/methodology-absence">
-                    Apprenticeship and levy statistics: methodology
-                  </Link>
+                  <Link to="#">Apprenticeship statistics: methodology</Link>
                 </li>
               </ul>
             </nav>
@@ -222,9 +220,23 @@ const PublicationPage = () => {
 
       <Accordion id="contents-sections">
         <AccordionSection heading="Overview">
+          <p>
+            General information in here about apprenticeships to give an
+            overview of what this publication contains.
+          </p>
+          <p>
+            We'd generally suggest including about 3 to 4 lines to break up the
+            beginning of this section ahead of the following table, chart and
+            data section.
+          </p>
+          <p>
+            Please note the following table is not accurate and even though it
+            has an 'apprenticeships' heading the table and charts do not contain
+            this kind of data.
+          </p>
           <PrototypeDataSample
             sectionId="absenceRates"
-            chartTitle="absence rates in England"
+            chartTitle="Apprenticeships in England"
             xAxisLabel="School Year"
             yAxisLabel="Absence Rate"
             chartData={[
@@ -262,61 +274,17 @@ const PublicationPage = () => {
             chartDataKeys={['primary', 'secondary', 'primary and secondary']}
           />
           <p>
-            The overall absence rate across state-funded primary, secondary and
-            special schools increased from 4.6% in 2015/16 to 4.7% in 2016/17.
+            You could add in more information underneath the table if you wanted
+            to.
           </p>
-          <p>
-            In primary schools the overall absence rate stayed the same at 4%
-            and the rate in secondary schools increased from 5.2% to 5.4%.
-          </p>
-          <p>Absence in special schools is much higher at 9.7% in 2016/17.</p>
-          <p>
-            The increase in overall absence rate has been driven by an increase
-            in the unauthorised absence rate across state-funded primary,
-            secondary and special schools - which increased from 1.1% to 1.3%
-            between 2015/16 and 2016/17.
-          </p>
-          <p>
-            Looking at longer-term trends - overall and authorised absence rates
-            have been fairly stable over recent years after decreasing gradually
-            between 2006/07 and 2013/14.
-          </p>
-          <p>
-            Unauthorised absence rates have not varied much since 2006/07 button
-            the unauthorised absence rate at 1.3% is now at its highest since
-            records began.
-          </p>
-          <p>
-            This is due to an increase in absence due to family holidays that
-            were not agreed by the school.
-          </p>
-          <p>
-            The authorised absence rate at 3.4% has not changed since last year
-            but have been decreasing across recent years in primary schools.
-          </p>
-          <p>
-            The total number of days missed due to overall absence across
-            state-funded primary, secondary and special schools increased from
-            54.8 million in 2015/16 to 56.7 million in 2016/17.
-          </p>
-          <p>
-            This partly reflects the rise in the total number of pupil
-            enrolments - the average number of days missed per enrolment has
-            increased very slightly from 8.1 days in 2015/16 to 8.2 days in
-            2016/17.
-          </p>
-          <p>
-            In 2016/17, 91.8% of pupils in primary, secondary and special
-            schools missed at least 1 session during the school year which is
-            similar to 91.7% figure in 2015/16.
-          </p>
+          <p>Or even add in an extra couple of lines - if you liked.</p>
         </AccordionSection>
 
         <AccordionSection heading="Annual comparisons">
           <div className="govuk-text">
             <p>
               The latest figures in this section relate to the 2017/18 academic
-              year and are based on full-year final data.
+              year with all figures and trends based on full-year final data.
             </p>
             <h3 className="govuk-heading-s">Apprenticeship standards</h3>
             <p>
@@ -325,8 +293,11 @@ const PublicationPage = () => {
             </p>
             <p>
               The government is committed to all apprenticeship starts being on
-              standards by the start of 2020/21. All apprenticeship frameworks
-              are to be withdrawn at this point.
+              standards by the start of 2020/21.
+            </p>
+            <p>
+              The apprenticeship frameworks these standards are replacing are to
+              be withdrawn at this point.
             </p>
             <p>Latest figures show:</p>
             <ul className="govuk-list-bullet">
@@ -368,223 +339,510 @@ const PublicationPage = () => {
                 apprenticeships – up from 1,700 in 2016/17 when they accounted
                 for 96.3% (1,630) of starts
               </li>
+              <li>
+                compared to 2016/17 - higher level starts increased by 31.7%
+                (xx,xxx) - up from 36,750
+              </li>
+            </ul>
+            <p>
+              In comparison - higher level starts increased by 34.7% (xx,xxx)
+              between 2015/16 and 2016/17.
+            </p>
+            <h3 className="govuk-heading-s">Length of employment</h3>
+            <p>
+              The rate of starts by the length of time apprentices have been
+              with their employer prior to starting their apprenticeships has
+              changed over time.
+            </p>
+            <p>
+              Those who had been with their employer for more than 12 months
+              prior to starting an apprenticeship accounted for:
+            </p>
+            <ul className="govuk-list-bullet">
+              <li>34.2% of all starts in 2013/14</li>
+              <li>(rising steadily to) 41.6% of all starts in 2016/17</li>
+              <li>(before falling to) 38.2% of all starts in 2017/18</li>
+            </ul>
+            <p>
+              Those had been with their employer for up to 3 months prior to
+              starting their apprenticeship accounted for:
+            </p>
+            <ul className="govuk-list-bullet">
+              <li>44.1% of all starts in 2017/18 - up from 39.5% in 2016/17</li>
+            </ul>
+            <h3 className="govuk-heading-s">
+              Expected duration and off-the-job training
+            </h3>
+            <p>
+              The expected duration of an apprenticeship is the difference
+              between the associated start date and planned end date as recorded
+              in the ILR.{' '}
+            </p>
+            <p>
+              Latest figures for 2017/18 show the average expected duration of
+              an apprenticeship:
+            </p>
+            <ul className="govuk-list-bullet">
+              <li>increased to 581 days - up from 406 days in 2011/12</li>
+              <li>
+                increased by 13.7% - up to 581 days from 511 days in 2016/17
+              </li>
+            </ul>
+            <p>
+              Reported average hours of formal training per week (taken from the
+              ‘Apprenticeship Evaluation Learner Survey 2017’) are combined with
+              apprenticeship starts and expected duration data (taken from the
+              ILR) to estimate off-the-job training hours.
+            </p>
+            <p>Latest estimates suggest:</p>
+            <ul className="govuk-list-bullet">
+              <li>
+                the average expected off-the-job training hours increased by
+                26.3% to 630 hours - up from 490 hours in 2016/17
+              </li>
+              <li>
+                despite a 26.0% decrease in apprenticeship starts since 2016/17,
+                the total number of off-the job training hours is estimated to
+                only have decreased by 6.6%% over the same period – down to 212
+                million hours from 227 million hours
+              </li>
             </ul>
           </div>
         </AccordionSection>
 
-        <AccordionSection heading="Reasons for absence">
-          <div className="govuk-inset-text">
-            <p>
-              Within this release absence by reason is broken down in the
-              following ways:
-            </p>
-            <ul className="govuk-list">
+        <AccordionSection heading="Apprenticeship service: transparency">
+          <div className="govuk-text">
+            <h3 className="govuk-heading-s">
+              Account registrations and commitments
+            </h3>
+            <p>As at 30 April 2019 the number of:</p>
+            <ul className="govuk-list-bullet">
+              <li>registered ASAs was 17,300</li>
               <li>
-                Distribution of absence by reason - the proportion of absence
-                for each reason, calculated by taking the number of absences for
-                a specific reason as a percentage of the total number of
-                absences
-              </li>
-              <li>
-                Rate of absence by reason - the rate of absence for each reason,
-                calculated by taking the number of absences for a specific
-                reason as a percentage of the total number of possible sessions
-              </li>
-              <li>
-                One or more sessions missed due to each reason - the number of
-                pupil enrolments missing at least 1 session due to each reason
+                commitments recorded for 2018/19 was 174,400 - 166,400 fully
+                agreed and 8,000 pending approval
               </li>
             </ul>
+            <p>
+              Compared to the equivalent point last year this is an increase of
+              X% - up from 140,900 in 2017/18 (132,600 fully agreed and 8,300
+              pending approval).
+            </p>
+            <h3 className="govuk-heading-s">Commitments by age and level</h3>
+            <p>Of the 174,400 commitments recorded so far for 2018/19:</p>
+            <ul className="govuk-list-bullet">
+              <li>aged 25 and over – 91,700</li>
+              <li>intermediate apprenticeships – 53,900</li>
+              <li>advanced – 74,100</li>
+            </ul>
+            <h3 className="govuk-heading-s">Transfers</h3>
+            <p>
+              In April 2018 it became possible for levy-paying organisations to
+              transfer up to 10% of the annual value of funds entering their
+              apprenticeship service account to other organisations in the
+              apprenticeship service. This increased to 25% from April 2019.
+            </p>
+            <p>
+              As at 30 April 2019 there were 480 commitments where the transfer
+              of funds between ASAs has been approved. Of these, 270
+              materialised into apprenticeship starts.
+            </p>
+            <h3 className="govuk-heading-s">Monthly starts</h3>
+            <p>
+              As of May 2017 significant structural changes were made to the
+              apprenticeship funding system including the introduction of the
+              apprenticeship levy and the apprenticeship service.
+            </p>
+            <p>
+              These changes have had a significant impact on apprenticeship
+              starts.
+            </p>
+            <p>
+              Quarterly apprenticeship starts data [link off elsewhere] are the
+              most robust basis for interpreting how starts relate to historical
+              trends.
+            </p>
+            <p>
+              Apprenticeship starts figures are provided on a monthly basis for
+              transparency purposes.
+            </p>
+            <p>
+              Reported to date for the period August 2018 to March 2019 there
+              have been 285,000 starts.
+            </p>
+            <p>Compared to the equivalent period in previous years this is:</p>
+            <ul className="govuk-list-bullet">
+              <li>up by x% from 261,200 in 2017/18</li>
+              <li>down by y% from 362,400 in 2016/17</li>
+              <li>down by z% from 346,300 in 2015/16</li>
+            </ul>
           </div>
-          <PrototypeDataSample
-            sectionId="reasonAbsence"
-            chartTitle="reason for absence in England"
-            xAxisLabel="School Year"
-            yAxisLabel="Absence Rate"
-            chartData={[
-              {
-                'family holiday': 0.7,
-                illness: 3.2,
-                name: '2012/13',
-                overall: 3.9,
-              },
-              {
-                'family holiday': 0.7,
-                illness: 3.5,
-                name: '2013/14',
-                overall: 4.2,
-              },
-              {
-                'family holiday': 0.7,
-                illness: 3.4,
-                name: '2014/15',
-                overall: 4.1,
-              },
-              {
-                'family holiday': 0.7,
-                illness: 3.3,
-                name: '2015/16',
-                overall: 4.0,
-              },
-              {
-                'family holiday': 0.7,
-                illness: 3.7,
-                name: '2016/17',
-                overall: 4.4,
-              },
-            ]}
-            chartDataKeys={['overall', 'illness', 'family holiday']}
-          />
-          <p>
-            Illness is the main driver for overall absence rates but while
-            overall absence rates have increased slightly since 2015/16 illness
-            rates have remained the same at 2.6%.
-          </p>
-          <p>
-            Illness accounted for 55.3% of all absence in 2016/17 down from
-            57.3% in 2015/16 and 60.1% in 2014/15.
-          </p>
-          <p>
-            The rate of absence due to other unauthorised circumstances has
-            remained the same as in 2015/16 at 0.7%.
-          </p>
-          <h3 className="govuk-heading-s">Absence due to family holiday</h3>
-          <p>
-            The percentage of pupils who missed at least 1 session due to a
-            family holiday in 2016/17 was 16.9% compared with 14.7% in 2015/16.
-          </p>
-          <p>
-            The absence rate due to family holidays agreed by the school statyed
-            at 0.1% for 2016/17 while the percentage of all possible sessions
-            missed due to unauthorised family holidays increased from 0.3% in
-            2015/16 to 0.4% in 2016/17.
-          </p>
-          <p>
-            Unauthorised holiday absence rates have been increasing gradually
-            since 2006/07 while authorised holiday absence rates are much lower
-            now than in 2006/07 and remained steady over recent years.
-          </p>
-          <p>
-            A regulation amendment in September 2013 stated that term-time leave
-            could only be granted in exceptional circumstances which explains
-            the sharp fall in authorised holiday absence between 2012/13 and
-            2013/14.
-          </p>
-          <p>
-            The statistics and data shown here relate to the period after the
-            Isle of Wight Council v Jon Platt High Court judgment (May 2016)
-            where the High Court supported a local magistrates’ ruling that
-            there was no case to answer and partially to the period after the
-            April 2017 Supreme Court judgment where it unanimously agreed that
-            no children should be taken out of school without good reason and
-            clarified that 'regularly' means 'in accordance with the rules
-            prescribed by the school'.
-          </p>
         </AccordionSection>
-        <AccordionSection heading="Distribution of absence">
+        <AccordionSection heading="Apprenticeship starts: headlines">
           <p>
-            Nearly half of all pupils (48.9%) were absent for 5 days or fewer
-            across primary, secondary and special schools in 2016/17, down from
-            49.1% in 2015/16.
+            The figures in this section relate to the first 2 quarters of
+            2018/19 (ie August 2018 to January 2019) unless otherwise stated.
           </p>
           <p>
-            The rate of pupils who had more than 25 days of absence in 2016/17
-            (4.3% ) was the same as in 2015/16.
+            During the first two quarters of 2018/19, the number of
+            apprenticeship starts reported to date was 214,200. Compared to:
+          </p>
+          <ul className="govuk-list-bullet">
+            <li>
+              the first two quarters of 2017/18 this was up 10.3% from 194,100
+            </li>
+            <li>
+              the first two quarters of 2016/17 this down 17.2% from 258,800
+            </li>
+          </ul>
+          <p>
+            There have now been 1,709,500 starts since May 2015 and 4,087,100
+            starts since May 2010.
+          </p>
+          <h3 className="govuk-heading-s">Starts by apprenticeship level</h3>
+          <p>Compared to the first two quarters of 2017/18:</p>
+          <ul className="govuk-list-bullet">
+            <li>intermediate level starts down 7.4% (include volume?)</li>
+            <li>advanced level starts up 8.9% (include volume?)</li>
+            <li>higher level starts up 92.6% (include volume?)</li>
+          </ul>
+          <p>Compared to the first two quarters of 2016/17:</p>
+          <ul className="govuk-list-bullet">
+            <li>intermediate level starts down 42.8% (include volume?)</li>
+            <li>advanced level starts down 7.0% (include volume?)</li>
+            <li>higher level starts up 142.6% (include volume?)</li>
+          </ul>
+          <p>During the first two quarters of 2018/19:</p>
+          <ul className="govuk-list-bullet">
+            <li>
+              intermediate and advanced levels as a proportion of all starts
+              decreased to 81.7% - down from 89.5% in the first two quarters of
+              2017/18
+            </li>
+            <li>
+              the number of starts at level 6 and 7 increased to 14,010 - up
+              from 4,050 in the first two quarters of 2017/18
+            </li>
+          </ul>
+          <h3 className="govuk-heading-s">Levy supported starts</h3>
+          <p>
+            During the first two quarters of 2018/19 the number of reported
+            levy-supported starts was 105,700. This was broken down by level as:
+          </p>
+          <ul className="govuk-list-bullet">
+            <li>intermediate level - 34,000</li>
+            <li>advanced level - 44,700</li>
+            <li>higher level - 27,000</li>
+          </ul>
+          <p>
+            In order to be counted as a levy supported start, an apprenticeship
+            must have been supported through levy funds.
           </p>
           <p>
-            These pupils accounted for 23.5% of days missed while 8.2% of pupils
-            had no absence during 2016/17.
+            Since the introduction of the apprenticeship levy in April 2017, a
+            total of 312,900 levy supported apprenticeship starts have been
+            recorded.
+          </p>
+          <h3 className="govuk-heading-s">New apprenticeship standards</h3>
+          <p>
+            The number of apprenticeship starts reported on apprenticeship
+            standards increased to 128,100 - up from 71,600 in the first two
+            quarters of 2017/18.
           </p>
           <p>
-            The average total absence in primary schools per pupil was 7.2 days
-            compared to 16.9 days in special and 9.3 days in secondary schools.
+            There have now been 321,200 starts on apprenticeship standards since
+            their introduction in September 2014.
           </p>
-          <p>
-            Across all schools, the overall absence rate is lowest in the autumn
-            and highest in the summer term, authorised absence is in the spring
-            and lowest in the summer term while unauthorised absence is highest
-            in the summer term.
-          </p>
-        </AccordionSection>
-        <AccordionSection heading="Absence by pupil characteristics">
-          <p>
-            The patterns of absence rates for pupils with different
-            characteristics have been consistent across recent years.
-          </p>
-          <h3 className="govuk-heading-s">Ethnic group</h3>
-          <p>
-            The highest overall absence rates were for Traveller of Irish
-            Heritage and Gypsy/ Roma pupils at 18.1% and 12.9% respectively.
-          </p>
-          <p>
-            Overall absence rates for pupils of a Chinese and Black African
-            ethnicity were substantially lower than the national average of 4.7%
-            at 2.4% and 2.9% respectively.
-          </p>
-          <p>
-            A similar pattern is seen in persistent absence rates where
-            Traveller of Irish heritage pupils had the highest rate at 64% and
-            Chinese pupils had the lowest rate at 3.1%.
-          </p>
+          <h3 className="govuk-heading-s">Participation numbers</h3>
+          <p>The number of reported apprenticeship participants was 602,400:</p>
+          <ul className="govuk-list-bullet">
+            <li>
+              in the first two quarters of 2017/18 this down 11.1% from 677,300
+            </li>
+            <li>
+              in the first two quarters of 2016/17 this down 17.7% from 731,600
+            </li>
+          </ul>
           <h3 className="govuk-heading-s">
-            Free school meals (FSM) eligibility
+            Proportion of participation by apprenticeship level
           </h3>
+          <p>Compared to the first two quarters of 2017/18:</p>
+          <ul className="govuk-list-bullet">
+            <li>intermediate level participation decreased to 28.8%</li>
+            <li>advanced level participation decreased to 6.0%</li>
+            <li>higher level participation increased to 55.7%</li>
+          </ul>
+          <p>Compared to the first two quarters of 2016/17:</p>
+          <ul className="govuk-list-bullet">
+            <li>intermediate level participation decreased to 42.3%</li>
+            <li>advanced level participation decreased to 6.2%</li>
+            <li>higher level participation increased to 108.8%</li>
+          </ul>
+          <h3 className="govuk-heading-s">Participation by age group</h3>
+          <p>Compared to the first two quarters of 2017/18:</p>
+          <ul className="govuk-list-bullet">
+            <li>under-19s - down 7.8%</li>
+            <li>19 to 24s - down 6.8%</li>
+            <li>25-plus - down 15.9%</li>
+          </ul>
+          <p>Compared to the first two quarters of 2016/17:</p>
+          <ul className="govuk-list-bullet">
+            <li>under-19s - down 17%</li>
+            <li>19 to 24s - down 14.6%</li>
+            <li>25-plus - down 20.5%</li>
+          </ul>
+        </AccordionSection>
+        <AccordionSection heading="Apprenticeship starts: learner charactertistics">
           <p>
-            Absence rates are higher for pupils who are known to be eligible for
-            and claiming free school meals.
+            The latest figures in this section relate to the 2018/19 academic
+            year (August 2018 to January 2019) unless otherwise stated.
           </p>
+          <h3 className="govuk-heading-s">Key headlines</h3>
+          <p>Out of the latest 214,200 reported starts:</p>
+          <ul className="govuk-list-bullet">
+            <li>males represent 52.9% (130,400)</li>
+            <li>females represent 47.1% (100,800)</li>
+            <li>under-19s represent 30.8% (xx,xxx)</li>
+            <li>19 to 24s represent 29.6% (xx,xxx)</li>
+            <li>25 and overs represent 39.5% (xx,xxx)</li>
+            <li>
+              Black, Asian and other ethnic minorities (BAME) represent 11.1%
+              (23,700)
+            </li>
+            <li>
+              those declaring a learning difficulties or disabilities (LLDD)
+              represent 11.9% (25,500)
+            </li>
+          </ul>
+          <p>Comparing latest start rates against those for earlier years:</p>
+          <ul className="govuk-list-bullet">
+            <li>males decreased from 53.4% n 2016/17</li>
+            <li>
+              BAMEs remain stable increasing slightly from 11.1% to 11.2% in
+              2016/17
+            </li>
+            <li>
+              LLDDs showed a year-on-year increase to 11.9% from 7.7% in 2011/12
+            </li>
+            <li>
+              the proportion of younger apprentices is growing - the under-19s
+              rate increased to 30.8% from 24.8% in 2016/17
+            </li>
+          </ul>
           <p>
-            The overall absence rate was 7.3% compared to 4.2% for non-FSM
-            pupils while persistent absence was more than double the rate for
-            non-FSM pupils.
+            Participation in apprenticeships has fallen in each age-group -
+            particularly among 25s and over.
           </p>
           <h3 className="govuk-heading-s">Gender</h3>
           <p>
-            Overall absence rates were very similar for boys (4.7%) and girls
-            (4.6%) and persistent absence rates were also similar for boys
-            (10.9%) and girls (10.6%).
+            The proportion of apprenticeship starts between males and females
+            has shifted towards males in the last two years:
           </p>
-          <h3 className="govuk-heading-s">National curriculum year group</h3>
+          <ul className="govuk-list-bullet">
+            <li>
+              females accounted for around 53% of starts between 2011/12 and
+              2016/17 (with the exception of 2012/13 where the female share was
+              nearer 55%)
+            </li>
+            <li>
+              the female rate decreased to 49% in 2017/18 down from 47.1% in the
+              latest reported figures
+            </li>
+          </ul>
+          <p>Investigating further:</p>
+          <ul className="govuk-list-bullet">
+            <li>
+              the decrease in female starts is mostly within the aged 25 and
+              over age group – in contrast there has been a rise in male
+              apprentices aged under-19
+            </li>
+            <li>
+              intermediate (level 2) apprenticeships for females have decreased
+              at a greater rate than for males – x% vs y%
+            </li>
+            <li>
+              health, public Services and care sector starts for females
+              accounted for almost a quarter (23%) of all starts in 2015/16 -
+              this has fallen to 17% in 2018/19
+            </li>
+          </ul>
+          <h3 className="govuk-heading-s">Age</h3>
           <p>
-            Pupils in national curriculum year groups 3 (3.9%) and 4 (4%) had
-            the lowest overall absence rates while pupils in year groups 10
-            (6.1%) and 11 (6.2%) had the highest rates. This trend is repeated
-            for persistent absence.
+            The 25 and over age group has the highest share of starts. However,
+            since 2016/17:
           </p>
-          <h3 className="govuk-heading-s">Special educational need (SEN)</h3>
+          <ul className="govuk-list-bullet">
+            <li>
+              aged 25s and over starts have decreased from 46% to 40% so far in
+              2018/19
+            </li>
+            <li>
+              under-19s starts have increased from 25% to 31% so far in 2018/1
+            </li>
+            <li>
+              the decline in starts for 25s and over seems to predominantly
+              coming from those aged 45-59
+            </li>
+          </ul>
+          <h3 className="govuk-heading-s">Ethnicity</h3>
           <p>
-            Pupils with a statement of special educational needs (SEN) or
-            education healthcare plan (EHC) had an overall absence rate of 8.2%
-            compared to 4.3% for those with no identified SEN.
+            Apprenticeship starts by those in minority ethnic groups have
+            changed little over the last few years with 11.1% of latest starts
+            within the BAME ethnic group compared to 11.2% in the previous two
+            academic years - their peak level.
           </p>
+          <p>Within the BAME group:</p>
+          <ul className="govuk-list-bullet">
+            <li>
+              Black apprentices have seen their proportion of starts decrease to
+              2.9% from 3.7% in 2015/16
+            </li>
+            <li>
+              Asian apprentices and those with mixed-race backgrounds have seen
+              their proportion of starts rise from xx% to yy%
+            </li>
+          </ul>
+          <h3 className="govuk-heading-s">
+            Learners with learning difficulties or disabilities (LLDD)
+          </h3>
           <p>
-            The persistent absence rate was more than 2 times higher for pupils
-            with an SEN statement or EHC plan compared to thise with no
-            identified SEN.
+            The share of LLDD apprentices has increased year-on-year from 7.7%
+            in 2011/12 to 11.9% reported so far in 2018/19.
           </p>
         </AccordionSection>
-        <AccordionSection heading="Absence for 4-year-olds">
+        <AccordionSection heading="Apprenticeship starts: subjects">
           <p>
-            The overall absence rate for 4-year-olds in 2016/17 was 5.1% which
-            is down on the 5.2% rate for the previous 2 years.
+            The latest figures in this section relate to the 2018/19 academic
+            year (August 2018 to January 2019) unless otherwise stated.
+          </p>
+          <p>Out of the 214,200 latest reported starts:</p>
+          <ul className="govuk-list-bullet">
+            <li>starts on standards represent 59.8% (xx,xxxx)</li>
+            <li>levy-supported starts represent 49.4% (xx,xxx)</li>
+            <li>level 6 and above starts represent 6.5% (xx,xxx)</li>
+            <li>
+              starts with science, technology, engineering and manufacturing
+              (STEM) related subjects represent 31% (xx,xxx)
+            </li>
+          </ul>
+          <p>Compared to this point in the 2017/18 academic year:</p>
+          <ul className="govuk-list-bullet">
+            <li>starts on standards have increased by 78.9% to 128,100</li>
+            <li>level 6 and 7 starts have increased by more than 3 times</li>
+          </ul>
+          <p>
+            Starts in business, admin and law related subjects continue to be
+            most popular - accounting for x% of all starts.
+          </p>
+          <p>The proportion of STEM starts has increased year-on-year.</p>
+          <p>
+            Data shows there' ha's been a shift towards starts on higher level
+            apprenticeships in recent years (ie those at level 4 and above).
+          </p>
+          <p>Between 2016/17 and 2017/18:</p>
+          <ul className="govuk-list-bullet">
+            <li>higher level starts increased by 31.7% to 48,150</li>
+            <li>level 6 and above starts increased by x% to 10,880</li>
+            <li>intermediate starts decreased by 38.1%</li>
+            <li>advanced starts decreased by 15.9%</li>
+          </ul>
+          <p>Latest quarterly data for 2018/19 shows:</p>
+          <ul className="govuk-list-bullet">
+            <li>higher level starts increased by 31.7% to 48,150</li>
+            <li>level 6 and above starts increased by x% to 10,880</li>
+          </ul>
+          <p>
+            In 2011/12 the proportion of intermediate and advanced level starts
+            out of all starts was 99.3%.
           </p>
           <p>
-            Absence recorded for 4-year-olds is not treated as 'authorised' or
-            'unauthorised' and is therefore reported as overall absence only.
+            Since their introduction in September 2014, the number of starts on
+            standards now stands at 321,200.
           </p>
         </AccordionSection>
-        <AccordionSection heading="Pupil referral unit absence">
+
+        <AccordionSection heading="Apprenticeship starts: public sector">
           <p>
-            The overall absence rate for pupil referral units in 2016/17 was
-            33.9% compared to 32.6% in 2015/16.
+            Public sector bodies in England with 250 or more staff have a target
+            to employ an average of at least 2.3% of their staff as new
+            apprentice starts over the period 1 April 2017 to 31 March 2021.
           </p>
           <p>
-            Persistent absence in pupil referral units was 73.9% in 2016/17
-            compared to 72.5% in 2015/16.
+            This means when making workforce planning decisions bodies in scope
+            should actively consider apprenticeships either for new recruits or
+            as part of career development for existing staff.
+          </p>
+          <p>
+            The target is for new apprenticeship starts (including both existing
+            staff that start an apprenticeship and new recruits) and measures
+            these as a percentage of the total headcount of public sector bodies
+            at the beginning of the reporting period.
+          </p>
+          <p>
+            The target is an average over four years, split into the following
+            individual reporting periods covering each financial year:
+          </p>
+          <h3 className="govuk-heading-s">
+            Period covering 1 April 2017 to 31 March 2018
+          </h3>
+          <p>Figures submitted to DfE by public sector bodies show:</p>
+          <ul className="govuk-list-bullet">
+            <li>
+              the proportion of workers in the public sector who started an
+              apprenticeship was 1.4% - equating to over 45,000 new apprentices
+            </li>
+            <li>
+              the total number of employees has fallen over the reporting period
+              (from 3.21 to 3.18 million) but the number of apprentices has
+              risen (from 46,000 to more than 60,000)
+            </li>
+            <li>
+              at the start of the reporting period - 1.4% of employees were
+              apprentices rising to 1.9% by the end
+            </li>
+            <li>
+              staff starting an apprenticeship account for one in ten (10%) of
+              all new appointments
+            </li>
+          </ul>
+          <h3 className="govuk-heading-s">Sub-sectors</h3>
+          <p>
+            There was variation in the take-up rate of apprentices in different
+            parts of the public sector during 2017/18:
+          </p>
+          <ul className="govuk-list-bullet">
+            <li>
+              armed forces recruitment reported the proportion of employees
+              starting with an apprenticeship at 9.1%
+            </li>
+            <li>
+              civil service recruitment was slightly behind the national average
+              reporting 1.3% of employees starting with an apprenticeship
+            </li>
+            <li>
+              NHS recruitment was also reported slightly behind the national
+              average with 1.2% of employees starting with an apprenticeship
+            </li>
+            <li>
+              police recruitment had the lowest reported rate of apprenticeship
+              recruitment at 0.2%
+            </li>
+            <li>
+              all sub-sectors (apart from the police) saw a reported increase in
+              the percentage of employees starting with an apprenticeship
+            </li>
+          </ul>
+          <p>
+            Most sub-sectors saw a modest rise in headcount over the period.
+            However, local authorities (LAs) declared a 5% fall in employees.
+          </p>
+          <p>
+            Despite this, the the number of apprentices in LAs has risen has
+            risen by more than 70% from 7,300 to 12,500.
           </p>
         </AccordionSection>
         <AccordionSection
-          heading="Regional and local authority (LA) breakdown"
+          heading="A N Other section"
           onToggle={() => mapRef && mapRef.refresh()}
         >
           <PrototypeAbsenceData
@@ -649,14 +907,14 @@ const PublicationPage = () => {
       <h2 className="govuk-heading-m govuk-!-margin-top-9">Help and support</h2>
       <Accordion id="extra-information-sections">
         <AccordionSection
-          heading="Pupil absence statistics: methodology"
+          heading="Apprenticeship statistics: methodology"
           caption="How we collect and process statistics and data"
           headingTag="h3"
         >
           <p>
             Read our{' '}
             <a href="/prototypes/methodology-absence">
-              Pupil absence statistics: methodology
+              Apprenticeships statistics: methodology
             </a>{' '}
             guidance.
           </p>

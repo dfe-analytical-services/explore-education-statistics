@@ -28,14 +28,12 @@ class MethodologyIndexPage extends Component<Props> {
     const { themes } = this.props;
     return (
       <Page
-        breadcrumbs={[
-          {
-            link: '/methodology',
-            name: 'Methodology',
-          },
-        ]}
+        title="Methodologies"
+        pageMeta={{
+          description:
+            'Browse to find out about the methodology behind specific education statistics and data',
+        }}
       >
-        <PageTitle title="Education statistics: methodology" />
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
             <p className="govuk-body-l">
