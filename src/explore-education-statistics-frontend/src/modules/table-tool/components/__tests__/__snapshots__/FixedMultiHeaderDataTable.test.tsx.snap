@@ -1,0 +1,122 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FixedMultiHeaderDataTable renders underlying table 1`] = `
+<table
+  aria-labelledby="dataTableCaption"
+  class="govuk-table table"
+>
+  <thead>
+    <tr>
+      <td
+        class="borderBottom borderRight"
+        colspan="1"
+        rowspan="2"
+      />
+      <th
+        class="govuk-table__header--center borderRight"
+        colspan="2"
+        scope="colgroup"
+      >
+        Col group A
+      </th>
+      <th
+        class="govuk-table__header--center borderRight"
+        colspan="2"
+        scope="colgroup"
+      >
+        Col group B
+      </th>
+    </tr>
+    <tr>
+      <th
+        class="govuk-table__header--numeric borderBottom"
+        colspan="1"
+        scope="col"
+      >
+        Col group C
+      </th>
+      <th
+        class="govuk-table__header--numeric borderBottom borderRight"
+        colspan="1"
+        scope="col"
+      >
+        Col group D
+      </th>
+      <th
+        class="govuk-table__header--numeric borderBottom"
+        colspan="1"
+        scope="col"
+      >
+        Col group C
+      </th>
+      <th
+        class="govuk-table__header--numeric borderBottom borderRight"
+        colspan="1"
+        scope="col"
+      >
+        Col group D
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th
+        class="govuk-table__cell--numeric borderRight"
+        rowspan="1"
+        scope="row"
+      >
+        Row group A
+      </th>
+      <td
+        class="govuk-table__cell--numeric borderBottom"
+      >
+        1
+      </td>
+      <td
+        class="govuk-table__cell--numeric borderRight borderBottom"
+      >
+        2
+      </td>
+      <td
+        class="govuk-table__cell--numeric borderBottom"
+      >
+        3
+      </td>
+      <td
+        class="govuk-table__cell--numeric borderRight borderBottom"
+      >
+        4
+      </td>
+    </tr>
+    <tr>
+      <th
+        class="govuk-table__cell--numeric borderRight borderBottom"
+        rowspan="1"
+        scope="row"
+      >
+        Row group B
+      </th>
+      <td
+        class="govuk-table__cell--numeric borderBottom"
+      >
+        5
+      </td>
+      <td
+        class="govuk-table__cell--numeric borderRight borderBottom"
+      >
+        6
+      </td>
+      <td
+        class="govuk-table__cell--numeric borderBottom"
+      >
+        7
+      </td>
+      <td
+        class="govuk-table__cell--numeric borderRight borderBottom"
+      >
+        8
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;

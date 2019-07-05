@@ -1,9 +1,5 @@
 @import '~explore-education-statistics-common/src/styles/govuk-base';
 
-.list {
-  padding: govuk-spacing(2);
-}
-
 .listDraggingOver {
   background: govuk-colour('grey-4');
   outline: $govuk-focus-width solid $govuk-focus-colour;

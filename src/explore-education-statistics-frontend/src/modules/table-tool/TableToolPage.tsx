@@ -172,7 +172,7 @@ class TableToolPage extends Component<Props, State> {
       indicators,
       startYear: timePeriods[0].year,
       endYear: timePeriods[timePeriods.length - 1].year,
-      geographicLevel: 'National',
+      geographicLevel: 'Country',
     });
 
     const filtersByValue = mapValues(subjectMeta.filters, value =>
