@@ -314,9 +314,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                     }
                 }
             },
-            
-            
-            
             new Theme
             {
                 Id = new Guid("9aa81762-e52c-40d4-8a90-f469977360a7"),
