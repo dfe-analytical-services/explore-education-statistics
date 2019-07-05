@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from './Link';
+import printStyles from './PrintCSS.module.scss';
 
 export interface BreadcrumbsProps {
   breadcrumbs?: {
@@ -12,7 +13,7 @@ const Breadcrumbs = ({ breadcrumbs = [] }: BreadcrumbsProps) => {
   const currentBreadcrumbIndex = breadcrumbs.length - 1;
 
   return (
-    <div className="govuk-breadcrumbs">
+    <div className={`govuk-breadcrumbs ${printStyles.hidden}`}>
       <ol className="govuk-breadcrumbs__list" data-testid="breadcrumbs--list">
         <li className="govuk-breadcrumbs__list-item">
           <Link className="govuk-breadcrumbs__link" to="/">

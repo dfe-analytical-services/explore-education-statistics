@@ -17,6 +17,7 @@ import classNames from 'classnames';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
 import ReactMarkdown from 'react-markdown';
+import printStyles from '@frontend/components/PrintCSS.module.scss';
 import ContentBlock from './components/ContentBlock';
 import styles from './PublicationReleasePage.module.scss';
 
@@ -92,6 +93,7 @@ class PublicationReleasePage extends Component<Props> {
                   </div>
                 </dl>
                 <Link
+                  className={printStyles.hidden}
                   unvisited
                   analytics={{
                     category: 'Subscribe',
@@ -213,7 +215,9 @@ class PublicationReleasePage extends Component<Props> {
           </div>
         </div>
         <hr />
-        <h2>Headline facts and figures - {data.releaseName}</h2>
+        <h2 className={printStyles.pageBreakBefore}>
+          Headline facts and figures - {data.releaseName}
+        </h2>
 
         {data.keyStatistics && (
           <DataBlock {...data.keyStatistics} id="keystats" />

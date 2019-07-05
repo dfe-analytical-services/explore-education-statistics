@@ -7,6 +7,7 @@ import React, {
   HTMLAttributes,
   ReactNode,
 } from 'react';
+import printStyles from '@frontend/components/PrintCSS.module.scss';
 import styles from './TabsSection.module.scss';
 
 export const classes = {
@@ -48,6 +49,7 @@ const TabsSection = forwardRef<HTMLElement, TabsSectionProps>(
           {
             [classes.panelHidden]: tabProps.hidden,
           },
+          printStyles.unbreakable,
         )}
         id={id}
         ref={ref}

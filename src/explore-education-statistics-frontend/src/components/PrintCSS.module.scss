@@ -1,0 +1,15 @@
+@import '../styles/all';
+
+.hidden {
+  @media print {
+    display: none;
+  }
+}
+
+.pageBreakBefore {
+  page-break-before: always;
+}
+
+.unbreakable {
+  page-break-inside: avoid;
+}

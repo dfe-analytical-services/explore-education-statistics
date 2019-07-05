@@ -3,6 +3,7 @@ import useToggle from '@common/hooks/useToggle';
 import findAllParents from '@common/lib/dom/findAllParents';
 import classNames from 'classnames';
 import React, { MouseEvent, ReactNode, useEffect, useRef } from 'react';
+import printStyles from '@frontend/components/PrintCSS.module.scss';
 
 let hasNativeDetails: boolean;
 let idCounter = 0;
@@ -60,7 +61,7 @@ const Details = ({
 
   return (
     <details
-      className={classNames('govuk-details', className)}
+      className={classNames('govuk-details', className, printStyles.hidden)}
       open={open}
       ref={ref}
       role={onMounted('group')}
