@@ -6,7 +6,6 @@ import RelatedInformation from '@common/components/RelatedInformation';
 import methodologyService, { Theme } from '@common/services/methodologyService';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
-import PageTitle from '@frontend/components/PageTitle';
 import React, { Component } from 'react';
 import MethodologyList from './components/MethodologyList';
 
