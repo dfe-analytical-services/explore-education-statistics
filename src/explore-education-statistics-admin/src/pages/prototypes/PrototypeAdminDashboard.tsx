@@ -1,5 +1,3 @@
-import AdminDashboardApprovedForPublication from '@admin/pages/prototypes/components/AdminDashboardApprovedForPublication';
-import AdminDashboardNeedsWork from '@admin/pages/prototypes/components/AdminDashboardNeedsWork';
 import PrototypeAdminDashboardPublications from '@admin/pages/prototypes/components/PrototypeAdminDashboardPublications';
 import AdminDashboardReadyForApproval from '@admin/pages/prototypes/components/AdminDashboardReadyForApproval';
 import RelatedInformation from '@common/components/RelatedInformation';
@@ -7,7 +5,6 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import React from 'react';
 import { RouteChildrenProps } from 'react-router';
-import AdminDashboardInProgress from '@admin/pages/prototypes/components/AdminDashboardInProgress';
 import { LoginContext } from '@admin/components/Login';
 import Link from '../../components/Link';
 import PrototypePage from './components/PrototypePage';

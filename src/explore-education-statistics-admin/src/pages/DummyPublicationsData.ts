@@ -10,8 +10,6 @@ import {
   Topic,
 } from '@admin/services/publicationService';
 import { PrototypeLoginService } from '@admin/services/PrototypeLoginService';
-import { format } from 'date-fns';
-import React from 'react';
 
 const methodologies: Methodology[] = [
   {

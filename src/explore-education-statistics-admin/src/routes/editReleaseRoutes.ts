@@ -7,6 +7,7 @@ import EditReleasePublishStatusPage from '../pages/edit-release/EditReleasePubli
 
 export interface EditReleaseRoute {
   path: string;
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   component: (props: any) => JSX.Element;
   title: string;
   generateLink: (releaseId: string) => string;
@@ -15,6 +16,7 @@ export interface EditReleaseRoute {
 const createRoute = (
   section: string,
   title: string,
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   component: (props: any) => JSX.Element,
 ): EditReleaseRoute => {
   const path = `/edit-release/:releaseId/${section}`;
