@@ -18,6 +18,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
         exclusions_duration_of_fixed_exclusions,
         exclusions_number_of_fixed_exclusions,
         exclusions_total_days_missed_fixed_exclusions,
-        school_applications_and_offers
+        school_applications_and_offers,
+        
+        SEN2_AGE_NEW,
+        SEN2_AGE_STOCK,
+        SEN2_ESTAB_NEW,
+        SEN2_ESTAB_STOCK,
+        SEN2_MI,
+        skeleton_dashboard_tidy_data_NARTS,
+        skeleton_dashboard_tidy_data_annual_v4,
+        clean_data_fe,
+        level_2_3_national,
+        level_2_3_sf,
+        level_2_3_sfla,
+        KS2_2016_test_UD,
+        KS4_2018_LA_Char_Testdata,
+        KS4_2018_Nat_Char_Testdata,
+        KS4_2018_Subject_Tables_S1_TestData,
+        KS4_2018_Subject_Tables_S3_TestData
     }
 }
