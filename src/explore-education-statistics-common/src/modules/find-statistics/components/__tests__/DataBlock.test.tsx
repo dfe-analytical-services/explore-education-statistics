@@ -42,9 +42,42 @@ describe('DataBlock', () => {
           {
             type: 'horizontalbar',
             stacked: true,
-            indicators: ['23', '26', '28'],
-            xAxis: { title: 'test x axis' },
-            yAxis: { title: 'test y axis' },
+            labels: {
+              '23_1_2': {
+                name: '23_1_2',
+                label: 'Label 23_1_2',
+                value: '23_1_2',
+                unit: '%',
+              },
+              '26_1_2': {
+                name: '26_1_2',
+                label: 'Label 26_1_2',
+                value: '26_1_2',
+                unit: '%',
+              },
+              '28_1_2': {
+                name: '28_1_2',
+                label: 'Label 28_1_2',
+                value: '28_1_2',
+                unit: '%',
+              },
+            },
+            axes: {
+              major: {
+                name: 'major',
+                groupBy: ['timePeriod'],
+                dataSets: [
+                  { indicator: '23', filters: ['1', '2'] },
+                  { indicator: '26', filters: ['1', '2'] },
+                  { indicator: '28', filters: ['1', '2'] },
+                ],
+              },
+              minor: {
+                name: 'minor',
+                groupBy: [],
+                dataSets: [],
+              },
+            },
             width: 800,
             height: 600,
           },
@@ -83,9 +116,43 @@ describe('DataBlock', () => {
         charts={[
           {
             type: 'verticalbar',
-            indicators: ['23', '26', '28'],
-            xAxis: { title: 'test x axis' },
-            yAxis: { title: 'test y axis' },
+            labels: {
+              '23_1_2': {
+                name: '23_1_2',
+                label: 'Label 23_1_2',
+                value: '23_1_2',
+                unit: '%',
+              },
+              '26_1_2': {
+                name: '26_1_2',
+                label: 'Label 26_1_2',
+                value: '26_1_2',
+                unit: '%',
+              },
+              '28_1_2': {
+                name: '28_1_2',
+                label: 'Label 28_1_2',
+                value: '28_1_2',
+                unit: '%',
+              },
+            },
+
+            axes: {
+              major: {
+                name: 'major',
+                groupBy: ['timePeriod'],
+                dataSets: [
+                  { indicator: '23', filters: ['1', '2'] },
+                  { indicator: '26', filters: ['1', '2'] },
+                  { indicator: '28', filters: ['1', '2'] },
+                ],
+              },
+              minor: {
+                name: 'minor',
+                groupBy: [],
+                dataSets: [],
+              },
+            },
             width: 800,
             height: 600,
           },
@@ -180,9 +247,43 @@ describe('DataBlock', () => {
         charts={[
           {
             type: 'map',
-            indicators: ['23', '26', '28'],
-            xAxis: { title: 'test x axis' },
-            yAxis: { title: 'test y axis' },
+            labels: {
+              '23_1_2': {
+                name: '23_1_2',
+                label: 'Label 23_1_2',
+                value: '23_1_2',
+                unit: '%',
+              },
+              '26_1_2': {
+                name: '26_1_2',
+                label: 'Label 26_1_2',
+                value: '26_1_2',
+                unit: '%',
+              },
+              '28_1_2': {
+                name: '28_1_2',
+                label: 'Label 28_1_2',
+                value: '28_1_2',
+                unit: '%',
+              },
+            },
+
+            axes: {
+              major: {
+                name: 'major',
+                groupBy: ['timePeriod'],
+                dataSets: [
+                  { indicator: '23', filters: ['1', '2'] },
+                  { indicator: '26', filters: ['1', '2'] },
+                  { indicator: '28', filters: ['1', '2'] },
+                ],
+              },
+              minor: {
+                name: 'minor',
+                groupBy: [],
+                dataSets: [],
+              },
+            },
             width: 800,
             height: 600,
           },

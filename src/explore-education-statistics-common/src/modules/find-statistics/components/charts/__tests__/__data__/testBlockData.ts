@@ -13,12 +13,12 @@ import Features from './testLocationData';
 const data: DataBlockData = {
   publicationId: 'test',
   releaseDate: new Date(),
-  releaseId: 1,
+  releaseId: '1',
   subjectId: 1,
   geographicLevel: GeographicLevel.Country,
   result: [
     {
-      filters: [1, 2],
+      filters: ['1', '2'],
       location: {
         country: {
           code: 'E92000001',
@@ -47,7 +47,7 @@ const data: DataBlockData = {
       year: 2014,
     },
     {
-      filters: [1, 2],
+      filters: ['1', '2'],
       location: {
         country: {
           code: 'E92000001',
@@ -68,9 +68,9 @@ const data: DataBlockData = {
         },
       },
       measures: {
-        '28': '5',
-        '26': '10',
-        '23': '3',
+        '28': '1',
+        '26': '4',
+        '23': '-3',
       },
       timeIdentifier: 'HT6',
       year: 2015,
@@ -81,12 +81,12 @@ const data: DataBlockData = {
 const multipleData: DataBlockData = {
   publicationId: 'test',
   releaseDate: new Date(),
-  releaseId: 1,
+  releaseId: '1',
   subjectId: 1,
   geographicLevel: GeographicLevel.Country,
   result: [
     {
-      filters: [1, 2],
+      filters: ['1', '2'],
       location: {
         country: {
           code: 'E92000001',
@@ -115,7 +115,7 @@ const multipleData: DataBlockData = {
       year: 2015,
     },
     {
-      filters: [1, 2],
+      filters: ['1', '2'],
       location: {
         country: {
           code: 'S92000001',
@@ -2806,19 +2806,130 @@ const responseMetadata: ResponseMetaData = {
 const AbstractChartProps: ChartProps = {
   data,
   meta: metaData,
-  labels,
-  indicators: ['23', '26', '28'],
-  xAxis: { title: 'test x axis' },
-  yAxis: { title: 'test y axis' },
+
+  labels: {
+    '2014_HT6': {
+      label: metaData.timePeriods['2014_HT6'].label,
+    },
+    '2015_HT6': {
+      label: metaData.timePeriods['2015_HT6'].label,
+    },
+    '23_1_2_____': {
+      label: metaData.indicators['23'].label,
+      unit: '%',
+      value: '23_1_2',
+    },
+    '26_1_2_____': {
+      label: metaData.indicators['26'].label,
+      unit: '%',
+      value: '26_1_2',
+    },
+    '28_1_2_____': {
+      label: metaData.indicators['28'].label,
+      unit: '%',
+      value: '28_1_2',
+    },
+  },
+
+  axes: {
+    major: {
+      name: '23',
+      groupBy: ['timePeriod'],
+      dataSets: [
+        {
+          indicator: '23',
+          filters: ['1', '2'],
+        },
+        {
+          indicator: '26',
+          filters: ['1', '2'],
+        },
+        {
+          indicator: '28',
+          filters: ['1', '2'],
+        },
+      ],
+    },
+    minor: {
+      name: 'minor',
+      groupBy: [],
+      title: '',
+      visible: true,
+      dataSets: [],
+    },
+  },
 };
 
 const AbstractMultipleChartProps: ChartProps = {
   data: multipleData,
   meta: metaData,
-  labels,
-  indicators: ['23', '26', '28'],
-  xAxis: { title: 'test x axis' },
-  yAxis: { title: 'test y axis' },
+
+  labels: {
+    '23': {
+      label: metaData.indicators['23'].label,
+      name: '23',
+      unit: '%',
+      value: '23',
+    },
+    '26': {
+      label: metaData.indicators['26'].label,
+      name: '26',
+      unit: '%',
+      value: '26',
+    },
+    '28': {
+      label: metaData.indicators['28'].label,
+      name: '28',
+      unit: '%',
+      value: '28',
+    },
+    '23_1_2': {
+      label: metaData.indicators['23'].label,
+      name: '23_1_2',
+      unit: '%',
+      value: '23_1_2',
+    },
+    '26_1_2': {
+      label: metaData.indicators['26'].label,
+      name: '26_1_2',
+      unit: '%',
+      value: '26_1_2',
+    },
+    '28_1_2': {
+      label: metaData.indicators['28'].label,
+      name: '28_1_2',
+      unit: '%',
+      value: '28_1_2',
+    },
+  },
+
+  axes: {
+    major: {
+      name: '23',
+      groupBy: ['timePeriod'],
+      dataSets: [
+        {
+          indicator: '23',
+          filters: ['1', '2'],
+        },
+        {
+          indicator: '26',
+          filters: ['1', '2'],
+        },
+        {
+          indicator: '28',
+          filters: ['1', '2'],
+        },
+      ],
+    },
+    minor: {
+      name: 'minor',
+      groupBy: [],
+      title: '',
+      visible: true,
+      dataSets: [],
+    },
+  },
 };
 
 const response: DataBlockResponse = {

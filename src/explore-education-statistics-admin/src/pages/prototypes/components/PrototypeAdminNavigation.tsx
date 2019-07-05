@@ -6,18 +6,14 @@ interface Props {
   task?: string;
 }
 
-const PrototypeAdminNavigation = ({ sectionId, task }: Props) => {
+const PrototypeAdminNavigation = ({ sectionId }: Props) => {
   return (
     <>
-      {task !== 'editRelease' && (
-        <>
-          <span className="govuk-tag">New release in progress</span>
-          <h1 className="govuk-heading-l">
-            Pupil absence statistics and data for schools in England{' '}
-            <span className="govuk-caption-l">Academic year 2018 to 2019</span>
-          </h1>
-        </>
-      )}
+      <h1 className="govuk-heading-l">
+        Pupil absence statistics and data for schools in England{' '}
+        <span className="govuk-caption-l">Create new release</span>
+      </h1>
+
       <nav className="app-navigation govuk-!-margin-bottom-9">
         <ul className="app-navigation__list govuk-!-margin-bottom-0">
           <li

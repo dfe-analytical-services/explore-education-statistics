@@ -120,12 +120,12 @@ Object {
   },
   "publicationId": "test",
   "releaseDate": Object {},
-  "releaseId": 1,
+  "releaseId": "1",
   "result": Array [
     Object {
       "filters": Array [
-        1,
-        2,
+        "1",
+        "2",
       ],
       "location": Object {
         "country": Object {
@@ -156,8 +156,8 @@ Object {
     },
     Object {
       "filters": Array [
-        1,
-        2,
+        "1",
+        "2",
       ],
       "location": Object {
         "country": Object {
@@ -179,9 +179,9 @@ Object {
         },
       },
       "measures": Object {
-        "23": "3",
-        "26": "10",
-        "28": "5",
+        "23": "-3",
+        "26": "4",
+        "28": "1",
       },
       "timeIdentifier": "HT6",
       "year": 2015,

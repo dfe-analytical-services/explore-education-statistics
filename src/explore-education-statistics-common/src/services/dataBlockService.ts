@@ -21,7 +21,7 @@ export enum GeographicLevel {
   Ward = 'Ward',
 }
 
-interface Country {
+export interface Country {
   code: string;
   name: string;
 }
@@ -43,14 +43,14 @@ interface LocalAuthorityDistrict {
 }
 
 export interface DataBlockLocation {
-  country: Country;
-  region: Region;
-  localAuthority: LocalAuthority;
-  localAuthorityDistrict: LocalAuthorityDistrict;
+  country?: Country;
+  region?: Region;
+  localAuthority?: LocalAuthority;
+  localAuthorityDistrict?: LocalAuthorityDistrict;
 }
 
 export interface Result {
-  filters: number[];
+  filters: string[];
   location: DataBlockLocation;
   measures: {
     [key: string]: string;
@@ -61,7 +61,7 @@ export interface Result {
 
 export interface DataBlockData {
   publicationId: string;
-  releaseId: number;
+  releaseId: string;
   subjectId: number;
   releaseDate: Date;
   geographicLevel: GeographicLevel;
@@ -75,7 +75,7 @@ interface LabelValueMetadata {
   value: string;
 }
 
-interface LabelValueUnitMetadata extends LabelValueMetadata {
+export interface LabelValueUnitMetadata extends LabelValueMetadata {
   unit: string;
 }
 
@@ -139,7 +139,7 @@ export interface DataBlockGeoJsonProperties {
   lat: number;
 
   // the following are just named here for easier finding in code completion and not required
-  objectid: number;
+  objectid?: number;
   ctry17cd?: string | null;
   ctry17nm?: string | null;
   lad17cd?: string | null;
@@ -162,8 +162,9 @@ export interface DataBlockLocationMetadata {
 export interface DataBlockMetadata {
   indicators: Dictionary<LabelValueUnitMetadata>;
   filters: Dictionary<LabelValueMetadata>;
+  timePeriod?: Dictionary<LabelValueMetadata>;
   timePeriods: Dictionary<LabelValueMetadata>;
-  locations: Dictionary<DataBlockLocationMetadata>;
+  locations?: Dictionary<DataBlockLocationMetadata>;
 }
 
 export interface DataBlockRequest {
@@ -191,7 +192,7 @@ export interface DataBlockResponse {
   metaData: DataBlockMetadata;
 
   publicationId: string;
-  releaseId: number;
+  releaseId: string;
   subjectId: number;
   releaseDate: Date;
   geographicLevel: GeographicLevel;
@@ -199,10 +200,8 @@ export interface DataBlockResponse {
 }
 
 const DataBlockService = {
-  async getDataBlockForSubject(request: DataBlockRequest) {
-    const response: DataBlockResponse = await dataApi.post('/Data', request);
-
-    response.metaData.timePeriods = response.result.reduce(
+  buildTimePeriodMetadata(result: Result[]) {
+    return result.reduce(
       (results: Dictionary<LabelValueMetadata>, { timeIdentifier, year }) => {
         const key = `${year}_${timeIdentifier}`;
         if (results[key]) return results;
@@ -214,6 +213,14 @@ const DataBlockService = {
       },
       {},
     );
+  },
+
+  async getDataBlockForSubject(request: DataBlockRequest) {
+    const response: DataBlockResponse = await dataApi.post('/Data', request);
+
+    response.metaData.timePeriods =
+      response.metaData.timePeriod ||
+      DataBlockService.buildTimePeriodMetadata(response.result);
 
     return response;
   },

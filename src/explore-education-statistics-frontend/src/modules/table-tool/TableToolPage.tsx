@@ -12,7 +12,6 @@ import TimePeriod from '@common/services/types/TimePeriod';
 import { Dictionary } from '@common/types/util';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
-import PageTitle from '@frontend/components/PageTitle';
 import PreviousStepModalConfirm from '@frontend/modules/table-tool/components/PreviousStepModalConfirm';
 import mapValues from 'lodash/mapValues';
 import { NextContext } from 'next';

@@ -89,3 +89,27 @@ h1.govuk-panel__title {
   max-height: 600px;
   overflow-x: auto;
 }
+
+.dfe-summary-list__key--small {
+  width: 15%;
+}
+
+.dfe-toggle-edit {
+  background: $govuk-brand-colour;
+  padding: 10px;
+}
+.dfe-toggle-edit {
+  .govuk-fieldset__legend {
+    background: $govuk-brand-colour;
+    color: govuk-colour('white');
+    margin-bottom: 0;
+    padding: 5px;
+  }
+  h1 {
+    color: govuk-colour('white');
+  }
+  .govuk-radios {
+    background: govuk-colour('white');
+    padding: 6px 6px 0;
+  }
+}

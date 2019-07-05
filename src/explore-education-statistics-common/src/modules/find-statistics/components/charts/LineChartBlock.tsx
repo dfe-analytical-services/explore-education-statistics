@@ -1,4 +1,11 @@
-import { ChartProps } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import {
+  ChartDataB,
+  ChartDefinition,
+  ChartProps,
+  createDataForAxis,
+  getKeysForChart,
+  mapNameToNameLabel,
+} from '@common/modules/find-statistics/components/charts/ChartFunctions';
 
 import React, { Component } from 'react';
 import {
@@ -46,30 +53,45 @@ const CustomToolTip = ({ active, payload, label }: TooltipProps) => {
 };
 
 export default class LineChartBlock extends Component<ChartProps> {
+  public static definition: ChartDefinition = {
+    type: 'line',
+    name: 'Line',
+
+    data: [
+      {
+        type: 'line',
+        title: 'Line',
+        entryCount: 'multiple',
+        targetAxis: 'xaxis',
+      },
+    ],
+
+    axes: [
+      {
+        id: 'xaxis',
+        title: 'X Axis',
+        type: 'major',
+        defaultDataType: 'timePeriod',
+      },
+      {
+        id: 'yaxis',
+        title: 'Y Axis',
+        type: 'minor',
+      },
+    ],
+  };
+
   public render() {
-    const { data, indicators, height, xAxis, yAxis, labels, meta } = this.props;
+    const { data, height, axes, labels } = this.props;
 
-    const chartData = data.result.map(result => {
-      return indicators.reduce(
-        (v, indicatorName) => {
-          return {
-            ...v,
-            [indicatorName]: result.measures[indicatorName],
-          };
-        },
-        {
-          name: `${
-            meta.timePeriods[`${result.year}_${result.timeIdentifier}`].label
-          }`,
-        },
-      );
-    });
+    const yAxisDomain: [AxisDomain, AxisDomain] = [-10, 10];
 
-    let yAxisDomain: [AxisDomain, AxisDomain] = [0, 0];
+    const chartData: ChartDataB[] = createDataForAxis(
+      axes.major,
+      data.result,
+    ).map(mapNameToNameLabel(labels));
 
-    if (yAxis.min !== undefined && yAxis.max !== undefined) {
-      yAxisDomain = [yAxis.min, yAxis.max];
-    }
+    const keysForChart = getKeysForChart(chartData);
 
     return (
       <ResponsiveContainer width={900} height={height || 300}>
@@ -78,18 +100,15 @@ export default class LineChartBlock extends Component<ChartProps> {
           margin={{ top: 5, right: 30, left: 20, bottom: 25 }}
         >
           <Tooltip content={CustomToolTip} />
-          {indicators.length > 1 ? (
-            <Legend verticalAlign="top" height={36} />
-          ) : (
-            ''
-          )}
+          <Legend verticalAlign="top" height={36} />
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis
             dataKey="name"
+            allowDuplicatedCategory={false}
             label={{
               offset: 5,
               position: 'bottom',
-              value: xAxis.title,
+              value: '',
             }}
             padding={{ left: 20, right: 20 }}
             tickMargin={10}
@@ -99,32 +118,28 @@ export default class LineChartBlock extends Component<ChartProps> {
               angle: -90,
               offset: 0,
               position: 'left',
-              value: yAxis.title,
+              value: '',
             }}
             scale="auto"
-            unit="%"
             domain={yAxisDomain}
+            dataKey="value"
           />
-          {indicators.map((dataKey, index) => {
-            const key = index;
 
-            return (
-              <Line
-                key={key}
-                name={labels[dataKey]}
-                type="linear"
-                dataKey={dataKey}
-                stroke={colours[index]}
-                fill={colours[index]}
-                strokeWidth="5"
-                unit="%"
-                legendType={symbols[index]}
-                activeDot={{ r: 3 }}
-                dot={props => <Symbols {...props} type={symbols[index]} />}
-                isAnimationActive={false}
-              />
-            );
-          })}
+          {keysForChart.map((name, index) => (
+            <Line
+              key={name}
+              dataKey={name}
+              type="linear"
+              name={(labels[name] && labels[name].label) || name}
+              legendType={symbols[index]}
+              dot={props => <Symbols {...props} type={symbols[index]} />}
+              stroke={colours[index]}
+              fill={colours[index]}
+              strokeWidth="5"
+              unit={(labels[name] && labels[name].unit) || ''}
+              isAnimationActive={false}
+            />
+          ))}
         </LineChart>
       </ResponsiveContainer>
     );

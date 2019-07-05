@@ -21,20 +21,21 @@ const TableHeading = ({ data, meta, indicators }: Props) => {
     <thead className="govuk-table__head">
       <tr>
         <th className="govuk-table__header" />
-        {[...data.result]
-          .sort((a, b) => a.year - b.year)
-          .map(result => (
-            <th
-              key={result.year}
-              className="govuk-table__header govuk-table__cell--numeric"
-              scope="col"
-            >
-              {
-                meta.timePeriods[`${result.year}_${result.timeIdentifier}`]
-                  .label
-              }
-            </th>
-          ))}
+        {meta.timePeriods &&
+          [...data.result]
+            .sort((a, b) => a.year - b.year)
+            .map(result => (
+              <th
+                key={result.year}
+                className="govuk-table__header govuk-table__cell--numeric"
+                scope="col"
+              >
+                {meta.timePeriods &&
+                  meta.timePeriods[`${result.year}_${result.timeIdentifier}`] &&
+                  meta.timePeriods[`${result.year}_${result.timeIdentifier}`]
+                    .label}
+              </th>
+            ))}
       </tr>
     </thead>
   );

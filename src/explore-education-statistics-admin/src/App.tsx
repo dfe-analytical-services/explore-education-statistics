@@ -4,11 +4,13 @@ import { Route } from 'react-router';
 import './App.scss';
 import { PrototypeLoginService } from '@admin/services/PrototypeLoginService';
 import { BrowserRouter } from 'react-router-dom';
-import AdminDashboardPage from './pages/prototypes/PrototypeAdminDashboard';
+import PrototypeAdminDashboard from './pages/prototypes/PrototypeAdminDashboard';
+import AdminDashboardPage from './pages/AdminDashboard';
 import AdminDocumentationGlossary from './pages/prototypes/PrototypeDocumentationGlossary';
 import AdminDocumentationHome from './pages/prototypes/PrototypeDocumentationHome';
 
 import PublicationCreateNew from './pages/prototypes/PrototypePublicationPageCreateNew';
+import PublicationAssignMethodology from './pages/prototypes/PrototypePublicationPageAssignMethodology';
 import PublicationConfirmNew from './pages/prototypes/PrototypePublicationPageConfirmNew';
 import PublicationEditNew from './pages/prototypes/PrototypePublicationPageEditNew';
 import ReleaseCreateNew from './pages/prototypes/PrototypeReleasePageCreateNew';
@@ -25,22 +27,32 @@ import PublicationCreateNewAbsenceSchedule from './pages/prototypes/PrototypePub
 import PublicationCreateNewAbsenceScheduleEdit from './pages/prototypes/PrototypePublicationPageNewAbsenceScheduleEdit';
 import PublicationCreateNewAbsenceStatus from './pages/prototypes/PrototypePublicationPageNewAbsenceStatus';
 import PrototypesIndexPage from './pages/prototypes/PrototypesIndexPage';
+import IndexPage from './pages/IndexPage';
+
+import PrototypeChartTest from './pages/prototypes/PrototypeChartTest';
 
 import { LoginContext } from './components/Login';
 
 function App() {
   return (
     <BrowserRouter>
-      <Route exact path="/" component={PrototypesIndexPage} />
+      <Route exact path="/" component={IndexPage} />
 
-      <LoginContext.Provider value={PrototypeLoginService.getUser('user1')}>
+      <LoginContext.Provider value={PrototypeLoginService.login()}>
+        {/* Non-Prototype Routes*/}
+        <Route exact path="/admin-dashboard" component={AdminDashboardPage} />
+
+        {/* Prototype Routes*/}
         <Route exact path="/prototypes/" component={PrototypesIndexPage} />
 
         <Route
           exact
           path="/prototypes/admin-dashboard"
-          component={AdminDashboardPage}
+          component={PrototypeAdminDashboard}
         />
+
+        <Route exact path="/prototypes/charts" component={PrototypeChartTest} />
+
         <Route
           exact
           path="/prototypes/publication-edit"
@@ -55,6 +67,11 @@ function App() {
           exact
           path="/prototypes/publication-create-new"
           component={PublicationCreateNew}
+        />
+        <Route
+          exact
+          path="/prototypes/publication-assign-methodology"
+          component={PublicationAssignMethodology}
         />
         <Route
           exact

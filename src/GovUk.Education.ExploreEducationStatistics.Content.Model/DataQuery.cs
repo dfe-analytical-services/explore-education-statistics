@@ -34,38 +34,59 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model {
         string Type { get; }
     }
 
+    public class ChartDataSet
+    {
+        public string Indicator;
+        public List<string> filters;
+        public List<string> location;
+        public string timePeriod;
+    }
+
+    public class ChartAxisConfiguration
+    {
+        public string Name;
+        public List<string> GroupBy;
+        public List<ChartDataSet> DataSets;
+        public bool Visible;
+        public string Title;
+    }
+
+    public class ChartLabelConfiguration
+    {
+        public string Name;
+        public string Label;
+        public string Unit;
+        public string Value;
+    }
+
     public class LineChart : IContentBlockChart
     {
         public string Type => "line";
-        public List<string> Indicators;
-        public Axis XAxis;
-        public Axis YAxis;
+        public Dictionary<string, ChartLabelConfiguration> Labels;
+        public Dictionary<string, ChartAxisConfiguration> Axes;
     }
 
     public class HorizontalBarChart : IContentBlockChart 
     {
         public string Type => "horizontalbar";
-        public List<string> Indicators;
-        public Axis XAxis;
-        public Axis YAxis;
+        public Dictionary<string, ChartLabelConfiguration> Labels;
+        public Dictionary<string, ChartAxisConfiguration> Axes;
 
     }
 
     public class VerticalBarChart : IContentBlockChart 
     {
         public string Type => "verticalbar";
-        public List<string> Indicators;
-        public Axis XAxis;
-        public Axis YAxis;
+        public Dictionary<string, ChartLabelConfiguration> Labels;
+        public Dictionary<string, ChartAxisConfiguration> Axes;
 
     }
 
     public class MapChart : IContentBlockChart 
     {
         public string Type => "map";
-        public List<string> Indicators;
-        public Axis XAxis => new Axis { title = "map"};
-        public Axis YAxis => new Axis { title = "map"};
+        public Dictionary<string, ChartLabelConfiguration> Labels;
+        public Dictionary<string, ChartAxisConfiguration> Axes;
 
     }
 
