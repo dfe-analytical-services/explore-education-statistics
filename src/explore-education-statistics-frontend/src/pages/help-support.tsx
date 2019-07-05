@@ -1,11 +1,9 @@
 import Page from '@frontend/components/Page';
-import PageTitle from '@frontend/components/PageTitle';
 import React from 'react';
 
 function HelpSupportPage() {
   return (
-    <Page breadcrumbs={[{ name: 'Help and support' }]}>
-      <PageTitle title="Help and support" />
+    <Page title="Help and support">
       <p>
         Find out more about explore education statistics - including how to use
         it services and get further help and support.

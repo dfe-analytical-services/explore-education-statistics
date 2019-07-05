@@ -3,25 +3,20 @@ import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
-import PageTitle from '@frontend/components/PageTitle';
 import PrototypeSearchForm from '@frontend/prototypes/components/PrototypeSearchForm';
 import React from 'react';
 
 function DownloadIndexPage() {
   return (
     <Page
+      title="Pupils and schools"
       breadcrumbs={[
         {
           link: '/download',
           name: 'Download data',
         },
-        {
-          link: '/download/pupils-schools',
-          name: 'Pupils and schools',
-        },
       ]}
     >
-      <PageTitle title="Download data files for pupils and schools" />
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <Link className="govuk-body" to="/download">

@@ -49,12 +49,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             };
             await blobContainer.SetPermissionsAsync(permissions);
 
-            UploadFileAsync(blobContainer, publication, release, dataFile, new List<KeyValuePair<string, string>>
+            await UploadFileAsync(blobContainer, publication, release, dataFile, new List<KeyValuePair<string, string>>
             {
                 new KeyValuePair<string, string>("name", name),
                 new KeyValuePair<string, string>("metafile", metaFile.FileName)
             });
-            UploadFileAsync(blobContainer, publication, release, metaFile, new List<KeyValuePair<string, string>>
+            await UploadFileAsync(blobContainer, publication, release, metaFile, new List<KeyValuePair<string, string>>
             {
                 new KeyValuePair<string, string>("datafile", dataFile.FileName)
             });

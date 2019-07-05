@@ -2,7 +2,6 @@ import publicationService, {
   Release,
 } from '@common/services/publicationService';
 import Page from '@frontend/components/Page';
-import PageTitle from '@frontend/components/PageTitle';
 import functionsService from '@frontend/services/functionsService';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
@@ -84,14 +83,13 @@ class SubscriptionPage extends Component<Props> {
 
     return (
       <Page
+        title={data.title}
+        caption="Notify me"
         breadcrumbs={[
           { name: 'Find statistics and data', link: '/statistics' },
           { name: data.title, link: `/statistics/${slug}` },
-          { name: 'Notify me' },
         ]}
       >
-        <PageTitle title={`${data.title}`} caption="Notify me" />
-
         <div className="govuk-warning-text">
           <span className="govuk-warning-text__icon" aria-hidden="true">
             !

@@ -1,4 +1,7 @@
-import { DataBlockRequest } from '@common/services/dataBlockService';
+import {
+  DataBlockLocation,
+  DataBlockRequest,
+} from '@common/services/dataBlockService';
 import { Dictionary } from '@common/types';
 import { contentApi } from './api';
 
@@ -57,29 +60,38 @@ export type ChartType = 'line' | 'verticalbar' | 'horizontalbar' | 'map';
 
 export interface ChartDataSet {
   indicator: string;
+  filters: string[];
+  location?: DataBlockLocation;
+  timePeriod?: string;
+}
+
+export interface OptionalChartDataSet {
+  indicator?: string;
   filters?: string[];
   location?: string[];
   timePeriod?: string;
 }
 
 export interface DataLabelConfigurationItem {
-  name: string;
   label: string;
-  value: string;
-  unit: string;
+  name?: string;
+  value?: string;
+  unit?: string;
 }
 
 export interface AxisConfigurationItem {
   name: string;
-  dataSet: ChartDataSet;
+  groupBy: ('timePeriod' | 'location' | 'filters' | 'indicator')[];
+  dataSets: ChartDataSet[];
+
+  visible?: boolean;
+  title?: string;
 }
 
 export interface Chart {
   type: ChartType;
-  dataSets: ChartDataSet[];
-  dataLabels: Dictionary<DataLabelConfigurationItem>;
-  xAxis?: Axis;
-  yAxis?: Axis;
+  labels: Dictionary<DataLabelConfigurationItem>;
+  axes: Dictionary<AxisConfigurationItem>;
   stacked?: boolean;
   referenceLines?: ReferenceLine[];
   width?: number;

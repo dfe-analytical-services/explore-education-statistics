@@ -12,7 +12,6 @@ import TimePeriod from '@common/services/types/TimePeriod';
 import { Dictionary } from '@common/types/util';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
-import PageTitle from '@frontend/components/PageTitle';
 import PreviousStepModalConfirm from '@frontend/modules/table-tool/components/PreviousStepModalConfirm';
 import mapValues from 'lodash/mapValues';
 import { NextContext } from 'next';
@@ -207,9 +206,7 @@ class TableToolPage extends Component<Props, State> {
     } = this.state;
 
     return (
-      <Page breadcrumbs={[{ name: 'Create your own tables online' }]} wide>
-        <PageTitle caption="Table tool" title="Create your own tables online" />
-
+      <Page title="Create your own tables online" caption="Table Tool" wide>
         <p>
           Choose the data and area of interest you want to explore and then use
           filters to create your table.
