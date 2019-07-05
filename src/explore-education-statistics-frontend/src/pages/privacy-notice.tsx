@@ -4,9 +4,7 @@ import React from 'react';
 
 function PrivacyNoticePage() {
   return (
-    <Page breadcrumbs={[{ name: 'Privacy notice' }]}>
-      <PageTitle title="Explore education statistics privacy notice" />
-
+    <Page title="Privacy notice">
       <div>
         <h3>Who we are</h3>
         <p>

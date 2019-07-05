@@ -75,11 +75,11 @@ const AccordionSection = ({
                 }}
               >
                 {heading}
+                <span aria-hidden className="govuk-accordion__icon" />
               </button>
-              <span aria-hidden className="govuk-accordion__icon" />
             </>
           ) : (
-            heading
+            <span id={headingId}>{heading}</span>
           ),
         )}
         {caption && (

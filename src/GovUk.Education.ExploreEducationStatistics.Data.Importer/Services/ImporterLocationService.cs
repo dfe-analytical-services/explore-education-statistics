@@ -125,6 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                     ParliamentaryConstituency = parliamentaryConstituency ?? ParliamentaryConstituency.Empty(),
                     Region = region ?? Region.Empty(),
                     RscRegion = rscRegion ?? RscRegion.Empty(),
+                    Sponsor = sponsor ?? Sponsor.Empty(),
                     Ward = ward ?? Ward.Empty()
                 });
 
