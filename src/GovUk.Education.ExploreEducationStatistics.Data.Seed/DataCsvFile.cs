@@ -19,7 +19,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
         exclusions_number_of_fixed_exclusions,
         exclusions_total_days_missed_fixed_exclusions,
         school_applications_and_offers,
-        
         SEN2_AGE_NEW,
         SEN2_AGE_STOCK,
         SEN2_ESTAB_NEW,

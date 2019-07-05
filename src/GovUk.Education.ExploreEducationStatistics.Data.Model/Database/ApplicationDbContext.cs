@@ -59,8 +59,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                     Title = "Children, early years and social care",
                     Slug = "children-and-early-years"
                 },
-                
-                // NEW
                 new Theme
                 {
                     Id = new Guid("9aa81762-e52c-40d4-8a90-f469977360a7"),
@@ -105,8 +103,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                     Slug = "early-years-foundation-stage-profile",
                     ThemeId = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53")
                 },
-                
-                // NEW
                 new Topic
                 {
                     Id = new Guid("dfc908db-242a-4e3a-b6c6-e3f66cd152af"),
@@ -183,8 +179,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                     Slug = "early-years-foundation-stage-profile-results",
                     TopicId = new Guid("17b2e32c-ed2f-4896-852b-513cdf466769")
                 },
-                
-                // NEW
                 new Publication
                 {
                     Id = new Guid("2d94e5c8-a272-497c-bda0-c1f6b75155b0"),
@@ -270,9 +264,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                     Slug = "2018",
                     PublicationId = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05")
                 },
-                
-                
-                // NEW
                 new Release
                 {
                     Id = new Guid("70efdb76-7e88-453f-95f1-7bb9af023db5"),
@@ -435,9 +426,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                     Name = "Applications and offers by school phase",
                     ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717")
                 },
-                
-                // NEW
-                
                 new Subject
                 {
                     Id = 18,
@@ -468,16 +456,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                     Name = "Management information",
                     ReleaseId = new Guid("70efdb76-7e88-453f-95f1-7bb9af023db5")
                 },
-                
-                
                 new Subject
                 {
                     Id = 23,
                     Name = "National achievement rates tables (NARTs)",
                     ReleaseId = new Guid("59258583-b075-47a2-bee4-5969e2d58873")
                 },
-                
-                
                 new Subject
                 {
                     Id = 24,
@@ -490,7 +474,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                     Name = "Further education and skills",
                     ReleaseId = new Guid("6ccc4416-7d22-46bf-a12a-56037831dc60")
                 },
-                
                 new Subject
                 {
                     Id = 26,
@@ -509,14 +492,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                     Name = "Level 2 and 3 sf by Local authority",
                     ReleaseId = new Guid("0dafd89b-b754-44a8-b3f1-72baac0a108a")
                 },
-                
                 new Subject
                 {
                     Id = 29,
                     Name = "2016 test data",
                     ReleaseId = new Guid("dbaeb363-33fa-4928-870f-5054278e0c9a")
                 },
-                
                 new Subject
                 {
                     Id = 30,
