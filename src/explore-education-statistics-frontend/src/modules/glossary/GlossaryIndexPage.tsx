@@ -4,13 +4,11 @@ import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
-import PageTitle from '@frontend/components/PageTitle';
 import React from 'react';
 
 function GlossaryIndexPage() {
   return (
-    <Page breadcrumbs={[{ name: 'Glossary' }]}>
-      <PageTitle title="Education statistics: glossary" />
+    <Page title="Glossary">
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <p className="govuk-body-l">

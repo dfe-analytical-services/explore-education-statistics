@@ -234,14 +234,11 @@ class EditablePublicationPage extends Component<Props, State> {
             {data ? 'New release in progress' : 'Editing in progress'}
           </span>
           <span className="govuk-caption-l">Academic year 2018 to 2019</span>
-          <PrototypeEditableContent
-            editable={editing}
-            content={`
-          <h1 class="govuk-heading-l">
+
+          <h1 className="govuk-heading-l">
             Pupil absence statistics and data for schools in England
           </h1>
-          `}
-          />
+
           <dl className="dfe-meta-content">
             <dt className="govuk-caption-m">Published:</dt>
             <dd>
@@ -309,7 +306,7 @@ class EditablePublicationPage extends Component<Props, State> {
                   <span className="govuk-caption-m govuk-caption-inline">
                     For school year:{' '}
                   </span>
-                  2016/17 (latest data)
+                  2018/19 (latest data)
                 </h3>
 
                 <Details summary="See previous 7 releases">
@@ -404,9 +401,11 @@ class EditablePublicationPage extends Component<Props, State> {
           </div>
           <hr />
           <h2 className="govuk-heading-l">
-            Latest headline facts and figures - 2016/17
+            Latest headline facts and figures - 2018/19
           </h2>
+
           <PrototypeDataSample
+            editing={editing}
             sectionId="headlines"
             chartTitle="change in absence types in England"
             xAxisLabel="School Year"
@@ -445,11 +444,9 @@ class EditablePublicationPage extends Component<Props, State> {
             ]}
             chartDataKeys={['unauthorised', 'authorised', 'overall']}
           />
-
           {data &&
             data.content.length > 0 &&
             this.renderContentSections(data, editing)}
-
           <h2 className="govuk-heading-m govuk-!-margin-top-9">
             Extra information
           </h2>
@@ -538,7 +535,6 @@ class EditablePublicationPage extends Component<Props, State> {
               </address>
             </AccordionSection>
           </Accordion>
-
           <h2 className="govuk-heading-m govuk-!-margin-top-9">
             Exploring the data
           </h2>

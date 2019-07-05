@@ -6,7 +6,6 @@ import RelatedInformation from '@common/components/RelatedInformation';
 import { contentApi } from '@common/services/api';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
-import PageTitle from '@frontend/components/PageTitle';
 import React, { Component } from 'react';
 import PublicationDownloadList from './components/PublicationDownloadList';
 import { Topic } from './components/TopicList';
@@ -34,15 +33,7 @@ class DownloadIndexPage extends Component<Props> {
   public render() {
     const { themes } = this.props;
     return (
-      <Page
-        breadcrumbs={[
-          {
-            link: '/download',
-            name: 'Download',
-          },
-        ]}
-      >
-        <PageTitle title="Download data files" />
+      <Page title="Download data files" breadcrumbLabel="Download">
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
             <p className="govuk-body-l">

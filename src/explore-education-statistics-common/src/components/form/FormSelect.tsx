@@ -9,6 +9,7 @@ export type SelectChangeEventHandler = ChangeEventHandler<HTMLSelectElement>;
 export interface SelectOption {
   label: string;
   value: string | number;
+  selected?: boolean;
 }
 
 export interface FormSelectProps {
@@ -58,7 +59,11 @@ const FormSelect = ({
           ? options
           : orderBy(options, order, orderDirection)
         ).map(option => (
-          <option value={option.value} key={`${option.value}-${option.label}`}>
+          <option
+            value={option.value}
+            key={`${option.value}-${option.label}`}
+            selected={option.selected}
+          >
             {option.label}
           </option>
         ))}

@@ -4,7 +4,6 @@ using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 {
@@ -20,9 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 
         public Methodology Get(string slug)
         {
-            return _context.Methodologies
-                .Include(x => x.Publication)
-                .FirstOrDefault(x => x.Publication.Slug == slug);
+            return _context.Methodologies.FirstOrDefault(x => x.Publication.Slug == slug);
         }
 
         public List<ThemeTree> GetTree()
@@ -31,7 +28,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
             {
                 Id = t.Id,
                 Title = t.Title,
-                Summary = t.Summary,
                 Topics = t.Topics.Select(x => new TopicTree
                 {
                     Id = x.Id,

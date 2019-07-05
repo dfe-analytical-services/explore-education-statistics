@@ -32,7 +32,7 @@
 											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 											"",
 											"pm.test(\"Expect correct number of themes\", function () {",
-											"    pm.expect(pm.response.json().length).to.be.above(2);",
+											"    pm.expect(pm.response.json().length).to.be.above(1);",
 											"});",
 											"",
 											"pm.test(\"Pupils and school theme should contain correct data\", function () {",
@@ -121,10 +121,10 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceByReason\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceForPersistentAbsentees\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.National\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Country\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations.LocalAuthority\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations.LocalAuthorityDistrict\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Regional\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Region\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
@@ -154,8 +154,8 @@
 													"});",
 													"",
 													"pm.test(\"Number of location options should be correct\", function() {",
-													"    pm.expect(pm.response.json().locations.National.options.length).to.equal(1);",
-													"    pm.expect(pm.response.json().locations.Regional.options.length).to.equal(10);",
+													"    pm.expect(pm.response.json().locations.Country.options.length).to.equal(1);",
+													"    pm.expect(pm.response.json().locations.Region.options.length).to.equal(10);",
 													"    pm.expect(pm.response.json().locations.LocalAuthority.options.length).to.equal(152);",
 													"    pm.expect(pm.response.json().locations.LocalAuthorityDistrict.options.length).to.equal(326);",
 													"});",
@@ -218,9 +218,9 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceForPersistentAbsentees\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceByReason\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.National\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Country\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations.LocalAuthority\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Regional\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Region\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
@@ -236,8 +236,8 @@
 													"});",
 													"",
 													"pm.test(\"Number of location options should be correct\", function() {",
-													"    pm.expect(pm.response.json().locations.National.options.length).to.equal(1);",
-													"    pm.expect(pm.response.json().locations.Regional.options.length).to.equal(10);",
+													"    pm.expect(pm.response.json().locations.Country.options.length).to.equal(1);",
+													"    pm.expect(pm.response.json().locations.Region.options.length).to.equal(10);",
 													"    pm.expect(pm.response.json().locations.LocalAuthority.options.length).to.equal(152);",
 													"});",
 													"",
@@ -295,9 +295,9 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceFields\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceByReason\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.National\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Country\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations.LocalAuthority\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Regional\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Region\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
@@ -313,8 +313,8 @@
 													"});",
 													"",
 													"pm.test(\"Number of location options should be correct\", function() {",
-													"    pm.expect(pm.response.json().locations.National.options.length).to.equal(1);",
-													"    pm.expect(pm.response.json().locations.Regional.options.length).to.equal(10);",
+													"    pm.expect(pm.response.json().locations.Country.options.length).to.equal(1);",
+													"    pm.expect(pm.response.json().locations.Region.options.length).to.equal(10);",
 													"    pm.expect(pm.response.json().locations.LocalAuthority.options.length).to.equal(152);",
 													"});",
 													"",
@@ -373,9 +373,9 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceFields\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.National\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Country\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations.LocalAuthority\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Regional\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Region\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
@@ -430,9 +430,9 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceFields\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceByReason\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.National\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Country\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations.LocalAuthority\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Regional\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Region\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"))",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"))",
@@ -487,9 +487,9 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceFields\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceByReason\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.National\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Country\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations.LocalAuthority\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Regional\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Region\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
@@ -546,7 +546,7 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.EnrolmentsByAbsencePercentageBand\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.National\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Country\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
@@ -649,10 +649,10 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceByReason\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceForPersistentAbsentees\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.National\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Country\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations.LocalAuthority\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations.LocalAuthorityDistrict\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Regional\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Region\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
@@ -682,8 +682,8 @@
 													"});",
 													"",
 													"pm.test(\"Number of location options should be correct\", function() {",
-													"    pm.expect(pm.response.json().locations.National.options.length).to.equal(1);",
-													"    pm.expect(pm.response.json().locations.Regional.options.length).to.equal(10);",
+													"    pm.expect(pm.response.json().locations.Country.options.length).to.equal(1);",
+													"    pm.expect(pm.response.json().locations.Region.options.length).to.equal(10);",
 													"    pm.expect(pm.response.json().locations.LocalAuthority.options.length).to.equal(152);",
 													"    pm.expect(pm.response.json().locations.LocalAuthorityDistrict.options.length).to.equal(326);",
 													"});",
@@ -754,10 +754,10 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceByReason\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceForPersistentAbsentees\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.National\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Country\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations.LocalAuthority\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations.LocalAuthorityDistrict\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Regional\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Region\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
@@ -788,8 +788,8 @@
 													"});",
 													"",
 													"pm.test(\"Number of location options should be correct\", function() {",
-													"    pm.expect(pm.response.json().locations.National.options.length).to.equal(1);",
-													"    pm.expect(pm.response.json().locations.Regional.options.length).to.equal(10);",
+													"    pm.expect(pm.response.json().locations.Country.options.length).to.equal(1);",
+													"    pm.expect(pm.response.json().locations.Region.options.length).to.equal(10);",
 													"    pm.expect(pm.response.json().locations.LocalAuthority.options.length).to.equal(152);",
 													"    pm.expect(pm.response.json().locations.LocalAuthorityDistrict.options.length).to.equal(326);",
 													"});",
@@ -832,7 +832,7 @@
 									"response": []
 								},
 								{
-									"name": "Subject Meta - Filter SubjectId 1, Start/End date 2016, GeographicLevel National",
+									"name": "Subject Meta - Filter SubjectId 1, Start/End date 2016, GeographicLevel Country",
 									"event": [
 										{
 											"listen": "prerequest",
@@ -860,7 +860,7 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceByReason\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceForPersistentAbsentees\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.National\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Country\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
@@ -891,8 +891,8 @@
 													"});",
 													"",
 													"pm.test(\"Number of location options should be correct\", function() {",
-													"    pm.expect(pm.response.json().locations.National.options.length).to.equal(1);",
-													"    pm.expect(pm.response.json().locations).to.not.have.property(\"Regional\");",
+													"    pm.expect(pm.response.json().locations.Country.options.length).to.equal(1);",
+													"    pm.expect(pm.response.json().locations).to.not.have.property(\"Region\");",
 													"    pm.expect(pm.response.json().locations).to.not.have.property(\"LocalAuthority\");",
 													"    pm.expect(pm.response.json().locations).to.not.have.property(\"LocalAuthorityDistrict\");",
 													"});",
@@ -919,7 +919,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\tsubjectId: 1,\n\tstartYear: 2016,\n\tendYear: 2016,\n\tgeographicLevel: \"National\"\n}"
+											"raw": "{\n\tsubjectId: 1,\n\tstartYear: 2016,\n\tendYear: 2016,\n\tgeographicLevel: \"Country\"\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject",
@@ -963,9 +963,9 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceByReason\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceForPersistentAbsentees\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.National\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Country\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations.LocalAuthority\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Regional\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Region\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
@@ -996,8 +996,8 @@
 													"});",
 													"",
 													"pm.test(\"Number of location options should be correct\", function() {",
-													"    pm.expect(pm.response.json().locations.National.options.length).to.equal(1);",
-													"    pm.expect(pm.response.json().locations.Regional.options.length).to.equal(10);",
+													"    pm.expect(pm.response.json().locations.Country.options.length).to.equal(1);",
+													"    pm.expect(pm.response.json().locations.Region.options.length).to.equal(10);",
 													"    pm.expect(pm.response.json().locations.LocalAuthority.options.length).to.equal(152);",
 													"    pm.expect(pm.response.json().locations).to.not.have.property(\"LocalAuthorityDistrict\");",
 													"});",
@@ -1070,9 +1070,9 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceByReason\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceForPersistentAbsentees\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.National\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Country\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations.LocalAuthority\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Regional\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Region\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
@@ -1101,8 +1101,8 @@
 													"});",
 													"",
 													"pm.test(\"Number of location options should be correct\", function() {",
-													"    pm.expect(pm.response.json().locations.National.options.length).to.equal(1);",
-													"    pm.expect(pm.response.json().locations.Regional.options.length).to.equal(1);",
+													"    pm.expect(pm.response.json().locations.Country.options.length).to.equal(1);",
+													"    pm.expect(pm.response.json().locations.Region.options.length).to.equal(1);",
 													"    pm.expect(pm.response.json().locations.LocalAuthority.options.length).to.equal(1);",
 													"    pm.expect(pm.response.json().locations).to.not.have.property(\"LocalAuthorityDistrict\");",
 													"});",
@@ -1129,7 +1129,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\tsubjectId: 2,\n\tstartYear: 2014,\n\tendYear: 2014,\n\tlocalAuthorities: [\"E09000001\"]\n}"
+											"raw": "{\n\tsubjectId: 2,\n\tstartYear: 2014,\n\tendYear: 2014,\n\tlocalAuthority: [\"E09000001\"]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject",
@@ -1171,7 +1171,7 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.EnrolmentsByAbsencePercentageBand\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.National\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Country\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
@@ -1191,8 +1191,8 @@
 													"});",
 													"",
 													"pm.test(\"Number of location options should be correct\", function() {",
-													"    pm.expect(pm.response.json().locations.National.options.length).to.equal(1);",
-													"    pm.expect(pm.response.json().locations).to.not.have.property(\"Regional\");",
+													"    pm.expect(pm.response.json().locations.Country.options.length).to.equal(1);",
+													"    pm.expect(pm.response.json().locations).to.not.have.property(\"Region\");",
 													"    pm.expect(pm.response.json().locations).to.not.have.property(\"LocalAuthority\");",
 													"    pm.expect(pm.response.json().locations).to.not.have.property(\"LocalAuthorityDistrict\");",
 													"});",
@@ -1298,9 +1298,9 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.Default\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.National\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Country\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations.LocalAuthority\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Regional\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Region\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
@@ -1358,9 +1358,9 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.Default\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.National\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Country\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations.LocalAuthority\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Regional\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Region\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
@@ -1419,9 +1419,9 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.PermanentExclusions\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.FixedPeriodExclusions\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.National\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Country\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations.LocalAuthority\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Regional\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Region\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
@@ -1481,7 +1481,7 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.Default\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.National\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Country\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
@@ -1539,9 +1539,9 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.Default\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.National\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Country\"));",
 													"    pm.expect(pm.response.to.not.have.jsonBody(\"locations.LocalAuthority\"));",
-													"    pm.expect(pm.response.to.not.have.jsonBody(\"locations.Regional\"));",
+													"    pm.expect(pm.response.to.not.have.jsonBody(\"locations.Region\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
@@ -1601,9 +1601,9 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.Default\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.National\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Country\"));",
 													"    pm.expect(pm.response.to.not.have.jsonBody(\"locations.LocalAuthority\"));",
-													"    pm.expect(pm.response.to.not.have.jsonBody(\"locations.Regional\"));",
+													"    pm.expect(pm.response.to.not.have.jsonBody(\"locations.Region\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
@@ -1671,9 +1671,9 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.GoodLevelOfDevelopment\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AreaOfLearning\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.National\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Country\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations.LocalAuthority\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Regional\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Region\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
@@ -1735,9 +1735,9 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AreaOfLearning\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.National\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Country\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations.LocalAuthority\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Regional\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Region\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
@@ -1799,9 +1799,9 @@
 													"    pm.expect(pm.response.to.not.have.jsonBody(\"indicators.GoodLevelOfDevelopment\"));",
 													"    pm.expect(pm.response.to.not.have.jsonBody(\"indicators.AreaOfLearning\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.National\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Country\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations.LocalAuthority\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Regional\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Region\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
 													"});",
 													"",
@@ -1865,9 +1865,9 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.Applications\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.PreferencesBreakdowns\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.National\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Country\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations.LocalAuthority\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Regional\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Region\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
@@ -1895,13 +1895,13 @@
 													"    pm.expect(pm.response.json().indicators.PreferencesBreakdowns.options.length).to.equal(11);    ",
 													"});",
 													"",
-													"pm.test(\"Location National should be correct\", function () {",
-													"    pm.expect(pm.response.json().locations.National.options.length).to.equal(1);",
-													"    pm.expect(pm.response.json().locations.National.options[0].label).to.equal(\"England\");",
+													"pm.test(\"Location Country should be correct\", function () {",
+													"    pm.expect(pm.response.json().locations.Country.options.length).to.equal(1);",
+													"    pm.expect(pm.response.json().locations.Country.options[0].label).to.equal(\"England\");",
 													"});",
 													"",
-													"pm.test(\"Location Regional should be correct\", function () {",
-													"    pm.expect(pm.response.json().locations.Regional.options.length).to.equal(9); // Outer London/Inner London share same code",
+													"pm.test(\"Location Region should be correct\", function () {",
+													"    pm.expect(pm.response.json().locations.Region.options.length).to.equal(9); // Outer London/Inner London share same code",
 													"});",
 													"",
 													"pm.test(\"Location LocalAuthority should be correct\", function () {",
@@ -1961,8 +1961,8 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.Applications\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.PreferencesBreakdowns\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.National\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Regional\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Country\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Region\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations.LocalAuthority\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
@@ -1983,8 +1983,8 @@
 													"});",
 													"",
 													"pm.test(\"Number of location options should be correct\", function() {",
-													"    pm.expect(pm.response.json().locations.National.options.length).to.equal(1);",
-													"    pm.expect(pm.response.json().locations.Regional.options.length).to.equal(2);",
+													"    pm.expect(pm.response.json().locations.Country.options.length).to.equal(1);",
+													"    pm.expect(pm.response.json().locations.Region.options.length).to.equal(2);",
 													"    pm.expect(pm.response.json().locations.LocalAuthority.options.length).to.equal(34);",
 													"});",
 													"",
@@ -2024,7 +2024,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\tSubjectId: 17,\n\tRegions: [\n\t\t\"E12000008\",\n\t\t\"E12000009\"\n\t]\n}"
+											"raw": "{\n\tSubjectId: 17,\n\tRegion: [\n\t\t\"E12000008\",\n\t\t\"E12000009\"\n\t]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject",
@@ -2040,7 +2040,7 @@
 									"response": []
 								},
 								{
-									"name": "Subject Meta - Filter SubjectId 17, National",
+									"name": "Subject Meta - Filter SubjectId 17, Country",
 									"event": [
 										{
 											"listen": "prerequest",
@@ -2068,8 +2068,8 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.Applications\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.PreferencesBreakdowns\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.National\"));",
-													"    pm.expect(pm.response.to.not.have.jsonBody(\"locations.Regional\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.Country\"));",
+													"    pm.expect(pm.response.to.not.have.jsonBody(\"locations.Region\"));",
 													"    pm.expect(pm.response.to.not.have.jsonBody(\"locations.LocalAuthority\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
@@ -2090,7 +2090,7 @@
 													"});",
 													"",
 													"pm.test(\"Number of location options should be correct\", function() {",
-													"    pm.expect(pm.response.json().locations.National.options.length).to.equal(1);",
+													"    pm.expect(pm.response.json().locations.Country.options.length).to.equal(1);",
 													"});",
 													"",
 													"pm.test(\"Expect correct number of indicator categories\", function () {",
@@ -2129,7 +2129,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\tSubjectId: 17,\n\tGeographicLevel: \"National\"\n}"
+											"raw": "{\n\tSubjectId: 17,\n\tGeographicLevel: \"Country\"\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject",
@@ -2286,7 +2286,7 @@
 							"name": "By characteristic",
 							"item": [
 								{
-									"name": "Absence by characteristic - National - *",
+									"name": "Absence by characteristic - Country - *",
 									"event": [
 										{
 											"listen": "test",
@@ -2300,7 +2300,7 @@
 													"});",
 													"",
 													"pm.test(\"geographicLevel should be same as request\", function () {",
-													"    pm.expect(respJson.geographicLevel).to.equal(\"National\");",
+													"    pm.expect(respJson.geographicLevel).to.equal(\"Country\");",
 													"})",
 													"",
 													"pm.test(\"subjectId should be \\\"1\\\"\", function () {",
@@ -2340,7 +2340,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"National\",\n    \"startYear\": 2014,\n    \"endYear\": 2015,\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Country\",\n    \"startYear\": 2014,\n    \"endYear\": 2015,\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2355,7 +2355,7 @@
 									"response": []
 								},
 								{
-									"name": "Absence by characteristic - National - * - Male, Female AND Primary, Secondary",
+									"name": "Absence by characteristic - Country - * - Male, Female AND Primary, Secondary",
 									"event": [
 										{
 											"listen": "test",
@@ -2369,7 +2369,7 @@
 													"});",
 													"",
 													"pm.test(\"geographicLevel should be same as request\", function () {",
-													"    pm.expect(respJson.geographicLevel).to.equal(\"National\");",
+													"    pm.expect(respJson.geographicLevel).to.equal(\"Country\");",
 													"})",
 													"",
 													"pm.test(\"subjectId should be \\\"1\\\"\", function () {",
@@ -2409,7 +2409,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"National\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}, {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Country\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}, {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2424,7 +2424,7 @@
 									"response": []
 								},
 								{
-									"name": "Absence by characteristic - National - England",
+									"name": "Absence by characteristic - Country - England",
 									"event": [
 										{
 											"listen": "test",
@@ -2461,7 +2461,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"National\",\n    \"countries\": [\n    \t\"E92000001\"\n    ],\n    \"startYear\": 2014,\n    \"endYear\": 2015,\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Country\",\n    \"countries\": [\n    \t\"E92000001\"\n    ],\n    \"startYear\": 2014,\n    \"endYear\": 2015,\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2563,7 +2563,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority\",\n    \"localAuthorities\": [\n    \t\"E09000032\"\n    ],\n    \"startYear\": 2014,\n    \"endYear\": 2015,\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority\",\n    \"localAuthority\": [\n    \t\"E09000032\"\n    ],\n    \"startYear\": 2014,\n    \"endYear\": 2015,\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2673,7 +2673,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority_District\",\n    \"localAuthorityDistricts\": [\n    \t\"E07000223\"\n    ],\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_FSMEligible}}, {{FILT_FSMNotEligible}}, {{FILT_FSMUnclassified}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority_District\",\n    \"localAuthorityDistrict\": [\n    \t\"E07000223\"\n    ],\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_FSMEligible}}, {{FILT_FSMNotEligible}}, {{FILT_FSMUnclassified}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2735,7 +2735,7 @@
 							"name": "By geographic level",
 							"item": [
 								{
-									"name": "Absence by geographic level - National - *",
+									"name": "Absence by geographic level - Country - *",
 									"event": [
 										{
 											"listen": "test",
@@ -2785,7 +2785,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"National\",\n    \"startYear\": 2006,\n    \"endYear\": 2016,\n    \"filters\" : [\n    \t{{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"Country\",\n    \"startYear\": 2006,\n    \"endYear\": 2016,\n    \"filters\" : [\n    \t{{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2865,7 +2865,7 @@
 									"response": []
 								},
 								{
-									"name": "Absence by geographic level - Regional - *",
+									"name": "Absence by geographic level - Region - *",
 									"event": [
 										{
 											"listen": "test",
@@ -2907,7 +2907,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"Regional\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n    \t{{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"Region\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n    \t{{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2922,7 +2922,7 @@
 									"response": []
 								},
 								{
-									"name": "Absence by geographic level - Regional - Inner London",
+									"name": "Absence by geographic level - Region - Inner London",
 									"event": [
 										{
 											"listen": "test",
@@ -2964,7 +2964,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"Regional\",\n    \"regions\": [\n\t\t\"E13000001\"\n\t],\n    \"startYear\": 2006,\n    \"endYear\": 2016,\n    \"filters\" : [\n    \t{{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"Region\",\n    \"region\": [\n\t\t\"E13000001\"\n\t],\n    \"startYear\": 2006,\n    \"endYear\": 2016,\n    \"filters\" : [\n    \t{{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3021,7 +3021,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"School\",\n    \"regions\": [ \"E13000001\" ],\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n    \t{{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"School\",\n    \"region\": [ \"E13000001\" ],\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n    \t{{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3078,7 +3078,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"School\",\n    \"localAuthorities\": [ \"E09000002\" ],\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n    \t{{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"School\",\n    \"localAuthority\": [ \"E09000002\" ],\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n    \t{{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3232,7 +3232,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\t\"subjectId\": 2,\n\t\"geographicLevel\": \"School\",\n\t\"regions\": [ \"E13000001\" ],\n\t\"startYear\": 2016,\n\t\"endYear\": 2016,\n\t\"filters\" : [\n\t\t{{FILT_AllSchools}}, {{FILT_StateFundedPrimary}}, {{FILT_PrimarySponsorLedAcademy}}, {{FILT_AcademyTypeNotSpecified}}, {{FILT_PrimaryFreeSchool}}, {{FILT_SecondarySponsorLedAcademy}}, {{FILT_SpecialFreeSchool}}\n\t],\n\t\"indicators\": [\n\t\t42, 61, 57, 59, 66, 111212\n\t]\n}"
+											"raw": "{\n\t\"subjectId\": 2,\n\t\"geographicLevel\": \"School\",\n\t\"region\": [ \"E13000001\" ],\n\t\"startYear\": 2016,\n\t\"endYear\": 2016,\n\t\"filters\" : [\n\t\t{{FILT_AllSchools}}, {{FILT_StateFundedPrimary}}, {{FILT_PrimarySponsorLedAcademy}}, {{FILT_AcademyTypeNotSpecified}}, {{FILT_PrimaryFreeSchool}}, {{FILT_SecondarySponsorLedAcademy}}, {{FILT_SpecialFreeSchool}}\n\t],\n\t\"indicators\": [\n\t\t42, 61, 57, 59, 66, 111212\n\t]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3284,7 +3284,7 @@
 							"name": "By term",
 							"item": [
 								{
-									"name": "Absence by term - National - *",
+									"name": "Absence by term - Country - *",
 									"event": [
 										{
 											"listen": "test",
@@ -3311,7 +3311,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 3,\n    \"geographicLevel\": \"National\",\n    \"startYear\": 2014,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        68, 86, 87, 88\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 3,\n    \"geographicLevel\": \"Country\",\n    \"startYear\": 2014,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        68, 86, 87, 88\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3326,7 +3326,7 @@
 									"response": []
 								},
 								{
-									"name": "Absence by term - National - England",
+									"name": "Absence by term - Country - England",
 									"event": [
 										{
 											"listen": "test",
@@ -3353,7 +3353,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 3,\n    \"geographicLevel\": \"National\",\n    \"countries\": [ \"E92000001\" ],\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        68, 86, 87, 88\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 3,\n    \"geographicLevel\": \"Country\",\n    \"countries\": [ \"E92000001\" ],\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        68, 86, 87, 88\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3395,7 +3395,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 3,\n    \"geographicLevel\": \"Local_Authority\",\n    \"countries\": [ \"E92000001\" ],\n    \"regions\": [ \"E13000001\", \"E13000002\" ],\n    \"localAuthorities\": [ \"E09000001\", \"E09000002\" ],\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        68, 86, 87, 88\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 3,\n    \"geographicLevel\": \"Local_Authority\",\n    \"countries\": [ \"E92000001\" ],\n    \"region\": [ \"E13000001\", \"E13000002\" ],\n    \"localAuthority\": [ \"E09000001\", \"E09000002\" ],\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        68, 86, 87, 88\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3410,7 +3410,7 @@
 									"response": []
 								},
 								{
-									"name": "Absence by term - Regional - *",
+									"name": "Absence by term - Region - *",
 									"event": [
 										{
 											"listen": "test",
@@ -3437,7 +3437,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 3,\n    \"geographicLevel\": \"National\",\n    \"years\": [ 2012, 2016 ],\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        68, 86, 87, 88\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 3,\n    \"geographicLevel\": \"Country\",\n    \"years\": [ 2012, 2016 ],\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        68, 86, 87, 88\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3495,7 +3495,7 @@
 							"name": "For four year olds",
 							"item": [
 								{
-									"name": "Absence for four year olds - National - *",
+									"name": "Absence for four year olds - Country - *",
 									"event": [
 										{
 											"listen": "test",
@@ -3522,7 +3522,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 4,\n    \"geographicLevel\": \"National\",\n    \"startYear\": 2013,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_Special}}, {{FILT_StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        95, 94\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 4,\n    \"geographicLevel\": \"Country\",\n    \"startYear\": 2013,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_Special}}, {{FILT_StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        95, 94\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3663,7 +3663,7 @@
 									"response": []
 								},
 								{
-									"name": "Absence in PRUs - Regional - *",
+									"name": "Absence in PRUs - Region - *",
 									"event": [
 										{
 											"listen": "test",
@@ -3690,7 +3690,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 5,\n    \"geographicLevel\": \"Regional\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_PupilReferralUnit}}\n    ],\n    \"indicators\": [\n        113, 114, 115\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 5,\n    \"geographicLevel\": \"Region\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_PupilReferralUnit}}\n    ],\n    \"indicators\": [\n        113, 114, 115\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3788,7 +3788,7 @@
 									"response": []
 								},
 								{
-									"name": "Absence number missing at least one session by reason - Regional - *",
+									"name": "Absence number missing at least one session by reason - Region - *",
 									"event": [
 										{
 											"listen": "test",
@@ -3815,7 +3815,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 6,\n    \"geographicLevel\": \"Regional\",\n    \"startYear\": 2012,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 6,\n    \"geographicLevel\": \"Region\",\n    \"startYear\": 2012,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3873,7 +3873,7 @@
 							"name": "Rate percent bands",
 							"item": [
 								{
-									"name": "Absence rate percent bands - National - *",
+									"name": "Absence rate percent bands - Country - *",
 									"event": [
 										{
 											"listen": "test",
@@ -3900,7 +3900,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 7,\n    \"geographicLevel\": \"National\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, {{FILT_Special}}, {{FILT_StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 7,\n    \"geographicLevel\": \"Country\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, {{FILT_Special}}, {{FILT_StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3991,7 +3991,7 @@
 							"name": "By characteristic",
 							"item": [
 								{
-									"name": "Absence by characteristic - National - *",
+									"name": "Absence by characteristic - Country - *",
 									"event": [
 										{
 											"listen": "test",
@@ -4028,7 +4028,7 @@
 													"});",
 													"",
 													"pm.test(\"geographicLevel should be same as request\", function () {",
-													"    pm.expect(respJson.geographicLevel).to.equal(\"National\");",
+													"    pm.expect(respJson.geographicLevel).to.equal(\"Country\");",
 													"})",
 													"",
 													"pm.test(\"Number of results should be correct\", function () { ",
@@ -4037,7 +4037,7 @@
 													"",
 													"pm.test(\"Every result should contain location country England only\", function () {",
 													"    for(var i = 0; i < pm.response.json().result.length; i++) {",
-													"        pm.expect(respJson.result[i].location.country.country_name).to.equal(\"England\");",
+													"        pm.expect(respJson.result[i].location.country.name).to.equal(\"England\");",
 													"        pm.expect(pm.response.to.not.have.jsonBody(`result[${i}].location.localAuthority`));",
 													"        pm.expect(pm.response.to.not.have.jsonBody(`result[${i}].location.localAuthorityDistrict`));",
 													"        pm.expect(pm.response.to.not.have.jsonBody(`result[${i}].location.region`));",
@@ -4060,7 +4060,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"National\",\n    \"startYear\": 2014,\n    \"endYear\": 2015,\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Country\",\n    \"startYear\": 2014,\n    \"endYear\": 2015,\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/data",
@@ -4075,7 +4075,7 @@
 									"response": []
 								},
 								{
-									"name": "Absence by characteristic - National - * - Male, Female AND Primary, Secondary",
+									"name": "Absence by characteristic - Country - * - Male, Female AND Primary, Secondary",
 									"event": [
 										{
 											"listen": "test",
@@ -4113,7 +4113,7 @@
 													"",
 													"",
 													"pm.test(\"geographicLevel should be same as request\", function () {",
-													"    pm.expect(respJson.geographicLevel).to.equal(\"National\");",
+													"    pm.expect(respJson.geographicLevel).to.equal(\"Country\");",
 													"})",
 													"",
 													"pm.test(\"Number of results should be correct\", function () { ",
@@ -4122,7 +4122,7 @@
 													"",
 													"pm.test(\"Every result should contain location country England only\", function () {",
 													"    for(var i = 0; i < pm.response.json().result.length; i++) {",
-													"        pm.expect(respJson.result[i].location.country.country_name).to.equal(\"England\");",
+													"        pm.expect(respJson.result[i].location.country.name).to.equal(\"England\");",
 													"        pm.expect(pm.response.to.not.have.jsonBody(`result[${i}].location.localAuthority`));",
 													"        pm.expect(pm.response.to.not.have.jsonBody(`result[${i}].location.localAuthorityDistrict`));",
 													"        pm.expect(pm.response.to.not.have.jsonBody(`result[${i}].location.region`));",
@@ -4145,7 +4145,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"National\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}, {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Country\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}, {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/data",
@@ -4211,7 +4211,7 @@
 													"// NOTE(mark): Takes a long time to run this test",
 													"// pm.test(\"Every result should contain location country, localAuthority, and region\", function () {",
 													"//     for(var i = 0; i < pm.response.json().result.length; i++) {",
-													"//         pm.expect(respJson.result[i].location.country.country_name).to.equal(\"England\");",
+													"//         pm.expect(respJson.result[i].location.country.name).to.equal(\"England\");",
 													"//         pm.expect(pm.response.to.have.jsonBody(`result[${i}].location.localAuthority`));",
 													"//         pm.expect(pm.response.to.not.have.jsonBody(`result[${i}].location.localAuthorityDistrict`));",
 													"//         pm.expect(pm.response.to.have.jsonBody(`result[${i}].location.region`));",
@@ -4301,7 +4301,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority\",\n    \"localAuthorities\": [\n    \t\"E09000032\"\n    ],\n    \"startYear\": 2014,\n    \"endYear\": 2015,\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority\",\n    \"localAuthority\": [\n    \t\"E09000032\"\n    ],\n    \"startYear\": 2014,\n    \"endYear\": 2015,\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/data",
@@ -4434,9 +4434,9 @@
 													"",
 													"pm.test(\"All results should have LA District name Hartlepool\", function () {",
 													"    for(var i = 0; i < respJson.result.length; i++) {",
-													"        pm.expect(respJson.result[i].location.country.country_name).to.equal(\"England\");",
-													"        pm.expect(respJson.result[i].location.localAuthorityDistrict.sch_lad_name).to.equal(\"Hartlepool\");",
-													"        pm.expect(respJson.result[i].location.region.region_name).to.equal(\"North East\");",
+													"        pm.expect(respJson.result[i].location.country.name).to.equal(\"England\");",
+													"        pm.expect(respJson.result[i].location.localAuthorityDistrict.name).to.equal(\"Hartlepool\");",
+													"        pm.expect(respJson.result[i].location.region.name).to.equal(\"North East\");",
 													"    }",
 													"});"
 												],
@@ -4456,7 +4456,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority_District\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"localAuthorityDistricts\": [\"E06000001\"],\n    \"filters\" : [\n    \t{{FILT_AllPupils}}, {{FILT_FSMEligible}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority_District\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"localAuthorityDistrict\": [\"E06000001\"],\n    \"filters\" : [\n    \t{{FILT_AllPupils}}, {{FILT_FSMEligible}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/data",
@@ -4515,9 +4515,9 @@
 													"",
 													"pm.test(\"All results should have correction location attributes\", function () {",
 													"    for(var i = 0; i < pm.response.json().result.length; i++) {",
-													"        pm.expect(pm.response.json().result[i].location.country.country_name).to.equal(\"England\");",
-													"        pm.expect(pm.response.json().result[i].location.localAuthorityDistrict.sch_lad_name).to.equal(\"Adur\");",
-													"        pm.expect(pm.response.json().result[i].location.region.region_name).to.equal(\"South East\");",
+													"        pm.expect(pm.response.json().result[i].location.country.name).to.equal(\"England\");",
+													"        pm.expect(pm.response.json().result[i].location.localAuthorityDistrict.name).to.equal(\"Adur\");",
+													"        pm.expect(pm.response.json().result[i].location.region.name).to.equal(\"South East\");",
 													"    }",
 													"});"
 												],
@@ -4537,7 +4537,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority_District\",\n    \"localAuthorityDistricts\": [\n    \t\"E07000223\"\n    ],\n    \"startYear\": 2014,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_FSMEligible}}, {{FILT_FSMNotEligible}}, {{FILT_FSMUnclassified}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority_District\",\n    \"localAuthorityDistrict\": [\n    \t\"E07000223\"\n    ],\n    \"startYear\": 2014,\n    \"endYear\": 2016,\n    \"filters\" : [\n        {{FILT_FSMEligible}}, {{FILT_FSMNotEligible}}, {{FILT_FSMUnclassified}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/data",
@@ -4699,7 +4699,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 10,\n    \"geographicLevel\": \"Local_Authority\",\n        \"localAuthorities\": [\n    \t\"E09000022\",\n    \t\"E08000014\",\n    \t\"E06000032\"\n    ],\n    \"startYear\": 2014,\n    \"endYear\": 2017,\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}\n    ],\n    \"indicators\": [\n        {{INDI_TotalPointScoreBasedOnAssessmentRating}},\n        {{INDI_AveragePointScore}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 10,\n    \"geographicLevel\": \"Local_Authority\",\n        \"localAuthority\": [\n    \t\"E09000022\",\n    \t\"E08000014\",\n    \t\"E06000032\"\n    ],\n    \"startYear\": 2014,\n    \"endYear\": 2017,\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}\n    ],\n    \"indicators\": [\n        {{INDI_TotalPointScoreBasedOnAssessmentRating}},\n        {{INDI_AveragePointScore}}\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/data",

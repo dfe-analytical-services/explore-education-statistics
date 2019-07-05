@@ -114,6 +114,14 @@ const PublicationDataPage = ({ location }: RouteChildrenProps) => {
           </div>
         </form>
       )}
+      <hr />
+      <div className="govuk-grid-row govuk-!-margin-top-9">
+        <div className="govuk-grid-column-one-half ">
+          <Link to="/prototypes/publication-create-new-absence">
+            Previous step, add / edit content
+          </Link>
+        </div>
+      </div>
     </PrototypePage>
   );
 };

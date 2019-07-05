@@ -11,7 +11,7 @@ const PrototypePublicationSummary = () => {
     <>
       <h2 className="govuk-heading-m">Release setup summary</h2>
 
-      <dl className="govuk-summary-list">
+      <dl className="govuk-summary-list govuk-!-margin-bottom-9">
         <div className="govuk-summary-list__row">
           <dt className="govuk-summary-list__key">Publication title</dt>
           <dd className="govuk-summary-list__value">
@@ -44,11 +44,11 @@ const PrototypePublicationSummary = () => {
         </div>
       </dl>
 
-      <p>
+      <div className="govuk-!-margin-top-9 dfe-align--right">
         <Link to="/prototypes/publication-create-new-absence-data">
           Next step, add / edit data
         </Link>
-      </p>
+      </div>
     </>
   );
 };
