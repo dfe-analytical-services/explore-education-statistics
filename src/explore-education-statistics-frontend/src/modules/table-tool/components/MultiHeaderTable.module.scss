@@ -1,0 +1,42 @@
+@import '~explore-education-statistics-common/src/styles/govuk-base';
+
+$border-width: 4px;
+
+.borderLeft {
+  border-left: $border-width solid govuk-colour('black') !important;
+}
+
+.borderRight {
+  border-right: $border-width solid govuk-colour('black') !important;
+}
+
+.borderBottom {
+  border-bottom: $border-width solid govuk-colour('black') !important;
+}
+
+.table {
+  border-collapse: separate;
+
+  th:last-child,
+  td:last-child {
+    padding-right: govuk-spacing(2);
+  }
+
+  thead td {
+    background: #fff;
+    position: relative;
+    z-index: 3;
+  }
+
+  thead th {
+    background: #fff;
+    position: relative;
+    z-index: 2;
+  }
+
+  tbody th {
+    background: #fff;
+    position: relative;
+    z-index: 1;
+  }
+}
