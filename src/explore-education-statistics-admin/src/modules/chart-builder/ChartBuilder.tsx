@@ -62,7 +62,7 @@ function generateAxesMetaData(
 }
 
 const ChartBuilder = ({ data }: Props) => {
-  const [selectedChartType, selectChartType] = React.useState<
+  const [selectedChartType, setSelectedChartType] = React.useState<
     ChartDefinition | undefined
   >();
 
@@ -133,7 +133,7 @@ const ChartBuilder = ({ data }: Props) => {
       <Details summary="Select chart type" open>
         <ChartTypeSelector
           chartTypes={chartTypes}
-          onSelectChart={selectChartType}
+          onSelectChart={setSelectedChartType}
           selectedChartType={selectedChartType}
         />
       </Details>

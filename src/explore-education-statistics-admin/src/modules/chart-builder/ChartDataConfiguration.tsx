@@ -86,23 +86,37 @@ const ChartDataConfiguration = ({
 
   return (
     <FormFieldset id="chart-configuration" legend="" legendHidden>
-      <p>
-        Update the label used for each dataset in the chart from the default
-      </p>
-      {dataLabels &&
-        Object.entries(dataLabels).map(([key, entry]) => (
-          <FormTextInput
-            key={key}
-            id={key}
-            name={key}
-            defaultValue={entry.label}
-            onChange={e => {
-              dataLabels[key].label = e.target.value;
-              setDataLabels({ ...dataLabels });
-            }}
-            label={entry.name}
-          />
-        ))}
+      <table className="govuk-table">
+        <caption>
+          Update the label used for each dataset in the chart from the default
+        </caption>
+        <thead>
+          <tr>
+            <th>Field</th>
+            <th>Options</th>
+          </tr>
+        </thead>
+        <tbody>
+          {dataLabels &&
+            Object.entries(dataLabels).map(([key, entry]) => (
+              <tr key={key}>
+                <td>{entry.name}</td>
+                <td>
+                  <FormTextInput
+                    id={key}
+                    name={key}
+                    defaultValue={entry.label}
+                    onChange={e => {
+                      dataLabels[key].label = e.target.value;
+                      setDataLabels({ ...dataLabels });
+                    }}
+                    label="label"
+                  />
+                </td>
+              </tr>
+            ))}
+        </tbody>
+      </table>
     </FormFieldset>
   );
 };
