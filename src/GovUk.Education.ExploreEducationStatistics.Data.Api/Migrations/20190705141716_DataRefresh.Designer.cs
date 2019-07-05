@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190705121835_DataFresh")]
-    partial class DataFresh
+    [Migration("20190705141716_DataRefresh")]
+    partial class DataRefresh
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -589,7 +589,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                         new
                         {
                             Id = 25L,
-                            Name = "Further education skills",
+                            Name = "Further education and skills",
                             ReleaseId = new Guid("6ccc4416-7d22-46bf-a12a-56037831dc60")
                         },
                         new

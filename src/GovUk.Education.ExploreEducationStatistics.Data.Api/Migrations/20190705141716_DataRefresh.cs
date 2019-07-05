@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 {
-    public partial class DataFresh : Migration
+    public partial class DataRefresh : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -89,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                 {
                     { 23L, "National achievement rates tables (NARTs)", new Guid("59258583-b075-47a2-bee4-5969e2d58873") },
                     { 24L, "Apprenticeship annual", new Guid("463c8521-d9b4-4ccc-aee9-0666e39c8e47") },
-                    { 25L, "Further education skills", new Guid("6ccc4416-7d22-46bf-a12a-56037831dc60") },
+                    { 25L, "Further education and skills", new Guid("6ccc4416-7d22-46bf-a12a-56037831dc60") },
                     { 26L, "Level 2 and 3 National", new Guid("0dafd89b-b754-44a8-b3f1-72baac0a108a") },
                     { 27L, "Level 2 and 3 sf", new Guid("0dafd89b-b754-44a8-b3f1-72baac0a108a") },
                     { 28L, "Level 2 and 3 sf by Local authority", new Guid("0dafd89b-b754-44a8-b3f1-72baac0a108a") },

@@ -487,7 +487,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                 new Subject
                 {
                     Id = 25,
-                    Name = "Further education skills",
+                    Name = "Further education and skills",
                     ReleaseId = new Guid("6ccc4416-7d22-46bf-a12a-56037831dc60")
                 },
                 

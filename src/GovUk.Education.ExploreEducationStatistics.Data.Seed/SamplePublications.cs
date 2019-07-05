@@ -406,7 +406,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                             new Subject
                                             {
                                                 Id = 25,
-                                                Name = "Further education skills",
+                                                Name = "Further education and skills",
                                             },
                                         }
                                     },   
