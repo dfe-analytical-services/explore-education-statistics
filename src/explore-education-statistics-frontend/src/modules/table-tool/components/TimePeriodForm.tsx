@@ -23,9 +23,11 @@ interface FormValues {
   end: string;
 }
 
+export type TimePeriodFormSubmitHandler = (values: FormValues) => void;
+
 interface Props {
   options: PublicationSubjectMeta['timePeriod']['options'];
-  onSubmit: (values: FormValues) => void;
+  onSubmit: TimePeriodFormSubmitHandler;
 }
 
 const TimePeriodForm = (props: Props & InjectedWizardProps) => {
