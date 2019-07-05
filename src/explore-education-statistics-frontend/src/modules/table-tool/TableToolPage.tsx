@@ -198,12 +198,15 @@ class TableToolPage extends Component<Props, State> {
     filters,
     indicators,
   }) => {
-    const { subjectId, timePeriods, subjectMeta } = this.state;
+    const { subjectId, timePeriods, locations, subjectMeta } = this.state;
 
     const { result } = await tableBuilderService.getTableData({
+      ...mapValues(locations, locationLevel =>
+        locationLevel.map(location => location.value),
+      ),
       subjectId,
-      filters: Object.values(filters).flat(),
       indicators,
+      filters: Object.values(filters).flat(),
       startYear: timePeriods[0].year,
       endYear: timePeriods[timePeriods.length - 1].year,
     });
