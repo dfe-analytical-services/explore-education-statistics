@@ -6,7 +6,6 @@ import RelatedInformation from '@common/components/RelatedInformation';
 import { contentApi } from '@common/services/api';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
-import PageTitle from '@frontend/components/PageTitle';
 import React, { Component } from 'react';
 import PublicationList from './components/PublicationList';
 import { Topic } from './components/TopicList';
