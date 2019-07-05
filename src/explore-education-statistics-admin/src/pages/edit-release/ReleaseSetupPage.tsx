@@ -1,4 +1,5 @@
 import DummyReferenceData from '@admin/pages/DummyReferenceData';
+import FormattedDate from '@common/components/FormattedDate';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import { format } from 'date-fns';
@@ -58,18 +59,16 @@ const ReleaseSetupPage = ({ match }: RouteComponentProps<MatchProps>) => {
             <div className="govuk-summary-list__row">
               <dt className="govuk-summary-list__key">Release period</dt>
               <dd className="govuk-summary-list__value">
-                {format(
-                  releaseSetupDetails.timePeriodCoverageStartDate,
-                  'yyyy',
-                )}{' '}
+                <FormattedDate format="yyyy">
+                  {releaseSetupDetails.timePeriodCoverageStartDate}
+                </FormattedDate>{' '}
                 to{' '}
-                {format(
-                  releaseSetupDetails.timePeriodCoverageStartDate.setFullYear(
+                <FormattedDate format="yyyy">
+                  {(
                     releaseSetupDetails.timePeriodCoverageStartDate.getFullYear() +
-                      1,
-                  ),
-                  'yyyy',
-                )}
+                    1
+                  ).toString()}
+                </FormattedDate>
               </dd>
             </div>
             <div className="govuk-summary-list__row">
@@ -81,10 +80,9 @@ const ReleaseSetupPage = ({ match }: RouteComponentProps<MatchProps>) => {
             <div className="govuk-summary-list__row">
               <dt className="govuk-summary-list__key">Scheduled release</dt>
               <dd className="govuk-summary-list__value">
-                {format(
-                  releaseSetupDetails.scheduledReleaseDate,
-                  'd MMMM yyyy',
-                )}
+                <FormattedDate>
+                  {releaseSetupDetails.scheduledReleaseDate}
+                </FormattedDate>
               </dd>
             </div>
             <div className="govuk-summary-list__row">

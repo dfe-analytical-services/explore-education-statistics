@@ -69,7 +69,7 @@ const ReleaseSetupEditPage = ({ match }: RouteComponentProps<MatchProps>) => {
                 <label htmlFor="time-period" className="govuk-label">
                   Type
                 </label>
-                {/*eslint-disable-next-line jsx-a11y/no-onchange*/}
+                {/* eslint-disable-next-line jsx-a11y/no-onchange */}
                 <select
                   name="time-period"
                   id="time-period"
