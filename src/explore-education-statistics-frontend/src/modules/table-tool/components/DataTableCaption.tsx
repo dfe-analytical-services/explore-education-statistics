@@ -1,0 +1,55 @@
+import commaList from '@common/lib/utils/string/commaList';
+import { FilterOption } from '@common/services/tableBuilderService';
+import TimePeriod from '@common/services/types/TimePeriod';
+import { Dictionary } from '@common/types';
+import React from 'react';
+
+interface Props {
+  id: string;
+  timePeriods: TimePeriod[];
+  locations: Dictionary<FilterOption[]>;
+  subjectName: string;
+  publicationName: string;
+}
+
+const DataTableCaption = ({
+  id = 'dataTableCaption',
+  timePeriods,
+  locations,
+  subjectName,
+  publicationName,
+}: Props) => {
+  const startLabel = timePeriods[0].label;
+  const endLabel = timePeriods[timePeriods.length - 1].label;
+
+  const locationLabels = Object.values(locations).flatMap(locationOptions =>
+    locationOptions.map(location => location.label),
+  );
+
+  const timePeriodString =
+    startLabel === endLabel
+      ? ` for ${startLabel}`
+      : ` between ${startLabel} and ${endLabel}`;
+
+  const caption = `Table showing '${subjectName}' from '${publicationName}' in ${commaList(
+    locationLabels,
+  )}${timePeriodString}`;
+
+  return (
+    <>
+      <strong id={id}>{caption}</strong>
+
+      <ul>
+        <li>
+          <strong>n/a</strong> - value matching this criteria could not be
+          found.
+        </li>
+        <li>
+          <strong>x</strong> - value matching this criteria is suppressed.
+        </li>
+      </ul>
+    </>
+  );
+};
+
+export default DataTableCaption;

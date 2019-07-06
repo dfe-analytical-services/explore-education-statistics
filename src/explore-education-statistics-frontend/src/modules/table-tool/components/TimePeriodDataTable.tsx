@@ -1,6 +1,5 @@
 import cartesian from '@common/lib/utils/cartesian';
 import formatPretty from '@common/lib/utils/number/formatPretty';
-import commaList from '@common/lib/utils/string/commaList';
 import {
   FilterOption,
   IndicatorOption,
@@ -8,6 +7,7 @@ import {
 } from '@common/services/tableBuilderService';
 import TimePeriod from '@common/services/types/TimePeriod';
 import { Dictionary } from '@common/types/util';
+import DataTableCaption from '@frontend/modules/table-tool/components/DataTableCaption';
 import sortBy from 'lodash/sortBy';
 import React, { memo, useEffect, useRef, useState } from 'react';
 import FixedMultiHeaderDataTable from './FixedMultiHeaderDataTable';
@@ -23,15 +23,9 @@ interface Props {
   results: TableData['result'];
 }
 
-const TimePeriodDataTable = ({
-  filters,
-  timePeriods,
-  indicators,
-  publicationName,
-  subjectName,
-  locations,
-  results,
-}: Props) => {
+const TimePeriodDataTable = (props: Props) => {
+  const { filters, timePeriods, indicators, results } = props;
+
   const dataTableRef = useRef<HTMLTableElement>(null);
 
   const [tableHeaders, setTableHeaders] = useState<TableHeadersFormValues>({
@@ -57,22 +51,6 @@ const TimePeriodDataTable = ({
       rows: indicators,
     });
   }, [filters, timePeriods, indicators]);
-
-  const startLabel = timePeriods[0].label;
-  const endLabel = timePeriods[timePeriods.length - 1].label;
-
-  const locationLabels = Object.values(locations).flatMap(locationOptions =>
-    locationOptions.map(location => location.label),
-  );
-
-  const timePeriodString =
-    startLabel === endLabel
-      ? ` for ${startLabel}`
-      : ` between ${startLabel} and ${endLabel}`;
-
-  const caption = `Table showing '${subjectName}' from '${publicationName}' in ${commaList(
-    locationLabels,
-  )} ${timePeriodString}`;
 
   const columnHeaders: string[][] = [
     ...tableHeaders.columnGroups.map(colGroup =>
@@ -154,7 +132,7 @@ const TimePeriodDataTable = ({
       />
 
       <FixedMultiHeaderDataTable
-        caption={caption}
+        caption={<DataTableCaption {...props} id="dataTableCaption" />}
         columnHeaders={columnHeaders}
         rowHeaders={rowHeaders}
         rows={rows}
