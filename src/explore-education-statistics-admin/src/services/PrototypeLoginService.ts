@@ -39,7 +39,7 @@ export class PrototypeLoginService {
 
   public static login() {
     return PrototypeLoginService.getAuthentication(
-      window.sessionStorage.getItem('userId') || 'John Smith',
+      window.sessionStorage.getItem('userId') || 'user1',
     );
   }
 
