@@ -1,3 +1,4 @@
+import cartesian from '@common/lib/utils/cartesian';
 import commaList from '@common/lib/utils/string/commaList';
 import {
   FilterOption,
@@ -8,18 +9,8 @@ import TimePeriod from '@common/services/types/TimePeriod';
 import { Dictionary } from '@common/types/util';
 import sortBy from 'lodash/sortBy';
 import React, { memo, useEffect, useRef, useState } from 'react';
-import FixedHeaderGroupedDataTable, {
-  HeaderGroup,
-  RowGroup,
-} from './FixedHeaderGroupedDataTable';
-import TableHeadersForm from './TableHeadersForm';
-
-interface TableHeaders {
-  columnGroups: FilterOption[];
-  columns: TimePeriod[];
-  rowGroups: FilterOption[];
-  rows: IndicatorOption[];
-}
+import FixedMultiHeaderDataTable from './FixedMultiHeaderDataTable';
+import TableHeadersForm, { TableHeadersFormValues } from './TableHeadersForm';
 
 interface Props {
   indicators: IndicatorOption[];
@@ -42,25 +33,29 @@ const TimePeriodDataTable = ({
 }: Props) => {
   const dataTableRef = useRef<HTMLTableElement>(null);
 
-  const [columnGroups, rowGroups] = sortBy(Object.values(filters), [
-    options => options.length,
-  ]);
-
-  const [tableHeaders, setTableHeaders] = useState<TableHeaders>({
-    columnGroups,
-    rowGroups,
-    columns: timePeriods,
-    rows: indicators,
+  const [tableHeaders, setTableHeaders] = useState<TableHeadersFormValues>({
+    columnGroups: [],
+    columns: [],
+    rowGroups: [],
+    rows: [],
   });
 
   useEffect(() => {
+    const sortedFilters = sortBy(Object.values(filters), [
+      options => options.length,
+    ]);
+
+    const halfwayIndex = Math.floor(sortedFilters.length / 2);
+    const columnGroups = sortedFilters.slice(0, halfwayIndex);
+    const rowGroups = sortedFilters.slice(halfwayIndex);
+
     setTableHeaders({
       columnGroups,
       rowGroups,
       columns: timePeriods,
       rows: indicators,
     });
-  }, [columnGroups, rowGroups, timePeriods, indicators]);
+  }, [filters, timePeriods, indicators]);
 
   const startLabel = timePeriods[0].label;
   const endLabel = timePeriods[timePeriods.length - 1].label;
@@ -78,61 +73,74 @@ const TimePeriodDataTable = ({
     locationLabels,
   )} ${timePeriodString}`;
 
-  const headerRow: HeaderGroup[] = tableHeaders.columnGroups.map(
-    columnGroup => {
-      return {
-        columns: tableHeaders.columns.map(column => column.label),
-        label: columnGroup.label,
-      };
-    },
+  const columnHeaders: string[][] = [
+    ...tableHeaders.columnGroups.map(colGroup =>
+      colGroup.map(group => group.label),
+    ),
+    tableHeaders.columns.map(column => column.label),
+  ];
+
+  const rowHeaders: string[][] = [
+    ...tableHeaders.rowGroups.map(rowGroup =>
+      rowGroup.map(group => group.label),
+    ),
+    tableHeaders.rows.map(row => row.label),
+  ];
+
+  const rowHeadersCartesian = cartesian(
+    ...tableHeaders.rowGroups,
+    tableHeaders.rows,
   );
 
-  const groupedData: RowGroup[] = tableHeaders.rowGroups.map(rowGroup => {
-    const rows = tableHeaders.rows.map(row => {
-      const columnGroupValues = tableHeaders.columnGroups.map(colGroup =>
-        tableHeaders.columns.map(column => {
-          const matchingResult = results.find(result => {
-            return Boolean(
-              result.measures[row.value] !== undefined &&
-                result.filters.every(filter =>
-                  [colGroup.value, rowGroup.value].includes(filter),
-                ) &&
-                result.timeIdentifier === column.code &&
-                result.year === column.year,
-            );
-          });
+  const columnHeadersCartesian = cartesian(
+    ...tableHeaders.columnGroups,
+    tableHeaders.columns,
+  );
 
-          if (!matchingResult) {
-            return 'n/a';
-          }
+  const rows = rowHeadersCartesian.map(rowFilterCombination => {
+    const indicatorOption = rowFilterCombination[
+      rowFilterCombination.length - 1
+    ] as IndicatorOption;
 
-          const rawValue = matchingResult.measures[row.value];
-          const numberValue = Number(rawValue);
+    return columnHeadersCartesian.map(columnFilterCombination => {
+      const time = columnFilterCombination[
+        columnFilterCombination.length - 1
+      ] as TimePeriod;
 
-          if (Number.isNaN(numberValue)) {
-            return rawValue;
-          }
+      const aggregateFilters = [
+        ...rowFilterCombination.slice(0, -1),
+        ...columnFilterCombination.slice(0, -1),
+      ];
 
-          const decimals = rawValue.split('.')[1];
-          const decimalPlaces = decimals ? decimals.length : 0;
+      const matchingResult = results.find(result => {
+        return (
+          aggregateFilters.every(filter => {
+            return result.filters.includes(filter.value);
+          }) &&
+          result.timeIdentifier === time.code &&
+          result.year === time.year
+        );
+      });
 
-          return `${numberValue.toLocaleString('en-GB', {
-            maximumFractionDigits: decimalPlaces,
-            minimumFractionDigits: decimalPlaces,
-          })}${row.unit}`;
-        }),
-      );
+      if (!matchingResult) {
+        return 'n/a';
+      }
 
-      return {
-        columnGroups: columnGroupValues,
-        label: row.label,
-      };
+      const rawValue = matchingResult.measures[indicatorOption.value];
+      const numberValue = Number(rawValue);
+
+      if (Number.isNaN(numberValue)) {
+        return rawValue;
+      }
+
+      const decimals = rawValue.split('.')[1];
+      const decimalPlaces = decimals ? decimals.length : 0;
+
+      return `${numberValue.toLocaleString('en-GB', {
+        maximumFractionDigits: decimalPlaces,
+        minimumFractionDigits: decimalPlaces,
+      })}${indicatorOption.unit}`;
     });
-
-    return {
-      rows,
-      label: rowGroup.label,
-    };
   });
 
   return (
@@ -140,7 +148,7 @@ const TimePeriodDataTable = ({
       <TableHeadersForm
         initialValues={tableHeaders}
         onSubmit={value => {
-          setTableHeaders(value as TableHeaders);
+          setTableHeaders(value);
 
           if (dataTableRef.current) {
             dataTableRef.current.scrollIntoView({
@@ -151,10 +159,11 @@ const TimePeriodDataTable = ({
         }}
       />
 
-      <FixedHeaderGroupedDataTable
+      <FixedMultiHeaderDataTable
         caption={caption}
-        headers={headerRow}
-        rowGroups={groupedData}
+        columnHeaders={columnHeaders}
+        rowHeaders={rowHeaders}
+        rows={rows}
         ref={dataTableRef}
       />
     </div>

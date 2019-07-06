@@ -10,28 +10,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         [EnumLabelValue("Local Authority District", "LAD")]
         Local_Authority_District,
 
-        [EnumLabelValue("Local Enterprise Partnerships", "LEP")]
-        Local_Enterprise_Partnerships,
+        [EnumLabelValue("Local Enterprise Partnership", "LEP")]
+        Local_Enterprise_Partnership,
 
         [EnumLabelValue("Institution", "INS")] Institution,
 
-        [EnumLabelValue("Mayoral Combined Authorities", "MCA")]
-        Mayoral_Combined_Authorities,
+        [EnumLabelValue("Mayoral Combined Authority", "MCA")]
+        Mayoral_Combined_Authority,
 
         [EnumLabelValue("Multi Academy Trust", "MAT")]
         Multi_Academy_Trust,
 
-        [EnumLabelValue("National", "NAT")] National,
+        [EnumLabelValue("Country", "NAT")] Country,
 
-        [EnumLabelValue("Opportunity Areas", "OA")]
-        Opportunity_Areas,
+        [EnumLabelValue("Opportunity Area", "OA")]
+        Opportunity_Area,
 
         [EnumLabelValue("Parliamentary Constituency", "PC")]
         Parliamentary_Constituency,
 
         [EnumLabelValue("Provider", "PRO")] Provider,
 
-        [EnumLabelValue("Regional", "REG")] Regional,
+        [EnumLabelValue("Regional", "REG")] Region,
 
         [EnumLabelValue("RSC Region", "RSCR")] RSC_Region,
 

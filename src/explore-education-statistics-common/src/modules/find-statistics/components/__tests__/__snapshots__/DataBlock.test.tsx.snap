@@ -330,7 +330,7 @@ exports[`DataBlock renders summary 1`] = `
           class="govuk-heading-xl"
           data-testid="key-stat-tile-value"
         >
-          3%
+          -3%
         </p>
         <p
           class="govuk-body-s"
@@ -383,7 +383,7 @@ exports[`DataBlock renders summary 1`] = `
           class="govuk-heading-xl"
           data-testid="key-stat-tile-value"
         >
-          10%
+          4%
         </p>
         <p
           class="govuk-body-s"
@@ -436,7 +436,7 @@ exports[`DataBlock renders summary 1`] = `
           class="govuk-heading-xl"
           data-testid="key-stat-tile-value"
         >
-          5%
+          1%
         </p>
         <p
           class="govuk-body-s"

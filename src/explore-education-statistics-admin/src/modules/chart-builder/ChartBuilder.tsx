@@ -10,9 +10,9 @@ import ChartDataSelector, {
 import {
   ChartDataSet,
   DataLabelConfigurationItem,
+  AxisConfigurationItem,
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 import styles from './graph-builder.module.scss';
 import ConstData from '../../pages/prototypes/PrototypeData';
 import ChartTypeSelector from './ChartTypeSelector';
@@ -23,8 +23,43 @@ interface Props {
   data: DataBlockResponse;
 }
 
+function getReduceMetaDataForAxis(data: DataBlockResponse) {
+  return (
+    items: Dictionary<DataLabelConfigurationItem>,
+    groupName: string,
+  ): Dictionary<DataLabelConfigurationItem> => {
+    if (groupName === 'timePeriod') {
+      return {
+        ...items,
+        ...data.result.reduce<Dictionary<DataLabelConfigurationItem>>(
+          (moreItems, result) => ({
+            ...moreItems,
+            [`${result.year}_${result.timeIdentifier}`]: data.metaData
+              .timePeriods[`${result.year}_${result.timeIdentifier}`],
+          }),
+          {},
+        ),
+      };
+    }
+    return items;
+  };
+}
+
+function generateAxesMetaData(
+  axes: Dictionary<AxisConfigurationItem>,
+  data: DataBlockResponse,
+) {
+  return Object.values(axes).reduce(
+    (allValues, axis) => ({
+      ...allValues,
+      ...axis.groupBy.reduce(getReduceMetaDataForAxis(data), {}),
+    }),
+    {},
+  );
+}
+
 const ChartBuilder = ({ data }: Props) => {
-  const [selectedChartType, selectChartType] = React.useState<
+  const [selectedChartType, setSelectedChartType] = React.useState<
     ChartDefinition | undefined
   >();
 
@@ -49,30 +84,53 @@ const ChartBuilder = ({ data }: Props) => {
     setDataSets(addedData);
   };
 
-  const [dataLabels, setDataLabels] = React.useState<
+  const [labels, setLabels] = React.useState<
     Dictionary<DataLabelConfigurationItem>
   >({});
 
-  /*
-  React.useEffect(() => {
-    selectChartType(chartTypes[0]);
-    setDataSets([
-      {
-        indicator: '23',
-        filters: ['1', '71'],
-      },
-    ]);
-  }, []);
-   */
+  const [fieldLabels, setFieldLabels] = React.useState<
+    Dictionary<DataLabelConfigurationItem>
+  >({});
 
-  if (data === undefined) return <LoadingSpinner />;
+  const [axes, setAxes] = React.useState<Dictionary<AxisConfigurationItem>>({});
+
+  React.useEffect(() => {
+    setLabels({
+      ...fieldLabels,
+
+      ...generateAxesMetaData(axes, data),
+    });
+  }, [axes, fieldLabels, data]);
+
+  React.useEffect(() => {
+    if (selectedChartType) {
+      const axiConfiguration = selectedChartType.axes.reduce<
+        Dictionary<AxisConfigurationItem>
+      >(
+        (axesConfigurationDictionary, axisDefinition) => ({
+          ...axesConfigurationDictionary,
+
+          [axisDefinition.type]: {
+            name: axisDefinition.title,
+            groupBy: axisDefinition.defaultDataType
+              ? [axisDefinition.defaultDataType]
+              : [],
+            dataSets: axisDefinition.type === 'major' ? dataSets : [],
+          },
+        }),
+        {},
+      );
+
+      setAxes(axiConfiguration);
+    }
+  }, [dataSets, selectedChartType]);
 
   return (
     <div className={styles.editor}>
       <Details summary="Select chart type" open>
         <ChartTypeSelector
           chartTypes={chartTypes}
-          onSelectChart={selectChartType}
+          onSelectChart={setSelectedChartType}
           selectedChartType={selectedChartType}
         />
       </Details>
@@ -94,12 +152,10 @@ const ChartBuilder = ({ data }: Props) => {
           <Details summary="Chart preview" open>
             <ChartRenderer
               type={selectedChartType.type}
-              dataSets={dataSets}
+              axes={axes}
               data={data}
               meta={data.metaData}
-              xAxis={{ title: '' }}
-              yAxis={{ title: '' }}
-              dataLabels={dataLabels}
+              labels={labels}
             />
           </Details>
 
@@ -108,7 +164,7 @@ const ChartBuilder = ({ data }: Props) => {
               dataSets={dataSets}
               data={data}
               meta={data.metaData}
-              onDataLabelsChange={setDataLabels}
+              onDataLabelsChange={setFieldLabels}
             />
           </Details>
 
@@ -116,12 +172,12 @@ const ChartBuilder = ({ data }: Props) => {
             <p>
               Add / Remove and update the axes and how they display data ranges
             </p>
-            {selectedChartType.axes.map(axis => (
+            {Object.values(axes).map(axis => (
               <ChartAxisConfiguration
-                dataSets={dataSets}
-                key={axis.id}
+                id={axis.name}
+                axisConfiguration={axis}
+                key={axis.name}
                 meta={data.metaData}
-                {...axis}
               />
             ))}
           </Details>

@@ -28,7 +28,7 @@ Validate names of cookies appear on Cookie Page
 Validate Privacy notice page
     [Tags]  HappyPath
     user clicks link   Privacy notice
-    user waits until page contains  Explore education statistics privacy notice
+    user waits until page contains element  xpath://h1[text()="Privacy notice"]
     user waits until page contains  The explore education statistics service is operated by the Department for Education
 
     ${current_url}=  get location
