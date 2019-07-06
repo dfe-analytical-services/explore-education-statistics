@@ -1,8 +1,9 @@
 import DummyReferenceData from '@admin/pages/DummyReferenceData';
 import FormattedDate from '@common/components/FormattedDate';
+import SummaryList from '@common/components/SummaryList';
+import SummaryListItem from '@common/components/SummaryListItem';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
-import { format } from 'date-fns';
 import { setupEditRoute } from '@admin/routes/releaseRoutes';
 import ReleasePageTemplate from '@admin/pages/edit-release/components/ReleasePageTemplate';
 import DummyPublicationsData from '@admin/pages/DummyPublicationsData';
@@ -42,64 +43,43 @@ const ReleaseSetupPage = ({ match }: RouteComponentProps<MatchProps>) => {
         }
       >
         {releaseSetupDetails && (
-          <dl className="govuk-summary-list govuk-!-margin-bottom-9">
-            <div className="govuk-summary-list__row">
-              <dt className="govuk-summary-list__key">Publication title</dt>
-              <dd className="govuk-summary-list__value">
-                {releaseSetupDetails.publicationTitle}
-              </dd>
-            </div>
-            <div className="govuk-summary-list__row">
-              <dt className="govuk-summary-list__key">Coverage type</dt>
-              <dd className="govuk-summary-list__value">
-                {selectedTimePeriodCoverageGroup &&
-                  selectedTimePeriodCoverageGroup.label}
-              </dd>
-            </div>
-            <div className="govuk-summary-list__row">
-              <dt className="govuk-summary-list__key">Release period</dt>
-              <dd className="govuk-summary-list__value">
-                <FormattedDate format="yyyy">
-                  {releaseSetupDetails.timePeriodCoverageStartDate}
-                </FormattedDate>{' '}
-                to{' '}
-                <FormattedDate format="yyyy">
-                  {(
-                    releaseSetupDetails.timePeriodCoverageStartDate.getFullYear() +
-                    1
-                  ).toString()}
-                </FormattedDate>
-              </dd>
-            </div>
-            <div className="govuk-summary-list__row">
-              <dt className="govuk-summary-list__key">Lead statistician</dt>
-              <dd className="govuk-summary-list__value">
-                {releaseSetupDetails.leadStatisticianName}
-              </dd>
-            </div>
-            <div className="govuk-summary-list__row">
-              <dt className="govuk-summary-list__key">Scheduled release</dt>
-              <dd className="govuk-summary-list__value">
-                <FormattedDate>
-                  {releaseSetupDetails.scheduledReleaseDate}
-                </FormattedDate>
-              </dd>
-            </div>
-            <div className="govuk-summary-list__row">
-              <dt className="govuk-summary-list__key">Release type</dt>
-              <dd className="govuk-summary-list__value">
-                {releaseSetupDetails.releaseType.label}
-              </dd>
-            </div>
-            <div className="govuk-summary-list__row">
-              <dt className="govuk-summary-list__key" />
-              <dd className="govuk-summary-list__actions">
-                <Link to={setupEditRoute.generateLink(releaseId)}>
-                  Edit release setup details
-                </Link>
-              </dd>
-            </div>
-          </dl>
+          <SummaryList>
+            <SummaryListItem term="Publication title">
+              {releaseSetupDetails.publicationTitle}
+            </SummaryListItem>
+            <SummaryListItem term="Coverage type">
+              {selectedTimePeriodCoverageGroup &&
+                selectedTimePeriodCoverageGroup.label}
+            </SummaryListItem>
+            <SummaryListItem term="Release period">
+              <FormattedDate format="yyyy">
+                {releaseSetupDetails.timePeriodCoverageStartDate}
+              </FormattedDate>{' '}
+              to{' '}
+              <FormattedDate format="yyyy">
+                {(
+                  releaseSetupDetails.timePeriodCoverageStartDate.getFullYear() +
+                  1
+                ).toString()}
+              </FormattedDate>
+            </SummaryListItem>
+            <SummaryListItem term="Lead statistician">
+              {releaseSetupDetails.leadStatisticianName}
+            </SummaryListItem>
+            <SummaryListItem term="Scheduled release">
+              <FormattedDate>
+                {releaseSetupDetails.scheduledReleaseDate}
+              </FormattedDate>
+            </SummaryListItem>
+            <SummaryListItem term="Release type">
+              {releaseSetupDetails.releaseType.label}
+            </SummaryListItem>
+            <SummaryListItem term="">
+              <Link to={setupEditRoute.generateLink(releaseId)}>
+                Edit release setup details
+              </Link>
+            </SummaryListItem>
+          </SummaryList>
         )}
       </ReleasePageTemplate>
     </>

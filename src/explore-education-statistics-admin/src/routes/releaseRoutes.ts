@@ -8,6 +8,7 @@ import ReleasePublishStatusPage from '../pages/edit-release/ReleasePublishStatus
 
 export interface ReleaseRoute {
   path: string;
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   component: (props: any) => JSX.Element;
   title: string;
   generateLink: (releaseId: string) => string;
@@ -16,6 +17,7 @@ export interface ReleaseRoute {
 const createReadonlyRoute = (
   section: string,
   title: string,
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   component: (props: any) => JSX.Element,
 ): ReleaseRoute => {
   const path = `/release/:releaseId/${section}`;
@@ -30,6 +32,7 @@ const createReadonlyRoute = (
 const createEditRoute = (
   section: string,
   title: string,
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   component: (props: any) => JSX.Element,
 ): ReleaseRoute => {
   const path = `/release/:releaseId/${section}/edit`;

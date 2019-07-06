@@ -1,4 +1,3 @@
-import groupBy from 'lodash/groupBy';
 import { IdLabelPair } from '@admin/services/publicationService';
 
 export enum DateType {

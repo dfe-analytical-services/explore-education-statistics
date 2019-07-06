@@ -1,4 +1,3 @@
-import { TimePeriodCoverageGroup } from '@admin/pages/DummyReferenceData';
 import { User } from '@admin/services/PrototypeLoginService';
 
 export interface IdLabelPair {
