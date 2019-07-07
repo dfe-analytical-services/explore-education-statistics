@@ -310,7 +310,7 @@ class TableToolPage extends Component<Props, State> {
                     <FiltersForm
                       {...stepProps}
                       onSubmit={this.handleFiltersFormSubmit}
-                      specification={subjectMeta}
+                      subjectMeta={subjectMeta}
                     />
                   )}
                 </WizardStep>
