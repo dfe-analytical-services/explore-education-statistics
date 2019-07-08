@@ -63,20 +63,7 @@ const DownloadCsvButton = ({
           return 'n/a';
         }
 
-        const rawValue = matchingResult.measures[indicator.value];
-        const numberValue = Number(rawValue);
-
-        if (Number.isNaN(numberValue)) {
-          return rawValue;
-        }
-
-        const decimals = rawValue.split('.')[1];
-        const decimalPlaces = decimals ? decimals.length : 0;
-
-        return numberValue.toLocaleString('en-GB', {
-          maximumFractionDigits: decimalPlaces,
-          minimumFractionDigits: decimalPlaces,
-        });
+        return matchingResult.measures[indicator.value];
       });
 
       return [...row.map(column => column.label), ...indicatorCells];
@@ -99,7 +86,7 @@ const DownloadCsvButton = ({
         });
       }}
     >
-      Download data (.csv)
+      Download underlying data (.csv)
     </ButtonText>
   );
 };

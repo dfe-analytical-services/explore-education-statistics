@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`DownloadCsvButton clicking generates correct CSV 1`] = `
+exports[`DownloadCsvButton clicking generates complete csv 1`] = `
 Array [
   Array [
     "Time period",
@@ -68,7 +68,7 @@ Array [
 ]
 `;
 
-exports[`DownloadCsvButton csv can contain suppressed or cells with no result  1`] = `
+exports[`DownloadCsvButton generated csv can contain suppressed or cells with no result  1`] = `
 Array [
   Array [
     "Time period",
@@ -78,46 +78,11 @@ Array [
     "Number of authorised absence sessions",
   ],
   Array [
-    "2014/15",
-    "Male",
-    "State-funded primary",
-    "1.2",
-    "2",
-  ],
-  Array [
-    "2014/15",
-    "Male",
-    "State-funded secondary",
-    "n/a",
-    "n/a",
-  ],
-  Array [
-    "2014/15",
-    "Female",
-    "State-funded primary",
-    "5.6",
-    "6",
-  ],
-  Array [
-    "2014/15",
-    "Female",
-    "State-funded secondary",
-    "7.8",
-    "8",
-  ],
-  Array [
     "2015/16",
     "Male",
     "State-funded primary",
-    "9",
-    "10",
-  ],
-  Array [
-    "2015/16",
-    "Male",
-    "State-funded secondary",
-    "11.2",
-    "12",
+    "n/a",
+    "n/a",
   ],
   Array [
     "2015/16",
@@ -126,12 +91,24 @@ Array [
     "13.4",
     "x",
   ],
+]
+`;
+
+exports[`DownloadCsvButton generated csv does not format values 1`] = `
+Array [
+  Array [
+    "Time period",
+    "Characteristics",
+    "School type",
+    "Authorised absence rate (%)",
+    "Number of authorised absence sessions",
+  ],
   Array [
     "2015/16",
     "Female",
-    "State-funded secondary",
-    "15.6",
-    "x",
+    "State-funded primary",
+    "12300000",
+    "44255667.2356",
   ],
 ]
 `;

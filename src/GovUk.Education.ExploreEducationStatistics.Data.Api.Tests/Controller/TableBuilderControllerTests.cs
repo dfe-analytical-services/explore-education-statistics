@@ -3,7 +3,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
-using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 
@@ -44,13 +43,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controller
         {
             var result = _controller.Query(_query);
             Assert.IsAssignableFrom<ResultViewModel>(result.Value);
-        }
-
-        [Fact]
-        public void Query_Post_NoResult_Returns_NotFound()
-        {
-            var result = _controller.Query(new ObservationQueryContext());
-            Assert.IsAssignableFrom<NotFoundResult>(result.Result);
         }
     }
 }
