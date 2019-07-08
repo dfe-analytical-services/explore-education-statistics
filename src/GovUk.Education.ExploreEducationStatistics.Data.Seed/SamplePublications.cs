@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                 {30, DataCsvFile.KS4_2018_LA_Char_Testdata},
                 {31, DataCsvFile.KS4_2018_Nat_Char_Testdata},
                 {32, DataCsvFile.KS4_2018_Subject_Tables_S1_TestData},
-                {33, DataCsvFile.KS4_2018_Subject_Tables_S3_TestData},
+                {33, DataCsvFile.KS4_2018_Subject_Tables_S3_TestData}
             };
 
         public static readonly IEnumerable<Theme> Themes = new List<Theme>
@@ -253,13 +253,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                             {
                                                 Id = 22,
                                                 Name = "Management information",
-                                            },
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                    },
+                    }
                 }
             },
             new Theme
@@ -347,12 +347,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                             {
                                                 Id = 23,
                                                 Name = "National achievement rates tables (NARTs)",
-                                            },
+                                            }
                                         }
-                                    },
+                                    }
                                 }
-                            },
-                        },
+                            }
+                        }
                     },
                     new Topic
                     {
@@ -380,9 +380,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                             {
                                                 Id = 24,
                                                 Name = "Apprenticeship annual",
-                                            },
+                                            }
                                         }
-                                    }, 
+                                    }
                                 }
                             },
                             new Publication
@@ -404,16 +404,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                             {
                                                 Id = 25,
                                                 Name = "Further education and skills",
-                                            },
+                                            }
                                         }
-                                    },   
+                                    }
                                 }
-                            },
-                        },
-                    },
+                            }
+                        }
+                    }
                 }
             },
-            
+
             new Theme
             {
                 Id = new Guid("fe805471-17e9-4ac6-a555-c7d0ebec1b90"),
@@ -457,11 +457,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                             {
                                                 Id = 28,
                                                 Name = "Level 2 and 3 sf by Local authority",
-                                            },
+                                            }
                                         }
-                                    },
+                                    }
                                 }
-                            },
+                            }
                         }
                     },
                     new Topic
@@ -490,11 +490,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                             {
                                                 Id = 29,
                                                 Name = "2016 test data",
-                                            },
+                                            }
                                         }
-                                    },
+                                    }
                                 }
-                            }, 
+                            }
                         }
                     },
                     new Topic
@@ -538,15 +538,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                             {
                                                 Id = 33,
                                                 Name = "Subject tables S3 test data",
-                                            },
+                                            }
                                         }
-                                    },
+                                    }
                                 }
                             }
                         }
-                    },
+                    }
                 }
-            },
+            }
         };
     }
 }
