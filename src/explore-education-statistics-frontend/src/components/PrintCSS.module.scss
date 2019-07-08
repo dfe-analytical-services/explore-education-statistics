@@ -7,13 +7,11 @@
 }
 
 .pageBreakBefore {
+  break-before: always;
   page-break-before: always;
 }
 
 .unbreakable {
+  break-inside: avoid;
   page-break-inside: avoid;
-}
-
-.dontBreakAfter {
-  page-break-after: avoid;
 }
