@@ -1,6 +1,4 @@
-import { DataBlockMetadata } from '@common/services/dataBlockService';
 import {
-  ChartDataSet,
   ChartConfiguration,
   ChartSymbol,
 } from '@common/services/publicationService';
@@ -22,23 +20,6 @@ interface Props {
 
   onConfigurationChange?: (value: ChartConfiguration) => void;
 }
-
-const buildConfigItem = (
-  meta: DataBlockMetadata,
-  dataset: ChartDataSet,
-  key: string,
-) => {
-  const filters = (dataset.filters || [])
-    .map(f => meta.filters[f].label)
-    .join(',');
-
-  return {
-    name: `${meta.indicators[dataset.indicator].label} (${filters})`,
-    label: `${meta.indicators[dataset.indicator].label} (${filters})`,
-    value: key,
-    unit: meta.indicators[dataset.indicator].unit,
-  };
-};
 
 const colourOptions: SelectOption[] = colours.map(color => {
   return {

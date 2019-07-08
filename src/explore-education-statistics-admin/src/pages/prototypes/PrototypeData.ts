@@ -1,10 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { Dictionary } from '@common/types';
-import LineChartBlock from '@common/modules/find-statistics/components/charts/LineChartBlock';
-import { ChartDefinition } from '@common/modules/find-statistics/components/charts/ChartFunctions';
-import HorizontalBarBlock from '@common/modules/find-statistics/components/charts/HorizontalBarBlock';
-import VerticalBarBlock from '@common/modules/find-statistics/components/charts/VerticalBarBlock';
-import MapBlock from '@common/modules/find-statistics/components/charts/MapBlock';
 import {
   DataBlockResponse,
   GeographicLevel,
@@ -3750,7 +3745,9 @@ const testResponse: DataBlockResponse = {
   ],
 };
 
-export default {
+const Data = {
   tables,
   testResponse,
 };
+
+export default Data;

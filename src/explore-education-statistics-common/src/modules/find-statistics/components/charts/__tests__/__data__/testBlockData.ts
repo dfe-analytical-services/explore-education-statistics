@@ -2810,9 +2810,11 @@ const AbstractChartProps: ChartProps = {
   labels: {
     '2014_HT6': {
       label: metaData.timePeriods['2014_HT6'].label,
+      value: '2014_HT6',
     },
     '2015_HT6': {
       label: metaData.timePeriods['2015_HT6'].label,
+      value: '2015_HT6',
     },
     '23_1_2_____': {
       label: metaData.indicators['23'].label,

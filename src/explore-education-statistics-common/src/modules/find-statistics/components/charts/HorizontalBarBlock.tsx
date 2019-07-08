@@ -16,7 +16,6 @@ import {
   BarChart,
   CartesianGrid,
   Legend,
-  Line,
   ResponsiveContainer,
   Tooltip,
 } from 'recharts';
@@ -84,7 +83,7 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
           <Tooltip cursor={false} />
           <Legend />
 
-          {Array.from(keysForChart).map((name, index) => (
+          {Array.from(keysForChart).map(name => (
             <Bar
               key={name}
               {...populateDefaultChartProps(name, labels[name])}

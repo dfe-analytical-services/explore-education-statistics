@@ -16,7 +16,6 @@ import {
   BarChart,
   CartesianGrid,
   Legend,
-  Line,
   ResponsiveContainer,
   Tooltip,
 } from 'recharts';
@@ -80,7 +79,7 @@ export default class VerticalBarBlock extends Component<StackedBarProps> {
           <Tooltip />
           <Legend />
 
-          {Array.from(keysForChart).map((name, index) => (
+          {Array.from(keysForChart).map(name => (
             <Bar
               key={name}
               {...populateDefaultChartProps(name, labels[name])}

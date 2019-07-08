@@ -10,7 +10,6 @@ import {
 import React, { ReactNode } from 'react';
 import {
   Label,
-  Line,
   PositionType,
   ReferenceLine as RechartsReferenceLine,
   XAxis,
