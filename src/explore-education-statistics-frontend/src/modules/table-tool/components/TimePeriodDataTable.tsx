@@ -47,12 +47,10 @@ const TimePeriodDataTable = (props: Props) => {
     );
 
     const halfwayIndex = Math.floor(sortedFilters.length / 2);
-    const columnGroups = sortedFilters.slice(0, halfwayIndex);
-    const rowGroups = sortedFilters.slice(halfwayIndex);
 
     setTableHeaders({
-      columnGroups,
-      rowGroups,
+      columnGroups: sortedFilters.slice(0, halfwayIndex),
+      rowGroups: sortedFilters.slice(halfwayIndex),
       columns: timePeriods,
       rows: indicators,
     });
@@ -88,16 +86,16 @@ const TimePeriodDataTable = (props: Props) => {
     return columnHeadersCartesian.map(columnFilterCombination => {
       const timePeriod = last(columnFilterCombination) as TimePeriod;
 
-      const combinationFilters = [
-        ...rowFilterCombination.slice(0, -1),
-        ...columnFilterCombination.slice(0, -1),
+      const filterCombination = [
+        ...rowFilterCombination,
+        ...columnFilterCombination,
       ];
 
-      const categoryFilters = combinationFilters.filter(
+      const categoryFilters = filterCombination.filter(
         filter => filter instanceof CategoryFilter,
       );
 
-      const locationFilters = combinationFilters.filter(
+      const locationFilters = filterCombination.filter(
         filter => filter instanceof LocationFilter,
       ) as LocationFilter[];
 
