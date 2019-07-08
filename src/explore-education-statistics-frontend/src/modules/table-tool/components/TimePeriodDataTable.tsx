@@ -109,7 +109,9 @@ const TimePeriodDataTable = (props: Props) => {
           result.timeIdentifier === timePeriod.code &&
           result.year === timePeriod.year &&
           locationFilters.every(
-            filter => result.location[filter.level].code === filter.value,
+            filter =>
+              result.location[filter.level] &&
+              result.location[filter.level].code === filter.value,
           )
         );
       });
