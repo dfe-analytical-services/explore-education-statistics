@@ -11,8 +11,8 @@ Library    utilities.py
 ${browser}    chrome
 ${headless}   1
 
-${timeout}          10
-${implicit_wait}    10
+${timeout}          15
+${implicit_wait}    15
 
 ${url}        about:blank
 ${urlAdmin}   about:blank
@@ -20,8 +20,8 @@ ${urlAdmin}   about:blank
 *** Keywords ***
 do this on failure
   capture page screenshot
-  set selenium timeout  3
-  set selenium implicit wait  3
+#  set selenium timeout  3
+#  set selenium implicit wait  3
 
 user opens the browser
   run keyword if    "${browser}" == "chrome"    user opens chrome
@@ -158,6 +158,14 @@ user checks element should not contain
   [Arguments]   ${element}  ${text}
   element should not contain  ${element}    ${text}
 
+user checks page contains
+  [Arguments]   ${text}
+  page should contain   ${text}
+
+user checks page does not contain
+  [Arguments]  ${text}
+  page should not contain   ${text}
+
 user checks page contains element
   [Arguments]  ${element}
   page should contain element  ${element}
@@ -191,6 +199,20 @@ user selects from list by label
 user presses keys
   [Arguments]   ${keys}
   press keys  ${None}    ${keys}
+
+user checks element count is x
+  [Arguments]   ${locator}   ${amount}
+  page should contain element   ${locator}   limit=${amount}
+
+user checks url contains
+  [Arguments]   ${text}
+  ${current_url}=   get location
+  should contain  ${current_url}   ${text}
+
+user checks page contains link with text and url
+  [Arguments]  ${text}  ${href}
+  user checks page contains element  xpath://a[@href="${href}" and text()="${text}"]
+
 
 #user clicks accordion
 #  [Arguments]   ${text}

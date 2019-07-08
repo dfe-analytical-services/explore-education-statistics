@@ -22,6 +22,7 @@ function PublicationList({ publications }: Props) {
             <strong>{title}</strong>
             {legacyPublicationUrl ? (
               <span>
+                {' '}
                 - currently available via{' '}
                 <a href={legacyPublicationUrl}>Statistics at DfE</a>
               </span>

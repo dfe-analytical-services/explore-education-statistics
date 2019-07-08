@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -24,7 +25,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             var yearsRange = TimePeriodUtil.YearsRange(query.Years, query.StartYear, query.EndYear);
 
             var subjectIdParam = new SqlParameter("subjectId", query.SubjectId);
-            var geographicLevelParam = new SqlParameter("geographicLevel", query.GeographicLevel.GetEnumValue());
+            var geographicLevelParam = new SqlParameter("geographicLevel",
+                query.GeographicLevel?.GetEnumValue() ?? (object) DBNull.Value);
             var yearsListParam = CreateIdListType("yearList", yearsRange);
             var countriesListParam = CreateIdListType("countriesList", query.Country);
             var institutionListParam =
