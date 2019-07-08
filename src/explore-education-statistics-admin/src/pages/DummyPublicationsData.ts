@@ -292,6 +292,7 @@ const getReleaseSetupDetails = (releaseId: string): ReleaseSetupDetails => {
     releaseType: release.releaseType,
     leadStatisticianName: release.lead.name,
     scheduledReleaseDate: release.scheduledReleaseDate,
+    nextExpectedReleaseDate: release.nextReleaseExpectedDate,
   };
 };
 

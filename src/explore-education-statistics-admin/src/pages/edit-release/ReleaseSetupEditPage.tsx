@@ -41,7 +41,7 @@ export const dateToDayMonthYear = (date?: Date) => {
 
 export const dayMonthYearToDate = (dmy: DayMonthYearValues) => {
   const date = dmy.day ? parseInt(dmy.day, 10) : 1;
-  const month = dmy.month ? parseInt(dmy.month, 10) : 1;
+  const month = dmy.month ? parseInt(dmy.month, 10) - 1 : 0;
   const year = dmy.year ? parseInt(dmy.year, 10) : 1971;
   return new Date(year, month, date);
 };
@@ -224,11 +224,10 @@ const ReleaseSetupEditPage = ({
                     DateType.DayMonthYear ===
                       selectedTimePeriodCoverageGroup.startDateType && (
                       <FormFieldDayMonthYear
-                        fieldsetId={`${formId}-timePeriodCoverageStartDateFieldset`}
+                        fieldName="timePeriodCoverageStartDate"
                         fieldsetLegend={
                           selectedTimePeriodCoverageGroup.startDateLabel
                         }
-                        fieldIdPrefix={`${formId}-timePeriodCoverageStartDate`}
                         day={form.values.timePeriodCoverageStartDate.day}
                         month={form.values.timePeriodCoverageStartDate.month}
                         year={form.values.timePeriodCoverageStartDate.year}
@@ -237,18 +236,16 @@ const ReleaseSetupEditPage = ({
                 </FormFieldset>
 
                 <FormFieldDayMonthYear
-                  fieldsetId={`${formId}-scheduledReleaseDateFieldset`}
+                  fieldName="scheduledReleaseDate"
                   fieldsetLegend="Schedule publish date"
-                  fieldIdPrefix={`${formId}-scheduledReleaseDate`}
                   day={form.values.scheduledReleaseDate.day}
                   month={form.values.scheduledReleaseDate.month}
                   year={form.values.scheduledReleaseDate.year}
                 />
 
                 <FormFieldDayMonthYear
-                  fieldsetId={`${formId}-nextExpectedReleaseDateFieldset`}
+                  fieldName="nextReleaseExpectedDate"
                   fieldsetLegend="Next release expected (optional)"
-                  fieldIdPrefix={`${formId}-nextExpectedReleaseDate`}
                   day={form.values.nextReleaseExpectedDate.day}
                   month={form.values.nextReleaseExpectedDate.month}
                   year={form.values.nextReleaseExpectedDate.year}

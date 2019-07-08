@@ -94,12 +94,12 @@ export const tablesEditRoute = createEditRoute(
   'View / edit tables',
   ReleaseTablesPage,
 );
-export const contentEditRoute = createReadonlyRoute(
+export const contentEditRoute = createEditRoute(
   'content',
   'Add / edit content',
   ReleaseContentPage,
 );
-export const publishStatusEditRoute = createReadonlyRoute(
+export const publishStatusEditRoute = createEditRoute(
   'publish-status',
   'Set publish status',
   ReleasePublishStatusPage,
