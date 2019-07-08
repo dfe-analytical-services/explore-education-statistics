@@ -55,23 +55,25 @@ const FormFieldSortableListGroup = <T extends Dictionary<SortableOption[][]>>({
                         key={index}
                       >
                         {(draggableProvided, draggableSnapshot) => (
-                          <div className={styles.listContainer}>
-                            <div
-                              {...draggableProvided.draggableProps}
-                              {...draggableProvided.dragHandleProps}
-                              className={classNames(styles.list, {
+                          <div
+                            {...draggableProvided.draggableProps}
+                            {...draggableProvided.dragHandleProps}
+                            className={classNames(
+                              styles.list,
+                              styles.listOneThird,
+                              {
                                 [styles.isDragging]:
                                   draggableSnapshot.isDragging,
-                              })}
-                              ref={draggableProvided.innerRef}
-                            >
-                              <FormFieldSortableList<T>
-                                name={`${name}[${index}]`}
-                                id={`sortableList-${name}-${index}`}
-                                legend={`${groupLegend} ${index + 1}`}
-                                legendSize="s"
-                              />
-                            </div>
+                              },
+                            )}
+                            ref={draggableProvided.innerRef}
+                          >
+                            <FormFieldSortableList<T>
+                              name={`${name}[${index}]`}
+                              id={`sortableList-${name}-${index}`}
+                              legend={`${groupLegend} ${index + 1}`}
+                              legendSize="s"
+                            />
                           </div>
                         )}
                       </Draggable>
