@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             catch (Exception e)
             {
                 // TODO Handle exceptions via notifications etc
-                logger.LogError($"{GetType().Name} function FAILED: {e.ToString()}");
+                logger.LogError($"{GetType().Name} function FAILED: {e}");
                 throw;
             }
 

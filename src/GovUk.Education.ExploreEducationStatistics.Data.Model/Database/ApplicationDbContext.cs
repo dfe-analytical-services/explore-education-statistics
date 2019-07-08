@@ -124,7 +124,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                     Slug = "further-education-and-skills",
                     ThemeId = new Guid("9aa81762-e52c-40d4-8a90-f469977360a7")
                 },
-                
                 new Topic
                 {
                     Id = new Guid("9e4fa097-2999-4c4d-9ecd-0c4733fc71b4"),
@@ -145,8 +144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                     Title = "GCSEs (key stage 4)",
                     Slug = "key-stage-four",
                     ThemeId = new Guid("fe805471-17e9-4ac6-a555-c7d0ebec1b90")
-                },
-                
+                }
             });
 
             modelBuilder.Entity<Publication>().HasData(new List<Publication>
@@ -319,7 +317,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                     Title = "2018",
                     Slug = "2018",
                     PublicationId = new Guid("15659c96-a624-4457-846d-2ab5f3db6aec")
-                },
+                }
             });
 
             modelBuilder.Entity<Subject>().HasData(new List<Subject>
@@ -521,7 +519,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                     Id = 33,
                     Name = "Subject tables S3 test data",
                     ReleaseId = new Guid("737dbab8-4e62-4d56-b0d6-5b4602a20801")
-                },
+                }
             });
         }
 
@@ -695,7 +693,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                 .OwnsOne(level => level.Sponsor,
                     builder => builder.HasIndex(sponsor => sponsor.Code));
         }
-        
+
         private static void ConfigureWard(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Location>()
