@@ -1,13 +1,14 @@
 using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
+namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
 {
     public class ObservationQueryContext
     {
         public long SubjectId { get; set; }
         public int StartYear { get; set; }
         public int EndYear { get; set; }
-        public IEnumerable<int> Years { get; set; }
+        public TimePeriodQuery TimePeriod { get; set; }
         public IEnumerable<long> Filters { get; set; }
         public GeographicLevel GeographicLevel { get; set; }
         public IEnumerable<long> Indicators { get; set; }
@@ -32,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
                 SubjectId = SubjectId,
                 StartYear = StartYear,
                 EndYear = EndYear,
-                Years = Years,
+                TimePeriod = TimePeriod,
                 GeographicLevel = GeographicLevel,
                 Indicators = Indicators,
                 Country = Country,

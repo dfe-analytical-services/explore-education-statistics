@@ -2,17 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
+namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
 {
     public class SubjectMetaQueryContext
     {
         public long SubjectId { get; set; }
         public int StartYear { get; set; }
         public int EndYear { get; set; }
-        public IEnumerable<int> Years { get; set; }
+        public TimePeriodQuery TimePeriod { get; set; }
         public GeographicLevel? GeographicLevel { get; set; }
         public IEnumerable<long> Indicators { get; set; }
         public IEnumerable<string> Country { get; set; }
@@ -33,12 +35,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
         {
             var predicate = PredicateBuilder.True<Observation>()
                 .And(observation => observation.SubjectId == SubjectId);
-
-            var yearsRange = TimePeriodUtil.YearsRange(Years, StartYear, EndYear);
-            if (yearsRange.Any())
+            
+            if (TimePeriod != null)
             {
-                predicate = predicate.And(observation =>
-                    yearsRange.Contains(observation.Year));
+                var timePeriodRange = TimePeriodUtil.Range(TimePeriod).ToList();
+                // TODO DFE-886 This is being evaluated locally and is very slow
+                predicate = predicate.And(observation => timePeriodRange.Contains(observation.GetTimePeriod()));
             }
 
             if (GeographicLevel != null)

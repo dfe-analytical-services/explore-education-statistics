@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
@@ -73,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private Dictionary<string, LegendOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>> GetObservationalUnits(
             SubjectMetaQueryContext query)
         {
-            var observationalUnits = _locationService.GetObservationalUnits(query);
+            var observationalUnits = _locationService.GetObservationalUnits(query.ObservationPredicate());
             return observationalUnits.ToDictionary(
                 pair => pair.Key.ToString().PascalCase(),
                 pair => new LegendOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
@@ -101,7 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>>>> GetFilters(
             SubjectMetaQueryContext query)
         {
-            return _filterItemService.GetFilterItems(query)
+            return _filterItemService.GetFilterItems(query.ObservationPredicate())
                 .GroupBy(item => item.FilterGroup.Filter)
                 .ToDictionary(
                     itemsGroupedByFilter => itemsGroupedByFilter.Key.Label.PascalCase(),

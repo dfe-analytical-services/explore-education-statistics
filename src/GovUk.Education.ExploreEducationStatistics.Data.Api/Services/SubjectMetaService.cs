@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Newtonsoft.Json;
 
@@ -103,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 .Distinct()
                 .OrderBy(tuple => tuple.Year)
                 .ThenBy(tuple => tuple.TimeIdentifier);
-            
+
             return timePeriods.ToDictionary(
                 tuple => $"{tuple.Year}_{tuple.TimeIdentifier.GetEnumValue()}",
                 tuple => new TimePeriodMetaViewModel

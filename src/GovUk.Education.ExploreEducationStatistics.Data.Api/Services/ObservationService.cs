@@ -2,14 +2,16 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
+namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
     public class ObservationService : AbstractRepository<Observation, long>, IObservationService
     {
@@ -21,11 +23,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
         public IEnumerable<Observation> FindObservations(ObservationQueryContext query)
         {
-            var yearsRange = TimePeriodUtil.YearsRange(query.Years, query.StartYear, query.EndYear);
+            var timePeriodRange = TimePeriodUtil.Range(query.TimePeriod);
 
             var subjectIdParam = new SqlParameter("subjectId", query.SubjectId);
             var geographicLevelParam = new SqlParameter("geographicLevel", query.GeographicLevel.GetEnumValue());
-            var yearsListParam = CreateIdListType("yearList", yearsRange);
+            var timePeriodListParam = CreateTimePeriodListType("timePeriodList", timePeriodRange);
             var countriesListParam = CreateIdListType("countriesList", query.Country);
             var institutionListParam =
                 CreateIdListType("institutionList", query.Institution);
@@ -53,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .FromSql("EXEC dbo.FilteredObservations " +
                          "@subjectId," +
                          "@geographicLevel," +
-                         "@yearList," +
+                         "@timePeriodList," +
                          "@countriesList," +
                          "@institutionList," +
                          "@localAuthorityList," +
@@ -70,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                          "@filtersList",
                     subjectIdParam,
                     geographicLevelParam,
-                    yearsListParam,
+                    timePeriodListParam,
                     countriesListParam,
                     institutionListParam,
                     localAuthorityListParam,
@@ -105,19 +107,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             return result;
         }
 
-        private static SqlParameter CreateIdListType(string parameterName, IEnumerable<int> idList)
+        private static SqlParameter CreateIdListType(string parameterName, IEnumerable<int> values)
         {
-            return CreateListType(parameterName, idList.AsIdListTable(), "dbo.IdListIntegerType");
+            return CreateListType(parameterName, values.AsIdListTable(), "dbo.IdListIntegerType");
         }
 
-        private static SqlParameter CreateIdListType(string parameterName, IEnumerable<long> idList)
+        private static SqlParameter CreateIdListType(string parameterName, IEnumerable<long> values)
         {
-            return CreateListType(parameterName, idList.AsIdListTable(), "dbo.IdListIntegerType");
+            return CreateListType(parameterName, values.AsIdListTable(), "dbo.IdListIntegerType");
         }
 
-        private static SqlParameter CreateIdListType(string parameterName, IEnumerable<string> idList)
+        private static SqlParameter CreateIdListType(string parameterName, IEnumerable<string> values)
         {
-            return CreateListType(parameterName, idList.AsIdListTable(), "dbo.IdListVarcharType");
+            return CreateListType(parameterName, values.AsIdListTable(), "dbo.IdListVarcharType");
+        }
+
+        private static SqlParameter CreateTimePeriodListType(string parameterName,
+            IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> values)
+        {
+            return CreateListType(parameterName, values.AsTimePeriodListTable(), "dbo.TimePeriodListType");
         }
 
         private static SqlParameter CreateListType(string parameterName, object value, string typeName)

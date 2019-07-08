@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -16,6 +17,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels
         [JsonConverter(typeof(StringEnumConverter))]
         public GeographicLevel GeographicLevel { get; set; }
 
+        public Dictionary<string, TimePeriodMetaViewModel> TimePeriodRange { get; set; }
+        
         public IEnumerable<ObservationViewModel> Result { get; set; }
 
         public ResultViewModel()
