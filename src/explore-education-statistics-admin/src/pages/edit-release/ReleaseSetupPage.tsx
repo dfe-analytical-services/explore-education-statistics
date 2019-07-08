@@ -74,11 +74,14 @@ const ReleaseSetupPage = ({ match }: RouteComponentProps<MatchProps>) => {
             <SummaryListItem term="Release type">
               {releaseSetupDetails.releaseType.label}
             </SummaryListItem>
-            <SummaryListItem term="">
-              <Link to={setupEditRoute.generateLink(releaseId)}>
-                Edit release setup details
-              </Link>
-            </SummaryListItem>
+            <SummaryListItem
+              term=""
+              actions={
+                <Link to={setupEditRoute.generateLink(releaseId)}>
+                  Edit release setup details
+                </Link>
+              }
+            />
           </SummaryList>
         )}
       </ReleasePageTemplate>

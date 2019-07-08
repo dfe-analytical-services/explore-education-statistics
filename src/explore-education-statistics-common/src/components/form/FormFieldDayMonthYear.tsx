@@ -81,12 +81,4 @@ const FormFieldDayMonthYear = ({
   );
 };
 
-export const dateToDayMonthYear = (date?: Date) => {
-  return {
-    day: `${date ? date.getDate() : ''}`,
-    month: `${date ? date.getMonth() : ''}`,
-    year: `${date ? date.getFullYear() : ''}`,
-  };
-};
-
 export default FormFieldDayMonthYear;

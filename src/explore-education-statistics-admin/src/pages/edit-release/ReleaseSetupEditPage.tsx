@@ -4,23 +4,17 @@ import DummyReferenceData, {
   TimePeriodCoverageGroup,
 } from '@admin/pages/DummyReferenceData';
 import ReleasePageTemplate from '@admin/pages/edit-release/components/ReleasePageTemplate';
-import {
-  Form,
-  FormFieldset,
-  FormGroup,
-  Formik,
-  FormTextInput,
-} from '@common/components/form';
-import FormFieldDayMonthYear, {
-  dateToDayMonthYear,
-} from '@common/components/form/FormFieldDayMonthYear';
+import { Form, FormFieldset, Formik } from '@common/components/form';
+import FormFieldDayMonthYear from '@common/components/form/FormFieldDayMonthYear';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
+import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { SelectOption } from '@common/components/form/FormSelect';
 import Yup from '@common/lib/validation/yup';
 import { Dictionary } from '@common/types';
 import { FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
+import { setupRoute } from '@admin/routes/releaseRoutes';
 import Link from '../../components/Link';
 import {
   IdLabelPair,
@@ -37,15 +31,34 @@ interface DayMonthYearValues {
   year: string;
 }
 
+export const dateToDayMonthYear = (date?: Date) => {
+  return {
+    day: `${date ? date.getDate() : ''}`,
+    month: `${date ? date.getMonth() : ''}`,
+    year: `${date ? date.getFullYear() : ''}`,
+  };
+};
+
+export const dayMonthYearToDate = (dmy: DayMonthYearValues) => {
+  const date = dmy.day ? parseInt(dmy.day, 10) : 1;
+  const month = dmy.month ? parseInt(dmy.month, 10) : 1;
+  const year = dmy.year ? parseInt(dmy.year, 10) : 1971;
+  return new Date(year, month, date);
+};
+
 interface FormValues {
   timePeriodCoverageCode: string;
-  timePeriodCoverageStartDate: DayMonthYearValues;
+  timePeriodCoverageStartDate?: DayMonthYearValues;
+  timePeriodCoverageStartDateYearOnly?: string;
   releaseTypeId: string;
   scheduledReleaseDate: DayMonthYearValues;
   nextExpectedReleaseDate: DayMonthYearValues;
 }
 
-const ReleaseSetupEditPage = ({ match }: RouteComponentProps<MatchProps>) => {
+const ReleaseSetupEditPage = ({
+  match,
+  history,
+}: RouteComponentProps<MatchProps>) => {
   const { releaseId } = match.params;
 
   const [releaseSetupDetails, setReleaseSetupDetails] = useState<
@@ -88,6 +101,24 @@ const ReleaseSetupEditPage = ({ match }: RouteComponentProps<MatchProps>) => {
 
   const formId = 'releaseSetupForm';
 
+  const handleFormSubmission = async (values: FormValues) => {
+    const release = DummyPublicationsData.getReleaseById(releaseId);
+
+    if (values.timePeriodCoverageStartDate) {
+      release.timePeriodCoverage.startDate = dayMonthYearToDate(
+        values.timePeriodCoverageStartDate,
+      );
+    } else if (values.timePeriodCoverageStartDateYearOnly) {
+      release.timePeriodCoverage.startDate = new Date(
+        parseInt(values.timePeriodCoverageStartDateYearOnly, 10),
+        1,
+        1,
+      );
+    }
+
+    history.push(setupRoute.generateLink(releaseId));
+  };
+
   return (
     <ReleasePageTemplate
       releaseId={releaseId}
@@ -102,14 +133,26 @@ const ReleaseSetupEditPage = ({ match }: RouteComponentProps<MatchProps>) => {
           enableReinitialize
           // ref={formikRef}
           onSubmit={async values => {
-            // await onSubmit(values);
+            await handleFormSubmission(values);
             // goToNextStep();
           }}
           initialValues={{
             timePeriodCoverageCode: releaseSetupDetails.timePeriodCoverageCode,
-            timePeriodCoverageStartDate: dateToDayMonthYear(
-              releaseSetupDetails.timePeriodCoverageStartDate,
-            ),
+            timePeriodCoverageStartDate:
+              selectedTimePeriodCoverageGroup &&
+              DateType.DayMonthYear ===
+                selectedTimePeriodCoverageGroup.startDateType
+                ? dateToDayMonthYear(
+                    releaseSetupDetails.timePeriodCoverageStartDate,
+                  )
+                : undefined,
+            timePeriodCoverageStartDateYearOnly:
+              selectedTimePeriodCoverageGroup &&
+              DateType.Year === selectedTimePeriodCoverageGroup.startDateType
+                ? releaseSetupDetails.timePeriodCoverageStartDate
+                    .getFullYear()
+                    .toString()
+                : undefined,
             releaseTypeId: releaseSetupDetails.releaseType.id,
             scheduledReleaseDate: dateToDayMonthYear(
               releaseSetupDetails.scheduledReleaseDate,
@@ -144,7 +187,7 @@ const ReleaseSetupEditPage = ({ match }: RouteComponentProps<MatchProps>) => {
                   id={`${formId}-timePeriodCoverageFieldset`}
                   legend="Select time period coverage"
                 >
-                  <FormFieldSelect
+                  <FormFieldSelect<FormValues>
                     id={`${formId}-timePeriodCoverage`}
                     label="Type"
                     name="time-period"
@@ -160,17 +203,15 @@ const ReleaseSetupEditPage = ({ match }: RouteComponentProps<MatchProps>) => {
                   {selectedTimePeriodCoverageGroup &&
                     DateType.Year ===
                       selectedTimePeriodCoverageGroup.startDateType && (
-                      <FormGroup>
-                        <FormTextInput
-                          id={`${formId}-timePeriodCoverageStartYear`}
-                          name="release-year"
-                          label={selectedTimePeriodCoverageGroup.startDateLabel}
-                          value={form.values.timePeriodCoverageStartDate.year}
-                          width={4}
-                        />
-                      </FormGroup>
+                      <FormFieldTextInput<FormValues>
+                        id={`${formId}-timePeriodCoverageStartYearOnly`}
+                        name="timePeriodCoverageStartDateYearOnly"
+                        label={selectedTimePeriodCoverageGroup.startDateLabel}
+                        width={4}
+                      />
                     )}
                   {selectedTimePeriodCoverageGroup &&
+                    form.values.timePeriodCoverageStartDate &&
                     DateType.DayMonthYear ===
                       selectedTimePeriodCoverageGroup.startDateType && (
                       <FormFieldDayMonthYear

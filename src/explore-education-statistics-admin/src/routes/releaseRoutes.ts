@@ -105,12 +105,22 @@ export const publishStatusEditRoute = createReadonlyRoute(
   ReleasePublishStatusPage,
 );
 
-export default [
+export const viewRoutes = [
   setupRoute,
   dataRoute,
   buildTablesRoute,
   tablesRoute,
   contentRoute,
   publishStatusRoute,
-  setupEditRoute,
 ];
+
+export const editRoutes = [
+  setupEditRoute,
+  dataEditRoute,
+  buildTablesEditRoute,
+  tablesEditRoute,
+  contentEditRoute,
+  publishStatusEditRoute,
+];
+
+export default [...viewRoutes, ...editRoutes];
