@@ -1,3 +1,4 @@
+import { Dictionary } from '@common/types';
 import classNames from 'classnames';
 import orderBy from 'lodash/orderBy';
 import React, { ChangeEventHandler, FocusEventHandler, ReactNode } from 'react';
@@ -19,7 +20,8 @@ export interface FormSelectProps {
   name: string;
   onBlur?: FocusEventHandler;
   onChange?: SelectChangeEventHandler;
-  options: SelectOption[];
+  options?: SelectOption[];
+  optGroups?: Dictionary<SelectOption[]>;
   order?:
     | (keyof SelectOption)[]
     | ((option: SelectOption) => SelectOption[keyof SelectOption])[];
@@ -35,6 +37,7 @@ const FormSelect = ({
   onBlur,
   onChange,
   options,
+  optGroups,
   order = ['label'],
   orderDirection = ['asc'],
   value,
@@ -55,18 +58,29 @@ const FormSelect = ({
         onChange={onChange}
         value={value}
       >
-        {(order === undefined
-          ? options
-          : orderBy(options, order, orderDirection)
-        ).map(option => (
-          <option
-            value={option.value}
-            key={`${option.value}-${option.label}`}
-            selected={option.selected}
-          >
-            {option.label}
-          </option>
-        ))}
+        {options &&
+          (order === undefined
+            ? options
+            : orderBy(options, order, orderDirection)
+          ).map(option => (
+            <option
+              value={option.value}
+              key={`${option.value}-${option.label}`}
+              selected={option.selected}
+            >
+              {option.label}
+            </option>
+          ))}
+        {optGroups &&
+          Object.keys(optGroups).map(group => (
+            <optgroup key={group} label={group}>
+              {optGroups[group].map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </optgroup>
+          ))}
       </select>
     </>
   );
