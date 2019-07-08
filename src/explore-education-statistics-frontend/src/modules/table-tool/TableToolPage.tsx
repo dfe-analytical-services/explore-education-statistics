@@ -256,6 +256,8 @@ class TableToolPage extends Component<Props, State> {
       tableData,
     } = this.state;
 
+    const locationsList = Object.values(locations).flat();
+
     return (
       <Page title="Create your own tables online" caption="Table Tool" wide>
         <p>
@@ -345,7 +347,7 @@ class TableToolPage extends Component<Props, State> {
                                 publication ? publication.title : ''
                               }
                               subjectName={subjectName}
-                              locations={locations}
+                              locations={locationsList}
                               timePeriods={timePeriods}
                               results={tableData}
                             />
@@ -372,7 +374,7 @@ class TableToolPage extends Component<Props, State> {
                                     meta={subjectMeta}
                                     filters={filters}
                                     indicators={indicators}
-                                    locations={locations}
+                                    locations={locationsList}
                                     timePeriods={timePeriods}
                                     results={tableData}
                                   />

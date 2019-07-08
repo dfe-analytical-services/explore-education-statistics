@@ -6,7 +6,6 @@ import {
 } from '@common/services/tableBuilderService';
 import TimePeriod from '@common/services/types/TimePeriod';
 import { Dictionary } from '@common/types/util';
-import DataTableCaption from '@frontend/modules/table-tool/components/DataTableCaption';
 import {
   CategoryFilter,
   Indicator,
@@ -14,6 +13,7 @@ import {
 } from '@frontend/modules/table-tool/components/types/filters';
 import sortBy from 'lodash/sortBy';
 import React, { memo, useEffect, useRef, useState } from 'react';
+import DataTableCaption from './DataTableCaption';
 import FixedMultiHeaderDataTable from './FixedMultiHeaderDataTable';
 import TableHeadersForm, { TableHeadersFormValues } from './TableHeadersForm';
 
@@ -23,7 +23,7 @@ interface Props {
   timePeriods: TimePeriod[];
   publicationName: string;
   subjectName: string;
-  locations: Dictionary<LocationFilter[]>;
+  locations: LocationFilter[];
   results: TableData['result'];
 }
 
@@ -43,7 +43,7 @@ const TimePeriodDataTable = (props: Props) => {
     const sortedFilters = sortBy(
       Object.values({
         ...filters,
-        locations: Object.values(locations).flat(),
+        locations,
       }),
       [options => options.length],
     );
@@ -94,7 +94,7 @@ const TimePeriodDataTable = (props: Props) => {
         columnFilterCombination.length - 1
       ] as TimePeriod;
 
-      const combinationFilters: LocationFilter[] | CategoryFilter[] = [
+      const combinationFilters = [
         ...rowFilterCombination.slice(0, -1),
         ...columnFilterCombination.slice(0, -1),
       ];

@@ -1,13 +1,12 @@
 import commaList from '@common/lib/utils/string/commaList';
-import { FilterOption } from '@common/services/tableBuilderService';
 import TimePeriod from '@common/services/types/TimePeriod';
-import { Dictionary } from '@common/types';
+import { LocationFilter } from '@frontend/modules/table-tool/components/types/filters';
 import React from 'react';
 
 interface Props {
   id: string;
   timePeriods: TimePeriod[];
-  locations: Dictionary<FilterOption[]>;
+  locations: LocationFilter[];
   subjectName: string;
   publicationName: string;
 }
@@ -22,18 +21,14 @@ const DataTableCaption = ({
   const startLabel = timePeriods[0].label;
   const endLabel = timePeriods[timePeriods.length - 1].label;
 
-  const locationLabels = Object.values(locations).flatMap(locationOptions =>
-    locationOptions.map(location => location.label),
-  );
+  const locationsString = commaList(locations.map(location => location.label));
 
   const timePeriodString =
     startLabel === endLabel
       ? ` for ${startLabel}`
       : ` between ${startLabel} and ${endLabel}`;
 
-  const caption = `Table showing '${subjectName}' from '${publicationName}' in ${commaList(
-    locationLabels,
-  )}${timePeriodString}`;
+  const caption = `Table showing '${subjectName}' from '${publicationName}' in ${locationsString}${timePeriodString}`;
 
   return (
     <>

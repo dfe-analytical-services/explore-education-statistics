@@ -18,7 +18,7 @@ interface Props {
   indicators: IndicatorOption[];
   filters: Dictionary<FilterOption[]>;
   timePeriods: TimePeriod[];
-  locations: Dictionary<FilterOption[]>;
+  locations: FilterOption[];
   results: TableData['result'];
 }
 
