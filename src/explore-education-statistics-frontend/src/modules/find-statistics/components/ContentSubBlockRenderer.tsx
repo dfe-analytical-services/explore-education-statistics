@@ -3,7 +3,6 @@ import { ContentBlock, Publication } from '@common/services/publicationService';
 import ButtonLink from '@frontend/components/ButtonLink';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import styles from './ContentSubBlockRenderer.module.scss';
 
 interface Props {
   block: ContentBlock;
@@ -34,7 +33,7 @@ const ContentSubBlockRenderer = ({ block, id, publication }: Props) => {
           {...block}
           id={`${id}_datablock`}
           additionalTabContent={
-            <div className={styles.printHidden}>
+            <div className="dfe-print-hidden">
               <h2 className="govuk-heading-m">
                 Explore and edit this data online
               </h2>

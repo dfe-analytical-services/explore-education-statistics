@@ -1,7 +1,1 @@
 @import '~explore-education-statistics-common/src/styles/all';
-
-@media print {
-  *[href]::after {
-    content: none !important;
-  }
-}
