@@ -15,3 +15,7 @@
   break-inside: avoid;
   page-break-inside: avoid;
 }
+
+.dontBreakAfter {
+  page-break-after: avoid;
+}

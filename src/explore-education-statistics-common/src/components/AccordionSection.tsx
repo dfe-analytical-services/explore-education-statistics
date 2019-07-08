@@ -56,7 +56,12 @@ const AccordionSection = ({
       })}
       role="presentation"
     >
-      <div className="govuk-accordion__section-header">
+      <div
+        className={classNames(
+          printStyles.dontBreakAfter,
+          'govuk-accordion__section-header',
+        )}
+      >
         {createElement(
           headingTag,
           {
