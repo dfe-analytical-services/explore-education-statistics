@@ -174,6 +174,7 @@ const ChartBuilder = ({ data }: Props) => {
     }
   }, [dataSets, selectedChartType]);
 
+  /*
   React.useEffect(() => {
     setSelectedChartType(chartTypes[0]);
 
@@ -182,6 +183,7 @@ const ChartBuilder = ({ data }: Props) => {
       filters: data.result[0].filters,
     });
   }, []);
+  */
 
   return (
     <div className={styles.editor}>
