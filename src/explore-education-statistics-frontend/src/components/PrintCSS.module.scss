@@ -13,3 +13,7 @@
 .unbreakable {
   page-break-inside: avoid;
 }
+
+.dontBreakAfter {
+  page-break-after: avoid;
+}

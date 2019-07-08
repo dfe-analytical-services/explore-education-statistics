@@ -1,5 +1,6 @@
 import useMounted from '@common/hooks/useMounted';
 import findAllParents from '@common/lib/dom/findAllParents';
+import printStyles from '@frontend/components/PrintCSS.module.scss';
 import classNames from 'classnames';
 import React, { createElement, ReactNode } from 'react';
 import GoToTopLink from './GoToTopLink';
@@ -55,7 +56,12 @@ const AccordionSection = ({
       })}
       role="presentation"
     >
-      <div className="govuk-accordion__section-header">
+      <div
+        className={classNames(
+          printStyles.dontBreakAfter,
+          'govuk-accordion__section-header',
+        )}
+      >
         {createElement(
           headingTag,
           {
