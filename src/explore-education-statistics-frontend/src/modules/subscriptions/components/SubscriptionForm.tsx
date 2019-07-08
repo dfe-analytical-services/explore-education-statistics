@@ -18,13 +18,11 @@ interface Props {
 }
 
 interface State {
-  isSubmitted: boolean;
   submitError: string;
 }
 
 class SubscriptionForm extends Component<Props, State> {
   public state: State = {
-    isSubmitted: false,
     submitError: '',
   };
 
