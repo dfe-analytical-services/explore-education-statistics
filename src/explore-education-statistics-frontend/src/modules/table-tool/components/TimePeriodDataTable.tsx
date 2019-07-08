@@ -1,4 +1,5 @@
 import cartesian from '@common/lib/utils/cartesian';
+import formatPretty from '@common/lib/utils/number/formatPretty';
 import commaList from '@common/lib/utils/string/commaList';
 import {
   FilterOption,
@@ -126,20 +127,13 @@ const TimePeriodDataTable = ({
         return 'n/a';
       }
 
-      const rawValue = matchingResult.measures[indicatorOption.value];
-      const numberValue = Number(rawValue);
+      const value = matchingResult.measures[indicatorOption.value];
 
-      if (Number.isNaN(numberValue)) {
-        return rawValue;
+      if (Number.isNaN(Number(value))) {
+        return value;
       }
 
-      const decimals = rawValue.split('.')[1];
-      const decimalPlaces = decimals ? decimals.length : 0;
-
-      return `${numberValue.toLocaleString('en-GB', {
-        maximumFractionDigits: decimalPlaces,
-        minimumFractionDigits: decimalPlaces,
-      })}${indicatorOption.unit}`;
+      return `${formatPretty(value)}${indicatorOption.unit}`;
     });
   });
 
