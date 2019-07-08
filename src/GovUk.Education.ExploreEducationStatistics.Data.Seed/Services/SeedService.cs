@@ -40,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
                     _logger.LogInformation("Updating Theme {Theme}", theme.Title);
                     var updated = _context.Theme.Update(theme).Entity;
                     _context.SaveChanges();
-                    
+
                     var subjects = updated.Topics
                         .SelectMany(topic => topic.Publications)
                         .SelectMany(publication => publication.Releases)
@@ -63,12 +63,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
             foreach (var subject in subjects)
             {
                 var file = SamplePublications.SubjectFiles.GetValueOrDefault(subject.Id);
-                _logger.LogInformation("Seeding Subject {Subject}", subject.Name);
-                
-                var lines = file.GetCsvLines();
-                var metaLines = file.GetMetaCsvLines();
+                // TODO DFE-897 DFE-754 Remove restriction on large FE data file
+                if (!file.Equals(DataCsvFile.clean_data_fe))
+                {
+                    _logger.LogInformation("Seeding Subject {Subject}", subject.Name);
 
-                _importerService.Import(lines, metaLines, subject);
+                    var lines = file.GetCsvLines();
+                    var metaLines = file.GetMetaCsvLines();
+
+                    _importerService.Import(lines, metaLines, subject);
+                }
             }
         }
     }
