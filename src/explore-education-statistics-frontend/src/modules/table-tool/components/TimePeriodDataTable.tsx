@@ -1,9 +1,6 @@
 import cartesian from '@common/lib/utils/cartesian';
 import formatPretty from '@common/lib/utils/number/formatPretty';
-import {
-  IndicatorOption,
-  TableData,
-} from '@common/services/tableBuilderService';
+import { TableData } from '@common/services/tableBuilderService';
 import TimePeriod from '@common/services/types/TimePeriod';
 import { Dictionary } from '@common/types/util';
 import {
@@ -11,6 +8,7 @@ import {
   Indicator,
   LocationFilter,
 } from '@frontend/modules/table-tool/components/types/filters';
+import last from 'lodash/last';
 import sortBy from 'lodash/sortBy';
 import React, { memo, useEffect, useRef, useState } from 'react';
 import DataTableCaption from './DataTableCaption';
@@ -85,14 +83,10 @@ const TimePeriodDataTable = (props: Props) => {
   );
 
   const rows = rowHeadersCartesian.map(rowFilterCombination => {
-    const indicatorOption = rowFilterCombination[
-      rowFilterCombination.length - 1
-    ] as IndicatorOption;
+    const indicator = last(rowFilterCombination) as Indicator;
 
     return columnHeadersCartesian.map(columnFilterCombination => {
-      const time = columnFilterCombination[
-        columnFilterCombination.length - 1
-      ] as TimePeriod;
+      const timePeriod = last(columnFilterCombination) as TimePeriod;
 
       const combinationFilters = [
         ...rowFilterCombination.slice(0, -1),
@@ -112,8 +106,8 @@ const TimePeriodDataTable = (props: Props) => {
           categoryFilters.every(filter =>
             result.filters.includes(filter.value),
           ) &&
-          result.timeIdentifier === time.code &&
-          result.year === time.year &&
+          result.timeIdentifier === timePeriod.code &&
+          result.year === timePeriod.year &&
           locationFilters.every(
             filter => result.location[filter.level].code === filter.value,
           )
@@ -124,13 +118,13 @@ const TimePeriodDataTable = (props: Props) => {
         return 'n/a';
       }
 
-      const value = matchingResult.measures[indicatorOption.value];
+      const value = matchingResult.measures[indicator.value];
 
       if (Number.isNaN(Number(value))) {
         return value;
       }
 
-      return `${formatPretty(value)}${indicatorOption.unit}`;
+      return `${formatPretty(value)}${indicator.unit}`;
     });
   });
 
