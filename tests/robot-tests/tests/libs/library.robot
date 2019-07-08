@@ -20,8 +20,8 @@ ${urlAdmin}   about:blank
 *** Keywords ***
 do this on failure
   capture page screenshot
-  set selenium timeout  3
-  set selenium implicit wait  3
+#  set selenium timeout  3
+#  set selenium implicit wait  3
 
 user opens the browser
   run keyword if    "${browser}" == "chrome"    user opens chrome

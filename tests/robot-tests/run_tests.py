@@ -68,8 +68,8 @@ parser.add_argument("--ci",
 args = parser.parse_args()
 
 # Default values
-timeout = 10
-implicit_wait = 10
+timeout = 20
+implicit_wait = 20
 
 # Set robotArgs
 robotArgs = ["--outputdir", "test-results/", "--exclude", "Failing",
