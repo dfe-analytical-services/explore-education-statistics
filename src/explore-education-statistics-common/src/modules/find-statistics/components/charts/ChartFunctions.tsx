@@ -10,6 +10,7 @@ import {
 import React, { ReactNode } from 'react';
 import {
   Label,
+  Line,
   PositionType,
   ReferenceLine as RechartsReferenceLine,
   XAxis,
@@ -56,6 +57,10 @@ export interface ChartProps {
   height?: number;
   width?: number;
   referenceLines?: ReferenceLine[];
+}
+
+export interface StackedBarProps extends ChartProps {
+  stacked?: boolean;
 }
 
 export interface ChartDataOld {
@@ -324,6 +329,8 @@ export function createDataForAxis(
   axisConfiguration: AxisConfigurationItem,
   results: Result[],
 ) {
+  if (axisConfiguration === undefined || results === undefined) return [];
+
   return axisConfiguration.dataSets.reduce<ChartDataB[]>(
     (combinedChartData, dataSetForAxisConfiguration) => {
       return getChartDataForAxis(
@@ -349,4 +356,18 @@ export function mapNameToNameLabel(dataLabels: Dictionary<ChartConfiguration>) {
     ...otherdata,
     name: (dataLabels[name] && dataLabels[name].label) || name,
   });
+}
+
+export function populateDefaultChartProps(
+  name: string,
+  config: ChartConfiguration,
+) {
+  return {
+    dataKey: name,
+    isAnimationActive: false,
+    name: (config && config.label) || name,
+    stroke: config && config.colour,
+    fill: config && config.colour,
+    unit: (config && config.unit) || '',
+  };
 }

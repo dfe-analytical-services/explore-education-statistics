@@ -160,7 +160,7 @@ const ChartBuilder = ({ data }: Props) => {
           ...axesConfigurationDictionary,
 
           [axisDefinition.type]: {
-            name: axisDefinition.title,
+            name: `${axisDefinition.title} (${axisDefinition.type} axis)`,
             groupBy: axisDefinition.defaultDataType
               ? [axisDefinition.defaultDataType]
               : [],
@@ -174,17 +174,6 @@ const ChartBuilder = ({ data }: Props) => {
     }
   }, [dataSets, selectedChartType]);
 
-  /*
-  React.useEffect(() => {
-    setSelectedChartType(chartTypes[0]);
-
-    onDataAdded({
-      indicator: Object.keys(data.result[0].measures)[0],
-      filters: data.result[0].filters,
-    });
-  }, []);
-  */
-
   return (
     <div className={styles.editor}>
       <Details summary="Select chart type" open>
@@ -196,21 +185,20 @@ const ChartBuilder = ({ data }: Props) => {
       </Details>
 
       {selectedChartType && (
-        <Details summary="Add data to chart" open>
-          <ChartDataSelector
-            onDataAdded={onDataAdded}
-            onDataRemoved={onDataRemoved}
-            metaData={data.metaData}
-            indicatorIds={indicatorIds}
-            filterIds={filterIdCombinations}
-            selectedData={dataSets}
-            chartType={selectedChartType}
-          />
-        </Details>
-      )}
-
-      {selectedChartType && (
         <React.Fragment>
+          <Details summary="Add data to chart" open>
+            <p>Add data from the existing dataset to the chart</p>
+            <ChartDataSelector
+              onDataAdded={onDataAdded}
+              onDataRemoved={onDataRemoved}
+              metaData={data.metaData}
+              indicatorIds={indicatorIds}
+              filterIds={filterIdCombinations}
+              selectedData={dataSets}
+              chartType={selectedChartType}
+            />
+          </Details>
+
           <Details summary="Chart preview" open>
             <ChartRenderer
               type={selectedChartType.type}
@@ -221,8 +209,14 @@ const ChartBuilder = ({ data }: Props) => {
             />
           </Details>
 
+          <Details summary="Configure chart" open>
+            <p>Configure the overall options for the chart</p>
+            <p>Configure legend</p>
+          </Details>
+
           <Details summary="Data label options" open>
-            Update the label used for each dataset in the chart from the default
+            Update the configuration used for each dataset in the chart from the
+            default
             {chartDataConfiguration.map((config, index) => (
               <ChartDataConfiguration
                 key={config.value}

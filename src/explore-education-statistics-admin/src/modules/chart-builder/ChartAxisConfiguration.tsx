@@ -27,7 +27,7 @@ const ChartAxisConfiguration = ({ id, axisConfiguration, meta }: Props) => {
 
   return (
     <FormFieldset id={id} legend={axisConfiguration.title}>
-      <p>{axisConfiguration.title} configuration</p>
+      <p>{axisConfiguration.name} configuration</p>
       <FormGroup>
         <FormCheckbox
           id={`${id}_show`}

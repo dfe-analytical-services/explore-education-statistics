@@ -4,11 +4,11 @@ import {
   calculateYAxis,
   ChartDataB,
   ChartDefinition,
-  ChartProps,
   createDataForAxis,
   getKeysForChart,
   mapNameToNameLabel,
-  colours,
+  populateDefaultChartProps,
+  StackedBarProps,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import React, { Component } from 'react';
 import {
@@ -16,11 +16,13 @@ import {
   BarChart,
   CartesianGrid,
   Legend,
+  Line,
   ResponsiveContainer,
   Tooltip,
 } from 'recharts';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 
-export default class VerticalBarBlock extends Component<ChartProps> {
+export default class VerticalBarBlock extends Component<StackedBarProps> {
   public static definition: ChartDefinition = {
     type: 'verticalbar',
     name: 'Vertical Bar',
@@ -39,12 +41,15 @@ export default class VerticalBarBlock extends Component<ChartProps> {
         id: 'xaxis',
         title: 'X Axis',
         type: 'major',
+        defaultDataType: 'timePeriod',
       },
     ],
   };
 
   public render() {
-    const { data, height, width, labels, axes } = this.props;
+    const { data, height, width, labels, axes, stacked } = this.props;
+
+    if (!axes.major || !data) return <LoadingSpinner />;
 
     const chartData: ChartDataB[] = createDataForAxis(
       axes.major,
@@ -75,13 +80,11 @@ export default class VerticalBarBlock extends Component<ChartProps> {
           <Tooltip />
           <Legend />
 
-          {Array.from(keysForChart).map((dataKey, index) => (
+          {Array.from(keysForChart).map((name, index) => (
             <Bar
-              key={dataKey}
-              dataKey={dataKey}
-              fill={colours[index]}
-              name={labels[dataKey] && labels[dataKey].label}
-              unit={labels[dataKey] && labels[dataKey].unit}
+              key={name}
+              {...populateDefaultChartProps(name, labels[name])}
+              stackId={stacked ? 'a' : undefined}
             />
           ))}
         </BarChart>

@@ -3,12 +3,12 @@ import {
   calculateYAxis,
   generateReferenceLines,
   ChartDefinition,
-  ChartProps,
   ChartDataB,
   createDataForAxis,
   getKeysForChart,
   mapNameToNameLabel,
-  colours,
+  StackedBarProps,
+  populateDefaultChartProps,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import React, { Component } from 'react';
 import {
@@ -16,17 +16,13 @@ import {
   BarChart,
   CartesianGrid,
   Legend,
+  Line,
   ResponsiveContainer,
   Tooltip,
 } from 'recharts';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 
-interface StackedBarHorizontalProps extends ChartProps {
-  stacked?: boolean;
-}
-
-export default class HorizontalBarBlock extends Component<
-  StackedBarHorizontalProps
-> {
+export default class HorizontalBarBlock extends Component<StackedBarProps> {
   public static definition: ChartDefinition = {
     type: 'horizontalbar',
     name: 'Horizontal Bar',
@@ -45,6 +41,7 @@ export default class HorizontalBarBlock extends Component<
         id: 'yaxis',
         title: 'Y Axis',
         type: 'major',
+        defaultDataType: 'timePeriod',
       },
     ],
   };
@@ -55,10 +52,12 @@ export default class HorizontalBarBlock extends Component<
       height,
       width,
       referenceLines,
-      stacked,
+      stacked = true,
       labels,
       axes,
     } = this.props;
+
+    if (!axes.major || !data) return <LoadingSpinner />;
 
     const chartData: ChartDataB[] = createDataForAxis(
       axes.major,
@@ -85,13 +84,10 @@ export default class HorizontalBarBlock extends Component<
           <Tooltip cursor={false} />
           <Legend />
 
-          {Array.from(keysForChart).map((dataKey, index) => (
+          {Array.from(keysForChart).map((name, index) => (
             <Bar
-              key={dataKey}
-              dataKey={dataKey}
-              fill={colours[index]}
-              name={labels[dataKey] && labels[dataKey].label}
-              unit={labels[dataKey] && labels[dataKey].unit}
+              key={name}
+              {...populateDefaultChartProps(name, labels[name])}
               stackId={stacked ? 'a' : undefined}
             />
           ))}

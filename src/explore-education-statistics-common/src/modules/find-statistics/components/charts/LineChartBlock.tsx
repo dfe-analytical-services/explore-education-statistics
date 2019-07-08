@@ -5,6 +5,7 @@ import {
   createDataForAxis,
   getKeysForChart,
   mapNameToNameLabel,
+  populateDefaultChartProps,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 
 import React, { Component } from 'react';
@@ -130,9 +131,8 @@ export default class LineChartBlock extends Component<ChartProps> {
           {keysForChart.map(name => (
             <Line
               key={name}
-              dataKey={name}
+              {...populateDefaultChartProps(name, labels[name])}
               type="linear"
-              isAnimationActive={false}
               legendType={labels[name] && labels[name].symbol}
               dot={
                 labels[name] &&
@@ -144,10 +144,6 @@ export default class LineChartBlock extends Component<ChartProps> {
                   />
                 ))
               }
-              name={(labels[name] && labels[name].label) || name}
-              stroke={labels[name] && labels[name].colour}
-              fill={labels[name] && labels[name].colour}
-              unit={(labels[name] && labels[name].unit) || ''}
               strokeWidth="2"
             />
           ))}
