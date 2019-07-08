@@ -81,10 +81,18 @@ const TimePeriodDataTable = (props: Props) => {
   );
 
   const rows = rowHeadersCartesian.map(rowFilterCombination => {
-    const indicator = last(rowFilterCombination) as Indicator;
+    const rowCol1 = last(rowFilterCombination);
 
     return columnHeadersCartesian.map(columnFilterCombination => {
-      const timePeriod = last(columnFilterCombination) as TimePeriod;
+      const rowCol2 = last(columnFilterCombination);
+
+      // User could choose to flip rows and columns
+      const indicator = (rowCol1 instanceof Indicator
+        ? rowCol1
+        : rowCol2) as Indicator;
+      const timePeriod = (rowCol2 instanceof TimePeriod
+        ? rowCol2
+        : rowCol1) as TimePeriod;
 
       const filterCombination = [
         ...rowFilterCombination,

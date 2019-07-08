@@ -14,10 +14,18 @@
   width: 100%;
 }
 
+.isDraggingOver {
+  composes: isDraggingOver from './FormFieldSortableListGroup.module.scss';
+}
+
 .list {
   composes: list from './FormFieldSortableListGroup.module.scss';
 
   &:not(:last-of-type) {
     margin-bottom: govuk-spacing(3);
   }
+}
+
+.isDragging {
+  composes: isDragging from './FormFieldSortableListGroup.module.scss';
 }

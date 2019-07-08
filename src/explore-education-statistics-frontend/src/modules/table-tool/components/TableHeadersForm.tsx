@@ -4,9 +4,10 @@ import { FormGroup, Formik } from '@common/components/form';
 import reorder from '@common/lib/utils/reorder';
 import Yup from '@common/lib/validation/yup';
 import { PickByType } from '@common/types';
+import classNames from 'classnames';
 import { Form, FormikProps } from 'formik';
 import React from 'react';
-import { DragDropContext } from 'react-beautiful-dnd';
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import FormFieldSortableList from './FormFieldSortableList';
 import FormFieldSortableListGroup from './FormFieldSortableListGroup';
 import { SortableOption } from './FormSortableList';
@@ -137,22 +138,82 @@ const TableHeadersForm = (props: Props) => {
                     </DragDropContext>
                   </div>
                   <div className="govuk-grid-column-one-quarter-from-desktop">
-                    <div className={styles.rowColContainer}>
-                      <div className={styles.list}>
-                        <FormFieldSortableList<TableHeadersFormValues>
-                          name="rows"
-                          id="sort-rows"
-                          legend="Rows"
-                        />
-                      </div>
-                      <div className={styles.list}>
-                        <FormFieldSortableList<TableHeadersFormValues>
-                          name="columns"
-                          id="sort-columns"
-                          legend="Columns"
-                        />
-                      </div>
-                    </div>
+                    <DragDropContext
+                      onDragEnd={result => {
+                        if (!result.destination) {
+                          return;
+                        }
+
+                        const { source, destination } = result;
+
+                        if (source.index === destination.index) {
+                          return;
+                        }
+
+                        const columns = [...form.values.columns];
+                        const rows = [...form.values.rows];
+
+                        form.setFieldTouched('rows');
+                        form.setFieldValue('rows', columns);
+
+                        form.setFieldTouched('columns');
+                        form.setFieldValue('columns', rows);
+                      }}
+                    >
+                      <Droppable droppableId="rowColumns">
+                        {(droppableProvided, droppableSnapshot) => (
+                          <div
+                            {...droppableProvided.droppableProps}
+                            ref={droppableProvided.innerRef}
+                            className={classNames(styles.rowColContainer, {
+                              [styles.isDraggingOver]:
+                                droppableSnapshot.isDraggingOver,
+                            })}
+                          >
+                            <Draggable draggableId="rows" index={0}>
+                              {(draggableProvided, draggableSnapshot) => (
+                                <div
+                                  {...draggableProvided.draggableProps}
+                                  {...draggableProvided.dragHandleProps}
+                                  ref={draggableProvided.innerRef}
+                                  className={classNames(styles.list, {
+                                    [styles.isDragging]:
+                                      draggableSnapshot.isDragging,
+                                  })}
+                                >
+                                  <FormFieldSortableList<TableHeadersFormValues>
+                                    name="rows"
+                                    id="sort-rows"
+                                    legend="Rows"
+                                  />
+                                </div>
+                              )}
+                            </Draggable>
+                            <Draggable draggableId="columns" index={1}>
+                              {(draggableProvided, draggableSnapshot) => (
+                                <div
+                                  {...draggableProvided.draggableProps}
+                                  {...draggableProvided.dragHandleProps}
+                                  ref={draggableProvided.innerRef}
+                                  className={classNames(styles.list, {
+                                    [styles.isDragging]:
+                                      draggableSnapshot.isDragging,
+                                  })}
+                                >
+                                  <FormFieldSortableList<TableHeadersFormValues>
+                                    name="columns"
+                                    id="sort-columns"
+                                    legend="Columns"
+                                  />
+                                </div>
+                              )}
+                            </Draggable>
+
+                            {droppableProvided.placeholder}
+                          </div>
+                        )}
+                      </Droppable>
+                    </DragDropContext>
                   </div>
                 </div>
               </FormGroup>

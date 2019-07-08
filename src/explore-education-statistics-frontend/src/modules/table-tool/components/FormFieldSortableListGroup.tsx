@@ -32,8 +32,7 @@ const FormFieldSortableListGroup = <T extends Dictionary<SortableOption[][]>>({
                 {...droppableProvided.droppableProps}
                 ref={droppableProvided.innerRef}
                 className={classNames(styles.groupsFieldset, {
-                  [styles.groupsFieldsetDraggingOver]:
-                    droppableSnapshot.isDraggingOver,
+                  [styles.isDraggingOver]: droppableSnapshot.isDraggingOver,
                 })}
               >
                 <FormFieldset
@@ -60,14 +59,10 @@ const FormFieldSortableListGroup = <T extends Dictionary<SortableOption[][]>>({
                             <div
                               {...draggableProvided.draggableProps}
                               {...draggableProvided.dragHandleProps}
-                              className={classNames(
-                                styles.list,
-                                styles.isDraggable,
-                                {
-                                  [styles.isDragging]:
-                                    draggableSnapshot.isDragging,
-                                },
-                              )}
+                              className={classNames(styles.list, {
+                                [styles.isDragging]:
+                                  draggableSnapshot.isDragging,
+                              })}
                               ref={draggableProvided.innerRef}
                             >
                               <FormFieldSortableList<T>

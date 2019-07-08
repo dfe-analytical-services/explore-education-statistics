@@ -6,7 +6,7 @@
   width: 100%;
 }
 
-.groupsFieldsetDraggingOver {
+.isDraggingOver {
   background-color: govuk-colour('grey-4');
   border-color: $govuk-focus-colour;
 }
@@ -42,9 +42,7 @@
   background: govuk-colour('grey-3');
   display: block;
   padding: govuk-spacing(2);
-}
 
-.isDraggable {
   &:hover {
     background: govuk-colour('grey-2');
 
