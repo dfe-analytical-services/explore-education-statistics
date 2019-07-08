@@ -2,9 +2,10 @@ import {
   Axis,
   ChartDataSet,
   ChartType,
-  DataLabelConfigurationItem,
+  ChartConfiguration,
   ReferenceLine,
   AxisConfigurationItem,
+  ChartSymbol,
 } from '@common/services/publicationService';
 import React, { ReactNode } from 'react';
 import {
@@ -24,10 +25,33 @@ import {
 import difference from 'lodash/difference';
 import { Dictionary } from '@common/types';
 
+export const colours: string[] = [
+  '#4763a5',
+  '#f5a450',
+  '#005ea5',
+  '#800080',
+  '#C0C0C0',
+];
+
+export const symbols: ChartSymbol[] = [
+  'circle',
+  'square',
+  'triangle',
+  'cross',
+  'star',
+];
+
+export function parseCondensedTimePeriodRange(
+  range: string,
+  separator: string = '/',
+) {
+  return [range.substring(0, 4), range.substring(4, 6)].join(separator);
+}
+
 export interface ChartProps {
   data: DataBlockData;
   meta: DataBlockMetadata;
-  labels: Dictionary<DataLabelConfigurationItem>;
+  labels: Dictionary<ChartConfiguration>;
   axes: Dictionary<AxisConfigurationItem>;
   height?: number;
   width?: number;
@@ -320,9 +344,7 @@ export function getKeysForChart(chartData: ChartDataB[]) {
   );
 }
 
-export function mapNameToNameLabel(
-  dataLabels: Dictionary<DataLabelConfigurationItem>,
-) {
+export function mapNameToNameLabel(dataLabels: Dictionary<ChartConfiguration>) {
   return ({ name, ...otherdata }: { name: string }) => ({
     ...otherdata,
     name: (dataLabels[name] && dataLabels[name].label) || name,

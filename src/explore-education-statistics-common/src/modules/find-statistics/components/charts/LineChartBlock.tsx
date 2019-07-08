@@ -21,7 +21,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { colours, symbols } from './Charts';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 
 const CustomToolTip = ({ active, payload, label }: TooltipProps) => {
   if (active) {
@@ -86,6 +86,8 @@ export default class LineChartBlock extends Component<ChartProps> {
 
     const yAxisDomain: [AxisDomain, AxisDomain] = [-10, 10];
 
+    if (!axes.major || !data) return <LoadingSpinner />;
+
     const chartData: ChartDataB[] = createDataForAxis(
       axes.major,
       data.result,
@@ -125,19 +127,28 @@ export default class LineChartBlock extends Component<ChartProps> {
             dataKey="value"
           />
 
-          {keysForChart.map((name, index) => (
+          {keysForChart.map(name => (
             <Line
               key={name}
               dataKey={name}
               type="linear"
-              name={(labels[name] && labels[name].label) || name}
-              legendType={symbols[index]}
-              dot={props => <Symbols {...props} type={symbols[index]} />}
-              stroke={colours[index]}
-              fill={colours[index]}
-              strokeWidth="5"
-              unit={(labels[name] && labels[name].unit) || ''}
               isAnimationActive={false}
+              legendType={labels[name] && labels[name].symbol}
+              dot={
+                labels[name] &&
+                labels[name].symbol &&
+                (props => (
+                  <Symbols
+                    {...props}
+                    type={labels[name] && labels[name].symbol}
+                  />
+                ))
+              }
+              name={(labels[name] && labels[name].label) || name}
+              stroke={labels[name] && labels[name].colour}
+              fill={labels[name] && labels[name].colour}
+              unit={(labels[name] && labels[name].unit) || ''}
+              strokeWidth="2"
             />
           ))}
         </LineChart>

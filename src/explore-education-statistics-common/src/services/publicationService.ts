@@ -72,11 +72,22 @@ export interface OptionalChartDataSet {
   timePeriod?: string;
 }
 
-export interface DataLabelConfigurationItem {
+export type ChartSymbol =
+  | 'circle'
+  | 'cross'
+  | 'diamond'
+  | 'square'
+  | 'star'
+  | 'triangle'
+  | 'wye';
+
+export interface ChartConfiguration {
   label: string;
+  value: string;
   name?: string;
-  value?: string;
   unit?: string;
+  colour?: string;
+  symbol?: ChartSymbol;
 }
 
 export interface AxisConfigurationItem {
@@ -90,7 +101,7 @@ export interface AxisConfigurationItem {
 
 export interface Chart {
   type: ChartType;
-  labels: Dictionary<DataLabelConfigurationItem>;
+  labels: Dictionary<ChartConfiguration>;
   axes: Dictionary<AxisConfigurationItem>;
   stacked?: boolean;
   referenceLines?: ReferenceLine[];

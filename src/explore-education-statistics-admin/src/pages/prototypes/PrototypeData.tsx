@@ -10,13 +10,6 @@ import {
   GeographicLevel,
 } from '@common/services/dataBlockService';
 
-const chartTypes: ChartDefinition[] = [
-  LineChartBlock.definition,
-  VerticalBarBlock.definition,
-  HorizontalBarBlock.definition,
-  MapBlock.definition,
-];
-
 export interface PrototypeTable {
   label: string;
   value: string;
@@ -3758,7 +3751,6 @@ const testResponse: DataBlockResponse = {
 };
 
 export default {
-  chartTypes,
   tables,
   testResponse,
 };

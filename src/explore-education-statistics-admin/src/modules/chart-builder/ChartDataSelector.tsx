@@ -5,7 +5,7 @@ import { DataBlockMetadata } from '@common/services/dataBlockService';
 import { SelectOption } from '@common/components/form/FormSelect';
 import Button from '@common/components/Button';
 
-export interface DataUpdatedEvent {
+export interface SelectedData {
   indicator: string;
   filters: string[];
 }
@@ -14,10 +14,11 @@ interface Props {
   chartType: ChartDefinition;
   indicatorIds: string[];
   filterIds: string[][];
+  selectedData?: SelectedData[];
   metaData: DataBlockMetadata;
-  onDataAdded?: (data: DataUpdatedEvent) => void;
-  onDataRemoved?: (data: DataUpdatedEvent) => void;
-  onDataUpdated?: (data: DataUpdatedEvent[]) => void;
+  onDataAdded?: (data: SelectedData) => void;
+  onDataRemoved?: (data: SelectedData, index: number) => void;
+  onDataUpdated?: (data: SelectedData[]) => void;
 }
 
 const ChartDataSelector = ({
@@ -27,13 +28,14 @@ const ChartDataSelector = ({
   onDataUpdated,
   onDataRemoved,
   onDataAdded,
+  selectedData = [],
 }: Props) => {
   const indicatorSelectOptions = [
     {
       label: 'Select an indicator...',
       value: '',
     },
-    ...indicatorIds.map<SelectOption>(id => metaData.indicators[id]),
+    ...indicatorIds.map<SelectOption>(id => ({ ...metaData.indicators[id] })),
   ];
 
   const filterSelectOptions = filterIds
@@ -59,15 +61,15 @@ const ChartDataSelector = ({
   const [selectedIndicator, setSelectedIndicator] = React.useState<string>('');
   const [selectedFilters, setSelectedFilters] = React.useState<string>('');
 
-  const [selectedList, setSelectedList] = React.useState<DataUpdatedEvent[]>(
-    [],
+  const [selectedList, setSelectedList] = React.useState<SelectedData[]>(
+    selectedData,
   );
 
-  const removeSelected = (selected: DataUpdatedEvent, index: number) => {
+  const removeSelected = (selected: SelectedData, index: number) => {
     const [removed] = selectedList.splice(index, 1);
     setSelectedList([...selectedList]);
 
-    if (onDataRemoved) onDataRemoved(removed);
+    if (onDataRemoved) onDataRemoved(removed, index);
     if (onDataUpdated) onDataUpdated(selectedList);
   };
 

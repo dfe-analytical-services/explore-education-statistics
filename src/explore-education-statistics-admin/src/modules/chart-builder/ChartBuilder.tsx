@@ -2,19 +2,30 @@ import React from 'react';
 
 import Details from '@common/components/Details';
 import ChartRenderer from '@common/modules/find-statistics/components/ChartRenderer';
-import { DataBlockResponse } from '@common/services/dataBlockService';
-import { ChartDefinition } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import {
+  DataBlockResponse,
+  DataBlockMetadata,
+} from '@common/services/dataBlockService';
+import {
+  ChartDefinition,
+  generateKeyFromDataSet,
+  colours,
+  symbols,
+} from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import ChartDataSelector, {
-  DataUpdatedEvent,
+  SelectedData,
 } from '@admin/modules/chart-builder/ChartDataSelector';
 import {
   ChartDataSet,
-  DataLabelConfigurationItem,
+  ChartConfiguration,
   AxisConfigurationItem,
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
+import LineChartBlock from '@common/modules/find-statistics/components/charts/LineChartBlock';
+import VerticalBarBlock from '@common/modules/find-statistics/components/charts/VerticalBarBlock';
+import HorizontalBarBlock from '@common/modules/find-statistics/components/charts/HorizontalBarBlock';
+import MapBlock from '@common/modules/find-statistics/components/charts/MapBlock';
 import styles from './graph-builder.module.scss';
-import ConstData from '../../pages/prototypes/PrototypeData';
 import ChartTypeSelector from './ChartTypeSelector';
 import ChartDataConfiguration from './ChartDataConfiguration';
 import ChartAxisConfiguration from './ChartAxisConfiguration';
@@ -23,15 +34,24 @@ interface Props {
   data: DataBlockResponse;
 }
 
+function dataName(meta: DataBlockMetadata, selectedData: SelectedData) {
+  return [
+    meta.indicators[selectedData.indicator].label,
+    '(',
+    ...selectedData.filters.map(filter => meta.filters[filter].label),
+    ')',
+  ].join(' ');
+}
+
 function getReduceMetaDataForAxis(data: DataBlockResponse) {
   return (
-    items: Dictionary<DataLabelConfigurationItem>,
+    items: Dictionary<ChartConfiguration>,
     groupName: string,
-  ): Dictionary<DataLabelConfigurationItem> => {
+  ): Dictionary<ChartConfiguration> => {
     if (groupName === 'timePeriod') {
       return {
         ...items,
-        ...data.result.reduce<Dictionary<DataLabelConfigurationItem>>(
+        ...data.result.reduce<Dictionary<ChartConfiguration>>(
           (moreItems, result) => ({
             ...moreItems,
             [`${result.year}_${result.timeIdentifier}`]: data.metaData
@@ -58,12 +78,17 @@ function generateAxesMetaData(
   );
 }
 
+const chartTypes: ChartDefinition[] = [
+  LineChartBlock.definition,
+  VerticalBarBlock.definition,
+  HorizontalBarBlock.definition,
+  MapBlock.definition,
+];
+
 const ChartBuilder = ({ data }: Props) => {
   const [selectedChartType, setSelectedChartType] = React.useState<
     ChartDefinition | undefined
   >();
-
-  const { chartTypes } = ConstData;
 
   const indicatorIds = Object.keys(data.metaData.indicators);
 
@@ -79,28 +104,52 @@ const ChartBuilder = ({ data }: Props) => {
   );
 
   const [dataSets, setDataSets] = React.useState<ChartDataSet[]>([]);
+  const [chartDataConfiguration, setChartDataConfiguration] = React.useState<
+    ChartConfiguration[]
+  >([]);
 
-  const onDataUpdated = (addedData: DataUpdatedEvent[]) => {
-    setDataSets(addedData);
+  const onDataAdded = (addedData: SelectedData) => {
+    setDataSets([...dataSets, addedData]);
+
+    setChartDataConfiguration([
+      ...chartDataConfiguration,
+      {
+        name: dataName(data.metaData, addedData),
+        value: generateKeyFromDataSet(addedData),
+        label: dataName(data.metaData, addedData),
+        colour: colours[dataSets.length % colours.length],
+        symbol: symbols[dataSets.length % symbols.length],
+      },
+    ]);
   };
 
-  const [labels, setLabels] = React.useState<
-    Dictionary<DataLabelConfigurationItem>
-  >({});
+  const onDataRemoved = (removedData: SelectedData, index: number) => {
+    dataSets.splice(index, 1);
+    setDataSets([...dataSets]);
 
-  const [fieldLabels, setFieldLabels] = React.useState<
-    Dictionary<DataLabelConfigurationItem>
-  >({});
+    chartDataConfiguration.splice(index, 1);
+    setChartDataConfiguration([...chartDataConfiguration]);
+  };
 
   const [axes, setAxes] = React.useState<Dictionary<AxisConfigurationItem>>({});
 
+  const [labels, setLabels] = React.useState<Dictionary<ChartConfiguration>>(
+    {},
+  );
+
   React.useEffect(() => {
     setLabels({
-      ...fieldLabels,
+      ...chartDataConfiguration.reduce<Dictionary<ChartConfiguration>>(
+        (mapped, item) => ({
+          ...mapped,
+          [item.value]: item,
+        }),
+        {},
+      ),
 
       ...generateAxesMetaData(axes, data),
     });
-  }, [axes, fieldLabels, data]);
+  }, [axes, chartDataConfiguration, data]);
 
   React.useEffect(() => {
     if (selectedChartType) {
@@ -125,6 +174,15 @@ const ChartBuilder = ({ data }: Props) => {
     }
   }, [dataSets, selectedChartType]);
 
+  React.useEffect(() => {
+    setSelectedChartType(chartTypes[0]);
+
+    onDataAdded({
+      indicator: Object.keys(data.result[0].measures)[0],
+      filters: data.result[0].filters,
+    });
+  }, []);
+
   return (
     <div className={styles.editor}>
       <Details summary="Select chart type" open>
@@ -138,16 +196,18 @@ const ChartBuilder = ({ data }: Props) => {
       {selectedChartType && (
         <Details summary="Add data to chart" open>
           <ChartDataSelector
-            onDataUpdated={onDataUpdated}
+            onDataAdded={onDataAdded}
+            onDataRemoved={onDataRemoved}
             metaData={data.metaData}
             indicatorIds={indicatorIds}
             filterIds={filterIdCombinations}
+            selectedData={dataSets}
             chartType={selectedChartType}
           />
         </Details>
       )}
 
-      {selectedChartType && dataSets.length > 0 && (
+      {selectedChartType && (
         <React.Fragment>
           <Details summary="Chart preview" open>
             <ChartRenderer
@@ -159,16 +219,22 @@ const ChartBuilder = ({ data }: Props) => {
             />
           </Details>
 
-          <Details summary="Data label options">
-            <ChartDataConfiguration
-              dataSets={dataSets}
-              data={data}
-              meta={data.metaData}
-              onDataLabelsChange={setFieldLabels}
-            />
+          <Details summary="Data label options" open>
+            Update the label used for each dataset in the chart from the default
+            {chartDataConfiguration.map((config, index) => (
+              <ChartDataConfiguration
+                key={config.value}
+                configuration={config}
+                onConfigurationChange={updatedConfig => {
+                  const newConfig = [...chartDataConfiguration];
+                  newConfig.splice(index, 1, updatedConfig);
+                  setChartDataConfiguration(newConfig);
+                }}
+              />
+            ))}
           </Details>
 
-          <Details summary="Axes options" open>
+          <Details summary="Axes options">
             <p>
               Add / Remove and update the axes and how they display data ranges
             </p>

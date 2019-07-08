@@ -8,6 +8,7 @@ import {
   createDataForAxis,
   getKeysForChart,
   mapNameToNameLabel,
+  colours,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import React, { Component } from 'react';
 import {
@@ -18,8 +19,6 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from 'recharts';
-
-import { colours } from './Charts';
 
 interface StackedBarHorizontalProps extends ChartProps {
   stacked?: boolean;

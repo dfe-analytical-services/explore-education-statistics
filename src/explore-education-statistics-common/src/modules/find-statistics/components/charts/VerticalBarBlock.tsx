@@ -8,6 +8,7 @@ import {
   createDataForAxis,
   getKeysForChart,
   mapNameToNameLabel,
+  colours,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import React, { Component } from 'react';
 import {
@@ -18,8 +19,6 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from 'recharts';
-
-import { colours } from './Charts';
 
 export default class VerticalBarBlock extends Component<ChartProps> {
   public static definition: ChartDefinition = {

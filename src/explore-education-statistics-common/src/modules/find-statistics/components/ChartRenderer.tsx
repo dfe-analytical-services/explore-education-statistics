@@ -4,7 +4,7 @@ import VerticalBarBlock from '@common/modules/find-statistics/components/charts/
 import {
   AxisConfigurationItem,
   ChartType,
-  DataLabelConfigurationItem,
+  ChartConfiguration,
   ReferenceLine,
 } from '@common/services/publicationService';
 import dynamic from 'next-server/dynamic';
@@ -30,7 +30,7 @@ export interface ChartRendererProps {
   width?: number;
   stacked?: boolean;
   referenceLines?: ReferenceLine[];
-  labels: Dictionary<DataLabelConfigurationItem>;
+  labels: Dictionary<ChartConfiguration>;
   axes: Dictionary<AxisConfigurationItem>;
 }
 

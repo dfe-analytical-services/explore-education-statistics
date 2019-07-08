@@ -596,7 +596,7 @@ class MapBlock extends Component<MapProps, MapState> {
                 value={selected.indicator}
                 onChange={e => this.onSelectIndicator(e.currentTarget.value)}
                 options={axes.major.dataSets.map(
-                  indicator => meta.indicators[+indicator.indicator],
+                  indicator => meta.indicators[indicator.indicator],
                 )}
                 order={[]}
               />
