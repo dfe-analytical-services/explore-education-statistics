@@ -21,7 +21,7 @@ Select "Pupil absence" publication
     user waits until page contains    Choose a subject
     user checks previous table tool step contains  1   Publication   Pupil absence in schools in England
 
-Select "Geographic levels" area of interest
+Select subject "Absence by characteristic"
     [Tags]  HappyPath
     user selects radio   Absence by characteristic
     user clicks element   css:#publicationSubjectForm-submit
