@@ -1,3 +1,4 @@
+import { Dictionary, PartialRecord } from '@common/types';
 import { dataApi } from './api';
 
 export interface FilterOption {
@@ -49,32 +50,41 @@ export interface PublicationMeta {
 }
 
 export interface PublicationSubjectMeta {
-  filters: {
-    [key: string]: {
-      legend: string;
-      hint?: string;
-      options: GroupedFilterOptions;
-    };
-  };
-  indicators: {
-    [key: string]: {
-      label: string;
-      options: IndicatorOption[];
-    };
-  };
-  locations: {
-    [key: string]: {
-      legend: string;
-      hint?: string;
-      options: FilterOption[];
-    };
-  };
+  filters: Dictionary<{
+    legend: string;
+    hint?: string;
+    options: GroupedFilterOptions;
+  }>;
+  indicators: Dictionary<{
+    label: string;
+    options: IndicatorOption[];
+  }>;
+  locations: Dictionary<{
+    legend: string;
+    hint?: string;
+    options: FilterOption[];
+  }>;
   timePeriod: {
     hint?: string;
     legend: string;
     options: TimePeriodOption[];
   };
 }
+
+export type LocationLevelKeys =
+  | 'country'
+  | 'institution'
+  | 'localAuthority'
+  | 'localAuthorityDistrict'
+  | 'localEnterprisePartnership'
+  | 'multiAcademyTrust'
+  | 'mayoralCombinedAuthority'
+  | 'opportunityArea'
+  | 'parliamentaryConstituency'
+  | 'region'
+  | 'rscRegion'
+  | 'sponsor'
+  | 'ward';
 
 export interface TableData {
   publicationId: string;
@@ -85,10 +95,12 @@ export interface TableData {
   result: {
     year: number;
     timeIdentifier: string;
-    measures: {
-      [indicator: string]: string;
-    };
+    measures: Dictionary<string>;
     filters: string[];
+    location: Dictionary<{
+      code: string[];
+      name: string[];
+    }>;
   }[];
 }
 
@@ -104,18 +116,26 @@ export default {
   ): Promise<PublicationSubjectMeta> {
     return dataApi.get(`/meta/subject/${subjectId}`);
   },
-  getTableData(query: {
-    subjectId: string;
-    filters: string[];
-    indicators: string[];
-    startYear: number;
-    endYear: number;
-    geographicLevel: string;
-    countries?: string[];
-    regions?: string[];
-    localAuthorities?: string[];
-    localAuthorityDistricts?: string[];
-  }): Promise<TableData> {
+  filterPublicationSubjectMeta(
+    query: {
+      subjectId: string;
+      startYear?: number;
+      endYear?: number;
+      geographicLevel?: string;
+    } & PartialRecord<LocationLevelKeys, string[]>,
+  ): Promise<PublicationSubjectMeta> {
+    return dataApi.post('/meta/subject', query);
+  },
+  getTableData(
+    query: {
+      subjectId: string;
+      filters: string[];
+      indicators: string[];
+      startYear: number;
+      endYear: number;
+      geographicLevel?: string;
+    } & PartialRecord<LocationLevelKeys, string[]>,
+  ): Promise<TableData> {
     return dataApi.post('/tablebuilder', query);
   },
 };

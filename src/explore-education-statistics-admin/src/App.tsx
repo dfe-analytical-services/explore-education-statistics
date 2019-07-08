@@ -4,8 +4,9 @@ import { Route } from 'react-router';
 import './App.scss';
 import { PrototypeLoginService } from '@admin/services/PrototypeLoginService';
 import { BrowserRouter } from 'react-router-dom';
+import editReleaseRoutes from '@admin/routes/editReleaseRoutes';
+import AdminDashboardPage from './pages/AdminDashboardPage';
 import PrototypeAdminDashboard from './pages/prototypes/PrototypeAdminDashboard';
-import AdminDashboardPage from './pages/AdminDashboard';
 import AdminDocumentationGlossary from './pages/prototypes/PrototypeDocumentationGlossary';
 import AdminDocumentationHome from './pages/prototypes/PrototypeDocumentationHome';
 
@@ -41,6 +42,14 @@ function App() {
       <LoginContext.Provider value={PrototypeLoginService.login()}>
         {/* Non-Prototype Routes*/}
         <Route exact path="/admin-dashboard" component={AdminDashboardPage} />
+
+        {editReleaseRoutes.map(route => (
+          <Route
+            key={route.path}
+            path={route.path}
+            component={route.component}
+          />
+        ))}
 
         {/* Prototype Routes*/}
         <Route exact path="/prototypes/" component={PrototypesIndexPage} />
