@@ -1,0 +1,115 @@
+<p>
+  The following sections outline how exclusions data goes from raw school census
+  returns to a finalised dataset used to prepare National Statistics releases.
+</p>
+<h3 id="section5-1">5.1 Data linking</h3>
+<p>
+  Exclusions data is collected at exclusion level and therefore aggregated to
+  annual figures by simply summing the number of termly exclusions together.
+</p>
+<p>Each exclusion is reported alongside a unique pupil identifier.</p>
+<p>
+  Pupil level exclusions data is derived by linking exclusion records collected
+  in each termly census to unique pupil identifiers, giving the total number of
+  exclusions received by each pupil across a given period (such as term or
+  academic year).
+</p>
+<p>
+  Exclusions are then linked to the relevant pupil's characteristics data (also
+  collected via the school census) at the term of the exclusion.
+</p>
+<p>
+  Where characteristics data is missing, information collected in the census
+  term reporting the exclusion is used.
+</p>
+<p>
+  If, again, data is also missing here a range of other relevant censuses will
+  be used to attempt to find a characteristic (except for ethnicity as this
+  information is only collected in the spring school census) as per Table 4:
+  Characteristics linking for exclusion data.
+</p>
+<table class="govuk-table">
+  <caption class="govuk-table-caption">
+    Table 4: Characteristics linking for exclusion data
+  </caption>
+  <thead>
+    <tr>
+      <th scope="col">Exclusion period</th>
+      <th scope="col">Source of exclusion data</th>
+      <th scope="col">
+        First choice for characteristic (same as exclusion period)
+      </th>
+      <th scope="col">Second choice for characteristic (following census)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Autumn term</td>
+      <td>Summer school census</td>
+      <td>Autumn school census</td>
+      <td>Summer school census</td>
+    </tr>
+    <tr>
+      <td>Spring term</td>
+      <td>Autumn school census</td>
+      <td>Spring school census</td>
+      <td>Autumn school census</td>
+    </tr>
+    <tr>
+      <td>Summer term</td>
+      <td>Spring school census</td>
+      <td>Summer school census</td>
+      <td>Spring school census</td>
+    </tr>
+  </tbody>
+</table>
+<h3 id="section5-2">5.2 Data removed</h3>
+<p>
+  To prepare the exclusions data for publication routine checks are applied to
+  the linked data and where necessary data is removed as follows.
+</p>
+<p>
+  Lunch time exclusions are not reported in published exclusions statistics.
+</p>
+<p>
+  Any exclusions from sponsored academies with a start date before the academy
+  opened are removed before analysis.
+</p>
+<p>
+  They're removed because when a sponsored academy opens it's a new school and
+  not responsible for exclusions accrued within the predecessor school.
+</p>
+<p>
+  Year-on-year comparisons of local authority (LA) data may be affected by
+  schools converting to academies.
+</p>
+<h3 id="section5-3">5.3 Variables added</h3>
+<p>
+  Most of the variables needed to produce national level exclusions statistics
+  can be calculated directly from the fields collected via the school census.
+</p>
+<p>
+  However, to prepare the data for publication the following variables are also
+  added to the dataset.
+</p>
+<h4 id="section5-3-1">5.3.1 Pupils with one or more fixed period exclusion</h4>
+<p>
+  Pupils with one or more fixed period exclusion across the academic year are
+  identified as such and are then used in the one or more fixed-period exclusion
+  measure.
+</p>
+<h4 id="section5-3-2">5.3.2 School and academy type</h4>
+<p>
+  School type information - including school type, academy type and academy open
+  date - is added to our underlying data prior to producing any analysis to
+  allow us to produce the school- and academy-type breakdowns in our statistical
+  releases.
+</p>
+<p>
+  These variables are derived using a combination of Edubase and the academies
+  and academy projects in development data.
+</p>
+<p>
+  Within exclusion National Statistics, academies are only indicated as
+  academies if they were open as of 12 September.
+</p>

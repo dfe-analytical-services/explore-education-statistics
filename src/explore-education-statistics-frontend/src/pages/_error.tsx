@@ -1,7 +1,6 @@
 import { NextContext } from 'next';
 import React, { Component } from 'react';
 import Page from '../components/Page';
-import PageTitle from '../components/PageTitle';
 
 interface Props {
   errorMessage: string;
@@ -24,15 +23,13 @@ class ErrorPage extends Component<Props> {
     };
   }
 
-  private getStatusCodePage() {
+  public render() {
     const { statusCode } = this.props;
 
     switch (statusCode) {
       case 404:
         return (
-          <>
-            <PageTitle title={ErrorPage.statusCodeTitles[404]} />
-
+          <Page title={ErrorPage.statusCodeTitles[404]}>
             <p>If you typed the web address, check it's correct.</p>
             <p>
               If you cut and pasted the web address, check you copied the entire
@@ -46,13 +43,11 @@ class ErrorPage extends Component<Props> {
               </a>{' '}
               if you need any help or support.
             </p>
-          </>
+          </Page>
         );
       case 500:
         return (
-          <>
-            <PageTitle title={ErrorPage.statusCodeTitles[500]} />
-
+          <Page title={ErrorPage.statusCodeTitles[500]}>
             <p>Try again later.</p>
             <p>
               In the meantime, if you need any help or support{' '}
@@ -61,13 +56,11 @@ class ErrorPage extends Component<Props> {
               </a>
               .
             </p>
-          </>
+          </Page>
         );
       default:
         return (
-          <>
-            <PageTitle title={ErrorPage.statusCodeTitles[500]} />
-
+          <Page title={ErrorPage.statusCodeTitles[500]}>
             <p>Try again later.</p>
             <p>
               In the meantime, if you need any help or support{' '}
@@ -76,30 +69,9 @@ class ErrorPage extends Component<Props> {
               </a>
               .
             </p>
-          </>
+          </Page>
         );
     }
-  }
-
-  public render() {
-    const { errorMessage, statusCode } = this.props;
-    const pageTitle = errorMessage
-      ? ErrorPage.statusCodeTitles[500]
-      : ErrorPage.statusCodeTitles[statusCode];
-
-    return (
-      <Page>
-        {errorMessage ? (
-          <>
-            <PageTitle title={pageTitle} />
-
-            <p>{errorMessage}</p>
-          </>
-        ) : (
-          this.getStatusCodePage()
-        )}
-      </Page>
-    );
   }
 }
 

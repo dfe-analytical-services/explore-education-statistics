@@ -1,8 +1,5 @@
-import time
 from robot.libraries.BuiltIn import BuiltIn
 from selenium.webdriver.common.action_chains  import ActionChains
-from selenium.webdriver.common.keys  import Keys
-from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 sl = BuiltIn().get_library_instance('SeleniumLibrary')
 
@@ -18,20 +15,11 @@ def user_should_be_at_top_of_page():
   if y != 0:
     raise AssertionError(f"Windows position Y is {y} not 0! User should be at the top of the page!")
 
-# def italic_x_characters_before_cursor(num):
-#   action = ActionChains(sl.driver).key_down(Keys.SHIFT).send_keys(Keys.ARROW_LEFT).key_up(Keys.SHIFT)
-#   for x in range(0, int(num)):
-#     action.perform()
-#
-#   sl.driver.find_element_by_css_selector('.ck-button:nth-child(4)').click()
-#
-#   action = ActionChains(sl.driver).send_keys(Keys.ARROW_RIGHT)
-#   for x in range(0, int(num)):
-#     action.perform()
-
-# def insert_image():
-#   sl.driver.find_element_by_css_selector('span.ck-file-dialog-button:nth-of-type(2)').click()
-#   sl.driver.send_keys("Screenshot")
+def user_checks_page_contains_accordion(accordion_heading):
+  try:
+    sl.driver.find_element_by_xpath(f'//*[@class="govuk-accordion__section-button" and text()="{accordion_heading}"]')
+  except:
+    raise AssertionError(f"Accordion with heading '{accordion_heading} not found!'")
 
 def user_checks_accordion_is_in_position(header_starts_with, position):
   try:
@@ -70,6 +58,17 @@ def user_closes_accordion_section(exact_section_text):
   except NoSuchElementException:
     raise AssertionError(f'Accordion "{exact_section_text}" not collapsed!')
 
+def user_checks_accordion_section_contains_details(accordion_section, details_component):
+  try:
+    sl.driver.find_element_by_xpath(f'//*[@class="govuk-accordion__section-button" and text()="{accordion_section}"]')
+  except:
+    raise AssertionError(f'Cannot find accordion section "{accordion_section}"')
+
+  try:
+    sl.driver.find_element_by_xpath(f'//*[@class="govuk-accordion__section-button" and text()="{accordion_section}"]/../../..//*[text()="{details_component}"]')
+  except:
+    raise AssertionError(f'Details component "{details_component}" not found in accordion section "{accordion_section}"')
+
 def user_opens_details_dropdown(exact_details_text):
   try:
     elem = sl.driver.find_element_by_xpath(f'.//*[@class="govuk-details__summary-text" and text()="{exact_details_text}"]')
@@ -81,10 +80,24 @@ def user_opens_details_dropdown(exact_details_text):
     raise AssertionError(f'Details component "{exact_details_text}" not expanded!')
 
 def user_closes_details_dropdown(exact_details_text):
-  elem = sl.driver.find_element_by_xpath(f'.//*[@class="govuk-details__summary-text" and text()="{exact_details_text}"]')
+  try:
+    elem = sl.driver.find_element_by_xpath(f'.//*[@class="govuk-details__summary-text" and text()="{exact_details_text}"]')
+  except:
+    raise AssertionError(f'Cannot find details component "{exact_details_text}"')
   elem.click()
   if elem.find_element_by_xpath('..').get_attribute("aria-expanded") == "true":
     raise AssertionError(f'Details component "{exact_details_text}" is still expanded!')
+
+def user_checks_details_dropdown_contains_publication(details_heading, publication_name):
+  try:
+    sl.driver.find_element_by_xpath(f'//*[@class="govuk-details__summary-text" and text()="{details_heading}"]')
+  except:
+    raise AssertionError(f'Cannot find details component "{details_heading}"')
+
+  try:
+    sl.driver.find_element_by_xpath(f'//*[@class="govuk-details__summary-text" and text()="{details_heading}"]/../..//strong[text()="{publication_name}"]')
+  except:
+    raise AssertionError(f'Cannot find publication "{publication_name}" inside details component "{details_heading}"')
 
 def user_checks_key_stat_tile_contents(tile_title, tile_value, tile_context):
   try:
@@ -150,33 +163,62 @@ def user_checks_update_exists(date, text_starts_with):
   except NoSuchElementException:
     raise AssertionError(f'No update on "{date}" found starting with text "{text_starts_with}"')
 
-def user_checks_previous_table_tool_step_contains(css, key, value):
-  if css.startswith('css:'):
-    css = css[4:]
+def user_selects_radio(radio_label):
+  sl.driver.find_element_by_xpath(f'//label[text()="{radio_label}"]').click()
+
+def user_clicks_checkbox(checkbox_label):
+  sl.driver.find_element_by_xpath(f'//label[text()="{checkbox_label}"]').click()
+
+def user_selects_start_date(start_date):
+  sl.select_from_list_by_label('css:#timePeriodForm-start', start_date)
+
+def user_selects_end_date(end_date):
+  sl.select_from_list_by_label('css:#timePeriodForm-end', end_date)
+
+def user_clicks_indicator_checkbox(subheading_label, indicator_label):
+  sl.driver.find_element_by_xpath(f'//*[@id="filtersForm-indicators"]//legend[text()="{subheading_label}"]/..//label[text()="{indicator_label}"]').click()
+
+def user_clicks_category_checkbox(subheading_label, category_label):
+  sl.driver.find_element_by_xpath(f'//legend[text()="{subheading_label}"]/..//label[text()="{category_label}"]').click()
+
+def user_clicks_select_all_for_category(category_label):
+  sl.driver.find_element_by_xpath(f'//legend[text()="{category_label}"]/..//button[contains(text(),"Select")]').click()
+
+def user_checks_results_table_contains(row, column, expected):
+  sl.table_cell_should_contain('css:table', row, column, expected)
+
+def user_checks_previous_table_tool_step_contains(step, key, value):
   try:
-    elem = sl.driver.find_element_by_css_selector(css)
+    sl.wait_until_page_contains_element(f'xpath://*[@id="tableTool-steps-step-{step}"]//*[text()="Go to this step"]')
+    elem = sl.driver.find_element_by_css_selector(f"#tableTool-steps-step-{step}")
   except:
-    raise AssertionError(f'Element "{css}" not found!')
+    raise AssertionError(f'Element "#tableTool-steps-step-{step}" isn\'t the previous step!')
 
   try:
-    elem.find_element_by_xpath(f'.//dt[text()="{key}"]')
+    elem.find_element_by_xpath(f'.//dt[text()="{key}"]/../dd[text()="{value}"]')
   except:
-    raise AssertionError(f'Element "{css}" containing "{key}" not found!')
-
-  try:
-    elem.find_element_by_xpath(f'.//dd[text()="{value}"]')
-  except:
-    raise AssertionError(f'Element "{css}" containing "{value}" not found!')
+    sl.capture_page_screenshot()
+    raise AssertionError(f'Element "#tableTool-steps-step-{step}" containing "{key}" and "{value}" not found!')
 
 def user_reorders_table_headers(drag_selector, drop_selector):
   drag_elem = None
   drop_elem = None
   if drag_selector.startswith('css:'):
     drag_selector = drag_selector[4:]
+    sl.wait_until_page_contains_element(f'css:{drag_selector}')
     drag_elem = sl.driver.find_element_by_css_selector(drag_selector)
   if drop_selector.startswith('css:'):
     drop_selector = drop_selector[4:]
+    sl.wait_until_page_contains_element(f'css:{drop_selector}')
     drop_elem = sl.driver.find_element_by_css_selector(drop_selector)
+  if drag_selector.startswith('xpath:'):
+    drag_selector = drag_selector[6:]
+    sl.wait_until_page_contains_element(f'xpath:{drag_selector}')
+    drag_elem = sl.driver.find_element_by_xpath(drag_selector)
+  if drop_selector.startswith('xpath:'):
+    drop_selector = drop_selector[6:]
+    sl.wait_until_page_contains_element(f'xpath:{drop_selector}')
+    drop_elem = sl.driver.find_element_by_xpath(drop_selector)
 
   # https://github.com/react-dnd/react-dnd/issues/1195#issuecomment-456370983
   action = ActionChains(sl.driver)
@@ -184,4 +226,3 @@ def user_reorders_table_headers(drag_selector, drop_selector):
   action.move_to_element(drop_elem).perform()
   action.move_by_offset(0, 0).pause(0.01).perform()
   action.release().perform()
-

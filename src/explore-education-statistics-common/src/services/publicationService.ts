@@ -1,4 +1,8 @@
-import { DataBlockRequest } from '@common/services/dataBlockService';
+import {
+  DataBlockLocation,
+  DataBlockRequest,
+} from '@common/services/dataBlockService';
+import { Dictionary } from '@common/types';
 import { contentApi } from './api';
 
 export interface Publication {
@@ -46,7 +50,7 @@ export interface ReferenceLine {
 
 export interface Axis {
   title: string;
-  key?: string;
+  key?: string[];
   min?: number;
   max?: number;
   size?: number;
@@ -54,18 +58,40 @@ export interface Axis {
 
 export type ChartType = 'line' | 'verticalbar' | 'horizontalbar' | 'map';
 
-export interface ChartDataGroup {
+export interface ChartDataSet {
+  indicator: string;
+  filters: string[];
+  location?: DataBlockLocation;
+  timePeriod?: string;
+}
+
+export interface OptionalChartDataSet {
+  indicator?: string;
   filters?: string[];
   location?: string[];
-  timePeriod?: boolean;
+  timePeriod?: string;
+}
+
+export interface DataLabelConfigurationItem {
+  label: string;
+  name?: string;
+  value?: string;
+  unit?: string;
+}
+
+export interface AxisConfigurationItem {
+  name: string;
+  groupBy: ('timePeriod' | 'location' | 'filters' | 'indicator')[];
+  dataSets: ChartDataSet[];
+
+  visible?: boolean;
+  title?: string;
 }
 
 export interface Chart {
   type: ChartType;
-  indicators: string[];
-  dataGroupings?: ChartDataGroup[];
-  xAxis?: Axis;
-  yAxis?: Axis;
+  labels: Dictionary<DataLabelConfigurationItem>;
+  axes: Dictionary<AxisConfigurationItem>;
   stacked?: boolean;
   referenceLines?: ReferenceLine[];
   width?: number;
@@ -82,7 +108,11 @@ export interface Summary {
   description: { type: string; body: string };
 }
 
-export type ContentBlockType = 'MarkDownBlock' | 'InsetTextBlock' | 'DataBlock';
+export type ContentBlockType =
+  | 'MarkDownBlock'
+  | 'InsetTextBlock'
+  | 'DataBlock'
+  | 'HtmlBlock';
 
 export interface ContentBlock {
   type: ContentBlockType;

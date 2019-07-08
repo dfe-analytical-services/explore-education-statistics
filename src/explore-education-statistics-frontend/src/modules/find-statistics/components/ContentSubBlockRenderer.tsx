@@ -14,6 +14,11 @@ const ContentSubBlockRenderer = ({ block, id, publication }: Props) => {
   switch (block.type) {
     case 'MarkDownBlock':
       return <ReactMarkdown className="govuk-body" source={block.body} />;
+    case 'HtmlBlock':
+      return (
+        // eslint-disable-next-line react/no-danger
+        <div dangerouslySetInnerHTML={{ __html: block.body }} />
+      );
     case 'InsetTextBlock':
       return (
         <div className="govuk-inset-text">

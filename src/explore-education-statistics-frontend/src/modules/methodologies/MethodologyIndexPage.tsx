@@ -6,7 +6,6 @@ import RelatedInformation from '@common/components/RelatedInformation';
 import methodologyService, { Theme } from '@common/services/methodologyService';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
-import PageTitle from '@frontend/components/PageTitle';
 import React, { Component } from 'react';
 import MethodologyList from './components/MethodologyList';
 
@@ -28,14 +27,12 @@ class MethodologyIndexPage extends Component<Props> {
     const { themes } = this.props;
     return (
       <Page
-        breadcrumbs={[
-          {
-            link: '/methodology',
-            name: 'Methodology',
-          },
-        ]}
+        title="Methodologies"
+        pageMeta={{
+          description:
+            'Browse to find out about the methodology behind specific education statistics and data',
+        }}
       >
-        <PageTitle title="Education statistics: methodology" />
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
             <p className="govuk-body-l">

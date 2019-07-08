@@ -1,4 +1,3 @@
-using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
@@ -20,13 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         [HttpPost]
         public ActionResult<ResultViewModel> Query([FromBody] ObservationQueryContext query)
         {
-            var result = _dataService.Query(query);
-            if (result.Result.Any())
-            {
-                return result;
-            }
-
-            return NotFound();
+            return _dataService.Query(query);
         }
     }
 }

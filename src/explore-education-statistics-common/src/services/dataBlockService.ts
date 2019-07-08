@@ -9,47 +9,48 @@ export enum GeographicLevel {
   LocalAuthorityDistrict = 'Local_Authority_District',
   LocalEnterprisePartnership = 'Local_Enterprise_Partnership',
   MATOrSponsor = 'MAT_Or_Sponsor',
-  MayoralCombinedAuthorities = 'Mayoral_Combined_Authorities',
-  National = 'National',
-  OpportunityAreas = 'Opportunity_Areas',
+  MayoralCombinedAuthority = 'Mayoral_Combined_Authority',
+  MultiAcademyTrust = 'Multi_Academy_Trust',
+  Country = 'Country',
+  OpportunityArea = 'OpportunityArea',
   ParliamentaryConstituency = 'Parliamentary_Constituency',
   Provider = 'Provider',
-  Regional = 'Regional',
+  Region = 'Region',
   RSCRegion = 'RSC_Region',
   School = 'School',
   Ward = 'Ward',
 }
 
-interface Country {
-  country_code: string;
-  country_name: string;
+export interface Country {
+  code: string;
+  name: string;
 }
 
 interface Region {
-  region_code: string;
-  region_name: string;
+  code: string;
+  name: string;
 }
 
 interface LocalAuthority {
-  new_la_code: string;
-  old_la_code: string;
-  la_name: string;
+  code: string;
+  old_code: string;
+  name: string;
 }
 
 interface LocalAuthorityDistrict {
-  sch_lad_code: string;
-  sch_lad_name: string;
+  code: string;
+  name: string;
 }
 
 export interface DataBlockLocation {
-  country: Country;
-  region: Region;
-  localAuthority: LocalAuthority;
-  localAuthorityDistrict: LocalAuthorityDistrict;
+  country?: Country;
+  region?: Region;
+  localAuthority?: LocalAuthority;
+  localAuthorityDistrict?: LocalAuthorityDistrict;
 }
 
 export interface Result {
-  filters: number[];
+  filters: string[];
   location: DataBlockLocation;
   measures: {
     [key: string]: string;
@@ -60,7 +61,7 @@ export interface Result {
 
 export interface DataBlockData {
   publicationId: string;
-  releaseId: number;
+  releaseId: string;
   subjectId: number;
   releaseDate: Date;
   geographicLevel: GeographicLevel;
@@ -74,7 +75,7 @@ interface LabelValueMetadata {
   value: string;
 }
 
-interface LabelValueUnitMetadata extends LabelValueMetadata {
+export interface LabelValueUnitMetadata extends LabelValueMetadata {
   unit: string;
 }
 
@@ -138,7 +139,7 @@ export interface DataBlockGeoJsonProperties {
   lat: number;
 
   // the following are just named here for easier finding in code completion and not required
-  objectid: number;
+  objectid?: number;
   ctry17cd?: string | null;
   ctry17nm?: string | null;
   lad17cd?: string | null;
@@ -161,17 +162,26 @@ export interface DataBlockLocationMetadata {
 export interface DataBlockMetadata {
   indicators: Dictionary<LabelValueUnitMetadata>;
   filters: Dictionary<LabelValueMetadata>;
+  timePeriod?: Dictionary<LabelValueMetadata>;
   timePeriods: Dictionary<LabelValueMetadata>;
-  locations: Dictionary<DataBlockLocationMetadata>;
+  locations?: Dictionary<DataBlockLocationMetadata>;
 }
 
 export interface DataBlockRequest {
   subjectId: number;
   geographicLevel: GeographicLevel;
-  countries?: string[];
-  localAuthorities?: string[];
-  localAuthorityDistricts?: string[];
-  regions?: string[];
+  country?: string[];
+  localAuthority?: string[];
+  localAuthorityDistrict?: string[];
+  localEnterprisePartnership?: string[];
+  multiAcademyTrust?: string[];
+  mayoralCombinedAuthority?: string[];
+  opportunityArea?: string[];
+  parliamentaryConstituency?: string[];
+  region?: string[];
+  rscRegion?: string[];
+  sponsor?: string[];
+  ward?: string[];
   startYear: string;
   endYear: string;
   filters: string[];
@@ -182,7 +192,7 @@ export interface DataBlockResponse {
   metaData: DataBlockMetadata;
 
   publicationId: string;
-  releaseId: number;
+  releaseId: string;
   subjectId: number;
   releaseDate: Date;
   geographicLevel: GeographicLevel;
@@ -190,10 +200,8 @@ export interface DataBlockResponse {
 }
 
 const DataBlockService = {
-  async getDataBlockForSubject(request: DataBlockRequest) {
-    const response: DataBlockResponse = await dataApi.post('/Data', request);
-
-    response.metaData.timePeriods = response.result.reduce(
+  buildTimePeriodMetadata(result: Result[]) {
+    return result.reduce(
       (results: Dictionary<LabelValueMetadata>, { timeIdentifier, year }) => {
         const key = `${year}_${timeIdentifier}`;
         if (results[key]) return results;
@@ -205,6 +213,14 @@ const DataBlockService = {
       },
       {},
     );
+  },
+
+  async getDataBlockForSubject(request: DataBlockRequest) {
+    const response: DataBlockResponse = await dataApi.post('/Data', request);
+
+    response.metaData.timePeriods =
+      response.metaData.timePeriod ||
+      DataBlockService.buildTimePeriodMetadata(response.result);
 
     return response;
   },

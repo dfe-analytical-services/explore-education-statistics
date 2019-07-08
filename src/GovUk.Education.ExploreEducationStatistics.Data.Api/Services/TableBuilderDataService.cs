@@ -33,7 +33,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 ReleaseId = first.Subject.Release.Id,
                 SubjectId = first.Subject.Id,
                 ReleaseDate = first.Subject.Release.ReleaseDate,
-                GeographicLevel = first.GeographicLevel,
                 Result = observations.Select(observation =>
                     _resultBuilder.BuildResult(observation, queryContext.Indicators))
             };

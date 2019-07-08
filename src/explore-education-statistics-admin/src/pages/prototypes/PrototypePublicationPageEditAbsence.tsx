@@ -1,4 +1,3 @@
-import { Release } from '@common/services/publicationService';
 import React, { Component } from 'react';
 import PrototypePublicationService from '@admin/pages/prototypes/components/PrototypePublicationService';
 import EditablePublicationPage from '@admin/pages/prototypes/components/EditablePublicationPage';
@@ -6,35 +5,33 @@ import PrototypePage from './components/PrototypePage';
 import PrototypeAdminNavigation from './components/PrototypeAdminNavigation';
 
 interface State {
-  data: Release | undefined;
+  // data: Release | undefined;
   // publication: string | undefined;
   editing: boolean;
 }
 
 class PublicationPage extends Component<{}, State> {
   public state = {
-    data: undefined,
     // publication: undefined,
     editing: false,
   };
 
   public async componentDidMount() {
-    const publication = 'pupil-absence-in-schools-in-england';
+    // const publication = 'pupil-absence-in-schools-in-england';
 
-    const request = PrototypePublicationService.getLatestPublicationRelease(
-      publication,
-    );
+    // const request = PrototypePublicationService.getLatestPublicationRelease(
+    // publication,
+    // );
 
-    const data = await request;
+    // const data = await request;
 
     this.setState({
-      data,
       // publication,
     });
   }
 
   public render() {
-    const { editing, data } = this.state;
+    const { editing } = this.state;
 
     return (
       <PrototypePage
@@ -48,8 +45,8 @@ class PublicationPage extends Component<{}, State> {
         ]}
       >
         <PrototypeAdminNavigation sectionId="addContent" task="editRelease" />
-        <div className="govuk-form-group">
-          <fieldset className="govuk-fieldset">
+        <div className="govuk-form-group govuk-width-container">
+          <fieldset className="govuk-fieldset dfe-toggle-edit">
             <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
               <h1 className="govuk-fieldset__heading">Set page view</h1>
             </legend>
@@ -93,8 +90,12 @@ class PublicationPage extends Component<{}, State> {
         </div>
 
         <hr />
-
-        <EditablePublicationPage editing={editing} data={data} />
+        <div className="govuk-width-container">
+          <EditablePublicationPage
+            editing={editing}
+            data={PrototypePublicationService.getNewPublication()}
+          />
+        </div>
       </PrototypePage>
     );
   }

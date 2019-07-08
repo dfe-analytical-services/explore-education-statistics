@@ -32,6 +32,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public string Body { get; set; }
     }
     
+    public class HtmlBlock : IContentBlock
+    {
+        public override string Type => "HtmlBlock";
+
+        public string Body { get; set; }
+    }
+    
     public class InsetTextBlock : IContentBlock
     {
         public override string Type => "InsetTextBlock";

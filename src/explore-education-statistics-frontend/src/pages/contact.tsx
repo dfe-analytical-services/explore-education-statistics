@@ -1,11 +1,13 @@
 import Page from '@frontend/components/Page';
-import PageTitle from '@frontend/components/PageTitle';
 import React from 'react';
 
 function ContactPage() {
   return (
-    <Page breadcrumbs={[{ name: 'Contact' }]}>
-      <PageTitle title="Contact explore education statistics" />
+    <Page
+      title="Contact explore education statistics"
+      breadcrumbLabel="Contact"
+      pageMeta={{ title: 'Contact' }}
+    >
       <p>
         If you need help and support or have a question about education
         statistics and data contact:

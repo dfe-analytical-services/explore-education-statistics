@@ -1,0 +1,58 @@
+.chartContainer {
+  display: flex;
+}
+
+.chart {
+  align-items: center;
+  display: flex;
+  flex-basis: 25%;
+  flex-direction: column;
+  margin: 4px;
+  padding: 8px;
+
+  &:hover {
+    background-color: #00a599;
+    color: #fff;
+  }
+
+  &.selected {
+    background-color: #005ea5;
+    color: #fff;
+  }
+}
+
+.chart .img {
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  height: 128px;
+  width: 192px;
+}
+
+.chart .title {
+  font-weight: bold;
+}
+
+.line {
+  background: url('/static/images/chart-types/line-chart.png');
+}
+
+.horizontalbar {
+  background: url('/static/images/chart-types/horizontal-bar.png');
+}
+
+.verticalbar {
+  background: url('/static/images/chart-types/vertical-bar.png');
+}
+
+.map {
+  background: url('/static/images/chart-types/map.png');
+}
+
+.formselect {
+  height: 200px;
+
+  select {
+    height: 100% !important;
+  }
+}

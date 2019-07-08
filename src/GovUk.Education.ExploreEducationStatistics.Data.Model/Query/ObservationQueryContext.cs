@@ -9,21 +9,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
         public int EndYear { get; set; }
         public IEnumerable<int> Years { get; set; }
         public IEnumerable<long> Filters { get; set; }
-        public GeographicLevel GeographicLevel { get; set; }
+        public GeographicLevel? GeographicLevel { get; set; }
         public IEnumerable<long> Indicators { get; set; }
-        public IEnumerable<string> Countries { get; set; }
-        public IEnumerable<string> Institutions { get; set; }
-        public IEnumerable<string> LocalAuthorities { get; set; }
-        public IEnumerable<string> LocalAuthorityDistricts { get; set; }
-        public IEnumerable<string> LocalEnterprisePartnerships { get; set; }
-        public IEnumerable<string> Mats { get; set; }
-        public IEnumerable<string> MayoralCombinedAuthorities { get; set; }
-        public IEnumerable<string> OpportunityAreas { get; set; }
-        public IEnumerable<string> ParliamentaryConstituencies { get; set; }
-        public IEnumerable<string> Regions { get; set; }
-        public IEnumerable<string> RscRegions { get; set; }
-        public IEnumerable<string> Sponsors { get; set; }
-        public IEnumerable<string> Wards { get; set; }
+        public IEnumerable<string> Country { get; set; }
+        public IEnumerable<string> Institution { get; set; }
+        public IEnumerable<string> LocalAuthority { get; set; }
+        public IEnumerable<string> LocalAuthorityDistrict { get; set; }
+        public IEnumerable<string> LocalEnterprisePartnership { get; set; }
+        public IEnumerable<string> MultiAcademyTrust { get; set; }
+        public IEnumerable<string> MayoralCombinedAuthority { get; set; }
+        public IEnumerable<string> OpportunityArea { get; set; }
+        public IEnumerable<string> ParliamentaryConstituency { get; set; }
+        public IEnumerable<string> Region { get; set; }
+        public IEnumerable<string> RscRegion { get; set; }
+        public IEnumerable<string> Sponsor { get; set; }
+        public IEnumerable<string> Ward { get; set; }
 
         public SubjectMetaQueryContext ToSubjectMetaQueryContext()
         {
@@ -35,19 +35,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
                 Years = Years,
                 GeographicLevel = GeographicLevel,
                 Indicators = Indicators,
-                Countries = Countries,
-                Institutions = Institutions,
-                LocalAuthorities = LocalAuthorities,
-                LocalAuthorityDistricts = LocalAuthorityDistricts,
-                LocalEnterprisePartnerships = LocalEnterprisePartnerships,
-                Mats = Mats,
-                MayoralCombinedAuthorities = MayoralCombinedAuthorities,
-                OpportunityAreas = OpportunityAreas,
-                ParliamentaryConstituencies = ParliamentaryConstituencies,
-                Regions = Regions,
-                RscRegions = RscRegions,
-                Sponsors = Sponsors,
-                Wards = Wards
+                Country = Country,
+                Institution = Institution,
+                LocalAuthority = LocalAuthority,
+                LocalAuthorityDistrict = LocalAuthorityDistrict,
+                LocalEnterprisePartnership = LocalEnterprisePartnership,
+                MultiAcademyTrust = MultiAcademyTrust,
+                MayoralCombinedAuthority = MayoralCombinedAuthority,
+                OpportunityArea = OpportunityArea,
+                ParliamentaryConstituency = ParliamentaryConstituency,
+                Region = Region,
+                RscRegion = RscRegion,
+                Sponsor = Sponsor,
+                Ward = Ward
             };
         }
     }
