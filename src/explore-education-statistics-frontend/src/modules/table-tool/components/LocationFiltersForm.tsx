@@ -89,7 +89,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
       validationSchema={Yup.object<FormValues>({
         locations: Yup.mixed().test(
           'required',
-          'Select at least one option',
+          'Select at least one location',
           (value: Dictionary<string[]>) =>
             Object.values(value).some(groupOptions => groupOptions.length > 0),
         ),

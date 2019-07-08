@@ -55,7 +55,7 @@ class MethodologyPage extends Component<Props> {
                   <FormattedDate>{data.published}</FormattedDate>{' '}
                 </strong>
               </dd>
-              {data.lastUpdated.length > 0 && (
+              {data.lastUpdated && (
                 <>
                   <dt className="govuk-caption-m">Last updated: </dt>
                   <dd>
@@ -75,7 +75,7 @@ class MethodologyPage extends Component<Props> {
           <div className="govuk-grid-column-two-thirds">
             <p className="govuk-body-l">
               {`Find out about the methodology behind ${
-                data.publication.title
+                data.title
               } statistics and
               data and how and why they're collected and published.`}
             </p>
@@ -87,11 +87,13 @@ class MethodologyPage extends Component<Props> {
                 Related content
               </h2>
               <ul className="govuk-list">
-                <li>
-                  <Link to={`/statistics/${data.publication.slug}`}>
-                    {data.publication.title}
-                  </Link>{' '}
-                </li>
+                {data.publication && (
+                  <li>
+                    <Link to={`/statistics/${data.publication.slug}`}>
+                      {data.publication.title}
+                    </Link>{' '}
+                  </li>
+                )}
               </ul>
             </aside>
           </div>
@@ -118,7 +120,6 @@ class MethodologyPage extends Component<Props> {
         )}
 
         <h2 className="govuk-heading-l govuk-!-margin-top-9">Annexes</h2>
-
         {data.content.length > 0 && (
           <Accordion id="contents-sections">
             {data.annexes.map(({ heading, caption, order, content }) => {
