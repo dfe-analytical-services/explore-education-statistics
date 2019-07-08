@@ -6,6 +6,7 @@ import DummyReferenceData, {
 import ReleasePageTemplate from '@admin/pages/edit-release/components/ReleasePageTemplate';
 import { Form, FormFieldset, Formik } from '@common/components/form';
 import FormFieldDayMonthYear from '@common/components/form/FormFieldDayMonthYear';
+import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { SelectOption } from '@common/components/form/FormSelect';
@@ -249,6 +250,16 @@ const ReleaseSetupEditPage = ({
                   day={form.values.nextReleaseExpectedDate.day}
                   month={form.values.nextReleaseExpectedDate.month}
                   year={form.values.nextReleaseExpectedDate.year}
+                />
+
+                <FormFieldRadioGroup<FormValues>
+                  id={`${formId}-releaseTypeId`}
+                  legend="Release Type"
+                  name="releaseTypeId"
+                  options={releaseTypes.map(type => ({
+                    label: type.label,
+                    value: `${type.id}`,
+                  }))}
                 />
 
                 <button
