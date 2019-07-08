@@ -51,7 +51,7 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
       height,
       width,
       referenceLines,
-      stacked = true,
+      stacked = false,
       labels,
       axes,
     } = this.props;
