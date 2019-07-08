@@ -1,9 +1,9 @@
 import React, { FunctionComponent } from 'react';
-import printStyles from '@frontend/components/PrintCSS.module.scss';
+import styles from './GoToTopLink.module.scss';
 
 const GoToTopLink: FunctionComponent = () => {
   return (
-    <div className={printStyles.hidden}>
+    <div className={styles.container}>
       <a href="#" className="govuk-link govuk-link--no-visited-state">
         Go to top
       </a>

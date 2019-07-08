@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from './Link';
-import printStyles from './PrintCSS.module.scss';
+import styles from './SubscribeLink.module.scss';
 
 export interface SubscribeLinkProps {
   slug: string;
@@ -9,7 +9,7 @@ export interface SubscribeLinkProps {
 const SubscribeLink = ({ slug }: SubscribeLinkProps) => {
   return (
     <Link
-      className={printStyles.hidden}
+      className={styles.container}
       unvisited
       to={`/subscriptions?slug=${slug}`}
       data-testid={`subsciption-${slug}`}

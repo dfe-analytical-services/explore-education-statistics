@@ -11,7 +11,6 @@ import findPreviousSibling from '@common/lib/dom/findPreviousSibling';
 import classNames from 'classnames';
 import debounce from 'lodash/debounce';
 import React, { Component, ReactNode } from 'react';
-import printStyles from '@frontend/components/PrintCSS.module.scss';
 import Highlighter from 'react-highlight-words';
 import styles from './PageSearchForm.module.scss';
 
@@ -163,7 +162,7 @@ class PageSearchForm extends Component<Props, State> {
 
     return (
       <form
-        className={classNames(styles.container, className, printStyles.hidden)}
+        className={classNames(styles.container, className)}
         onSubmit={e => e.preventDefault()}
         autoComplete="off"
         role="search"

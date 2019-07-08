@@ -215,7 +215,7 @@ class PublicationReleasePage extends Component<Props> {
           </div>
         </div>
         <hr />
-        <h2 className={printStyles.pageBreakBefore}>
+        <h2 className={styles.pageBreakBefore}>
           Headline facts and figures - {data.releaseName}
         </h2>
 
