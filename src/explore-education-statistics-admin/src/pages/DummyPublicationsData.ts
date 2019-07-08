@@ -48,6 +48,7 @@ const releaseTemplate: Release = {
     startDate: new Date('2017-01-01'),
   },
   scheduledReleaseDate: new Date('2020-09-20'),
+  nextReleaseExpectedDate: new Date('2021-09-20'),
   status: {
     approvalStatus: ApprovalStatus.Approved,
     isLive: true,

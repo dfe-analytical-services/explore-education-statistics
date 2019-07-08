@@ -50,6 +50,7 @@ export interface Release {
   releaseName: string;
   timePeriodCoverage: TimePeriodCoverage;
   scheduledReleaseDate: Date;
+  nextReleaseExpectedDate: Date;
   releaseType: IdLabelPair;
   slug: string;
   status: ReleaseStatus;

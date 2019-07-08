@@ -34,7 +34,7 @@ interface DayMonthYearValues {
 export const dateToDayMonthYear = (date?: Date) => {
   return {
     day: `${date ? date.getDate() : ''}`,
-    month: `${date ? date.getMonth() : ''}`,
+    month: `${date ? date.getMonth() + 1 : ''}`,
     year: `${date ? date.getFullYear() : ''}`,
   };
 };
@@ -52,7 +52,7 @@ interface FormValues {
   timePeriodCoverageStartDateYearOnly?: string;
   releaseTypeId: string;
   scheduledReleaseDate: DayMonthYearValues;
-  nextExpectedReleaseDate: DayMonthYearValues;
+  nextReleaseExpectedDate: DayMonthYearValues;
 }
 
 const ReleaseSetupEditPage = ({
@@ -104,6 +104,8 @@ const ReleaseSetupEditPage = ({
   const handleFormSubmission = async (values: FormValues) => {
     const release = DummyPublicationsData.getReleaseById(releaseId);
 
+    release.timePeriodCoverage.code = values.timePeriodCoverageCode;
+
     if (values.timePeriodCoverageStartDate) {
       release.timePeriodCoverage.startDate = dayMonthYearToDate(
         values.timePeriodCoverageStartDate,
@@ -116,7 +118,15 @@ const ReleaseSetupEditPage = ({
       );
     }
 
-    history.push(setupRoute.generateLink(releaseId));
+    release.scheduledReleaseDate = dayMonthYearToDate(
+      values.scheduledReleaseDate,
+    );
+    release.nextReleaseExpectedDate = dayMonthYearToDate(
+      values.nextReleaseExpectedDate,
+    );
+    release.releaseType = DummyReferenceData.findReleaseType(
+      values.releaseTypeId,
+    );
   };
 
   return (
@@ -134,7 +144,7 @@ const ReleaseSetupEditPage = ({
           // ref={formikRef}
           onSubmit={async values => {
             await handleFormSubmission(values);
-            // goToNextStep();
+            history.push(setupRoute.generateLink(releaseId));
           }}
           initialValues={{
             timePeriodCoverageCode: releaseSetupDetails.timePeriodCoverageCode,
@@ -157,7 +167,7 @@ const ReleaseSetupEditPage = ({
             scheduledReleaseDate: dateToDayMonthYear(
               releaseSetupDetails.scheduledReleaseDate,
             ),
-            nextExpectedReleaseDate: dateToDayMonthYear(
+            nextReleaseExpectedDate: dateToDayMonthYear(
               releaseSetupDetails.nextExpectedReleaseDate,
             ),
           }}
@@ -174,7 +184,7 @@ const ReleaseSetupEditPage = ({
               month: Yup.string(),
               year: Yup.string(),
             }),
-            nextExpectedReleaseDate: Yup.object({
+            nextReleaseExpectedDate: Yup.object({
               day: Yup.string(),
               month: Yup.string(),
               year: Yup.string(),
@@ -190,9 +200,8 @@ const ReleaseSetupEditPage = ({
                   <FormFieldSelect<FormValues>
                     id={`${formId}-timePeriodCoverage`}
                     label="Type"
-                    name="time-period"
+                    name="timePeriodCoverageCode"
                     optGroups={getTimePeriodOptions(timePeriodCoverageGroups)}
-                    value={form.values.timePeriodCoverageCode}
                     onChange={event => {
                       setReleaseSetupDetails({
                         ...releaseSetupDetails,
@@ -240,9 +249,9 @@ const ReleaseSetupEditPage = ({
                   fieldsetId={`${formId}-nextExpectedReleaseDateFieldset`}
                   fieldsetLegend="Next release expected (optional)"
                   fieldIdPrefix={`${formId}-nextExpectedReleaseDate`}
-                  day={form.values.nextExpectedReleaseDate.day}
-                  month={form.values.nextExpectedReleaseDate.month}
-                  year={form.values.nextExpectedReleaseDate.year}
+                  day={form.values.nextReleaseExpectedDate.day}
+                  month={form.values.nextReleaseExpectedDate.month}
+                  year={form.values.nextReleaseExpectedDate.year}
                 />
 
                 <button

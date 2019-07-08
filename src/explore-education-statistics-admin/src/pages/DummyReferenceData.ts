@@ -171,8 +171,15 @@ const findTimePeriodCoverageGroup = (code: string) => {
   );
 };
 
+const findReleaseType = (id: string) => {
+  return (
+    releaseTypeOptions.find(type => type.id === id) || releaseTypeOptions[0]
+  );
+};
+
 export default {
   timePeriodCoverageGroups,
   releaseTypeOptions,
   findTimePeriodCoverageGroup,
+  findReleaseType,
 };
