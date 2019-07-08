@@ -6,8 +6,8 @@ import { Field, FieldProps } from 'formik';
 import React from 'react';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
 import FormFieldSortableList from './FormFieldSortableList';
+import styles from './FormFieldSortableListGroup.module.scss';
 import { SortableOption } from './FormSortableList';
-import styles from './TableHeadersForm.module.scss';
 
 interface Props<FormValues> {
   name: keyof FormValues & string;
@@ -56,25 +56,27 @@ const FormFieldSortableListGroup = <T extends Dictionary<SortableOption[][]>>({
                         key={index}
                       >
                         {(draggableProvided, draggableSnapshot) => (
-                          <div
-                            {...draggableProvided.draggableProps}
-                            {...draggableProvided.dragHandleProps}
-                            className={classNames(
-                              styles.list,
-                              styles.isDraggable,
-                              {
-                                [styles.isDragging]:
-                                  draggableSnapshot.isDragging,
-                              },
-                            )}
-                            ref={draggableProvided.innerRef}
-                          >
-                            <FormFieldSortableList<T>
-                              name={`${name}[${index}]`}
-                              id={`sortableList-${name}-${index}`}
-                              legend={`${groupLegend} ${index + 1}`}
-                              legendSize="s"
-                            />
+                          <div className={styles.listContainer}>
+                            <div
+                              {...draggableProvided.draggableProps}
+                              {...draggableProvided.dragHandleProps}
+                              className={classNames(
+                                styles.list,
+                                styles.isDraggable,
+                                {
+                                  [styles.isDragging]:
+                                    draggableSnapshot.isDragging,
+                                },
+                              )}
+                              ref={draggableProvided.innerRef}
+                            >
+                              <FormFieldSortableList<T>
+                                name={`${name}[${index}]`}
+                                id={`sortableList-${name}-${index}`}
+                                legend={`${groupLegend} ${index + 1}`}
+                                legendSize="s"
+                              />
+                            </div>
                           </div>
                         )}
                       </Draggable>
