@@ -65,6 +65,7 @@ Select School types
 Create table
     [Tags]  HappyPath
     user clicks element     css:#filtersForm-submit
+    user waits until page contains element   css:table
 
 Validate results table column headings
     [Tags]  HappyPath

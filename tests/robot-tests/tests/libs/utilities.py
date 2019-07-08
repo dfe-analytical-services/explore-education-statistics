@@ -189,13 +189,15 @@ def user_checks_results_table_contains(row, column, expected):
 
 def user_checks_previous_table_tool_step_contains(step, key, value):
   try:
+    sl.wait_until_page_contains_element(f'xpath://*[@id="tableTool-steps-step-{step}"]//*[text()="Go to this step"]')
     elem = sl.driver.find_element_by_css_selector(f"#tableTool-steps-step-{step}")
   except:
-    raise AssertionError(f'Element "#tableTool-steps-step-{step}" not found!')
+    raise AssertionError(f'Element "#tableTool-steps-step-{step}" isn\'t the previous step!')
 
   try:
     elem.find_element_by_xpath(f'.//dt[text()="{key}"]/../dd[text()="{value}"]')
   except:
+    sl.capture_page_screenshot()
     raise AssertionError(f'Element "#tableTool-steps-step-{step}" containing "{key}" and "{value}" not found!')
 
 def user_reorders_table_headers(drag_selector, drop_selector):
@@ -203,15 +205,19 @@ def user_reorders_table_headers(drag_selector, drop_selector):
   drop_elem = None
   if drag_selector.startswith('css:'):
     drag_selector = drag_selector[4:]
+    sl.wait_until_page_contains_element(f'css:{drag_selector}')
     drag_elem = sl.driver.find_element_by_css_selector(drag_selector)
   if drop_selector.startswith('css:'):
     drop_selector = drop_selector[4:]
+    sl.wait_until_page_contains_element(f'css:{drop_selector}')
     drop_elem = sl.driver.find_element_by_css_selector(drop_selector)
   if drag_selector.startswith('xpath:'):
     drag_selector = drag_selector[6:]
+    sl.wait_until_page_contains_element(f'xpath:{drag_selector}')
     drag_elem = sl.driver.find_element_by_xpath(drag_selector)
   if drop_selector.startswith('xpath:'):
     drop_selector = drop_selector[6:]
+    sl.wait_until_page_contains_element(f'xpath:{drop_selector}')
     drop_elem = sl.driver.find_element_by_xpath(drop_selector)
 
   # https://github.com/react-dnd/react-dnd/issues/1195#issuecomment-456370983

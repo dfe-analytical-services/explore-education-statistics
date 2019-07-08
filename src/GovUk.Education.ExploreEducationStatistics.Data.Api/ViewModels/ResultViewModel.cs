@@ -1,9 +1,6 @@
 using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels
 {
@@ -13,9 +10,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels
         public Guid? ReleaseId { get; set; }
         public long? SubjectId { get; set; }
         public DateTime? ReleaseDate { get; set; }
-
-        [JsonConverter(typeof(StringEnumConverter))]
-        public GeographicLevel? GeographicLevel { get; set; }
 
         public Dictionary<string, TimePeriodMetaViewModel> TimePeriodRange { get; set; }
         

@@ -22,6 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return new ObservationViewModel
             {
                 Filters = FilterItems(observation),
+                GeographicLevel = observation.GeographicLevel,
                 Location = _mapper.Map<LocationViewModel>(observation.Location),
                 Measures = Measures(observation, indicators),
                 TimePeriod = TimePeriod(observation)

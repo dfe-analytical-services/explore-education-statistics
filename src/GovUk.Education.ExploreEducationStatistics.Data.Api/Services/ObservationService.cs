@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -26,7 +27,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             var timePeriodRange = TimePeriodUtil.Range(query.TimePeriod);
 
             var subjectIdParam = new SqlParameter("subjectId", query.SubjectId);
-            var geographicLevelParam = new SqlParameter("geographicLevel", query.GeographicLevel.GetEnumValue());
+            var geographicLevelParam = new SqlParameter("geographicLevel",
+                query.GeographicLevel?.GetEnumValue() ?? (object) DBNull.Value);
             var timePeriodListParam = CreateTimePeriodListType("timePeriodList", timePeriodRange);
             var countriesListParam = CreateIdListType("countriesList", query.Country);
             var institutionListParam =
