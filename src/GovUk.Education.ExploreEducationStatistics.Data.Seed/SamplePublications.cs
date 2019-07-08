@@ -232,27 +232,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                             new Subject
                                             {
                                                 Id = 18,
-                                                Name = "New cases by age",
+                                                Name = "New cases by age"
                                             },
                                             new Subject
                                             {
                                                 Id = 19,
-                                                Name = "Stock cases by age",
+                                                Name = "Stock cases by age"
                                             },
                                             new Subject
                                             {
                                                 Id = 20,
-                                                Name = "New cases by establishment",
+                                                Name = "New cases by establishment"
                                             },
                                             new Subject
                                             {
                                                 Id = 21,
-                                                Name = "Stock cases by establishment",
+                                                Name = "Stock cases by establishment"
                                             },
                                             new Subject
                                             {
                                                 Id = 22,
-                                                Name = "Management information",
+                                                Name = "Management information"
                                             }
                                         }
                                     }
@@ -346,7 +346,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                             new Subject
                                             {
                                                 Id = 23,
-                                                Name = "National achievement rates tables (NARTs)",
+                                                Name = "National achievement rates tables (NARTs)"
                                             }
                                         }
                                     }
@@ -379,7 +379,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                             new Subject
                                             {
                                                 Id = 24,
-                                                Name = "Apprenticeship annual",
+                                                Name = "Apprenticeship annual"
                                             }
                                         }
                                     }
@@ -403,7 +403,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                             new Subject
                                             {
                                                 Id = 25,
-                                                Name = "Further education and skills",
+                                                Name = "Further education and skills"
                                             }
                                         }
                                     }
@@ -446,17 +446,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                             new Subject
                                             {
                                                 Id = 26,
-                                                Name = "Level 2 and 3 National",
+                                                Name = "Level 2 and 3 National"
                                             },
                                             new Subject
                                             {
                                                 Id = 27,
-                                                Name = "Level 2 and 3 sf",
+                                                Name = "Level 2 and 3 sf"
                                             },
                                             new Subject
                                             {
                                                 Id = 28,
-                                                Name = "Level 2 and 3 sf by Local authority",
+                                                Name = "Level 2 and 3 sf by Local authority"
                                             }
                                         }
                                     }
@@ -489,7 +489,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                             new Subject
                                             {
                                                 Id = 29,
-                                                Name = "2016 test data",
+                                                Name = "2016 test data"
                                             }
                                         }
                                     }
@@ -522,22 +522,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                             new Subject
                                             {
                                                 Id = 30,
-                                                Name = "Characteristic test data by Local authority",
+                                                Name = "Characteristic test data by Local authority"
                                             },
                                             new Subject
                                             {
                                                 Id = 31,
-                                                Name = "National characteristic test data",
+                                                Name = "National characteristic test data"
                                             },
                                             new Subject
                                             {
                                                 Id = 32,
-                                                Name = "Subject tables S1 test data",
+                                                Name = "Subject tables S1 test data"
                                             },
                                             new Subject
                                             {
                                                 Id = 33,
-                                                Name = "Subject tables S3 test data",
+                                                Name = "Subject tables S3 test data"
                                             }
                                         }
                                     }
