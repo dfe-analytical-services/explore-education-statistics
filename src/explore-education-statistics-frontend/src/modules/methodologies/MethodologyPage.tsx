@@ -76,31 +76,33 @@ class MethodologyPage extends Component<Props> {
         </div>
 
         <hr />
-        <div className="govuk-grid-row">
-          <div className="govuk-grid-column-two-thirds">
-            <p className="govuk-body-l">
-              {`Find out about the methodology behind ${
-                data.publication.title
-              } statistics and
+        {data.publication && (
+          <div className="govuk-grid-row">
+            <div className="govuk-grid-column-two-thirds">
+              <p className="govuk-body-l">
+                {`Find out about the methodology behind ${
+                  data.publication.title
+                } statistics and
               data and how and why they're collected and published.`}
-            </p>
-          </div>
+              </p>
+            </div>
 
-          <div className="govuk-grid-column-one-third">
-            <aside className="app-related-items">
-              <h2 className="govuk-heading-m" id="subsection-title">
-                Related content
-              </h2>
-              <ul className="govuk-list">
-                <li>
-                  <Link to={`/statistics/${data.publication.slug}`}>
-                    {data.publication.title}
-                  </Link>{' '}
-                </li>
-              </ul>
-            </aside>
+            <div className="govuk-grid-column-one-third">
+              <aside className="app-related-items">
+                <h2 className="govuk-heading-m" id="subsection-title">
+                  Related content
+                </h2>
+                <ul className="govuk-list">
+                  <li>
+                    <Link to={`/statistics/${data.publication.slug}`}>
+                      {data.publication.title}
+                    </Link>{' '}
+                  </li>
+                </ul>
+              </aside>
+            </div>
           </div>
-        </div>
+        )}
 
         {data.content && (
           <Accordion id="contents-sections">
