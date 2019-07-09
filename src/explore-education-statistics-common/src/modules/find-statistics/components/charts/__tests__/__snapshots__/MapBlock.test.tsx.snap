@@ -171,7 +171,7 @@ exports[`MapBlock renders 1`] = `
       class="govuk-grid-column-two-thirds"
     >
       <div
-        class="map leaflet-container leaflet-grab leaflet-touch-drag"
+        class="map dfe-print-unbreakable leaflet-container leaflet-grab leaflet-touch-drag"
         style="width: 900px; height: 600px; position: relative;"
         tabindex="0"
       >
