@@ -1,13 +1,13 @@
 import BaseDocument, {
-  DocumentContext,
   Head,
   Main,
+  NextDocumentContext,
   NextScript,
 } from 'next/document';
 import React from 'react';
 
 class Document extends BaseDocument {
-  public static async getInitialProps(ctx: DocumentContext) {
+  public static async getInitialProps(ctx: NextDocumentContext) {
     const initialProps = await BaseDocument.getInitialProps(ctx);
     return { ...initialProps };
   }

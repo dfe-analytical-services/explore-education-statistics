@@ -8,17 +8,15 @@ type Props = {
 } & LinkProps;
 
 const ButtonLink = ({
-  as,
   children,
   className,
   disabled = false,
   to,
   href,
-  prefetch,
   ...props
 }: Props) => {
   return (
-    <Link href={href || to} as={as} prefetch={prefetch}>
+    <Link {...props} href={href || to}>
       <a
         {...props}
         className={classNames(

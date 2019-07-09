@@ -14,7 +14,7 @@ import ButtonLink from '@frontend/components/ButtonLink';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import classNames from 'classnames';
-import { NextPageContext } from 'next';
+import { NextContext } from 'next';
 import React, { Component } from 'react';
 import ReactMarkdown from 'react-markdown';
 import ContentBlock from './components/ContentBlock';
@@ -27,12 +27,17 @@ interface Props {
 }
 
 class PublicationReleasePage extends Component<Props> {
-  public static async getInitialProps({ query }: NextPageContext) {
+  public static async getInitialProps({
+    query,
+  }: NextContext<{
+    publication: string;
+    release: string;
+  }>) {
     const { publication, release } = query;
 
     const request = release
-      ? publicationService.getPublicationRelease(release as string)
-      : publicationService.getLatestPublicationRelease(publication as string);
+      ? publicationService.getPublicationRelease(release)
+      : publicationService.getLatestPublicationRelease(publication);
 
     const data = await request;
 
@@ -144,7 +149,9 @@ class PublicationReleasePage extends Component<Props> {
                             releaseName,
                             <li key={id} data-testid="previous-release-item">
                               <Link
-                                to={`/statistics/${data.publication.slug}/${slug}`}
+                                to={`/statistics/${
+                                  data.publication.slug
+                                }/${slug}`}
                               >
                                 {releaseName}
                               </Link>

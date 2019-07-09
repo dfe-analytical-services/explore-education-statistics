@@ -1,4 +1,4 @@
-import { NextPageContext } from 'next';
+import { NextContext } from 'next';
 import React, { Component } from 'react';
 import Page from '../components/Page';
 
@@ -13,7 +13,7 @@ class ErrorPage extends Component<Props> {
     500: "Sorry, there's a problem with the service",
   };
 
-  public static getInitialProps({ res, err }: NextPageContext): Props {
+  public static getInitialProps({ res, err }: NextContext): Props {
     const statusCode = res ? res.statusCode : 500;
     const errorMessage = err ? err.message : '';
 

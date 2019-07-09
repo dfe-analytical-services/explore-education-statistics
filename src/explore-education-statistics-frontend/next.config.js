@@ -2,6 +2,7 @@
 
 const withCss = require('@zeit/next-css');
 const cssLoaderConfig = require('@zeit/next-css/css-loader-config');
+const withTypescript = require('@zeit/next-typescript');
 const DotEnv = require('dotenv');
 const DotEnvPlugin = require('dotenv-webpack');
 const fs = require('fs');
@@ -125,7 +126,17 @@ const withESLint = createPlugin((config, options) => {
 const nextConfig = {
   transpileModules: ['explore-education-statistics-common', '@common'],
   webpack(config, options) {
-    const { dev } = options;
+    const { dev, isServer } = options;
+
+    if (isServer) {
+      const ForkTsCheckerPlugin = require('fork-ts-checker-webpack-plugin');
+
+      config.plugins.push(
+        new ForkTsCheckerPlugin({
+          tsconfig: path.resolve(__dirname, 'tsconfig.json'),
+        }),
+      );
+    }
 
     if (dev) {
       const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
@@ -186,5 +197,6 @@ module.exports = compose(
   withImages,
   withCss,
   withSassModules,
+  withTypescript,
   withESLint,
 )(nextConfig);

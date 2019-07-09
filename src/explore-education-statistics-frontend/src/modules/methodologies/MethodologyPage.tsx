@@ -1,19 +1,19 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
-import ContentSectionIndex from '@common/components/ContentSectionIndex';
+import Link from '@frontend/components/Link';
+import Page from '@frontend/components/Page';
+import { NextContext } from 'next';
+import React, { Component } from 'react';
+import ContentBlock from '@frontend/modules/find-statistics/components/ContentBlock';
 import FormattedDate from '@common/components/FormattedDate';
-import PageSearchForm from '@common/components/PageSearchForm';
 import PrintThisPage from '@common/components/PrintThisPage';
 import methodologyService, {
   Methodology,
 } from '@common/services/methodologyService';
-import Link from '@frontend/components/Link';
-import Page from '@frontend/components/Page';
-import ContentBlock from '@frontend/modules/find-statistics/components/ContentBlock';
-import MethodologyContent from '@frontend/prototypes/methodology/components/MethodologyContent';
+import PageSearchForm from '@common/components/PageSearchForm';
 import MethodologyHeader from '@frontend/prototypes/methodology/components/MethodologyHeader';
-import { NextPageContext } from 'next';
-import React, { Component } from 'react';
+import MethodologyContent from '@frontend/prototypes/methodology/components/MethodologyContent';
+import ContentSectionIndex from '@common/components/ContentSectionIndex';
 
 interface Props {
   publication: string;
@@ -21,10 +21,14 @@ interface Props {
 }
 
 class MethodologyPage extends Component<Props> {
-  public static async getInitialProps({ query }: NextPageContext) {
+  public static async getInitialProps({
+    query,
+  }: NextContext<{
+    publication: string;
+  }>) {
     const { publication } = query;
 
-    const request = methodologyService.getMethodology(publication as string);
+    const request = methodologyService.getMethodology(publication);
 
     const data = await request;
 
@@ -76,7 +80,9 @@ class MethodologyPage extends Component<Props> {
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-two-thirds">
               <p className="govuk-body-l">
-                {`Find out about the methodology behind ${data.publication.title} statistics and
+                {`Find out about the methodology behind ${
+                  data.publication.title
+                } statistics and
               data and how and why they're collected and published.`}
               </p>
             </div>

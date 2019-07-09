@@ -14,7 +14,7 @@ import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PreviousStepModalConfirm from '@frontend/modules/table-tool/components/PreviousStepModalConfirm';
 import mapValues from 'lodash/mapValues';
-import { NextPageContext } from 'next';
+import { NextContext } from 'next';
 import React, { Component } from 'react';
 import DownloadCsvButton from './components/DownloadCsvButton';
 import FiltersForm, { FilterFormSubmitHandler } from './components/FiltersForm';
@@ -90,7 +90,7 @@ class TableToolPage extends Component<Props, State> {
     tableData: [],
   };
 
-  public static async getInitialProps({ query }: NextPageContext) {
+  public static async getInitialProps({ query }: NextContext) {
     const themeMeta = await tableBuilderService.getThemes();
 
     const publication = themeMeta
@@ -345,7 +345,9 @@ class TableToolPage extends Component<Props, State> {
                                 <li>
                                   <Link
                                     as={`/statistics/${publication.slug}`}
-                                    to={`/statistics/publication?publication=${publication.slug}`}
+                                    to={`/statistics/publication?publication=${
+                                      publication.slug
+                                    }`}
                                   >
                                     Go to publication
                                   </Link>
@@ -368,7 +370,9 @@ class TableToolPage extends Component<Props, State> {
                                 <li>
                                   <Link
                                     as={`/methodologies/${publication.slug}`}
-                                    to={`/methodologies/methodology?methodology=${publication.slug}`}
+                                    to={`/methodologies/methodology?methodology=${
+                                      publication.slug
+                                    }`}
                                   >
                                     Go to methodology
                                   </Link>
