@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190701153922_RefactorTimePeriods")]
+    [Migration("20190709121039_RefactorTimePeriods")]
     partial class RefactorTimePeriods
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -241,6 +241,55 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                             Slug = "early-years-foundation-stage-profile-results",
                             Title = "Early years foundation stage profile results",
                             TopicId = new Guid("17b2e32c-ed2f-4896-852b-513cdf466769")
+                        },
+                        new
+                        {
+                            Id = new Guid("2d94e5c8-a272-497c-bda0-c1f6b75155b0"),
+                            Slug = "statements-of-sen-and-ehc-plans",
+                            Title = "Statements of SEN and EHC plans",
+                            TopicId = new Guid("dfc908db-242a-4e3a-b6c6-e3f66cd152af")
+                        },
+                        new
+                        {
+                            Id = new Guid("99ce35fb-3fe2-48bb-9b73-23159df9d5ea"),
+                            Slug = "national-achievement-rates-tables",
+                            Title = "National achievement rates tables",
+                            TopicId = new Guid("721048b9-8c06-4bad-8585-8789fa38a03b")
+                        },
+                        new
+                        {
+                            Id = new Guid("5aea252e-fddc-42b3-a1da-47f12e523e70"),
+                            Slug = "apprenticeships-and-traineeships",
+                            Title = "Apprenticeships and traineeships",
+                            TopicId = new Guid("71444ff6-614f-405b-b6c7-f72077d42e34")
+                        },
+                        new
+                        {
+                            Id = new Guid("d5a01a5c-cd57-482f-8a19-803b266e1012"),
+                            Slug = "further-education-and-skills",
+                            Title = "Further education and skills",
+                            TopicId = new Guid("71444ff6-614f-405b-b6c7-f72077d42e34")
+                        },
+                        new
+                        {
+                            Id = new Guid("adb95888-64c7-4aa7-ba70-a9e535f8a30f"),
+                            Slug = "Level 2 and 3 attainment by young people aged 19",
+                            Title = "Level 2 and 3 attainment by young people aged 19",
+                            TopicId = new Guid("9e4fa097-2999-4c4d-9ecd-0c4733fc71b4")
+                        },
+                        new
+                        {
+                            Id = new Guid("90ecb3d3-bd05-4f84-a73e-1d153568b320"),
+                            Slug = "national-curriculum-assessments-key-stage2",
+                            Title = "National curriculum assessments at key stage 2",
+                            TopicId = new Guid("f38469bd-a5f7-46b1-96bb-3b0a01e9e53f")
+                        },
+                        new
+                        {
+                            Id = new Guid("15659c96-a624-4457-846d-2ab5f3db6aec"),
+                            Slug = "gcse-results-including-pupil-characteristics",
+                            Title = "GCSE and equivalent results, including pupil characteristics",
+                            TopicId = new Guid("81fbb21d-3c49-46a2-8b43-0076974114f7")
                         });
                 });
 
@@ -292,6 +341,62 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                         {
                             Id = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
                             PublicationId = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
+                            ReleaseDate = new DateTime(2019, 4, 29, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Slug = "2018",
+                            Title = "2018"
+                        },
+                        new
+                        {
+                            Id = new Guid("70efdb76-7e88-453f-95f1-7bb9af023db5"),
+                            PublicationId = new Guid("2d94e5c8-a272-497c-bda0-c1f6b75155b0"),
+                            ReleaseDate = new DateTime(2019, 4, 29, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Slug = "2018",
+                            Title = "2018"
+                        },
+                        new
+                        {
+                            Id = new Guid("59258583-b075-47a2-bee4-5969e2d58873"),
+                            PublicationId = new Guid("99ce35fb-3fe2-48bb-9b73-23159df9d5ea"),
+                            ReleaseDate = new DateTime(2019, 4, 29, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Slug = "2018",
+                            Title = "2018"
+                        },
+                        new
+                        {
+                            Id = new Guid("463c8521-d9b4-4ccc-aee9-0666e39c8e47"),
+                            PublicationId = new Guid("5aea252e-fddc-42b3-a1da-47f12e523e70"),
+                            ReleaseDate = new DateTime(2019, 4, 29, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Slug = "2018",
+                            Title = "2018"
+                        },
+                        new
+                        {
+                            Id = new Guid("6ccc4416-7d22-46bf-a12a-56037831dc60"),
+                            PublicationId = new Guid("d5a01a5c-cd57-482f-8a19-803b266e1012"),
+                            ReleaseDate = new DateTime(2019, 4, 29, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Slug = "2018",
+                            Title = "2018"
+                        },
+                        new
+                        {
+                            Id = new Guid("0dafd89b-b754-44a8-b3f1-72baac0a108a"),
+                            PublicationId = new Guid("adb95888-64c7-4aa7-ba70-a9e535f8a30f"),
+                            ReleaseDate = new DateTime(2019, 4, 29, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Slug = "2018",
+                            Title = "2018"
+                        },
+                        new
+                        {
+                            Id = new Guid("dbaeb363-33fa-4928-870f-5054278e0c9a"),
+                            PublicationId = new Guid("90ecb3d3-bd05-4f84-a73e-1d153568b320"),
+                            ReleaseDate = new DateTime(2019, 4, 29, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Slug = "2018",
+                            Title = "2018"
+                        },
+                        new
+                        {
+                            Id = new Guid("737dbab8-4e62-4d56-b0d6-5b4602a20801"),
+                            PublicationId = new Guid("15659c96-a624-4457-846d-2ab5f3db6aec"),
                             ReleaseDate = new DateTime(2019, 4, 29, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Slug = "2018",
                             Title = "2018"
@@ -438,6 +543,102 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                             Id = 17L,
                             Name = "Applications and offers by school phase",
                             ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717")
+                        },
+                        new
+                        {
+                            Id = 18L,
+                            Name = "New cases by age",
+                            ReleaseId = new Guid("70efdb76-7e88-453f-95f1-7bb9af023db5")
+                        },
+                        new
+                        {
+                            Id = 19L,
+                            Name = "Stock cases by age",
+                            ReleaseId = new Guid("70efdb76-7e88-453f-95f1-7bb9af023db5")
+                        },
+                        new
+                        {
+                            Id = 20L,
+                            Name = "New cases by establishment",
+                            ReleaseId = new Guid("70efdb76-7e88-453f-95f1-7bb9af023db5")
+                        },
+                        new
+                        {
+                            Id = 21L,
+                            Name = "Stock cases by establishment",
+                            ReleaseId = new Guid("70efdb76-7e88-453f-95f1-7bb9af023db5")
+                        },
+                        new
+                        {
+                            Id = 22L,
+                            Name = "Management information",
+                            ReleaseId = new Guid("70efdb76-7e88-453f-95f1-7bb9af023db5")
+                        },
+                        new
+                        {
+                            Id = 23L,
+                            Name = "National achievement rates tables (NARTs)",
+                            ReleaseId = new Guid("59258583-b075-47a2-bee4-5969e2d58873")
+                        },
+                        new
+                        {
+                            Id = 24L,
+                            Name = "Apprenticeship annual",
+                            ReleaseId = new Guid("463c8521-d9b4-4ccc-aee9-0666e39c8e47")
+                        },
+                        new
+                        {
+                            Id = 25L,
+                            Name = "Further education and skills",
+                            ReleaseId = new Guid("6ccc4416-7d22-46bf-a12a-56037831dc60")
+                        },
+                        new
+                        {
+                            Id = 26L,
+                            Name = "Level 2 and 3 National",
+                            ReleaseId = new Guid("0dafd89b-b754-44a8-b3f1-72baac0a108a")
+                        },
+                        new
+                        {
+                            Id = 27L,
+                            Name = "Level 2 and 3 sf",
+                            ReleaseId = new Guid("0dafd89b-b754-44a8-b3f1-72baac0a108a")
+                        },
+                        new
+                        {
+                            Id = 28L,
+                            Name = "Level 2 and 3 sf by Local authority",
+                            ReleaseId = new Guid("0dafd89b-b754-44a8-b3f1-72baac0a108a")
+                        },
+                        new
+                        {
+                            Id = 29L,
+                            Name = "2016 test data",
+                            ReleaseId = new Guid("dbaeb363-33fa-4928-870f-5054278e0c9a")
+                        },
+                        new
+                        {
+                            Id = 30L,
+                            Name = "Characteristic test data by Local authority",
+                            ReleaseId = new Guid("737dbab8-4e62-4d56-b0d6-5b4602a20801")
+                        },
+                        new
+                        {
+                            Id = 31L,
+                            Name = "National characteristic test data",
+                            ReleaseId = new Guid("737dbab8-4e62-4d56-b0d6-5b4602a20801")
+                        },
+                        new
+                        {
+                            Id = 32L,
+                            Name = "Subject tables S1 test data",
+                            ReleaseId = new Guid("737dbab8-4e62-4d56-b0d6-5b4602a20801")
+                        },
+                        new
+                        {
+                            Id = 33L,
+                            Name = "Subject tables S3 test data",
+                            ReleaseId = new Guid("737dbab8-4e62-4d56-b0d6-5b4602a20801")
                         });
                 });
 
@@ -466,6 +667,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                             Id = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"),
                             Slug = "children-and-early-years",
                             Title = "Children, early years and social care"
+                        },
+                        new
+                        {
+                            Id = new Guid("9aa81762-e52c-40d4-8a90-f469977360a7"),
+                            Slug = "further-education",
+                            Title = "Further education"
+                        },
+                        new
+                        {
+                            Id = new Guid("fe805471-17e9-4ac6-a555-c7d0ebec1b90"),
+                            Slug = "outcomes-and-performance",
+                            Title = "School and college outcomes and performance"
                         });
                 });
 
@@ -514,6 +727,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                             Slug = "early-years-foundation-stage-profile",
                             ThemeId = new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"),
                             Title = "Early years foundation stage profile"
+                        },
+                        new
+                        {
+                            Id = new Guid("dfc908db-242a-4e3a-b6c6-e3f66cd152af"),
+                            Slug = "sen",
+                            ThemeId = new Guid("ee1855ca-d1e1-4f04-a795-cbd61d326a1f"),
+                            Title = "Special educational needs (SEN)"
+                        },
+                        new
+                        {
+                            Id = new Guid("721048b9-8c06-4bad-8585-8789fa38a03b"),
+                            Slug = "national-achievement-rates-tables",
+                            ThemeId = new Guid("9aa81762-e52c-40d4-8a90-f469977360a7"),
+                            Title = "National achievement rates tables"
+                        },
+                        new
+                        {
+                            Id = new Guid("71444ff6-614f-405b-b6c7-f72077d42e34"),
+                            Slug = "further-education-and-skills",
+                            ThemeId = new Guid("9aa81762-e52c-40d4-8a90-f469977360a7"),
+                            Title = "Further education and skills"
+                        },
+                        new
+                        {
+                            Id = new Guid("9e4fa097-2999-4c4d-9ecd-0c4733fc71b4"),
+                            Slug = "sixteen-to-nineteen-attainment",
+                            ThemeId = new Guid("fe805471-17e9-4ac6-a555-c7d0ebec1b90"),
+                            Title = "16 to 19 attainment"
+                        },
+                        new
+                        {
+                            Id = new Guid("f38469bd-a5f7-46b1-96bb-3b0a01e9e53f"),
+                            Slug = "key-stage-two",
+                            ThemeId = new Guid("fe805471-17e9-4ac6-a555-c7d0ebec1b90"),
+                            Title = "Key stage 2"
+                        },
+                        new
+                        {
+                            Id = new Guid("81fbb21d-3c49-46a2-8b43-0076974114f7"),
+                            Slug = "key-stage-four",
+                            ThemeId = new Guid("fe805471-17e9-4ac6-a555-c7d0ebec1b90"),
+                            Title = "GCSEs (key stage 4)"
                         });
                 });
 

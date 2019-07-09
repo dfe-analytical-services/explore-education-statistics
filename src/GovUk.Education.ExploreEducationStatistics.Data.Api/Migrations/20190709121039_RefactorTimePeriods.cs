@@ -11,14 +11,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            ExecuteFile(migrationBuilder, _migrationsPath + "20190701153922_AddTimePeriodListType.sql");
-            ExecuteFile(migrationBuilder, _migrationsPath + "20190701153922_FilteredObservations.sql");
+            ExecuteFile(migrationBuilder, _migrationsPath + "20190709121039_AddTimePeriodListType.sql");
+            ExecuteFile(migrationBuilder, _migrationsPath + "20190709121039_FilteredObservations.sql");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             // Revert to the previous version of the stored proc
-            ExecuteFile(migrationBuilder, _migrationsPath + "20190627104633_FilteredObservations.sql");
+            ExecuteFile(migrationBuilder, _migrationsPath + "20190708124358_FilteredObservations.sql");
             migrationBuilder.Sql("DROP TYPE dbo.TimePeriodListType");
         }
 

@@ -1,6 +1,6 @@
 ALTER PROCEDURE FilteredObservations
     @subjectId int,
-    @geographicLevel varchar(max),
+    @geographicLevel nvarchar(6) = NULL,
     @timePeriodList TimePeriodListType READONLY,
     @countriesList IdListVarcharType READONLY,
     @institutionsList IdListVarcharType READONLY,
@@ -37,7 +37,7 @@ FROM Observation o
 JOIN ObservationFilterItem ofi ON o.Id = ofi.ObservationId
 JOIN Location l on o.LocationId = l.Id
 WHERE o.SubjectId = @subjectId
-AND o.GeographicLevel = @geographicLevel
+AND o.GeographicLevel = ISNULL(@geographicLevel, o.GeographicLevel)
 AND ofi.FilterItemId IN (SELECT id FROM @filterList)
 AND (@timePeriodCount = 0 OR o.Year IN (SELECT year from @timePeriodList))
 AND (@countriesCount = 0 OR l.Country_Code IN (SELECT id from @countriesList))
