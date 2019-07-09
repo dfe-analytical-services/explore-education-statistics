@@ -1,7 +1,7 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
-import PageSearchForm from '@common/components/PageSearchForm';
+import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import RelatedInformation from '@common/components/RelatedInformation';
 import { contentApi } from '@common/services/api';
 import Link from '@frontend/components/Link';
@@ -41,7 +41,7 @@ class DownloadIndexPage extends Component<Props> {
               Find the data files behind our range of national and regional
               statistics for your own analysis.
             </p>
-            <PageSearchForm />
+            <PageSearchFormWithAnalytics />
           </div>
           <div className="govuk-grid-column-one-third">
             <RelatedInformation>

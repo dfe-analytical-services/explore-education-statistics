@@ -10,7 +10,7 @@ import PrintThisPage from '@common/components/PrintThisPage';
 import methodologyService, {
   Methodology,
 } from '@common/services/methodologyService';
-import PageSearchForm from '@common/components/PageSearchForm';
+import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import MethodologyHeader from '@frontend/prototypes/methodology/components/MethodologyHeader';
 import MethodologyContent from '@frontend/prototypes/methodology/components/MethodologyContent';
 import ContentSectionIndex from '@common/components/ContentSectionIndex';
@@ -71,7 +71,7 @@ class MethodologyPage extends Component<Props> {
             </dl>
           </div>
           <div className="govuk-grid-column-one-third">
-            <PageSearchForm />
+            <PageSearchFormWithAnalytics />
           </div>
         </div>
 

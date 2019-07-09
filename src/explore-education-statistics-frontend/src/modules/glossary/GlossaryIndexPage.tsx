@@ -1,6 +1,6 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
-import PageSearchForm from '@common/components/PageSearchForm';
+import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
@@ -17,7 +17,7 @@ function GlossaryIndexPage() {
             education statistics and data.
           </p>
 
-          <PageSearchForm />
+          <PageSearchFormWithAnalytics />
         </div>
         <div className="govuk-grid-column-one-third">
           <RelatedInformation>

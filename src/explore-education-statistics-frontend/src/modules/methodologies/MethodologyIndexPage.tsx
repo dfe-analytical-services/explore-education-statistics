@@ -1,7 +1,7 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
-import PageSearchForm from '@common/components/PageSearchForm';
+import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import RelatedInformation from '@common/components/RelatedInformation';
 import methodologyService, { Theme } from '@common/services/methodologyService';
 import Link from '@frontend/components/Link';
@@ -41,7 +41,7 @@ class MethodologyIndexPage extends Component<Props> {
               statistics and data and how and why they're collected and
               published.
             </p>
-            <PageSearchForm />
+            <PageSearchFormWithAnalytics />
           </div>
           <div className="govuk-grid-column-one-third">
             <RelatedInformation>
