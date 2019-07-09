@@ -3,7 +3,7 @@ import publicationService, {
 } from '@common/services/publicationService';
 import Page from '@frontend/components/Page';
 import functionsService from '@frontend/services/functionsService';
-import { NextContext } from 'next';
+import { NextPageContext } from 'next';
 import React, { Component } from 'react';
 import SubscriptionForm, {
   SubscriptionFormSubmitHandler,
@@ -25,16 +25,10 @@ class SubscriptionPage extends Component<Props> {
     subscribed: false,
   };
 
-  public static async getInitialProps({
-    query,
-  }: NextContext<{
-    slug: string;
-    unsubscribed?: string;
-    verified?: string;
-  }>) {
+  public static async getInitialProps({ query }: NextPageContext) {
     const { slug, unsubscribed, verified } = query;
 
-    const request = publicationService.getPublication(slug);
+    const request = publicationService.getPublication(slug as string);
 
     const data = await request;
 
