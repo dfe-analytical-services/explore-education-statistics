@@ -92,6 +92,11 @@ export interface TableData {
   releaseId: string;
   releaseDate: string;
   geographicLevel: string;
+  timePeriodRange: {
+    code: string;
+    label: string;
+    year: number;
+  }[];
   result: {
     year: number;
     timeIdentifier: string;
@@ -102,6 +107,13 @@ export interface TableData {
       name: string[];
     }>;
   }[];
+}
+
+interface TimePeriodQuery {
+  startYear: number;
+  startCode: string;
+  endYear: number;
+  endCode: string;
 }
 
 export default {
@@ -119,8 +131,7 @@ export default {
   filterPublicationSubjectMeta(
     query: {
       subjectId: string;
-      startYear?: number;
-      endYear?: number;
+      timePeriod?: TimePeriodQuery;
       geographicLevel?: string;
     } & PartialRecord<LocationLevelKeys, string[]>,
   ): Promise<PublicationSubjectMeta> {
@@ -131,8 +142,7 @@ export default {
       subjectId: string;
       filters: string[];
       indicators: string[];
-      startYear: number;
-      endYear: number;
+      timePeriod?: TimePeriodQuery;
       geographicLevel?: string;
     } & PartialRecord<LocationLevelKeys, string[]>,
   ): Promise<TableData> {
