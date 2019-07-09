@@ -2,7 +2,6 @@ import { FormTextInputProps } from '@common/components/form/FormTextInput';
 import classNames from 'classnames';
 import debounce from 'lodash/debounce';
 import React, { ChangeEvent } from 'react';
-import { logEvent } from '@frontend/services/googleAnalyticsService';
 import ErrorMessage from '../ErrorMessage';
 import styles from './FormTextSearchInput.module.scss';
 import createDescribedBy from './util/createDescribedBy';
@@ -25,7 +24,6 @@ const FormTextSearchInput = ({
 }: Props) => {
   const handleChange = debounce((event: ChangeEvent<HTMLInputElement>) => {
     if (onChange) {
-      logEvent(window.location.pathname, id, event.target.value);
       onChange(event);
     }
   }, debounceTime);
