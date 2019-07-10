@@ -93,7 +93,7 @@ export default class LineChartBlock extends Component<ChartProps> {
       axes.major,
       data.result,
       meta,
-    ).map(mapNameToNameLabel(labels));
+    ).map(mapNameToNameLabel(labels, meta.timePeriods, meta.locations));
 
     const keysForChart = getKeysForChart(chartData);
 

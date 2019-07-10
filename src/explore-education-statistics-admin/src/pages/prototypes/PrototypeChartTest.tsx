@@ -11,7 +11,7 @@ import MapBlock from '@common/modules/find-statistics/components/charts/MapBlock
 const PrototypeChartTest = () => {
   return (
     <PrototypePage wide>
-      <VerticalBarBlock {...Data.AbstractMissingDataChartProps} />
+      <LineChartBlock {...Data.AbstractMissingDataChartProps} />
     </PrototypePage>
   );
 };
