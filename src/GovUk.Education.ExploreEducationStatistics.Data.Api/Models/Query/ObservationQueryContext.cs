@@ -6,8 +6,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
     public class ObservationQueryContext
     {
         public long SubjectId { get; set; }
-        public int StartYear { get; set; }
-        public int EndYear { get; set; }
         public TimePeriodQuery TimePeriod { get; set; }
         public IEnumerable<long> Filters { get; set; }
         public GeographicLevel? GeographicLevel { get; set; }
@@ -31,8 +29,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
             return new SubjectMetaQueryContext
             {
                 SubjectId = SubjectId,
-                StartYear = StartYear,
-                EndYear = EndYear,
                 TimePeriod = TimePeriod,
                 GeographicLevel = GeographicLevel,
                 Indicators = Indicators,
