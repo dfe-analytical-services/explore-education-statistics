@@ -65,7 +65,7 @@ describe('DataBlock', () => {
             axes: {
               major: {
                 name: 'major',
-                groupBy: ['timePeriod'],
+                groupBy: 'timePeriods',
                 dataSets: [
                   { indicator: '23', filters: ['1', '2'] },
                   { indicator: '26', filters: ['1', '2'] },
@@ -74,7 +74,6 @@ describe('DataBlock', () => {
               },
               minor: {
                 name: 'minor',
-                groupBy: [],
                 dataSets: [],
               },
             },
@@ -140,7 +139,7 @@ describe('DataBlock', () => {
             axes: {
               major: {
                 name: 'major',
-                groupBy: ['timePeriod'],
+                groupBy: 'timePeriods',
                 dataSets: [
                   { indicator: '23', filters: ['1', '2'] },
                   { indicator: '26', filters: ['1', '2'] },
@@ -149,7 +148,6 @@ describe('DataBlock', () => {
               },
               minor: {
                 name: 'minor',
-                groupBy: [],
                 dataSets: [],
               },
             },
@@ -271,7 +269,7 @@ describe('DataBlock', () => {
             axes: {
               major: {
                 name: 'major',
-                groupBy: ['timePeriod'],
+                groupBy: 'timePeriods',
                 dataSets: [
                   { indicator: '23', filters: ['1', '2'] },
                   { indicator: '26', filters: ['1', '2'] },
@@ -280,7 +278,6 @@ describe('DataBlock', () => {
               },
               minor: {
                 name: 'minor',
-                groupBy: [],
                 dataSets: [],
               },
             },

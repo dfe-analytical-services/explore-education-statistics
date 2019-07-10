@@ -144,7 +144,7 @@ export const newApiHorizontalData: ChartProps = {
   axes: {
     major: {
       name: 'major',
-      groupBy: ['timePeriod'],
+      groupBy: 'timePeriods',
       dataSets: [
         { indicator: '23', filters: ['1'] },
         { indicator: '26', filters: ['1'] },
@@ -153,7 +153,7 @@ export const newApiHorizontalData: ChartProps = {
     },
     minor: {
       name: 'minor',
-      groupBy: [],
+
       dataSets: [],
     },
   },
@@ -177,7 +177,7 @@ export const newChartsApiDataBlock: DataBlockProps = {
       axes: {
         major: {
           name: 'major',
-          groupBy: ['timePeriod'],
+          groupBy: 'timePeriods',
           dataSets: [
             { indicator: '23', filters: ['1', '2'] },
             { indicator: '26', filters: ['1', '2'] },
@@ -187,7 +187,6 @@ export const newChartsApiDataBlock: DataBlockProps = {
         },
         minor: {
           name: 'minor',
-          groupBy: [],
           dataSets: [],
         },
       },

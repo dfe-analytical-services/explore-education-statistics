@@ -2936,7 +2936,7 @@ const AbstractChartProps: ChartProps = {
   axes: {
     major: {
       name: '23',
-      groupBy: ['timePeriod'],
+      groupBy: 'timePeriods',
       dataSets: [
         {
           indicator: '23',
@@ -2954,7 +2954,6 @@ const AbstractChartProps: ChartProps = {
     },
     minor: {
       name: 'minor',
-      groupBy: [],
       title: '',
       visible: true,
       dataSets: [],
@@ -3008,7 +3007,7 @@ const AbstractMultipleChartProps: ChartProps = {
   axes: {
     major: {
       name: '23',
-      groupBy: ['timePeriod'],
+      groupBy: 'timePeriods',
       dataSets: [
         {
           indicator: '23',
@@ -3026,7 +3025,7 @@ const AbstractMultipleChartProps: ChartProps = {
     },
     minor: {
       name: 'minor',
-      groupBy: [],
+
       title: '',
       visible: true,
       dataSets: [],
@@ -3067,7 +3066,7 @@ const AbstractLargeDataChartProps: ChartProps = {
   axes: {
     major: {
       name: '23',
-      groupBy: ['location'],
+      groupBy: 'locations',
       dataSets: [
         {
           indicator: '23',
@@ -3085,7 +3084,6 @@ const AbstractLargeDataChartProps: ChartProps = {
     },
     minor: {
       name: 'minor',
-      groupBy: [],
       title: '',
       visible: true,
       dataSets: [],
@@ -3147,7 +3145,7 @@ const AbstractMissingDataChartProps: ChartProps = {
   axes: {
     major: {
       name: '23',
-      groupBy: ['timePeriod'],
+      groupBy: 'timePeriods',
       dataSets: [
         {
           indicator: '23',
@@ -3165,7 +3163,6 @@ const AbstractMissingDataChartProps: ChartProps = {
     },
     minor: {
       name: 'minor',
-      groupBy: [],
       title: '',
       visible: true,
       dataSets: [],

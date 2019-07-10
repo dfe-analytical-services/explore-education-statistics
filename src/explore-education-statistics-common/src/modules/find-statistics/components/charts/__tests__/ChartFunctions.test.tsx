@@ -28,13 +28,14 @@ describe('ChartFunctions', () => {
 
     const minorAxisConfiguration: AxisConfigurationItem = {
       name: meta.indicators['26'].label,
-      groupBy: ['timePeriod'],
+      groupBy: 'timePeriods',
       dataSets: [dataSet26_1_72],
     };
 
     const chartData = ChartFunctions.createDataForAxis(
       minorAxisConfiguration,
       Data.responseData.result,
+      meta,
     );
 
     expect(chartData.sort((a, b) => a.name.localeCompare(b.name))).toEqual([
@@ -66,13 +67,14 @@ describe('ChartFunctions', () => {
 
     const minorAxisConfiguration: AxisConfigurationItem = {
       name: meta.indicators['26'].label,
-      groupBy: ['timePeriod'],
+      groupBy: 'timePeriods',
       dataSets: [dataSet26_1_72, dataSet23_1_72],
     };
 
     const chartData = ChartFunctions.createDataForAxis(
       minorAxisConfiguration,
       Data.responseData.result,
+      meta,
     );
 
     expect(chartData.sort((a, b) => a.name.localeCompare(b.name))).toEqual([
@@ -109,13 +111,14 @@ describe('ChartFunctions', () => {
 
     const minorAxisConfiguration: AxisConfigurationItem = {
       name: meta.indicators['26'].label,
-      groupBy: ['timePeriod'],
+      groupBy: 'timePeriods',
       dataSets: [dataSet26_1_71, dataSet26_1_72],
     };
 
     const chartData = ChartFunctions.createDataForAxis(
       minorAxisConfiguration,
       Data.responseData.result,
+      meta,
     );
 
     expect(chartData.sort((a, b) => a.name.localeCompare(b.name))).toEqual([
@@ -152,13 +155,14 @@ describe('ChartFunctions', () => {
 
     const axisConfig: AxisConfigurationItem = {
       name: meta.indicators['26'].label,
-      groupBy: ['timePeriod'],
+      groupBy: 'timePeriods',
       dataSets: [dataSet26_1_71, dataSet26_1_72],
     };
 
     const chartData = ChartFunctions.createDataForAxis(
       axisConfig,
       Data.responseWithMissingData.result,
+      meta,
     );
 
     expect(chartData.sort((a, b) => a.name.localeCompare(b.name))).toEqual([

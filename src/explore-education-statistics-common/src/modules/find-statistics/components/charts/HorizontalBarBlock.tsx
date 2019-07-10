@@ -40,7 +40,7 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
         id: 'yaxis',
         title: 'Y Axis',
         type: 'major',
-        defaultDataType: 'timePeriod',
+        defaultDataType: 'timePeriods',
       },
     ],
   };
@@ -48,6 +48,7 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
   public render() {
     const {
       data,
+      meta,
       height,
       width,
       referenceLines,
@@ -61,6 +62,7 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
     const chartData: ChartDataB[] = createDataForAxis(
       axes.major,
       data.result,
+      meta,
     ).map(mapNameToNameLabel(labels));
 
     const keysForChart = getKeysForChart(chartData);

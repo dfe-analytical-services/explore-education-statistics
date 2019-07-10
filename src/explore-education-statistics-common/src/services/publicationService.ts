@@ -90,9 +90,15 @@ export interface ChartConfiguration {
   symbol?: ChartSymbol;
 }
 
+export type AxisGroupBy =
+  | 'timePeriods'
+  | 'locations'
+  | 'filters'
+  | 'indicators';
+
 export interface AxisConfigurationItem {
   name: string;
-  groupBy: ('timePeriod' | 'location' | 'filters' | 'indicator')[];
+  groupBy?: AxisGroupBy;
   dataSets: ChartDataSet[];
 
   visible?: boolean;

@@ -46,7 +46,7 @@ function dataName(meta: DataBlockMetadata, selectedData: SelectedData) {
 function getReduceMetaDataForAxis(data: DataBlockResponse) {
   return (
     items: Dictionary<ChartConfiguration>,
-    groupName: string,
+    groupName?: string,
   ): Dictionary<ChartConfiguration> => {
     if (groupName === 'timePeriod') {
       return {
@@ -72,7 +72,7 @@ function generateAxesMetaData(
   return Object.values(axes).reduce(
     (allValues, axis) => ({
       ...allValues,
-      ...axis.groupBy.reduce(getReduceMetaDataForAxis(data), {}),
+      ...[axis.groupBy].reduce(getReduceMetaDataForAxis(data), {}),
     }),
     {},
   );
@@ -161,9 +161,7 @@ const ChartBuilder = ({ data }: Props) => {
 
           [axisDefinition.type]: {
             name: `${axisDefinition.title} (${axisDefinition.type} axis)`,
-            groupBy: axisDefinition.defaultDataType
-              ? [axisDefinition.defaultDataType]
-              : [],
+            groupBy: axisDefinition.defaultDataType,
             dataSets: axisDefinition.type === 'major' ? dataSets : [],
           },
         }),

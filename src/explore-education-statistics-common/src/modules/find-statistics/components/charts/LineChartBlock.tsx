@@ -72,7 +72,7 @@ export default class LineChartBlock extends Component<ChartProps> {
         id: 'xaxis',
         title: 'X Axis',
         type: 'major',
-        defaultDataType: 'timePeriod',
+        defaultDataType: 'timePeriods',
       },
       {
         id: 'yaxis',
@@ -83,7 +83,7 @@ export default class LineChartBlock extends Component<ChartProps> {
   };
 
   public render() {
-    const { data, height, axes, labels } = this.props;
+    const { data, meta, height, axes, labels } = this.props;
 
     const yAxisDomain: [AxisDomain, AxisDomain] = [-10, 10];
 
@@ -92,6 +92,7 @@ export default class LineChartBlock extends Component<ChartProps> {
     const chartData: ChartDataB[] = createDataForAxis(
       axes.major,
       data.result,
+      meta,
     ).map(mapNameToNameLabel(labels));
 
     const keysForChart = getKeysForChart(chartData);

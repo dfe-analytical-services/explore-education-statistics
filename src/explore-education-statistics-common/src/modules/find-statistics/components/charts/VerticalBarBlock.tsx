@@ -40,7 +40,7 @@ export default class VerticalBarBlock extends Component<StackedBarProps> {
         id: 'xaxis',
         title: 'X Axis',
         type: 'major',
-        defaultDataType: 'timePeriod',
+        defaultDataType: 'timePeriods',
       },
     ],
   };
@@ -53,6 +53,7 @@ export default class VerticalBarBlock extends Component<StackedBarProps> {
     const chartData: ChartDataB[] = createDataForAxis(
       axes.major,
       data.result,
+      meta,
     ).map(mapNameToNameLabel(labels, meta.timePeriods, meta.locations));
 
     const keysForChart = getKeysForChart(chartData);

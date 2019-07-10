@@ -6,6 +6,7 @@ import {
   ReferenceLine,
   AxisConfigurationItem,
   ChartSymbol,
+  AxisGroupBy,
 } from '@common/services/publicationService';
 import React, { ReactNode } from 'react';
 import {
@@ -91,7 +92,7 @@ export interface ChartDefinition {
     id: string;
     title: string;
     type: 'major' | 'minor';
-    defaultDataType?: 'timePeriod' | 'location' | 'filters' | 'indicator';
+    defaultDataType?: AxisGroupBy;
   }[];
 }
 
@@ -255,13 +256,14 @@ export interface ChartDataB {
 
 export function generateKeyFromDataSet(
   dataSet: ChartDataSet,
-  ignoringFields: string[] = [],
+  ignoringField?: AxisGroupBy,
 ) {
   const { indicator, filters, location, timePeriod } = {
     ...dataSet,
   };
 
-  const ignoreLocation = ignoringFields.includes('location');
+  const ignoreLocation = ignoringField === 'locations';
+
   const joinedLocations = [
     (!ignoreLocation &&
       location &&
@@ -288,41 +290,59 @@ export function generateKeyFromDataSet(
 
     ...joinedLocations,
 
-    (!ignoringFields.includes('timePeriod') && timePeriod) || '',
+    (ignoringField !== 'timePeriods' && timePeriod) || '',
   ].join('_');
 }
 
-function generateNameForAxisConfiguration(groupBy: string[], result: Result) {
-  return groupBy
-    .map(identifier => {
-      switch (identifier) {
-        case 'timePeriod':
-          return `${result.year}_${result.timeIdentifier}`;
-        case 'location':
-          return `${result.location.localAuthorityDistrict &&
-            result.location.localAuthorityDistrict.code}`;
-        default:
-          return '';
-      }
-    })
-    .join('_');
+function generateNameForAxisConfiguration(
+  result: Result,
+  groupBy?: AxisGroupBy,
+) {
+  switch (groupBy) {
+    case 'timePeriods':
+      return `${result.year}_${result.timeIdentifier}`;
+    case 'locations':
+      return `${result.location.localAuthorityDistrict &&
+        result.location.localAuthorityDistrict.code}`;
+    default:
+      return '';
+  }
 }
 
 function getChartDataForAxis(
   dataForAxis: Result[],
   dataSet: ChartDataSet,
-  groupBy: string[],
+  meta: DataBlockMetadata,
+  groupBy?: AxisGroupBy,
 ) {
-  return dataForAxis.reduce<ChartDataB[]>(
-    (r: ChartDataB[], result) => [
-      ...r,
-      {
-        name: generateNameForAxisConfiguration(groupBy, result),
-        [generateKeyFromDataSet(dataSet, groupBy)]:
-          result.measures[dataSet.indicator] || 'NaN',
-      },
-    ],
-    [],
+  const source = groupBy && meta[groupBy];
+
+  const initialNames = source && Object.keys(source);
+
+  if (initialNames === undefined || initialNames.length === 0) {
+    throw new Error(
+      'Invalid grouping specified for the data on the axis, unable to determine the groups',
+    );
+  }
+
+  const nameDictionary: Dictionary<ChartDataB> = initialNames.reduce(
+    (chartdata, n) => ({ ...chartdata, [n]: { name: n } }),
+    {},
+  );
+
+  return Object.values(
+    dataForAxis.reduce<Dictionary<ChartDataB>>((r, result) => {
+      const name = generateNameForAxisConfiguration(result, groupBy);
+
+      return {
+        ...r,
+        [name]: {
+          name,
+          [generateKeyFromDataSet(dataSet, groupBy)]:
+            result.measures[dataSet.indicator] || 'NaN',
+        },
+      };
+    }, nameDictionary),
   );
 }
 
@@ -352,6 +372,7 @@ function reduceCombineChartData(
 export function createDataForAxis(
   axisConfiguration: AxisConfigurationItem,
   results: Result[],
+  meta: DataBlockMetadata,
 ) {
   if (axisConfiguration === undefined || results === undefined) return [];
 
@@ -360,6 +381,7 @@ export function createDataForAxis(
       return getChartDataForAxis(
         results.filter(filterResultsForDataSet(dataSetForAxisConfiguration)),
         dataSetForAxisConfiguration,
+        meta,
         axisConfiguration.groupBy,
       ).reduce(reduceCombineChartData, [...combinedChartData]);
     },
