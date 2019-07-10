@@ -213,9 +213,6 @@
 													"pm.test(\"Fields are present\", function () {",
 													"    pm.expect(pm.response.to.have.jsonBody(\"filters\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"filters.SchoolType\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"filters.AcademyType\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"filters.AcademyOpenDate\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"filters.AllThroughSchoolFlag\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceFields\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceForPersistentAbsentees\"));",
@@ -375,9 +372,6 @@
 													"pm.test(\"Fields are present\", function () {",
 													"    pm.expect(pm.response.to.have.jsonBody(\"filters\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"filters.SchoolType\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"filters.AcademyType\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"filters.AcademyOpenDate\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"filters.AllThroughSchoolFlag\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceFields\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
@@ -578,6 +572,64 @@
 												"meta",
 												"subject",
 												"7"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Early learning goal underlying data 2013-2018",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"id": "f422cd8a-6b27-49d0-b9e6-3668bc4a0717",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"filters\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"filters.Characteristic\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.OverallRating\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.EarlyLearningGoal\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.GoodLevelOfDevelopment\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AreaOfLearning\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.country\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.options\"));",
+													"",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{data_api_url}}/meta/subject/10",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"meta",
+												"subject",
+												"10"
 											]
 										}
 									},
@@ -1070,9 +1122,6 @@
 													"pm.test(\"Fields are present\", function () {",
 													"    pm.expect(pm.response.to.have.jsonBody(\"filters\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"filters.SchoolType\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"filters.AcademyType\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"filters.AcademyOpenDate\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"filters.AllThroughSchoolFlag\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceFields\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceByReason\"));",
@@ -1091,16 +1140,8 @@
 													"    pm.expect(pm.response.json()).to.not.have.property(\"Characteristic\");",
 													"});",
 													"",
-													"pm.test(\"Number of academy type options should be correct\", function () { ",
-													"    pm.expect(pm.response.json().filters.AcademyType.options.Default.options.length).to.equal(1);",
-													"});",
-													"",
 													"pm.test(\"Number of school type default options should be correct\", function () { ",
 													"    pm.expect(pm.response.json().filters.SchoolType.options.Default.options.length).to.equal(2);",
-													"});",
-													"",
-													"pm.test(\"Number of AllThroughSchoolFlag default options should be correct\", function () {",
-													"    pm.expect(pm.response.json().filters.AllThroughSchoolFlag.options.Default.options.length).to.equal(1); ",
 													"});",
 													"",
 													"pm.test(\"Time periods options should be correct\", function() {",
@@ -2299,7 +2340,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "0c491405-7891-4f02-a4bb-47785d27fa09",
 												"exec": [
 													"respJson = pm.response.json()",
 													"",
@@ -3240,7 +3281,7 @@
 									"response": []
 								},
 								{
-									"name": "Tablebuilder - Absence by geographic level - School - * - Primary, Special AND Secondary Free School",
+									"name": "Tablebuilder - Absence by geographic level - School - * - Primary AND Special",
 									"event": [
 										{
 											"listen": "test",
@@ -3265,7 +3306,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"School\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n    \t{{FILT_StateFundedPrimary}}, {{FILT_Special}}, {{FILT_SecondaryFreeSchool}}\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"School\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n    \t{{FILT_StateFundedPrimary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3280,63 +3321,7 @@
 									"response": []
 								},
 								{
-									"name": "Tablebuilder - Absence by geographic level - School - * - Primary, Special AND Primary Free School, Special Free School, Secondary Free School",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
-												"exec": [
-													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-													"",
-													"pm.test(\"Compulsory fields are present\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-													"});",
-													"",
-													"pm.test(\"Release date is not empty\", function () {",
-													"    pm.expect(pm.response.json().releaseDate).to.not.equal(\"0001-01-01T00:00:00\");",
-													"});",
-													"",
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
-													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(144); });"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"type": "text",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"School\",\n    \"startYear\": 2016,\n    \"endYear\": 2016,\n    \"filters\" : [\n    \t{{FILT_StateFundedPrimary}}, {{FILT_Special}}, {{FILT_PrimaryFreeSchool}}, {{FILT_SpecialFreeSchool}}, {{FILT_SecondaryFreeSchool}}\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
-										},
-										"url": {
-											"raw": "{{data_api_url}}/tablebuilder",
-											"host": [
-												"{{data_api_url}}"
-											],
-											"path": [
-												"tablebuilder"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Tablebuilder - Absence by geographic level - School - Region Inner London - All Schools, Primary, And Academies Pri Sponsor, Not specified, Pri Free, Sec Sponsor, Special Free",
+									"name": "Tablebuilder - Absence by geographic level - School - Region Inner London - All Schools AND Primary",
 									"event": [
 										{
 											"listen": "test",
@@ -3359,7 +3344,7 @@
 													"",
 													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(673); });"
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(706); });"
 												],
 												"type": "text/javascript"
 											}
@@ -3377,7 +3362,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\t\"subjectId\": 2,\n\t\"geographicLevel\": \"School\",\n\t\"region\": [ \"E13000001\" ],\n\t\"startYear\": 2016,\n\t\"endYear\": 2016,\n\t\"filters\" : [\n\t\t{{FILT_AllSchools}}, {{FILT_StateFundedPrimary}}, {{FILT_PrimarySponsorLedAcademy}}, {{FILT_AcademyTypeNotSpecified}}, {{FILT_PrimaryFreeSchool}}, {{FILT_SecondarySponsorLedAcademy}}, {{FILT_SpecialFreeSchool}}\n\t],\n\t\"indicators\": [\n\t\t42, 61, 57, 59, 66, 111212\n\t]\n}"
+											"raw": "{\n\t\"subjectId\": 2,\n\t\"geographicLevel\": \"School\",\n\t\"region\": [ \"E13000001\" ],\n\t\"startYear\": 2016,\n\t\"endYear\": 2016,\n\t\"filters\" : [\n\t\t{{FILT_AllSchools}}, {{FILT_StateFundedPrimary}}\n\t],\n\t\"indicators\": [\n\t\t42, 61, 57, 59, 66, 111212\n\t]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3399,16 +3384,22 @@
 										"id": "6354b6c5-34ad-43c1-b2d7-45f006621e28",
 										"type": "text/javascript",
 										"exec": [
-											"pm.globals.set(\"FILT_StateFundedPrimary\", \"85\");",
-											"pm.globals.set(\"FILT_StateFundedSecondary\", \"86\");",
-											"pm.globals.set(\"FILT_Special\", \"87\");",
-											"pm.globals.set(\"FILT_AcademyTypeNotSpecified\", \"82\");",
-											"pm.globals.set(\"FILT_AllSchools\", \"81\");",
-											"pm.globals.set(\"FILT_PrimaryFreeSchool\", \"121\");",
-											"pm.globals.set(\"FILT_SecondaryFreeSchool\", \"100\");",
-											"pm.globals.set(\"FILT_SpecialFreeSchool\", \"179\");",
-											"pm.globals.set(\"FILT_PrimarySponsorLedAcademy\", \"125\");",
-											"pm.globals.set(\"FILT_SecondarySponsorLedAcademy\", \"140\");"
+											"pm.globals.set(\"FILT_AllSchools\", \"82\");",
+											"pm.globals.set(\"FILT_StateFundedPrimary\", \"83\");",
+											"pm.globals.set(\"FILT_StateFundedSecondary\", \"84\");",
+											"pm.globals.set(\"FILT_Special\", \"85\");",
+											"",
+											"// NOTE(mark): Saved in case the older values get restored!",
+											"// pm.globals.set(\"FILT_StateFundedPrimary\", \"85\");",
+											"// pm.globals.set(\"FILT_StateFundedSecondary\", \"86\");",
+											"// pm.globals.set(\"FILT_Special\", \"87\");",
+											"// pm.globals.set(\"FILT_AcademyTypeNotSpecified\", \"82\");",
+											"// pm.globals.set(\"FILT_AllSchools\", \"81\");",
+											"// pm.globals.set(\"FILT_PrimaryFreeSchool\", \"121\");",
+											"// pm.globals.set(\"FILT_SecondaryFreeSchool\", \"100\");",
+											"// pm.globals.set(\"FILT_SpecialFreeSchool\", \"179\");",
+											"// pm.globals.set(\"FILT_PrimarySponsorLedAcademy\", \"125\");",
+											"// pm.globals.set(\"FILT_SecondarySponsorLedAcademy\", \"140\");"
 										]
 									}
 								},
@@ -3604,9 +3595,14 @@
 										"id": "f28d57d5-c4a2-4c3c-a90c-e672993bec6d",
 										"type": "text/javascript",
 										"exec": [
-											"pm.globals.set(\"FILT_StateFundedPrimary\", \"258\");",
-											"pm.globals.set(\"FILT_StateFundedSecondary\", \"259\");",
-											"pm.globals.set(\"FILT_Special\", \"260\");"
+											"pm.globals.set(\"FILT_StateFundedPrimary\", \"86\");",
+											"pm.globals.set(\"FILT_StateFundedSecondary\", \"87\");",
+											"pm.globals.set(\"FILT_Special\", \"88\");",
+											"",
+											"// NOTE(mark): Saving in case these values get restored!",
+											"// pm.globals.set(\"FILT_StateFundedPrimary\", \"258\");",
+											"// pm.globals.set(\"FILT_StateFundedSecondary\", \"259\");",
+											"// pm.globals.set(\"FILT_Special\", \"260\");"
 										]
 									}
 								},
@@ -3730,8 +3726,12 @@
 										"id": "2cb67ee0-9a6d-4616-8d92-02a3aa5184e4",
 										"type": "text/javascript",
 										"exec": [
-											"pm.globals.set(\"FILT_StateFundedSecondary\", \"379\");",
-											"pm.globals.set(\"FILT_Special\", \"378\");"
+											"pm.globals.set(\"FILT_StateFundedSecondary\", \"91\");",
+											"pm.globals.set(\"FILT_Special\", \"92\");",
+											"",
+											"// NOTE(mark): Saved in case the values are restored",
+											"// pm.globals.set(\"FILT_StateFundedSecondary\", \"379\");",
+											"// pm.globals.set(\"FILT_Special\", \"378\");"
 										]
 									}
 								},
@@ -3899,7 +3899,7 @@
 										"id": "52135f05-03ae-4080-bbbb-dddcd7ee3e42",
 										"type": "text/javascript",
 										"exec": [
-											"pm.globals.set(\"FILT_PupilReferralUnit\", \"403\");"
+											"pm.globals.set(\"FILT_PupilReferralUnit\", \"93\");"
 										]
 									}
 								},
@@ -4023,9 +4023,14 @@
 										"id": "e04223f2-1e08-4ff6-9984-732c655dbcdf",
 										"type": "text/javascript",
 										"exec": [
-											"pm.globals.set(\"FILT_StateFundedPrimary\", \"405\");",
-											"pm.globals.set(\"FILT_StateFundedSecondary\", \"406\");",
-											"pm.globals.set(\"FILT_Special\", \"407\");"
+											"pm.globals.set(\"FILT_StateFundedPrimary\", \"95\");",
+											"pm.globals.set(\"FILT_StateFundedSecondary\", \"96\");",
+											"pm.globals.set(\"FILT_Special\", \"97\");",
+											"",
+											"// NOTE(mark): Saving in case values are restored!",
+											"// pm.globals.set(\"FILT_StateFundedPrimary\", \"405\");",
+											"// pm.globals.set(\"FILT_StateFundedSecondary\", \"406\");",
+											"// pm.globals.set(\"FILT_Special\", \"407\");"
 										]
 									}
 								},
@@ -4107,9 +4112,14 @@
 										"id": "49522da0-95a0-4ddf-9a8a-9ca103db1df2",
 										"type": "text/javascript",
 										"exec": [
-											"pm.globals.set(\"FILT_StateFundedPrimary\", \"456\");",
-											"pm.globals.set(\"FILT_StateFundedSecondary\", \"458\");",
-											"pm.globals.set(\"FILT_Special\", \"457\");"
+											"pm.globals.set(\"FILT_StateFundedPrimary\", \"146\");",
+											"pm.globals.set(\"FILT_StateFundedSecondary\", \"148\");",
+											"pm.globals.set(\"FILT_Special\", \"147\");",
+											"",
+											"// NOTE(mark): Saving in case values are restored!",
+											"// pm.globals.set(\"FILT_StateFundedPrimary\", \"456\");",
+											"// pm.globals.set(\"FILT_StateFundedSecondary\", \"458\");",
+											"// pm.globals.set(\"FILT_Special\", \"457\");"
 										]
 									}
 								},
@@ -4843,15 +4853,15 @@
 													"pm.test(\"Should have correct filters metaData\", function () {",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
 													"    pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(2); ",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters.884\"))",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters.885\"))",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters.\" + pm.globals.get(\"FILT_GenderFemale\")));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters.\" + pm.globals.get(\"FILT_GenderMale\")));",
 													"});",
 													"",
 													"pm.test(\"Should have correct indicators metaData\", function () {",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
 													"    pm.expect(Object.keys(respJson.metaData.indicators).length).to.equal(2);",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators.218\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators.219\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators.\" + pm.globals.get(\"INDI_TotalPointScoreBasedOnAssessmentRating\")));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators.\" + pm.globals.get(\"INDI_AveragePointScore\")));",
 													"});",
 													"",
 													"pm.test(\"Should have correct locations metaData\", function () {",
@@ -4874,9 +4884,11 @@
 													"    pm.expect(respJson.result.length).to.equal(24); ",
 													"});",
 													"",
+													"pm.globals.get(\"variable_key\");",
+													"",
 													"pm.test(\"All results have filter 884 or 885\", function () {",
 													"    for(var i = 0; i < pm.response.json().result.length; i++) {",
-													"        if(respJson.result[i].filters[0] !== \"884\" && respJson.result[i].filters[0] !== \"885\") {",
+													"        if(respJson.result[i].filters[0] !== pm.globals.get(\"FILT_GenderFemale\") && respJson.result[i].filters[0] !== pm.globals.get(\"FILT_GenderMale\")) {",
 													"            pm.expect(respJson.result[i].filters[0]).to.equal(-99999);",
 													"        }",
 													"    }",
@@ -4920,12 +4932,18 @@
 										"id": "fda225ab-c571-4c3a-908a-d9d99051e238",
 										"type": "text/javascript",
 										"exec": [
-											"pm.globals.set(\"FILT_All\", \"883\");",
-											"pm.globals.set(\"FILT_GenderFemale\", \"884\");",
-											"pm.globals.set(\"FILT_GenderMale\", \"885\");",
+											"pm.globals.set(\"FILT_All\", \"580\");",
+											"pm.globals.set(\"FILT_GenderFemale\", \"581\");",
+											"pm.globals.set(\"FILT_GenderMale\", \"582\");",
+											"pm.globals.set(\"INDI_TotalPointScoreBasedOnAssessmentRating\", \"266\");",
+											"pm.globals.set(\"INDI_AveragePointScore\", \"267\");",
 											"",
-											"pm.globals.set(\"INDI_TotalPointScoreBasedOnAssessmentRating\", \"218\");",
-											"pm.globals.set(\"INDI_AveragePointScore\", \"219\");"
+											"// NOTE(mark): Saved in case they're restored!",
+											"// pm.globals.set(\"FILT_All\", \"883\");",
+											"// pm.globals.set(\"FILT_GenderFemale\", \"884\");",
+											"// pm.globals.set(\"FILT_GenderMale\", \"885\");",
+											"// pm.globals.set(\"INDI_TotalPointScoreBasedOnAssessmentRating\", \"218\");",
+											"// pm.globals.set(\"INDI_AveragePointScore\", \"219\");"
 										]
 									}
 								},
