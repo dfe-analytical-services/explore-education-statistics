@@ -10,6 +10,7 @@ import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { SelectOption } from '@common/components/form/FormSelect';
+import { isValid } from 'date-fns';
 import Yup from '@common/lib/validation/yup';
 import { Dictionary } from '@common/types';
 import { FormikProps } from 'formik';
@@ -73,19 +74,12 @@ const ReleaseSetupEditPage = ({
   const [releaseTypes, setReleaseTypes] = useState<IdLabelPair[]>();
 
   useEffect(() => {
-    setReleaseSetupDetails(
-      DummyPublicationsData.getReleaseSetupDetails(releaseId),
-    );
+    const release = DummyPublicationsData.getReleaseSetupDetails(releaseId);
+
+    setReleaseSetupDetails(release);
     setTimePeriodCoverageGroups(DummyReferenceData.timePeriodCoverageGroups);
     setReleaseTypes(DummyReferenceData.releaseTypeOptions);
   }, [releaseId]);
-
-  const selectedTimePeriodCoverageGroup =
-    releaseSetupDetails && releaseSetupDetails.timePeriodCoverageCode
-      ? DummyReferenceData.findTimePeriodCoverageGroup(
-          releaseSetupDetails.timePeriodCoverageCode,
-        )
-      : null;
 
   const getTimePeriodOptions = (
     timePeriodGroups: TimePeriodCoverageGroup[],
@@ -130,6 +124,12 @@ const ReleaseSetupEditPage = ({
     );
   };
 
+  const selectedTimePeriodCoverageGroup =
+    releaseSetupDetails &&
+    DummyReferenceData.findTimePeriodCoverageGroup(
+      releaseSetupDetails.timePeriodCoverageCode,
+    );
+
   return (
     <ReleasePageTemplate
       releaseId={releaseId}
@@ -173,23 +173,54 @@ const ReleaseSetupEditPage = ({
             ),
           }}
           validationSchema={Yup.object<FormValues>({
-            timePeriodCoverageCode: Yup.string(),
-            timePeriodCoverageStartDate: Yup.object({
-              day: Yup.string(),
-              month: Yup.string(),
-              year: Yup.string(),
-            }),
+            timePeriodCoverageCode: Yup.string().required(
+              'Choose a time period',
+            ),
+            timePeriodCoverageStartDate: Yup.object<DayMonthYearValues>().when(
+              'timePeriodCoverageCode',
+              {
+                is: val =>
+                  DateType.DayMonthYear ===
+                  DummyReferenceData.findTimePeriodCoverageGroup(val)
+                    .startDateType,
+                then: Yup.object({
+                  day: Yup.string().required('Enter a start day'),
+                  month: Yup.string().required('Enter a start month'),
+                  year: Yup.string().required('Enter a start year'),
+                }),
+                otherwise: Yup.object({
+                  day: Yup.string(),
+                  month: Yup.string(),
+                  year: Yup.string(),
+                }),
+              },
+            ),
+            timePeriodCoverageStartDateYearOnly: Yup.string().when(
+              'timePeriodCoverageCode',
+              {
+                is: val =>
+                  DateType.Year ===
+                  DummyReferenceData.findTimePeriodCoverageGroup(val)
+                    .startDateType,
+                then: Yup.string().required('Enter a start year'),
+                otherwise: Yup.string(),
+              },
+            ),
             releaseTypeId: Yup.string(),
             scheduledReleaseDate: Yup.object({
-              day: Yup.string(),
-              month: Yup.string(),
-              year: Yup.string(),
-            }),
+              day: Yup.string().required('Enter a day'),
+              month: Yup.string().required('Enter a month'),
+              year: Yup.string().required('Enter a year'),
+            }).test('validDate', 'Enter a valid date', value =>
+              isValid(new Date(value.year, value.month, value.day)),
+            ),
             nextReleaseExpectedDate: Yup.object({
               day: Yup.string(),
               month: Yup.string(),
               year: Yup.string(),
-            }),
+            }).test('validDate', 'Enter a valid date', value =>
+              isValid(new Date(value.year, value.month, value.day)),
+            ),
           })}
           render={(form: FormikProps<FormValues>) => {
             return (
@@ -210,28 +241,51 @@ const ReleaseSetupEditPage = ({
                       });
                     }}
                   />
-                  {selectedTimePeriodCoverageGroup &&
+                  {form.values.timePeriodCoverageCode &&
                     DateType.Year ===
-                      selectedTimePeriodCoverageGroup.startDateType && (
+                      DummyReferenceData.findTimePeriodCoverageGroup(
+                        form.values.timePeriodCoverageCode,
+                      ).startDateType && (
                       <FormFieldTextInput<FormValues>
                         id={`${formId}-timePeriodCoverageStartYearOnly`}
                         name="timePeriodCoverageStartDateYearOnly"
-                        label={selectedTimePeriodCoverageGroup.startDateLabel}
+                        label={
+                          DummyReferenceData.findTimePeriodCoverageGroup(
+                            form.values.timePeriodCoverageCode,
+                          ).startDateLabel
+                        }
                         width={4}
+                        type="number"
+                        pattern="[0-9]*"
                       />
                     )}
-                  {selectedTimePeriodCoverageGroup &&
-                    form.values.timePeriodCoverageStartDate &&
+                  {form.values.timePeriodCoverageCode &&
                     DateType.DayMonthYear ===
-                      selectedTimePeriodCoverageGroup.startDateType && (
+                      DummyReferenceData.findTimePeriodCoverageGroup(
+                        form.values.timePeriodCoverageCode,
+                      ).startDateType && (
                       <FormFieldDayMonthYear
                         fieldName="timePeriodCoverageStartDate"
                         fieldsetLegend={
-                          selectedTimePeriodCoverageGroup.startDateLabel
+                          DummyReferenceData.findTimePeriodCoverageGroup(
+                            form.values.timePeriodCoverageCode,
+                          ).startDateLabel
                         }
-                        day={form.values.timePeriodCoverageStartDate.day}
-                        month={form.values.timePeriodCoverageStartDate.month}
-                        year={form.values.timePeriodCoverageStartDate.year}
+                        day={
+                          form.values.timePeriodCoverageStartDate
+                            ? form.values.timePeriodCoverageStartDate.day
+                            : ''
+                        }
+                        month={
+                          form.values.timePeriodCoverageStartDate
+                            ? form.values.timePeriodCoverageStartDate.month
+                            : ''
+                        }
+                        year={
+                          form.values.timePeriodCoverageStartDate
+                            ? form.values.timePeriodCoverageStartDate.year
+                            : ''
+                        }
                       />
                     )}
                 </FormFieldset>

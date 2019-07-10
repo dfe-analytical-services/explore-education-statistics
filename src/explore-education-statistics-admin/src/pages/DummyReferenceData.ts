@@ -166,8 +166,10 @@ const releaseTypeOptions: IdLabelPair[] = [
 ];
 
 const findTimePeriodCoverageGroup = (code: string) => {
-  return timePeriodCoverageGroups.find(group =>
-    group.options.map(option => option.id).some(id => id === code),
+  return (
+    timePeriodCoverageGroups.find(group =>
+      group.options.map(option => option.id).some(id => id === code),
+    ) || timePeriodCoverageGroups[0]
   );
 };
 
