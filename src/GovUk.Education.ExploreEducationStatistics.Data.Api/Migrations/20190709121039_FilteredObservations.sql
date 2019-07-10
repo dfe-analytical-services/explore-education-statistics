@@ -39,7 +39,8 @@ JOIN Location l on o.LocationId = l.Id
 WHERE o.SubjectId = @subjectId
 AND o.GeographicLevel = ISNULL(@geographicLevel, o.GeographicLevel)
 AND ofi.FilterItemId IN (SELECT id FROM @filterList)
-AND (@timePeriodCount = 0 OR o.Year IN (SELECT year from @timePeriodList))
+AND (@timePeriodCount = 0 OR
+     EXISTS(SELECT 1 from @timePeriodList t WHERE t.year = o.Year AND t.timeIdentifier = o.TimeIdentifier))
 AND (@countriesCount = 0 OR l.Country_Code IN (SELECT id from @countriesList))
 AND (@institutionCount = 0 OR l.Institution_Code IN (SELECT id from @institutionsList))
 AND (@localAuthoritiesCount = 0 OR l.LocalAuthority_Code IN (SELECT id from @localAuthorityList))
