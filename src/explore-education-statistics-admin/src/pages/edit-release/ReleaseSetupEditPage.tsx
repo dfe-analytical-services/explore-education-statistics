@@ -169,7 +169,7 @@ const ReleaseSetupEditPage = ({
               releaseSetupDetails.scheduledReleaseDate,
             ),
             nextReleaseExpectedDate: dateToDayMonthYear(
-              releaseSetupDetails.nextExpectedReleaseDate,
+              releaseSetupDetails.nextReleaseExpectedDate,
             ),
           }}
           validationSchema={Yup.object<FormValues>({

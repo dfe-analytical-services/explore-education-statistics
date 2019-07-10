@@ -47,7 +47,7 @@ const ReleaseSetupPage = ({ match }: RouteComponentProps<MatchProps>) => {
             <SummaryListItem term="Publication title">
               {releaseSetupDetails.publicationTitle}
             </SummaryListItem>
-            <SummaryListItem term="Coverage type">
+            <SummaryListItem term="Time period">
               {selectedTimePeriodCoverageGroup &&
                 selectedTimePeriodCoverageGroup.label}
             </SummaryListItem>
@@ -70,6 +70,13 @@ const ReleaseSetupPage = ({ match }: RouteComponentProps<MatchProps>) => {
               <FormattedDate>
                 {releaseSetupDetails.scheduledReleaseDate}
               </FormattedDate>
+            </SummaryListItem>
+            <SummaryListItem term="Next release expected">
+              {releaseSetupDetails.nextReleaseExpectedDate && (
+                <FormattedDate>
+                  {releaseSetupDetails.nextReleaseExpectedDate}
+                </FormattedDate>
+              )}
             </SummaryListItem>
             <SummaryListItem term="Release type">
               {releaseSetupDetails.releaseType.label}

@@ -95,5 +95,5 @@ export interface ReleaseSetupDetails {
   releaseType: IdLabelPair;
   leadStatisticianName: string;
   scheduledReleaseDate: Date;
-  nextExpectedReleaseDate?: Date;
+  nextReleaseExpectedDate?: Date;
 }
