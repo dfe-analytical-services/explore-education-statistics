@@ -3,6 +3,7 @@ import classNames from 'classnames';
 import { UrlLike } from 'next-server/router';
 import RouterLink from 'next/link';
 import React, { AnchorHTMLAttributes, ReactNode } from 'react';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
 
 export type LinkProps = {
   as?: string | UrlLike;
@@ -11,7 +12,15 @@ export type LinkProps = {
   prefetch?: boolean;
   to?: string | UrlLike;
   unvisited?: boolean;
-} & AnchorHTMLAttributes<HTMLAnchorElement>;
+} & AnchorHTMLAttributes<HTMLAnchorElement> &
+  AnalyticProps;
+
+export interface AnalyticProps {
+  analytics?: {
+    category: string;
+    action: string;
+  };
+}
 
 const Link = ({
   as,
@@ -20,13 +29,25 @@ const Link = ({
   prefetch,
   to,
   href,
+  analytics,
   unvisited = false,
   ...props
 }: LinkProps) => {
+  const handleAnalytics = () => {
+    if (analytics) {
+      logEvent(
+        analytics.category || window.location.pathname,
+        analytics.action,
+      );
+    }
+  };
+
   return (
     <RouterLink href={href || to} as={as} prefetch={prefetch}>
       <a
         {...props}
+        role="link"
+        tabIndex={-1}
         className={classNames(
           'govuk-link',
           {
@@ -34,6 +55,14 @@ const Link = ({
           },
           className,
         )}
+        onClick={() => {
+          handleAnalytics();
+        }}
+        onKeyDown={event => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            handleAnalytics();
+          }
+        }}
       >
         {children}
       </a>
