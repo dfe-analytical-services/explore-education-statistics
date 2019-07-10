@@ -53,13 +53,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions
 
             for (var i = 0; i < array.GetLength(0); i++)
             {
+                var row = dataTable.NewRow();
                 for (var j = 0; j < array.GetLength(1); j++)
                 {
-                    var row = dataTable.NewRow();
                     var x = array[i, j];
                     row[x.Column] = x.Value;
-                    dataTable.Rows.Add(row);
                 }
+                dataTable.Rows.Add(row);
             }
         }
 
