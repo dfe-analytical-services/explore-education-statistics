@@ -87,7 +87,7 @@ const ReleaseSetupEditPage = ({
     const optGroups: Dictionary<SelectOption[]> = {};
     timePeriodGroups.forEach(group => {
       optGroups[group.label] = group.options.map(option => ({
-        label: option.label,
+        label: `${option.label} - ${option.id}`,
         value: option.id,
       }));
     });
