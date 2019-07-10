@@ -45,21 +45,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private static Dictionary<string, TimePeriodMetaViewModel> GetTimePeriodRange(
             IEnumerable<Observation> observations)
         {
-            var timePeriods = observations.Select(o => new {o.TimeIdentifier, o.Year})
+            var timePeriods = observations.Select(o => (o.Year, o.TimeIdentifier))
                 .Distinct()
                 .OrderBy(tuple => tuple.Year)
-                .ThenBy(tuple => tuple.TimeIdentifier);
+                .ThenBy(tuple => tuple.TimeIdentifier)
+                .ToList();
 
-            // TODO DFE-886 determine minimum and maximum time period from the observations
-            var minYear = 2012;
-            var minIdentifier = TimeIdentifier.SixHalfTerms;
-            var maxYear = 2018;
-            var maxIdentifier = TimeIdentifier.SixHalfTerms;
+            var first = timePeriods.First();
+            var last = timePeriods.Last();
 
-            var range = TimePeriodUtil.Range(minYear, minIdentifier, maxYear, maxIdentifier);
+            var range = TimePeriodUtil.Range(first.Year, first.TimeIdentifier, last.Year, last.TimeIdentifier);
 
             // TODO DFE-886 there could be values in the range that the table tool doesn’t want returning
-            
+
             return range.ToDictionary(
                 tuple => tuple.GetTimePeriod(),
                 tuple => new TimePeriodMetaViewModel
