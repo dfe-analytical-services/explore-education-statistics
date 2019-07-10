@@ -6,8 +6,8 @@ import {
   IndicatorOption,
   TableData,
 } from '@common/services/tableBuilderService';
-import TimePeriod from '@common/services/types/TimePeriod';
 import { Dictionary } from '@common/types/util';
+import TimePeriod from '@frontend/modules/table-tool/components/types/TimePeriod';
 import sortBy from 'lodash/sortBy';
 import React, { memo, useEffect, useRef, useState } from 'react';
 import FixedMultiHeaderDataTable from './FixedMultiHeaderDataTable';
