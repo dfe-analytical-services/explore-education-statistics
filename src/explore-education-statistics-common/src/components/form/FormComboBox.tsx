@@ -157,12 +157,12 @@ const FormComboBox = ({
       ref={containerRef}
     >
       <div
+        // eslint-disable-next-line jsx-a11y/role-has-required-aria-props
+        role="combobox"
         aria-expanded={renderedOptions ? renderedOptions.length > 0 : false}
         aria-owns={`${id}-options`}
         aria-haspopup="listbox"
         className="govuk-form-group"
-        // eslint-disable-next-line jsx-a11y/role-has-required-aria-props
-        role="combobox"
       >
         <label
           className={classNames('govuk-label', classes.inputLabel)}

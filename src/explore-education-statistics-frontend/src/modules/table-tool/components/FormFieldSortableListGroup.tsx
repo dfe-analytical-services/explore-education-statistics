@@ -50,10 +50,10 @@ const FormFieldSortableListGroup = <T extends Dictionary<SortableOption[][]>>({
 
                     {form.values[name].map((_, index: number) => (
                       <Draggable
-                        draggableId={`${name}-${index}`}
-                        index={index}
                         // eslint-disable-next-line react/no-array-index-key
                         key={index}
+                        draggableId={`${name}-${index}`}
+                        index={index}
                       >
                         {(draggableProvided, draggableSnapshot) => (
                           <div
