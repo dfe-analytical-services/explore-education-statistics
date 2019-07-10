@@ -4,7 +4,7 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import { LoginContext } from '@admin/components/Login';
 import DummyPublicationsData from '@admin/pages/DummyPublicationsData';
-import { Publication } from '@admin/services/publicationService';
+import { Publication } from '@admin/services/types/types';
 import AdminDashboardPublicationsTab from '@admin/components/AdminDashboardPublicationsTab';
 import Link from '../components/Link';
 import Page from '../components/Page';

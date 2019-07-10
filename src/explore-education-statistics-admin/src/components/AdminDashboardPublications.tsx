@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from '@admin/components/Link';
 import DashboardReleaseList from '@admin/components/DashboardReleaseList';
-import { Publication } from '@admin/services/publicationService';
+import { Publication } from '@admin/services/types/types';
 
 export interface AdminDashboardPublicationsProps {
   publication: Publication;

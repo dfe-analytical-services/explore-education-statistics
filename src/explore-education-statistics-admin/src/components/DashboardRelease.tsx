@@ -4,7 +4,7 @@ import Link from '@admin/components/Link';
 import { format } from 'date-fns';
 import Details from '@common/components/Details';
 import { LoginContext } from '@admin/components/Login';
-import { ApprovalStatus, Release } from '@admin/services/publicationService';
+import { ApprovalStatus, Release } from '@admin/services/types/types';
 import { setupRoute } from '@admin/routes/releaseRoutes';
 
 const getLiveLatestLabel = (isLive: boolean, isLatest: boolean) => {

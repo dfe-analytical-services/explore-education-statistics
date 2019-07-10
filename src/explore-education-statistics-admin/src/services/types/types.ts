@@ -1,4 +1,4 @@
-import { User } from '@admin/services/PrototypeLoginService';
+import { User } from '../PrototypeLoginService';
 
 export interface IdLabelPair {
   id: string;
@@ -49,7 +49,7 @@ export interface Release {
   id: string;
   releaseName: string;
   timePeriodCoverage: TimePeriodCoverage;
-  scheduledReleaseDate: Date;
+  scheduledReleaseDate: DayMonthYearValues;
   nextReleaseExpectedDate: Date;
   releaseType: IdLabelPair;
   slug: string;
@@ -94,6 +94,31 @@ export interface ReleaseSetupDetails {
   timePeriodCoverageStartDate: Date;
   releaseType: IdLabelPair;
   leadStatisticianName: string;
-  scheduledReleaseDate: Date;
+  scheduledReleaseDate: DayMonthYearValues;
   nextReleaseExpectedDate?: Date;
 }
+
+export interface DayMonthYearValues {
+  day?: number;
+  month?: number;
+  year?: number;
+}
+
+export const dateToDayMonthYear = (date?: Date) => {
+  return {
+    day: date && date.getDate(),
+    month: date && date.getMonth() + 1,
+    year: date && date.getFullYear(),
+  };
+};
+
+export const dayMonthYearToDate = (dmy: DayMonthYearValues) => {
+  if (!(dmy.day && dmy.month && dmy.year)) {
+    throw Error(
+      `Couldn't convert DayMonthYearValues ${JSON.stringify(
+        dmy,
+      )} to Date - missing required value`,
+    );
+  }
+  return new Date(dmy.year, dmy.month - 1, dmy.day);
+};

@@ -6,7 +6,7 @@ import {
   ReleaseDataType,
   ReleaseSetupDetails,
   Topic,
-} from '@admin/services/publicationService';
+} from '@admin/services/types/types';
 import { PrototypeLoginService } from '@admin/services/PrototypeLoginService';
 
 const methodologies: IdLabelPair[] = [
@@ -47,7 +47,11 @@ const releaseTemplate: Release = {
     code: 'AYQ1Q4',
     startDate: new Date('2017-01-01'),
   },
-  scheduledReleaseDate: new Date('2020-09-20'),
+  scheduledReleaseDate: {
+    day: 20,
+    month: 9,
+    year: 2020,
+  },
   nextReleaseExpectedDate: new Date('2021-09-20'),
   status: {
     approvalStatus: ApprovalStatus.Approved,
