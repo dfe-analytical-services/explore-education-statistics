@@ -9,7 +9,6 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
 import { PublicationSubjectMeta } from '@common/services/tableBuilderService';
-import TimePeriod from '@common/services/types/TimePeriod';
 import useResetFormOnPreviousStep from '@frontend/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
 import { FormikProps } from 'formik';
 import React, { useRef } from 'react';
@@ -56,6 +55,14 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
       };
     }),
   ];
+
+  const getOptionLabel = (optionValue: string) => {
+    const matchingOption = timePeriodOptions.find(
+      option => option.value === optionValue,
+    );
+
+    return matchingOption ? matchingOption.label : '';
+  };
 
   const stepHeading = (
     <WizardStepHeading {...props} fieldsetHeading>
@@ -156,12 +163,10 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
             {stepHeading}
             <SummaryList noBorder>
               <SummaryListItem term="Start date">
-                {form.values.start &&
-                  TimePeriod.fromString(form.values.start).label}
+                {form.values.start && getOptionLabel(form.values.start)}
               </SummaryListItem>
               <SummaryListItem term="End date">
-                {form.values.end &&
-                  TimePeriod.fromString(form.values.end).label}
+                {form.values.end && getOptionLabel(form.values.end)}
               </SummaryListItem>
             </SummaryList>
           </>
