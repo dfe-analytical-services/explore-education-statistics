@@ -117,9 +117,7 @@ const TimePeriodDataTable = ({
         return (
           aggregateFilters.every(filter => {
             return result.filters.includes(filter.value);
-          }) &&
-          result.timeIdentifier === time.code &&
-          result.year === time.year
+          }) && result.timePeriod === time.value
         );
       });
 

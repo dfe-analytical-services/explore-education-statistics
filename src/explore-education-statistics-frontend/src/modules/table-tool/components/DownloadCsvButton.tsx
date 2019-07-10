@@ -53,9 +53,7 @@ const DownloadCsvButton = ({
           return Boolean(
             filterOptions.every(filter =>
               result.filters.includes(filter.value),
-            ) &&
-              result.timeIdentifier === timePeriod.code &&
-              result.year === timePeriod.year,
+            ) && result.timePeriod === timePeriod.value,
           );
         });
 

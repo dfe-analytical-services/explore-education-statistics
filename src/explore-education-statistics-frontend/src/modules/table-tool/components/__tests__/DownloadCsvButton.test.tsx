@@ -111,83 +111,75 @@ describe('DownloadCsvButton', () => {
         results={[
           {
             filters: ['gender_male', 'school_primary'],
-            timeIdentifier: 'AY',
+            timePeriod: '2014_AY',
             location: {},
             measures: {
               authAbsRate: '1.2',
               authAbsSess: '2',
             },
-            year: 2014,
           },
           {
             filters: ['gender_male', 'school_secondary'],
-            timeIdentifier: 'AY',
+            timePeriod: '2014_AY',
             location: {},
             measures: {
               authAbsRate: '3.4',
               authAbsSess: '4',
             },
-            year: 2014,
           },
           {
             filters: ['gender_female', 'school_primary'],
-            timeIdentifier: 'AY',
+            timePeriod: '2014_AY',
             location: {},
             measures: {
               authAbsRate: '5.6',
               authAbsSess: '6',
             },
-            year: 2014,
           },
           {
             filters: ['gender_female', 'school_secondary'],
-            timeIdentifier: 'AY',
+            timePeriod: '2014_AY',
             location: {},
             measures: {
               authAbsRate: '7.8',
               authAbsSess: '8',
             },
-            year: 2014,
           },
           {
             filters: ['gender_male', 'school_primary'],
-            timeIdentifier: 'AY',
+            timePeriod: '2015_AY',
             location: {},
             measures: {
               authAbsRate: '9',
               authAbsSess: '10',
             },
-            year: 2015,
           },
           {
             filters: ['gender_male', 'school_secondary'],
-            timeIdentifier: 'AY',
+            timePeriod: '2015_AY',
             location: {},
             measures: {
               authAbsRate: '11.2',
               authAbsSess: '12',
             },
-            year: 2015,
           },
           {
             filters: ['gender_female', 'school_primary'],
-            timeIdentifier: 'AY',
+            timePeriod: '2015_AY',
             location: {},
             measures: {
               authAbsRate: '13.4',
               authAbsSess: '14',
             },
-            year: 2015,
           },
           {
             filters: ['gender_female', 'school_secondary'],
-            timeIdentifier: 'AY',
+            timePeriod: '2015_AY',
             location: {},
             measures: {
               authAbsRate: '15.6',
               authAbsSess: '16',
             },
-            year: 2015,
           },
         ]}
       />,
@@ -230,13 +222,12 @@ describe('DownloadCsvButton', () => {
         results={[
           {
             filters: ['gender_female', 'school_primary'],
-            timeIdentifier: 'AY',
+            timePeriod: '2015_AY',
             location: {},
             measures: {
               authAbsRate: '12300000',
               authAbsSess: '44255667.2356',
             },
-            year: 2015,
           },
         ]}
       />,
@@ -282,13 +273,12 @@ describe('DownloadCsvButton', () => {
         results={[
           {
             filters: ['gender_female', 'school_primary'],
-            timeIdentifier: 'AY',
+            timePeriod: '2015_AY',
             location: {},
             measures: {
               authAbsRate: '13.4',
               authAbsSess: 'x',
             },
-            year: 2015,
           },
         ]}
       />,

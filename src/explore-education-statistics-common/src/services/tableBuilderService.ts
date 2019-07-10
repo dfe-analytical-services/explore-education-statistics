@@ -98,8 +98,7 @@ export interface TableData {
     year: number;
   }[];
   result: {
-    year: number;
-    timeIdentifier: string;
+    timePeriod: string;
     measures: Dictionary<string>;
     filters: string[];
     location: Dictionary<{
