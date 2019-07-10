@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions
         private static T[,] ToMultidimensionalArray<T>(this T[][] jaggedArray)
         {
             var rows = jaggedArray.Length;
-            var cols = jaggedArray.Max(subArray => subArray.Length);
+            var cols = rows == 0 ? 0 : jaggedArray.Max(subArray => subArray.Length);
             var array = new T[rows, cols];
             for (var i = 0; i < rows; i++)
             {
