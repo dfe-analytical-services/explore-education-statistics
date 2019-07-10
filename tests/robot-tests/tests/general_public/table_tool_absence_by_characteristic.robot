@@ -81,51 +81,51 @@ Validate Gender female Authorised absence rate row
     [Tags]  HappyPath
     user checks results table contains  3    1     Gender female
     user checks results table contains  3    2     Authorised absence rate
-    user checks results table contains  3    3     4.7%
-    user checks results table contains  3    4     3.4%
-    user checks results table contains  3    5     3.4%
-    user checks results table contains  3    6     3.5%
+    user checks results table contains  3    3     4.2%
+    user checks results table contains  3    4     3.5%
+    user checks results table contains  3    5     3.5%
+    user checks results table contains  3    6     3.4%
 
 Validate Gender female Unauthorised absence rate row
     [Tags]  HappyPath
     user checks results table contains  4    1     Overall absence rate
-    user checks results table contains  4    2     5.6%
-    user checks results table contains  4    3     4.4%
-    user checks results table contains  4    4     4.2%
-    user checks results table contains  4    5     4.4%
+    user checks results table contains  4    2     5.3%
+    user checks results table contains  4    3     4.5%
+    user checks results table contains  4    4     4.6%
+    user checks results table contains  4    5     4.5%
 
 Validate Gender female Overall absence rate row
     [Tags]  HappyPath
     user checks results table contains  5    1     Unauthorised absence rate
-    user checks results table contains  5    2     0.9%
-    user checks results table contains  5    3     1%
-    user checks results table contains  5    4     0.8%
-    user checks results table contains  5    5     0.9%
+    user checks results table contains  5    2     1.1%
+    user checks results table contains  5    3     1.1%
+    user checks results table contains  5    4     1.1%
+    user checks results table contains  5    5     1.1%
 
 Validate Gender male Authorised absence rate row
     [Tags]  HappyPath
     user checks results table contains  6    1     Gender male
     user checks results table contains  6    2     Authorised absence rate
-    user checks results table contains  6    3     4.6%
-    user checks results table contains  6    4     3.5%
-    user checks results table contains  6    5     3.2%
-    user checks results table contains  6    6     3.6%
+    user checks results table contains  6    3     4.2%
+    user checks results table contains  6    4     3.4%
+    user checks results table contains  6    5     3.6%
+    user checks results table contains  6    6     3.5%
 
 Validate Gender male Unauthorised absence rate row
     [Tags]  HappyPath
     user checks results table contains  7    1     Overall absence rate
-    user checks results table contains  7    2     5.4%
-    user checks results table contains  7    3     4.6%
-    user checks results table contains  7    4     3.9%
-    user checks results table contains  7    5     4.5%
+    user checks results table contains  7    2     5.2%
+    user checks results table contains  7    3     4.5%
+    user checks results table contains  7    4     4.6%
+    user checks results table contains  7    5     4.6%
 
 Validate Gender male Overall absence rate row
     [Tags]  HappyPath
     user checks results table contains  8    1     Unauthorised absence rate
-    user checks results table contains  8    2     0.8%
-    user checks results table contains  8    3     1.2%
-    user checks results table contains  8    4     0.7%
-    user checks results table contains  8    5     0.9%
+    user checks results table contains  8    2     1.1%
+    user checks results table contains  8    3     1.1%
+    user checks results table contains  8    4     1.1%
+    user checks results table contains  8    5     1.1%
 
 Reorder results
     [Tags]  HappyPath
@@ -161,40 +161,40 @@ Validate All schools Overall absence rate row after reordering
     user checks results table contains  3    1     All schools
     user checks results table contains  3    2     Overall absence rate
 
-    user checks results table contains  3    3     4.4%
-    user checks results table contains  3    4     4.2%
-    user checks results table contains  3    5     4.4%
-    user checks results table contains  3    6     5.6%
+    user checks results table contains  3    3     4.5%
+    user checks results table contains  3    4     4.6%
+    user checks results table contains  3    5     4.5%
+    user checks results table contains  3    6     5.3%
 
-    user checks results table contains  3    7     4.6%
-    user checks results table contains  3    8     3.9%
-    user checks results table contains  3    9     4.5%
-    user checks results table contains  3    10    5.4%
+    user checks results table contains  3    7     4.5%
+    user checks results table contains  3    8     4.6%
+    user checks results table contains  3    9     4.6%
+    user checks results table contains  3    10    5.2%
 
 Validate All schools Unauthorised absence rate row after reordering
     [Tags]  HappyPath
     user checks results table contains  4    1     Unauthorised absence rate
 
-    user checks results table contains  4    2     1%
-    user checks results table contains  4    3     0.8%
-    user checks results table contains  4    4     0.9%
-    user checks results table contains  4    5     0.9%
+    user checks results table contains  4    2     1.1%
+    user checks results table contains  4    3     1.1%
+    user checks results table contains  4    4     1.1%
+    user checks results table contains  4    5     1.1%
 
-    user checks results table contains  4    6     1.2%
-    user checks results table contains  4    7     0.7%
-    user checks results table contains  4    8     0.9%
-    user checks results table contains  4    9     0.8%
+    user checks results table contains  4    6     1.1%
+    user checks results table contains  4    7     1.1%
+    user checks results table contains  4    8     1.1%
+    user checks results table contains  4    9     1.1%
 
 Validate All schools Authorised absence rate row after reordering
     [Tags]  HappyPath
     user checks results table contains  5    1     Authorised absence rate
 
-    user checks results table contains  5    2     3.4%
-    user checks results table contains  5    3     3.4%
-    user checks results table contains  5    4     3.5%
-    user checks results table contains  5    5     4.7%
+    user checks results table contains  5    2     3.5%
+    user checks results table contains  5    3     3.5%
+    user checks results table contains  5    4     3.4%
+    user checks results table contains  5    5     4.2%
 
-    user checks results table contains  5    6     3.5%
-    user checks results table contains  5    7     3.2%
-    user checks results table contains  5    8     3.6%
-    user checks results table contains  5    9     4.6%
+    user checks results table contains  5    6     3.4%
+    user checks results table contains  5    7     3.6%
+    user checks results table contains  5    8     3.5%
+    user checks results table contains  5    9     4.2%
