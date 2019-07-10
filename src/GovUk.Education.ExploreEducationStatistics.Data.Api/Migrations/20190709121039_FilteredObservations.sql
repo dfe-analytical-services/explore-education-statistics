@@ -14,7 +14,7 @@ ALTER PROCEDURE FilteredObservations
     @regionsList IdListVarcharType READONLY,
     @rscRegionsList IdListVarcharType READONLY,
     @sponsorList IdListVarcharType READONLY,
-    @wardsList IdListVarcharType READONLY,    
+    @wardsList IdListVarcharType READONLY,
     @filterList IdListIntegerType READONLY
 AS
 DECLARE
