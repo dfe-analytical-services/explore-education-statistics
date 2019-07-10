@@ -8,11 +8,13 @@ import tableBuilderService, {
   TableData,
   ThemeMeta,
 } from '@common/services/tableBuilderService';
-import TimePeriod, { TimePeriodCode } from '@common/services/types/TimePeriod';
 import { Dictionary } from '@common/types/util';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PreviousStepModalConfirm from '@frontend/modules/table-tool/components/PreviousStepModalConfirm';
+import TimePeriod, {
+  parseYearCodeTuple,
+} from '@frontend/modules/table-tool/components/types/TimePeriod';
 import mapValues from 'lodash/mapValues';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
@@ -57,8 +59,10 @@ interface Props {
 
 interface State {
   locations: Dictionary<FilterOption[]>;
-  startTime?: TimePeriod;
-  endTime?: TimePeriod;
+  startYear?: number;
+  startCode?: string;
+  endYear?: number;
+  endCode?: string;
   filters: Dictionary<FilterOption[]>;
   indicators: IndicatorOption[];
   publication?: PublicationOptions['topics'][0]['publications'][0];
@@ -175,8 +179,8 @@ class TableToolPage extends Component<Props, State> {
   private handleTimePeriodFormSubmit: TimePeriodFormSubmitHandler = async values => {
     const { subjectId, locations } = this.state;
 
-    const start = TimePeriod.fromString(values.start);
-    const end = TimePeriod.fromString(values.end);
+    const [startYear, startCode] = parseYearCodeTuple(values.start);
+    const [endYear, endCode] = parseYearCodeTuple(values.end);
 
     const subjectMeta = await tableBuilderService.filterPublicationSubjectMeta({
       ...mapValues(locations, locationLevel =>
@@ -184,16 +188,18 @@ class TableToolPage extends Component<Props, State> {
       ),
       subjectId,
       timePeriod: {
-        startYear: start.year,
-        startCode: start.code,
-        endYear: end.year,
-        endCode: end.code,
+        startYear,
+        startCode,
+        endYear,
+        endCode,
       },
     });
 
     this.setState(prevState => ({
-      startTime: start,
-      endTime: end,
+      startYear,
+      startCode,
+      endYear,
+      endCode,
       subjectMeta: {
         ...prevState.subjectMeta,
         filters: subjectMeta.filters,
@@ -207,13 +213,15 @@ class TableToolPage extends Component<Props, State> {
   }) => {
     const {
       subjectId,
-      startTime,
-      endTime,
+      startYear,
+      startCode,
+      endYear,
+      endCode,
       locations,
       subjectMeta,
     } = this.state;
 
-    if (!startTime || !endTime) {
+    if (!startYear || !startCode || !endYear || !endCode) {
       return;
     }
 
@@ -225,10 +233,10 @@ class TableToolPage extends Component<Props, State> {
       indicators,
       filters: Object.values(filters).flat(),
       timePeriod: {
-        startYear: startTime.year,
-        startCode: startTime.code,
-        endYear: endTime.year,
-        endCode: endTime.code,
+        startYear,
+        startCode,
+        endYear,
+        endCode,
       },
     });
 
@@ -246,8 +254,7 @@ class TableToolPage extends Component<Props, State> {
       ),
       indicators: indicators.map(indicator => indicatorsByValue[indicator]),
       timePeriodRange: timePeriodRange.map(
-        timePeriod =>
-          new TimePeriod(timePeriod.year, timePeriod.code as TimePeriodCode),
+        timePeriod => new TimePeriod(timePeriod),
       ),
       tableData: result,
     });

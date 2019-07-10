@@ -6,8 +6,8 @@ import {
   PublicationSubjectMeta,
   TableData,
 } from '@common/services/tableBuilderService';
-import TimePeriod from '@common/services/types/TimePeriod';
 import { Dictionary } from '@common/types';
+import TimePeriod from '@frontend/modules/table-tool/components/types/TimePeriod';
 import { saveAs } from 'file-saver';
 import Papa from 'papaparse';
 import React from 'react';
