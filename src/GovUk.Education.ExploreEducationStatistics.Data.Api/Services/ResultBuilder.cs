@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 GeographicLevel = observation.GeographicLevel,
                 Location = _mapper.Map<LocationViewModel>(observation.Location),
                 Measures = Measures(observation, indicators),
-                TimePeriod = TimePeriod(observation)
+                TimePeriod = observation.GetTimePeriod()
             };
         }
 
@@ -40,11 +40,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 ? QueryUtil.FilterMeasures(observation.Measures, indicators)
                 : observation.Measures;
             return measures.ToDictionary(pair => pair.Key.ToString(), pair => pair.Value);
-        }
-
-        private static string TimePeriod(Observation observation)
-        {
-            return $"{observation.Year}_{observation.TimeIdentifier.GetEnumValue()}";
         }
     }
 }

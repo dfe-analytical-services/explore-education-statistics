@@ -38,9 +38,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
             
             if (TimePeriod != null)
             {
-                var timePeriodRange = TimePeriodUtil.Range(TimePeriod).ToList();
-                // TODO DFE-886 This is being evaluated locally and is very slow
-                predicate = predicate.And(observation => timePeriodRange.Contains(observation.GetTimePeriod()));
+                var timePeriodRange = TimePeriodUtil.Range(TimePeriod)
+                    .Select(tuple => tuple.GetTimePeriod()).ToList();
+
+                // Don't use the observation.GetTimePeriod() extension in the expression here as it can't be translated
+                predicate = predicate.And(observation => timePeriodRange.Contains(
+                    observation.Year + "_" + observation.TimeIdentifier));
             }
 
             if (GeographicLevel != null)

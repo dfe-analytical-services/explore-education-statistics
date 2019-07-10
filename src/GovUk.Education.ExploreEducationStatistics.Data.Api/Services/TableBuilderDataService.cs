@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
@@ -61,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             // TODO DFE-886 there could be values in the range that the table tool doesn’t want returning
             
             return range.ToDictionary(
-                tuple => $"{tuple.Year}_{tuple.TimeIdentifier.GetEnumValue()}",
+                tuple => tuple.GetTimePeriod(),
                 tuple => new TimePeriodMetaViewModel
                 {
                     Code = tuple.TimeIdentifier,

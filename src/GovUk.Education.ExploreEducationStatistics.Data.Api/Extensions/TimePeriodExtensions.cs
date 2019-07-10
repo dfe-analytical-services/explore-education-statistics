@@ -1,12 +1,18 @@
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Extensions
 {
     public static class TimePeriodExtensions
     {
-        public static (int Year, TimeIdentifier TimeIdentifier) GetTimePeriod(this Observation observation)
+        public static string GetTimePeriod(this (int Year, TimeIdentifier TimeIdentifier) tuple)
         {
-            return (observation.Year, observation.TimeIdentifier);
+            return $"{tuple.Year}_{tuple.TimeIdentifier.GetEnumValue()}";
+        }
+
+        public static string GetTimePeriod(this Observation observation)
+        {
+            return $"{observation.Year}_{observation.TimeIdentifier.GetEnumValue()}";
         }
     }
 }
