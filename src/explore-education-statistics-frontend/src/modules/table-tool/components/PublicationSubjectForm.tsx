@@ -65,7 +65,7 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
       }}
       initialValues={initialValues}
       validationSchema={Yup.object<FormValues>({
-        subjectId: Yup.string().required('Choose a publication subject'),
+        subjectId: Yup.string().required('Choose a subject'),
       })}
       render={(form: FormikProps<FormValues>) => {
         return isActive ? (

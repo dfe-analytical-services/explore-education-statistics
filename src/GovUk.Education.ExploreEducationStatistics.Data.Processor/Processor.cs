@@ -1,3 +1,4 @@
+using System;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
@@ -22,8 +23,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             ImportMessage message,
             ILogger logger)
         {
-            logger.LogInformation($"{GetType().Name} function triggered: {message}");
-            _importService.Import(message);
+            try
+            {
+                logger.LogInformation($"{GetType().Name} function triggered: {message}");
+                _importService.Import(message);
+            }
+            catch (Exception e)
+            {
+                // TODO Handle exceptions via notifications etc
+                logger.LogError($"{GetType().Name} function FAILED: {e}");
+                throw;
+            }
+
             logger.LogInformation($"{GetType().Name} function completed");
         }
     }

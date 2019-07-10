@@ -75,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         {
             var observationalUnits = _locationService.GetObservationalUnits(query);
             return observationalUnits.ToDictionary(
-                pair => pair.Key.ToString().PascalCase(),
+                pair => pair.Key.ToString().CamelCase(),
                 pair => new LegendOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
                 {
                     Hint = "",
