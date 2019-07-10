@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
@@ -42,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             };
         }
 
-        private static Dictionary<string, TimePeriodMetaViewModel> GetTimePeriodRange(
+        private static IEnumerable<TimePeriodMetaViewModel> GetTimePeriodRange(
             IEnumerable<Observation> observations)
         {
             var timePeriods = observations.Select(o => (o.Year, o.TimeIdentifier))
@@ -58,14 +57,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
             // TODO DFE-886 there could be values in the range that the table tool doesn’t want returning
 
-            return range.ToDictionary(
-                tuple => tuple.GetTimePeriod(),
-                tuple => new TimePeriodMetaViewModel
-                {
-                    Code = tuple.TimeIdentifier,
-                    Label = TimePeriodLabelFormatter.Format(tuple.Year, tuple.TimeIdentifier),
-                    Year = tuple.Year
-                });
+            return range.Select(tuple => new TimePeriodMetaViewModel
+            {
+                Code = tuple.TimeIdentifier,
+                Label = TimePeriodLabelFormatter.Format(tuple.Year, tuple.TimeIdentifier),
+                Year = tuple.Year
+            });
         }
     }
 }

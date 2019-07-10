@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels
         public long? SubjectId { get; set; }
         public DateTime? ReleaseDate { get; set; }
 
-        public Dictionary<string, TimePeriodMetaViewModel> TimePeriodRange { get; set; }
+        public IEnumerable<TimePeriodMetaViewModel> TimePeriodRange { get; set; }
         
         public IEnumerable<ObservationViewModel> Result { get; set; }
 
