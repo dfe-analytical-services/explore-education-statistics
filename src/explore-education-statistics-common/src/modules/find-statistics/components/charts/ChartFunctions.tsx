@@ -19,6 +19,7 @@ import {
 } from 'recharts';
 import {
   DataBlockData,
+  DataBlockLocation,
   DataBlockMetadata,
   Result,
 } from '@common/services/dataBlockService';
@@ -256,16 +257,37 @@ export function generateKeyFromDataSet(
   dataSet: ChartDataSet,
   ignoringFields: string[] = [],
 ) {
-  const { indicator, filters, location, timePeriod } = dataSet;
+  const { indicator, filters, location, timePeriod } = {
+    ...dataSet,
+  };
+
+  const ignoreLocation = ignoringFields.includes('location');
+  const joinedLocations = [
+    (!ignoreLocation &&
+      location &&
+      location.country &&
+      location.country.code) ||
+      '',
+    (!ignoreLocation && location && location.region && location.region.code) ||
+      '',
+    (!ignoreLocation &&
+      location &&
+      location.localAuthorityDistrict &&
+      location.localAuthorityDistrict.code) ||
+      '',
+    (!ignoreLocation &&
+      location &&
+      location.localAuthority &&
+      location.localAuthority.code) ||
+      '',
+  ];
+
   return [
     indicator,
     ...(filters || []),
-    location && location.country && location.country.code,
-    location && location.region && location.region.code,
-    location &&
-      location.localAuthorityDistrict &&
-      location.localAuthorityDistrict.code,
-    location && location.localAuthority && location.localAuthority.code,
+
+    ...joinedLocations,
+
     (!ignoringFields.includes('timePeriod') && timePeriod) || '',
   ].join('_');
 }
@@ -276,6 +298,9 @@ function generateNameForAxisConfiguration(groupBy: string[], result: Result) {
       switch (identifier) {
         case 'timePeriod':
           return `${result.year}_${result.timeIdentifier}`;
+        case 'location':
+          return `${result.location.localAuthorityDistrict &&
+            result.location.localAuthorityDistrict.code}`;
         default:
           return '';
       }
@@ -350,10 +375,22 @@ export function getKeysForChart(chartData: ChartDataB[]) {
   );
 }
 
-export function mapNameToNameLabel(dataLabels: Dictionary<ChartConfiguration>) {
+const FindFirstInDictionaries = (
+  metaDataObjects: (Dictionary<ChartConfiguration> | undefined)[],
+  name: string,
+) => (result: string | undefined, meta?: Dictionary<ChartConfiguration>) =>
+  result || (meta && meta[name] && meta[name].label);
+
+export function mapNameToNameLabel(
+  ...metaDataObjects: (Dictionary<ChartConfiguration> | undefined)[]
+) {
   return ({ name, ...otherdata }: { name: string }) => ({
     ...otherdata,
-    name: (dataLabels[name] && dataLabels[name].label) || name,
+    name:
+      metaDataObjects.reduce(
+        FindFirstInDictionaries(metaDataObjects, name),
+        '',
+      ) || name,
   });
 }
 

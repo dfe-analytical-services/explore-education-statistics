@@ -3706,6 +3706,209 @@ const responseData: DataBlockResponse = {
   ],
 };
 
+/**
+ * Data for 2014 removed from results, but metadata still included so the full 2012-2017 is included
+ */
+const responseWithMissingData: DataBlockResponse = {
+  ...responseData,
+
+  result: [
+    {
+      filters: ['1', '72'],
+      location: {
+        country: {
+          code: 'E92000001',
+          name: 'England',
+        },
+      },
+      measures: {
+        '28': '3',
+        '26': '3.9',
+        '23': '0.8',
+      },
+      timeIdentifier: 'HT6',
+      year: 2013,
+    },
+    {
+      filters: ['1', '73'],
+      location: {
+        country: {
+          code: 'E92000001',
+          name: 'England',
+        },
+      },
+      measures: {
+        '28': '3.9',
+        '26': '5.2',
+        '23': '1.3',
+      },
+      timeIdentifier: 'HT6',
+      year: 2013,
+    },
+    {
+      filters: ['1', '71'],
+      location: {
+        country: {
+          code: 'E92000001',
+          name: 'England',
+        },
+      },
+      measures: {
+        '28': '7.1',
+        '26': '9',
+        '23': '1.9',
+      },
+      timeIdentifier: 'HT6',
+      year: 2013,
+    },
+    {
+      filters: ['1', '73'],
+      location: {
+        country: {
+          code: 'E92000001',
+          name: 'England',
+        },
+      },
+      measures: {
+        '28': '4.5',
+        '26': '5.9',
+        '23': '1.4',
+      },
+      timeIdentifier: 'HT6',
+      year: 2012,
+    },
+    {
+      filters: ['1', '71'],
+      location: {
+        country: {
+          code: 'E92000001',
+          name: 'England',
+        },
+      },
+      measures: {
+        '28': '7.7',
+        '26': '9.6',
+        '23': '1.9',
+      },
+      timeIdentifier: 'HT6',
+      year: 2012,
+    },
+    {
+      filters: ['1', '72'],
+      location: {
+        country: {
+          code: 'E92000001',
+          name: 'England',
+        },
+      },
+      measures: {
+        '28': '3.9',
+        '26': '4.7',
+        '23': '0.8',
+      },
+      timeIdentifier: 'HT6',
+      year: 2012,
+    },
+    {
+      filters: ['1', '72'],
+      location: {
+        country: {
+          code: 'E92000001',
+          name: 'England',
+        },
+      },
+      measures: {
+        '28': '3.1',
+        '26': '4',
+        '23': '0.9',
+      },
+      timeIdentifier: 'HT6',
+      year: 2015,
+    },
+    {
+      filters: ['1', '73'],
+      location: {
+        country: {
+          code: 'E92000001',
+          name: 'England',
+        },
+      },
+      measures: {
+        '28': '3.8',
+        '26': '5.4',
+        '23': '1.5',
+      },
+      timeIdentifier: 'HT6',
+      year: 2016,
+    },
+    {
+      filters: ['1', '72'],
+      location: {
+        country: {
+          code: 'E92000001',
+          name: 'England',
+        },
+      },
+      measures: {
+        '28': '3',
+        '26': '4',
+        '23': '1.1',
+      },
+      timeIdentifier: 'HT6',
+      year: 2016,
+    },
+    {
+      filters: ['1', '71'],
+      location: {
+        country: {
+          code: 'E92000001',
+          name: 'England',
+        },
+      },
+      measures: {
+        '28': '7.7',
+        '26': '9.7',
+        '23': '2.1',
+      },
+      timeIdentifier: 'HT6',
+      year: 2016,
+    },
+    {
+      filters: ['1', '73'],
+      location: {
+        country: {
+          code: 'E92000001',
+          name: 'England',
+        },
+      },
+      measures: {
+        '28': '3.8',
+        '26': '5.2',
+        '23': '1.4',
+      },
+      timeIdentifier: 'HT6',
+      year: 2015,
+    },
+    {
+      filters: ['1', '71'],
+      location: {
+        country: {
+          code: 'E92000001',
+          name: 'England',
+        },
+      },
+      measures: {
+        '28': '7.4',
+        '26': '9.1',
+        '23': '1.7',
+      },
+      timeIdentifier: 'HT6',
+      year: 2015,
+    },
+  ],
+};
+
 export default {
   responseData,
+  responseWithMissingData,
 };

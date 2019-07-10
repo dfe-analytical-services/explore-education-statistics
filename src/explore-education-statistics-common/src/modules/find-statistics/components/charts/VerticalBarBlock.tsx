@@ -46,14 +46,14 @@ export default class VerticalBarBlock extends Component<StackedBarProps> {
   };
 
   public render() {
-    const { data, height, width, labels, axes, stacked } = this.props;
+    const { data, meta, height, width, labels, axes, stacked } = this.props;
 
     if (!axes.major || !data) return <LoadingSpinner />;
 
     const chartData: ChartDataB[] = createDataForAxis(
       axes.major,
       data.result,
-    ).map(mapNameToNameLabel(labels));
+    ).map(mapNameToNameLabel(labels, meta.timePeriods, meta.locations));
 
     const keysForChart = getKeysForChart(chartData);
 
