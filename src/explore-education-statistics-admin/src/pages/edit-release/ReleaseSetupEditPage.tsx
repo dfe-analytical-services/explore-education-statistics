@@ -216,51 +216,47 @@ const ReleaseSetupEditPage = ({
                       });
                     }}
                   />
-                  {form.values.timePeriodCoverageCode &&
-                    DateType.Year ===
-                      DummyReferenceData.findTimePeriodCoverageGroup(
-                        form.values.timePeriodCoverageCode,
-                      ).startDateType && (
-                      <FormFieldTextInput<FormValues>
-                        id={`${formId}-timePeriodCoverageStartYearOnly`}
-                        name="timePeriodCoverageStartDateYearOnly"
-                        label={
-                          DummyReferenceData.findTimePeriodCoverageGroup(
-                            form.values.timePeriodCoverageCode,
-                          ).startDateLabel
-                        }
-                        width={4}
-                        type="number"
-                        pattern="[0-9]*"
-                      />
-                    )}
-                  {form.values.timePeriodCoverageCode &&
-                    DateType.DayMonthYear ===
-                      DummyReferenceData.findTimePeriodCoverageGroup(
-                        form.values.timePeriodCoverageCode,
-                      ).startDateType && (
-                      <FormFieldDayMonthYear<FormValues>
-                        formId={formId}
-                        fieldName="timePeriodCoverageStartDate"
-                        fieldsetLegend={
-                          DummyReferenceData.findTimePeriodCoverageGroup(
-                            form.values.timePeriodCoverageCode,
-                          ).startDateLabel
-                        }
-                        day={
-                          form.values.timePeriodCoverageStartDate &&
-                          form.values.timePeriodCoverageStartDate.day
-                        }
-                        month={
-                          form.values.timePeriodCoverageStartDate &&
-                          form.values.timePeriodCoverageStartDate.month
-                        }
-                        year={
-                          form.values.timePeriodCoverageStartDate &&
-                          form.values.timePeriodCoverageStartDate.year
-                        }
-                      />
-                    )}
+                  {isYearOnlyDateTypeCodeSelected(
+                    form.values.timePeriodCoverageCode,
+                  ) && (
+                    <FormFieldTextInput<FormValues>
+                      id={`${formId}-timePeriodCoverageStartYearOnly`}
+                      name="timePeriodCoverageStartDateYearOnly"
+                      label={
+                        DummyReferenceData.findTimePeriodCoverageGroup(
+                          form.values.timePeriodCoverageCode,
+                        ).startDateLabel
+                      }
+                      width={4}
+                      type="number"
+                      pattern="[0-9]*"
+                    />
+                  )}
+                  {isDayMonthYearDateTypeCodeSelected(
+                    form.values.timePeriodCoverageCode,
+                  ) && (
+                    <FormFieldDayMonthYear<FormValues>
+                      formId={formId}
+                      fieldName="timePeriodCoverageStartDate"
+                      fieldsetLegend={
+                        DummyReferenceData.findTimePeriodCoverageGroup(
+                          form.values.timePeriodCoverageCode,
+                        ).startDateLabel
+                      }
+                      day={
+                        form.values.timePeriodCoverageStartDate &&
+                        form.values.timePeriodCoverageStartDate.day
+                      }
+                      month={
+                        form.values.timePeriodCoverageStartDate &&
+                        form.values.timePeriodCoverageStartDate.month
+                      }
+                      year={
+                        form.values.timePeriodCoverageStartDate &&
+                        form.values.timePeriodCoverageStartDate.year
+                      }
+                    />
+                  )}
                 </FormFieldset>
 
                 <FormFieldDayMonthYear<FormValues>
