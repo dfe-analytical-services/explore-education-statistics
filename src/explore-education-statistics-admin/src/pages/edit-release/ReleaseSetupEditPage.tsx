@@ -10,13 +10,17 @@ import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { SelectOption } from '@common/components/form/FormSelect';
-import { isValid } from 'date-fns';
 import Yup from '@common/lib/validation/yup';
 import { Dictionary } from '@common/types';
 import { FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import { setupRoute } from '@admin/routes/releaseRoutes';
+import {
+  shapeOfDayMonthYearField,
+  validateMandatoryDayMonthYearField,
+  validateOptionalPartialDayMonthYearField,
+} from '@admin/validation/validation';
 import Link from '../../components/Link';
 import {
   dateToDayMonthYear,
@@ -33,7 +37,7 @@ interface MatchProps {
 interface FormValues {
   timePeriodCoverageCode: string;
   timePeriodCoverageStartDate?: DayMonthYearValues;
-  timePeriodCoverageStartDateYearOnly?: string;
+  timePeriodCoverageStartDateYearOnly?: number;
   releaseTypeId: string;
   scheduledReleaseDate: DayMonthYearValues;
   nextReleaseExpectedDate: DayMonthYearValues;
@@ -78,33 +82,6 @@ const ReleaseSetupEditPage = ({
 
   const formId = 'releaseSetupForm';
 
-  const handleFormSubmission = async (values: FormValues) => {
-    const release = DummyPublicationsData.getReleaseById(releaseId);
-
-    release.timePeriodCoverage.code = values.timePeriodCoverageCode;
-
-    if (values.timePeriodCoverageStartDate) {
-      release.timePeriodCoverage.startDate = dayMonthYearToDate(
-        values.timePeriodCoverageStartDate,
-      );
-    } else if (values.timePeriodCoverageStartDateYearOnly) {
-      release.timePeriodCoverage.startDate = new Date(
-        parseInt(values.timePeriodCoverageStartDateYearOnly, 10),
-        1,
-        1,
-      );
-    }
-
-    release.scheduledReleaseDate = values.scheduledReleaseDate;
-
-    release.nextReleaseExpectedDate = dayMonthYearToDate(
-      values.nextReleaseExpectedDate,
-    );
-    release.releaseType = DummyReferenceData.findReleaseType(
-      values.releaseTypeId,
-    );
-  };
-
   const selectedTimePeriodCoverageGroup =
     releaseSetupDetails &&
     DummyReferenceData.findTimePeriodCoverageGroup(
@@ -114,19 +91,29 @@ const ReleaseSetupEditPage = ({
   const isDayMonthYearDateTypeSelected = (
     timePeriodGroup?: TimePeriodCoverageGroup,
   ) =>
-    timePeriodGroup && DateType.DayMonthYear === timePeriodGroup.startDateType;
+    timePeriodGroup
+      ? DateType.DayMonthYear === timePeriodGroup.startDateType
+      : false;
 
   const isYearOnlyDateTypeSelected = (
     timePeriodGroup?: TimePeriodCoverageGroup,
-  ) => timePeriodGroup && DateType.Year === timePeriodGroup.startDateType;
+  ) =>
+    timePeriodGroup ? DateType.Year === timePeriodGroup.startDateType : false;
 
-  const validateMandatoryDayMonthYearField = Yup.object({
-    day: Yup.number().required('Enter a day'),
-    month: Yup.number().required('Enter a month'),
-    year: Yup.number().required('Enter a year'),
-  }).test('validDate', 'Enter a valid date', value =>
-    isValid(new Date(value.year, value.month, value.day)),
-  );
+  const isDayMonthYearDateTypeCodeSelected = (timePeriodGroupCode?: string) =>
+    timePeriodGroupCode
+      ? isDayMonthYearDateTypeSelected(
+          DummyReferenceData.findTimePeriodCoverageGroup(timePeriodGroupCode),
+        )
+      : false;
+
+  const isYearOnlyDateTypeCodeSelected = (timePeriodGroupCode?: string) =>
+    timePeriodGroupCode
+      ? isYearOnlyDateTypeSelected(
+          DummyReferenceData.findTimePeriodCoverageGroup(timePeriodGroupCode),
+        )
+      : false;
+
   return (
     <ReleasePageTemplate
       releaseId={releaseId}
@@ -139,10 +126,6 @@ const ReleaseSetupEditPage = ({
       {releaseSetupDetails && timePeriodCoverageGroups && releaseTypes && (
         <Formik<FormValues>
           enableReinitialize
-          onSubmit={async values => {
-            await handleFormSubmission(values);
-            history.push(setupRoute.generateLink(releaseId));
-          }}
           initialValues={{
             timePeriodCoverageCode: releaseSetupDetails.timePeriodCoverageCode,
             timePeriodCoverageStartDate: isDayMonthYearDateTypeSelected(
@@ -155,9 +138,7 @@ const ReleaseSetupEditPage = ({
             timePeriodCoverageStartDateYearOnly: isYearOnlyDateTypeSelected(
               selectedTimePeriodCoverageGroup,
             )
-              ? releaseSetupDetails.timePeriodCoverageStartDate
-                  .getFullYear()
-                  .toString()
+              ? releaseSetupDetails.timePeriodCoverageStartDate.getFullYear()
               : undefined,
             releaseTypeId: releaseSetupDetails.releaseType.id,
             scheduledReleaseDate: releaseSetupDetails.scheduledReleaseDate,
@@ -172,70 +153,50 @@ const ReleaseSetupEditPage = ({
             timePeriodCoverageStartDate: Yup.object<DayMonthYearValues>().when(
               'timePeriodCoverageCode',
               {
-                is: val =>
-                  DateType.DayMonthYear ===
-                  DummyReferenceData.findTimePeriodCoverageGroup(val)
-                    .startDateType,
+                is: (val: string) => isDayMonthYearDateTypeCodeSelected(val),
                 then: validateMandatoryDayMonthYearField,
-                otherwise: Yup.object({
-                  day: Yup.mixed()
-                    .transform(val =>
-                      val === '' ? undefined : parseInt(val, 10),
-                    )
-                    .nullable(),
-                  month: Yup.mixed()
-                    .transform(val =>
-                      val === '' ? undefined : parseInt(val, 10),
-                    )
-                    .nullable(),
-                  year: Yup.mixed()
-                    .transform(val =>
-                      val === '' ? undefined : parseInt(val, 10),
-                    )
-                    .nullable(),
-                }),
+                otherwise: shapeOfDayMonthYearField,
               },
             ),
-            timePeriodCoverageStartDateYearOnly: Yup.string().when(
+            timePeriodCoverageStartDateYearOnly: Yup.number().when(
               'timePeriodCoverageCode',
               {
-                is: val =>
-                  DateType.Year ===
-                  DummyReferenceData.findTimePeriodCoverageGroup(val)
-                    .startDateType,
-                then: Yup.string().required('Enter a start year'),
-                otherwise: Yup.string(),
+                is: (val: string) => isYearOnlyDateTypeCodeSelected(val),
+                then: Yup.number().required('Enter a start year'),
+                otherwise: Yup.number(),
               },
             ),
             releaseTypeId: Yup.string(),
-            scheduledReleaseDate: Yup.object({
-              day: Yup.mixed()
-                .transform(val => (val === '' ? undefined : parseInt(val, 10)))
-                .nullable(),
-              month: Yup.mixed()
-                .transform(val => (val === '' ? undefined : parseInt(val, 10)))
-                .nullable(),
-              year: Yup.mixed()
-                .transform(val => (val === '' ? undefined : parseInt(val, 10)))
-                .nullable(),
-            }).test(
-              'validDateWithAllFieldsDefined',
-              'Enter a valid date',
-              value => {
-                if (!value.year || !value.month || !value.day) {
-                  return true;
-                }
-                return isValid(new Date(value.year, value.month, value.day));
-              },
-            ),
-            nextReleaseExpectedDate: Yup.object({
-              day: Yup.number(),
-              month: Yup.number(),
-              year: Yup.number(),
-            }).test('validDate', 'Enter a valid date', value =>
-              isValid(new Date(value.year, value.month, value.day)),
-            ),
+            scheduledReleaseDate: validateOptionalPartialDayMonthYearField,
+            nextReleaseExpectedDate: validateOptionalPartialDayMonthYearField,
           })}
+          onSubmit={async (values: FormValues) => {
+            const release = DummyPublicationsData.getReleaseById(releaseId);
+
+            release.timePeriodCoverage.code = values.timePeriodCoverageCode;
+
+            if (values.timePeriodCoverageStartDate) {
+              release.timePeriodCoverage.startDate = dayMonthYearToDate(
+                values.timePeriodCoverageStartDate,
+              );
+            } else if (values.timePeriodCoverageStartDateYearOnly) {
+              release.timePeriodCoverage.startDate = new Date(
+                values.timePeriodCoverageStartDateYearOnly,
+                1,
+                1,
+              );
+            }
+
+            release.scheduledReleaseDate = values.scheduledReleaseDate;
+
+            release.nextReleaseExpectedDate = dayMonthYearToDate(
+              values.nextReleaseExpectedDate,
+            );
+            release.releaseType = DummyReferenceData.findReleaseType(
+              values.releaseTypeId,
+            );
+            history.push(setupRoute.generateLink(releaseId));
+          }}
           render={(form: FormikProps<FormValues>) => {
             return (
               <Form id={formId}>
