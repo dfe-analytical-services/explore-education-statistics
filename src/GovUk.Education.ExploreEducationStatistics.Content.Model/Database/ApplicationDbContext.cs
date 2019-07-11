@@ -1250,61 +1250,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         {
                             new LineChart
                             {
-                                Axes = new Dictionary<string, ChartAxisConfiguration>
+                                Axes = new Dictionary<string, AxisConfigurationItem>
                                 {
-                                    ["major"] = new ChartAxisConfiguration
+                                    ["major"] = new AxisConfigurationItem
                                     {
-                                        GroupBy = new List<string> {"timePeriod"},
+                                        GroupBy = AxisGroupBy.timePeriods,
                                         DataSets = new List<ChartDataSet>
                                         {
-                                            new ChartDataSet {Indicator = "23", filters = new List<string> {"1", "2"}},
-                                            new ChartDataSet {Indicator = "26", filters = new List<string> {"1", "2"}},
-                                            new ChartDataSet {Indicator = "28", filters = new List<string> {"1", "2"}},
+                                            new ChartDataSet {Indicator = "23", Filters = new List<string> {"1", "2"}},
+                                            new ChartDataSet {Indicator = "26", Filters = new List<string> {"1", "2"}},
+                                            new ChartDataSet {Indicator = "28", Filters = new List<string> {"1", "2"}},
                                         },
                                         Title = "School Year"
                                     },
-                                    ["minor"] = new ChartAxisConfiguration
+                                    ["minor"] = new AxisConfigurationItem
                                     {
-                                        Title = "Absence Rate",
-                                        GroupBy = new List<string>(),
+                                        Title = "Absence Rate"
                                     }
                                 },
-                                Labels = new Dictionary<string, ChartLabelConfiguration>
+                                Labels = new Dictionary<string, ChartConfiguration>
                                 {
-                                    ["2012_HT6"] = new ChartLabelConfiguration
-                                    {
-                                        Label = "2012/2013"
-                                    },
-                                    ["2013_HT6"] = new ChartLabelConfiguration
-                                    {
-                                        Label = "2013/2014"
-                                    },
-                                    ["2014_HT6"] = new ChartLabelConfiguration
-                                    {
-                                        Label = "2014/2015"
-                                    },
-                                    ["2015_HT6"] = new ChartLabelConfiguration
-                                    {
-                                        Label = "2015/2016"
-                                    },
-                                    ["2016_HT6"] = new ChartLabelConfiguration
-                                    {
-                                        Label = "2016/2017"
-                                    },
-                                    ["23_1_2_____"] = new ChartLabelConfiguration
+                                    ["23_1_2_____"] = new ChartConfiguration
                                     {
                                         Label = "Unauthorised Absence Rate",
-                                        Unit = "%"
+                                        Unit = "%",
+                                        Colour = "#4763a5",
+                                        symbol = ChartSymbol.circle
                                     },
-                                    ["26_1_2_____"] = new ChartLabelConfiguration
+                                    ["26_1_2_____"] = new ChartConfiguration
                                     {
                                         Label = "Overall Absence Rate",
-                                        Unit = "%"
+                                        Unit = "%",
+                                        Colour = "#f5a450",
+                                        symbol = ChartSymbol.cross
                                     },
-                                    ["28_1_2_____"] = new ChartLabelConfiguration
+                                    ["28_1_2_____"] = new ChartConfiguration
                                     {
                                         Label = "Authorised Absence Rate",
-                                        Unit = "%"
+                                        Unit = "%",
+                                        Colour = "#005ea5",
+                                        symbol = ChartSymbol.diamond
                                     },
                                 }
                             },
@@ -1369,64 +1354,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     {
                                         new LineChart
                                         {
-                                            Axes = new Dictionary<string, ChartAxisConfiguration>
+                                            Axes = new Dictionary<string, AxisConfigurationItem>
                                             {
-                                                ["major"] = new ChartAxisConfiguration
+                                                ["major"] = new AxisConfigurationItem
                                                 {
-                                                    GroupBy = new List<string> {"timePeriod"},
+                                                    GroupBy = AxisGroupBy.timePeriods,
                                                     DataSets = new List<ChartDataSet>
                                                     {
                                                         new ChartDataSet
-                                                            {Indicator = "23", filters = new List<string> {"1", "2"}},
+                                                            {Indicator = "23", Filters = new List<string> {"1", "2"}},
                                                         new ChartDataSet
-                                                            {Indicator = "26", filters = new List<string> {"1", "2"}},
+                                                            {Indicator = "26", Filters = new List<string> {"1", "2"}},
                                                         new ChartDataSet
-                                                            {Indicator = "28", filters = new List<string> {"1", "2"}},
+                                                            {Indicator = "28", Filters = new List<string> {"1", "2"}},
                                                     },
                                                     Title = "School Year"
                                                 },
-                                                ["minor"] = new ChartAxisConfiguration
+                                                ["minor"] = new AxisConfigurationItem
                                                 {
-                                                    Title = "Absence Rate",
-                                                    GroupBy = new List<string>(),
+                                                    Title = "Absence Rate"
                                                 }
                                             },
-                                            Labels = new Dictionary<string, ChartLabelConfiguration>
+                                            Labels = new Dictionary<string, ChartConfiguration>
                                             {
-                                                ["2012_HT6"] = new ChartLabelConfiguration
-                                                {
-                                                    Label = "2012/2013"
-                                                },
-                                                ["2013_HT6"] = new ChartLabelConfiguration
-                                                {
-                                                    Label = "2013/2014"
-                                                },
-                                                ["2014_HT6"] = new ChartLabelConfiguration
-                                                {
-                                                    Label = "2014/2015"
-                                                },
-                                                ["2015_HT6"] = new ChartLabelConfiguration
-                                                {
-                                                    Label = "2015/2016"
-                                                },
-                                                ["2016_HT6"] = new ChartLabelConfiguration
-                                                {
-                                                    Label = "2016/2017"
-                                                },
-                                                ["23_1_2_____"] = new ChartLabelConfiguration
+                                                ["23_1_2_____"] = new ChartConfiguration
                                                 {
                                                     Label = "Unauthorised Absence Rate",
-                                                    Unit = "%"
+                                                    Unit = "%",
+                                                    Colour = "#4763a5",
+                                                    symbol = ChartSymbol.circle
                                                 },
-                                                ["26_1_2_____"] = new ChartLabelConfiguration
+                                                ["26_1_2_____"] = new ChartConfiguration
                                                 {
                                                     Label = "Overall Absence Rate",
-                                                    Unit = "%"
+                                                    Unit = "%",
+                                                    Colour = "#f5a450",
+                                                    symbol = ChartSymbol.cross
                                                 },
-                                                ["28_1_2_____"] = new ChartLabelConfiguration
+                                                ["28_1_2_____"] = new ChartConfiguration
                                                 {
                                                     Label = "Authorised Absence Rate",
-                                                    Unit = "%"
+                                                    Unit = "%",
+                                                    Colour = "#005ea5",
+                                                    symbol = ChartSymbol.diamond
                                                 },
                                             }
                                         }
@@ -1682,48 +1652,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     {
                                         new MapChart
                                         {
-                                            Axes = new Dictionary<string, ChartAxisConfiguration>
+                                            Axes = new Dictionary<string, AxisConfigurationItem>
                                             {
-                                                ["major"] = new ChartAxisConfiguration
+                                                ["major"] = new AxisConfigurationItem
                                                 {
-                                                    GroupBy = new List<string> {"timePeriod"},
+                                                    GroupBy = AxisGroupBy.timePeriods,
                                                     DataSets = new List<ChartDataSet>
                                                     {
                                                         new ChartDataSet
-                                                            {Indicator = "23", filters = new List<string> {"1", "2"}},
+                                                            {Indicator = "23", Filters = new List<string> {"1", "2"}},
                                                         new ChartDataSet
-                                                            {Indicator = "26", filters = new List<string> {"1", "2"}},
+                                                            {Indicator = "26", Filters = new List<string> {"1", "2"}},
                                                         new ChartDataSet
-                                                            {Indicator = "28", filters = new List<string> {"1", "2"}},
+                                                            {Indicator = "28", Filters = new List<string> {"1", "2"}},
                                                     },
                                                     Title = "School Year"
                                                 },
-                                                ["minor"] = new ChartAxisConfiguration
+                                                ["minor"] = new AxisConfigurationItem
                                                 {
                                                     Title = "Absence Rate",
-                                                    GroupBy = new List<string>(),
                                                 }
                                             },
-                                            Labels = new Dictionary<string, ChartLabelConfiguration>
+                                            Labels = new Dictionary<string, ChartConfiguration>
                                             {
-                                                ["2016_HT6"] = new ChartLabelConfiguration
-                                                {
-                                                    Label = "2016/2017"
-                                                },
-                                                ["23_1_2_____"] = new ChartLabelConfiguration
+                                                ["23_1_2_____"] = new ChartConfiguration
                                                 {
                                                     Label = "Unauthorised Absence Rate",
-                                                    Unit = "%"
+                                                    Unit = "%",
+                                                    Colour = "#4763a5",
+                                                    symbol = ChartSymbol.circle
                                                 },
-                                                ["26_1_2_____"] = new ChartLabelConfiguration
+                                                ["26_1_2_____"] = new ChartConfiguration
                                                 {
                                                     Label = "Overall Absence Rate",
-                                                    Unit = "%"
+                                                    Unit = "%",
+                                                    Colour = "#f5a450",
+                                                    symbol = ChartSymbol.cross
                                                 },
-                                                ["28_1_2_____"] = new ChartLabelConfiguration
+                                                ["28_1_2_____"] = new ChartConfiguration
                                                 {
                                                     Label = "Authorised Absence Rate",
-                                                    Unit = "%"
+                                                    Unit = "%",
+                                                    Colour = "#005ea5",
+                                                    symbol = ChartSymbol.diamond
                                                 },
                                             }
                                         }
@@ -1850,55 +1821,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         {
                             new LineChart
                             {
-                                Axes = new Dictionary<string, ChartAxisConfiguration>
+                                Axes = new Dictionary<string, AxisConfigurationItem>
                                 {
-                                    ["major"] = new ChartAxisConfiguration
+                                    ["major"] = new AxisConfigurationItem
                                     {
-                                        GroupBy = new List<string> {"timePeriod"},
+                                        GroupBy = AxisGroupBy.timePeriods,
                                         DataSets = new List<ChartDataSet>
                                         {
-                                            new ChartDataSet {Indicator = "158", filters = new List<string> {"727"}},
-                                            new ChartDataSet {Indicator = "160", filters = new List<string> {"727"}},
+                                            new ChartDataSet {Indicator = "158", Filters = new List<string> {"727"}},
+                                            new ChartDataSet {Indicator = "160", Filters = new List<string> {"727"}},
                                         },
                                         Title = "School Year"
                                     },
-                                    ["minor"] = new ChartAxisConfiguration
+                                    ["minor"] = new AxisConfigurationItem
                                     {
                                         Title = "Absence Rate",
-                                        GroupBy = new List<string>(),
                                     }
                                 },
-                                Labels = new Dictionary<string, ChartLabelConfiguration>
+                                Labels = new Dictionary<string, ChartConfiguration>
                                 {
-                                    ["2012_HT6"] = new ChartLabelConfiguration
-                                    {
-                                        Label = "2012/2013"
-                                    },
-                                    ["2013_HT6"] = new ChartLabelConfiguration
-                                    {
-                                        Label = "2013/2014"
-                                    },
-                                    ["2014_HT6"] = new ChartLabelConfiguration
-                                    {
-                                        Label = "2014/2015"
-                                    },
-                                    ["2015_HT6"] = new ChartLabelConfiguration
-                                    {
-                                        Label = "2015/2016"
-                                    },
-                                    ["2016_HT6"] = new ChartLabelConfiguration
-                                    {
-                                        Label = "2016/2017"
-                                    },
-                                    ["158_727_____"] = new ChartLabelConfiguration
+                                    ["158_727_____"] = new ChartConfiguration
                                     {
                                         Label = "Fixed period exclusion Rate",
-                                        Unit = "%"
+                                        Unit = "%",
+                                        Colour = "#4763a5",
+                                        symbol = ChartSymbol.circle
                                     },
-                                    ["160_727_____"] = new ChartLabelConfiguration
+                                    ["160_727_____"] = new ChartConfiguration
                                     {
                                         Label = "Pupils with one ore more exclusion",
-                                        Unit = "%"
+                                        Unit = "%",
+                                        Colour = "#f5a450",
+                                        symbol = ChartSymbol.cross
                                     }
                                 }
                             }
@@ -1960,50 +1914,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     {
                                         new LineChart
                                         {
-                                            Axes = new Dictionary<string, ChartAxisConfiguration>
+                                            Axes = new Dictionary<string, AxisConfigurationItem>
                                             {
-                                                ["major"] = new ChartAxisConfiguration
+                                                ["major"] = new AxisConfigurationItem
                                                 {
-                                                    GroupBy = new List<string> {"timePeriod"},
+                                                    GroupBy = AxisGroupBy.timePeriods,
                                                     DataSets = new List<ChartDataSet>
                                                     {
                                                         new ChartDataSet
-                                                            {Indicator = "156", filters = new List<string> {"727"}}
+                                                            {Indicator = "156", Filters = new List<string> {"727"}}
                                                     },
                                                     Title = "School Year"
                                                 },
-                                                ["minor"] = new ChartAxisConfiguration
+                                                ["minor"] = new AxisConfigurationItem
                                                 {
                                                     Title = "Exclusion Rate",
-                                                    GroupBy = new List<string>()
                                                 }
                                             },
-                                            Labels = new Dictionary<string, ChartLabelConfiguration>
+                                            Labels = new Dictionary<string, ChartConfiguration>
                                             {
-                                                ["2012_HT6"] = new ChartLabelConfiguration
-                                                {
-                                                    Label = "2012/2013"
-                                                },
-                                                ["2013_HT6"] = new ChartLabelConfiguration
-                                                {
-                                                    Label = "2013/2014"
-                                                },
-                                                ["2014_HT6"] = new ChartLabelConfiguration
-                                                {
-                                                    Label = "2014/2015"
-                                                },
-                                                ["2015_HT6"] = new ChartLabelConfiguration
-                                                {
-                                                    Label = "2015/2016"
-                                                },
-                                                ["2016_HT6"] = new ChartLabelConfiguration
-                                                {
-                                                    Label = "2016/2017"
-                                                },
-                                                ["156_727_____"] = new ChartLabelConfiguration
+                                                ["156_727_____"] = new ChartConfiguration
                                                 {
                                                     Label = "Fixed period exclusion Rate",
-                                                    Unit = "%"
+                                                    Unit = "%",
+                                                    Colour = "#4763a5",
+                                                    symbol = ChartSymbol.circle
                                                 },
                                             },
                                         },
@@ -2061,50 +1996,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     {
                                         new LineChart
                                         {
-                                            Axes = new Dictionary<string, ChartAxisConfiguration>
+                                            Axes = new Dictionary<string, AxisConfigurationItem>
                                             {
-                                                ["major"] = new ChartAxisConfiguration
+                                                ["major"] = new AxisConfigurationItem
                                                 {
-                                                    GroupBy = new List<string> {"timePeriod"},
+                                                    GroupBy = AxisGroupBy.timePeriods,
                                                     DataSets = new List<ChartDataSet>
                                                     {
                                                         new ChartDataSet
-                                                            {Indicator = "158", filters = new List<string> {"727"}},
+                                                            {Indicator = "158", Filters = new List<string> {"727"}},
                                                     },
                                                     Title = "School Year"
                                                 },
-                                                ["minor"] = new ChartAxisConfiguration
+                                                ["minor"] = new AxisConfigurationItem
                                                 {
                                                     Title = "Absence Rate",
-                                                    GroupBy = new List<string>(),
                                                 }
                                             },
-                                            Labels = new Dictionary<string, ChartLabelConfiguration>
+                                            Labels = new Dictionary<string, ChartConfiguration>
                                             {
-                                                ["2012_HT6"] = new ChartLabelConfiguration
-                                                {
-                                                    Label = "2012/2013"
-                                                },
-                                                ["2013_HT6"] = new ChartLabelConfiguration
-                                                {
-                                                    Label = "2013/2014"
-                                                },
-                                                ["2014_HT6"] = new ChartLabelConfiguration
-                                                {
-                                                    Label = "2014/2015"
-                                                },
-                                                ["2015_HT6"] = new ChartLabelConfiguration
-                                                {
-                                                    Label = "2015/2016"
-                                                },
-                                                ["2016_HT6"] = new ChartLabelConfiguration
-                                                {
-                                                    Label = "2016/2017"
-                                                },
-                                                ["158_727_____"] = new ChartLabelConfiguration
+                                                ["158_727_____"] = new ChartConfiguration
                                                 {
                                                     Label = "Fixed period exclusion Rate",
-                                                    Unit = "%"
+                                                    Unit = "%",
+                                                    Colour = "#4763a5",
+                                                    symbol = ChartSymbol.circle
                                                 }
                                             }
                                         }
