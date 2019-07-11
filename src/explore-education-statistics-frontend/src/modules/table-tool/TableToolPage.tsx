@@ -12,6 +12,11 @@ import { Dictionary } from '@common/types/util';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PreviousStepModalConfirm from '@frontend/modules/table-tool/components/PreviousStepModalConfirm';
+import {
+  CategoryFilter,
+  Indicator,
+  LocationFilter,
+} from '@frontend/modules/table-tool/components/types/filters';
 import TimePeriod, {
   parseYearCodeTuple,
 } from '@frontend/modules/table-tool/components/types/TimePeriod';
@@ -58,13 +63,13 @@ interface Props {
 }
 
 interface State {
-  locations: Dictionary<FilterOption[]>;
   startYear?: number;
   startCode?: string;
   endYear?: number;
   endCode?: string;
-  filters: Dictionary<FilterOption[]>;
-  indicators: IndicatorOption[];
+  locations: Dictionary<LocationFilter[]>;
+  filters: Dictionary<CategoryFilter[]>;
+  indicators: Indicator[];
   publication?: PublicationOptions['topics'][0]['publications'][0];
   subjects: PublicationSubject[];
   subjectId: string;
@@ -166,12 +171,17 @@ class TableToolPage extends Component<Props, State> {
       locations: mapValuesWithKeys(
         values.locations,
         (locationLevel, locations) =>
-          locations.map(
-            location =>
+          locations
+            .map(location =>
               subjectMeta.locations[locationLevel].options.find(
                 option => option.value === location,
-              ) as FilterOption,
-          ),
+              ),
+            )
+            .filter(option => typeof option !== 'undefined')
+            .map(
+              option =>
+                new LocationFilter(option as FilterOption, locationLevel),
+            ),
       ),
     }));
   };
@@ -250,9 +260,13 @@ class TableToolPage extends Component<Props, State> {
 
     this.setState({
       filters: mapValuesWithKeys(filters, (filterGroup, selectedFilters) =>
-        selectedFilters.map(filter => filtersByValue[filterGroup][filter]),
+        selectedFilters.map(
+          filter => new CategoryFilter(filtersByValue[filterGroup][filter]),
+        ),
       ),
-      indicators: indicators.map(indicator => indicatorsByValue[indicator]),
+      indicators: indicators.map(
+        indicator => new Indicator(indicatorsByValue[indicator]),
+      ),
       timePeriodRange: timePeriodRange.map(
         timePeriod => new TimePeriod(timePeriod),
       ),
@@ -273,6 +287,8 @@ class TableToolPage extends Component<Props, State> {
       timePeriodRange,
       tableData,
     } = this.state;
+
+    const locationsList = Object.values(locations).flat();
 
     return (
       <Page title="Create your own tables online" caption="Table Tool" wide>
@@ -342,7 +358,7 @@ class TableToolPage extends Component<Props, State> {
                     <FiltersForm
                       {...stepProps}
                       onSubmit={this.handleFiltersFormSubmit}
-                      specification={subjectMeta}
+                      subjectMeta={subjectMeta}
                     />
                   )}
                 </WizardStep>
@@ -359,7 +375,7 @@ class TableToolPage extends Component<Props, State> {
                           indicators={indicators}
                           publicationName={publication ? publication.title : ''}
                           subjectName={subjectName}
-                          locations={locations}
+                          locations={locationsList}
                           timePeriods={timePeriodRange}
                           results={tableData}
                         />
@@ -384,7 +400,7 @@ class TableToolPage extends Component<Props, State> {
                                 meta={subjectMeta}
                                 filters={filters}
                                 indicators={indicators}
-                                locations={locations}
+                                locations={locationsList}
                                 timePeriods={timePeriodRange}
                                 results={tableData}
                               />

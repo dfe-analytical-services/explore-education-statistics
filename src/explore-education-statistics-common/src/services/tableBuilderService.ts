@@ -97,8 +97,8 @@ export interface TableData {
     measures: Dictionary<string>;
     filters: string[];
     location: Dictionary<{
-      code: string[];
-      name: string[];
+      code: string;
+      name: string;
     }>;
   }[];
 }
