@@ -63,6 +63,7 @@ const Link = ({
       </a>
     </RouterLink>
   );
+  /* eslint-enable jsx-a11y/no-static-element-interactions */
 };
 
 export default Link;
