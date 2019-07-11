@@ -68,6 +68,12 @@ const ReleaseSetupEditPage = ({
     setReleaseTypes(DummyReferenceData.releaseTypeOptions);
   }, [releaseId]);
 
+  const selectedTimePeriodCoverageGroup =
+    releaseSetupDetails &&
+    DummyReferenceData.findTimePeriodCoverageGroup(
+      releaseSetupDetails.timePeriodCoverageCode,
+    );
+
   const getTimePeriodOptions = (
     timePeriodGroups: TimePeriodCoverageGroup[],
   ) => {
@@ -80,14 +86,6 @@ const ReleaseSetupEditPage = ({
     });
     return optGroups;
   };
-
-  const formId = 'releaseSetupForm';
-
-  const selectedTimePeriodCoverageGroup =
-    releaseSetupDetails &&
-    DummyReferenceData.findTimePeriodCoverageGroup(
-      releaseSetupDetails.timePeriodCoverageCode,
-    );
 
   const isDayMonthYearDateTypeSelected = (
     timePeriodGroup?: TimePeriodCoverageGroup,
@@ -114,6 +112,8 @@ const ReleaseSetupEditPage = ({
           DummyReferenceData.findTimePeriodCoverageGroup(timePeriodGroupCode),
         )
       : false;
+
+  const formId = 'releaseSetupForm';
 
   return (
     <ReleasePageTemplate
