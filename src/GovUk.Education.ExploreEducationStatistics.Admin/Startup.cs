@@ -60,15 +60,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             );
 
             // In production, the React files will be served from this directory
-            services.AddSpaStaticFiles(configuration =>
-            {
-                configuration.RootPath = "wwwroot";
-            });
+            services.AddSpaStaticFiles(configuration => { configuration.RootPath = "wwwroot"; });
 
             services.AddTransient<IFileStorageService, FileStorageService>();
             services.AddTransient<IImportService, ImportService>();
             services.AddTransient<INotificationsService, NotificationsService>();
             services.AddTransient<IPublishingService, PublishingService>();
+            services.AddTransient<IThemeService, ThemeService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -120,6 +118,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                         template: "{controller=Home}/{action=Index}/{id?}");
                 })
             );
+
+            // TODO Is this the best solution to the routing - controllers can be accessed on both "/tools" and "/api"
+            // TODO We could perhaps move everything to the toplevel "/" and have routes specified in the controllers
+            // TODO themselves but this will have an effect on the react app we serve up.
+            app.Map("/api", apiApp => apiApp.UseMvc());
 
             app.UseSpa(spa =>
             {
