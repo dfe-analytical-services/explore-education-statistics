@@ -30,7 +30,7 @@
     "fix": "npm run fix:js && npm run fix:style",
     "fix:js": "eslint --fix --ext .ts,.tsx,.js,.jsx src",
     "fix:style": "stylelint --fix src/**/*.{scss,css}",
-    "format": "prettier --write src/**/*.{js,jsx,ts,tsx,css,scss,html}",
+    "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,css,scss,html}\"",
     "format:check": "prettier --list-different \"src/**/*.{js,jsx,ts,tsx,css,scss,html}\"",
     "lint": "npm run lint:js && npm run lint:style",
     "lint:js": "eslint --ext .ts,.tsx,.js,.jsx src",
