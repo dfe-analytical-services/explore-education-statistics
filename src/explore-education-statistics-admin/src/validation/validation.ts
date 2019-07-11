@@ -1,6 +1,3 @@
-/**
- *
- */
 import Yup from '@common/lib/validation/yup';
 import { isValid } from 'date-fns';
 
