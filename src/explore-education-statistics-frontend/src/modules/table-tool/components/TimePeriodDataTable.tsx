@@ -1,13 +1,13 @@
 import cartesian from '@common/lib/utils/cartesian';
 import formatPretty from '@common/lib/utils/number/formatPretty';
 import { TableData } from '@common/services/tableBuilderService';
-import TimePeriod from '@common/services/types/TimePeriod';
 import { Dictionary } from '@common/types/util';
 import {
   CategoryFilter,
   Indicator,
   LocationFilter,
 } from '@frontend/modules/table-tool/components/types/filters';
+import TimePeriod from '@frontend/modules/table-tool/components/types/TimePeriod';
 import last from 'lodash/last';
 import sortBy from 'lodash/sortBy';
 import React, { memo, useEffect, useRef, useState } from 'react';
@@ -112,8 +112,7 @@ const TimePeriodDataTable = (props: Props) => {
           categoryFilters.every(filter =>
             result.filters.includes(filter.value),
           ) &&
-          result.timeIdentifier === timePeriod.code &&
-          result.year === timePeriod.year &&
+          result.timePeriod === timePeriod.value &&
           locationFilters.every(
             filter =>
               result.location[filter.level] &&

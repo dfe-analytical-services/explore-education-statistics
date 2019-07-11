@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -24,8 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 GeographicLevel = observation.GeographicLevel,
                 Location = _mapper.Map<LocationViewModel>(observation.Location),
                 Measures = Measures(observation, indicators),
-                TimeIdentifier = observation.TimeIdentifier,
-                Year = observation.Year
+                TimePeriod = observation.GetTimePeriod()
             };
         }
 

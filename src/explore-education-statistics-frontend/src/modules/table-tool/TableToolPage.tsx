@@ -8,7 +8,6 @@ import tableBuilderService, {
   TableData,
   ThemeMeta,
 } from '@common/services/tableBuilderService';
-import TimePeriod from '@common/services/types/TimePeriod';
 import { Dictionary } from '@common/types/util';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
@@ -18,6 +17,9 @@ import {
   Indicator,
   LocationFilter,
 } from '@frontend/modules/table-tool/components/types/filters';
+import TimePeriod, {
+  parseYearCodeTuple,
+} from '@frontend/modules/table-tool/components/types/TimePeriod';
 import mapValues from 'lodash/mapValues';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
@@ -61,7 +63,10 @@ interface Props {
 }
 
 interface State {
-  timePeriods: TimePeriod[];
+  startYear?: number;
+  startCode?: string;
+  endYear?: number;
+  endCode?: string;
   locations: Dictionary<LocationFilter[]>;
   filters: Dictionary<CategoryFilter[]>;
   indicators: Indicator[];
@@ -70,13 +75,13 @@ interface State {
   subjectId: string;
   subjectName: string;
   subjectMeta: PublicationSubjectMeta;
+  timePeriodRange: TimePeriod[];
   tableData: TableData['result'];
 }
 
 class TableToolPage extends Component<Props, State> {
   public state: State = {
     filters: {},
-    timePeriods: [],
     locations: {},
     indicators: [],
     subjectName: '',
@@ -92,6 +97,7 @@ class TableToolPage extends Component<Props, State> {
       filters: {},
     },
     subjects: [],
+    timePeriodRange: [],
     tableData: [],
   };
 
@@ -183,24 +189,31 @@ class TableToolPage extends Component<Props, State> {
   private handleTimePeriodFormSubmit: TimePeriodFormSubmitHandler = async values => {
     const { subjectId, locations } = this.state;
 
-    const start = TimePeriod.fromString(values.start);
-    const end = TimePeriod.fromString(values.end);
+    const [startYear, startCode] = parseYearCodeTuple(values.start);
+    const [endYear, endCode] = parseYearCodeTuple(values.end);
 
     const subjectMeta = await tableBuilderService.filterPublicationSubjectMeta({
       ...mapValues(locations, locationLevel =>
         locationLevel.map(location => location.value),
       ),
       subjectId,
-      startYear: start.year,
-      endYear: end.year,
+      timePeriod: {
+        startYear,
+        startCode,
+        endYear,
+        endCode,
+      },
     });
 
     this.setState(prevState => ({
+      startYear,
+      startCode,
+      endYear,
+      endCode,
       subjectMeta: {
         ...prevState.subjectMeta,
         filters: subjectMeta.filters,
       },
-      timePeriods: TimePeriod.createRange(start, end),
     }));
   };
 
@@ -208,17 +221,33 @@ class TableToolPage extends Component<Props, State> {
     filters,
     indicators,
   }) => {
-    const { subjectId, timePeriods, locations, subjectMeta } = this.state;
+    const {
+      subjectId,
+      startYear,
+      startCode,
+      endYear,
+      endCode,
+      locations,
+      subjectMeta,
+    } = this.state;
 
-    const { result } = await tableBuilderService.getTableData({
+    if (!startYear || !startCode || !endYear || !endCode) {
+      return;
+    }
+
+    const { timePeriodRange, result } = await tableBuilderService.getTableData({
       ...mapValues(locations, locationLevel =>
         locationLevel.map(location => location.value),
       ),
       subjectId,
       indicators,
       filters: Object.values(filters).flat(),
-      startYear: timePeriods[0].year,
-      endYear: timePeriods[timePeriods.length - 1].year,
+      timePeriod: {
+        startYear,
+        startCode,
+        endYear,
+        endCode,
+      },
     });
 
     const filtersByValue = mapValues(subjectMeta.filters, value =>
@@ -238,6 +267,9 @@ class TableToolPage extends Component<Props, State> {
       indicators: indicators.map(
         indicator => new Indicator(indicatorsByValue[indicator]),
       ),
+      timePeriodRange: timePeriodRange.map(
+        timePeriod => new TimePeriod(timePeriod),
+      ),
       tableData: result,
     });
   };
@@ -248,11 +280,11 @@ class TableToolPage extends Component<Props, State> {
       filters,
       indicators,
       locations,
-      timePeriods,
       publication,
       subjectName,
       subjectMeta,
       subjects,
+      timePeriodRange,
       tableData,
     } = this.state;
 
@@ -337,64 +369,58 @@ class TableToolPage extends Component<Props, State> {
                         Explore data
                       </WizardStepHeading>
 
-                      {tableData.length > 0 && (
+                      <div className="govuk-!-margin-bottom-4">
+                        <TimePeriodDataTable
+                          filters={filters}
+                          indicators={indicators}
+                          publicationName={publication ? publication.title : ''}
+                          subjectName={subjectName}
+                          locations={locationsList}
+                          timePeriods={timePeriodRange}
+                          results={tableData}
+                        />
+                      </div>
+
+                      {publication && (
                         <>
-                          <div className="govuk-!-margin-bottom-4">
-                            <TimePeriodDataTable
-                              filters={filters}
-                              indicators={indicators}
-                              publicationName={
-                                publication ? publication.title : ''
-                              }
-                              subjectName={subjectName}
-                              locations={locationsList}
-                              timePeriods={timePeriods}
-                              results={tableData}
-                            />
-                          </div>
+                          <h3>Additional options</h3>
 
-                          {publication && (
-                            <>
-                              <h3>Additional options</h3>
+                          <ul className="govuk-list">
+                            <li>
+                              <Link
+                                as={`/statistics/${publication.slug}`}
+                                to={`/statistics/publication?publication=${publication.slug}`}
+                              >
+                                Go to publication
+                              </Link>
+                            </li>
+                            <li>
+                              <DownloadCsvButton
+                                publicationSlug={publication.slug}
+                                meta={subjectMeta}
+                                filters={filters}
+                                indicators={indicators}
+                                locations={locationsList}
+                                timePeriods={timePeriodRange}
+                                results={tableData}
+                              />
+                            </li>
 
-                              <ul className="govuk-list">
-                                <li>
-                                  <Link
-                                    as={`/statistics/${publication.slug}`}
-                                    to={`/statistics/publication?publication=${publication.slug}`}
-                                  >
-                                    Go to publication
-                                  </Link>
-                                </li>
-                                <li>
-                                  <DownloadCsvButton
-                                    publicationSlug={publication.slug}
-                                    meta={subjectMeta}
-                                    filters={filters}
-                                    indicators={indicators}
-                                    locations={locationsList}
-                                    timePeriods={timePeriods}
-                                    results={tableData}
-                                  />
-                                </li>
-
-                                <li>
-                                  <a href="#api">Access developer API</a>
-                                </li>
-                                <li>
-                                  <Link
-                                    as={`/methodologies/${publication.slug}`}
-                                    to={`/methodologies/methodology?methodology=${publication.slug}`}
-                                  >
-                                    Go to methodology
-                                  </Link>
-                                </li>
-                                <li>
-                                  <a href="#contact">Contact</a>
-                                </li>
-                              </ul>
-                            </>
-                          )}
+                            <li>
+                              <a href="#api">Access developer API</a>
+                            </li>
+                            <li>
+                              <Link
+                                as={`/methodologies/${publication.slug}`}
+                                to={`/methodologies/methodology?methodology=${publication.slug}`}
+                              >
+                                Go to methodology
+                              </Link>
+                            </li>
+                            <li>
+                              <a href="#contact">Contact</a>
+                            </li>
+                          </ul>
                         </>
                       )}
                     </>

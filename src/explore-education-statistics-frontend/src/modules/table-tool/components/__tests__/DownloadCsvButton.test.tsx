@@ -139,7 +139,7 @@ describe('DownloadCsvButton', () => {
         results={[
           {
             filters: ['gender_male', 'school_primary'],
-            timeIdentifier: 'AY',
+            timePeriod: '2014_AY',
             location: {
               country: {
                 code: 'england',
@@ -150,11 +150,10 @@ describe('DownloadCsvButton', () => {
               authAbsRate: '1.2',
               authAbsSess: '2',
             },
-            year: 2014,
           },
           {
             filters: ['gender_male', 'school_secondary'],
-            timeIdentifier: 'AY',
+            timePeriod: '2014_AY',
             location: {
               country: {
                 code: 'england',
@@ -165,11 +164,10 @@ describe('DownloadCsvButton', () => {
               authAbsRate: '3.4',
               authAbsSess: '4',
             },
-            year: 2014,
           },
           {
             filters: ['gender_female', 'school_primary'],
-            timeIdentifier: 'AY',
+            timePeriod: '2014_AY',
             location: {
               country: {
                 code: 'england',
@@ -180,11 +178,10 @@ describe('DownloadCsvButton', () => {
               authAbsRate: '5.6',
               authAbsSess: '6',
             },
-            year: 2014,
           },
           {
             filters: ['gender_female', 'school_secondary'],
-            timeIdentifier: 'AY',
+            timePeriod: '2014_AY',
             location: {
               country: {
                 code: 'england',
@@ -195,11 +192,10 @@ describe('DownloadCsvButton', () => {
               authAbsRate: '7.8',
               authAbsSess: '8',
             },
-            year: 2014,
           },
           {
             filters: ['gender_male', 'school_primary'],
-            timeIdentifier: 'AY',
+            timePeriod: '2015_AY',
             location: {
               country: {
                 code: 'england',
@@ -210,11 +206,10 @@ describe('DownloadCsvButton', () => {
               authAbsRate: '9',
               authAbsSess: '10',
             },
-            year: 2015,
           },
           {
             filters: ['gender_male', 'school_secondary'],
-            timeIdentifier: 'AY',
+            timePeriod: '2015_AY',
             location: {
               country: {
                 code: 'england',
@@ -225,11 +220,10 @@ describe('DownloadCsvButton', () => {
               authAbsRate: '11.2',
               authAbsSess: '12',
             },
-            year: 2015,
           },
           {
             filters: ['gender_female', 'school_primary'],
-            timeIdentifier: 'AY',
+            timePeriod: '2015_AY',
             location: {
               country: {
                 code: 'england',
@@ -240,11 +234,10 @@ describe('DownloadCsvButton', () => {
               authAbsRate: '13.4',
               authAbsSess: '14',
             },
-            year: 2015,
           },
           {
             filters: ['gender_female', 'school_secondary'],
-            timeIdentifier: 'AY',
+            timePeriod: '2015_AY',
             location: {
               country: {
                 code: 'england',
@@ -255,11 +248,10 @@ describe('DownloadCsvButton', () => {
               authAbsRate: '15.6',
               authAbsSess: '16',
             },
-            year: 2015,
           },
           {
             filters: ['gender_male', 'school_primary'],
-            timeIdentifier: 'AY',
+            timePeriod: '2014_AY',
             location: {
               region: {
                 code: 'south_yorkshire',
@@ -270,11 +262,10 @@ describe('DownloadCsvButton', () => {
               authAbsRate: '16.7',
               authAbsSess: '17',
             },
-            year: 2014,
           },
           {
             filters: ['gender_male', 'school_secondary'],
-            timeIdentifier: 'AY',
+            timePeriod: '2014_AY',
             location: {
               country: {
                 code: 'england',
@@ -285,11 +276,10 @@ describe('DownloadCsvButton', () => {
               authAbsRate: '17.8',
               authAbsSess: '18',
             },
-            year: 2014,
           },
           {
             filters: ['gender_female', 'school_primary'],
-            timeIdentifier: 'AY',
+            timePeriod: '2014_AY',
             location: {
               country: {
                 code: 'england',
@@ -300,11 +290,10 @@ describe('DownloadCsvButton', () => {
               authAbsRate: '18.9',
               authAbsSess: '19',
             },
-            year: 2014,
           },
           {
             filters: ['gender_female', 'school_secondary'],
-            timeIdentifier: 'AY',
+            timePeriod: '2014_AY',
             location: {
               country: {
                 code: 'england',
@@ -315,11 +304,10 @@ describe('DownloadCsvButton', () => {
               authAbsRate: '20.1',
               authAbsSess: '20',
             },
-            year: 2014,
           },
           {
             filters: ['gender_male', 'school_primary'],
-            timeIdentifier: 'AY',
+            timePeriod: '2014_AY',
             location: {
               country: {
                 code: 'england',
@@ -330,11 +318,10 @@ describe('DownloadCsvButton', () => {
               authAbsRate: '22.3',
               authAbsSess: '22',
             },
-            year: 2015,
           },
           {
             filters: ['gender_male', 'school_secondary'],
-            timeIdentifier: 'AY',
+            timePeriod: '2014_AY',
             location: {
               country: {
                 code: 'england',
@@ -345,11 +332,10 @@ describe('DownloadCsvButton', () => {
               authAbsRate: '24.5',
               authAbsSess: '25',
             },
-            year: 2015,
           },
           {
             filters: ['gender_female', 'school_primary'],
-            timeIdentifier: 'AY',
+            timePeriod: '2014_AY',
             location: {
               country: {
                 code: 'england',
@@ -360,11 +346,10 @@ describe('DownloadCsvButton', () => {
               authAbsRate: '26.7',
               authAbsSess: '27',
             },
-            year: 2015,
           },
           {
             filters: ['gender_female', 'school_secondary'],
-            timeIdentifier: 'AY',
+            timePeriod: '2014_AY',
             location: {
               country: {
                 code: 'england',
@@ -375,7 +360,6 @@ describe('DownloadCsvButton', () => {
               authAbsRate: '28.9',
               authAbsSess: '29',
             },
-            year: 2015,
           },
         ]}
       />,
@@ -425,7 +409,7 @@ describe('DownloadCsvButton', () => {
         results={[
           {
             filters: ['gender_female', 'school_primary'],
-            timeIdentifier: 'AY',
+            timePeriod: '2015_AY',
             location: {
               country: {
                 code: 'england',
@@ -436,7 +420,6 @@ describe('DownloadCsvButton', () => {
               authAbsRate: '12300000',
               authAbsSess: '44255667.2356',
             },
-            year: 2015,
           },
         ]}
       />,
@@ -487,7 +470,7 @@ describe('DownloadCsvButton', () => {
         results={[
           {
             filters: ['gender_female', 'school_primary'],
-            timeIdentifier: 'AY',
+            timePeriod: '2015_AY',
             location: {
               country: {
                 code: 'england',
@@ -498,7 +481,6 @@ describe('DownloadCsvButton', () => {
               authAbsRate: '13.4',
               authAbsSess: 'x',
             },
-            year: 2015,
           },
         ]}
       />,

@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
+namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
     public class ObservationService : AbstractRepository<Observation, long>, IObservationService
     {
@@ -22,12 +25,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
         public IEnumerable<Observation> FindObservations(ObservationQueryContext query)
         {
-            var yearsRange = TimePeriodUtil.YearsRange(query.Years, query.StartYear, query.EndYear);
-
             var subjectIdParam = new SqlParameter("subjectId", query.SubjectId);
             var geographicLevelParam = new SqlParameter("geographicLevel",
                 query.GeographicLevel?.GetEnumValue() ?? (object) DBNull.Value);
-            var yearsListParam = CreateIdListType("yearList", yearsRange);
+            var timePeriodListParam = CreateTimePeriodListType("timePeriodList", GetTimePeriodRange(query));
             var countriesListParam = CreateIdListType("countriesList", query.Country);
             var institutionListParam =
                 CreateIdListType("institutionList", query.Institution);
@@ -55,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .FromSql("EXEC dbo.FilteredObservations " +
                          "@subjectId," +
                          "@geographicLevel," +
-                         "@yearList," +
+                         "@timePeriodList," +
                          "@countriesList," +
                          "@institutionList," +
                          "@localAuthorityList," +
@@ -72,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                          "@filtersList",
                     subjectIdParam,
                     geographicLevelParam,
-                    yearsListParam,
+                    timePeriodListParam,
                     countriesListParam,
                     institutionListParam,
                     localAuthorityListParam,
@@ -107,19 +108,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             return result;
         }
 
-        private static SqlParameter CreateIdListType(string parameterName, IEnumerable<int> idList)
+        private static SqlParameter CreateIdListType(string parameterName, IEnumerable<int> values)
         {
-            return CreateListType(parameterName, idList.AsIdListTable(), "dbo.IdListIntegerType");
+            return CreateListType(parameterName, values.AsIdListTable(), "dbo.IdListIntegerType");
         }
 
-        private static SqlParameter CreateIdListType(string parameterName, IEnumerable<long> idList)
+        private static SqlParameter CreateIdListType(string parameterName, IEnumerable<long> values)
         {
-            return CreateListType(parameterName, idList.AsIdListTable(), "dbo.IdListIntegerType");
+            return CreateListType(parameterName, values.AsIdListTable(), "dbo.IdListIntegerType");
         }
 
-        private static SqlParameter CreateIdListType(string parameterName, IEnumerable<string> idList)
+        private static SqlParameter CreateIdListType(string parameterName, IEnumerable<string> values)
         {
-            return CreateListType(parameterName, idList.AsIdListTable(), "dbo.IdListVarcharType");
+            return CreateListType(parameterName, values.AsIdListTable(), "dbo.IdListVarcharType");
+        }
+
+        private static SqlParameter CreateTimePeriodListType(string parameterName,
+            IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> values)
+        {
+            return CreateListType(parameterName, values.AsTimePeriodListTable(), "dbo.TimePeriodListType");
         }
 
         private static SqlParameter CreateListType(string parameterName, object value, string typeName)
@@ -131,10 +138,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             };
         }
 
-        public IEnumerable<(TimeIdentifier TimePeriod, int Year)> GetTimePeriodsMeta(SubjectMetaQueryContext query)
+        private static IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriodRange(
+            ObservationQueryContext query)
         {
-            var timePeriods = (from o in DbSet().AsNoTracking().Where(query.ObservationPredicate())
-                select new {o.TimeIdentifier, o.Year}).Distinct();
+            if (query.TimePeriod.StartCode.IsNumberOfTerms() || query.TimePeriod.EndCode.IsNumberOfTerms())
+            {
+                return TimePeriodUtil.RangeForNumberOfTerms(query.TimePeriod.StartYear, query.TimePeriod.EndYear);
+            }
+
+            return TimePeriodUtil.Range(query.TimePeriod);
+        }
+
+        public IEnumerable<(TimeIdentifier TimeIdentifier, int Year)> GetTimePeriodsMeta(SubjectMetaQueryContext query)
+        {
+            var timePeriods = DbSet().AsNoTracking().Where(query.ObservationPredicate())
+                .Select(o => new {o.TimeIdentifier, o.Year})
+                .OrderBy(tuple => tuple.Year)
+                .ThenBy(tuple => tuple.TimeIdentifier)
+                .Distinct();
 
             return from timePeriod in timePeriods.AsEnumerable()
                 select (timePeriod.TimeIdentifier, timePeriod.Year);

@@ -4,13 +4,13 @@ import {
   PublicationSubjectMeta,
   TableData,
 } from '@common/services/tableBuilderService';
-import TimePeriod from '@common/services/types/TimePeriod';
 import { Dictionary } from '@common/types';
 import {
   CategoryFilter,
   Indicator,
   LocationFilter,
 } from '@frontend/modules/table-tool/components/types/filters';
+import TimePeriod from '@frontend/modules/table-tool/components/types/TimePeriod';
 import { saveAs } from 'file-saver';
 import Papa from 'papaparse';
 import React from 'react';
@@ -70,8 +70,7 @@ const DownloadCsvButton = ({
             filterOptions.every(filter =>
               result.filters.includes(filter.value),
             ) &&
-              result.timeIdentifier === timePeriod.code &&
-              result.year === timePeriod.year &&
+              result.timePeriod === timePeriod.value &&
               result.location[location.level] &&
               result.location[location.level].code === location.value,
           );
