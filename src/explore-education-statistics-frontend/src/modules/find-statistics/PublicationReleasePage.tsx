@@ -153,9 +153,7 @@ class PublicationReleasePage extends Component<Props> {
                             releaseName,
                             <li key={id} data-testid="previous-release-item">
                               <Link
-                                to={`/statistics/${
-                                  data.publication.slug
-                                }/${slug}`}
+                                to={`/statistics/${data.publication.slug}/${slug}`}
                               >
                                 {releaseName}
                               </Link>
