@@ -56,6 +56,8 @@ const DownloadCsvButton = ({
       timePeriods,
       ...Object.values(filters),
     ).map(row => {
+      // TODO: Remove ignore when Prettier stops adding trailing comma to tuple type
+      // prettier-ignore
       const [location, timePeriod, ...filterOptions] = row as [
         LocationFilter,
         TimePeriod,
