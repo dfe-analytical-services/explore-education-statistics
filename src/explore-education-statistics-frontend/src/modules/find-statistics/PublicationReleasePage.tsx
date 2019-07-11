@@ -75,14 +75,14 @@ class PublicationReleasePage extends Component<Props> {
                   </strong>
                 )}
                 <dl className="dfe-meta-content govuk-!-margin-top-3 govuk-!-margin-bottom-1">
-                  <dt className="govuk-caption-m">Published: </dt>
+                  <dt className="govuk-caption-m">Published:</dt>
                   <dd data-testid="published-date">
                     <strong>
                       <FormattedDate>{data.published}</FormattedDate>{' '}
                     </strong>
                   </dd>
                   <div>
-                    <dt className="govuk-caption-m">Next update: </dt>
+                    <dt className="govuk-caption-m">Next update:</dt>
                     <dd data-testid="next-update">
                       <strong>
                         <FormattedDate format="MMMM yyyy">
@@ -146,7 +146,7 @@ class PublicationReleasePage extends Component<Props> {
               <h3>About these statistics</h3>
 
               <dl className="dfe-meta-content">
-                <dt className="govuk-caption-m">For school year: </dt>
+                <dt className="govuk-caption-m">For school year:</dt>
                 <dd data-testid="release-name">
                   <strong>{data.releaseName}</strong>
                 </dd>
@@ -186,7 +186,7 @@ class PublicationReleasePage extends Component<Props> {
                 </dd>
               </dl>
               <dl className="dfe-meta-content">
-                <dt className="govuk-caption-m">Last updated: </dt>
+                <dt className="govuk-caption-m">Last updated:</dt>
                 <dd data-testid="last-updated">
                   <strong>
                     <FormattedDate>{data.updates[0].on}</FormattedDate>
