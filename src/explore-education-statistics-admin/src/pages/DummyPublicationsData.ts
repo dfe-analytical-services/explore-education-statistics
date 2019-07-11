@@ -21,16 +21,33 @@ const theme1: IdLabelPair = {
   label: 'Pupils and schools',
 };
 
+const theme2: IdLabelPair = {
+  id: 'theme-2',
+  label: 'Theme 2',
+};
+
 const theme1Topic1: Topic = {
   id: 'topic-1',
-  title: 'pupil absence',
+  title: 'Pupil absence',
   theme: theme1,
 };
 
 const theme1Topic2: Topic = {
   id: 'topic-2',
-  title: 'exclusions',
+  title: 'Exclusions',
   theme: theme1,
+};
+
+const theme2Topic1: Topic = {
+  id: 'theme-2-topic-1',
+  title: 'Theme 2 topic 1',
+  theme: theme2,
+};
+
+const theme2Topic2: Topic = {
+  id: 'theme-2-topic-2',
+  title: 'Theme 2 topic 2',
+  theme: theme2,
 };
 
 const dataTypeRevised: ReleaseDataType = {
@@ -307,34 +324,28 @@ interface ThemeAndTopics {
 
 const themesAndTopics: ThemeAndTopics[] = [
   {
-    theme: {
-      id: 'pupil-schools',
-      label: 'Pupils and schools',
-    },
+    theme: theme1,
     topics: [
       {
-        id: 'pupil-absence',
-        label: 'Pupil absence',
+        id: theme1Topic1.id,
+        label: theme1Topic1.title,
       },
       {
-        id: 'exclusions',
-        label: 'Exclusions',
+        id: theme1Topic2.id,
+        label: theme1Topic2.title,
       },
     ],
   },
   {
-    theme: {
-      id: 'theme-2',
-      label: 'Theme 2',
-    },
+    theme: theme2,
     topics: [
       {
-        id: 'theme-2-topic-1',
-        label: 'Topic 1',
+        id: theme2Topic1.id,
+        label: theme2Topic1.title,
       },
       {
-        id: 'theme-2-topic-2',
-        label: 'Topic 2',
+        id: theme2Topic2.id,
+        label: theme2Topic2.title,
       },
     ],
   },

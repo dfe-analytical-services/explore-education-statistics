@@ -29,10 +29,6 @@ const AdminDashboardPublicationsTab = ({
   onThemeChange,
   onTopicChange,
 }: AdminDashboardPublicationsTabProps) => {
-  if (publications.length === 0) {
-    return <div className="govuk-inset-text">{noResultsMessage}</div>;
-  }
-
   const selectedTheme =
     themes.find(theme => theme.id === selectedThemeId) || themes[0];
   const selectedTopic =
@@ -79,20 +75,25 @@ const AdminDashboardPublicationsTab = ({
           />
         </div>
       </div>
+      {publications.length > 0 && (
+        <Accordion id="publications">
+          {publications.map(publication => (
+            <AccordionSection
+              key={publication.id}
+              heading={publication.title}
+              headingTag="h3"
+            >
+              <AdminDashboardPublications publication={publication} />
+            </AccordionSection>
+          ))}
+        </Accordion>
+      )}
+      {publications.length === 0 && (
+        <div className="govuk-inset-text">{noResultsMessage}</div>
+      )}
       <Link to="/prototypes/publication-create-new" className="govuk-button">
         Create a new publication
       </Link>
-      <Accordion id="publications">
-        {publications.map(publication => (
-          <AccordionSection
-            key={publication.id}
-            heading={publication.title}
-            headingTag="h3"
-          >
-            <AdminDashboardPublications publication={publication} />
-          </AccordionSection>
-        ))}
-      </Accordion>
     </section>
   );
 };

@@ -54,7 +54,9 @@ const AdminDashboardPage = () => {
 
       if (selectedTopicId) {
         const fetchedMyPublications = DummyPublicationsData.allPublications.filter(
-          publication => publication.owner.id === loggedInUserId,
+          publication =>
+            publication.owner.id === loggedInUserId &&
+            publication.topic.id === selectedTopicId,
         );
 
         const fetchedInProgressPublications = DummyPublicationsData.allPublications.filter(
