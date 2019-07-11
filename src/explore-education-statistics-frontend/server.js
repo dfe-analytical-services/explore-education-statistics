@@ -1,4 +1,10 @@
 require('core-js/fn/array/flat-map');
+require('core-js/fn/array/flatten');
+
+if (!Array.prototype.flat) {
+  // eslint-disable-next-line no-extend-native
+  Array.prototype.flat = Array.prototype.flatten;
+}
 
 const appInsights = require('applicationinsights');
 

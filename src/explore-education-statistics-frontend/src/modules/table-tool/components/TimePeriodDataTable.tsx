@@ -1,37 +1,33 @@
 import cartesian from '@common/lib/utils/cartesian';
 import formatPretty from '@common/lib/utils/number/formatPretty';
-import commaList from '@common/lib/utils/string/commaList';
-import {
-  FilterOption,
-  IndicatorOption,
-  TableData,
-} from '@common/services/tableBuilderService';
+import { TableData } from '@common/services/tableBuilderService';
 import TimePeriod from '@common/services/types/TimePeriod';
 import { Dictionary } from '@common/types/util';
+import {
+  CategoryFilter,
+  Indicator,
+  LocationFilter,
+} from '@frontend/modules/table-tool/components/types/filters';
+import last from 'lodash/last';
 import sortBy from 'lodash/sortBy';
 import React, { memo, useEffect, useRef, useState } from 'react';
+import DataTableCaption from './DataTableCaption';
 import FixedMultiHeaderDataTable from './FixedMultiHeaderDataTable';
 import TableHeadersForm, { TableHeadersFormValues } from './TableHeadersForm';
 
 interface Props {
-  indicators: IndicatorOption[];
-  filters: Dictionary<FilterOption[]>;
+  indicators: Indicator[];
+  filters: Dictionary<CategoryFilter[]>;
   timePeriods: TimePeriod[];
   publicationName: string;
   subjectName: string;
-  locations: Dictionary<FilterOption[]>;
+  locations: LocationFilter[];
   results: TableData['result'];
 }
 
-const TimePeriodDataTable = ({
-  filters,
-  timePeriods,
-  indicators,
-  publicationName,
-  subjectName,
-  locations,
-  results,
-}: Props) => {
+const TimePeriodDataTable = (props: Props) => {
+  const { filters, timePeriods, locations, indicators, results } = props;
+
   const dataTableRef = useRef<HTMLTableElement>(null);
 
   const [tableHeaders, setTableHeaders] = useState<TableHeadersFormValues>({
@@ -42,37 +38,23 @@ const TimePeriodDataTable = ({
   });
 
   useEffect(() => {
-    const sortedFilters = sortBy(Object.values(filters), [
-      options => options.length,
-    ]);
+    const sortedFilters = sortBy(
+      Object.values({
+        ...filters,
+        locations,
+      }),
+      [options => options.length],
+    );
 
     const halfwayIndex = Math.floor(sortedFilters.length / 2);
-    const columnGroups = sortedFilters.slice(0, halfwayIndex);
-    const rowGroups = sortedFilters.slice(halfwayIndex);
 
     setTableHeaders({
-      columnGroups,
-      rowGroups,
+      columnGroups: sortedFilters.slice(0, halfwayIndex),
+      rowGroups: sortedFilters.slice(halfwayIndex),
       columns: timePeriods,
       rows: indicators,
     });
-  }, [filters, timePeriods, indicators]);
-
-  const startLabel = timePeriods[0].label;
-  const endLabel = timePeriods[timePeriods.length - 1].label;
-
-  const locationLabels = Object.values(locations).flatMap(locationOptions =>
-    locationOptions.map(location => location.label),
-  );
-
-  const timePeriodString =
-    startLabel === endLabel
-      ? ` for ${startLabel}`
-      : ` between ${startLabel} and ${endLabel}`;
-
-  const caption = `Table showing '${subjectName}' from '${publicationName}' in ${commaList(
-    locationLabels,
-  )} ${timePeriodString}`;
+  }, [filters, timePeriods, locations, indicators]);
 
   const columnHeaders: string[][] = [
     ...tableHeaders.columnGroups.map(colGroup =>
@@ -99,27 +81,44 @@ const TimePeriodDataTable = ({
   );
 
   const rows = rowHeadersCartesian.map(rowFilterCombination => {
-    const indicatorOption = rowFilterCombination[
-      rowFilterCombination.length - 1
-    ] as IndicatorOption;
+    const rowCol1 = last(rowFilterCombination);
 
     return columnHeadersCartesian.map(columnFilterCombination => {
-      const time = columnFilterCombination[
-        columnFilterCombination.length - 1
-      ] as TimePeriod;
+      const rowCol2 = last(columnFilterCombination);
 
-      const aggregateFilters = [
-        ...rowFilterCombination.slice(0, -1),
-        ...columnFilterCombination.slice(0, -1),
+      // User could choose to flip rows and columns
+      const indicator = (rowCol1 instanceof Indicator
+        ? rowCol1
+        : rowCol2) as Indicator;
+      const timePeriod = (rowCol2 instanceof TimePeriod
+        ? rowCol2
+        : rowCol1) as TimePeriod;
+
+      const filterCombination = [
+        ...rowFilterCombination,
+        ...columnFilterCombination,
       ];
+
+      const categoryFilters = filterCombination.filter(
+        filter => filter instanceof CategoryFilter,
+      );
+
+      const locationFilters = filterCombination.filter(
+        filter => filter instanceof LocationFilter,
+      ) as LocationFilter[];
 
       const matchingResult = results.find(result => {
         return (
-          aggregateFilters.every(filter => {
-            return result.filters.includes(filter.value);
-          }) &&
-          result.timeIdentifier === time.code &&
-          result.year === time.year
+          categoryFilters.every(filter =>
+            result.filters.includes(filter.value),
+          ) &&
+          result.timeIdentifier === timePeriod.code &&
+          result.year === timePeriod.year &&
+          locationFilters.every(
+            filter =>
+              result.location[filter.level] &&
+              result.location[filter.level].code === filter.value,
+          )
         );
       });
 
@@ -127,13 +126,13 @@ const TimePeriodDataTable = ({
         return 'n/a';
       }
 
-      const value = matchingResult.measures[indicatorOption.value];
+      const value = matchingResult.measures[indicator.value];
 
       if (Number.isNaN(Number(value))) {
         return value;
       }
 
-      return `${formatPretty(value)}${indicatorOption.unit}`;
+      return `${formatPretty(value)}${indicator.unit}`;
     });
   });
 
@@ -154,7 +153,7 @@ const TimePeriodDataTable = ({
       />
 
       <FixedMultiHeaderDataTable
-        caption={caption}
+        caption={<DataTableCaption {...props} id="dataTableCaption" />}
         columnHeaders={columnHeaders}
         rowHeaders={rowHeaders}
         rows={rows}

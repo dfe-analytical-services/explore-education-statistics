@@ -1,0 +1,58 @@
+@import '~explore-education-statistics-common/src/styles/govuk-base';
+
+.groupsFieldset {
+  border: 4px solid govuk-colour('grey-3');
+  padding: govuk-spacing(2);
+  width: 100%;
+}
+
+.isDraggingOver {
+  background-color: govuk-colour('grey-4');
+  border-color: $govuk-focus-colour;
+}
+
+.listsContainer {
+  display: flex;
+  flex-direction: column;
+  padding: govuk-spacing(2);
+  width: 100%;
+
+  @include govuk-media-query($from: desktop) {
+    flex-direction: row;
+  }
+}
+
+.listOneThird {
+  flex-basis: 100%;
+  margin-bottom: govuk-spacing(2);
+
+  @include govuk-media-query($from: tablet) {
+    flex-basis: 33%;
+    margin-bottom: 0;
+
+    &:not(:last-of-type) {
+      margin-right: govuk-spacing(2);
+    }
+  }
+}
+
+.list {
+  @include govuk-focusable;
+
+  background: govuk-colour('grey-3');
+  display: block;
+  padding: govuk-spacing(2);
+
+  &:hover {
+    background: govuk-colour('grey-2');
+
+    // Fallback if grab is unsupported
+    cursor: move;
+    cursor: grab;
+  }
+}
+
+.isDragging {
+  outline: $govuk-focus-width solid $govuk-focus-colour;
+  outline-offset: 0;
+}
