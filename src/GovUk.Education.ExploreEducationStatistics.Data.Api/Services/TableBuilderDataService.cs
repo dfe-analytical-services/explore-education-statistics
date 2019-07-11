@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using static GovUk.Education.ExploreEducationStatistics.Data.Model.TimeIdentifier;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
@@ -44,25 +46,62 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private static IEnumerable<TimePeriodMetaViewModel> GetTimePeriodRange(
             IEnumerable<Observation> observations)
         {
-            var timePeriods = observations.Select(o => (o.Year, o.TimeIdentifier))
+            var timePeriods = GetDistinctObservationTimePeriods(observations);
+
+            var start = timePeriods.First();
+            var end = timePeriods.Last();
+
+            if (start.TimeIdentifier.IsNumberOfTerms() || end.TimeIdentifier.IsNumberOfTerms())
+            {
+                return MergeTimePeriodsWithHalfTermRange(timePeriods, start.Year, end.Year)
+                    .Select(BuildTimePeriodViewModel);
+            }
+
+            return GetTimePeriodRange(start, end).Select(BuildTimePeriodViewModel);
+        }
+
+        private static IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriodRange(
+            (int Year, TimeIdentifier TimeIdentifier) start,
+            (int Year, TimeIdentifier TimeIdentifier) end)
+        {
+            return TimePeriodUtil.Range(start.Year, start.TimeIdentifier, end.Year, end.TimeIdentifier);
+        }
+
+        private static IEnumerable<(int Year, TimeIdentifier TimeIdentifier)>
+            MergeTimePeriodsWithHalfTermRange(
+                List<(int Year, TimeIdentifier TimeIdentifier)> timePeriods, int startYear, int endYear)
+        {
+            // Generate a year range based only on Six Half Terms
+            var range = TimePeriodUtil.Range(startYear, SixHalfTerms, endYear, SixHalfTerms);
+
+            // Merge it with the distinct time periods to replace any years which should be Five Half Terms
+            var rangeMap = range.ToDictionary(tuple => tuple.Year, tuple => tuple);
+            timePeriods.ForEach(tuple =>
+            {
+                rangeMap[tuple.Year] = (tuple.Year, tuple.TimeIdentifier);
+            });
+
+            return rangeMap.Values;
+        }
+
+        private static List<(int Year, TimeIdentifier TimeIdentifier)> GetDistinctObservationTimePeriods(
+            IEnumerable<Observation> observations)
+        {
+            return observations.Select(o => (o.Year, o.TimeIdentifier))
                 .Distinct()
                 .OrderBy(tuple => tuple.Year)
                 .ThenBy(tuple => tuple.TimeIdentifier)
                 .ToList();
+        }
 
-            var first = timePeriods.First();
-            var last = timePeriods.Last();
-
-            var range = TimePeriodUtil.Range(first.Year, first.TimeIdentifier, last.Year, last.TimeIdentifier);
-
-            // TODO DFE-886 there could be values in the range that the table tool doesn’t want returning
-
-            return range.Select(tuple => new TimePeriodMetaViewModel
+        private static TimePeriodMetaViewModel BuildTimePeriodViewModel((int Year, TimeIdentifier TimeIdentifier) tuple)
+        {
+            return new TimePeriodMetaViewModel
             {
                 Code = tuple.TimeIdentifier,
                 Label = TimePeriodLabelFormatter.Format(tuple.Year, tuple.TimeIdentifier),
                 Year = tuple.Year
-            });
+            };
         }
     }
 }

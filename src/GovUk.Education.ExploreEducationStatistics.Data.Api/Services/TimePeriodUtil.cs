@@ -75,6 +75,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 "The time period StartCode and EndCode must either represent a year or be part of an associated range");
         }
 
+        public static IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> RangeForNumberOfTerms(
+            int startYear, int endYear)
+        {
+            var result = new List<(int Year, TimeIdentifier TimeIdentifier)>();
+
+            foreach (var numberOfTerm in TimeIdentifierUtil.GetNumberOfTerms())
+            {
+                result.AddRange(Range(startYear, numberOfTerm, endYear, numberOfTerm));
+            }
+
+            return result;
+        }
+
         private static IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetYearsForTimeIdentifier(int startYear,
             int endYear, TimeIdentifier identifier)
         {

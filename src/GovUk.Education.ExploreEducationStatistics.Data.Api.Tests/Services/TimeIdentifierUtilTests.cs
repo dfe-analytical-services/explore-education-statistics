@@ -107,7 +107,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 CalendarYear,
                 FinancialYear,
                 TaxYear,
-                EndOfMarch
+                EndOfMarch,
+                FiveHalfTerms,
+                SixHalfTerms
             }, TimeIdentifierUtil.GetYears());
         }
 

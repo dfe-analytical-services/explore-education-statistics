@@ -31,7 +31,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 TimeIdentifier.CalendarYear,
                 TimeIdentifier.FinancialYear,
                 TimeIdentifier.TaxYear,
-                TimeIdentifier.EndOfMarch
+                TimeIdentifier.EndOfMarch,
+                TimeIdentifier.FiveHalfTerms,
+                TimeIdentifier.SixHalfTerms
             };
         }
 

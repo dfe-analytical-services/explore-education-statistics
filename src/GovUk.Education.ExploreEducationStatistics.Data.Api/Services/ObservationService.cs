@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -24,12 +25,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         public IEnumerable<Observation> FindObservations(ObservationQueryContext query)
         {
-            var timePeriodRange = TimePeriodUtil.Range(query.TimePeriod);
-
             var subjectIdParam = new SqlParameter("subjectId", query.SubjectId);
             var geographicLevelParam = new SqlParameter("geographicLevel",
                 query.GeographicLevel?.GetEnumValue() ?? (object) DBNull.Value);
-            var timePeriodListParam = CreateTimePeriodListType("timePeriodList", timePeriodRange);
+            var timePeriodListParam = CreateTimePeriodListType("timePeriodList", GetTimePeriodRange(query));
             var countriesListParam = CreateIdListType("countriesList", query.Country);
             var institutionListParam =
                 CreateIdListType("institutionList", query.Institution);
@@ -137,6 +136,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 SqlDbType = SqlDbType.Structured,
                 TypeName = typeName
             };
+        }
+
+        private static IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriodRange(
+            ObservationQueryContext query)
+        {
+            if (query.TimePeriod.StartCode.IsNumberOfTerms() || query.TimePeriod.EndCode.IsNumberOfTerms())
+            {
+                return TimePeriodUtil.RangeForNumberOfTerms(query.TimePeriod.StartYear, query.TimePeriod.EndYear);
+            }
+
+            return TimePeriodUtil.Range(query.TimePeriod);
         }
 
         public IEnumerable<(TimeIdentifier TimeIdentifier, int Year)> GetTimePeriodsMeta(SubjectMetaQueryContext query)

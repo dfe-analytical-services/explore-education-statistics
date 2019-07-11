@@ -17,13 +17,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Extensions
         [Fact]
         public void TimeIdentifiersAreAlikeWhenTheyAreEqual()
         {
+            Assert.True(AcademicYear.IsAlike(AcademicYear));
             Assert.True(CalendarYear.IsAlike(CalendarYear));
+            Assert.True(FinancialYear.IsAlike(FinancialYear));
             Assert.True(TaxYear.IsAlike(TaxYear));
+            Assert.True(AcademicYearQ1.IsAlike(AcademicYearQ1));
             Assert.True(CalendarYearQ1.IsAlike(CalendarYearQ1));
+            Assert.True(FinancialYearQ1.IsAlike(FinancialYearQ1));
+            Assert.True(TaxYearQ1.IsAlike(TaxYearQ1));
             Assert.True(EndOfMarch.IsAlike(EndOfMarch));
+            Assert.True(FiveHalfTerms.IsAlike(FiveHalfTerms));
+            Assert.True(SixHalfTerms.IsAlike(SixHalfTerms));
             Assert.True(January.IsAlike(January));
             Assert.True(SpringTerm.IsAlike(SpringTerm));
-            Assert.True(SixHalfTerms.IsAlike(SixHalfTerms));
         }
 
         [Fact]
@@ -54,12 +60,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Extensions
         public void MonthsAreAlike()
         {
             AssertTimeIdentifiersAreAlike(TimeIdentifierUtil.GetMonths());
-        }
-
-        [Fact]
-        public void NumberOfTermsAreAlike()
-        {
-            AssertTimeIdentifiersAreAlike(TimeIdentifierUtil.GetNumberOfTerms());
         }
 
         [Fact]
@@ -171,12 +171,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Extensions
         public void GetAssociatedRangeForTermReturnsAssociatedRange()
         {
             Assert.Equal(TimeIdentifierUtil.GetTerms(), AutumnTerm.GetAssociatedRange());
-        }
-
-        [Fact]
-        public void GetAssociatedRangeForNumberOfTermsReturnsAssociatedRange()
-        {
-            Assert.Equal(TimeIdentifierUtil.GetNumberOfTerms(), FiveHalfTerms.GetAssociatedRange());
         }
 
         private void AssertTimeIdentifiersMeetCondition(Func<TimeIdentifier, bool> condition,

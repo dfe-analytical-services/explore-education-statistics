@@ -19,7 +19,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Extensions
                    IsFinancialQuarter(timeIdentifier) && IsFinancialQuarter(compare) ||
                    IsTaxQuarter(timeIdentifier) && IsTaxQuarter(compare) ||
                    IsMonth(timeIdentifier) && IsMonth(compare) ||
-                   IsNumberOfTerms(timeIdentifier) && IsNumberOfTerms(compare) ||
                    IsTerm(timeIdentifier) && IsTerm(compare);
         }
 
@@ -98,11 +97,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Extensions
             if (timeIdentifier.IsTerm())
             {
                 return GetTerms();
-            }
-
-            if (timeIdentifier.IsNumberOfTerms())
-            {
-                return GetNumberOfTerms();
             }
 
             throw new ArgumentOutOfRangeException(nameof(timeIdentifier),

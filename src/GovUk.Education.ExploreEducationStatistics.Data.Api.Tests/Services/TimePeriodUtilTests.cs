@@ -111,6 +111,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Assert.Throws<ArgumentException>(() =>
                     TimePeriodUtil.Range(new TimePeriodQuery(2018, AutumnTerm, 2019, identifier)));
             }
+
+            Assert.Throws<ArgumentException>(() =>
+                TimePeriodUtil.Range(new TimePeriodQuery(2018, CalendarYear, 2019, AcademicYear)));
+
+            Assert.Throws<ArgumentException>(() =>
+                TimePeriodUtil.Range(new TimePeriodQuery(2018, CalendarYear, 2019, TaxYear)));
+
+            Assert.Throws<ArgumentException>(() =>
+                TimePeriodUtil.Range(new TimePeriodQuery(2018, CalendarYear, 2019, FinancialYear)));
+
+            Assert.Throws<ArgumentException>(() =>
+                TimePeriodUtil.Range(new TimePeriodQuery(2018, CalendarYear, 2019, EndOfMarch)));
+
+            Assert.Throws<ArgumentException>(() =>
+                TimePeriodUtil.Range(new TimePeriodQuery(2018, CalendarYear, 2019, FiveHalfTerms)));
+
+            Assert.Throws<ArgumentException>(() =>
+                TimePeriodUtil.Range(new TimePeriodQuery(2018, FiveHalfTerms, 2019, SixHalfTerms)));
         }
 
         [Fact]
@@ -176,6 +194,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             CollectionAssert.AreEquivalent(expected,
                 TimePeriodUtil.Range(new TimePeriodQuery(2018, EndOfMarch, 2019, EndOfMarch)).ToList());
+        }
+
+        [Fact]
+        public void RangeIsGeneratedForFiveHalfTermsQuery()
+        {
+            var expected = new List<(int Year, TimeIdentifier TimeIdentifier)>
+            {
+                (2018, FiveHalfTerms),
+                (2019, FiveHalfTerms)
+            };
+
+            CollectionAssert.AreEquivalent(expected,
+                TimePeriodUtil.Range(new TimePeriodQuery(2018, FiveHalfTerms, 2019, SixHalfTerms)).ToList());
+        }
+
+        [Fact]
+        public void RangeIsGeneratedForSixHalfTermsQuery()
+        {
+            var expected = new List<(int Year, TimeIdentifier TimeIdentifier)>
+            {
+                (2018, SixHalfTerms),
+                (2019, SixHalfTerms)
+            };
+
+            CollectionAssert.AreEquivalent(expected,
+                TimePeriodUtil.Range(new TimePeriodQuery(2018, SixHalfTerms, 2019, SixHalfTerms)).ToList());
+        }
+
+        [Fact]
+        public void RangeIsGeneratedForNumberOfTermsQuery()
+        {
+            var expected = new List<(int Year, TimeIdentifier TimeIdentifier)>
+            {
+                (2018, FiveHalfTerms),
+                (2018, FiveHalfTerms),
+                (2019, SixHalfTerms),
+                (2019, SixHalfTerms)
+            };
+
+            CollectionAssert.AreEquivalent(expected,
+                TimePeriodUtil.RangeForNumberOfTerms(2018, 2019).ToList());
         }
 
         [Fact]
@@ -451,36 +510,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     (2020, AutumnTerm)
                 },
                 TimePeriodUtil.Range(new TimePeriodQuery(2018, SpringTerm, 2020, AutumnTerm)).ToList());
-        }
-
-        [Fact]
-        public void RangeIsGeneratedForNumberOfTermsQuery()
-        {
-            CollectionAssert.AreEquivalent(
-                new List<(int Year, TimeIdentifier TimeIdentifier)>
-                {
-                    (2019, SixHalfTerms)
-                },
-                TimePeriodUtil.Range(new TimePeriodQuery(2019, SixHalfTerms, 2019, SixHalfTerms)).ToList());
-
-            CollectionAssert.AreEquivalent(
-                new List<(int Year, TimeIdentifier TimeIdentifier)>
-                {
-                    (2019, FiveHalfTerms),
-                    (2019, SixHalfTerms)
-                },
-                TimePeriodUtil.Range(new TimePeriodQuery(2019, FiveHalfTerms, 2019, SixHalfTerms)).ToList());
-
-            CollectionAssert.AreEquivalent(
-                new List<(int Year, TimeIdentifier TimeIdentifier)>
-                {
-                    (2018, SixHalfTerms),
-                    (2019, FiveHalfTerms),
-                    (2019, SixHalfTerms),
-                    (2020, FiveHalfTerms),
-                    (2020, SixHalfTerms)
-                },
-                TimePeriodUtil.Range(new TimePeriodQuery(2018, SixHalfTerms, 2020, SixHalfTerms)).ToList());
         }
     }
 }

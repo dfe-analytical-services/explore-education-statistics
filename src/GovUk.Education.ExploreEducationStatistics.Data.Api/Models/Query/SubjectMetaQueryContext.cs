@@ -36,12 +36,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
             
             if (TimePeriod != null)
             {
-                var timePeriodRange = TimePeriodUtil.Range(TimePeriod)
-                    .Select(tuple => tuple.GetTimePeriod()).ToList();
-
                 // Don't use the observation.GetTimePeriod() extension in the expression here as it can't be translated
-                predicate = predicate.And(observation => timePeriodRange.Contains(
-                    observation.Year + "_" + observation.TimeIdentifier));
+                predicate = predicate.And(observation => GetTimePeriodRange(TimePeriod)
+                    .Contains(observation.Year + "_" + observation.TimeIdentifier));
             }
 
             if (GeographicLevel != null)
@@ -128,6 +125,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
             }
 
             return predicate;
+        }
+        
+        private static IEnumerable<string> GetTimePeriodRange(TimePeriodQuery timePeriod)
+        {
+            if (timePeriod.StartCode.IsNumberOfTerms() || timePeriod.EndCode.IsNumberOfTerms())
+            {
+                return TimePeriodUtil.RangeForNumberOfTerms(timePeriod.StartYear, timePeriod.EndYear)
+                    .Select(tuple => tuple.GetTimePeriod());
+            }
+
+            return TimePeriodUtil.Range(timePeriod).Select(tuple => tuple.GetTimePeriod());
         }
     }
 }
