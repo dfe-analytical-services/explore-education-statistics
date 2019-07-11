@@ -300,9 +300,50 @@ const getReleaseSetupDetails = (releaseId: string): ReleaseSetupDetails => {
   };
 };
 
+interface ThemeAndTopics {
+  theme: IdLabelPair;
+  topics: IdLabelPair[];
+}
+
+const themesAndTopics: ThemeAndTopics[] = [
+  {
+    theme: {
+      id: 'pupil-schools',
+      label: 'Pupils and schools',
+    },
+    topics: [
+      {
+        id: 'pupil-absence',
+        label: 'Pupil absence',
+      },
+      {
+        id: 'exclusions',
+        label: 'Exclusions',
+      },
+    ],
+  },
+  {
+    theme: {
+      id: 'theme-2',
+      label: 'Theme 2',
+    },
+    topics: [
+      {
+        id: 'theme-2-topic-1',
+        label: 'Topic 1',
+      },
+      {
+        id: 'theme-2-topic-2',
+        label: 'Topic 2',
+      },
+    ],
+  },
+];
+
 export default {
   allPublications,
   getReleaseById,
   getOwningPublicationForRelease,
   getReleaseSetupDetails,
+  themesAndTopics,
 };

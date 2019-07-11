@@ -4,7 +4,7 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import { LoginContext } from '@admin/components/Login';
 import DummyPublicationsData from '@admin/pages/DummyPublicationsData';
-import { Publication } from '@admin/services/types/types';
+import { IdLabelPair, Publication } from '@admin/services/types/types';
 import AdminDashboardPublicationsTab from '@admin/components/AdminDashboardPublicationsTab';
 import Link from '../components/Link';
 import Page from '../components/Page';
@@ -16,6 +16,14 @@ const AdminDashboardPage = () => {
     Publication[]
   >([]);
 
+  const [themes, setThemes] = useState<IdLabelPair[]>();
+
+  const [topics, setTopics] = useState<IdLabelPair[]>();
+
+  const [selectedThemeId, setSelectedThemeId] = useState<string>();
+
+  const [selectedTopicId, setSelectedTopicId] = useState<string>();
+
   const authentication = useContext(LoginContext);
 
   useEffect(() => {
@@ -23,21 +31,44 @@ const AdminDashboardPage = () => {
     const loggedInUserId = user ? user.id : null;
 
     if (loggedInUserId) {
-      const fetchedMyPublications = DummyPublicationsData.allPublications.filter(
-        publication => publication.owner.id === loggedInUserId,
-      );
+      if (!themes) {
+        const { themesAndTopics } = DummyPublicationsData;
+        const listOfJustTheThemes = themesAndTopics.map(
+          themeTopicsPair => themeTopicsPair.theme,
+        );
 
-      const fetchedInProgressPublications = DummyPublicationsData.allPublications.filter(
-        publication => publication.owner.id !== loggedInUserId,
-      );
+        setThemes(listOfJustTheThemes);
+        setSelectedThemeId(listOfJustTheThemes[0].id);
+      }
 
-      setMyPublications(fetchedMyPublications);
-      setInProgressPublications(fetchedInProgressPublications);
+      if (selectedThemeId) {
+        const { themesAndTopics } = DummyPublicationsData;
+        const matchingThemeTopicsPair =
+          themesAndTopics.find(
+            themeTopicsPair => themeTopicsPair.theme.id === selectedThemeId,
+          ) || themesAndTopics[0];
+        const justThisThemesTopics = matchingThemeTopicsPair.topics;
+        setTopics(justThisThemesTopics);
+        setSelectedTopicId(justThisThemesTopics[0].id);
+      }
+
+      if (selectedTopicId) {
+        const fetchedMyPublications = DummyPublicationsData.allPublications.filter(
+          publication => publication.owner.id === loggedInUserId,
+        );
+
+        const fetchedInProgressPublications = DummyPublicationsData.allPublications.filter(
+          publication => publication.owner.id !== loggedInUserId,
+        );
+
+        setMyPublications(fetchedMyPublications);
+        setInProgressPublications(fetchedInProgressPublications);
+      }
     } else {
       setMyPublications([]);
       setInProgressPublications([]);
     }
-  }, [authentication]);
+  }, [authentication, selectedThemeId, selectedTopicId, themes, topics]);
 
   return (
     <Page wide breadcrumbs={[{ name: 'Administrator dashboard' }]}>
@@ -59,16 +90,21 @@ const AdminDashboardPage = () => {
       </div>
       <Tabs id="publicationTabs">
         <TabsSection id="my-publications" title="Publications">
-          <AdminDashboardPublicationsTab
-            publications={myPublications}
-            noResultsMessage="You have not yet created any publications"
-          />
+          {themes && topics && selectedThemeId && selectedTopicId && (
+            <AdminDashboardPublicationsTab
+              publications={myPublications}
+              noResultsMessage="You have not yet created any publications"
+              themes={themes}
+              topics={topics}
+              selectedThemeId={selectedThemeId}
+              selectedTopicId={selectedTopicId}
+              onThemeChange={themeId => setSelectedThemeId(themeId)}
+              onTopicChange={topicId => setSelectedThemeId(topicId)}
+            />
+          )}
         </TabsSection>
         <TabsSection id="in-progress-publications" title="In progress">
-          <AdminDashboardPublicationsTab
-            publications={inProgressPublications}
-            noResultsMessage="There are currently no releases in progress"
-          />
+          Hi
         </TabsSection>
       </Tabs>
     </Page>
