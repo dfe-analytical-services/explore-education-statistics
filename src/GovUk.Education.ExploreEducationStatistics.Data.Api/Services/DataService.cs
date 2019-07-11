@@ -29,14 +29,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 return new ResultWithMetaViewModel();
             }
 
-            var first = observations.FirstOrDefault();
-
             return new ResultWithMetaViewModel
             {
-                PublicationId = first.Subject.Release.PublicationId,
-                ReleaseId = first.Subject.Release.Id,
-                SubjectId = first.Subject.Id,
-                ReleaseDate = first.Subject.Release.ReleaseDate,
                 Result = observations.Select(observation =>
                     _resultBuilder.BuildResult(observation, queryContext.Indicators)),
                 MetaData = _subjectMetaService.GetSubjectMeta(queryContext.ToSubjectMetaQueryContext(), observations)

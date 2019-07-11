@@ -30,13 +30,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 return new ResultViewModel();
             }
 
-            var first = observations.FirstOrDefault();
             return new ResultViewModel
             {
-                PublicationId = first.Subject.Release.PublicationId,
-                ReleaseId = first.Subject.Release.Id,
-                SubjectId = first.Subject.Id,
-                ReleaseDate = first.Subject.Release.ReleaseDate,
                 TimePeriodRange = GetTimePeriodRange(observations),
                 Result = observations.Select(observation =>
                     _resultBuilder.BuildResult(observation, queryContext.Indicators))
@@ -76,10 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
             // Merge it with the distinct time periods to replace any years which should be Five Half Terms
             var rangeMap = range.ToDictionary(tuple => tuple.Year, tuple => tuple);
-            timePeriods.ForEach(tuple =>
-            {
-                rangeMap[tuple.Year] = (tuple.Year, tuple.TimeIdentifier);
-            });
+            timePeriods.ForEach(tuple => { rangeMap[tuple.Year] = (tuple.Year, tuple.TimeIdentifier); });
 
             return rangeMap.Values;
         }
