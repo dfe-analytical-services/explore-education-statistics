@@ -1,13 +1,16 @@
 import ButtonText from '@common/components/ButtonText';
 import cartesian from '@common/lib/utils/cartesian';
 import {
-  FilterOption,
-  IndicatorOption,
   PublicationSubjectMeta,
   TableData,
 } from '@common/services/tableBuilderService';
 import TimePeriod from '@common/services/types/TimePeriod';
 import { Dictionary } from '@common/types';
+import {
+  CategoryFilter,
+  Indicator,
+  LocationFilter,
+} from '@frontend/modules/table-tool/components/types/filters';
 import { saveAs } from 'file-saver';
 import Papa from 'papaparse';
 import React from 'react';
@@ -15,10 +18,10 @@ import React from 'react';
 interface Props {
   publicationSlug: string;
   meta: PublicationSubjectMeta;
-  indicators: IndicatorOption[];
-  filters: Dictionary<FilterOption[]>;
+  indicators: Indicator[];
+  filters: Dictionary<CategoryFilter[]>;
   timePeriods: TimePeriod[];
-  locations: Dictionary<FilterOption[]>;
+  locations: LocationFilter[];
   results: TableData['result'];
 }
 
@@ -28,6 +31,7 @@ const DownloadCsvButton = ({
   indicators,
   filters,
   timePeriods,
+  locations,
   results,
 }: Props) => {
   const getCsvData = (): string[][] => {
@@ -40,13 +44,23 @@ const DownloadCsvButton = ({
       return `${indicator.label}${unit}`;
     });
 
-    const columns = ['Time period', ...filterColumns, ...indicatorColumns];
+    const columns = [
+      'Location',
+      'Time period',
+      ...filterColumns,
+      ...indicatorColumns,
+    ];
 
-    const rows = cartesian<FilterOption | TimePeriod>(
+    const rows = cartesian(
+      locations,
       timePeriods,
       ...Object.values(filters),
     ).map(row => {
-      const [timePeriod, ...filterOptions] = row as [TimePeriod, FilterOption];
+      const [location, timePeriod, ...filterOptions] = row as [
+        LocationFilter,
+        TimePeriod,
+        ...CategoryFilter[]
+      ];
 
       const indicatorCells = indicators.map(indicator => {
         const matchingResult = results.find(result => {
@@ -55,7 +69,9 @@ const DownloadCsvButton = ({
               result.filters.includes(filter.value),
             ) &&
               result.timeIdentifier === timePeriod.code &&
-              result.year === timePeriod.year,
+              result.year === timePeriod.year &&
+              result.location[location.level] &&
+              result.location[location.level].code === location.value,
           );
         });
 
