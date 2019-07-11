@@ -353,64 +353,58 @@ class TableToolPage extends Component<Props, State> {
                         Explore data
                       </WizardStepHeading>
 
-                      {tableData.length > 0 && (
+                      <div className="govuk-!-margin-bottom-4">
+                        <TimePeriodDataTable
+                          filters={filters}
+                          indicators={indicators}
+                          publicationName={publication ? publication.title : ''}
+                          subjectName={subjectName}
+                          locations={locations}
+                          timePeriods={timePeriodRange}
+                          results={tableData}
+                        />
+                      </div>
+
+                      {publication && (
                         <>
-                          <div className="govuk-!-margin-bottom-4">
-                            <TimePeriodDataTable
-                              filters={filters}
-                              indicators={indicators}
-                              publicationName={
-                                publication ? publication.title : ''
-                              }
-                              subjectName={subjectName}
-                              locations={locations}
-                              timePeriods={timePeriodRange}
-                              results={tableData}
-                            />
-                          </div>
+                          <h3>Additional options</h3>
 
-                          {publication && (
-                            <>
-                              <h3>Additional options</h3>
+                          <ul className="govuk-list">
+                            <li>
+                              <Link
+                                as={`/statistics/${publication.slug}`}
+                                to={`/statistics/publication?publication=${publication.slug}`}
+                              >
+                                Go to publication
+                              </Link>
+                            </li>
+                            <li>
+                              <DownloadCsvButton
+                                publicationSlug={publication.slug}
+                                meta={subjectMeta}
+                                filters={filters}
+                                indicators={indicators}
+                                locations={locations}
+                                timePeriods={timePeriodRange}
+                                results={tableData}
+                              />
+                            </li>
 
-                              <ul className="govuk-list">
-                                <li>
-                                  <Link
-                                    as={`/statistics/${publication.slug}`}
-                                    to={`/statistics/publication?publication=${publication.slug}`}
-                                  >
-                                    Go to publication
-                                  </Link>
-                                </li>
-                                <li>
-                                  <DownloadCsvButton
-                                    publicationSlug={publication.slug}
-                                    meta={subjectMeta}
-                                    filters={filters}
-                                    indicators={indicators}
-                                    locations={locations}
-                                    timePeriods={timePeriodRange}
-                                    results={tableData}
-                                  />
-                                </li>
-
-                                <li>
-                                  <a href="#api">Access developer API</a>
-                                </li>
-                                <li>
-                                  <Link
-                                    as={`/methodologies/${publication.slug}`}
-                                    to={`/methodologies/methodology?methodology=${publication.slug}`}
-                                  >
-                                    Go to methodology
-                                  </Link>
-                                </li>
-                                <li>
-                                  <a href="#contact">Contact</a>
-                                </li>
-                              </ul>
-                            </>
-                          )}
+                            <li>
+                              <a href="#api">Access developer API</a>
+                            </li>
+                            <li>
+                              <Link
+                                as={`/methodologies/${publication.slug}`}
+                                to={`/methodologies/methodology?methodology=${publication.slug}`}
+                              >
+                                Go to methodology
+                              </Link>
+                            </li>
+                            <li>
+                              <a href="#contact">Contact</a>
+                            </li>
+                          </ul>
                         </>
                       )}
                     </>
