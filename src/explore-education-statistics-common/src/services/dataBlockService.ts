@@ -196,6 +196,7 @@ export interface DataBlockResponse {
   subjectId: number;
   releaseDate: Date;
   geographicLevel: GeographicLevel;
+
   result: Result[];
 }
 
