@@ -3,7 +3,10 @@ import classNames from 'classnames';
 import { UrlLike } from 'next-server/router';
 import RouterLink from 'next/link';
 import React, { AnchorHTMLAttributes, ReactNode } from 'react';
-import { logEvent } from '@frontend/services/googleAnalyticsService';
+import {
+  logEvent,
+  AnalyticProps,
+} from '@frontend/services/googleAnalyticsService';
 
 export type LinkProps = {
   as?: string | UrlLike;
@@ -14,13 +17,6 @@ export type LinkProps = {
   unvisited?: boolean;
 } & AnchorHTMLAttributes<HTMLAnchorElement> &
   AnalyticProps;
-
-export interface AnalyticProps {
-  analytics?: {
-    category: string;
-    action: string;
-  };
-}
 
 const Link = ({
   as,
