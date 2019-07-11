@@ -4,6 +4,7 @@ import DummyReferenceData, {
   TimePeriodCoverageGroup,
 } from '@admin/pages/DummyReferenceData';
 import ReleasePageTemplate from '@admin/pages/edit-release/components/ReleasePageTemplate';
+import Button from '@common/components/Button';
 import { Form, FormFieldset, Formik } from '@common/components/form';
 import FormFieldDayMonthYear from '@common/components/form/FormFieldDayMonthYear';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
@@ -287,15 +288,12 @@ const ReleaseSetupEditPage = ({
                   }))}
                 />
 
-                <button
-                  type="submit"
-                  className="govuk-button govuk-!-margin-top-6"
-                >
+                <Button type="submit" className="govuk-!-margin-top-6">
                   Update release setup
-                </button>
+                </Button>
 
                 <div className="govuk-!-margin-top-6">
-                  <Link to="/prototypes/publication-create-new-absence-config">
+                  <Link to={setupRoute.generateLink(releaseId)}>
                     Cancel update
                   </Link>
                 </div>
