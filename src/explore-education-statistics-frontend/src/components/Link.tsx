@@ -41,7 +41,7 @@ const Link = ({
   return (
     <RouterLink href={href || to} as={as} prefetch={prefetch}>
       <>
-        {/* eslint-disable-next-line */}
+        {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
         <a
           {...props}
           className={classNames(
