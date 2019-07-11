@@ -8,6 +8,7 @@ import DummyPublicationsData, {
 } from '@admin/pages/DummyPublicationsData';
 import { IdLabelPair, Publication } from '@admin/services/types/types';
 import AdminDashboardPublicationsTab from '@admin/components/AdminDashboardPublicationsTab';
+import themeService from '@admin/services/themeService';
 import Link from '../components/Link';
 import Page from '../components/Page';
 
@@ -53,17 +54,17 @@ const AdminDashboardPage = () => {
     }
 
     if (!themes) {
-      const themeList = DummyPublicationsData.themesAndTopics;
+      themeService.getThemesAndTopics(loggedInUser.id).then(themeList => {
+        const themesAsIdLabelPairs = themeList.map(
+          themeToThemeWithIdLabelAndTopics,
+        );
 
-      const themesAsIdLabelPairs = themeList.map(
-        themeToThemeWithIdLabelAndTopics,
-      );
+        setThemes(themesAsIdLabelPairs);
 
-      setThemes(themesAsIdLabelPairs);
-
-      setSelectedThemeAndTopic({
-        theme: themesAsIdLabelPairs[0],
-        topic: themesAsIdLabelPairs[0].topics[0],
+        setSelectedThemeAndTopic({
+          theme: themesAsIdLabelPairs[0],
+          topic: themesAsIdLabelPairs[0].topics[0],
+        });
       });
     }
 
