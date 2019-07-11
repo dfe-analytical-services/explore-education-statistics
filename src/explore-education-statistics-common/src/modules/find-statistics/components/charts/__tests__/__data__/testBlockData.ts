@@ -3033,6 +3033,28 @@ const AbstractMultipleChartProps: ChartProps = {
   },
 };
 
+const testResponseData_23_26__1_2_LAD: DataBlockResponse = {
+  ...testResponseData_23_26_28__1_2_LAD,
+
+  result: testResponseData_23_26_28__1_2_LAD.result.map(r => {
+    return {
+      ...r,
+      measures: {
+        '23': r.measures['23'],
+        '26': r.measures['26'],
+      },
+    };
+  }),
+
+  metaData: {
+    ...testResponseData_23_26_28__1_2_LAD.metaData,
+    indicators: {
+      '23': testResponseData_23_26_28__1_2_LAD.metaData.indicators['23'],
+      '26': testResponseData_23_26_28__1_2_LAD.metaData.indicators['26'],
+    },
+  },
+};
+
 const AbstractLargeDataChartProps: ChartProps = {
   data: testResponseData_23_26_28__1_2_LAD,
   meta: testResponseData_23_26_28__1_2_LAD.metaData,
@@ -3078,6 +3100,60 @@ const AbstractLargeDataChartProps: ChartProps = {
         },
         {
           indicator: '28',
+          filters: ['1', '2'],
+        },
+      ],
+    },
+    minor: {
+      name: 'minor',
+      title: '',
+      visible: true,
+      dataSets: [],
+    },
+  },
+};
+
+const AbstractLargeDataChartProps_smaller_datasets: ChartProps = {
+  data: testResponseData_23_26__1_2_LAD,
+  meta: testResponseData_23_26__1_2_LAD.metaData,
+
+  labels: {
+    '2014_HT6': {
+      label: metaData.timePeriods['2014_HT6'].label,
+      value: '2014_HT6',
+    },
+    '2015_HT6': {
+      label: metaData.timePeriods['2015_HT6'].label,
+      value: '2015_HT6',
+    },
+    '23_1_2_____': {
+      label: metaData.indicators['23'].label,
+      unit: '%',
+      value: '23_1_2',
+    },
+    '26_1_2_____': {
+      label: metaData.indicators['26'].label,
+      unit: '%',
+      value: '26_1_2',
+    },
+    '28_1_2_____': {
+      label: metaData.indicators['28'].label,
+      unit: '%',
+      value: '28_1_2',
+    },
+  },
+
+  axes: {
+    major: {
+      name: '23',
+      groupBy: 'locations',
+      dataSets: [
+        {
+          indicator: '23',
+          filters: ['1', '2'],
+        },
+        {
+          indicator: '26',
           filters: ['1', '2'],
         },
       ],
@@ -3180,6 +3256,7 @@ export default {
   AbstractMultipleChartProps,
   AbstractMissingDataChartProps,
   AbstractLargeDataChartProps,
+  AbstractLargeDataChartProps_smaller_datasets,
   testBlockData: data,
   testBlockMetaData: responseMetadata,
   labels,
