@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Internal;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
     [Route("themes")]
     [ApiController]

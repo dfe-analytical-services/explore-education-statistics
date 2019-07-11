@@ -15,6 +15,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
@@ -67,6 +68,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<INotificationsService, NotificationsService>();
             services.AddTransient<IPublishingService, PublishingService>();
             services.AddTransient<IThemeService, ThemeService>();
+            
+            
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info {Title = "Explore education statistics - Admin API", Version = "v1"});
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -123,6 +130,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             // TODO We could perhaps move everything to the toplevel "/" and have routes specified in the controllers
             // TODO themselves but this will have an effect on the react app we serve up.
             app.Map("/api", apiApp => apiApp.UseMvc());
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Data API V1");
+                c.RoutePrefix = "docs";
+            });
 
             app.UseSpa(spa =>
             {

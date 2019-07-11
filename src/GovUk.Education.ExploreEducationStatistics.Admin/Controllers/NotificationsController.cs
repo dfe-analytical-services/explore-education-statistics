@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
 {
+    [ApiExplorerSettings(IgnoreApi=true)]
     [Authorize]
     public class NotificationsController : Controller
     {
