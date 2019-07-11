@@ -99,7 +99,7 @@ const AdminDashboardPage = () => {
               selectedThemeId={selectedThemeId}
               selectedTopicId={selectedTopicId}
               onThemeChange={themeId => setSelectedThemeId(themeId)}
-              onTopicChange={topicId => setSelectedThemeId(topicId)}
+              onTopicChange={topicId => setSelectedTopicId(topicId)}
             />
           )}
         </TabsSection>

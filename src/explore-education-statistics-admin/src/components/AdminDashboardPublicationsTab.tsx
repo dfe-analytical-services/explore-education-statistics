@@ -29,23 +29,20 @@ const AdminDashboardPublicationsTab = ({
   onThemeChange,
   onTopicChange,
 }: AdminDashboardPublicationsTabProps) => {
-  const createThemeTopicTitleLabel = (publication: Publication) =>
-    `${publication.topic.theme.label}, ${publication.topic.title}`;
-
-  const publicationsByThemeAndTopic: Dictionary<Publication[]> = groupBy(
-    publications,
-    createThemeTopicTitleLabel,
-  );
-
-  const themesAndTopics = Object.keys(publicationsByThemeAndTopic);
-
-  if (themesAndTopics.length === 0) {
+  if (publications.length === 0) {
     return <div className="govuk-inset-text">{noResultsMessage}</div>;
   }
 
-  const themesAndTopicsSections = themesAndTopics.map(themeTopic => (
-    <React.Fragment key={themeTopic}>
-      <h2 className="govuk-heading-l govuk-!-margin-bottom-0">{themeTopic}</h2>
+  const selectedTheme =
+    themes.find(theme => theme.id === selectedThemeId) || themes[0];
+  const selectedTopic =
+    topics.find(topic => topic.id === selectedTopicId) || topics[0];
+
+  return (
+    <section>
+      <h2 className="govuk-heading-l govuk-!-margin-bottom-0">
+        {`${selectedTheme.label}, ${selectedTopic.label}`}
+      </h2>
       <p className="govuk-body">
         Edit an existing release or create a new release for current
         publications.
@@ -85,8 +82,8 @@ const AdminDashboardPublicationsTab = ({
       <Link to="/prototypes/publication-create-new" className="govuk-button">
         Create a new publication
       </Link>
-      <Accordion id={themeTopic} key={themeTopic}>
-        {publicationsByThemeAndTopic[themeTopic].map(publication => (
+      <Accordion id="publications">
+        {publications.map(publication => (
           <AccordionSection
             key={publication.id}
             heading={publication.title}
@@ -96,10 +93,8 @@ const AdminDashboardPublicationsTab = ({
           </AccordionSection>
         ))}
       </Accordion>
-    </React.Fragment>
-  ));
-
-  return <section>{themesAndTopicsSections}</section>;
+    </section>
+  );
 };
 
 export default AdminDashboardPublicationsTab;
