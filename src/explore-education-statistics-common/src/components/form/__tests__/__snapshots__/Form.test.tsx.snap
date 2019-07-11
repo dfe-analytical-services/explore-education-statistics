@@ -1,6 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Form does not render errors for fields that do not have errors 1`] = `
+
 <form id="test-form">
   <div aria-labelledby="test-form-summary-title"
        class="govuk-error-summary"
@@ -24,9 +25,11 @@ exports[`Form does not render errors for fields that do not have errors 1`] = `
   </div>
   The form
 </form>
+
 `;
 
 exports[`Form renders error summary from form errors when form is submitted 1`] = `
+
 <form id="test-form">
   <div aria-labelledby="test-form-summary-title"
        class="govuk-error-summary"
@@ -55,9 +58,11 @@ exports[`Form renders error summary from form errors when form is submitted 1`] 
   </div>
   The form
 </form>
+
 `;
 
 exports[`Form renders submit error 1`] = `
+
 <form id="test-form">
   <div aria-labelledby="test-form-summary-title"
        class="govuk-error-summary"
@@ -81,4 +86,5 @@ exports[`Form renders submit error 1`] = `
   </div>
   The form
 </form>
+
 `;

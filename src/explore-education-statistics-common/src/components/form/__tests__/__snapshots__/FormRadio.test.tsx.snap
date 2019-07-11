@@ -1,6 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`FormRadio does not render conditional content when not checked 1`] = `
+
 <div class="govuk-radios__item">
   <input data-aria-controls="test-radio-conditional"
          class="govuk-radios__input"
@@ -23,9 +24,11 @@ exports[`FormRadio does not render conditional content when not checked 1`] = `
     The conditional content
   </p>
 </div>
+
 `;
 
 exports[`FormRadio renders conditional content when checked 1`] = `
+
 <div class="govuk-radios__item">
   <input data-aria-controls="test-radio-conditional"
          class="govuk-radios__input"
@@ -49,9 +52,11 @@ exports[`FormRadio renders conditional content when checked 1`] = `
     The conditional content
   </p>
 </div>
+
 `;
 
 exports[`FormRadio renders correctly when \`hint\` is provided 1`] = `
+
 <div class="govuk-radios__item">
   <input aria-describedby="test-radio-item-hint"
          class="govuk-radios__input"
@@ -72,9 +77,11 @@ exports[`FormRadio renders correctly when \`hint\` is provided 1`] = `
     Click me to proceed
   </span>
 </div>
+
 `;
 
 exports[`FormRadio renders correctly with required props 1`] = `
+
 <div class="govuk-radios__item">
   <input class="govuk-radios__input"
          id="test-radio"
@@ -89,4 +96,5 @@ exports[`FormRadio renders correctly with required props 1`] = `
     Test radio
   </label>
 </div>
+
 `;

@@ -1,6 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Details renders correctly 1`] = `
+
 <details class="govuk-details"
          role="group"
 >
@@ -23,9 +24,11 @@ exports[`Details renders correctly 1`] = `
     Test content
   </div>
 </details>
+
 `;
 
 exports[`Details renders correctly with \`open\` prop set to true 1`] = `
+
 <details class="govuk-details"
          open
          role="group"
@@ -49,4 +52,5 @@ exports[`Details renders correctly with \`open\` prop set to true 1`] = `
     Test content
   </div>
 </details>
+
 `;

@@ -1,6 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`FormCheckboxGroup generates option IDs from id and value if none specified 1`] = `
+
 <div class="govuk-form-group">
   <fieldset class="govuk-fieldset"
             id="test-checkboxes"
@@ -51,9 +52,11 @@ exports[`FormCheckboxGroup generates option IDs from id and value if none specif
     </div>
   </fieldset>
 </div>
+
 `;
 
 exports[`FormCheckboxGroup renders \`Select all 3 options\` button when \`selectAll\` is true 1`] = `
+
 <div class="govuk-form-group">
   <fieldset class="govuk-fieldset"
             id="test-checkboxes"
@@ -110,9 +113,11 @@ exports[`FormCheckboxGroup renders \`Select all 3 options\` button when \`select
     </div>
   </fieldset>
 </div>
+
 `;
 
 exports[`FormCheckboxGroup renders checkboxes with some pre-checked 1`] = `
+
 <div class="govuk-form-group">
   <fieldset class="govuk-fieldset"
             id="test-checkboxes"
@@ -164,9 +169,11 @@ exports[`FormCheckboxGroup renders checkboxes with some pre-checked 1`] = `
     </div>
   </fieldset>
 </div>
+
 `;
 
 exports[`FormCheckboxGroup renders correctly with legend 1`] = `
+
 <div class="govuk-form-group">
   <fieldset class="govuk-fieldset"
             id="test-checkboxes"
@@ -191,6 +198,7 @@ exports[`FormCheckboxGroup renders correctly with legend 1`] = `
     </div>
   </fieldset>
 </div>
+
 `;
 
 exports[`FormCheckboxGroup renders correctly with small size variants 1`] = `
@@ -234,6 +242,7 @@ exports[`FormCheckboxGroup renders correctly with small size variants 1`] = `
 `;
 
 exports[`FormCheckboxGroup renders list of checkboxes in correct order 1`] = `
+
 <div class="govuk-form-group">
   <fieldset class="govuk-fieldset"
             id="test-checkboxes"
@@ -284,9 +293,11 @@ exports[`FormCheckboxGroup renders list of checkboxes in correct order 1`] = `
     </div>
   </fieldset>
 </div>
+
 `;
 
 exports[`FormCheckboxGroup renders option with conditional contents 1`] = `
+
 <div class="govuk-form-group">
   <fieldset class="govuk-fieldset"
             id="test-checkboxes"
@@ -353,4 +364,5 @@ exports[`FormCheckboxGroup renders option with conditional contents 1`] = `
     </div>
   </fieldset>
 </div>
+
 `;

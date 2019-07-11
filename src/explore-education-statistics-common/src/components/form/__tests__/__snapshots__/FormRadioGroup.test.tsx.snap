@@ -1,6 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`FormRadioGroup generates option IDs from id and value if none specified 1`] = `
+
 <div class="govuk-form-group">
   <fieldset class="govuk-fieldset"
             id="test-radios"
@@ -54,9 +55,11 @@ exports[`FormRadioGroup generates option IDs from id and value if none specified
     </div>
   </fieldset>
 </div>
+
 `;
 
 exports[`FormRadioGroup renders correctly with legend 1`] = `
+
 <div class="govuk-form-group">
   <fieldset class="govuk-fieldset"
             id="test-radios"
@@ -82,6 +85,7 @@ exports[`FormRadioGroup renders correctly with legend 1`] = `
     </div>
   </fieldset>
 </div>
+
 `;
 
 exports[`FormRadioGroup renders correctly with small size variants 1`] = `
@@ -126,6 +130,7 @@ exports[`FormRadioGroup renders correctly with small size variants 1`] = `
 `;
 
 exports[`FormRadioGroup renders list of radios in correct order 1`] = `
+
 <div class="govuk-form-group">
   <fieldset class="govuk-fieldset"
             id="test-radios"
@@ -179,9 +184,11 @@ exports[`FormRadioGroup renders list of radios in correct order 1`] = `
     </div>
   </fieldset>
 </div>
+
 `;
 
 exports[`FormRadioGroup renders option with conditional contents 1`] = `
+
 <div class="govuk-form-group">
   <fieldset class="govuk-fieldset"
             id="test-radios"
@@ -260,4 +267,5 @@ exports[`FormRadioGroup renders option with conditional contents 1`] = `
     </div>
   </fieldset>
 </div>
+
 `;

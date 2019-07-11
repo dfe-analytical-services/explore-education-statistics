@@ -1,6 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ErrorSummary renders correctly with some errors 1`] = `
+
 <div aria-labelledby="test-errors-title"
      class="govuk-error-summary"
      role="alert"
@@ -26,4 +27,5 @@ exports[`ErrorSummary renders correctly with some errors 1`] = `
     </ul>
   </div>
 </div>
+
 `;

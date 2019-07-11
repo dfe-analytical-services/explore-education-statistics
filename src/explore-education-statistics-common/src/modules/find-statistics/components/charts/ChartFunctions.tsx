@@ -262,22 +262,25 @@ export function generateKeyFromDataSet(
     ...dataSet,
   };
 
-  const ignoreLocation = ignoringField === 'locations';
+  const dontIgnoreLocations = ignoringField !== 'locations';
 
   const joinedLocations = [
-    (!ignoreLocation &&
+    (dontIgnoreLocations &&
       location &&
       location.country &&
       location.country.code) ||
       '',
-    (!ignoreLocation && location && location.region && location.region.code) ||
+    (dontIgnoreLocations &&
+      location &&
+      location.region &&
+      location.region.code) ||
       '',
-    (!ignoreLocation &&
+    (dontIgnoreLocations &&
       location &&
       location.localAuthorityDistrict &&
       location.localAuthorityDistrict.code) ||
       '',
-    (!ignoreLocation &&
+    (dontIgnoreLocations &&
       location &&
       location.localAuthority &&
       location.localAuthority.code) ||

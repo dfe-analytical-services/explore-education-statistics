@@ -1,6 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Tabs renders multiple tabs correctly 1`] = `
+
 <div class="govuk-tabs">
   <ul class="govuk-tabs__list"
       role="tablist"
@@ -60,9 +61,11 @@ exports[`Tabs renders multiple tabs correctly 1`] = `
     </p>
   </section>
 </div>
+
 `;
 
 exports[`Tabs renders single tab correctly 1`] = `
+
 <div class="govuk-tabs">
   <ul class="govuk-tabs__list"
       role="tablist"
@@ -95,4 +98,5 @@ exports[`Tabs renders single tab correctly 1`] = `
     </p>
   </section>
 </div>
+
 `;

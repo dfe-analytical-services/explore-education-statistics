@@ -1,6 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`FormTextSearchInput renders correctly with error 1`] = `
+
 <label class="govuk-label"
        for="test-input"
 >
@@ -17,9 +18,11 @@ exports[`FormTextSearchInput renders correctly with error 1`] = `
        id="test-input"
        type="text"
 >
+
 `;
 
 exports[`FormTextSearchInput renders correctly with hint 1`] = `
+
 <label class="govuk-label"
        for="test-input"
 >
@@ -36,9 +39,11 @@ exports[`FormTextSearchInput renders correctly with hint 1`] = `
        id="test-input"
        type="text"
 >
+
 `;
 
 exports[`FormTextSearchInput renders correctly with required props 1`] = `
+
 <label class="govuk-label"
        for="test-input"
 >
@@ -49,9 +54,11 @@ exports[`FormTextSearchInput renders correctly with required props 1`] = `
        id="test-input"
        type="text"
 >
+
 `;
 
 exports[`FormTextSearchInput renders with a specific width class 1`] = `
+
 <label class="govuk-label"
        for="test-input"
 >
@@ -68,4 +75,5 @@ exports[`FormTextSearchInput renders with a specific width class 1`] = `
        id="test-input"
        type="text"
 >
+
 `;
