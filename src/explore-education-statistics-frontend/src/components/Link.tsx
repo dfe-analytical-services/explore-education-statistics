@@ -4,8 +4,8 @@ import { UrlLike } from 'next-server/router';
 import RouterLink from 'next/link';
 import React, { AnchorHTMLAttributes, ReactNode } from 'react';
 import {
-  logEvent,
   AnalyticProps,
+  logEvent,
 } from '@frontend/services/googleAnalyticsService';
 
 export type LinkProps = {
@@ -38,31 +38,29 @@ const Link = ({
     }
   };
 
+  /* eslint-disable jsx-a11y/no-static-element-interactions */
   return (
     <RouterLink href={href || to} as={as} prefetch={prefetch}>
-      <>
-        {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
-        <a
-          {...props}
-          className={classNames(
-            'govuk-link',
-            {
-              'govuk-link--no-visited-state': unvisited,
-            },
-            className,
-          )}
-          onClick={() => {
+      <a
+        {...props}
+        className={classNames(
+          'govuk-link',
+          {
+            'govuk-link--no-visited-state': unvisited,
+          },
+          className,
+        )}
+        onClick={() => {
+          handleAnalytics();
+        }}
+        onKeyDown={event => {
+          if (event.key === 'Enter' || event.key === ' ') {
             handleAnalytics();
-          }}
-          onKeyDown={event => {
-            if (event.key === 'Enter' || event.key === ' ') {
-              handleAnalytics();
-            }
-          }}
-        >
-          {children}
-        </a>
-      </>
+          }
+        }}
+      >
+        {children}
+      </a>
     </RouterLink>
   );
 };
