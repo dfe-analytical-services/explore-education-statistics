@@ -18,6 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels
         public ResultViewModel()
         {
             Result = new List<ObservationViewModel>();
+            TimePeriodRange = new List<TimePeriodMetaViewModel>();
         }
     }
 }
