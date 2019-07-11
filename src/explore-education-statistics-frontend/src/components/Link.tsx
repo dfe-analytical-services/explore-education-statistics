@@ -40,28 +40,29 @@ const Link = ({
 
   return (
     <RouterLink href={href || to} as={as} prefetch={prefetch}>
-      <a
-        {...props}
-        role="link"
-        tabIndex={-1}
-        className={classNames(
-          'govuk-link',
-          {
-            'govuk-link--no-visited-state': unvisited,
-          },
-          className,
-        )}
-        onClick={() => {
-          handleAnalytics();
-        }}
-        onKeyDown={event => {
-          if (event.key === 'Enter' || event.key === ' ') {
+      <>
+        {/* eslint-disable-next-line */}
+        <a
+          {...props}
+          className={classNames(
+            'govuk-link',
+            {
+              'govuk-link--no-visited-state': unvisited,
+            },
+            className,
+          )}
+          onClick={() => {
             handleAnalytics();
-          }
-        }}
-      >
-        {children}
-      </a>
+          }}
+          onKeyDown={event => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              handleAnalytics();
+            }
+          }}
+        >
+          {children}
+        </a>
+      </>
     </RouterLink>
   );
 };

@@ -6,9 +6,7 @@ exports[`Breadcrumbs renders correctly with just home breadcrumb 1`] = `
       data-testid="breadcrumbs--list"
   >
     <li class="govuk-breadcrumbs__list-item">
-      <a role="link"
-         tabindex="-1"
-         class="govuk-link govuk-breadcrumbs__link"
+      <a class="govuk-link govuk-breadcrumbs__link"
          href="/"
       >
         Home
@@ -24,18 +22,14 @@ exports[`Breadcrumbs renders correctly with multiple breadcrumbs 1`] = `
       data-testid="breadcrumbs--list"
   >
     <li class="govuk-breadcrumbs__list-item">
-      <a role="link"
-         tabindex="-1"
-         class="govuk-link govuk-breadcrumbs__link"
+      <a class="govuk-link govuk-breadcrumbs__link"
          href="/"
       >
         Home
       </a>
     </li>
     <li class="govuk-breadcrumbs__list-item">
-      <a role="link"
-         tabindex="-1"
-         class="govuk-link govuk-breadcrumbs__link"
+      <a class="govuk-link govuk-breadcrumbs__link"
          href="/publications"
       >
         Publications
