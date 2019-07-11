@@ -1,7 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`AccordionSection renders correctly with required props 1`] = `
-
 <div class="govuk-accordion__section"
      role="presentation"
 >
@@ -32,11 +31,9 @@ exports[`AccordionSection renders correctly with required props 1`] = `
     </div>
   </div>
 </div>
-
 `;
 
 exports[`AccordionSection renders with caption 1`] = `
-
 <div class="govuk-accordion__section"
      role="presentation"
 >
@@ -70,11 +67,9 @@ exports[`AccordionSection renders with caption 1`] = `
     </div>
   </div>
 </div>
-
 `;
 
 exports[`AccordionSection renders with different heading size 1`] = `
-
 <div class="govuk-accordion__section"
      role="presentation"
 >
@@ -105,5 +100,4 @@ exports[`AccordionSection renders with different heading size 1`] = `
     </div>
   </div>
 </div>
-
 `;

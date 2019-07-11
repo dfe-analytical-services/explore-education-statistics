@@ -72,9 +72,7 @@ class PrototypeMap extends Component<PrototypeMapProps, State> {
       boundaries.features[featureIndex].properties.layer = layer;
 
       layer.bindTooltip(
-        `${feature.properties.lad17nm}<br /> overall absence ${
-          feature.properties.absence.overall
-        }%`,
+        `${feature.properties.lad17nm}<br /> overall absence ${feature.properties.absence.overall}%`,
         {
           // className: f.properties.toolTipClass,
           direction: 'auto',

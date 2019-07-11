@@ -1,17 +1,22 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Converters;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Model {
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model
+{
     public class DataQuery
     {
         public string path;
         public string method;
         public string body;
-
     }
 
-    public class DataBlockRequest {
+    public class DataBlockRequest
+    {
         public int subjectId;
         public string geographicLevel;
         public List<string> countries;
@@ -37,57 +42,91 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model {
     public class ChartDataSet
     {
         public string Indicator;
-        public List<string> filters;
-        public List<string> location;
-        public string timePeriod;
+        public List<string> Filters;
+        public List<ChartDataLocation> Location;
+        public string TimePeriod;
     }
 
-    public class ChartAxisConfiguration
+    public class ChartDataLocation
+    {
+        public Country Country;
+        public Region Region;
+        public LocalAuthority LocalAuthority;
+        public LocalAuthorityDistrict LocalAuthorityDistrict;
+    }
+
+    // this enum needs these like this as they match what is used in the front end
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    public enum AxisGroupBy
+    {
+        timePeriods,
+        locations,
+        filters,
+        indicators
+    }
+
+    // this enum needs these like this as they match what is used in the front end
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    public enum ChartSymbol
+    {
+        circle,
+        cross,
+        diamond,
+        square,
+        star,
+        triangle,
+        wye
+    }
+
+    public class AxisConfigurationItem
     {
         public string Name;
-        public List<string> GroupBy;
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        public AxisGroupBy GroupBy;
+
         public List<ChartDataSet> DataSets;
         public bool Visible;
         public string Title;
     }
 
-    public class ChartLabelConfiguration
+    public class ChartConfiguration
     {
-        public string Name;
         public string Label;
-        public string Unit;
         public string Value;
+        public string Name;
+        public string Unit;
+        public string Colour;
+        
+        [JsonConverter(typeof(StringEnumConverter))]
+        public ChartSymbol symbol;
     }
 
     public class LineChart : IContentBlockChart
     {
         public string Type => "line";
-        public Dictionary<string, ChartLabelConfiguration> Labels;
-        public Dictionary<string, ChartAxisConfiguration> Axes;
+        public Dictionary<string, ChartConfiguration> Labels;
+        public Dictionary<string, AxisConfigurationItem> Axes;
     }
 
-    public class HorizontalBarChart : IContentBlockChart 
+    public class HorizontalBarChart : IContentBlockChart
     {
         public string Type => "horizontalbar";
-        public Dictionary<string, ChartLabelConfiguration> Labels;
-        public Dictionary<string, ChartAxisConfiguration> Axes;
-
+        public Dictionary<string, ChartConfiguration> Labels;
+        public Dictionary<string, AxisConfigurationItem> Axes;
     }
 
-    public class VerticalBarChart : IContentBlockChart 
+    public class VerticalBarChart : IContentBlockChart
     {
         public string Type => "verticalbar";
-        public Dictionary<string, ChartLabelConfiguration> Labels;
-        public Dictionary<string, ChartAxisConfiguration> Axes;
-
+        public Dictionary<string, ChartConfiguration> Labels;
+        public Dictionary<string, AxisConfigurationItem> Axes;
     }
 
-    public class MapChart : IContentBlockChart 
+    public class MapChart : IContentBlockChart
     {
         public string Type => "map";
-        public Dictionary<string, ChartLabelConfiguration> Labels;
-        public Dictionary<string, ChartAxisConfiguration> Axes;
-
+        public Dictionary<string, ChartConfiguration> Labels;
+        public Dictionary<string, AxisConfigurationItem> Axes;
     }
-
 }
