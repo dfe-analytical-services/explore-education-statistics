@@ -43,7 +43,7 @@ const AdminDashboardPage = () => {
         const firstTopic = topicsList[0];
 
         setSelectedThemeAndTopicIds({
-          themeId: firstTheme.theme.id,
+          themeId: firstTheme.id,
           topicId: firstTopic.id,
         });
       }
@@ -69,8 +69,7 @@ const AdminDashboardPage = () => {
   }, [authentication, selectedThemeAndTopicIds]);
 
   const findThemeById = (themeId: string, availableThemes: ThemeAndTopics[]) =>
-    availableThemes.find(theme => theme.theme.id === themeId) ||
-    availableThemes[0];
+    availableThemes.find(theme => theme.id === themeId) || availableThemes[0];
 
   return (
     <Page wide breadcrumbs={[{ name: 'Administrator dashboard' }]}>
@@ -96,10 +95,14 @@ const AdminDashboardPage = () => {
             <AdminDashboardPublicationsTab
               publications={myPublications}
               noResultsMessage="You have not yet created any publications"
-              themes={themes.map(theme => theme.theme)}
-              topics={
-                findThemeById(selectedThemeAndTopicIds.themeId, themes).topics
-              }
+              themes={themes.map(theme => ({
+                id: theme.id,
+                label: theme.title,
+              }))}
+              topics={findThemeById(
+                selectedThemeAndTopicIds.themeId,
+                themes,
+              ).topics.map(topic => ({ id: topic.id, label: topic.title }))}
               selectedThemeId={selectedThemeAndTopicIds.themeId}
               selectedTopicId={selectedThemeAndTopicIds.topicId}
               onThemeChange={themeId =>
