@@ -206,7 +206,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             };
 
             CollectionAssert.AreEquivalent(expected,
-                TimePeriodUtil.Range(new TimePeriodQuery(2018, FiveHalfTerms, 2019, SixHalfTerms)).ToList());
+                TimePeriodUtil.Range(new TimePeriodQuery(2018, FiveHalfTerms, 2019, FiveHalfTerms)).ToList());
         }
 
         [Fact]
@@ -228,8 +228,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var expected = new List<(int Year, TimeIdentifier TimeIdentifier)>
             {
                 (2018, FiveHalfTerms),
-                (2018, FiveHalfTerms),
-                (2019, SixHalfTerms),
+                (2019, FiveHalfTerms),
+                (2018, SixHalfTerms),
                 (2019, SixHalfTerms)
             };
 
