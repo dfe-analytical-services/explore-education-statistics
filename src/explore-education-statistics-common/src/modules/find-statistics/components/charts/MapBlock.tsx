@@ -1,12 +1,6 @@
-import {
-  Feature,
-  FeatureCollection,
-  GeoJsonProperties,
-  Geometry,
-} from 'geojson';
-import 'leaflet/dist/leaflet.css';
-import React, { Component, createRef } from 'react';
-import { GeoJSON, LatLngBounds, Map } from 'react-leaflet';
+import Details from '@common/components/Details';
+import { FormSelect } from '@common/components/form';
+import { SelectOption } from '@common/components/form/FormSelect';
 import {
   ChartDefinition,
   ChartProps,
@@ -18,13 +12,19 @@ import {
   DataBlockLocationMetadata,
   DataBlockMetadata,
 } from '@common/services/dataBlockService';
-import { FormSelect } from '@common/components/form';
-import classNames from 'classnames';
-import { SelectOption } from '@common/components/form/FormSelect';
 import { Dictionary } from '@common/types/util';
+import classNames from 'classnames';
+import {
+  Feature,
+  FeatureCollection,
+  GeoJsonProperties,
+  Geometry,
+} from 'geojson';
 
 import { Layer, LeafletMouseEvent, Path, Polyline } from 'leaflet';
-import Details from '@common/components/Details';
+import 'leaflet/dist/leaflet.css';
+import React, { Component, createRef } from 'react';
+import { GeoJSON, LatLngBounds, Map } from 'react-leaflet';
 import styles from './MapBlock.module.scss';
 
 export type MapFeature = Feature<Geometry, GeoJsonProperties>;
@@ -503,9 +503,7 @@ class MapBlock extends Component<MapProps, MapState> {
       if (feature.properties) {
         const content = Object.entries(feature.properties.measures).map(
           ([id, value]) =>
-            `${meta.indicators[id].label} : ${value}${
-              meta.indicators[id].unit
-            }`,
+            `${meta.indicators[id].label} : ${value}${meta.indicators[id].unit}`,
         );
 
         if (feature.id) {

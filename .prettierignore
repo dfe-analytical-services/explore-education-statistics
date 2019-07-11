@@ -3,3 +3,6 @@ build/
 node_modules/
 *.min.css
 *.min.js
+
+# This file is massive and holds the formatter
+src/explore-education-statistics-common/src/services/UKGeoJson.ts

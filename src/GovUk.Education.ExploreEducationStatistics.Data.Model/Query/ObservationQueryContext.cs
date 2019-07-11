@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
         public int EndYear { get; set; }
         public IEnumerable<int> Years { get; set; }
         public IEnumerable<long> Filters { get; set; }
-        public GeographicLevel GeographicLevel { get; set; }
+        public GeographicLevel? GeographicLevel { get; set; }
         public IEnumerable<long> Indicators { get; set; }
         public IEnumerable<string> Country { get; set; }
         public IEnumerable<string> Institution { get; set; }

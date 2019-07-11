@@ -1,15 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`FormComboBox renders with no options by default 1`] = `
-
 <div class="container"
      role="none"
 >
-  <div aria-expanded="true"
+  <div role="combobox"
+       aria-expanded="true"
        aria-owns="test-combobox-options"
        aria-haspopup="listbox"
        class="govuk-form-group"
-       role="combobox"
   >
     <label class="govuk-label"
            for="test-combobox-input"
@@ -25,19 +24,17 @@ exports[`FormComboBox renders with no options by default 1`] = `
     >
   </div>
 </div>
-
 `;
 
 exports[`FormComboBox renders with options in correct order when input changes 1`] = `
-
 <div class="container"
      role="none"
 >
-  <div aria-expanded="true"
+  <div role="combobox"
+       aria-expanded="true"
        aria-owns="test-combobox-options"
        aria-haspopup="listbox"
        class="govuk-form-group"
-       role="combobox"
   >
     <label class="govuk-label"
            for="test-combobox-input"
@@ -79,5 +76,4 @@ exports[`FormComboBox renders with options in correct order when input changes 1
     </div>
   </div>
 </div>
-
 `;
