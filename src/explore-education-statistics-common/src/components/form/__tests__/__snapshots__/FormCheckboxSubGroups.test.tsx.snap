@@ -1,7 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`FormCheckboxSubGroups renders \`Unselect all options\` buttons when \`selectAll\` is true 1`] = `
-
 <div class="govuk-form-group">
   <fieldset class="govuk-fieldset"
             id="test-checkboxes"
@@ -110,11 +109,9 @@ exports[`FormCheckboxSubGroups renders \`Unselect all options\` buttons when \`s
     </div>
   </fieldset>
 </div>
-
 `;
 
 exports[`FormCheckboxSubGroups renders groups of checkboxes in correct order 1`] = `
-
 <div class="govuk-form-group">
   <fieldset class="govuk-fieldset"
             id="test-checkboxes"
@@ -198,5 +195,4 @@ exports[`FormCheckboxSubGroups renders groups of checkboxes in correct order 1`]
     </div>
   </fieldset>
 </div>
-
 `;

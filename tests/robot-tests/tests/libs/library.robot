@@ -182,7 +182,7 @@ user clicks element
 
 user clicks link
   [Arguments]   ${text}
-  click link  ${text}
+  click element  xpath://a[text()="${text}"]
 
 user clicks button
   [Arguments]   ${text}

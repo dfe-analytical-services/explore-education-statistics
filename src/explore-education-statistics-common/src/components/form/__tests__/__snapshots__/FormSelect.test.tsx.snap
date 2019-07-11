@@ -1,7 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`FormSelect renders correctly with required props 1`] = `
-
 <label class="govuk-label"
        for="test-select"
 >
@@ -21,11 +20,9 @@ exports[`FormSelect renders correctly with required props 1`] = `
     Option 3
   </option>
 </select>
-
 `;
 
 exports[`FormSelect renders with error message 1`] = `
-
 <label class="govuk-label"
        for="test-select"
 >
@@ -48,5 +45,4 @@ exports[`FormSelect renders with error message 1`] = `
     Option 3
   </option>
 </select>
-
 `;

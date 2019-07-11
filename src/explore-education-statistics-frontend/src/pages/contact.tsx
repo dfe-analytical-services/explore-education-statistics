@@ -4,8 +4,8 @@ import React from 'react';
 function ContactPage() {
   return (
     <Page
-      breadcrumbs={[{ name: 'Contact' }]}
       title="Contact explore education statistics"
+      breadcrumbs={[{ name: 'Contact' }]}
     >
       <h2>General enquiries</h2>
       <p>
