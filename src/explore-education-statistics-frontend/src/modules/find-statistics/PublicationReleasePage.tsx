@@ -11,6 +11,7 @@ import publicationService, {
   Release,
 } from '@common/services/publicationService';
 import ButtonLink from '@frontend/components/ButtonLink';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import classNames from 'classnames';
@@ -115,7 +116,13 @@ class PublicationReleasePage extends Component<Props> {
 
             <ReactMarkdown className="govuk-body" source={data.summary} />
 
-            <Details summary="Download data files">
+            <Details
+              summary="Download data files"
+              onToggle={(open: boolean) =>
+                open &&
+                logEvent('Downloads', 'Open download data files accordion')
+              }
+            >
               <ul className="govuk-list govuk-list--bullet">
                 {data.dataFiles.map(({ extension, name, path, size }) => (
                   <li key={path}>
@@ -153,7 +160,9 @@ class PublicationReleasePage extends Component<Props> {
                             releaseName,
                             <li key={id} data-testid="previous-release-item">
                               <Link
-                                to={`/statistics/${data.publication.slug}/${slug}`}
+                                to={`/statistics/${
+                                  data.publication.slug
+                                }/${slug}`}
                               >
                                 {releaseName}
                               </Link>
