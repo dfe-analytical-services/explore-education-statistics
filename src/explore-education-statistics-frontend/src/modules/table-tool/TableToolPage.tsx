@@ -12,6 +12,11 @@ import { Dictionary } from '@common/types/util';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PreviousStepModalConfirm from '@frontend/modules/table-tool/components/PreviousStepModalConfirm';
+import {
+  CategoryFilter,
+  Indicator,
+  LocationFilter,
+} from '@frontend/modules/table-tool/components/types/filters';
 import TimePeriod, {
   parseYearCodeTuple,
 } from '@frontend/modules/table-tool/components/types/TimePeriod';
@@ -58,13 +63,13 @@ interface Props {
 }
 
 interface State {
-  locations: Dictionary<FilterOption[]>;
   startYear?: number;
   startCode?: string;
   endYear?: number;
   endCode?: string;
-  filters: Dictionary<FilterOption[]>;
-  indicators: IndicatorOption[];
+  locations: Dictionary<LocationFilter[]>;
+  filters: Dictionary<CategoryFilter[]>;
+  indicators: Indicator[];
   publication?: PublicationOptions['topics'][0]['publications'][0];
   subjects: PublicationSubject[];
   subjectId: string;
@@ -166,12 +171,17 @@ class TableToolPage extends Component<Props, State> {
       locations: mapValuesWithKeys(
         values.locations,
         (locationLevel, locations) =>
-          locations.map(
-            location =>
+          locations
+            .map(location =>
               subjectMeta.locations[locationLevel].options.find(
                 option => option.value === location,
-              ) as FilterOption,
-          ),
+              ),
+            )
+            .filter(option => typeof option !== 'undefined')
+            .map(
+              option =>
+                new LocationFilter(option as FilterOption, locationLevel),
+            ),
       ),
     }));
   };
@@ -250,9 +260,13 @@ class TableToolPage extends Component<Props, State> {
 
     this.setState({
       filters: mapValuesWithKeys(filters, (filterGroup, selectedFilters) =>
-        selectedFilters.map(filter => filtersByValue[filterGroup][filter]),
+        selectedFilters.map(
+          filter => new CategoryFilter(filtersByValue[filterGroup][filter]),
+        ),
       ),
-      indicators: indicators.map(indicator => indicatorsByValue[indicator]),
+      indicators: indicators.map(
+        indicator => new Indicator(indicatorsByValue[indicator]),
+      ),
       timePeriodRange: timePeriodRange.map(
         timePeriod => new TimePeriod(timePeriod),
       ),
@@ -273,6 +287,8 @@ class TableToolPage extends Component<Props, State> {
       timePeriodRange,
       tableData,
     } = this.state;
+
+    const locationsList = Object.values(locations).flat();
 
     return (
       <Page title="Create your own tables online" caption="Table Tool" wide>
@@ -342,7 +358,7 @@ class TableToolPage extends Component<Props, State> {
                     <FiltersForm
                       {...stepProps}
                       onSubmit={this.handleFiltersFormSubmit}
-                      specification={subjectMeta}
+                      subjectMeta={subjectMeta}
                     />
                   )}
                 </WizardStep>
@@ -353,64 +369,58 @@ class TableToolPage extends Component<Props, State> {
                         Explore data
                       </WizardStepHeading>
 
-                      {tableData.length > 0 && (
+                      <div className="govuk-!-margin-bottom-4">
+                        <TimePeriodDataTable
+                          filters={filters}
+                          indicators={indicators}
+                          publicationName={publication ? publication.title : ''}
+                          subjectName={subjectName}
+                          locations={locationsList}
+                          timePeriods={timePeriodRange}
+                          results={tableData}
+                        />
+                      </div>
+
+                      {publication && (
                         <>
-                          <div className="govuk-!-margin-bottom-4">
-                            <TimePeriodDataTable
-                              filters={filters}
-                              indicators={indicators}
-                              publicationName={
-                                publication ? publication.title : ''
-                              }
-                              subjectName={subjectName}
-                              locations={locations}
-                              timePeriods={timePeriodRange}
-                              results={tableData}
-                            />
-                          </div>
+                          <h3>Additional options</h3>
 
-                          {publication && (
-                            <>
-                              <h3>Additional options</h3>
+                          <ul className="govuk-list">
+                            <li>
+                              <Link
+                                as={`/statistics/${publication.slug}`}
+                                to={`/statistics/publication?publication=${publication.slug}`}
+                              >
+                                Go to publication
+                              </Link>
+                            </li>
+                            <li>
+                              <DownloadCsvButton
+                                publicationSlug={publication.slug}
+                                meta={subjectMeta}
+                                filters={filters}
+                                indicators={indicators}
+                                locations={locationsList}
+                                timePeriods={timePeriodRange}
+                                results={tableData}
+                              />
+                            </li>
 
-                              <ul className="govuk-list">
-                                <li>
-                                  <Link
-                                    as={`/statistics/${publication.slug}`}
-                                    to={`/statistics/publication?publication=${publication.slug}`}
-                                  >
-                                    Go to publication
-                                  </Link>
-                                </li>
-                                <li>
-                                  <DownloadCsvButton
-                                    publicationSlug={publication.slug}
-                                    meta={subjectMeta}
-                                    filters={filters}
-                                    indicators={indicators}
-                                    locations={locations}
-                                    timePeriods={timePeriodRange}
-                                    results={tableData}
-                                  />
-                                </li>
-
-                                <li>
-                                  <a href="#api">Access developer API</a>
-                                </li>
-                                <li>
-                                  <Link
-                                    as={`/methodologies/${publication.slug}`}
-                                    to={`/methodologies/methodology?methodology=${publication.slug}`}
-                                  >
-                                    Go to methodology
-                                  </Link>
-                                </li>
-                                <li>
-                                  <a href="#contact">Contact</a>
-                                </li>
-                              </ul>
-                            </>
-                          )}
+                            <li>
+                              <a href="#api">Access developer API</a>
+                            </li>
+                            <li>
+                              <Link
+                                as={`/methodologies/${publication.slug}`}
+                                to={`/methodologies/methodology?methodology=${publication.slug}`}
+                              >
+                                Go to methodology
+                              </Link>
+                            </li>
+                            <li>
+                              <a href="#contact">Contact</a>
+                            </li>
+                          </ul>
                         </>
                       )}
                     </>

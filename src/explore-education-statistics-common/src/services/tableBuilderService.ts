@@ -87,11 +87,6 @@ export type LocationLevelKeys =
   | 'ward';
 
 export interface TableData {
-  publicationId: string;
-  subjectId: string;
-  releaseId: string;
-  releaseDate: string;
-  geographicLevel: string;
   timePeriodRange: {
     code: string;
     label: string;
@@ -102,8 +97,8 @@ export interface TableData {
     measures: Dictionary<string>;
     filters: string[];
     location: Dictionary<{
-      code: string[];
-      name: string[];
+      code: string;
+      name: string;
     }>;
   }[];
 }

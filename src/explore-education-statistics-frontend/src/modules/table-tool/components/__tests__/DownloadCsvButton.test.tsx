@@ -1,11 +1,17 @@
+import { PublicationSubjectMeta } from '@common/services/tableBuilderService';
 import TimePeriod from '@common/services/types/TimePeriod';
+import {
+  CategoryFilter,
+  Indicator,
+  LocationFilter,
+} from '@frontend/modules/table-tool/components/types/filters';
 import Papa from 'papaparse';
 import React from 'react';
 import { fireEvent, render } from 'react-testing-library';
 import DownloadCsvButton from '../DownloadCsvButton';
 
 describe('DownloadCsvButton', () => {
-  const testMeta = {
+  const testMeta: PublicationSubjectMeta = {
     filters: {
       characteristics: {
         legend: 'Characteristics',
@@ -57,7 +63,17 @@ describe('DownloadCsvButton', () => {
         ],
       },
     },
-    locations: {},
+    locations: {
+      country: {
+        legend: 'Country',
+        options: [
+          {
+            value: 'england',
+            label: 'England',
+          },
+        ],
+      },
+    },
     timePeriod: {
       legend: 'Academic year',
       hint: '',
@@ -83,36 +99,53 @@ describe('DownloadCsvButton', () => {
         meta={testMeta}
         filters={{
           characteristics: [
-            { label: 'Male', value: 'gender_male' },
-            { label: 'Female', value: 'gender_female' },
+            new CategoryFilter({ label: 'Male', value: 'gender_male' }),
+            new CategoryFilter({ label: 'Female', value: 'gender_female' }),
           ],
           schoolType: [
-            { label: 'State-funded primary', value: 'school_primary' },
-            { label: 'State-funded secondary', value: 'school_secondary' },
+            new CategoryFilter({
+              label: 'State-funded primary',
+              value: 'school_primary',
+            }),
+            new CategoryFilter({
+              label: 'State-funded secondary',
+              value: 'school_secondary',
+            }),
           ],
         }}
-        locations={{}}
+        locations={[
+          new LocationFilter({ value: 'england', label: 'England' }, 'country'),
+          new LocationFilter(
+            { value: 'south_yorkshire', label: 'South Yorkshire' },
+            'region',
+          ),
+        ]}
         timePeriods={[
           TimePeriod.fromString('2014_AY'),
           TimePeriod.fromString('2015_AY'),
         ]}
         indicators={[
-          {
+          new Indicator({
             label: 'Authorised absence rate',
             value: 'authAbsRate',
             unit: '%',
-          },
-          {
+          }),
+          new Indicator({
             label: 'Number of authorised absence sessions',
             value: 'authAbsSess',
             unit: '',
-          },
+          }),
         ]}
         results={[
           {
             filters: ['gender_male', 'school_primary'],
             timePeriod: '2014_AY',
-            location: {},
+            location: {
+              country: {
+                code: 'england',
+                name: 'England',
+              },
+            },
             measures: {
               authAbsRate: '1.2',
               authAbsSess: '2',
@@ -121,7 +154,12 @@ describe('DownloadCsvButton', () => {
           {
             filters: ['gender_male', 'school_secondary'],
             timePeriod: '2014_AY',
-            location: {},
+            location: {
+              country: {
+                code: 'england',
+                name: 'England',
+              },
+            },
             measures: {
               authAbsRate: '3.4',
               authAbsSess: '4',
@@ -130,7 +168,12 @@ describe('DownloadCsvButton', () => {
           {
             filters: ['gender_female', 'school_primary'],
             timePeriod: '2014_AY',
-            location: {},
+            location: {
+              country: {
+                code: 'england',
+                name: 'England',
+              },
+            },
             measures: {
               authAbsRate: '5.6',
               authAbsSess: '6',
@@ -139,7 +182,12 @@ describe('DownloadCsvButton', () => {
           {
             filters: ['gender_female', 'school_secondary'],
             timePeriod: '2014_AY',
-            location: {},
+            location: {
+              country: {
+                code: 'england',
+                name: 'England',
+              },
+            },
             measures: {
               authAbsRate: '7.8',
               authAbsSess: '8',
@@ -148,7 +196,12 @@ describe('DownloadCsvButton', () => {
           {
             filters: ['gender_male', 'school_primary'],
             timePeriod: '2015_AY',
-            location: {},
+            location: {
+              country: {
+                code: 'england',
+                name: 'England',
+              },
+            },
             measures: {
               authAbsRate: '9',
               authAbsSess: '10',
@@ -157,7 +210,12 @@ describe('DownloadCsvButton', () => {
           {
             filters: ['gender_male', 'school_secondary'],
             timePeriod: '2015_AY',
-            location: {},
+            location: {
+              country: {
+                code: 'england',
+                name: 'England',
+              },
+            },
             measures: {
               authAbsRate: '11.2',
               authAbsSess: '12',
@@ -166,7 +224,12 @@ describe('DownloadCsvButton', () => {
           {
             filters: ['gender_female', 'school_primary'],
             timePeriod: '2015_AY',
-            location: {},
+            location: {
+              country: {
+                code: 'england',
+                name: 'England',
+              },
+            },
             measures: {
               authAbsRate: '13.4',
               authAbsSess: '14',
@@ -175,10 +238,127 @@ describe('DownloadCsvButton', () => {
           {
             filters: ['gender_female', 'school_secondary'],
             timePeriod: '2015_AY',
-            location: {},
+            location: {
+              country: {
+                code: 'england',
+                name: 'England',
+              },
+            },
             measures: {
               authAbsRate: '15.6',
               authAbsSess: '16',
+            },
+          },
+          {
+            filters: ['gender_male', 'school_primary'],
+            timePeriod: '2014_AY',
+            location: {
+              region: {
+                code: 'south_yorkshire',
+                name: 'South Yorkshire',
+              },
+            },
+            measures: {
+              authAbsRate: '16.7',
+              authAbsSess: '17',
+            },
+          },
+          {
+            filters: ['gender_male', 'school_secondary'],
+            timePeriod: '2014_AY',
+            location: {
+              country: {
+                code: 'england',
+                name: 'England',
+              },
+            },
+            measures: {
+              authAbsRate: '17.8',
+              authAbsSess: '18',
+            },
+          },
+          {
+            filters: ['gender_female', 'school_primary'],
+            timePeriod: '2014_AY',
+            location: {
+              country: {
+                code: 'england',
+                name: 'England',
+              },
+            },
+            measures: {
+              authAbsRate: '18.9',
+              authAbsSess: '19',
+            },
+          },
+          {
+            filters: ['gender_female', 'school_secondary'],
+            timePeriod: '2014_AY',
+            location: {
+              country: {
+                code: 'england',
+                name: 'England',
+              },
+            },
+            measures: {
+              authAbsRate: '20.1',
+              authAbsSess: '20',
+            },
+          },
+          {
+            filters: ['gender_male', 'school_primary'],
+            timePeriod: '2014_AY',
+            location: {
+              country: {
+                code: 'england',
+                name: 'England',
+              },
+            },
+            measures: {
+              authAbsRate: '22.3',
+              authAbsSess: '22',
+            },
+          },
+          {
+            filters: ['gender_male', 'school_secondary'],
+            timePeriod: '2014_AY',
+            location: {
+              country: {
+                code: 'england',
+                name: 'England',
+              },
+            },
+            measures: {
+              authAbsRate: '24.5',
+              authAbsSess: '25',
+            },
+          },
+          {
+            filters: ['gender_female', 'school_primary'],
+            timePeriod: '2014_AY',
+            location: {
+              country: {
+                code: 'england',
+                name: 'England',
+              },
+            },
+            measures: {
+              authAbsRate: '26.7',
+              authAbsSess: '27',
+            },
+          },
+          {
+            filters: ['gender_female', 'school_secondary'],
+            timePeriod: '2014_AY',
+            location: {
+              country: {
+                code: 'england',
+                name: 'England',
+              },
+            },
+            measures: {
+              authAbsRate: '28.9',
+              authAbsSess: '29',
             },
           },
         ]}
@@ -200,30 +380,42 @@ describe('DownloadCsvButton', () => {
         publicationSlug="pupil-absence"
         meta={testMeta}
         filters={{
-          characteristics: [{ label: 'Female', value: 'gender_female' }],
+          characteristics: [
+            new CategoryFilter({ label: 'Female', value: 'gender_female' }),
+          ],
           schoolType: [
-            { label: 'State-funded primary', value: 'school_primary' },
+            new CategoryFilter({
+              label: 'State-funded primary',
+              value: 'school_primary',
+            }),
           ],
         }}
-        locations={{}}
+        locations={[
+          new LocationFilter({ value: 'england', label: 'England' }, 'country'),
+        ]}
         timePeriods={[TimePeriod.fromString('2015_AY')]}
         indicators={[
-          {
+          new Indicator({
             label: 'Authorised absence rate',
             value: 'authAbsRate',
             unit: '%',
-          },
-          {
+          }),
+          new Indicator({
             label: 'Number of authorised absence sessions',
             value: 'authAbsSess',
             unit: '',
-          },
+          }),
         ]}
         results={[
           {
             filters: ['gender_female', 'school_primary'],
             timePeriod: '2015_AY',
-            location: {},
+            location: {
+              country: {
+                code: 'england',
+                name: 'England',
+              },
+            },
             measures: {
               authAbsRate: '12300000',
               authAbsSess: '44255667.2356',
@@ -249,32 +441,42 @@ describe('DownloadCsvButton', () => {
         meta={testMeta}
         filters={{
           characteristics: [
-            { label: 'Male', value: 'gender_male' },
-            { label: 'Female', value: 'gender_female' },
+            new CategoryFilter({ label: 'Male', value: 'gender_male' }),
+            new CategoryFilter({ label: 'Female', value: 'gender_female' }),
           ],
           schoolType: [
-            { label: 'State-funded primary', value: 'school_primary' },
+            new CategoryFilter({
+              label: 'State-funded primary',
+              value: 'school_primary',
+            }),
           ],
         }}
-        locations={{}}
+        locations={[
+          new LocationFilter({ value: 'england', label: 'England' }, 'country'),
+        ]}
         timePeriods={[TimePeriod.fromString('2015_AY')]}
         indicators={[
-          {
+          new Indicator({
             label: 'Authorised absence rate',
             value: 'authAbsRate',
             unit: '%',
-          },
-          {
+          }),
+          new Indicator({
             label: 'Number of authorised absence sessions',
             value: 'authAbsSess',
             unit: '',
-          },
+          }),
         ]}
         results={[
           {
             filters: ['gender_female', 'school_primary'],
             timePeriod: '2015_AY',
-            location: {},
+            location: {
+              country: {
+                code: 'england',
+                name: 'England',
+              },
+            },
             measures: {
               authAbsRate: '13.4',
               authAbsSess: 'x',
