@@ -21,11 +21,6 @@ const theme1: IdLabelPair = {
   label: 'Pupils and schools',
 };
 
-const theme2: IdLabelPair = {
-  id: 'theme-2',
-  label: 'Theme 2',
-};
-
 const theme1Topic1: Topic = {
   id: '67c249de-1cca-446e-8ccb-dcdac542f460',
   title: 'Pupil absence',
@@ -36,18 +31,6 @@ const theme1Topic2: Topic = {
   id: '77941b7d-bbd6-4069-9107-565af89e2dec',
   title: 'Exclusions',
   theme: theme1,
-};
-
-const theme2Topic1: Topic = {
-  id: 'theme-2-topic-1',
-  title: 'Theme 2 topic 1',
-  theme: theme2,
-};
-
-const theme2Topic2: Topic = {
-  id: 'theme-2-topic-2',
-  title: 'Theme 2 topic 2',
-  theme: theme2,
 };
 
 const dataTypeRevised: ReleaseDataType = {

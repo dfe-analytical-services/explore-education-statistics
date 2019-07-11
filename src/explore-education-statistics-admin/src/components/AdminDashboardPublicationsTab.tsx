@@ -1,10 +1,8 @@
 import FormSelect from '@common/components/form/FormSelect';
 import React from 'react';
-import { Dictionary } from '@common/types';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import { IdLabelPair, Publication } from '@admin/services/types/types';
-import groupBy from 'lodash/groupBy';
 import AdminDashboardPublications from './AdminDashboardPublications';
 import Link from './Link';
 

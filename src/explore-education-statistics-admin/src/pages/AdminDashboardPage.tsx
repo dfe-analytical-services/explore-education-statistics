@@ -11,65 +11,72 @@ import AdminDashboardPublicationsTab from '@admin/components/AdminDashboardPubli
 import Link from '../components/Link';
 import Page from '../components/Page';
 
+const themeToThemeWithIdLabelAndTopics = (theme: ThemeAndTopics) => ({
+  id: theme.id,
+  label: theme.title,
+  topics: theme.topics.map(topic => ({
+    id: topic.id,
+    label: topic.title,
+  })),
+});
+
+const findThemeById = (
+  themeId: string,
+  availableThemes: ThemeAndTopicsIdsAndLabels[],
+) => availableThemes.find(theme => theme.id === themeId) || availableThemes[0];
+
+const findTopicById = (topicId: string, theme: ThemeAndTopicsIdsAndLabels) =>
+  theme.topics.find(topic => topic.id === topicId) || theme.topics[0];
+
+interface ThemeAndTopicsIdsAndLabels extends IdLabelPair {
+  topics: IdLabelPair[];
+}
+
 const AdminDashboardPage = () => {
   const [myPublications, setMyPublications] = useState<Publication[]>([]);
 
-  const [inProgressPublications, setInProgressPublications] = useState<
-    Publication[]
-  >([]);
+  const [themes, setThemes] = useState<ThemeAndTopicsIdsAndLabels[]>();
 
-  const [themes, setThemes] = useState<ThemeAndTopics[]>();
-
-  const [selectedThemeAndTopicIds, setSelectedThemeAndTopicIds] = useState<{
-    themeId: string;
-    topicId: string;
+  const [selectedThemeAndTopic, setSelectedThemeAndTopic] = useState<{
+    theme: ThemeAndTopicsIdsAndLabels;
+    topic: IdLabelPair;
   }>();
 
   const authentication = useContext(LoginContext);
 
   useEffect(() => {
-    const { user } = authentication;
-    const loggedInUserId = user ? user.id : null;
+    const loggedInUser = authentication.user;
 
-    if (loggedInUserId) {
-      if (!themes) {
-        const themeList = DummyPublicationsData.themesAndTopics;
-
-        const firstTheme = themeList[0];
-        const topicsList = themeList[0].topics;
-
-        setThemes(themeList);
-
-        const firstTopic = topicsList[0];
-
-        setSelectedThemeAndTopicIds({
-          themeId: firstTheme.id,
-          topicId: firstTopic.id,
-        });
-      }
-
-      if (selectedThemeAndTopicIds) {
-        const fetchedMyPublications = DummyPublicationsData.allPublications.filter(
-          publication =>
-            publication.owner.id === loggedInUserId &&
-            publication.topic.id === selectedThemeAndTopicIds.topicId,
-        );
-
-        const fetchedInProgressPublications = DummyPublicationsData.allPublications.filter(
-          publication => publication.owner.id !== loggedInUserId,
-        );
-
-        setMyPublications(fetchedMyPublications);
-        setInProgressPublications(fetchedInProgressPublications);
-      }
-    } else {
+    if (!loggedInUser) {
       setMyPublications([]);
-      setInProgressPublications([]);
+      return;
     }
-  }, [authentication, selectedThemeAndTopicIds]);
 
-  const findThemeById = (themeId: string, availableThemes: ThemeAndTopics[]) =>
-    availableThemes.find(theme => theme.id === themeId) || availableThemes[0];
+    if (!themes) {
+      const themeList = DummyPublicationsData.themesAndTopics;
+
+      const themesAsIdLabelPairs = themeList.map(
+        themeToThemeWithIdLabelAndTopics,
+      );
+
+      setThemes(themesAsIdLabelPairs);
+
+      setSelectedThemeAndTopic({
+        theme: themesAsIdLabelPairs[0],
+        topic: themesAsIdLabelPairs[0].topics[0],
+      });
+    }
+
+    if (selectedThemeAndTopic) {
+      const fetchedMyPublications = DummyPublicationsData.allPublications.filter(
+        publication =>
+          publication.owner.id === loggedInUser.id &&
+          publication.topic.id === selectedThemeAndTopic.topic.id,
+      );
+
+      setMyPublications(fetchedMyPublications);
+    }
+  }, [authentication, selectedThemeAndTopic, themes]);
 
   return (
     <Page wide breadcrumbs={[{ name: 'Administrator dashboard' }]}>
@@ -91,30 +98,24 @@ const AdminDashboardPage = () => {
       </div>
       <Tabs id="publicationTabs">
         <TabsSection id="my-publications" title="Publications">
-          {themes && selectedThemeAndTopicIds && (
+          {themes && selectedThemeAndTopic && (
             <AdminDashboardPublicationsTab
               publications={myPublications}
               noResultsMessage="You have not yet created any publications"
-              themes={themes.map(theme => ({
-                id: theme.id,
-                label: theme.title,
-              }))}
-              topics={findThemeById(
-                selectedThemeAndTopicIds.themeId,
-                themes,
-              ).topics.map(topic => ({ id: topic.id, label: topic.title }))}
-              selectedThemeId={selectedThemeAndTopicIds.themeId}
-              selectedTopicId={selectedThemeAndTopicIds.topicId}
+              themes={themes}
+              topics={selectedThemeAndTopic.theme.topics}
+              selectedThemeId={selectedThemeAndTopic.theme.id}
+              selectedTopicId={selectedThemeAndTopic.topic.id}
               onThemeChange={themeId =>
-                setSelectedThemeAndTopicIds({
-                  themeId,
-                  topicId: findThemeById(themeId, themes).topics[0].id,
+                setSelectedThemeAndTopic({
+                  theme: findThemeById(themeId, themes),
+                  topic: findThemeById(themeId, themes).topics[0],
                 })
               }
               onTopicChange={topicId =>
-                setSelectedThemeAndTopicIds({
-                  themeId: selectedThemeAndTopicIds.themeId,
-                  topicId,
+                setSelectedThemeAndTopic({
+                  theme: selectedThemeAndTopic.theme,
+                  topic: findTopicById(topicId, selectedThemeAndTopic.theme),
                 })
               }
             />
