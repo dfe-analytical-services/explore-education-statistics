@@ -31,7 +31,7 @@ const FormFieldTextInput = <T extends {}>(props: Props<T>) => {
           <FormGroup
             hasError={!!errorMessage}
             className={classNames({
-              [formGroupClass]: formGroupClass,
+              [formGroupClass || '']: formGroupClass,
             })}
           >
             <FormTextInput {...childProps} {...field} error={errorMessage} />

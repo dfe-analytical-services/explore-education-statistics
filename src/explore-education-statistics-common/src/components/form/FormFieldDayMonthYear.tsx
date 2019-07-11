@@ -1,4 +1,3 @@
-import { DayMonthYearValues } from '@admin/services/types/types';
 import FormFieldset from '@common/components/form/FormFieldset';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import FormGroup from '@common/components/form/FormGroup';
@@ -6,6 +5,12 @@ import { Field, FieldProps } from 'formik';
 import FormTextInput from '@common/components/form/FormTextInput';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import React, { ReactNode } from 'react';
+
+interface DayMonthYearValues {
+  day?: number;
+  month?: number;
+  year?: number;
+}
 
 interface Props<FormValues> extends DayMonthYearValues {
   error?: ReactNode | string;
