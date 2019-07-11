@@ -317,7 +317,7 @@ const getReleaseSetupDetails = (releaseId: string): ReleaseSetupDetails => {
   };
 };
 
-interface ThemeAndTopics {
+export interface ThemeAndTopics {
   theme: IdLabelPair;
   topics: IdLabelPair[];
 }

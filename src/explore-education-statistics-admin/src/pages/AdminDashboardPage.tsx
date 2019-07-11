@@ -3,7 +3,9 @@ import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import { LoginContext } from '@admin/components/Login';
-import DummyPublicationsData from '@admin/pages/DummyPublicationsData';
+import DummyPublicationsData, {
+  ThemeAndTopics,
+} from '@admin/pages/DummyPublicationsData';
 import { IdLabelPair, Publication } from '@admin/services/types/types';
 import AdminDashboardPublicationsTab from '@admin/components/AdminDashboardPublicationsTab';
 import Link from '../components/Link';
@@ -16,13 +18,12 @@ const AdminDashboardPage = () => {
     Publication[]
   >([]);
 
-  const [themes, setThemes] = useState<IdLabelPair[]>();
+  const [themes, setThemes] = useState<ThemeAndTopics[]>();
 
-  const [topics, setTopics] = useState<IdLabelPair[]>();
-
-  const [selectedThemeId, setSelectedThemeId] = useState<string>();
-
-  const [selectedTopicId, setSelectedTopicId] = useState<string>();
+  const [selectedThemeAndTopicIds, setSelectedThemeAndTopicIds] = useState<{
+    themeId: string;
+    topicId: string;
+  }>();
 
   const authentication = useContext(LoginContext);
 
@@ -32,31 +33,26 @@ const AdminDashboardPage = () => {
 
     if (loggedInUserId) {
       if (!themes) {
-        const { themesAndTopics } = DummyPublicationsData;
-        const listOfJustTheThemes = themesAndTopics.map(
-          themeTopicsPair => themeTopicsPair.theme,
-        );
+        const themeList = DummyPublicationsData.themesAndTopics;
 
-        setThemes(listOfJustTheThemes);
-        setSelectedThemeId(listOfJustTheThemes[0].id);
+        const firstTheme = themeList[0];
+        const topicsList = themeList[0].topics;
+
+        setThemes(themeList);
+
+        const firstTopic = topicsList[0];
+
+        setSelectedThemeAndTopicIds({
+          themeId: firstTheme.theme.id,
+          topicId: firstTopic.id,
+        });
       }
 
-      if (selectedThemeId) {
-        const { themesAndTopics } = DummyPublicationsData;
-        const matchingThemeTopicsPair =
-          themesAndTopics.find(
-            themeTopicsPair => themeTopicsPair.theme.id === selectedThemeId,
-          ) || themesAndTopics[0];
-        const justThisThemesTopics = matchingThemeTopicsPair.topics;
-        setTopics(justThisThemesTopics);
-        setSelectedTopicId(justThisThemesTopics[0].id);
-      }
-
-      if (selectedTopicId) {
+      if (selectedThemeAndTopicIds) {
         const fetchedMyPublications = DummyPublicationsData.allPublications.filter(
           publication =>
             publication.owner.id === loggedInUserId &&
-            publication.topic.id === selectedTopicId,
+            publication.topic.id === selectedThemeAndTopicIds.topicId,
         );
 
         const fetchedInProgressPublications = DummyPublicationsData.allPublications.filter(
@@ -70,7 +66,11 @@ const AdminDashboardPage = () => {
       setMyPublications([]);
       setInProgressPublications([]);
     }
-  }, [authentication, selectedThemeId, selectedTopicId, themes, topics]);
+  }, [authentication, selectedThemeAndTopicIds]);
+
+  const findThemeById = (themeId: string, availableThemes: ThemeAndTopics[]) =>
+    availableThemes.find(theme => theme.theme.id === themeId) ||
+    availableThemes[0];
 
   return (
     <Page wide breadcrumbs={[{ name: 'Administrator dashboard' }]}>
@@ -92,16 +92,28 @@ const AdminDashboardPage = () => {
       </div>
       <Tabs id="publicationTabs">
         <TabsSection id="my-publications" title="Publications">
-          {themes && topics && selectedThemeId && selectedTopicId && (
+          {themes && selectedThemeAndTopicIds && (
             <AdminDashboardPublicationsTab
               publications={myPublications}
               noResultsMessage="You have not yet created any publications"
-              themes={themes}
-              topics={topics}
-              selectedThemeId={selectedThemeId}
-              selectedTopicId={selectedTopicId}
-              onThemeChange={themeId => setSelectedThemeId(themeId)}
-              onTopicChange={topicId => setSelectedTopicId(topicId)}
+              themes={themes.map(theme => theme.theme)}
+              topics={
+                findThemeById(selectedThemeAndTopicIds.themeId, themes).topics
+              }
+              selectedThemeId={selectedThemeAndTopicIds.themeId}
+              selectedTopicId={selectedThemeAndTopicIds.topicId}
+              onThemeChange={themeId =>
+                setSelectedThemeAndTopicIds({
+                  themeId,
+                  topicId: findThemeById(themeId, themes).topics[0].id,
+                })
+              }
+              onTopicChange={topicId =>
+                setSelectedThemeAndTopicIds({
+                  themeId: selectedThemeAndTopicIds.themeId,
+                  topicId,
+                })
+              }
             />
           )}
         </TabsSection>
