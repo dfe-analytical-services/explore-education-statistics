@@ -62,21 +62,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
         {
             foreach (var subject in subjects)
             {
-                // TODO DFE-897 Remove when Subject files and meta files are valid
-                if (subject.Id != 18 && subject.Id != 32 && subject.Id != 33)
-                {
-                    var file = SamplePublications.SubjectFiles.GetValueOrDefault(subject.Id);
-                    // TODO DFE-897 DFE-754 Remove restriction on large FE data file
-                    if (!file.Equals(DataCsvFile.clean_data_fe))
-                    {
-                        _logger.LogInformation("Seeding Subject {Subject}", subject.Name);
+                var file = SamplePublications.SubjectFiles.GetValueOrDefault(subject.Id);
+                _logger.LogInformation("Seeding Subject {Subject}", subject.Name);
 
-                        var lines = file.GetCsvLines();
-                        var metaLines = file.GetMetaCsvLines();
+                var lines = file.GetCsvLines();
+                var metaLines = file.GetMetaCsvLines();
 
-                        _importerService.Import(lines, metaLines, subject);
-                    }
-                }
+                _importerService.Import(lines, metaLines, subject);
             }
         }
     }
