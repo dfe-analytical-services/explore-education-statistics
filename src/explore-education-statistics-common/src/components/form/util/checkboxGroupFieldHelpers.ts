@@ -7,7 +7,7 @@ import {
   CheckboxOption,
 } from '../FormCheckboxGroup';
 
-export const onAllChange = (
+export const handleAllChange = (
   { form, name }: FieldArrayRenderProps,
   options: CheckboxOption[],
 ): CheckboxGroupAllChangeEventHandler => {
@@ -29,7 +29,11 @@ export const onAllChange = (
   };
 };
 
-export const onChange = ({ form, name, ...helpers }: FieldArrayRenderProps) => {
+export const handleChange = ({
+  form,
+  name,
+  ...helpers
+}: FieldArrayRenderProps) => {
   return (event: ChangeEvent<HTMLInputElement>) => {
     if (event.isDefaultPrevented()) {
       return;

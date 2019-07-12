@@ -4,7 +4,10 @@ import FieldCheckboxArray from './FieldCheckboxArray';
 import FormCheckboxSearchGroup, {
   FormCheckboxSearchGroupProps,
 } from './FormCheckboxSearchGroup';
-import { onAllChange, onChange } from './util/checkboxGroupFieldHelpers';
+import {
+  handleAllChange,
+  handleChange,
+} from './util/checkboxGroupFieldHelpers';
 
 export type FormFieldCheckboxSearchGroupProps<FormValues> = {
   name: keyof FormValues | string;
@@ -29,14 +32,14 @@ const FormFieldCheckboxSearchGroup = <T extends {}>(
                 props.onAllChange(event, checked);
               }
 
-              onAllChange(fieldArrayProps, options)(event, checked);
+              handleAllChange(fieldArrayProps, options)(event, checked);
             }}
             onChange={(event, option) => {
               if (props.onChange) {
                 props.onChange(event, option);
               }
 
-              onChange(fieldArrayProps)(event);
+              handleChange(fieldArrayProps)(event);
             }}
           />
         );
