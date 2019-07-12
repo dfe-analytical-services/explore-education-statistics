@@ -72,16 +72,33 @@ export interface OptionalChartDataSet {
   timePeriod?: string;
 }
 
-export interface DataLabelConfigurationItem {
+export type ChartSymbol =
+  | 'circle'
+  | 'cross'
+  | 'diamond'
+  | 'square'
+  | 'star'
+  | 'triangle'
+  | 'wye';
+
+export interface ChartConfiguration {
   label: string;
+  value: string;
   name?: string;
-  value?: string;
   unit?: string;
+  colour?: string;
+  symbol?: ChartSymbol;
 }
+
+export type AxisGroupBy =
+  | 'timePeriods'
+  | 'locations'
+  | 'filters'
+  | 'indicators';
 
 export interface AxisConfigurationItem {
   name: string;
-  groupBy: ('timePeriod' | 'location' | 'filters' | 'indicator')[];
+  groupBy?: AxisGroupBy;
   dataSets: ChartDataSet[];
 
   visible?: boolean;
@@ -90,7 +107,7 @@ export interface AxisConfigurationItem {
 
 export interface Chart {
   type: ChartType;
-  labels: Dictionary<DataLabelConfigurationItem>;
+  labels: Dictionary<ChartConfiguration>;
   axes: Dictionary<AxisConfigurationItem>;
   stacked?: boolean;
   referenceLines?: ReferenceLine[];

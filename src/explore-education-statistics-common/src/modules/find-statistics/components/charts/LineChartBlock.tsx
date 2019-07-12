@@ -5,6 +5,7 @@ import {
   createDataForAxis,
   getKeysForChart,
   mapNameToNameLabel,
+  populateDefaultChartProps,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 
 import React, { Component } from 'react';
@@ -21,7 +22,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { colours, symbols } from './Charts';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 
 const CustomToolTip = ({ active, payload, label }: TooltipProps) => {
   if (active) {
@@ -71,7 +72,7 @@ export default class LineChartBlock extends Component<ChartProps> {
         id: 'xaxis',
         title: 'X Axis',
         type: 'major',
-        defaultDataType: 'timePeriod',
+        defaultDataType: 'timePeriods',
       },
       {
         id: 'yaxis',
@@ -82,14 +83,17 @@ export default class LineChartBlock extends Component<ChartProps> {
   };
 
   public render() {
-    const { data, height, axes, labels } = this.props;
+    const { data, meta, height, axes, labels } = this.props;
 
     const yAxisDomain: [AxisDomain, AxisDomain] = [-10, 10];
+
+    if (!axes.major || !data) return <LoadingSpinner />;
 
     const chartData: ChartDataB[] = createDataForAxis(
       axes.major,
       data.result,
-    ).map(mapNameToNameLabel(labels));
+      meta,
+    ).map(mapNameToNameLabel(labels, meta.timePeriods, meta.locations));
 
     const keysForChart = getKeysForChart(chartData);
 
@@ -104,7 +108,6 @@ export default class LineChartBlock extends Component<ChartProps> {
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis
             dataKey="name"
-            allowDuplicatedCategory={false}
             label={{
               offset: 5,
               position: 'bottom',
@@ -125,19 +128,23 @@ export default class LineChartBlock extends Component<ChartProps> {
             dataKey="value"
           />
 
-          {keysForChart.map((name, index) => (
+          {keysForChart.map(name => (
             <Line
               key={name}
-              dataKey={name}
+              {...populateDefaultChartProps(name, labels[name])}
               type="linear"
-              name={(labels[name] && labels[name].label) || name}
-              legendType={symbols[index]}
-              dot={props => <Symbols {...props} type={symbols[index]} />}
-              stroke={colours[index]}
-              fill={colours[index]}
-              strokeWidth="5"
-              unit={(labels[name] && labels[name].unit) || ''}
-              isAnimationActive={false}
+              legendType={labels[name] && labels[name].symbol}
+              dot={
+                labels[name] &&
+                labels[name].symbol &&
+                (props => (
+                  <Symbols
+                    {...props}
+                    type={labels[name] && labels[name].symbol}
+                  />
+                ))
+              }
+              strokeWidth="2"
             />
           ))}
         </LineChart>

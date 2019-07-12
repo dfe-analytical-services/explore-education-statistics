@@ -3,11 +3,12 @@ import {
   calculateYAxis,
   generateReferenceLines,
   ChartDefinition,
-  ChartProps,
   ChartDataB,
   createDataForAxis,
   getKeysForChart,
   mapNameToNameLabel,
+  StackedBarProps,
+  populateDefaultChartProps,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import React, { Component } from 'react';
 import {
@@ -18,16 +19,9 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from 'recharts';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 
-import { colours } from './Charts';
-
-interface StackedBarHorizontalProps extends ChartProps {
-  stacked?: boolean;
-}
-
-export default class HorizontalBarBlock extends Component<
-  StackedBarHorizontalProps
-> {
+export default class HorizontalBarBlock extends Component<StackedBarProps> {
   public static definition: ChartDefinition = {
     type: 'horizontalbar',
     name: 'Horizontal Bar',
@@ -46,6 +40,7 @@ export default class HorizontalBarBlock extends Component<
         id: 'yaxis',
         title: 'Y Axis',
         type: 'major',
+        defaultDataType: 'timePeriods',
       },
     ],
   };
@@ -53,17 +48,21 @@ export default class HorizontalBarBlock extends Component<
   public render() {
     const {
       data,
+      meta,
       height,
       width,
       referenceLines,
-      stacked,
+      stacked = false,
       labels,
       axes,
     } = this.props;
 
+    if (!axes.major || !data) return <LoadingSpinner />;
+
     const chartData: ChartDataB[] = createDataForAxis(
       axes.major,
       data.result,
+      meta,
     ).map(mapNameToNameLabel(labels));
 
     const keysForChart = getKeysForChart(chartData);
@@ -86,13 +85,10 @@ export default class HorizontalBarBlock extends Component<
           <Tooltip cursor={false} />
           <Legend />
 
-          {Array.from(keysForChart).map((dataKey, index) => (
+          {Array.from(keysForChart).map(name => (
             <Bar
-              key={dataKey}
-              dataKey={dataKey}
-              fill={colours[index]}
-              name={labels[dataKey] && labels[dataKey].label}
-              unit={labels[dataKey] && labels[dataKey].unit}
+              key={name}
+              {...populateDefaultChartProps(name, labels[name])}
               stackId={stacked ? 'a' : undefined}
             />
           ))}
