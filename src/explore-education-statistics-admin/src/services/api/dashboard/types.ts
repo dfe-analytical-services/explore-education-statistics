@@ -1,8 +1,14 @@
 import { User } from '@admin/services/PrototypeLoginService';
 import {
+  DayMonthYearValues,
   IdLabelPair,
   UserContact,
 } from '@admin/services/api/common/types/types';
+
+export enum ReleaseApprovalStatus {
+  Approved,
+  ReadyToReview,
+}
 
 export interface ThemeAndTopics {
   title: string;
@@ -14,13 +20,17 @@ export interface ThemeAndTopics {
 }
 
 export interface AdminDashboardRelease {
+  id: string;
+  status: ReleaseApprovalStatus;
+  latestRelease: boolean;
+  live: boolean;
   dateRangeLabel: string;
   timePeriodCoverage: IdLabelPair;
-  scheduledPublishDate: Date;
-  nextReleaseExpectedDate: Date;
+  publishedDate: Date;
+  nextReleaseExpectedDate: DayMonthYearValues;
   leadStatistician: UserContact;
   lastEditedUser: User;
-  lastEditedDateTime: Date;
+  lastEditedDateTime: string;
 }
 
 export interface AdminDashboardPublication {

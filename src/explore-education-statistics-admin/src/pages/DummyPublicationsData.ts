@@ -1,5 +1,4 @@
 import {
-  ApprovalStatus,
   IdLabelPair,
   Publication,
   Release,
@@ -7,6 +6,7 @@ import {
   ReleaseSetupDetails,
   Topic,
 } from '@admin/services/api/common/types/types';
+import { ReleaseApprovalStatus } from '@admin/services/api/dashboard/types';
 import { PrototypeLoginService } from '@admin/services/PrototypeLoginService';
 
 const methodologies: IdLabelPair[] = [
@@ -54,7 +54,7 @@ const releaseTemplate: Release = {
   },
   nextReleaseExpectedDate: new Date('2021-09-20'),
   status: {
-    approvalStatus: ApprovalStatus.Approved,
+    approvalStatus: ReleaseApprovalStatus.Approved,
     isLive: true,
     isLatest: false,
     isNew: false,

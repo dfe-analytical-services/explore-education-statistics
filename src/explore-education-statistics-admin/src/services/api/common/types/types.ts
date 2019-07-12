@@ -1,3 +1,4 @@
+import { ReleaseApprovalStatus } from '@admin/services/api/dashboard/types';
 import { User } from '../../../PrototypeLoginService';
 
 export interface IdLabelPair {
@@ -23,13 +24,8 @@ export interface TimePeriodCoverage {
   startDate: Date;
 }
 
-export enum ApprovalStatus {
-  Approved,
-  ReadyToReview,
-}
-
 export interface ReleaseStatus {
-  approvalStatus: ApprovalStatus;
+  approvalStatus: ReleaseApprovalStatus;
   isNew: boolean;
   isLive: boolean;
   isLatest: boolean;
@@ -110,6 +106,10 @@ export const dateToDayMonthYear = (date?: Date) => {
     month: date && date.getMonth() + 1,
     year: date && date.getFullYear(),
   };
+};
+
+export const dayMonthYearIsComplete = (dmy?: DayMonthYearValues) => {
+  return dmy && dmy.day && dmy.month && dmy.year;
 };
 
 export const dayMonthYearToDate = (dmy: DayMonthYearValues) => {

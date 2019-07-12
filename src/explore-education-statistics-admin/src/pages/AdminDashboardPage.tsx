@@ -1,14 +1,13 @@
-import { ThemeAndTopics } from '@admin/services/api/dashboard/types';
+import {
+  AdminDashboardPublication,
+  ThemeAndTopics,
+} from '@admin/services/api/dashboard/types';
 import React, { useContext, useEffect, useState } from 'react';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import { LoginContext } from '@admin/components/Login';
-import DummyPublicationsData from '@admin/pages/DummyPublicationsData';
-import {
-  IdLabelPair,
-  Publication,
-} from '@admin/services/api/common/types/types';
+import { IdLabelPair } from '@admin/services/api/common/types/types';
 import AdminDashboardPublicationsTab from '@admin/components/AdminDashboardPublicationsTab';
 import dashboardService from '@admin/services/api/dashboard/service';
 import Link from '../components/Link';
@@ -36,7 +35,9 @@ interface ThemeAndTopicsIdsAndLabels extends IdLabelPair {
 }
 
 const AdminDashboardPage = () => {
-  const [myPublications, setMyPublications] = useState<Publication[]>([]);
+  const [myPublications, setMyPublications] = useState<
+    AdminDashboardPublication[]
+  >([]);
 
   const [themes, setThemes] = useState<ThemeAndTopicsIdsAndLabels[]>();
 
@@ -71,11 +72,9 @@ const AdminDashboardPage = () => {
     }
 
     if (selectedThemeAndTopic) {
-      const fetchedMyPublications = DummyPublicationsData.myPublications.filter(
-        publication => publication.topic.id === selectedThemeAndTopic.topic.id,
-      );
-
-      setMyPublications(fetchedMyPublications);
+      dashboardService
+        .getPublicationsByTopic(selectedThemeAndTopic.topic.id, loggedInUser.id)
+        .then(setMyPublications);
     }
   }, [authentication, selectedThemeAndTopic, themes]);
 

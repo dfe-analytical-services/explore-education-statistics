@@ -1,4 +1,9 @@
-import { ThemeAndTopics } from '@admin/services/api/dashboard/types';
+import {
+  AdminDashboardPublication,
+  ReleaseApprovalStatus,
+  ThemeAndTopics,
+} from '@admin/services/api/dashboard/types';
+import { PrototypeLoginService } from '@admin/services/PrototypeLoginService';
 
 const themesAndTopics: ThemeAndTopics[] = [
   {
@@ -213,6 +218,46 @@ const themesAndTopics: ThemeAndTopics[] = [
   },
 ];
 
+const dashboardPublications: AdminDashboardPublication[] = [
+  {
+    id: 'publication-1',
+    title: 'Pupil absence statistics and data for schools in England',
+    methodology: {
+      id: 'methodology-1',
+      label: 'A guide to absence statistics',
+    },
+    releases: [
+      {
+        id: 'my-publication-1-release-1',
+        dateRangeLabel: '2017-2018',
+        timePeriodCoverage: {
+          id: 'AYQ1Q4',
+          label: 'Academic year',
+        },
+        status: ReleaseApprovalStatus.Approved,
+        latestRelease: true,
+        live: true,
+        publishedDate: new Date('2020-09-20'),
+        nextReleaseExpectedDate: {
+          day: 20,
+          month: 9,
+          year: 2021,
+        },
+        leadStatistician: {
+          name: 'John Smith',
+          telNo: '07654 653763',
+          email: 'js@example.com',
+        },
+        lastEditedDateTime: '2019-09-20 09:30',
+        lastEditedUser: PrototypeLoginService.getUser(
+          '4add7621-4aef-4abc-b2e6-0938b37fe5b9',
+        ),
+      },
+    ],
+  },
+];
+
 export default {
   themesAndTopics,
+  dashboardPublications,
 };

@@ -15,10 +15,20 @@ export default {
 
     // getThemesAndTopics
     mock
-      .onGet('/Theme', {
+      .onGet('/Themes', {
         params: { userId: PrototypeLoginService.getUserList()[0].id },
       })
       .reply(200, mockData.themesAndTopics);
+
+    // getThemesAndTopics
+    mock
+      .onGet('/Publications', {
+        params: {
+          topicId: '67c249de-1cca-446e-8ccb-dcdac542f460',
+          userId: PrototypeLoginService.getUserList()[0].id,
+        },
+      })
+      .reply(200, mockData.dashboardPublications);
 
     return axiosInstance;
   },

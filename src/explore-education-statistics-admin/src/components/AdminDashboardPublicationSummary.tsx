@@ -1,15 +1,13 @@
+import { AdminDashboardPublication } from '@admin/services/api/dashboard/types';
 import React from 'react';
 import Link from '@admin/components/Link';
 import DashboardReleaseList from '@admin/components/DashboardReleaseList';
-import { Publication } from '@admin/services/api/common/types/types';
 
-export interface AdminDashboardPublicationsProps {
-  publication: Publication;
+export interface Props {
+  publication: AdminDashboardPublication;
 }
 
-const AdminDashboardPublications = ({
-  publication,
-}: AdminDashboardPublicationsProps) => {
+const AdminDashboardPublicationSummary = ({ publication }: Props) => {
   return (
     <>
       <dl className="govuk-summary-list govuk-!-margin-bottom-0">
@@ -18,7 +16,7 @@ const AdminDashboardPublications = ({
             Methodology
           </dt>
           <dd className="govuk-summary-list__value">
-            <Link to="/methodology/{publication.methodology.id}">
+            <Link to={`/methodology/${publication.methodology.id}`}>
               {publication.methodology.label}
             </Link>
           </dd>
@@ -34,4 +32,4 @@ const AdminDashboardPublications = ({
   );
 };
 
-export default AdminDashboardPublications;
+export default AdminDashboardPublicationSummary;

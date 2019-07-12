@@ -1,13 +1,13 @@
-import DashboardRelease from '@admin/components/DashboardRelease';
+import DashboardReleaseSummary from '@admin/components/DashboardReleaseSummary';
 import Link from '@admin/components/Link';
+import { AdminDashboardRelease } from '@admin/services/api/dashboard/types';
 import React from 'react';
-import { Release } from '@admin/services/api/common/types/types';
 
-export interface DashboardReleaseListProps {
-  releases: Release[];
+export interface Props {
+  releases: AdminDashboardRelease[];
 }
 
-const DashboardReleaseList = ({ releases }: DashboardReleaseListProps) => (
+const DashboardReleaseList = ({ releases }: Props) => (
   <>
     <dl className="govuk-summary-list">
       <div className="govuk-summary-list__row">
@@ -18,7 +18,7 @@ const DashboardReleaseList = ({ releases }: DashboardReleaseListProps) => (
           <ul className="govuk-list dfe-admin">
             {releases.map(release => (
               <li key={release.id}>
-                <DashboardRelease release={release} showComments />
+                <DashboardReleaseSummary release={release} />
               </li>
             ))}
           </ul>
