@@ -10,7 +10,8 @@ using Microsoft.EntityFrameworkCore.Internal;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
-    [Route("themes")]
+    // TODO rename to Themes once the current Crud theme controller is removed
+    [Route("[controller]")]
     [ApiController]
     [Authorize]
     public class ThemeController : ControllerBase
