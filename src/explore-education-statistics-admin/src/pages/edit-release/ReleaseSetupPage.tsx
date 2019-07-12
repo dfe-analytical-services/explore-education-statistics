@@ -7,8 +7,8 @@ import { RouteComponentProps } from 'react-router';
 import { setupEditRoute } from '@admin/routes/releaseRoutes';
 import ReleasePageTemplate from '@admin/pages/edit-release/components/ReleasePageTemplate';
 import DummyPublicationsData from '@admin/pages/DummyPublicationsData';
-import { ReleaseSetupDetails } from '../../services/api/common/types/types';
-import Link from '../../components/Link';
+import { ReleaseSetupDetails } from '@admin/services/api/common/types/types';
+import Link from '@admin/components/Link';
 
 interface MatchProps {
   releaseId: string;

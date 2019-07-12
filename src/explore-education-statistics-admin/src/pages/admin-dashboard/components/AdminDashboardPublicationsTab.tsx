@@ -4,8 +4,8 @@ import React from 'react';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import { IdLabelPair } from '@admin/services/api/common/types/types';
+import Link from '@admin/components/Link';
 import AdminDashboardPublicationSummary from './AdminDashboardPublicationSummary';
-import Link from './Link';
 
 interface AdminDashboardPublicationsTabProps {
   publications: AdminDashboardPublication[];

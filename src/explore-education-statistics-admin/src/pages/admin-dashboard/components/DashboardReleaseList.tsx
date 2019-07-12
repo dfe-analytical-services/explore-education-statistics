@@ -1,7 +1,7 @@
-import DashboardReleaseSummary from '@admin/components/DashboardReleaseSummary';
+import React from 'react';
 import Link from '@admin/components/Link';
 import { AdminDashboardRelease } from '@admin/services/api/dashboard/types';
-import React from 'react';
+import DashboardReleaseSummary from './DashboardReleaseSummary';
 
 export interface Props {
   releases: AdminDashboardRelease[];

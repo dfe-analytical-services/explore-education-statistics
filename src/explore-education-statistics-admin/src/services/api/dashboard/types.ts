@@ -26,7 +26,7 @@ export interface AdminDashboardRelease {
   live: boolean;
   dateRangeLabel: string;
   timePeriodCoverage: IdLabelPair;
-  publishedDate: Date;
+  publishedDate: string;
   nextReleaseExpectedDate: DayMonthYearValues;
   leadStatistician: UserContact;
   lastEditedUser: User;

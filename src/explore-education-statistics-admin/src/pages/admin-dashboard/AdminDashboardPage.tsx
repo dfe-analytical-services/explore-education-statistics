@@ -8,10 +8,10 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import { LoginContext } from '@admin/components/Login';
 import { IdLabelPair } from '@admin/services/api/common/types/types';
-import AdminDashboardPublicationsTab from '@admin/components/AdminDashboardPublicationsTab';
 import dashboardService from '@admin/services/api/dashboard/service';
-import Link from '../components/Link';
-import Page from '../components/Page';
+import Link from '@admin/components/Link';
+import Page from '@admin/components/Page';
+import AdminDashboardPublicationsTab from './components/AdminDashboardPublicationsTab';
 
 const themeToThemeWithIdLabelAndTopics = (theme: ThemeAndTopics) => ({
   id: theme.id,

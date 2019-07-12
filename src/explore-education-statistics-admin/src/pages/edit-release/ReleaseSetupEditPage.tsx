@@ -22,14 +22,14 @@ import {
   validateMandatoryDayMonthYearField,
   validateOptionalPartialDayMonthYearField,
 } from '@admin/validation/validation';
-import Link from '../../components/Link';
+import Link from '@admin/components/Link';
 import {
   dateToDayMonthYear,
   dayMonthYearToDate,
   DayMonthYearValues,
   IdLabelPair,
   ReleaseSetupDetails,
-} from '../../services/api/common/types/types';
+} from '@admin/services/api/common/types/types';
 
 interface MatchProps {
   releaseId: string;

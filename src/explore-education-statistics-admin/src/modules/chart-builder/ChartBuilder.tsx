@@ -12,9 +12,9 @@ import {
   DataLabelConfigurationItem,
   AxisConfigurationItem,
 } from '@common/services/publicationService';
+import ConstData from '@admin/pages/prototypes/PrototypeData';
 import { Dictionary } from '@common/types';
 import styles from './graph-builder.module.scss';
-import ConstData from '../../pages/prototypes/PrototypeData';
 import ChartTypeSelector from './ChartTypeSelector';
 import ChartDataConfiguration from './ChartDataConfiguration';
 import ChartAxisConfiguration from './ChartAxisConfiguration';

@@ -237,7 +237,7 @@ const dashboardPublications: AdminDashboardPublication[] = [
         status: ReleaseApprovalStatus.Approved,
         latestRelease: true,
         live: true,
-        publishedDate: new Date('2020-09-20'),
+        publishedDate: '2020-09-20',
         nextReleaseExpectedDate: {
           day: 20,
           month: 9,

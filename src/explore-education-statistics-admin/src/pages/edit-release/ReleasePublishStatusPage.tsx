@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import DummyPublicationsData from '@admin/pages/DummyPublicationsData';
 import ReleasePageTemplate from '@admin/pages/edit-release/components/ReleasePageTemplate';
-import { Release } from '../../services/api/common/types/types';
+import { Release } from '@admin/services/api/common/types/types';
 
 interface MatchProps {
   releaseId: string;
