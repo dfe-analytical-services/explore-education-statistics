@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
@@ -1208,12 +1209,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         DataBlockRequest = new DataBlockRequest
                         {
-                            subjectId = 1,
-                            geographicLevel = "Country",
-                            startYear = "2012",
-                            endYear = "2016",
-                            filters = new List<string> {"1", "2"},
-                            indicators = new List<string> {"23", "26", "28"}
+                            SubjectId = 1,
+                            GeographicLevel = "Country",
+                            TimePeriod = new TimePeriod
+                            {
+                                StartYear = "2012",
+                                StartCode = TimeIdentifier.SixHalfTerms,
+                                EndYear = "2016",
+                                EndCode = TimeIdentifier.SixHalfTerms,
+                            },
+                            Filters = new List<string> {"1", "2"},
+                            Indicators = new List<string> {"23", "26", "28"}
                         },
 
                         Summary = new Summary
@@ -1295,7 +1301,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             },
                         },
                     },
-
                     Content = new List<ContentSection>
                     {
                         new ContentSection
@@ -1336,12 +1341,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     Heading = null,
                                     DataBlockRequest = new DataBlockRequest
                                     {
-                                        subjectId = 1,
-                                        geographicLevel = "Country",
-                                        startYear = "2012",
-                                        endYear = "2016",
-                                        filters = new List<string> {"1", "2"},
-                                        indicators = new List<string> {"23", "26", "28"}
+                                        SubjectId = 1,
+                                        GeographicLevel = "Country",
+                                        TimePeriod = new TimePeriod
+                                        {
+                                            StartYear = "2012",
+                                            StartCode = TimeIdentifier.SixHalfTerms,
+                                            EndYear = "2016",
+                                            EndCode = TimeIdentifier.SixHalfTerms,
+                                        },
+                                        Filters = new List<string> {"1", "2"},
+                                        Indicators = new List<string> {"23", "26", "28"}
                                     },
                                     Tables = new List<Table>
                                     {
@@ -1429,44 +1439,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         "It also accounted for almost a third (31.6%) of all [authorised absence](../glossary#authorised-absence) and more than half (53.8%) of all [unauthorised absence](../glossary#unauthorised-absence).\n\n" +
                                         "Overall, it's increased across primary and secondary schools to 10.8% - up from 10.5% in 2015 to 16."
                                 },
-/*                                new DataBlock
-                                {
-                                    Heading = null,
-                                    DataBlockRequest = new DataBlockRequest
-                                    {
-                                        subjectId = 1,
-                                        geographicLevel = "Country",
-                                        startYear = "2012",
-                                        endYear = "2016",
-                                        filters = new List<string> {"1", "2"},
-                                        indicators = new List<string> {"23", "26", "28"}
-                                    },
-                                    Tables = new List<Table>
-                                    {
-                                        new Table
-                                        {
-                                            indicators = new List<string> {"23", "26", "28"}
-                                        }
-                                    },
-                                    Charts = new List<IContentBlockChart>
-                                    {
-                                        new LineChart
-                                        {
-                                            XAxis = new Axis
-                                            {
-                                                title = "School Year"
-                                            },
-                                            YAxis = new Axis
-                                            {
-                                                title = "Absence Rate"
-                                            },
-                                            Indicators = new List<string>
-                                            {
-                                                "23", "26", "28"
-                                            },
-                                        }
-                                    }
-                                },*/
+
                                 new MarkDownBlock
                                 {
                                     Body =
@@ -1490,44 +1463,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         "* rate of absence by reason - the rate of absence for each reason, calculated by taking the number of absences for a specific reason as a percentage of the total number of possible sessions\n\n" +
                                         "* one or more sessions missed due to each reason - the number of pupils missing at least 1 session due to each reason"
                                 },
-/*                                new DataBlock
-                                {
-                                    Heading = null,
-                                    DataBlockRequest = new DataBlockRequest
-                                    {
-                                        subjectId = 1,
-                                        geographicLevel = "Country",
-                                        startYear = "2012",
-                                        endYear = "2016",
-                                        filters = new List<string> {"1", "2"},
-                                        indicators = new List<string> {"23", "26", "28"}
-                                    },
-                                    Tables = new List<Table>
-                                    {
-                                        new Table
-                                        {
-                                            indicators = new List<string> {"23", "26", "28"}
-                                        }
-                                    },
-                                    Charts = new List<IContentBlockChart>
-                                    {
-                                        new LineChart
-                                        {
-                                            XAxis = new Axis
-                                            {
-                                                title = "School Year"
-                                            },
-                                            YAxis = new Axis
-                                            {
-                                                title = "Absence Rate"
-                                            },
-                                            Indicators = new List<string>
-                                            {
-                                                "23", "26", "28"
-                                            },
-                                        }
-                                    }
-                                },*/
+
                                 new MarkDownBlock
                                 {
                                     Body =
@@ -1641,12 +1577,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 {
                                     DataBlockRequest = new DataBlockRequest
                                     {
-                                        subjectId = 1,
-                                        geographicLevel = "Local_Authority_District",
-                                        startYear = "2016",
-                                        endYear = "2017",
-                                        indicators = new List<string> {"23", "26", "28"},
-                                        filters = new List<string> {"1", "2"}
+                                        SubjectId = 1,
+                                        GeographicLevel = "Local_Authority_District",
+                                        TimePeriod = new TimePeriod
+                                        {
+                                            StartYear = "2016",
+                                            StartCode = TimeIdentifier.SixHalfTerms,
+                                            EndYear = "2017",
+                                            EndCode = TimeIdentifier.SixHalfTerms,
+                                        },
+
+                                        Indicators = new List<string> {"23", "26", "28"},
+                                        Filters = new List<string> {"1", "2"}
                                     },
                                     Charts = new List<IContentBlockChart>
                                     {
@@ -1779,12 +1721,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         DataBlockRequest = new DataBlockRequest
                         {
-                            subjectId = 12,
-                            geographicLevel = "Country",
-                            startYear = "2012",
-                            endYear = "2016",
-                            filters = new List<string> {"727"},
-                            indicators = new List<string> {"153", "154", "155", "156", "157", "158", "160"}
+                            SubjectId = 12,
+                            GeographicLevel = "Country",
+                            TimePeriod = new TimePeriod
+                            {
+                                StartYear = "2012",
+                                StartCode = TimeIdentifier.AcademicYear,
+                                EndYear = "2016",
+                                EndCode = TimeIdentifier.AcademicYear,
+                            },
+
+                            Filters = new List<string> {"727"},
+                            Indicators = new List<string> {"153", "154", "155", "156", "157", "158", "160"}
                         },
                         Summary = new Summary
                         {
@@ -1894,12 +1842,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     Heading = "Chart showing permanent exclusions in England",
                                     DataBlockRequest = new DataBlockRequest
                                     {
-                                        subjectId = 12,
-                                        geographicLevel = "Country",
-                                        startYear = "2012",
-                                        endYear = "2016",
-                                        filters = new List<string> {"727"},
-                                        indicators = new List<string> {"156", "154", "155"}
+                                        SubjectId = 12,
+                                        GeographicLevel = "Country",
+                                        TimePeriod = new TimePeriod {
+                                            StartYear = "2012",
+                                            StartCode = TimeIdentifier.AcademicYear,
+                                            EndYear = "2016",
+                                            EndCode = TimeIdentifier.AcademicYear,
+                                        },
+                                        Filters = new List<string> {"727"},
+                                        Indicators = new List<string> {"156", "154", "155"}
                                     },
 
                                     Tables = new List<Table>
@@ -1976,12 +1928,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     Heading = "Chart showing fixed-period exclusions in England",
                                     DataBlockRequest = new DataBlockRequest
                                     {
-                                        subjectId = 12,
-                                        geographicLevel = "Country",
-                                        startYear = "2012",
-                                        endYear = "2016",
-                                        filters = new List<string> {"727"},
-                                        indicators = new List<string> {"158", "154", "157"}
+                                        SubjectId = 12,
+                                        GeographicLevel = "Country",
+                                        TimePeriod = new TimePeriod {
+                                            StartYear = "2012",
+                                            StartCode = TimeIdentifier.AcademicYear,
+                                            EndYear = "2016",
+                                            EndCode = TimeIdentifier.AcademicYear,
+                                        },
+
+                                        Filters = new List<string> {"727"},
+                                        Indicators = new List<string> {"158", "154", "157"}
                                     },
 
                                     Tables = new List<Table>
@@ -2148,22 +2105,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Caption = "",
                             Content = new List<IContentBlock>
                             {
-                                // new DataBlock {
-                                //     DataBlockRequest = new DataBlockRequest {
-                                //         subjectId = 12,
-                                //         geographicLevel = "Local_Authority",
-                                //         startYear = "2016",
-                                //         endYear = "2017",
-                                //         indicators = new List<string> { "155" , "156" , "158" },
-                                //         filters = new List<string> { "727" }
-                                //     },
-                                //     Charts = new List<IContentBlockChart> {
-                                //         new MapChart {
-                                //             Indicators = new List<string> { "155" , "156" , "158" }
-                                //         }
-                                //     }
-
-                                // },
                                 new MarkDownBlock
                                 {
                                     Body =
@@ -2197,7 +2138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     KeyStatistics = new DataBlock
                     {
                         Heading = "Latest headline facts and figures - 2016 to 2017",
-
+    
                         Summary = new Summary
                         {
                             dataKeys = new List<string>
@@ -2252,8 +2193,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     KeyStatistics = new DataBlock
                     {
                         Heading = "Latest headline facts and figures - 2016 to 2017",
-
-
+    
+    
                         Summary = new Summary
                         {
                             dataKeys = new List<string>
@@ -2278,7 +2219,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             }
                         },
                     },
-
+    
                     Content = new List<ContentSection>
                     {
                         new ContentSection
@@ -2507,12 +2448,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         DataBlockRequest = new DataBlockRequest
                         {
-                            subjectId = 17,
-                            geographicLevel = "Country",
-                            startYear = "2014",
-                            endYear = "2018",
-                            filters = new List<string> {"845"},
-                            indicators = new List<string>
+                            SubjectId = 17,
+                            GeographicLevel = "Country",
+                            TimePeriod = new TimePeriod {
+                                StartYear = "2014",
+                                StartCode = TimeIdentifier.CalendarYear,
+                                EndYear = "2018",
+                                EndCode = TimeIdentifier.CalendarYear,
+                            },
+
+                            Filters = new List<string> {"845"},
+                            Indicators = new List<string>
                                 {"189", "193", "194", "195", "196", "197", "198", "199"}
                         },
                         Summary = new Summary
@@ -2606,12 +2552,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         "Table of Timeseries of key secondary preference rates, England",
                                     DataBlockRequest = new DataBlockRequest
                                     {
-                                        subjectId = 17,
-                                        geographicLevel = "Country",
-                                        startYear = "2014",
-                                        endYear = "2018",
-                                        filters = new List<string> {"848"},
-                                        indicators = new List<string> {"197", "198", "199", "200"}
+                                        SubjectId = 17,
+                                        GeographicLevel = "Country",
+                                        TimePeriod = new TimePeriod {
+                                            StartYear = "2014",
+                                            StartCode = TimeIdentifier.CalendarYear,
+                                            EndYear = "2018",
+                                            EndCode = TimeIdentifier.CalendarYear,
+                                        },
+
+                                        Filters = new List<string> {"848"},
+                                        Indicators = new List<string> {"197", "198", "199", "200"}
                                     },
                                     Tables = new List<Table>
                                     {
@@ -2703,12 +2654,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         "Table showing Timeseries of key primary preference rates, England Entry into academic year",
                                     DataBlockRequest = new DataBlockRequest
                                     {
-                                        subjectId = 17,
-                                        geographicLevel = "Country",
-                                        startYear = "2014",
-                                        endYear = "2018",
-                                        filters = new List<string> {"845"},
-                                        indicators = new List<string> {"197", "198", "199", "200"}
+                                        SubjectId = 17,
+                                        GeographicLevel = "Country",
+                                        TimePeriod = new TimePeriod {
+                                            StartYear = "2014",
+                                            StartCode = TimeIdentifier.CalendarYear,
+                                            EndYear = "2018",
+                                            EndCode = TimeIdentifier.CalendarYear,
+                                        },
+
+                                        Filters = new List<string> {"845"},
+                                        Indicators = new List<string> {"197", "198", "199", "200"}
                                     },
                                     Tables = new List<Table>
                                     {

@@ -26301,12 +26301,12 @@ Object {
     },
     "timePeriods": Object {
       "2014_HT6": Object {
-        "code": "HT6",
-        "year": 2014,
+        "label": "2014/15",
+        "value": "2014_HT6",
       },
       "2015_HT6": Object {
-        "code": "HT6",
-        "year": 2015,
+        "label": "2015/16",
+        "value": "2015_HT6",
       },
     },
   },
@@ -26343,8 +26343,7 @@ Object {
         "26": "10",
         "28": "5",
       },
-      "timeIdentifier": "HT6",
-      "year": 2014,
+      "timePeriod": "2014_HT6",
     },
     Object {
       "filters": Array [
@@ -26375,8 +26374,7 @@ Object {
         "26": "4",
         "28": "1",
       },
-      "timeIdentifier": "HT6",
-      "year": 2015,
+      "timePeriod": "2015_HT6",
     },
   ],
   "subjectId": 1,

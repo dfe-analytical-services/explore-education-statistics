@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Converters;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Converters;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -17,21 +17,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
     public class DataBlockRequest
     {
-        public int subjectId;
-        public string geographicLevel;
-        public List<string> countries;
-        public List<string> localAuthorities;
-        public List<string> regions;
-        public string startYear;
-        public string endYear;
-        public List<string> filters;
-        public List<string> indicators;
+        public int SubjectId;
+        public string GeographicLevel;
+        public TimePeriod TimePeriod;
+        public List<string> Filters;
+        public List<string> Indicators;
+        
+        public List<string> Country;
+        public List<string> LocalAuthority;
+        public List<string> Region;
     }
 
-    public class Axis
+    public class TimePeriod
     {
-        public string title;
+        public string StartYear;
+        [JsonConverter(typeof(EnumToEnumValueJsonConverter<TimeIdentifier>))]
+        public TimeIdentifier StartCode;
+        public string EndYear;
+        [JsonConverter(typeof(EnumToEnumValueJsonConverter<TimeIdentifier>))]
+        public TimeIdentifier EndCode;
     }
+
 
     [JsonConverter(typeof(ContentBlockChartConverter))]
     public interface IContentBlockChart

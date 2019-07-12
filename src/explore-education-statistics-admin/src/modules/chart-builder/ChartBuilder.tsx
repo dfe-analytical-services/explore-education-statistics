@@ -54,8 +54,7 @@ function getReduceMetaDataForAxis(data: DataBlockResponse) {
         ...data.result.reduce<Dictionary<ChartConfiguration>>(
           (moreItems, result) => ({
             ...moreItems,
-            [`${result.year}_${result.timeIdentifier}`]: data.metaData
-              .timePeriods[`${result.year}_${result.timeIdentifier}`],
+            [result.timePeriod]: data.metaData.timePeriods[result.timePeriod],
           }),
           {},
         ),

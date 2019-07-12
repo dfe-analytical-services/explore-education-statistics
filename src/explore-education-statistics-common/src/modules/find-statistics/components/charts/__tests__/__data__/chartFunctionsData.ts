@@ -3476,8 +3476,7 @@ const responseData: DataBlockResponse = {
         '26': '3.9',
         '23': '0.8',
       },
-      timeIdentifier: 'HT6',
-      year: 2013,
+      timePeriod: '2013_HT6',
     },
     {
       filters: ['1', '73'],
@@ -3492,8 +3491,7 @@ const responseData: DataBlockResponse = {
         '26': '5.2',
         '23': '1.3',
       },
-      timeIdentifier: 'HT6',
-      year: 2013,
+      timePeriod: '2013_HT6',
     },
     {
       filters: ['1', '71'],
@@ -3508,8 +3506,7 @@ const responseData: DataBlockResponse = {
         '26': '9',
         '23': '1.9',
       },
-      timeIdentifier: 'HT6',
-      year: 2013,
+      timePeriod: '2013_HT6',
     },
     {
       filters: ['1', '71'],
@@ -3524,8 +3521,7 @@ const responseData: DataBlockResponse = {
         '26': '9.4',
         '23': '1.9',
       },
-      timeIdentifier: 'HT6',
-      year: 2014,
+      timePeriod: '2014_HT6',
     },
     {
       filters: ['1', '73'],
@@ -3540,8 +3536,7 @@ const responseData: DataBlockResponse = {
         '26': '5.9',
         '23': '1.4',
       },
-      timeIdentifier: 'HT6',
-      year: 2012,
+      timePeriod: '2012_HT6',
     },
     {
       filters: ['1', '71'],
@@ -3556,8 +3551,7 @@ const responseData: DataBlockResponse = {
         '26': '9.6',
         '23': '1.9',
       },
-      timeIdentifier: 'HT6',
-      year: 2012,
+      timePeriod: '2012_HT6',
     },
     {
       filters: ['1', '72'],
@@ -3572,8 +3566,7 @@ const responseData: DataBlockResponse = {
         '26': '4.7',
         '23': '0.8',
       },
-      timeIdentifier: 'HT6',
-      year: 2012,
+      timePeriod: '2012_HT6',
     },
     {
       filters: ['1', '72'],
@@ -3588,8 +3581,7 @@ const responseData: DataBlockResponse = {
         '26': '4',
         '23': '0.9',
       },
-      timeIdentifier: 'HT6',
-      year: 2015,
+      timePeriod: '2015_HT6',
     },
     {
       filters: ['1', '73'],
@@ -3604,8 +3596,7 @@ const responseData: DataBlockResponse = {
         '26': '5.4',
         '23': '1.5',
       },
-      timeIdentifier: 'HT6',
-      year: 2016,
+      timePeriod: '2016_HT6',
     },
     {
       filters: ['1', '72'],
@@ -3620,8 +3611,7 @@ const responseData: DataBlockResponse = {
         '26': '4',
         '23': '1.1',
       },
-      timeIdentifier: 'HT6',
-      year: 2016,
+      timePeriod: '2016_HT6',
     },
     {
       filters: ['1', '71'],
@@ -3636,8 +3626,7 @@ const responseData: DataBlockResponse = {
         '26': '9.7',
         '23': '2.1',
       },
-      timeIdentifier: 'HT6',
-      year: 2016,
+      timePeriod: '2016_HT6',
     },
     {
       filters: ['1', '72'],
@@ -3652,8 +3641,7 @@ const responseData: DataBlockResponse = {
         '26': '4',
         '23': '0.9',
       },
-      timeIdentifier: 'HT6',
-      year: 2014,
+      timePeriod: '2014_HT6',
     },
     {
       filters: ['1', '73'],
@@ -3668,8 +3656,7 @@ const responseData: DataBlockResponse = {
         '26': '5.3',
         '23': '1.3',
       },
-      timeIdentifier: 'HT6',
-      year: 2014,
+      timePeriod: '2014_HT6',
     },
     {
       filters: ['1', '73'],
@@ -3684,8 +3671,7 @@ const responseData: DataBlockResponse = {
         '26': '5.2',
         '23': '1.4',
       },
-      timeIdentifier: 'HT6',
-      year: 2015,
+      timePeriod: '2015_HT6',
     },
     {
       filters: ['1', '71'],
@@ -3700,8 +3686,7 @@ const responseData: DataBlockResponse = {
         '26': '9.1',
         '23': '1.7',
       },
-      timeIdentifier: 'HT6',
-      year: 2015,
+      timePeriod: '2015_HT6',
     },
   ],
 };
@@ -3726,8 +3711,7 @@ const responseWithMissingData: DataBlockResponse = {
         '26': '3.9',
         '23': '0.8',
       },
-      timeIdentifier: 'HT6',
-      year: 2013,
+      timePeriod: '2013_HT6',
     },
     {
       filters: ['1', '73'],
@@ -3742,8 +3726,7 @@ const responseWithMissingData: DataBlockResponse = {
         '26': '5.2',
         '23': '1.3',
       },
-      timeIdentifier: 'HT6',
-      year: 2013,
+      timePeriod: '2013_HT6',
     },
     {
       filters: ['1', '71'],
@@ -3758,8 +3741,7 @@ const responseWithMissingData: DataBlockResponse = {
         '26': '9',
         '23': '1.9',
       },
-      timeIdentifier: 'HT6',
-      year: 2013,
+      timePeriod: '2013_HT6',
     },
     {
       filters: ['1', '73'],
@@ -3774,8 +3756,7 @@ const responseWithMissingData: DataBlockResponse = {
         '26': '5.9',
         '23': '1.4',
       },
-      timeIdentifier: 'HT6',
-      year: 2012,
+      timePeriod: '2012_HT6',
     },
     {
       filters: ['1', '71'],
@@ -3790,8 +3771,7 @@ const responseWithMissingData: DataBlockResponse = {
         '26': '9.6',
         '23': '1.9',
       },
-      timeIdentifier: 'HT6',
-      year: 2012,
+      timePeriod: '2012_HT6',
     },
     {
       filters: ['1', '72'],
@@ -3806,8 +3786,7 @@ const responseWithMissingData: DataBlockResponse = {
         '26': '4.7',
         '23': '0.8',
       },
-      timeIdentifier: 'HT6',
-      year: 2012,
+      timePeriod: '2012_HT6',
     },
     {
       filters: ['1', '72'],
@@ -3822,8 +3801,7 @@ const responseWithMissingData: DataBlockResponse = {
         '26': '4',
         '23': '0.9',
       },
-      timeIdentifier: 'HT6',
-      year: 2015,
+      timePeriod: '2015_HT6',
     },
     {
       filters: ['1', '73'],
@@ -3838,8 +3816,7 @@ const responseWithMissingData: DataBlockResponse = {
         '26': '5.4',
         '23': '1.5',
       },
-      timeIdentifier: 'HT6',
-      year: 2016,
+      timePeriod: '2016_HT6',
     },
     {
       filters: ['1', '72'],
@@ -3854,8 +3831,7 @@ const responseWithMissingData: DataBlockResponse = {
         '26': '4',
         '23': '1.1',
       },
-      timeIdentifier: 'HT6',
-      year: 2016,
+      timePeriod: '2016_HT6',
     },
     {
       filters: ['1', '71'],
@@ -3870,8 +3846,7 @@ const responseWithMissingData: DataBlockResponse = {
         '26': '9.7',
         '23': '2.1',
       },
-      timeIdentifier: 'HT6',
-      year: 2016,
+      timePeriod: '2016_HT6',
     },
     {
       filters: ['1', '73'],
@@ -3886,8 +3861,7 @@ const responseWithMissingData: DataBlockResponse = {
         '26': '5.2',
         '23': '1.4',
       },
-      timeIdentifier: 'HT6',
-      year: 2015,
+      timePeriod: '2015_HT6',
     },
     {
       filters: ['1', '71'],
@@ -3902,8 +3876,7 @@ const responseWithMissingData: DataBlockResponse = {
         '26': '9.1',
         '23': '1.7',
       },
-      timeIdentifier: 'HT6',
-      year: 2015,
+      timePeriod: '2015_HT6',
     },
   ],
 };

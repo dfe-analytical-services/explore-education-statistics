@@ -240,8 +240,7 @@ function filterResultsForDataSet(ds: ChartDataSet) {
     }
 
     if (ds.timePeriod) {
-      if (ds.timePeriod !== `${result.year}_${result.timeIdentifier}`)
-        return false;
+      if (ds.timePeriod !== result.timePeriod) return false;
     }
 
     return true;
@@ -303,7 +302,7 @@ function generateNameForAxisConfiguration(
 ) {
   switch (groupBy) {
     case 'timePeriods':
-      return `${result.year}_${result.timeIdentifier}`;
+      return result.timePeriod;
     case 'locations':
       return `${result.location.localAuthorityDistrict &&
         result.location.localAuthorityDistrict.code}`;

@@ -442,8 +442,12 @@ export default class PrototypePublicationService {
           subjectId: 1,
           filters: ['1', '2'],
           indicators: ['23', '26', '28'],
-          startYear: '2016',
-          endYear: '2017',
+          timePeriod: {
+            startYear: '2016',
+            startCode: 'HT6',
+            endYear: '2017',
+            endCode: 'HT6',
+          },
           geographicLevel: GeographicLevel.Country,
         },
 
