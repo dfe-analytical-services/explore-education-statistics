@@ -1,7 +1,7 @@
 import { ThemeAndTopics } from '@admin/pages/DummyPublicationsData';
-import Client from '@admin/services/api/Client';
+import Client from '@common/services/api/Client';
 import axios from 'axios';
-import { commaSeparated } from '../util/paramSerializers';
+import { commaSeparated } from '@common/services/util/paramSerializers';
 import mocks from './mock/axios-mock';
 
 const createContentApiAxios = async () => {
