@@ -2335,82 +2335,7 @@
 							"name": "By characteristic",
 							"item": [
 								{
-									"name": "Tablebuilder - Absence by characteristic - Country - *",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "0c491405-7891-4f02-a4bb-47785d27fa09",
-												"exec": [
-													"respJson = pm.response.json()",
-													"",
-													"pm.test(\"Fields are present\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodRange\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-													"});",
-													"",
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { ",
-													"    pm.expect(respJson.publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); ",
-													"});",
-													"",
-													"pm.test(\"geographicLevel should be same as request\", function () {",
-													"    for(var i = 0; i < respJson.result.length; i++) {",
-													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Country\");",
-													"    }",
-													"});",
-													"",
-													"pm.test(\"subjectId should be \\\"1\\\"\", function () {",
-													"    pm.expect(respJson.subjectId).to.equal(1);",
-													"});",
-													"",
-													"pm.test(\"Number of results should be correct\", function () { ",
-													"    pm.expect(respJson.result.length).to.equal(16); ",
-													"});",
-													"",
-													"pm.test(\"First result should have correct fields\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].filters\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].geographicLevel\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].location\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].measures\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].timePeriod\"));",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"type": "text",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Country\",\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"HT6\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"HT6\",\n    },\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
-										},
-										"url": {
-											"raw": "{{data_api_url}}/tablebuilder",
-											"host": [
-												"{{data_api_url}}"
-											],
-											"path": [
-												"tablebuilder"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Tablebuilder - Absence by characteristic - Country - * - no geoLevel",
+									"name": "Tablebuilder - Absence by characteristic - no geoLevel - *",
 									"event": [
 										{
 											"listen": "test",
@@ -2419,11 +2344,11 @@
 												"exec": [
 													"respJson = pm.response.json()",
 													"",
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { ",
-													"    pm.expect(respJson.publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); ",
+													"pm.test(\"timePeriodRange length should be correct\", function () {",
+													"    pm.expect(respJson.timePeriodRange.length).to.equal(1); ",
 													"});",
 													"",
-													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"pm.test(\"results should contain Country, Local_Authority, and Local_Authority_District geographicLevels\", function () {",
 													"    var countryFound = false;",
 													"    var localAuthorityFound = false;",
 													"    var localAuthorityDistrictFound = false;",
@@ -2442,15 +2367,6 @@
 													"    pm.expect(localAuthorityFound).to.equal(true);",
 													"    pm.expect(localAuthorityDistrictFound).to.equal(true);",
 													"});",
-													"",
-													"pm.test(\"subjectId should be \\\"1\\\"\", function () {",
-													"    pm.expect(respJson.subjectId).to.equal(1);",
-													"});",
-													"",
-													"pm.test(\"releaseDate field is present\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
-													"});",
-													"",
 													"",
 													"pm.test(\"Number of results should be correct\", function () { ",
 													"    pm.expect(respJson.result.length).to.equal(1881); ",
@@ -2495,6 +2411,70 @@
 									"response": []
 								},
 								{
+									"name": "Tablebuilder - Absence by characteristic - Country - *",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "0c491405-7891-4f02-a4bb-47785d27fa09",
+												"exec": [
+													"respJson = pm.response.json()",
+													"",
+													"",
+													"pm.test(\"timePeriodRange length should be correct\", function () {",
+													"    pm.expect(respJson.timePeriodRange.length).to.equal(2); ",
+													"});",
+													"",
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Country\");",
+													"    }",
+													"});",
+													"",
+													"pm.test(\"Number of results should be correct\", function () { ",
+													"    pm.expect(respJson.result.length).to.equal(16); ",
+													"});",
+													"",
+													"pm.test(\"First result should have correct fields\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].filters\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].geographicLevel\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].location\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].location.country\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].measures\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].timePeriod\"));",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Country\",\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"HT6\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"HT6\",\n    },\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/tablebuilder",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"tablebuilder"
+											]
+										}
+									},
+									"response": []
+								},
+								{
 									"name": "Tablebuilder - Absence by characteristic - Country - * - Male, Female AND Primary, Secondary",
 									"event": [
 										{
@@ -2504,22 +2484,10 @@
 												"exec": [
 													"respJson = pm.response.json()",
 													"",
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { ",
-													"    pm.expect(respJson.publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); ",
-													"});",
-													"",
 													"pm.test(\"geographicLevel should be same as request\", function () {",
 													"    for(var i = 0; i < respJson.result.length; i++) {",
 													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Country\");",
 													"    }",
-													"});",
-													"",
-													"pm.test(\"subjectId should be \\\"1\\\"\", function () {",
-													"    pm.expect(respJson.subjectId).to.equal(1);",
-													"});",
-													"",
-													"pm.test(\"releaseDate field is present\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
 													"});",
 													"",
 													"pm.test(\"Number of results should be correct\", function () { ",
@@ -2532,8 +2500,7 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].location\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].measures\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].timePeriod\"));",
-													"});",
-													""
+													"});"
 												],
 												"type": "text/javascript"
 											}
@@ -2574,8 +2541,6 @@
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
 													"respJson = pm.response.json()",
-													"",
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(respJson.publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
 													"",
 													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(16); });",
 													"",
@@ -2625,9 +2590,14 @@
 											"script": {
 												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
 												"exec": [
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"var respJson = pm.response.json();",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(2412); });",
+													"",
+													"pm.test(\"timePeriodRange length should be correct\", function () {",
+													"    pm.expect(respJson.timePeriodRange.length).to.equal(2); ",
+													"});",
+													"",
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(2412); });",
 													"",
 													"pm.test(\"First result should have correct fields\", function () {",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].filters\"));",
@@ -2635,6 +2605,12 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].location\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].measures\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].timePeriod\"));",
+													"});",
+													"",
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Local_Authority\");",
+													"    }",
 													"});"
 												],
 												"type": "text/javascript"
@@ -2675,11 +2651,13 @@
 											"script": {
 												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
 												"exec": [
-													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"var respJson = pm.response.json();",
 													"",
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"pm.test(\"timePeriodRange length should be correct\", function () {",
+													"    pm.expect(respJson.timePeriodRange.length).to.equal(2); ",
+													"});",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(16); });",
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(16); });",
 													"",
 													"pm.test(\"First result should have correct fields\", function () {",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].filters\"));",
@@ -2729,10 +2707,9 @@
 												"exec": [
 													"respJson = pm.response.json();",
 													"",
-													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { ",
-													"    pm.expect(respJson.publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); ",
+													"pm.test(\"timePeriodRange length should be correct\", function () {",
+													"    pm.expect(respJson.timePeriodRange.length).to.equal(1); ",
 													"});",
 													"",
 													"pm.test(\"Number of results should be correct\", function () { ",
@@ -2745,6 +2722,12 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].location\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].measures\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].timePeriod\"));",
+													"});",
+													"",
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Local_Authority_District\");",
+													"    }",
 													"});"
 												],
 												"type": "text/javascript"
@@ -2785,10 +2768,6 @@
 											"script": {
 												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
 												"exec": [
-													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-													"",
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
-													"",
 													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(11); });",
 													"",
 													"pm.test(\"First result should have correct fields\", function () {",
@@ -2857,15 +2836,8 @@
 											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 											"",
 											"pm.test(\"Compulsory fields are present\", function () {",
-											"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodRange\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-											"});",
-											"",
-											"pm.test(\"Release date is not empty\", function () {",
-											"    pm.expect(pm.response.json().releaseDate).to.not.equal(\"0001-01-01T00:00:00\");",
 											"});"
 										]
 									}
@@ -2884,24 +2856,21 @@
 											"script": {
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
+													"var respJson = pm.response.json();",
+													"",
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
 													"pm.test(\"Compulsory fields are present\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodRange\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
 													"});",
 													"",
-													"pm.test(\"Release date is not empty\", function () {",
-													"    pm.expect(pm.response.json().releaseDate).to.not.equal(\"0001-01-01T00:00:00\");",
+													"",
+													"pm.test(\"timePeriodRange length should be correct\", function () {",
+													"    pm.expect(respJson.timePeriodRange.length).to.equal(11); ",
 													"});",
 													"",
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
-													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(33); });",
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(33); });",
 													"",
 													"pm.test(\"First result should have correct fields\", function () {",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].filters\"));",
@@ -2909,6 +2878,12 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].location\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].measures\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].timePeriod\"));",
+													"});",
+													"",
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Country\");",
+													"    }",
 													"});"
 												],
 												"type": "text/javascript"
@@ -2942,7 +2917,7 @@
 									"response": []
 								},
 								{
-									"name": "Tablebuilder - Absence by geographic level - Country - 200607 - all schoolTypes filters Copy",
+									"name": "Tablebuilder - Absence by geographic level - Country - 200607 - all schoolTypes",
 									"event": [
 										{
 											"listen": "test",
@@ -2952,6 +2927,15 @@
 													"// DFE-1034",
 													"pm.test(\"Status code is 200\", function () {",
 													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Compulsory fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodRange\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
+													"});",
+													"",
+													"pm.test(\"timePeriodRange length should be correct\", function () {",
+													"    pm.expect(respJson.timePeriodRange.length).to.equal(1); ",
 													"});",
 													"",
 													"pm.test(\"Expect correct number of results\", function() {",
@@ -2973,7 +2957,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\t\"country\":[\"E92000001\"],\n\t\"subjectId\":\"2\",\n\t\"indicators\":[\"48\"],\n\t\"filters\":[\"82\",\"83\",\"84\",\"85\"],\n\t\"timePeriod\": {\n    \t\"startYear\": 2006,\n    \t\"startCode\": \"HT6\",\n    \t\"endYear\": 2006,\n    \t\"endCode\": \"HT6\"\n    }\n}"
+											"raw": "{\n\t\"country\":[\"E92000001\"],\n\t\"subjectId\":\"2\",\n\t\"indicators\":[\"48\"],\n\t\"filters\": [\n\t\t{{FILT_AllSchools}}, {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n\t],\n\t\"timePeriod\": {\n    \t\"startYear\": 2006,\n    \t\"startCode\": \"HT6\",\n    \t\"endYear\": 2006,\n    \t\"endCode\": \"HT6\"\n    }\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2995,31 +2979,30 @@
 											"script": {
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
+													"var respJson = pm.response.json();",
+													"",
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
 													"pm.test(\"Compulsory fields are present\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodRange\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
 													"});",
 													"",
-													"pm.test(\"Release date is not empty\", function () {",
-													"    pm.expect(pm.response.json().releaseDate).to.not.equal(\"0001-01-01T00:00:00\");",
-													"});",
-													"",
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
-													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(451); });",
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(451); });",
 													"",
 													"pm.test(\"First result should have correct fields\", function () {",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].filters\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].geographicLevel\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].location\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].location.localAuthority\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].measures\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].timePeriod\"));",
+													"});",
+													"",
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Local_Authority\");",
+													"    }",
 													"});"
 												],
 												"type": "text/javascript"
@@ -3060,24 +3043,31 @@
 											"script": {
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
+													"var respJson = pm.response.json();",
+													"",
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
 													"pm.test(\"Compulsory fields are present\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodRange\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
 													"});",
 													"",
-													"pm.test(\"Release date is not empty\", function () {",
-													"    pm.expect(pm.response.json().releaseDate).to.not.equal(\"0001-01-01T00:00:00\");",
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(30); });",
+													"",
+													"pm.test(\"First result should have correct fields\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].filters\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].geographicLevel\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].location\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].location.region\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].measures\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].timePeriod\"));",
 													"});",
 													"",
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
-													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(30); });"
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Region\");",
+													"    }",
+													"});"
 												],
 												"type": "text/javascript"
 											}
@@ -3117,24 +3107,20 @@
 											"script": {
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
+													"var respJson = pm.response.json();",
+													"",
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
 													"pm.test(\"Compulsory fields are present\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodRange\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
 													"});",
 													"",
-													"pm.test(\"Release date is not empty\", function () {",
-													"    pm.expect(pm.response.json().releaseDate).to.not.equal(\"0001-01-01T00:00:00\");",
+													"pm.test(\"timePeriodRange length should be correct\", function () {",
+													"    pm.expect(respJson.timePeriodRange.length).to.equal(11); ",
 													"});",
 													"",
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
-													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(33); });"
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(33); });"
 												],
 												"type": "text/javascript"
 											}
@@ -3177,19 +3163,14 @@
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
 													"pm.test(\"Compulsory fields are present\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodRange\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
 													"});",
 													"",
-													"pm.test(\"Release date is not empty\", function () {",
-													"    pm.expect(pm.response.json().releaseDate).to.not.equal(\"0001-01-01T00:00:00\");",
-													"});",
 													"",
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"pm.test(\"timePeriodRange length should be correct\", function () {",
+													"    pm.expect(respJson.timePeriodRange.length).to.equal(1); ",
+													"});",
 													"",
 													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(938); });"
 												],
@@ -3234,19 +3215,9 @@
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
 													"pm.test(\"Compulsory fields are present\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodRange\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
 													"});",
-													"",
-													"pm.test(\"Release date is not empty\", function () {",
-													"    pm.expect(pm.response.json().releaseDate).to.not.equal(\"0001-01-01T00:00:00\");",
-													"});",
-													"",
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
 													"",
 													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(60); });"
 												],
@@ -3288,12 +3259,11 @@
 											"script": {
 												"id": "2c8281ce-e56c-4542-9cb2-b90dcac8f445",
 												"exec": [
-													"",
 													"pm.test(\"Status code is 200\", function () {",
 													"    pm.response.to.have.status(200);",
 													"});",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(0); });"
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(17838); });"
 												],
 												"type": "text/javascript"
 											}
@@ -3333,24 +3303,22 @@
 											"script": {
 												"id": "6ef52a6e-a307-4849-b277-6f929e629b1c",
 												"exec": [
+													"var respJson = pm.response.json();",
+													"",
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
 													"pm.test(\"Compulsory fields are present\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodRange\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
 													"});",
 													"",
-													"pm.test(\"Release date is not empty\", function () {",
-													"    pm.expect(pm.response.json().releaseDate).to.not.equal(\"0001-01-01T00:00:00\");",
-													"});",
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(706); });",
 													"",
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
-													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(706); });"
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"School\");",
+													"    }",
+													"});"
 												],
 												"type": "text/javascript"
 											}
@@ -3426,16 +3394,27 @@
 							"name": "By term",
 							"item": [
 								{
-									"name": "Tablebuilder - Absence by term - Country - *",
+									"name": "Tablebuilder - Absence by term - Country - * - HT6",
 									"event": [
 										{
 											"listen": "test",
 											"script": {
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"var respJson = pm.response.json();",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(36); });"
+													"",
+													"pm.test(\"timePeriodRange length should be correct\", function () {",
+													"    pm.expect(respJson.timePeriodRange.length).to.equal(3); ",
+													"});",
+													"",
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(9); });",
+													"",
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Country\");",
+													"    }",
+													"});"
 												],
 												"type": "text/javascript"
 											}
@@ -3468,16 +3447,75 @@
 									"response": []
 								},
 								{
-									"name": "Tablebuilder - Absence by term - Country - England",
+									"name": "Tablebuilder - Absence by term - Country - * - T1,T2,T3",
 									"event": [
 										{
 											"listen": "test",
 											"script": {
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"var respJson = pm.response.json();",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(8); });"
+													"// NOTE(mark): Asked to disable these tests due to DFE-1044",
+													"// pm.test(\"timePeriodRange length should be correct\", function () {",
+													"//     pm.expect(respJson.timePeriodRange.length).to.equal(11); ",
+													"// });",
+													"",
+													"// pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(33); });",
+													"",
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Country\");",
+													"    }",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subjectId\": 3,\n    \"geographicLevel\": \"Country\",\n    \"timePeriod\": {\n    \t\"startYear\": 2013,\n    \t\"startCode\": \"T2\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"T3\"\n    },\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        68, 86, 87, 88\n    ]\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/tablebuilder",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"tablebuilder"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Tablebuilder - Absence by term - Country - England - HT6",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"exec": [
+													"var respJson = pm.response.json();",
+													"",
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(2); });",
+													"",
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Country\");",
+													"    }",
+													"});"
 												],
 												"type": "text/javascript"
 											}
@@ -3510,16 +3548,22 @@
 									"response": []
 								},
 								{
-									"name": "Tablebuilder - Absence by term - LA - Country England, Region Inner London + Outer London, LA City of London + Barking and Dagenham",
+									"name": "Tablebuilder - Absence by term - LA - Country England, Region Inner London + Outer London, LA City of London + Barking and Dagenham - HT6",
 									"event": [
 										{
 											"listen": "test",
 											"script": {
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"var respJson = pm.response.json();",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(12); });"
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(3); });",
+													"",
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Local_Authority\");",
+													"    }",
+													"});"
 												],
 												"type": "text/javascript"
 											}
@@ -3559,9 +3603,15 @@
 											"script": {
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"var respJson = pm.response.json();",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(16); });"
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(100); });",
+													"",
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Region\");",
+													"    }",
+													"});"
 												],
 												"type": "text/javascript"
 											}
@@ -3579,7 +3629,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 3,\n    \"geographicLevel\": \"Country\",\n    \"timePeriod\": {\n    \t\"startYear\": 2012,\n    \t\"startCode\": \"HT6\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"HT6\"\n    },\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        68, 86, 87, 88\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 3,\n    \"geographicLevel\": \"Region\",\n    \"timePeriod\": {\n    \t\"startYear\": 2012,\n    \t\"startCode\": \"HT6\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"HT6\"\n    },\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        68, 86, 87, 88\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3621,15 +3671,8 @@
 											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 											"",
 											"pm.test(\"Compulsory fields are present\", function () {",
-											"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodRange\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-											"});",
-											"",
-											"pm.test(\"Release date is not empty\", function () {",
-											"    pm.expect(pm.response.json().releaseDate).to.not.equal(\"0001-01-01T00:00:00\");",
 											"});"
 										]
 									}
@@ -3648,9 +3691,20 @@
 											"script": {
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"var respJson = pm.response.json();",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(8); });"
+													"",
+													"pm.test(\"timePeriodRange length should be correct\", function () {",
+													"    pm.expect(respJson.timePeriodRange.length).to.equal(4); ",
+													"});",
+													"",
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(8); });",
+													"",
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Country\");",
+													"    }",
+													"});"
 												],
 												"type": "text/javascript"
 											}
@@ -3690,9 +3744,19 @@
 											"script": {
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"var respJson = pm.response.json();",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(538); });"
+													"pm.test(\"timePeriodRange length should be correct\", function () {",
+													"    pm.expect(respJson.timePeriodRange.length).to.equal(1); ",
+													"});",
+													"",
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(538); });",
+													"",
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"School\");",
+													"    }",
+													"});"
 												],
 												"type": "text/javascript"
 											}
@@ -3733,11 +3797,7 @@
 										"type": "text/javascript",
 										"exec": [
 											"pm.globals.set(\"FILT_StateFundedSecondary\", \"91\");",
-											"pm.globals.set(\"FILT_Special\", \"92\");",
-											"",
-											"// NOTE(mark): Saved in case the values are restored",
-											"// pm.globals.set(\"FILT_StateFundedSecondary\", \"379\");",
-											"// pm.globals.set(\"FILT_Special\", \"378\");"
+											"pm.globals.set(\"FILT_Special\", \"92\");"
 										]
 									}
 								},
@@ -3750,15 +3810,8 @@
 											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 											"",
 											"pm.test(\"Compulsory fields are present\", function () {",
-											"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodRange\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-											"});",
-											"",
-											"pm.test(\"Release date is not empty\", function () {",
-											"    pm.expect(pm.response.json().releaseDate).to.not.equal(\"0001-01-01T00:00:00\");",
 											"});"
 										]
 									}
@@ -3770,6 +3823,73 @@
 							"name": "In PRUs",
 							"item": [
 								{
+									"name": "Tablebuilder - Absence in PRUs - no geoLevel - England",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"exec": [
+													"// DFE-998 - If no geographicLevel is provided, respond with all geographicLevels",
+													"var respJson = pm.response.json()",
+													"",
+													"pm.test(\"timePeriodRange length should be correct\", function () {",
+													"    pm.expect(respJson.timePeriodRange.length).to.equal(4); ",
+													"});",
+													"",
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(612); });",
+													"",
+													"pm.test(\"results should contain Country, Local_Authority, and Region geographicLevels\", function () {",
+													"    var countryFound = false;",
+													"    var localAuthorityFound = false;",
+													"    var regionFound = false;",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"        if(respJson.result[i].geographicLevel == \"Country\") {",
+													"            countryFound = true;",
+													"        }",
+													"        if(respJson.result[i].geographicLevel == \"Local_Authority\") {",
+													"            localAuthorityFound = true;",
+													"        }",
+													"        if(respJson.result[i].geographicLevel == \"Region\") {",
+													"            regionFound = true;",
+													"        }",
+													"    }",
+													"    pm.expect(countryFound).to.equal(true);",
+													"    pm.expect(localAuthorityFound).to.equal(true);",
+													"    pm.expect(regionFound).to.equal(true);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subjectId\": 5,\n    \"Country\": [\"E92000001\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2013,\n    \t\"startCode\": \"HT6\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"HT6\"\n    },\n    \"filters\" : [\n        {{FILT_PupilReferralUnit}}\n    ],\n    \"indicators\": [\n        96\n    ]\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/tablebuilder",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"tablebuilder"
+											]
+										}
+									},
+									"response": []
+								},
+								{
 									"name": "Tablebuilder - Absence in PRUs - LA - *",
 									"event": [
 										{
@@ -3777,9 +3897,19 @@
 											"script": {
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"var respJson = pm.response.json();",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(142); });"
+													"pm.test(\"timePeriodRange length should be correct\", function () {",
+													"    pm.expect(respJson.timePeriodRange.length).to.equal(1); ",
+													"});",
+													"",
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(142); });",
+													"",
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Local_Authority\");",
+													"    }",
+													"});"
 												],
 												"type": "text/javascript"
 											}
@@ -3819,9 +3949,15 @@
 											"script": {
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"var respJson = pm.response.json();",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(10); });"
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(10); });",
+													"",
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Region\");",
+													"    }",
+													"});"
 												],
 												"type": "text/javascript"
 											}
@@ -3840,50 +3976,6 @@
 										"body": {
 											"mode": "raw",
 											"raw": "{\n    \"subjectId\": 5,\n    \"geographicLevel\": \"Region\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"HT6\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"HT6\"\n    },\n    \"filters\" : [\n        {{FILT_PupilReferralUnit}}\n    ],\n    \"indicators\": [\n        113, 114, 115\n    ]\n}"
-										},
-										"url": {
-											"raw": "{{data_api_url}}/tablebuilder",
-											"host": [
-												"{{data_api_url}}"
-											],
-											"path": [
-												"tablebuilder"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Tablebuilder - Absence in PRUs - Country - England",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
-												"exec": [
-													"// DFE-998 - If no geographicLevel is provided, respond with all geographicLevels",
-													"",
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
-													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(612); });"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"type": "text",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 5,\n    \"Country\": [\"E92000001\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2013,\n    \t\"startCode\": \"HT6\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"HT6\"\n    },\n    \"filters\" : [\n        {{FILT_PupilReferralUnit}}\n    ],\n    \"indicators\": [\n        96\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3918,15 +4010,8 @@
 											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 											"",
 											"pm.test(\"Compulsory fields are present\", function () {",
-											"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodRange\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-											"});",
-											"",
-											"pm.test(\"Release date is not empty\", function () {",
-											"    pm.expect(pm.response.json().releaseDate).to.not.equal(\"0001-01-01T00:00:00\");",
 											"});"
 										]
 									}
@@ -3945,9 +4030,15 @@
 											"script": {
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"var respJson = pm.response.json();",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(2255); });"
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(2255); });",
+													"",
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Local_Authority\");",
+													"    }",
+													"});"
 												],
 												"type": "text/javascript"
 											}
@@ -3987,9 +4078,13 @@
 											"script": {
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(150); });",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(150); });"
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    for(var i = 0; i < pm.response.json().result.length; i++) {",
+													"        pm.expect(pm.response.json().result[i].geographicLevel).to.equal(\"Region\");",
+													"    }",
+													"});"
 												],
 												"type": "text/javascript"
 											}
@@ -4031,12 +4126,7 @@
 										"exec": [
 											"pm.globals.set(\"FILT_StateFundedPrimary\", \"95\");",
 											"pm.globals.set(\"FILT_StateFundedSecondary\", \"96\");",
-											"pm.globals.set(\"FILT_Special\", \"97\");",
-											"",
-											"// NOTE(mark): Saving in case values are restored!",
-											"// pm.globals.set(\"FILT_StateFundedPrimary\", \"405\");",
-											"// pm.globals.set(\"FILT_StateFundedSecondary\", \"406\");",
-											"// pm.globals.set(\"FILT_Special\", \"407\");"
+											"pm.globals.set(\"FILT_Special\", \"97\");"
 										]
 									}
 								},
@@ -4049,15 +4139,8 @@
 											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 											"",
 											"pm.test(\"Compulsory fields are present\", function () {",
-											"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodRange\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-											"});",
-											"",
-											"pm.test(\"Release date is not empty\", function () {",
-											"    pm.expect(pm.response.json().releaseDate).to.not.equal(\"0001-01-01T00:00:00\");",
 											"});"
 										]
 									}
@@ -4076,9 +4159,13 @@
 											"script": {
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); });",
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(306); });",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(306); });"
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    for(var i = 0; i < pm.response.json().result.length; i++) {",
+													"        pm.expect(pm.response.json().result[i].geographicLevel).to.equal(\"Country\");",
+													"    }",
+													"});"
 												],
 												"type": "text/javascript"
 											}
@@ -4120,12 +4207,7 @@
 										"exec": [
 											"pm.globals.set(\"FILT_StateFundedPrimary\", \"146\");",
 											"pm.globals.set(\"FILT_StateFundedSecondary\", \"148\");",
-											"pm.globals.set(\"FILT_Special\", \"147\");",
-											"",
-											"// NOTE(mark): Saving in case values are restored!",
-											"// pm.globals.set(\"FILT_StateFundedPrimary\", \"456\");",
-											"// pm.globals.set(\"FILT_StateFundedSecondary\", \"458\");",
-											"// pm.globals.set(\"FILT_Special\", \"457\");"
+											"pm.globals.set(\"FILT_Special\", \"147\");"
 										]
 									}
 								},
@@ -4138,15 +4220,8 @@
 											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 											"",
 											"pm.test(\"Compulsory fields are present\", function () {",
-											"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodRange\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-											"});",
-											"",
-											"pm.test(\"Release date is not empty\", function () {",
-											"    pm.expect(pm.response.json().releaseDate).to.not.equal(\"0001-01-01T00:00:00\");",
 											"});"
 										]
 									}
@@ -4207,15 +4282,8 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodRange\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-													"});",
-													"",
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { ",
-													"    pm.expect(respJson.publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); ",
 													"});",
 													"",
 													"pm.test(\"Number of metaData filters should be correct\", function () {",
@@ -4292,15 +4360,8 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodRange\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-													"});",
-													"",
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { ",
-													"    pm.expect(respJson.publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); ",
 													"});",
 													"",
 													"pm.test(\"Number of metaData filters should be correct\", function () {",
@@ -4377,15 +4438,8 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodRange\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-													"});",
-													"",
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { ",
-													"    pm.expect(respJson.publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\");",
 													"});",
 													"",
 													"pm.test(\"geographicLevel should be same as request\", function () {",
@@ -4416,7 +4470,7 @@
 													"",
 													"// NOTE(mark): Takes a long time to run this test",
 													"// pm.test(\"Every result should contain location country, localAuthority, and region\", function () {",
-													"//     for(var i = 0; i < pm.response.json().result.length; i++) {",
+													"//     for(var i = 0; i < respJson.result.length; i++) {",
 													"//         pm.expect(respJson.result[i].location.country.name).to.equal(\"England\");",
 													"//         pm.expect(pm.response.to.have.jsonBody(`result[${i}].location.localAuthority`));",
 													"//         pm.expect(pm.response.to.not.have.jsonBody(`result[${i}].location.localAuthorityDistrict`));",
@@ -4469,15 +4523,8 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodRange\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-													"});",
-													"",
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { ",
-													"    pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); ",
 													"});",
 													"",
 													"pm.test(\"Number of metaData filters should be correct\", function () {",
@@ -4537,19 +4584,12 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodRange\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
 													"});",
 													"",
-													"pm.test(\"Publication id matches the publication id of the subject\", function () {",
-													"    pm.expect(respJson.publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\");",
-													"});",
-													"",
 													"pm.test(\"Number of metaData filters should be correct\", function () {",
-													"   pm.expect(Object.keys(pm.response.json().metaData.filters).length).to.equal(7);",
+													"   pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(7);",
 													"});",
 													"",
 													"pm.test(\"geographicLevel should be same as request\", function () {",
@@ -4568,7 +4608,7 @@
 													"1 + 10 + 326 = 337",
 													"*/",
 													"pm.test(\"Number of metaData locations should be correct\", function () {",
-													"   pm.expect(Object.keys(pm.response.json().metaData.locations).length).to.equal(337);",
+													"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(337);",
 													"});",
 													"",
 													"pm.test(\"Number of results should be correct\", function () {",
@@ -4622,15 +4662,8 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodRange\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-													"});",
-													"",
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { ",
-													"    pm.expect(respJson.publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\"); ",
 													"});",
 													"",
 													"pm.test(\"geographicLevel should be same as request\", function () {",
@@ -4693,6 +4726,8 @@
 											"script": {
 												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
 												"exec": [
+													"var respJson = pm.response.json();",
+													"",
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
 													"pm.test(\"Should have correct fields\", function () {",
@@ -4700,38 +4735,31 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodRange\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
 													"});",
 													"",
 													"pm.test(\"Number of metaData filters should be correct\", function () {",
-													"   pm.expect(Object.keys(pm.response.json().metaData.filters).length).to.equal(3); ",
+													"   pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(3); ",
 													"});",
 													"",
 													"pm.test(\"Number of metaData indicators should be correct\", function () {",
-													"   pm.expect(Object.keys(pm.response.json().metaData.indicators).length).to.equal(3); ",
+													"   pm.expect(Object.keys(respJson.metaData.indicators).length).to.equal(3); ",
 													"});",
 													"",
 													"pm.test(\"Number of metaData locations should be correct\", function () {",
-													"   pm.expect(Object.keys(pm.response.json().metaData.locations).length).to.equal(3); ",
-													"});",
-													"",
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { ",
-													"    pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\");",
+													"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(3); ",
 													"});",
 													"",
 													"pm.test(\"Number of results should be correct\", function () { ",
-													"    pm.expect(pm.response.json().result.length).to.equal(2);",
+													"    pm.expect(respJson.result.length).to.equal(2);",
 													"});",
 													"",
 													"pm.test(\"All results should have correction location attributes\", function () {",
 													"    for(var i = 0; i < pm.response.json().result.length; i++) {",
-													"        pm.expect(pm.response.json().result[i].location.country.name).to.equal(\"England\");",
-													"        pm.expect(pm.response.json().result[i].location.localAuthorityDistrict.name).to.equal(\"Adur\");",
-													"        pm.expect(pm.response.json().result[i].location.region.name).to.equal(\"South East\");",
+													"        pm.expect(respJson.result[i].location.country.name).to.equal(\"England\");",
+													"        pm.expect(respJson.result[i].location.localAuthorityDistrict.name).to.equal(\"Adur\");",
+													"        pm.expect(respJson.result[i].location.region.name).to.equal(\"South East\");",
 													"    }",
 													"});"
 												],
@@ -4843,10 +4871,10 @@
 													"",
 													"pm.test(\"Should have correct fields\", function () {",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodRange\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
 													"});",
 													"",
@@ -4882,15 +4910,9 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E12000006\")); //          East of England",
 													"});",
 													"",
-													"pm.test(\"Publication id matches the publication id of the subject\", function () { ",
-													"    pm.expect(respJson.publicationId).to.equal(\"fcda2962-82a6-4052-afa2-ea398c53c85f\"); ",
-													"});",
-													"",
 													"pm.test(\"Number of results should be correct\", function () { ",
 													"    pm.expect(respJson.result.length).to.equal(24); ",
 													"});",
-													"",
-													"pm.globals.get(\"variable_key\");",
 													"",
 													"pm.test(\"All results have filter 884 or 885\", function () {",
 													"    for(var i = 0; i < pm.response.json().result.length; i++) {",
@@ -4942,14 +4964,7 @@
 											"pm.globals.set(\"FILT_GenderFemale\", \"581\");",
 											"pm.globals.set(\"FILT_GenderMale\", \"582\");",
 											"pm.globals.set(\"INDI_TotalPointScoreBasedOnAssessmentRating\", \"266\");",
-											"pm.globals.set(\"INDI_AveragePointScore\", \"267\");",
-											"",
-											"// NOTE(mark): Saved in case they're restored!",
-											"// pm.globals.set(\"FILT_All\", \"883\");",
-											"// pm.globals.set(\"FILT_GenderFemale\", \"884\");",
-											"// pm.globals.set(\"FILT_GenderMale\", \"885\");",
-											"// pm.globals.set(\"INDI_TotalPointScoreBasedOnAssessmentRating\", \"218\");",
-											"// pm.globals.set(\"INDI_AveragePointScore\", \"219\");"
+											"pm.globals.set(\"INDI_AveragePointScore\", \"267\");"
 										]
 									}
 								},
@@ -4984,7 +4999,6 @@
 								"exec": [
 									"(pm.environment.get(\"data_api_url\") === \"http://localhost:5000/api\" ? pm.test.skip : pm.test)(\"Status code is 200\", function () { ",
 									"    pm.response.to.have.status(200); ",
-									"    ",
 									"});",
 									"",
 									"(pm.environment.get(\"data_api_url\") === \"http://localhost:5000/api\" ? pm.test.skip : pm.test)(\"First line of CSV should be correct\", function () { ",
