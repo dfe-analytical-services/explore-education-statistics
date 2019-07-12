@@ -24,12 +24,12 @@ const FormFieldCheckboxSearchGroup = <T extends {}>(
             {...props}
             {...fieldArrayProps}
             options={options}
-            onAllChange={event => {
+            onAllChange={(event, checked) => {
               if (props.onAllChange) {
-                props.onAllChange(event, options);
+                props.onAllChange(event, checked);
               }
 
-              onAllChange(fieldArrayProps, options)(event);
+              onAllChange(fieldArrayProps, options)(event, checked);
             }}
             onChange={(event, option) => {
               if (props.onChange) {

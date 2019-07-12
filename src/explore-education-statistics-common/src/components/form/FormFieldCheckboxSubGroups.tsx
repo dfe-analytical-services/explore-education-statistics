@@ -20,12 +20,12 @@ const FormFieldCheckboxSubGroups = <T extends {}>(
           {...props}
           {...fieldArrayProps}
           small
-          onAllChange={(event, options) => {
+          onAllChange={(event, checked, groupOptions) => {
             if (props.onAllChange) {
-              props.onAllChange(event, options);
+              props.onAllChange(event, checked, groupOptions);
             }
 
-            onAllChange(fieldArrayProps, options)(event);
+            onAllChange(fieldArrayProps, groupOptions)(event, checked);
           }}
           onChange={(event, option) => {
             if (props.onChange) {

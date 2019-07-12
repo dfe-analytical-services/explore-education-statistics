@@ -3,15 +3,15 @@ import difference from 'lodash/difference';
 import get from 'lodash/get';
 import { ChangeEvent } from 'react';
 import {
-  CheckboxGroupAllChangeEvent,
+  CheckboxGroupAllChangeEventHandler,
   CheckboxOption,
 } from '../FormCheckboxGroup';
 
 export const onAllChange = (
   { form, name }: FieldArrayRenderProps,
   options: CheckboxOption[],
-) => {
-  return (event: CheckboxGroupAllChangeEvent) => {
+): CheckboxGroupAllChangeEventHandler => {
+  return (event, checked) => {
     if (event.isDefaultPrevented()) {
       return;
     }
@@ -21,7 +21,7 @@ export const onAllChange = (
     const allOptionValues = options.map(option => option.value);
     const restValues = difference(currentValues, allOptionValues);
 
-    if (currentValues.length < allOptionValues.length) {
+    if (!checked) {
       form.setFieldValue(name, [...restValues, ...allOptionValues]);
     } else {
       form.setFieldValue(name, restValues);

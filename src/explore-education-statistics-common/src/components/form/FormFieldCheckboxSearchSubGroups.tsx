@@ -26,12 +26,12 @@ const FormFieldCheckboxSearchSubGroups = <T extends {}>(
                 {...props}
                 {...fieldArrayProps}
                 small
-                onAllChange={(event, allOptions) => {
+                onAllChange={(event, checked, groupOptions) => {
                   if (props.onAllChange) {
-                    props.onAllChange(event, allOptions);
+                    props.onAllChange(event, checked, groupOptions);
                   }
 
-                  onAllChange(fieldArrayProps, allOptions)(event);
+                  onAllChange(fieldArrayProps, groupOptions)(event, checked);
                 }}
                 onChange={(event, option) => {
                   if (props.onChange) {
@@ -47,7 +47,15 @@ const FormFieldCheckboxSearchSubGroups = <T extends {}>(
       )}
 
       {options.length === 1 && (
-        <FormFieldCheckboxSearchGroup {...props} options={options[0].options} />
+        <FormFieldCheckboxSearchGroup
+          {...props}
+          onAllChange={(event, checked) => {
+            if (props.onAllChange) {
+              props.onAllChange(event, checked, options[0].options);
+            }
+          }}
+          options={options[0].options}
+        />
       )}
     </>
   );

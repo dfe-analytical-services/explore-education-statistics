@@ -25,7 +25,7 @@ export type CheckboxGroupAllChangeEvent = MouseEvent<HTMLButtonElement>;
 
 export type CheckboxGroupAllChangeEventHandler = (
   event: CheckboxGroupAllChangeEvent,
-  options: CheckboxOption[],
+  checked: boolean,
 ) => void;
 
 interface BaseFormCheckboxGroupProps {
@@ -75,10 +75,10 @@ export class BaseFormCheckboxGroup extends PureComponent<
   }
 
   private handleAllChange: MouseEventHandler<HTMLButtonElement> = event => {
-    const { onAllChange, options } = this.props;
+    const { onAllChange } = this.props;
 
     if (onAllChange) {
-      onAllChange(event, options);
+      onAllChange(event, this.isAllChecked());
     }
   };
 
@@ -88,6 +88,12 @@ export class BaseFormCheckboxGroup extends PureComponent<
     if (onChange) {
       onChange(event, option);
     }
+  };
+
+  private isAllChecked = () => {
+    const { options, value } = this.props;
+
+    return options.every(option => value.indexOf(option.value) > -1);
   };
 
   public render() {
@@ -101,10 +107,6 @@ export class BaseFormCheckboxGroup extends PureComponent<
       orderDirection,
       small,
     } = this.props;
-
-    const isAllChecked = options.every(
-      option => value.indexOf(option.value) > -1,
-    );
 
     return (
       <div
@@ -120,7 +122,9 @@ export class BaseFormCheckboxGroup extends PureComponent<
             className={styles.selectAll}
             underline={false}
           >
-            {isAllChecked ? 'Unselect' : 'Select'} all {options.length} options
+            {`${this.isAllChecked() ? 'Unselect' : 'Select'} all ${
+              options.length
+            } options`}
           </ButtonText>
         )}
 
