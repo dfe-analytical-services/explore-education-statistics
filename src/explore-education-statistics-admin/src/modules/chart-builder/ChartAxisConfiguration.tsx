@@ -43,17 +43,23 @@ const ChartAxisConfiguration = ({ id, axisConfiguration, meta }: Props) => {
           value="show"
           conditional={
             <React.Fragment>
-              <FormComboBox
-                id={`${id}_unit`}
-                inputLabel="Unit"
-                onInputChange={e => setSelectedValue(e.target.value)}
-                inputValue={selectedValue}
-                onSelect={selected => {
-                  setSelectedValue(selectableUnits[selected]);
-                }}
-                options={selectableUnits}
-                initialOption={selectedUnit}
-              />
+              {axisConfiguration.type === 'major' && (
+                <FormComboBox
+                  id={`${id}_unit`}
+                  inputLabel="Unit"
+                  onInputChange={e => setSelectedValue(e.target.value)}
+                  inputValue={selectedValue}
+                  onSelect={selected => {
+                    setSelectedValue(selectableUnits[selected]);
+                  }}
+                  options={selectableUnits}
+                  initialOption={selectedUnit}
+                />
+              )}
+
+              <p>Add / remove grid lines DFE-1008</p>
+              <p>Add / remove / edit series labels & range DFE-1018 1017</p>
+              <p>Restrict range of series (years only?) DFE-1009</p>
 
               {/*
         <FormTextInput

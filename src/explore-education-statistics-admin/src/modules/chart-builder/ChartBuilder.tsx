@@ -160,6 +160,7 @@ const ChartBuilder = ({ data }: Props) => {
 
           [axisDefinition.type]: {
             name: `${axisDefinition.title} (${axisDefinition.type} axis)`,
+            type: axisDefinition.type,
             groupBy: axisDefinition.defaultDataType,
             dataSets: axisDefinition.type === 'major' ? dataSets : [],
           },

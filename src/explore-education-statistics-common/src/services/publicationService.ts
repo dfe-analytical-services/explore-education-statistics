@@ -96,6 +96,8 @@ export type AxisGroupBy =
   | 'filters'
   | 'indicators';
 
+export type AxisType = 'major' | 'minor';
+
 export interface AxisConfigurationItem {
   name: string;
   groupBy?: AxisGroupBy;
@@ -103,6 +105,8 @@ export interface AxisConfigurationItem {
 
   visible?: boolean;
   title?: string;
+
+  type: AxisType;
 }
 
 export interface Chart {

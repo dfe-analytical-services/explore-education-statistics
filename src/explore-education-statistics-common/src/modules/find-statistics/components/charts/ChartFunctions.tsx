@@ -7,6 +7,7 @@ import {
   AxisConfigurationItem,
   ChartSymbol,
   AxisGroupBy,
+  AxisType,
 } from '@common/services/publicationService';
 import React, { ReactNode } from 'react';
 import {
@@ -91,7 +92,7 @@ export interface ChartDefinition {
   axes: {
     id: string;
     title: string;
-    type: 'major' | 'minor';
+    type: AxisType;
     defaultDataType?: AxisGroupBy;
   }[];
 }
