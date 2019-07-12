@@ -5,7 +5,7 @@ function ContactPage() {
   return (
     <Page
       title="Contact explore education statistics"
-      breadcrumbs={[{ name: 'Contact' }]}
+      breadcrumbLabel="Contact"
     >
       <h2>General enquiries</h2>
       <p>
