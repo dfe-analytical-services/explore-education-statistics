@@ -1,4 +1,5 @@
 import DummyPublicationsData from '@admin/pages/DummyPublicationsData';
+import { PrototypeLoginService } from '@admin/services/PrototypeLoginService';
 import { AxiosInstance } from 'axios';
 
 export default {
@@ -11,7 +12,9 @@ export default {
 
     // getThemesAndTopics
     mock
-      .onGet('/Themes', { params: { userId: 'user1' } })
+      .onGet('/Theme', {
+        params: { userId: PrototypeLoginService.getUserList()[0].id },
+      })
       .reply(200, DummyPublicationsData.themesAndTopics);
 
     return axiosInstance;

@@ -22,7 +22,7 @@ export default {
     const client = new Client(axiosInstance);
     return {
       getThemesAndTopics: (userId: string) =>
-        client.get<ThemeAndTopics[]>('/Themes', { params: { userId } }),
+        client.get<ThemeAndTopics[]>('/Theme', { params: { userId } }),
     };
   }),
 };

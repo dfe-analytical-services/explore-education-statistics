@@ -59,7 +59,9 @@ const releaseTemplate: Release = {
     isLatest: false,
     isNew: false,
     lastEdited: new Date('2019-03-20 17:37'),
-    lastEditor: PrototypeLoginService.getUser('user1'),
+    lastEditor: PrototypeLoginService.getUser(
+      '4add7621-4aef-4abc-b2e6-0938b37fe5b9',
+    ),
     published: new Date('2019-09-20 09:30'),
     nextRelease: new Date('2020-09-20 09:30'),
   },
@@ -76,7 +78,9 @@ const releaseTemplate: Release = {
   comments: [
     {
       id: '1',
-      author: PrototypeLoginService.getUser('user2'),
+      author: PrototypeLoginService.getUser(
+        '8e3a250b-6153-4c5e-aba5-363a554bc288',
+      ),
       datetime: new Date('2018-06-17 17:35'),
       content: `Lorem ipsum, dolor sit amet consectetur adipisicing elit.
                 Fugit rem, optio sunt dolorum corrupti harum labore quia
@@ -85,7 +89,9 @@ const releaseTemplate: Release = {
     },
     {
       id: '2',
-      author: PrototypeLoginService.getUser('user3'),
+      author: PrototypeLoginService.getUser(
+        'b7630cce-7f5f-4233-90fe-a8c751b1c38c',
+      ),
       datetime: new Date('2018-06-17 13:35'),
       content: `Corrupti harum labore quia repellat! Quae voluptatem illo
                 soluta optio ducimus at possimus quisquam doloremque veritatis
@@ -111,7 +117,7 @@ const publicationTemplate: Publication = {
     telNo: '',
   },
   methodology: methodologies[0],
-  owner: PrototypeLoginService.getUser('user1'),
+  owner: PrototypeLoginService.getUser('4add7621-4aef-4abc-b2e6-0938b37fe5b9'),
 };
 
 //
@@ -259,7 +265,7 @@ const inProgressPublication1 = {
   ...publicationTemplate,
   title:
     'Pupil absence statistics and data for schools in England: autumn and spring terms',
-  owner: PrototypeLoginService.getUser('user2'),
+  owner: PrototypeLoginService.getUser('8e3a250b-6153-4c5e-aba5-363a554bc288'),
   releases: inProgressPublication1Releases,
 };
 
@@ -523,6 +529,7 @@ const themesAndTopics: ThemeAndTopics[] = [
 ];
 
 export default {
+  myPublications,
   allPublications,
   getReleaseById,
   getOwningPublicationForRelease,

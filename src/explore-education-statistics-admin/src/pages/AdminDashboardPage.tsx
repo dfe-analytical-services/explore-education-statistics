@@ -69,10 +69,8 @@ const AdminDashboardPage = () => {
     }
 
     if (selectedThemeAndTopic) {
-      const fetchedMyPublications = DummyPublicationsData.allPublications.filter(
-        publication =>
-          publication.owner.id === loggedInUser.id &&
-          publication.topic.id === selectedThemeAndTopic.topic.id,
+      const fetchedMyPublications = DummyPublicationsData.myPublications.filter(
+        publication => publication.topic.id === selectedThemeAndTopic.topic.id,
       );
 
       setMyPublications(fetchedMyPublications);
