@@ -27,7 +27,7 @@ const PrototypeAdminNavigation = ({ sectionId }: Props) => {
               to="/prototypes/publication-create-new-absence-config"
               className="govuk-link govuk-link--no-visited-state"
             >
-              Release setup
+              Release summary
             </Link>
           </li>
           <li
@@ -41,7 +41,7 @@ const PrototypeAdminNavigation = ({ sectionId }: Props) => {
               to="/prototypes/publication-create-new-absence-data"
               className="govuk-link govuk-link--no-visited-state"
             >
-              Add / edit data
+              Manage data
             </Link>
           </li>
           <li
@@ -55,7 +55,7 @@ const PrototypeAdminNavigation = ({ sectionId }: Props) => {
               to="/prototypes/publication-create-new-absence-table?status=step1"
               className="govuk-link govuk-link--no-visited-state"
             >
-              Build / edit tables and charts
+              Manage tables and charts
             </Link>
           </li>
 
@@ -70,7 +70,7 @@ const PrototypeAdminNavigation = ({ sectionId }: Props) => {
               to="/prototypes/publication-create-new-absence"
               className="govuk-link govuk-link--no-visited-state"
             >
-              Add / edit content
+              Manage content
             </Link>
           </li>
           {/* <li

@@ -299,12 +299,18 @@ const PublicationDataPage = () => {
       <div className="govuk-grid-row govuk-!-margin-top-9">
         <div className="govuk-grid-column-one-half ">
           <Link to="/prototypes/publication-create-new-absence-config">
-            Previous step, release setup
+            <span className="govuk-heading-m govuk-!-margin-bottom-0">
+              Previous step
+            </span>
+            Release summary
           </Link>
         </div>
         <div className="govuk-grid-column-one-half dfe-align--right">
           <Link to="/prototypes/publication-create-new-absence-table?status=step1">
-            Next step, build tables
+            <span className="govuk-heading-m govuk-!-margin-bottom-0">
+              Next step
+            </span>
+            Create tables and charts
           </Link>
         </div>
       </div>

@@ -19,7 +19,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
   return (
     <>
       {sectionId === 'setup' && (
-        <h2 className="govuk-heading-m">Edit release setup</h2>
+        <h2 className="govuk-heading-l">Edit release summary</h2>
       )}
       <form action="/prototypes/publication-create-new-absence-config">
         <FormFieldset id="test" legend="Select time period coverage">
@@ -403,12 +403,12 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
         {sectionId === 'setup' && (
           <>
             <button type="submit" className="govuk-button govuk-!-margin-top-6">
-              Update release setup
+              Update
             </button>
 
             <div className="govuk-!-margin-top-6">
               <Link to="/prototypes/publication-create-new-absence-config">
-                Cancel update
+                Cancel
               </Link>
             </div>
           </>

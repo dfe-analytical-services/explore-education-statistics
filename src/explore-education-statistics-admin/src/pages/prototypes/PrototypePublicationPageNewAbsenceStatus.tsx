@@ -42,7 +42,7 @@ const PublicationDataPage = ({ location }: RouteChildrenProps) => {
           <div className="govuk-form-group">
             <fieldset className="govuk-fieldset">
               <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
-                Set page status
+                Set publish status
               </legend>
               <div className="govuk-radios">
                 <div className="govuk-radios__item">
@@ -109,7 +109,7 @@ const PublicationDataPage = ({ location }: RouteChildrenProps) => {
               />
             </div>
             <button className="govuk-button govuk-!-margin-top-3" type="submit">
-              Update page status
+              Update
             </button>
           </div>
         </form>
@@ -118,7 +118,10 @@ const PublicationDataPage = ({ location }: RouteChildrenProps) => {
       <div className="govuk-grid-row govuk-!-margin-top-9">
         <div className="govuk-grid-column-one-half ">
           <Link to="/prototypes/publication-create-new-absence">
-            Previous step, add / edit content
+            <span className="govuk-heading-m govuk-!-margin-bottom-0">
+              Previous step
+            </span>
+            Manage content
           </Link>
         </div>
       </div>
