@@ -7,7 +7,11 @@ import { RouteComponentProps } from 'react-router';
 import { setupEditRoute } from '@admin/routes/releaseRoutes';
 import ReleasePageTemplate from '@admin/pages/edit-release/components/ReleasePageTemplate';
 import DummyPublicationsData from '@admin/pages/DummyPublicationsData';
-import { ReleaseSetupDetails } from '@admin/services/api/common/types/types';
+import {
+  dayMonthYearIsComplete,
+  dayMonthYearToDate,
+  ReleaseSetupDetails,
+} from '@admin/services/api/common/types/types';
 import Link from '@admin/components/Link';
 
 interface MatchProps {
@@ -67,19 +71,13 @@ const ReleaseSetupPage = ({ match }: RouteComponentProps<MatchProps>) => {
               {releaseSetupDetails.leadStatisticianName}
             </SummaryListItem>
             <SummaryListItem term="Scheduled release">
-              {releaseSetupDetails.scheduledPublishDate.day &&
-                releaseSetupDetails.scheduledPublishDate.month &&
-                releaseSetupDetails.scheduledPublishDate.year && (
-                  <FormattedDate>
-                    {
-                      new Date(
-                        releaseSetupDetails.scheduledPublishDate.year,
-                        releaseSetupDetails.scheduledPublishDate.month,
-                        releaseSetupDetails.scheduledPublishDate.day,
-                      )
-                    }
-                  </FormattedDate>
-                )}
+              {dayMonthYearIsComplete(
+                releaseSetupDetails.scheduledPublishDate,
+              ) && (
+                <FormattedDate>
+                  {dayMonthYearToDate(releaseSetupDetails.scheduledPublishDate)}
+                </FormattedDate>
+              )}
             </SummaryListItem>
             <SummaryListItem term="Next release expected">
               {releaseSetupDetails.nextReleaseExpectedDate && (

@@ -113,12 +113,12 @@ export const dayMonthYearIsComplete = (dmy?: DayMonthYearValues) => {
 };
 
 export const dayMonthYearToDate = (dmy: DayMonthYearValues) => {
-  if (!(dmy.day && dmy.month && dmy.year)) {
+  if (!dayMonthYearIsComplete(dmy)) {
     throw Error(
       `Couldn't convert DayMonthYearValues ${JSON.stringify(
         dmy,
       )} to Date - missing required value`,
     );
   }
-  return new Date(dmy.year, dmy.month - 1, dmy.day);
+  return new Date(dmy.year || 0, (dmy.month || 0) - 1, dmy.day);
 };
