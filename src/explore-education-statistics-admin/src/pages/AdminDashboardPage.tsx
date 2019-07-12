@@ -1,14 +1,16 @@
+import { ThemeAndTopics } from '@admin/services/api/dashboard/types';
 import React, { useContext, useEffect, useState } from 'react';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import { LoginContext } from '@admin/components/Login';
-import DummyPublicationsData, {
-  ThemeAndTopics,
-} from '@admin/pages/DummyPublicationsData';
-import { IdLabelPair, Publication } from '@admin/services/types/types';
+import DummyPublicationsData from '@admin/pages/DummyPublicationsData';
+import {
+  IdLabelPair,
+  Publication,
+} from '@admin/services/api/common/types/types';
 import AdminDashboardPublicationsTab from '@admin/components/AdminDashboardPublicationsTab';
-import themeService from '@admin/services/themeService';
+import dashboardService from '@admin/services/api/dashboard/service';
 import Link from '../components/Link';
 import Page from '../components/Page';
 
@@ -54,7 +56,7 @@ const AdminDashboardPage = () => {
     }
 
     if (!themes) {
-      themeService.getThemesAndTopics(loggedInUser.id).then(themeList => {
+      dashboardService.getThemesAndTopics(loggedInUser.id).then(themeList => {
         const themesAsIdLabelPairs = themeList.map(
           themeToThemeWithIdLabelAndTopics,
         );

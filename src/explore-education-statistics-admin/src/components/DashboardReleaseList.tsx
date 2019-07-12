@@ -1,7 +1,7 @@
 import DashboardRelease from '@admin/components/DashboardRelease';
 import Link from '@admin/components/Link';
 import React from 'react';
-import { Release } from '@admin/services/types/types';
+import { Release } from '@admin/services/api/common/types/types';
 
 export interface DashboardReleaseListProps {
   releases: Release[];

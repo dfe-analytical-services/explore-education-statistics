@@ -1,8 +1,14 @@
-import { User } from '../PrototypeLoginService';
+import { User } from '../../../PrototypeLoginService';
 
 export interface IdLabelPair {
   id: string;
   label: string;
+}
+
+export interface UserContact {
+  name: string;
+  email: string;
+  telNo: string;
 }
 
 export interface Topic {
@@ -49,7 +55,7 @@ export interface Release {
   id: string;
   releaseName: string;
   timePeriodCoverage: TimePeriodCoverage;
-  scheduledReleaseDate: DayMonthYearValues;
+  scheduledPublishDate: DayMonthYearValues;
   nextReleaseExpectedDate: Date;
   releaseType: IdLabelPair;
   slug: string;
@@ -63,12 +69,6 @@ export interface LegacyRelease {
   id: string;
   description: string;
   url: string;
-}
-
-export interface UserContact {
-  name: string;
-  email: string;
-  telNo: string;
 }
 
 export interface Publication {
@@ -94,7 +94,7 @@ export interface ReleaseSetupDetails {
   timePeriodCoverageStartDate: Date;
   releaseType: IdLabelPair;
   leadStatisticianName: string;
-  scheduledReleaseDate: DayMonthYearValues;
+  scheduledPublishDate: DayMonthYearValues;
   nextReleaseExpectedDate?: Date;
 }
 

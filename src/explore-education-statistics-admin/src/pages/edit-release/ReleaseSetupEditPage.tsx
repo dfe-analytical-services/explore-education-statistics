@@ -29,7 +29,7 @@ import {
   DayMonthYearValues,
   IdLabelPair,
   ReleaseSetupDetails,
-} from '../../services/types/types';
+} from '../../services/api/common/types/types';
 
 interface MatchProps {
   releaseId: string;
@@ -40,7 +40,7 @@ interface FormValues {
   timePeriodCoverageStartDate?: DayMonthYearValues;
   timePeriodCoverageStartDateYearOnly?: number;
   releaseTypeId: string;
-  scheduledReleaseDate: DayMonthYearValues;
+  scheduledPublishDate: DayMonthYearValues;
   nextReleaseExpectedDate: DayMonthYearValues;
 }
 
@@ -142,7 +142,7 @@ const ReleaseSetupEditPage = ({
               ? releaseSetupDetails.timePeriodCoverageStartDate.getFullYear()
               : undefined,
             releaseTypeId: releaseSetupDetails.releaseType.id,
-            scheduledReleaseDate: releaseSetupDetails.scheduledReleaseDate,
+            scheduledPublishDate: releaseSetupDetails.scheduledPublishDate,
             nextReleaseExpectedDate: dateToDayMonthYear(
               releaseSetupDetails.nextReleaseExpectedDate,
             ),
@@ -168,7 +168,7 @@ const ReleaseSetupEditPage = ({
               },
             ),
             releaseTypeId: Yup.string(),
-            scheduledReleaseDate: validateOptionalPartialDayMonthYearField,
+            scheduledPublishDate: validateOptionalPartialDayMonthYearField,
             nextReleaseExpectedDate: validateOptionalPartialDayMonthYearField,
           })}
           onSubmit={async (values: FormValues) => {
@@ -188,7 +188,7 @@ const ReleaseSetupEditPage = ({
               );
             }
 
-            release.scheduledReleaseDate = values.scheduledReleaseDate;
+            release.scheduledPublishDate = values.scheduledPublishDate;
 
             release.nextReleaseExpectedDate = dayMonthYearToDate(
               values.nextReleaseExpectedDate,
@@ -262,11 +262,11 @@ const ReleaseSetupEditPage = ({
 
                 <FormFieldDayMonthYear<FormValues>
                   formId={formId}
-                  fieldName="scheduledReleaseDate"
+                  fieldName="scheduledPublishDate"
                   fieldsetLegend="Schedule publish date (optional)"
-                  day={form.values.scheduledReleaseDate.day}
-                  month={form.values.scheduledReleaseDate.month}
-                  year={form.values.scheduledReleaseDate.year}
+                  day={form.values.scheduledPublishDate.day}
+                  month={form.values.scheduledPublishDate.month}
+                  year={form.values.scheduledPublishDate.year}
                 />
 
                 <FormFieldDayMonthYear<FormValues>

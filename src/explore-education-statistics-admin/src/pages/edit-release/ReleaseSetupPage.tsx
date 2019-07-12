@@ -7,7 +7,7 @@ import { RouteComponentProps } from 'react-router';
 import { setupEditRoute } from '@admin/routes/releaseRoutes';
 import ReleasePageTemplate from '@admin/pages/edit-release/components/ReleasePageTemplate';
 import DummyPublicationsData from '@admin/pages/DummyPublicationsData';
-import { ReleaseSetupDetails } from '../../services/types/types';
+import { ReleaseSetupDetails } from '../../services/api/common/types/types';
 import Link from '../../components/Link';
 
 interface MatchProps {
@@ -67,15 +67,15 @@ const ReleaseSetupPage = ({ match }: RouteComponentProps<MatchProps>) => {
               {releaseSetupDetails.leadStatisticianName}
             </SummaryListItem>
             <SummaryListItem term="Scheduled release">
-              {releaseSetupDetails.scheduledReleaseDate.day &&
-                releaseSetupDetails.scheduledReleaseDate.month &&
-                releaseSetupDetails.scheduledReleaseDate.year && (
+              {releaseSetupDetails.scheduledPublishDate.day &&
+                releaseSetupDetails.scheduledPublishDate.month &&
+                releaseSetupDetails.scheduledPublishDate.year && (
                   <FormattedDate>
                     {
                       new Date(
-                        releaseSetupDetails.scheduledReleaseDate.year,
-                        releaseSetupDetails.scheduledReleaseDate.month,
-                        releaseSetupDetails.scheduledReleaseDate.day,
+                        releaseSetupDetails.scheduledPublishDate.year,
+                        releaseSetupDetails.scheduledPublishDate.month,
+                        releaseSetupDetails.scheduledPublishDate.day,
                       )
                     }
                   </FormattedDate>

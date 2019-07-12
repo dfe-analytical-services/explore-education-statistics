@@ -2,7 +2,10 @@ import FormSelect from '@common/components/form/FormSelect';
 import React from 'react';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
-import { IdLabelPair, Publication } from '@admin/services/types/types';
+import {
+  IdLabelPair,
+  Publication,
+} from '@admin/services/api/common/types/types';
 import AdminDashboardPublications from './AdminDashboardPublications';
 import Link from './Link';
 
