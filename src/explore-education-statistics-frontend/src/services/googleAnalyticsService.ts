@@ -31,3 +31,10 @@ export const logException = (description: string, fatal: boolean = false) => {
     ReactGA.exception({ description, fatal });
   }
 };
+
+export interface AnalyticProps {
+  analytics?: {
+    category: string;
+    action: string;
+  };
+}

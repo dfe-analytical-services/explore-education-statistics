@@ -18,9 +18,9 @@
 using System;
 using System.Collections.Generic;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
+namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions
 {
-    static partial class MoreEnumerable
+    public static class EnumerableExtensions
     {
         /// <summary>
         /// Batches the source sequence into sized buckets.

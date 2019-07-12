@@ -19,8 +19,12 @@ describe('DataBlock', () => {
   const dataBlockRequest: DataBlockRequest = {
     subjectId: 1,
     geographicLevel: GeographicLevel.Country,
-    startYear: '2014',
-    endYear: '2015',
+    timePeriod: {
+      startYear: '2014',
+      startCode: 'HT6',
+      endYear: '2015',
+      endCode: 'HT6',
+    },
     filters: ['1', '2'],
     indicators: ['23', '26', '28'],
   };

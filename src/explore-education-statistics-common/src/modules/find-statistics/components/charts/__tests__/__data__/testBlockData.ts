@@ -47,8 +47,7 @@ const data: DataBlockData = {
         '26': '10',
         '23': '3',
       },
-      timeIdentifier: 'HT6',
-      year: 2014,
+      timePeriod: '2014_HT6',
     },
     {
       filters: ['1', '2'],
@@ -76,8 +75,7 @@ const data: DataBlockData = {
         '26': '4',
         '23': '-3',
       },
-      timeIdentifier: 'HT6',
-      year: 2015,
+      timePeriod: '2015_HT6',
     },
   ],
 };
@@ -114,8 +112,7 @@ const missingData: DataBlockData = {
         '28': '5',
         '23': '3',
       },
-      timeIdentifier: 'HT6',
-      year: 2013,
+      timePeriod: '2013_HT6',
     },
     {
       filters: ['1', '2'],
@@ -143,8 +140,7 @@ const missingData: DataBlockData = {
         '26': '10',
         '23': '-3',
       },
-      timeIdentifier: 'HT6',
-      year: 2015,
+      timePeriod: '2015_HT6',
     },
     {
       filters: ['1', '2'],
@@ -172,8 +168,7 @@ const missingData: DataBlockData = {
         '26': '4',
         '23': '-2',
       },
-      timeIdentifier: 'HT6',
-      year: 2016,
+      timePeriod: '2016_HT6',
     },
   ],
 };
@@ -211,8 +206,7 @@ const multipleData: DataBlockData = {
         '26': '10',
         '23': '3',
       },
-      timeIdentifier: 'HT6',
-      year: 2015,
+      timePeriod: '2015_HT6',
     },
     {
       filters: ['1', '2'],
@@ -240,8 +234,7 @@ const multipleData: DataBlockData = {
         '26': '20',
         '23': '4',
       },
-      timeIdentifier: 'HT6',
-      year: 2015,
+      timePeriod: '2015_HT6',
     },
   ],
 };

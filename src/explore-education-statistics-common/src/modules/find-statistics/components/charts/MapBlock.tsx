@@ -46,7 +46,7 @@ interface MapState {
 
   selected: {
     indicator: string;
-    timePeriod: number;
+    timePeriod: string;
     location: string;
     results: IdValue[];
   };
@@ -98,7 +98,7 @@ class MapBlock extends Component<MapProps, MapState> {
   public state: MapState = {
     selected: {
       indicator: '',
-      timePeriod: 0,
+      timePeriod: '',
       location: '',
       results: [],
     },
@@ -120,7 +120,7 @@ class MapBlock extends Component<MapProps, MapState> {
     );
 
     // TODO, if required, allow range of years to be selected
-    const firstTimePeriod = data.result[0].year;
+    const firstTimePeriod = meta.timePeriods[data.result[0].timePeriod].value;
 
     selected = {
       ...selected,
@@ -251,7 +251,7 @@ class MapBlock extends Component<MapProps, MapState> {
     data: DataBlockData,
     meta: DataBlockMetadata,
     selectedIndicator: string,
-    selectedYear: number,
+    selectedYear: string,
   ) {
     const displayedFilter = +selectedIndicator;
 
@@ -302,10 +302,10 @@ class MapBlock extends Component<MapProps, MapState> {
     data: DataBlockData,
     meta: DataBlockMetadata,
     displayedFilter: number,
-    selectedYear: number,
+    selectedYear: string,
   ) {
     const resultsFilteredByYear = data.result.filter(
-      result => result.year === selectedYear,
+      result => result.timePeriod === selectedYear,
     );
 
     return resultsFilteredByYear

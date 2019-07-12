@@ -1,10 +1,9 @@
-import React, { forwardRef, Ref, useRef } from 'react';
-import DataTableKeys from './DataTableKeys';
+import React, { forwardRef, ReactNode, Ref, useRef } from 'react';
 import styles from './FixedMultiHeaderDataTable.module.scss';
 import MultiHeaderTable from './MultiHeaderTable';
 
 interface Props {
-  caption: string;
+  caption: ReactNode;
   captionId?: string;
   innerRef?: Ref<HTMLElement>;
   columnHeaders: string[][];
@@ -20,11 +19,7 @@ const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
 
     return (
       <figure className={styles.figure} ref={ref}>
-        <figcaption>
-          <strong id={captionId}>{caption}</strong>
-
-          <DataTableKeys />
-        </figcaption>
+        <figcaption>{caption}</figcaption>
 
         <div
           className={styles.container}
@@ -68,6 +63,6 @@ const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
   },
 );
 
-FixedMultiHeaderDataTable.displayName = 'FixedHeaderGroupedDataTable';
+FixedMultiHeaderDataTable.displayName = 'FixedMultiHeaderDataTable';
 
 export default FixedMultiHeaderDataTable;
