@@ -6,8 +6,8 @@ import { Field, FieldProps } from 'formik';
 import React from 'react';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
 import FormFieldSortableList from './FormFieldSortableList';
+import styles from './FormFieldSortableListGroup.module.scss';
 import { SortableOption } from './FormSortableList';
-import styles from './TableHeadersForm.module.scss';
 
 interface Props<FormValues> {
   name: keyof FormValues & string;
@@ -32,8 +32,7 @@ const FormFieldSortableListGroup = <T extends Dictionary<SortableOption[][]>>({
                 {...droppableProvided.droppableProps}
                 ref={droppableProvided.innerRef}
                 className={classNames(styles.groupsFieldset, {
-                  [styles.groupsFieldsetDraggingOver]:
-                    droppableSnapshot.isDraggingOver,
+                  [styles.isDraggingOver]: droppableSnapshot.isDraggingOver,
                 })}
               >
                 <FormFieldset
@@ -61,7 +60,7 @@ const FormFieldSortableListGroup = <T extends Dictionary<SortableOption[][]>>({
                             {...draggableProvided.dragHandleProps}
                             className={classNames(
                               styles.list,
-                              styles.isDraggable,
+                              styles.listOneThird,
                               {
                                 [styles.isDragging]:
                                   draggableSnapshot.isDragging,

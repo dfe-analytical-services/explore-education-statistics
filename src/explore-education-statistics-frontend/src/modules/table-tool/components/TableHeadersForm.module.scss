@@ -1,83 +1,31 @@
 @import '~explore-education-statistics-common/src/styles/govuk-base';
 
+.groupsContainer {
+  padding: govuk-spacing(2);
+}
+
 .axisContainer {
-  display: flex;
-  flex-wrap: wrap;
   margin-bottom: govuk-spacing(2);
-
-  @include govuk-media-query($from: tablet) {
-    flex-wrap: nowrap;
-  }
 }
 
-.groupsFieldset {
+.rowColContainer {
   border: 4px solid govuk-colour('grey-3');
-  flex-basis: 100%;
-  padding: govuk-spacing(2);
-
-  @include govuk-media-query($from: tablet) {
-    flex-basis: 75%;
-  }
+  padding: govuk-spacing(3);
+  width: 100%;
 }
 
-.groupsFieldsetDraggingOver {
-  background-color: govuk-colour('grey-4');
-  border-color: $govuk-focus-colour;
-}
-
-.listsContainer {
-  display: flex;
-  flex-direction: column;
-  padding: govuk-spacing(2);
-
-  @include govuk-media-query($from: tablet) {
-    flex-basis: 33%;
-    flex-direction: row;
-  }
+.isDraggingOver {
+  composes: isDraggingOver from './FormFieldSortableListGroup.module.scss';
 }
 
 .list {
-  @include govuk-focusable;
+  composes: list from './FormFieldSortableListGroup.module.scss';
 
-  background: govuk-colour('grey-3');
-  display: block;
-  flex-basis: 100%;
-  margin-bottom: govuk-spacing(2);
-  padding: govuk-spacing(2);
-
-  @include govuk-media-query($from: tablet) {
-    flex-basis: 33%;
-    margin-bottom: 0;
-
-    &:not(:last-of-type) {
-      margin-right: govuk-spacing(2);
-    }
-  }
-}
-
-.isDraggable {
-  &:hover {
-    background: govuk-colour('grey-2');
-
-    // Fallback if grab is unsupported
-    cursor: move;
-    cursor: grab;
+  &:not(:last-of-type) {
+    margin-bottom: govuk-spacing(3);
   }
 }
 
 .isDragging {
-  outline: $govuk-focus-width solid $govuk-focus-colour;
-  outline-offset: 0;
-}
-
-.rowColContainer {
-  flex-basis: 100%;
-  padding: govuk-spacing(2) 0;
-
-  @include govuk-media-query($from: tablet) {
-    flex-basis: 25%;
-    flex-wrap: nowrap;
-    margin: -#{govuk-spacing(2)} 0;
-    padding: govuk-spacing(2);
-  }
+  composes: isDragging from './FormFieldSortableListGroup.module.scss';
 }

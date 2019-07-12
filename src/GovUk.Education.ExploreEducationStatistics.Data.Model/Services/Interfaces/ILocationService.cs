@@ -1,12 +1,13 @@
+using System;
 using System.Collections.Generic;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
+using System.Linq.Expressions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces
 {
     public interface ILocationService : IRepository<Location, long>
     {
         Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> GetObservationalUnits(
-            SubjectMetaQueryContext query);
+            Expression<Func<Observation, bool>> observationPredicate);
 
         Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> GetObservationalUnits(
             IEnumerable<Location> locations);
