@@ -2,17 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
+namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
 {
     public class SubjectMetaQueryContext
     {
         public long SubjectId { get; set; }
-        public int StartYear { get; set; }
-        public int EndYear { get; set; }
-        public IEnumerable<int> Years { get; set; }
+        public TimePeriodQuery TimePeriod { get; set; }
         public GeographicLevel? GeographicLevel { get; set; }
         public IEnumerable<long> Indicators { get; set; }
         public IEnumerable<string> Country { get; set; }
@@ -33,12 +33,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
         {
             var predicate = PredicateBuilder.True<Observation>()
                 .And(observation => observation.SubjectId == SubjectId);
-
-            var yearsRange = TimePeriodUtil.YearsRange(Years, StartYear, EndYear);
-            if (yearsRange.Any())
+            
+            if (TimePeriod != null)
             {
-                predicate = predicate.And(observation =>
-                    yearsRange.Contains(observation.Year));
+                // Don't use the observation.GetTimePeriod() extension in the expression here as it can't be translated
+                predicate = predicate.And(observation => GetTimePeriodRange(TimePeriod)
+                    .Contains(observation.Year + "_" + observation.TimeIdentifier));
             }
 
             if (GeographicLevel != null)
@@ -125,6 +125,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
             }
 
             return predicate;
+        }
+        
+        private static IEnumerable<string> GetTimePeriodRange(TimePeriodQuery timePeriod)
+        {
+            if (timePeriod.StartCode.IsNumberOfTerms() || timePeriod.EndCode.IsNumberOfTerms())
+            {
+                return TimePeriodUtil.RangeForNumberOfTerms(timePeriod.StartYear, timePeriod.EndYear)
+                    .Select(tuple => tuple.GetTimePeriod());
+            }
+
+            return TimePeriodUtil.Range(timePeriod).Select(tuple => tuple.GetTimePeriod());
         }
     }
 }

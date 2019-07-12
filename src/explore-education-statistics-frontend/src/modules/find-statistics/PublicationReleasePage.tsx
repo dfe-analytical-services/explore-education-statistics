@@ -93,8 +93,12 @@ class PublicationReleasePage extends Component<Props> {
                 </dl>
                 <Link
                   unvisited
+                  analytics={{
+                    category: 'Subscribe',
+                    action: 'Email subscription',
+                  }}
                   to={`/subscriptions?slug=${data.publication.slug}`}
-                  data-testid={`subsciption-${data.publication.slug}`}
+                  data-testid={`subscription-${data.publication.slug}`}
                 >
                   Sign up for email alerts
                 </Link>

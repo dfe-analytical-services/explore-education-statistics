@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
 {
+    [ApiExplorerSettings(IgnoreApi=true)]
     [Authorize]
     public class FileUploadController : Controller
     {
