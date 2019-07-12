@@ -1,3 +1,4 @@
+import ButtonLink from '@admin/components/ButtonLink';
 import FormattedDate from '@common/components/FormattedDate';
 import React from 'react';
 import Link from '@admin/components/Link';
@@ -26,17 +27,10 @@ const getTag = (approvalStatus: ApprovalStatus) => {
 
 interface Props {
   release: Release;
-  editing: boolean;
-  review: boolean;
   showComments: boolean;
 }
 
-const DashboardRelease = ({
-  release,
-  editing,
-  review,
-  showComments,
-}: Props) => {
+const DashboardRelease = ({ release, showComments }: Props) => {
   return (
     <Details
       className="govuk-!-margin-bottom-0"
@@ -45,6 +39,10 @@ const DashboardRelease = ({
       } ${getLiveLatestLabel(release.status.isLive, release.status.isLatest)}`}
       tag={getTag(release.status.approvalStatus)}
     >
+      <ButtonLink to={setupRoute.generateLink(release.id)}>
+        Edit this release
+      </ButtonLink>
+
       <dl className="govuk-summary-list govuk-!-margin-bottom-3">
         <div className="govuk-summary-list__row">
           {release.status.isNew && (
@@ -147,23 +145,6 @@ const DashboardRelease = ({
                 );
               }}
             </LoginContext.Consumer>
-          </dd>
-          <dd className="govuk-summary-list__actions">
-            {review && (
-              <Link to="/prototypes/publication-review">
-                Review this release
-              </Link>
-            )}
-            {!editing && !review && (
-              <Link to={setupRoute.generateLink(release.id)}>
-                Edit this release
-              </Link>
-            )}
-            {editing && (
-              <Link to="/prototypes/publication-create-new-absence-config">
-                View / edit this draft
-              </Link>
-            )}
           </dd>
         </div>
       </dl>

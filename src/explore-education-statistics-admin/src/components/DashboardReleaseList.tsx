@@ -18,12 +18,7 @@ const DashboardReleaseList = ({ releases }: DashboardReleaseListProps) => (
           <ul className="govuk-list dfe-admin">
             {releases.map(release => (
               <li key={release.id}>
-                <DashboardRelease
-                  release={release}
-                  review={false}
-                  showComments
-                  editing={false}
-                />
+                <DashboardRelease release={release} showComments />
               </li>
             ))}
           </ul>

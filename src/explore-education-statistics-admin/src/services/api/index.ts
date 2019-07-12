@@ -1,15 +1,28 @@
+import { ThemeAndTopics } from '@admin/pages/DummyPublicationsData';
+import Client from '@admin/services/api/Client';
 import axios from 'axios';
 import { commaSeparated } from '../util/paramSerializers';
-import Client from './Client';
+import mocks from './mock/axios-mock';
 
-export const baseUrl = {
-  content: process.env.CONTENT_API_BASE_URL,
-  data: process.env.DATA_API_BASE_URL,
+const createContentApiAxios = async () => {
+  const baseUrl = process.env.CONTENT_API_BASE_URL;
+
+  const axiosInstance = axios.create({
+    baseURL: `${baseUrl}/api/`,
+    paramsSerializer: commaSeparated,
+  });
+
+  return process.env.USE_MOCK_API === 'true'
+    ? mocks.createMockContentApiAxiosInstance(axiosInstance)
+    : axiosInstance;
 };
 
-export const contentApi = new Client(
-  axios.create({
-    baseURL: `${baseUrl.content}/api/`,
-    paramsSerializer: commaSeparated,
+export default {
+  contentApi: createContentApiAxios().then(axiosInstance => {
+    const client = new Client(axiosInstance);
+    return {
+      getThemesAndTopics: (userId: string) =>
+        client.get<ThemeAndTopics[]>('/Themes', { params: { userId } }),
+    };
   }),
-);
+};
