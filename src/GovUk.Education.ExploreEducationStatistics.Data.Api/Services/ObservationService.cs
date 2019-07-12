@@ -90,15 +90,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                     filtersListParam);
 
             var ids = inner.Select(obs => obs.Id).ToList();
+            var batches = ids.Batch(10000);
 
-            var result = DbSet()
-                .AsNoTracking()
-                .Where(observation => ids.Contains(observation.Id))
-                .Include(observation => observation.Subject)
-                .ThenInclude(subject => subject.Release)
-                .Include(observation => observation.Location)
-                .Include(observation => observation.FilterItems)
-                .ThenInclude(item => item.FilterItem.FilterGroup).ToList();
+            var result = new List<Observation>();
+
+            foreach (var batch in batches)
+            {
+                result.AddRange(DbSet()
+                    .AsNoTracking()
+                    .Where(observation => batch.Contains(observation.Id))
+                    .Include(observation => observation.Subject)
+                    .ThenInclude(subject => subject.Release)
+                    .Include(observation => observation.Location)
+                    .Include(observation => observation.FilterItems)
+                    .ThenInclude(item => item.FilterItem.FilterGroup));
+            }
 
             result.Select(observation => observation.Location)
                 .Distinct()
