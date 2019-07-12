@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 
@@ -119,10 +120,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                                         Label = item.Label,
                                         Value = item.Id.ToString()
                                     }),
-                                    // TODO DFE-891 Populate the total type
-                                    TotalType = string.Empty
+                                    TotalValue =
+                                        itemsGroupedByFilterGroup.FirstOrDefault(IsFilterItemTotal)?.Id.ToString() ??
+                                        string.Empty
                                 })
                     });
+        }
+
+        private static bool IsFilterItemTotal(FilterItem item)
+        {
+            return item.Label.Equals("Total", StringComparison.InvariantCultureIgnoreCase);
         }
     }
 }
