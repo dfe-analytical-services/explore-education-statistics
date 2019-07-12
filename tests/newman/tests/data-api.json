@@ -2836,17 +2836,9 @@
 											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 											"",
 											"pm.test(\"Compulsory fields are present\", function () {",
-											"    // pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
-											"    // pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
-											"    // pm.expect(pm.response.to.have.jsonBody(\"subjectId\"));",
-											"    // pm.expect(pm.response.to.have.jsonBody(\"releaseDate\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodRange\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-											"});",
-											"",
-											"// pm.test(\"Release date is not empty\", function () {",
-											"//     pm.expect(pm.response.json().releaseDate).to.not.equal(\"0001-01-01T00:00:00\");",
-											"// });"
+											"});"
 										]
 									}
 								}
@@ -3805,11 +3797,7 @@
 										"type": "text/javascript",
 										"exec": [
 											"pm.globals.set(\"FILT_StateFundedSecondary\", \"91\");",
-											"pm.globals.set(\"FILT_Special\", \"92\");",
-											"",
-											"// NOTE(mark): Saved in case the values are restored",
-											"// pm.globals.set(\"FILT_StateFundedSecondary\", \"379\");",
-											"// pm.globals.set(\"FILT_Special\", \"378\");"
+											"pm.globals.set(\"FILT_Special\", \"92\");"
 										]
 									}
 								},
@@ -4138,12 +4126,7 @@
 										"exec": [
 											"pm.globals.set(\"FILT_StateFundedPrimary\", \"95\");",
 											"pm.globals.set(\"FILT_StateFundedSecondary\", \"96\");",
-											"pm.globals.set(\"FILT_Special\", \"97\");",
-											"",
-											"// NOTE(mark): Saving in case values are restored!",
-											"// pm.globals.set(\"FILT_StateFundedPrimary\", \"405\");",
-											"// pm.globals.set(\"FILT_StateFundedSecondary\", \"406\");",
-											"// pm.globals.set(\"FILT_Special\", \"407\");"
+											"pm.globals.set(\"FILT_Special\", \"97\");"
 										]
 									}
 								},
@@ -4224,12 +4207,7 @@
 										"exec": [
 											"pm.globals.set(\"FILT_StateFundedPrimary\", \"146\");",
 											"pm.globals.set(\"FILT_StateFundedSecondary\", \"148\");",
-											"pm.globals.set(\"FILT_Special\", \"147\");",
-											"",
-											"// NOTE(mark): Saving in case values are restored!",
-											"// pm.globals.set(\"FILT_StateFundedPrimary\", \"456\");",
-											"// pm.globals.set(\"FILT_StateFundedSecondary\", \"458\");",
-											"// pm.globals.set(\"FILT_Special\", \"457\");"
+											"pm.globals.set(\"FILT_Special\", \"147\");"
 										]
 									}
 								},
@@ -4986,14 +4964,7 @@
 											"pm.globals.set(\"FILT_GenderFemale\", \"581\");",
 											"pm.globals.set(\"FILT_GenderMale\", \"582\");",
 											"pm.globals.set(\"INDI_TotalPointScoreBasedOnAssessmentRating\", \"266\");",
-											"pm.globals.set(\"INDI_AveragePointScore\", \"267\");",
-											"",
-											"// NOTE(mark): Saved in case they're restored!",
-											"// pm.globals.set(\"FILT_All\", \"883\");",
-											"// pm.globals.set(\"FILT_GenderFemale\", \"884\");",
-											"// pm.globals.set(\"FILT_GenderMale\", \"885\");",
-											"// pm.globals.set(\"INDI_TotalPointScoreBasedOnAssessmentRating\", \"218\");",
-											"// pm.globals.set(\"INDI_AveragePointScore\", \"219\");"
+											"pm.globals.set(\"INDI_AveragePointScore\", \"267\");"
 										]
 									}
 								},
