@@ -68,6 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<INotificationsService, NotificationsService>();
             services.AddTransient<IPublishingService, PublishingService>();
             services.AddTransient<IThemeService, ThemeService>();
+            services.AddTransient<IPublicationService, PublicationService>();
             
             
             services.AddSwaggerGen(c =>
