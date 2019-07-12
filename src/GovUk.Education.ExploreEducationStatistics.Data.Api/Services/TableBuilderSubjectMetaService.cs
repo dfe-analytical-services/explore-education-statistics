@@ -97,30 +97,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             );
         }
 
-        private Dictionary<string, LegendOptionsMetaValueModel<Dictionary<string,
-            LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>>>> GetFilters(
+        private Dictionary<string, LegendOptionsMetaValueModel<Dictionary<string, FilterItemMetaViewModel>>> GetFilters(
             SubjectMetaQueryContext query)
         {
             return _filterItemService.GetFilterItems(query.ObservationPredicate())
                 .GroupBy(item => item.FilterGroup.Filter)
                 .ToDictionary(
                     itemsGroupedByFilter => itemsGroupedByFilter.Key.Label.PascalCase(),
-                    itemsGroupedByFilter => new LegendOptionsMetaValueModel<Dictionary<string,
-                        LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>>>
+                    itemsGroupedByFilter => new LegendOptionsMetaValueModel<Dictionary<string, FilterItemMetaViewModel>>
                     {
                         Hint = itemsGroupedByFilter.Key.Hint,
                         Legend = itemsGroupedByFilter.Key.Label,
                         Options = itemsGroupedByFilter.GroupBy(item => item.FilterGroup).ToDictionary(
                             itemsGroupedByFilterGroup => itemsGroupedByFilterGroup.Key.Label.PascalCase(),
                             itemsGroupedByFilterGroup =>
-                                new LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
+                                new FilterItemMetaViewModel
                                 {
                                     Label = itemsGroupedByFilterGroup.Key.Label,
                                     Options = itemsGroupedByFilterGroup.Select(item => new LabelValueViewModel
                                     {
                                         Label = item.Label,
                                         Value = item.Id.ToString()
-                                    })
+                                    }),
+                                    // TODO DFE-891 Populate the total type
+                                    TotalType = string.Empty
                                 })
                     });
         }
