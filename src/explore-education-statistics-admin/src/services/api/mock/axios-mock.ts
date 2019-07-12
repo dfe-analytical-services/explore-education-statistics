@@ -6,8 +6,10 @@ export default {
     const MockAdaptor = (await import(
       /* webpackChunkName: "axios-mock-adapter" */ 'axios-mock-adapter'
     )).default;
+
     const mock = new MockAdaptor(axiosInstance);
 
+    // getThemesAndTopics
     mock
       .onGet('/Themes', { params: { userId: 'user1' } })
       .reply(200, DummyPublicationsData.themesAndTopics);
