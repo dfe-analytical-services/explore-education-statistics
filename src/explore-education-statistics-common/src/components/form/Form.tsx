@@ -5,7 +5,7 @@ import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import { connect, FormikContext } from 'formik';
 import camelCase from 'lodash/camelCase';
 import get from 'lodash/get';
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 
 interface Props {
   children: ReactNode;
@@ -46,6 +46,12 @@ const Form = ({
   const [submitted, setSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState<ErrorSummaryMessage>();
 
+  useEffect(() => {
+    if (!formik.submitCount) {
+      setSubmitError(undefined);
+    }
+  }, [submitError, formik.submitCount]);
+
   const summaryErrors: ErrorSummaryMessage[] = Object.entries(getAllErrors())
     .filter(([errorName]) => get(touched, errorName))
     .map(([errorName, message]) => ({
@@ -60,7 +66,6 @@ const Form = ({
   return (
     <form
       id={id}
-      onReset={formik.handleReset}
       onSubmit={async event => {
         setSubmitted(true);
         setSubmitError(undefined);

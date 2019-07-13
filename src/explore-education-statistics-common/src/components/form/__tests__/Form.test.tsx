@@ -247,4 +247,50 @@ describe('Form', () => {
 
     expect(queryByText('Something went wrong')).toBeNull();
   });
+
+  test('removes submit error when form is reset', async () => {
+    const onSubmit = jest.fn(() => {
+      throw new Error('Something went wrong');
+    });
+
+    const { container, queryByText, getByText } = render(
+      <Formik
+        initialValues={{
+          firstName: 'Firstname',
+        }}
+        validationSchema={Yup.object({
+          firstName: Yup.string().required(),
+        })}
+        onSubmit={onSubmit}
+      >
+        {formik => (
+          <Form id="test-form">
+            The form
+            <button type="button" onClick={formik.handleReset}>
+              Reset form
+            </button>
+          </Form>
+        )}
+      </Formik>,
+    );
+
+    const form = container.querySelector('#test-form') as HTMLFormElement;
+
+    fireEvent.submit(form, {
+      current: form,
+      target: form,
+    });
+
+    await wait();
+
+    expect(queryByText('Something went wrong')).not.toBeNull();
+
+    onSubmit.mockImplementation();
+
+    fireEvent.click(getByText('Reset form'));
+
+    await wait();
+
+    expect(queryByText('Something went wrong')).toBeNull();
+  });
 });
