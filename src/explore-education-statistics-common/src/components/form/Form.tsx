@@ -43,6 +43,7 @@ const Form = ({
     touched,
   });
 
+  const [submitted, setSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState<ErrorSummaryMessage>();
 
   const summaryErrors: ErrorSummaryMessage[] = Object.entries(getAllErrors())
@@ -61,6 +62,7 @@ const Form = ({
       id={id}
       onReset={formik.handleReset}
       onSubmit={async event => {
+        setSubmitted(true);
         setSubmitError(undefined);
         event.preventDefault();
 
@@ -76,7 +78,11 @@ const Form = ({
         }
       }}
     >
-      <ErrorSummary errors={allErrors} id={`${id}-summary`} />
+      <ErrorSummary
+        errors={allErrors}
+        id={`${id}-summary`}
+        focusOnError={submitted}
+      />
 
       {children}
     </form>
