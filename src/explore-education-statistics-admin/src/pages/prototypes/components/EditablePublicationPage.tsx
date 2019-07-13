@@ -27,6 +27,7 @@ interface State {
 
 interface Props {
   editing?: boolean;
+  reviewing?: boolean;
   data: Release | undefined;
 }
 
@@ -105,16 +106,24 @@ class EditablePublicationPage extends Component<Props, State> {
     }
   }
 
-  private renderContentSections(data: Release, editing: boolean | undefined) {
+  private renderContentSections(
+    data: Release,
+    editing: boolean | undefined,
+    reviewing: boolean | undefined,
+  ) {
     const { reordering } = this.state;
 
     if (reordering) {
       return this.renderDraggableSections(data);
     }
-    return this.renderEditableSections(data, editing);
+    return this.renderEditableSections(data, editing, reviewing);
   }
 
-  private renderEditableSections(data: Release, editing: boolean | undefined) {
+  private renderEditableSections(
+    data: Release,
+    editing: boolean | undefined,
+    reviewing: boolean | undefined,
+  ) {
     return (
       <div>
         <h2 className="govuk-heading-l reorderable-relative">
@@ -139,6 +148,7 @@ class EditablePublicationPage extends Component<Props, State> {
               <EditableContentBlock
                 editable={editing}
                 content={content}
+                reviewing={reviewing}
                 id={`editable-block-${index}`}
                 onContentChange={(block, newContent) => {
                   block.body = newContent;
@@ -224,6 +234,7 @@ class EditablePublicationPage extends Component<Props, State> {
   }
 
   public render() {
+    const { reviewing } = this.props;
     const { editing } = this.props;
     const { data } = this.state;
 
@@ -248,6 +259,7 @@ class EditablePublicationPage extends Component<Props, State> {
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-two-thirds">
               <PrototypeEditableContent
+                reviewing={reviewing}
                 editable={editing}
                 content={`
           <p className="govuk-body">
@@ -406,6 +418,7 @@ class EditablePublicationPage extends Component<Props, State> {
 
           <PrototypeDataSample
             editing={editing}
+            reviewing={reviewing}
             sectionId="headlines"
             chartTitle="change in absence types in England"
             xAxisLabel="School Year"
@@ -446,7 +459,7 @@ class EditablePublicationPage extends Component<Props, State> {
           />
           {data &&
             data.content.length > 0 &&
-            this.renderContentSections(data, editing)}
+            this.renderContentSections(data, editing, reviewing)}
           <h2 className="govuk-heading-m govuk-!-margin-top-9">
             Extra information
           </h2>

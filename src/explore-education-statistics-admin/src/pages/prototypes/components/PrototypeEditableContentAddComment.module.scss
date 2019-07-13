@@ -1,0 +1,10 @@
+@import '../../../styles/govuk-base';
+
+.addComment {
+  background: govuk-colour('grey-4');
+  border-right: 5px solid govuk-colour('orange');
+  margin-left: -320px;
+  padding: 1rem;
+  position: absolute;
+  width: 300px;
+}

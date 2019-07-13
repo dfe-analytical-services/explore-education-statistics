@@ -3,6 +3,7 @@ import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 // @ts-ignore
 import CKEditor from '@ckeditor/ckeditor5-react';
 import React, { ChangeEvent, createRef, Fragment } from 'react';
+import AddComment from './PrototypeEditableContentAddComment';
 
 import styles from './PrototypeEditableContent.module.scss';
 
@@ -10,6 +11,7 @@ import styles from './PrototypeEditableContent.module.scss';
 
 interface Props {
   editable?: boolean;
+  reviewing?: boolean;
   content: string;
   onContentChange?: (content: string) => void;
 }
@@ -27,6 +29,7 @@ class PrototypeEditableContent extends React.Component<Props, State> {
 
   public static defaultProps = {
     editable: false,
+    reviewing: false,
   };
 
   public state: State = {
@@ -36,7 +39,7 @@ class PrototypeEditableContent extends React.Component<Props, State> {
   };
 
   public componentDidMount() {
-    const { content } = this.props;
+    const { content, reviewing } = this.props;
     const { editing } = this.state;
 
     this.setState({
@@ -82,7 +85,11 @@ class PrototypeEditableContent extends React.Component<Props, State> {
     }
   };
 
-  private renderEditableArea(unsaved: boolean, editable?: boolean) {
+  private renderEditableArea(
+    unsaved: boolean,
+    editable?: boolean,
+    reviewing?: boolean,
+  ) {
     return (
       // eslint-disable-next-line jsx-a11y/no-static-element-interactions,jsx-a11y/click-events-have-key-events
       <div
@@ -93,6 +100,8 @@ class PrototypeEditableContent extends React.Component<Props, State> {
         }
         onClick={this.setEditing}
       >
+        {reviewing && <AddComment />}
+
         <div className={styles.editableButton}>
           <div className={styles.editableButtonContent}>
             Click to edit this section
@@ -129,13 +138,13 @@ class PrototypeEditableContent extends React.Component<Props, State> {
   public render() {
     const { editing, content, unsaved } = this.state;
 
-    const { editable } = this.props;
+    const { editable, reviewing } = this.props;
 
     return (
       <Fragment>
         {editable && editing
           ? this.renderEditor(content)
-          : this.renderEditableArea(unsaved, editable)}
+          : this.renderEditableArea(unsaved, editable, reviewing)}
       </Fragment>
     );
   }

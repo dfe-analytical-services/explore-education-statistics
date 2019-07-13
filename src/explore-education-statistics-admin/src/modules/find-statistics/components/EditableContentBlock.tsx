@@ -1,23 +1,32 @@
 import { Release, ContentBlock } from '@common/services/publicationService';
 import React, { Component } from 'react';
 import EditableContentSubBlockRenderer from './EditableContentSubBlockRenderer';
+import AddComment from '../../../pages/prototypes/components/PrototypeEditableContentAddComment';
 
 interface Props {
   content: Release['content'][0]['content'];
   id?: string;
   editable?: boolean;
+  reviewing?: boolean;
   onContentChange?: (block: ContentBlock, content: string) => void;
 }
 
 class EditableContentBlock extends Component<Props> {
   public render() {
-    const { content, id = '', editable, onContentChange } = this.props;
+    const {
+      content,
+      id = '',
+      editable,
+      onContentChange,
+      reviewing,
+    } = this.props;
 
     return content.length > 0 ? (
       content.map((block, index) => {
         const key = `${index}-${block.heading}-${block.type}`;
         return (
           <>
+            {reviewing && <AddComment />}
             <EditableContentSubBlockRenderer
               editable={editable}
               block={block}

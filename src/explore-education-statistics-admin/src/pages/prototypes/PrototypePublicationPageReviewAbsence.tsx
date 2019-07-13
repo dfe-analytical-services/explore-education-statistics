@@ -49,7 +49,7 @@ class PublicationPage extends Component<{}, State> {
         ]}
       >
         {' '}
-        <div className="govuk-width-container">
+        <div>
           <FormGroup>
             <FormRadioGroup
               legend="Review this release"
@@ -124,8 +124,11 @@ class PublicationPage extends Component<{}, State> {
           </Link>
         </div>
         <hr />
-        <div className="govuk-width-container">
-          <EditablePublicationPage data={data} />
+        <div className="govuk-width-container dfe-align--comments">
+          <EditablePublicationPage
+            reviewing
+            data={PrototypePublicationService.getNewPublication()}
+          />
         </div>
       </PrototypePage>
     );
