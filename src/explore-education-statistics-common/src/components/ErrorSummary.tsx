@@ -17,6 +17,14 @@ const ErrorSummary = ({ id, errors, title = 'There is a problem' }: Props) => {
   const [prevErrors, setPrevErrors] = useState<ErrorSummaryMessage[]>([]);
 
   useEffect(() => {
+    import('govuk-frontend/components/error-summary/error-summary').then(
+      ({ default: GovUkErrorSummary }) => {
+        new GovUkErrorSummary(ref.current).init();
+      },
+    );
+  }, [ref]);
+
+  useEffect(() => {
     if (errors.length > 0 && !prevErrors.length && ref.current) {
       ref.current.scrollIntoView({
         behavior: 'smooth',
@@ -27,14 +35,6 @@ const ErrorSummary = ({ id, errors, title = 'There is a problem' }: Props) => {
 
     setPrevErrors(errors);
   }, [errors, prevErrors]);
-
-  useEffect(() => {
-    import('govuk-frontend/components/error-summary/error-summary').then(
-      ({ default: GovUkErrorSummary }) => {
-        new GovUkErrorSummary(ref.current).init();
-      },
-    );
-  }, [ref]);
 
   const idTitle = `${id}-title`;
 
