@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             var userId = new Guid(); // TODO get the Guid from AD
 
-            var result = _themeService.GetByUser(userId);
+            var result = _themeService.GetUserThemes(userId);
 
             if (result.Any())
             {

@@ -6,6 +6,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IThemeService
     {
-        List<Theme> GetByUser(Guid guid);
+        List<Theme> GetUserThemes(Guid guid);
     }
 }

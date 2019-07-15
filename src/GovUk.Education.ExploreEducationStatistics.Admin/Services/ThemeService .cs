@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _context = context;
         }
 
-        public List<Theme> GetByUser(UserId userId)
+        public List<Theme> GetUserThemes(UserId userId)
         {
             // TODO This method simply returns all Themes as we currently do not have a concept of how a user
             // TODO is connected to Themes for the purpose of administration. Once this has been modelled then
