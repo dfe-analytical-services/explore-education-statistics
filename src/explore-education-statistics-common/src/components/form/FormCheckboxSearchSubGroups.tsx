@@ -107,9 +107,9 @@ const FormCheckboxSearchSubGroups = ({
                 legend={optionGroup.legend}
                 legendSize="s"
                 options={optionGroup.options}
-                onAllChange={event => {
+                onAllChange={(event, checked) => {
                   if (onAllChange) {
-                    onAllChange(event, optionGroup.options);
+                    onAllChange(event, checked, optionGroup.options);
                   }
                 }}
               />
