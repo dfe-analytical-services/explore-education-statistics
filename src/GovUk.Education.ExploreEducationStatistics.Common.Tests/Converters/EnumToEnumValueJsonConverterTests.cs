@@ -3,7 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Model.Database;
 using Newtonsoft.Json;
 using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Converters
+namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Converters
 {
     public class EnumToEnumValueJsonConverterTests
     {
