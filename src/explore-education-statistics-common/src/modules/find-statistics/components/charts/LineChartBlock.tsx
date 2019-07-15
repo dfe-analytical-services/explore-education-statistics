@@ -23,6 +23,8 @@ import {
   YAxis,
 } from 'recharts';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import { AxisConfigurationItem } from '@common/services/publicationService';
+import { Dictionary } from '@common/types';
 
 const CustomToolTip = ({ active, payload, label }: TooltipProps) => {
   if (active) {
@@ -105,28 +107,44 @@ export default class LineChartBlock extends Component<ChartProps> {
         >
           <Tooltip content={CustomToolTip} />
           <Legend verticalAlign="top" height={36} />
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis
-            dataKey="name"
-            label={{
-              offset: 5,
-              position: 'bottom',
-              value: '',
-            }}
-            padding={{ left: 20, right: 20 }}
-            tickMargin={10}
+          <CartesianGrid
+            strokeDasharray="3 3"
+            horizontal={axes.minor.showGrid !== false}
+            vertical={axes.major.showGrid !== false}
           />
-          <YAxis
-            label={{
-              angle: -90,
-              offset: 0,
-              position: 'left',
-              value: '',
-            }}
-            scale="auto"
-            domain={yAxisDomain}
-            dataKey="value"
-          />
+
+          {axes.major && axes.major.visible && (
+            <XAxis
+              dataKey="name"
+              label={{
+                offset: 5,
+                position: 'bottom',
+                value: '',
+              }}
+              scale="auto"
+              interval={
+                axes.minor && !axes.minor.visible
+                  ? 'preserveStartEnd'
+                  : undefined
+              }
+              padding={{ left: 20, right: 20 }}
+              tickMargin={10}
+            />
+          )}
+
+          {axes.minor && axes.minor.visible && (
+            <YAxis
+              label={{
+                angle: -90,
+                offset: 0,
+                position: 'left',
+                value: '',
+              }}
+              scale="auto"
+              domain={yAxisDomain}
+              dataKey="value"
+            />
+          )}
 
           {keysForChart.map(name => (
             <Line

@@ -100,13 +100,13 @@ export type AxisType = 'major' | 'minor';
 
 export interface AxisConfigurationItem {
   name: string;
+  type: AxisType;
   groupBy?: AxisGroupBy;
   dataSets: ChartDataSet[];
 
   visible?: boolean;
   title?: string;
-
-  type: AxisType;
+  showGrid?: boolean;
 }
 
 export interface Chart {
