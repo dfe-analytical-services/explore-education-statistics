@@ -170,7 +170,9 @@ const ReleaseSetupEditPage = ({
             const updatedReleaseDetails: ReleaseSetupDetailsUpdateRequest = {
               id: releaseId,
               timePeriodCoverageCode: values.timePeriodCoverageCode,
-              timePeriodCoverageStartDate: isDayMonthYearDateTypeSelected() && values.timePeriodCoverageStartDate
+              timePeriodCoverageStartDate:
+                isDayMonthYearDateTypeCodeSelected(values.timePeriodCoverageCode)
+                && values.timePeriodCoverageStartDate
                 ? values.timePeriodCoverageStartDate
                 : {
                   year: values.timePeriodCoverageStartDateYearOnly,

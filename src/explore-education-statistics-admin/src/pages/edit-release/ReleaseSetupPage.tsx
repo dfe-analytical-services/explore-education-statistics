@@ -49,12 +49,16 @@ const ReleaseSetupPage = ({ match }: RouteComponentProps<MatchProps>) => {
               {getSelectedTimePeriodCoverageLabel(releaseSetupDetails.timePeriodCoverageCode)}
             </SummaryListItem>
             <SummaryListItem term="Release period">
-              <time>{releaseSetupDetails.timePeriodCoverageStartDate.year}</time>
-              {' '}to{' '}
-              {releaseSetupDetails.timePeriodCoverageStartDate.year
-                ? (releaseSetupDetails.timePeriodCoverageStartDate.year + 1).toString()
-                : ''
-              }
+              {releaseSetupDetails.timePeriodCoverageStartDate.year && (
+                <>
+                  <time>{releaseSetupDetails.timePeriodCoverageStartDate.year}</time>
+                  {' '}to{' '}
+                  {releaseSetupDetails.timePeriodCoverageStartDate.year
+                    ? (releaseSetupDetails.timePeriodCoverageStartDate.year + 1).toString()
+                    : ''
+                  }
+                </>
+              )}
             </SummaryListItem>
             <SummaryListItem term="Lead statistician">
               {releaseSetupDetails.leadStatisticianName}
