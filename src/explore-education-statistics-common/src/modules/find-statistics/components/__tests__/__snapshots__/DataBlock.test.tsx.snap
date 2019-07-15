@@ -175,7 +175,7 @@ exports[`DataBlock renders map instead of chart 1`] = `
       class="govuk-grid-column-two-thirds"
     >
       <div
-        class="map dfe-print-unbreakable leaflet-container leaflet-grab leaflet-touch-drag"
+        class="map dfe-print-break-avoid leaflet-container leaflet-grab leaflet-touch-drag"
         style="width: 800px; height: 600px; position: relative;"
         tabindex="0"
       >

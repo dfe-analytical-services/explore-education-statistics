@@ -8,11 +8,11 @@
   @include print-hide();
 }
 
-@mixin print-unbreakable() {
+@mixin print-break-avoid() {
   page-break-inside: avoid;
 }
-.dfe-print-unbreakable {
-  @include print-unbreakable();
+.dfe-print-break-avoid {
+  @include print-break-avoid();
 }
 
 @mixin dfe-print-break-before() {
@@ -28,7 +28,7 @@
   }
 
   .govuk-accordion {
-    @include print-unbreakable();
+    @include print-break-avoid();
   }
 
   .govuk-details {
