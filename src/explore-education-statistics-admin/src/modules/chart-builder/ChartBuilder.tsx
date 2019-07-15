@@ -151,7 +151,7 @@ const ChartBuilder = ({ data }: Props) => {
   }, [axes, chartDataConfiguration, data]);
 
   React.useEffect(() => {
-    if (selectedChartType) {
+    if (selectedChartType && Object.keys(axes).length === 0) {
       const axiConfiguration = selectedChartType.axes.reduce<
         Dictionary<AxisConfigurationItem>
       >(
@@ -163,6 +163,8 @@ const ChartBuilder = ({ data }: Props) => {
             type: axisDefinition.type,
             groupBy: axisDefinition.defaultDataType,
             dataSets: axisDefinition.type === 'major' ? dataSets : [],
+            visible: true,
+            showGrid: true,
           },
         }),
         {},
@@ -232,12 +234,15 @@ const ChartBuilder = ({ data }: Props) => {
             <p>
               Add / Remove and update the axes and how they display data ranges
             </p>
-            {Object.values(axes).map(axis => (
+            {Object.entries(axes).map(([key, axis]) => (
               <ChartAxisConfiguration
+                key={key}
                 id={axis.name}
-                axisConfiguration={axis}
-                key={axis.name}
+                configuration={axis}
                 meta={data.metaData}
+                onConfigurationChange={updatedConfig => {
+                  setAxes({ ...axes, [key]: updatedConfig });
+                }}
               />
             ))}
           </Details>

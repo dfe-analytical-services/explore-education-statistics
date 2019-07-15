@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
 
 import LineChartBlock from '@common/modules/find-statistics/components/charts/LineChartBlock';
@@ -15,7 +16,10 @@ const PrototypeChartTest = () => {
   const [data] = React.useState<DataBlockResponse>(PrototypeData2.testResponse);
 
   return (
-    <PrototypePage wide>{data && <ChartBuilder data={data} />}</PrototypePage>
+    <PrototypePage wide>
+      <LineChartBlock {...PrototypeData.AbstractChartProps2} />
+      {data && <ChartBuilder data={data} />}
+    </PrototypePage>
   );
 };
 

@@ -10,13 +10,23 @@ import { DataBlockMetadata } from '@common/services/dataBlockService';
 interface Props {
   id: string;
   defaultDataType?: AxisGroupBy;
-  axisConfiguration: AxisConfigurationItem;
+  configuration: AxisConfigurationItem;
   meta: DataBlockMetadata;
+  onConfigurationChange: (configuration: AxisConfigurationItem) => void;
 }
 
-const ChartAxisConfiguration = ({ id, axisConfiguration, meta }: Props) => {
+const ChartAxisConfiguration = ({
+  id,
+  configuration,
+  meta,
+  onConfigurationChange,
+}: Props) => {
+  const [axisConfiguration, setAxisConfiguration] = React.useState<
+    AxisConfigurationItem
+  >(configuration);
+
   const [selectableUnits] = React.useState<string[]>(() => {
-    return axisConfiguration.dataSets
+    return configuration.dataSets
       .map(dataSet => meta.indicators[dataSet.indicator])
       .filter(indicator => indicator !== null)
       .map(indicator => indicator.unit);
@@ -26,7 +36,11 @@ const ChartAxisConfiguration = ({ id, axisConfiguration, meta }: Props) => {
 
   const [selectedValue, setSelectedValue] = React.useState<string>();
 
-  const [show, setShow] = React.useState<boolean>(true);
+  const updateAxisConfiguration = (newValues: object) => {
+    const newConfiguration = { ...axisConfiguration, ...newValues };
+    setAxisConfiguration(newConfiguration);
+    if (onConfigurationChange) onConfigurationChange(newConfiguration);
+  };
 
   return (
     <FormFieldset id={id} legend={axisConfiguration.title}>
@@ -36,9 +50,9 @@ const ChartAxisConfiguration = ({ id, axisConfiguration, meta }: Props) => {
           id={`${id}_show`}
           name={`${id}_show`}
           label="Show axis?"
-          checked={show}
+          checked={axisConfiguration.visible}
           onChange={e => {
-            setShow(e.target.checked);
+            updateAxisConfiguration({ visible: e.target.checked });
           }}
           value="show"
           conditional={
@@ -57,10 +71,6 @@ const ChartAxisConfiguration = ({ id, axisConfiguration, meta }: Props) => {
                 />
               )}
 
-              <p>Add / remove grid lines DFE-1008</p>
-              <p>Add / remove / edit series labels & range DFE-1018 1017</p>
-              <p>Restrict range of series (years only?) DFE-1009</p>
-
               {/*
         <FormTextInput
           id={`${id}_name`}
@@ -71,6 +81,19 @@ const ChartAxisConfiguration = ({ id, axisConfiguration, meta }: Props) => {
             </React.Fragment>
           }
         />
+        <FormCheckbox
+          id={`${id}_grid`}
+          name={`${id}_grid`}
+          label="Show grid lines"
+          onChange={e =>
+            updateAxisConfiguration({ showGrid: e.target.checked })
+          }
+          checked={axisConfiguration.showGrid}
+          value="grid"
+        />
+
+        <p>Add / remove / edit series labels & range DFE-1018 1017</p>
+        <p>Restrict range of series (years only?) DFE-1009</p>
       </FormGroup>
     </FormFieldset>
   );
