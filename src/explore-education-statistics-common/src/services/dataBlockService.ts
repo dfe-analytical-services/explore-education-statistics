@@ -1,5 +1,4 @@
 import { dataApi } from '@common/services/api';
-import TimePeriod, { TimePeriodCode } from '@common/services/types/TimePeriod';
 import { Dictionary } from '@common/types/util';
 import { Feature, Geometry } from 'geojson';
 
