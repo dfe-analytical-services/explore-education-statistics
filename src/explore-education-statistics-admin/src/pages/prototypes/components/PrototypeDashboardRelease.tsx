@@ -21,6 +21,7 @@ interface Props {
   nextRelease?: Date;
   dataType?: string;
   showComments?: boolean;
+  task?: string;
 }
 
 const PrototypeDashboardRelease = ({
@@ -39,6 +40,7 @@ const PrototypeDashboardRelease = ({
   nextRelease,
   dataType,
   showComments,
+  task,
 }: Props) => {
   return (
     <Details
@@ -59,6 +61,11 @@ const PrototypeDashboardRelease = ({
           className="govuk-button"
         >
           View / edit this draft
+        </Link>
+      )}
+      {task === 'resolveComments' && (
+        <Link to="/prototypes/publication-review" className="govuk-button">
+          View release and resolve comments
         </Link>
       )}
       <dl className="govuk-summary-list govuk-!-margin-bottom-3">
@@ -162,14 +169,9 @@ const PrototypeDashboardRelease = ({
             {' at '}
             {format(lastEdited, 'HH:mm')} by <a href="#">{lastEditor.name}</a>
           </dd>
-          <dd className="govuk-summary-list__actions">
-            {review && (
-              <Link to="/prototypes/publication-review">
-                Review this release
-              </Link>
-            )}
-          </dd>
+          <dd className="govuk-summary-list__actions" />
         </div>
+        {task}
       </dl>
     </Details>
   );

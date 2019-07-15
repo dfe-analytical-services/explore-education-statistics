@@ -56,11 +56,19 @@ const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
         </TabsSection> */}
         <TabsSection
           id="task-ready-approval1"
-          title={`In progress ${
-            location.search === '?status=readyApproval' ? '(1)' : ''
+          title={`Ready for you to review ${
+            location.search === '?status=readyApproval' ? '(1)' : '(0)'
           }`}
         >
-          <AdminDashboardReadyForApproval />
+          <AdminDashboardReadyForApproval task="readyReview" />
+        </TabsSection>
+        <TabsSection
+          id="task-in-progress2"
+          title={`Unresolved comments ${
+            location.search === '?status=readyApproval' ? '(1)' : '(0)'
+          }`}
+        >
+          <AdminDashboardReadyForApproval task="resolveComments" />
         </TabsSection>
       </Tabs>
 
