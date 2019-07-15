@@ -21,7 +21,6 @@ import {
 } from 'recharts';
 import {
   DataBlockData,
-  DataBlockLocation,
   DataBlockMetadata,
   Result,
 } from '@common/services/dataBlockService';
