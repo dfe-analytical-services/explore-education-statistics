@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Model.Service;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Model.Service.TimeIdentifier;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using Assert = Xunit.Assert;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services

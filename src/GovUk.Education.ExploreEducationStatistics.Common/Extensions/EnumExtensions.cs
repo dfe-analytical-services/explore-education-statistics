@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Common.Database;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 {

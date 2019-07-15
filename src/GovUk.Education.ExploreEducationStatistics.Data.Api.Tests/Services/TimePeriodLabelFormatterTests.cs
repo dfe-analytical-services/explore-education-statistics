@@ -1,7 +1,7 @@
 using Xunit;
 using Xunit.Abstractions;
 using static GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TimePeriodLabelFormatter;
-using static GovUk.Education.ExploreEducationStatistics.Model.Service.TimeIdentifier;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 {
