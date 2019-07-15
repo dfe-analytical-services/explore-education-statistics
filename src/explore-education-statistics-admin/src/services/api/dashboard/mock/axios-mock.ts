@@ -20,7 +20,7 @@ export default {
       })
       .reply(200, mockData.themesAndTopics);
 
-    // getThemesAndTopics
+    // getPublicationsByTopic
     mock
       .onGet('/Publications', {
         params: {

@@ -1,13 +1,14 @@
 import Link from '@admin/components/Link';
-import PrototypePage from '@admin/pages/prototypes/components/PrototypePage';
+import { DataFileView } from '@admin/services/api/edit-release/data/types';
 import ModalConfirm from '@common/components/ModalConfirm';
+import SummaryList from '@common/components/SummaryList';
+import SummaryListItem from '@common/components/SummaryListItem';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
-import DummyPublicationsData from '@admin/pages/DummyPublicationsData';
+import service from '@admin/services/api/edit-release/data/service';
 import ReleasePageTemplate from '@admin/pages/edit-release/components/ReleasePageTemplate';
-import { Release } from '@admin/services/api/common/types/types';
 
 interface MatchProps {
   releaseId: string;
@@ -16,25 +17,15 @@ interface MatchProps {
 const ReleaseDataPage = ({ match }: RouteComponentProps<MatchProps>) => {
   const { releaseId } = match.params;
 
-  const [release, setRelease] = useState<Release>();
-
-  const [publicationTitle, setPublicationTitle] = useState('');
+  const [dataFiles, setDataFiles] = useState<DataFileView>();
 
   useEffect(() => {
-    const selectedRelease = DummyPublicationsData.getReleaseById(releaseId);
-
-    const owningPublication = DummyPublicationsData.getOwningPublicationForRelease(
-      selectedRelease,
-    );
-
-    setRelease(selectedRelease);
-
-    setPublicationTitle(owningPublication ? owningPublication.title : '');
+    service.getReleaseDataFiles(releaseId).then(setDataFiles);
   }, [releaseId]);
 
-  const toggleDeleteFilesModal = (bool: boolean) => {};
+  const toggleDeleteFilesModal = (_: boolean) => {};
 
-  const toggleReplaceDataModal = (bool: boolean) => {};
+  const toggleReplaceDataModal = (_: boolean) => {};
 
   const showReplaceDataModal = false;
 
@@ -42,124 +33,43 @@ const ReleaseDataPage = ({ match }: RouteComponentProps<MatchProps>) => {
 
   return (
     <ReleasePageTemplate
-      publicationTitle={publicationTitle}
+      publicationTitle={dataFiles ? dataFiles.publicationTitle : ''}
       releaseId={releaseId}
     >
       <h3>Data uploads</h3>
 
       <Tabs id="dataUploadTab">
         <TabsSection id="data-upload" title="Data uploads">
-          <div className="govuk-table">
-            <caption className="govuk-table__caption govuk-heading-m">
-              Current data for this release
-            </caption>
-            <thead className="govuk-table__head">
-              <tr className="govuk-table__row">
-                <th className="govuk-table__header" scope="col">
-                  Subject title
-                </th>
-                <th className="govuk-table__header" scope="col">
-                  Data file
-                </th>
-                <th
-                  className="govuk-table__header govuk-table__cell--numeric"
-                  scope="col"
-                >
-                  Filesize
-                </th>
-                <th
-                  className="govuk-table__header govuk-table__header--numeric"
-                  scope="col"
-                >
-                  Number of rows
-                </th>
-                <th className="govuk-table__header" scope="col">
-                  Metadata file
-                </th>
-                <th className="govuk-table__header" colSpan={3} scope="col">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr className="govuk-table__row">
-                <td className="govuk-table__cell">Geographical absence</td>
-                <td className="govuk-table__cell">
-                  <a href="#">absence_geoglevels.csv</a>
-                </td>
-                <td className="govuk-table__cell govuk-table__cell--numeric">
-                  61 Mb
-                </td>
-                <td className="govuk-table__cell govuk-table__cell--numeric">
-                  212,000
-                </td>
-                <td className="govuk-table__cell">
-                  <a href="#">meta_absence_geoglevels.csv</a>
-                </td>
-                <td className="govuk-table__cell">
-                  <a href="#" onClick={() => toggleDeleteFilesModal(true)}>
-                    Delete files
-                  </a>
-                </td>
-                <td className="govuk-table__cell">
-                  <a href="#" onClick={() => toggleReplaceDataModal(true)}>
-                    Replace data
-                  </a>
-                </td>
-                <td className="govuk-table__cell">
-                  <a href="#">Replace metadata</a>
-                </td>
-              </tr>
-              <tr className="govuk-table__row">
-                <td className="govuk-table__cell">Local authority</td>
-                <td className="govuk-table__cell">
-                  <a href="#">absence_lacharacteristics.csv</a>
-                </td>
-                <td className="govuk-table__cell govuk-table__cell--numeric">
-                  66 Mb
-                </td>
-                <td className="govuk-table__cell govuk-table__cell--numeric">
-                  240,000
-                </td>
-                <td className="govuk-table__cell">
-                  <a href="#">meta_absence_lacharacteristics.csv</a>
-                </td>
-                <td className="govuk-table__cell">
-                  <a href="#">Delete files</a>
-                </td>
-                <td className="govuk-table__cell">
-                  <a href="#">Replace data</a>
-                </td>
-                <td className="govuk-table__cell">
-                  <a href="#">Replace metadata</a>
-                </td>
-              </tr>
-              <tr className="govuk-table__row">
-                <td className="govuk-table__cell">National characteristics</td>
-                <td className="govuk-table__cell">
-                  <a href="#">absence_natcharacteristics.csv</a>
-                </td>
-                <td className="govuk-table__cell govuk-table__cell--numeric">
-                  71 Mb
-                </td>
-                <td className="govuk-table__cell govuk-table__cell--numeric">
-                  320,000
-                </td>
-                <td className="govuk-table__cell">
-                  <a href="#">meta_absence_natcharacteristics.csv</a>
-                </td>
-                <td className="govuk-table__cell">
-                  <a href="#">Delete files</a>
-                </td>
-                <td className="govuk-table__cell">
-                  <a href="#">Replace data</a>
-                </td>
-                <td className="govuk-table__cell">
-                  <a href="#">Replace metadata</a>
-                </td>
-              </tr>
-            </tbody>
-          </div>
+          {dataFiles &&
+            dataFiles.dataFiles.map(dataFile => (
+              <SummaryList key={dataFile.file.id}>
+                <SummaryListItem term="Subject title">
+                  {dataFile.title}
+                </SummaryListItem>
+                <SummaryListItem term="Data file">
+                  {dataFile.file.fileName}
+                </SummaryListItem>
+                <SummaryListItem term="Filesize">
+                  {dataFile.fileSize.size} {dataFile.fileSize.unit}
+                </SummaryListItem>
+                <SummaryListItem term="Number of rows">
+                  {dataFile.numberOfRows}
+                </SummaryListItem>
+                <SummaryListItem term="Metadata file">
+                  {dataFile.metadataFile.fileName}
+                </SummaryListItem>
+                <SummaryListItem
+                  term="Actions"
+                  actions={
+                    <>
+                      <Link to="#">Delete files</Link>
+                      <Link to="#">Replace data</Link>
+                      <Link to="#">Replace metadata</Link>
+                    </>
+                  }
+                />
+              </SummaryList>
+            ))}
 
           <form>
             <fieldset className="govuk-fieldset">
