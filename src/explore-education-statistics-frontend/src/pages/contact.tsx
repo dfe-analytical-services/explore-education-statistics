@@ -26,8 +26,8 @@ function ContactPage() {
       </p>
       <h2>Data and methodology enquiries</h2>
       <p>
-        If you have a specific question about the data or methods used in any of
-        our statistics contact the team or statistician listed within the
+        If you have a question about the data or methods used in a specific set
+        of our statistics contact the team or statistician listed within the
         ‘Contact us’ section of the relevant page.
       </p>
       <h2>Statistical policy enquiries</h2>
