@@ -61,18 +61,22 @@ function ChartRenderer(props: ChartRendererProps) {
     stacked,
   };
 
-  switch (type.toLowerCase()) {
-    case 'line':
-      return <LineChartBlock {...chartProps} />;
-    case 'verticalbar':
-      return <VerticalBarBlock {...chartProps} />;
-    case 'horizontalbar':
-      return <HorizontalBarBlock {...chartProps} />;
-    case 'map':
-      return <DynamicMapBlock {...chartProps} />;
-    default:
-      return <div>[ Unimplemented chart type requested ${type} ]</div>;
+  if (data && meta && data.result.length > 0) {
+    switch (type.toLowerCase()) {
+      case 'line':
+        return <LineChartBlock {...chartProps} />;
+      case 'verticalbar':
+        return <VerticalBarBlock {...chartProps} />;
+      case 'horizontalbar':
+        return <HorizontalBarBlock {...chartProps} />;
+      case 'map':
+        return <DynamicMapBlock {...chartProps} />;
+      default:
+        return <div>[ Unimplemented chart type requested ${type} ]</div>;
+    }
   }
+
+  return <div>Invalid data specified</div>;
 }
 
 export default ChartRenderer;
