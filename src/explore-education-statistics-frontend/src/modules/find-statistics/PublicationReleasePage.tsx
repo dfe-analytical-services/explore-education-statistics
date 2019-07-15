@@ -10,6 +10,7 @@ import { baseUrl } from '@common/services/api';
 import publicationService, {
   Release,
 } from '@common/services/publicationService';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
 import ButtonLink from '@frontend/components/ButtonLink';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
@@ -145,7 +146,17 @@ class PublicationReleasePage extends Component<Props> {
                   <strong>{data.releaseName}</strong>
                 </dd>
                 <dd>
-                  <Details summary={`See previous ${releaseCount} releases`}>
+                  <Details
+                    summary={`See previous ${releaseCount} releases`}
+                    onToggle={(open: boolean) =>
+                      open &&
+                      logEvent(
+                        window.location.pathname,
+                        'Open previous releases accordion',
+                        'Previous Releases',
+                      )
+                    }
+                  >
                     <ul className="govuk-list">
                       {[
                         ...data.publication.releases
