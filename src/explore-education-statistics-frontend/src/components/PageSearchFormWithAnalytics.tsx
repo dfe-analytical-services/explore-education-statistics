@@ -22,4 +22,6 @@ const PageSearchFormWithAnalytics = (props: PageSearchFormProps) => {
   );
 };
 
+PageSearchFormWithAnalytics.defaultProps = PageSearchForm.defaultProps;
+
 export default PageSearchFormWithAnalytics;
