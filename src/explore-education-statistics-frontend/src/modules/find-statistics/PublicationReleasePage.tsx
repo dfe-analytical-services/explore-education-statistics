@@ -92,6 +92,7 @@ class PublicationReleasePage extends Component<Props> {
                   </div>
                 </dl>
                 <Link
+                  className="dfe-print-hidden"
                   unvisited
                   analytics={{
                     category: 'Subscribe',
@@ -213,7 +214,9 @@ class PublicationReleasePage extends Component<Props> {
           </div>
         </div>
         <hr />
-        <h2>Headline facts and figures - {data.releaseName}</h2>
+        <h2 className="dfe-print-break-before">
+          Headline facts and figures - {data.releaseName}
+        </h2>
 
         {data.keyStatistics && (
           <DataBlock {...data.keyStatistics} id="keystats" />

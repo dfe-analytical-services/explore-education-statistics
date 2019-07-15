@@ -12,6 +12,9 @@
   flex-direction: column;
   margin: 0.5% 0.5% 1.5%;
   max-width: 32.3;
+  @media print {
+    display: block;
+  }
 
   @include govuk-media-query($until: tablet) {
     flex: 0 0 100%;
@@ -28,23 +31,38 @@
     @include govuk-media-query($until: tablet) {
       flex-basis: auto;
     }
+
+    @media print {
+      background: none;
+      border-left: 4px solid $govuk-brand-colour;
+      display: block;
+    }
   }
 
   .keyStat :global(.govuk-heading-s) {
     color: govuk-colour('white');
     margin: 0;
     padding: 0;
+    @media print {
+      color: govuk-colour('black');
+    }
   }
 
   .keyStat :global(.govuk-heading-xl) {
     color: govuk-colour('white');
     margin: 0;
     padding: 0;
+    @media print {
+      color: govuk-colour('black');
+    }
   }
 
   .keyStat :global(.govuk-body-s) {
     color: govuk-colour('white');
     margin: 0 0 0.5rem;
+    @media print {
+      color: govuk-colour('black');
+    }
   }
 
   details {
