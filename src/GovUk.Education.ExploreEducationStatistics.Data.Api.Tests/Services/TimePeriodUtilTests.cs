@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Model.Service;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Data.Model.TimeIdentifier;
+using static GovUk.Education.ExploreEducationStatistics.Model.Service.TimeIdentifier;
 using Assert = Xunit.Assert;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
@@ -475,7 +475,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     (2020, TaxYearQ1Q4),
                     (2020, TaxYearQ2)
                 },
-                TimePeriodUtil.Range(new TimePeriodQuery(2018, TaxYearQ4, 2020, TaxYearQ2)).ToList());
+                TimePeriodUtil.Range(new TimePeriodQuery(2018, TimeIdentifier.TaxYearQ4, 2020, TaxYearQ2)).ToList());
         }
 
         [Fact]

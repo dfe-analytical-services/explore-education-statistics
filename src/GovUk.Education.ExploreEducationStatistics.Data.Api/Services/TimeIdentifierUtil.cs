@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Model.Service;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services

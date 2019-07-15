@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Model.Service;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
@@ -7,7 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
-using static GovUk.Education.ExploreEducationStatistics.Data.Model.TimeIdentifier;
+using static GovUk.Education.ExploreEducationStatistics.Model.Service.TimeIdentifier;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {

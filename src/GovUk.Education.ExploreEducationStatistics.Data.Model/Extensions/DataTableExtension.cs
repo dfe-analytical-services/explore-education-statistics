@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Model.Service;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions
 {

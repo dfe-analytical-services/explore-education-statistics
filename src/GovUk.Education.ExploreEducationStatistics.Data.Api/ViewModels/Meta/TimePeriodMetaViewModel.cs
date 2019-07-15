@@ -1,5 +1,6 @@
+using GovUk.Education.ExploreEducationStatistics.Model.Service;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Converters;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
+
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta

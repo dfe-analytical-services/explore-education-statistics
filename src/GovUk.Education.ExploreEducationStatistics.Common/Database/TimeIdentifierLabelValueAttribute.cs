@@ -1,6 +1,6 @@
 using System;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
+namespace GovUk.Education.ExploreEducationStatistics.Model.Database
 {
     [AttributeUsage(AttributeTargets.Field)]
     public class TimeIdentifierLabelValueAttribute : EnumLabelValueAttribute

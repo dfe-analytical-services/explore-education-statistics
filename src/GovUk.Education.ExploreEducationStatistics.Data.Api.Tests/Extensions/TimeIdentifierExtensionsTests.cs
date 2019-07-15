@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Model.Service;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Data.Model.TimeIdentifier;
+using static GovUk.Education.ExploreEducationStatistics.Model.Service.TimeIdentifier;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Extensions
 {

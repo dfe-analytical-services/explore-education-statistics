@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Model.Service;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {

@@ -1,4 +1,4 @@
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Model.Database;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {

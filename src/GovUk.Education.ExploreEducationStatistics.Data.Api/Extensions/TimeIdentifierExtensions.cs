@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Model.Service;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using static GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TimeIdentifierUtil;
 
