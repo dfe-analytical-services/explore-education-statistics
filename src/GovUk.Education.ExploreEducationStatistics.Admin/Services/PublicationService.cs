@@ -60,12 +60,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     Releases = p.Releases.Select(r => new Release
                         {
                             Id = r.Id,
-                            Title = r.Title
+                            Title = r.Title,
+                            Published = r.Published,
+                            ReleaseName = r.ReleaseName
                             // TODO Status
-                            // TODO isLatestRelease? latest published?
+                            // TODO Live? Is this Status? Or a bool or something else? - A question for design
+                            // TODO isLatestRelease? latest published? - A question for design
                             // TODO timePeriodCoverage
+                            // TODO LastEdited - Auditing
                         }
-                        // TODO LastEdited
+                        
                     ).ToList()
                 }
             ).Where(p => p.TopicId == topicId).ToList();
