@@ -41,7 +41,7 @@ const dataFilesByReleaseId: Dictionary<DataFileView> = {
         title: 'National characteristics',
         file: {
           id: 'file-3',
-          fileName: 'bsence_natcharacteristics.csv',
+          fileName: 'absence_natcharacteristics.csv',
         },
         fileSize: {
           size: 71,

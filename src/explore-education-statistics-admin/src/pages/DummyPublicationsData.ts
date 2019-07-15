@@ -3,7 +3,6 @@ import {
   Publication,
   Release,
   ReleaseDataType,
-  ReleaseSetupDetails,
   Topic,
 } from '@admin/services/common/types/types';
 import { ReleaseApprovalStatus } from '@admin/services/dashboard/types';
@@ -290,26 +289,9 @@ const getOwningPublicationForRelease = (release: Release) => {
   )[0];
 };
 
-const getReleaseSetupDetails = (releaseId: string): ReleaseSetupDetails => {
-  const release = getReleaseById(releaseId);
-  const owningPublication = getOwningPublicationForRelease(release);
-
-  return {
-    id: release.id,
-    publicationTitle: owningPublication.title,
-    timePeriodCoverageCode: release.timePeriodCoverage.code,
-    timePeriodCoverageStartDate: release.timePeriodCoverage.startDate,
-    releaseType: release.releaseType,
-    leadStatisticianName: release.lead.name,
-    scheduledPublishDate: release.scheduledPublishDate,
-    nextReleaseExpectedDate: release.nextReleaseExpectedDate,
-  };
-};
-
 export default {
   myPublications,
   allPublications,
   getReleaseById,
   getOwningPublicationForRelease,
-  getReleaseSetupDetails,
 };

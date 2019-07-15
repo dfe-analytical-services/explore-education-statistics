@@ -83,17 +83,6 @@ export interface Publication {
   owner: User;
 }
 
-export interface ReleaseSetupDetails {
-  id: string;
-  publicationTitle: string;
-  timePeriodCoverageCode: string;
-  timePeriodCoverageStartDate: Date;
-  releaseType: IdLabelPair;
-  leadStatisticianName: string;
-  scheduledPublishDate: DayMonthYearValues;
-  nextReleaseExpectedDate?: Date;
-}
-
 export interface DayMonthYearValues {
   day?: number;
   month?: number;
