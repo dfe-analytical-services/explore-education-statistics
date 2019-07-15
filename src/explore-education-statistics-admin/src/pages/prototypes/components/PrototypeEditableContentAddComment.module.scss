@@ -1,10 +1,15 @@
 @import '../../../styles/govuk-base';
 
-.addComment {
+.addComment,
+.resolveComment {
   background: govuk-colour('grey-4');
   border-right: 5px solid govuk-colour('orange');
   margin-left: -320px;
   padding: 1rem;
   position: absolute;
   width: 300px;
+}
+
+.resolveComment {
+  border-right: 5px solid govuk-colour('red');
 }

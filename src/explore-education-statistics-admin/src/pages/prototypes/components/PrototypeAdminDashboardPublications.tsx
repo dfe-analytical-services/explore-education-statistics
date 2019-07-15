@@ -109,7 +109,7 @@ const PrototypeAdminDashboardPublications = () => {
                       <PrototypeDashboardRelease
                         title="Academic year,"
                         years="2018 to 2019"
-                        tag="Ready to review"
+                        tag="Ready for you to review"
                         review
                         lastEdited={new Date('2019-03-20 17:37')}
                         lastEditor={{ id: 'me', name: 'me', permissions: [] }}
@@ -117,6 +117,7 @@ const PrototypeAdminDashboardPublications = () => {
                         nextRelease={new Date('2020-09-20 09:30')}
                         dataType="Revised"
                         showComments
+                        task="readyReview"
                       />
                     </li>
                   )}

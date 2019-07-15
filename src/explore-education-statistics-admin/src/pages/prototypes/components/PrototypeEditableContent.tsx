@@ -4,6 +4,7 @@ import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import CKEditor from '@ckeditor/ckeditor5-react';
 import React, { ChangeEvent, createRef, Fragment } from 'react';
 import AddComment from './PrototypeEditableContentAddComment';
+import ResolveComment from './PrototypeEditableContentResolveComment';
 
 import styles from './PrototypeEditableContent.module.scss';
 
@@ -12,6 +13,7 @@ import styles from './PrototypeEditableContent.module.scss';
 interface Props {
   editable?: boolean;
   reviewing?: boolean;
+  resolveComments?: boolean;
   content: string;
   onContentChange?: (content: string) => void;
 }
@@ -30,6 +32,7 @@ class PrototypeEditableContent extends React.Component<Props, State> {
   public static defaultProps = {
     editable: false,
     reviewing: false,
+    resolveComments: false,
   };
 
   public state: State = {
@@ -39,7 +42,7 @@ class PrototypeEditableContent extends React.Component<Props, State> {
   };
 
   public componentDidMount() {
-    const { content, reviewing } = this.props;
+    const { content, reviewing, resolveComments } = this.props;
     const { editing } = this.state;
 
     this.setState({
@@ -89,6 +92,7 @@ class PrototypeEditableContent extends React.Component<Props, State> {
     unsaved: boolean,
     editable?: boolean,
     reviewing?: boolean,
+    resolveComments?: boolean,
   ) {
     return (
       // eslint-disable-next-line jsx-a11y/no-static-element-interactions,jsx-a11y/click-events-have-key-events
@@ -101,7 +105,7 @@ class PrototypeEditableContent extends React.Component<Props, State> {
         onClick={this.setEditing}
       >
         {reviewing && <AddComment />}
-
+        {resolveComments && <ResolveComment name="Stephen Doherty" />}
         <div className={styles.editableButton}>
           <div className={styles.editableButtonContent}>
             Click to edit this section
@@ -113,38 +117,46 @@ class PrototypeEditableContent extends React.Component<Props, State> {
     );
   }
 
-  private renderEditor(content: string) {
+  private renderEditor(content: string, resolveComments?: boolean) {
     return (
-      <div className={styles.editableContentEditing}>
-        <div className={styles.editableButton}>
-          <button className="govuk-button" onClick={this.save} type="button">
-            Save
-          </button>
+      <>
+        {resolveComments && <ResolveComment name="Stephen Doherty" />}
+        <div className={styles.editableContentEditing}>
+          <div className={styles.editableButton}>
+            <button className="govuk-button" onClick={this.save} type="button">
+              Save
+            </button>
+          </div>
+          <CKEditor
+            editor={ClassicEditor}
+            data={content}
+            onChange={(event: ChangeEvent, editor: { getData(): string }) => {
+              this.temporaryContent = editor.getData();
+            }}
+            onInit={(editor: { editing: { view: { focus(): void } } }) => {
+              editor.editing.view.focus();
+            }}
+          />
         </div>
-        <CKEditor
-          editor={ClassicEditor}
-          data={content}
-          onChange={(event: ChangeEvent, editor: { getData(): string }) => {
-            this.temporaryContent = editor.getData();
-          }}
-          onInit={(editor: { editing: { view: { focus(): void } } }) => {
-            editor.editing.view.focus();
-          }}
-        />
-      </div>
+      </>
     );
   }
 
   public render() {
     const { editing, content, unsaved } = this.state;
 
-    const { editable, reviewing } = this.props;
+    const { editable, reviewing, resolveComments } = this.props;
 
     return (
       <Fragment>
         {editable && editing
-          ? this.renderEditor(content)
-          : this.renderEditableArea(unsaved, editable, reviewing)}
+          ? this.renderEditor(content, resolveComments)
+          : this.renderEditableArea(
+              unsaved,
+              editable,
+              reviewing,
+              resolveComments,
+            )}
       </Fragment>
     );
   }

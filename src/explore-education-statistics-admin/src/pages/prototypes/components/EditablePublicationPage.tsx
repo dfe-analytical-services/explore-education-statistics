@@ -28,6 +28,7 @@ interface State {
 interface Props {
   editing?: boolean;
   reviewing?: boolean;
+  resolveComments?: boolean;
   data: Release | undefined;
 }
 
@@ -110,19 +111,26 @@ class EditablePublicationPage extends Component<Props, State> {
     data: Release,
     editing: boolean | undefined,
     reviewing: boolean | undefined,
+    resolveComments: boolean | undefined,
   ) {
     const { reordering } = this.state;
 
     if (reordering) {
       return this.renderDraggableSections(data);
     }
-    return this.renderEditableSections(data, editing, reviewing);
+    return this.renderEditableSections(
+      data,
+      editing,
+      reviewing,
+      resolveComments,
+    );
   }
 
   private renderEditableSections(
     data: Release,
     editing: boolean | undefined,
     reviewing: boolean | undefined,
+    resolveComments: boolean | undefined,
   ) {
     return (
       <div>
@@ -149,6 +157,7 @@ class EditablePublicationPage extends Component<Props, State> {
                 editable={editing}
                 content={content}
                 reviewing={reviewing}
+                resolveComments={resolveComments}
                 id={`editable-block-${index}`}
                 onContentChange={(block, newContent) => {
                   block.body = newContent;
@@ -235,6 +244,7 @@ class EditablePublicationPage extends Component<Props, State> {
 
   public render() {
     const { reviewing } = this.props;
+    const { resolveComments } = this.props;
     const { editing } = this.props;
     const { data } = this.state;
 
@@ -242,7 +252,10 @@ class EditablePublicationPage extends Component<Props, State> {
       <>
         <div className={editing ? 'page-editing' : ''}>
           <span className="govuk-tag">
-            {data ? 'New release in progress' : 'Editing in progress'}
+            {!reviewing && (
+              <>{data ? 'New release in progress' : 'Editing in progress'}</>
+            )}
+            {reviewing && <>Review release</>}
           </span>
           <span className="govuk-caption-l">Academic year 2018 to 2019</span>
 
@@ -260,6 +273,7 @@ class EditablePublicationPage extends Component<Props, State> {
             <div className="govuk-grid-column-two-thirds">
               <PrototypeEditableContent
                 reviewing={reviewing}
+                resolveComments={resolveComments}
                 editable={editing}
                 content={`
           <p className="govuk-body">
@@ -459,7 +473,12 @@ class EditablePublicationPage extends Component<Props, State> {
           />
           {data &&
             data.content.length > 0 &&
-            this.renderContentSections(data, editing, reviewing)}
+            this.renderContentSections(
+              data,
+              editing,
+              reviewing,
+              resolveComments,
+            )}
           <h2 className="govuk-heading-m govuk-!-margin-top-9">
             Extra information
           </h2>

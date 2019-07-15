@@ -50,24 +50,6 @@ const PrototypeDashboardRelease = ({
       }`}
       tag={tag}
     >
-      {!editing && !review && (
-        <Link to="/prototypes/publication-edit" className="govuk-button">
-          Edit this release
-        </Link>
-      )}
-      {editing && (
-        <Link
-          to="/prototypes/publication-create-new-absence-config"
-          className="govuk-button"
-        >
-          View / edit this draft
-        </Link>
-      )}
-      {task === 'resolveComments' && (
-        <Link to="/prototypes/publication-review" className="govuk-button">
-          View release and resolve comments
-        </Link>
-      )}
       <dl className="govuk-summary-list govuk-!-margin-bottom-3">
         <div className="govuk-summary-list__row">
           {isNew && (
@@ -171,8 +153,33 @@ const PrototypeDashboardRelease = ({
           </dd>
           <dd className="govuk-summary-list__actions" />
         </div>
-        {task}
       </dl>
+      {!editing && !review && (
+        <Link to="/prototypes/publication-edit" className="govuk-button">
+          Edit this release
+        </Link>
+      )}
+      {editing && (
+        <Link
+          to="/prototypes/publication-create-new-absence-config"
+          className="govuk-button"
+        >
+          View / edit this draft
+        </Link>
+      )}
+      {task === 'resolveComments' && (
+        <Link
+          to="/prototypes/publication-unresolved-comments"
+          className="govuk-button"
+        >
+          View release and resolve comments
+        </Link>
+      )}
+      {task === 'readyReview' && (
+        <Link to="/prototypes/publication-review" className="govuk-button">
+          Review release
+        </Link>
+      )}
     </Details>
   );
 };

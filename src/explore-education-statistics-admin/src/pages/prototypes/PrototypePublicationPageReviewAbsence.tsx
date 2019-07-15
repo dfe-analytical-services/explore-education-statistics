@@ -49,73 +49,50 @@ class PublicationPage extends Component<{}, State> {
         ]}
       >
         {' '}
-        <div>
-          <FormGroup>
-            <FormRadioGroup
-              legend="Review this release"
-              id="review-release"
-              name="review-release"
-              options={[
-                {
-                  id: 'approve-release',
-                  label: 'Approved for publication',
-                  value: 'approve-release',
-                  conditional: (
-                    <FormGroup>
-                      <label
-                        htmlFor="approved-comments"
-                        className="govuk-label"
-                      >
-                        Add any extra comments
-                      </label>
-                      <textarea
-                        name="approved-comments"
-                        id="approved-comments"
-                        className="govuk-textarea"
-                      />
-                    </FormGroup>
-                  ),
-                },
-                {
-                  id: 'requires-work',
-                  label: 'Requires work',
-                  value: 'requires-work',
-                  conditional: (
-                    <FormGroup>
-                      <label
-                        htmlFor="requires-work-comments"
-                        className="govuk-label"
-                      >
-                        Please provide feedback
-                      </label>
-                      <textarea
-                        name="requires-work-comments"
-                        id="requires-work-comments"
-                        className="govuk-textarea"
-                      />
-                    </FormGroup>
-                  ),
-                },
-                {
-                  id: 'question',
-                  label: 'Add a comment or question',
-                  value: 'question',
-                  conditional: (
-                    <FormGroup>
-                      <label htmlFor="question" className="govuk-label">
-                        Add your comment or question
-                      </label>
-                      <textarea
-                        name="question"
-                        id="question"
-                        className="govuk-textarea"
-                      />
-                    </FormGroup>
-                  ),
-                },
-              ]}
-            />
-          </FormGroup>
+        <div className="govuk-width-container dfe-align--comments">
+          <FormRadioGroup
+            legend="Review this release"
+            id="review-release"
+            name="review-release"
+            options={[
+              {
+                id: 'approve-release',
+                label: 'Approved for publication',
+                value: 'approve-release',
+                conditional: (
+                  <FormGroup>
+                    <label htmlFor="approved-comments" className="govuk-label">
+                      Add any extra comments
+                    </label>
+                    <textarea
+                      name="approved-comments"
+                      id="approved-comments"
+                      className="govuk-textarea"
+                    />
+                  </FormGroup>
+                ),
+              },
+
+              {
+                id: 'question',
+                label: 'Add a comment or question',
+                value: 'question',
+                conditional: (
+                  <FormGroup>
+                    <label htmlFor="question" className="govuk-label">
+                      Add your comment or question
+                    </label>
+                    <textarea
+                      name="question"
+                      id="question"
+                      className="govuk-textarea"
+                    />
+                  </FormGroup>
+                ),
+              },
+            ]}
+          />
+
           <Link
             to="/prototypes/admin-dashboard?status=readyApproval"
             className="govuk-button"
