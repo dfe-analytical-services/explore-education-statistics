@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
@@ -27,6 +28,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public List<ContentSection> Content { get; set; }
         
         public DataBlock KeyStatistics { get; set; }
+
+        public TimeIdentifier TimePeriodCoverage { get; set; }
 
         protected bool Equals(Release other)
         {
