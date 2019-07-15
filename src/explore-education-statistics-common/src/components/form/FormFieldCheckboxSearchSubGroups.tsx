@@ -5,7 +5,10 @@ import FormCheckboxSearchSubGroups, {
   FormCheckboxSearchSubGroupsProps,
 } from './FormCheckboxSearchSubGroups';
 import FormFieldCheckboxSearchGroup from './FormFieldCheckboxSearchGroup';
-import { onAllChange, onChange } from './util/checkboxGroupFieldHelpers';
+import {
+  handleAllChange,
+  handleChange,
+} from './util/checkboxGroupFieldHelpers';
 
 export type FormFieldCheckboxSearchSubGroupsProps<FormValues> = {
   showError?: boolean;
@@ -26,19 +29,22 @@ const FormFieldCheckboxSearchSubGroups = <T extends {}>(
                 {...props}
                 {...fieldArrayProps}
                 small
-                onAllChange={(event, allOptions) => {
+                onAllChange={(event, checked, groupOptions) => {
                   if (props.onAllChange) {
-                    props.onAllChange(event, allOptions);
+                    props.onAllChange(event, checked, groupOptions);
                   }
 
-                  onAllChange(fieldArrayProps, allOptions)(event);
+                  handleAllChange(fieldArrayProps, groupOptions)(
+                    event,
+                    checked,
+                  );
                 }}
                 onChange={(event, option) => {
                   if (props.onChange) {
                     props.onChange(event, option);
                   }
 
-                  onChange(fieldArrayProps)(event);
+                  handleChange(fieldArrayProps)(event);
                 }}
               />
             );
@@ -47,7 +53,15 @@ const FormFieldCheckboxSearchSubGroups = <T extends {}>(
       )}
 
       {options.length === 1 && (
-        <FormFieldCheckboxSearchGroup {...props} options={options[0].options} />
+        <FormFieldCheckboxSearchGroup
+          {...props}
+          onAllChange={(event, checked) => {
+            if (props.onAllChange) {
+              props.onAllChange(event, checked, options[0].options);
+            }
+          }}
+          options={options[0].options}
+        />
       )}
     </>
   );

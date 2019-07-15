@@ -28,13 +28,14 @@ describe('ChartFunctions', () => {
 
     const minorAxisConfiguration: AxisConfigurationItem = {
       name: meta.indicators['26'].label,
-      groupBy: ['timePeriod'],
+      groupBy: 'timePeriods',
       dataSets: [dataSet26_1_72],
     };
 
     const chartData = ChartFunctions.createDataForAxis(
       minorAxisConfiguration,
       Data.responseData.result,
+      meta,
     );
 
     expect(chartData.sort((a, b) => a.name.localeCompare(b.name))).toEqual([
@@ -66,13 +67,14 @@ describe('ChartFunctions', () => {
 
     const minorAxisConfiguration: AxisConfigurationItem = {
       name: meta.indicators['26'].label,
-      groupBy: ['timePeriod'],
+      groupBy: 'timePeriods',
       dataSets: [dataSet26_1_72, dataSet23_1_72],
     };
 
     const chartData = ChartFunctions.createDataForAxis(
       minorAxisConfiguration,
       Data.responseData.result,
+      meta,
     );
 
     expect(chartData.sort((a, b) => a.name.localeCompare(b.name))).toEqual([
@@ -109,13 +111,14 @@ describe('ChartFunctions', () => {
 
     const minorAxisConfiguration: AxisConfigurationItem = {
       name: meta.indicators['26'].label,
-      groupBy: ['timePeriod'],
+      groupBy: 'timePeriods',
       dataSets: [dataSet26_1_71, dataSet26_1_72],
     };
 
     const chartData = ChartFunctions.createDataForAxis(
       minorAxisConfiguration,
       Data.responseData.result,
+      meta,
     );
 
     expect(chartData.sort((a, b) => a.name.localeCompare(b.name))).toEqual([
@@ -133,6 +136,48 @@ describe('ChartFunctions', () => {
         name: '2014_HT6',
         '26_1_71_____': '9.4',
         '26_1_72_____': '4',
+      },
+      {
+        name: '2015_HT6',
+        '26_1_71_____': '9.1',
+        '26_1_72_____': '4',
+      },
+      {
+        name: '2016_HT6',
+        '26_1_71_____': '9.7',
+        '26_1_72_____': '4',
+      },
+    ]);
+  });
+
+  test('createDataForAxis returns full data range if data is missing', () => {
+    const meta = Data.responseWithMissingData.metaData;
+
+    const axisConfig: AxisConfigurationItem = {
+      name: meta.indicators['26'].label,
+      groupBy: 'timePeriods',
+      dataSets: [dataSet26_1_71, dataSet26_1_72],
+    };
+
+    const chartData = ChartFunctions.createDataForAxis(
+      axisConfig,
+      Data.responseWithMissingData.result,
+      meta,
+    );
+
+    expect(chartData.sort((a, b) => a.name.localeCompare(b.name))).toEqual([
+      {
+        name: '2012_HT6',
+        '26_1_71_____': '9.6',
+        '26_1_72_____': '4.7',
+      },
+      {
+        name: '2013_HT6',
+        '26_1_71_____': '9',
+        '26_1_72_____': '3.9',
+      },
+      {
+        name: '2014_HT6',
       },
       {
         name: '2015_HT6',

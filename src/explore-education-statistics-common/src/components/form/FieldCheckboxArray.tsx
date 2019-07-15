@@ -1,5 +1,10 @@
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
-import { FieldArray, FieldArrayRenderProps } from 'formik';
+import {
+  connect,
+  FieldArray,
+  FieldArrayRenderProps,
+  FormikContext,
+} from 'formik';
 import get from 'lodash/get';
 import React, { ReactNode } from 'react';
 
@@ -13,16 +18,22 @@ interface FieldCheckboxArrayProps<FormValues> {
   error?: string;
   name: string;
   showError?: boolean;
+  validateOnChange?: boolean;
 }
 
 const FieldCheckboxArray = <T extends {}>({
   children,
   error,
   name,
+  formik,
   showError = true,
-}: FieldCheckboxArrayProps<T>) => {
+  validateOnChange = false,
+}: FieldCheckboxArrayProps<T> & { formik: FormikContext<T> }) => {
   return (
-    <FieldArray name={name}>
+    <FieldArray
+      name={name}
+      validateOnChange={validateOnChange || formik.validateOnChange}
+    >
       {({ form, ...arrayHelpers }) => {
         const { getError } = createErrorHelper(form);
 
@@ -46,4 +57,4 @@ const FieldCheckboxArray = <T extends {}>({
   );
 };
 
-export default FieldCheckboxArray;
+export default connect<FieldCheckboxArrayProps<{}>>(FieldCheckboxArray);

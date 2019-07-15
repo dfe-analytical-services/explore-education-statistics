@@ -8,25 +8,20 @@ export interface ErrorSummaryMessage {
 interface Props {
   errors: ErrorSummaryMessage[];
   id: string;
+  focusOnError?: boolean;
   title?: string;
 }
 
-const ErrorSummary = ({ id, errors, title = 'There is a problem' }: Props) => {
+const ErrorSummary = ({
+  id,
+  errors,
+  focusOnError = false,
+  title = 'There is a problem',
+}: Props) => {
   const ref = useRef<HTMLDivElement>(null);
 
-  const [prevErrors, setPrevErrors] = useState<ErrorSummaryMessage[]>([]);
-
-  useEffect(() => {
-    if (errors.length > 0 && !prevErrors.length && ref.current) {
-      ref.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      });
-      ref.current.focus();
-    }
-
-    setPrevErrors(errors);
-  }, [errors, prevErrors]);
+  // Only
+  const [prevErrors, setPrevErrors] = useState(0);
 
   useEffect(() => {
     import('govuk-frontend/components/error-summary/error-summary').then(
@@ -35,6 +30,21 @@ const ErrorSummary = ({ id, errors, title = 'There is a problem' }: Props) => {
       },
     );
   }, [ref]);
+
+  useEffect(() => {
+    if (errors.length > 0 && !prevErrors && ref.current) {
+      if (focusOnError) {
+        ref.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+
+        ref.current.focus();
+      }
+    }
+
+    setPrevErrors(errors.length);
+  }, [errors, prevErrors, focusOnError]);
 
   const idTitle = `${id}-title`;
 

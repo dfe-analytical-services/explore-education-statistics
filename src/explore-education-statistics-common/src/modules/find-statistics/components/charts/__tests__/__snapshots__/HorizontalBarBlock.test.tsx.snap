@@ -436,13 +436,29 @@ exports[`HorzontalBarBlock renders with correct output 1`] = `
             class="recharts-layer recharts-bar-rectangles"
           >
             <g
-              class="recharts-layer"
+              class="recharts-layer recharts-bar-rectangle"
             >
-              <g
-                class="recharts-layer recharts-bar-rectangle"
+              <path
+                class="recharts-rectangle"
+                d="M 246.25,33.25 h 108.125 v 226 h -108.125 Z"
+                height="226"
+                radius="0"
+                width="108.125"
+                x="246.25"
+                y="33.25"
               />
-              <g
-                class="recharts-layer recharts-bar-rectangle"
+            </g>
+            <g
+              class="recharts-layer recharts-bar-rectangle"
+            >
+              <path
+                class="recharts-rectangle"
+                d="M 246.25,315.75 h -108.125 v 226 h 108.125 Z"
+                height="226"
+                radius="0"
+                width="-108.125"
+                x="246.25"
+                y="315.75"
               />
             </g>
           </g>
@@ -454,13 +470,29 @@ exports[`HorzontalBarBlock renders with correct output 1`] = `
             class="recharts-layer recharts-bar-rectangles"
           >
             <g
-              class="recharts-layer"
+              class="recharts-layer recharts-bar-rectangle"
             >
-              <g
-                class="recharts-layer recharts-bar-rectangle"
+              <path
+                class="recharts-rectangle"
+                d="M 354.375,33.25 h 360.41666666666663 v 226 h -360.41666666666663 Z"
+                height="226"
+                radius="0"
+                width="360.41666666666663"
+                x="354.375"
+                y="33.25"
               />
-              <g
-                class="recharts-layer recharts-bar-rectangle"
+            </g>
+            <g
+              class="recharts-layer recharts-bar-rectangle"
+            >
+              <path
+                class="recharts-rectangle"
+                d="M 138.125,315.75 h 144.16666666666669 v 226 h -144.16666666666669 Z"
+                height="226"
+                radius="0"
+                width="144.16666666666669"
+                x="138.125"
+                y="315.75"
               />
             </g>
           </g>
@@ -472,13 +504,29 @@ exports[`HorzontalBarBlock renders with correct output 1`] = `
             class="recharts-layer recharts-bar-rectangles"
           >
             <g
-              class="recharts-layer"
+              class="recharts-layer recharts-bar-rectangle"
             >
-              <g
-                class="recharts-layer recharts-bar-rectangle"
+              <path
+                class="recharts-rectangle"
+                d="M 714.7916666666666,33.25 h 180.20833333333337 v 226 h -180.20833333333337 Z"
+                height="226"
+                radius="0"
+                width="180.20833333333337"
+                x="714.7916666666666"
+                y="33.25"
               />
-              <g
-                class="recharts-layer recharts-bar-rectangle"
+            </g>
+            <g
+              class="recharts-layer recharts-bar-rectangle"
+            >
+              <path
+                class="recharts-rectangle"
+                d="M 282.2916666666667,315.75 h 36.04166666666663 v 226 h -36.04166666666663 Z"
+                height="226"
+                radius="0"
+                width="36.04166666666663"
+                x="282.2916666666667"
+                y="315.75"
               />
             </g>
           </g>
@@ -507,7 +555,6 @@ exports[`HorzontalBarBlock renders with correct output 1`] = `
               <path
                 class="recharts-legend-icon"
                 d="M0,4h32v24h-32z"
-                fill="#4763a5"
                 stroke="none"
               />
             </svg>
@@ -532,7 +579,6 @@ exports[`HorzontalBarBlock renders with correct output 1`] = `
               <path
                 class="recharts-legend-icon"
                 d="M0,4h32v24h-32z"
-                fill="#f5a450"
                 stroke="none"
               />
             </svg>
@@ -557,7 +603,6 @@ exports[`HorzontalBarBlock renders with correct output 1`] = `
               <path
                 class="recharts-legend-icon"
                 d="M0,4h32v24h-32z"
-                fill="#005ea5"
                 stroke="none"
               />
             </svg>

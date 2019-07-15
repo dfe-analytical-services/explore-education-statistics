@@ -10,8 +10,12 @@ export const newApiTest: DataBlockProps = {
   dataBlockRequest: {
     subjectId: 1,
     geographicLevel: GeographicLevel.Country,
-    startYear: '2014',
-    endYear: '2017',
+    timePeriod: {
+      startYear: '2014',
+      startCode: 'HT6',
+      endYear: '2017',
+      endCode: 'HT6',
+    },
     indicators: ['23', '26', '28'],
     filters: ['1', '2'],
   },
@@ -51,8 +55,7 @@ export const newApiHorizontalData: ChartProps = {
           '26': '10',
           '23': '3',
         },
-        timeIdentifier: 'HT6',
-        year: 2014,
+        timePeriod: '2014_HT6',
       },
       {
         filters: ['1'],
@@ -80,8 +83,7 @@ export const newApiHorizontalData: ChartProps = {
           '26': '10',
           '23': '3',
         },
-        timeIdentifier: 'HT6',
-        year: 2015,
+        timePeriod: '2015_HT6',
       },
     ],
   },
@@ -144,7 +146,7 @@ export const newApiHorizontalData: ChartProps = {
   axes: {
     major: {
       name: 'major',
-      groupBy: ['timePeriod'],
+      groupBy: 'timePeriods',
       dataSets: [
         { indicator: '23', filters: ['1'] },
         { indicator: '26', filters: ['1'] },
@@ -153,7 +155,7 @@ export const newApiHorizontalData: ChartProps = {
     },
     minor: {
       name: 'minor',
-      groupBy: [],
+
       dataSets: [],
     },
   },
@@ -165,8 +167,12 @@ export const newChartsApiDataBlock: DataBlockProps = {
   dataBlockRequest: {
     subjectId: 1,
     geographicLevel: GeographicLevel.Country,
-    startYear: '2012',
-    endYear: '2017',
+    timePeriod: {
+      startYear: '2012',
+      startCode: 'HT6',
+      endYear: '2017',
+      endCode: 'HT6',
+    },
     indicators: ['23', '26', '28', '27'],
     filters: ['1', '2'],
   },
@@ -177,7 +183,7 @@ export const newChartsApiDataBlock: DataBlockProps = {
       axes: {
         major: {
           name: 'major',
-          groupBy: ['timePeriod'],
+          groupBy: 'timePeriods',
           dataSets: [
             { indicator: '23', filters: ['1', '2'] },
             { indicator: '26', filters: ['1', '2'] },
@@ -187,7 +193,6 @@ export const newChartsApiDataBlock: DataBlockProps = {
         },
         minor: {
           name: 'minor',
-          groupBy: [],
           dataSets: [],
         },
       },
