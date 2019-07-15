@@ -2,9 +2,7 @@ using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Model.Service;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {

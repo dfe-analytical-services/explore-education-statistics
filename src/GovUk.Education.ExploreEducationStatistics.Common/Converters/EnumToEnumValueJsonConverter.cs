@@ -1,9 +1,9 @@
 using System;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Newtonsoft.Json;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Converters
+namespace GovUk.Education.ExploreEducationStatistics.Common.Converters
 {
     public class EnumToEnumValueJsonConverter<TEnum> : JsonConverter<TEnum> where TEnum : Enum
     {

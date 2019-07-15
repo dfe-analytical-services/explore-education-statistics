@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
