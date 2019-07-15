@@ -2,7 +2,7 @@ import {
   AdminDashboardPublication,
   ReleaseApprovalStatus,
   ThemeAndTopics,
-} from '@admin/services/api/dashboard/types';
+} from '@admin/services/dashboard/types';
 import { PrototypeLoginService } from '@admin/services/PrototypeLoginService';
 
 const themesAndTopics: ThemeAndTopics[] = [

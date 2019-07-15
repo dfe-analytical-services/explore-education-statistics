@@ -11,7 +11,7 @@ import {
   dayMonthYearIsComplete,
   dayMonthYearToDate,
   ReleaseSetupDetails,
-} from '@admin/services/api/common/types/types';
+} from '@admin/services/common/types/types';
 import Link from '@admin/components/Link';
 
 interface MatchProps {

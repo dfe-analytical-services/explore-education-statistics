@@ -1,5 +1,5 @@
-import { DataFileView } from '@admin/services/api/edit-release/data/types';
 import { Dictionary } from '@common/types';
+import { DataFileView } from '../types';
 
 const dataFilesByReleaseId: Dictionary<DataFileView> = {
   'my-publication-1-release-1': {

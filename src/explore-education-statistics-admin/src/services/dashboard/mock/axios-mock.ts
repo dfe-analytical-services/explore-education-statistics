@@ -1,5 +1,5 @@
 import { AxiosInstance } from 'axios';
-import { PrototypeLoginService } from '../../../PrototypeLoginService';
+import { PrototypeLoginService } from '@admin/services/PrototypeLoginService';
 
 export default {
   createMockContentApiAxiosInstance: async (axiosInstance: AxiosInstance) => {

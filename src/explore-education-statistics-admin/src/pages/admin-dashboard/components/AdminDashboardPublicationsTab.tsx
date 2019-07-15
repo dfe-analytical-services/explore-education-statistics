@@ -1,9 +1,9 @@
-import { AdminDashboardPublication } from '@admin/services/api/dashboard/types';
+import { AdminDashboardPublication } from '@admin/services/dashboard/types';
 import FormSelect from '@common/components/form/FormSelect';
 import React from 'react';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
-import { IdLabelPair } from '@admin/services/api/common/types/types';
+import { IdLabelPair } from '@admin/services/common/types/types';
 import Link from '@admin/components/Link';
 import AdminDashboardPublicationSummary from './AdminDashboardPublicationSummary';
 

@@ -1,5 +1,5 @@
 import Link from '@admin/components/Link';
-import { DataFileView } from '@admin/services/api/edit-release/data/types';
+import { DataFileView } from '@admin/services/edit-release/data/types';
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -7,7 +7,7 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
-import service from '@admin/services/api/edit-release/data/service';
+import service from '@admin/services/edit-release/data/service';
 import ReleasePageTemplate from '@admin/pages/edit-release/components/ReleasePageTemplate';
 
 interface MatchProps {

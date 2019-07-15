@@ -29,7 +29,7 @@ import {
   DayMonthYearValues,
   IdLabelPair,
   ReleaseSetupDetails,
-} from '@admin/services/api/common/types/types';
+} from '@admin/services/common/types/types';
 
 interface MatchProps {
   releaseId: string;

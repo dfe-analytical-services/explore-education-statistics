@@ -1,11 +1,8 @@
-import mocks from '@admin/services/api/dashboard/mock/axios-mock';
-import {
-  AdminDashboardPublication,
-  ThemeAndTopics,
-} from '@admin/services/api/dashboard/types';
 import Client from '@common/services/api/Client';
 import { commaSeparated } from '@common/services/util/paramSerializers';
 import axios from 'axios';
+import mocks from './mock/axios-mock';
+import { DataFileView } from './types';
 
 const createClient = async () => {
   const baseUrl = process.env.CONTENT_API_BASE_URL;
@@ -13,6 +10,12 @@ const createClient = async () => {
   const axiosInstance = axios.create({
     baseURL: `${baseUrl}/api/`,
     paramsSerializer: commaSeparated,
+  });
+
+  axios.interceptors.request.use(request => {
+    // eslint-disable-next-line no-console
+    console.log('Starting Request', request);
+    return request;
   });
 
   const decoratedAxios =
@@ -26,19 +29,9 @@ const createClient = async () => {
 const apiClient = createClient();
 
 export default {
-  getThemesAndTopics(userId: string): Promise<ThemeAndTopics[]> {
+  getReleaseDataFiles(releaseId: string): Promise<DataFileView> {
     return apiClient.then(client =>
-      client.get<ThemeAndTopics[]>('/Themes', { params: { userId } }),
-    );
-  },
-  getPublicationsByTopic(
-    topicId: string,
-    userId: string,
-  ): Promise<AdminDashboardPublication[]> {
-    return apiClient.then(client =>
-      client.get<AdminDashboardPublication[]>('/Publications', {
-        params: { topicId, userId },
-      }),
+      client.get<DataFileView>(`/release/${releaseId}/datafiles`),
     );
   },
 };

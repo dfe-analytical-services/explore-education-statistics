@@ -5,8 +5,8 @@ import {
   ReleaseDataType,
   ReleaseSetupDetails,
   Topic,
-} from '@admin/services/api/common/types/types';
-import { ReleaseApprovalStatus } from '@admin/services/api/dashboard/types';
+} from '@admin/services/common/types/types';
+import { ReleaseApprovalStatus } from '@admin/services/dashboard/types';
 import { PrototypeLoginService } from '@admin/services/PrototypeLoginService';
 
 const methodologies: IdLabelPair[] = [

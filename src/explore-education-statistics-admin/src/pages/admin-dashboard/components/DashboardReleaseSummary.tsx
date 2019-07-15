@@ -2,11 +2,11 @@ import ButtonLink from '@admin/components/ButtonLink';
 import {
   dayMonthYearIsComplete,
   dayMonthYearToDate,
-} from '@admin/services/api/common/types/types';
+} from '@admin/services/common/types/types';
 import {
   AdminDashboardRelease,
   ReleaseApprovalStatus,
-} from '@admin/services/api/dashboard/types';
+} from '@admin/services/dashboard/types';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';

@@ -1,5 +1,5 @@
 import DashboardReleaseSummary from '@admin/pages/admin-dashboard/components/DashboardReleaseSummary';
-import { AdminDashboardPublication } from '@admin/services/api/dashboard/types';
+import { AdminDashboardPublication } from '@admin/services/dashboard/types';
 import React from 'react';
 import Link from '@admin/components/Link';
 
