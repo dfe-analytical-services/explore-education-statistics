@@ -13,14 +13,11 @@ const ContentAddComment = () => {
   return (
     <>
       <div className={styles.addComment}>
-        <Details
-          summary="Suggest update or comment"
-          className="govuk-!-margin-bottom-1"
-        >
+        <Details summary="Add comment" className="govuk-!-margin-bottom-1">
           <form>
             <textarea name="comment" id="comment" />
             <button type="submit" className="govuk-button">
-              Add comment
+              Submit
             </button>
           </form>
         </Details>

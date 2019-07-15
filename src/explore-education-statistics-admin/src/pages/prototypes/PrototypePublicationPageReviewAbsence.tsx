@@ -49,7 +49,7 @@ class PublicationPage extends Component<{}, State> {
         ]}
       >
         {' '}
-        <div className="govuk-width-container dfe-align--comments">
+        <div>
           <FormRadioGroup
             legend="Review this release"
             id="review-release"

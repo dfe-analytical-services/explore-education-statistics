@@ -38,7 +38,7 @@ class PublicationPage extends Component<{}, State> {
         wide
         breadcrumbs={[
           {
-            link: '/prototypes/admin-dashboard?status=editLiveRelease',
+            link: '/prototypes/admin-dashboard?status=readyApproval',
             text: 'Administrator dashboard',
           },
           { text: 'Edit pupil absence statistics', link: '#' },
@@ -46,7 +46,7 @@ class PublicationPage extends Component<{}, State> {
       >
         <PrototypeAdminNavigation sectionId="addContent" task="editRelease" />
 
-        <div className="govuk-form-group govuk-width-container  dfe-align--comments">
+        <div className="govuk-form-group">
           <div className="govuk-warning-text">
             <span className="govuk-warning-text__icon" aria-hidden="true">
               !

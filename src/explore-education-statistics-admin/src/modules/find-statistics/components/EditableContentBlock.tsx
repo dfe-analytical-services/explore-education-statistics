@@ -1,6 +1,7 @@
 import { Release, ContentBlock } from '@common/services/publicationService';
 import React, { Component } from 'react';
 import EditableContentSubBlockRenderer from './EditableContentSubBlockRenderer';
+import AddComment from '../../../pages/prototypes/components/PrototypeEditableContentAddComment';
 import ResolveComment from '../../../pages/prototypes/components/PrototypeEditableContentResolveComment';
 
 interface Props {
@@ -28,6 +29,7 @@ class EditableContentBlock extends Component<Props> {
         const key = `${index}-${block.heading}-${block.type}`;
         return (
           <>
+            {reviewing && <AddComment />}
             {resolveComments && <ResolveComment name="Ann Evans" />}
             <EditableContentSubBlockRenderer
               editable={editable}
