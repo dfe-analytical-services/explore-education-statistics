@@ -56,3 +56,12 @@
     height: 100% !important;
   }
 }
+
+.verticalfields {
+  display: flex;
+  flex-direction: column;
+}
+
+.colorSelect {
+  width: 50px;
+}

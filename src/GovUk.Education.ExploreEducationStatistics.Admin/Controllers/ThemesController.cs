@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
 {
+    [ApiExplorerSettings(IgnoreApi=true)]
     public class ThemesController : Controller
     {
         private readonly ApplicationDbContext _context;

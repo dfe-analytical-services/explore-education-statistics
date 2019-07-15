@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
 {
+    [ApiExplorerSettings(IgnoreApi=true)]
     [Authorize]
     public class HomeController : Controller
     {

@@ -1,21 +1,9 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { Dictionary } from '@common/types';
-import LineChartBlock from '@common/modules/find-statistics/components/charts/LineChartBlock';
-import { ChartDefinition } from '@common/modules/find-statistics/components/charts/ChartFunctions';
-import HorizontalBarBlock from '@common/modules/find-statistics/components/charts/HorizontalBarBlock';
-import VerticalBarBlock from '@common/modules/find-statistics/components/charts/VerticalBarBlock';
-import MapBlock from '@common/modules/find-statistics/components/charts/MapBlock';
 import {
   DataBlockResponse,
   GeographicLevel,
 } from '@common/services/dataBlockService';
-
-const chartTypes: ChartDefinition[] = [
-  LineChartBlock.definition,
-  VerticalBarBlock.definition,
-  HorizontalBarBlock.definition,
-  MapBlock.definition,
-];
 
 export interface PrototypeTable {
   label: string;
@@ -3527,8 +3515,7 @@ const testResponse: DataBlockResponse = {
         '26': '3.9',
         '23': '0.8',
       },
-      timeIdentifier: 'HT6',
-      year: 2013,
+      timePeriod: '2013_HT6',
     },
     {
       filters: ['1', '73'],
@@ -3543,8 +3530,7 @@ const testResponse: DataBlockResponse = {
         '26': '5.2',
         '23': '1.3',
       },
-      timeIdentifier: 'HT6',
-      year: 2013,
+      timePeriod: '2013_HT6',
     },
     {
       filters: ['1', '71'],
@@ -3559,8 +3545,7 @@ const testResponse: DataBlockResponse = {
         '26': '9',
         '23': '1.9',
       },
-      timeIdentifier: 'HT6',
-      year: 2013,
+      timePeriod: '2013_HT6',
     },
     {
       filters: ['1', '71'],
@@ -3575,8 +3560,7 @@ const testResponse: DataBlockResponse = {
         '26': '9.4',
         '23': '1.9',
       },
-      timeIdentifier: 'HT6',
-      year: 2014,
+      timePeriod: '2014_HT6',
     },
     {
       filters: ['1', '73'],
@@ -3591,8 +3575,7 @@ const testResponse: DataBlockResponse = {
         '26': '5.9',
         '23': '1.4',
       },
-      timeIdentifier: 'HT6',
-      year: 2012,
+      timePeriod: '2012_HT6',
     },
     {
       filters: ['1', '71'],
@@ -3607,8 +3590,7 @@ const testResponse: DataBlockResponse = {
         '26': '9.6',
         '23': '1.9',
       },
-      timeIdentifier: 'HT6',
-      year: 2012,
+      timePeriod: '2012_HT6',
     },
     {
       filters: ['1', '72'],
@@ -3623,8 +3605,7 @@ const testResponse: DataBlockResponse = {
         '26': '4.7',
         '23': '0.8',
       },
-      timeIdentifier: 'HT6',
-      year: 2012,
+      timePeriod: '2012_HT6',
     },
     {
       filters: ['1', '72'],
@@ -3639,8 +3620,7 @@ const testResponse: DataBlockResponse = {
         '26': '4',
         '23': '0.9',
       },
-      timeIdentifier: 'HT6',
-      year: 2015,
+      timePeriod: '2015_HT6',
     },
     {
       filters: ['1', '73'],
@@ -3655,8 +3635,7 @@ const testResponse: DataBlockResponse = {
         '26': '5.4',
         '23': '1.5',
       },
-      timeIdentifier: 'HT6',
-      year: 2016,
+      timePeriod: '2016_HT6',
     },
     {
       filters: ['1', '72'],
@@ -3671,8 +3650,7 @@ const testResponse: DataBlockResponse = {
         '26': '4',
         '23': '1.1',
       },
-      timeIdentifier: 'HT6',
-      year: 2016,
+      timePeriod: '2016_HT6',
     },
     {
       filters: ['1', '71'],
@@ -3687,8 +3665,7 @@ const testResponse: DataBlockResponse = {
         '26': '9.7',
         '23': '2.1',
       },
-      timeIdentifier: 'HT6',
-      year: 2016,
+      timePeriod: '2016_HT6',
     },
     {
       filters: ['1', '72'],
@@ -3703,8 +3680,7 @@ const testResponse: DataBlockResponse = {
         '26': '4',
         '23': '0.9',
       },
-      timeIdentifier: 'HT6',
-      year: 2014,
+      timePeriod: '2014_HT6',
     },
     {
       filters: ['1', '73'],
@@ -3719,8 +3695,7 @@ const testResponse: DataBlockResponse = {
         '26': '5.3',
         '23': '1.3',
       },
-      timeIdentifier: 'HT6',
-      year: 2014,
+      timePeriod: '2014_HT6',
     },
     {
       filters: ['1', '73'],
@@ -3735,8 +3710,7 @@ const testResponse: DataBlockResponse = {
         '26': '5.2',
         '23': '1.4',
       },
-      timeIdentifier: 'HT6',
-      year: 2015,
+      timePeriod: '2015_HT6',
     },
     {
       filters: ['1', '71'],
@@ -3751,14 +3725,14 @@ const testResponse: DataBlockResponse = {
         '26': '9.1',
         '23': '1.7',
       },
-      timeIdentifier: 'HT6',
-      year: 2015,
+      timePeriod: '2015_HT6',
     },
   ],
 };
 
-export default {
-  chartTypes,
+const Data = {
   tables,
   testResponse,
 };
+
+export default Data;
