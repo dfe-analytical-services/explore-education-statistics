@@ -68,8 +68,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<INotificationsService, NotificationsService>();
             services.AddTransient<IPublishingService, PublishingService>();
             services.AddTransient<IThemeService, ThemeService>();
-            
-            
+            services.AddTransient<IPublicationService, PublicationService>();
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info {Title = "Explore education statistics - Admin API", Version = "v1"});
