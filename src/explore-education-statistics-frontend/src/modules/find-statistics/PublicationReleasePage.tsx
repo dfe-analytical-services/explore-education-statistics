@@ -120,7 +120,11 @@ class PublicationReleasePage extends Component<Props> {
               summary="Download data files"
               onToggle={(open: boolean) =>
                 open &&
-                logEvent('Downloads', 'Open download data files accordion')
+                logEvent(
+                  'Downloads',
+                  'Open download data files accordion',
+                  window.location.pathname,
+                )
               }
             >
               <ul className="govuk-list govuk-list--bullet">
