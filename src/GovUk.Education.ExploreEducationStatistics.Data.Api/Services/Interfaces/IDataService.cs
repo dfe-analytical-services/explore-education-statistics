@@ -1,4 +1,4 @@
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces
 {

@@ -1,13 +1,10 @@
+import Details from '@common/components/Details';
+import { FormSelect } from '@common/components/form';
+import { SelectOption } from '@common/components/form/FormSelect';
 import {
-  Feature,
-  FeatureCollection,
-  GeoJsonProperties,
-  Geometry,
-} from 'geojson';
-import 'leaflet/dist/leaflet.css';
-import React, { Component, createRef } from 'react';
-import { GeoJSON, LatLngBounds, Map } from 'react-leaflet';
-import { ChartProps } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+  ChartDefinition,
+  ChartProps,
+} from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import {
   DataBlockData,
   DataBlockGeoJsonProperties,
@@ -15,13 +12,19 @@ import {
   DataBlockLocationMetadata,
   DataBlockMetadata,
 } from '@common/services/dataBlockService';
-import { FormSelect } from '@common/components/form';
-import classNames from 'classnames';
-import { SelectOption } from '@common/components/form/FormSelect';
 import { Dictionary } from '@common/types/util';
+import classNames from 'classnames';
+import {
+  Feature,
+  FeatureCollection,
+  GeoJsonProperties,
+  Geometry,
+} from 'geojson';
 
 import { Layer, LeafletMouseEvent, Path, Polyline } from 'leaflet';
-import Details from '@common/components/Details';
+import 'leaflet/dist/leaflet.css';
+import React, { Component, createRef } from 'react';
+import { GeoJSON, LatLngBounds, Map } from 'react-leaflet';
 import styles from './MapBlock.module.scss';
 
 export type MapFeature = Feature<Geometry, GeoJsonProperties>;
@@ -43,7 +46,7 @@ interface MapState {
 
   selected: {
     indicator: string;
-    timePeriod: number;
+    timePeriod: string;
     location: string;
     results: IdValue[];
   };
@@ -77,11 +80,11 @@ interface MapClickEvent extends LeafletMouseEvent {
 
 function getLowestLocationCode(location: DataBlockLocation) {
   return (
-    (location.localAuthorityDistrict &&
-      location.localAuthorityDistrict.sch_lad_code) ||
-    (location.localAuthority && location.localAuthority.new_la_code) ||
-    (location.region && location.region.region_code) ||
-    (location.country && location.country.country_code)
+    (location.localAuthorityDistrict && location.localAuthorityDistrict.code) ||
+    (location.localAuthority && location.localAuthority.code) ||
+    (location.region && location.region.code) ||
+    (location.country && location.country.code) ||
+    ''
   );
 }
 
@@ -95,7 +98,7 @@ class MapBlock extends Component<MapProps, MapState> {
   public state: MapState = {
     selected: {
       indicator: '',
-      timePeriod: 0,
+      timePeriod: '',
       location: '',
       results: [],
     },
@@ -117,7 +120,7 @@ class MapBlock extends Component<MapProps, MapState> {
     );
 
     // TODO, if required, allow range of years to be selected
-    const firstTimePeriod = data.result[0].year;
+    const firstTimePeriod = meta.timePeriods[data.result[0].timePeriod].value;
 
     selected = {
       ...selected,
@@ -162,6 +165,28 @@ class MapBlock extends Component<MapProps, MapState> {
     }
   }
 
+  public static definition: ChartDefinition = {
+    type: 'map',
+    name: 'Geographic',
+
+    data: [
+      {
+        type: 'geojson',
+        title: 'Geographic',
+        entryCount: 'multiple',
+        targetAxis: 'geojson',
+      },
+    ],
+
+    axes: [
+      {
+        id: 'geojson',
+        title: 'geojson',
+        type: 'major',
+      },
+    ],
+  };
+
   private static getLocationsForIndicator(
     data: DataBlockData,
     meta: DataBlockMetadata,
@@ -180,7 +205,7 @@ class MapBlock extends Component<MapProps, MapState> {
       ...allLocationIds
         .reduce(
           (locations: { label: string; value: string }[], next: string) => {
-            const { label, value } = meta.locations[next];
+            const { label, value } = (meta.locations || {})[next];
 
             return [...locations, { label, value }];
           },
@@ -226,7 +251,7 @@ class MapBlock extends Component<MapProps, MapState> {
     data: DataBlockData,
     meta: DataBlockMetadata,
     selectedIndicator: string,
-    selectedYear: number,
+    selectedYear: string,
   ) {
     const displayedFilter = +selectedIndicator;
 
@@ -277,15 +302,17 @@ class MapBlock extends Component<MapProps, MapState> {
     data: DataBlockData,
     meta: DataBlockMetadata,
     displayedFilter: number,
-    selectedYear: number,
+    selectedYear: string,
   ) {
     const resultsFilteredByYear = data.result.filter(
-      result => result.year === selectedYear,
+      result => result.timePeriod === selectedYear,
     );
 
     return resultsFilteredByYear
       .map(result => ({
-        location: meta.locations[getLowestLocationCode(result.location)],
+        location: (meta.locations || {})[
+          getLowestLocationCode(result.location)
+        ],
         selectedMeasure: +result.measures[displayedFilter],
         measures: result.measures,
       }))
@@ -476,14 +503,12 @@ class MapBlock extends Component<MapProps, MapState> {
       if (feature.properties) {
         const content = Object.entries(feature.properties.measures).map(
           ([id, value]) =>
-            `${meta.indicators[id].label} : ${value}${
-              meta.indicators[id].unit
-            }`,
+            `${meta.indicators[id].label} : ${value}${meta.indicators[id].unit}`,
         );
 
         if (feature.id) {
           content.unshift(
-            `<strong>${meta.locations[feature.id].label}</strong>`,
+            `<strong>${(meta.locations || {})[feature.id].label}</strong>`,
           );
         }
 
@@ -507,7 +532,7 @@ class MapBlock extends Component<MapProps, MapState> {
       width,
       height,
       meta,
-      indicators,
+      axes,
     } = this.props;
 
     const { selected, options, geometry, legend, ukGeometry } = this.state;
@@ -568,8 +593,8 @@ class MapBlock extends Component<MapProps, MapState> {
                 label="Select data to view"
                 value={selected.indicator}
                 onChange={e => this.onSelectIndicator(e.currentTarget.value)}
-                options={indicators.map(
-                  indicator => meta.indicators[indicator],
+                options={axes.major.dataSets.map(
+                  indicator => meta.indicators[indicator.indicator],
                 )}
                 order={[]}
               />

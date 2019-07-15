@@ -13,7 +13,6 @@ import publicationService, {
 import ButtonLink from '@frontend/components/ButtonLink';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
-import PageTitle from '@frontend/components/PageTitle';
 import classNames from 'classnames';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
@@ -94,8 +93,12 @@ class PublicationReleasePage extends Component<Props> {
                 </dl>
                 <Link
                   unvisited
+                  analytics={{
+                    category: 'Subscribe',
+                    action: 'Email subscription',
+                  }}
                   to={`/subscriptions?slug=${data.publication.slug}`}
-                  data-testid={`subsciption-${data.publication.slug}`}
+                  data-testid={`subscription-${data.publication.slug}`}
                 >
                   Sign up for email alerts
                 </Link>
@@ -150,9 +153,7 @@ class PublicationReleasePage extends Component<Props> {
                             releaseName,
                             <li key={id} data-testid="previous-release-item">
                               <Link
-                                to={`/statistics/${
-                                  data.publication.slug
-                                }/${slug}`}
+                                to={`/statistics/${data.publication.slug}/${slug}`}
                               >
                                 {releaseName}
                               </Link>

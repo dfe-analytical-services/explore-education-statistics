@@ -40,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
                     _logger.LogInformation("Updating Theme {Theme}", theme.Title);
                     var updated = _context.Theme.Update(theme).Entity;
                     _context.SaveChanges();
-                    
+
                     var subjects = updated.Topics
                         .SelectMany(topic => topic.Publications)
                         .SelectMany(publication => publication.Releases)
@@ -64,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
             {
                 var file = SamplePublications.SubjectFiles.GetValueOrDefault(subject.Id);
                 _logger.LogInformation("Seeding Subject {Subject}", subject.Name);
-                
+
                 var lines = file.GetCsvLines();
                 var metaLines = file.GetMetaCsvLines();
 

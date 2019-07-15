@@ -1,4 +1,8 @@
-import { DataBlockRequest } from '@common/services/dataBlockService';
+import {
+  DataBlockLocation,
+  DataBlockRequest,
+} from '@common/services/dataBlockService';
+import { Dictionary } from '@common/types';
 import { contentApi } from './api';
 
 export interface Publication {
@@ -46,7 +50,7 @@ export interface ReferenceLine {
 
 export interface Axis {
   title: string;
-  key?: string;
+  key?: string[];
   min?: number;
   max?: number;
   size?: number;
@@ -54,18 +58,57 @@ export interface Axis {
 
 export type ChartType = 'line' | 'verticalbar' | 'horizontalbar' | 'map';
 
-export interface ChartDataGroup {
+export interface ChartDataSet {
+  indicator: string;
+  filters: string[];
+  location?: DataBlockLocation;
+  timePeriod?: string;
+}
+
+export interface OptionalChartDataSet {
+  indicator?: string;
   filters?: string[];
   location?: string[];
-  timePeriod?: boolean;
+  timePeriod?: string;
+}
+
+export type ChartSymbol =
+  | 'circle'
+  | 'cross'
+  | 'diamond'
+  | 'square'
+  | 'star'
+  | 'triangle'
+  | 'wye';
+
+export interface ChartConfiguration {
+  label: string;
+  value: string;
+  name?: string;
+  unit?: string;
+  colour?: string;
+  symbol?: ChartSymbol;
+}
+
+export type AxisGroupBy =
+  | 'timePeriods'
+  | 'locations'
+  | 'filters'
+  | 'indicators';
+
+export interface AxisConfigurationItem {
+  name: string;
+  groupBy?: AxisGroupBy;
+  dataSets: ChartDataSet[];
+
+  visible?: boolean;
+  title?: string;
 }
 
 export interface Chart {
   type: ChartType;
-  indicators: string[];
-  dataGroupings?: ChartDataGroup[];
-  xAxis?: Axis;
-  yAxis?: Axis;
+  labels: Dictionary<ChartConfiguration>;
+  axes: Dictionary<AxisConfigurationItem>;
   stacked?: boolean;
   referenceLines?: ReferenceLine[];
   width?: number;

@@ -2,9 +2,9 @@ import HorizontalBarBlock from '@common/modules/find-statistics/components/chart
 import LineChartBlock from '@common/modules/find-statistics/components/charts/LineChartBlock';
 import VerticalBarBlock from '@common/modules/find-statistics/components/charts/VerticalBarBlock';
 import {
-  Axis,
-  ChartDataGroup,
+  AxisConfigurationItem,
   ChartType,
+  ChartConfiguration,
   ReferenceLine,
 } from '@common/services/publicationService';
 import dynamic from 'next-server/dynamic';
@@ -13,6 +13,7 @@ import {
   DataBlockData,
   DataBlockMetadata,
 } from '@common/services/dataBlockService';
+import { Dictionary } from '@common/types';
 
 const DynamicMapBlock = dynamic(
   () => import('@common/modules/find-statistics/components/charts/MapBlock'),
@@ -23,16 +24,14 @@ const DynamicMapBlock = dynamic(
 
 export interface ChartRendererProps {
   type: ChartType;
-  indicators: string[];
   data: DataBlockData;
   meta: DataBlockMetadata;
-  xAxis: Axis;
-  yAxis: Axis;
   height?: number;
   width?: number;
   stacked?: boolean;
   referenceLines?: ReferenceLine[];
-  dataGroupings?: ChartDataGroup[];
+  labels: Dictionary<ChartConfiguration>;
+  axes: Dictionary<AxisConfigurationItem>;
 }
 
 function ChartRenderer(props: ChartRendererProps) {
@@ -41,91 +40,36 @@ function ChartRenderer(props: ChartRendererProps) {
     height,
     width,
     meta,
-    indicators,
     referenceLines,
     stacked,
     type,
-    xAxis = { title: '' },
-    yAxis = { title: '' },
-    dataGroupings,
+    labels,
+    axes,
   } = props;
 
-  const labels = Object.entries(meta.indicators).reduce(
-    (results, [key, indicator]) => ({ ...results, [key]: indicator.label }),
-    {},
-  );
-
   // TODO : Temporary sort on the results to get them in date order
-  data.result.sort((a, b) => {
-    if (a.year < b.year) {
-      return -1;
-    }
+  data.result.sort((a, b) => a.timePeriod.localeCompare(b.timePeriod));
 
-    if (a.year > b.year) {
-      return 1;
-    }
-
-    return 0;
-  });
+  const chartProps = {
+    data,
+    meta,
+    labels,
+    axes,
+    height,
+    width,
+    referenceLines,
+    stacked,
+  };
 
   switch (type.toLowerCase()) {
     case 'line':
-      return (
-        <LineChartBlock
-          indicators={indicators}
-          data={data}
-          meta={meta}
-          labels={labels}
-          xAxis={xAxis}
-          yAxis={yAxis}
-          height={height}
-          width={width}
-          referenceLines={referenceLines}
-        />
-      );
+      return <LineChartBlock {...chartProps} />;
     case 'verticalbar':
-      return (
-        <VerticalBarBlock
-          indicators={indicators}
-          data={data}
-          meta={meta}
-          labels={labels}
-          xAxis={xAxis}
-          yAxis={yAxis}
-          height={height}
-          width={width}
-          referenceLines={referenceLines}
-        />
-      );
+      return <VerticalBarBlock {...chartProps} />;
     case 'horizontalbar':
-      return (
-        <HorizontalBarBlock
-          indicators={indicators}
-          data={data}
-          meta={meta}
-          labels={labels}
-          xAxis={xAxis}
-          yAxis={yAxis}
-          height={height}
-          width={width}
-          stacked={stacked}
-          referenceLines={referenceLines}
-        />
-      );
+      return <HorizontalBarBlock {...chartProps} />;
     case 'map':
-      return (
-        <DynamicMapBlock
-          indicators={indicators}
-          data={data}
-          meta={meta}
-          labels={labels}
-          xAxis={xAxis}
-          yAxis={yAxis}
-          height={height}
-          width={width}
-          dataGroupings={dataGroupings}
-        />
-      );
+      return <DynamicMapBlock {...chartProps} />;
     default:
       return <div>[ Unimplemented chart type requested ${type} ]</div>;
   }

@@ -8,12 +8,18 @@ import tableBuilderService, {
   TableData,
   ThemeMeta,
 } from '@common/services/tableBuilderService';
-import TimePeriod from '@common/services/types/TimePeriod';
 import { Dictionary } from '@common/types/util';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
-import PageTitle from '@frontend/components/PageTitle';
 import PreviousStepModalConfirm from '@frontend/modules/table-tool/components/PreviousStepModalConfirm';
+import {
+  CategoryFilter,
+  Indicator,
+  LocationFilter,
+} from '@frontend/modules/table-tool/components/types/filters';
+import TimePeriod, {
+  parseYearCodeTuple,
+} from '@frontend/modules/table-tool/components/types/TimePeriod';
 import mapValues from 'lodash/mapValues';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
@@ -29,7 +35,9 @@ import PublicationSubjectForm, {
   PublicationSubjectFormSubmitHandler,
 } from './components/PublicationSubjectForm';
 import TimePeriodDataTable from './components/TimePeriodDataTable';
-import TimePeriodForm from './components/TimePeriodForm';
+import TimePeriodForm, {
+  TimePeriodFormSubmitHandler,
+} from './components/TimePeriodForm';
 import mapOptionValues from './components/utils/mapOptionValues';
 import Wizard from './components/Wizard';
 import WizardStep from './components/WizardStep';
@@ -55,22 +63,25 @@ interface Props {
 }
 
 interface State {
-  timePeriods: TimePeriod[];
-  locations: Dictionary<FilterOption[]>;
-  filters: Dictionary<FilterOption[]>;
-  indicators: IndicatorOption[];
+  startYear?: number;
+  startCode?: string;
+  endYear?: number;
+  endCode?: string;
+  locations: Dictionary<LocationFilter[]>;
+  filters: Dictionary<CategoryFilter[]>;
+  indicators: Indicator[];
   publication?: PublicationOptions['topics'][0]['publications'][0];
   subjects: PublicationSubject[];
   subjectId: string;
   subjectName: string;
   subjectMeta: PublicationSubjectMeta;
+  timePeriodRange: TimePeriod[];
   tableData: TableData['result'];
 }
 
 class TableToolPage extends Component<Props, State> {
   public state: State = {
     filters: {},
-    timePeriods: [],
     locations: {},
     indicators: [],
     subjectName: '',
@@ -86,6 +97,7 @@ class TableToolPage extends Component<Props, State> {
       filters: {},
     },
     subjects: [],
+    timePeriodRange: [],
     tableData: [],
   };
 
@@ -143,36 +155,99 @@ class TableToolPage extends Component<Props, State> {
     });
   };
 
-  private handleLocationFiltersFormSubmit: LocationFiltersFormSubmitHandler = values => {
-    const { subjectMeta } = this.state;
+  private handleLocationFiltersFormSubmit: LocationFiltersFormSubmitHandler = async values => {
+    const { subjectId } = this.state;
 
-    this.setState({
+    const subjectMeta = await tableBuilderService.filterPublicationSubjectMeta({
+      ...values,
+      subjectId,
+    });
+
+    this.setState(prevState => ({
+      subjectMeta: {
+        ...prevState.subjectMeta,
+        timePeriod: subjectMeta.timePeriod,
+      },
       locations: mapValuesWithKeys(
         values.locations,
         (locationLevel, locations) =>
-          locations.map(
-            location =>
+          locations
+            .map(location =>
               subjectMeta.locations[locationLevel].options.find(
                 option => option.value === location,
-              ) as FilterOption,
-          ),
+              ),
+            )
+            .filter(option => typeof option !== 'undefined')
+            .map(
+              option =>
+                new LocationFilter(option as FilterOption, locationLevel),
+            ),
       ),
+    }));
+  };
+
+  private handleTimePeriodFormSubmit: TimePeriodFormSubmitHandler = async values => {
+    const { subjectId, locations } = this.state;
+
+    const [startYear, startCode] = parseYearCodeTuple(values.start);
+    const [endYear, endCode] = parseYearCodeTuple(values.end);
+
+    const subjectMeta = await tableBuilderService.filterPublicationSubjectMeta({
+      ...mapValues(locations, locationLevel =>
+        locationLevel.map(location => location.value),
+      ),
+      subjectId,
+      timePeriod: {
+        startYear,
+        startCode,
+        endYear,
+        endCode,
+      },
     });
+
+    this.setState(prevState => ({
+      startYear,
+      startCode,
+      endYear,
+      endCode,
+      subjectMeta: {
+        ...prevState.subjectMeta,
+        filters: subjectMeta.filters,
+      },
+    }));
   };
 
   private handleFiltersFormSubmit: FilterFormSubmitHandler = async ({
     filters,
     indicators,
   }) => {
-    const { subjectId, timePeriods, subjectMeta } = this.state;
-
-    const { result } = await tableBuilderService.getTableData({
+    const {
       subjectId,
-      filters: Object.values(filters).flat(),
+      startYear,
+      startCode,
+      endYear,
+      endCode,
+      locations,
+      subjectMeta,
+    } = this.state;
+
+    if (!startYear || !startCode || !endYear || !endCode) {
+      return;
+    }
+
+    const { timePeriodRange, result } = await tableBuilderService.getTableData({
+      ...mapValues(locations, locationLevel =>
+        locationLevel.map(location => location.value),
+      ),
+      subjectId,
       indicators,
-      startYear: timePeriods[0].year,
-      endYear: timePeriods[timePeriods.length - 1].year,
-      geographicLevel: 'National',
+      filters: Object.values(filters).flat(),
+      timePeriod: {
+        startYear,
+        startCode,
+        endYear,
+        endCode,
+      },
     });
 
     const filtersByValue = mapValues(subjectMeta.filters, value =>
@@ -185,9 +260,16 @@ class TableToolPage extends Component<Props, State> {
 
     this.setState({
       filters: mapValuesWithKeys(filters, (filterGroup, selectedFilters) =>
-        selectedFilters.map(filter => filtersByValue[filterGroup][filter]),
+        selectedFilters.map(
+          filter => new CategoryFilter(filtersByValue[filterGroup][filter]),
+        ),
       ),
-      indicators: indicators.map(indicator => indicatorsByValue[indicator]),
+      indicators: indicators.map(
+        indicator => new Indicator(indicatorsByValue[indicator]),
+      ),
+      timePeriodRange: timePeriodRange.map(
+        timePeriod => new TimePeriod(timePeriod),
+      ),
       tableData: result,
     });
   };
@@ -198,13 +280,15 @@ class TableToolPage extends Component<Props, State> {
       filters,
       indicators,
       locations,
-      timePeriods,
       publication,
       subjectName,
       subjectMeta,
       subjects,
+      timePeriodRange,
       tableData,
     } = this.state;
+
+    const locationsList = Object.values(locations).flat();
 
     return (
       <Page title="Create your own tables online" caption="Table Tool" wide>
@@ -265,14 +349,7 @@ class TableToolPage extends Component<Props, State> {
                     <TimePeriodForm
                       {...stepProps}
                       options={subjectMeta.timePeriod.options}
-                      onSubmit={values => {
-                        this.setState({
-                          timePeriods: TimePeriod.createRange(
-                            TimePeriod.fromString(values.start),
-                            TimePeriod.fromString(values.end),
-                          ),
-                        });
-                      }}
+                      onSubmit={this.handleTimePeriodFormSubmit}
                     />
                   )}
                 </WizardStep>
@@ -281,7 +358,7 @@ class TableToolPage extends Component<Props, State> {
                     <FiltersForm
                       {...stepProps}
                       onSubmit={this.handleFiltersFormSubmit}
-                      specification={subjectMeta}
+                      subjectMeta={subjectMeta}
                     />
                   )}
                 </WizardStep>
@@ -292,68 +369,58 @@ class TableToolPage extends Component<Props, State> {
                         Explore data
                       </WizardStepHeading>
 
-                      {tableData.length > 0 && (
+                      <div className="govuk-!-margin-bottom-4">
+                        <TimePeriodDataTable
+                          filters={filters}
+                          indicators={indicators}
+                          publicationName={publication ? publication.title : ''}
+                          subjectName={subjectName}
+                          locations={locationsList}
+                          timePeriods={timePeriodRange}
+                          results={tableData}
+                        />
+                      </div>
+
+                      {publication && (
                         <>
-                          <div className="govuk-!-margin-bottom-4">
-                            <TimePeriodDataTable
-                              filters={filters}
-                              indicators={indicators}
-                              publicationName={
-                                publication ? publication.title : ''
-                              }
-                              subjectName={subjectName}
-                              locations={locations}
-                              timePeriods={timePeriods}
-                              results={tableData}
-                            />
-                          </div>
+                          <h3>Additional options</h3>
 
-                          {publication && (
-                            <>
-                              <h3>Additional options</h3>
+                          <ul className="govuk-list">
+                            <li>
+                              <Link
+                                as={`/statistics/${publication.slug}`}
+                                to={`/statistics/publication?publication=${publication.slug}`}
+                              >
+                                Go to publication
+                              </Link>
+                            </li>
+                            <li>
+                              <DownloadCsvButton
+                                publicationSlug={publication.slug}
+                                meta={subjectMeta}
+                                filters={filters}
+                                indicators={indicators}
+                                locations={locationsList}
+                                timePeriods={timePeriodRange}
+                                results={tableData}
+                              />
+                            </li>
 
-                              <ul className="govuk-list">
-                                <li>
-                                  <Link
-                                    as={`/statistics/${publication.slug}`}
-                                    to={`/statistics/publication?publication=${
-                                      publication.slug
-                                    }`}
-                                  >
-                                    Go to publication
-                                  </Link>
-                                </li>
-                                <li>
-                                  <DownloadCsvButton
-                                    publicationSlug={publication.slug}
-                                    meta={subjectMeta}
-                                    filters={filters}
-                                    indicators={indicators}
-                                    locations={locations}
-                                    timePeriods={timePeriods}
-                                    results={tableData}
-                                  />
-                                </li>
-
-                                <li>
-                                  <a href="#api">Access developer API</a>
-                                </li>
-                                <li>
-                                  <Link
-                                    as={`/methodologies/${publication.slug}`}
-                                    to={`/methodologies/methodology?methodology=${
-                                      publication.slug
-                                    }`}
-                                  >
-                                    Go to methodology
-                                  </Link>
-                                </li>
-                                <li>
-                                  <a href="#contact">Contact</a>
-                                </li>
-                              </ul>
-                            </>
-                          )}
+                            <li>
+                              <a href="#api">Access developer API</a>
+                            </li>
+                            <li>
+                              <Link
+                                as={`/methodologies/${publication.slug}`}
+                                to={`/methodologies/methodology?methodology=${publication.slug}`}
+                              >
+                                Go to methodology
+                              </Link>
+                            </li>
+                            <li>
+                              <a href="#contact">Contact</a>
+                            </li>
+                          </ul>
                         </>
                       )}
                     </>

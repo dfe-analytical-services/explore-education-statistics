@@ -1,138 +1,138 @@
-import commaList from '@common/lib/utils/string/commaList';
-import {
-  FilterOption,
-  IndicatorOption,
-  TableData,
-} from '@common/services/tableBuilderService';
-import TimePeriod from '@common/services/types/TimePeriod';
+import cartesian from '@common/lib/utils/cartesian';
+import formatPretty from '@common/lib/utils/number/formatPretty';
+import { TableData } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types/util';
+import {
+  CategoryFilter,
+  Indicator,
+  LocationFilter,
+} from '@frontend/modules/table-tool/components/types/filters';
+import TimePeriod from '@frontend/modules/table-tool/components/types/TimePeriod';
+import last from 'lodash/last';
 import sortBy from 'lodash/sortBy';
 import React, { memo, useEffect, useRef, useState } from 'react';
-import FixedHeaderGroupedDataTable, {
-  HeaderGroup,
-  RowGroup,
-} from './FixedHeaderGroupedDataTable';
-import TableHeadersForm from './TableHeadersForm';
-
-interface TableHeaders {
-  columnGroups: FilterOption[];
-  columns: TimePeriod[];
-  rowGroups: FilterOption[];
-  rows: IndicatorOption[];
-}
+import DataTableCaption from './DataTableCaption';
+import FixedMultiHeaderDataTable from './FixedMultiHeaderDataTable';
+import TableHeadersForm, { TableHeadersFormValues } from './TableHeadersForm';
 
 interface Props {
-  indicators: IndicatorOption[];
-  filters: Dictionary<FilterOption[]>;
+  indicators: Indicator[];
+  filters: Dictionary<CategoryFilter[]>;
   timePeriods: TimePeriod[];
   publicationName: string;
   subjectName: string;
-  locations: Dictionary<FilterOption[]>;
+  locations: LocationFilter[];
   results: TableData['result'];
 }
 
-const TimePeriodDataTable = ({
-  filters,
-  timePeriods,
-  indicators,
-  publicationName,
-  subjectName,
-  locations,
-  results,
-}: Props) => {
+const TimePeriodDataTable = (props: Props) => {
+  const { filters, timePeriods, locations, indicators, results } = props;
+
   const dataTableRef = useRef<HTMLTableElement>(null);
 
-  const [columnGroups, rowGroups] = sortBy(Object.values(filters), [
-    options => options.length,
-  ]);
-
-  const [tableHeaders, setTableHeaders] = useState<TableHeaders>({
-    columnGroups,
-    rowGroups,
-    columns: timePeriods,
-    rows: indicators,
+  const [tableHeaders, setTableHeaders] = useState<TableHeadersFormValues>({
+    columnGroups: [],
+    columns: [],
+    rowGroups: [],
+    rows: [],
   });
 
   useEffect(() => {
+    const sortedFilters = sortBy(
+      Object.values({
+        ...filters,
+        locations,
+      }),
+      [options => options.length],
+    );
+
+    const halfwayIndex = Math.floor(sortedFilters.length / 2);
+
     setTableHeaders({
-      columnGroups,
-      rowGroups,
+      columnGroups: sortedFilters.slice(0, halfwayIndex),
+      rowGroups: sortedFilters.slice(halfwayIndex),
       columns: timePeriods,
       rows: indicators,
     });
-  }, [columnGroups, rowGroups, timePeriods, indicators]);
+  }, [filters, timePeriods, locations, indicators]);
 
-  const startLabel = timePeriods[0].label;
-  const endLabel = timePeriods[timePeriods.length - 1].label;
+  const columnHeaders: string[][] = [
+    ...tableHeaders.columnGroups.map(colGroup =>
+      colGroup.map(group => group.label),
+    ),
+    tableHeaders.columns.map(column => column.label),
+  ];
 
-  const locationLabels = Object.values(locations).flatMap(locationOptions =>
-    locationOptions.map(location => location.label),
+  const rowHeaders: string[][] = [
+    ...tableHeaders.rowGroups.map(rowGroup =>
+      rowGroup.map(group => group.label),
+    ),
+    tableHeaders.rows.map(row => row.label),
+  ];
+
+  const rowHeadersCartesian = cartesian(
+    ...tableHeaders.rowGroups,
+    tableHeaders.rows,
   );
 
-  const timePeriodString =
-    startLabel === endLabel
-      ? ` for ${startLabel}`
-      : ` between ${startLabel} and ${endLabel}`;
-
-  const caption = `Table showing '${subjectName}' from '${publicationName}' in ${commaList(
-    locationLabels,
-  )} ${timePeriodString}`;
-
-  const headerRow: HeaderGroup[] = tableHeaders.columnGroups.map(
-    columnGroup => {
-      return {
-        columns: tableHeaders.columns.map(column => column.label),
-        label: columnGroup.label,
-      };
-    },
+  const columnHeadersCartesian = cartesian(
+    ...tableHeaders.columnGroups,
+    tableHeaders.columns,
   );
 
-  const groupedData: RowGroup[] = tableHeaders.rowGroups.map(rowGroup => {
-    const rows = tableHeaders.rows.map(row => {
-      const columnGroupValues = tableHeaders.columnGroups.map(colGroup =>
-        tableHeaders.columns.map(column => {
-          const matchingResult = results.find(result => {
-            return Boolean(
-              result.measures[row.value] !== undefined &&
-                result.filters.every(filter =>
-                  [colGroup.value, rowGroup.value].includes(filter),
-                ) &&
-                result.timeIdentifier === column.code &&
-                result.year === column.year,
-            );
-          });
+  const rows = rowHeadersCartesian.map(rowFilterCombination => {
+    const rowCol1 = last(rowFilterCombination);
 
-          if (!matchingResult) {
-            return 'n/a';
-          }
+    return columnHeadersCartesian.map(columnFilterCombination => {
+      const rowCol2 = last(columnFilterCombination);
 
-          const rawValue = matchingResult.measures[row.value];
-          const numberValue = Number(rawValue);
+      // User could choose to flip rows and columns
+      const indicator = (rowCol1 instanceof Indicator
+        ? rowCol1
+        : rowCol2) as Indicator;
+      const timePeriod = (rowCol2 instanceof TimePeriod
+        ? rowCol2
+        : rowCol1) as TimePeriod;
 
-          if (Number.isNaN(numberValue)) {
-            return rawValue;
-          }
+      const filterCombination = [
+        ...rowFilterCombination,
+        ...columnFilterCombination,
+      ];
 
-          const decimals = rawValue.split('.')[1];
-          const decimalPlaces = decimals ? decimals.length : 0;
-
-          return `${numberValue.toLocaleString('en-GB', {
-            maximumFractionDigits: decimalPlaces,
-            minimumFractionDigits: decimalPlaces,
-          })}${row.unit}`;
-        }),
+      const categoryFilters = filterCombination.filter(
+        filter => filter instanceof CategoryFilter,
       );
 
-      return {
-        columnGroups: columnGroupValues,
-        label: row.label,
-      };
-    });
+      const locationFilters = filterCombination.filter(
+        filter => filter instanceof LocationFilter,
+      ) as LocationFilter[];
 
-    return {
-      rows,
-      label: rowGroup.label,
-    };
+      const matchingResult = results.find(result => {
+        return (
+          categoryFilters.every(filter =>
+            result.filters.includes(filter.value),
+          ) &&
+          result.timePeriod === timePeriod.value &&
+          locationFilters.every(
+            filter =>
+              result.location[filter.level] &&
+              result.location[filter.level].code === filter.value,
+          )
+        );
+      });
+
+      if (!matchingResult) {
+        return 'n/a';
+      }
+
+      const value = matchingResult.measures[indicator.value];
+
+      if (Number.isNaN(Number(value))) {
+        return value;
+      }
+
+      return `${formatPretty(value)}${indicator.unit}`;
+    });
   });
 
   return (
@@ -140,7 +140,7 @@ const TimePeriodDataTable = ({
       <TableHeadersForm
         initialValues={tableHeaders}
         onSubmit={value => {
-          setTableHeaders(value as TableHeaders);
+          setTableHeaders(value);
 
           if (dataTableRef.current) {
             dataTableRef.current.scrollIntoView({
@@ -151,10 +151,11 @@ const TimePeriodDataTable = ({
         }}
       />
 
-      <FixedHeaderGroupedDataTable
-        caption={caption}
-        headers={headerRow}
-        rowGroups={groupedData}
+      <FixedMultiHeaderDataTable
+        caption={<DataTableCaption {...props} id="dataTableCaption" />}
+        columnHeaders={columnHeaders}
+        rowHeaders={rowHeaders}
+        rows={rows}
         ref={dataTableRef}
       />
     </div>

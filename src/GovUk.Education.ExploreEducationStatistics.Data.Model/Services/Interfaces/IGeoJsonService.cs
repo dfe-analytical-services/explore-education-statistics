@@ -2,6 +2,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
 {
     public interface IGeoJsonService
     {
-        GeoJson Find(string code);
+        GeoJson Find(GeographicLevel level, string code);
     }
 }

@@ -1,13 +1,8 @@
-using Newtonsoft.Json;
-
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
     public class Sponsor : IObservationalUnit
     {
-        [JsonProperty(PropertyName = "sponsor_id")]
         public string Code { get; set; }
-
-        [JsonProperty(PropertyName = "sponsor_name")]
         public string Name { get; set; }
 
         private Sponsor()

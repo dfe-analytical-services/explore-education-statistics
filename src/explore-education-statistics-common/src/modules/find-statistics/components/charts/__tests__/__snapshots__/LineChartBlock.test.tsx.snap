@@ -58,8 +58,8 @@ exports[`LineChartBlock renders with correct output 1`] = `
               x1="80"
               x2="870"
               y="5"
-              y1="173"
-              y2="173"
+              y1="185"
+              y2="185"
             />
             <line
               fill="none"
@@ -71,8 +71,21 @@ exports[`LineChartBlock renders with correct output 1`] = `
               x1="80"
               x2="870"
               y="5"
-              y1="101"
-              y2="101"
+              y1="125"
+              y2="125"
+            />
+            <line
+              fill="none"
+              height="240"
+              stroke="#ccc"
+              stroke-dasharray="3 3"
+              width="790"
+              x="80"
+              x1="80"
+              x2="870"
+              y="5"
+              y1="65"
+              y2="65"
             />
             <line
               fill="none"
@@ -242,9 +255,7 @@ exports[`LineChartBlock renders with correct output 1`] = `
             <tspan
               dy="0.71em"
               x="475"
-            >
-              test x axis
-            </tspan>
+            />
           </text>
         </g>
         <g
@@ -296,7 +307,7 @@ exports[`LineChartBlock renders with correct output 1`] = `
                   dy="0.355em"
                   x="72"
                 >
-                  0%
+                  -10
                 </tspan>
               </text>
             </g>
@@ -313,8 +324,8 @@ exports[`LineChartBlock renders with correct output 1`] = `
                 x1="74"
                 x2="80"
                 y="5"
-                y1="173"
-                y2="173"
+                y1="185"
+                y2="185"
               />
               <text
                 class="recharts-text recharts-cartesian-axis-tick-value"
@@ -324,13 +335,13 @@ exports[`LineChartBlock renders with correct output 1`] = `
                 text-anchor="end"
                 width="60"
                 x="72"
-                y="173"
+                y="185"
               >
                 <tspan
                   dy="0.355em"
                   x="72"
                 >
-                  3%
+                  -5
                 </tspan>
               </text>
             </g>
@@ -347,8 +358,8 @@ exports[`LineChartBlock renders with correct output 1`] = `
                 x1="74"
                 x2="80"
                 y="5"
-                y1="101"
-                y2="101"
+                y1="125"
+                y2="125"
               />
               <text
                 class="recharts-text recharts-cartesian-axis-tick-value"
@@ -358,13 +369,47 @@ exports[`LineChartBlock renders with correct output 1`] = `
                 text-anchor="end"
                 width="60"
                 x="72"
-                y="101"
+                y="125"
               >
                 <tspan
                   dy="0.355em"
                   x="72"
                 >
-                  6%
+                  0
+                </tspan>
+              </text>
+            </g>
+            <g
+              class="recharts-layer recharts-cartesian-axis-tick"
+            >
+              <line
+                class="recharts-cartesian-axis-tick-line"
+                fill="none"
+                height="240"
+                stroke="#666"
+                width="60"
+                x="20"
+                x1="74"
+                x2="80"
+                y="5"
+                y1="65"
+                y2="65"
+              />
+              <text
+                class="recharts-text recharts-cartesian-axis-tick-value"
+                fill="#666"
+                height="240"
+                stroke="none"
+                text-anchor="end"
+                width="60"
+                x="72"
+                y="65"
+              >
+                <tspan
+                  dy="0.355em"
+                  x="72"
+                >
+                  5
                 </tspan>
               </text>
             </g>
@@ -398,7 +443,7 @@ exports[`LineChartBlock renders with correct output 1`] = `
                   dy="0.355em"
                   x="72"
                 >
-                  10%
+                  10
                 </tspan>
               </text>
             </g>
@@ -413,9 +458,7 @@ exports[`LineChartBlock renders with correct output 1`] = `
             <tspan
               dy="0.355em"
               x="20"
-            >
-              test y axis
-            </tspan>
+            />
           </text>
         </g>
         <g
@@ -423,36 +466,36 @@ exports[`LineChartBlock renders with correct output 1`] = `
         >
           <path
             class="recharts-curve recharts-line-curve"
-            d="M100,173L850,173"
+            d="M100,89L850,161"
             fill="none"
             height="240"
-            stroke="#4763a5"
-            stroke-width="5"
+            stroke="#3182bd"
+            stroke-width="2"
             width="790"
           />
           <g
             class="recharts-layer recharts-line-dots"
           >
-            <path
-              class="recharts-symbols"
-              d="M4.51351666838205,0A4.51351666838205,4.51351666838205,0,1,1,-4.51351666838205,0A4.51351666838205,4.51351666838205,0,1,1,4.51351666838205,0"
-              fill="#4763a5"
+            <circle
+              class="recharts-dot recharts-line-dot"
+              cx="100"
+              cy="89"
+              fill="#fff"
               height="240"
               r="3"
-              stroke="#4763a5"
-              stroke-width="5"
-              transform="translate(100, 173)"
+              stroke="#3182bd"
+              stroke-width="2"
               width="790"
             />
-            <path
-              class="recharts-symbols"
-              d="M4.51351666838205,0A4.51351666838205,4.51351666838205,0,1,1,-4.51351666838205,0A4.51351666838205,4.51351666838205,0,1,1,4.51351666838205,0"
-              fill="#4763a5"
+            <circle
+              class="recharts-dot recharts-line-dot"
+              cx="850"
+              cy="161"
+              fill="#fff"
               height="240"
               r="3"
-              stroke="#4763a5"
-              stroke-width="5"
-              transform="translate(850, 173)"
+              stroke="#3182bd"
+              stroke-width="2"
               width="790"
             />
           </g>
@@ -462,36 +505,36 @@ exports[`LineChartBlock renders with correct output 1`] = `
         >
           <path
             class="recharts-curve recharts-line-curve"
-            d="M100,5L850,5"
+            d="M100,5L850,77"
             fill="none"
             height="240"
-            stroke="#f5a450"
-            stroke-width="5"
+            stroke="#3182bd"
+            stroke-width="2"
             width="790"
           />
           <g
             class="recharts-layer recharts-line-dots"
           >
-            <path
-              class="recharts-symbols"
-              d="M-4,-4h8v8h-8Z"
-              fill="#f5a450"
+            <circle
+              class="recharts-dot recharts-line-dot"
+              cx="100"
+              cy="5"
+              fill="#fff"
               height="240"
               r="3"
-              stroke="#f5a450"
-              stroke-width="5"
-              transform="translate(100, 5)"
+              stroke="#3182bd"
+              stroke-width="2"
               width="790"
             />
-            <path
-              class="recharts-symbols"
-              d="M-4,-4h8v8h-8Z"
-              fill="#f5a450"
+            <circle
+              class="recharts-dot recharts-line-dot"
+              cx="850"
+              cy="77"
+              fill="#fff"
               height="240"
               r="3"
-              stroke="#f5a450"
-              stroke-width="5"
-              transform="translate(850, 5)"
+              stroke="#3182bd"
+              stroke-width="2"
               width="790"
             />
           </g>
@@ -501,36 +544,36 @@ exports[`LineChartBlock renders with correct output 1`] = `
         >
           <path
             class="recharts-curve recharts-line-curve"
-            d="M100,125L850,125"
+            d="M100,65L850,113"
             fill="none"
             height="240"
-            stroke="#005ea5"
-            stroke-width="5"
+            stroke="#3182bd"
+            stroke-width="2"
             width="790"
           />
           <g
             class="recharts-layer recharts-line-dots"
           >
-            <path
-              class="recharts-symbols"
-              d="M0,-7.019061402413294L6.07868548521274,3.509530701206647L-6.07868548521274,3.509530701206647Z"
-              fill="#005ea5"
+            <circle
+              class="recharts-dot recharts-line-dot"
+              cx="100"
+              cy="65"
+              fill="#fff"
               height="240"
               r="3"
-              stroke="#005ea5"
-              stroke-width="5"
-              transform="translate(100, 125)"
+              stroke="#3182bd"
+              stroke-width="2"
               width="790"
             />
-            <path
-              class="recharts-symbols"
-              d="M0,-7.019061402413294L6.07868548521274,3.509530701206647L-6.07868548521274,3.509530701206647Z"
-              fill="#005ea5"
+            <circle
+              class="recharts-dot recharts-line-dot"
+              cx="850"
+              cy="113"
+              fill="#fff"
               height="240"
               r="3"
-              stroke="#005ea5"
-              stroke-width="5"
-              transform="translate(850, 125)"
+              stroke="#3182bd"
+              stroke-width="2"
               width="790"
             />
           </g>
@@ -557,10 +600,14 @@ exports[`LineChartBlock renders with correct output 1`] = `
               width="14"
             >
               <path
-                class="recharts-symbols"
-                d="M16,0A16,16,0,1,1,-16,0A16,16,0,1,1,16,0"
-                fill="#4763a5"
-                transform="translate(16, 16)"
+                class="recharts-legend-icon"
+                d="M0,16h10.666666666666666
+            A5.333333333333333,5.333333333333333,0,1,1,21.333333333333332,16
+            H32M21.333333333333332,16
+            A5.333333333333333,5.333333333333333,0,1,1,10.666666666666666,16"
+                fill="none"
+                stroke="#3182bd"
+                stroke-width="4"
               />
             </svg>
             <span
@@ -582,10 +629,14 @@ exports[`LineChartBlock renders with correct output 1`] = `
               width="14"
             >
               <path
-                class="recharts-symbols"
-                d="M-16,-16h32v32h-32Z"
-                fill="#f5a450"
-                transform="translate(16, 16)"
+                class="recharts-legend-icon"
+                d="M0,16h10.666666666666666
+            A5.333333333333333,5.333333333333333,0,1,1,21.333333333333332,16
+            H32M21.333333333333332,16
+            A5.333333333333333,5.333333333333333,0,1,1,10.666666666666666,16"
+                fill="none"
+                stroke="#3182bd"
+                stroke-width="4"
               />
             </svg>
             <span
@@ -607,10 +658,14 @@ exports[`LineChartBlock renders with correct output 1`] = `
               width="14"
             >
               <path
-                class="recharts-symbols"
-                d="M0,-18.475208614068023L15.999999999999998,9.237604307034012L-15.999999999999998,9.237604307034012Z"
-                fill="#005ea5"
-                transform="translate(16, 16)"
+                class="recharts-legend-icon"
+                d="M0,16h10.666666666666666
+            A5.333333333333333,5.333333333333333,0,1,1,21.333333333333332,16
+            H32M21.333333333333332,16
+            A5.333333333333333,5.333333333333333,0,1,1,10.666666666666666,16"
+                fill="none"
+                stroke="#3182bd"
+                stroke-width="4"
               />
             </svg>
             <span

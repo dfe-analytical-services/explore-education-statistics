@@ -68,8 +68,8 @@ parser.add_argument("--ci",
 args = parser.parse_args()
 
 # Default values
-timeout = 10
-implicit_wait = 10
+timeout = 20
+implicit_wait = 20
 
 # Set robotArgs
 robotArgs = ["--outputdir", "test-results/", "--exclude", "Failing",
@@ -88,6 +88,7 @@ else:
     if args.env == 'local':
         url = "http://localhost:3000"
         urlAdmin = "http://localhost:3001"
+        robotArgs += ['--exclude', 'NotAgainstLocal']
     else:
         load_dotenv(os.path.join(os.path.dirname(__file__), '.env.' + args.env))
         url = os.getenv('publicAppUrl')

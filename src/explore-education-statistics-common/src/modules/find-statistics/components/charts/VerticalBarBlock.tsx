@@ -1,7 +1,16 @@
-import ChartFunctions, {
-  ChartProps,
+import {
+  calculateMargins,
+  calculateXAxis,
+  calculateYAxis,
+  ChartDataB,
+  ChartDefinition,
+  createDataForAxis,
+  getKeysForChart,
+  mapNameToNameLabel,
+  populateDefaultChartProps,
+  StackedBarProps,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
-import React from 'react';
+import React, { Component } from 'react';
 import {
   Bar,
   BarChart,
@@ -10,54 +19,76 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from 'recharts';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 
-import { colours } from './Charts';
+export default class VerticalBarBlock extends Component<StackedBarProps> {
+  public static definition: ChartDefinition = {
+    type: 'verticalbar',
+    name: 'Vertical Bar',
 
-export default function VerticalBarBlock({
-  data,
-  indicators,
-  height,
-  xAxis,
-  yAxis,
-  width,
-  meta,
-}: ChartProps) {
-  const chartData = data.result.map(({ measures, year, timeIdentifier }) => ({
-    name: `${meta.timePeriods[`${year}_${timeIdentifier}`].label}`,
-    ...measures,
-  }));
+    data: [
+      {
+        type: 'bar',
+        title: 'Bar',
+        entryCount: 1,
+        targetAxis: 'xaxis',
+      },
+    ],
 
-  return (
-    <ResponsiveContainer width={width || 900} height={height || 300}>
-      <BarChart
-        data={chartData}
-        margin={ChartFunctions.calculateMargins(xAxis, yAxis, undefined)}
-      >
-        {ChartFunctions.calculateXAxis(xAxis, {
-          interval: 0,
-          tick: { fontSize: 12 },
-          dataKey: xAxis.key || 'name',
-        })}
+    axes: [
+      {
+        id: 'xaxis',
+        title: 'X Axis',
+        type: 'major',
+        defaultDataType: 'timePeriods',
+      },
+    ],
+  };
 
-        <CartesianGrid />
+  public render() {
+    const { data, meta, height, width, labels, axes, stacked } = this.props;
 
-        {ChartFunctions.calculateYAxis(yAxis, { type: 'number' })}
+    if (!axes.major || !data) return <LoadingSpinner />;
 
-        <Tooltip />
-        <Legend />
+    const chartData: ChartDataB[] = createDataForAxis(
+      axes.major,
+      data.result,
+      meta,
+    ).map(mapNameToNameLabel(labels, meta.timePeriods, meta.locations));
 
-        {indicators.map((dataKey, index) => {
-          return (
+    const keysForChart = getKeysForChart(chartData);
+
+    const yAxis = { key: undefined, title: '' };
+    const xAxis = { key: undefined, title: '' };
+
+    return (
+      <ResponsiveContainer width={width || 900} height={height || 300}>
+        <BarChart
+          data={chartData}
+          margin={calculateMargins(xAxis, yAxis, undefined)}
+        >
+          {calculateXAxis(xAxis, {
+            interval: 0,
+            tick: { fontSize: 12 },
+            dataKey: 'name',
+          })}
+
+          <CartesianGrid />
+
+          {calculateYAxis(yAxis, { type: 'number' })}
+
+          <Tooltip />
+          <Legend />
+
+          {Array.from(keysForChart).map(name => (
             <Bar
-              key={dataKey}
-              dataKey={dataKey}
-              fill={colours[index]}
-              name={(meta && meta.indicators[dataKey].label) || 'a'}
-              isAnimationActive={false}
+              key={name}
+              {...populateDefaultChartProps(name, labels[name])}
+              stackId={stacked ? 'a' : undefined}
             />
-          );
-        })}
-      </BarChart>
-    </ResponsiveContainer>
-  );
+          ))}
+        </BarChart>
+      </ResponsiveContainer>
+    );
+  }
 }
