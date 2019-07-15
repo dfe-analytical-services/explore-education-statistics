@@ -79,13 +79,16 @@ const FormSelect = ({
             >
               {option.label}
             </option>
-          ))
-        }
+          ))}
         {optGroups &&
           Object.keys(optGroups).map(group => (
             <optgroup key={group} label={group}>
               {optGroups[group].map(option => (
-                <option key={option.value} value={option.value} style={option.style}>
+                <option
+                  key={option.value}
+                  value={option.value}
+                  style={option.style}
+                >
                   {option.label}
                 </option>
               ))}

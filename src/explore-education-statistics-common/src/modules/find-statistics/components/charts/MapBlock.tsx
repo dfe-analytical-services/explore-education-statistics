@@ -503,7 +503,9 @@ class MapBlock extends Component<MapProps, MapState> {
       if (feature.properties) {
         const content = Object.entries(feature.properties.measures).map(
           ([id, value]) =>
-            `${meta.indicators[id].label} : ${value}${meta.indicators[id].unit}`,
+            `${meta.indicators[id].label} : ${value}${
+              meta.indicators[id].unit
+            }`,
         );
 
         if (feature.id) {
