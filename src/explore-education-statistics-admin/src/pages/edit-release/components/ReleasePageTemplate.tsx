@@ -3,7 +3,7 @@ import PreviousNextLinks from '@admin/components/PreviousNextLinks';
 import NavLink from '@admin/components/NavLink';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { viewRoutes } from '@admin/routes/releaseRoutes';
-import Page from '../../../components/Page';
+import Page from '@admin/components/Page';
 
 interface Props extends RouteComponentProps {
   releaseId: string;

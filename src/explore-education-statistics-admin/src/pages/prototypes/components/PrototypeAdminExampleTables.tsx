@@ -12,7 +12,7 @@ import DataBlockService, {
   DataBlockResponse,
   GeographicLevel,
 } from '@common/services/dataBlockService';
-import Link from '../../../components/Link';
+import Link from '@admin/components/Link';
 import PrototypeData, { PrototypeTable } from '../PrototypeData';
 
 interface Props {

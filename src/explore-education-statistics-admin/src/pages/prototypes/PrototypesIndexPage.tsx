@@ -2,7 +2,7 @@ import React from 'react';
 
 import { FormSelect, FormGroup } from '@common/components/form';
 import { PrototypeLoginService } from '@admin/services/PrototypeLoginService';
-import Link from '../../components/Link';
+import Link from '@admin/components/Link';
 import PrototypePage from './components/PrototypePage';
 
 function PrototypesIndexPage() {

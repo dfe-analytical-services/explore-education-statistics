@@ -1,16 +1,17 @@
+import {
+  AdminDashboardPublication,
+  ThemeAndTopics,
+} from '@admin/services/api/dashboard/types';
 import React, { useContext, useEffect, useState } from 'react';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import { LoginContext } from '@admin/components/Login';
-import DummyPublicationsData, {
-  ThemeAndTopics,
-} from '@admin/pages/DummyPublicationsData';
-import { IdLabelPair, Publication } from '@admin/services/types/types';
-import AdminDashboardPublicationsTab from '@admin/components/AdminDashboardPublicationsTab';
-import themeService from '@admin/services/themeService';
-import Link from '../components/Link';
-import Page from '../components/Page';
+import { IdLabelPair } from '@admin/services/api/common/types/types';
+import dashboardService from '@admin/services/api/dashboard/service';
+import Link from '@admin/components/Link';
+import Page from '@admin/components/Page';
+import AdminDashboardPublicationsTab from './components/AdminDashboardPublicationsTab';
 
 const themeToThemeWithIdLabelAndTopics = (theme: ThemeAndTopics) => ({
   id: theme.id,
@@ -34,7 +35,9 @@ interface ThemeAndTopicsIdsAndLabels extends IdLabelPair {
 }
 
 const AdminDashboardPage = () => {
-  const [myPublications, setMyPublications] = useState<Publication[]>([]);
+  const [myPublications, setMyPublications] = useState<
+    AdminDashboardPublication[]
+  >([]);
 
   const [themes, setThemes] = useState<ThemeAndTopicsIdsAndLabels[]>();
 
@@ -54,7 +57,7 @@ const AdminDashboardPage = () => {
     }
 
     if (!themes) {
-      themeService.getThemesAndTopics(loggedInUser.id).then(themeList => {
+      dashboardService.getThemesAndTopics(loggedInUser.id).then(themeList => {
         const themesAsIdLabelPairs = themeList.map(
           themeToThemeWithIdLabelAndTopics,
         );
@@ -69,11 +72,9 @@ const AdminDashboardPage = () => {
     }
 
     if (selectedThemeAndTopic) {
-      const fetchedMyPublications = DummyPublicationsData.myPublications.filter(
-        publication => publication.topic.id === selectedThemeAndTopic.topic.id,
-      );
-
-      setMyPublications(fetchedMyPublications);
+      dashboardService
+        .getPublicationsByTopic(selectedThemeAndTopic.topic.id, loggedInUser.id)
+        .then(setMyPublications);
     }
   }, [authentication, selectedThemeAndTopic, themes]);
 
