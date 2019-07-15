@@ -168,10 +168,7 @@ exports[`FormFieldCheckboxGroupsMenu renders single checkbox group with search i
         id="test-all"
         type="button"
       >
-        Select
-         all 
-        2
-         options
+        Select all 2 options
       </button>
       <div
         class="govuk-checkboxes__item"
