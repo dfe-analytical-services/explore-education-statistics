@@ -1,36 +1,34 @@
-
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Internal;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
     // TODO rename to Themes once the current Crud theme controller is removed
-    [Route("[controller]")]
     [ApiController]
     [Authorize]
     public class ThemeController : ControllerBase
     {
-
         private readonly IThemeService _themeService;
-        
+
         public ThemeController(IThemeService themeService)
         {
             _themeService = themeService;
         }
-        
-        // GET api/themes?userId={guid}
-        [HttpGet]
+
+        // GET api/me/themes/
+        [HttpGet("/me/themes")]
         [AllowAnonymous]
-        public ActionResult<List<Theme>> GetThemes([Required][FromQuery(Name ="userId")]Guid guid)
+        public ActionResult<List<Theme>> GetMyThemes()
         {
-            var result =  _themeService.GetThemes(guid);
-            
+            var userId = new Guid(); // TODO get the Guid from AD
+
+            var result = _themeService.GetUserThemes(userId);
+
             if (result.Any())
             {
                 return result;

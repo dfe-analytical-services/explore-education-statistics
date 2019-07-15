@@ -2,8 +2,7 @@ import { OmitStrict, PartialBy } from '@common/types/util';
 import classNames from 'classnames';
 import kebabCase from 'lodash/kebabCase';
 import orderBy from 'lodash/orderBy';
-import memoize from 'memoizee';
-import React, { ChangeEvent, createRef, PureComponent } from 'react';
+import React, { createRef, PureComponent } from 'react';
 import FormFieldset, { FormFieldsetProps } from './FormFieldset';
 import FormRadio, {
   FormRadioProps,
@@ -15,15 +14,10 @@ type RadioOption = PartialBy<
   'id'
 >;
 
-export type RadioGroupChangeEventHandler = (
-  event: ChangeEvent<HTMLInputElement>,
-  option: RadioOption,
-) => void;
-
 export type FormRadioGroupProps = {
   inline?: boolean;
   name: string;
-  onChange?: RadioGroupChangeEventHandler;
+  onChange?: RadioChangeEventHandler;
   options: RadioOption[];
   small?: boolean;
   order?:
@@ -45,20 +39,6 @@ class FormRadioGroup extends PureComponent<FormRadioGroupProps> {
 
   private ref = createRef<HTMLInputElement>();
 
-  private handleChange = memoize(
-    (option: RadioOption): RadioChangeEventHandler => event => {
-      const { onChange } = this.props;
-
-      if (onChange) {
-        onChange(event, option);
-      }
-    },
-    {
-      normalizer: ([option]: [RadioOption]) =>
-        `${option.value}-${option.label}-${option.id}`,
-    },
-  );
-
   public componentDidMount(): void {
     if (this.ref.current) {
       import('govuk-frontend/components/radios/radios').then(
@@ -68,6 +48,14 @@ class FormRadioGroup extends PureComponent<FormRadioGroupProps> {
       );
     }
   }
+
+  private handleChange: RadioChangeEventHandler = (event, option) => {
+    const { onChange } = this.props;
+
+    if (onChange) {
+      onChange(event, option);
+    }
+  };
 
   public render() {
     const {
@@ -97,7 +85,7 @@ class FormRadioGroup extends PureComponent<FormRadioGroupProps> {
               checked={value === option.value}
               key={option.value}
               name={name}
-              onChange={this.handleChange(option)}
+              onChange={this.handleChange}
             />
           ))}
         </div>
