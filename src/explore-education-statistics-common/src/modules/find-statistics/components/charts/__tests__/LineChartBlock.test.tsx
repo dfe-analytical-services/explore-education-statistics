@@ -8,7 +8,7 @@ import testData from './__data__/testBlockData';
 jest.mock('recharts/lib/util/LogUtils');
 
 const props = testData.AbstractChartProps;
-const { data, meta, labels, axes } = props;
+const { axes } = props;
 
 describe('LineChartBlock', () => {
   test('renders basic chart correctly', () => {

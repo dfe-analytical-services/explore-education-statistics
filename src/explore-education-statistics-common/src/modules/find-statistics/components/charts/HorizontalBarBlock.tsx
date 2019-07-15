@@ -1,6 +1,4 @@
 import {
-  calculateXAxis,
-  calculateYAxis,
   generateReferenceLines,
   ChartDefinition,
   ChartDataB,
@@ -18,6 +16,8 @@ import {
   Legend,
   ResponsiveContainer,
   Tooltip,
+  XAxis,
+  YAxis,
 } from 'recharts';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 
@@ -37,10 +37,15 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
 
     axes: [
       {
-        id: 'yaxis',
+        id: 'major',
         title: 'Y Axis',
         type: 'major',
         defaultDataType: 'timePeriods',
+      },
+      {
+        id: 'minor',
+        title: 'X Axis',
+        type: 'minor',
       },
     ],
   };
@@ -63,24 +68,51 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
       axes.major,
       data.result,
       meta,
-    ).map(mapNameToNameLabel(labels));
+    ).map(mapNameToNameLabel(labels, meta.timePeriods));
 
     const keysForChart = getKeysForChart(chartData);
 
-    const yAxis = { key: undefined, title: '' };
-    const xAxis = { key: undefined, title: '' };
-
     return (
       <ResponsiveContainer width={width || '100%'} height={height || 600}>
-        <BarChart data={chartData} layout="vertical">
-          {calculateYAxis(yAxis, {
-            type: 'category',
-            dataKey: (xAxis.key || ['name'])[0],
-          })}
+        <BarChart data={chartData} layout="vertical" margin={{ left: 30 }}>
+          <CartesianGrid
+            strokeDasharray="3 3"
+            horizontal={axes.minor && axes.minor.showGrid !== false}
+            vertical={axes.major && axes.major.showGrid !== false}
+          />
 
-          <CartesianGrid />
+          {axes.minor && axes.minor.visible !== false && (
+            <XAxis
+              type="number"
+              label={{
+                angle: -90,
+                offset: 0,
+                position: 'left',
+                value: '',
+              }}
+              scale="auto"
+              padding={{ left: 20, right: 20 }}
+              tickMargin={10}
+            />
+          )}
 
-          {calculateXAxis(xAxis, { type: 'number' })}
+          {axes.major && axes.major.visible !== false && (
+            <YAxis
+              type="category"
+              dataKey="name"
+              label={{
+                offset: 5,
+                position: 'bottom',
+                value: '',
+              }}
+              scale="auto"
+              interval={
+                axes.minor && axes.minor.visible !== false
+                  ? 'preserveStartEnd'
+                  : undefined
+              }
+            />
+          )}
 
           <Tooltip cursor={false} />
           <Legend />

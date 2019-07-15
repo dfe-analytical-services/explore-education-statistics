@@ -107,8 +107,13 @@ const ChartBuilder = ({ data }: Props) => {
     ChartConfiguration[]
   >([]);
 
+  const [axesConfiguration, setAxesConfiguration] = React.useState<
+    Dictionary<AxisConfigurationItem>
+  >({});
+
   const onDataAdded = (addedData: SelectedData) => {
-    setDataSets([...dataSets, addedData]);
+    const newDataSets = [...dataSets, addedData];
+    setDataSets(newDataSets);
 
     setChartDataConfiguration([
       ...chartDataConfiguration,
@@ -116,28 +121,48 @@ const ChartBuilder = ({ data }: Props) => {
         name: dataName(data.metaData, addedData),
         value: generateKeyFromDataSet(addedData),
         label: dataName(data.metaData, addedData),
-        colour: colours[dataSets.length % colours.length],
-        symbol: symbols[dataSets.length % symbols.length],
+        colour: colours[newDataSets.length % colours.length],
+        symbol: symbols[newDataSets.length % symbols.length],
       },
     ]);
   };
 
   const onDataRemoved = (removedData: SelectedData, index: number) => {
-    dataSets.splice(index, 1);
-    setDataSets([...dataSets]);
+    const newDataSets = [...dataSets];
 
-    chartDataConfiguration.splice(index, 1);
-    setChartDataConfiguration([...chartDataConfiguration]);
+    newDataSets.splice(index, 1);
+    setDataSets(newDataSets);
+    const newChartDataConfiguration = [...chartDataConfiguration];
+    newChartDataConfiguration.splice(index, 1);
+    setChartDataConfiguration(newChartDataConfiguration);
   };
 
-  const [axes, setAxes] = React.useState<Dictionary<AxisConfigurationItem>>({});
-
-  const [labels, setLabels] = React.useState<Dictionary<ChartConfiguration>>(
-    {},
-  );
+  /// the following are used in rendering the chart based on the configured values being constructed
+  const [
+    renderedAxesConfiguration,
+    setRenderedAxesConfiguration,
+  ] = React.useState<Dictionary<AxisConfigurationItem>>({});
+  const [
+    renderedChartConfiguration,
+    setRenderedChartConfiguration,
+  ] = React.useState<Dictionary<ChartConfiguration>>({});
+  React.useEffect(() => {
+    setRenderedAxesConfiguration(
+      Object.entries(axesConfiguration).reduce(
+        (populatedData, [key, value]) => ({
+          ...populatedData,
+          [key]: {
+            ...value,
+            dataSets: value.type === 'major' ? dataSets : [],
+          },
+        }),
+        {},
+      ),
+    );
+  }, [axesConfiguration, dataSets]);
 
   React.useEffect(() => {
-    setLabels({
+    setRenderedChartConfiguration({
       ...chartDataConfiguration.reduce<Dictionary<ChartConfiguration>>(
         (mapped, item) => ({
           ...mapped,
@@ -146,33 +171,41 @@ const ChartBuilder = ({ data }: Props) => {
         {},
       ),
 
-      ...generateAxesMetaData(axes, data),
+      ...generateAxesMetaData(axesConfiguration, data),
     });
-  }, [axes, chartDataConfiguration, data]);
+  }, [axesConfiguration, chartDataConfiguration, data]);
 
+  const previousSelectionChartType = React.useRef<ChartDefinition>();
+
+  // set defaults for a selected chart type
   React.useEffect(() => {
-    if (selectedChartType && Object.keys(axes).length === 0) {
-      const axiConfiguration = selectedChartType.axes.reduce<
-        Dictionary<AxisConfigurationItem>
-      >(
-        (axesConfigurationDictionary, axisDefinition) => ({
-          ...axesConfigurationDictionary,
+    if (previousSelectionChartType.current !== selectedChartType) {
+      previousSelectionChartType.current = selectedChartType;
 
-          [axisDefinition.type]: {
-            name: `${axisDefinition.title} (${axisDefinition.type} axis)`,
-            type: axisDefinition.type,
-            groupBy: axisDefinition.defaultDataType,
-            dataSets: axisDefinition.type === 'major' ? dataSets : [],
-            visible: true,
-            showGrid: true,
-          },
-        }),
-        {},
-      );
+      if (selectedChartType) {
+        const axisConfiguration = selectedChartType.axes.reduce<
+          Dictionary<AxisConfigurationItem>
+        >(
+          (axesConfigurationDictionary, axisDefinition) => ({
+            ...axesConfigurationDictionary,
 
-      setAxes(axiConfiguration);
+            [axisDefinition.type]: {
+              name: `${axisDefinition.title} (${axisDefinition.type} axis)`,
+              type: axisDefinition.type,
+              groupBy: axisDefinition.defaultDataType,
+
+              dataSets: axisDefinition.type === 'major' ? dataSets : [],
+              visible: true,
+              showGrid: true,
+            },
+          }),
+          {},
+        );
+
+        setAxesConfiguration(axisConfiguration);
+      }
     }
-  }, [dataSets, selectedChartType]);
+  }, [selectedChartType, dataSets]);
 
   return (
     <div className={styles.editor}>
@@ -202,10 +235,10 @@ const ChartBuilder = ({ data }: Props) => {
           <Details summary="Chart preview" open>
             <ChartRenderer
               type={selectedChartType.type}
-              axes={axes}
+              axes={renderedAxesConfiguration}
               data={data}
               meta={data.metaData}
-              labels={labels}
+              labels={renderedChartConfiguration}
             />
           </Details>
 
@@ -234,14 +267,17 @@ const ChartBuilder = ({ data }: Props) => {
             <p>
               Add / Remove and update the axes and how they display data ranges
             </p>
-            {Object.entries(axes).map(([key, axis]) => (
+            {Object.entries(axesConfiguration).map(([key, axis]) => (
               <ChartAxisConfiguration
                 key={key}
                 id={axis.name}
                 configuration={axis}
                 meta={data.metaData}
                 onConfigurationChange={updatedConfig => {
-                  setAxes({ ...axes, [key]: updatedConfig });
+                  setAxesConfiguration({
+                    ...axesConfiguration,
+                    [key]: updatedConfig,
+                  });
                 }}
               />
             ))}

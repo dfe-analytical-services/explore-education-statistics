@@ -61,9 +61,9 @@ const ChartDataSelector = ({
   const [selectedIndicator, setSelectedIndicator] = React.useState<string>('');
   const [selectedFilters, setSelectedFilters] = React.useState<string>('');
 
-  const [selectedList, setSelectedList] = React.useState<SelectedData[]>(
-    selectedData,
-  );
+  const [selectedList, setSelectedList] = React.useState<SelectedData[]>([
+    ...selectedData,
+  ]);
 
   const removeSelected = (selected: SelectedData, index: number) => {
     const [removed] = selectedList.splice(index, 1);

@@ -1,7 +1,5 @@
 import {
   calculateMargins,
-  calculateXAxis,
-  calculateYAxis,
   ChartDataB,
   ChartDefinition,
   createDataForAxis,
@@ -18,6 +16,8 @@ import {
   Legend,
   ResponsiveContainer,
   Tooltip,
+  XAxis,
+  YAxis,
 } from 'recharts';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 
@@ -37,10 +37,15 @@ export default class VerticalBarBlock extends Component<StackedBarProps> {
 
     axes: [
       {
-        id: 'xaxis',
+        id: 'major',
         title: 'X Axis',
         type: 'major',
         defaultDataType: 'timePeriods',
+      },
+      {
+        id: 'minor',
+        title: 'Y Axis',
+        type: 'minor',
       },
     ],
   };
@@ -48,47 +53,78 @@ export default class VerticalBarBlock extends Component<StackedBarProps> {
   public render() {
     const { data, meta, height, width, labels, axes, stacked } = this.props;
 
-    if (!axes.major || !data) return <LoadingSpinner />;
+    if (axes.major && data) {
+      const chartData: ChartDataB[] = createDataForAxis(
+        axes.major,
+        data.result,
+        meta,
+      ).map(mapNameToNameLabel(labels, meta.timePeriods, meta.locations));
 
-    const chartData: ChartDataB[] = createDataForAxis(
-      axes.major,
-      data.result,
-      meta,
-    ).map(mapNameToNameLabel(labels, meta.timePeriods, meta.locations));
+      const keysForChart = getKeysForChart(chartData);
 
-    const keysForChart = getKeysForChart(chartData);
+      const yAxis = { key: undefined, title: '' };
+      const xAxis = { key: undefined, title: '' };
 
-    const yAxis = { key: undefined, title: '' };
-    const xAxis = { key: undefined, title: '' };
-
-    return (
-      <ResponsiveContainer width={width || 900} height={height || 300}>
-        <BarChart
-          data={chartData}
-          margin={calculateMargins(xAxis, yAxis, undefined)}
-        >
-          {calculateXAxis(xAxis, {
-            interval: 0,
-            tick: { fontSize: 12 },
-            dataKey: 'name',
-          })}
-
-          <CartesianGrid />
-
-          {calculateYAxis(yAxis, { type: 'number' })}
-
-          <Tooltip />
-          <Legend />
-
-          {Array.from(keysForChart).map(name => (
-            <Bar
-              key={name}
-              {...populateDefaultChartProps(name, labels[name])}
-              stackId={stacked ? 'a' : undefined}
+      return (
+        <ResponsiveContainer width={width || 900} height={height || 300}>
+          <BarChart
+            data={chartData}
+            margin={calculateMargins(xAxis, yAxis, undefined)}
+          >
+            <CartesianGrid
+              strokeDasharray="3 3"
+              vertical={axes.minor && axes.minor.showGrid !== false}
+              horizontal={axes.major && axes.major.showGrid !== false}
             />
-          ))}
-        </BarChart>
-      </ResponsiveContainer>
-    );
+
+            {axes.minor && axes.minor.visible && (
+              <YAxis
+                type="number"
+                label={{
+                  angle: -90,
+                  offset: 0,
+                  position: 'left',
+                  value: '',
+                }}
+                scale="auto"
+                interval={
+                  axes.minor && !axes.minor.visible
+                    ? 'preserveStartEnd'
+                    : undefined
+                }
+              />
+            )}
+
+            {axes.major && axes.major.visible && (
+              <XAxis
+                type="category"
+                dataKey="name"
+                label={{
+                  offset: 5,
+                  position: 'bottom',
+                  value: '',
+                }}
+                scale="auto"
+                padding={{ left: 20, right: 20 }}
+                tickMargin={10}
+              />
+            )}
+
+            <Tooltip />
+            <Legend />
+
+            {Array.from(keysForChart).map(name => (
+              <Bar
+                key={name}
+                {...populateDefaultChartProps(name, labels[name])}
+                stackId={stacked ? 'a' : undefined}
+              />
+            ))}
+          </BarChart>
+        </ResponsiveContainer>
+      );
+    }
+
+    return <LoadingSpinner />;
   }
 }

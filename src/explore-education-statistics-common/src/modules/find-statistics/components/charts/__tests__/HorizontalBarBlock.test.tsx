@@ -9,11 +9,13 @@ import testData from './__data__/testBlockData';
 jest.mock('recharts/lib/util/LogUtils');
 
 const props = testData.AbstractChartProps;
-const { data, meta, labels, axes } = props;
+const { axes } = props;
 
 describe('HorzontalBarBlock', () => {
   test('renders basic chart correctly', () => {
-    const { container } = render(<HorzontalBarBlock {...props} />);
+    const { container } = render(<HorzontalBarBlock {...props} width={900} />);
+
+    expect(container).toMatchSnapshot();
 
     // axes
     expect(
@@ -34,12 +36,10 @@ describe('HorzontalBarBlock', () => {
       container.querySelector('.recharts-cartesian-grid-vertical'),
     ).toBeInTheDocument();
 
-    // expect there to be lines for all 3 data sets
+    // expect there to be rectangles for all 3 data sets across both years
     expect(
-      Array.from(container.querySelectorAll('.recharts-line')).length,
-    ).toBe(3);
-
-    expect(container).toMatchSnapshot();
+      Array.from(container.querySelectorAll('.recharts-rectangle')).length,
+    ).toBe(6);
   });
 
   test('major axis can be hidden', () => {
