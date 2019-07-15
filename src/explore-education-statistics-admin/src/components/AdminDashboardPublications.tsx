@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from '@admin/components/Link';
 import DashboardReleaseList from '@admin/components/DashboardReleaseList';
-import { Publication } from '@admin/services/publicationService';
+import { Publication } from '@admin/services/types/types';
 
 export interface AdminDashboardPublicationsProps {
   publication: Publication;
@@ -19,7 +19,7 @@ const AdminDashboardPublications = ({
           </dt>
           <dd className="govuk-summary-list__value">
             <Link to="/methodology/{publication.methodology.id}">
-              {publication.methodology.title}
+              {publication.methodology.label}
             </Link>
           </dd>
           <dd className="govuk-summary-list__actions">

@@ -1,43 +1,20 @@
-import { User } from '@admin/services/PrototypeLoginService';
+import { User } from '../PrototypeLoginService';
 
-export interface Methodology {
+export interface IdLabelPair {
   id: string;
-  title: string;
-}
-
-export interface Theme {
-  id: string;
-  title: string;
+  label: string;
 }
 
 export interface Topic {
   id: string;
   title: string;
-  theme: Theme;
-}
-
-export interface TimePeriod {
-  id: string;
-  title: string;
+  theme: IdLabelPair;
 }
 
 export interface TimePeriodCoverage {
   label: string;
-  academicYear?: {
-    yearStarting: number;
-    timePeriod: TimePeriod;
-    termsPerYear: number;
-  };
-  calendarYear?: {
-    year: number;
-  };
-  financialYear?: {
-    startDate: Date;
-    timePeriod: TimePeriod;
-  };
-  month?: {
-    monthlyReleaseDate: Date;
-  };
+  code: string;
+  startDate: Date;
 }
 
 export enum ApprovalStatus {
@@ -72,7 +49,9 @@ export interface Release {
   id: string;
   releaseName: string;
   timePeriodCoverage: TimePeriodCoverage;
-  scheduledReleaseDate: Date;
+  scheduledReleaseDate: DayMonthYearValues;
+  nextReleaseExpectedDate: Date;
+  releaseType: IdLabelPair;
   slug: string;
   status: ReleaseStatus;
   lead: UserContact;
@@ -104,14 +83,42 @@ export interface Publication {
   legacyReleases: LegacyRelease[];
   topic: Topic;
   contact: UserContact;
-  methodology: Methodology;
+  methodology: IdLabelPair;
   owner: User;
 }
 
 export interface ReleaseSetupDetails {
+  id: string;
   publicationTitle: string;
-  releaseType: string;
-  releaseName: string;
+  timePeriodCoverageCode: string;
+  timePeriodCoverageStartDate: Date;
+  releaseType: IdLabelPair;
   leadStatisticianName: string;
-  scheduledReleaseDate: Date;
+  scheduledReleaseDate: DayMonthYearValues;
+  nextReleaseExpectedDate?: Date;
 }
+
+export interface DayMonthYearValues {
+  day?: number;
+  month?: number;
+  year?: number;
+}
+
+export const dateToDayMonthYear = (date?: Date) => {
+  return {
+    day: date && date.getDate(),
+    month: date && date.getMonth() + 1,
+    year: date && date.getFullYear(),
+  };
+};
+
+export const dayMonthYearToDate = (dmy: DayMonthYearValues) => {
+  if (!(dmy.day && dmy.month && dmy.year)) {
+    throw Error(
+      `Couldn't convert DayMonthYearValues ${JSON.stringify(
+        dmy,
+      )} to Date - missing required value`,
+    );
+  }
+  return new Date(dmy.year, dmy.month - 1, dmy.day);
+};

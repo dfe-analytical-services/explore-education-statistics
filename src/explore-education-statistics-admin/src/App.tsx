@@ -4,7 +4,7 @@ import { Route } from 'react-router';
 import './App.scss';
 import { PrototypeLoginService } from '@admin/services/PrototypeLoginService';
 import { BrowserRouter } from 'react-router-dom';
-import editReleaseRoutes from '@admin/routes/editReleaseRoutes';
+import releaseRoutes from '@admin/routes/releaseRoutes';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import PrototypeAdminDashboard from './pages/prototypes/PrototypeAdminDashboard';
 import AdminDocumentationGlossary from './pages/prototypes/PrototypeDocumentationGlossary';
@@ -43,8 +43,9 @@ function App() {
         {/* Non-Prototype Routes*/}
         <Route exact path="/admin-dashboard" component={AdminDashboardPage} />
 
-        {editReleaseRoutes.map(route => (
+        {releaseRoutes.map(route => (
           <Route
+            exact
             key={route.path}
             path={route.path}
             component={route.component}
