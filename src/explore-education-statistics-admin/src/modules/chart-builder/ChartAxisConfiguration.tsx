@@ -1,12 +1,15 @@
 import * as React from 'react';
 import { FormFieldset, FormCheckbox, FormGroup } from '@common/components/form';
 import FormComboBox from '@common/components/form/FormComboBox';
-import { AxisConfigurationItem } from '@common/services/publicationService';
+import {
+  AxisConfigurationItem,
+  AxisGroupBy,
+} from '@common/services/publicationService';
 import { DataBlockMetadata } from '@common/services/dataBlockService';
 
 interface Props {
   id: string;
-  defaultDataType?: string;
+  defaultDataType?: AxisGroupBy;
   axisConfiguration: AxisConfigurationItem;
   meta: DataBlockMetadata;
 }
@@ -27,7 +30,7 @@ const ChartAxisConfiguration = ({ id, axisConfiguration, meta }: Props) => {
 
   return (
     <FormFieldset id={id} legend={axisConfiguration.title}>
-      <p>{axisConfiguration.title} configuration</p>
+      <p>{axisConfiguration.name} configuration</p>
       <FormGroup>
         <FormCheckbox
           id={`${id}_show`}

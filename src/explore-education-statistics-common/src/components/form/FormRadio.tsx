@@ -1,7 +1,12 @@
 import classNames from 'classnames';
-import React, { ChangeEventHandler, memo, ReactNode } from 'react';
+import React, { ChangeEvent, memo, ReactNode } from 'react';
 
-export type RadioChangeEventHandler = ChangeEventHandler<HTMLInputElement>;
+export type OtherRadioChangeProps = Pick<FormRadioProps, 'label'>;
+
+export type RadioChangeEventHandler = (
+  event: ChangeEvent<HTMLInputElement>,
+  radioProps: OtherRadioChangeProps,
+) => void;
 
 export interface FormRadioProps {
   checked?: boolean;
@@ -37,7 +42,11 @@ const FormRadio = ({
           defaultChecked={defaultChecked}
           id={id}
           name={name}
-          onChange={onChange}
+          onChange={event => {
+            if (onChange) {
+              onChange(event, { label });
+            }
+          }}
           type="radio"
           value={value}
           data-testid={label}

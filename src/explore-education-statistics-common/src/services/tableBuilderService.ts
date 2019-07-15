@@ -87,21 +87,27 @@ export type LocationLevelKeys =
   | 'ward';
 
 export interface TableData {
-  publicationId: string;
-  subjectId: string;
-  releaseId: string;
-  releaseDate: string;
-  geographicLevel: string;
-  result: {
+  timePeriodRange: {
+    code: string;
+    label: string;
     year: number;
-    timeIdentifier: string;
+  }[];
+  result: {
+    timePeriod: string;
     measures: Dictionary<string>;
     filters: string[];
     location: Dictionary<{
-      code: string[];
-      name: string[];
+      code: string;
+      name: string;
     }>;
   }[];
+}
+
+interface TimePeriodQuery {
+  startYear: number;
+  startCode: string;
+  endYear: number;
+  endCode: string;
 }
 
 export default {
@@ -119,8 +125,7 @@ export default {
   filterPublicationSubjectMeta(
     query: {
       subjectId: string;
-      startYear?: number;
-      endYear?: number;
+      timePeriod?: TimePeriodQuery;
       geographicLevel?: string;
     } & PartialRecord<LocationLevelKeys, string[]>,
   ): Promise<PublicationSubjectMeta> {
@@ -131,8 +136,7 @@ export default {
       subjectId: string;
       filters: string[];
       indicators: string[];
-      startYear: number;
-      endYear: number;
+      timePeriod?: TimePeriodQuery;
       geographicLevel?: string;
     } & PartialRecord<LocationLevelKeys, string[]>,
   ): Promise<TableData> {

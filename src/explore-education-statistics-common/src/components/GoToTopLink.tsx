@@ -2,7 +2,7 @@ import React, { FunctionComponent } from 'react';
 
 const GoToTopLink: FunctionComponent = () => {
   return (
-    <div>
+    <div className="dfe-print-hidden">
       <a href="#" className="govuk-link govuk-link--no-visited-state">
         Go to top
       </a>

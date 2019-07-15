@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public Guid Id { get; set; }
 
         public string Slug { get; set; }
-
+        
         [Required] public string Title { get; set; }
 
         public string Summary { get; set; }

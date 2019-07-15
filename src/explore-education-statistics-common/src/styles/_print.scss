@@ -1,0 +1,37 @@
+@mixin print-hide() {
+  @media print {
+    display: none;
+  }
+}
+
+.dfe-print-hidden {
+  @include print-hide();
+}
+
+@mixin print-break-avoid() {
+  page-break-inside: avoid;
+}
+.dfe-print-break-avoid {
+  @include print-break-avoid();
+}
+
+@mixin dfe-print-break-before() {
+  page-break-inside: avoid;
+}
+.dfe-print-break-before {
+  @include dfe-print-break-before();
+}
+
+@media print {
+  *[href]::after {
+    content: none !important;
+  }
+
+  .govuk-accordion {
+    @include print-break-avoid();
+  }
+
+  .govuk-details {
+    @include print-hide();
+  }
+}

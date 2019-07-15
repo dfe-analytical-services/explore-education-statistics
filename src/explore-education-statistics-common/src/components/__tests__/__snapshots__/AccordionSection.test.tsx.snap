@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`AccordionSection renders correctly with required props 1`] = `
-<div class="govuk-accordion__section"
+<div class="govuk-accordion__section section"
      role="presentation"
 >
   <div class="govuk-accordion__section-header">
@@ -22,7 +22,7 @@ exports[`AccordionSection renders correctly with required props 1`] = `
     <p>
       Test content
     </p>
-    <div>
+    <div class="dfe-print-hidden">
       <a href="#"
          class="govuk-link govuk-link--no-visited-state"
       >
@@ -34,7 +34,7 @@ exports[`AccordionSection renders correctly with required props 1`] = `
 `;
 
 exports[`AccordionSection renders with caption 1`] = `
-<div class="govuk-accordion__section"
+<div class="govuk-accordion__section section"
      role="presentation"
 >
   <div class="govuk-accordion__section-header">
@@ -58,7 +58,7 @@ exports[`AccordionSection renders with caption 1`] = `
     <p>
       Test content
     </p>
-    <div>
+    <div class="dfe-print-hidden">
       <a href="#"
          class="govuk-link govuk-link--no-visited-state"
       >
@@ -70,7 +70,7 @@ exports[`AccordionSection renders with caption 1`] = `
 `;
 
 exports[`AccordionSection renders with different heading size 1`] = `
-<div class="govuk-accordion__section"
+<div class="govuk-accordion__section section"
      role="presentation"
 >
   <div class="govuk-accordion__section-header">
@@ -91,7 +91,7 @@ exports[`AccordionSection renders with different heading size 1`] = `
     <p>
       Test content
     </p>
-    <div>
+    <div class="dfe-print-hidden">
       <a href="#"
          class="govuk-link govuk-link--no-visited-state"
       >

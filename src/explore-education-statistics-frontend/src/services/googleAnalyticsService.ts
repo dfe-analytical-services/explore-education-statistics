@@ -20,9 +20,14 @@ export const logPageView = () => {
   }
 };
 
-export const logEvent = (category: string, action: string) => {
+export const logEvent = (
+  category: string,
+  action: string,
+  label?: string,
+  value?: number,
+) => {
   if (initialised) {
-    ReactGA.event({ category, action });
+    ReactGA.event({ category, action, label, value });
   }
 };
 
@@ -31,3 +36,10 @@ export const logException = (description: string, fatal: boolean = false) => {
     ReactGA.exception({ description, fatal });
   }
 };
+
+export interface AnalyticProps {
+  analytics?: {
+    category: string;
+    action: string;
+  };
+}

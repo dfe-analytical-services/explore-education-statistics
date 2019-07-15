@@ -16,6 +16,7 @@ $border-width: 4px;
 
 .table {
   border-collapse: separate;
+  width: auto;
 
   th:last-child,
   td:last-child {

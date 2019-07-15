@@ -4,7 +4,7 @@ import VerticalBarBlock from '@common/modules/find-statistics/components/charts/
 import {
   AxisConfigurationItem,
   ChartType,
-  DataLabelConfigurationItem,
+  ChartConfiguration,
   ReferenceLine,
 } from '@common/services/publicationService';
 import dynamic from 'next-server/dynamic';
@@ -30,7 +30,7 @@ export interface ChartRendererProps {
   width?: number;
   stacked?: boolean;
   referenceLines?: ReferenceLine[];
-  labels: Dictionary<DataLabelConfigurationItem>;
+  labels: Dictionary<ChartConfiguration>;
   axes: Dictionary<AxisConfigurationItem>;
 }
 
@@ -48,17 +48,7 @@ function ChartRenderer(props: ChartRendererProps) {
   } = props;
 
   // TODO : Temporary sort on the results to get them in date order
-  data.result.sort((a, b) => {
-    if (a.year < b.year) {
-      return -1;
-    }
-
-    if (a.year > b.year) {
-      return 1;
-    }
-
-    return 0;
-  });
+  data.result.sort((a, b) => a.timePeriod.localeCompare(b.timePeriod));
 
   const chartProps = {
     data,
@@ -71,18 +61,22 @@ function ChartRenderer(props: ChartRendererProps) {
     stacked,
   };
 
-  switch (type.toLowerCase()) {
-    case 'line':
-      return <LineChartBlock {...chartProps} />;
-    case 'verticalbar':
-      return <VerticalBarBlock {...chartProps} />;
-    case 'horizontalbar':
-      return <HorizontalBarBlock {...chartProps} />;
-    case 'map':
-      return <DynamicMapBlock {...chartProps} />;
-    default:
-      return <div>[ Unimplemented chart type requested ${type} ]</div>;
+  if (data && meta && data.result.length > 0) {
+    switch (type.toLowerCase()) {
+      case 'line':
+        return <LineChartBlock {...chartProps} />;
+      case 'verticalbar':
+        return <VerticalBarBlock {...chartProps} />;
+      case 'horizontalbar':
+        return <HorizontalBarBlock {...chartProps} />;
+      case 'map':
+        return <DynamicMapBlock {...chartProps} />;
+      default:
+        return <div>[ Unimplemented chart type requested ${type} ]</div>;
+    }
   }
+
+  return <div>Invalid data specified</div>;
 }
 
 export default ChartRenderer;

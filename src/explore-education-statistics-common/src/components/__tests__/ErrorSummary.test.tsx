@@ -20,7 +20,7 @@ describe('ErrorSummary', () => {
     expect(container.innerHTML).toMatchSnapshot();
   });
 
-  test('gains focus and scrolls into view when there are errors', () => {
+  test('does not gain focus or scroll into view when there are errors by default', () => {
     const { container } = render(
       <ErrorSummary
         id="test-errors"
@@ -35,14 +35,35 @@ describe('ErrorSummary', () => {
       '.govuk-error-summary',
     ) as HTMLElement;
 
+    expect(summary).not.toHaveFocus();
+    expect(summary).not.toHaveScrolledIntoView();
+  });
+
+  test('gains focus and scrolls into view when there are errors and `focusOnError` is true', () => {
+    const { container } = render(
+      <ErrorSummary
+        id="test-errors"
+        focusOnError
+        errors={[
+          { id: 'test-error-1', message: 'Something went wrong 1' },
+          { id: 'test-error-2', message: 'Something went wrong 2' },
+        ]}
+      />,
+    );
+
+    const summary = container.querySelector(
+      '.govuk-error-summary',
+    ) as HTMLElement;
+
     expect(summary).toHaveFocus();
-    expect(summary.scrollIntoView).toHaveBeenCalled();
+    expect(summary).toHaveScrolledIntoView();
   });
 
   test('re-rendering with new errors does not gain focus or scroll into view', () => {
     const { container, getByText, rerender } = render(
       <ErrorSummary
         id="test-errors"
+        focusOnError
         errors={[
           { id: 'test-error-1', message: 'Something went wrong 1' },
           { id: 'test-error-2', message: 'Something went wrong 2' },

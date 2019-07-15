@@ -438,13 +438,29 @@ exports[`VerticalBarBlock renders with correct output 1`] = `
             class="recharts-layer recharts-bar-rectangles"
           >
             <g
-              class="recharts-layer"
+              class="recharts-layer recharts-bar-rectangle"
             >
-              <g
-                class="recharts-layer recharts-bar-rectangle"
+              <path
+                class="recharts-rectangle"
+                d="M 124.25,132.5 h 102 v 58.75 h -102 Z"
+                height="58.75"
+                radius="0"
+                width="102"
+                x="124.25"
+                y="132.5"
               />
-              <g
-                class="recharts-layer recharts-bar-rectangle"
+            </g>
+            <g
+              class="recharts-layer recharts-bar-rectangle"
+            >
+              <path
+                class="recharts-rectangle"
+                d="M 516.75,250 h 102 v -58.75 h -102 Z"
+                height="-58.75"
+                radius="0"
+                width="102"
+                x="516.75"
+                y="250"
               />
             </g>
           </g>
@@ -456,13 +472,29 @@ exports[`VerticalBarBlock renders with correct output 1`] = `
             class="recharts-layer recharts-bar-rectangles"
           >
             <g
-              class="recharts-layer"
+              class="recharts-layer recharts-bar-rectangle"
             >
-              <g
-                class="recharts-layer recharts-bar-rectangle"
+              <path
+                class="recharts-rectangle"
+                d="M 230.25,-4.583333333333314 h 102 v 195.83333333333331 h -102 Z"
+                height="195.83333333333331"
+                radius="0"
+                width="102"
+                x="230.25"
+                y="-4.583333333333314"
               />
-              <g
-                class="recharts-layer recharts-bar-rectangle"
+            </g>
+            <g
+              class="recharts-layer recharts-bar-rectangle"
+            >
+              <path
+                class="recharts-rectangle"
+                d="M 622.75,112.91666666666666 h 102 v 78.33333333333334 h -102 Z"
+                height="78.33333333333334"
+                radius="0"
+                width="102"
+                x="622.75"
+                y="112.91666666666666"
               />
             </g>
           </g>
@@ -474,13 +506,29 @@ exports[`VerticalBarBlock renders with correct output 1`] = `
             class="recharts-layer recharts-bar-rectangles"
           >
             <g
-              class="recharts-layer"
+              class="recharts-layer recharts-bar-rectangle"
             >
-              <g
-                class="recharts-layer recharts-bar-rectangle"
+              <path
+                class="recharts-rectangle"
+                d="M 336.25,93.33333333333334 h 102 v 97.91666666666666 h -102 Z"
+                height="97.91666666666666"
+                radius="0"
+                width="102"
+                x="336.25"
+                y="93.33333333333334"
               />
-              <g
-                class="recharts-layer recharts-bar-rectangle"
+            </g>
+            <g
+              class="recharts-layer recharts-bar-rectangle"
+            >
+              <path
+                class="recharts-rectangle"
+                d="M 728.75,171.66666666666669 h 102 v 19.583333333333314 h -102 Z"
+                height="19.583333333333314"
+                radius="0"
+                width="102"
+                x="728.75"
+                y="171.66666666666669"
               />
             </g>
           </g>
@@ -509,7 +557,6 @@ exports[`VerticalBarBlock renders with correct output 1`] = `
               <path
                 class="recharts-legend-icon"
                 d="M0,4h32v24h-32z"
-                fill="#4763a5"
                 stroke="none"
               />
             </svg>
@@ -534,7 +581,6 @@ exports[`VerticalBarBlock renders with correct output 1`] = `
               <path
                 class="recharts-legend-icon"
                 d="M0,4h32v24h-32z"
-                fill="#f5a450"
                 stroke="none"
               />
             </svg>
@@ -559,7 +605,6 @@ exports[`VerticalBarBlock renders with correct output 1`] = `
               <path
                 class="recharts-legend-icon"
                 d="M0,4h32v24h-32z"
-                fill="#005ea5"
                 stroke="none"
               />
             </svg>

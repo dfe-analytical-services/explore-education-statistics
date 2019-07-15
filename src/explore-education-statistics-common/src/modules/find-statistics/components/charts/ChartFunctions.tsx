@@ -2,9 +2,11 @@ import {
   Axis,
   ChartDataSet,
   ChartType,
-  DataLabelConfigurationItem,
+  ChartConfiguration,
   ReferenceLine,
   AxisConfigurationItem,
+  ChartSymbol,
+  AxisGroupBy,
 } from '@common/services/publicationService';
 import React, { ReactNode } from 'react';
 import {
@@ -24,14 +26,41 @@ import {
 import difference from 'lodash/difference';
 import { Dictionary } from '@common/types';
 
+export const colours: string[] = [
+  '#4763a5',
+  '#f5a450',
+  '#005ea5',
+  '#800080',
+  '#C0C0C0',
+];
+
+export const symbols: ChartSymbol[] = [
+  'circle',
+  'square',
+  'triangle',
+  'cross',
+  'star',
+];
+
+export function parseCondensedTimePeriodRange(
+  range: string,
+  separator: string = '/',
+) {
+  return [range.substring(0, 4), range.substring(4, 6)].join(separator);
+}
+
 export interface ChartProps {
   data: DataBlockData;
   meta: DataBlockMetadata;
-  labels: Dictionary<DataLabelConfigurationItem>;
+  labels: Dictionary<ChartConfiguration>;
   axes: Dictionary<AxisConfigurationItem>;
   height?: number;
   width?: number;
   referenceLines?: ReferenceLine[];
+}
+
+export interface StackedBarProps extends ChartProps {
+  stacked?: boolean;
 }
 
 export interface ChartDataOld {
@@ -62,7 +91,7 @@ export interface ChartDefinition {
     id: string;
     title: string;
     type: 'major' | 'minor';
-    defaultDataType?: 'timePeriod' | 'location' | 'filters' | 'indicator';
+    defaultDataType?: AxisGroupBy;
   }[];
 }
 
@@ -210,8 +239,7 @@ function filterResultsForDataSet(ds: ChartDataSet) {
     }
 
     if (ds.timePeriod) {
-      if (ds.timePeriod !== `${result.year}_${result.timeIdentifier}`)
-        return false;
+      if (ds.timePeriod !== result.timePeriod) return false;
     }
 
     return true;
@@ -226,50 +254,96 @@ export interface ChartDataB {
 
 export function generateKeyFromDataSet(
   dataSet: ChartDataSet,
-  ignoringFields: string[] = [],
+  ignoringField?: AxisGroupBy,
 ) {
-  const { indicator, filters, location, timePeriod } = dataSet;
+  const { indicator, filters, location, timePeriod } = {
+    ...dataSet,
+  };
+
+  const dontIgnoreLocations = ignoringField !== 'locations';
+
+  const joinedLocations = [
+    (dontIgnoreLocations &&
+      location &&
+      location.country &&
+      location.country.code) ||
+      '',
+    (dontIgnoreLocations &&
+      location &&
+      location.region &&
+      location.region.code) ||
+      '',
+    (dontIgnoreLocations &&
+      location &&
+      location.localAuthorityDistrict &&
+      location.localAuthorityDistrict.code) ||
+      '',
+    (dontIgnoreLocations &&
+      location &&
+      location.localAuthority &&
+      location.localAuthority.code) ||
+      '',
+  ];
+
   return [
     indicator,
     ...(filters || []),
-    location && location.country && location.country.code,
-    location && location.region && location.region.code,
-    location &&
-      location.localAuthorityDistrict &&
-      location.localAuthorityDistrict.code,
-    location && location.localAuthority && location.localAuthority.code,
-    (!ignoringFields.includes('timePeriod') && timePeriod) || '',
+
+    ...joinedLocations,
+
+    (ignoringField !== 'timePeriods' && timePeriod) || '',
   ].join('_');
 }
 
-function generateNameForAxisConfiguration(groupBy: string[], result: Result) {
-  return groupBy
-    .map(identifier => {
-      switch (identifier) {
-        case 'timePeriod':
-          return `${result.year}_${result.timeIdentifier}`;
-        default:
-          return '';
-      }
-    })
-    .join('_');
+function generateNameForAxisConfiguration(
+  result: Result,
+  groupBy?: AxisGroupBy,
+) {
+  switch (groupBy) {
+    case 'timePeriods':
+      return result.timePeriod;
+    case 'locations':
+      return `${result.location.localAuthorityDistrict &&
+        result.location.localAuthorityDistrict.code}`;
+    default:
+      return '';
+  }
 }
 
 function getChartDataForAxis(
   dataForAxis: Result[],
   dataSet: ChartDataSet,
-  groupBy: string[],
+  meta: DataBlockMetadata,
+  groupBy?: AxisGroupBy,
 ) {
-  return dataForAxis.reduce<ChartDataB[]>(
-    (r: ChartDataB[], result) => [
-      ...r,
-      {
-        name: generateNameForAxisConfiguration(groupBy, result),
-        [generateKeyFromDataSet(dataSet, groupBy)]:
-          result.measures[dataSet.indicator] || 'NaN',
-      },
-    ],
-    [],
+  const source = groupBy && meta[groupBy];
+
+  const initialNames = source && Object.keys(source);
+
+  if (initialNames === undefined || initialNames.length === 0) {
+    throw new Error(
+      'Invalid grouping specified for the data on the axis, unable to determine the groups',
+    );
+  }
+
+  const nameDictionary: Dictionary<ChartDataB> = initialNames.reduce(
+    (chartdata, n) => ({ ...chartdata, [n]: { name: n } }),
+    {},
+  );
+
+  return Object.values(
+    dataForAxis.reduce<Dictionary<ChartDataB>>((r, result) => {
+      const name = generateNameForAxisConfiguration(result, groupBy);
+
+      return {
+        ...r,
+        [name]: {
+          name,
+          [generateKeyFromDataSet(dataSet, groupBy)]:
+            result.measures[dataSet.indicator] || 'NaN',
+        },
+      };
+    }, nameDictionary),
   );
 }
 
@@ -299,12 +373,16 @@ function reduceCombineChartData(
 export function createDataForAxis(
   axisConfiguration: AxisConfigurationItem,
   results: Result[],
+  meta: DataBlockMetadata,
 ) {
+  if (axisConfiguration === undefined || results === undefined) return [];
+
   return axisConfiguration.dataSets.reduce<ChartDataB[]>(
     (combinedChartData, dataSetForAxisConfiguration) => {
       return getChartDataForAxis(
         results.filter(filterResultsForDataSet(dataSetForAxisConfiguration)),
         dataSetForAxisConfiguration,
+        meta,
         axisConfiguration.groupBy,
       ).reduce(reduceCombineChartData, [...combinedChartData]);
     },
@@ -320,11 +398,35 @@ export function getKeysForChart(chartData: ChartDataB[]) {
   );
 }
 
+const FindFirstInDictionaries = (
+  metaDataObjects: (Dictionary<ChartConfiguration> | undefined)[],
+  name: string,
+) => (result: string | undefined, meta?: Dictionary<ChartConfiguration>) =>
+  result || (meta && meta[name] && meta[name].label);
+
 export function mapNameToNameLabel(
-  dataLabels: Dictionary<DataLabelConfigurationItem>,
+  ...metaDataObjects: (Dictionary<ChartConfiguration> | undefined)[]
 ) {
   return ({ name, ...otherdata }: { name: string }) => ({
     ...otherdata,
-    name: (dataLabels[name] && dataLabels[name].label) || name,
+    name:
+      metaDataObjects.reduce(
+        FindFirstInDictionaries(metaDataObjects, name),
+        '',
+      ) || name,
   });
+}
+
+export function populateDefaultChartProps(
+  name: string,
+  config: ChartConfiguration,
+) {
+  return {
+    dataKey: name,
+    isAnimationActive: false,
+    name: (config && config.label) || name,
+    stroke: config && config.colour,
+    fill: config && config.colour,
+    unit: (config && config.unit) || '',
+  };
 }
