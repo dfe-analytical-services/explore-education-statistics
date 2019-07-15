@@ -48,8 +48,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         Id = p.Contact.Id,
                         ContactName = p.Contact.ContactName,
-                        // TODO EmailAddress
-                        // TODO PhoneNumber
+                        TeamEmail = p.Contact.TeamEmail,
+                        ContactTelNo = p.Contact.ContactTelNo
                     } : null,
                     TopicId = p.TopicId,
                     Methodologies = p.Methodologies.Select(m => new Methodology
