@@ -26,11 +26,11 @@ export interface AdminDashboardRelease {
   live: boolean;
   dateRangeLabel: string;
   timePeriodCoverage: IdLabelPair;
-  publishedDate: string;
-  nextReleaseExpectedDate: DayMonthYearValues;
   leadStatistician: UserContact;
   lastEditedUser: User;
   lastEditedDateTime: string;
+  scheduledPublishDate: DayMonthYearValues;
+  nextReleaseExpectedDate: DayMonthYearValues;
 }
 
 export interface AdminDashboardPublication {

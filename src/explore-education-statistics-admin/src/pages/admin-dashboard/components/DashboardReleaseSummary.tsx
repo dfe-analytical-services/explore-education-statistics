@@ -62,15 +62,19 @@ const DashboardReleaseSummary = ({ release }: Props) => {
 
       <SummaryList additionalClassName="govuk-!-margin-bottom-3">
         <SummaryListItem term="Publish date">
-          <FormattedDate>{release.publishedDate}</FormattedDate>
+          {dayMonthYearIsComplete(release.scheduledPublishDate) && (
+            <FormattedDate>
+              {dayMonthYearToDate(release.scheduledPublishDate)}
+            </FormattedDate>
+          )}
         </SummaryListItem>
-        {dayMonthYearIsComplete(release.nextReleaseExpectedDate) && (
-          <SummaryListItem term="Next release date">
+        <SummaryListItem term="Next release date">
+          {dayMonthYearIsComplete(release.nextReleaseExpectedDate) && (
             <FormattedDate>
               {dayMonthYearToDate(release.nextReleaseExpectedDate)}
             </FormattedDate>
-          </SummaryListItem>
-        )}
+          )}
+        </SummaryListItem>
         <SummaryListItem term="Lead statistician">
           {release.leadStatistician && (
             <span>
