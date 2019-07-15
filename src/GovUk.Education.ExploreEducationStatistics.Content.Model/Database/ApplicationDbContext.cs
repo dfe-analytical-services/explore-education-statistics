@@ -1204,7 +1204,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Summary =
                         "Read national statistical summaries, view charts and tables and download data files.\n\n" +
                         "Find out how and why these statistics are collected and published - [Pupil absence statistics: methodology](../methodology/pupil-absence-in-schools-in-england).",
-
+                    TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     KeyStatistics = new DataBlock
                     {
                         DataBlockRequest = new DataBlockRequest
@@ -1669,6 +1669,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Slug = "2015-16",
                     Summary =
                         "Read national statistical summaries and definitions, view charts and tables and download data files across a range of pupil absence subject areas.",
+                    TimePeriodCoverage = TimeIdentifier.AcademicYear,
 
                     KeyStatistics = new DataBlock
                     {
@@ -1717,6 +1718,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Summary =
                         "Read national statistical summaries, view charts and tables and download data files.\n\n" +
                         "Find out how and why these statistics are collected and published - [Permanent and fixed-period exclusion statistics: methodology](../methodology/permanent-and-fixed-period-exclusions-in-england)",
+                    TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     KeyStatistics = new DataBlock
                     {
                         DataBlockRequest = new DataBlockRequest
@@ -2444,6 +2446,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Summary =
                         "Read national statistical summaries, view charts and tables and download data files.\n\n" +
                         "Find out how and why these statistics are collected and published - [Secondary and primary school applications and offers: methodology](../methodology/secondary-and-primary-schools-applications-and-offers)",
+                    TimePeriodCoverage    = TimeIdentifier.AcademicYear,
                     KeyStatistics = new DataBlock
                     {
                         DataBlockRequest = new DataBlockRequest
