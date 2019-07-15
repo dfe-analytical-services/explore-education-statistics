@@ -20,9 +20,14 @@ export const logPageView = () => {
   }
 };
 
-export const logEvent = (category: string, action: string) => {
+export const logEvent = (
+  category: string,
+  action: string,
+  label?: string,
+  value?: number,
+) => {
   if (initialised) {
-    ReactGA.event({ category, action });
+    ReactGA.event({ category, action, label, value });
   }
 };
 
