@@ -27,9 +27,9 @@ const FormFieldCheckboxGroupsMenu = <T extends {}>(
         legendHidden
         selectAll
         options={options[0].options}
-        onAllChange={event => {
+        onAllChange={(event, checked) => {
           if (onAllChange) {
-            onAllChange(event, options[0].options);
+            onAllChange(event, checked, options[0].options);
           }
         }}
       />
@@ -40,6 +40,11 @@ const FormFieldCheckboxGroupsMenu = <T extends {}>(
         small
         name={name}
         options={options[0].options}
+        onAllChange={(event, checked) => {
+          if (onAllChange) {
+            onAllChange(event, checked, options[0].options);
+          }
+        }}
       />
     );
   };
