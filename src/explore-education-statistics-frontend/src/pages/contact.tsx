@@ -9,8 +9,8 @@ function ContactPage() {
     >
       <h2>General enquiries</h2>
       <p>
-        If you need help and support or have a question about education
-        statistics and data contact:
+        If you need help and support using the service or have any general
+        questions about education statistics and data contact:
       </p>
 
       <p>
@@ -26,9 +26,9 @@ function ContactPage() {
       </p>
       <h2>Data and methodology enquiries</h2>
       <p>
-        If you have a question about the data or methods used in any of our
-        statistics contact the team or statistician listed within the ‘Contact
-        us’ section of the relevant page.
+        If you have a specific question about the data or methods used in any of
+        our statistics contact the team or statistician listed within the
+        ‘Contact us’ section of the relevant page.
       </p>
       <h2>Statistical policy enquiries</h2>
       <p>
