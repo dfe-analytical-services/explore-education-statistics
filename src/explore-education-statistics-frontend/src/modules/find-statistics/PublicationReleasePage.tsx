@@ -204,7 +204,17 @@ class PublicationReleasePage extends Component<Props> {
                   <strong>
                     <FormattedDate>{data.updates[0].on}</FormattedDate>
                   </strong>
-                  <Details summary={`See all ${data.updates.length} updates`}>
+                  <Details
+                    onToggle={(open: boolean) =>
+                      open &&
+                      logEvent(
+                        'Previous Updates',
+                        'Open previous updates accordion',
+                        window.location.pathname,
+                      )
+                    }
+                    summary={`See all ${data.updates.length} updates`}
+                  >
                     {data.updates.map(elem => (
                       <div data-testid="last-updated-element" key={elem.on}>
                         <FormattedDate className="govuk-body govuk-!-font-weight-bold">
