@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190715141154_AddTimeIdentifierToRelease")]
+    [Migration("20190716083807_AddTimeIdentifierToRelease")]
     partial class AddTimeIdentifierToRelease
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

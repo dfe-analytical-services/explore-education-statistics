@@ -1,9 +1,11 @@
+import FormattedDate from '@common/components/FormattedDate';
 import React from 'react';
 import Link from '@admin/components/Link';
 import { format } from 'date-fns';
 import Details from '@common/components/Details';
 import { LoginContext } from '@admin/components/Login';
-import { ApprovalStatus, Release } from '@admin/services/publicationService';
+import { ApprovalStatus, Release } from '@admin/services/types/types';
+import { setupRoute } from '@admin/routes/releaseRoutes';
 
 const getLiveLatestLabel = (isLive: boolean, isLatest: boolean) => {
   if (isLive && isLatest) {
@@ -51,7 +53,7 @@ const DashboardRelease = ({
                 Scheduled publish date
               </dt>
               <dd className="govuk-summary-list__value">
-                {format(release.status.published, 'd MMMM yyyy')}
+                <FormattedDate>{release.status.published}</FormattedDate>
               </dd>
               <dd className="govuk-summary-list__actions">
                 <Link to="/prototypes/publication-create-new-absence-status">
@@ -64,7 +66,7 @@ const DashboardRelease = ({
             <>
               <dt className="govuk-summary-list__key">Publish date</dt>
               <dd className="govuk-summary-list__value">
-                {format(release.status.published, 'd MMMM yyyy')}
+                <FormattedDate>{release.status.published}</FormattedDate>
               </dd>
               <dd className="govuk-summary-list__actions" />
             </>
@@ -74,7 +76,7 @@ const DashboardRelease = ({
           <>
             <dt className="govuk-summary-list__key">Next release</dt>
             <dd className="govuk-summary-list__value">
-              {format(release.status.nextRelease, 'd MMMM yyyy')}
+              <FormattedDate>{release.status.nextRelease}</FormattedDate>
             </dd>
             <dd className="govuk-summary-list__actions" />
           </>
@@ -112,7 +114,7 @@ const DashboardRelease = ({
                   key={`${release.id}-comments-${comment.id}`}
                   summary={`${comment.author.name}, ${format(
                     comment.datetime,
-                    'd MMMM yyyy, HH:mm',
+                    'dd MMMM yyyy, HH:mm',
                   )}`}
                   className="govuk-!-margin-bottom-0"
                 >
@@ -137,7 +139,7 @@ const DashboardRelease = ({
                 return (
                   <>
                     {' '}
-                    {format(release.status.lastEdited, 'd MMMM yyyy')}
+                    <FormattedDate>{release.status.lastEdited}</FormattedDate>
                     {' at '}
                     {format(release.status.lastEdited, 'HH:mm')} by{' '}
                     <a href="#">{editorName}</a>
@@ -153,7 +155,7 @@ const DashboardRelease = ({
               </Link>
             )}
             {!editing && !review && (
-              <Link to={`/edit-release/${release.id}/setup`}>
+              <Link to={setupRoute.generateLink(release.id)}>
                 Edit this release
               </Link>
             )}
