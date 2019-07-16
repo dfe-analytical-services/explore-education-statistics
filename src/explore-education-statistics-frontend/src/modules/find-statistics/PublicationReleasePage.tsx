@@ -151,9 +151,9 @@ class PublicationReleasePage extends Component<Props> {
                     onToggle={(open: boolean) =>
                       open &&
                       logEvent(
-                        window.location.pathname,
-                        'Open previous releases accordion',
                         'Previous Releases',
+                        'Open previous releases accordion',
+                        window.location.pathname,
                       )
                     }
                   >
