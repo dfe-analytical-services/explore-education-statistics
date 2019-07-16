@@ -1,10 +1,10 @@
 /* eslint-disable no-shadow */
-import React from 'react';
-import PrototypePublicationService from '@admin/pages/prototypes/components/PrototypePublicationService';
 import EditablePublicationPage from '@admin/pages/prototypes/components/EditablePublicationPage';
+import PrototypePublicationService from '@admin/pages/prototypes/components/PrototypePublicationService';
 import { ExtendedComment } from '@admin/services/publicationService';
-import PrototypePage from './components/PrototypePage';
+import React from 'react';
 import PrototypeAdminNavigation from './components/PrototypeAdminNavigation';
+import PrototypePage from './components/PrototypePage';
 
 const PublicationPage = () => {
   const [editing, setEditing] = React.useState(true);
