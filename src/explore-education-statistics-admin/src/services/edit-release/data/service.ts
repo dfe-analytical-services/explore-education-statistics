@@ -46,6 +46,11 @@ export default {
       return client.post<null>(`/release/${releaseId}/datafiles/upload`, data);
     });
   },
+  deleteDataFiles(releaseId: string, dataFileId: string): Promise<null> {
+    return apiClient.then(client =>
+      client.delete<null>(`/release/${releaseId}/datafiles/${dataFileId}`),
+    );
+  },
   createDownloadDataFileLink(releaseId: string, fileId: string): string {
     return `/release/${releaseId}/datafile/${fileId}`;
   },

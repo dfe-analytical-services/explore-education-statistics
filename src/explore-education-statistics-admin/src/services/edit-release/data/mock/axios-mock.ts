@@ -1,5 +1,8 @@
 import { AxiosInstance } from 'axios';
 
+const generateRandomInteger = (max: number) => Math.floor(Math.random() * Math.floor(max));
+const generateRandomIntegerString = (max: number) => generateRandomInteger(max).toString();
+
 export default {
   createMockContentApiAxiosInstance: async (axiosInstance: AxiosInstance) => {
     const MockAdaptor = (await import(
@@ -24,9 +27,6 @@ export default {
         ),
       ];
     });
-
-    const generateRandomInteger = (max: number) => Math.floor(Math.random() * Math.floor(max));
-    const generateRandomIntegerString = (max: number) => generateRandomInteger(max).toString();
 
     // uploadDataFiles
     mock.onPost(/\/release\/.*\/datafiles\/upload/).reply(({ url, data }) => {
@@ -58,10 +58,23 @@ export default {
         numberOfRows: generateRandomInteger(200000),
       });
 
-      return [
-        200,
-        null,
-      ];
+      return [200];
+    });
+
+    // deleteDataFiles
+    mock.onDelete(/\/release\/.*\/datafiles\/.*/).reply(({ url }) => {
+      const idsMatch = url
+        ? url.match(/\/release\/(.*)\/datafiles\/(.*)/)
+        : [''];
+
+      const [releaseId, dataFileId] = idsMatch ? idsMatch.slice(1) : ['', ''];
+
+      const dataFilesView = mockData.getDataFilesForRelease(releaseId);
+
+      // eslint-disable-next-line no-param-reassign
+      dataFilesView.dataFiles = dataFilesView.dataFiles.filter(file => file.file.id !== dataFileId);
+
+      return [204];
     });
 
     return axiosInstance;

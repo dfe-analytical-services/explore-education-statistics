@@ -31,18 +31,11 @@ const ReleaseDataPage = ({ match }: RouteComponentProps<MatchProps>) => {
   const { releaseId } = match.params;
 
   const [dataFiles, setDataFiles] = useState<DataFileView>();
+  const [deleteFileId, setDeleteFilesRequest] = useState('');
 
   useEffect(() => {
     service.getReleaseDataFiles(releaseId).then(setDataFiles);
   }, [releaseId]);
-
-  const toggleDeleteFilesModal = (_: boolean) => {};
-
-  const toggleReplaceDataModal = (_: boolean) => {};
-
-  const showReplaceDataModal = false;
-
-  const showDeleteFilesModal = false;
 
   const formId = 'dataFileUploadForm'
 
@@ -67,10 +60,10 @@ const ReleaseDataPage = ({ match }: RouteComponentProps<MatchProps>) => {
                   </a>
                 </SummaryListItem>
                 <SummaryListItem term="Filesize">
-                  {dataFile.fileSize.size} {dataFile.fileSize.unit}
+                  {dataFile.fileSize.size.toLocaleString()} {dataFile.fileSize.unit}
                 </SummaryListItem>
                 <SummaryListItem term="Number of rows">
-                  {dataFile.numberOfRows}
+                  {dataFile.numberOfRows.toLocaleString()}
                 </SummaryListItem>
                 <SummaryListItem term="Metadata file">
                   <a href={service.createDownloadDataMetadataFileLink(releaseId, dataFile.file.id)}>
@@ -80,12 +73,16 @@ const ReleaseDataPage = ({ match }: RouteComponentProps<MatchProps>) => {
                 <SummaryListItem
                   term="Actions"
                   actions={
-                    <Link to="#">Delete files</Link>
+                    <Link
+                      to="#"
+                      onClick={_ => setDeleteFilesRequest(dataFile.file.id)}
+                    >
+                      Delete files
+                    </Link>
                   }
                 />
               </SummaryList>
             ))}
-
           <Formik<FormValues>
             enableReinitialize
             initialValues={{
@@ -255,21 +252,17 @@ const ReleaseDataPage = ({ match }: RouteComponentProps<MatchProps>) => {
       </Tabs>
 
       <ModalConfirm
-        mounted={showReplaceDataModal}
-        title="Confirm replace data file"
-        onExit={() => toggleReplaceDataModal(false)}
-        onConfirm={() => toggleReplaceDataModal(false)}
-        onCancel={() => toggleReplaceDataModal(false)}
-      >
-        <p>Please ensure supporting meta data file is still correct</p>
-      </ModalConfirm>
-
-      <ModalConfirm
-        mounted={showDeleteFilesModal}
+        mounted={deleteFileId != null && deleteFileId.length > 0}
         title="Confirm deletion of selected data files"
-        onExit={() => toggleDeleteFilesModal(false)}
-        onConfirm={() => toggleDeleteFilesModal(false)}
-        onCancel={() => toggleDeleteFilesModal(false)}
+        onExit={() => setDeleteFilesRequest('')}
+        onCancel={() => setDeleteFilesRequest('')}
+        onConfirm={() =>
+          service.
+            deleteDataFiles(releaseId, deleteFileId).
+            then(_ => service.getReleaseDataFiles(releaseId)).
+            then(setDataFiles).
+            then(_ => setDeleteFilesRequest(''))
+        }
       >
         <p>This data will no longer be available for use in this release</p>
       </ModalConfirm>
