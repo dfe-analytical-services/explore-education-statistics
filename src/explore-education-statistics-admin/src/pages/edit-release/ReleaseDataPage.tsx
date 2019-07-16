@@ -1,10 +1,17 @@
 import Link from '@admin/components/Link';
+import { dataRoute } from "@admin/routes/releaseRoutes";
 import { DataFileView } from '@admin/services/edit-release/data/types';
+import Button from "@common/components/Button";
+import { Form, FormFieldset, Formik } from "@common/components/form";
+import FormFieldFileSelector from "@common/components/form/FormFieldFileSelector";
+import FormFieldTextInput from "@common/components/form/FormFieldTextInput";
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
+import Yup from "@common/lib/validation/yup";
+import {FormikProps} from "formik";
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import service from '@admin/services/edit-release/data/service';
@@ -12,6 +19,12 @@ import ReleasePageTemplate from '@admin/pages/edit-release/components/ReleasePag
 
 interface MatchProps {
   releaseId: string;
+}
+
+interface FormValues {
+  subjectTitle: string;
+  dataFile: File | null;
+  metadataFile: File | null;
 }
 
 const ReleaseDataPage = ({ match }: RouteComponentProps<MatchProps>) => {
@@ -30,6 +43,8 @@ const ReleaseDataPage = ({ match }: RouteComponentProps<MatchProps>) => {
   const showReplaceDataModal = false;
 
   const showDeleteFilesModal = false;
+
+  const formId = 'dataFileUploadForm'
 
   return (
     <ReleasePageTemplate
@@ -65,121 +80,92 @@ const ReleaseDataPage = ({ match }: RouteComponentProps<MatchProps>) => {
                 <SummaryListItem
                   term="Actions"
                   actions={
-                    <>
-                      <Link to="#">Delete files</Link>
-                      <Link to="#">Replace data</Link>
-                      <Link to="#">Replace metadata</Link>
-                    </>
+                    <Link to="#">Delete files</Link>
                   }
                 />
               </SummaryList>
             ))}
 
-          <form>
-            <fieldset className="govuk-fieldset">
-              <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
-                Add new data to release
-              </legend>
-
-              <div className="govuk-form-group">
-                <label htmlFor="release-title" className="govuk-label">
-                  Subject title
-                </label>
-                <input
-                  type="text"
-                  className="govuk-input govuk-!-width-one-half"
-                />
-              </div>
-
-              <fieldset className="govuk-fieldset">
-                <legend className="govuk-fieldset__legend govuk-fieldset__legend--s">
-                  Data type
-                </legend>
-                <div className="govuk-radios">
-                  <div className="govuk-radios__item">
-                    <input
-                      type="radio"
-                      name="data-type"
-                      id="data-type-final"
-                      value="final"
-                      className="govuk-radios__input"
+          <Formik<FormValues>
+            enableReinitialize
+            initialValues={{
+              subjectTitle: '',
+              dataFile: null,
+              metadataFile: null,
+            }}
+            onSubmit={async (values: FormValues, actions) => {
+              service.uploadDataFiles(
+                releaseId,
+                {
+                  subjectTitle: values.subjectTitle,
+                  dataFile: values.dataFile as File,
+                  metadataFile: values.metadataFile as File,
+                }
+              ).
+              then(_ => service.getReleaseDataFiles(releaseId)).
+              then(setDataFiles).
+              then(_ => {
+                actions.resetForm();
+                document.querySelectorAll(`#${formId} input[type='file']`).forEach(input => {
+                  const fileInput = input as HTMLInputElement;
+                  fileInput.value = '';
+                });
+              });
+            }}
+            validationSchema={Yup.object<FormValues>({
+              subjectTitle: Yup.string().required(
+                'Enter a subject title',
+              ),
+              dataFile: Yup.mixed().required(
+                'Choose a data file',
+              ),
+              metadataFile: Yup.mixed().required(
+                'Choose a metadata file',
+              ),
+            })}
+            render={(form: FormikProps<FormValues>) => {
+              return (
+                <Form id={formId}>
+                  <FormFieldset
+                    id={`${formId}-allFieldsFieldset`}
+                    legend="Add new data to release"
+                  >
+                    <FormFieldTextInput<FormValues>
+                      id={`${formId}-subjectTitle`}
+                      name="subjectTitle"
+                      label='Subject title'
                     />
-                    <label
-                      htmlFor="data-type=final"
-                      className="govuk-label govuk-radios__label"
-                    >
-                      Final
-                    </label>
-                  </div>
-                  <div className="govuk-radios__item">
-                    <input
-                      type="radio"
-                      name="data-type"
-                      id="data-type-provisional"
-                      value="provisional"
-                      className="govuk-radios__input"
-                    />
-                    <label
-                      htmlFor="data-type-final"
-                      className="govuk-label govuk-radios__label"
-                    >
-                      Provisional
-                    </label>
-                  </div>
-                  <div className="govuk-radios__item">
-                    <input
-                      type="radio"
-                      name="data-type"
-                      id="data-type-revised"
-                      value="revised"
-                      className="govuk-radios__input"
-                    />
-                    <label
-                      htmlFor="data-type-revised"
-                      className="govuk-label govuk-radios__label"
-                    >
-                      Revised
-                    </label>
-                  </div>
-                </div>
-              </fieldset>
 
-              <div className="govuk-form-group govuk-!-margin-top-6">
-                <label
-                  className="govuk-label govuk-label--s"
-                  htmlFor="data-upload-1"
-                >
-                  Upload data
-                </label>
-                <input
-                  className="govuk-file-upload"
-                  id="data-upload-1"
-                  name="data-upload-1"
-                  type="file"
-                />
-              </div>
+                    <FormFieldFileSelector<FormValues>
+                      id={`${formId}-dataFile`}
+                      name="dataFile"
+                      label='Upload data file'
+                      formGroupClass='govuk-!-margin-top-6'
+                      form={form}
+                    />
 
-              <div className="govuk-form-group govuk-!-margin-top-6">
-                <label
-                  className="govuk-label govuk-label--s"
-                  htmlFor="data-upload-2"
-                >
-                  Upload metadata
-                </label>
-                <input
-                  className="govuk-file-upload"
-                  id="data-upload-2"
-                  name="data-upload-2"
-                  type="file"
-                />
-              </div>
-            </fieldset>
-            <div className="govuk-form-group govuk-!-margin-top-6">
-              <button className="govuk-button" type="button">
-                Upload data files
-              </button>
-            </div>
-          </form>
+                    <FormFieldFileSelector<FormValues>
+                      id={`${formId}-metadataFile`}
+                      name="metadataFile"
+                      label='Upload metadata file'
+                      form={form}
+                    />
+
+                  </FormFieldset>
+
+                  <Button type="submit" className="govuk-!-margin-top-6">
+                    Upload data files
+                  </Button>
+
+                  <div className="govuk-!-margin-top-6">
+                    <Link to={dataRoute.generateLink(releaseId)}>
+                      Cancel
+                    </Link>
+                  </div>
+                </Form>
+              );
+            }}
+          />
         </TabsSection>
         <TabsSection id="file-upload" title="File uploads">
           <table className="govuk-table">
@@ -288,18 +274,6 @@ const ReleaseDataPage = ({ match }: RouteComponentProps<MatchProps>) => {
         <p>This data will no longer be available for use in this release</p>
       </ModalConfirm>
 
-      <div className="govuk-grid-row govuk-!-margin-top-9">
-        <div className="govuk-grid-column-one-half ">
-          <Link to="/prototypes/publication-create-new-absence-config">
-            Previous step, release setup
-          </Link>
-        </div>
-        <div className="govuk-grid-column-one-half dfe-align--right">
-          <Link to="/prototypes/publication-create-new-absence-table?status=step1">
-            Next step, build tables
-          </Link>
-        </div>
-      </div>
     </ReleasePageTemplate>
   );
 };

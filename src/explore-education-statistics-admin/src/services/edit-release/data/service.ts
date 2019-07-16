@@ -12,12 +12,6 @@ const createClient = async () => {
     paramsSerializer: commaSeparated,
   });
 
-  axios.interceptors.request.use(request => {
-    // eslint-disable-next-line no-console
-    console.log('Starting Request', request);
-    return request;
-  });
-
   const decoratedAxios =
     process.env.USE_MOCK_API === 'true'
       ? mocks.createMockContentApiAxiosInstance(axiosInstance)
@@ -28,11 +22,29 @@ const createClient = async () => {
 
 const apiClient = createClient();
 
+export interface UploadDataFilesRequest {
+  subjectTitle: string,
+  dataFile: File,
+  metadataFile: File,
+}
+
 export default {
   getReleaseDataFiles(releaseId: string): Promise<DataFileView> {
     return apiClient.then(client =>
       client.get<DataFileView>(`/release/${releaseId}/datafiles`),
     );
+  },
+  uploadDataFiles(
+    releaseId: string,
+    request: UploadDataFilesRequest): Promise<null> {
+
+    return apiClient.then(client => {
+      const data = new FormData();
+      data.append('subjectTitle', request.subjectTitle);
+      data.append('dataFile', request.dataFile);
+      data.append('metadataFile', request.metadataFile);
+      return client.post<null>(`/release/${releaseId}/datafiles/upload`, data);
+    });
   },
   createDownloadDataFileLink(releaseId: string, fileId: string): string {
     return `/release/${releaseId}/datafile/${fileId}`;

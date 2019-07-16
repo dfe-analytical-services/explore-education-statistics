@@ -25,6 +25,42 @@ export default {
       ];
     });
 
+    // uploadDataFiles
+    mock.onPost(/\/release\/.*\/datafiles\/upload/).reply(({ url, data }) => {
+      const releaseIdMatch = url
+        ? url.match(/\/release\/(.*)\/datafiles/)
+        : [''];
+
+      const dataFilesView = mockData.getDataFilesForRelease(releaseIdMatch ? releaseIdMatch[1] : '');
+
+      const formData = data as FormData;
+      const subjectTitle = formData.get('subjectTitle') as string;
+      const dataFile = formData.get('dataFile') as File;
+      const metadataFile = formData.get('metadataFile') as File;
+
+      dataFilesView.dataFiles.push({
+        title: subjectTitle,
+        file: {
+          id: '1234',
+          fileName: dataFile.name,
+        },
+        metadataFile: {
+          id: '5678',
+          fileName: metadataFile.name,
+        },
+        fileSize: {
+          size: dataFile.size,
+          unit: 'Mb',
+        },
+        numberOfRows: 102005,
+      });
+
+      return [
+        200,
+        null,
+      ];
+    });
+
     return axiosInstance;
   },
 };
