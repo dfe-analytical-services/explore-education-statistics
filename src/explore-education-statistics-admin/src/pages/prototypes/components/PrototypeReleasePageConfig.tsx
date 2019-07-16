@@ -22,7 +22,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
         <h2 className="govuk-heading-l">Edit release summary</h2>
       )}
       <form action="/prototypes/publication-create-new-absence-config">
-        <FormFieldset id="test" legend="Select time period coverage">
+        <FormFieldset id="test" legend="Select release period">
           <FormGroup>
             <label htmlFor="time-period" className="govuk-label">
               Type
@@ -118,7 +118,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
               width={4}
             />
           </FormGroup>
-          <FormGroup>
+          {/* <FormGroup>
             <fieldset className="govuk-fieldset">
               <legend className="govuk-heading-s govuk-!-margin-bottom-3">
                 Financial year start
@@ -187,10 +187,10 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                 </fieldset>
               </div>
             </fieldset>
-          </FormGroup>
+          </FormGroup> */}
         </FormFieldset>
 
-        <fieldset className="govuk-fieldset">
+        <fieldset className="govuk-fieldset govuk-!-margin-top-9">
           <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
             Schedule publish date
           </legend>
@@ -251,9 +251,9 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
             </div>
           </div>
         </fieldset>
-        <fieldset className="govuk-fieldset govuk-!-margin-top-6 govuk-!-margin-bottom-6">
+        <fieldset className="govuk-fieldset govuk-!-margin-top-9 govuk-!-margin-bottom-9">
           <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
-            Next release expected (optional)
+            Next release date (optional)
           </legend>
           <div className="govuk-date-input" id="schedule-publish-date">
             <div className="govuk-date-input__item">
@@ -325,12 +325,12 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
             options={[
               {
                 id: 'national-stats',
-                label: 'National statistics',
+                label: 'National Statistics',
                 value: 'national-stats',
               },
               {
                 id: 'adhoc-stats',
-                label: 'Official / adhoc statistics',
+                label: 'Official / ad hoc statistics',
                 value: 'adhoc-stats',
               },
             ]}
@@ -339,10 +339,10 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
 
         {!sectionId && (
           <>
-            <div className="govuk-form-group govuk-!-margin-top-6">
+            <div className="govuk-form-group govuk-!-margin-top-9">
               <fieldset className="govuk-fieldset">
                 <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
-                  Setup
+                  Select template
                 </legend>
                 <div className="govuk-radios">
                   <div className="govuk-radios__item">
@@ -357,7 +357,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                       className="govuk-label govuk-radios__label"
                       htmlFor="release-setup-blank"
                     >
-                      Create from blank template
+                      Create new template
                     </label>
                   </div>
                   {/* <div className="govuk-radios__item">
@@ -388,7 +388,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                       className="govuk-label govuk-radios__label"
                       htmlFor="release-setup-copy-data-structure"
                     >
-                      Copy structure of current release (2017 / 2018)
+                      Copy existing template (2017 / 2018)
                     </label>
                   </div>
                 </div>
@@ -403,7 +403,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
         {sectionId === 'setup' && (
           <>
             <button type="submit" className="govuk-button govuk-!-margin-top-6">
-              Update
+              Update release summary
             </button>
 
             <div className="govuk-!-margin-top-6">

@@ -16,10 +16,31 @@ const PrototypeAdminDashboardPublications = () => {
   const userContext = React.useContext(LoginContext);
   return (
     <>
-      <p className="govuk-body">
-        Edit an existing release or create a new release for current
-        publications.
+      {userContext.user &&
+        userContext.user.permissions.includes('team lead') && (
+          <p className="govuk-body">
+            View existing and create new publications.
+          </p>
+        )}
+      {userContext.user &&
+        userContext.user.permissions.includes('team member') && (
+          <p className="govuk-body">
+            View existing publications and create new releases.
+          </p>
+        )}
+      <p className="govuk-body">Select publications to:</p>
+      <ul className="govuk-list--bullet">
+        <li>create new releases and methodologies</li>
+        <li>edit exiting releases and methodologies</li>
+        <li>view and sign-off releases and methodologies</li>
+      </ul>
+      <p className="govuk-bo">
+        To remove publications, releases and methodologies email{' '}
+        <a href="mailto:explore.statistics@education.gov.uk">
+          explore.statistics@education.gov.uk
+        </a>
       </p>
+
       {userContext.user && userContext.user.permissions.includes('team lead') && (
         <>
           <form>
@@ -327,8 +348,8 @@ const PrototypeAdminDashboardPublications = () => {
         </AccordionSection>
         {window.location.search === '?status=newPublication' && (
           <AccordionSection
-            heading="Pupil absence statistics and data for schools in England: summer term"
-            caption="New publication, requires release adding"
+            heading="Pupil absence statistics and data for schools in England: summer term (NEW)"
+            caption="Create new release"
           >
             <dl className="govuk-summary-list">
               <div className="govuk-summary-list__row">

@@ -42,8 +42,9 @@ const PublicationDataPage = ({ location }: RouteChildrenProps) => {
           <div className="govuk-form-group">
             <fieldset className="govuk-fieldset">
               <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
-                Set publish status
+                Release status
               </legend>
+              <p className="govuk-body">Select and update release status.</p>
               <div className="govuk-radios">
                 <div className="govuk-radios__item">
                   <input
@@ -58,7 +59,7 @@ const PublicationDataPage = ({ location }: RouteChildrenProps) => {
                     className="govuk-label govuk-radios__label"
                     htmlFor="edit"
                   >
-                    Editing in progress
+                    In draft
                   </label>
                 </div>
 
@@ -74,7 +75,7 @@ const PublicationDataPage = ({ location }: RouteChildrenProps) => {
                     className="govuk-label govuk-radios__label"
                     htmlFor="readyApproval"
                   >
-                    Level 1: Ready for team approval
+                    Level 1: in review
                   </label>
                 </div>
 
@@ -91,7 +92,7 @@ const PublicationDataPage = ({ location }: RouteChildrenProps) => {
                     className="govuk-label govuk-radios__label"
                     htmlFor="readyTeamLeadApproval"
                   >
-                    Level 2: Ready for team lead appoval
+                    Level 2: in higher review
                   </label>
                 </div>
               </div>
@@ -109,7 +110,7 @@ const PublicationDataPage = ({ location }: RouteChildrenProps) => {
               />
             </div>
             <button className="govuk-button govuk-!-margin-top-3" type="submit">
-              Update
+              Update release status
             </button>
           </div>
         </form>

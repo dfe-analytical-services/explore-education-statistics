@@ -43,7 +43,7 @@ const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
         </div>
       </div>
       <Tabs id="dashboard-tabs">
-        <TabsSection id="publications" title="Publications">
+        <TabsSection id="publications" title="Manage publications">
           <PrototypeAdminDashboardPublications />
         </TabsSection>
         {/* <TabsSection
@@ -64,7 +64,7 @@ const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
         </TabsSection>
         <TabsSection
           id="task-in-progress2"
-          title={`Unresolved comments ${
+          title={`Comments for you to resolve ${
             location.search === '?status=readyApproval' ? '(1)' : '(0)'
           }`}
         >

@@ -45,7 +45,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
 
             <FormGroup>
               <FormRadioGroup
-                legend="Methodology"
+                legend="Select a methodology for this publication"
                 id="methodology"
                 name="methodology"
                 value={value}
@@ -55,7 +55,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                 options={[
                   {
                     id: 'existing-methodology',
-                    label: 'Add existing methodology to this publication',
+                    label: 'Add existing methodology',
                     value: 'existing-methodlogy',
                     conditional: (
                       <FormSelect
@@ -84,33 +84,10 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                       />
                     ),
                   },
-                  {
-                    id: 'url-methodology',
-                    label: 'Link to externally hosted methodology',
-                    value: 'url-methodology',
-                    conditional: (
-                      <>
-                        <FormGroup>
-                          <FormTextInput
-                            id="external-url"
-                            name="external-url"
-                            label="URL"
-                            value="http://"
-                          />
-                        </FormGroup>
-                        <FormGroup>
-                          <FormTextInput
-                            id="external-title"
-                            name="external-title"
-                            label="Link title"
-                          />
-                        </FormGroup>
-                      </>
-                    ),
-                  },
+
                   {
                     id: 'new-methodology',
-                    label: 'This publication requires new methodology creating',
+                    label: 'Create new methodology',
                     value: 'new-methodology',
                   },
                 ]}
@@ -118,7 +95,14 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
             </FormGroup>
 
             <FormGroup>
-              <FormFieldset id="lead-statisician" legend="Lead statistician">
+              <FormFieldset
+                id="lead-statisician"
+                legend="Select the lead statistician for this publication"
+              >
+                <p className="govuk-hint">
+                  They will be the main point of contact for data and
+                  methodology enquiries for this publication.
+                </p>
                 <FormSelect
                   id="select-lead-statisician"
                   label="Select lead statistician"
