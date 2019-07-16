@@ -31,10 +31,7 @@ const Link = ({
 }: LinkProps) => {
   const handleAnalytics = () => {
     if (analytics) {
-      logEvent(
-        analytics.category || window.location.pathname,
-        analytics.action,
-      );
+      logEvent(analytics.category, analytics.action, window.location.pathname);
     }
   };
 

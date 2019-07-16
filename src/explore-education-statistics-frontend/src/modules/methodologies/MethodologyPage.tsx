@@ -6,7 +6,7 @@ import methodologyService, {
   Methodology,
 } from '@common/services/methodologyService';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
-import PrintThisPageAnalytics from '@frontend/components/PrintThisPageAnalytics';
+import PrintThisPage from '@frontend/components/PrintThisPage';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import ContentBlock from '@frontend/modules/find-statistics/components/ContentBlock';
@@ -154,7 +154,12 @@ class MethodologyPage extends Component<Props> {
           </>
         )}
 
-        <PrintThisPageAnalytics />
+        <PrintThisPage
+          analytics={{
+            category: 'Page print',
+            action: 'Print this page link selected',
+          }}
+        />
       </Page>
     );
   }

@@ -12,7 +12,7 @@ import publicationService, {
 import ButtonLink from '@frontend/components/ButtonLink';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
-import PrintThisPageAnalytics from '@frontend/components/PrintThisPageAnalytics';
+import PrintThisPage from '@frontend/components/PrintThisPage';
 import classNames from 'classnames';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
@@ -367,7 +367,12 @@ class PublicationReleasePage extends Component<Props> {
           Create tables
         </ButtonLink>
 
-        <PrintThisPageAnalytics />
+        <PrintThisPage
+          analytics={{
+            category: 'Page print',
+            action: 'Print this page link selected',
+          }}
+        />
       </Page>
     );
   }
