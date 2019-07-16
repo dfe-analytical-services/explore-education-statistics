@@ -20,10 +20,13 @@ const key = (() => {
   };
 })();
 
-interface Comment {
+export interface Comment {
   name: string;
   time: Date;
   comment: string;
+  state?: 'open' | 'resolved';
+  resolvedBy?: string;
+  resolvedOn?: Date;
 }
 
 const ContentAddComment = () => {
@@ -39,7 +42,10 @@ const ContentAddComment = () => {
       permissions: [],
     };
 
-    setComments([...comments, { name: user.name, time: new Date(), comment }]);
+    setComments([
+      ...comments,
+      { name: user.name, time: new Date(), comment, state: 'open' },
+    ]);
     setCurrentComment('');
   };
 

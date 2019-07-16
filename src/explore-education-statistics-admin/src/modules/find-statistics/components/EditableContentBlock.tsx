@@ -29,8 +29,6 @@ class EditableContentBlock extends Component<Props> {
         const key = `${index}-${block.heading}-${block.type}`;
         return (
           <>
-            {reviewing && <AddComment />}
-            {resolveComments && <ResolveComment name="Ann Evans" />}
             <EditableContentSubBlockRenderer
               editable={editable}
               block={block}

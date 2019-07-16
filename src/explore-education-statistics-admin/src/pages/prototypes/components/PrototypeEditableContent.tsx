@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions,jsx-a11y/click-events-have-key-events */
 // @ts-ignore
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 // @ts-ignore
@@ -95,24 +96,25 @@ class PrototypeEditableContent extends React.Component<Props, State> {
     resolveComments?: boolean,
   ) {
     return (
-      // eslint-disable-next-line jsx-a11y/no-static-element-interactions,jsx-a11y/click-events-have-key-events
-      <div
-        className={
-          editable
-            ? `${styles.editableContent}  ${unsaved ? styles.unsaved : ''}`
-            : ''
-        }
-        onClick={this.setEditing}
-      >
+      <div>
         {reviewing && <AddComment />}
         {resolveComments && <ResolveComment name="Stephen Doherty" />}
-        <div className={styles.editableButton}>
-          <div className={styles.editableButtonContent}>
-            Click to edit this section
-            {unsaved ? '\u000amodified' : ''}
+        <div
+          className={
+            editable
+              ? `${styles.editableContent}  ${unsaved ? styles.unsaved : ''}`
+              : ''
+          }
+          onClick={this.setEditing}
+        >
+          <div className={styles.editableButton}>
+            <div className={styles.editableButtonContent}>
+              Click to edit this section
+              {unsaved ? '\u000amodified' : ''}
+            </div>
           </div>
+          <div ref={this.ref} />
         </div>
-        <div ref={this.ref} />
       </div>
     );
   }
