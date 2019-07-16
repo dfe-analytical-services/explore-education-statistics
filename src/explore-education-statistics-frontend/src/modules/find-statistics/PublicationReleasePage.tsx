@@ -156,7 +156,17 @@ class PublicationReleasePage extends Component<Props> {
                   <strong>{data.releaseName}</strong>
                 </dd>
                 <dd>
-                  <Details summary={`See previous ${releaseCount} releases`}>
+                  <Details
+                    summary={`See previous ${releaseCount} releases`}
+                    onToggle={(open: boolean) =>
+                      open &&
+                      logEvent(
+                        'Previous Releases',
+                        'Open previous releases accordion',
+                        window.location.pathname,
+                      )
+                    }
+                  >
                     <ul className="govuk-list">
                       {[
                         ...data.publication.releases
