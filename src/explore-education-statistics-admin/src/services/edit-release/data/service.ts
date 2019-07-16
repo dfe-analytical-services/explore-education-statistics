@@ -37,4 +37,7 @@ export default {
   createDownloadDataFileLink(releaseId: string, fileId: string): string {
     return `/release/${releaseId}/datafile/${fileId}`;
   },
+  createDownloadDataMetadataFileLink(releaseId: string, fileId: string): string {
+    return `/release/${releaseId}/datafile/metadata/${fileId}`;
+  },
 };

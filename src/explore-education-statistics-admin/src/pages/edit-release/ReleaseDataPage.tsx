@@ -58,7 +58,9 @@ const ReleaseDataPage = ({ match }: RouteComponentProps<MatchProps>) => {
                   {dataFile.numberOfRows}
                 </SummaryListItem>
                 <SummaryListItem term="Metadata file">
-                  {dataFile.metadataFile.fileName}
+                  <a href={service.createDownloadDataMetadataFileLink(releaseId, dataFile.file.id)}>
+                    {dataFile.metadataFile.fileName}
+                  </a>
                 </SummaryListItem>
                 <SummaryListItem
                   term="Actions"
