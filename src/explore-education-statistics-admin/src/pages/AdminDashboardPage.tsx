@@ -3,41 +3,80 @@ import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import { LoginContext } from '@admin/components/Login';
-import DummyPublicationsData from '@admin/pages/DummyPublicationsData';
-import { Publication } from '@admin/services/publicationService';
+import DummyPublicationsData, {
+  ThemeAndTopics,
+} from '@admin/pages/DummyPublicationsData';
+import { IdLabelPair, Publication } from '@admin/services/types/types';
 import AdminDashboardPublicationsTab from '@admin/components/AdminDashboardPublicationsTab';
 import Link from '../components/Link';
 import Page from '../components/Page';
 
+const themeToThemeWithIdLabelAndTopics = (theme: ThemeAndTopics) => ({
+  id: theme.id,
+  label: theme.title,
+  topics: theme.topics.map(topic => ({
+    id: topic.id,
+    label: topic.title,
+  })),
+});
+
+const findThemeById = (
+  themeId: string,
+  availableThemes: ThemeAndTopicsIdsAndLabels[],
+) => availableThemes.find(theme => theme.id === themeId) || availableThemes[0];
+
+const findTopicById = (topicId: string, theme: ThemeAndTopicsIdsAndLabels) =>
+  theme.topics.find(topic => topic.id === topicId) || theme.topics[0];
+
+interface ThemeAndTopicsIdsAndLabels extends IdLabelPair {
+  topics: IdLabelPair[];
+}
+
 const AdminDashboardPage = () => {
   const [myPublications, setMyPublications] = useState<Publication[]>([]);
 
-  const [inProgressPublications, setInProgressPublications] = useState<
-    Publication[]
-  >([]);
+  const [themes, setThemes] = useState<ThemeAndTopicsIdsAndLabels[]>();
+
+  const [selectedThemeAndTopic, setSelectedThemeAndTopic] = useState<{
+    theme: ThemeAndTopicsIdsAndLabels;
+    topic: IdLabelPair;
+  }>();
 
   const authentication = useContext(LoginContext);
 
   useEffect(() => {
-    const { user } = authentication;
-    const loggedInUserId = user ? user.id : null;
+    const loggedInUser = authentication.user;
 
-    if (loggedInUserId) {
-      const fetchedMyPublications = DummyPublicationsData.allPublications.filter(
-        publication => publication.owner.id === loggedInUserId,
+    if (!loggedInUser) {
+      setMyPublications([]);
+      return;
+    }
+
+    if (!themes) {
+      const themeList = DummyPublicationsData.themesAndTopics;
+
+      const themesAsIdLabelPairs = themeList.map(
+        themeToThemeWithIdLabelAndTopics,
       );
 
-      const fetchedInProgressPublications = DummyPublicationsData.allPublications.filter(
-        publication => publication.owner.id !== loggedInUserId,
+      setThemes(themesAsIdLabelPairs);
+
+      setSelectedThemeAndTopic({
+        theme: themesAsIdLabelPairs[0],
+        topic: themesAsIdLabelPairs[0].topics[0],
+      });
+    }
+
+    if (selectedThemeAndTopic) {
+      const fetchedMyPublications = DummyPublicationsData.allPublications.filter(
+        publication =>
+          publication.owner.id === loggedInUser.id &&
+          publication.topic.id === selectedThemeAndTopic.topic.id,
       );
 
       setMyPublications(fetchedMyPublications);
-      setInProgressPublications(fetchedInProgressPublications);
-    } else {
-      setMyPublications([]);
-      setInProgressPublications([]);
     }
-  }, [authentication]);
+  }, [authentication, selectedThemeAndTopic, themes]);
 
   return (
     <Page wide breadcrumbs={[{ name: 'Administrator dashboard' }]}>
@@ -59,16 +98,31 @@ const AdminDashboardPage = () => {
       </div>
       <Tabs id="publicationTabs">
         <TabsSection id="my-publications" title="Publications">
-          <AdminDashboardPublicationsTab
-            publications={myPublications}
-            noResultsMessage="You have not yet created any publications"
-          />
+          {themes && selectedThemeAndTopic && (
+            <AdminDashboardPublicationsTab
+              publications={myPublications}
+              noResultsMessage="You have not yet created any publications"
+              themes={themes}
+              topics={selectedThemeAndTopic.theme.topics}
+              selectedThemeId={selectedThemeAndTopic.theme.id}
+              selectedTopicId={selectedThemeAndTopic.topic.id}
+              onThemeChange={themeId =>
+                setSelectedThemeAndTopic({
+                  theme: findThemeById(themeId, themes),
+                  topic: findThemeById(themeId, themes).topics[0],
+                })
+              }
+              onTopicChange={topicId =>
+                setSelectedThemeAndTopic({
+                  theme: selectedThemeAndTopic.theme,
+                  topic: findTopicById(topicId, selectedThemeAndTopic.theme),
+                })
+              }
+            />
+          )}
         </TabsSection>
         <TabsSection id="in-progress-publications" title="In progress">
-          <AdminDashboardPublicationsTab
-            publications={inProgressPublications}
-            noResultsMessage="There are currently no releases in progress"
-          />
+          Hi
         </TabsSection>
       </Tabs>
     </Page>

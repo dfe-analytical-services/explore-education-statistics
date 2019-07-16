@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import DummyPublicationsData from '@admin/pages/DummyPublicationsData';
-import EditReleasePageTemplate from '@admin/pages/edit-release/components/EditReleasePageTemplate';
-import { Release } from '../../services/publicationService';
+import ReleasePageTemplate from '@admin/pages/edit-release/components/ReleasePageTemplate';
+import { Release } from '../../services/types/types';
 
 interface MatchProps {
   releaseId: string;
 }
 
-const EditReleaseTablesPage = ({ match }: RouteComponentProps<MatchProps>) => {
+const ReleaseTablesPage = ({ match }: RouteComponentProps<MatchProps>) => {
   const { releaseId } = match.params;
 
   const [release, setRelease] = useState<Release>();
@@ -28,13 +28,13 @@ const EditReleaseTablesPage = ({ match }: RouteComponentProps<MatchProps>) => {
   }, [releaseId]);
 
   return (
-    <EditReleasePageTemplate
+    <ReleasePageTemplate
       publicationTitle={publicationTitle}
       releaseId={releaseId}
     >
       {release && <h2 className="govuk-heading-m">View / edit tables</h2>}
-    </EditReleasePageTemplate>
+    </ReleasePageTemplate>
   );
 };
 
-export default EditReleaseTablesPage;
+export default ReleaseTablesPage;
