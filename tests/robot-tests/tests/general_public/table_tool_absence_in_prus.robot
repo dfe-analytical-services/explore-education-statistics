@@ -61,18 +61,22 @@ Create table
 
 Validate results table column headings
     [Tags]  HappyPath
-    user checks results table contains  1   1   ${EMPTY}
-    user checks results table contains  1   2   2013/14
-    user checks results table contains  1   3   2014/15
-    user checks results table contains  1   4   2015/16
-    user checks results table contains  1   5   2016/17
+    user checks results table column heading contains  1   1   Pupil Referral Unit
+
+    user checks results table column heading contains  2   1   2013/14
+    user checks results table column heading contains  2   2   2014/15
+    user checks results table column heading contains  2   3   2015/16
+    user checks results table column heading contains  2   4   2016/17
+
+Validate results table row headings
+    [Tags]   HappyPath
+    user checks results table row heading contains  1     1     England
+    user checks results table row heading contains  1     2     Number of schools
 
 Validate Number of schools row results
     [Tags]  HappyPath
-    user checks results table contains  2   1   Pupil Referral Unit
-    user checks results table contains  2   2   Number of schools
-    user checks results table contains  2   3   361
-    user checks results table contains  2   4   363
-    user checks results table contains  2   5   350
-    user checks results table contains  2   6   349
+    user checks results table cell contains     1     1     361
+    user checks results table cell contains     1     2     363
+    user checks results table cell contains     1     3     350
+    user checks results table cell contains     1     4     349
 
