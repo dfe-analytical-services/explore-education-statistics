@@ -475,7 +475,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     (2020, TaxYearQ1Q4),
                     (2020, TaxYearQ2)
                 },
-                TimePeriodUtil.Range(new TimePeriodQuery(2018, TimeIdentifier.TaxYearQ4, 2020, TaxYearQ2)).ToList());
+                TimePeriodUtil.Range(new TimePeriodQuery(2018, TaxYearQ4, 2020, TaxYearQ2)).ToList());
         }
 
         [Fact]
