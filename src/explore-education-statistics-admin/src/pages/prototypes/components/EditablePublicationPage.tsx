@@ -10,7 +10,6 @@ import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import RelatedAside from '@common/components/RelatedAside';
-import { Release } from '@common/services/publicationService';
 import React, { Component } from 'react';
 import {
   DragDropContext,
@@ -19,17 +18,20 @@ import {
   Droppable,
   DropResult,
 } from 'react-beautiful-dnd';
+import { EditableRelease } from '@admin/services/publicationService';
+import AddComment from '@admin/pages/prototypes/components/PrototypeEditableContentAddComment';
+import ResolveComment from '@admin/pages/prototypes/components/PrototypeEditableContentResolveComment';
 
 interface State {
   reordering: boolean;
-  data?: Release | undefined;
+  data?: EditableRelease | undefined;
 }
 
 interface Props {
   editing?: boolean;
   reviewing?: boolean;
   resolveComments?: boolean;
-  data: Release | undefined;
+  data: EditableRelease | undefined;
 }
 
 const ACCORDION_ID_REGEXP = /accordion[(]([0-9]+)[)]/;
@@ -70,7 +72,7 @@ class EditablePublicationPage extends Component<Props, State> {
         if (sourceAccordion && targetAccordion) {
           if (source.index !== target.index) {
             if (data) {
-              const release: Release = (data as unknown) as Release;
+              const release: EditableRelease = (data as unknown) as EditableRelease;
 
               const resultList = Array.from(release.content);
 
@@ -99,6 +101,7 @@ class EditablePublicationPage extends Component<Props, State> {
           {
             type: 'MarkDownBlock',
             body: 'editable',
+            comments: [],
           },
         ],
       });
@@ -108,7 +111,7 @@ class EditablePublicationPage extends Component<Props, State> {
   }
 
   private renderContentSections(
-    data: Release,
+    data: EditableRelease,
     editing: boolean | undefined,
     reviewing: boolean | undefined,
     resolveComments: boolean | undefined,
@@ -127,7 +130,7 @@ class EditablePublicationPage extends Component<Props, State> {
   }
 
   private renderEditableSections(
-    data: Release,
+    data: EditableRelease,
     editing: boolean | undefined,
     reviewing: boolean | undefined,
     resolveComments: boolean | undefined,
@@ -151,7 +154,7 @@ class EditablePublicationPage extends Component<Props, State> {
               heading={heading}
               caption={caption}
               index={index}
-              key={`${order}`}
+              key={`${order}_${heading}`}
             >
               <EditableContentBlock
                 editable={editing}
@@ -180,7 +183,7 @@ class EditablePublicationPage extends Component<Props, State> {
     );
   }
 
-  private renderDraggableSections(data: Release) {
+  private renderDraggableSections(data: EditableRelease) {
     return (
       <DragDropContext onDragEnd={this.onDragEnd}>
         <h2 className="govuk-heading-l reorderable-relative">
@@ -271,6 +274,12 @@ class EditablePublicationPage extends Component<Props, State> {
           </dl>
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-two-thirds">
+              {reviewing && data && (
+                <AddComment initialComments={data.keyStatistics.comments} />
+              )}
+              {resolveComments && data && (
+                <ResolveComment initialComments={data.keyStatistics.comments} />
+              )}
               <PrototypeEditableContent
                 reviewing={reviewing}
                 resolveComments={resolveComments}

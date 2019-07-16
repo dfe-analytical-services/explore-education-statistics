@@ -3,14 +3,9 @@ import React from 'react';
 import Details from '@common/components/Details';
 
 import { LoginContext } from '@admin/components/Login';
-import { Comment } from './PrototypeEditableContentAddComment';
 
+import { ExtendedComment } from '@admin/services/publicationService';
 import styles from './PrototypeEditableContentAddComment.module.scss';
-
-interface Props {
-  name?: string;
-  date?: Date;
-}
 
 const key = (() => {
   let keyValue = 0;
@@ -21,20 +16,16 @@ const key = (() => {
   };
 })();
 
-const ContentResolveComment = ({ name, date }: Props) => {
+interface Props {
+  initialComments: ExtendedComment[];
+}
+
+const ContentResolveComment = ({ initialComments }: Props) => {
   const context = React.useContext(LoginContext);
 
-  const [comments, setComments] = React.useState<Comment[]>([
-    {
-      name: name || 'guest',
-      time: date || new Date(),
-      comment: `Lorem ipsum dolor sit, amet consectetur adipisicing elit. Tempore,
-              nostrum atque assumenda vitae quae ratione nihil accusamus
-              provident natus ipsum iure numquam ex labore nam, deleniti impedit
-              repudiandae eligendi quasi.`,
-      state: 'open',
-    },
-  ]);
+  const [comments, setComments] = React.useState<ExtendedComment[]>(
+    initialComments,
+  );
 
   const resolveComment = (index: number) => {
     comments[index].state = 'resolved';

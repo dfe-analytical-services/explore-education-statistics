@@ -1,14 +1,8 @@
 import React from 'react';
 import Details from '@common/components/Details';
-import {
-  FormGroup,
-  FormTextInput,
-  FormSelect,
-  FormRadioGroup,
-} from '@common/components/form';
-
 import { LoginContext } from '@admin/components/Login';
 import { User } from '@admin/services/PrototypeLoginService';
+import { ExtendedComment } from '@admin/services/publicationService';
 import styles from './PrototypeEditableContentAddComment.module.scss';
 
 const key = (() => {
@@ -20,18 +14,15 @@ const key = (() => {
   };
 })();
 
-export interface Comment {
-  name: string;
-  time: Date;
-  comment: string;
-  state?: 'open' | 'resolved';
-  resolvedBy?: string;
-  resolvedOn?: Date;
+interface Props {
+  initialComments: ExtendedComment[];
 }
 
-const ContentAddComment = () => {
+const ContentAddComment = ({ initialComments }: Props) => {
   const [currentComment, setCurrentComment] = React.useState<string>('');
-  const [comments, setComments] = React.useState<Comment[]>([]);
+  const [comments, setComments] = React.useState<ExtendedComment[]>(
+    initialComments,
+  );
 
   const context = React.useContext(LoginContext);
 

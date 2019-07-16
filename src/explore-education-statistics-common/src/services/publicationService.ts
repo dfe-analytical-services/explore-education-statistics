@@ -1,6 +1,6 @@
 import { DataBlockRequest } from '@common/services/dataBlockService';
-import { contentApi } from './api';
 import { Dictionary } from '@common/types';
+import { contentApi } from './api';
 
 export interface Publication {
   id: string;
@@ -106,7 +106,7 @@ export interface ContentBlock {
   summary?: Summary;
 }
 
-export interface Release {
+export interface AbstractRelease<ContentBlockType> {
   id: string;
   title: string;
   releaseName: string;
@@ -125,9 +125,9 @@ export interface Release {
     order: number;
     heading: string;
     caption: string;
-    content: ContentBlock[];
+    content: ContentBlockType[];
   }[];
-  keyStatistics: ContentBlock;
+  keyStatistics: ContentBlockType;
   dataFiles: {
     extension: string;
     name: string;
@@ -135,6 +135,8 @@ export interface Release {
     size: string;
   }[];
 }
+
+export type Release = AbstractRelease<ContentBlock>;
 
 export default {
   getPublication(publicationSlug: string): Promise<Release> {

@@ -97,8 +97,6 @@ class PrototypeEditableContent extends React.Component<Props, State> {
   ) {
     return (
       <div>
-        {reviewing && <AddComment />}
-        {resolveComments && <ResolveComment name="Stephen Doherty" />}
         <div
           className={
             editable
@@ -121,8 +119,7 @@ class PrototypeEditableContent extends React.Component<Props, State> {
 
   private renderEditor(content: string, resolveComments?: boolean) {
     return (
-      <>
-        {resolveComments && <ResolveComment name="Stephen Doherty" />}
+      <div>
         <div className={styles.editableContentEditing}>
           <div className={styles.editableButton}>
             <button className="govuk-button" onClick={this.save} type="button">
@@ -140,7 +137,7 @@ class PrototypeEditableContent extends React.Component<Props, State> {
             }}
           />
         </div>
-      </>
+      </div>
     );
   }
 
