@@ -34,4 +34,7 @@ export default {
       client.get<DataFileView>(`/release/${releaseId}/datafiles`),
     );
   },
+  createDownloadDataFileLink(releaseId: string, fileId: string): string {
+    return `/release/${releaseId}/datafile/${fileId}`;
+  },
 };

@@ -47,7 +47,9 @@ const ReleaseDataPage = ({ match }: RouteComponentProps<MatchProps>) => {
                   {dataFile.title}
                 </SummaryListItem>
                 <SummaryListItem term="Data file">
-                  {dataFile.file.fileName}
+                  <a href={service.createDownloadDataFileLink(releaseId, dataFile.file.id)}>
+                    {dataFile.file.fileName}
+                  </a>
                 </SummaryListItem>
                 <SummaryListItem term="Filesize">
                   {dataFile.fileSize.size} {dataFile.fileSize.unit}
