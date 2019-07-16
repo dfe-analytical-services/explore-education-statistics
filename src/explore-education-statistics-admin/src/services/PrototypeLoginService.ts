@@ -34,12 +34,12 @@ export class PrototypeLoginService {
   }
 
   public static setActiveUser(userId: string) {
-    window.sessionStorage.setItem('userId', userId);
+    window.localStorage.setItem('userId', userId);
   }
 
   public static login() {
     return PrototypeLoginService.getAuthentication(
-      window.sessionStorage.getItem('userId') || 'John Smith',
+      window.localStorage.getItem('userId') || 'John Smith',
     );
   }
 
