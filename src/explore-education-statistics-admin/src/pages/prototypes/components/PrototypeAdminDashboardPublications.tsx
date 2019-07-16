@@ -16,7 +16,18 @@ const PrototypeAdminDashboardPublications = () => {
   const userContext = React.useContext(LoginContext);
   return (
     <>
-      <p className="govuk-body">View existing and create new publications</p>
+      {userContext.user &&
+        userContext.user.permissions.includes('team lead') && (
+          <p className="govuk-body">
+            View existing and create new publications.
+          </p>
+        )}
+      {userContext.user &&
+        userContext.user.permissions.includes('team member') && (
+          <p className="govuk-body">
+            View existing publications and create new releases.
+          </p>
+        )}
       <p className="govuk-body">Select publications to:</p>
       <ul className="govuk-list--bullet">
         <li>create new releases and methodologies</li>
@@ -338,7 +349,7 @@ const PrototypeAdminDashboardPublications = () => {
         {window.location.search === '?status=newPublication' && (
           <AccordionSection
             heading="Pupil absence statistics and data for schools in England: summer term (NEW)"
-            caption="Add new release"
+            caption="Create new release"
           >
             <dl className="govuk-summary-list">
               <div className="govuk-summary-list__row">
@@ -356,7 +367,7 @@ const PrototypeAdminDashboardPublications = () => {
               </div>
             </dl>
             <Link to="/prototypes/release-create-new" className="govuk-button">
-              Add new release
+              Create new release
             </Link>
           </AccordionSection>
         )}

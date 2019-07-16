@@ -143,7 +143,7 @@ const PublicationDataPage = () => {
           <form>
             <fieldset className="govuk-fieldset">
               <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
-                Upload new data to release
+                Upload new data to this release
               </legend>
 
               <div className="govuk-form-group">
@@ -257,7 +257,7 @@ const PublicationDataPage = () => {
           <form>
             <fieldset className="govuk-fieldset">
               <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
-                Upload files
+                Upload files to this release
               </legend>
 
               <div className="govuk-form-group">
@@ -340,7 +340,7 @@ const PublicationDataPage = () => {
             <span className="govuk-heading-m govuk-!-margin-bottom-0">
               Next step
             </span>
-            Create tables and charts
+            Manage tables and charts
           </Link>
         </div>
       </div>

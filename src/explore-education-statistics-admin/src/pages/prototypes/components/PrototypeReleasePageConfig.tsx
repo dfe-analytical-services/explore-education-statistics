@@ -339,10 +339,10 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
 
         {!sectionId && (
           <>
-            <div className="govuk-form-group govuk-!-margin-top-6">
+            <div className="govuk-form-group govuk-!-margin-top-9">
               <fieldset className="govuk-fieldset">
                 <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
-                  Setup
+                  Select template
                 </legend>
                 <div className="govuk-radios">
                   <div className="govuk-radios__item">

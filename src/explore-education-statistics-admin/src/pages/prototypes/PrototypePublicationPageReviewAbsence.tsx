@@ -51,13 +51,13 @@ class PublicationPage extends Component<{}, State> {
         {' '}
         <div>
           <FormRadioGroup
-            legend="Review this release"
+            legend="Release status"
             id="review-release"
             name="review-release"
             options={[
               {
                 id: 'approve-release',
-                label: 'Approved for publication',
+                label: 'Approve for higher review',
                 value: 'approve-release',
                 conditional: (
                   <FormGroup>
@@ -75,7 +75,7 @@ class PublicationPage extends Component<{}, State> {
 
               {
                 id: 'question',
-                label: 'Add a comment or question',
+                label: 'In review - add comments and questions',
                 value: 'question',
                 conditional: (
                   <FormGroup>
