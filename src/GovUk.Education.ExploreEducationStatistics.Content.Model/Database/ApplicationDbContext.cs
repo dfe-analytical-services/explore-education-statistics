@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
+// ReSharper disable StringLiteralTypo
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 {
     public class ApplicationDbContext : DbContext
@@ -18,6 +19,149 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             : base(options)
         {
         }
+
+        private enum FilterItemName
+        {
+            Characteristic__Total,
+            School_Type__Total,
+            Year_of_admission__Primary_Total,
+            Year_of_admission__Secondary_Total
+        }
+
+        private enum IndicatorName
+        {
+            Unauthorised_absence_rate,
+            Overall_absence_rate,
+            Authorised_absence_rate,
+            Number_of_schools,
+            Number_of_pupils,
+            Number_of_permanent_exclusions,
+            Permanent_exclusion_rate,
+            Number_of_fixed_period_exclusions,
+            Fixed_period_exclusion_rate,
+            Percentage_of_pupils_with_fixed_period_exclusions,
+            Number_of_applications_received,
+            Number_of_first_preferences_offered,
+            Number_of_second_preferences_offered,
+            Number_of_third_preferences_offered,
+            Number_that_received_one_of_their_first_three_preferences,
+            Number_that_received_an_offer_for_a_preferred_school,
+            Number_that_received_an_offer_for_a_non_preferred_school,
+            Number_that_did_not_receive_an_offer,
+            Number_that_received_an_offer_for_a_school_within_their_LA
+        }
+
+        private static readonly Dictionary<int, Dictionary<FilterItemName, int>> SubjectFilterItemIds =
+            new Dictionary<int, Dictionary<FilterItemName, int>>
+            {
+                {
+                    1, new Dictionary<FilterItemName, int>
+                    {
+                        {
+                            FilterItemName.Characteristic__Total, 1
+                        },
+                        {
+                            FilterItemName.School_Type__Total, 2
+                        }
+                    }
+                },
+                {
+                    12, new Dictionary<FilterItemName, int>
+                    {
+                        {
+                            FilterItemName.School_Type__Total, 423
+                        }
+                    }
+                },
+                {
+                    17, new Dictionary<FilterItemName, int>
+                    {
+                        {
+                            FilterItemName.Year_of_admission__Primary_Total, 539
+                        },
+                        {
+                            FilterItemName.Year_of_admission__Secondary_Total, 540
+                        }
+                    }
+                }
+            };
+
+        private static readonly Dictionary<int, Dictionary<IndicatorName, int>> SubjectIndicatorIds =
+            new Dictionary<int, Dictionary<IndicatorName, int>>
+            {
+                {
+                    1, new Dictionary<IndicatorName, int>
+                    {
+                        {
+                            IndicatorName.Unauthorised_absence_rate, 23
+                        },
+                        {
+                            IndicatorName.Overall_absence_rate, 26
+                        },
+                        {
+                            IndicatorName.Authorised_absence_rate, 28
+                        }
+                    }
+                },
+                {
+                    12, new Dictionary<IndicatorName, int>
+                    {
+                        {
+                            IndicatorName.Number_of_schools, 153
+                        },
+                        {
+                            IndicatorName.Number_of_pupils, 154
+                        },
+                        {
+                            IndicatorName.Number_of_permanent_exclusions, 155
+                        },
+                        {
+                            IndicatorName.Permanent_exclusion_rate, 156
+                        },
+                        {
+                            IndicatorName.Number_of_fixed_period_exclusions, 157
+                        },
+                        {
+                            IndicatorName.Fixed_period_exclusion_rate, 158
+                        },
+                        {
+                            IndicatorName.Percentage_of_pupils_with_fixed_period_exclusions, 160
+                        }
+                    }
+                },
+                {
+                    17, new Dictionary<IndicatorName, int>
+                    {
+                        {
+                            IndicatorName.Number_of_applications_received, 189
+                        },
+                        {
+                            IndicatorName.Number_of_first_preferences_offered, 193
+                        },
+                        {
+                            IndicatorName.Number_of_second_preferences_offered, 194
+                        },
+                        {
+                            IndicatorName.Number_of_third_preferences_offered, 195
+                        },
+                        {
+                            IndicatorName.Number_that_received_one_of_their_first_three_preferences, 196
+                        },
+                        {
+                            IndicatorName.Number_that_received_an_offer_for_a_preferred_school, 197
+                        },
+                        {
+                            IndicatorName.Number_that_received_an_offer_for_a_non_preferred_school, 198
+                        },
+                        {
+                            IndicatorName.Number_that_did_not_receive_an_offer, 199
+                        },
+                        {
+                            IndicatorName.Number_that_received_an_offer_for_a_school_within_their_LA, 200
+                        }
+                    }
+                }
+            };
 
         public DbSet<Methodology> Methodologies { get; set; }
         public DbSet<Theme> Themes { get; set; }
@@ -1218,17 +1362,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 EndYear = "2016",
                                 EndCode = TimeIdentifier.AcademicYear
                             },
-                            Filters = new List<string> {"1", "2"},
-                            Indicators = new List<string> {"23", "26", "28"}
+                            Filters = new List<string>
+                            {
+                                FItem(1, FilterItemName.Characteristic__Total),
+                                FItem(1, FilterItemName.School_Type__Total)
+                            },
+                            Indicators = new List<string>
+                            {
+                                Indicator(1, IndicatorName.Unauthorised_absence_rate),
+                                Indicator(1, IndicatorName.Overall_absence_rate),
+                                Indicator(1, IndicatorName.Authorised_absence_rate)
+                            }
                         },
 
                         Summary = new Summary
                         {
                             dataKeys = new List<string>
                             {
-                                "26",
-                                "28",
-                                "23"
+                                Indicator(1, IndicatorName.Overall_absence_rate),
+                                Indicator(1, IndicatorName.Authorised_absence_rate),
+                                Indicator(1, IndicatorName.Unauthorised_absence_rate)
                             },
                             dataSummary = new List<string>
                             {
@@ -1244,12 +1397,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                        " * 10% of pupils persistently absent during 2016/17"
                             }
                         },
-
                         Tables = new List<Table>
                         {
                             new Table
                             {
-                                indicators = new List<string> {"23", "26", "28"}
+                                indicators = new List<string>
+                                {
+                                    Indicator(1, IndicatorName.Unauthorised_absence_rate),
+                                    Indicator(1, IndicatorName.Overall_absence_rate),
+                                    Indicator(1, IndicatorName.Authorised_absence_rate)
+                                }
                             }
                         },
                         Charts = new List<IContentBlockChart>
@@ -1263,9 +1420,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         GroupBy = AxisGroupBy.timePeriods,
                                         DataSets = new List<ChartDataSet>
                                         {
-                                            new ChartDataSet {Indicator = "23", Filters = new List<string> {"1", "2"}},
-                                            new ChartDataSet {Indicator = "26", Filters = new List<string> {"1", "2"}},
-                                            new ChartDataSet {Indicator = "28", Filters = new List<string> {"1", "2"}},
+                                            new ChartDataSet
+                                            {
+                                                Indicator = Indicator(1, IndicatorName.Unauthorised_absence_rate),
+                                                Filters = new List<string>
+                                                {
+                                                    FItem(1, FilterItemName.Characteristic__Total),
+                                                    FItem(1, FilterItemName.School_Type__Total)
+                                                }
+                                            },
+                                            new ChartDataSet
+                                            {
+                                                Indicator = Indicator(1, IndicatorName.Overall_absence_rate),
+                                                Filters = new List<string>
+                                                {
+                                                    FItem(1, FilterItemName.Characteristic__Total),
+                                                    FItem(1, FilterItemName.School_Type__Total)
+                                                }
+                                            },
+                                            new ChartDataSet
+                                            {
+                                                Indicator = Indicator(1, IndicatorName.Overall_absence_rate),
+                                                Filters = new List<string>
+                                                {
+                                                    FItem(1, FilterItemName.Characteristic__Total),
+                                                    FItem(1, FilterItemName.School_Type__Total)
+                                                }
+                                            }
                                         },
                                         Title = "School Year"
                                     },
@@ -1276,30 +1457,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 },
                                 Labels = new Dictionary<string, ChartConfiguration>
                                 {
-                                    ["23_1_2_____"] = new ChartConfiguration
-                                    {
-                                        Label = "Unauthorised Absence Rate",
-                                        Unit = "%",
-                                        Colour = "#4763a5",
-                                        symbol = ChartSymbol.circle
-                                    },
-                                    ["26_1_2_____"] = new ChartConfiguration
-                                    {
-                                        Label = "Overall Absence Rate",
-                                        Unit = "%",
-                                        Colour = "#f5a450",
-                                        symbol = ChartSymbol.cross
-                                    },
-                                    ["28_1_2_____"] = new ChartConfiguration
-                                    {
-                                        Label = "Authorised Absence Rate",
-                                        Unit = "%",
-                                        Colour = "#005ea5",
-                                        symbol = ChartSymbol.diamond
-                                    },
+                                    [$"{Indicator(1, IndicatorName.Unauthorised_absence_rate)}_{FItem(1, FilterItemName.Characteristic__Total)}_{FItem(1, FilterItemName.School_Type__Total)}_____"]
+                                        = new ChartConfiguration
+                                        {
+                                            Label = "Unauthorised Absence Rate",
+                                            Unit = "%",
+                                            Colour = "#4763a5",
+                                            symbol = ChartSymbol.circle
+                                        },
+                                    [$"{Indicator(1, IndicatorName.Overall_absence_rate)}_{FItem(1, FilterItemName.Characteristic__Total)}_{FItem(1, FilterItemName.School_Type__Total)}_____"]
+                                        = new ChartConfiguration
+                                        {
+                                            Label = "Overall Absence Rate",
+                                            Unit = "%",
+                                            Colour = "#f5a450",
+                                            symbol = ChartSymbol.cross
+                                        },
+                                    [$"{Indicator(1, IndicatorName.Authorised_absence_rate)}_{FItem(1, FilterItemName.Characteristic__Total)}_{FItem(1, FilterItemName.School_Type__Total)}_____"]
+                                        = new ChartConfiguration
+                                        {
+                                            Label = "Authorised Absence Rate",
+                                            Unit = "%",
+                                            Colour = "#005ea5",
+                                            symbol = ChartSymbol.diamond
+                                        }
                                 }
-                            },
-                        },
+                            }
+                        }
                     },
                     Content = new List<ContentSection>
                     {
@@ -1350,14 +1534,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                             EndYear = "2016",
                                             EndCode = TimeIdentifier.AcademicYear
                                         },
-                                        Filters = new List<string> {"1", "2"},
-                                        Indicators = new List<string> {"23", "26", "28"}
+                                        Filters = new List<string>
+                                        {
+                                            FItem(1, FilterItemName.Characteristic__Total),
+                                            FItem(1, FilterItemName.School_Type__Total)
+                                        },
+                                        Indicators = new List<string>
+                                        {
+                                            Indicator(1, IndicatorName.Unauthorised_absence_rate),
+                                            Indicator(1, IndicatorName.Overall_absence_rate),
+                                            Indicator(1, IndicatorName.Authorised_absence_rate)
+                                        }
                                     },
                                     Tables = new List<Table>
                                     {
                                         new Table
                                         {
-                                            indicators = new List<string> {"23", "26", "28"}
+                                            indicators = new List<string>
+                                            {
+                                                Indicator(1, IndicatorName.Unauthorised_absence_rate),
+                                                Indicator(1, IndicatorName.Overall_absence_rate),
+                                                Indicator(1, IndicatorName.Authorised_absence_rate)
+                                            }
                                         }
                                     },
                                     Charts = new List<IContentBlockChart>
@@ -1372,11 +1570,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                                     DataSets = new List<ChartDataSet>
                                                     {
                                                         new ChartDataSet
-                                                            {Indicator = "23", Filters = new List<string> {"1", "2"}},
+                                                        {
+                                                            Indicator = Indicator(1, IndicatorName.Unauthorised_absence_rate),
+                                                            Filters = new List<string>
+                                                            {
+                                                                FItem(1,
+                                                                    FilterItemName.Characteristic__Total),
+                                                                FItem(1, FilterItemName.School_Type__Total)
+                                                            }
+                                                        },
                                                         new ChartDataSet
-                                                            {Indicator = "26", Filters = new List<string> {"1", "2"}},
+                                                        {
+                                                            Indicator = Indicator(1, IndicatorName.Overall_absence_rate),
+                                                            Filters = new List<string>
+                                                            {
+                                                                FItem(1,
+                                                                    FilterItemName.Characteristic__Total),
+                                                                FItem(1, FilterItemName.School_Type__Total)
+                                                            }
+                                                        },
                                                         new ChartDataSet
-                                                            {Indicator = "28", Filters = new List<string> {"1", "2"}},
+                                                        {
+                                                            Indicator = Indicator(1, IndicatorName.Authorised_absence_rate),
+                                                            Filters = new List<string>
+                                                            {
+                                                                FItem(1,
+                                                                    FilterItemName.Characteristic__Total),
+                                                                FItem(1, FilterItemName.School_Type__Total)
+                                                            }
+                                                        }
                                                     },
                                                     Title = "School Year"
                                                 },
@@ -1387,27 +1609,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                             },
                                             Labels = new Dictionary<string, ChartConfiguration>
                                             {
-                                                ["23_1_2_____"] = new ChartConfiguration
-                                                {
-                                                    Label = "Unauthorised Absence Rate",
-                                                    Unit = "%",
-                                                    Colour = "#4763a5",
-                                                    symbol = ChartSymbol.circle
-                                                },
-                                                ["26_1_2_____"] = new ChartConfiguration
-                                                {
-                                                    Label = "Overall Absence Rate",
-                                                    Unit = "%",
-                                                    Colour = "#f5a450",
-                                                    symbol = ChartSymbol.cross
-                                                },
-                                                ["28_1_2_____"] = new ChartConfiguration
-                                                {
-                                                    Label = "Authorised Absence Rate",
-                                                    Unit = "%",
-                                                    Colour = "#005ea5",
-                                                    symbol = ChartSymbol.diamond
-                                                },
+                                                [$"{Indicator(1, IndicatorName.Unauthorised_absence_rate)}_{FItem(1, FilterItemName.Characteristic__Total)}_{FItem(1, FilterItemName.School_Type__Total)}_____"]
+                                                    = new ChartConfiguration
+                                                    {
+                                                        Label = "Unauthorised Absence Rate",
+                                                        Unit = "%",
+                                                        Colour = "#4763a5",
+                                                        symbol = ChartSymbol.circle
+                                                    },
+                                                [$"{Indicator(1, IndicatorName.Overall_absence_rate)}_{FItem(1, FilterItemName.Characteristic__Total)}_{FItem(1, FilterItemName.School_Type__Total)}_____"]
+                                                    = new ChartConfiguration
+                                                    {
+                                                        Label = "Overall Absence Rate",
+                                                        Unit = "%",
+                                                        Colour = "#f5a450",
+                                                        symbol = ChartSymbol.cross
+                                                    },
+                                                [$"{Indicator(1, IndicatorName.Authorised_absence_rate)}_{FItem(1, FilterItemName.Characteristic__Total)}_{FItem(1, FilterItemName.School_Type__Total)}_____"]
+                                                    = new ChartConfiguration
+                                                    {
+                                                        Label = "Authorised Absence Rate",
+                                                        Unit = "%",
+                                                        Colour = "#005ea5",
+                                                        symbol = ChartSymbol.diamond
+                                                    }
                                             }
                                         }
                                     }
@@ -1439,7 +1664,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         "It also accounted for almost a third (31.6%) of all [authorised absence](../glossary#authorised-absence) and more than half (53.8%) of all [unauthorised absence](../glossary#unauthorised-absence).\n\n" +
                                         "Overall, it's increased across primary and secondary schools to 10.8% - up from 10.5% in 2015 to 16."
                                 },
-
                                 new MarkDownBlock
                                 {
                                     Body =
@@ -1455,7 +1679,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             Order = 4, Heading = "Reasons for absence", Caption = "",
                             Content = new List<IContentBlock>
                             {
-                                new MarkDownBlock()
+                                new MarkDownBlock
                                 {
                                     Body =
                                         "These have been broken down into the following:\n\n" +
@@ -1463,7 +1687,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         "* rate of absence by reason - the rate of absence for each reason, calculated by taking the number of absences for a specific reason as a percentage of the total number of possible sessions\n\n" +
                                         "* one or more sessions missed due to each reason - the number of pupils missing at least 1 session due to each reason"
                                 },
-
                                 new MarkDownBlock
                                 {
                                     Body =
@@ -1587,8 +1810,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                             EndCode = TimeIdentifier.AcademicYear
                                         },
 
-                                        Indicators = new List<string> {"23", "26", "28"},
-                                        Filters = new List<string> {"1", "2"}
+                                        Indicators = new List<string>
+                                        {
+                                            Indicator(1, IndicatorName.Unauthorised_absence_rate),
+                                            Indicator(1, IndicatorName.Overall_absence_rate),
+                                            Indicator(1, IndicatorName.Authorised_absence_rate)
+                                        },
+                                        Filters = new List<string>
+                                        {
+                                            FItem(1, FilterItemName.Characteristic__Total),
+                                            FItem(1, FilterItemName.School_Type__Total)
+                                        }
                                     },
                                     Charts = new List<IContentBlockChart>
                                     {
@@ -1602,42 +1834,66 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                                     DataSets = new List<ChartDataSet>
                                                     {
                                                         new ChartDataSet
-                                                            {Indicator = "23", Filters = new List<string> {"1", "2"}},
+                                                        {
+                                                            Indicator = Indicator(1, IndicatorName.Unauthorised_absence_rate),
+                                                            Filters = new List<string>
+                                                            {
+                                                                FItem(1, FilterItemName.Characteristic__Total),
+                                                                FItem(1, FilterItemName.School_Type__Total)
+                                                            }
+                                                        },
                                                         new ChartDataSet
-                                                            {Indicator = "26", Filters = new List<string> {"1", "2"}},
+                                                        {
+                                                            Indicator = Indicator(1, IndicatorName.Overall_absence_rate),
+                                                            Filters = new List<string>
+                                                            {
+                                                                FItem(1, FilterItemName.Characteristic__Total),
+                                                                FItem(1, FilterItemName.School_Type__Total)
+                                                            }
+                                                        },
                                                         new ChartDataSet
-                                                            {Indicator = "28", Filters = new List<string> {"1", "2"}},
+                                                        {
+                                                            Indicator = Indicator(1, IndicatorName.Authorised_absence_rate),
+                                                            Filters = new List<string>
+                                                            {
+                                                                FItem(1, FilterItemName.Characteristic__Total),
+                                                                FItem(1, FilterItemName.School_Type__Total)
+                                                            }
+                                                        }
                                                     },
                                                     Title = "School Year"
                                                 },
                                                 ["minor"] = new AxisConfigurationItem
                                                 {
-                                                    Title = "Absence Rate",
+                                                    Title = "Absence Rate"
                                                 }
                                             },
                                             Labels = new Dictionary<string, ChartConfiguration>
                                             {
-                                                ["23_1_2_____"] = new ChartConfiguration
-                                                {
-                                                    Label = "Unauthorised Absence Rate",
-                                                    Unit = "%",
-                                                    Colour = "#4763a5",
-                                                    symbol = ChartSymbol.circle
-                                                },
-                                                ["26_1_2_____"] = new ChartConfiguration
-                                                {
-                                                    Label = "Overall Absence Rate",
-                                                    Unit = "%",
-                                                    Colour = "#f5a450",
-                                                    symbol = ChartSymbol.cross
-                                                },
-                                                ["28_1_2_____"] = new ChartConfiguration
-                                                {
-                                                    Label = "Authorised Absence Rate",
-                                                    Unit = "%",
-                                                    Colour = "#005ea5",
-                                                    symbol = ChartSymbol.diamond
-                                                },
+                                                [$"{Indicator(1, IndicatorName.Unauthorised_absence_rate)}_{FItem(1, FilterItemName.Characteristic__Total)}_{FItem(1, FilterItemName.School_Type__Total)}_____"]
+                                                    = new ChartConfiguration
+                                                    {
+                                                        Label = "Unauthorised Absence Rate",
+                                                        Unit = "%",
+                                                        Colour = "#4763a5",
+                                                        symbol = ChartSymbol.circle
+                                                    },
+                                                [$"{Indicator(1, IndicatorName.Overall_absence_rate)}_{FItem(1, FilterItemName.Characteristic__Total)}_{FItem(1, FilterItemName.School_Type__Total)}_____"]
+                                                    = new ChartConfiguration
+                                                    {
+                                                        Label = "Overall Absence Rate",
+                                                        Unit = "%",
+                                                        Colour = "#f5a450",
+                                                        symbol = ChartSymbol.cross
+                                                    },
+                                                [$"{Indicator(1, IndicatorName.Authorised_absence_rate)}_{FItem(1, FilterItemName.Characteristic__Total)}_{FItem(1, FilterItemName.School_Type__Total)}_____"]
+                                                    = new ChartConfiguration
+                                                    {
+                                                        Label = "Authorised Absence Rate",
+                                                        Unit = "%",
+                                                        Colour = "#005ea5",
+                                                        symbol = ChartSymbol.diamond
+                                                    }
                                             }
                                         }
                                     }
@@ -1733,16 +1989,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 EndCode = TimeIdentifier.AcademicYear
                             },
 
-                            Filters = new List<string> {"727"},
-                            Indicators = new List<string> {"153", "154", "155", "156", "157", "158", "160"}
+                            Filters = new List<string>
+                            {
+                                FItem(12, FilterItemName.School_Type__Total)
+                            },
+                            Indicators = new List<string>
+                            {
+                                Indicator(12, IndicatorName.Number_of_schools),
+                                Indicator(12, IndicatorName.Number_of_pupils),
+                                Indicator(12, IndicatorName.Number_of_permanent_exclusions),
+                                Indicator(12, IndicatorName.Permanent_exclusion_rate),
+                                Indicator(12, IndicatorName.Number_of_fixed_period_exclusions),
+                                Indicator(12, IndicatorName.Fixed_period_exclusion_rate),
+                                Indicator(12, IndicatorName.Percentage_of_pupils_with_fixed_period_exclusions)
+                            }
                         },
                         Summary = new Summary
                         {
                             dataKeys = new List<string>
                             {
-                                "156",
-                                "158",
-                                "155"
+                                Indicator(12, IndicatorName.Permanent_exclusion_rate),
+                                Indicator(12, IndicatorName.Fixed_period_exclusion_rate),
+                                Indicator(12, IndicatorName.Number_of_permanent_exclusions)
                             },
                             dataSummary = new List<string>
                             {
@@ -1763,7 +2031,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         {
                             new Table
                             {
-                                indicators = new List<string> {"156", "158", "155"}
+                                indicators = new List<string>
+                                {
+                                    Indicator(12, IndicatorName.Permanent_exclusion_rate),
+                                    Indicator(12, IndicatorName.Fixed_period_exclusion_rate),
+                                    Indicator(12, IndicatorName.Number_of_permanent_exclusions)
+                                }
                             }
                         },
 
@@ -1778,32 +2051,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         GroupBy = AxisGroupBy.timePeriods,
                                         DataSets = new List<ChartDataSet>
                                         {
-                                            new ChartDataSet {Indicator = "158", Filters = new List<string> {"727"}},
-                                            new ChartDataSet {Indicator = "160", Filters = new List<string> {"727"}},
+                                            new ChartDataSet
+                                            {
+                                                Indicator = Indicator(12, IndicatorName.Fixed_period_exclusion_rate),
+                                                Filters = new List<string>
+                                                {
+                                                    FItem(12, FilterItemName.School_Type__Total)
+                                                }
+                                            },
+                                            new ChartDataSet
+                                            {
+                                                Indicator = Indicator(12,
+                                                    IndicatorName.Percentage_of_pupils_with_fixed_period_exclusions),
+                                                Filters = new List<string>
+                                                {
+                                                    FItem(12, FilterItemName.School_Type__Total)
+                                                }
+                                            }
                                         },
                                         Title = "School Year"
                                     },
                                     ["minor"] = new AxisConfigurationItem
                                     {
-                                        Title = "Absence Rate",
+                                        Title = "Absence Rate"
                                     }
                                 },
                                 Labels = new Dictionary<string, ChartConfiguration>
                                 {
-                                    ["158_727_____"] = new ChartConfiguration
-                                    {
-                                        Label = "Fixed period exclusion Rate",
-                                        Unit = "%",
-                                        Colour = "#4763a5",
-                                        symbol = ChartSymbol.circle
-                                    },
-                                    ["160_727_____"] = new ChartConfiguration
-                                    {
-                                        Label = "Pupils with one ore more exclusion",
-                                        Unit = "%",
-                                        Colour = "#f5a450",
-                                        symbol = ChartSymbol.cross
-                                    }
+                                    [$"{Indicator(12, IndicatorName.Fixed_period_exclusion_rate)}_{FItem(12, FilterItemName.School_Type__Total)}_____"]
+                                        =
+                                        new ChartConfiguration
+                                        {
+                                            Label = "Fixed period exclusion Rate",
+                                            Unit = "%",
+                                            Colour = "#4763a5",
+                                            symbol = ChartSymbol.circle
+                                        },
+                                    [$"{Indicator(12, IndicatorName.Percentage_of_pupils_with_fixed_period_exclusions)}_{FItem(12, FilterItemName.School_Type__Total)}_____"]
+                                        =
+                                        new ChartConfiguration
+                                        {
+                                            Label = "Pupils with one ore more exclusion",
+                                            Unit = "%",
+                                            Colour = "#f5a450",
+                                            symbol = ChartSymbol.cross
+                                        }
                                 }
                             }
                         }
@@ -1846,24 +2138,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     {
                                         SubjectId = 12,
                                         GeographicLevel = "Country",
-                                        TimePeriod = new TimePeriod {
+                                        TimePeriod = new TimePeriod
+                                        {
                                             StartYear = "2012",
                                             StartCode = TimeIdentifier.AcademicYear,
                                             EndYear = "2016",
                                             EndCode = TimeIdentifier.AcademicYear
                                         },
-                                        Filters = new List<string> {"727"},
-                                        Indicators = new List<string> {"156", "154", "155"}
+                                        Filters = new List<string>
+                                        {
+                                            FItem(12, FilterItemName.School_Type__Total)
+                                        },
+                                        Indicators = new List<string>
+                                        {
+                                            Indicator(12, IndicatorName.Permanent_exclusion_rate),
+                                            Indicator(12, IndicatorName.Number_of_pupils),
+                                            Indicator(12, IndicatorName.Number_of_permanent_exclusions)
+                                        }
                                     },
-
                                     Tables = new List<Table>
                                     {
                                         new Table
                                         {
-                                            indicators = new List<string> {"154", "155", "156"}
+                                            indicators = new List<string>
+                                            {
+                                                Indicator(12, IndicatorName.Number_of_pupils),
+                                                Indicator(12, IndicatorName.Number_of_permanent_exclusions),
+                                                Indicator(12, IndicatorName.Permanent_exclusion_rate)
+                                            }
                                         }
                                     },
-
                                     Charts = new List<IContentBlockChart>
                                     {
                                         new LineChart
@@ -1876,29 +2180,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                                     DataSets = new List<ChartDataSet>
                                                     {
                                                         new ChartDataSet
-                                                            {Indicator = "156", Filters = new List<string> {"727"}}
+                                                        {
+                                                            Indicator = Indicator(12, IndicatorName.Permanent_exclusion_rate),
+                                                            Filters = new List<string>
+                                                            {
+                                                                FItem(12, FilterItemName.School_Type__Total)
+                                                            }
+                                                        }
                                                     },
                                                     Title = "School Year"
                                                 },
                                                 ["minor"] = new AxisConfigurationItem
                                                 {
-                                                    Title = "Exclusion Rate",
+                                                    Title = "Exclusion Rate"
                                                 }
                                             },
                                             Labels = new Dictionary<string, ChartConfiguration>
                                             {
-                                                ["156_727_____"] = new ChartConfiguration
-                                                {
-                                                    Label = "Fixed period exclusion Rate",
-                                                    Unit = "%",
-                                                    Colour = "#4763a5",
-                                                    symbol = ChartSymbol.circle
-                                                },
-                                            },
-                                        },
-                                    },
+                                                [$"{Indicator(12, IndicatorName.Permanent_exclusion_rate)}_{FItem(12, FilterItemName.School_Type__Total)}_____"]
+                                                    =
+                                                    new ChartConfiguration
+                                                    {
+                                                        Label = "Fixed period exclusion Rate",
+                                                        Unit = "%",
+                                                        Colour = "#4763a5",
+                                                        symbol = ChartSymbol.circle
+                                                    }
+                                            }
+                                        }
+                                    }
                                 },
-
                                 new MarkDownBlock
                                 {
                                     Body =
@@ -1932,25 +2243,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     {
                                         SubjectId = 12,
                                         GeographicLevel = "Country",
-                                        TimePeriod = new TimePeriod {
+                                        TimePeriod = new TimePeriod
+                                        {
                                             StartYear = "2012",
                                             StartCode = TimeIdentifier.AcademicYear,
                                             EndYear = "2016",
                                             EndCode = TimeIdentifier.AcademicYear
                                         },
 
-                                        Filters = new List<string> {"727"},
-                                        Indicators = new List<string> {"158", "154", "157"}
+                                        Filters = new List<string>
+                                        {
+                                            FItem(12, FilterItemName.School_Type__Total)
+                                        },
+                                        Indicators = new List<string>
+                                        {
+                                            Indicator(12, IndicatorName.Fixed_period_exclusion_rate),
+                                            Indicator(12, IndicatorName.Number_of_pupils),
+                                            Indicator(12, IndicatorName.Number_of_fixed_period_exclusions)
+                                        }
                                     },
-
                                     Tables = new List<Table>
                                     {
                                         new Table
                                         {
-                                            indicators = new List<string> {"154", "157", "158"}
+                                            indicators = new List<string>
+                                            {
+                                                Indicator(12, IndicatorName.Number_of_pupils),
+                                                Indicator(12, IndicatorName.Number_of_fixed_period_exclusions),
+                                                Indicator(12, IndicatorName.Fixed_period_exclusion_rate)
+                                            }
                                         }
                                     },
-
                                     Charts = new List<IContentBlockChart>
                                     {
                                         new LineChart
@@ -1963,24 +2286,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                                     DataSets = new List<ChartDataSet>
                                                     {
                                                         new ChartDataSet
-                                                            {Indicator = "158", Filters = new List<string> {"727"}},
+                                                        {
+                                                            Indicator =
+                                                                Indicator(12, IndicatorName.Fixed_period_exclusion_rate),
+                                                            Filters = new List<string>
+                                                            {
+                                                                FItem(12, FilterItemName.School_Type__Total)
+                                                            }
+                                                        }
                                                     },
                                                     Title = "School Year"
                                                 },
                                                 ["minor"] = new AxisConfigurationItem
                                                 {
-                                                    Title = "Absence Rate",
+                                                    Title = "Absence Rate"
                                                 }
                                             },
                                             Labels = new Dictionary<string, ChartConfiguration>
                                             {
-                                                ["158_727_____"] = new ChartConfiguration
-                                                {
-                                                    Label = "Fixed period exclusion Rate",
-                                                    Unit = "%",
-                                                    Colour = "#4763a5",
-                                                    symbol = ChartSymbol.circle
-                                                }
+                                                [$"{Indicator(12, IndicatorName.Fixed_period_exclusion_rate)}_{FItem(12, FilterItemName.School_Type__Total)}_____"]
+                                                    =
+                                                    new ChartConfiguration
+                                                    {
+                                                        Label = "Fixed period exclusion Rate",
+                                                        Unit = "%",
+                                                        Colour = "#4763a5",
+                                                        symbol = ChartSymbol.circle
+                                                    }
                                             }
                                         }
                                     }
@@ -2125,315 +2457,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         }
                     }
                 },
-                /*
-                // // school pupil numbers
-                new Release
-                {
-                    Id = new Guid("e3288537-9adb-431d-adfb-9bc3ef7be48c"),
-                    Title = "Schools, pupils and their characteristics: January 2018",
-                    ReleaseName = "January 2018",
-                    PublicationId = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
-                    Published = new DateTime(2018, 5, 28),
-                    Slug = "january-2018",
-                    Summary =
-                        "Statistics on pupils in schools in England as collected in the January 2018 school census.",
-                    KeyStatistics = new DataBlock
-                    {
-                        Heading = "Latest headline facts and figures - 2016 to 2017",
-    
-                        Summary = new Summary
-                        {
-                            dataKeys = new List<string>
-                            {
-                                "--",
-                                "--",
-                                "--"
-                            },
-                            dataSummary = new List<string>
-                            {
-                                "",
-                                "",
-                                ""
-                            },
-                            description = new MarkDownBlock
-                            {
-                                Body = ""
-                            }
-                        }
-                    },
-                    Content = new List<ContentSection>
-                    {
-                        new ContentSection
-                        {
-                            Order = 1, Heading = "About this release", Caption = "",
-                            Content = new List<IContentBlock>
-                            {
-                                new MarkDownBlock
-                                {
-                                    Body =
-                                        "This statistical publication provides the number of schools and pupils in schools in England, using data from the January 2018School Census.\n\n Breakdowns are given for school types as well as for pupil characteristics including free school meal eligibility, English as an additional languageand ethnicity.This release also contains information about average class sizes.\n\n SEN tables previously provided in thispublication will be published in the statistical publication ‘Special educational needs in England: January 2018’ scheduled for release on 26July 2018.\n\n Cross border movement tables will be added to this publication later this year."
-                                }
-                            }
-                        },
-                    }
-                },
-                */
-                /*
-                // // GCSE / KS4
-                new Release
-                {
-                    Id = new Guid("e7ae88fb-afaf-4d51-a78a-bbb2de671daf"),
-                    Title = "GCSE and equivalent results in England, 2016 to 2017",
-                    ReleaseName = "2016 to 2017",
-                    PublicationId = new Guid("bfdcaae1-ce6b-4f63-9b2b-0a1f3942887f"),
-                    Published = new DateTime(2018, 6, 20),
-                    Slug = "2016-17",
-                    Summary =
-                        "This statistical first release (SFR) provides information on the achievements in GCSE examinations and other qualifications of young people in academic year 2016 to 2017. This typically covers those starting the academic year aged 15. \n\n" +
-                        "You can also view a regional breakdown of statistics and data within the [local authorities section](#contents-sections-content-6) \n\n" +
-                        "[Find out more about our GCSE and equivalent results methodology and terminology](#extra-information-sections-heading-1)",
-                    KeyStatistics = new DataBlock
-                    {
-                        Heading = "Latest headline facts and figures - 2016 to 2017",
-    
-    
-                        Summary = new Summary
-                        {
-                            dataKeys = new List<string>
-                            {
-                                "--",
-                                "--",
-                                "--"
-                            },
-                            dataSummary = new List<string>
-                            {
-                                "",
-                                "",
-                                ""
-                            },
-                            description = new MarkDownBlock
-                            {
-                                Body =
-                                    " * average Attainment8 scores remained stable compared to 2017s \n" +
-                                    " * percentage of pupils achieving 5 or above in English and Maths increased \n" +
-                                    " * EBacc entry increased slightly \n" +
-                                    " * over 250 schools met the coasting definition in 2018"
-                            }
-                        },
-                    },
-    
-                    Content = new List<ContentSection>
-                    {
-                        new ContentSection
-                        {
-                            Order = 1,
-                            Heading = "About this release",
-                            Caption = "",
-                            Content = new List<IContentBlock>
-                            {
-                                new MarkDownBlock
-                                {
-                                    Body =
-                                        "This release shows results for GCSE and equivalent Key Stage 4 (KS4) qualifications in 2018 across a range of measures, broken down by pupil characteristics and education institutions. Results are also provided on schools below the floor standards and meeting the coasting definition.  \n\n" +
-                                        "This is an update to Provisional figures released in October 2018. Users should be careful when comparing headline measures to results in previous years given recent methodological changes \n\n" +
-                                        "Figures are available at national, regional, local authority, and school level. Figures held in this release are used for policy development and count towards the secondary performance tables. Schools and local authorities also use the statistics to compare their local performance to regional and national averages for different pupil groups."
-                                }
-                            }
-                        },
-                        new ContentSection
-                        {
-                            Order = 2,
-                            Heading = "School performance for 2018",
-                            Caption =
-                                "School performance for 2018 shows small increases across all headline measures compared to 2017",
-                            Content = new List<IContentBlock>
-                            {
-                                new DataBlock
-                                {
-                                    Heading = "Average headline performance measures over time",
-                                },
-                                new MarkDownBlock
-                                {
-                                    Body =
-                                        "Results for 2018 show an increases across all headline measures compared to 2017. **When drawing comparison over time, however, it is very important to note any changes to methodology or data changes underpinning these measures**. For example, changes in Attainment 8 may have been affected by the introduction of further reformed GCSEs graded on the 9-1 scale which have a higher maximum score than unreformed GCSEs. Similarly, in 2016 there were significant changes to the Attainment in English and Maths measure. \n\n" +
-                                        "These results cover state-funded schools but results for all schools are available in the supporting tables and show slightly lower performance across all headline measures on average. Differences between the figures for all schools and state-funded schools are primarily due to the impact of unapproved and unregulated qualifications such as international GCSEs taken more commonly in independent schools. These qualification are not included in school performance tables. \n\n" +
-                                        "There are five primary headline measures used throughout this report: \n" +
-                                        " * **Attainment8** - measures the average achievement of pupils in up to 8 qualifications (including English and Maths). \n" +
-                                        " * **Attainment in English & Maths (9-5)** - measures the percentage of pupils achieving a grade 5 or above in both English and maths.\n" +
-                                        " * **EBacc Entries** – measure the percentage of pupils reaching the English Baccalaureate (EBacc) attainment threshold in core academic subjects at key stage 4. The EBacc is made up of English, maths, science, a language, and history or geography. \n" +
-                                        " * **EBacc Average Point Score (APS)** – measures pupils’ point scores across the five pillars of the EBacc, ensuring the attainment of all pupils is recognised. New measure from 2018, replacing the previous threshold EBacc attainment measure. \n" +
-                                        " * **Progress** - measures the progress a pupil makes from the end of key stage 2 to the end of key stage 4. It compares pupils’ Attainment 8 score with the average for all pupils nationally who had a similar starting point. Progress 8 is a relative measure, therefore the national average Progress 8 score for mainstream schools is very close to zero. "
-                                }
-                            }
-                        },
-                        new ContentSection
-                        {
-                            Order = 3,
-                            Heading = "Schools meeting the coasting and floor standard",
-                            Caption = "Over 250 schools failed to support pupils to fulfil their potential in 2018",
-                            Content = new List<IContentBlock>
-                            {
-                                new DataBlock
-                                {
-                                    Heading =
-                                        "There is wide variation in the percentage of schools meeting the coasting and floor standard by region"
-                                },
-                                new MarkDownBlock
-                                {
-                                    Body =
-                                        "The floor and coasting standards give measures of whether schools are helping pupils to fulfil their potential based on progress measures. The floor standard is based on results in the most recent year, whereas the Coasting definition looks at slightly different measures over the past three years. Only state-funded mainstream schools are covered by these measures, subject to certain eligibility criteria. \n" +
-                                        "* **11.6%** of eligible schools were below the floor standard in 2018. This represents 346 schools\n" +
-                                        "* **9.2%** of eligible schools met the coasting definition in 2018. This represents 257 schools \n" +
-                                        "* **161** schools were both coating and below the floor standard \n" +
-                                        "* due to methodological changes no directly comparable measures exist for previous years \n"
-                                }
-                            }
-                        },
-                        new ContentSection
-                        {
-                            Order = 4,
-                            Heading = "Pupil characteristics",
-                            Caption =
-                                "Disadvantaged pupils and those with Special Education Needs continue to do less well than their peers",
-                            Content = new List<IContentBlock>
-                            {
-                                new DataBlock
-                                {
-                                    Heading = "Average headline scores by pupil characteristics"
-                                },
-                                new MarkDownBlock
-                                {
-                                    Body =
-                                        "Breakdowns by pupil characteristics show that across all headline measures: \n" +
-                                        "* girls continue to do better than boys \n" +
-                                        "* non-disadvantaged pupils continue to do better than disadvantaged pupils \n" +
-                                        "* pupils with no identified Special Educational Needs (SEN) continue to do better perform than SEN pupils \n" +
-                                        "In general the pattern of attainment gaps for Attainment 8 in 2018 remained the same as in 2017 although differences in Attainment 8 scores widened slightly across all groups. This is to be expected due to changes to reformed GCSEs in 2018, meaning more points are available for higher scores.  \n\n" +
-                                        "Due to changes in performance measures over time, comparability over time is complicated. As such, for disadvantaged pupils is recommended to use to disadvantage gap index instead with is more resilient to changes in grading systems over time. The gap between disadvantaged pupils and others, measured using the gap index, has remained broadly stable, widening by 0.6% in 2018, and narrowing by 9.5% since 2011."
-                                },
-                                new DataBlock
-                                {
-                                    Heading = "Disadvantage attainment gap index"
-                                }
-                            }
-                        },
-                        new ContentSection
-                        {
-                            Order = 5,
-                            Heading = "Headline performance",
-                            Caption = "Results across headline performance measures vary by ethnicity",
-                            Content = new List<IContentBlock>
-                            {
-                                new DataBlock
-                                {
-                                    Heading = "Average headline scores by pupil ethnicity"
-                                },
-                                new MarkDownBlock
-                                {
-                                    Body =
-                                        "Results across headline measures differ by ethnicity with Chinese pupils in particular achieving scores above the national average. \n\n" +
-                                        "Performance across headline measures increased for all major ethnic groups from 2017 to 2018, with the exception of EBacc entries for white pupils were there was a small decrease. \n\n" +
-                                        "Within the more detailed ethnic groupings, pupils from an Indian background are the highest performing group in key stage 4 headline measures other than Chinese pupils. Gypsy/Roma pupils and traveller of Irish heritage pupils are the lowest performing groups. \n\n" +
-                                        "For context, White pupils made up 75.8% of pupils at the end of key stage 4 in 2018, 10.6% were Asian, 5.5% were black, 4.7% were mixed, 0.4% were Chinese. The remainder are in smaller breakdowns or unclassified."
-                                }
-                            }
-                        },
-                        new ContentSection
-                        {
-                            Order = 6,
-                            Heading = "Local authority",
-                            Caption = "Performance by local authority varies considerably ",
-                            Content = new List<IContentBlock>
-                            {
-                                new MarkDownBlock
-                                {
-                                    Body =
-                                        "Performance varies considerably across the country – for Attainment 8 score per pupil there is nearly a 23 point gap between the poorest and highest performing areas. The highest performing local authorities are concentrated in London and the south with the majority of the lowest performing local authorities are located in the northern and midland regions with average Attainment 8 score per pupil show that. This is similar to patterns seen in recent years and against other performance measures. "
-                                }
-                            }
-                        },
-                        new ContentSection
-                        {
-                            Order = 7,
-                            Heading = "Pupil subject areas",
-                            Caption =
-                                "Pupil subject entries are highest for science and humanities and continue to increase",
-                            Content = new List<IContentBlock>
-                            {
-                                new DataBlock
-                                {
-                                    Heading =
-                                        "Pupil subject entries are highest for science and humanities and continue to increase"
-                                },
-                                new MarkDownBlock
-                                {
-                                    Body =
-                                        "It is compulsory for pupils to study English and Maths at key stage 4 in state-funded schools.  \n " +
-                                        "### Science\n" +
-                                        "It is compulsory for schools to teach Science at Key Stage 4. For these subjects, the proportion of pupils entering continues to increase.  \n\n " +
-                                        "In 2018, 68.0% of the cohort entered the new combined science pathway rather than the individual science subjects like Chemistry, Biology, Physics or Computer Science. The general pattern is for pupils with higher prior attainment tend to take single sciences; those with lower prior attainment to opt for the combined science pathway; and those with the lowest prior attainment to take no science qualifications. \n " +
-                                        "### Humanities \n" +
-                                        "The proportion of pupils entering EBacc humanities continued to increase in 2018, to 78.3% in state-funded schools, a rise of 1.5 percentage points since 2017. This was driven by small increases in entries across the majority of prior attainment groups for geography, and small increases in entries for pupils with low and average prior attainment for history. In history, the slight increase in entries from pupils with low and average prior attainment groups was counter-balanced by continued decreases in proportion of entries for high prior attainers. This trend has continued since 2016. \n " +
-                                        "### Languages \n " +
-                                        "Entries to EBacc languages continued to decrease in 2018 to 46.1%, a fall of 1.3 percentage points compared to 2017. This was the fourth year in a row that entries have fallen. There were decreases across the majority of prior attainment bands but the largest drop occurred for pupils with higher prior attainment.. This decrease in entries for pupils with high prior attainment between 2018 and 2017 is much smaller than the drop that occurred between 2016 and 2017. Some of this drop can be explained by pupils who entered a language qualification early in a subject that was subsequently reformed in 2018. This was the case for over 3,500 pupils, whose language result did not count in 2018 performance tables.  \n " +
-                                        "### Art and design subjects \n " +
-                                        "The percentage of pupils entering at least one arts subject decreased in 2018, by 2.2 percentage points compared to equivalent data in 2017. 44.3% of pupils in state-funded schools entered at least one arts subject. This is the third consecutive year that a fall in entries has occurred. "
-                                }
-                            }
-                        },
-                        new ContentSection
-                        {
-                            Order = 8,
-                            Heading = "Schools performance",
-                            Caption =
-                                "Across state-funded schools performance is typically higher in converter academies, the most common school type",
-                            Content = new List<IContentBlock>
-                            {
-                                new DataBlock
-                                {
-                                    Heading =
-                                        "Across state-funded schools performance is typically higher in converter academies, the most common school type"
-                                },
-                                new MarkDownBlock
-                                {
-                                    Body =
-                                        "Schools in England can be divided into state-funded and independent schools (funded by fees paid by attendees). Independent schools are considered separately, because the department holds state-funded schools accountable for their performance.  \n\n " +
-                                        "The vast majority of pupils in state-funded schools are in either academies (68%) or LA maintained schools (29%). *Converter academies* were high performing schools that chose to convert to academies and have on average higher attainment across the headline measures. *Sponsored academies* were schools that were low performing prior to conversion and tend to perform below the average for state-funded schools.  \n\n " +
-                                        "Between 2017 and 2018 EBacc entry remained stable for sponsored academies, with an increase of 0.1 percentage points to 30.1%. EBacc entry fell marginally for converter academies by 0.3 percentage points (from 44.2% to 43.8%). Over the same period, EBacc entry in local authority maintained schools increased by 0.2 percentage points to 37.0%."
-                                }
-                            }
-                        },
-                        new ContentSection
-                        {
-                            Order = 9,
-                            Heading = "Attainment",
-                            Caption =
-                                "Multi-academy trust schools generally perform below national averages, but typically face greater challenges.",
-                            Content = new List<IContentBlock>
-                            {
-                                new MarkDownBlock
-                                {
-                                    Body =
-                                        "Academies are state schools directly funded by the government, each belonging to a trust. Multi-Academy Trusts (MATs) can be responsible for a group of academies and cover around 13.6% of state-funded mainstream pupils. Most MATs are responsible for between 3 and 5 schools but just over 10% cover 11 or more schools.  \n\n" +
-                                        "Generally speaking MATs are typically more likely to cover previously poor-performing schools and pupils are more likely to have lower prior attainment, be disadvantaged, have special educational needs (SEN) or have English as an additional language (EAL) than the national average. \n\n" +
-                                        "The number of eligible MATs included in Key Stage 4 measures increased from 62 in 2017 to 85 in 2018. This is an increase from 384 to 494 schools, and from 54,356 to 69,169 pupils. "
-                                },
-                                new DataBlock
-                                {
-                                    Heading = "Performance in MATs compared to national average"
-                                },
-                                new MarkDownBlock
-                                {
-                                    Body =
-                                        "On Progress8 measures, in 2018, 32.9% of MATs were below the national average and 7.1% well below average. 29.4% were not above or below the national average by a statistically significant amount. \n\n" +
-                                        "Entry rate in EBacc is lower in MATs compared to the national average – in 2018 43.5% of MATs had an entry rate higher than the national average of 39.1%. The EBacc average point score is also lower in MATs – 32.9% of MATs had an APS higher than the national average. \n\n" +
-                                        "Analysis by characteristics shows that in 2018 disadvantaged pupils in MATs made more progress than the national average for disadvantaged. However, non-disadvantaged pupils, SEN and non-SEN pupils, pupils with English as a first language and high prior attainment pupils made less progress than the national average for their respective group."
-                                }
-                            }
-                        },
-                    }
-                },
-                */
                 // Secondary and primary schools applications offers
                 new Release
                 {
@@ -2446,29 +2469,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Summary =
                         "Read national statistical summaries, view charts and tables and download data files.\n\n" +
                         "Find out how and why these statistics are collected and published - [Secondary and primary school applications and offers: methodology](../methodology/secondary-and-primary-schools-applications-and-offers)",
-                    TimePeriodCoverage    = TimeIdentifier.AcademicYear,
+                    TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     KeyStatistics = new DataBlock
                     {
                         DataBlockRequest = new DataBlockRequest
                         {
                             SubjectId = 17,
                             GeographicLevel = "Country",
-                            TimePeriod = new TimePeriod {
+                            TimePeriod = new TimePeriod
+                            {
                                 StartYear = "2014",
                                 StartCode = TimeIdentifier.CalendarYear,
                                 EndYear = "2018",
                                 EndCode = TimeIdentifier.CalendarYear
                             },
-
-                            Filters = new List<string> {"845"},
+                            Filters = new List<string>
+                            {
+                                FItem(17, FilterItemName.Year_of_admission__Primary_Total)
+                            },
                             Indicators = new List<string>
-                                {"189", "193", "194", "195", "196", "197", "198", "199"}
+                            {
+                                Indicator(17, IndicatorName.Number_of_applications_received),
+                                Indicator(17, IndicatorName.Number_of_first_preferences_offered),
+                                Indicator(17, IndicatorName.Number_of_second_preferences_offered),
+                                Indicator(17, IndicatorName.Number_of_third_preferences_offered),
+                                Indicator(17, IndicatorName.Number_that_received_one_of_their_first_three_preferences),
+                                Indicator(17, IndicatorName.Number_that_received_an_offer_for_a_preferred_school),
+                                Indicator(17, IndicatorName.Number_that_received_an_offer_for_a_non_preferred_school),
+                                Indicator(17, IndicatorName.Number_that_did_not_receive_an_offer)
+                            }
                         },
                         Summary = new Summary
                         {
                             dataKeys = new List<string>
                             {
-                                "189", "193", "194"
+                                Indicator(17, IndicatorName.Number_of_applications_received),
+                                Indicator(17, IndicatorName.Number_of_first_preferences_offered),
+                                Indicator(17, IndicatorName.Number_of_second_preferences_offered)
                             },
                             dataSummary = new List<string>
                             {
@@ -2482,35 +2519,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     "* majority of applicants received a preferred offer\n" +
                                     "* percentage of applicants receiving secondary first choice offers decreases as applications increase\n" +
                                     "* slight proportional increase in applicants receiving primary first choice offer as applications decrease\n"
-                            },
+                            }
                         },
                         Tables = new List<Table>
                         {
                             new Table
                             {
-                                indicators = new List<string> {"189", "193", "194", "195", "198", "199"}
+                                indicators = new List<string>
+                                {
+                                    Indicator(17, IndicatorName.Number_of_applications_received),
+                                    Indicator(17, IndicatorName.Number_of_first_preferences_offered),
+                                    Indicator(17, IndicatorName.Number_of_second_preferences_offered),
+                                    Indicator(17, IndicatorName.Number_of_third_preferences_offered),
+                                    Indicator(17, IndicatorName.Number_that_received_an_offer_for_a_non_preferred_school),
+                                    Indicator(17, IndicatorName.Number_that_did_not_receive_an_offer)
+                                }
                             }
                         }
-
-                        /*
-                        Charts = new List<IContentBlockChart> {
-                            new LineChart
-                            {
-                                XAxis = new Axis
-                                {
-                                    title = "School Year"
-                                },
-                                YAxis = new Axis
-                                {
-                                    title = ""
-                                },
-                                Indicators = new List<string>
-                                {
-                                    "189", "196", "197"
-                                },
-                            }
-                        }
-                        */
                     },
                     Content = new List<ContentSection>
                     {
@@ -2557,21 +2582,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     {
                                         SubjectId = 17,
                                         GeographicLevel = "Country",
-                                        TimePeriod = new TimePeriod {
+                                        TimePeriod = new TimePeriod
+                                        {
                                             StartYear = "2014",
                                             StartCode = TimeIdentifier.CalendarYear,
                                             EndYear = "2018",
                                             EndCode = TimeIdentifier.CalendarYear
                                         },
 
-                                        Filters = new List<string> {"848"},
-                                        Indicators = new List<string> {"197", "198", "199", "200"}
+                                        Filters = new List<string>
+                                        {
+                                            FItem(17, FilterItemName.Year_of_admission__Secondary_Total)
+                                        },
+                                        Indicators = new List<string>
+                                        {
+                                            Indicator(17, IndicatorName.Number_that_received_an_offer_for_a_preferred_school),
+                                            Indicator(17,
+                                                IndicatorName.Number_that_received_an_offer_for_a_non_preferred_school),
+                                            Indicator(17, IndicatorName.Number_that_did_not_receive_an_offer),
+                                            Indicator(17,
+                                                IndicatorName
+                                                    .Number_that_received_an_offer_for_a_school_within_their_LA)
+                                        }
                                     },
                                     Tables = new List<Table>
                                     {
-                                        new Table {indicators = new List<string> {"197", "198", "199"}}
+                                        new Table
+                                        {
+                                            indicators = new List<string>
+                                            {
+                                                Indicator(17,
+                                                    IndicatorName.Number_that_received_an_offer_for_a_preferred_school),
+                                                Indicator(17,
+                                                    IndicatorName
+                                                        .Number_that_received_an_offer_for_a_non_preferred_school),
+                                                Indicator(17, IndicatorName.Number_that_did_not_receive_an_offer)
+                                            }
+                                        }
                                     }
-                                },
+                                }
                             }
                         },
                         new ContentSection
@@ -2642,19 +2691,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     {
                                         SubjectId = 17,
                                         GeographicLevel = "Country",
-                                        TimePeriod = new TimePeriod {
+                                        TimePeriod = new TimePeriod
+                                        {
                                             StartYear = "2014",
                                             StartCode = TimeIdentifier.CalendarYear,
                                             EndYear = "2018",
                                             EndCode = TimeIdentifier.CalendarYear
                                         },
 
-                                        Filters = new List<string> {"845"},
-                                        Indicators = new List<string> {"197", "198", "199", "200"}
+                                        Filters = new List<string>
+                                        {
+                                            FItem(17, FilterItemName.Year_of_admission__Primary_Total)
+                                        },
+                                        Indicators = new List<string>
+                                        {
+                                            Indicator(17, IndicatorName.Number_that_received_an_offer_for_a_preferred_school),
+                                            Indicator(17,
+                                                IndicatorName.Number_that_received_an_offer_for_a_non_preferred_school),
+                                            Indicator(17, IndicatorName.Number_that_did_not_receive_an_offer),
+                                            Indicator(17,
+                                                IndicatorName
+                                                    .Number_that_received_an_offer_for_a_school_within_their_LA)
+                                        }
                                     },
                                     Tables = new List<Table>
                                     {
-                                        new Table {indicators = new List<string> {"197", "198", "199"}}
+                                        new Table
+                                        {
+                                            indicators = new List<string>
+                                            {
+                                                Indicator(17,
+                                                    IndicatorName.Number_that_received_an_offer_for_a_preferred_school),
+                                                Indicator(17,
+                                                    IndicatorName
+                                                        .Number_that_received_an_offer_for_a_non_preferred_school),
+                                                Indicator(17, IndicatorName.Number_that_did_not_receive_an_offer)
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -2691,7 +2764,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         "As in previous years, at primary level a smaller proportion of offers were made of schools outside the applicant’s home authority compared to secondary level."
                                 }
                             }
-                        },
+                        }
                     }
                 }
             );
@@ -3030,7 +3103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         ? File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/Section4.html",
                                             Encoding.UTF8)
                                         : ""
-                                },
+                                }
                             }
                         },
                         new ContentSection
@@ -3046,7 +3119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         ? File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/Section5.html",
                                             Encoding.UTF8)
                                         : ""
-                                },
+                                }
                             }
                         },
                         new ContentSection
@@ -3062,7 +3135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         ? File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/Section6.html",
                                             Encoding.UTF8)
                                         : ""
-                                },
+                                }
                             }
                         },
                         new ContentSection
@@ -3078,7 +3151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         ? File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/Section7.html",
                                             Encoding.UTF8)
                                         : ""
-                                },
+                                }
                             }
                         }
                     },
@@ -3097,7 +3170,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         ? File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/AnnexA.html",
                                             Encoding.UTF8)
                                         : ""
-                                },
+                                }
                             }
                         },
                         new ContentSection
@@ -3113,7 +3186,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         ? File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/AnnexB.html",
                                             Encoding.UTF8)
                                         : ""
-                                },
+                                }
                             }
                         },
                         new ContentSection
@@ -3129,7 +3202,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         ? File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/AnnexC.html",
                                             Encoding.UTF8)
                                         : ""
-                                },
+                                }
                             }
                         },
                         new ContentSection
@@ -3145,7 +3218,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         ? File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/AnnexD.html",
                                             Encoding.UTF8)
                                         : ""
-                                },
+                                }
                             }
                         },
                         new ContentSection
@@ -3161,7 +3234,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         ? File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/AnnexE.html",
                                             Encoding.UTF8)
                                         : ""
-                                },
+                                }
                             }
                         },
                         new ContentSection
@@ -3177,7 +3250,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         ? File.ReadAllText(@"Migrations/Html/Pupil_Absence_Statistics/AnnexF.html",
                                             Encoding.UTF8)
                                         : ""
-                                },
+                                }
                             }
                         }
                     }
@@ -3207,7 +3280,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                                 @"Migrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section1.html",
                                                 Encoding.UTF8)
                                             : ""
-                                },
+                                }
                             }
                         },
                         new ContentSection
@@ -3226,7 +3299,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                                 @"Migrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section2.html",
                                                 Encoding.UTF8)
                                             : ""
-                                },
+                                }
                             }
                         },
                         new ContentSection
@@ -3245,7 +3318,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                                 @"Migrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section3.html",
                                                 Encoding.UTF8)
                                             : ""
-                                },
+                                }
                             }
                         },
                         new ContentSection
@@ -3264,10 +3337,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                                 @"Migrations/Html/Secondary_And_Primary_School_Applications_And_Offers/Section4.html",
                                                 Encoding.UTF8)
                                             : ""
-                                },
+                                }
                             }
-                        },
-                    },
+                        }
+                    }
                 },
                 new Methodology
                 {
@@ -3291,7 +3364,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         ? File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/Section1.html",
                                             Encoding.UTF8)
                                         : ""
-                                },
+                                }
                             }
                         },
                         new ContentSection
@@ -3307,7 +3380,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         ? File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/Section2.html",
                                             Encoding.UTF8)
                                         : ""
-                                },
+                                }
                             }
                         },
                         new ContentSection
@@ -3323,7 +3396,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         ? File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/Section3.html",
                                             Encoding.UTF8)
                                         : ""
-                                },
+                                }
                             }
                         },
                         new ContentSection
@@ -3339,7 +3412,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         ? File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/Section4.html",
                                             Encoding.UTF8)
                                         : ""
-                                },
+                                }
                             }
                         },
                         new ContentSection
@@ -3355,7 +3428,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         ? File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/Section5.html",
                                             Encoding.UTF8)
                                         : ""
-                                },
+                                }
                             }
                         },
                         new ContentSection
@@ -3371,7 +3444,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         ? File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/Section6.html",
                                             Encoding.UTF8)
                                         : ""
-                                },
+                                }
                             }
                         },
                         new ContentSection
@@ -3387,7 +3460,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         ? File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/Section7.html",
                                             Encoding.UTF8)
                                         : ""
-                                },
+                                }
                             }
                         },
                     },
@@ -3406,7 +3479,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         ? File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/AnnexA.html",
                                             Encoding.UTF8)
                                         : ""
-                                },
+                                }
                             }
                         },
                         new ContentSection
@@ -3422,7 +3495,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         ? File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/AnnexB.html",
                                             Encoding.UTF8)
                                         : ""
-                                },
+                                }
                             }
                         },
                         new ContentSection
@@ -3438,7 +3511,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         ? File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/AnnexC.html",
                                             Encoding.UTF8)
                                         : ""
-                                },
+                                }
                             }
                         },
                         new ContentSection
@@ -3454,12 +3527,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         ? File.ReadAllText(@"Migrations/Html/Pupil_Exclusion_Statistics/AnnexD.html",
                                             Encoding.UTF8)
                                         : ""
-                                },
+                                }
                             }
-                        },
+                        }
                     }
                 }
             );
+        }
+
+        private static string FItem(int subjectId, FilterItemName filterItemName)
+        {
+            return SubjectFilterItemIds[subjectId][filterItemName].ToString();
+        }
+
+        private static string Indicator(int subjectId, IndicatorName indicatorName)
+        {
+            return SubjectIndicatorIds[subjectId][indicatorName].ToString();
         }
     }
 }
