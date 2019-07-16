@@ -102,6 +102,7 @@ Validate Sitemap page
 Validate Feedback page
     [Tags]  HappyPath
     user clicks link  feedback
+    user selects newly opened window
     user waits until page contains      Explore Education Statistics - Beta banner feedback survey
 
     user checks url contains    www.smartsurvey.co.uk
