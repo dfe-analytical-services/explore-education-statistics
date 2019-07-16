@@ -74,7 +74,7 @@ Validate results table row headings
     user checks results table row heading contains  1     2     Number of schools
 
 Validate Number of schools row results
-    [Tags]  HappyPath
+    [Tags]  HappyPath   Failing
     user checks results table cell contains     1     1     361
     user checks results table cell contains     1     2     363
     user checks results table cell contains     1     3     350
