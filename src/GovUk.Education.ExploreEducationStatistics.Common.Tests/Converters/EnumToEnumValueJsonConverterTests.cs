@@ -1,9 +1,9 @@
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Converters;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Common.Converters;
+using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using Newtonsoft.Json;
 using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Converters
+namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Converters
 {
     public class EnumToEnumValueJsonConverterTests
     {
