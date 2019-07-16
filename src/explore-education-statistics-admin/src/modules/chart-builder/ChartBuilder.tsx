@@ -20,7 +20,6 @@ import {
   ChartConfiguration,
   AxisConfigurationItem,
 } from '@common/services/publicationService';
-import ConstData from '@admin/pages/prototypes/PrototypeData';
 import { Dictionary } from '@common/types';
 import LineChartBlock from '@common/modules/find-statistics/components/charts/LineChartBlock';
 import VerticalBarBlock from '@common/modules/find-statistics/components/charts/VerticalBarBlock';
