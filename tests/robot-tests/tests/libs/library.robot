@@ -188,6 +188,9 @@ user clicks button
   [Arguments]   ${text}
   click button  ${text}
 
+user selects newly opened window
+  select window   NEW
+
 user checks element attribute value should be
   [Arguments]   ${locator}  ${attribute}    ${expected}
   element attribute value should be  ${locator}     ${attribute}   ${expected}
