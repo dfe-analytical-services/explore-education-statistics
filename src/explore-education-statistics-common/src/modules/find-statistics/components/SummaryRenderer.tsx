@@ -36,6 +36,10 @@ export default function SummaryRenderer({
 }: SummaryRendererProps) {
   let measures: { [key: string]: string } = {};
 
+  if (meta === undefined) {
+    return <div>Invalid data specified</div>;
+  }
+
   if (data) {
     measures = getLatestMeasures(data.result);
   } else {

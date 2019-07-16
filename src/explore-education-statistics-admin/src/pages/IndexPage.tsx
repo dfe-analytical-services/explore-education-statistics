@@ -1,6 +1,6 @@
 import React from 'react';
-import Link from '../components/Link';
-import Page from '../components/Page';
+import Link from '@admin/components/Link';
+import Page from '@admin/components/Page';
 
 function IndexPage() {
   return (
