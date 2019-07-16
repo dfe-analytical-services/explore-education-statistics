@@ -80,6 +80,7 @@ export interface Release {
   id: string;
   releaseName: string;
   timePeriodCoverage: TimePeriodCoverage;
+  scheduledReleaseDate: Date;
   slug: string;
   status: ReleaseStatus;
   lead: UserContact;
@@ -112,6 +113,15 @@ export interface Publication {
   topic: Topic;
   contact: UserContact;
   methodology: Methodology;
+  owner: User;
+}
+
+export interface ReleaseSetupDetails {
+  publicationTitle: string;
+  releaseType: string;
+  releaseName: string;
+  leadStatisticianName: string;
+  scheduledReleaseDate: Date;
 }
 
 export interface ExtendedComment {

@@ -10,40 +10,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         [EnumLabelValue("Local Authority District", "LAD")]
         Local_Authority_District,
 
-        [EnumLabelValue("Local Enterprise Partnerships", "LEP")]
-        Local_Enterprise_Partnerships,
+        [EnumLabelValue("Local Enterprise Partnership", "LEP")]
+        Local_Enterprise_Partnership,
 
-        [EnumLabelValue("Institution", "INS")]
-        Institution,
-        
-        [EnumLabelValue("MAT Or Sponsor", "MATS")]
-        MAT_Or_Sponsor,
+        [EnumLabelValue("Institution", "INS")] Institution,
 
-        [EnumLabelValue("Mayoral Combined Authorities", "MCA")]
-        Mayoral_Combined_Authorities,
+        [EnumLabelValue("Mayoral Combined Authority", "MCA")]
+        Mayoral_Combined_Authority,
 
-        [EnumLabelValue("National", "NAT")]
-        National,
+        [EnumLabelValue("Multi Academy Trust", "MAT")]
+        Multi_Academy_Trust,
 
-        [EnumLabelValue("Opportunity Areas", "OA")]
-        Opportunity_Areas,
+        [EnumLabelValue("Country", "NAT")] Country,
+
+        [EnumLabelValue("Opportunity Area", "OA")]
+        Opportunity_Area,
 
         [EnumLabelValue("Parliamentary Constituency", "PC")]
         Parliamentary_Constituency,
 
-        [EnumLabelValue("Provider", "PRO")]
-        Provider,
+        [EnumLabelValue("Provider", "PRO")] Provider,
 
-        [EnumLabelValue("Regional", "REG")]
-        Regional,
+        [EnumLabelValue("Regional", "REG")] Region,
 
-        [EnumLabelValue("RSC Region", "RSCR")]
-        RSC_Region,
+        [EnumLabelValue("RSC Region", "RSCR")] RSC_Region,
 
-        [EnumLabelValue("School", "SCH")]
-        School,
+        [EnumLabelValue("School", "SCH")] School,
 
-        [EnumLabelValue("Ward", "WAR")]
-        Ward
+        [EnumLabelValue("Sponsor", "SPO")] Sponsor,
+
+        [EnumLabelValue("Ward", "WAR")] Ward
     }
 }

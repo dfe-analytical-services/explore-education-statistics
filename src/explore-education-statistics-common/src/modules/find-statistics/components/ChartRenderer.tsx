@@ -2,10 +2,9 @@ import HorizontalBarBlock from '@common/modules/find-statistics/components/chart
 import LineChartBlock from '@common/modules/find-statistics/components/charts/LineChartBlock';
 import VerticalBarBlock from '@common/modules/find-statistics/components/charts/VerticalBarBlock';
 import {
-  Axis,
-  ChartConfigurationOptions,
-  ChartDataSet,
+  AxisConfigurationItem,
   ChartType,
+  ChartConfiguration,
   ReferenceLine,
 } from '@common/services/publicationService';
 import dynamic from 'next-server/dynamic';
@@ -14,6 +13,7 @@ import {
   DataBlockData,
   DataBlockMetadata,
 } from '@common/services/dataBlockService';
+import { Dictionary } from '@common/types';
 
 const DynamicMapBlock = dynamic(
   () => import('@common/modules/find-statistics/components/charts/MapBlock'),
@@ -26,14 +26,12 @@ export interface ChartRendererProps {
   type: ChartType;
   data: DataBlockData;
   meta: DataBlockMetadata;
-  xAxis: Axis;
-  yAxis: Axis;
   height?: number;
   width?: number;
   stacked?: boolean;
   referenceLines?: ReferenceLine[];
-  dataSets: ChartDataSet[];
-  configuration: ChartConfigurationOptions;
+  labels: Dictionary<ChartConfiguration>;
+  axes: Dictionary<AxisConfigurationItem>;
 }
 
 function ChartRenderer(props: ChartRendererProps) {
@@ -45,91 +43,40 @@ function ChartRenderer(props: ChartRendererProps) {
     referenceLines,
     stacked,
     type,
-    xAxis = { title: '' },
-    yAxis = { title: '' },
-    dataSets,
-    configuration,
+    labels,
+    axes,
   } = props;
 
-  const labels = Object.entries(meta.indicators).reduce(
-    (results, [key, indicator]) => ({ ...results, [key]: indicator.label }),
-    {},
-  );
-
   // TODO : Temporary sort on the results to get them in date order
-  data.result.sort((a, b) => {
-    if (a.year < b.year) {
-      return -1;
+  data.result.sort((a, b) => a.timePeriod.localeCompare(b.timePeriod));
+
+  const chartProps = {
+    data,
+    meta,
+    labels,
+    axes,
+    height,
+    width,
+    referenceLines,
+    stacked,
+  };
+
+  if (data && meta && data.result.length > 0) {
+    switch (type.toLowerCase()) {
+      case 'line':
+        return <LineChartBlock {...chartProps} />;
+      case 'verticalbar':
+        return <VerticalBarBlock {...chartProps} />;
+      case 'horizontalbar':
+        return <HorizontalBarBlock {...chartProps} />;
+      case 'map':
+        return <DynamicMapBlock {...chartProps} />;
+      default:
+        return <div>[ Unimplemented chart type requested ${type} ]</div>;
     }
-
-    if (a.year > b.year) {
-      return 1;
-    }
-
-    return 0;
-  });
-
-  switch (type.toLowerCase()) {
-    case 'line':
-      return (
-        <LineChartBlock
-          data={data}
-          meta={meta}
-          labels={labels}
-          xAxis={xAxis}
-          yAxis={yAxis}
-          height={height}
-          width={width}
-          referenceLines={referenceLines}
-          dataSets={dataSets}
-          configuration={configuration}
-        />
-      );
-    case 'verticalbar':
-      return (
-        <VerticalBarBlock
-          data={data}
-          meta={meta}
-          labels={labels}
-          xAxis={xAxis}
-          yAxis={yAxis}
-          height={height}
-          width={width}
-          referenceLines={referenceLines}
-          dataSets={dataSets}
-        />
-      );
-    case 'horizontalbar':
-      return (
-        <HorizontalBarBlock
-          data={data}
-          meta={meta}
-          labels={labels}
-          xAxis={xAxis}
-          yAxis={yAxis}
-          height={height}
-          width={width}
-          stacked={stacked}
-          referenceLines={referenceLines}
-          dataSets={dataSets}
-        />
-      );
-    case 'map':
-      return (
-        <DynamicMapBlock
-          data={data}
-          meta={meta}
-          labels={labels}
-          xAxis={xAxis}
-          yAxis={yAxis}
-          height={height}
-          width={width}
-          dataSets={dataSets}
-        />
-      );
-    default:
-      return <div>[ Unimplemented chart type requested ${type} ]</div>;
   }
+
+  return <div>Invalid data specified</div>;
 }
 
 export default ChartRenderer;

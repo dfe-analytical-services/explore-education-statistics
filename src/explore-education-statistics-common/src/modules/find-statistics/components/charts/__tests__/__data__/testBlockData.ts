@@ -10,32 +10,36 @@ import {
 
 import Features from './testLocationData';
 
+import testResponseData_23_26_28__1_2_LAD_JSON from './testResponseData_23_26_28__1_2_LAD.json';
+
+const testResponseData_23_26_28__1_2_LAD: DataBlockResponse = (testResponseData_23_26_28__1_2_LAD_JSON as unknown) as DataBlockResponse;
+
 const data: DataBlockData = {
   publicationId: 'test',
   releaseDate: new Date(),
   releaseId: '1',
   subjectId: 1,
-  geographicLevel: GeographicLevel.National,
+  geographicLevel: GeographicLevel.Country,
   result: [
     {
       filters: ['1', '2'],
       location: {
         country: {
-          country_code: 'E92000001',
-          country_name: 'England',
+          code: 'E92000001',
+          name: 'England',
         },
         region: {
-          region_code: '',
-          region_name: '',
+          code: '',
+          name: '',
         },
         localAuthority: {
-          new_la_code: '',
-          old_la_code: '',
-          la_name: '',
+          code: '',
+          old_code: '',
+          name: '',
         },
         localAuthorityDistrict: {
-          sch_lad_code: '',
-          sch_lad_name: '',
+          code: '',
+          name: '',
         },
       },
       measures: {
@@ -43,28 +47,65 @@ const data: DataBlockData = {
         '26': '10',
         '23': '3',
       },
-      timeIdentifier: 'HT6',
-      year: 2014,
+      timePeriod: '2014_HT6',
     },
     {
       filters: ['1', '2'],
       location: {
         country: {
-          country_code: 'E92000001',
-          country_name: 'England',
+          code: 'E92000001',
+          name: 'England',
         },
         region: {
-          region_code: '',
-          region_name: '',
+          code: '',
+          name: '',
         },
         localAuthority: {
-          new_la_code: '',
-          old_la_code: '',
-          la_name: '',
+          code: '',
+          old_code: '',
+          name: '',
         },
         localAuthorityDistrict: {
-          sch_lad_code: '',
-          sch_lad_name: '',
+          code: '',
+          name: '',
+        },
+      },
+      measures: {
+        '28': '1',
+        '26': '4',
+        '23': '-3',
+      },
+      timePeriod: '2015_HT6',
+    },
+  ],
+};
+
+const data2: DataBlockData = {
+  publicationId: 'test',
+  releaseDate: new Date(),
+  releaseId: '1',
+  subjectId: 1,
+  geographicLevel: GeographicLevel.Country,
+  result: [
+    {
+      filters: ['1', '2'],
+      location: {
+        country: {
+          code: 'E92000001',
+          name: 'England',
+        },
+        region: {
+          code: '',
+          name: '',
+        },
+        localAuthority: {
+          code: '',
+          old_code: '',
+          name: '',
+        },
+        localAuthorityDistrict: {
+          code: '',
+          name: '',
         },
       },
       measures: {
@@ -72,8 +113,156 @@ const data: DataBlockData = {
         '26': '10',
         '23': '3',
       },
-      timeIdentifier: 'HT6',
-      year: 2015,
+      timePeriod: '2014_HT6',
+    },
+    {
+      filters: ['1', '2'],
+      location: {
+        country: {
+          code: 'E92000001',
+          name: 'England',
+        },
+        region: {
+          code: '',
+          name: '',
+        },
+        localAuthority: {
+          code: '',
+          old_code: '',
+          name: '',
+        },
+        localAuthorityDistrict: {
+          code: '',
+          name: '',
+        },
+      },
+      measures: {
+        '28': '1',
+        '26': '4',
+        '23': '-3',
+      },
+      timePeriod: '2015_HT6',
+    },
+    {
+      filters: ['1', '2'],
+      location: {
+        country: {
+          code: 'E92000001',
+          name: 'England',
+        },
+        region: {
+          code: '',
+          name: '',
+        },
+        localAuthority: {
+          code: '',
+          old_code: '',
+          name: '',
+        },
+        localAuthorityDistrict: {
+          code: '',
+          name: '',
+        },
+      },
+      measures: {
+        '28': '0',
+        '26': '5',
+        '23': '-2',
+      },
+      timePeriod: '2016_HT6',
+    },
+  ],
+};
+
+const missingData: DataBlockData = {
+  publicationId: 'test',
+  releaseDate: new Date(),
+  releaseId: '1',
+  subjectId: 1,
+  geographicLevel: GeographicLevel.Country,
+  result: [
+    {
+      filters: ['1', '2'],
+      location: {
+        country: {
+          code: 'E92000001',
+          name: 'England',
+        },
+        region: {
+          code: '',
+          name: '',
+        },
+        localAuthority: {
+          code: '',
+          old_code: '',
+          name: '',
+        },
+        localAuthorityDistrict: {
+          code: '',
+          name: '',
+        },
+      },
+      measures: {
+        '28': '5',
+        '23': '3',
+      },
+      timePeriod: '2013_HT6',
+    },
+    {
+      filters: ['1', '2'],
+      location: {
+        country: {
+          code: 'E92000001',
+          name: 'England',
+        },
+        region: {
+          code: '',
+          name: '',
+        },
+        localAuthority: {
+          code: '',
+          old_code: '',
+          name: '',
+        },
+        localAuthorityDistrict: {
+          code: '',
+          name: '',
+        },
+      },
+      measures: {
+        '28': '1',
+        '26': '10',
+        '23': '-3',
+      },
+      timePeriod: '2015_HT6',
+    },
+    {
+      filters: ['1', '2'],
+      location: {
+        country: {
+          code: 'E92000001',
+          name: 'England',
+        },
+        region: {
+          code: '',
+          name: '',
+        },
+        localAuthority: {
+          code: '',
+          old_code: '',
+          name: '',
+        },
+        localAuthorityDistrict: {
+          code: '',
+          name: '',
+        },
+      },
+      measures: {
+        '28': '6',
+        '26': '4',
+        '23': '-2',
+      },
+      timePeriod: '2016_HT6',
     },
   ],
 };
@@ -83,27 +272,27 @@ const multipleData: DataBlockData = {
   releaseDate: new Date(),
   releaseId: '1',
   subjectId: 1,
-  geographicLevel: GeographicLevel.National,
+  geographicLevel: GeographicLevel.Country,
   result: [
     {
       filters: ['1', '2'],
       location: {
         country: {
-          country_code: 'E92000001',
-          country_name: 'England',
+          code: 'E92000001',
+          name: 'England',
         },
         region: {
-          region_code: '',
-          region_name: '',
+          code: '',
+          name: '',
         },
         localAuthority: {
-          new_la_code: '',
-          old_la_code: '',
-          la_name: '',
+          code: '',
+          old_code: '',
+          name: '',
         },
         localAuthorityDistrict: {
-          sch_lad_code: '',
-          sch_lad_name: '',
+          code: '',
+          name: '',
         },
       },
       measures: {
@@ -111,28 +300,27 @@ const multipleData: DataBlockData = {
         '26': '10',
         '23': '3',
       },
-      timeIdentifier: 'HT6',
-      year: 2015,
+      timePeriod: '2015_HT6',
     },
     {
       filters: ['1', '2'],
       location: {
         country: {
-          country_code: 'S92000001',
-          country_name: 'Scotland',
+          code: 'S92000001',
+          name: 'Scotland',
         },
         region: {
-          region_code: '',
-          region_name: '',
+          code: '',
+          name: '',
         },
         localAuthority: {
-          new_la_code: '',
-          old_la_code: '',
-          la_name: '',
+          code: '',
+          old_code: '',
+          name: '',
         },
         localAuthorityDistrict: {
-          sch_lad_code: '',
-          sch_lad_name: '',
+          code: '',
+          name: '',
         },
       },
       measures: {
@@ -140,8 +328,7 @@ const multipleData: DataBlockData = {
         '26': '20',
         '23': '4',
       },
-      timeIdentifier: 'HT6',
-      year: 2015,
+      timePeriod: '2015_HT6',
     },
   ],
 };
@@ -2715,7 +2902,7 @@ const responseMetadata: ResponseMetaData = {
     },
     National: {
       hint: '',
-      legend: 'National',
+      legend: 'Country',
       options: [
         {
           label: 'England',
@@ -2806,27 +2993,402 @@ const responseMetadata: ResponseMetaData = {
 const AbstractChartProps: ChartProps = {
   data,
   meta: metaData,
-  labels,
-  dataSets: [
-    { indicator: '23', filters: ['1', '2'] },
-    { indicator: '26', filters: ['1', '2'] },
-    { indicator: '28', filters: ['1', '2'] },
-  ],
-  xAxis: { title: 'test x axis' },
-  yAxis: { title: 'test y axis' },
+
+  labels: {
+    '23_1_2_____': {
+      label: metaData.indicators['23'].label,
+      unit: '%',
+      value: '23_1_2',
+    },
+    '26_1_2_____': {
+      label: metaData.indicators['26'].label,
+      unit: '%',
+      value: '26_1_2',
+    },
+    '28_1_2_____': {
+      label: metaData.indicators['28'].label,
+      unit: '%',
+      value: '28_1_2',
+    },
+  },
+
+  axes: {
+    major: {
+      name: '23',
+      type: 'major',
+      groupBy: 'timePeriods',
+      dataSets: [
+        {
+          indicator: '23',
+          filters: ['1', '2'],
+        },
+        {
+          indicator: '26',
+          filters: ['1', '2'],
+        },
+        {
+          indicator: '28',
+          filters: ['1', '2'],
+        },
+      ],
+      visible: true,
+    },
+    minor: {
+      name: 'minor',
+      type: 'minor',
+      title: '',
+      visible: true,
+      dataSets: [],
+    },
+  },
+};
+
+const AbstractChartProps2: ChartProps = {
+  data: data2,
+  meta: {
+    ...metaData,
+    timePeriods: {
+      ...metaData.timePeriods,
+      '2016_HT6': {
+        label: '2016/17',
+        value: '2016_HT6',
+      },
+    },
+  },
+
+  labels: {
+    '23_1_2_____': {
+      label: metaData.indicators['23'].label,
+      unit: '%',
+      value: '23_1_2',
+    },
+    '26_1_2_____': {
+      label: metaData.indicators['26'].label,
+      unit: '%',
+      value: '26_1_2',
+    },
+    '28_1_2_____': {
+      label: metaData.indicators['28'].label,
+      unit: '%',
+      value: '28_1_2',
+    },
+  },
+
+  axes: {
+    major: {
+      name: '23',
+      type: 'major',
+      groupBy: 'timePeriods',
+      dataSets: [
+        {
+          indicator: '23',
+          filters: ['1', '2'],
+        },
+        {
+          indicator: '26',
+          filters: ['1', '2'],
+        },
+        {
+          indicator: '28',
+          filters: ['1', '2'],
+        },
+      ],
+      visible: true,
+    },
+    minor: {
+      name: 'minor',
+      type: 'minor',
+      title: '',
+      visible: true,
+      dataSets: [],
+    },
+  },
 };
 
 const AbstractMultipleChartProps: ChartProps = {
   data: multipleData,
   meta: metaData,
-  labels,
-  dataSets: [
-    { indicator: '23', filters: ['1', '2'] },
-    { indicator: '26', filters: ['1', '2'] },
-    { indicator: '28', filters: ['1', '2'] },
-  ],
-  xAxis: { title: 'test x axis' },
-  yAxis: { title: 'test y axis' },
+
+  labels: {
+    '23': {
+      label: metaData.indicators['23'].label,
+      name: '23',
+      unit: '%',
+      value: '23',
+    },
+    '26': {
+      label: metaData.indicators['26'].label,
+      name: '26',
+      unit: '%',
+      value: '26',
+    },
+    '28': {
+      label: metaData.indicators['28'].label,
+      name: '28',
+      unit: '%',
+      value: '28',
+    },
+    '23_1_2': {
+      label: metaData.indicators['23'].label,
+      name: '23_1_2',
+      unit: '%',
+      value: '23_1_2',
+    },
+    '26_1_2': {
+      label: metaData.indicators['26'].label,
+      name: '26_1_2',
+      unit: '%',
+      value: '26_1_2',
+    },
+    '28_1_2': {
+      label: metaData.indicators['28'].label,
+      name: '28_1_2',
+      unit: '%',
+      value: '28_1_2',
+    },
+  },
+
+  axes: {
+    major: {
+      name: '23',
+      type: 'major',
+      groupBy: 'timePeriods',
+      dataSets: [
+        {
+          indicator: '23',
+          filters: ['1', '2'],
+        },
+        {
+          indicator: '26',
+          filters: ['1', '2'],
+        },
+        {
+          indicator: '28',
+          filters: ['1', '2'],
+        },
+      ],
+    },
+    minor: {
+      name: 'minor',
+      type: 'minor',
+      title: '',
+      visible: true,
+      dataSets: [],
+    },
+  },
+};
+
+const testResponseData_23_26__1_2_LAD: DataBlockResponse = {
+  ...testResponseData_23_26_28__1_2_LAD,
+
+  result: testResponseData_23_26_28__1_2_LAD.result.map(r => {
+    return {
+      ...r,
+      measures: {
+        '23': r.measures['23'],
+        '26': r.measures['26'],
+      },
+    };
+  }),
+
+  metaData: {
+    ...testResponseData_23_26_28__1_2_LAD.metaData,
+    indicators: {
+      '23': testResponseData_23_26_28__1_2_LAD.metaData.indicators['23'],
+      '26': testResponseData_23_26_28__1_2_LAD.metaData.indicators['26'],
+    },
+  },
+};
+
+const AbstractLargeDataChartProps: ChartProps = {
+  data: testResponseData_23_26_28__1_2_LAD,
+  meta: testResponseData_23_26_28__1_2_LAD.metaData,
+
+  labels: {
+    '2014_HT6': {
+      label: metaData.timePeriods['2014_HT6'].label,
+      value: '2014_HT6',
+    },
+    '2015_HT6': {
+      label: metaData.timePeriods['2015_HT6'].label,
+      value: '2015_HT6',
+    },
+    '23_1_2_____': {
+      label: metaData.indicators['23'].label,
+      unit: '%',
+      value: '23_1_2',
+    },
+    '26_1_2_____': {
+      label: metaData.indicators['26'].label,
+      unit: '%',
+      value: '26_1_2',
+    },
+    '28_1_2_____': {
+      label: metaData.indicators['28'].label,
+      unit: '%',
+      value: '28_1_2',
+    },
+  },
+
+  axes: {
+    major: {
+      name: '23',
+      type: 'major',
+      groupBy: 'locations',
+      dataSets: [
+        {
+          indicator: '23',
+          filters: ['1', '2'],
+        },
+        {
+          indicator: '26',
+          filters: ['1', '2'],
+        },
+        {
+          indicator: '28',
+          filters: ['1', '2'],
+        },
+      ],
+    },
+    minor: {
+      name: 'minor',
+      type: 'minor',
+      title: '',
+      visible: true,
+      dataSets: [],
+    },
+  },
+};
+
+const AbstractLargeDataChartProps_smaller_datasets: ChartProps = {
+  data: testResponseData_23_26__1_2_LAD,
+  meta: testResponseData_23_26__1_2_LAD.metaData,
+
+  labels: {
+    '2014_HT6': {
+      label: metaData.timePeriods['2014_HT6'].label,
+      value: '2014_HT6',
+    },
+    '2015_HT6': {
+      label: metaData.timePeriods['2015_HT6'].label,
+      value: '2015_HT6',
+    },
+    '23_1_2_____': {
+      label: metaData.indicators['23'].label,
+      unit: '%',
+      value: '23_1_2',
+    },
+    '26_1_2_____': {
+      label: metaData.indicators['26'].label,
+      unit: '%',
+      value: '26_1_2',
+    },
+    '28_1_2_____': {
+      label: metaData.indicators['28'].label,
+      unit: '%',
+      value: '28_1_2',
+    },
+  },
+
+  axes: {
+    major: {
+      name: '23',
+      type: 'major',
+      groupBy: 'locations',
+      dataSets: [
+        {
+          indicator: '23',
+          filters: ['1', '2'],
+        },
+        {
+          indicator: '26',
+          filters: ['1', '2'],
+        },
+      ],
+      visible: true,
+    },
+    minor: {
+      name: 'minor',
+      type: 'minor',
+      title: '',
+      visible: true,
+      dataSets: [],
+    },
+  },
+};
+
+const AbstractMissingDataChartProps: ChartProps = {
+  data: missingData,
+
+  meta: {
+    ...metaData,
+    timePeriods: {
+      '2013_HT6': {
+        label: '2013/14',
+        value: '2013_HT6',
+      },
+      '2014_HT6': {
+        label: '2014/15',
+        value: '2014_HT6',
+      },
+      '2015_HT6': {
+        label: '2015/16',
+        value: '2015_HT6',
+      },
+      '2016_HT6': {
+        label: '2016/17',
+        value: '2016_HT6',
+      },
+    },
+  },
+
+  labels: {
+    '23_1_2_____': {
+      label: metaData.indicators['23'].label,
+      unit: '%',
+      value: '23_1_2',
+    },
+    '26_1_2_____': {
+      label: metaData.indicators['26'].label,
+      unit: '%',
+      value: '26_1_2',
+    },
+    '28_1_2_____': {
+      label: metaData.indicators['28'].label,
+      unit: '%',
+      value: '28_1_2',
+    },
+  },
+
+  axes: {
+    major: {
+      name: '23',
+      type: 'major',
+      groupBy: 'timePeriods',
+      dataSets: [
+        {
+          indicator: '23',
+          filters: ['1', '2'],
+        },
+        {
+          indicator: '26',
+          filters: ['1', '2'],
+        },
+        {
+          indicator: '28',
+          filters: ['1', '2'],
+        },
+      ],
+      visible: true,
+    },
+    minor: {
+      name: 'minor',
+      type: 'minor',
+      title: '',
+      visible: true,
+      dataSets: [],
+    },
+  },
 };
 
 const response: DataBlockResponse = {
@@ -2836,7 +3398,11 @@ const response: DataBlockResponse = {
 
 export default {
   AbstractChartProps,
+  AbstractChartProps2,
   AbstractMultipleChartProps,
+  AbstractMissingDataChartProps,
+  AbstractLargeDataChartProps,
+  AbstractLargeDataChartProps_smaller_datasets,
   testBlockData: data,
   testBlockMetaData: responseMetadata,
   labels,

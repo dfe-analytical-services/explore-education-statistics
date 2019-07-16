@@ -1,7 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`AccordionSection renders correctly with required props 1`] = `
-
 <div class="govuk-accordion__section"
      role="presentation"
 >
@@ -12,11 +11,11 @@ exports[`AccordionSection renders correctly with required props 1`] = `
               type="button"
       >
         Test heading
+        <span aria-hidden="true"
+              class="govuk-accordion__icon"
+        >
+        </span>
       </button>
-      <span aria-hidden="true"
-            class="govuk-accordion__icon"
-      >
-      </span>
     </h2>
   </div>
   <div class="govuk-accordion__section-content">
@@ -32,11 +31,9 @@ exports[`AccordionSection renders correctly with required props 1`] = `
     </div>
   </div>
 </div>
-
 `;
 
 exports[`AccordionSection renders with caption 1`] = `
-
 <div class="govuk-accordion__section"
      role="presentation"
 >
@@ -47,11 +44,11 @@ exports[`AccordionSection renders with caption 1`] = `
               type="button"
       >
         Test heading
+        <span aria-hidden="true"
+              class="govuk-accordion__icon"
+        >
+        </span>
       </button>
-      <span aria-hidden="true"
-            class="govuk-accordion__icon"
-      >
-      </span>
     </h2>
     <span class="govuk-accordion__section-summary">
       Some caption text
@@ -70,11 +67,9 @@ exports[`AccordionSection renders with caption 1`] = `
     </div>
   </div>
 </div>
-
 `;
 
 exports[`AccordionSection renders with different heading size 1`] = `
-
 <div class="govuk-accordion__section"
      role="presentation"
 >
@@ -85,11 +80,11 @@ exports[`AccordionSection renders with different heading size 1`] = `
               type="button"
       >
         Test heading
+        <span aria-hidden="true"
+              class="govuk-accordion__icon"
+        >
+        </span>
       </button>
-      <span aria-hidden="true"
-            class="govuk-accordion__icon"
-      >
-      </span>
     </h3>
   </div>
   <div class="govuk-accordion__section-content">
@@ -105,5 +100,4 @@ exports[`AccordionSection renders with different heading size 1`] = `
     </div>
   </div>
 </div>
-
 `;

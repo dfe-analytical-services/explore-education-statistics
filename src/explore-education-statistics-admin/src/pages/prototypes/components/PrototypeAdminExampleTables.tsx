@@ -13,7 +13,7 @@ import DataBlockService, {
   GeographicLevel,
 } from '@common/services/dataBlockService';
 import Link from '../../../components/Link';
-import { PrototypeTable } from '../PrototypeData';
+import PrototypeData, { PrototypeTable } from '../PrototypeData';
 
 interface Props {
   // tableId?: string;
@@ -25,8 +25,11 @@ const PrototypeExampleTable = ({ task, table }: Props) => {
   const [showEditModal, toggleEditModal] = useToggle(false);
   const [showDeleteModal, toggleDeleteModal] = useToggle(false);
 
-  const [Data, updateData] = React.useState<DataBlockResponse>();
+  const [Data, updateData] = React.useState<DataBlockResponse>(
+    PrototypeData.testResponse,
+  );
 
+  /*
   React.useEffect(() => {
     // Temporary for now
     const fetchData = async () => {
@@ -43,6 +46,7 @@ const PrototypeExampleTable = ({ task, table }: Props) => {
 
     fetchData();
   }, []);
+   */
 
   return (
     <div className="govuk-width-container">

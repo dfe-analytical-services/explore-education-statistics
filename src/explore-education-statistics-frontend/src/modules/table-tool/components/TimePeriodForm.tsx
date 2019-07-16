@@ -9,8 +9,6 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
 import { PublicationSubjectMeta } from '@common/services/tableBuilderService';
-import TimePeriod from '@common/services/types/TimePeriod';
-import { Comparison } from '@common/types/util';
 import useResetFormOnPreviousStep from '@frontend/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
 import { FormikProps } from 'formik';
 import React, { useRef } from 'react';
@@ -23,9 +21,11 @@ interface FormValues {
   end: string;
 }
 
+export type TimePeriodFormSubmitHandler = (values: FormValues) => void;
+
 interface Props {
   options: PublicationSubjectMeta['timePeriod']['options'];
-  onSubmit: (values: FormValues) => void;
+  onSubmit: TimePeriodFormSubmitHandler;
 }
 
 const TimePeriodForm = (props: Props & InjectedWizardProps) => {
@@ -56,6 +56,14 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
     }),
   ];
 
+  const getOptionLabel = (optionValue: string) => {
+    const matchingOption = timePeriodOptions.find(
+      option => option.value === optionValue,
+    );
+
+    return matchingOption ? matchingOption.label : '';
+  };
+
   const stepHeading = (
     <WizardStepHeading {...props} fieldsetHeading>
       Choose time period
@@ -75,38 +83,11 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
         end: '',
       }}
       validationSchema={Yup.object<FormValues>({
-        end: Yup.string()
-          .required('End date is required')
-          .test(
-            'moreThanOrEqual',
-            'Must be after or same as start date',
-            function moreThanOrEqual(value: string) {
-              if (!value) {
-                return true;
-              }
-
-              const start: string = this.resolve(Yup.ref('start'));
-
-              if (!start) {
-                return true;
-              }
-
-              const endTime = TimePeriod.fromString(value);
-              const startTime = TimePeriod.fromString(start);
-
-              const comparison = endTime.compare(startTime);
-
-              return (
-                comparison === Comparison.GreaterThan ||
-                comparison === Comparison.EqualTo
-              );
-            },
-          ),
         start: Yup.string()
-          .required('Start date is required')
+          .required('Start date required')
           .test(
             'lessThanOrEqual',
-            'Must be before or same as end date',
+            'Start date must be before or same as end date',
             function lessThanOrEqual(value: string) {
               if (!value) {
                 return true;
@@ -118,15 +99,40 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
                 return true;
               }
 
-              const startTime = TimePeriod.fromString(value);
-              const endTime = TimePeriod.fromString(end);
-
-              const comparison = startTime.compare(endTime);
-
-              return (
-                comparison === Comparison.LessThan ||
-                comparison === Comparison.EqualTo
+              const startIndex = timePeriodOptions.findIndex(
+                option => option.value === value,
               );
+              const endIndex = timePeriodOptions.findIndex(
+                option => option.value === end,
+              );
+
+              return startIndex <= endIndex;
+            },
+          ),
+        end: Yup.string()
+          .required('End date required')
+          .test(
+            'moreThanOrEqual',
+            'End date must be after or same as start date',
+            function moreThanOrEqual(value: string) {
+              if (!value) {
+                return true;
+              }
+
+              const start: string = this.resolve(Yup.ref('start'));
+
+              if (!start) {
+                return true;
+              }
+
+              const endIndex = timePeriodOptions.findIndex(
+                option => option.value === value,
+              );
+              const startIndex = timePeriodOptions.findIndex(
+                option => option.value === start,
+              );
+
+              return endIndex >= startIndex;
             },
           ),
       })}
@@ -139,12 +145,14 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
                 id={`${formId}-start`}
                 label="Start date"
                 options={timePeriodOptions}
+                order={[]}
               />
               <FormFieldSelect
                 name="end"
                 id={`${formId}-end`}
                 label="End date"
                 options={timePeriodOptions}
+                order={[]}
               />
             </FormFieldset>
 
@@ -155,12 +163,10 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
             {stepHeading}
             <SummaryList noBorder>
               <SummaryListItem term="Start date">
-                {form.values.start &&
-                  TimePeriod.fromString(form.values.start).label}
+                {form.values.start && getOptionLabel(form.values.start)}
               </SummaryListItem>
               <SummaryListItem term="End date">
-                {form.values.end &&
-                  TimePeriod.fromString(form.values.end).label}
+                {form.values.end && getOptionLabel(form.values.end)}
               </SummaryListItem>
             </SummaryList>
           </>

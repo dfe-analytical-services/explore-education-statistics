@@ -1,6 +1,11 @@
 import classNames from 'classnames';
 import orderBy from 'lodash/orderBy';
-import React, { ChangeEventHandler, FocusEventHandler, ReactNode } from 'react';
+import React, {
+  ChangeEventHandler,
+  CSSProperties,
+  FocusEventHandler,
+  ReactNode,
+} from 'react';
 import ErrorMessage from '../ErrorMessage';
 import styles from './FormSelect.module.scss';
 
@@ -10,6 +15,7 @@ export interface SelectOption {
   label: string;
   value: string | number;
   selected?: boolean;
+  style?: CSSProperties;
 }
 
 export interface FormSelectProps {
@@ -25,7 +31,7 @@ export interface FormSelectProps {
     | ((option: SelectOption) => SelectOption[keyof SelectOption])[];
   orderDirection?: ('asc' | 'desc')[];
   value?: string | number;
-  multiple?: boolean;
+  className?: string;
 }
 
 const FormSelect = ({
@@ -39,7 +45,7 @@ const FormSelect = ({
   order = ['label'],
   orderDirection = ['asc'],
   value,
-  multiple = false,
+  className,
 }: FormSelectProps) => {
   return (
     <>
@@ -48,7 +54,7 @@ const FormSelect = ({
       </label>
       {error && <ErrorMessage>{error}</ErrorMessage>}
       <select
-        className={classNames('govuk-select', styles.select, {
+        className={classNames('govuk-select', styles.select, className, {
           'govuk-select--error': !!error,
         })}
         id={id}
@@ -56,7 +62,6 @@ const FormSelect = ({
         onBlur={onBlur}
         onChange={onChange}
         value={value}
-        multiple={multiple}
       >
         {(order === undefined
           ? options
@@ -66,6 +71,7 @@ const FormSelect = ({
             value={option.value}
             key={`${option.value}-${option.label}`}
             selected={option.selected}
+            style={option.style}
           >
             {option.label}
           </option>

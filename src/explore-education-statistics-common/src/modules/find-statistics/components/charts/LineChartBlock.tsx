@@ -1,7 +1,11 @@
-import ChartFunctions, {
-  ChartData,
+import {
+  ChartDataB,
   ChartDefinition,
   ChartProps,
+  createDataForAxis,
+  getKeysForChart,
+  mapNameToNameLabel,
+  populateDefaultChartProps,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 
 import React, { Component } from 'react';
@@ -18,7 +22,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { colours, symbols } from './Charts';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 
 const CustomToolTip = ({ active, payload, label }: TooltipProps) => {
   if (active) {
@@ -68,102 +72,101 @@ export default class LineChartBlock extends Component<ChartProps> {
         id: 'xaxis',
         title: 'X Axis',
         type: 'major',
+        defaultDataType: 'timePeriods',
       },
       {
         id: 'yaxis',
         title: 'Y Axis',
-        type: 'value',
+        type: 'minor',
       },
     ],
   };
 
   public render() {
-    const {
-      data,
-      height,
-      xAxis,
-      yAxis,
-      labels,
-      meta,
-      dataSets,
-      configuration,
-    } = this.props;
+    const { data, meta, height, axes, labels } = this.props;
 
-    // const timePeriods = meta.timePeriods || {};
+    const yAxisDomain: [AxisDomain, AxisDomain] = [-10, 10];
 
-    const chartData: ChartData[] = ChartFunctions.generateDataGroupedByIndicators(
-      // @ts-ignore
-      ChartFunctions.filterResultsByDataSet(dataSets, data.result),
-      meta,
-    );
+    if (axes.major && data) {
+      const chartData: ChartDataB[] = createDataForAxis(
+        axes.major,
+        data.result,
+        meta,
+      ).map(mapNameToNameLabel(labels, meta.timePeriods, meta.locations));
 
-    let yAxisDomain: [AxisDomain, AxisDomain] = [0, 0];
+      const keysForChart = getKeysForChart(chartData);
 
-    if (yAxis.min !== undefined && yAxis.max !== undefined) {
-      yAxisDomain = [yAxis.min, yAxis.max];
+      return (
+        <ResponsiveContainer width={900} height={height || 300}>
+          <LineChart
+            data={chartData}
+            margin={{ top: 5, right: 30, left: 20, bottom: 25 }}
+          >
+            <Tooltip content={CustomToolTip} />
+            <Legend verticalAlign="top" height={36} />
+            <CartesianGrid
+              strokeDasharray="3 3"
+              horizontal={axes.minor.showGrid !== false}
+              vertical={axes.major.showGrid !== false}
+            />
+
+            {axes.major && axes.major.visible && (
+              <XAxis
+                dataKey="name"
+                label={{
+                  offset: 5,
+                  position: 'bottom',
+                  value: '',
+                }}
+                scale="auto"
+                interval={
+                  axes.minor && !axes.minor.visible
+                    ? 'preserveStartEnd'
+                    : undefined
+                }
+                padding={{ left: 20, right: 20 }}
+                tickMargin={10}
+              />
+            )}
+
+            {axes.minor && axes.minor.visible && (
+              <YAxis
+                label={{
+                  angle: -90,
+                  offset: 0,
+                  position: 'left',
+                  value: '',
+                }}
+                scale="auto"
+                domain={yAxisDomain}
+                dataKey="value"
+              />
+            )}
+
+            {keysForChart.map(name => (
+              <Line
+                key={name}
+                {...populateDefaultChartProps(name, labels[name])}
+                type="linear"
+                legendType={labels[name] && labels[name].symbol}
+                dot={
+                  labels[name] &&
+                  labels[name].symbol &&
+                  (props => (
+                    <Symbols
+                      {...props}
+                      type={labels[name] && labels[name].symbol}
+                    />
+                  ))
+                }
+                strokeWidth="2"
+              />
+            ))}
+          </LineChart>
+        </ResponsiveContainer>
+      );
     }
 
-    return (
-      <ResponsiveContainer width={900} height={height || 300}>
-        <LineChart
-          data={chartData}
-          margin={{ top: 5, right: 30, left: 20, bottom: 25 }}
-        >
-          <Tooltip content={CustomToolTip} />
-          <Legend verticalAlign="top" height={36} />
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis
-            dataKey="name"
-            type="category"
-            allowDuplicatedCategory={false}
-            label={{
-              offset: 5,
-              position: 'bottom',
-              value: xAxis.title,
-            }}
-            padding={{ left: 20, right: 20 }}
-            tickMargin={10}
-          />
-          <YAxis
-            label={{
-              angle: -90,
-              offset: 0,
-              position: 'left',
-              value: yAxis.title,
-            }}
-            scale="auto"
-            domain={yAxisDomain}
-            dataKey="value"
-          />
-
-          {chartData.map((cd, index) => (
-            <Line
-              dataKey="value"
-              data={cd.data}
-              name={
-                cd.name &&
-                configuration &&
-                configuration.dataLabels[cd.name] &&
-                configuration.dataLabels[cd.name].label
-              }
-              key={cd.name}
-              legendType={symbols[index]}
-              dot={props => <Symbols {...props} type={symbols[index]} />}
-              type="linear"
-              stroke={colours[index]}
-              fill={colours[index]}
-              strokeWidth="5"
-              unit={
-                cd.name &&
-                configuration &&
-                configuration.dataLabels[cd.name] &&
-                configuration.dataLabels[cd.name].unit
-              }
-              isAnimationActive={false}
-            />
-          ))}
-        </LineChart>
-      </ResponsiveContainer>
-    );
+    return <LoadingSpinner />;
   }
 }

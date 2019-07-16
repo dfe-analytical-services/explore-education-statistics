@@ -28,14 +28,14 @@ export interface FormValues {
 export type FilterFormSubmitHandler = (values: FormValues) => void;
 
 interface Props {
-  specification: PublicationSubjectMeta;
+  subjectMeta: PublicationSubjectMeta;
   onSubmit: FilterFormSubmitHandler;
 }
 
 const FiltersForm = (props: Props & InjectedWizardProps) => {
   const {
     onSubmit,
-    specification,
+    subjectMeta,
     goToNextStep,
     currentStep,
     stepNumber,
@@ -57,12 +57,15 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
       enableReinitialize
       ref={formikRef}
       initialValues={{
-        filters: mapValues(specification.filters, () => []),
+        filters: mapValues(subjectMeta.filters, () => []),
         indicators: [],
       }}
       validationSchema={Yup.object<FormValues>({
+        indicators: Yup.array()
+          .of(Yup.string())
+          .required('Select at least one indicator'),
         filters: Yup.object(
-          mapValues(specification.filters, filter =>
+          mapValues(subjectMeta.filters, filter =>
             Yup.array()
               .of(Yup.string())
               .min(
@@ -71,9 +74,6 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
               ),
           ),
         ),
-        indicators: Yup.array()
-          .of(Yup.string())
-          .required('Select at least one indicator'),
       })}
       onSubmit={async values => {
         await onSubmit(values);
@@ -98,7 +98,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                       hint="Select at least one indicator"
                       error={getError('indicators')}
                       selectAll
-                      options={Object.entries(specification.indicators).map(
+                      options={Object.entries(subjectMeta.indicators).map(
                         ([_, group]) => {
                           return {
                             legend: group.label,
@@ -115,7 +115,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                       hint="Select at least one option from all categories"
                       error={getError('filters')}
                     >
-                      {Object.entries(specification.filters).map(
+                      {Object.entries(subjectMeta.filters).map(
                         ([filterKey, filterGroup]) => {
                           const filterName = `filters.${filterKey}`;
 

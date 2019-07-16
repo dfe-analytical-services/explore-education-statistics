@@ -1,13 +1,8 @@
-using Newtonsoft.Json;
-
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
     public class ParliamentaryConstituency : IObservationalUnit
     {
-        [JsonProperty(PropertyName = "pcon_code")]
         public string Code { get; set; }
-
-        [JsonProperty(PropertyName = "pcon_name")]
         public string Name { get; set; }
 
         private ParliamentaryConstituency()

@@ -1,7 +1,12 @@
-import ChartFunctions, {
-  ChartData,
+import {
+  calculateMargins,
+  ChartDataB,
   ChartDefinition,
-  ChartProps,
+  createDataForAxis,
+  getKeysForChart,
+  mapNameToNameLabel,
+  populateDefaultChartProps,
+  StackedBarProps,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import React, { Component } from 'react';
 import {
@@ -11,11 +16,12 @@ import {
   Legend,
   ResponsiveContainer,
   Tooltip,
+  XAxis,
+  YAxis,
 } from 'recharts';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 
-import { colours } from './Charts';
-
-export default class VerticalBarBlock extends Component<ChartProps> {
+export default class VerticalBarBlock extends Component<StackedBarProps> {
   public static definition: ChartDefinition = {
     type: 'verticalbar',
     name: 'Vertical Bar',
@@ -31,63 +37,94 @@ export default class VerticalBarBlock extends Component<ChartProps> {
 
     axes: [
       {
-        id: 'xaxis',
+        id: 'major',
         title: 'X Axis',
         type: 'major',
+        defaultDataType: 'timePeriods',
+      },
+      {
+        id: 'minor',
+        title: 'Y Axis',
+        type: 'minor',
       },
     ],
   };
 
   public render() {
-    const { data, height, xAxis, yAxis, width, meta, dataSets } = this.props;
+    const { data, meta, height, width, labels, axes, stacked } = this.props;
 
-    if (dataSets === undefined) return <div />;
+    if (axes.major && data) {
+      const chartData: ChartDataB[] = createDataForAxis(
+        axes.major,
+        data.result,
+        meta,
+      ).map(mapNameToNameLabel(labels, meta.timePeriods, meta.locations));
 
-    const chartData: ChartData[] = ChartFunctions.generateDataGroupedByGroups(
-      ChartFunctions.filterResultsByDataSet(dataSets, data.result),
-      meta,
-    );
+      const keysForChart = getKeysForChart(chartData);
 
-    const chartKeys: Set<string> = chartData.reduce(
-      (keys: Set<string>, next) => {
-        return new Set([
-          ...Array.from(keys),
-          ...(next.data || []).map(({ name }) => name),
-        ]);
-      },
-      new Set<string>(),
-    );
+      const yAxis = { key: undefined, title: '' };
+      const xAxis = { key: undefined, title: '' };
 
-    return (
-      <ResponsiveContainer width={width || 900} height={height || 300}>
-        <BarChart
-          data={chartData}
-          margin={ChartFunctions.calculateMargins(xAxis, yAxis, undefined)}
-        >
-          {ChartFunctions.calculateXAxis(xAxis, {
-            interval: 0,
-            tick: { fontSize: 12 },
-            dataKey: 'name',
-          })}
-
-          <CartesianGrid />
-
-          {ChartFunctions.calculateYAxis(yAxis, { type: 'number' })}
-
-          <Tooltip />
-          <Legend />
-
-          {Array.from(chartKeys).map((dataKey, index) => (
-            <Bar
-              key={dataKey}
-              dataKey={dataKey}
-              fill={colours[index]}
-              name={meta.indicators[dataKey].label || 'a'}
-              unit={meta.indicators[dataKey].unit || 'a'}
+      return (
+        <ResponsiveContainer width={width || 900} height={height || 300}>
+          <BarChart
+            data={chartData}
+            margin={calculateMargins(xAxis, yAxis, undefined)}
+          >
+            <CartesianGrid
+              strokeDasharray="3 3"
+              vertical={axes.minor && axes.minor.showGrid !== false}
+              horizontal={axes.major && axes.major.showGrid !== false}
             />
-          ))}
-        </BarChart>
-      </ResponsiveContainer>
-    );
+
+            {axes.minor && axes.minor.visible && (
+              <YAxis
+                type="number"
+                label={{
+                  angle: -90,
+                  offset: 0,
+                  position: 'left',
+                  value: '',
+                }}
+                scale="auto"
+                interval={
+                  axes.minor && !axes.minor.visible
+                    ? 'preserveStartEnd'
+                    : undefined
+                }
+              />
+            )}
+
+            {axes.major && axes.major.visible && (
+              <XAxis
+                type="category"
+                dataKey="name"
+                label={{
+                  offset: 5,
+                  position: 'bottom',
+                  value: '',
+                }}
+                scale="auto"
+                padding={{ left: 20, right: 20 }}
+                tickMargin={10}
+              />
+            )}
+
+            <Tooltip />
+            <Legend />
+
+            {Array.from(keysForChart).map(name => (
+              <Bar
+                key={name}
+                {...populateDefaultChartProps(name, labels[name])}
+                stackId={stacked ? 'a' : undefined}
+              />
+            ))}
+          </BarChart>
+        </ResponsiveContainer>
+      );
+    }
+
+    return <LoadingSpinner />;
   }
 }

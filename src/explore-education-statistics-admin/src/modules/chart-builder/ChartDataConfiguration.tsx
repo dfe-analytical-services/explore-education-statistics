@@ -1,84 +1,100 @@
 import {
-  DataBlockResponse,
-  DataBlockMetadata,
-} from '@common/services/dataBlockService';
-import {
-  ChartDataSet,
-  DataLabelConfigurationItem,
+  ChartConfiguration,
+  ChartSymbol,
 } from '@common/services/publicationService';
 import * as React from 'react';
-import { FormFieldset, FormTextInput } from '@common/components/form';
-import { Dictionary } from '@common/types';
+import {
+  FormFieldset,
+  FormTextInput,
+  FormSelect,
+} from '@common/components/form';
+import {
+  colours,
+  symbols,
+} from '@common/modules/find-statistics/components/charts/ChartFunctions';
+
+import { SelectOption } from '@common/components/form/FormSelect';
 
 interface Props {
-  dataSets: ChartDataSet[];
-  data: DataBlockResponse;
-  meta: DataBlockMetadata;
+  configuration: ChartConfiguration;
 
-  onDataLabelsChange?: (
-    dataLabels: Dictionary<DataLabelConfigurationItem>,
-  ) => void;
+  onConfigurationChange?: (value: ChartConfiguration) => void;
 }
 
-const ChartDataConfiguration = ({
-  dataSets,
-  // data,
-  meta,
-  onDataLabelsChange,
-}: Props) => {
-  const buildConfigItem = (dataset: ChartDataSet, key: string) => {
-    const filters = (dataset.filters || [])
-      .map(f => meta.filters[f].label)
-      .join(',');
+const colourOptions: SelectOption[] = colours.map(color => {
+  return {
+    label: color,
+    value: color,
+    style: { backgroundColor: `${color}` },
+  };
+});
 
-    return {
-      name: `${meta.indicators[dataset.indicator].label} (${filters})`,
-      label: `${meta.indicators[dataset.indicator].label} (${filters})`,
-      value: key,
-      unit: meta.indicators[dataset.indicator].unit,
-    };
+const symbolOptions: SelectOption[] = [
+  {
+    label: 'none',
+    value: '',
+  },
+  ...symbols.map<SelectOption>(symbol => ({
+    label: symbol,
+    value: symbol,
+  })),
+];
+
+const ChartDataConfiguration = ({
+  configuration,
+  onConfigurationChange,
+}: Props) => {
+  const [config, setConfig] = React.useState<ChartConfiguration>(configuration);
+
+  const updateConfig = (newConfig: ChartConfiguration) => {
+    setConfig(newConfig);
+    if (onConfigurationChange) onConfigurationChange(newConfig);
   };
 
-  const [dataLabels, setDataLabels] = React.useState<
-    Dictionary<DataLabelConfigurationItem>
-  >({});
-
-  React.useEffect(() => {
-    const dl = dataSets.reduce((results, dataset) => {
-      const key = `${dataset.indicator}_${dataset.filters &&
-        dataset.filters.join('_')}`;
-      return {
-        ...results,
-        [key]: (dataLabels && dataLabels[key]) || buildConfigItem(dataset, key),
-      };
-    }, {});
-
-    setDataLabels(dl);
-  }, [dataSets]);
-
-  React.useEffect(() => {
-    if (onDataLabelsChange && dataLabels) onDataLabelsChange(dataLabels);
-  }, [dataLabels, onDataLabelsChange]);
-
   return (
-    <FormFieldset id="chart-configuration" legend="" legendHidden>
-      <p>
-        Update the label used for each dataset in the chart from the default
-      </p>
-      {dataLabels &&
-        Object.entries(dataLabels).map(([key, entry]) => (
-          <FormTextInput
-            key={key}
-            id={key}
-            name={key}
-            defaultValue={entry.label}
-            onChange={e => {
-              dataLabels[key].label = e.target.value;
-              setDataLabels({ ...dataLabels });
-            }}
-            label={entry.name}
-          />
-        ))}
+    <FormFieldset id={configuration.value} legend="" legendHidden>
+      <p>{configuration.name}</p>
+
+      <FormTextInput
+        id="label"
+        name="label"
+        value={config.label}
+        label="Enter Label"
+        onChange={e =>
+          updateConfig({
+            ...config,
+            label: e.target.value,
+          })
+        }
+      />
+
+      <FormSelect
+        id="colour"
+        name="colour"
+        label="Select colour"
+        value={configuration.colour}
+        onChange={e =>
+          updateConfig({
+            ...config,
+            colour: e.target.value,
+          })
+        }
+        options={colourOptions}
+      />
+
+      <FormSelect
+        id="symbol"
+        name="symbol"
+        label="Select symbol"
+        value={configuration.symbol}
+        onChange={e =>
+          updateConfig({
+            ...config,
+            symbol: e.target.value as ChartSymbol,
+          })
+        }
+        options={symbolOptions}
+      />
     </FormFieldset>
   );
 };

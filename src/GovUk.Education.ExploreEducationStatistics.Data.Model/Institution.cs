@@ -1,13 +1,8 @@
-using Newtonsoft.Json;
-
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
     public class Institution : IObservationalUnit
     {
-        [JsonProperty(PropertyName = "institution_id")]
         public string Code { get; set; }
-
-        [JsonProperty(PropertyName = "institution_name")]
         public string Name { get; set; }
 
         private Institution()

@@ -1,4 +1,7 @@
-import { DataBlockRequest } from '@common/services/dataBlockService';
+import {
+  DataBlockLocation,
+  DataBlockRequest,
+} from '@common/services/dataBlockService';
 import { Dictionary } from '@common/types';
 import { contentApi } from './api';
 
@@ -57,27 +60,59 @@ export type ChartType = 'line' | 'verticalbar' | 'horizontalbar' | 'map';
 
 export interface ChartDataSet {
   indicator: string;
+  filters: string[];
+  location?: DataBlockLocation;
+  timePeriod?: string;
+}
+
+export interface OptionalChartDataSet {
+  indicator?: string;
   filters?: string[];
   location?: string[];
   timePeriod?: string;
 }
 
-export interface DataLabelConfigurationItem {
-  name: string;
+export type ChartSymbol =
+  | 'circle'
+  | 'cross'
+  | 'diamond'
+  | 'square'
+  | 'star'
+  | 'triangle'
+  | 'wye';
+
+export interface ChartConfiguration {
   label: string;
   value: string;
-  unit: string;
+  name?: string;
+  unit?: string;
+  colour?: string;
+  symbol?: ChartSymbol;
 }
 
-export interface ChartConfigurationOptions {
-  dataLabels: Dictionary<DataLabelConfigurationItem>;
+export type AxisGroupBy =
+  | 'timePeriods'
+  | 'locations'
+  | 'filters'
+  | 'indicators';
+
+export type AxisType = 'major' | 'minor';
+
+export interface AxisConfigurationItem {
+  name: string;
+  type: AxisType;
+  groupBy?: AxisGroupBy;
+  dataSets: ChartDataSet[];
+
+  visible?: boolean;
+  title?: string;
+  showGrid?: boolean;
 }
 
 export interface Chart {
   type: ChartType;
-  dataSets: ChartDataSet[];
-  xAxis?: Axis;
-  yAxis?: Axis;
+  labels: Dictionary<ChartConfiguration>;
+  axes: Dictionary<AxisConfigurationItem>;
   stacked?: boolean;
   referenceLines?: ReferenceLine[];
   width?: number;
@@ -94,7 +129,11 @@ export interface Summary {
   description: { type: string; body: string };
 }
 
-export type ContentBlockType = 'MarkDownBlock' | 'InsetTextBlock' | 'DataBlock';
+export type ContentBlockType =
+  | 'MarkDownBlock'
+  | 'InsetTextBlock'
+  | 'DataBlock'
+  | 'HtmlBlock';
 
 export interface ContentBlock {
   type: ContentBlockType;

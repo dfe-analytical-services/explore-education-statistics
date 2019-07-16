@@ -3,7 +3,6 @@ import {
   FormGroup,
   FormFieldset,
   FormTextInput,
-  FormSelect,
   FormRadioGroup,
 } from '@common/components/form';
 import Link from '../../../components/Link';

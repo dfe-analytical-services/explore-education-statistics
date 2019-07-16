@@ -4,6 +4,7 @@ import {
   Publication,
   Release,
   ReleaseDataType,
+  ReleaseSetupDetails,
   Theme,
   TimePeriod,
   Topic,
@@ -17,20 +18,22 @@ const methodologies: Methodology[] = [
   },
 ];
 
-const themes: Theme[] = [
-  {
-    id: 'theme-1',
-    title: 'Pupils and schools',
-  },
-];
+const theme1: Theme = {
+  id: 'theme-1',
+  title: 'Pupils and schools',
+};
 
-const topics: Topic[] = [
-  {
-    id: 'topic-1',
-    title: 'pupil absence',
-    theme: themes[0],
-  },
-];
+const theme1Topic1: Topic = {
+  id: 'topic-1',
+  title: 'pupil absence',
+  theme: theme1,
+};
+
+const theme1Topic2: Topic = {
+  id: 'topic-2',
+  title: 'exclusions',
+  theme: theme1,
+};
 
 const timePeriodTermAutumn: TimePeriod = {
   id: 'term-autumn',
@@ -48,7 +51,7 @@ const dataTypeRevised: ReleaseDataType = {
 };
 
 const releaseTemplate: Release = {
-  id: 'release-1',
+  id: 'my-publication-1-release-1',
   releaseName: '2017 to 2018',
   slug: '2017-2018',
   timePeriodCoverage: {
@@ -59,6 +62,7 @@ const releaseTemplate: Release = {
       termsPerYear: 6,
     },
   },
+  scheduledReleaseDate: new Date('2020-09-20'),
   status: {
     approvalStatus: ApprovalStatus.Approved,
     isLive: true,
@@ -86,7 +90,7 @@ const releaseTemplate: Release = {
                 possimus quisquam doloremque veritatis provident!`,
     },
     {
-      id: '1',
+      id: '2',
       author: PrototypeLoginService.getUser('user3'),
       datetime: new Date('2018-06-17 13:35'),
       content: `Corrupti harum labore quia repellat! Quae voluptatem illo
@@ -97,7 +101,7 @@ const releaseTemplate: Release = {
 };
 
 const publicationTemplate: Publication = {
-  id: 'publication-1',
+  id: 'my-publication-1',
   slug: 'pupil-absence-statistics-and-data-for-schools-in-england',
   title: 'Pupil absence statistics and data for schools in England',
   description: '',
@@ -106,51 +110,54 @@ const publicationTemplate: Publication = {
   nextUpdate: '',
   releases: [],
   legacyReleases: [],
-  topic: topics[0],
+  topic: theme1Topic1,
   contact: {
     email: '',
     name: '',
     telNo: '',
   },
   methodology: methodologies[0],
+  owner: PrototypeLoginService.getUser('user1'),
 };
 
 //
-// PUBLICATION 1
+// MY PUBLICATION 1
 //
 
-const publication1ReleaseTemplate = {
+const myPublication1ReleaseTemplate = {
   ...releaseTemplate,
 };
 
-const publication1Releases: Release[] = [
+const myPublication1Releases: Release[] = [
   {
-    ...publication1ReleaseTemplate,
+    ...myPublication1ReleaseTemplate,
     status: {
-      ...publication1ReleaseTemplate.status,
+      ...myPublication1ReleaseTemplate.status,
       isLatest: true,
     },
   },
   {
-    ...publication1ReleaseTemplate,
+    ...myPublication1ReleaseTemplate,
+    id: 'my-publication-1-release-2',
     releaseName: '2016 to 2017',
   },
   {
-    ...publication1ReleaseTemplate,
+    ...myPublication1ReleaseTemplate,
+    id: 'my-publication-1-release-3',
     releaseName: '2015 to 2016',
   },
 ];
 
-const publication1 = {
+const myPublication1 = {
   ...publicationTemplate,
-  releases: publication1Releases,
+  releases: myPublication1Releases,
 };
 
 //
-// PUBLICATION 2
+// MY PUBLICATION 2
 //
 
-const publication2ReleaseTemplate = {
+const myPublication2ReleaseTemplate = {
   ...releaseTemplate,
   timePeriodCoverage: {
     label: 'Autumn term, academic year',
@@ -162,34 +169,36 @@ const publication2ReleaseTemplate = {
   },
 };
 
-const publication2Releases: Release[] = [
+const myPublication2Releases: Release[] = [
   {
-    ...publication2ReleaseTemplate,
+    ...myPublication2ReleaseTemplate,
+    id: 'my-publication-2-release-1',
     status: {
-      ...publication2ReleaseTemplate.status,
+      ...myPublication2ReleaseTemplate.status,
       isLatest: true,
     },
   },
   {
-    ...publication2ReleaseTemplate,
+    ...myPublication2ReleaseTemplate,
+    id: 'my-publication-2-release-2',
     releaseName: '2016 to 2017',
   },
 ];
 
-const publication2 = {
+const myPublication2 = {
   ...publicationTemplate,
-  id: 'publication-2',
+  id: 'my-publication-2',
   slug: 'pupil-absence-statistics-and-data-for-schools-in-england-autumn-term',
   title:
     'Pupil absence statistics and data for schools in England: autumn term',
-  releases: publication2Releases,
+  releases: myPublication2Releases,
 };
 
 //
-// PUBLICATION 3
+// MY PUBLICATION 3
 //
 
-const publication3ReleaseTemplate = {
+const myPublication3ReleaseTemplate = {
   ...releaseTemplate,
   timePeriodCoverage: {
     label: 'Autumn and spring terms, academic year',
@@ -199,34 +208,110 @@ const publication3ReleaseTemplate = {
       termsPerYear: 6,
     },
   },
+  topic: theme1Topic2,
 };
 
-const publication3Releases: Release[] = [
+const myPublication3Releases: Release[] = [
   {
-    ...publication3ReleaseTemplate,
+    ...myPublication3ReleaseTemplate,
+    id: 'my-publication-3-release-1',
     status: {
-      ...publication3ReleaseTemplate.status,
+      ...myPublication3ReleaseTemplate.status,
       isLatest: true,
     },
   },
   {
-    ...publication3ReleaseTemplate,
+    ...myPublication3ReleaseTemplate,
+    id: 'my-publication-1-release-2',
     releaseName: '2016 to 2017',
   },
 ];
 
-const publication3 = {
+const myPublication3 = {
   ...publicationTemplate,
-  id: 'publication-3',
+  id: 'my-publication-3',
   slug:
-    'pupil-absence-statistics-and-data-for-schools-in-england-autumn-and-spring-terms',
+    'pupil-exclusions-statistics-and-data-for-schools-in-england-autumn-and-spring-terms',
   title:
-    'Pupil absence statistics and data for schools in England: autumn and spring terms',
-  releases: publication3Releases,
+    'Pupil exclusions statistics and data for schools in England: autumn and spring terms',
+  releases: myPublication3Releases,
+  topic: theme1Topic2,
 };
 
-const publications = [publication1, publication2, publication3];
+//
+// IN PROGRESS PUBLICATION 1
+//
+
+const inProgressPublication1ReleaseTemplate = {
+  ...releaseTemplate,
+};
+
+const inProgressPublication1Releases: Release[] = [
+  {
+    ...inProgressPublication1ReleaseTemplate,
+    id: 'in-progress-publication-1-release-1',
+    status: {
+      ...inProgressPublication1ReleaseTemplate.status,
+      isLatest: true,
+    },
+  },
+  {
+    ...inProgressPublication1ReleaseTemplate,
+    id: 'in-progress-publication-1-release-2',
+    releaseName: '2016 to 2017',
+  },
+  {
+    ...inProgressPublication1ReleaseTemplate,
+    id: 'in-progress-publication-1-release-3',
+    releaseName: '2015 to 2016',
+  },
+];
+
+const inProgressPublication1 = {
+  ...publicationTemplate,
+  title:
+    'Pupil absence statistics and data for schools in England: autumn and spring terms',
+  owner: PrototypeLoginService.getUser('user2'),
+  releases: inProgressPublication1Releases,
+};
+
+const myPublications: Publication[] = [
+  myPublication1,
+  myPublication2,
+  myPublication3,
+];
+const inProgressPublications: Publication[] = [inProgressPublication1];
+const allPublications = [...myPublications, ...inProgressPublications];
+
+const getReleaseById = (id: string): Release => {
+  const allReleases = allPublications.flatMap(
+    publication => publication.releases,
+  );
+  return allReleases.filter(release => release.id === id)[0];
+};
+
+const getOwningPublicationForRelease = (release: Release) => {
+  return allPublications.filter(publication =>
+    publication.releases.includes(release),
+  )[0];
+};
+
+const getReleaseSetupDetails = (releaseId: string): ReleaseSetupDetails => {
+  const release = getReleaseById(releaseId);
+  const owningPublication = getOwningPublicationForRelease(release);
+
+  return {
+    publicationTitle: owningPublication.title,
+    releaseType: release.timePeriodCoverage.label,
+    releaseName: release.releaseName,
+    leadStatisticianName: release.lead.name,
+    scheduledReleaseDate: release.scheduledReleaseDate,
+  };
+};
 
 export default {
-  publications,
+  allPublications,
+  getReleaseById,
+  getOwningPublicationForRelease,
+  getReleaseSetupDetails,
 };

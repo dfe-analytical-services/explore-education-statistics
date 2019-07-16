@@ -21,6 +21,12 @@ export type KeysWithType<T, U> = {
 }[keyof T];
 
 /**
+ * Pick key/value pairs from T that
+ * have a value matching type U.
+ */
+export type PickByType<T, U> = Pick<T, KeysWithType<T, U>>;
+
+/**
  * Remove any specified keys from T, that exist on T.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -39,3 +45,9 @@ export type Overwrite<T, U> = OmitStrict<T, keyof T & keyof U> & U;
  */
 export type PartialBy<T, K extends keyof T> = OmitStrict<T, K> &
   Partial<Pick<T, K>>;
+
+/**
+ * Construct a type with a set of optional properties K of type T.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type PartialRecord<K extends keyof any, T> = { [P in K]?: T };

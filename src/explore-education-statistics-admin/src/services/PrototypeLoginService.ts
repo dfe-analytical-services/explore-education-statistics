@@ -24,7 +24,7 @@ export class PrototypeLoginService {
   }
 
   public static getUser(userId: string) {
-    return PrototypeLoginService.USERS.filter(_ => _.id === userId)[0];
+    return PrototypeLoginService.USERS.filter(user => user.id === userId)[0];
   }
 
   public static getAuthentication(userId: string) {

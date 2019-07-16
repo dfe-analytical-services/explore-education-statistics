@@ -1,16 +1,20 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
-import Link from '@frontend/components/Link';
-import Page from '@frontend/components/Page';
-import { NextContext } from 'next';
-import React, { Component } from 'react';
-import ContentBlock from '@frontend/modules/find-statistics/components/ContentBlock';
+import ContentSectionIndex from '@common/components/ContentSectionIndex';
 import FormattedDate from '@common/components/FormattedDate';
+import PageSearchForm from '@common/components/PageSearchForm';
 import PrintThisPage from '@common/components/PrintThisPage';
 import methodologyService, {
   Methodology,
 } from '@common/services/methodologyService';
-import PageSearchForm from '@common/components/PageSearchForm';
+import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
+import Link from '@frontend/components/Link';
+import Page from '@frontend/components/Page';
+import ContentBlock from '@frontend/modules/find-statistics/components/ContentBlock';
+import MethodologyContent from '@frontend/prototypes/methodology/components/MethodologyContent';
+import MethodologyHeader from '@frontend/prototypes/methodology/components/MethodologyHeader';
+import { NextContext } from 'next';
+import React, { Component } from 'react';
 
 interface Props {
   publication: string;
@@ -40,64 +44,68 @@ class MethodologyPage extends Component<Props> {
 
     return (
       <Page
-        breadcrumbs={[
-          { name: 'Methodologies', link: '/methodologies' },
-          { name: data.title },
-        ]}
+        title={data.title}
+        caption="Methodology"
+        breadcrumbs={[{ name: 'Methodologies', link: '/methodologies' }]}
       >
-        <h1 className="govuk-heading-xl">{data.title}</h1>
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
             <dl className="dfe-meta-content govuk-!-margin-0">
-              <dt className="govuk-caption-m">Published: </dt>
-              <dd>
-                <strong>
-                  <FormattedDate>{data.published}</FormattedDate>{' '}
-                </strong>
-              </dd>
-              {data.lastUpdated.length > 0 && (
+              <div>
+                <dt className="govuk-caption-m">Published: </dt>
+                <dd>
+                  <strong>
+                    <FormattedDate>{data.published}</FormattedDate>{' '}
+                  </strong>
+                </dd>
+              </div>
+              {data.lastUpdated && data.lastUpdated.length > 0 && (
                 <>
                   <dt className="govuk-caption-m">Last updated: </dt>
                   <dd>
-                    <FormattedDate>{data.lastUpdated}</FormattedDate>{' '}
+                    <strong>
+                      <FormattedDate>{data.lastUpdated}</FormattedDate>{' '}
+                    </strong>
                   </dd>
                 </>
               )}
             </dl>
           </div>
           <div className="govuk-grid-column-one-third">
-            <PageSearchForm />
+            <PageSearchFormWithAnalytics />
           </div>
         </div>
 
         <hr />
-        <div className="govuk-grid-row">
-          <div className="govuk-grid-column-two-thirds">
-            <p className="govuk-body-l">
-              {`Find out about the methodology behind ${
-                data.publication.title
-              } statistics and
+        {data.publication && (
+          <div className="govuk-grid-row">
+            <div className="govuk-grid-column-two-thirds">
+              <p className="govuk-body-l">
+                {`Find out about the methodology behind ${
+                  data.publication.title
+                } statistics and
               data and how and why they're collected and published.`}
-            </p>
-          </div>
+              </p>
+            </div>
 
-          <div className="govuk-grid-column-one-third">
-            <aside className="app-related-items">
-              <h2 className="govuk-heading-m" id="subsection-title">
-                Related content
-              </h2>
-              <ul className="govuk-list">
-                <li>
-                  <Link to={`/statistics/${data.publication.slug}`}>
-                    {data.publication.title}
-                  </Link>{' '}
-                </li>
-              </ul>
-            </aside>
+            <div className="govuk-grid-column-one-third">
+              <aside className="app-related-items">
+                <h2 className="govuk-heading-m" id="subsection-title">
+                  Related content
+                </h2>
+                <ul className="govuk-list">
+                  <li>
+                    <Link to={`/statistics/${data.publication.slug}`}>
+                      {data.publication.title}
+                    </Link>{' '}
+                  </li>
+                </ul>
+              </aside>
+            </div>
           </div>
-        </div>
+        )}
 
-        {data.content.length > 0 && (
+        {data.content && (
           <Accordion id="contents-sections">
             {data.content.map(({ heading, caption, order, content }) => {
               return (
@@ -106,37 +114,47 @@ class MethodologyPage extends Component<Props> {
                   caption={caption}
                   key={order}
                 >
-                  <ContentBlock
-                    content={content}
-                    id={`content_${order}`}
-                    publication={data.publication}
-                  />
+                  <MethodologyHeader>
+                    <ContentSectionIndex
+                      fromId={`contents-sections-${order}-content`}
+                    />
+                  </MethodologyHeader>
+
+                  <MethodologyContent>
+                    <ContentBlock
+                      content={content}
+                      id={`content_${order}`}
+                      publication={data.publication}
+                    />
+                  </MethodologyContent>
                 </AccordionSection>
               );
             })}
           </Accordion>
         )}
 
-        <h2 className="govuk-heading-l govuk-!-margin-top-9">Annexes</h2>
+        {data.annexes && data.annexes.length > 0 && (
+          <>
+            <h2 className="govuk-heading-l govuk-!-margin-top-9">Annexes</h2>
 
-        {data.content.length > 0 && (
-          <Accordion id="contents-sections">
-            {data.annexes.map(({ heading, caption, order, content }) => {
-              return (
-                <AccordionSection
-                  heading={heading}
-                  caption={caption}
-                  key={order}
-                >
-                  <ContentBlock
-                    content={content}
-                    id={`content_${order}`}
-                    publication={data.publication}
-                  />
-                </AccordionSection>
-              );
-            })}
-          </Accordion>
+            <Accordion id="contents-sections">
+              {data.annexes.map(({ heading, caption, order, content }) => {
+                return (
+                  <AccordionSection
+                    heading={heading}
+                    caption={caption}
+                    key={order}
+                  >
+                    <ContentBlock
+                      content={content}
+                      id={`content_${order}`}
+                      publication={data.publication}
+                    />
+                  </AccordionSection>
+                );
+              })}
+            </Accordion>
+          </>
         )}
 
         <PrintThisPage />

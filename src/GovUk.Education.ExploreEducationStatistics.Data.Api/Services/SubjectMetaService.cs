@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Newtonsoft.Json;
 
@@ -46,7 +47,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             {
                 Filters = GetFilters(observations),
                 Indicators = GetIndicators(subject.Id, query.Indicators),
-                Locations = GetObservationalUnits(observations)
+                Locations = GetObservationalUnits(observations),
+                TimePeriods = GetTimePeriods(observations)
             };
         }
 
@@ -82,24 +84,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 .GroupBy(observation => observation.Location)
                 .Select(group => group.Key);
 
-            var observationalUnits =
-                _locationService.GetObservationalUnits(locations).Values.SelectMany(units => units);
+            var observationalUnits = _locationService.GetObservationalUnits(locations);
 
-            // TODO should we just be extracting the most significant observational unit for the query here?
+            var observationalUnitMetaViewModels = observationalUnits.SelectMany(pair =>
+                pair.Value.Select(observationalUnit =>
+                    new ObservationalUnitMetaViewModel
+                    {
+                        GeoJson = GetGeoJsonForObservationalUnit(pair.Key, observationalUnit),
+                        Label = observationalUnit.Name,
+                        Value = observationalUnit.Code
+                    }));
 
-            return observationalUnits.ToDictionary(
-                observationalUnit => observationalUnit.Code,
-                observationalUnit => new ObservationalUnitMetaViewModel
-                {
-                    GeoJson = GetGeoJsonForObservationalUnit(observationalUnit),
-                    Label = observationalUnit.Name,
-                    Value = observationalUnit.Code
-                });
+            return observationalUnitMetaViewModels.ToDictionary(
+                model => model.Value,
+                model => model);
         }
 
-        private dynamic GetGeoJsonForObservationalUnit(IObservationalUnit observationalUnit)
+        private static Dictionary<string, TimePeriodMetaViewModel> GetTimePeriods(IEnumerable<Observation> observations)
         {
-            var geoJson = _geoJsonService.Find(observationalUnit.Code);
+            var timePeriods = observations.Select(o => (o.Year, o.TimeIdentifier))
+                .Distinct()
+                .OrderBy(tuple => tuple.Year)
+                .ThenBy(tuple => tuple.TimeIdentifier);
+
+            return timePeriods.ToDictionary(
+                tuple => tuple.GetTimePeriod(),
+                tuple => new TimePeriodMetaViewModel
+                {
+                    Code = tuple.TimeIdentifier,
+                    Label = TimePeriodLabelFormatter.Format(tuple.Year, tuple.TimeIdentifier),
+                    Year = tuple.Year
+                }
+            );
+        }
+
+        private dynamic GetGeoJsonForObservationalUnit(GeographicLevel geographicLevel,
+            IObservationalUnit observationalUnit)
+        {
+            var geoJson = _geoJsonService.Find(geographicLevel, observationalUnit.Code);
             return geoJson != null ? JsonConvert.DeserializeObject(geoJson.Value) : null;
         }
     }

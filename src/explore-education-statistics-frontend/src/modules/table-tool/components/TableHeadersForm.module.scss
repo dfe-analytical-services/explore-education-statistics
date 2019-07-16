@@ -1,0 +1,31 @@
+@import '~explore-education-statistics-common/src/styles/govuk-base';
+
+.groupsContainer {
+  padding: govuk-spacing(2);
+}
+
+.axisContainer {
+  margin-bottom: govuk-spacing(2);
+}
+
+.rowColContainer {
+  border: 4px solid govuk-colour('grey-3');
+  padding: govuk-spacing(3);
+  width: 100%;
+}
+
+.isDraggingOver {
+  composes: isDraggingOver from './FormFieldSortableListGroup.module.scss';
+}
+
+.list {
+  composes: list from './FormFieldSortableListGroup.module.scss';
+
+  &:not(:last-of-type) {
+    margin-bottom: govuk-spacing(3);
+  }
+}
+
+.isDragging {
+  composes: isDragging from './FormFieldSortableListGroup.module.scss';
+}

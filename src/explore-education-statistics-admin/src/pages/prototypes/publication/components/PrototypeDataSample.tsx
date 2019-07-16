@@ -1,11 +1,11 @@
-import PrototypeEditableContent from '@admin/pages/prototypes/components/PrototypeEditableContent';
-import PrototypeChartSample from '@admin/pages/prototypes/publication/components/PrototypeChartSample';
 import Button from '@common/components/Button';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import PrototypeDataTilesHighlights from '@common/prototypes/publication/components/PrototypeDataTilesHighlights';
-import PrototypeTableSample from '@common/prototypes/publication/components/PrototypeTableSample';
 import React from 'react';
+import PrototypeEditableContent from '@admin/pages/prototypes/components/PrototypeEditableContent';
+import PrototypeChartSample from '@admin/pages/prototypes/publication/components/PrototypeChartSample';
+import PrototypeTableSample from '@common/prototypes/publication/components/PrototypeTableSample';
 
 interface Props {
   editing?: boolean;

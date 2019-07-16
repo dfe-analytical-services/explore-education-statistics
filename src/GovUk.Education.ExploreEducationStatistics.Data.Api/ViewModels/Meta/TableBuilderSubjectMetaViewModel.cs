@@ -5,8 +5,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta
     public class TableBuilderSubjectMetaViewModel
     {
         public Dictionary<string,
-            LegendOptionsMetaValueModel<Dictionary<string,
-                LabelOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>>>> Filters { get; set; }
+            LegendOptionsMetaValueModel<Dictionary<string, FilterItemMetaViewModel>>> Filters { get; set; }
 
         public Dictionary<string,
             LabelOptionsMetaValueModel<IEnumerable<IndicatorMetaViewModel>>> Indicators { get; set; }

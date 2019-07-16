@@ -89,7 +89,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
       validationSchema={Yup.object<FormValues>({
         locations: Yup.mixed().test(
           'required',
-          'Select at least one option',
+          'Select at least one location',
           (value: Dictionary<string[]>) =>
             Object.values(value).some(groupOptions => groupOptions.length > 0),
         ),
@@ -133,17 +133,21 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
                               draft[levelKey] = [];
                             }
 
+                            const { value } = event.target;
+
                             const matchingOption = draft[levelKey].find(
-                              levelOption => levelOption.value === option.value,
+                              levelOption => levelOption.value === value,
                             );
 
                             if (matchingOption) {
                               draft[levelKey] = draft[levelKey].filter(
-                                levelOption =>
-                                  levelOption.value !== option.value,
+                                levelOption => levelOption.value !== value,
                               );
                             } else {
-                              draft[levelKey].push(option);
+                              draft[levelKey].push({
+                                value,
+                                label: option.label,
+                              });
                             }
                           });
                         }}

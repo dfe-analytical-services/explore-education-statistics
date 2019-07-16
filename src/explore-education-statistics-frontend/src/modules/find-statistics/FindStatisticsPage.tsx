@@ -1,12 +1,11 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
-import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedInformation from '@common/components/RelatedInformation';
 import { contentApi } from '@common/services/api';
+import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
-import PageTitle from '@frontend/components/PageTitle';
 import React, { Component } from 'react';
 import PublicationList from './components/PublicationList';
 import { Topic } from './components/TopicList';
@@ -38,9 +37,7 @@ class FindStatisticsPage extends Component<Props> {
     const { themes } = this.props;
 
     return (
-      <Page breadcrumbs={[{ name: 'Find statistics and data' }]}>
-        <PageTitle title="Find statistics and data" />
-
+      <Page title="Find statistics and data">
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
             <p className="govuk-body-l">
@@ -59,7 +56,7 @@ class FindStatisticsPage extends Component<Props> {
               </li>
             </ul>
 
-            <PageSearchForm />
+            <PageSearchFormWithAnalytics />
           </div>
           <div className="govuk-grid-column-one-third">
             <RelatedInformation>

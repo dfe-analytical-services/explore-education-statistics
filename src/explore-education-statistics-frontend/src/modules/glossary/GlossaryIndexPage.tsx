@@ -1,16 +1,14 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
-import PageSearchForm from '@common/components/PageSearchForm';
+import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
-import PageTitle from '@frontend/components/PageTitle';
 import React from 'react';
 
 function GlossaryIndexPage() {
   return (
-    <Page breadcrumbs={[{ name: 'Glossary' }]}>
-      <PageTitle title="Education statistics: glossary" />
+    <Page title="Glossary">
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <p className="govuk-body-l">
@@ -18,7 +16,7 @@ function GlossaryIndexPage() {
             education statistics and data.
           </p>
 
-          <PageSearchForm />
+          <PageSearchFormWithAnalytics />
         </div>
         <div className="govuk-grid-column-one-third">
           <RelatedInformation>

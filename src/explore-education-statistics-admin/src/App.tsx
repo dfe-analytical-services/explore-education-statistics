@@ -4,8 +4,9 @@ import { Route } from 'react-router';
 import './App.scss';
 import { PrototypeLoginService } from '@admin/services/PrototypeLoginService';
 import { BrowserRouter } from 'react-router-dom';
+import editReleaseRoutes from '@admin/routes/editReleaseRoutes';
+import AdminDashboardPage from './pages/AdminDashboardPage';
 import PrototypeAdminDashboard from './pages/prototypes/PrototypeAdminDashboard';
-import AdminDashboardPage from './pages/AdminDashboard';
 import AdminDocumentationGlossary from './pages/prototypes/PrototypeDocumentationGlossary';
 import AdminDocumentationHome from './pages/prototypes/PrototypeDocumentationHome';
 
@@ -30,6 +31,8 @@ import PublicationCreateNewAbsenceStatus from './pages/prototypes/PrototypePubli
 import PrototypesIndexPage from './pages/prototypes/PrototypesIndexPage';
 import IndexPage from './pages/IndexPage';
 
+import PrototypeChartTest from './pages/prototypes/PrototypeChartTest';
+
 import { LoginContext } from './components/Login';
 
 function App() {
@@ -41,6 +44,14 @@ function App() {
         {/* Non-Prototype Routes*/}
         <Route exact path="/admin-dashboard" component={AdminDashboardPage} />
 
+        {editReleaseRoutes.map(route => (
+          <Route
+            key={route.path}
+            path={route.path}
+            component={route.component}
+          />
+        ))}
+
         {/* Prototype Routes*/}
         <Route exact path="/prototypes/" component={PrototypesIndexPage} />
 
@@ -49,6 +60,8 @@ function App() {
           path="/prototypes/admin-dashboard"
           component={PrototypeAdminDashboard}
         />
+
+        <Route exact path="/prototypes/charts" component={PrototypeChartTest} />
 
         <Route
           exact

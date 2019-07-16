@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
 {
+    [ApiExplorerSettings(IgnoreApi=true)]
     [Authorize]
     public class FileUploadController : Controller
     {
@@ -34,7 +35,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
         }
 
         [HttpPost]
-        [RequestSizeLimit(200 * 1024 * 1024)]
+        [RequestSizeLimit(int.MaxValue)]
+        [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public async Task<IActionResult> Post(Guid releaseId, string name, IFormFile file, IFormFile metaFile)
         {
             var release = _context.Releases

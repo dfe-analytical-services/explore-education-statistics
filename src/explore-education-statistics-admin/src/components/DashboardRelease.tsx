@@ -109,7 +109,7 @@ const DashboardRelease = ({
             <dd className="govuk-summary-list__value">
               {release.comments.map(comment => (
                 <Details
-                  key={comment.id}
+                  key={`${release.id}-comments-${comment.id}`}
                   summary={`${comment.author.name}, ${format(
                     comment.datetime,
                     'd MMMM yyyy, HH:mm',
@@ -153,7 +153,9 @@ const DashboardRelease = ({
               </Link>
             )}
             {!editing && !review && (
-              <Link to="/prototypes/publication-edit">Edit this release</Link>
+              <Link to={`/edit-release/${release.id}/setup`}>
+                Edit this release
+              </Link>
             )}
             {editing && (
               <Link to="/prototypes/publication-create-new-absence-config">

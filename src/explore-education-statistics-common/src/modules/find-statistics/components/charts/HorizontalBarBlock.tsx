@@ -1,7 +1,12 @@
-import ChartFunctions, {
-  ChartData,
+import {
+  generateReferenceLines,
   ChartDefinition,
-  ChartProps,
+  ChartDataB,
+  createDataForAxis,
+  getKeysForChart,
+  mapNameToNameLabel,
+  StackedBarProps,
+  populateDefaultChartProps,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import React, { Component } from 'react';
 import {
@@ -11,17 +16,12 @@ import {
   Legend,
   ResponsiveContainer,
   Tooltip,
+  XAxis,
+  YAxis,
 } from 'recharts';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 
-import { colours } from './Charts';
-
-interface StackedBarHorizontalProps extends ChartProps {
-  stacked?: boolean;
-}
-
-export default class HorizontalBarBlock extends Component<
-  StackedBarHorizontalProps
-> {
+export default class HorizontalBarBlock extends Component<StackedBarProps> {
   public static definition: ChartDefinition = {
     type: 'horizontalbar',
     name: 'Horizontal Bar',
@@ -37,9 +37,15 @@ export default class HorizontalBarBlock extends Component<
 
     axes: [
       {
-        id: 'yaxis',
+        id: 'major',
         title: 'Y Axis',
         type: 'major',
+        defaultDataType: 'timePeriods',
+      },
+      {
+        id: 'minor',
+        title: 'X Axis',
+        type: 'minor',
       },
     ],
   };
@@ -50,62 +56,76 @@ export default class HorizontalBarBlock extends Component<
       meta,
       height,
       width,
-      xAxis,
       referenceLines,
-      yAxis,
-      stacked,
-      dataSets,
+      stacked = false,
+      labels,
+      axes,
     } = this.props;
 
-    if (dataSets === undefined) return <div />;
+    if (!axes.major || !data) return <LoadingSpinner />;
 
-    const chartData: ChartData[] = ChartFunctions.generateDataGroupedByGroups(
-      ChartFunctions.filterResultsByDataSet(dataSets, data.result),
+    const chartData: ChartDataB[] = createDataForAxis(
+      axes.major,
+      data.result,
       meta,
-    );
+    ).map(mapNameToNameLabel(labels, meta.timePeriods));
 
-    const chartKeys: Set<string> = chartData.reduce(
-      (keys: Set<string>, next) => {
-        return new Set([
-          ...Array.from(keys),
-          ...(next.data || []).map(({ name }) => name),
-        ]);
-      },
-      new Set<string>(),
-    );
+    const keysForChart = getKeysForChart(chartData);
 
     return (
       <ResponsiveContainer width={width || '100%'} height={height || 600}>
-        <BarChart
-          data={chartData}
-          layout="vertical"
-          margin={ChartFunctions.calculateMargins(yAxis, xAxis, referenceLines)}
-        >
-          {ChartFunctions.calculateYAxis(yAxis, {
-            type: 'category',
-            dataKey: (xAxis.key || ['name'])[0],
-          })}
+        <BarChart data={chartData} layout="vertical" margin={{ left: 30 }}>
+          <CartesianGrid
+            strokeDasharray="3 3"
+            horizontal={axes.minor && axes.minor.showGrid !== false}
+            vertical={axes.major && axes.major.showGrid !== false}
+          />
 
-          <CartesianGrid />
+          {axes.minor && axes.minor.visible !== false && (
+            <XAxis
+              type="number"
+              label={{
+                angle: -90,
+                offset: 0,
+                position: 'left',
+                value: '',
+              }}
+              scale="auto"
+              padding={{ left: 20, right: 20 }}
+              tickMargin={10}
+            />
+          )}
 
-          {ChartFunctions.calculateXAxis(xAxis, { type: 'number' })}
+          {axes.major && axes.major.visible !== false && (
+            <YAxis
+              type="category"
+              dataKey="name"
+              label={{
+                offset: 5,
+                position: 'bottom',
+                value: '',
+              }}
+              scale="auto"
+              interval={
+                axes.minor && axes.minor.visible !== false
+                  ? 'preserveStartEnd'
+                  : undefined
+              }
+            />
+          )}
 
           <Tooltip cursor={false} />
           <Legend />
 
-          {Array.from(chartKeys).map((dataKey, index) => (
+          {Array.from(keysForChart).map(name => (
             <Bar
-              key={dataKey}
-              dataKey={dataKey}
-              fill={colours[index]}
-              name={meta.indicators[dataKey].label || 'a'}
-              unit={meta.indicators[dataKey].unit || 'a'}
+              key={name}
+              {...populateDefaultChartProps(name, labels[name])}
               stackId={stacked ? 'a' : undefined}
             />
           ))}
 
-          {referenceLines &&
-            ChartFunctions.generateReferenceLines(referenceLines)}
+          {referenceLines && generateReferenceLines(referenceLines)}
         </BarChart>
       </ResponsiveContainer>
     );

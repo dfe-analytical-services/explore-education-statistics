@@ -30,6 +30,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Converters
                 case "DataBlock":
                     contentBlock = new DataBlock();
                     break;
+                case "HtmlBlock":
+                    contentBlock = new HtmlBlock();
+                    break;
             }
             serializer.Populate(jsonObject.CreateReader(), contentBlock);
             return contentBlock;

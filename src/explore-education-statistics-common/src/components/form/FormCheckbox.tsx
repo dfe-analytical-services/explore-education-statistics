@@ -1,7 +1,12 @@
 import classNames from 'classnames';
-import React, { ChangeEventHandler, memo, ReactNode } from 'react';
+import React, { ChangeEvent, memo, ReactNode } from 'react';
 
-export type CheckboxChangeEventHandler = ChangeEventHandler<HTMLInputElement>;
+export type OtherCheckboxChangeProps = Pick<FormCheckboxProps, 'label'>;
+
+export type CheckboxChangeEventHandler = (
+  event: ChangeEvent<HTMLInputElement>,
+  otherCheckboxProps: OtherCheckboxChangeProps,
+) => void;
 
 export interface FormCheckboxProps {
   checked?: boolean;
@@ -38,7 +43,11 @@ const FormCheckbox = ({
           defaultChecked={defaultChecked}
           id={id}
           name={name}
-          onChange={onChange}
+          onChange={event => {
+            if (onChange) {
+              onChange(event, { label });
+            }
+          }}
           type="checkbox"
           value={value}
         />

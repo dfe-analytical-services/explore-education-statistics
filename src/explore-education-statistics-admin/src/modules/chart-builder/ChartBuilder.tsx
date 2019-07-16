@@ -2,19 +2,30 @@ import React from 'react';
 
 import Details from '@common/components/Details';
 import ChartRenderer from '@common/modules/find-statistics/components/ChartRenderer';
-import { DataBlockResponse } from '@common/services/dataBlockService';
-import { ChartDefinition } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import {
+  DataBlockResponse,
+  DataBlockMetadata,
+} from '@common/services/dataBlockService';
+import {
+  ChartDefinition,
+  generateKeyFromDataSet,
+  colours,
+  symbols,
+} from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import ChartDataSelector, {
-  DataUpdatedEvent,
+  SelectedData,
 } from '@admin/modules/chart-builder/ChartDataSelector';
 import {
   ChartDataSet,
-  ChartConfigurationOptions,
-  DataLabelConfigurationItem,
+  ChartConfiguration,
+  AxisConfigurationItem,
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
+import LineChartBlock from '@common/modules/find-statistics/components/charts/LineChartBlock';
+import VerticalBarBlock from '@common/modules/find-statistics/components/charts/VerticalBarBlock';
+import HorizontalBarBlock from '@common/modules/find-statistics/components/charts/HorizontalBarBlock';
+import MapBlock from '@common/modules/find-statistics/components/charts/MapBlock';
 import styles from './graph-builder.module.scss';
-import ConstData from '../../pages/prototypes/PrototypeData';
 import ChartTypeSelector from './ChartTypeSelector';
 import ChartDataConfiguration from './ChartDataConfiguration';
 import ChartAxisConfiguration from './ChartAxisConfiguration';
@@ -23,12 +34,60 @@ interface Props {
   data: DataBlockResponse;
 }
 
+function dataName(meta: DataBlockMetadata, selectedData: SelectedData) {
+  return [
+    meta.indicators[selectedData.indicator].label,
+    '(',
+    ...selectedData.filters.map(filter => meta.filters[filter].label),
+    ')',
+  ].join(' ');
+}
+
+function getReduceMetaDataForAxis(data: DataBlockResponse) {
+  return (
+    items: Dictionary<ChartConfiguration>,
+    groupName?: string,
+  ): Dictionary<ChartConfiguration> => {
+    if (groupName === 'timePeriod') {
+      return {
+        ...items,
+        ...data.result.reduce<Dictionary<ChartConfiguration>>(
+          (moreItems, result) => ({
+            ...moreItems,
+            [result.timePeriod]: data.metaData.timePeriods[result.timePeriod],
+          }),
+          {},
+        ),
+      };
+    }
+    return items;
+  };
+}
+
+function generateAxesMetaData(
+  axes: Dictionary<AxisConfigurationItem>,
+  data: DataBlockResponse,
+) {
+  return Object.values(axes).reduce(
+    (allValues, axis) => ({
+      ...allValues,
+      ...[axis.groupBy].reduce(getReduceMetaDataForAxis(data), {}),
+    }),
+    {},
+  );
+}
+
+const chartTypes: ChartDefinition[] = [
+  LineChartBlock.definition,
+  VerticalBarBlock.definition,
+  HorizontalBarBlock.definition,
+  MapBlock.definition,
+];
+
 const ChartBuilder = ({ data }: Props) => {
-  const [selectedChartType, selectChartType] = React.useState<
+  const [selectedChartType, setSelectedChartType] = React.useState<
     ChartDefinition | undefined
   >();
-
-  const { chartTypes } = ConstData;
 
   const indicatorIds = Object.keys(data.metaData.indicators);
 
@@ -44,84 +103,183 @@ const ChartBuilder = ({ data }: Props) => {
   );
 
   const [dataSets, setDataSets] = React.useState<ChartDataSet[]>([]);
+  const [chartDataConfiguration, setChartDataConfiguration] = React.useState<
+    ChartConfiguration[]
+  >([]);
 
-  const onDataUpdated = (addedData: DataUpdatedEvent[]) => {
-    setDataSets(addedData);
-  };
+  const [axesConfiguration, setAxesConfiguration] = React.useState<
+    Dictionary<AxisConfigurationItem>
+  >({});
 
-  const [chartConfiguration, setChartConfiguration] = React.useState<
-    ChartConfigurationOptions
-  >({ dataLabels: {} });
+  const onDataAdded = (addedData: SelectedData) => {
+    const newDataSets = [...dataSets, addedData];
+    setDataSets(newDataSets);
 
-  const onDataLabelsChange = (
-    dataLabels: Dictionary<DataLabelConfigurationItem>,
-  ) => {
-    setChartConfiguration({ ...chartConfiguration, dataLabels });
-  };
-
-  React.useEffect(() => {
-    selectChartType(chartTypes[0]);
-    setDataSets([
+    setChartDataConfiguration([
+      ...chartDataConfiguration,
       {
-        indicator: '23',
-        filters: ['1', '71'],
+        name: dataName(data.metaData, addedData),
+        value: generateKeyFromDataSet(addedData),
+        label: dataName(data.metaData, addedData),
+        colour: colours[newDataSets.length % colours.length],
+        symbol: symbols[newDataSets.length % symbols.length],
       },
     ]);
-  }, []);
+  };
 
-  if (data === undefined) return <div />;
+  const onDataRemoved = (removedData: SelectedData, index: number) => {
+    const newDataSets = [...dataSets];
+
+    newDataSets.splice(index, 1);
+    setDataSets(newDataSets);
+    const newChartDataConfiguration = [...chartDataConfiguration];
+    newChartDataConfiguration.splice(index, 1);
+    setChartDataConfiguration(newChartDataConfiguration);
+  };
+
+  /// the following are used in rendering the chart based on the configured values being constructed
+  const [
+    renderedAxesConfiguration,
+    setRenderedAxesConfiguration,
+  ] = React.useState<Dictionary<AxisConfigurationItem>>({});
+  const [
+    renderedChartConfiguration,
+    setRenderedChartConfiguration,
+  ] = React.useState<Dictionary<ChartConfiguration>>({});
+  React.useEffect(() => {
+    setRenderedAxesConfiguration(
+      Object.entries(axesConfiguration).reduce(
+        (populatedData, [key, value]) => ({
+          ...populatedData,
+          [key]: {
+            ...value,
+            dataSets: value.type === 'major' ? dataSets : [],
+          },
+        }),
+        {},
+      ),
+    );
+  }, [axesConfiguration, dataSets]);
+
+  React.useEffect(() => {
+    setRenderedChartConfiguration({
+      ...chartDataConfiguration.reduce<Dictionary<ChartConfiguration>>(
+        (mapped, item) => ({
+          ...mapped,
+          [item.value]: item,
+        }),
+        {},
+      ),
+
+      ...generateAxesMetaData(axesConfiguration, data),
+    });
+  }, [axesConfiguration, chartDataConfiguration, data]);
+
+  const previousSelectionChartType = React.useRef<ChartDefinition>();
+
+  // set defaults for a selected chart type
+  React.useEffect(() => {
+    if (previousSelectionChartType.current !== selectedChartType) {
+      previousSelectionChartType.current = selectedChartType;
+
+      if (selectedChartType) {
+        const axisConfiguration = selectedChartType.axes.reduce<
+          Dictionary<AxisConfigurationItem>
+        >(
+          (axesConfigurationDictionary, axisDefinition) => ({
+            ...axesConfigurationDictionary,
+
+            [axisDefinition.type]: {
+              name: `${axisDefinition.title} (${axisDefinition.type} axis)`,
+              type: axisDefinition.type,
+              groupBy: axisDefinition.defaultDataType,
+
+              dataSets: axisDefinition.type === 'major' ? dataSets : [],
+              visible: true,
+              showGrid: true,
+            },
+          }),
+          {},
+        );
+
+        setAxesConfiguration(axisConfiguration);
+      }
+    }
+  }, [selectedChartType, dataSets]);
 
   return (
     <div className={styles.editor}>
       <Details summary="Select chart type" open>
         <ChartTypeSelector
           chartTypes={chartTypes}
-          onSelectChart={selectChartType}
+          onSelectChart={setSelectedChartType}
           selectedChartType={selectedChartType}
         />
       </Details>
 
       {selectedChartType && (
-        <Details summary="Add data to chart" open>
-          <ChartDataSelector
-            onDataUpdated={onDataUpdated}
-            metaData={data.metaData}
-            indicatorIds={indicatorIds}
-            filterIds={filterIdCombinations}
-            chartType={selectedChartType}
-          />
-        </Details>
-      )}
-
-      {selectedChartType && dataSets.length > 0 && (
         <React.Fragment>
+          <Details summary="Add data to chart" open>
+            <p>Add data from the existing dataset to the chart</p>
+            <ChartDataSelector
+              onDataAdded={onDataAdded}
+              onDataRemoved={onDataRemoved}
+              metaData={data.metaData}
+              indicatorIds={indicatorIds}
+              filterIds={filterIdCombinations}
+              selectedData={dataSets}
+              chartType={selectedChartType}
+            />
+          </Details>
+
           <Details summary="Chart preview" open>
             <ChartRenderer
               type={selectedChartType.type}
-              dataSets={dataSets}
+              axes={renderedAxesConfiguration}
               data={data}
               meta={data.metaData}
-              xAxis={{ title: '' }}
-              yAxis={{ title: '' }}
-              configuration={chartConfiguration}
+              labels={renderedChartConfiguration}
             />
           </Details>
 
-          <Details summary="Data label options">
-            <ChartDataConfiguration
-              dataSets={dataSets}
-              data={data}
-              meta={data.metaData}
-              onDataLabelsChange={onDataLabelsChange}
-            />
+          <Details summary="Configure chart" open>
+            <p>Configure the overall options for the chart</p>
+            <p>Configure legend</p>
           </Details>
 
-          <Details summary="Axes options" open>
+          <Details summary="Data label options" open>
+            Update the configuration used for each dataset in the chart from the
+            default
+            {chartDataConfiguration.map((config, index) => (
+              <ChartDataConfiguration
+                key={config.value}
+                configuration={config}
+                onConfigurationChange={updatedConfig => {
+                  const newConfig = [...chartDataConfiguration];
+                  newConfig.splice(index, 1, updatedConfig);
+                  setChartDataConfiguration(newConfig);
+                }}
+              />
+            ))}
+          </Details>
+
+          <Details summary="Axes options">
             <p>
               Add / Remove and update the axes and how they display data ranges
             </p>
-            {selectedChartType.axes.map(axis => (
-              <ChartAxisConfiguration key={axis.id} {...axis} />
+            {Object.entries(axesConfiguration).map(([key, axis]) => (
+              <ChartAxisConfiguration
+                key={key}
+                id={axis.name}
+                configuration={axis}
+                meta={data.metaData}
+                onConfigurationChange={updatedConfig => {
+                  setAxesConfiguration({
+                    ...axesConfiguration,
+                    [key]: updatedConfig,
+                  });
+                }}
+              />
             ))}
           </Details>
         </React.Fragment>

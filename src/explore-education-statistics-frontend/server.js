@@ -1,4 +1,26 @@
 require('core-js/fn/array/flat-map');
+require('core-js/fn/array/flatten');
+
+if (!Array.prototype.flat) {
+  // eslint-disable-next-line no-extend-native
+  Array.prototype.flat = Array.prototype.flatten;
+}
+
+const appInsights = require('applicationinsights');
+
+// AI Key should be loaded via enviroment variable APPINSIGHTS_INSTRUMENTATIONKEY
+if (process.env.APPINSIGHTS_INSTRUMENTATIONKEY) {
+  appInsights
+    .setup()
+    .setAutoDependencyCorrelation(true)
+    .setAutoCollectRequests(true)
+    .setAutoCollectPerformance(true)
+    .setAutoCollectExceptions(true)
+    .setAutoCollectDependencies(true)
+    .setAutoCollectConsole(true)
+    .setUseDiskRetryCaching(true)
+    .start();
+}
 
 const basicAuth = require('express-basic-auth');
 const express = require('express');

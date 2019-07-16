@@ -73,4 +73,29 @@ describe('MapBlock', () => {
       );
     }
   });
+
+  test('include all indicators from reduced selection', async () => {
+    const { container } = render(
+      <MapBlock
+        {...testData.AbstractLargeDataChartProps_smaller_datasets}
+        height={600}
+        width={900}
+      />,
+    );
+
+    await wait();
+
+    const select = container.querySelector('#selectedIndicator');
+
+    expect(select).toBeVisible();
+
+    if (select) {
+      expect(select.querySelector('option[value="26"]')).toHaveTextContent(
+        'Overall absence rate',
+      );
+      expect(select.querySelector('option[value="23"]')).toHaveTextContent(
+        'Unauthorised absence rate',
+      );
+    }
+  });
 });
