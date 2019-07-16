@@ -81,9 +81,10 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
             vertical={axes.major && axes.major.showGrid !== false}
           />
 
-          {axes.minor && axes.minor.visible !== false && (
+          {axes.minor && (
             <XAxis
               type="number"
+              hide={axes.minor.visible === false}
               label={{
                 angle: -90,
                 offset: 0,
@@ -96,10 +97,11 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
             />
           )}
 
-          {axes.major && axes.major.visible !== false && (
+          {axes.major && (
             <YAxis
               type="category"
               dataKey="name"
+              hide={axes.major.visible === false}
               label={{
                 offset: 5,
                 position: 'bottom',
