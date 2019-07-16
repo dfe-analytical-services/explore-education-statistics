@@ -3,6 +3,7 @@ import {
   DataBlockRequest,
 } from '@common/services/dataBlockService';
 import { Dictionary } from '@common/types';
+import { PositionType } from 'recharts';
 import { contentApi } from './api';
 
 export interface Publication {
@@ -98,6 +99,8 @@ export type AxisGroupBy =
 
 export type AxisType = 'major' | 'minor';
 
+export type LabelPosition = 'axis' | 'graph' | PositionType;
+
 export interface AxisConfigurationItem {
   name: string;
   type: AxisType;
@@ -107,6 +110,7 @@ export interface AxisConfigurationItem {
   visible?: boolean;
   title?: string;
   showGrid?: boolean;
+  labelPosition?: LabelPosition;
 }
 
 export interface Chart {

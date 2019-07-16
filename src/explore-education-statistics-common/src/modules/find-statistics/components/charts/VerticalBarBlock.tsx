@@ -13,6 +13,8 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
+  Label,
+  LabelList,
   Legend,
   ResponsiveContainer,
   Tooltip,
@@ -120,7 +122,14 @@ export default class VerticalBarBlock extends Component<StackedBarProps> {
                 key={name}
                 {...populateDefaultChartProps(name, labels[name])}
                 stackId={stacked ? 'a' : undefined}
-              />
+                label={{
+                  content: <span>hello</span>,
+                }}
+              >
+                {axes.major.labelPosition !== 'axis' && (
+                  <Label position="insideTop">hello</Label>
+                )}
+              </Bar>
             ))}
           </BarChart>
         </ResponsiveContainer>

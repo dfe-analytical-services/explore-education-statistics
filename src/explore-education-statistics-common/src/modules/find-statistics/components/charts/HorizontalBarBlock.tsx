@@ -13,6 +13,7 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
+  LabelList,
   Legend,
   ResponsiveContainer,
   Tooltip,
@@ -124,7 +125,11 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
               key={name}
               {...populateDefaultChartProps(name, labels[name])}
               stackId={stacked ? 'a' : undefined}
-            />
+            >
+              {axes.major.labelPosition !== 'axis' && (
+                <LabelList dataKey={name} position="insideRight" />
+              )}
+            </Bar>
           ))}
 
           {referenceLines && generateReferenceLines(referenceLines)}

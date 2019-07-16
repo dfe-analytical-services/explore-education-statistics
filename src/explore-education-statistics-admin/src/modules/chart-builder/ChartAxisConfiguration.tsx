@@ -1,5 +1,10 @@
 import * as React from 'react';
-import { FormFieldset, FormCheckbox, FormGroup } from '@common/components/form';
+import {
+  FormFieldset,
+  FormCheckbox,
+  FormGroup,
+  FormSelect,
+} from '@common/components/form';
 import FormComboBox from '@common/components/form/FormComboBox';
 import {
   AxisConfigurationItem,
@@ -90,6 +95,18 @@ const ChartAxisConfiguration = ({
           }
           checked={axisConfiguration.showGrid}
           value="grid"
+        />
+        <FormSelect
+          id={`${id}_labelPosition`}
+          name={`${id}_labelPosition`}
+          label="Label position"
+          onChange={e =>
+            updateAxisConfiguration({ labelPosition: e.target.value })
+          }
+          options={[
+            { label: 'On axis', value: 'axis' },
+            { label: 'On graph', value: 'graph' },
+          ]}
         />
 
         <p>Add / remove / edit series labels & range DFE-1018 1017</p>
