@@ -5,7 +5,7 @@ import './App.scss';
 import { PrototypeLoginService } from '@admin/services/PrototypeLoginService';
 import { BrowserRouter } from 'react-router-dom';
 import releaseRoutes from '@admin/routes/releaseRoutes';
-import AdminDashboardPage from './pages/AdminDashboardPage';
+import AdminDashboardPage from './pages/admin-dashboard/AdminDashboardPage';
 import PrototypeAdminDashboard from './pages/prototypes/PrototypeAdminDashboard';
 import AdminDocumentationGlossary from './pages/prototypes/PrototypeDocumentationGlossary';
 import AdminDocumentationHome from './pages/prototypes/PrototypeDocumentationHome';
