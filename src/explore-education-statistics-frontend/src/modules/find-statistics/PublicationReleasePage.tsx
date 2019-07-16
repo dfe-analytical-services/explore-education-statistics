@@ -123,7 +123,7 @@ class PublicationReleasePage extends Component<Props> {
                 open &&
                 logEvent(
                   'Downloads',
-                  'Open download data files accordion',
+                  'Release page download data files dropdown opened',
                   window.location.pathname,
                 )
               }
