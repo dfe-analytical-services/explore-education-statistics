@@ -1,13 +1,14 @@
+import { AdminDashboardPublication } from '@admin/services/api/dashboard/types';
 import FormSelect from '@common/components/form/FormSelect';
 import React from 'react';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
-import { IdLabelPair, Publication } from '@admin/services/types/types';
-import AdminDashboardPublications from './AdminDashboardPublications';
-import Link from './Link';
+import { IdLabelPair } from '@admin/services/api/common/types/types';
+import Link from '@admin/components/Link';
+import AdminDashboardPublicationSummary from './AdminDashboardPublicationSummary';
 
 interface AdminDashboardPublicationsTabProps {
-  publications: Publication[];
+  publications: AdminDashboardPublication[];
   noResultsMessage: string;
   themes: IdLabelPair[];
   topics: IdLabelPair[];
@@ -81,7 +82,7 @@ const AdminDashboardPublicationsTab = ({
               heading={publication.title}
               headingTag="h3"
             >
-              <AdminDashboardPublications publication={publication} />
+              <AdminDashboardPublicationSummary publication={publication} />
             </AccordionSection>
           ))}
         </Accordion>

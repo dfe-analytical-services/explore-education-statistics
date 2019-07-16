@@ -1,8 +1,15 @@
-import { User } from '../PrototypeLoginService';
+import { ReleaseApprovalStatus } from '@admin/services/api/dashboard/types';
+import { User } from '../../../PrototypeLoginService';
 
 export interface IdLabelPair {
   id: string;
   label: string;
+}
+
+export interface UserContact {
+  name: string;
+  email: string;
+  telNo: string;
 }
 
 export interface Topic {
@@ -17,13 +24,8 @@ export interface TimePeriodCoverage {
   startDate: Date;
 }
 
-export enum ApprovalStatus {
-  Approved,
-  ReadyToReview,
-}
-
 export interface ReleaseStatus {
-  approvalStatus: ApprovalStatus;
+  approvalStatus: ReleaseApprovalStatus;
   isNew: boolean;
   isLive: boolean;
   isLatest: boolean;
@@ -49,7 +51,7 @@ export interface Release {
   id: string;
   releaseName: string;
   timePeriodCoverage: TimePeriodCoverage;
-  scheduledReleaseDate: DayMonthYearValues;
+  scheduledPublishDate: DayMonthYearValues;
   nextReleaseExpectedDate: Date;
   releaseType: IdLabelPair;
   slug: string;
@@ -63,12 +65,6 @@ export interface LegacyRelease {
   id: string;
   description: string;
   url: string;
-}
-
-export interface UserContact {
-  name: string;
-  email: string;
-  telNo: string;
 }
 
 export interface Publication {
@@ -94,7 +90,7 @@ export interface ReleaseSetupDetails {
   timePeriodCoverageStartDate: Date;
   releaseType: IdLabelPair;
   leadStatisticianName: string;
-  scheduledReleaseDate: DayMonthYearValues;
+  scheduledPublishDate: DayMonthYearValues;
   nextReleaseExpectedDate?: Date;
 }
 
@@ -112,13 +108,17 @@ export const dateToDayMonthYear = (date?: Date) => {
   };
 };
 
+export const dayMonthYearIsComplete = (dmy?: DayMonthYearValues) => {
+  return dmy && dmy.day && dmy.month && dmy.year;
+};
+
 export const dayMonthYearToDate = (dmy: DayMonthYearValues) => {
-  if (!(dmy.day && dmy.month && dmy.year)) {
+  if (!dayMonthYearIsComplete(dmy)) {
     throw Error(
       `Couldn't convert DayMonthYearValues ${JSON.stringify(
         dmy,
       )} to Date - missing required value`,
     );
   }
-  return new Date(dmy.year, dmy.month - 1, dmy.day);
+  return new Date(dmy.year || 0, (dmy.month || 0) - 1, dmy.day);
 };

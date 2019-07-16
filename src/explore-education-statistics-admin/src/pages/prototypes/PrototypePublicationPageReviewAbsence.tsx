@@ -1,10 +1,10 @@
 import { Release } from '@common/services/publicationService';
 import React, { Component } from 'react';
 import { FormGroup, FormRadioGroup } from '@common/components/form';
+import Link from '@admin/components/Link';
 import PrototypePublicationService from '@admin/pages/prototypes/components/PrototypePublicationService';
 import EditablePublicationPage from '@admin/pages/prototypes/components/EditablePublicationPage';
 import PrototypePage from './components/PrototypePage';
-import Link from '../../components/Link';
 
 interface State {
   data: Release | undefined;

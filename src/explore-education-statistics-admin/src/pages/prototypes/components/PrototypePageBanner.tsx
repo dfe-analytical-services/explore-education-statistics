@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import React from 'react';
-import Link from '../../../components/Link';
+import Link from '@admin/components/Link';
 import styles from './PrototypePageBanner.module.scss';
 
 const PrototypePageBanner = () => {

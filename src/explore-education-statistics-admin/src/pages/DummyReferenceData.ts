@@ -1,4 +1,4 @@
-import { IdLabelPair } from '@admin/services/types/types';
+import { IdLabelPair } from '@admin/services/api/common/types/types';
 
 export enum DateType {
   DayMonthYear,
