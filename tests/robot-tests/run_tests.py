@@ -32,7 +32,7 @@ parser.add_argument("-i", "--interp",
 parser.add_argument("-e", "--env",
                     dest="env",
                     default="dev",
-                    choices=["local", "dev", "dev02", "dev03"],
+                    choices=["local", "dev", "dev02", "dev03", "test", "prod"],
                     help="the environment to run the tests against")
 parser.add_argument("-f", "--file",
                     dest="tests",
