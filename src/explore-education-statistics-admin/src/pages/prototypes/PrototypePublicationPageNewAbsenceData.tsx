@@ -24,6 +24,10 @@ const PublicationDataPage = () => {
       <PrototypeAdminNavigation sectionId="addData" />
       <Tabs id="dataUploadTab">
         <TabsSection id="data-upload" title="Data uploads">
+          <div className="govuk-body">
+            Users will be able to download this data from this release.
+          </div>
+
           <div className="govuk-table">
             <caption className="govuk-table__caption govuk-heading-m">
               Current data for this release
@@ -31,7 +35,7 @@ const PublicationDataPage = () => {
             <thead className="govuk-table__head">
               <tr className="govuk-table__row">
                 <th className="govuk-table__header" scope="col">
-                  Subject title
+                  Name
                 </th>
                 <th className="govuk-table__header" scope="col">
                   Data file
@@ -139,12 +143,12 @@ const PublicationDataPage = () => {
           <form>
             <fieldset className="govuk-fieldset">
               <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
-                Add new data to release
+                Upload new data to release
               </legend>
 
               <div className="govuk-form-group">
                 <label htmlFor="release-title" className="govuk-label">
-                  Subject title
+                  Name
                 </label>
                 <input
                   type="text"
@@ -182,6 +186,15 @@ const PublicationDataPage = () => {
                 />
               </div>
             </fieldset>
+            <p className="govuk-body govuk-!-margin-top-9">
+              Depending on your internet connection speed, files may take some
+              time to upload. Do not close this page until the file has
+              uploaded.
+            </p>
+            <p className="govuk-body">
+              If you close this page while the file is still uploading - the
+              upload will fail.
+            </p>
             <div className="govuk-form-group govuk-!-margin-top-6">
               <button className="govuk-button" type="button">
                 Upload data files
@@ -190,9 +203,17 @@ const PublicationDataPage = () => {
           </form>
         </TabsSection>
         <TabsSection id="file-upload" title="File uploads">
+          <p className="govuk-body">
+            Users will be able to download these files from this release.
+          </p>
+          <p className="govuk-body">
+            These files should be alternatives to service-generated tables and
+            charts. For example, infographics or unsupported complex tables and
+            charts.
+          </p>
           <table className="govuk-table">
             <caption className="govuk-table__caption govuk-heading-m">
-              File uploads available for this release
+              Current files for this release
             </caption>
             <thead className="govuk-table__head">
               <tr className="govuk-table__row">
@@ -236,7 +257,7 @@ const PublicationDataPage = () => {
           <form>
             <fieldset className="govuk-fieldset">
               <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
-                Upload file
+                Upload files
               </legend>
 
               <div className="govuk-form-group">
@@ -267,9 +288,18 @@ const PublicationDataPage = () => {
                 />
               </div>
             </fieldset>
+            <p className="govuk-body govuk-!-margin-top-9">
+              Depending on your internet connection speed, files may take some
+              time to upload. Do not close this page until the file has
+              uploaded.
+            </p>
+            <p className="govuk-body">
+              If you close this page while the file is still uploading - the
+              upload will fail.
+            </p>
             <div className="govuk-form-group govuk-!-margin-top-6">
               <button className="govuk-button" type="button">
-                Upload file
+                Upload files
               </button>
             </div>
           </form>

@@ -49,9 +49,18 @@ const PublicationDataPage = () => {
           </li>
         </ul>
         <div className="govuk-tabs__panel">
+          <h2 className="govuk-heading-">
+            Create tables and charts for this release
+          </h2>
+
           <p className="govuk-body">
             Choose the data from your uploaded files then use filters to create
-            your table.
+            your tables and charts.
+          </p>
+
+          <p className="govuk-body">
+            Once you've created your tables and charts, you can save them and
+            embed them in your release.
           </p>
 
           <p className="govuk-body">

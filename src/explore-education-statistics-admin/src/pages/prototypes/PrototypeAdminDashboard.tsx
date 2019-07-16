@@ -43,7 +43,7 @@ const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
         </div>
       </div>
       <Tabs id="dashboard-tabs">
-        <TabsSection id="publications" title="Publications">
+        <TabsSection id="publications" title="Manage publications">
           <PrototypeAdminDashboardPublications />
         </TabsSection>
         {/* <TabsSection

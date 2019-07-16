@@ -74,7 +74,7 @@ const PublicationDataPage = ({ location }: RouteChildrenProps) => {
                     className="govuk-label govuk-radios__label"
                     htmlFor="readyApproval"
                   >
-                    Level 1: Ready for team approval
+                    Level 1: Ready for review
                   </label>
                 </div>
 
@@ -91,7 +91,7 @@ const PublicationDataPage = ({ location }: RouteChildrenProps) => {
                     className="govuk-label govuk-radios__label"
                     htmlFor="readyTeamLeadApproval"
                   >
-                    Level 2: Ready for team lead appoval
+                    Level 2: Ready for higher review
                   </label>
                 </div>
               </div>

@@ -11,13 +11,11 @@ const PrototypePublicationSummary = () => {
     <>
       <h2 className="govuk-heading-m">Release summary</h2>
 
+      <p className="govuk-bo">
+        These details will be shown to users to help identify this release.
+      </p>
+
       <dl className="govuk-summary-list govuk-!-margin-bottom-9">
-        <div className="govuk-summary-list__row">
-          <dt className="govuk-summary-list__key">Publication title</dt>
-          <dd className="govuk-summary-list__value">
-            Pupil absence statistics and data for schools in England
-          </dd>
-        </div>
         <div className="govuk-summary-list__row">
           <dt className="govuk-summary-list__key">Release type</dt>
           <dd className="govuk-summary-list__value">Academic year</dd>
@@ -31,7 +29,7 @@ const PrototypePublicationSummary = () => {
           <dd className="govuk-summary-list__value">Alex Miller</dd>
         </div>
         <div className="govuk-summary-list__row">
-          <dt className="govuk-summary-list__key">Scheduled release</dt>
+          <dt className="govuk-summary-list__key">Scheduled publish date</dt>
           <dd className="govuk-summary-list__value">20 September 2019</dd>
         </div>
         <div className="govuk-summary-list__row">

@@ -55,7 +55,7 @@ const PrototypeAdminNavigation = ({ sectionId }: Props) => {
               to="/prototypes/publication-create-new-absence-table?status=step1"
               className="govuk-link govuk-link--no-visited-state"
             >
-              Manage tables and charts
+              Create tables and charts
             </Link>
           </li>
 
