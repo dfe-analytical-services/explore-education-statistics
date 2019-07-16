@@ -1214,9 +1214,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             TimePeriod = new TimePeriod
                             {
                                 StartYear = "2012",
-                                StartCode = TimeIdentifier.SixHalfTerms,
+                                StartCode = TimeIdentifier.AcademicYear,
                                 EndYear = "2016",
-                                EndCode = TimeIdentifier.SixHalfTerms,
+                                EndCode = TimeIdentifier.AcademicYear
                             },
                             Filters = new List<string> {"1", "2"},
                             Indicators = new List<string> {"23", "26", "28"}
@@ -1346,9 +1346,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         TimePeriod = new TimePeriod
                                         {
                                             StartYear = "2012",
-                                            StartCode = TimeIdentifier.SixHalfTerms,
+                                            StartCode = TimeIdentifier.AcademicYear,
                                             EndYear = "2016",
-                                            EndCode = TimeIdentifier.SixHalfTerms,
+                                            EndCode = TimeIdentifier.AcademicYear
                                         },
                                         Filters = new List<string> {"1", "2"},
                                         Indicators = new List<string> {"23", "26", "28"}
@@ -1582,9 +1582,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         TimePeriod = new TimePeriod
                                         {
                                             StartYear = "2016",
-                                            StartCode = TimeIdentifier.SixHalfTerms,
+                                            StartCode = TimeIdentifier.AcademicYear,
                                             EndYear = "2017",
-                                            EndCode = TimeIdentifier.SixHalfTerms,
+                                            EndCode = TimeIdentifier.AcademicYear
                                         },
 
                                         Indicators = new List<string> {"23", "26", "28"},
@@ -1730,7 +1730,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 StartYear = "2012",
                                 StartCode = TimeIdentifier.AcademicYear,
                                 EndYear = "2016",
-                                EndCode = TimeIdentifier.AcademicYear,
+                                EndCode = TimeIdentifier.AcademicYear
                             },
 
                             Filters = new List<string> {"727"},
@@ -1850,7 +1850,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                             StartYear = "2012",
                                             StartCode = TimeIdentifier.AcademicYear,
                                             EndYear = "2016",
-                                            EndCode = TimeIdentifier.AcademicYear,
+                                            EndCode = TimeIdentifier.AcademicYear
                                         },
                                         Filters = new List<string> {"727"},
                                         Indicators = new List<string> {"156", "154", "155"}
@@ -1936,7 +1936,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                             StartYear = "2012",
                                             StartCode = TimeIdentifier.AcademicYear,
                                             EndYear = "2016",
-                                            EndCode = TimeIdentifier.AcademicYear,
+                                            EndCode = TimeIdentifier.AcademicYear
                                         },
 
                                         Filters = new List<string> {"727"},
@@ -2457,7 +2457,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 StartYear = "2014",
                                 StartCode = TimeIdentifier.CalendarYear,
                                 EndYear = "2018",
-                                EndCode = TimeIdentifier.CalendarYear,
+                                EndCode = TimeIdentifier.CalendarYear
                             },
 
                             Filters = new List<string> {"845"},
@@ -2561,7 +2561,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                             StartYear = "2014",
                                             StartCode = TimeIdentifier.CalendarYear,
                                             EndYear = "2018",
-                                            EndCode = TimeIdentifier.CalendarYear,
+                                            EndCode = TimeIdentifier.CalendarYear
                                         },
 
                                         Filters = new List<string> {"848"},
@@ -2599,23 +2599,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         "**Regional variation**\n\n" +
                                         "There's much less regional variation in the proportions receiving any preferred offer compared to those for receiving a first preference as shown in the following chart."
                                 },
-                                // new DataBlock
-                                // {
-                                //   Heading = "Chart showing Secondary school preferences by region, 2018",
-                                //   DataBlockRequest = new DataBlockRequest {
-                                //       subjectId = 17,
-                                //       geographicLevel = "Local_Authority",
-                                //       startYear = "2017",
-                                //       endYear = "2018",
-                                //       indicators = new List<string> { "192" },
-                                //       filters = new List<string> { "848" }
-                                //   },
-                                //   Charts = new List<IContentBlockChart> {
-                                //       new MapChart {
-                                //           Indicators = new List<string> { "192" }
-                                //       }
-                                //   }
-                                // },
                                 new MarkDownBlock
                                 {
                                     Body =
@@ -2663,7 +2646,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                             StartYear = "2014",
                                             StartCode = TimeIdentifier.CalendarYear,
                                             EndYear = "2018",
-                                            EndCode = TimeIdentifier.CalendarYear,
+                                            EndCode = TimeIdentifier.CalendarYear
                                         },
 
                                         Filters = new List<string> {"845"},
@@ -2700,23 +2683,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         "* primary first preference rate increased to 86.6% - up from 85.9% in 2017\n\n" +
                                         "* secondary first preference rate decreased to 66% - down from 68.% in 2017"
                                 },
-                                // new DataBlock
-                                // {
-                                //   Heading = "Chart showing Primary school preferences by region, 2018",
-                                //   DataBlockRequest = new DataBlockRequest {
-                                //       subjectId = 17,
-                                //       geographicLevel = "Local_Authority",
-                                //       startYear = "2017",
-                                //       endYear = "2018",
-                                //       indicators = new List<string> { "193" },
-                                //       filters = new List<string> { "845" }
-                                //   },
-                                //   Charts = new List<IContentBlockChart> {
-                                //       new MapChart {
-                                //           Indicators = new List<string> { "193" }
-                                //       }
-                                //   }
-                                // },
                                 new MarkDownBlock
                                 {
                                     Body =
