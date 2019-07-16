@@ -10,8 +10,8 @@ import { baseUrl } from '@common/services/api';
 import publicationService, {
   Release,
 } from '@common/services/publicationService';
-import { logEvent } from '@frontend/services/googleAnalyticsService';
 import ButtonLink from '@frontend/components/ButtonLink';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import classNames from 'classnames';
