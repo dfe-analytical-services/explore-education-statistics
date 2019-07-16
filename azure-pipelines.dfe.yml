@@ -278,7 +278,7 @@ jobs:
       - task: 'PublishPipelineArtifact@0'
         displayName: 'Publish Pipeline Artifact'
         inputs:
-          artifactName: 'frontend-dev02'
+          artifactName: 'frontend-test'
           targetPath: '$(Build.ArtifactStagingDirectory)'
   - job: 'FrontendArtifactTest'
     dependsOn: 'Frontend'
