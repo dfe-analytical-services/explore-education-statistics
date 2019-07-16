@@ -209,7 +209,7 @@ class PublicationReleasePage extends Component<Props> {
                       open &&
                       logEvent(
                         'Previous Updates',
-                        'Open previous updates accordion',
+                        'Release page previous updates dropdown opened',
                         window.location.pathname,
                       )
                     }
