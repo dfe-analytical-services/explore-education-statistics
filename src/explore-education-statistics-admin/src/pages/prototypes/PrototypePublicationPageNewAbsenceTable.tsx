@@ -7,10 +7,10 @@ import {
   FormSelect,
   // FormRadioGroup,
 } from '@common/components/form';
+import Link from '@admin/components/Link';
 import PrototypeAdminExampleTables from './components/PrototypeAdminExampleTables';
 import PrototypeAdminNavigation from './components/PrototypeAdminNavigation';
 import PrototypePage from './components/PrototypePage';
-import Link from '../../components/Link';
 
 const PublicationDataPage = () => {
   return (

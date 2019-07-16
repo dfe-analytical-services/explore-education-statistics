@@ -1,5 +1,11 @@
 @import '../styles/govuk-base';
 
+.container {
+  @media print {
+    display: none;
+  }
+}
+
 .searchButton {
   background: $govuk-link-colour url('/static/images/search-button.png') 1px -17px;
   border: 2px solid $govuk-input-border-colour;

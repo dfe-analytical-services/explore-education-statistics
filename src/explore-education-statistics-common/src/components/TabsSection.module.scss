@@ -1,6 +1,7 @@
 @import '../styles/govuk-base';
 
 .panel {
+  page-break-inside: avoid;
   &:focus {
     outline: none;
   }

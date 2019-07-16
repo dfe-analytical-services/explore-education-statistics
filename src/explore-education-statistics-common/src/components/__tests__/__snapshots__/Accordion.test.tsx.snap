@@ -24,7 +24,7 @@ exports[`Accordion renders with hidden content by default 1`] = `
       </button>
     </div>
     <div
-      class="govuk-accordion__section"
+      class="govuk-accordion__section section"
       role="presentation"
     >
       <div
@@ -55,7 +55,9 @@ exports[`Accordion renders with hidden content by default 1`] = `
         <p>
           Test content
         </p>
-        <div>
+        <div
+          class="dfe-print-hidden"
+        >
           <a
             class="govuk-link govuk-link--no-visited-state"
             href="#"
@@ -93,7 +95,7 @@ exports[`Accordion renders with visible content when \`open\` is true 1`] = `
       </button>
     </div>
     <div
-      class="govuk-accordion__section govuk-accordion__section--expanded"
+      class="govuk-accordion__section section govuk-accordion__section--expanded"
       role="presentation"
     >
       <div
@@ -124,7 +126,9 @@ exports[`Accordion renders with visible content when \`open\` is true 1`] = `
         <p>
           Test content
         </p>
-        <div>
+        <div
+          class="dfe-print-hidden"
+        >
           <a
             class="govuk-link govuk-link--no-visited-state"
             href="#"

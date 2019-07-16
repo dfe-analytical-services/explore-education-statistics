@@ -14,6 +14,8 @@ export interface FormTextInputProps {
   id: string;
   label: ReactNode | string;
   name: string;
+  type?: string;
+  pattern?: string;
   onChange?: ChangeEventHandler<HTMLInputElement>;
   onKeyPress?: KeyboardEventHandler<HTMLInputElement>;
   onClick?: MouseEventHandler<HTMLInputElement>;
@@ -28,6 +30,7 @@ const FormTextInput = ({
   id,
   label,
   width,
+  type = 'text',
   ...props
 }: FormTextInputProps) => {
   return (
@@ -52,7 +55,7 @@ const FormTextInput = ({
           [`govuk-input--width-${width}`]: width !== undefined,
         })}
         id={id}
-        type="text"
+        type={type}
       />
     </>
   );

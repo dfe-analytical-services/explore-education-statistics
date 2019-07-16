@@ -698,7 +698,7 @@ class MapBlock extends Component<MapProps, MapState> {
               width: (width && `${width}px`) || '100%',
               height: `${height || 600}px`,
             }}
-            className={styles.map}
+            className={classNames(styles.map, 'dfe-print-break-avoid')}
             center={position}
             zoom={6.5}
             // minZoom={6.5}
