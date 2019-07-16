@@ -62,7 +62,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             Id = r.Id,
                             Title = r.Title,
                             Published = r.Published,
-                            ReleaseName = r.ReleaseName
+                            ReleaseName = r.ReleaseName,
+                            TimePeriodCoverage = r.TimePeriodCoverage
                             // TODO Status
                             // TODO Live? Is this Status? Or a bool or something else? - A question for design
                             // TODO isLatestRelease? latest published? - A question for design

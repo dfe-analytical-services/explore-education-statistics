@@ -3,7 +3,6 @@ import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
-import PrintThisPage from '@common/components/PrintThisPage';
 import RelatedAside from '@common/components/RelatedAside';
 import DataBlock from '@common/modules/find-statistics/components/DataBlock';
 import { baseUrl } from '@common/services/api';
@@ -14,6 +13,7 @@ import ButtonLink from '@frontend/components/ButtonLink';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
+import PrintThisPage from '@frontend/components/PrintThisPage';
 import classNames from 'classnames';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
@@ -75,14 +75,14 @@ class PublicationReleasePage extends Component<Props> {
                   </strong>
                 )}
                 <dl className="dfe-meta-content govuk-!-margin-top-3 govuk-!-margin-bottom-1">
-                  <dt className="govuk-caption-m">Published: </dt>
+                  <dt className="govuk-caption-m">Published:</dt>
                   <dd data-testid="published-date">
                     <strong>
                       <FormattedDate>{data.published}</FormattedDate>{' '}
                     </strong>
                   </dd>
                   <div>
-                    <dt className="govuk-caption-m">Next update: </dt>
+                    <dt className="govuk-caption-m">Next update:</dt>
                     <dd data-testid="next-update">
                       <strong>
                         <FormattedDate format="MMMM yyyy">
@@ -117,7 +117,17 @@ class PublicationReleasePage extends Component<Props> {
 
             <ReactMarkdown className="govuk-body" source={data.summary} />
 
-            <Details summary="Download data files">
+            <Details
+              summary="Download data files"
+              onToggle={(open: boolean) =>
+                open &&
+                logEvent(
+                  'Downloads',
+                  'Open download data files accordion',
+                  window.location.pathname,
+                )
+              }
+            >
               <ul className="govuk-list govuk-list--bullet">
                 {data.dataFiles.map(({ extension, name, path, size }) => (
                   <li key={path}>
@@ -141,7 +151,7 @@ class PublicationReleasePage extends Component<Props> {
               <h3>About these statistics</h3>
 
               <dl className="dfe-meta-content">
-                <dt className="govuk-caption-m">For school year: </dt>
+                <dt className="govuk-caption-m">For school year:</dt>
                 <dd data-testid="release-name">
                   <strong>{data.releaseName}</strong>
                 </dd>
@@ -189,7 +199,7 @@ class PublicationReleasePage extends Component<Props> {
                 </dd>
               </dl>
               <dl className="dfe-meta-content">
-                <dt className="govuk-caption-m">Last updated: </dt>
+                <dt className="govuk-caption-m">Last updated:</dt>
                 <dd data-testid="last-updated">
                   <strong>
                     <FormattedDate>{data.updates[0].on}</FormattedDate>
@@ -378,7 +388,12 @@ class PublicationReleasePage extends Component<Props> {
           Create tables
         </ButtonLink>
 
-        <PrintThisPage />
+        <PrintThisPage
+          analytics={{
+            category: 'Page print',
+            action: 'Print this page link selected',
+          }}
+        />
       </Page>
     );
   }

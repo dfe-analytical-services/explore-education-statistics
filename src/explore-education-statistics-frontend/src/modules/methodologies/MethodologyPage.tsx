@@ -2,12 +2,11 @@ import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import ContentSectionIndex from '@common/components/ContentSectionIndex';
 import FormattedDate from '@common/components/FormattedDate';
-import PageSearchForm from '@common/components/PageSearchForm';
-import PrintThisPage from '@common/components/PrintThisPage';
 import methodologyService, {
   Methodology,
 } from '@common/services/methodologyService';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
+import PrintThisPage from '@frontend/components/PrintThisPage';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import ContentBlock from '@frontend/modules/find-statistics/components/ContentBlock';
@@ -155,7 +154,12 @@ class MethodologyPage extends Component<Props> {
           </>
         )}
 
-        <PrintThisPage />
+        <PrintThisPage
+          analytics={{
+            category: 'Page print',
+            action: 'Print this page link selected',
+          }}
+        />
       </Page>
     );
   }
