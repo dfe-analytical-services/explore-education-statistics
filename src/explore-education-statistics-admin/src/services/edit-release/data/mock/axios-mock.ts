@@ -25,6 +25,9 @@ export default {
       ];
     });
 
+    const generateRandomInteger = (max: number) => Math.floor(Math.random() * Math.floor(max));
+    const generateRandomIntegerString = (max: number) => generateRandomInteger(max).toString();
+
     // uploadDataFiles
     mock.onPost(/\/release\/.*\/datafiles\/upload/).reply(({ url, data }) => {
       const releaseIdMatch = url
@@ -41,18 +44,18 @@ export default {
       dataFilesView.dataFiles.push({
         title: subjectTitle,
         file: {
-          id: '1234',
+          id: generateRandomIntegerString(100000),
           fileName: dataFile.name,
         },
         metadataFile: {
-          id: '5678',
+          id: generateRandomIntegerString(100000),
           fileName: metadataFile.name,
         },
         fileSize: {
-          size: dataFile.size,
+          size: generateRandomInteger(100),
           unit: 'Mb',
         },
-        numberOfRows: 102005,
+        numberOfRows: generateRandomInteger(200000),
       });
 
       return [
