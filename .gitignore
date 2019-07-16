@@ -43,3 +43,5 @@ src/GovUk.Education.ExploreEducationStatistics.Data.Seed/Files/
 tags
 *.pyc
 *.tmp
+
+lerna-debug.log

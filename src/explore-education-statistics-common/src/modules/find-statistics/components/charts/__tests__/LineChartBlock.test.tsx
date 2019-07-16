@@ -13,7 +13,7 @@ describe('LineChartBlock', () => {
       <LineChartBlock {...testData.AbstractChartProps} />,
     );
 
-    /*
+    /* TODO
     expect(
       container.querySelector('.xAxis text.recharts-label tspan'),
     ).toHaveTextContent('test x axis');

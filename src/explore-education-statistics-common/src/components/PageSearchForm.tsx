@@ -21,11 +21,12 @@ interface SearchResult {
   location: string;
 }
 
-interface Props {
+export interface PageSearchFormProps {
   className?: string;
   elementSelectors: string[];
   id: string;
   minInput: number;
+  onSearch?: any;
 }
 
 interface State {
@@ -33,7 +34,7 @@ interface State {
   searchComplete: boolean;
 }
 
-class PageSearchForm extends Component<Props, State> {
+class PageSearchForm extends Component<PageSearchFormProps, State> {
   public state: State = {
     searchResults: [],
     searchComplete: false,
@@ -85,13 +86,17 @@ class PageSearchForm extends Component<Props, State> {
   }
 
   private search = (value: string) => {
-    const { elementSelectors, minInput } = this.props;
+    const { elementSelectors, minInput, id, onSearch } = this.props;
 
     const isAcronym = value === value.toUpperCase() && value.length > 1;
 
     if (!isAcronym && value.length < minInput) {
       this.resetSearch();
       return;
+    }
+
+    if (typeof onSearch === 'function') {
+      onSearch(value);
     }
 
     const elements = findAllByText(

@@ -1,5 +1,4 @@
 import { dataApi } from '@common/services/api';
-import TimePeriod, { TimePeriodCode } from '@common/services/types/TimePeriod';
 import { Dictionary } from '@common/types/util';
 import { Feature, Geometry } from 'geojson';
 
@@ -20,6 +19,71 @@ export enum GeographicLevel {
   School = 'School',
   Ward = 'Ward',
 }
+
+type TimeIdentifier =
+  | 'AY'
+  | 'AYQ1'
+  | 'AYQ1Q2'
+  | 'AYQ1Q3'
+  | 'AYQ1Q4'
+  | 'AYQ2'
+  | 'AYQ2Q3'
+  | 'AYQ2Q4'
+  | 'AYQ3'
+  | 'AYQ3Q4'
+  | 'AYQ4'
+  | 'CY'
+  | 'CYQ1'
+  | 'CYQ1Q2'
+  | 'CYQ1Q3'
+  | 'CYQ1Q4'
+  | 'CYQ2'
+  | 'CYQ2Q3'
+  | 'CYQ2Q4'
+  | 'CYQ3'
+  | 'CYQ3Q4'
+  | 'CYQ4'
+  | 'FY'
+  | 'FYQ1'
+  | 'FYQ1Q2'
+  | 'FYQ1Q3'
+  | 'FYQ1Q4'
+  | 'FYQ2'
+  | 'FYQ2Q3'
+  | 'FYQ2Q4'
+  | 'FYQ3'
+  | 'FYQ3Q4'
+  | 'FYQ4'
+  | 'TY'
+  | 'TYQ1'
+  | 'TYQ1Q2'
+  | 'TYQ1Q3'
+  | 'TYQ1Q4'
+  | 'TYQ2'
+  | 'TYQ2Q3'
+  | 'TYQ2Q4'
+  | 'TYQ3'
+  | 'TYQ3Q4'
+  | 'TYQ4'
+  | 'HT5'
+  | 'HT6'
+  | 'EOM'
+  | 'T1'
+  | 'T1T2'
+  | 'T2'
+  | 'T3'
+  | 'M1'
+  | 'M2'
+  | 'M3'
+  | 'M4'
+  | 'M5'
+  | 'M6'
+  | 'M7'
+  | 'M8'
+  | 'M9'
+  | 'M10'
+  | 'M11'
+  | 'M12';
 
 export interface Country {
   code: string;
@@ -55,8 +119,7 @@ export interface Result {
   measures: {
     [key: string]: string;
   };
-  timeIdentifier: TimePeriodCode;
-  year: number;
+  timePeriod: string;
 }
 
 export interface DataBlockData {
@@ -89,7 +152,7 @@ interface OptionMetadata extends OptionListMetadata<LabelValueMetadata> {
 
 interface TimePeriodOptionMetadata {
   label: string;
-  code: TimePeriodCode;
+  code: TimeIdentifier;
   year: number;
 }
 
@@ -162,14 +225,24 @@ export interface DataBlockLocationMetadata {
 export interface DataBlockMetadata {
   indicators: Dictionary<LabelValueUnitMetadata>;
   filters: Dictionary<LabelValueMetadata>;
-  timePeriod?: Dictionary<LabelValueMetadata>;
   timePeriods: Dictionary<LabelValueMetadata>;
-  locations?: Dictionary<DataBlockLocationMetadata>;
+  locations: Dictionary<DataBlockLocationMetadata>;
+}
+
+interface DataBlockTimePeriod {
+  startYear: string;
+  startCode: TimeIdentifier;
+  endYear: string;
+  endCode: TimeIdentifier;
 }
 
 export interface DataBlockRequest {
   subjectId: number;
+  timePeriod: DataBlockTimePeriod;
+  filters: string[];
   geographicLevel: GeographicLevel;
+  indicators: string[];
+
   country?: string[];
   localAuthority?: string[];
   localAuthorityDistrict?: string[];
@@ -182,10 +255,6 @@ export interface DataBlockRequest {
   rscRegion?: string[];
   sponsor?: string[];
   ward?: string[];
-  startYear: string;
-  endYear: string;
-  filters: string[];
-  indicators: string[];
 }
 
 export interface DataBlockResponse {
@@ -196,31 +265,13 @@ export interface DataBlockResponse {
   subjectId: number;
   releaseDate: Date;
   geographicLevel: GeographicLevel;
+
   result: Result[];
 }
 
 const DataBlockService = {
-  buildTimePeriodMetadata(result: Result[]) {
-    return result.reduce(
-      (results: Dictionary<LabelValueMetadata>, { timeIdentifier, year }) => {
-        const key = `${year}_${timeIdentifier}`;
-        if (results[key]) return results;
-
-        return {
-          ...results,
-          [key]: new TimePeriod(year, timeIdentifier),
-        };
-      },
-      {},
-    );
-  },
-
   async getDataBlockForSubject(request: DataBlockRequest) {
     const response: DataBlockResponse = await dataApi.post('/Data', request);
-
-    response.metaData.timePeriods =
-      response.metaData.timePeriod ||
-      DataBlockService.buildTimePeriodMetadata(response.result);
 
     return response;
   },

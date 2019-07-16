@@ -3,9 +3,7 @@ import { OmitStrict, PartialBy } from '@common/types/util';
 import classNames from 'classnames';
 import kebabCase from 'lodash/kebabCase';
 import orderBy from 'lodash/orderBy';
-import memoize from 'memoizee';
 import React, {
-  ChangeEvent,
   createRef,
   MouseEvent,
   MouseEventHandler,
@@ -24,21 +22,17 @@ export type CheckboxOption = PartialBy<
 >;
 
 export type CheckboxGroupAllChangeEvent = MouseEvent<HTMLButtonElement>;
+
 export type CheckboxGroupAllChangeEventHandler = (
   event: CheckboxGroupAllChangeEvent,
-  options: CheckboxOption[],
-) => void;
-
-export type CheckboxGroupChangeEventHandler = (
-  event: ChangeEvent<HTMLInputElement>,
-  option: CheckboxOption,
+  checked: boolean,
 ) => void;
 
 interface BaseFormCheckboxGroupProps {
   id: string;
   name: string;
   onAllChange?: CheckboxGroupAllChangeEventHandler;
-  onChange?: CheckboxGroupChangeEventHandler;
+  onChange?: CheckboxChangeEventHandler;
   options: CheckboxOption[];
   selectAll?: boolean;
   small?: boolean;
@@ -52,20 +46,13 @@ interface BaseFormCheckboxGroupProps {
 export type FormCheckboxGroupProps = BaseFormCheckboxGroupProps &
   FormFieldsetProps;
 
-interface State {
-  checkedCount: number;
-}
-
 /**
  * Basic checkbox group that should be used as a controlled component.
- * When using Formik, use {@see FormFieldRadioGroup} instead.
  */
 export class BaseFormCheckboxGroup extends PureComponent<
-  BaseFormCheckboxGroupProps,
-  State
+  BaseFormCheckboxGroupProps
 > {
   public static defaultProps = {
-    legendSize: 'm',
     selectAll: false,
     small: false,
     order: ['label'],
@@ -88,27 +75,26 @@ export class BaseFormCheckboxGroup extends PureComponent<
   }
 
   private handleAllChange: MouseEventHandler<HTMLButtonElement> = event => {
-    const { onAllChange, options } = this.props;
+    const { onAllChange } = this.props;
 
     if (onAllChange) {
-      onAllChange(event, options);
+      onAllChange(event, this.isAllChecked());
     }
   };
 
-  // eslint-disable-next-line react/sort-comp
-  private handleChange = memoize(
-    (option: CheckboxOption): CheckboxChangeEventHandler => event => {
-      const { onChange } = this.props;
+  private handleChange: CheckboxChangeEventHandler = (event, option) => {
+    const { onChange } = this.props;
 
-      if (onChange) {
-        onChange(event, option);
-      }
-    },
-    {
-      normalizer: ([option]: [CheckboxOption]) =>
-        `${option.value}-${option.label}-${option.id}`,
-    },
-  );
+    if (onChange) {
+      onChange(event, option);
+    }
+  };
+
+  private isAllChecked = () => {
+    const { options, value } = this.props;
+
+    return options.every(option => value.indexOf(option.value) > -1);
+  };
 
   public render() {
     const {
@@ -121,10 +107,6 @@ export class BaseFormCheckboxGroup extends PureComponent<
       orderDirection,
       small,
     } = this.props;
-
-    const isAllChecked = options.every(
-      option => value.indexOf(option.value) > -1,
-    );
 
     return (
       <div
@@ -140,7 +122,9 @@ export class BaseFormCheckboxGroup extends PureComponent<
             className={styles.selectAll}
             underline={false}
           >
-            {isAllChecked ? 'Unselect' : 'Select'} all {options.length} options
+            {`${this.isAllChecked() ? 'Unselect' : 'Select'} all ${
+              options.length
+            } options`}
           </ButtonText>
         )}
 
@@ -151,7 +135,7 @@ export class BaseFormCheckboxGroup extends PureComponent<
             name={name}
             key={option.value}
             checked={value.indexOf(option.value) > -1}
-            onChange={this.handleChange(option)}
+            onChange={this.handleChange}
           />
         ))}
 

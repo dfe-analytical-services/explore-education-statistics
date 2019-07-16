@@ -84,17 +84,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 .GroupBy(observation => observation.Location)
                 .Select(group => group.Key);
 
-            var observationalUnits =
-                _locationService.GetObservationalUnits(locations).Values.SelectMany(units => units);
+            var observationalUnits = _locationService.GetObservationalUnits(locations);
 
-            return observationalUnits.ToDictionary(
-                observationalUnit => observationalUnit.Code,
-                observationalUnit => new ObservationalUnitMetaViewModel
-                {
-                    GeoJson = GetGeoJsonForObservationalUnit(observationalUnit),
-                    Label = observationalUnit.Name,
-                    Value = observationalUnit.Code
-                });
+            var observationalUnitMetaViewModels = observationalUnits.SelectMany(pair =>
+                pair.Value.Select(observationalUnit =>
+                    new ObservationalUnitMetaViewModel
+                    {
+                        GeoJson = GetGeoJsonForObservationalUnit(pair.Key, observationalUnit),
+                        Label = observationalUnit.Name,
+                        Value = observationalUnit.Code
+                    }));
+
+            return observationalUnitMetaViewModels.ToDictionary(
+                model => model.Value,
+                model => model);
         }
 
         private static Dictionary<string, TimePeriodMetaViewModel> GetTimePeriods(IEnumerable<Observation> observations)
@@ -115,9 +118,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             );
         }
 
-        private dynamic GetGeoJsonForObservationalUnit(IObservationalUnit observationalUnit)
+        private dynamic GetGeoJsonForObservationalUnit(GeographicLevel geographicLevel,
+            IObservationalUnit observationalUnit)
         {
-            var geoJson = _geoJsonService.Find(observationalUnit.Code);
+            var geoJson = _geoJsonService.Find(geographicLevel, observationalUnit.Code);
             return geoJson != null ? JsonConvert.DeserializeObject(geoJson.Value) : null;
         }
     }

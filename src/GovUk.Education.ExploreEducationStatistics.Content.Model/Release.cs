@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using GovUk.Education.ExploreEducationStatistics.Common.Converters;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
@@ -27,6 +30,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public List<ContentSection> Content { get; set; }
         
         public DataBlock KeyStatistics { get; set; }
+
+        [JsonConverter(typeof(TimeIdentifierJsonConverter))]
+        public TimeIdentifier TimePeriodCoverage { get; set; }
 
         protected bool Equals(Release other)
         {

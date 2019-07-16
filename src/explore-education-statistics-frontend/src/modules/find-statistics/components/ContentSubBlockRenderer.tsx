@@ -33,7 +33,7 @@ const ContentSubBlockRenderer = ({ block, id, publication }: Props) => {
           {...block}
           id={`${id}_datablock`}
           additionalTabContent={
-            <>
+            <div className="dfe-print-hidden">
               <h2 className="govuk-heading-m">
                 Explore and edit this data online
               </h2>
@@ -44,7 +44,7 @@ const ContentSubBlockRenderer = ({ block, id, publication }: Props) => {
               >
                 Explore data
               </ButtonLink>
-            </>
+            </div>
           }
         />
       );

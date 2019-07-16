@@ -19,17 +19,7 @@ export interface SummaryRendererProps {
 function getLatestMeasures(result: Result[]) {
   const copiedResult = [...result];
 
-  copiedResult.sort((a, b) => {
-    if (a.year < b.year) {
-      return -1;
-    }
-
-    if (a.year > b.year) {
-      return 1;
-    }
-
-    return 0;
-  });
+  copiedResult.sort((a, b) => a.timePeriod.localeCompare(b.timePeriod));
 
   const latest = copiedResult[copiedResult.length - 1];
 
@@ -45,6 +35,10 @@ export default function SummaryRenderer({
   dataSummary,
 }: SummaryRendererProps) {
   let measures: { [key: string]: string } = {};
+
+  if (meta === undefined) {
+    return <div>Invalid data specified</div>;
+  }
 
   if (data) {
     measures = getLatestMeasures(data.result);
