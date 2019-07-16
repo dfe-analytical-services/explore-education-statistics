@@ -1,6 +1,5 @@
 import Page from '@frontend/components/Page';
 import React from 'react';
-import classNames from 'classnames';
 
 function ContactPage() {
   return (
