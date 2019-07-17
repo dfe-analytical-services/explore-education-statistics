@@ -12,10 +12,7 @@ const ReleasePublishStatusPage = ({
   const { releaseId } = match.params;
 
   return (
-    <ReleasePageTemplate
-      publicationTitle='TODO'
-      releaseId={releaseId}
-    >
+    <ReleasePageTemplate publicationTitle="TODO" releaseId={releaseId}>
       <h2 className="govuk-heading-m">Set publish status</h2>
     </ReleasePageTemplate>
   );

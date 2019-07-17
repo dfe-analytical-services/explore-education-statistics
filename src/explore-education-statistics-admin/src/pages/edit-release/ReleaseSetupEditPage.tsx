@@ -3,7 +3,10 @@ import DummyReferenceData, {
   TimePeriodCoverageGroup,
 } from '@admin/pages/DummyReferenceData';
 import ReleasePageTemplate from '@admin/pages/edit-release/components/ReleasePageTemplate';
-import {ReleaseSetupDetails, ReleaseSetupDetailsUpdateRequest} from "@admin/services/edit-release/setup/types";
+import {
+  ReleaseSetupDetails,
+  ReleaseSetupDetailsUpdateRequest,
+} from '@admin/services/edit-release/setup/types';
 import Button from '@common/components/Button';
 import { Form, FormFieldset, Formik } from '@common/components/form';
 import FormFieldDayMonthYear from '@common/components/form/FormFieldDayMonthYear';
@@ -139,7 +142,8 @@ const ReleaseSetupEditPage = ({
               : undefined,
             releaseTypeId: releaseSetupDetails.releaseType.id,
             scheduledPublishDate: releaseSetupDetails.scheduledPublishDate,
-            nextReleaseExpectedDate: releaseSetupDetails.nextReleaseExpectedDate,
+            nextReleaseExpectedDate:
+              releaseSetupDetails.nextReleaseExpectedDate,
           }}
           validationSchema={Yup.object<FormValues>({
             timePeriodCoverageCode: Yup.string().required(
@@ -166,17 +170,17 @@ const ReleaseSetupEditPage = ({
             nextReleaseExpectedDate: validateOptionalPartialDayMonthYearField,
           })}
           onSubmit={async (values: FormValues) => {
-
             const updatedReleaseDetails: ReleaseSetupDetailsUpdateRequest = {
               id: releaseId,
               timePeriodCoverageCode: values.timePeriodCoverageCode,
               timePeriodCoverageStartDate:
-                isDayMonthYearDateTypeCodeSelected(values.timePeriodCoverageCode)
-                && values.timePeriodCoverageStartDate
-                ? values.timePeriodCoverageStartDate
-                : {
-                  year: values.timePeriodCoverageStartDateYearOnly,
-                },
+                isDayMonthYearDateTypeCodeSelected(
+                  values.timePeriodCoverageCode,
+                ) && values.timePeriodCoverageStartDate
+                  ? values.timePeriodCoverageStartDate
+                  : {
+                      year: values.timePeriodCoverageStartDateYearOnly,
+                    },
               scheduledPublishDate: values.scheduledPublishDate,
               nextReleaseExpectedDate: values.nextReleaseExpectedDate,
               releaseType: DummyReferenceData.findReleaseType(
@@ -184,11 +188,9 @@ const ReleaseSetupEditPage = ({
               ),
             };
 
-            service.
-              updateReleaseSetupDetails(updatedReleaseDetails).
-              then(_ =>
-                history.push(setupRoute.generateLink(releaseId))
-              );
+            service
+              .updateReleaseSetupDetails(updatedReleaseDetails)
+              .then(_ => history.push(setupRoute.generateLink(releaseId)));
           }}
           render={(form: FormikProps<FormValues>) => {
             return (

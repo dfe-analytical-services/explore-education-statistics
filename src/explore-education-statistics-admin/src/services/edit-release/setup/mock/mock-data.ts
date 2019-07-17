@@ -1,10 +1,11 @@
-import {ReleaseSetupDetails} from "@admin/services/edit-release/setup/types";
-import {Dictionary} from '@common/types';
+import { ReleaseSetupDetails } from '@admin/services/edit-release/setup/types';
+import { Dictionary } from '@common/types';
 
 const setupByReleaseId: Dictionary<ReleaseSetupDetails> = {
   'my-publication-1-release-1': {
     id: 'my-publication-1-release-1',
-    publicationTitle: 'Pupil absence statistics and data for schools in England',
+    publicationTitle:
+      'Pupil absence statistics and data for schools in England',
     timePeriodCoverageCode: 'AY',
     timePeriodCoverageStartDate: {
       day: 1,
@@ -26,7 +27,7 @@ const setupByReleaseId: Dictionary<ReleaseSetupDetails> = {
       month: 9,
       year: 2019,
     },
-  }
+  },
 };
 
 export default {

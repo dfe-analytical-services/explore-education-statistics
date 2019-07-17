@@ -1,4 +1,4 @@
-import {createClient} from "@admin/services/common/service";
+import { createClient } from '@admin/services/common/service';
 import mocks from './mock/axios-mock';
 import { AdminDashboardPublication, ThemeAndTopics } from './types';
 

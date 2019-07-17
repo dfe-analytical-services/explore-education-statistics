@@ -1,5 +1,5 @@
 import DummyReferenceData from '@admin/pages/DummyReferenceData';
-import {ReleaseSetupDetails} from "@admin/services/edit-release/setup/types";
+import { ReleaseSetupDetails } from '@admin/services/edit-release/setup/types';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -30,7 +30,8 @@ const ReleaseSetupPage = ({ match }: RouteComponentProps<MatchProps>) => {
   }, [releaseId]);
 
   const getSelectedTimePeriodCoverageLabel = (timePeriodCoverageCode: string) =>
-      DummyReferenceData.findTimePeriodCoverageOption(timePeriodCoverageCode).label;
+    DummyReferenceData.findTimePeriodCoverageOption(timePeriodCoverageCode)
+      .label;
 
   return (
     <>
@@ -46,17 +47,22 @@ const ReleaseSetupPage = ({ match }: RouteComponentProps<MatchProps>) => {
               {releaseSetupDetails.publicationTitle}
             </SummaryListItem>
             <SummaryListItem term="Time period">
-              {getSelectedTimePeriodCoverageLabel(releaseSetupDetails.timePeriodCoverageCode)}
+              {getSelectedTimePeriodCoverageLabel(
+                releaseSetupDetails.timePeriodCoverageCode,
+              )}
             </SummaryListItem>
             <SummaryListItem term="Release period">
               {releaseSetupDetails.timePeriodCoverageStartDate.year && (
                 <>
-                  <time>{releaseSetupDetails.timePeriodCoverageStartDate.year}</time>
-                  {' '}to{' '}
+                  <time>
+                    {releaseSetupDetails.timePeriodCoverageStartDate.year}
+                  </time>{' '}
+                  to{' '}
                   {releaseSetupDetails.timePeriodCoverageStartDate.year
-                    ? (releaseSetupDetails.timePeriodCoverageStartDate.year + 1).toString()
-                    : ''
-                  }
+                    ? (
+                        releaseSetupDetails.timePeriodCoverageStartDate.year + 1
+                      ).toString()
+                    : ''}
                 </>
               )}
             </SummaryListItem>
@@ -77,7 +83,9 @@ const ReleaseSetupPage = ({ match }: RouteComponentProps<MatchProps>) => {
                 releaseSetupDetails.nextReleaseExpectedDate,
               ) && (
                 <FormattedDate>
-                  {dayMonthYearToDate(releaseSetupDetails.nextReleaseExpectedDate)}
+                  {dayMonthYearToDate(
+                    releaseSetupDetails.nextReleaseExpectedDate,
+                  )}
                 </FormattedDate>
               )}
             </SummaryListItem>

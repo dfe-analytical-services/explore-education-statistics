@@ -3,7 +3,8 @@ import { DataFileView } from '../types';
 
 const dataFilesByReleaseId: Dictionary<DataFileView> = {
   'my-publication-1-release-1': {
-    publicationTitle: 'Pupil absence statistics and data for schools in England',
+    publicationTitle:
+      'Pupil absence statistics and data for schools in England',
     dataFiles: [
       {
         title: 'Geographical absence',

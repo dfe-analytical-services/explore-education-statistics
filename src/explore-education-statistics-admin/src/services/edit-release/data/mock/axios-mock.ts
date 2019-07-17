@@ -1,34 +1,31 @@
-import MockAdapter from "axios-mock-adapter";
+import MockAdapter from 'axios-mock-adapter';
 
-const generateRandomInteger = (max: number) => Math.floor(Math.random() * Math.floor(max));
-const generateRandomIntegerString = (max: number) => generateRandomInteger(max).toString();
+const generateRandomInteger = (max: number) =>
+  Math.floor(Math.random() * Math.floor(max));
+const generateRandomIntegerString = (max: number) =>
+  generateRandomInteger(max).toString();
 
 export default async (mock: MockAdapter) => {
-
   const mockData = (await import(
     /* webpackChunkName: "mock-data" */ './mock-data'
-    )).default;
+  )).default;
 
   // getReleaseDataFiles
   mock.onGet(/\/release\/.*\/datafiles/).reply(({ url }) => {
-    const releaseIdMatch = url
-      ? url.match(/\/release\/(.*)\/datafiles/)
-      : [''];
+    const releaseIdMatch = url ? url.match(/\/release\/(.*)\/datafiles/) : [''];
     return [
       200,
-      mockData.getDataFilesForRelease(
-        releaseIdMatch ? releaseIdMatch[1] : '',
-      ),
+      mockData.getDataFilesForRelease(releaseIdMatch ? releaseIdMatch[1] : ''),
     ];
   });
 
   // uploadDataFiles
   mock.onPost(/\/release\/.*\/datafiles\/upload/).reply(({ url, data }) => {
-    const releaseIdMatch = url
-      ? url.match(/\/release\/(.*)\/datafiles/)
-      : [''];
+    const releaseIdMatch = url ? url.match(/\/release\/(.*)\/datafiles/) : [''];
 
-    const dataFilesView = mockData.getDataFilesForRelease(releaseIdMatch ? releaseIdMatch[1] : '');
+    const dataFilesView = mockData.getDataFilesForRelease(
+      releaseIdMatch ? releaseIdMatch[1] : '',
+    );
 
     const formData = data as FormData;
     const subjectTitle = formData.get('subjectTitle') as string;
@@ -57,16 +54,16 @@ export default async (mock: MockAdapter) => {
 
   // deleteDataFiles
   mock.onDelete(/\/release\/.*\/datafiles\/.*/).reply(({ url }) => {
-    const idsMatch = url
-      ? url.match(/\/release\/(.*)\/datafiles\/(.*)/)
-      : [''];
+    const idsMatch = url ? url.match(/\/release\/(.*)\/datafiles\/(.*)/) : [''];
 
     const [releaseId, dataFileId] = idsMatch ? idsMatch.slice(1) : ['', ''];
 
     const dataFilesView = mockData.getDataFilesForRelease(releaseId);
 
     // eslint-disable-next-line no-param-reassign
-    dataFilesView.dataFiles = dataFilesView.dataFiles.filter(file => file.file.id !== dataFileId);
+    dataFilesView.dataFiles = dataFilesView.dataFiles.filter(
+      file => file.file.id !== dataFileId,
+    );
 
     return [204];
   });

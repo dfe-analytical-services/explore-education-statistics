@@ -1,5 +1,5 @@
 import { createClient } from '@admin/services/common/service';
-import {DataFileView, UploadDataFilesRequest} from './types';
+import { DataFileView, UploadDataFilesRequest } from './types';
 import mocks from './mock/axios-mock';
 
 const apiClient = createClient({
@@ -14,8 +14,8 @@ export default {
   },
   uploadDataFiles(
     releaseId: string,
-    request: UploadDataFilesRequest): Promise<null> {
-
+    request: UploadDataFilesRequest,
+  ): Promise<null> {
     return apiClient.then(client => {
       const data = new FormData();
       data.append('subjectTitle', request.subjectTitle);
@@ -32,7 +32,10 @@ export default {
   createDownloadDataFileLink(releaseId: string, fileId: string): string {
     return `/release/${releaseId}/datafile/${fileId}`;
   },
-  createDownloadDataMetadataFileLink(releaseId: string, fileId: string): string {
+  createDownloadDataMetadataFileLink(
+    releaseId: string,
+    fileId: string,
+  ): string {
     return `/release/${releaseId}/datafile/metadata/${fileId}`;
   },
 };

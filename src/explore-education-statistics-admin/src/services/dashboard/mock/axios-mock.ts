@@ -1,8 +1,7 @@
 import { PrototypeLoginService } from '@admin/services/PrototypeLoginService';
-import MockAdapter from "axios-mock-adapter";
+import MockAdapter from 'axios-mock-adapter';
 
 export default async (mock: MockAdapter) => {
-
   const mockData = (await import(
     /* webpackChunkName: "mock-data" */ './mock-data'
   )).default;

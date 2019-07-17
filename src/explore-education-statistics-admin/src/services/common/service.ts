@@ -1,7 +1,7 @@
 import axios from 'axios';
 import Client from '@common/services/api/Client';
 import { commaSeparated } from '@common/services/util/paramSerializers';
-import MockAdapter from "axios-mock-adapter";
+import MockAdapter from 'axios-mock-adapter';
 
 /**
  * If choosing to use the mock API for local development, the mock behaviours need to be
@@ -25,9 +25,12 @@ interface Config {
  * @param customBaseUrl
  * @param mockBehaviourRegistrar - see description for the MockBehaviourRegistrar type.
  */
-export const createClient = async ({ customBaseUrl, mockBehaviourRegistrar }: Config): Promise<Client> => {
-
-  const baseURL = `${customBaseUrl || (`${process.env.CONTENT_API_BASE_URL}/api/`)}`;
+export const createClient = async ({
+  customBaseUrl,
+  mockBehaviourRegistrar,
+}: Config): Promise<Client> => {
+  const baseURL = `${customBaseUrl ||
+    `${process.env.CONTENT_API_BASE_URL}/api/`}`;
 
   const axiosInstance = axios.create({
     baseURL,
@@ -35,10 +38,9 @@ export const createClient = async ({ customBaseUrl, mockBehaviourRegistrar }: Co
   });
 
   if (process.env.USE_MOCK_API === 'true') {
-
     const MockAdaptor = (await import(
       /* webpackChunkName: "axios-mock-adapter" */ 'axios-mock-adapter'
-      )).default;
+    )).default;
 
     const mock = new MockAdaptor(axiosInstance);
 

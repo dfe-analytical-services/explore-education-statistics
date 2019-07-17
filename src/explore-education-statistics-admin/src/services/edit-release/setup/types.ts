@@ -1,4 +1,7 @@
-import {DayMonthYearValues, IdLabelPair} from "@admin/services/common/types/types";
+import {
+  DayMonthYearValues,
+  IdLabelPair,
+} from '@admin/services/common/types/types';
 
 export interface ReleaseSetupDetails {
   id: string;

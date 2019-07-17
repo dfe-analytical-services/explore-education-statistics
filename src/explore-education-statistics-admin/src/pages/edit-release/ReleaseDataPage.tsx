@@ -1,17 +1,17 @@
 import Link from '@admin/components/Link';
-import { dataRoute } from "@admin/routes/releaseRoutes";
+import { dataRoute } from '@admin/routes/releaseRoutes';
 import { DataFileView } from '@admin/services/edit-release/data/types';
-import Button from "@common/components/Button";
-import { Form, FormFieldset, Formik } from "@common/components/form";
-import FormFieldFileSelector from "@common/components/form/FormFieldFileSelector";
-import FormFieldTextInput from "@common/components/form/FormFieldTextInput";
+import Button from '@common/components/Button';
+import { Form, FormFieldset, Formik } from '@common/components/form';
+import FormFieldFileSelector from '@common/components/form/FormFieldFileSelector';
+import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import Yup from "@common/lib/validation/yup";
-import {FormikProps} from "formik";
+import Yup from '@common/lib/validation/yup';
+import { FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import service from '@admin/services/edit-release/data/service';
@@ -37,7 +37,7 @@ const ReleaseDataPage = ({ match }: RouteComponentProps<MatchProps>) => {
     service.getReleaseDataFiles(releaseId).then(setDataFiles);
   }, [releaseId]);
 
-  const formId = 'dataFileUploadForm'
+  const formId = 'dataFileUploadForm';
 
   return (
     <ReleasePageTemplate
@@ -55,18 +55,29 @@ const ReleaseDataPage = ({ match }: RouteComponentProps<MatchProps>) => {
                   {dataFile.title}
                 </SummaryListItem>
                 <SummaryListItem term="Data file">
-                  <a href={service.createDownloadDataFileLink(releaseId, dataFile.file.id)}>
+                  <a
+                    href={service.createDownloadDataFileLink(
+                      releaseId,
+                      dataFile.file.id,
+                    )}
+                  >
                     {dataFile.file.fileName}
                   </a>
                 </SummaryListItem>
                 <SummaryListItem term="Filesize">
-                  {dataFile.fileSize.size.toLocaleString()} {dataFile.fileSize.unit}
+                  {dataFile.fileSize.size.toLocaleString()}{' '}
+                  {dataFile.fileSize.unit}
                 </SummaryListItem>
                 <SummaryListItem term="Number of rows">
                   {dataFile.numberOfRows.toLocaleString()}
                 </SummaryListItem>
                 <SummaryListItem term="Metadata file">
-                  <a href={service.createDownloadDataMetadataFileLink(releaseId, dataFile.file.id)}>
+                  <a
+                    href={service.createDownloadDataMetadataFileLink(
+                      releaseId,
+                      dataFile.file.id,
+                    )}
+                  >
                     {dataFile.metadataFile.fileName}
                   </a>
                 </SummaryListItem>
@@ -91,34 +102,28 @@ const ReleaseDataPage = ({ match }: RouteComponentProps<MatchProps>) => {
               metadataFile: null,
             }}
             onSubmit={async (values: FormValues, actions) => {
-              service.uploadDataFiles(
-                releaseId,
-                {
+              service
+                .uploadDataFiles(releaseId, {
                   subjectTitle: values.subjectTitle,
                   dataFile: values.dataFile as File,
                   metadataFile: values.metadataFile as File,
-                }
-              ).
-              then(_ => service.getReleaseDataFiles(releaseId)).
-              then(setDataFiles).
-              then(_ => {
-                actions.resetForm();
-                document.querySelectorAll(`#${formId} input[type='file']`).forEach(input => {
-                  const fileInput = input as HTMLInputElement;
-                  fileInput.value = '';
+                })
+                .then(_ => service.getReleaseDataFiles(releaseId))
+                .then(setDataFiles)
+                .then(_ => {
+                  actions.resetForm();
+                  document
+                    .querySelectorAll(`#${formId} input[type='file']`)
+                    .forEach(input => {
+                      const fileInput = input as HTMLInputElement;
+                      fileInput.value = '';
+                    });
                 });
-              });
             }}
             validationSchema={Yup.object<FormValues>({
-              subjectTitle: Yup.string().required(
-                'Enter a subject title',
-              ),
-              dataFile: Yup.mixed().required(
-                'Choose a data file',
-              ),
-              metadataFile: Yup.mixed().required(
-                'Choose a metadata file',
-              ),
+              subjectTitle: Yup.string().required('Enter a subject title'),
+              dataFile: Yup.mixed().required('Choose a data file'),
+              metadataFile: Yup.mixed().required('Choose a metadata file'),
             })}
             render={(form: FormikProps<FormValues>) => {
               return (
@@ -130,24 +135,23 @@ const ReleaseDataPage = ({ match }: RouteComponentProps<MatchProps>) => {
                     <FormFieldTextInput<FormValues>
                       id={`${formId}-subjectTitle`}
                       name="subjectTitle"
-                      label='Subject title'
+                      label="Subject title"
                     />
 
                     <FormFieldFileSelector<FormValues>
                       id={`${formId}-dataFile`}
                       name="dataFile"
-                      label='Upload data file'
-                      formGroupClass='govuk-!-margin-top-6'
+                      label="Upload data file"
+                      formGroupClass="govuk-!-margin-top-6"
                       form={form}
                     />
 
                     <FormFieldFileSelector<FormValues>
                       id={`${formId}-metadataFile`}
                       name="metadataFile"
-                      label='Upload metadata file'
+                      label="Upload metadata file"
                       form={form}
                     />
-
                   </FormFieldset>
 
                   <Button type="submit" className="govuk-!-margin-top-6">
@@ -155,9 +159,7 @@ const ReleaseDataPage = ({ match }: RouteComponentProps<MatchProps>) => {
                   </Button>
 
                   <div className="govuk-!-margin-top-6">
-                    <Link to={dataRoute.generateLink(releaseId)}>
-                      Cancel
-                    </Link>
+                    <Link to={dataRoute.generateLink(releaseId)}>Cancel</Link>
                   </div>
                 </Form>
               );
@@ -257,16 +259,15 @@ const ReleaseDataPage = ({ match }: RouteComponentProps<MatchProps>) => {
         onExit={() => setDeleteFilesRequest('')}
         onCancel={() => setDeleteFilesRequest('')}
         onConfirm={() =>
-          service.
-            deleteDataFiles(releaseId, deleteFileId).
-            then(_ => service.getReleaseDataFiles(releaseId)).
-            then(setDataFiles).
-            then(_ => setDeleteFilesRequest(''))
+          service
+            .deleteDataFiles(releaseId, deleteFileId)
+            .then(_ => service.getReleaseDataFiles(releaseId))
+            .then(setDataFiles)
+            .then(_ => setDeleteFilesRequest(''))
         }
       >
         <p>This data will no longer be available for use in this release</p>
       </ModalConfirm>
-
     </ReleasePageTemplate>
   );
 };

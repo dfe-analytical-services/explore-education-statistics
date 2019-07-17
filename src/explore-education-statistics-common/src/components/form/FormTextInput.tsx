@@ -39,7 +39,8 @@ const FormTextInput = ({
         className={classNames('govuk-label', {
           'govuk-label--s': type === 'file',
         })}
-        htmlFor={id}>
+        htmlFor={id}
+      >
         {label}
       </label>
       {hint && (

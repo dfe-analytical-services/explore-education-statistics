@@ -20,7 +20,7 @@ export interface DataFileView {
 }
 
 export interface UploadDataFilesRequest {
-  subjectTitle: string,
-  dataFile: File,
-  metadataFile: File,
+  subjectTitle: string;
+  dataFile: File;
+  metadataFile: File;
 }
