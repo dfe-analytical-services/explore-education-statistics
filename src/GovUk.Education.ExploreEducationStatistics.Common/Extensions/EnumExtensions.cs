@@ -1,8 +1,8 @@
 using System;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Common.Database;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions
+namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 {
     public static class EnumExtensions
     {

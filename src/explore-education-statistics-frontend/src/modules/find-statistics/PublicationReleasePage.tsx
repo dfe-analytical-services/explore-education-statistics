@@ -3,7 +3,6 @@ import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
-import PrintThisPage from '@common/components/PrintThisPage';
 import RelatedAside from '@common/components/RelatedAside';
 import DataBlock from '@common/modules/find-statistics/components/DataBlock';
 import { baseUrl } from '@common/services/api';
@@ -14,6 +13,7 @@ import ButtonLink from '@frontend/components/ButtonLink';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
+import PrintThisPage from '@frontend/components/PrintThisPage';
 import classNames from 'classnames';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
@@ -123,7 +123,7 @@ class PublicationReleasePage extends Component<Props> {
                 open &&
                 logEvent(
                   'Downloads',
-                  'Open download data files accordion',
+                  'Release page download data files dropdown opened',
                   window.location.pathname,
                 )
               }
@@ -156,7 +156,17 @@ class PublicationReleasePage extends Component<Props> {
                   <strong>{data.releaseName}</strong>
                 </dd>
                 <dd>
-                  <Details summary={`See previous ${releaseCount} releases`}>
+                  <Details
+                    summary={`See previous ${releaseCount} releases`}
+                    onToggle={(open: boolean) =>
+                      open &&
+                      logEvent(
+                        'Previous Releases',
+                        'Release page previous releases dropdown opened',
+                        window.location.pathname,
+                      )
+                    }
+                  >
                     <ul className="govuk-list">
                       {[
                         ...data.publication.releases
@@ -194,7 +204,17 @@ class PublicationReleasePage extends Component<Props> {
                   <strong>
                     <FormattedDate>{data.updates[0].on}</FormattedDate>
                   </strong>
-                  <Details summary={`See all ${data.updates.length} updates`}>
+                  <Details
+                    onToggle={(open: boolean) =>
+                      open &&
+                      logEvent(
+                        'Previous Updates',
+                        'Open previous updates accordion',
+                        window.location.pathname,
+                      )
+                    }
+                    summary={`See all ${data.updates.length} updates`}
+                  >
                     {data.updates.map(elem => (
                       <div data-testid="last-updated-element" key={elem.on}>
                         <FormattedDate className="govuk-body govuk-!-font-weight-bold">
@@ -378,7 +398,12 @@ class PublicationReleasePage extends Component<Props> {
           Create tables
         </ButtonLink>
 
-        <PrintThisPage />
+        <PrintThisPage
+          analytics={{
+            category: 'Page print',
+            action: 'Print this page link selected',
+          }}
+        />
       </Page>
     );
   }

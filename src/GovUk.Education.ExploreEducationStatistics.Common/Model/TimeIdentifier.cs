@@ -1,8 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.TimePeriodLabelFormat;
+using GovUk.Education.ExploreEducationStatistics.Common.Database;
+using static GovUk.Education.ExploreEducationStatistics.Common.Database.TimePeriodLabelFormat;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model
+namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 {
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public enum TimeIdentifier

@@ -1,4 +1,4 @@
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
+namespace GovUk.Education.ExploreEducationStatistics.Common.Database
 {
     /// <summary>
     /// Formats that can be used to label a year and a <c>TimeIdentifier</c>
