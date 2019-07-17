@@ -208,8 +208,8 @@ class PublicationReleasePage extends Component<Props> {
                     onToggle={(open: boolean) =>
                       open &&
                       logEvent(
-                        'Previous Updates',
-                        'Release page previous updates dropdown opened',
+                        'Last Updates',
+                        'Release page last updates dropdown opened',
                         window.location.pathname,
                       )
                     }
