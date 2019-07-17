@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _context.Publications.ToList();
         }
 
-        // TODO it maybe necessary to add authorisation to this method?
+        // TODO it maybe necessary to add authorisation to this method
         public List<Publication> GetByTopicAndUser(TopicId topicId, UserId userId)
         {
             // TODO This method simply returns all Publications for a Topic as we currently do not have a concept of how
@@ -63,12 +63,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             Title = r.Title,
                             Published = r.Published,
                             ReleaseName = r.ReleaseName,
-                            TimePeriodCoverage = r.TimePeriodCoverage
-                            // TODO Status
-                            // TODO Live? Is this Status? Or a bool or something else? - A question for design
-                            // TODO isLatestRelease? latest published? - A question for design
-                            // TODO timePeriodCoverage
-                            // TODO LastEdited - Auditing
+                            TimePeriodCoverage = r.TimePeriodCoverage,
+                            // TODO isLatestRelease - This needs to be done when we have a chronological concept of 
+                            // TODO different releases. Note it can't be published date as technically there is no
+                            // TODO reason why releases have to be published in order. 
+                            // TODO LastEdited - This needs to be done when we have a concept of release versions
                         }
                         
                     ).ToList()
