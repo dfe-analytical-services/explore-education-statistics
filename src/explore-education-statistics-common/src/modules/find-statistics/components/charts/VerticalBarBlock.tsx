@@ -1,5 +1,4 @@
 import {
-  calculateMargins,
   ChartDataB,
   ChartDefinition,
   createDataForAxis,
@@ -13,9 +12,7 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
-  Label,
   Legend,
-  LineChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
