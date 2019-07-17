@@ -86,7 +86,6 @@
     "jest-resolve": "^24.7.1",
     "jest-serializer-html": "^7.0.0",
     "jest-watch-typeahead": "^0.3.0",
-    "lodash": "4.17.13",
     "ncp": "^2.0.0",
     "node-sass": "^4.11.0",
     "normalize.css": "^8.0.1",
