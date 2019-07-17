@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "4ad5bedf-5b64-4962-a7c0-36f6aa11a3e6",
+		"_postman_id": "efb31e9b-ab5e-4acd-a5a9-1b81353797f4",
 		"name": "DfE Data API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -2923,7 +2923,7 @@
 													"});",
 													"",
 													"pm.test(\"Expect correct number of results\", function() {",
-													"   pm.expect(respJson.result.length).to.equal(22458);",
+													"   pm.expect(respJson.result.length).to.equal(4);",
 													"});"
 												],
 												"type": "text/javascript"
@@ -3804,26 +3804,12 @@
 													"    pm.expect(respJson.timePeriodRange.length).to.equal(4); ",
 													"});",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(612); });",
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(4); });",
 													"",
-													"pm.test(\"results should contain Country, Local_Authority, and Region geographicLevels\", function () {",
-													"    var countryFound = false;",
-													"    var localAuthorityFound = false;",
-													"    var regionFound = false;",
+													"pm.test(\"geographicLevel should be same as request\", function () {",
 													"    for(var i = 0; i < respJson.result.length; i++) {",
-													"        if(respJson.result[i].geographicLevel == \"Country\") {",
-													"            countryFound = true;",
-													"        }",
-													"        if(respJson.result[i].geographicLevel == \"Local_Authority\") {",
-													"            localAuthorityFound = true;",
-													"        }",
-													"        if(respJson.result[i].geographicLevel == \"Region\") {",
-													"            regionFound = true;",
-													"        }",
+													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Country\");",
 													"    }",
-													"    pm.expect(countryFound).to.equal(true);",
-													"    pm.expect(localAuthorityFound).to.equal(true);",
-													"    pm.expect(regionFound).to.equal(true);",
 													"});"
 												],
 												"type": "text/javascript"
