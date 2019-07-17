@@ -1,4 +1,4 @@
-import {DataFileView} from "@admin/services/edit-release/data/mock/axios-mock";
+import {DataFileView} from "@admin/services/edit-release/data/mock/mock-service";
 import {Dictionary} from '@common/types';
 
 const dataFilesByReleaseId: Dictionary<DataFileView> = {

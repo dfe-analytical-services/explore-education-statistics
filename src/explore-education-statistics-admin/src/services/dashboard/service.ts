@@ -1,5 +1,5 @@
 import {createClient} from '@admin/services/util/service';
-import mocks from './mock/axios-mock';
+import mocks from './mock/mock-service';
 import {AdminDashboardPublication, ThemeAndTopics} from './types';
 
 const apiClient = createClient({
