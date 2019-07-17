@@ -123,7 +123,7 @@ class PublicationReleasePage extends Component<Props> {
                 open &&
                 logEvent(
                   'Downloads',
-                  'Open download data files accordion',
+                  'Release page download data files dropdown opened',
                   window.location.pathname,
                 )
               }
@@ -162,7 +162,7 @@ class PublicationReleasePage extends Component<Props> {
                       open &&
                       logEvent(
                         'Previous Releases',
-                        'Open previous releases accordion',
+                        'Release page previous releases dropdown opened',
                         window.location.pathname,
                       )
                     }

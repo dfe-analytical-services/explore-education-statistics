@@ -10,8 +10,14 @@ const PageBanner = () => {
 
         <span className="govuk-phase-banner__text">
           This is a new service – your{' '}
-          <a href="https://www.smartsurvey.co.uk/s/7YS0I/">feedback</a> will
-          help us to improve it.
+          <a
+            rel="noopener noreferrer"
+            target="_blank"
+            href="https://www.smartsurvey.co.uk/s/7YS0I/"
+          >
+            feedback
+          </a>{' '}
+          will help us to improve it.
         </span>
       </p>
     </div>

@@ -24,13 +24,13 @@ function ContactPage() {
           explore.statistics@education.gov.uk
         </a>
       </p>
-      <h2>Data and methodology enquiries</h2>
+      <h2 className="govuk-!-margin-top-9">Data and methodology enquiries</h2>
       <p>
         If you have a question about the data or methods used in a specific set
         of our statistics contact the team or statistician listed within the
         ‘Contact us’ section of the relevant page.
       </p>
-      <h2>Statistical policy enquiries</h2>
+      <h2 className="govuk-!-margin-top-9">Statistical policy enquiries</h2>
       <p>
         If you have a question about statistical policies such as about the Code
         of Practice, revisions and confidentiality contact:
@@ -47,7 +47,9 @@ function ContactPage() {
           hop.statistics@education.gov.uk
         </a>
       </p>
-      <h2>Freedom of information (FOI) requests</h2>
+      <h2 className="govuk-!-margin-top-9">
+        Freedom of information (FOI) requests
+      </h2>
       <p>
         If you want access to data or statistics which are not available within
         this service submit a{' '}
