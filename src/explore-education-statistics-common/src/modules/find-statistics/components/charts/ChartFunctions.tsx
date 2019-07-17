@@ -1,13 +1,13 @@
 import {
   Axis,
-  ChartDataSet,
-  ChartType,
-  ChartConfiguration,
-  ReferenceLine,
-  AxisConfigurationItem,
-  ChartSymbol,
+  AxisConfiguration,
   AxisGroupBy,
   AxisType,
+  ChartDataSet,
+  ChartSymbol,
+  ChartType,
+  DataSetConfiguration,
+  ReferenceLine,
 } from '@common/services/publicationService';
 import React, { ReactNode } from 'react';
 import {
@@ -53,11 +53,13 @@ export function parseCondensedTimePeriodRange(
 export interface ChartProps {
   data: DataBlockData;
   meta: DataBlockMetadata;
-  labels: Dictionary<ChartConfiguration>;
-  axes: Dictionary<AxisConfigurationItem>;
+  labels: Dictionary<DataSetConfiguration>;
+  axes: Dictionary<AxisConfiguration>;
   height?: number;
   width?: number;
   referenceLines?: ReferenceLine[];
+  legend?: 'none' | 'top' | 'bottom';
+  legendHeight?: string;
 }
 
 export interface StackedBarProps extends ChartProps {
@@ -77,9 +79,16 @@ export interface DataSetResult {
   results: Result[];
 }
 
+export interface ChartCapabilities {
+  dataSymbols: boolean;
+  stackable: boolean;
+}
+
 export interface ChartDefinition {
   type: ChartType;
   name: string;
+
+  capabilities: ChartCapabilities;
 
   data: {
     type: string;
@@ -372,7 +381,7 @@ function reduceCombineChartData(
 }
 
 export function createDataForAxis(
-  axisConfiguration: AxisConfigurationItem,
+  axisConfiguration: AxisConfiguration,
   results: Result[],
   meta: DataBlockMetadata,
 ) {
@@ -400,13 +409,13 @@ export function getKeysForChart(chartData: ChartDataB[]) {
 }
 
 const FindFirstInDictionaries = (
-  metaDataObjects: (Dictionary<ChartConfiguration> | undefined)[],
+  metaDataObjects: (Dictionary<DataSetConfiguration> | undefined)[],
   name: string,
-) => (result: string | undefined, meta?: Dictionary<ChartConfiguration>) =>
+) => (result: string | undefined, meta?: Dictionary<DataSetConfiguration>) =>
   result || (meta && meta[name] && meta[name].label);
 
 export function mapNameToNameLabel(
-  ...metaDataObjects: (Dictionary<ChartConfiguration> | undefined)[]
+  ...metaDataObjects: (Dictionary<DataSetConfiguration> | undefined)[]
 ) {
   return ({ name, ...otherdata }: { name: string }) => ({
     ...otherdata,
@@ -420,7 +429,7 @@ export function mapNameToNameLabel(
 
 export function populateDefaultChartProps(
   name: string,
-  config: ChartConfiguration,
+  config: DataSetConfiguration,
 ) {
   return {
     dataKey: name,

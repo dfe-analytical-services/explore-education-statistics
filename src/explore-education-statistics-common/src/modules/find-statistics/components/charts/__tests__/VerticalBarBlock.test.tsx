@@ -4,6 +4,7 @@ import { render } from 'react-testing-library';
 import VerticalBarBlock from '../VerticalBarBlock';
 
 import testData from './__data__/testBlockData';
+import LineChartBlock from '@common/modules/find-statistics/components/charts/LineChartBlock';
 
 jest.mock('recharts/lib/util/LogUtils');
 
@@ -33,6 +34,10 @@ describe('VerticalBarBlock', () => {
     ).toBeInTheDocument();
     expect(
       container.querySelector('.recharts-cartesian-grid-vertical'),
+    ).toBeInTheDocument();
+
+    expect(
+      container.querySelector('.recharts-default-legend'),
     ).toBeInTheDocument();
 
     // expect there to be rectangles for all 3 data sets across both years
@@ -103,6 +108,14 @@ describe('VerticalBarBlock', () => {
 
     expect(
       container.querySelector('.recharts-cartesian-axis.xAxis'),
+    ).not.toBeInTheDocument();
+  });
+
+  test('can hide legend', () => {
+    const { container } = render(<VerticalBarBlock {...props} legend="none" />);
+
+    expect(
+      container.querySelector('.recharts-default-legend'),
     ).not.toBeInTheDocument();
   });
 });

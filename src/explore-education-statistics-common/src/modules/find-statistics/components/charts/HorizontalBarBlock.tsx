@@ -1,12 +1,12 @@
 import {
-  generateReferenceLines,
-  ChartDefinition,
   ChartDataB,
+  ChartDefinition,
   createDataForAxis,
+  generateReferenceLines,
   getKeysForChart,
   mapNameToNameLabel,
-  StackedBarProps,
   populateDefaultChartProps,
+  StackedBarProps,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import React, { Component } from 'react';
 import {
@@ -15,6 +15,7 @@ import {
   CartesianGrid,
   LabelList,
   Legend,
+  LineChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -26,6 +27,11 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
   public static definition: ChartDefinition = {
     type: 'horizontalbar',
     name: 'Horizontal Bar',
+
+    capabilities: {
+      dataSymbols: false,
+      stackable: true,
+    },
 
     data: [
       {
@@ -61,6 +67,8 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
       stacked = false,
       labels,
       axes,
+      legend,
+      legendHeight,
     } = this.props;
 
     if (!axes.major || !data) return <LoadingSpinner />;
@@ -75,7 +83,14 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
 
     return (
       <ResponsiveContainer width={width || '100%'} height={height || 600}>
-        <BarChart data={chartData} layout="vertical" margin={{ left: 30 }}>
+        <BarChart
+          data={chartData}
+          layout="vertical"
+          margin={{
+            left: 30,
+            top: legend === 'top' ? 10 : 0,
+          }}
+        >
           <CartesianGrid
             strokeDasharray="3 3"
             horizontal={axes.minor && axes.minor.showGrid !== false}
@@ -93,6 +108,7 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
                 value: '',
               }}
               scale="auto"
+              height={legend === 'bottom' ? 50 : undefined}
               padding={{ left: 20, right: 20 }}
               tickMargin={10}
             />
@@ -118,18 +134,16 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
           )}
 
           <Tooltip cursor={false} />
-          <Legend />
+          {(legend === 'top' || legend === 'bottom') && (
+            <Legend verticalAlign={legend} height={+(legendHeight || '50')} />
+          )}
 
           {Array.from(keysForChart).map(name => (
             <Bar
               key={name}
               {...populateDefaultChartProps(name, labels[name])}
               stackId={stacked ? 'a' : undefined}
-            >
-              {axes.major.labelPosition !== 'axis' && (
-                <LabelList dataKey={name} position="insideRight" />
-              )}
-            </Bar>
+            />
           ))}
 
           {referenceLines && generateReferenceLines(referenceLines)}

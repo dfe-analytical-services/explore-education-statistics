@@ -1,13 +1,13 @@
 import * as React from 'react';
 import {
-  FormFieldset,
   FormCheckbox,
+  FormFieldset,
   FormGroup,
   FormSelect,
 } from '@common/components/form';
 import FormComboBox from '@common/components/form/FormComboBox';
 import {
-  AxisConfigurationItem,
+  AxisConfiguration,
   AxisGroupBy,
 } from '@common/services/publicationService';
 import { DataBlockMetadata } from '@common/services/dataBlockService';
@@ -15,9 +15,9 @@ import { DataBlockMetadata } from '@common/services/dataBlockService';
 interface Props {
   id: string;
   defaultDataType?: AxisGroupBy;
-  configuration: AxisConfigurationItem;
+  configuration: AxisConfiguration;
   meta: DataBlockMetadata;
-  onConfigurationChange: (configuration: AxisConfigurationItem) => void;
+  onConfigurationChange: (configuration: AxisConfiguration) => void;
 }
 
 const ChartAxisConfiguration = ({
@@ -27,7 +27,7 @@ const ChartAxisConfiguration = ({
   onConfigurationChange,
 }: Props) => {
   const [axisConfiguration, setAxisConfiguration] = React.useState<
-    AxisConfigurationItem
+    AxisConfiguration
   >(configuration);
 
   const [selectableUnits] = React.useState<string[]>(() => {

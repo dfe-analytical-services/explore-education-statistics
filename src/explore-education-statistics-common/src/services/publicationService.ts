@@ -82,7 +82,7 @@ export type ChartSymbol =
   | 'triangle'
   | 'wye';
 
-export interface ChartConfiguration {
+export interface DataSetConfiguration {
   label: string;
   value: string;
   name?: string;
@@ -101,7 +101,7 @@ export type AxisType = 'major' | 'minor';
 
 export type LabelPosition = 'axis' | 'graph' | PositionType;
 
-export interface AxisConfigurationItem {
+export interface AxisConfiguration {
   name: string;
   type: AxisType;
   groupBy?: AxisGroupBy;
@@ -115,12 +115,14 @@ export interface AxisConfigurationItem {
 
 export interface Chart {
   type: ChartType;
-  labels: Dictionary<ChartConfiguration>;
-  axes: Dictionary<AxisConfigurationItem>;
+  labels: Dictionary<DataSetConfiguration>;
+  axes: Dictionary<AxisConfiguration>;
+
   stacked?: boolean;
   referenceLines?: ReferenceLine[];
   width?: number;
   height?: number;
+  showLegend?: boolean;
 }
 
 export interface Table {
