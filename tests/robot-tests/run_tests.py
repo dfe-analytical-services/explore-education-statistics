@@ -32,7 +32,7 @@ parser.add_argument("-i", "--interp",
 parser.add_argument("-e", "--env",
                     dest="env",
                     default="dev",
-                    choices=["local", "dev", "dev02", "dev03", "test", "prod"],
+                    choices=["local", "dev", "dev02", "dev03", "test", "prod", "ci"],
                     help="the environment to run the tests against")
 parser.add_argument("-f", "--file",
                     dest="tests",
@@ -61,10 +61,6 @@ parser.add_argument("--chromedriver",
                     default="74.0.3729.6",
                     metavar="{version}",
                     help="specify which version of chromedriver to use")
-parser.add_argument("--ci",
-                    dest="ci",
-                    action="store_true",
-                    help="for use by the CI pipeline")
 args = parser.parse_args()
 
 # Default values
@@ -80,19 +76,18 @@ if args.tags:
 
 url = "about:blank"
 urlAdmin = "about:blank"
-if args.ci:
+if args.env == "ci":
     robotArgs += ["--xunit", "xunit", "-v", "timeout:" + str(timeout), "-v", "implicit_wait:" + str(implicit_wait)]
     url = os.getenv('publicAppUrl')
     urlAdmin = os.getenv('adminAppUrl')
+elif args.env == 'local':
+    url = "http://localhost:3000"
+    urlAdmin = "http://localhost:3001"
+    robotArgs += ['--exclude', 'NotAgainstLocal']
 else:
-    if args.env == 'local':
-        url = "http://localhost:3000"
-        urlAdmin = "http://localhost:3001"
-        robotArgs += ['--exclude', 'NotAgainstLocal']
-    else:
-        load_dotenv(os.path.join(os.path.dirname(__file__), '.env.' + args.env))
-        url = os.getenv('publicAppUrl')
-        urlAdmin = os.getenv('adminAppUrl')
+    load_dotenv(os.path.join(os.path.dirname(__file__), '.env.' + args.env))
+    url = os.getenv('publicAppUrl')
+    urlAdmin = os.getenv('adminAppUrl')
 robotArgs += ["-v", "url:" + url]
 robotArgs += ["-v", "urlAdmin:" + urlAdmin]
 
