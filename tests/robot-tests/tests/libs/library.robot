@@ -3,7 +3,7 @@ Library     SeleniumLibrary  timeout=${timeout}  implicit_wait=${implicit_wait} 
 Library     OperatingSystem
 #Library     XvfbRobot           # sudo apt install xvfb + pip install robotframework-xvfb
 
-Library    email_guerrillamail.py
+#Library    email_guerrillamail.py
 Library    file_operations.py
 Library    utilities.py
 
@@ -216,6 +216,8 @@ user checks page contains link with text and url
   [Arguments]  ${text}  ${href}
   user checks page contains element  xpath://a[@href="${href}" and text()="${text}"]
 
+user waits until results table appears
+  user waits until page contains element   css:table thead th
 
 #user clicks accordion
 #  [Arguments]   ${text}
