@@ -1,4 +1,5 @@
 import {EditReleaseService} from "@admin/services/edit-release/data/service";
+import getCaptureGroups from "@admin/services/util/mock/mock-service";
 import MockAdapter from 'axios-mock-adapter';
 
 const generateRandomInteger = (max: number) =>
@@ -96,18 +97,23 @@ export default async (mock: MockAdapter) => {
     createDownloadAdhocFileLink: releaseId => '',
   };
 
-  // getReleaseDataFiles
-  mock.onGet(/\/release\/.*\/datafiles/).reply(({ url }) => {
-    const releaseIdMatch = url ? url.match(/\/release\/(.*)\/datafiles/) : [''];
+  const getReleaseDataFilesUrl = /\/release\/(.*)\/datafiles/;
+  const uploadDataFilesUrl = /\/release\/(.*)\/datafiles\/upload/;
+  const deleteDataFilesUrl = /\/release\/(.*)\/datafiles\/(.*)/;
+  const getReleaseAdhocFilesUrl = /\/release\/(.*)\/adhoc-files/;
+  const uploadAdhocFileUrl = /\/release\/(.*)\/adhoc-files\/upload/;
+  const deleteAdhocFileUrl = /\/release\/(.*)\/adhoc-files\/(.*)/;
+
+  mock.onGet(getReleaseDataFilesUrl).reply(({ url }) => {
+    const [releaseId] = getCaptureGroups(getReleaseDataFilesUrl, url);
     return [
       200,
-      service.getReleaseDataFiles(releaseIdMatch ? releaseIdMatch[1] : ''),
+      service.getReleaseDataFiles(releaseId),
     ];
   });
 
-  // uploadDataFiles
-  mock.onPost(/\/release\/.*\/datafiles\/upload/).reply(({ url, data }) => {
-    const releaseIdMatch = url ? url.match(/\/release\/(.*)\/datafiles\/upload/) : [''];
+  mock.onPost(uploadDataFilesUrl).reply(({ url, data }) => {
+    const [releaseId] = getCaptureGroups(uploadDataFilesUrl, url);
 
     const formData = data as FormData;
     const subjectTitle = formData.get('subjectTitle') as string;
@@ -116,7 +122,7 @@ export default async (mock: MockAdapter) => {
 
     return [
       200,
-      service.uploadDataFiles(releaseIdMatch ? releaseIdMatch[1] : '', {
+      service.uploadDataFiles(releaseId, {
         subjectTitle,
         dataFile,
         metadataFile,
@@ -124,28 +130,24 @@ export default async (mock: MockAdapter) => {
     ];
   });
 
-  // deleteDataFiles
-  mock.onDelete(/\/release\/.*\/datafiles\/.*/).reply(({ url }) => {
-    const idsMatch = url ? url.match(/\/release\/(.*)\/datafiles\/(.*)/) : [''];
-    const [releaseId, dataFileId] = idsMatch ? idsMatch.slice(1) : ['', ''];
+  mock.onDelete(deleteDataFilesUrl).reply(({ url }) => {
+    const [releaseId, dataFileId] = getCaptureGroups(deleteDataFilesUrl, url);
     return [
       204,
       service.deleteDataFiles(releaseId, dataFileId)
     ];
   });
 
-  // getReleaseAdhocFiles
-  mock.onGet(/\/release\/.*\/adhoc-files/).reply(({ url }) => {
-    const releaseIdMatch = url ? url.match(/\/release\/(.*)\/adhoc-files/) : [''];
+  mock.onGet(getReleaseAdhocFilesUrl).reply(({ url }) => {
+    const [releaseId] = getCaptureGroups(getReleaseAdhocFilesUrl, url);
     return [
       200,
-      service.getReleaseAdhocFiles(releaseIdMatch ? releaseIdMatch[1] : ''),
+      service.getReleaseAdhocFiles(releaseId),
     ];
   });
 
-  // uploadAdhocFile - `/release/${releaseId}/adhoc-files/upload`
-  mock.onPost(/\/release\/.*\/adhoc-files\/upload/).reply(({ url, data }) => {
-    const releaseIdMatch = url ? url.match(/\/release\/(.*)\/adhoc-files\/upload/) : [''];
+  mock.onPost(uploadAdhocFileUrl).reply(({ url, data }) => {
+    const [releaseId] = getCaptureGroups(uploadAdhocFileUrl, url);
 
     const formData = data as FormData;
     const name = formData.get('name') as string;
@@ -153,17 +155,15 @@ export default async (mock: MockAdapter) => {
 
     return [
       200,
-      service.uploadAdhocFile(releaseIdMatch ? releaseIdMatch[1] : '', {
+      service.uploadAdhocFile(releaseId, {
         name,
         file,
       }),
     ];
   });
 
-  // deleteAdhocFile
-  mock.onDelete(/\/release\/.*\/adhoc-files\/.*/).reply(({ url }) => {
-    const idsMatch = url ? url.match(/\/release\/(.*)\/adhoc-files\/(.*)/) : [''];
-    const [releaseId, fileId] = idsMatch ? idsMatch.slice(1) : ['', ''];
+  mock.onDelete(deleteAdhocFileUrl).reply(({ url }) => {
+    const [releaseId, fileId] = getCaptureGroups(deleteAdhocFileUrl, url);
     return [
       204,
       service.deleteAdhocFile(releaseId, fileId)

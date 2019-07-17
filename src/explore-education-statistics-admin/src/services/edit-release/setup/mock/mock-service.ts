@@ -1,4 +1,5 @@
 import { ReleaseSetupDetailsUpdateRequest } from '@admin/services/edit-release/setup/types';
+import getCaptureGroups from "@admin/services/util/mock/mock-service";
 import MockAdapter from 'axios-mock-adapter';
 
 export default async (mock: MockAdapter) => {
@@ -6,15 +7,15 @@ export default async (mock: MockAdapter) => {
     /* webpackChunkName: "mock-data" */ './mock-data'
   )).default;
 
-  // getReleaseSetupDetails
-  mock.onGet(/\/release\/.*\/setup/).reply(({ url }) => {
-    const releaseIdMatch = url ? url.match(/\/release\/(.*)\/setup/) : [''];
-    const releaseId = releaseIdMatch ? releaseIdMatch[1] : '';
+  const getReleaseSetupDetailsUrl = /\/release\/(.*)\/setup/;
+  const updateReleaseSetupDetailsUrl = /\/release\/(.*)\/setup/;
+
+  mock.onGet(getReleaseSetupDetailsUrl).reply(({ url }) => {
+    const [releaseId] = getCaptureGroups(getReleaseSetupDetailsUrl, url);
     return [200, mockData.getReleaseSetupDetailsForRelease(releaseId)];
   });
 
-  // updateReleaseSetupDetails
-  mock.onPost(/\/release\/.*\/setup/).reply(config => {
+  mock.onPost(updateReleaseSetupDetailsUrl).reply(config => {
     const updateRequest = JSON.parse(
       config.data,
     ) as ReleaseSetupDetailsUpdateRequest;
