@@ -21,20 +21,16 @@ const PublicationDataPage = ({ location }: RouteChildrenProps) => {
         <>
           <div className="govuk-panel govuk-panel--confirmation">
             <h1 className="govuk-panel__title">
-              Release ready for team approval
+              Release ready for level 1 team review
             </h1>
             <div className="govuk-panel__body">
-              This release had been marked for moderation by the team.
+              Check the 'Comments for you to resolve' tab on your{' '}
+              <Link to="/prototypes/admin-dashboard?status=readyApproval">
+                dashboard
+              </Link>{' '}
+              for feedback
             </div>
           </div>
-          <div className="govuk-!-margin-top-6 govuk-!-margin-bottom-6">
-            <Link to="/prototypes/publication-create-new-absence-status">
-              Edit status
-            </Link>
-          </div>
-          <Link to="/prototypes/admin-dashboard?status=readyApproval">
-            Back to administrator dashboard
-          </Link>
         </>
       )}
       {location.search !== '?status=readyTeamApproval' && (
@@ -115,7 +111,7 @@ const PublicationDataPage = ({ location }: RouteChildrenProps) => {
           </div>
         </form>
       )}
-      <hr />
+      <hr className="govuk-!-margin-top-9" />
       <div className="govuk-grid-row govuk-!-margin-top-9">
         <div className="govuk-grid-column-one-half ">
           <Link to="/prototypes/publication-create-new-absence">
@@ -125,6 +121,16 @@ const PublicationDataPage = ({ location }: RouteChildrenProps) => {
             Manage content
           </Link>
         </div>
+        {location.search === '?status=readyTeamApproval' && (
+          <div className="govuk-grid-column-one-half dfe-align--right">
+            <Link to="/prototypes/admin-dashboard?status=readyApproval">
+              <span className="govuk-heading-m govuk-!-margin-bottom-0">
+                Next step
+              </span>
+              Go to dashboard
+            </Link>
+          </div>
+        )}
       </div>
     </PrototypePage>
   );

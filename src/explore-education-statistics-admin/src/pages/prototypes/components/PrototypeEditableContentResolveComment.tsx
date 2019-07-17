@@ -37,7 +37,10 @@ const ContentResolveComment = ({ initialComments }: Props) => {
   return (
     <>
       <div className={styles.resolveComment}>
-        <Details summary="View comments" className="govuk-!-margin-bottom-1">
+        <Details
+          summary="View comments for section"
+          className="govuk-!-margin-bottom-1"
+        >
           {comments.map(
             ({ name, time, comment, state, resolvedOn, resolvedBy }, index) => (
               <div key={key()}>

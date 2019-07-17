@@ -425,7 +425,7 @@ export default class PrototypePublicationService {
               body: LOREM,
               comments: [
                 {
-                  comment: LOREM,
+                  comment: LOREM.substring(0, 120),
                   name: 'John Smith',
                   time: new Date(),
                   state: 'open',
@@ -444,7 +444,7 @@ export default class PrototypePublicationService {
               body: LOREM,
               comments: [
                 {
-                  comment: LOREM,
+                  comment: LOREM.substring(0, 120),
                   name: 'John Smith',
                   time: new Date(),
                   state: 'open',
@@ -523,7 +523,7 @@ export default class PrototypePublicationService {
         },
         comments: [
           {
-            comment: LOREM,
+            comment: LOREM.substring(0, 120),
             name: 'John Smith',
             time: new Date(),
             state: 'open',
