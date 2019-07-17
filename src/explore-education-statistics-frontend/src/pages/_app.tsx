@@ -1,5 +1,6 @@
 import { logPageView } from '@frontend/services/googleAnalyticsService';
 import { initHotJar } from '@frontend/services/hotjarService';
+import CookieBanner from '@common/components/CookieBanner';
 import BaseApp, { Container, NextAppContext } from 'next/app';
 import Router from 'next/router';
 import React from 'react';
@@ -35,6 +36,7 @@ class App extends BaseApp {
 
     return (
       <Container>
+        <CookieBanner />
         <Helmet titleTemplate="%s - GOV.UK" />
         <Component {...pageProps} />
       </Container>

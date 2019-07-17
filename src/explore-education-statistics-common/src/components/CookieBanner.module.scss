@@ -1,0 +1,46 @@
+@import '../styles/govuk-base';
+
+.container {
+  background: #d5e8f3;
+  padding: 10px 0;
+  width: 100%;
+
+  p {
+    font-family: 'nta', Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.14286;
+    margin: 0 15px;
+    max-width: 960px;
+    text-transform: none;
+
+    @media (min-width: 40.0625em) {
+      font-size: 16px;
+      line-height: 1.25;
+      margin: 0 30px;
+    }
+    @media (min-width: 1020px) {
+      margin: 0 auto;
+    }
+  }
+}
+
+.button {
+  @include govuk-link-common;
+  @include govuk-link-style-default;
+  @include govuk-link-print-friendly;
+  @include govuk-focusable-fill;
+
+  background: none;
+  border-width: 0;
+  color: govuk-colour('blue');
+  cursor: pointer;
+  display: inline-block;
+  margin-bottom: 0 !important;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.noUnderline {
+  text-decoration: none;
+}
