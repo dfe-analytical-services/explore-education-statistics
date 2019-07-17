@@ -1,4 +1,3 @@
-import { AxiosInstance } from 'axios';
 import { PrototypeLoginService } from '@admin/services/PrototypeLoginService';
 import MockAdapter from "axios-mock-adapter";
 

@@ -1,16 +1,10 @@
 import { createClient } from '@admin/services/common/service';
-import { DataFileView } from './types';
+import {DataFileView, UploadDataFilesRequest} from './types';
 import mocks from './mock/axios-mock';
 
 const apiClient = createClient({
   mockBehaviourRegistrar: mocks,
 });
-
-export interface UploadDataFilesRequest {
-  subjectTitle: string,
-  dataFile: File,
-  metadataFile: File,
-}
 
 export default {
   getReleaseDataFiles(releaseId: string): Promise<DataFileView> {
