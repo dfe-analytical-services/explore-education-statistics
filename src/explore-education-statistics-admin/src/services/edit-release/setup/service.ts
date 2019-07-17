@@ -1,8 +1,5 @@
-import { createClient } from '@admin/services/common/service';
-import {
-  ReleaseSetupDetails,
-  ReleaseSetupDetailsUpdateRequest,
-} from '@admin/services/edit-release/setup/types';
+import {ReleaseSetupDetails, ReleaseSetupDetailsUpdateRequest,} from '@admin/services/edit-release/setup/types';
+import {createClient} from '@admin/services/util/service';
 import mocks from './mock/axios-mock';
 
 const apiClient = createClient({

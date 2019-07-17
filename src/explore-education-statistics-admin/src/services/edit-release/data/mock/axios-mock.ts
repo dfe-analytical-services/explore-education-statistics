@@ -1,9 +1,14 @@
+import {DataFile} from "@admin/services/edit-release/data/types";
 import MockAdapter from 'axios-mock-adapter';
 
 const generateRandomInteger = (max: number) =>
   Math.floor(Math.random() * Math.floor(max));
 const generateRandomIntegerString = (max: number) =>
   generateRandomInteger(max).toString();
+
+export interface DataFileView {
+  dataFiles: DataFile[];
+}
 
 export default async (mock: MockAdapter) => {
   const mockData = (await import(
@@ -15,7 +20,7 @@ export default async (mock: MockAdapter) => {
     const releaseIdMatch = url ? url.match(/\/release\/(.*)\/datafiles/) : [''];
     return [
       200,
-      mockData.getDataFilesForRelease(releaseIdMatch ? releaseIdMatch[1] : ''),
+      mockData.getDataFilesForRelease(releaseIdMatch ? releaseIdMatch[1] : '').dataFiles,
     ];
   });
 
@@ -32,7 +37,8 @@ export default async (mock: MockAdapter) => {
     const dataFile = formData.get('dataFile') as File;
     const metadataFile = formData.get('metadataFile') as File;
 
-    dataFilesView.dataFiles.push({
+    // eslint-disable-next-line no-param-reassign
+    dataFilesView.dataFiles = dataFilesView.dataFiles.concat([{
       title: subjectTitle,
       file: {
         id: generateRandomIntegerString(100000),
@@ -47,7 +53,7 @@ export default async (mock: MockAdapter) => {
         unit: 'Mb',
       },
       numberOfRows: generateRandomInteger(200000),
-    });
+    }]);
 
     return [200];
   });
@@ -58,10 +64,10 @@ export default async (mock: MockAdapter) => {
 
     const [releaseId, dataFileId] = idsMatch ? idsMatch.slice(1) : ['', ''];
 
-    const dataFilesView = mockData.getDataFilesForRelease(releaseId);
+    const dataFiles = mockData.getDataFilesForRelease(releaseId);
 
     // eslint-disable-next-line no-param-reassign
-    dataFilesView.dataFiles = dataFilesView.dataFiles.filter(
+    dataFiles.dataFiles = dataFiles.dataFiles.filter(
       file => file.file.id !== dataFileId,
     );
 

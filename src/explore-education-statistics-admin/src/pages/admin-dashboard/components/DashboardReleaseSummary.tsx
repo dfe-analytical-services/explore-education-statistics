@@ -2,7 +2,7 @@ import ButtonLink from '@admin/components/ButtonLink';
 import {
   dayMonthYearIsComplete,
   dayMonthYearToDate,
-} from '@admin/services/common/types/types';
+} from '@admin/services/common/types';
 import {
   AdminDashboardRelease,
   ReleaseApprovalStatus,

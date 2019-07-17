@@ -1,6 +1,6 @@
 import ReleaseSetupEditPage from '@admin/pages/edit-release/ReleaseSetupEditPage';
 import ReleaseSetupPage from '@admin/pages/edit-release/ReleaseSetupPage';
-import ReleaseDataPage from '@admin/pages/edit-release/ReleaseDataPage';
+import ReleaseDataPage from '@admin/pages/edit-release/data/ReleaseDataPage';
 import ReleaseBuildTablesPage from '@admin/pages/edit-release/ReleaseBuildTablesPage';
 import ReleaseTablesPage from '@admin/pages/edit-release/ReleaseTablesPage';
 import ReleaseContentPage from '@admin/pages/edit-release/ReleaseContentPage';

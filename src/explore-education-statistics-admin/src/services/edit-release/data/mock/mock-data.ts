@@ -1,10 +1,8 @@
-import { Dictionary } from '@common/types';
-import { DataFileView } from '../types';
+import {DataFileView} from "@admin/services/edit-release/data/mock/axios-mock";
+import {Dictionary} from '@common/types';
 
 const dataFilesByReleaseId: Dictionary<DataFileView> = {
   'my-publication-1-release-1': {
-    publicationTitle:
-      'Pupil absence statistics and data for schools in England',
     dataFiles: [
       {
         title: 'Geographical absence',
@@ -40,19 +38,27 @@ const dataFilesByReleaseId: Dictionary<DataFileView> = {
       },
       {
         title: 'National characteristics',
-        file: {
-          id: 'file-3',
-          fileName: 'absence_natcharacteristics.csv',
-        },
+        file:
+          {
+            id: 'file-3',
+            fileName:
+              'absence_natcharacteristics.csv',
+          }
+        ,
         fileSize: {
           size: 71,
-          unit: 'Mb',
-        },
+          unit:
+            'Mb',
+        }
+        ,
         numberOfRows: 320000,
-        metadataFile: {
-          id: 'metadata-file-3',
-          fileName: 'meta_absence_natcharacteristics.csv',
-        },
+        metadataFile:
+          {
+            id: 'metadata-file-3',
+            fileName:
+              'meta_absence_natcharacteristics.csv',
+          }
+        ,
       },
     ],
   },

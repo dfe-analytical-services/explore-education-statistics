@@ -7,7 +7,7 @@ import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import { LoginContext } from '@admin/components/Login';
-import { IdLabelPair } from '@admin/services/common/types/types';
+import { IdLabelPair } from '@admin/services/common/types';
 import dashboardService from '@admin/services/dashboard/service';
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';

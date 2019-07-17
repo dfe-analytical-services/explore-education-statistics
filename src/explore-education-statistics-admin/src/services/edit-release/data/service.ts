@@ -1,15 +1,15 @@
-import { createClient } from '@admin/services/common/service';
-import { DataFileView, UploadDataFilesRequest } from './types';
+import {createClient} from '@admin/services/util/service';
 import mocks from './mock/axios-mock';
+import {DataFile, UploadDataFilesRequest} from './types';
 
 const apiClient = createClient({
   mockBehaviourRegistrar: mocks,
 });
 
 export default {
-  getReleaseDataFiles(releaseId: string): Promise<DataFileView> {
+  getReleaseDataFiles(releaseId: string): Promise<DataFile[]> {
     return apiClient.then(client =>
-      client.get<DataFileView>(`/release/${releaseId}/datafiles`),
+      client.get<DataFile[]>(`/release/${releaseId}/datafiles`),
     );
   },
   uploadDataFiles(
