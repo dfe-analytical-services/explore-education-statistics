@@ -1,5 +1,6 @@
 import Page from '@frontend/components/Page';
 import React from 'react';
+import { cookieBannerSeenName } from '@frontend/components/CookieBanner';
 
 function CookiesPage() {
   return (
@@ -117,7 +118,7 @@ function CookiesPage() {
         </thead>
         <tbody className="govuk-table__body">
           <tr className="govuk-table__row">
-            <td className="govuk-table__cell">seen_cookie_message</td>
+            <td className="govuk-table__cell">{cookieBannerSeenName}</td>
             <td className="govuk-table__cell">
               Saves a message to let us know that you’ve seen our cookie message
             </td>

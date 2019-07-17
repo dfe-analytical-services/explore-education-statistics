@@ -1,5 +1,3 @@
-@import '../styles/govuk-base';
-
 .container {
   background: #d5e8f3;
   padding: 10px 0;
@@ -23,24 +21,4 @@
       margin: 0 auto;
     }
   }
-}
-
-.button {
-  @include govuk-link-common;
-  @include govuk-link-style-default;
-  @include govuk-link-print-friendly;
-  @include govuk-focusable-fill;
-
-  background: none;
-  border-width: 0;
-  color: govuk-colour('blue');
-  cursor: pointer;
-  display: inline-block;
-  margin-bottom: 0 !important;
-  padding: 0;
-  text-decoration: underline;
-}
-
-.noUnderline {
-  text-decoration: none;
 }
