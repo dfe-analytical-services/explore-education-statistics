@@ -6,7 +6,15 @@ const apiClient = createClient({
   mockBehaviourRegistrar: mocks,
 });
 
-export default {
+export interface DashboardService {
+  getThemesAndTopics(userId: string): Promise<ThemeAndTopics[]>;
+  getPublicationsByTopic(
+    topicId: string,
+    userId: string,
+  ): Promise<AdminDashboardPublication[]>;
+}
+
+const service: DashboardService = {
   getThemesAndTopics(userId: string): Promise<ThemeAndTopics[]> {
     return apiClient.then(client =>
       client.get<ThemeAndTopics[]>('/Themes', { params: { userId } }),
@@ -23,3 +31,5 @@ export default {
     );
   },
 };
+
+export default service;
