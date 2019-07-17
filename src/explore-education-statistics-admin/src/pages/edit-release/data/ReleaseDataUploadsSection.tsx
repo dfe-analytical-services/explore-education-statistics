@@ -25,7 +25,7 @@ interface Props {
 
 const formId = 'dataFileUploadForm';
 
-const ReleaseDataFileUploadsSection = ({releaseId}: Props) => {
+const ReleaseDataUploadsSection = ({releaseId}: Props) => {
 
   const [dataFiles, setDataFiles] = useState<DataFile[]>();
   const [deleteFileId, setDeleteFilesRequest] = useState('');
@@ -172,4 +172,4 @@ const ReleaseDataFileUploadsSection = ({releaseId}: Props) => {
   );
 };
 
-export default ReleaseDataFileUploadsSection;
+export default ReleaseDataUploadsSection;

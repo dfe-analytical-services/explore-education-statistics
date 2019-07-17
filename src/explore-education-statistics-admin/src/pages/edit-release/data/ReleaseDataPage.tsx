@@ -1,5 +1,5 @@
 import ReleasePageTemplate from "@admin/pages/edit-release/components/ReleasePageTemplate";
-import ReleaseDataFileUploadsSection from "@admin/pages/edit-release/data/ReleaseDataFileUploadsSection";
+import ReleaseDataUploadsSection from "@admin/pages/edit-release/data/ReleaseDataUploadsSection";
 import service from '@admin/services/common/service';
 import {IdLabelPair} from "@admin/services/common/types";
 import Tabs from '@common/components/Tabs';
@@ -30,7 +30,7 @@ const ReleaseDataPage = ({ match }: RouteComponentProps<MatchProps>) => {
 
           <Tabs id="dataUploadTab">
             <TabsSection id="data-upload" title="Data uploads">
-              <ReleaseDataFileUploadsSection releaseId={releaseId} />
+              <ReleaseDataUploadsSection releaseId={releaseId} />
             </TabsSection>
             <TabsSection id="file-upload" title="File uploads">
               <table className="govuk-table">
