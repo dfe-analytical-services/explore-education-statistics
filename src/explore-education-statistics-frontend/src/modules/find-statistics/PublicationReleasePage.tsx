@@ -116,33 +116,33 @@ class PublicationReleasePage extends Component<Props> {
             </div>
 
             <ReactMarkdown className="govuk-body" source={data.summary} />
-
-            <Details
-              summary="Download data files"
-              onToggle={(open: boolean) =>
-                open &&
-                logEvent(
-                  'Downloads',
-                  'Release page download data files dropdown opened',
-                  window.location.pathname,
-                )
-              }
-            >
-              <ul className="govuk-list govuk-list--bullet">
-                {data.dataFiles.map(({ extension, name, path, size }) => (
-                  <li key={path}>
-                    <Link
-                      to={`${baseUrl.data}/api/download/${path}`}
-                      className="govuk-link"
-                    >
-                      {name}
-                    </Link>
-                    {` (${extension}, ${size})`}
-                  </li>
-                ))}
-              </ul>
-            </Details>
-
+            {data.dataFiles && (
+              <Details
+                summary="Download data files"
+                onToggle={(open: boolean) =>
+                  open &&
+                  logEvent(
+                    'Downloads',
+                    'Release page download data files dropdown opened',
+                    window.location.pathname,
+                  )
+                }
+              >
+                <ul className="govuk-list govuk-list--bullet">
+                  {data.dataFiles.map(({ extension, name, path, size }) => (
+                    <li key={path}>
+                      <Link
+                        to={`${baseUrl.data}/api/download/${path}`}
+                        className="govuk-link"
+                      >
+                        {name}
+                      </Link>
+                      {` (${extension}, ${size})`}
+                    </li>
+                  ))}
+                </ul>
+              </Details>
+            )}
             <PageSearchFormWithAnalytics className="govuk-!-margin-top-3 govuk-!-margin-bottom-3" />
           </div>
 
