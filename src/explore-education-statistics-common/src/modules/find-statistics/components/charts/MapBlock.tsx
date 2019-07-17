@@ -174,6 +174,11 @@ class MapBlock extends Component<MapProps, MapState> {
     type: 'map',
     name: 'Geographic',
 
+    capabilities: {
+      dataSymbols: false,
+      stackable: false,
+    },
+
     data: [
       {
         type: 'geojson',

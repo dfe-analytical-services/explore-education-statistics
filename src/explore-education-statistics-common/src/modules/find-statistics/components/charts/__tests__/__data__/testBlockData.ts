@@ -2994,6 +2994,9 @@ const AbstractChartProps: ChartProps = {
   data,
   meta: metaData,
 
+  legend: 'top',
+  legendHeight: '50',
+
   labels: {
     '23_1_2_____': {
       label: metaData.indicators['23'].label,

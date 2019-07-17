@@ -36,6 +36,10 @@ describe('HorzontalBarBlock', () => {
       container.querySelector('.recharts-cartesian-grid-vertical'),
     ).toBeInTheDocument();
 
+    expect(
+      container.querySelector('.recharts-default-legend'),
+    ).toBeInTheDocument();
+
     // expect there to be rectangles for all 3 data sets across both years
     expect(
       Array.from(container.querySelectorAll('.recharts-rectangle')).length,
@@ -104,6 +108,16 @@ describe('HorzontalBarBlock', () => {
 
     expect(
       container.querySelector('.recharts-cartesian-axis.xAxis'),
+    ).not.toBeInTheDocument();
+  });
+
+  test('can hide legend', () => {
+    const { container } = render(
+      <HorzontalBarBlock {...props} legend="none" />,
+    );
+
+    expect(
+      container.querySelector('.recharts-default-legend'),
     ).not.toBeInTheDocument();
   });
 });

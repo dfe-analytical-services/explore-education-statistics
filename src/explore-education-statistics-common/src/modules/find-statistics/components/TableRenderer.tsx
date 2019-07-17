@@ -4,7 +4,6 @@ import {
   DataBlockData,
   DataBlockMetadata,
 } from '@common/services/dataBlockService';
-import TimePeriod from '@common/services/types/TimePeriod';
 
 export interface Props {
   data: DataBlockData;

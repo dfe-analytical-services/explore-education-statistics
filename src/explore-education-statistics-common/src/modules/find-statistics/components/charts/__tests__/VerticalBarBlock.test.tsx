@@ -35,6 +35,10 @@ describe('VerticalBarBlock', () => {
       container.querySelector('.recharts-cartesian-grid-vertical'),
     ).toBeInTheDocument();
 
+    expect(
+      container.querySelector('.recharts-default-legend'),
+    ).toBeInTheDocument();
+
     // expect there to be rectangles for all 3 data sets across both years
     expect(
       Array.from(container.querySelectorAll('.recharts-rectangle')).length,
@@ -103,6 +107,14 @@ describe('VerticalBarBlock', () => {
 
     expect(
       container.querySelector('.recharts-cartesian-axis.xAxis'),
+    ).not.toBeInTheDocument();
+  });
+
+  test('can hide legend', () => {
+    const { container } = render(<VerticalBarBlock {...props} legend="none" />);
+
+    expect(
+      container.querySelector('.recharts-default-legend'),
     ).not.toBeInTheDocument();
   });
 });

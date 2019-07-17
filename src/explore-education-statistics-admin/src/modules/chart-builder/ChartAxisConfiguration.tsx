@@ -1,8 +1,13 @@
 import * as React from 'react';
-import { FormFieldset, FormCheckbox, FormGroup } from '@common/components/form';
+import {
+  FormCheckbox,
+  FormFieldset,
+  FormGroup,
+  FormSelect,
+} from '@common/components/form';
 import FormComboBox from '@common/components/form/FormComboBox';
 import {
-  AxisConfigurationItem,
+  AxisConfiguration,
   AxisGroupBy,
 } from '@common/services/publicationService';
 import { DataBlockMetadata } from '@common/services/dataBlockService';
@@ -10,9 +15,9 @@ import { DataBlockMetadata } from '@common/services/dataBlockService';
 interface Props {
   id: string;
   defaultDataType?: AxisGroupBy;
-  configuration: AxisConfigurationItem;
+  configuration: AxisConfiguration;
   meta: DataBlockMetadata;
-  onConfigurationChange: (configuration: AxisConfigurationItem) => void;
+  onConfigurationChange: (configuration: AxisConfiguration) => void;
 }
 
 const ChartAxisConfiguration = ({
@@ -22,7 +27,7 @@ const ChartAxisConfiguration = ({
   onConfigurationChange,
 }: Props) => {
   const [axisConfiguration, setAxisConfiguration] = React.useState<
-    AxisConfigurationItem
+    AxisConfiguration
   >(configuration);
 
   const [selectableUnits] = React.useState<string[]>(() => {
@@ -90,6 +95,18 @@ const ChartAxisConfiguration = ({
           }
           checked={axisConfiguration.showGrid}
           value="grid"
+        />
+        <FormSelect
+          id={`${id}_labelPosition`}
+          name={`${id}_labelPosition`}
+          label="Label position"
+          onChange={e =>
+            updateAxisConfiguration({ labelPosition: e.target.value })
+          }
+          options={[
+            { label: 'On axis', value: 'axis' },
+            { label: 'On graph', value: 'graph' },
+          ]}
         />
 
         <p>Add / remove / edit series labels & range DFE-1018 1017</p>

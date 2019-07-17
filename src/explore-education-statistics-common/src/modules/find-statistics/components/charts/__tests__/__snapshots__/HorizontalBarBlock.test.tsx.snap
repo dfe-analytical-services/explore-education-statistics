@@ -22,10 +22,10 @@ exports[`HorzontalBarBlock renders basic chart correctly 1`] = `
             id="recharts4-clip"
           >
             <rect
-              height="570"
+              height="560"
               width="810"
               x="90"
-              y="0"
+              y="10"
             />
           </clippath>
         </defs>
@@ -37,53 +37,53 @@ exports[`HorzontalBarBlock renders basic chart correctly 1`] = `
           >
             <line
               fill="none"
-              height="570"
+              height="560"
               stroke="#ccc"
               stroke-dasharray="3 3"
               width="810"
               x="90"
               x1="90"
               x2="900"
-              y="0"
-              y1="142.5"
-              y2="142.5"
+              y="10"
+              y1="150"
+              y2="150"
             />
             <line
               fill="none"
-              height="570"
+              height="560"
               stroke="#ccc"
               stroke-dasharray="3 3"
               width="810"
               x="90"
               x1="90"
               x2="900"
-              y="0"
-              y1="427.5"
-              y2="427.5"
+              y="10"
+              y1="430"
+              y2="430"
             />
             <line
               fill="none"
-              height="570"
+              height="560"
               stroke="#ccc"
               stroke-dasharray="3 3"
               width="810"
               x="90"
               x1="90"
               x2="900"
-              y="0"
-              y1="0"
-              y2="0"
+              y="10"
+              y1="10"
+              y2="10"
             />
             <line
               fill="none"
-              height="570"
+              height="560"
               stroke="#ccc"
               stroke-dasharray="3 3"
               width="810"
               x="90"
               x1="90"
               x2="900"
-              y="0"
+              y="10"
               y1="570"
               y2="570"
             />
@@ -93,93 +93,93 @@ exports[`HorzontalBarBlock renders basic chart correctly 1`] = `
           >
             <line
               fill="none"
-              height="570"
+              height="560"
               stroke="#ccc"
               stroke-dasharray="3 3"
               width="810"
               x="90"
               x1="110"
               x2="110"
-              y="0"
-              y1="0"
+              y="10"
+              y1="10"
               y2="570"
             />
             <line
               fill="none"
-              height="570"
+              height="560"
               stroke="#ccc"
               stroke-dasharray="3 3"
               width="810"
               x="90"
               x1="302.5"
               x2="302.5"
-              y="0"
-              y1="0"
+              y="10"
+              y1="10"
               y2="570"
             />
             <line
               fill="none"
-              height="570"
+              height="560"
               stroke="#ccc"
               stroke-dasharray="3 3"
               width="810"
               x="90"
               x1="495"
               x2="495"
-              y="0"
-              y1="0"
+              y="10"
+              y1="10"
               y2="570"
             />
             <line
               fill="none"
-              height="570"
+              height="560"
               stroke="#ccc"
               stroke-dasharray="3 3"
               width="810"
               x="90"
               x1="687.5"
               x2="687.5"
-              y="0"
-              y1="0"
+              y="10"
+              y1="10"
               y2="570"
             />
             <line
               fill="none"
-              height="570"
+              height="560"
               stroke="#ccc"
               stroke-dasharray="3 3"
               width="810"
               x="90"
               x1="880"
               x2="880"
-              y="0"
-              y1="0"
+              y="10"
+              y1="10"
               y2="570"
             />
             <line
               fill="none"
-              height="570"
+              height="560"
               stroke="#ccc"
               stroke-dasharray="3 3"
               width="810"
               x="90"
               x1="90"
               x2="90"
-              y="0"
-              y1="0"
+              y="10"
+              y1="10"
               y2="570"
             />
             <line
               fill="none"
-              height="570"
+              height="560"
               stroke="#ccc"
               stroke-dasharray="3 3"
               width="810"
               x="90"
               x1="900"
               x2="900"
-              y="0"
-              y1="0"
+              y="10"
+              y1="10"
               y2="570"
             />
           </g>
@@ -393,14 +393,14 @@ exports[`HorzontalBarBlock renders basic chart correctly 1`] = `
           <line
             class="recharts-cartesian-axis-line"
             fill="none"
-            height="570"
+            height="560"
             stroke="#666"
             width="60"
             x="30"
             x1="90"
             x2="90"
-            y="0"
-            y1="0"
+            y="10"
+            y1="10"
             y2="570"
           />
           <g
@@ -412,25 +412,25 @@ exports[`HorzontalBarBlock renders basic chart correctly 1`] = `
               <line
                 class="recharts-cartesian-axis-tick-line"
                 fill="none"
-                height="570"
+                height="560"
                 stroke="#666"
                 width="60"
                 x="30"
                 x1="84"
                 x2="90"
-                y="0"
-                y1="142.5"
-                y2="142.5"
+                y="10"
+                y1="150"
+                y2="150"
               />
               <text
                 class="recharts-text recharts-cartesian-axis-tick-value"
                 fill="#666"
-                height="570"
+                height="560"
                 stroke="none"
                 text-anchor="end"
                 width="60"
                 x="82"
-                y="142.5"
+                y="150"
               >
                 <tspan
                   dy="0.355em"
@@ -446,25 +446,25 @@ exports[`HorzontalBarBlock renders basic chart correctly 1`] = `
               <line
                 class="recharts-cartesian-axis-tick-line"
                 fill="none"
-                height="570"
+                height="560"
                 stroke="#666"
                 width="60"
                 x="30"
                 x1="84"
                 x2="90"
-                y="0"
-                y1="427.5"
-                y2="427.5"
+                y="10"
+                y1="430"
+                y2="430"
               />
               <text
                 class="recharts-text recharts-cartesian-axis-tick-value"
                 fill="#666"
-                height="570"
+                height="560"
                 stroke="none"
                 text-anchor="end"
                 width="60"
                 x="82"
-                y="427.5"
+                y="430"
               >
                 <tspan
                   dy="0.355em"
@@ -498,12 +498,12 @@ exports[`HorzontalBarBlock renders basic chart correctly 1`] = `
             >
               <path
                 class="recharts-rectangle"
-                d="M 302.5,28.5 h 192.5 v 73 h -192.5 Z"
-                height="73"
+                d="M 302.5,38 h 192.5 v 72 h -192.5 Z"
+                height="72"
                 radius="0"
                 width="192.5"
                 x="302.5"
-                y="28.5"
+                y="38"
               />
             </g>
             <g
@@ -511,12 +511,12 @@ exports[`HorzontalBarBlock renders basic chart correctly 1`] = `
             >
               <path
                 class="recharts-rectangle"
-                d="M 302.5,313.5 h -192.5 v 73 h 192.5 Z"
-                height="73"
+                d="M 302.5,318 h -192.5 v 72 h 192.5 Z"
+                height="72"
                 radius="0"
                 width="-192.5"
                 x="302.5"
-                y="313.5"
+                y="318"
               />
             </g>
           </g>
@@ -532,12 +532,12 @@ exports[`HorzontalBarBlock renders basic chart correctly 1`] = `
             >
               <path
                 class="recharts-rectangle"
-                d="M 302.5,105.5 h 641.6666666666666 v 73 h -641.6666666666666 Z"
-                height="73"
+                d="M 302.5,114 h 641.6666666666666 v 72 h -641.6666666666666 Z"
+                height="72"
                 radius="0"
                 width="641.6666666666666"
                 x="302.5"
-                y="105.5"
+                y="114"
               />
             </g>
             <g
@@ -545,12 +545,12 @@ exports[`HorzontalBarBlock renders basic chart correctly 1`] = `
             >
               <path
                 class="recharts-rectangle"
-                d="M 302.5,390.5 h 256.66666666666674 v 73 h -256.66666666666674 Z"
-                height="73"
+                d="M 302.5,394 h 256.66666666666674 v 72 h -256.66666666666674 Z"
+                height="72"
                 radius="0"
                 width="256.66666666666674"
                 x="302.5"
-                y="390.5"
+                y="394"
               />
             </g>
           </g>
@@ -566,12 +566,12 @@ exports[`HorzontalBarBlock renders basic chart correctly 1`] = `
             >
               <path
                 class="recharts-rectangle"
-                d="M 302.5,182.5 h 320.83333333333326 v 73 h -320.83333333333326 Z"
-                height="73"
+                d="M 302.5,190 h 320.83333333333326 v 72 h -320.83333333333326 Z"
+                height="72"
                 radius="0"
                 width="320.83333333333326"
                 x="302.5"
-                y="182.5"
+                y="190"
               />
             </g>
             <g
@@ -579,12 +579,12 @@ exports[`HorzontalBarBlock renders basic chart correctly 1`] = `
             >
               <path
                 class="recharts-rectangle"
-                d="M 302.5,467.5 h 64.16666666666663 v 73 h -64.16666666666663 Z"
-                height="73"
+                d="M 302.5,470 h 64.16666666666663 v 72 h -64.16666666666663 Z"
+                height="72"
                 radius="0"
                 width="64.16666666666663"
                 x="302.5"
-                y="467.5"
+                y="470"
               />
             </g>
           </g>
@@ -592,7 +592,7 @@ exports[`HorzontalBarBlock renders basic chart correctly 1`] = `
       </svg>
       <div
         class="recharts-legend-wrapper"
-        style="position: absolute; width: 870px; height: auto; left: 30px; bottom: 0px;"
+        style="position: absolute; width: 870px; height: 50px; left: 30px; top: 10px;"
       >
         <ul
           class="recharts-default-legend"

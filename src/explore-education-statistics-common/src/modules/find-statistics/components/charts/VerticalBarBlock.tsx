@@ -1,5 +1,4 @@
 import {
-  calculateMargins,
   ChartDataB,
   ChartDefinition,
   createDataForAxis,
@@ -26,6 +25,11 @@ export default class VerticalBarBlock extends Component<StackedBarProps> {
     type: 'verticalbar',
     name: 'Vertical Bar',
 
+    capabilities: {
+      dataSymbols: false,
+      stackable: true,
+    },
+
     data: [
       {
         type: 'bar',
@@ -51,7 +55,17 @@ export default class VerticalBarBlock extends Component<StackedBarProps> {
   };
 
   public render() {
-    const { data, meta, height, width, labels, axes, stacked } = this.props;
+    const {
+      data,
+      meta,
+      height,
+      width,
+      labels,
+      axes,
+      stacked,
+      legend,
+      legendHeight,
+    } = this.props;
 
     if (axes.major && data) {
       const chartData: ChartDataB[] = createDataForAxis(
@@ -62,14 +76,14 @@ export default class VerticalBarBlock extends Component<StackedBarProps> {
 
       const keysForChart = getKeysForChart(chartData);
 
-      const yAxis = { key: undefined, title: '' };
-      const xAxis = { key: undefined, title: '' };
-
       return (
         <ResponsiveContainer width={width || 900} height={height || 300}>
           <BarChart
             data={chartData}
-            margin={calculateMargins(xAxis, yAxis, undefined)}
+            margin={{
+              left: 30,
+              top: legend === 'top' ? 10 : 0,
+            }}
           >
             <CartesianGrid
               strokeDasharray="3 3"
@@ -108,18 +122,28 @@ export default class VerticalBarBlock extends Component<StackedBarProps> {
                 }}
                 scale="auto"
                 padding={{ left: 20, right: 20 }}
+                height={legend === 'bottom' ? 50 : undefined}
                 tickMargin={10}
               />
             )}
 
             <Tooltip />
-            <Legend />
+            {(legend === 'top' || legend === 'bottom') && (
+              <Legend
+                verticalAlign={legend}
+                height={+(legendHeight || '50')}
+                margin={{ top: 5, bottom: 5 }}
+              />
+            )}
 
             {Array.from(keysForChart).map(name => (
               <Bar
                 key={name}
                 {...populateDefaultChartProps(name, labels[name])}
                 stackId={stacked ? 'a' : undefined}
+                label={{
+                  content: <span>hello</span>,
+                }}
               />
             ))}
           </BarChart>

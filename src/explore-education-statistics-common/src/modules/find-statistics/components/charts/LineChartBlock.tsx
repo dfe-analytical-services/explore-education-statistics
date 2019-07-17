@@ -58,6 +58,11 @@ export default class LineChartBlock extends Component<ChartProps> {
     type: 'line',
     name: 'Line',
 
+    capabilities: {
+      dataSymbols: true,
+      stackable: false,
+    },
+
     data: [
       {
         type: 'line',
@@ -83,7 +88,15 @@ export default class LineChartBlock extends Component<ChartProps> {
   };
 
   public render() {
-    const { data, meta, height, axes, labels } = this.props;
+    const {
+      data,
+      meta,
+      height,
+      axes,
+      labels,
+      legend,
+      legendHeight,
+    } = this.props;
 
     const yAxisDomain: [AxisDomain, AxisDomain] = [-10, 10];
 
@@ -100,10 +113,15 @@ export default class LineChartBlock extends Component<ChartProps> {
         <ResponsiveContainer width={900} height={height || 300}>
           <LineChart
             data={chartData}
-            margin={{ top: 5, right: 30, left: 20, bottom: 25 }}
+            margin={{
+              left: 30,
+              top: legend === 'top' ? 10 : 0,
+            }}
           >
             <Tooltip content={CustomToolTip} />
-            <Legend verticalAlign="top" height={36} />
+            {(legend === 'top' || legend === 'bottom') && (
+              <Legend verticalAlign={legend} height={+(legendHeight || '50')} />
+            )}
             <CartesianGrid
               strokeDasharray="3 3"
               horizontal={axes.minor.showGrid !== false}
@@ -124,6 +142,7 @@ export default class LineChartBlock extends Component<ChartProps> {
                     ? 'preserveStartEnd'
                     : undefined
                 }
+                height={legend === 'bottom' ? 50 : undefined}
                 padding={{ left: 20, right: 20 }}
                 tickMargin={10}
               />

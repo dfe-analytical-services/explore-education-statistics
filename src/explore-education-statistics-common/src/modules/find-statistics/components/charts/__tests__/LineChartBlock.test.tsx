@@ -33,6 +33,10 @@ describe('LineChartBlock', () => {
       container.querySelector('.recharts-cartesian-grid-vertical'),
     ).toBeInTheDocument();
 
+    expect(
+      container.querySelector('.recharts-default-legend'),
+    ).toBeInTheDocument();
+
     // expect there to be lines for all 3 data sets
     expect(
       Array.from(container.querySelectorAll('.recharts-line')).length,
@@ -103,6 +107,14 @@ describe('LineChartBlock', () => {
 
     expect(
       container.querySelector('.recharts-cartesian-axis.xAxis'),
+    ).not.toBeInTheDocument();
+  });
+
+  test('can hide legend', () => {
+    const { container } = render(<LineChartBlock {...props} legend="none" />);
+
+    expect(
+      container.querySelector('.recharts-default-legend'),
     ).not.toBeInTheDocument();
   });
 });
