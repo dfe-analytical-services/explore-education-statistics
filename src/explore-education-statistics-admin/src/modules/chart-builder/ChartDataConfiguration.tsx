@@ -1,6 +1,7 @@
 import {
   ChartSymbol,
   DataSetConfiguration,
+  LineStyle,
 } from '@common/services/publicationService';
 import * as React from 'react';
 import {
@@ -40,6 +41,12 @@ const symbolOptions: SelectOption[] = [
     label: symbol,
     value: symbol,
   })),
+];
+
+const lineStyleOptions: SelectOption[] = [
+  { label: 'Solid', value: 'solid' },
+  { label: 'Dashed', value: 'dashed' },
+  { label: 'Dotted', value: 'dotted' },
 ];
 
 const ChartDataConfiguration = ({
@@ -100,6 +107,23 @@ const ChartDataConfiguration = ({
             })
           }
           options={symbolOptions}
+        />
+      )}
+
+      {capabilities.lineStyle && (
+        <FormSelect
+          id="lineStyle"
+          name="lineStyle"
+          label="Select linestyle"
+          value={configuration.lineStyle}
+          order={[]}
+          onChange={e =>
+            updateConfig({
+              ...config,
+              lineStyle: e.target.value as LineStyle,
+            })
+          }
+          options={lineStyleOptions}
         />
       )}
     </FormFieldset>

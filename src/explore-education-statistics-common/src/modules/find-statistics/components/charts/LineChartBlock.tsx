@@ -23,6 +23,7 @@ import {
   YAxis,
 } from 'recharts';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import { Dictionary } from '@common/types';
 
 const CustomToolTip = ({ active, payload, label }: TooltipProps) => {
   if (active) {
@@ -53,6 +54,12 @@ const CustomToolTip = ({ active, payload, label }: TooltipProps) => {
   return null;
 };
 
+const LineStyles: Dictionary<string> = {
+  solid: '',
+  dashed: '5 5',
+  dotted: '2 2',
+};
+
 export default class LineChartBlock extends Component<ChartProps> {
   public static definition: ChartDefinition = {
     type: 'line',
@@ -61,6 +68,7 @@ export default class LineChartBlock extends Component<ChartProps> {
     capabilities: {
       dataSymbols: true,
       stackable: false,
+      lineStyle: true,
     },
 
     data: [
@@ -175,10 +183,16 @@ export default class LineChartBlock extends Component<ChartProps> {
                     <Symbols
                       {...props}
                       type={labels[name] && labels[name].symbol}
+                      strokeDasharray=""
                     />
                   ))
                 }
                 strokeWidth="2"
+                strokeDasharray={
+                  labels[name] &&
+                  labels[name].lineStyle &&
+                  LineStyles[labels[name].lineStyle || 'solid']
+                }
               />
             ))}
           </LineChart>
