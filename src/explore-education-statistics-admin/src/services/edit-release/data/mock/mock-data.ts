@@ -1,5 +1,13 @@
-import {DataFileView} from "@admin/services/edit-release/data/mock/mock-service";
+import {AdhocFile, DataFile} from "@admin/services/edit-release/data/types";
 import {Dictionary} from '@common/types';
+
+export interface DataFileView {
+  dataFiles: DataFile[];
+}
+
+export interface AdhocFileView {
+  adhocFiles: AdhocFile[];
+}
 
 const dataFilesByReleaseId: Dictionary<DataFileView> = {
   'my-publication-1-release-1': {
@@ -64,7 +72,39 @@ const dataFilesByReleaseId: Dictionary<DataFileView> = {
   },
 };
 
+const adhocFilesByReleaseId: Dictionary<AdhocFileView> = {
+  'my-publication-1-release-1': {
+    adhocFiles: [
+      {
+        title: 'Custom chart',
+        file: {
+          id: 'file-1',
+          fileName: 'custom-chart.png',
+        },
+        fileSize: {
+          size: 1.2,
+          unit: 'Mb',
+        },
+      },
+      {
+        title: 'Design diagram',
+        file: {
+          id: 'file-2',
+          fileName: 'custom-chart.jpg',
+        },
+        fileSize: {
+          size: 3.5,
+          unit: 'Mb',
+        },
+      },
+    ],
+  },
+};
+
 export default {
   getDataFilesForRelease: (releaseId: string) =>
     dataFilesByReleaseId[releaseId],
+
+  getAdhocFilesForRelease: (releaseId: string) =>
+    adhocFilesByReleaseId[releaseId],
 };

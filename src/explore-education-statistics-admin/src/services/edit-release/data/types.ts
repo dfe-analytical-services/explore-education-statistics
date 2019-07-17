@@ -19,3 +19,17 @@ export interface UploadDataFilesRequest {
   dataFile: File;
   metadataFile: File;
 }
+
+export interface AdhocFile {
+  title: string;
+  file: FileDetails;
+  fileSize: {
+    size: number;
+    unit: string;
+  };
+}
+
+export interface UploadAdhocFileRequest {
+  name: string;
+  file: File;
+}
