@@ -120,7 +120,7 @@ export default class LineChartBlock extends Component<ChartProps> {
           >
             <Tooltip content={CustomToolTip} />
             {(legend === 'top' || legend === 'bottom') && (
-              <Legend verticalAlign={legend} height={+legendHeight} />
+              <Legend verticalAlign={legend} height={+(legendHeight || '50')} />
             )}
             <CartesianGrid
               strokeDasharray="3 3"

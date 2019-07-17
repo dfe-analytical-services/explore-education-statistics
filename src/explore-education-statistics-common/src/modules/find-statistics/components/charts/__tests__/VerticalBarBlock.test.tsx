@@ -4,7 +4,6 @@ import { render } from 'react-testing-library';
 import VerticalBarBlock from '../VerticalBarBlock';
 
 import testData from './__data__/testBlockData';
-import LineChartBlock from '@common/modules/find-statistics/components/charts/LineChartBlock';
 
 jest.mock('recharts/lib/util/LogUtils');
 

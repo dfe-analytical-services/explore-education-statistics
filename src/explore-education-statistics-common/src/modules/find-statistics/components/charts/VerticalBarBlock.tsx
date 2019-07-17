@@ -79,9 +79,6 @@ export default class VerticalBarBlock extends Component<StackedBarProps> {
 
       const keysForChart = getKeysForChart(chartData);
 
-      const yAxis = { key: undefined, title: '' };
-      const xAxis = { key: undefined, title: '' };
-
       return (
         <ResponsiveContainer width={width || 900} height={height || 300}>
           <BarChart
@@ -137,7 +134,7 @@ export default class VerticalBarBlock extends Component<StackedBarProps> {
             {(legend === 'top' || legend === 'bottom') && (
               <Legend
                 verticalAlign={legend}
-                height={+legendHeight}
+                height={+(legendHeight || '50')}
                 margin={{ top: 5, bottom: 5 }}
               />
             )}
