@@ -8,12 +8,15 @@ import testData from './__data__/testBlockData';
 
 jest.mock('recharts/lib/util/LogUtils');
 
-const props = testData.AbstractChartProps;
+const props = {
+  ...testData.AbstractChartProps,
+  width: 900,
+};
 const { axes } = props;
 
 describe('HorzontalBarBlock', () => {
   test('renders basic chart correctly', () => {
-    const { container } = render(<HorzontalBarBlock {...props} width={900} />);
+    const { container } = render(<HorzontalBarBlock {...props} />);
 
     expect(container).toMatchSnapshot();
 
@@ -61,7 +64,7 @@ describe('HorzontalBarBlock', () => {
     );
 
     expect(
-      container.querySelector('.recharts-cartesian-axis.xAxis'),
+      container.querySelector('.recharts-cartesian-axis.yAxis'),
     ).not.toBeInTheDocument();
   });
 
@@ -80,7 +83,7 @@ describe('HorzontalBarBlock', () => {
     );
 
     expect(
-      container.querySelector('.recharts-cartesian-axis.yAxis'),
+      container.querySelector('.recharts-cartesian-axis.xAxis'),
     ).not.toBeInTheDocument();
   });
 
@@ -119,5 +122,19 @@ describe('HorzontalBarBlock', () => {
     expect(
       container.querySelector('.recharts-default-legend'),
     ).not.toBeInTheDocument();
+  });
+
+  test('can stack data', () => {
+    const { container } = render(
+      <HorzontalBarBlock {...props} stacked legend="none" />,
+    );
+
+    // Unsure how to tell stacked data apart, other than the snapshot
+
+    expect(container).toMatchSnapshot();
+
+    expect(
+      Array.from(container.querySelectorAll('.recharts-rectangle')).length,
+    ).toBe(6);
   });
 });
