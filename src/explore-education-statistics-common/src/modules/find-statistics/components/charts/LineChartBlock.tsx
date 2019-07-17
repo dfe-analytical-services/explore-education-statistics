@@ -87,68 +87,86 @@ export default class LineChartBlock extends Component<ChartProps> {
 
     const yAxisDomain: [AxisDomain, AxisDomain] = [-10, 10];
 
-    if (!axes.major || !data) return <LoadingSpinner />;
+    if (axes.major && data) {
+      const chartData: ChartDataB[] = createDataForAxis(
+        axes.major,
+        data.result,
+        meta,
+      ).map(mapNameToNameLabel(labels, meta.timePeriods, meta.locations));
 
-    const chartData: ChartDataB[] = createDataForAxis(
-      axes.major,
-      data.result,
-      meta,
-    ).map(mapNameToNameLabel(labels, meta.timePeriods, meta.locations));
+      const keysForChart = getKeysForChart(chartData);
 
-    const keysForChart = getKeysForChart(chartData);
-
-    return (
-      <ResponsiveContainer width={900} height={height || 300}>
-        <LineChart
-          data={chartData}
-          margin={{ top: 5, right: 30, left: 20, bottom: 25 }}
-        >
-          <Tooltip content={CustomToolTip} />
-          <Legend verticalAlign="top" height={36} />
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis
-            dataKey="name"
-            label={{
-              offset: 5,
-              position: 'bottom',
-              value: '',
-            }}
-            padding={{ left: 20, right: 20 }}
-            tickMargin={10}
-          />
-          <YAxis
-            label={{
-              angle: -90,
-              offset: 0,
-              position: 'left',
-              value: '',
-            }}
-            scale="auto"
-            domain={yAxisDomain}
-            dataKey="value"
-          />
-
-          {keysForChart.map(name => (
-            <Line
-              key={name}
-              {...populateDefaultChartProps(name, labels[name])}
-              type="linear"
-              legendType={labels[name] && labels[name].symbol}
-              dot={
-                labels[name] &&
-                labels[name].symbol &&
-                (props => (
-                  <Symbols
-                    {...props}
-                    type={labels[name] && labels[name].symbol}
-                  />
-                ))
-              }
-              strokeWidth="2"
+      return (
+        <ResponsiveContainer width={900} height={height || 300}>
+          <LineChart
+            data={chartData}
+            margin={{ top: 5, right: 30, left: 20, bottom: 25 }}
+          >
+            <Tooltip content={CustomToolTip} />
+            <Legend verticalAlign="top" height={36} />
+            <CartesianGrid
+              strokeDasharray="3 3"
+              horizontal={axes.minor.showGrid !== false}
+              vertical={axes.major.showGrid !== false}
             />
-          ))}
-        </LineChart>
-      </ResponsiveContainer>
-    );
+
+            {axes.major && axes.major.visible && (
+              <XAxis
+                dataKey="name"
+                label={{
+                  offset: 5,
+                  position: 'bottom',
+                  value: '',
+                }}
+                scale="auto"
+                interval={
+                  axes.minor && !axes.minor.visible
+                    ? 'preserveStartEnd'
+                    : undefined
+                }
+                padding={{ left: 20, right: 20 }}
+                tickMargin={10}
+              />
+            )}
+
+            {axes.minor && axes.minor.visible && (
+              <YAxis
+                label={{
+                  angle: -90,
+                  offset: 0,
+                  position: 'left',
+                  value: '',
+                }}
+                scale="auto"
+                domain={yAxisDomain}
+                dataKey="value"
+              />
+            )}
+
+            {keysForChart.map(name => (
+              <Line
+                key={name}
+                {...populateDefaultChartProps(name, labels[name])}
+                type="linear"
+                legendType={labels[name] && labels[name].symbol}
+                dot={
+                  labels[name] &&
+                  labels[name].symbol &&
+                  (props => (
+                    <Symbols
+                      {...props}
+                      type={labels[name] && labels[name].symbol}
+                    />
+                  ))
+                }
+                strokeWidth="2"
+              />
+            ))}
+          </LineChart>
+        </ResponsiveContainer>
+      );
+    }
+
+    return <LoadingSpinner />;
   }
 }

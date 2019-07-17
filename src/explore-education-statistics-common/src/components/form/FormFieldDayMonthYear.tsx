@@ -1,9 +1,7 @@
 import FormFieldset from '@common/components/form/FormFieldset';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
-import FormGroup from '@common/components/form/FormGroup';
-import { Field, FieldProps } from 'formik';
-import FormTextInput from '@common/components/form/FormTextInput';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
+import { Field, FieldProps } from 'formik';
 import React, { ReactNode } from 'react';
 
 interface DayMonthYearValues {
@@ -24,12 +22,11 @@ const FormFieldDayMonthYear = <FormValues extends {}>({
   fieldsetLegend,
   formId,
   fieldName,
-  error,
   showError = true,
 }: Props<FormValues>) => {
   return (
     <Field name={fieldName}>
-      {({ field, form }: FieldProps) => {
+      {({ form }: FieldProps) => {
         const { getError } = createErrorHelper<FormValues>(form);
         return (
           <FormFieldset

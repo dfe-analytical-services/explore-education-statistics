@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`LineChartBlock renders with correct output 1`] = `
+exports[`LineChartBlock renders basic chart correctly 1`] = `
 <div>
   <div
     class="recharts-responsive-container"

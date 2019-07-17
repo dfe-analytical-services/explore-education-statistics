@@ -96,13 +96,17 @@ export type AxisGroupBy =
   | 'filters'
   | 'indicators';
 
+export type AxisType = 'major' | 'minor';
+
 export interface AxisConfigurationItem {
   name: string;
+  type: AxisType;
   groupBy?: AxisGroupBy;
   dataSets: ChartDataSet[];
 
   visible?: boolean;
   title?: string;
+  showGrid?: boolean;
 }
 
 export interface Chart {

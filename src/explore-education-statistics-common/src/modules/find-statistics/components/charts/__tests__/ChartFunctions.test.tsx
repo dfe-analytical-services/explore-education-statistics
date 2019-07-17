@@ -28,6 +28,7 @@ describe('ChartFunctions', () => {
 
     const minorAxisConfiguration: AxisConfigurationItem = {
       name: meta.indicators['26'].label,
+      type: 'major',
       groupBy: 'timePeriods',
       dataSets: [dataSet26_1_72],
     };
@@ -67,6 +68,7 @@ describe('ChartFunctions', () => {
 
     const minorAxisConfiguration: AxisConfigurationItem = {
       name: meta.indicators['26'].label,
+      type: 'major',
       groupBy: 'timePeriods',
       dataSets: [dataSet26_1_72, dataSet23_1_72],
     };
@@ -111,6 +113,7 @@ describe('ChartFunctions', () => {
 
     const minorAxisConfiguration: AxisConfigurationItem = {
       name: meta.indicators['26'].label,
+      type: 'major',
       groupBy: 'timePeriods',
       dataSets: [dataSet26_1_71, dataSet26_1_72],
     };
@@ -155,6 +158,7 @@ describe('ChartFunctions', () => {
 
     const axisConfig: AxisConfigurationItem = {
       name: meta.indicators['26'].label,
+      type: 'major',
       groupBy: 'timePeriods',
       dataSets: [dataSet26_1_71, dataSet26_1_72],
     };

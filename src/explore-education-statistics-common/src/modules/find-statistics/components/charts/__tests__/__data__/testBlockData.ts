@@ -80,6 +80,100 @@ const data: DataBlockData = {
   ],
 };
 
+const data2: DataBlockData = {
+  publicationId: 'test',
+  releaseDate: new Date(),
+  releaseId: '1',
+  subjectId: 1,
+  geographicLevel: GeographicLevel.Country,
+  result: [
+    {
+      filters: ['1', '2'],
+      location: {
+        country: {
+          code: 'E92000001',
+          name: 'England',
+        },
+        region: {
+          code: '',
+          name: '',
+        },
+        localAuthority: {
+          code: '',
+          old_code: '',
+          name: '',
+        },
+        localAuthorityDistrict: {
+          code: '',
+          name: '',
+        },
+      },
+      measures: {
+        '28': '5',
+        '26': '10',
+        '23': '3',
+      },
+      timePeriod: '2014_HT6',
+    },
+    {
+      filters: ['1', '2'],
+      location: {
+        country: {
+          code: 'E92000001',
+          name: 'England',
+        },
+        region: {
+          code: '',
+          name: '',
+        },
+        localAuthority: {
+          code: '',
+          old_code: '',
+          name: '',
+        },
+        localAuthorityDistrict: {
+          code: '',
+          name: '',
+        },
+      },
+      measures: {
+        '28': '1',
+        '26': '4',
+        '23': '-3',
+      },
+      timePeriod: '2015_HT6',
+    },
+    {
+      filters: ['1', '2'],
+      location: {
+        country: {
+          code: 'E92000001',
+          name: 'England',
+        },
+        region: {
+          code: '',
+          name: '',
+        },
+        localAuthority: {
+          code: '',
+          old_code: '',
+          name: '',
+        },
+        localAuthorityDistrict: {
+          code: '',
+          name: '',
+        },
+      },
+      measures: {
+        '28': '0',
+        '26': '5',
+        '23': '-2',
+      },
+      timePeriod: '2016_HT6',
+    },
+  ],
+};
+
 const missingData: DataBlockData = {
   publicationId: 'test',
   releaseDate: new Date(),
@@ -2901,14 +2995,6 @@ const AbstractChartProps: ChartProps = {
   meta: metaData,
 
   labels: {
-    '2014_HT6': {
-      label: metaData.timePeriods['2014_HT6'].label,
-      value: '2014_HT6',
-    },
-    '2015_HT6': {
-      label: metaData.timePeriods['2015_HT6'].label,
-      value: '2015_HT6',
-    },
     '23_1_2_____': {
       label: metaData.indicators['23'].label,
       unit: '%',
@@ -2929,6 +3015,7 @@ const AbstractChartProps: ChartProps = {
   axes: {
     major: {
       name: '23',
+      type: 'major',
       groupBy: 'timePeriods',
       dataSets: [
         {
@@ -2944,9 +3031,73 @@ const AbstractChartProps: ChartProps = {
           filters: ['1', '2'],
         },
       ],
+      visible: true,
     },
     minor: {
       name: 'minor',
+      type: 'minor',
+      title: '',
+      visible: true,
+      dataSets: [],
+    },
+  },
+};
+
+const AbstractChartProps2: ChartProps = {
+  data: data2,
+  meta: {
+    ...metaData,
+    timePeriods: {
+      ...metaData.timePeriods,
+      '2016_HT6': {
+        label: '2016/17',
+        value: '2016_HT6',
+      },
+    },
+  },
+
+  labels: {
+    '23_1_2_____': {
+      label: metaData.indicators['23'].label,
+      unit: '%',
+      value: '23_1_2',
+    },
+    '26_1_2_____': {
+      label: metaData.indicators['26'].label,
+      unit: '%',
+      value: '26_1_2',
+    },
+    '28_1_2_____': {
+      label: metaData.indicators['28'].label,
+      unit: '%',
+      value: '28_1_2',
+    },
+  },
+
+  axes: {
+    major: {
+      name: '23',
+      type: 'major',
+      groupBy: 'timePeriods',
+      dataSets: [
+        {
+          indicator: '23',
+          filters: ['1', '2'],
+        },
+        {
+          indicator: '26',
+          filters: ['1', '2'],
+        },
+        {
+          indicator: '28',
+          filters: ['1', '2'],
+        },
+      ],
+      visible: true,
+    },
+    minor: {
+      name: 'minor',
+      type: 'minor',
       title: '',
       visible: true,
       dataSets: [],
@@ -3000,6 +3151,7 @@ const AbstractMultipleChartProps: ChartProps = {
   axes: {
     major: {
       name: '23',
+      type: 'major',
       groupBy: 'timePeriods',
       dataSets: [
         {
@@ -3018,10 +3170,32 @@ const AbstractMultipleChartProps: ChartProps = {
     },
     minor: {
       name: 'minor',
-
+      type: 'minor',
       title: '',
       visible: true,
       dataSets: [],
+    },
+  },
+};
+
+const testResponseData_23_26__1_2_LAD: DataBlockResponse = {
+  ...testResponseData_23_26_28__1_2_LAD,
+
+  result: testResponseData_23_26_28__1_2_LAD.result.map(r => {
+    return {
+      ...r,
+      measures: {
+        '23': r.measures['23'],
+        '26': r.measures['26'],
+      },
+    };
+  }),
+
+  metaData: {
+    ...testResponseData_23_26_28__1_2_LAD.metaData,
+    indicators: {
+      '23': testResponseData_23_26_28__1_2_LAD.metaData.indicators['23'],
+      '26': testResponseData_23_26_28__1_2_LAD.metaData.indicators['26'],
     },
   },
 };
@@ -3059,6 +3233,7 @@ const AbstractLargeDataChartProps: ChartProps = {
   axes: {
     major: {
       name: '23',
+      type: 'major',
       groupBy: 'locations',
       dataSets: [
         {
@@ -3077,6 +3252,64 @@ const AbstractLargeDataChartProps: ChartProps = {
     },
     minor: {
       name: 'minor',
+      type: 'minor',
+      title: '',
+      visible: true,
+      dataSets: [],
+    },
+  },
+};
+
+const AbstractLargeDataChartProps_smaller_datasets: ChartProps = {
+  data: testResponseData_23_26__1_2_LAD,
+  meta: testResponseData_23_26__1_2_LAD.metaData,
+
+  labels: {
+    '2014_HT6': {
+      label: metaData.timePeriods['2014_HT6'].label,
+      value: '2014_HT6',
+    },
+    '2015_HT6': {
+      label: metaData.timePeriods['2015_HT6'].label,
+      value: '2015_HT6',
+    },
+    '23_1_2_____': {
+      label: metaData.indicators['23'].label,
+      unit: '%',
+      value: '23_1_2',
+    },
+    '26_1_2_____': {
+      label: metaData.indicators['26'].label,
+      unit: '%',
+      value: '26_1_2',
+    },
+    '28_1_2_____': {
+      label: metaData.indicators['28'].label,
+      unit: '%',
+      value: '28_1_2',
+    },
+  },
+
+  axes: {
+    major: {
+      name: '23',
+      type: 'major',
+      groupBy: 'locations',
+      dataSets: [
+        {
+          indicator: '23',
+          filters: ['1', '2'],
+        },
+        {
+          indicator: '26',
+          filters: ['1', '2'],
+        },
+      ],
+      visible: true,
+    },
+    minor: {
+      name: 'minor',
+      type: 'minor',
       title: '',
       visible: true,
       dataSets: [],
@@ -3110,14 +3343,6 @@ const AbstractMissingDataChartProps: ChartProps = {
   },
 
   labels: {
-    '2014_HT6': {
-      label: metaData.timePeriods['2014_HT6'].label,
-      value: '2014_HT6',
-    },
-    '2015_HT6': {
-      label: metaData.timePeriods['2015_HT6'].label,
-      value: '2015_HT6',
-    },
     '23_1_2_____': {
       label: metaData.indicators['23'].label,
       unit: '%',
@@ -3138,6 +3363,7 @@ const AbstractMissingDataChartProps: ChartProps = {
   axes: {
     major: {
       name: '23',
+      type: 'major',
       groupBy: 'timePeriods',
       dataSets: [
         {
@@ -3153,9 +3379,11 @@ const AbstractMissingDataChartProps: ChartProps = {
           filters: ['1', '2'],
         },
       ],
+      visible: true,
     },
     minor: {
       name: 'minor',
+      type: 'minor',
       title: '',
       visible: true,
       dataSets: [],
@@ -3170,9 +3398,11 @@ const response: DataBlockResponse = {
 
 export default {
   AbstractChartProps,
+  AbstractChartProps2,
   AbstractMultipleChartProps,
   AbstractMissingDataChartProps,
   AbstractLargeDataChartProps,
+  AbstractLargeDataChartProps_smaller_datasets,
   testBlockData: data,
   testBlockMetaData: responseMetadata,
   labels,

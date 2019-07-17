@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`HorzontalBarBlock renders with correct output 1`] = `
+exports[`HorzontalBarBlock renders basic chart correctly 1`] = `
 <div>
   <div
     class="recharts-responsive-container"
@@ -19,105 +19,16 @@ exports[`HorzontalBarBlock renders with correct output 1`] = `
       >
         <defs>
           <clippath
-            id="recharts1-clip"
+            id="recharts4-clip"
           >
             <rect
-              height="565"
-              width="865"
-              x="30"
-              y="5"
+              height="570"
+              width="810"
+              x="90"
+              y="0"
             />
           </clippath>
         </defs>
-        <g
-          class="recharts-layer recharts-cartesian-axis recharts-yAxis yAxis"
-        >
-          <line
-            class="recharts-cartesian-axis-line"
-            fill="none"
-            height="565"
-            stroke="#666"
-            width="25"
-            x="5"
-            x1="30"
-            x2="30"
-            y="5"
-            y1="5"
-            y2="570"
-          />
-          <g
-            class="recharts-cartesian-axis-ticks"
-          >
-            <g
-              class="recharts-layer recharts-cartesian-axis-tick"
-            >
-              <line
-                class="recharts-cartesian-axis-tick-line"
-                fill="none"
-                height="565"
-                stroke="#666"
-                width="25"
-                x="5"
-                x1="24"
-                x2="30"
-                y="5"
-                y1="146.25"
-                y2="146.25"
-              />
-              <text
-                class="recharts-text recharts-cartesian-axis-tick-value"
-                fill="#666"
-                height="565"
-                stroke="none"
-                text-anchor="end"
-                width="25"
-                x="22"
-                y="146.25"
-              >
-                <tspan
-                  dy="0.355em"
-                  x="22"
-                >
-                  2014/15
-                </tspan>
-              </text>
-            </g>
-            <g
-              class="recharts-layer recharts-cartesian-axis-tick"
-            >
-              <line
-                class="recharts-cartesian-axis-tick-line"
-                fill="none"
-                height="565"
-                stroke="#666"
-                width="25"
-                x="5"
-                x1="24"
-                x2="30"
-                y="5"
-                y1="428.75"
-                y2="428.75"
-              />
-              <text
-                class="recharts-text recharts-cartesian-axis-tick-value"
-                fill="#666"
-                height="565"
-                stroke="none"
-                text-anchor="end"
-                width="25"
-                x="22"
-                y="428.75"
-              >
-                <tspan
-                  dy="0.355em"
-                  x="22"
-                >
-                  2015/16
-                </tspan>
-              </text>
-            </g>
-          </g>
-        </g>
         <g
           class="recharts-cartesian-grid"
         >
@@ -126,49 +37,53 @@ exports[`HorzontalBarBlock renders with correct output 1`] = `
           >
             <line
               fill="none"
-              height="565"
+              height="570"
               stroke="#ccc"
-              width="865"
-              x="30"
-              x1="30"
-              x2="895"
-              y="5"
-              y1="146.25"
-              y2="146.25"
+              stroke-dasharray="3 3"
+              width="810"
+              x="90"
+              x1="90"
+              x2="900"
+              y="0"
+              y1="142.5"
+              y2="142.5"
             />
             <line
               fill="none"
-              height="565"
+              height="570"
               stroke="#ccc"
-              width="865"
-              x="30"
-              x1="30"
-              x2="895"
-              y="5"
-              y1="428.75"
-              y2="428.75"
+              stroke-dasharray="3 3"
+              width="810"
+              x="90"
+              x1="90"
+              x2="900"
+              y="0"
+              y1="427.5"
+              y2="427.5"
             />
             <line
               fill="none"
-              height="565"
+              height="570"
               stroke="#ccc"
-              width="865"
-              x="30"
-              x1="30"
-              x2="895"
-              y="5"
-              y1="5"
-              y2="5"
+              stroke-dasharray="3 3"
+              width="810"
+              x="90"
+              x1="90"
+              x2="900"
+              y="0"
+              y1="0"
+              y2="0"
             />
             <line
               fill="none"
-              height="565"
+              height="570"
               stroke="#ccc"
-              width="865"
-              x="30"
-              x1="30"
-              x2="895"
-              y="5"
+              stroke-dasharray="3 3"
+              width="810"
+              x="90"
+              x1="90"
+              x2="900"
+              y="0"
               y1="570"
               y2="570"
             />
@@ -178,62 +93,93 @@ exports[`HorzontalBarBlock renders with correct output 1`] = `
           >
             <line
               fill="none"
-              height="565"
+              height="570"
               stroke="#ccc"
-              width="865"
-              x="30"
-              x1="30"
-              x2="30"
-              y="5"
-              y1="5"
+              stroke-dasharray="3 3"
+              width="810"
+              x="90"
+              x1="110"
+              x2="110"
+              y="0"
+              y1="0"
               y2="570"
             />
             <line
               fill="none"
-              height="565"
+              height="570"
               stroke="#ccc"
-              width="865"
-              x="30"
-              x1="246.25"
-              x2="246.25"
-              y="5"
-              y1="5"
+              stroke-dasharray="3 3"
+              width="810"
+              x="90"
+              x1="302.5"
+              x2="302.5"
+              y="0"
+              y1="0"
               y2="570"
             />
             <line
               fill="none"
-              height="565"
+              height="570"
               stroke="#ccc"
-              width="865"
-              x="30"
-              x1="462.5"
-              x2="462.5"
-              y="5"
-              y1="5"
+              stroke-dasharray="3 3"
+              width="810"
+              x="90"
+              x1="495"
+              x2="495"
+              y="0"
+              y1="0"
               y2="570"
             />
             <line
               fill="none"
-              height="565"
+              height="570"
               stroke="#ccc"
-              width="865"
-              x="30"
-              x1="678.75"
-              x2="678.75"
-              y="5"
-              y1="5"
+              stroke-dasharray="3 3"
+              width="810"
+              x="90"
+              x1="687.5"
+              x2="687.5"
+              y="0"
+              y1="0"
               y2="570"
             />
             <line
               fill="none"
-              height="565"
+              height="570"
               stroke="#ccc"
-              width="865"
-              x="30"
-              x1="895"
-              x2="895"
-              y="5"
-              y1="5"
+              stroke-dasharray="3 3"
+              width="810"
+              x="90"
+              x1="880"
+              x2="880"
+              y="0"
+              y1="0"
+              y2="570"
+            />
+            <line
+              fill="none"
+              height="570"
+              stroke="#ccc"
+              stroke-dasharray="3 3"
+              width="810"
+              x="90"
+              x1="90"
+              x2="90"
+              y="0"
+              y1="0"
+              y2="570"
+            />
+            <line
+              fill="none"
+              height="570"
+              stroke="#ccc"
+              stroke-dasharray="3 3"
+              width="810"
+              x="90"
+              x1="900"
+              x2="900"
+              y="0"
+              y1="0"
               y2="570"
             />
           </g>
@@ -244,12 +190,12 @@ exports[`HorzontalBarBlock renders with correct output 1`] = `
           <line
             class="recharts-cartesian-axis-line"
             fill="none"
-            height="25"
+            height="30"
             stroke="#666"
-            width="865"
-            x="30"
-            x1="30"
-            x2="895"
+            width="810"
+            x="90"
+            x1="90"
+            x2="900"
             y="570"
             y1="570"
             y2="570"
@@ -263,12 +209,12 @@ exports[`HorzontalBarBlock renders with correct output 1`] = `
               <line
                 class="recharts-cartesian-axis-tick-line"
                 fill="none"
-                height="25"
+                height="30"
                 stroke="#666"
-                width="865"
-                x="30"
-                x1="30"
-                x2="30"
+                width="810"
+                x="90"
+                x1="110"
+                x2="110"
                 y="570"
                 y1="576"
                 y2="570"
@@ -276,18 +222,18 @@ exports[`HorzontalBarBlock renders with correct output 1`] = `
               <text
                 class="recharts-text recharts-cartesian-axis-tick-value"
                 fill="#666"
-                height="25"
+                height="30"
                 stroke="none"
                 text-anchor="middle"
-                width="865"
-                x="30"
-                y="578"
+                width="810"
+                x="110"
+                y="586"
               >
                 <tspan
                   dy="0.71em"
-                  x="30"
+                  x="110"
                 >
-                  -6
+                  -3
                 </tspan>
               </text>
             </g>
@@ -297,12 +243,12 @@ exports[`HorzontalBarBlock renders with correct output 1`] = `
               <line
                 class="recharts-cartesian-axis-tick-line"
                 fill="none"
-                height="25"
+                height="30"
                 stroke="#666"
-                width="865"
-                x="30"
-                x1="246.25"
-                x2="246.25"
+                width="810"
+                x="90"
+                x1="302.5"
+                x2="302.5"
                 y="570"
                 y1="576"
                 y2="570"
@@ -310,16 +256,16 @@ exports[`HorzontalBarBlock renders with correct output 1`] = `
               <text
                 class="recharts-text recharts-cartesian-axis-tick-value"
                 fill="#666"
-                height="25"
+                height="30"
                 stroke="none"
                 text-anchor="middle"
-                width="865"
-                x="246.25"
-                y="578"
+                width="810"
+                x="302.5"
+                y="586"
               >
                 <tspan
                   dy="0.71em"
-                  x="246.25"
+                  x="302.5"
                 >
                   0
                 </tspan>
@@ -331,12 +277,12 @@ exports[`HorzontalBarBlock renders with correct output 1`] = `
               <line
                 class="recharts-cartesian-axis-tick-line"
                 fill="none"
-                height="25"
+                height="30"
                 stroke="#666"
-                width="865"
-                x="30"
-                x1="462.5"
-                x2="462.5"
+                width="810"
+                x="90"
+                x1="495"
+                x2="495"
                 y="570"
                 y1="576"
                 y2="570"
@@ -344,16 +290,50 @@ exports[`HorzontalBarBlock renders with correct output 1`] = `
               <text
                 class="recharts-text recharts-cartesian-axis-tick-value"
                 fill="#666"
-                height="25"
+                height="30"
                 stroke="none"
                 text-anchor="middle"
-                width="865"
-                x="462.5"
-                y="578"
+                width="810"
+                x="495"
+                y="586"
               >
                 <tspan
                   dy="0.71em"
-                  x="462.5"
+                  x="495"
+                >
+                  3
+                </tspan>
+              </text>
+            </g>
+            <g
+              class="recharts-layer recharts-cartesian-axis-tick"
+            >
+              <line
+                class="recharts-cartesian-axis-tick-line"
+                fill="none"
+                height="30"
+                stroke="#666"
+                width="810"
+                x="90"
+                x1="687.5"
+                x2="687.5"
+                y="570"
+                y1="576"
+                y2="570"
+              />
+              <text
+                class="recharts-text recharts-cartesian-axis-tick-value"
+                fill="#666"
+                height="30"
+                stroke="none"
+                text-anchor="middle"
+                width="810"
+                x="687.5"
+                y="586"
+              >
+                <tspan
+                  dy="0.71em"
+                  x="687.5"
                 >
                   6
                 </tspan>
@@ -365,12 +345,12 @@ exports[`HorzontalBarBlock renders with correct output 1`] = `
               <line
                 class="recharts-cartesian-axis-tick-line"
                 fill="none"
-                height="25"
+                height="30"
                 stroke="#666"
-                width="865"
-                x="30"
-                x1="678.75"
-                x2="678.75"
+                width="810"
+                x="90"
+                x1="880"
+                x2="880"
                 y="570"
                 y1="576"
                 y2="570"
@@ -378,18 +358,85 @@ exports[`HorzontalBarBlock renders with correct output 1`] = `
               <text
                 class="recharts-text recharts-cartesian-axis-tick-value"
                 fill="#666"
-                height="25"
+                height="30"
                 stroke="none"
                 text-anchor="middle"
-                width="865"
-                x="678.75"
-                y="578"
+                width="810"
+                x="880"
+                y="586"
               >
                 <tspan
                   dy="0.71em"
-                  x="678.75"
+                  x="880"
                 >
-                  12
+                  9
+                </tspan>
+              </text>
+            </g>
+          </g>
+          <text
+            class="recharts-text recharts-label"
+            text-anchor="end"
+            transform="rotate(-90, 90, 585)"
+            x="90"
+            y="585"
+          >
+            <tspan
+              dy="0.355em"
+              x="90"
+            />
+          </text>
+        </g>
+        <g
+          class="recharts-layer recharts-cartesian-axis recharts-yAxis yAxis"
+        >
+          <line
+            class="recharts-cartesian-axis-line"
+            fill="none"
+            height="570"
+            stroke="#666"
+            width="60"
+            x="30"
+            x1="90"
+            x2="90"
+            y="0"
+            y1="0"
+            y2="570"
+          />
+          <g
+            class="recharts-cartesian-axis-ticks"
+          >
+            <g
+              class="recharts-layer recharts-cartesian-axis-tick"
+            >
+              <line
+                class="recharts-cartesian-axis-tick-line"
+                fill="none"
+                height="570"
+                stroke="#666"
+                width="60"
+                x="30"
+                x1="84"
+                x2="90"
+                y="0"
+                y1="142.5"
+                y2="142.5"
+              />
+              <text
+                class="recharts-text recharts-cartesian-axis-tick-value"
+                fill="#666"
+                height="570"
+                stroke="none"
+                text-anchor="end"
+                width="60"
+                x="82"
+                y="142.5"
+              >
+                <tspan
+                  dy="0.355em"
+                  x="82"
+                >
+                  2014/15
                 </tspan>
               </text>
             </g>
@@ -399,35 +446,46 @@ exports[`HorzontalBarBlock renders with correct output 1`] = `
               <line
                 class="recharts-cartesian-axis-tick-line"
                 fill="none"
-                height="25"
+                height="570"
                 stroke="#666"
-                width="865"
+                width="60"
                 x="30"
-                x1="895"
-                x2="895"
-                y="570"
-                y1="576"
-                y2="570"
+                x1="84"
+                x2="90"
+                y="0"
+                y1="427.5"
+                y2="427.5"
               />
               <text
                 class="recharts-text recharts-cartesian-axis-tick-value"
                 fill="#666"
-                height="25"
+                height="570"
                 stroke="none"
-                text-anchor="middle"
-                width="865"
-                x="895"
-                y="578"
+                text-anchor="end"
+                width="60"
+                x="82"
+                y="427.5"
               >
                 <tspan
-                  dy="0.71em"
-                  x="895"
+                  dy="0.355em"
+                  x="82"
                 >
-                  18
+                  2015/16
                 </tspan>
               </text>
             </g>
           </g>
+          <text
+            class="recharts-text recharts-label"
+            text-anchor="middle"
+            x="60"
+            y="575"
+          >
+            <tspan
+              dy="0.71em"
+              x="60"
+            />
+          </text>
         </g>
         <g
           class="recharts-layer recharts-bar"
@@ -440,12 +498,12 @@ exports[`HorzontalBarBlock renders with correct output 1`] = `
             >
               <path
                 class="recharts-rectangle"
-                d="M 246.25,33.25 h 108.125 v 226 h -108.125 Z"
-                height="226"
+                d="M 302.5,28.5 h 192.5 v 73 h -192.5 Z"
+                height="73"
                 radius="0"
-                width="108.125"
-                x="246.25"
-                y="33.25"
+                width="192.5"
+                x="302.5"
+                y="28.5"
               />
             </g>
             <g
@@ -453,12 +511,12 @@ exports[`HorzontalBarBlock renders with correct output 1`] = `
             >
               <path
                 class="recharts-rectangle"
-                d="M 246.25,315.75 h -108.125 v 226 h 108.125 Z"
-                height="226"
+                d="M 302.5,313.5 h -192.5 v 73 h 192.5 Z"
+                height="73"
                 radius="0"
-                width="-108.125"
-                x="246.25"
-                y="315.75"
+                width="-192.5"
+                x="302.5"
+                y="313.5"
               />
             </g>
           </g>
@@ -474,12 +532,12 @@ exports[`HorzontalBarBlock renders with correct output 1`] = `
             >
               <path
                 class="recharts-rectangle"
-                d="M 354.375,33.25 h 360.41666666666663 v 226 h -360.41666666666663 Z"
-                height="226"
+                d="M 302.5,105.5 h 641.6666666666666 v 73 h -641.6666666666666 Z"
+                height="73"
                 radius="0"
-                width="360.41666666666663"
-                x="354.375"
-                y="33.25"
+                width="641.6666666666666"
+                x="302.5"
+                y="105.5"
               />
             </g>
             <g
@@ -487,12 +545,12 @@ exports[`HorzontalBarBlock renders with correct output 1`] = `
             >
               <path
                 class="recharts-rectangle"
-                d="M 138.125,315.75 h 144.16666666666669 v 226 h -144.16666666666669 Z"
-                height="226"
+                d="M 302.5,390.5 h 256.66666666666674 v 73 h -256.66666666666674 Z"
+                height="73"
                 radius="0"
-                width="144.16666666666669"
-                x="138.125"
-                y="315.75"
+                width="256.66666666666674"
+                x="302.5"
+                y="390.5"
               />
             </g>
           </g>
@@ -508,12 +566,12 @@ exports[`HorzontalBarBlock renders with correct output 1`] = `
             >
               <path
                 class="recharts-rectangle"
-                d="M 714.7916666666666,33.25 h 180.20833333333337 v 226 h -180.20833333333337 Z"
-                height="226"
+                d="M 302.5,182.5 h 320.83333333333326 v 73 h -320.83333333333326 Z"
+                height="73"
                 radius="0"
-                width="180.20833333333337"
-                x="714.7916666666666"
-                y="33.25"
+                width="320.83333333333326"
+                x="302.5"
+                y="182.5"
               />
             </g>
             <g
@@ -521,12 +579,12 @@ exports[`HorzontalBarBlock renders with correct output 1`] = `
             >
               <path
                 class="recharts-rectangle"
-                d="M 282.2916666666667,315.75 h 36.04166666666663 v 226 h -36.04166666666663 Z"
-                height="226"
+                d="M 302.5,467.5 h 64.16666666666663 v 73 h -64.16666666666663 Z"
+                height="73"
                 radius="0"
-                width="36.04166666666663"
-                x="282.2916666666667"
-                y="315.75"
+                width="64.16666666666663"
+                x="302.5"
+                y="467.5"
               />
             </g>
           </g>
@@ -534,7 +592,7 @@ exports[`HorzontalBarBlock renders with correct output 1`] = `
       </svg>
       <div
         class="recharts-legend-wrapper"
-        style="position: absolute; width: 890px; height: auto; left: 5px; bottom: 5px;"
+        style="position: absolute; width: 870px; height: auto; left: 30px; bottom: 0px;"
       >
         <ul
           class="recharts-default-legend"
