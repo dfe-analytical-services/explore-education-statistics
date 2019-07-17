@@ -1,7 +1,7 @@
 using System;
 using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Test
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
 {
     public class ReleaseTests
     {

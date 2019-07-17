@@ -5,7 +5,7 @@
 
         <IsPackable>false</IsPackable>
 
-        <RootNamespace>GovUk.Education.ExploreEducationStatistics.Content.Model.Test</RootNamespace>
+        <RootNamespace>GovUk.Education.ExploreEducationStatistics.Content.Model.Tests</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
