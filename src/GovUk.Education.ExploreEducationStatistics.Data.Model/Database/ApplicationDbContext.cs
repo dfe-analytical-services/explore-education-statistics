@@ -17,6 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         public DbSet<Filter> Filter { get; set; }
         public DbSet<FilterItem> FilterItem { get; set; }
         public DbSet<FilterGroup> FilterGroup { get; set; }
+        public DbSet<Footnote> Footnote { get; set; }
         public DbQuery<GeoJson> GeoJson { get; set; }
         public DbSet<Indicator> Indicator { get; set; }
         public DbSet<IndicatorGroup> IndicatorGroup { get; set; }
@@ -27,6 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         public DbSet<Release> Release { get; set; }
         public DbSet<School> School { get; set; }
         public DbSet<Subject> Subject { get; set; }
+        public DbSet<SubjectFootnote> SubjectFootnote { get; set; }
         public DbSet<Theme> Theme { get; set; }
         public DbSet<Topic> Topic { get; set; }
 
@@ -40,6 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             ConfigureMeasures(modelBuilder);
             ConfigureObservationFilterItem(modelBuilder);
             ConfigurePublication(modelBuilder);
+            ConfigureSubjectFootnote(modelBuilder);
             ConfigureTimePeriod(modelBuilder);
             ConfigureUnit(modelBuilder);
         }
@@ -693,6 +696,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             modelBuilder.Entity<Location>()
                 .OwnsOne(level => level.Sponsor,
                     builder => builder.HasIndex(sponsor => sponsor.Code));
+        }
+
+        private static void ConfigureSubjectFootnote(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<SubjectFootnote>()
+                .HasKey(item => new {item.SubjectId, item.FootnoteId});
+
+            modelBuilder.Entity<SubjectFootnote>()
+                .HasOne(subjectFootnote => subjectFootnote.Subject)
+                .WithMany(subject => subject.Footnotes)
+                .HasForeignKey(subjectFootnote => subjectFootnote.SubjectId);
+
+            modelBuilder.Entity<SubjectFootnote>()
+                .HasOne(subjectFootnote => subjectFootnote.Footnote)
+                .WithMany()
+                .HasForeignKey(subjectFootnote => subjectFootnote.FootnoteId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
         private static void ConfigureWard(ModelBuilder modelBuilder)
