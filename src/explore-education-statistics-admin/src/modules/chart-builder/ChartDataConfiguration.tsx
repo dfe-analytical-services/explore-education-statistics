@@ -114,7 +114,7 @@ const ChartDataConfiguration = ({
         <FormSelect
           id="lineStyle"
           name="lineStyle"
-          label="Select linestyle"
+          label="Select Line Style"
           value={configuration.lineStyle}
           order={[]}
           onChange={e =>
