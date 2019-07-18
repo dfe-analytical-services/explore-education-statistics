@@ -4,6 +4,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using UserId = System.Guid;
 using TopicId = System.Guid;
 
@@ -34,12 +36,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         // TODO it maybe necessary to add authorisation to this method
-        public List<Publication> GetByTopicAndUser(TopicId topicId, UserId userId)
+        public List<PublicationViewModel> GetByTopicAndUser(TopicId topicId, UserId userId)
         {
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Publication, PublicationViewModel>()
+                    .ForMember(
+                        dest => dest.Releases, m => m.MapFrom(publication =>
+                            publication.Releases));
+            });
+
+            var mapper = config.CreateMapper();
+            
+            
             // TODO This method simply returns all Publications for a Topic as we currently do not have a concept of how
             // TODO a user is connected to Publications for the purpose of administration. Once this has been modelled
             // TODO then this method will need altered reflect this.
-            return _context.Publications.Select(p => new Publication
+            var publications = _context.Publications.Select(p => new Publication
                 {
                     Id = p.Id,
                     Title = p.Title,
@@ -64,6 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             Published = r.Published,
                             ReleaseName = r.ReleaseName,
                             TimePeriodCoverage = r.TimePeriodCoverage,
+                            Order = r.Order
                             // TODO isLatestRelease - This needs to be done when we have a chronological concept of 
                             // TODO different releases. Note it can't be published date as technically there is no
                             // TODO reason why releases have to be published in order. 
@@ -73,6 +87,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     ).ToList()
                 }
             ).Where(p => p.TopicId == topicId).ToList();
+            
+            return mapper.Map<List<PublicationViewModel>>(publications);
         }
     }
 }

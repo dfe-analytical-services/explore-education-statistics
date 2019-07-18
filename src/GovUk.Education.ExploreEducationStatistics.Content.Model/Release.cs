@@ -46,6 +46,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         [JsonConverter(typeof(TimeIdentifierJsonConverter))]
         public TimeIdentifier TimePeriodCoverage { get; set; }
+        
+        public int Order { get; set; }
 
         protected bool Equals(Release other)
         {
