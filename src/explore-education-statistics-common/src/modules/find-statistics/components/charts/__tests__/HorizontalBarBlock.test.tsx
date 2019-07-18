@@ -8,37 +8,116 @@ import testData from './__data__/testBlockData';
 
 jest.mock('recharts/lib/util/LogUtils');
 
+const props = testData.AbstractChartProps;
+const { axes } = props;
+
 describe('HorzontalBarBlock', () => {
-  test('renders with correct output', () => {
+  test('renders basic chart correctly', () => {
+    const { container } = render(<HorzontalBarBlock {...props} width={900} />);
+
+    expect(container).toMatchSnapshot();
+
+    // axes
+    expect(
+      container.querySelector('.recharts-cartesian-axis.xAxis'),
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('.recharts-cartesian-axis.yAxis'),
+    ).toBeInTheDocument();
+
+    // grid & grid lines
+    expect(
+      container.querySelector('.recharts-cartesian-grid'),
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('.recharts-cartesian-grid-horizontal'),
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('.recharts-cartesian-grid-vertical'),
+    ).toBeInTheDocument();
+
+    expect(
+      container.querySelector('.recharts-default-legend'),
+    ).toBeInTheDocument();
+
+    // expect there to be rectangles for all 3 data sets across both years
+    expect(
+      Array.from(container.querySelectorAll('.recharts-rectangle')).length,
+    ).toBe(6);
+  });
+
+  test('major axis can be hidden', () => {
     const { container } = render(
       <HorzontalBarBlock
-        {...testData.AbstractChartProps}
-        stacked
-        height={600}
-        width={900}
+        {...props}
+        axes={{
+          ...axes,
+          major: {
+            ...axes.major,
+            visible: false,
+          },
+        }}
       />,
     );
 
-    /*
     expect(
-      container.querySelector('.xAxis text.recharts-label tspan'),
-    ).toHaveTextContent('test x axis');
-    expect(
-      container.querySelector('.yAxis text.recharts-label tspan'),
-    ).toHaveTextContent('test y axis');
-     */
+      container.querySelector('.recharts-cartesian-axis.xAxis'),
+    ).not.toBeInTheDocument();
+  });
+
+  test('minor axis can be hidden', () => {
+    const { container } = render(
+      <HorzontalBarBlock
+        {...props}
+        axes={{
+          ...axes,
+          minor: {
+            ...axes.minor,
+            visible: false,
+          },
+        }}
+      />,
+    );
 
     expect(
-      container.querySelector(
-        '.yAxis .recharts-cartesian-axis-tick:nth-child(1) text tspan',
-      ),
-    ).toHaveTextContent('2014/15');
-    expect(
-      container.querySelector(
-        '.yAxis .recharts-cartesian-axis-tick:nth-child(2) text tspan',
-      ),
-    ).toHaveTextContent('2015/16');
+      container.querySelector('.recharts-cartesian-axis.yAxis'),
+    ).not.toBeInTheDocument();
+  });
 
-    expect(container).toMatchSnapshot();
+  test('both axes can be hidden', () => {
+    const { container } = render(
+      <HorzontalBarBlock
+        {...props}
+        axes={{
+          ...axes,
+          minor: {
+            ...axes.minor,
+            visible: false,
+          },
+          major: {
+            ...axes.major,
+            visible: false,
+          },
+        }}
+      />,
+    );
+
+    expect(
+      container.querySelector('.recharts-cartesian-axis.yAxis'),
+    ).not.toBeInTheDocument();
+
+    expect(
+      container.querySelector('.recharts-cartesian-axis.xAxis'),
+    ).not.toBeInTheDocument();
+  });
+
+  test('can hide legend', () => {
+    const { container } = render(
+      <HorzontalBarBlock {...props} legend="none" />,
+    );
+
+    expect(
+      container.querySelector('.recharts-default-legend'),
+    ).not.toBeInTheDocument();
   });
 });

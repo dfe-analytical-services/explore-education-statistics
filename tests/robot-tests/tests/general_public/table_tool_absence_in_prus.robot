@@ -57,7 +57,7 @@ Select Characteristics
 Create table
     [Tags]  HappyPath
     user clicks element     css:#filtersForm-submit
-    user waits until page contains element   css:table
+    user waits until results table appears
 
 Validate results table column headings
     [Tags]  HappyPath
