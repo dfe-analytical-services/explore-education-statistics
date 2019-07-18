@@ -12,11 +12,11 @@ const CookieBanner = () => {
   const oneMonthFromNow = new Date(
     dateToday.setMonth(dateToday.getMonth() + 1),
   );
-  function acceptCookies() {
+  const acceptCookies = () => {
     setCookie(cookieBannerSeenName, true, {
       expires: oneMonthFromNow,
     });
-  }
+  };
 
   return !cookies[cookieBannerSeenName] ? (
     <div className={styles.container}>
@@ -31,7 +31,8 @@ const CookieBanner = () => {
         >
           Accept Cookies
         </ButtonText>{' '}
-        or <a href="/cookies">find out more about cookies</a>.
+        or{' '}
+        <a href="/cookies">find out more about cookies and cookie settings</a>.
       </p>
     </div>
   ) : null;
