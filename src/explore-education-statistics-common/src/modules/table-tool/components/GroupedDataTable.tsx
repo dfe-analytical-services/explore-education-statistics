@@ -58,7 +58,9 @@ function GroupedDataTable({ caption, header, groups }: Props) {
                   <tr key={rowKey}>
                     <td>{row.name}</td>
                     {row.columns.map((column, columnIndex) => {
-                      const cellKey = `${group.name}_${row.name}_${column}_${columnIndex}`;
+                      const cellKey = `${group.name}_${
+                        row.name
+                      }_${column}_${columnIndex}`;
 
                       return (
                         <td
