@@ -54,9 +54,9 @@ export default async (mock: MockAdapter) => {
       return Promise.resolve(null);
     },
 
-    createDownloadDataFileLink: releaseId => '',
+    createDownloadDataFileLink: _ => '',
 
-    createDownloadDataMetadataFileLink: releaseId => '',
+    createDownloadDataMetadataFileLink: _ => '',
 
     getReleaseAdhocFiles: releaseId =>
       Promise.resolve(mockData.getAdhocFilesForRelease(releaseId).adhocFiles),
@@ -93,7 +93,7 @@ export default async (mock: MockAdapter) => {
       return Promise.resolve(null);
     },
 
-    createDownloadAdhocFileLink: releaseId => '',
+    createDownloadAdhocFileLink: _ => '',
   };
 
   const getReleaseDataFilesUrl = /\/release\/(.*)\/datafiles/;

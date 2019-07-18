@@ -1,9 +1,4 @@
-import {
-  DayMonthYearValues,
-  IdLabelPair,
-  ContactDetails, UserDetails,
-} from '@admin/services/common/types';
-import { User } from '@admin/services/PrototypeLoginService';
+import {ContactDetails, DayMonthYearValues, IdLabelPair, UserDetails,} from '@admin/services/common/types';
 
 export enum ReleaseApprovalStatus {
   Approved,
