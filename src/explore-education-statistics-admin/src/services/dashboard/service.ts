@@ -1,4 +1,5 @@
 import publicationPollyfilla from "@admin/services/dashboard/polyfillas";
+import {polyfill} from "@admin/services/util/polyfilla";
 import {createClient} from '@admin/services/util/service';
 import mocks from './mock/mock-service';
 import {AdminDashboardPublication, ThemeAndTopics} from './types';
@@ -26,7 +27,8 @@ const service: DashboardService = {
     return apiClient.then(client =>
       client.get<AdminDashboardPublication[]>('/me/publications', {
         params: { topicId },
-      }).then(publications => publications.map(publicationPollyfilla)),
+      }).then(publications => publications.map(publication =>
+        polyfill(publication, publicationPollyfilla))),
     );
   },
 };
