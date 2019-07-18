@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             // TODO This method simply returns all Publications for a Topic as we currently do not have a concept of how
             // TODO a user is connected to Publications for the purpose of administration. Once this has been modelled
             // TODO then this method will need altered reflect this.
-            List<Publication> publications =  _context.Publications.Select(p => new Publication
+            return _context.Publications.Select(p => new Publication
                 {
                     Id = p.Id,
                     Title = p.Title,
