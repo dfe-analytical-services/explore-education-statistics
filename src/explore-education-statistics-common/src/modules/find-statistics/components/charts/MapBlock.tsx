@@ -115,46 +115,51 @@ class MapBlock extends Component<MapProps, MapState> {
     const { data, meta } = this.props;
     let { selected } = this.state;
 
-    const sortedMeasures = Object.values(meta.indicators).sort((a, b) =>
-      a.label.localeCompare(b.label),
-    );
+    if (data.result && data.result.length > 0) {
+      const sortedMeasures = Object.values(meta.indicators).sort((a, b) =>
+        a.label.localeCompare(b.label),
+      );
 
-    // TODO, if required, allow range of years to be selected
-    const firstTimePeriod = meta.timePeriods[data.result[0].timePeriod].value;
+      // TODO, if required, allow range of years to be selected
+      const firstTimePeriod =
+        meta.timePeriods &&
+        meta.timePeriods[data.result[0].timePeriod] &&
+        meta.timePeriods[data.result[0].timePeriod].value;
 
-    selected = {
-      ...selected,
-      indicator: sortedMeasures[0].value,
-      timePeriod: firstTimePeriod,
-    };
+      selected = {
+        ...selected,
+        indicator: sortedMeasures[0].value,
+        timePeriod: firstTimePeriod,
+      };
 
-    const {
-      geometry,
-      legend,
-    } = MapBlock.generateGeometryAndLegendForSelectedOptions(
-      data,
-      meta,
-      selected.indicator,
-      selected.timePeriod,
-    );
+      const {
+        geometry,
+        legend,
+      } = MapBlock.generateGeometryAndLegendForSelectedOptions(
+        data,
+        meta,
+        selected.indicator,
+        selected.timePeriod,
+      );
 
-    const imported = await import('@common/services/UKGeoJson');
+      const imported = await import('@common/services/UKGeoJson');
 
-    const location = MapBlock.getLocationsForIndicator(
-      data,
-      meta,
-      selected.indicator,
-    );
+      const location = MapBlock.getLocationsForIndicator(
+        data,
+        meta,
+        selected.indicator,
+      );
 
-    this.setState({
-      selected,
-      options: {
-        location,
-      },
-      geometry,
-      legend,
-      ukGeometry: imported.default,
-    });
+      this.setState({
+        selected,
+        options: {
+          location,
+        },
+        geometry,
+        legend,
+        ukGeometry: imported.default,
+      });
+    }
 
     this.registerResizingCheck();
   }
@@ -168,6 +173,11 @@ class MapBlock extends Component<MapProps, MapState> {
   public static definition: ChartDefinition = {
     type: 'map',
     name: 'Geographic',
+
+    capabilities: {
+      dataSymbols: false,
+      stackable: false,
+    },
 
     data: [
       {

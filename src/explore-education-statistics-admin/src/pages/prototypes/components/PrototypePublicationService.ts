@@ -476,6 +476,7 @@ export default class PrototypePublicationService {
             axes: {
               major: {
                 name: 'major',
+                type: 'major',
                 groupBy: 'timePeriods',
                 dataSets: [
                   { indicator: '23', filters: ['1', '2'] },
@@ -485,6 +486,7 @@ export default class PrototypePublicationService {
               },
               minor: {
                 name: 'minor',
+                type: 'minor',
                 dataSets: [],
               },
             },

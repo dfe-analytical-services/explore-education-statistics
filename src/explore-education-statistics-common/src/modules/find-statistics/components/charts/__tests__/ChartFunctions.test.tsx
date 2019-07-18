@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import {
-  AxisConfigurationItem,
+  AxisConfiguration,
   ChartDataSet,
 } from '@common/services/publicationService';
 import * as ChartFunctions from '../ChartFunctions';
@@ -26,8 +26,9 @@ describe('ChartFunctions', () => {
   test('createDataForAxis from single indicator', () => {
     const meta = Data.responseData.metaData;
 
-    const minorAxisConfiguration: AxisConfigurationItem = {
+    const minorAxisConfiguration: AxisConfiguration = {
       name: meta.indicators['26'].label,
+      type: 'major',
       groupBy: 'timePeriods',
       dataSets: [dataSet26_1_72],
     };
@@ -65,8 +66,9 @@ describe('ChartFunctions', () => {
   test('createDataForAxis from multiple indicators', () => {
     const meta = Data.responseData.metaData;
 
-    const minorAxisConfiguration: AxisConfigurationItem = {
+    const minorAxisConfiguration: AxisConfiguration = {
       name: meta.indicators['26'].label,
+      type: 'major',
       groupBy: 'timePeriods',
       dataSets: [dataSet26_1_72, dataSet23_1_72],
     };
@@ -109,8 +111,9 @@ describe('ChartFunctions', () => {
   test('createDataForAxis from multiple filters', () => {
     const meta = Data.responseData.metaData;
 
-    const minorAxisConfiguration: AxisConfigurationItem = {
+    const minorAxisConfiguration: AxisConfiguration = {
       name: meta.indicators['26'].label,
+      type: 'major',
       groupBy: 'timePeriods',
       dataSets: [dataSet26_1_71, dataSet26_1_72],
     };
@@ -153,8 +156,9 @@ describe('ChartFunctions', () => {
   test('createDataForAxis returns full data range if data is missing', () => {
     const meta = Data.responseWithMissingData.metaData;
 
-    const axisConfig: AxisConfigurationItem = {
+    const axisConfig: AxisConfiguration = {
       name: meta.indicators['26'].label,
+      type: 'major',
       groupBy: 'timePeriods',
       dataSets: [dataSet26_1_71, dataSet26_1_72],
     };
