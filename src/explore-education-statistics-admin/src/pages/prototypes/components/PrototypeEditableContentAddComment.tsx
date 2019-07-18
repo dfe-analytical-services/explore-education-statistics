@@ -1,8 +1,8 @@
-import React from 'react';
-import Details from '@common/components/Details';
 import { LoginContext } from '@admin/components/Login';
 import { User } from '@admin/services/PrototypeLoginService';
 import { ExtendedComment } from '@admin/services/publicationService';
+import Details from '@common/components/Details';
+import React from 'react';
 import styles from './PrototypeEditableContentAddComment.module.scss';
 
 const key = (() => {
@@ -56,7 +56,6 @@ const ContentAddComment = ({ initialComments }: Props) => {
             <textarea
               name="comment"
               id="comment"
-              defaultValue=""
               value={currentComment}
               onChange={e => setCurrentComment(e.target.value)}
             />

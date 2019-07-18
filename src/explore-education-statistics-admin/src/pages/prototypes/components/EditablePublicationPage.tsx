@@ -438,6 +438,12 @@ class EditablePublicationPage extends Component<Props, State> {
           <h2 className="govuk-heading-l">
             Latest headline facts and figures - 2018/19
           </h2>
+          {reviewing && data && (
+            <AddComment initialComments={data.keyStatistics.comments} />
+          )}
+          {resolveComments && data && (
+            <ResolveComment initialComments={data.keyStatistics.comments} />
+          )}
 
           <PrototypeDataSample
             editing={editing}
