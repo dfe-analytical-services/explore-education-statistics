@@ -1,17 +1,9 @@
-import { interfaceExtends } from '@babel/types';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
-import {
-  Field,
-  FieldProps,
-  FormikFormProps,
-  FormikProps,
-  FormikValues,
-} from 'formik';
-import React, { ChangeEvent, ReactNode } from 'react';
 import classNames from 'classnames';
-import FormFieldTextInput from './FormFieldTextInput';
+import { FormikProps } from 'formik';
+import React, { ChangeEvent, ReactNode } from 'react';
 import FormGroup from './FormGroup';
-import FormTextInput, { FormTextInputProps } from './FormTextInput';
+import FormTextInput from './FormTextInput';
 
 interface Props<T> {
   id: string;
