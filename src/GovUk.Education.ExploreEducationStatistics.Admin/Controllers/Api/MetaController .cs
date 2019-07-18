@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
     [ApiController]
     [Authorize]
-    [Route("/api/meta")]
+    [Route("meta")]
     public class MetaController : ControllerBase
     {
         private readonly IMetaService _metaService;
@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         // GET api/meta/timeidentifiers
-        [HttpGet("/timeidentifiers")]
+        [HttpGet("timeidentifiers")]
         [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
         public ActionResult<List<TimeIdentifierCategoryModel>> GetTimeIdentifiersByCategory()
         {
@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
         
         // GET api/meta/releasetypes
-        [HttpGet("/releasetypes")]
+        [HttpGet("releasetypes")]
         [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
         public ActionResult<List<ReleaseType>> GetReleaseTypes()
         {
