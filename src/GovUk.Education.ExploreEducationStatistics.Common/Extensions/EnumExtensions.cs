@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
     {
         public static string GetEnumLabel(this Enum enumValue)
         {
-            return GetEnumLabelAttribute(enumValue)?.Label ?? enumValue.ToString();
+            return GetEnumLabelValueAttribute(enumValue)?.Label ?? enumValue.ToString();
         }
 
         public static string GetEnumValue(this Enum enumValue)
@@ -30,9 +30,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             return enumValue.GetEnumAttribute<EnumLabelValueAttribute>();
         }
         
-        private static EnumLabelValueAttribute GetEnumLabelAttribute(this Enum enumValue)
-        {
-            return enumValue.GetEnumAttribute<EnumLabelValueAttribute>();
-        }
     }
 }
