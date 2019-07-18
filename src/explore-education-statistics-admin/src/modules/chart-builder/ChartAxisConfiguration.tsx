@@ -3,7 +3,7 @@ import {
   FormCheckbox,
   FormFieldset,
   FormGroup,
-  FormSelect,
+  FormTextInput,
 } from '@common/components/form';
 import FormComboBox from '@common/components/form/FormComboBox';
 import {
@@ -96,6 +96,19 @@ const ChartAxisConfiguration = ({
           checked={axisConfiguration.showGrid}
           value="grid"
         />
+
+        <FormTextInput
+          id={`${id}_size`}
+          name={`${id}_size`}
+          type="number"
+          min="0"
+          max="100"
+          label="Size"
+          value={axisConfiguration.size}
+          onChange={e => updateAxisConfiguration({ size: e.target.value })}
+        />
+
+        {/*
         <FormSelect
           id={`${id}_labelPosition`}
           name={`${id}_labelPosition`}
@@ -108,6 +121,7 @@ const ChartAxisConfiguration = ({
             { label: 'On graph', value: 'graph' },
           ]}
         />
+*/}
 
         <p>Add / remove / edit series labels & range DFE-1018 1017</p>
         <p>Restrict range of series (years only?) DFE-1009</p>

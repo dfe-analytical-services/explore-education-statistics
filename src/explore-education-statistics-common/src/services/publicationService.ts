@@ -114,6 +114,7 @@ export interface AxisConfiguration {
   title?: string;
   showGrid?: boolean;
   labelPosition?: LabelPosition;
+  size?: string;
 }
 
 export interface Chart {

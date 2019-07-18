@@ -168,7 +168,9 @@ const ChartBuilder = ({ data }: Props) => {
 
         meta: data.metaData,
 
-        axes: Object.entries(axesConfiguration).reduce(
+        axes: Object.entries(axesConfiguration).reduce<
+          Dictionary<AxisConfiguration>
+        >(
           (populatedData, [key, value]) => ({
             ...populatedData,
             [key]: {
@@ -221,6 +223,7 @@ const ChartBuilder = ({ data }: Props) => {
               dataSets: axisDefinition.type === 'major' ? dataSets : [],
               visible: true,
               showGrid: true,
+              size: '50',
             },
           }),
           {},
