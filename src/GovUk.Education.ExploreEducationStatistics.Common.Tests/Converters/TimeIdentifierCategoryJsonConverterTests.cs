@@ -119,5 +119,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Converters
 
             Assert.Equal(expected, JsonConvert.DeserializeObject<SampleClass>(jsonText));
         }
+        
+        [Fact]
+        public void SerializeDeserializeObject()
+        {
+            var original = new SampleClass
+            {
+                StringFieldBefore = "Hello",
+                SampleField = TimeIdentifierCategory.Term,
+                StringFieldAfter = "Goodbye",
+            };
+            var jsonText = JsonConvert.SerializeObject(original);
+            var deserialized = JsonConvert.DeserializeObject<SampleClass>(jsonText);
+            Assert.Equal(original, deserialized);
+        }
+
     }
 }
