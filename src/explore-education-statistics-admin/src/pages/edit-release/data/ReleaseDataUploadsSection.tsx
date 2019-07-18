@@ -1,17 +1,17 @@
-import Link from "@admin/components/Link";
-import {dataRoute} from "@admin/routes/releaseRoutes";
-import service from "@admin/services/edit-release/data/service";
-import {DataFile} from "@admin/services/edit-release/data/types";
-import Button from "@common/components/Button";
-import {Form, FormFieldset, Formik} from "@common/components/form";
-import FormFieldFileSelector from "@common/components/form/FormFieldFileSelector";
-import FormFieldTextInput from "@common/components/form/FormFieldTextInput";
-import ModalConfirm from "@common/components/ModalConfirm";
-import SummaryList from "@common/components/SummaryList";
-import SummaryListItem from "@common/components/SummaryListItem";
-import Yup from "@common/lib/validation/yup";
-import {FormikProps} from "formik";
-import React, {useEffect, useState} from "react";
+import Link from '@admin/components/Link';
+import { dataRoute } from '@admin/routes/releaseRoutes';
+import service from '@admin/services/edit-release/data/service';
+import { DataFile } from '@admin/services/edit-release/data/types';
+import Button from '@common/components/Button';
+import { Form, FormFieldset, Formik } from '@common/components/form';
+import FormFieldFileSelector from '@common/components/form/FormFieldFileSelector';
+import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
+import ModalConfirm from '@common/components/ModalConfirm';
+import SummaryList from '@common/components/SummaryList';
+import SummaryListItem from '@common/components/SummaryListItem';
+import Yup from '@common/lib/validation/yup';
+import { FormikProps } from 'formik';
+import React, { useEffect, useState } from 'react';
 
 interface FormValues {
   subjectTitle: string;
@@ -25,8 +25,7 @@ interface Props {
 
 const formId = 'dataFileUploadForm';
 
-const ReleaseDataUploadsSection = ({releaseId}: Props) => {
-
+const ReleaseDataUploadsSection = ({ releaseId }: Props) => {
   const [dataFiles, setDataFiles] = useState<DataFile[]>();
   const [deleteFileId, setDeleteFilesRequest] = useState('');
 
@@ -36,51 +35,51 @@ const ReleaseDataUploadsSection = ({releaseId}: Props) => {
 
   return (
     <>
-      {dataFiles && dataFiles.map(dataFile => (
-        <SummaryList key={dataFile.file.id}>
-          <SummaryListItem term="Subject title">
-            {dataFile.title}
-          </SummaryListItem>
-          <SummaryListItem term="Data file">
-            <a
-              href={service.createDownloadDataFileLink(
-                releaseId,
-                dataFile.file.id,
-              )}
-            >
-              {dataFile.file.fileName}
-            </a>
-          </SummaryListItem>
-          <SummaryListItem term="Filesize">
-            {dataFile.fileSize.size.toLocaleString()}{' '}
-            {dataFile.fileSize.unit}
-          </SummaryListItem>
-          <SummaryListItem term="Number of rows">
-            {dataFile.numberOfRows.toLocaleString()}
-          </SummaryListItem>
-          <SummaryListItem term="Metadata file">
-            <a
-              href={service.createDownloadDataMetadataFileLink(
-                releaseId,
-                dataFile.file.id,
-              )}
-            >
-              {dataFile.metadataFile.fileName}
-            </a>
-          </SummaryListItem>
-          <SummaryListItem
-            term="Actions"
-            actions={
-              <Link
-                to="#"
-                onClick={_ => setDeleteFilesRequest(dataFile.file.id)}
+      {dataFiles &&
+        dataFiles.map(dataFile => (
+          <SummaryList key={dataFile.file.id}>
+            <SummaryListItem term="Subject title">
+              {dataFile.title}
+            </SummaryListItem>
+            <SummaryListItem term="Data file">
+              <a
+                href={service.createDownloadDataFileLink(
+                  releaseId,
+                  dataFile.file.id,
+                )}
               >
-                Delete files
-              </Link>
-            }
-          />
-        </SummaryList>
-      ))}
+                {dataFile.file.fileName}
+              </a>
+            </SummaryListItem>
+            <SummaryListItem term="Filesize">
+              {dataFile.fileSize.size.toLocaleString()} {dataFile.fileSize.unit}
+            </SummaryListItem>
+            <SummaryListItem term="Number of rows">
+              {dataFile.numberOfRows.toLocaleString()}
+            </SummaryListItem>
+            <SummaryListItem term="Metadata file">
+              <a
+                href={service.createDownloadDataMetadataFileLink(
+                  releaseId,
+                  dataFile.file.id,
+                )}
+              >
+                {dataFile.metadataFile.fileName}
+              </a>
+            </SummaryListItem>
+            <SummaryListItem
+              term="Actions"
+              actions={
+                <Link
+                  to="#"
+                  onClick={_ => setDeleteFilesRequest(dataFile.file.id)}
+                >
+                  Delete files
+                </Link>
+              }
+            />
+          </SummaryList>
+        ))}
       <Formik<FormValues>
         enableReinitialize
         initialValues={{

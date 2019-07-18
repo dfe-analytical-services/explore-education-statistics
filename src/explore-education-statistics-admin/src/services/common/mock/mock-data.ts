@@ -1,5 +1,5 @@
-import {IdLabelPair} from "@admin/services/common/types";
-import {Dictionary} from '@common/types';
+import { IdLabelPair } from '@admin/services/common/types';
+import { Dictionary } from '@common/types';
 
 const publicationDetailsByReleaseId: Dictionary<IdLabelPair> = {
   'my-publication-1-release-1': {

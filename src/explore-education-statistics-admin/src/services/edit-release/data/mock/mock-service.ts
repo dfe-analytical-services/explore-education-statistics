@@ -1,5 +1,5 @@
-import {EditReleaseService} from "@admin/services/edit-release/data/service";
-import getCaptureGroups from "@admin/services/util/mock/mock-service";
+import { EditReleaseService } from '@admin/services/edit-release/data/service';
+import getCaptureGroups from '@admin/services/util/mock/mock-service';
 import MockAdapter from 'axios-mock-adapter';
 
 const generateRandomInteger = (max: number) =>
@@ -9,43 +9,41 @@ const generateRandomIntegerString = (max: number) =>
   generateRandomInteger(max).toString();
 
 export default async (mock: MockAdapter) => {
-
   const mockData = (await import(
     /* webpackChunkName: "mock-data" */ './mock-data'
   )).default;
 
   const service: EditReleaseService = {
-
     getReleaseDataFiles: releaseId =>
       Promise.resolve(mockData.getDataFilesForRelease(releaseId).dataFiles),
 
     uploadDataFiles: (releaseId, request) => {
-
       const dataFilesView = mockData.getDataFilesForRelease(releaseId);
 
       // eslint-disable-next-line no-param-reassign
-      dataFilesView.dataFiles = dataFilesView.dataFiles.concat([{
-        title: request.subjectTitle,
-        file: {
-          id: generateRandomIntegerString(100000),
-          fileName: request.dataFile.name,
+      dataFilesView.dataFiles = dataFilesView.dataFiles.concat([
+        {
+          title: request.subjectTitle,
+          file: {
+            id: generateRandomIntegerString(100000),
+            fileName: request.dataFile.name,
+          },
+          metadataFile: {
+            id: generateRandomIntegerString(100000),
+            fileName: request.metadataFile.name,
+          },
+          fileSize: {
+            size: generateRandomInteger(100),
+            unit: 'Mb',
+          },
+          numberOfRows: generateRandomInteger(200000),
         },
-        metadataFile: {
-          id: generateRandomIntegerString(100000),
-          fileName: request.metadataFile.name,
-        },
-        fileSize: {
-          size: generateRandomInteger(100),
-          unit: 'Mb',
-        },
-        numberOfRows: generateRandomInteger(200000),
-      }]);
+      ]);
 
       return Promise.resolve(null);
     },
 
     deleteDataFiles: (releaseId, dataFileId) => {
-
       const dataFiles = mockData.getDataFilesForRelease(releaseId);
 
       // eslint-disable-next-line no-param-reassign
@@ -64,21 +62,22 @@ export default async (mock: MockAdapter) => {
       Promise.resolve(mockData.getAdhocFilesForRelease(releaseId).adhocFiles),
 
     uploadAdhocFile: (releaseId, request) => {
-
       const adhocFilesView = mockData.getAdhocFilesForRelease(releaseId);
 
       // eslint-disable-next-line no-param-reassign
-      adhocFilesView.adhocFiles = adhocFilesView.adhocFiles.concat([{
-        title: request.name,
-        file: {
-          id: generateRandomIntegerString(100000),
-          fileName: request.file.name,
+      adhocFilesView.adhocFiles = adhocFilesView.adhocFiles.concat([
+        {
+          title: request.name,
+          file: {
+            id: generateRandomIntegerString(100000),
+            fileName: request.file.name,
+          },
+          fileSize: {
+            size: generateRandomInteger(100),
+            unit: 'Mb',
+          },
         },
-        fileSize: {
-          size: generateRandomInteger(100),
-          unit: 'Mb',
-        },
-      }]);
+      ]);
 
       return Promise.resolve(null);
     },
@@ -106,10 +105,7 @@ export default async (mock: MockAdapter) => {
 
   mock.onGet(getReleaseDataFilesUrl).reply(({ url }) => {
     const [releaseId] = getCaptureGroups(getReleaseDataFilesUrl, url);
-    return [
-      200,
-      service.getReleaseDataFiles(releaseId),
-    ];
+    return [200, service.getReleaseDataFiles(releaseId)];
   });
 
   mock.onPost(uploadDataFilesUrl).reply(({ url, data }) => {
@@ -132,18 +128,12 @@ export default async (mock: MockAdapter) => {
 
   mock.onDelete(deleteDataFilesUrl).reply(({ url }) => {
     const [releaseId, dataFileId] = getCaptureGroups(deleteDataFilesUrl, url);
-    return [
-      204,
-      service.deleteDataFiles(releaseId, dataFileId)
-    ];
+    return [204, service.deleteDataFiles(releaseId, dataFileId)];
   });
 
   mock.onGet(getReleaseAdhocFilesUrl).reply(({ url }) => {
     const [releaseId] = getCaptureGroups(getReleaseAdhocFilesUrl, url);
-    return [
-      200,
-      service.getReleaseAdhocFiles(releaseId),
-    ];
+    return [200, service.getReleaseAdhocFiles(releaseId)];
   });
 
   mock.onPost(uploadAdhocFileUrl).reply(({ url, data }) => {
@@ -164,9 +154,6 @@ export default async (mock: MockAdapter) => {
 
   mock.onDelete(deleteAdhocFileUrl).reply(({ url }) => {
     const [releaseId, fileId] = getCaptureGroups(deleteAdhocFileUrl, url);
-    return [
-      204,
-      service.deleteAdhocFile(releaseId, fileId)
-    ];
+    return [204, service.deleteAdhocFile(releaseId, fileId)];
   });
 };

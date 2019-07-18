@@ -1,6 +1,11 @@
-import {createClient} from '@admin/services/util/service';
+import { createClient } from '@admin/services/util/service';
 import mocks from './mock/mock-service';
-import {AdhocFile, DataFile, UploadAdhocFileRequest, UploadDataFilesRequest} from './types';
+import {
+  AdhocFile,
+  DataFile,
+  UploadAdhocFileRequest,
+  UploadDataFilesRequest,
+} from './types';
 
 const apiClient = createClient({
   mockBehaviourRegistrar: mocks,
@@ -72,7 +77,10 @@ const service: EditReleaseService = {
       const data = new FormData();
       data.append('name', request.name);
       data.append('file', request.file);
-      return client.post<null>(`/release/${releaseId}/adhoc-files/upload`, data);
+      return client.post<null>(
+        `/release/${releaseId}/adhoc-files/upload`,
+        data,
+      );
     });
   },
   deleteAdhocFile(releaseId: string, fileId: string): Promise<null> {
@@ -83,7 +91,6 @@ const service: EditReleaseService = {
   createDownloadAdhocFileLink(releaseId: string, fileId: string): string {
     return `/release/${releaseId}/adhoc-file/${fileId}`;
   },
-
 };
 
 export default service;

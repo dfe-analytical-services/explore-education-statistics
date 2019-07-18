@@ -1,5 +1,8 @@
-import {ReleaseSetupDetails, ReleaseSetupDetailsUpdateRequest,} from '@admin/services/edit-release/setup/types';
-import {createClient} from '@admin/services/util/service';
+import {
+  ReleaseSetupDetails,
+  ReleaseSetupDetailsUpdateRequest,
+} from '@admin/services/edit-release/setup/types';
+import { createClient } from '@admin/services/util/service';
 import mocks from './mock/mock-service';
 
 const apiClient = createClient({
@@ -8,7 +11,9 @@ const apiClient = createClient({
 
 export interface ReleaseSetupService {
   getReleaseSetupDetails: (releaseId: string) => Promise<ReleaseSetupDetails>;
-  updateReleaseSetupDetails: (updatedRelease: ReleaseSetupDetailsUpdateRequest) => Promise<void>;
+  updateReleaseSetupDetails: (
+    updatedRelease: ReleaseSetupDetailsUpdateRequest,
+  ) => Promise<void>;
 }
 
 const service: ReleaseSetupService = {

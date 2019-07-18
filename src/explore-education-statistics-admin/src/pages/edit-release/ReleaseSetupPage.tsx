@@ -1,15 +1,18 @@
 import Link from '@admin/components/Link';
 import DummyReferenceData from '@admin/pages/DummyReferenceData';
 import ReleasePageTemplate from '@admin/pages/edit-release/components/ReleasePageTemplate';
-import {setupEditRoute} from '@admin/routes/releaseRoutes';
-import {dayMonthYearIsComplete, dayMonthYearToDate,} from '@admin/services/common/types';
+import { setupEditRoute } from '@admin/routes/releaseRoutes';
+import {
+  dayMonthYearIsComplete,
+  dayMonthYearToDate,
+} from '@admin/services/common/types';
 import service from '@admin/services/edit-release/setup/service';
-import {ReleaseSetupDetails} from '@admin/services/edit-release/setup/types';
+import { ReleaseSetupDetails } from '@admin/services/edit-release/setup/types';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import React, {useEffect, useState} from 'react';
-import {RouteComponentProps} from 'react-router';
+import React, { useEffect, useState } from 'react';
+import { RouteComponentProps } from 'react-router';
 
 interface MatchProps {
   releaseId: string;
@@ -57,7 +60,10 @@ const ReleaseSetupPage = ({ match }: RouteComponentProps<MatchProps>) => {
                     </time>{' '}
                     to{' '}
                     {releaseSetupDetails.timePeriodCoverageStartDate.year
-                      ? (releaseSetupDetails.timePeriodCoverageStartDate.year + 1).toString()
+                      ? (
+                          releaseSetupDetails.timePeriodCoverageStartDate.year +
+                          1
+                        ).toString()
                       : ''}
                   </>
                 )}
@@ -70,7 +76,9 @@ const ReleaseSetupPage = ({ match }: RouteComponentProps<MatchProps>) => {
                   releaseSetupDetails.scheduledPublishDate,
                 ) && (
                   <FormattedDate>
-                    {dayMonthYearToDate(releaseSetupDetails.scheduledPublishDate)}
+                    {dayMonthYearToDate(
+                      releaseSetupDetails.scheduledPublishDate,
+                    )}
                   </FormattedDate>
                 )}
               </SummaryListItem>

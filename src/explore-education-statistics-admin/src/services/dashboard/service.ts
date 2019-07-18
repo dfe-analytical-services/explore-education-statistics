@@ -1,6 +1,6 @@
-import {createClient} from '@admin/services/util/service';
+import { createClient } from '@admin/services/util/service';
 import mocks from './mock/mock-service';
-import {AdminDashboardPublication, ThemeAndTopics} from './types';
+import { AdminDashboardPublication, ThemeAndTopics } from './types';
 
 const apiClient = createClient({
   mockBehaviourRegistrar: mocks,

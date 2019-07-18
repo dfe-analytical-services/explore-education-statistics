@@ -1,5 +1,5 @@
-import {AdhocFile, DataFile} from "@admin/services/edit-release/data/types";
-import {Dictionary} from '@common/types';
+import { AdhocFile, DataFile } from '@admin/services/edit-release/data/types';
+import { Dictionary } from '@common/types';
 
 export interface DataFileView {
   dataFiles: DataFile[];
@@ -46,27 +46,19 @@ const dataFilesByReleaseId: Dictionary<DataFileView> = {
       },
       {
         title: 'National characteristics',
-        file:
-          {
-            id: 'file-3',
-            fileName:
-              'absence_natcharacteristics.csv',
-          }
-        ,
+        file: {
+          id: 'file-3',
+          fileName: 'absence_natcharacteristics.csv',
+        },
         fileSize: {
           size: 71,
-          unit:
-            'Mb',
-        }
-        ,
+          unit: 'Mb',
+        },
         numberOfRows: 320000,
-        metadataFile:
-          {
-            id: 'metadata-file-3',
-            fileName:
-              'meta_absence_natcharacteristics.csv',
-          }
-        ,
+        metadataFile: {
+          id: 'metadata-file-3',
+          fileName: 'meta_absence_natcharacteristics.csv',
+        },
       },
     ],
   },

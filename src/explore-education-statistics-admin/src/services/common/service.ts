@@ -1,5 +1,5 @@
-import {IdLabelPair} from "@admin/services/common/types";
-import {createClient} from '@admin/services/util/service';
+import { IdLabelPair } from '@admin/services/common/types';
+import { createClient } from '@admin/services/util/service';
 import mocks from './mock/mock-service';
 
 const apiClient = createClient({

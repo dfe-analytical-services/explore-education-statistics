@@ -1,27 +1,33 @@
 import Link from '@admin/components/Link';
-import DummyReferenceData, {DateType, TimePeriodCoverageGroup,} from '@admin/pages/DummyReferenceData';
+import DummyReferenceData, {
+  DateType,
+  TimePeriodCoverageGroup,
+} from '@admin/pages/DummyReferenceData';
 import ReleasePageTemplate from '@admin/pages/edit-release/components/ReleasePageTemplate';
-import {setupRoute} from '@admin/routes/releaseRoutes';
-import {DayMonthYearValues, IdLabelPair,} from '@admin/services/common/types';
+import { setupRoute } from '@admin/routes/releaseRoutes';
+import { DayMonthYearValues, IdLabelPair } from '@admin/services/common/types';
 import service from '@admin/services/edit-release/setup/service';
-import {ReleaseSetupDetails, ReleaseSetupDetailsUpdateRequest,} from '@admin/services/edit-release/setup/types';
+import {
+  ReleaseSetupDetails,
+  ReleaseSetupDetailsUpdateRequest,
+} from '@admin/services/edit-release/setup/types';
 import {
   shapeOfDayMonthYearField,
   validateMandatoryDayMonthYearField,
   validateOptionalPartialDayMonthYearField,
 } from '@admin/validation/validation';
 import Button from '@common/components/Button';
-import {Form, FormFieldset, Formik} from '@common/components/form';
+import { Form, FormFieldset, Formik } from '@common/components/form';
 import FormFieldDayMonthYear from '@common/components/form/FormFieldDayMonthYear';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
-import {SelectOption} from '@common/components/form/FormSelect';
+import { SelectOption } from '@common/components/form/FormSelect';
 import Yup from '@common/lib/validation/yup';
-import {Dictionary} from '@common/types';
-import {FormikProps} from 'formik';
-import React, {useEffect, useState} from 'react';
-import {RouteComponentProps} from 'react-router';
+import { Dictionary } from '@common/types';
+import { FormikProps } from 'formik';
+import React, { useEffect, useState } from 'react';
+import { RouteComponentProps } from 'react-router';
 
 interface MatchProps {
   releaseId: string;
@@ -110,7 +116,6 @@ const ReleaseSetupEditPage = ({
   return (
     <>
       {releaseSetupDetails && timePeriodCoverageGroups && releaseTypes && (
-
         <ReleasePageTemplate
           releaseId={releaseId}
           publicationTitle={
@@ -123,7 +128,8 @@ const ReleaseSetupEditPage = ({
             <Formik<FormValues>
               enableReinitialize
               initialValues={{
-                timePeriodCoverageCode: releaseSetupDetails.timePeriodCoverageCode,
+                timePeriodCoverageCode:
+                  releaseSetupDetails.timePeriodCoverageCode,
                 timePeriodCoverageStartDate: isDayMonthYearDateTypeSelected(
                   selectedTimePeriodCoverageGroup,
                 )
@@ -137,20 +143,19 @@ const ReleaseSetupEditPage = ({
                 releaseTypeId: releaseSetupDetails.releaseType.id,
                 scheduledPublishDate: releaseSetupDetails.scheduledPublishDate,
                 nextReleaseExpectedDate:
-                releaseSetupDetails.nextReleaseExpectedDate,
+                  releaseSetupDetails.nextReleaseExpectedDate,
               }}
               validationSchema={Yup.object<FormValues>({
                 timePeriodCoverageCode: Yup.string().required(
                   'Choose a time period',
                 ),
-                timePeriodCoverageStartDate: Yup.object<DayMonthYearValues>().when(
-                  'timePeriodCoverageCode',
-                  {
-                    is: (val: string) => isDayMonthYearDateTypeCodeSelected(val),
-                    then: validateMandatoryDayMonthYearField,
-                    otherwise: shapeOfDayMonthYearField,
-                  },
-                ),
+                timePeriodCoverageStartDate: Yup.object<
+                  DayMonthYearValues
+                >().when('timePeriodCoverageCode', {
+                  is: (val: string) => isDayMonthYearDateTypeCodeSelected(val),
+                  then: validateMandatoryDayMonthYearField,
+                  otherwise: shapeOfDayMonthYearField,
+                }),
                 timePeriodCoverageStartDateYearOnly: Yup.number().when(
                   'timePeriodCoverageCode',
                   {
@@ -173,8 +178,8 @@ const ReleaseSetupEditPage = ({
                     ) && values.timePeriodCoverageStartDate
                       ? values.timePeriodCoverageStartDate
                       : {
-                        year: values.timePeriodCoverageStartDateYearOnly,
-                      },
+                          year: values.timePeriodCoverageStartDateYearOnly,
+                        },
                   scheduledPublishDate: values.scheduledPublishDate,
                   nextReleaseExpectedDate: values.nextReleaseExpectedDate,
                   releaseType: DummyReferenceData.findReleaseType(
@@ -197,7 +202,9 @@ const ReleaseSetupEditPage = ({
                         id={`${formId}-timePeriodCoverage`}
                         label="Type"
                         name="timePeriodCoverageCode"
-                        optGroups={getTimePeriodOptions(timePeriodCoverageGroups)}
+                        optGroups={getTimePeriodOptions(
+                          timePeriodCoverageGroups,
+                        )}
                         onChange={event => {
                           setReleaseSetupDetails({
                             ...releaseSetupDetails,

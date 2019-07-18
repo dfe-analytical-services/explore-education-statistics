@@ -1,5 +1,7 @@
-const getCaptureGroups: (regex: RegExp, string?: string) => RegExpMatchArray = (regex, string) => {
-
+const getCaptureGroups: (regex: RegExp, string?: string) => RegExpMatchArray = (
+  regex,
+  string,
+) => {
   if (!string) {
     return [];
   }

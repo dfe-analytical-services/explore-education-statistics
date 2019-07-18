@@ -1,4 +1,4 @@
-import {DashboardService} from "@admin/services/dashboard/service";
+import { DashboardService } from '@admin/services/dashboard/service';
 import { PrototypeLoginService } from '@admin/services/PrototypeLoginService';
 import MockAdapter from 'axios-mock-adapter';
 
@@ -9,7 +9,8 @@ export default async (mock: MockAdapter) => {
 
   const service: DashboardService = {
     getThemesAndTopics: _ => Promise.resolve(mockData.themesAndTopics),
-    getPublicationsByTopic: _ => Promise.resolve(mockData.dashboardPublications),
+    getPublicationsByTopic: _ =>
+      Promise.resolve(mockData.dashboardPublications),
   };
 
   // getThemesAndTopics
@@ -27,5 +28,5 @@ export default async (mock: MockAdapter) => {
         userId: PrototypeLoginService.getUserList()[0].id,
       },
     })
-    .reply(200, service.getPublicationsByTopic('', ''  ));
+    .reply(200, service.getPublicationsByTopic('', ''));
 };

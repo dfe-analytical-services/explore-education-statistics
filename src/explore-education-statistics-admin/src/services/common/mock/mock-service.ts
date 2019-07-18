@@ -1,5 +1,5 @@
-import {CommonService} from "@admin/services/common/service";
-import getCaptureGroups from "@admin/services/util/mock/mock-service";
+import { CommonService } from '@admin/services/common/service';
+import getCaptureGroups from '@admin/services/util/mock/mock-service';
 import MockAdapter from 'axios-mock-adapter';
 
 export default async (mock: MockAdapter) => {
@@ -16,7 +16,10 @@ export default async (mock: MockAdapter) => {
 
   // getPublicationDetailsForRelease
   mock.onGet(getPublicationDetailsForReleaseUrl).reply(({ url }) => {
-    const [releaseId] = getCaptureGroups(getPublicationDetailsForReleaseUrl, url);
+    const [releaseId] = getCaptureGroups(
+      getPublicationDetailsForReleaseUrl,
+      url,
+    );
     return [200, service.getPublicationDetailsForRelease(releaseId)];
   });
 };

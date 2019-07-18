@@ -1,5 +1,5 @@
 import Client from '@common/services/api/Client';
-import {commaSeparated} from '@common/services/util/paramSerializers';
+import { commaSeparated } from '@common/services/util/paramSerializers';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 
