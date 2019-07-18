@@ -9,10 +9,8 @@ export const cookieBannerSeenName = 'dfe_seen_cookie_message';
 export function getCookies() {
   // turns document.cookie e.g. 'cookie_name=hello-world; cookietwo=true'
   // into { cookie_name: "hellow-world", cookietwo: true }
-  const stringCookies = document.cookie;
-  const cookiesPairsArray = stringCookies.split('; ');
   const cookies: any = {};
-  cookiesPairsArray.forEach(cookiesPairString => {
+  document.cookie.split('; ').forEach(cookiesPairString => {
     const [key, value]: string[] = cookiesPairString.split('=');
     cookies[key] = value;
   });
