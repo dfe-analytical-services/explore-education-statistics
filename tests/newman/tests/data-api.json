@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "4ad5bedf-5b64-4962-a7c0-36f6aa11a3e6",
+		"_postman_id": "e40fd965-ed1f-47e0-99da-a9b8db0fd702",
 		"name": "DfE Data API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -2550,7 +2550,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Country\",\n    \"countries\": [\n    \t\"E92000001\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Country\",\n    \"country\": [\n    \t\"E92000001\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2923,7 +2923,7 @@
 													"});",
 													"",
 													"pm.test(\"Expect correct number of results\", function() {",
-													"   pm.expect(respJson.result.length).to.equal(22458);",
+													"   pm.expect(respJson.result.length).to.equal(4);",
 													"});"
 												],
 												"type": "text/javascript"
@@ -2941,7 +2941,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\t\"country\":[\"E92000001\"],\n\t\"subjectId\":\"2\",\n\t\"indicators\":[\"48\"],\n\t\"filters\": [\n\t\t{{FILT_Total}}, {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n\t],\n\t\"timePeriod\": {\n    \t\"startYear\": 2006,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2006,\n    \t\"endCode\": \"AY\"\n    }\n}"
+											"raw": "{\n\t\"geographicLevel\": \"Country\",\n\t\"country\":[\"E92000001\"],\n\t\"subjectId\":\"2\",\n\t\"indicators\":[\"48\"],\n\t\"filters\": [\n\t\t{{FILT_Total}}, {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n\t],\n\t\"timePeriod\": {\n    \t\"startYear\": 2006,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2006,\n    \t\"endCode\": \"AY\"\n    }\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3505,7 +3505,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 3,\n    \"geographicLevel\": \"Country\",\n    \"countries\": [ \"E92000001\" ],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"HT6\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"HT6\"\n    },\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        68, 86, 87, 88\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 3,\n    \"geographicLevel\": \"Country\",\n    \"country\": [ \"E92000001\" ],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"HT6\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"HT6\"\n    },\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        68, 86, 87, 88\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3520,7 +3520,7 @@
 									"response": []
 								},
 								{
-									"name": "Tablebuilder - Absence by term - LA - Country England, Region Inner London + Outer London, LA City of London + Barking and Dagenham - HT6",
+									"name": "Tablebuilder - Absence by term - no geoLevel - Country England, Region Inner London + Outer London, LA City of London + Barking and Dagenham - HT6",
 									"event": [
 										{
 											"listen": "test",
@@ -3529,7 +3529,7 @@
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(3); });",
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(9); });",
 													"",
 													"pm.test(\"geographicLevel should be same as request\", function () {",
 													"    for(var i = 0; i < respJson.result.length; i++) {",
@@ -3553,7 +3553,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 3,\n    \"geographicLevel\": \"Local_Authority\",\n    \"countries\": [ \"E92000001\" ],\n    \"region\": [ \"E13000001\", \"E13000002\" ],\n    \"localAuthority\": [ \"E09000001\", \"E09000002\" ],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"HT6\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"HT6\"\n    },\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        68, 86, 87, 88\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 3,\n    \"country\": [ \"E92000001\" ],\n    \"region\": [ \"E13000001\", \"E13000002\" ],\n    \"localAuthority\": [ \"E09000001\", \"E09000002\" ],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"HT6\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"HT6\"\n    },\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        68, 86, 87, 88\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3804,26 +3804,12 @@
 													"    pm.expect(respJson.timePeriodRange.length).to.equal(4); ",
 													"});",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(612); });",
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(4); });",
 													"",
-													"pm.test(\"results should contain Country, Local_Authority, and Region geographicLevels\", function () {",
-													"    var countryFound = false;",
-													"    var localAuthorityFound = false;",
-													"    var regionFound = false;",
+													"pm.test(\"geographicLevel should be same as request\", function () {",
 													"    for(var i = 0; i < respJson.result.length; i++) {",
-													"        if(respJson.result[i].geographicLevel == \"Country\") {",
-													"            countryFound = true;",
-													"        }",
-													"        if(respJson.result[i].geographicLevel == \"Local_Authority\") {",
-													"            localAuthorityFound = true;",
-													"        }",
-													"        if(respJson.result[i].geographicLevel == \"Region\") {",
-													"            regionFound = true;",
-													"        }",
+													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Country\");",
 													"    }",
-													"    pm.expect(countryFound).to.equal(true);",
-													"    pm.expect(localAuthorityFound).to.equal(true);",
-													"    pm.expect(regionFound).to.equal(true);",
 													"});"
 												],
 												"type": "text/javascript"
@@ -3842,7 +3828,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 5,\n    \"Country\": [\"E92000001\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2013,\n    \t\"startCode\": \"HT6\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"HT6\"\n    },\n    \"filters\" : [\n        {{FILT_PupilReferralUnit}}\n    ],\n    \"indicators\": [\n        96\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 5,\n    \"country\": [\"E92000001\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2013,\n    \t\"startCode\": \"HT6\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"HT6\"\n    },\n    \"filters\" : [\n        {{FILT_PupilReferralUnit}}\n    ],\n    \"indicators\": [\n        96\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -4905,7 +4891,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 10,\n    \"geographicLevel\": \"Local_Authority\",\n        \"localAuthority\": [\n    \t\"E09000022\",\n    \t\"E08000014\",\n    \t\"E06000032\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2017,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}\n    ],\n    \"indicators\": [\n        {{INDI_TotalPointScoreBasedOnAssessmentRating}},\n        {{INDI_AveragePointScore}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 10,\n    \"geographicLevel\": \"Local_Authority\",\n    \"localAuthority\": [\n    \t\"E09000022\",\n    \t\"E08000014\",\n    \t\"E06000032\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2017,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}\n    ],\n    \"indicators\": [\n        {{INDI_TotalPointScoreBasedOnAssessmentRating}},\n        {{INDI_AveragePointScore}}\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/data",
