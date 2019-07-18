@@ -1,6 +1,7 @@
 import Page from '@frontend/components/Page';
 import React from 'react';
 import { cookieBannerSeenName } from '@frontend/components/CookieBanner';
+import Link from '@frontend/components/Link';
 
 function CookiesPage() {
   return (
@@ -20,9 +21,14 @@ function CookiesPage() {
           remember the notifications you’ve seen so that we don’t show them to
           you again
         </li>
+        <li>
+          store various settings you have selected so they will be used when you
+          return to the site.
+        </li>
       </ul>
-
-      <p>GOV.UK cookies aren’t used to identify you personally.</p>
+      <div className="govuk-inset-text">
+        <p>GOV.UK cookies aren’t used to identify you personally.</p>
+      </div>
       <p>
         You’ll normally see a message on the site before we store a cookie on
         your computer.
@@ -35,97 +41,109 @@ function CookiesPage() {
       </p>
 
       <h2>How cookies are used on this service</h2>
-      <h3>Measuring website usage (Google Analytics)</h3>
-      <p>
-        We use Google Analytics software to collect information about how you
-        use GOV.UK. We do this to help make sure the site is meeting the needs
-        of its users and to help us make improvements.
-      </p>
-      <p>Google Analytics stores information about:</p>
-      <ul>
-        <li>the pages you visit on this service</li>
-        <li>how long you spend on each page</li>
-        <li>how you got to the site</li>
-        <li>what you click on while you’re visiting the site</li>
-      </ul>
-      <p>
-        We don’t collect or store your personal information (eg your name or
-        address) so this information can’t be used to identify who you are.
-      </p>
-      <p>We don’t allow Google to use or share our analytics data.</p>
-      <p>Google Analytics sets the following cookies:</p>
-      <h3>Universal Analytics</h3>
-      <table className="govuk-table">
-        <thead className="govuk-table__head">
-          <tr className="govuk-table__row">
-            <th className="govuk-table__header" scope="col">
-              Name
-            </th>
-            <th className="govuk-table__header" scope="col">
-              Purpose
-            </th>
-            <th className="govuk-table__header" scope="col">
-              Expires
-            </th>
-          </tr>
-        </thead>
-        <tbody className="govuk-table__body">
-          <tr className="govuk-table__row">
-            <td className="govuk-table__cell">_ga</td>
-            <td className="govuk-table__cell">
-              This helps us count how many people visit GOV.UK by tracking if
-              you’ve visited before
-            </td>
-            <td className="govuk-table__cell">2 years</td>
-          </tr>
-          <tr className="govuk-table__row">
-            <td className="govuk-table__cell">_gid</td>
-            <td className="govuk-table__cell">
-              This helps us count how many people visit GOV.UK by tracking if
-              you’ve visited before
-            </td>
-            <td className="govuk-table__cell">24 hours</td>
-          </tr>
-          <tr className="govuk-table__row">
-            <td className="govuk-table__cell">_gat</td>
-            <td className="govuk-table__cell">
-              Used to manage the rate at which page view requests are made
-            </td>
-            <td className="govuk-table__cell">10 minutes</td>
-          </tr>
-        </tbody>
-      </table>
-      <h3>Our introductory message</h3>
-      <p>
-        You may see a pop-up welcome message when you first visit GOV.UK. We’ll
-        store a cookie so that your computer knows you’ve seen it and knows not
-        to show it again.
-      </p>
+      <section>
+        <h3>Measuring website usage (Google Analytics)</h3>
+        <p>
+          We use Google Analytics software to collect information about how you
+          use GOV.UK. We do this to help make sure the site is meeting the needs
+          of its users and to help us make improvements.
+        </p>
+        <p>Google Analytics stores information about:</p>
+        <ul>
+          <li>the pages you visit on this service</li>
+          <li>how long you spend on each page</li>
+          <li>how you got to the site</li>
+          <li>what you click on while you’re visiting the site</li>
+        </ul>
+        <p>
+          We don’t collect or store your personal information (eg your name or
+          address) so this information can’t be used to identify who you are.
+        </p>
+        <p>We don’t allow Google to use or share our analytics data.</p>
+        <p>Google Analytics sets the following cookies:</p>
+        <table className="govuk-table">
+          <thead className="govuk-table__head">
+            <tr className="govuk-table__row">
+              <th className="govuk-table__header" scope="col">
+                Name
+              </th>
+              <th className="govuk-table__header" scope="col">
+                Purpose
+              </th>
+              <th className="govuk-table__header" scope="col">
+                Expires
+              </th>
+            </tr>
+          </thead>
+          <tbody className="govuk-table__body">
+            <tr className="govuk-table__row">
+              <td className="govuk-table__cell">_ga</td>
+              <td className="govuk-table__cell">
+                This helps us count how many people visit GOV.UK by tracking if
+                you’ve visited before
+              </td>
+              <td className="govuk-table__cell">2 years</td>
+            </tr>
+            <tr className="govuk-table__row">
+              <td className="govuk-table__cell">_gid</td>
+              <td className="govuk-table__cell">
+                This helps us count how many people visit GOV.UK by tracking if
+                you’ve visited before
+              </td>
+              <td className="govuk-table__cell">24 hours</td>
+            </tr>
+            <tr className="govuk-table__row">
+              <td className="govuk-table__cell">_gat</td>
+              <td className="govuk-table__cell">
+                Used to manage the rate at which page view requests are made
+              </td>
+              <td className="govuk-table__cell">10 minutes</td>
+            </tr>
+          </tbody>
+        </table>
+        <div className="govuk-inset-text">
+          <p>
+            You can{' '}
+            <Link to="https://tools.google.com/dlpage/gaoptout">
+              opt out of Google Analytics cookies.
+            </Link>
+          </p>
+        </div>
+      </section>
+      <section>
+        <h3>Our introductory message</h3>
+        <p>
+          You may see a pop-up welcome message when you first visit GOV.UK.
+          We’ll store a cookie so that your computer knows you’ve seen it and
+          knows not to show it again.
+        </p>
 
-      <table className="govuk-table">
-        <thead className="govuk-table__head">
-          <tr className="govuk-table__row">
-            <th className="govuk-table__header" scope="col">
-              Name
-            </th>
-            <th className="govuk-table__header" scope="col">
-              Purpose
-            </th>
-            <th className="govuk-table__header" scope="col">
-              Expires
-            </th>
-          </tr>
-        </thead>
-        <tbody className="govuk-table__body">
-          <tr className="govuk-table__row">
-            <td className="govuk-table__cell">{cookieBannerSeenName}</td>
-            <td className="govuk-table__cell">
-              Saves a message to let us know that you’ve seen our cookie message
-            </td>
-            <td className="govuk-table__cell">1 month</td>
-          </tr>
-        </tbody>
-      </table>
+        <table className="govuk-table">
+          <thead className="govuk-table__head">
+            <tr className="govuk-table__row">
+              <th className="govuk-table__header" scope="col">
+                Name
+              </th>
+              <th className="govuk-table__header" scope="col">
+                Purpose
+              </th>
+              <th className="govuk-table__header" scope="col">
+                Expires
+              </th>
+            </tr>
+          </thead>
+          <tbody className="govuk-table__body">
+            <tr className="govuk-table__row">
+              <td className="govuk-table__cell">{cookieBannerSeenName}</td>
+              <td className="govuk-table__cell">
+                Saves a message to let us know that you’ve seen our cookie
+                message
+              </td>
+              <td className="govuk-table__cell">1 month</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
     </Page>
   );
 }
