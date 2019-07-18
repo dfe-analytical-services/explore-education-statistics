@@ -31,6 +31,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         
         public DataBlock KeyStatistics { get; set; }
 
+        public ReleaseType Type { get; set; }
+
         [JsonConverter(typeof(TimeIdentifierJsonConverter))]
         public TimeIdentifier TimePeriodCoverage { get; set; }
 

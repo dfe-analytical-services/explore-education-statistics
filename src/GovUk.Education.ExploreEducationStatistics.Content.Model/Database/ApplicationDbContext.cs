@@ -168,6 +168,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public DbSet<Topic> Topics { get; set; }
         public DbSet<Publication> Publications { get; set; }
         public DbSet<Release> Releases { get; set; }
+        public DbSet<ReleaseType> ReleaseTypes { get; set; }
         public DbSet<Contact> Contacts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
