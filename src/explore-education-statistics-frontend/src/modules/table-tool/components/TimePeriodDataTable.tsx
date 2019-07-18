@@ -7,6 +7,7 @@ import {
   Indicator,
   LocationFilter,
 } from '@frontend/modules/table-tool/components/types/filters';
+import Footnote from '@frontend/components/Footnote';
 import TimePeriod from '@frontend/modules/table-tool/components/types/TimePeriod';
 import last from 'lodash/last';
 import sortBy from 'lodash/sortBy';
@@ -23,10 +24,18 @@ interface Props {
   subjectName: string;
   locations: LocationFilter[];
   results: TableData['result'];
+  footnotes?: string[];
 }
 
 const TimePeriodDataTable = (props: Props) => {
-  const { filters, timePeriods, locations, indicators, results } = props;
+  const {
+    filters,
+    timePeriods,
+    locations,
+    indicators,
+    results,
+    footnotes,
+  } = props;
 
   const dataTableRef = useRef<HTMLTableElement>(null);
 
@@ -158,6 +167,7 @@ const TimePeriodDataTable = (props: Props) => {
         rows={rows}
         ref={dataTableRef}
       />
+      {footnotes && <Footnote content={footnotes} />}
     </div>
   );
 };

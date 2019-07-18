@@ -378,6 +378,10 @@ class TableToolPage extends Component<Props, State> {
                           locations={locationsList}
                           timePeriods={timePeriodRange}
                           results={tableData}
+                          footnotes={[
+                            'This is an example footnote',
+                            'This is another example footnote',
+                          ]}
                         />
                       </div>
 
