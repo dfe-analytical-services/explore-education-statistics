@@ -31,6 +31,7 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
       dataSymbols: false,
       stackable: true,
       lineStyle: false,
+      gridLines: true,
     },
 
     data: [

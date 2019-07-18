@@ -339,6 +339,7 @@ const ChartBuilder = ({ data }: Props) => {
                 key={key}
                 id={axis.name}
                 configuration={axis}
+                capabilities={selectedChartType.capabilities}
                 meta={data.metaData}
                 onConfigurationChange={updatedConfig => {
                   setAxesConfiguration({

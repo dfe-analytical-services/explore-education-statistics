@@ -70,6 +70,7 @@ export default class LineChartBlock extends Component<ChartProps> {
       dataSymbols: true,
       stackable: false,
       lineStyle: true,
+      gridLines: true,
     },
 
     data: [
