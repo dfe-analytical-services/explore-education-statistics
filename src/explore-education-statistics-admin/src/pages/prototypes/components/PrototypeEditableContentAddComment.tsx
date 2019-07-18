@@ -34,8 +34,8 @@ const ContentAddComment = ({ initialComments }: Props) => {
     };
 
     setComments([
-      ...comments,
       { name: user.name, time: new Date(), comment, state: 'open' },
+      ...comments,
     ]);
     setCurrentComment('');
   };
@@ -71,7 +71,7 @@ const ContentAddComment = ({ initialComments }: Props) => {
             </button>
           </form>
           <hr />
-          {comments.reverse().map(({ name, comment, time }, index) => (
+          {comments.map(({ name, comment, time }, index) => (
             <div key={key()}>
               <h2 className="govuk-body-xs govuk-!-margin-0">
                 <strong>{`${name} ${time.toLocaleDateString()}`}</strong>
