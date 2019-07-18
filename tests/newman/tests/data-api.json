@@ -2257,6 +2257,61 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "Publication Meta - Secondary and primary schools applications and offers",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+										"exec": [
+											"pm.variables.set('publication_id', '66c8e9db-8bf2-4b0b-b094-cfab25c20b05');"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"id": "ac4b1f03-19f2-44f5-b80f-840e78849333",
+										"exec": [
+											"var respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+											"",
+											"pm.test(\"Fields are present\", function () {",
+											"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjects\"));",
+											"});",
+											"",
+											"pm.test(\"Publication id matches the publication requested\", function () { pm.expect(respJson.publicationId).to.equal(pm.variables.get(\"publication_id\")); });",
+											"",
+											"pm.test(\"Subjects and subject label should be correct\", function () {",
+											"    pm.expect(respJson.subjects.length).to.equal(1);",
+											"    pm.expect(respJson.subjects[0].label).to.equal(\"Applications and offers by school phase\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{data_api_url}}/meta/publication/{{publication_id}}",
+									"host": [
+										"{{data_api_url}}"
+									],
+									"path": [
+										"meta",
+										"publication",
+										"{{publication_id}}"
+									]
+								}
+							},
+							"response": []
 						}
 					],
 					"event": [
@@ -4643,7 +4698,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority\",\n    \"localAuthority\": [\n    \t\"E09000032\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"localAuthority\": [\n    \t\"E09000032\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/data",
@@ -4794,7 +4849,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority_District\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"localAuthorityDistrict\": [\"E06000001\"],\n    \"filters\" : [\n    \t{{FILT_AllPupils}}, {{FILT_FSMEligible}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"localAuthorityDistrict\": [\"E06000001\"],\n    \"filters\" : [\n    \t{{FILT_AllPupils}}, {{FILT_FSMEligible}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/data",
@@ -4869,7 +4924,87 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority_District\",\n    \"localAuthorityDistrict\": [\n    \t\"E07000223\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_FSMEligible}}, {{FILT_FSMNotEligible}}, {{FILT_FSMUnclassified}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"localAuthorityDistrict\": [\n    \t\"E07000223\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_FSMEligible}}, {{FILT_FSMNotEligible}}, {{FILT_FSMUnclassified}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/data",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"data"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Data - Absence by characteristic - LA district Adur + LA Wandsworth",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+												"exec": [
+													"var respJson = pm.response.json();",
+													"",
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Should have correct fields\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodRange\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
+													"});",
+													"",
+													"pm.test(\"Number of metaData filters should be correct\", function () {",
+													"   pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(8); ",
+													"});",
+													"",
+													"pm.test(\"Number of metaData indicators should be correct\", function () {",
+													"   pm.expect(Object.keys(respJson.metaData.indicators).length).to.equal(5); ",
+													"});",
+													"",
+													"pm.test(\"Number of metaData locations should be correct\", function () {",
+													"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(5);",
+													"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E92000001\")); // England",
+													"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E09000032\")); // LA Wandsworth",
+													"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E07000223\")); // LAD Adur",
+													"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E13000001\")); // Region Inner London",
+													"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E12000008\")); // Region South East",
+													"});",
+													"",
+													"pm.test(\"Number of results should be correct\", function () { ",
+													"    pm.expect(respJson.result.length).to.equal(35); // LA 24 + LAD 11",
+													"});",
+													"",
+													"pm.test(\"All results should have correction geographicLevel\", function () {",
+													"    for(var i = 0; i < pm.response.json().result.length; i++) {",
+													"        pm.expect(respJson.result[i].geographicLevel).to.satisfy(function(geoLevel) {",
+													"           return geoLevel === \"Local_Authority\" || geoLevel === \"Local_Authority_District\"; ",
+													"        });",
+													"    }",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subjectId\": 1,\n    \"localAuthority\": [\"E09000032\"],\n    \"localAuthorityDistrict\": [\"E07000223\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2015,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_FSMEligible}}, {{FILT_FSMNotEligible}}, {{FILT_FSMUnclassified}}\n    ],\n    \"indicators\": [\n        6, 7, 8, 9, 10\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/data",
@@ -5070,6 +5205,114 @@
 								}
 							],
 							"_postman_isSubFolder": true
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Secondary and primary schools applications and offers",
+					"item": [
+						{
+							"name": "Data - Applications and offers by school phase - LA Wirral, York",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+										"exec": [
+											"respJson = pm.response.json()",
+											"",
+											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+											"",
+											"pm.test(\"Should have correct fields\", function () {",
+											"    pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodRange\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
+											"});",
+											"",
+											"pm.test(\"Number of metaData filters should be correct\", function () {",
+											"   pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(1); ",
+											"});",
+											"",
+											"pm.test(\"Number of metaData locations should be correct\", function () {",
+											"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(5); ",
+											"});",
+											"",
+											"pm.test(\"Correct metaData locations should be returned\", function () {",
+											"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E92000001\"));  // Country England",
+											"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E12000002\"));  // Region North West",
+											"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E12000003\"));  // Region Yorkshire and the Humber",
+											"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E08000015\"));  // LA Wirral",
+											"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E06000014\"));  // LA York",
+											"});",
+											"",
+											"pm.test(\"geographicLevel should be same as request\", function () {",
+											"    for(var i = 0; i < respJson.result.length; i++) {",
+											"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Local_Authority\");",
+											"    }",
+											"});",
+											"",
+											"pm.test(\"Number of results should be correct\", function () { ",
+											"    pm.expect(respJson.result.length).to.equal(6); ",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"subjectId\": 17,\n    \"localAuthority\": [\"E08000015\", \"E06000014\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2015,\n    \t\"startCode\": \"CY\",\n    \t\"endYear\": 2017,\n    \t\"endCode\": \"CY\"\n    },\n    \"filters\" : [\n        {{FILT_Primary__R}}\n    ],\n    \"indicators\": [\n        189, 190, 191\n    ]\n}"
+								},
+								"url": {
+									"raw": "{{data_api_url}}/data",
+									"host": [
+										"{{data_api_url}}"
+									],
+									"path": [
+										"data"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "06185e19-060d-44b4-9adf-3c424694ae9e",
+								"type": "text/javascript",
+								"exec": [
+									"pm.globals.set(\"FILT_Primary__R\", \"538\");",
+									"pm.globals.set(\"FILT_Secondary__9\", \"541\");",
+									"pm.globals.set(\"FILT_Secondary__7\", \"542\");"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "a725cb4a-8a8f-477e-85f1-8ead50eacf42",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
 						}
 					],
 					"_postman_isSubFolder": true
