@@ -2,15 +2,19 @@ import ReactGA from 'react-ga';
 
 let initialised = false;
 
-if (
-  process.env.GA_TRACKING_ID !== undefined &&
-  process.env.GA_TRACKING === 'true'
-) {
-  ReactGA.initialize(process.env.GA_TRACKING_ID);
-  initialised = true;
+export const cookieEnabled = 'dfe-disable-google-analytics';
 
-  // eslint-disable-next-line no-console
-  console.log('GA initialised');
+export function initGA() {
+  if (
+    process.env.GA_TRACKING_ID !== undefined &&
+    process.env.GA_TRACKING === 'true'
+  ) {
+    ReactGA.initialize(process.env.GA_TRACKING_ID);
+    initialised = true;
+
+    // eslint-disable-next-line no-console
+    console.log('GA initialised');
+  }
 }
 
 export const logPageView = () => {
