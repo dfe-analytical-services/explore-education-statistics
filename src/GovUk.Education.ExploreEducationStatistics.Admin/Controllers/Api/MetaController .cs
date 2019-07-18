@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
     [ApiController]
     [Authorize]
-    [Route("/api")]
+    [Route("/api/meta")]
     public class MetaController : ControllerBase
     {
         private readonly IMetaService _metaService;
@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         // GET api/meta/timeidentifiers
-        [HttpGet("/meta/timeidentifiers")]
+        [HttpGet("/timeidentifiers")]
         [AllowAnonymous] // Anyone can see the time identifiers
         public ActionResult<List<TimeIdentifierCategoryModel>> GetTimeIdentifiersByCategory()
         {
