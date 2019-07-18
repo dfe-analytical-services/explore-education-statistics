@@ -49,15 +49,8 @@ const AdminDashboardPage = () => {
   const authentication = useContext(LoginContext);
 
   useEffect(() => {
-    const loggedInUser = authentication.user;
-
-    if (!loggedInUser) {
-      setMyPublications([]);
-      return;
-    }
-
     if (!themes) {
-      dashboardService.getThemesAndTopics(loggedInUser.id).then(themeList => {
+      dashboardService.getMyThemesAndTopics().then(themeList => {
         const themesAsIdLabelPairs = themeList.map(
           themeToThemeWithIdLabelAndTopics,
         );
@@ -73,7 +66,7 @@ const AdminDashboardPage = () => {
 
     if (selectedThemeAndTopic) {
       dashboardService
-        .getPublicationsByTopic(selectedThemeAndTopic.topic.id, loggedInUser.id)
+        .getMyPublicationsByTopic(selectedThemeAndTopic.topic.id)
         .then(setMyPublications);
     }
   }, [authentication, selectedThemeAndTopic, themes]);

@@ -46,7 +46,7 @@ const DashboardReleaseSummary = ({ release }: Props) => {
       : release.lastEditedUser.name;
 
   const releaseSummaryLabel = `${release.timePeriodCoverage.label}, ${
-    release.dateRangeLabel
+    release.releaseName
   } 
      ${getLiveLatestLabel(release.live, release.latestRelease)}`;
 
@@ -62,9 +62,14 @@ const DashboardReleaseSummary = ({ release }: Props) => {
 
       <SummaryList additionalClassName="govuk-!-margin-bottom-3">
         <SummaryListItem term="Publish date">
-          {dayMonthYearIsComplete(release.scheduledPublishDate) && (
+          {release.published && (
             <FormattedDate>
-              {dayMonthYearToDate(release.scheduledPublishDate)}
+              {release.published}
+            </FormattedDate>
+          )}
+          {!release.published && dayMonthYearIsComplete(release.publishScheduled) && (
+            <FormattedDate>
+              {dayMonthYearToDate(release.publishScheduled)}
             </FormattedDate>
           )}
         </SummaryListItem>
@@ -76,15 +81,15 @@ const DashboardReleaseSummary = ({ release }: Props) => {
           )}
         </SummaryListItem>
         <SummaryListItem term="Lead statistician">
-          {release.leadStatistician && (
+          {release.contact && (
             <span>
-              {release.leadStatistician.name}
+              {release.contact.contactName}
               <br />
               <a href="mailto:{lead.teamEmail}">
-                {release.leadStatistician.email}
+                {release.contact.teamEmail}
               </a>
               <br />
-              {release.leadStatistician.telNo}
+              {release.contact.contactTelNo}
             </span>
           )}
         </SummaryListItem>
