@@ -117,7 +117,11 @@ class PrototypeEditableContent extends React.Component<Props, State> {
     );
   }
 
-  private renderEditor(content: string, resolveComments?: boolean) {
+  private renderEditor(
+    content: string,
+    reviewing?: boolean,
+    resolveComments?: boolean,
+  ) {
     return (
       <div>
         <div className={styles.editableContentEditing}>
@@ -149,7 +153,7 @@ class PrototypeEditableContent extends React.Component<Props, State> {
     return (
       <Fragment>
         {editable && editing
-          ? this.renderEditor(content, resolveComments)
+          ? this.renderEditor(content, reviewing, resolveComments)
           : this.renderEditableArea(
               unsaved,
               editable,

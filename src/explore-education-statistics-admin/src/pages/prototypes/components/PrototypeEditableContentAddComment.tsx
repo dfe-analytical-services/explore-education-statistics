@@ -48,29 +48,10 @@ const ContentAddComment = ({ initialComments }: Props) => {
   return (
     <>
       <div className={styles.addComment}>
-        <Details summary="Add comment" className="govuk-!-margin-bottom-1">
-          {comments.map(({ name, comment, time }, index) => (
-            <div key={key()}>
-              <h2 className="govuk-body-xs govuk-!-margin-0">
-                <strong>{`${name} ${time.toLocaleDateString()}`}</strong>
-              </h2>
-              <p className="govuk-body-xs govuk-!-margin-bottom-1 ">
-                {comment}
-              </p>
-              {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
-              <a
-                className="govuk-body-xs"
-                role="button"
-                tabIndex={0}
-                onClick={() => removeComment(index)}
-                style={{ cursor: 'pointer' }}
-              >
-                Remove
-              </a>
-              <hr />
-            </div>
-          ))}
-
+        <Details
+          summary="Add comment to section"
+          className="govuk-!-margin-bottom-1"
+        >
           <form>
             <textarea
               name="comment"
@@ -90,6 +71,26 @@ const ContentAddComment = ({ initialComments }: Props) => {
               Submit
             </button>
           </form>
+          <hr />
+          {comments.reverse().map(({ name, comment, time }, index) => (
+            <div key={key()}>
+              <h2 className="govuk-body-xs govuk-!-margin-0">
+                <strong>{`${name} ${time.toLocaleDateString()}`}</strong>
+              </h2>
+              <p className="govuk-body-xs govuk-!-margin-bottom-1">{comment}</p>
+              {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
+              <a
+                className="govuk-body-xs"
+                role="button"
+                tabIndex={0}
+                onClick={() => removeComment(index)}
+                style={{ cursor: 'pointer' }}
+              >
+                Remove
+              </a>
+              <hr />
+            </div>
+          ))}
         </Details>
       </div>
     </>

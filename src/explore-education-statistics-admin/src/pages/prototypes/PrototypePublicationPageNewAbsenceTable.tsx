@@ -59,13 +59,8 @@ const PublicationDataPage = () => {
           </p>
 
           <p className="govuk-body">
-            Once you've created your tables and charts, you can save them and
-            embed them in your release.
-          </p>
-
-          <p className="govuk-body">
-            Once you've created a table, you can save it for use in your
-            release.
+            Once you've created your tables and charts, you can save and embed
+            them in this release.
           </p>
 
           <h2 className="govuk-heading-m">1. Select data file</h2>

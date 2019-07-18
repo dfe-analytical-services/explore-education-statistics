@@ -35,7 +35,7 @@ const PublicationDataPage = () => {
             <thead className="govuk-table__head">
               <tr className="govuk-table__row">
                 <th className="govuk-table__header" scope="col">
-                  Name
+                  Title
                 </th>
                 <th className="govuk-table__header" scope="col">
                   Data file
@@ -148,10 +148,18 @@ const PublicationDataPage = () => {
 
               <div className="govuk-form-group">
                 <label htmlFor="release-title" className="govuk-label">
-                  Name
+                  Add data file title
+                  <span className="govuk-hint">
+                    This will be the name shown to users for the data file when
+                    they download it from this release.
+                    <br />
+                    You should also use it as a reference for the data file if
+                    you refer to it in this release.
+                  </span>
                 </label>
                 <input
                   type="text"
+                  id="release-title"
                   className="govuk-input govuk-!-width-one-half"
                 />
               </div>
@@ -204,12 +212,12 @@ const PublicationDataPage = () => {
         </TabsSection>
         <TabsSection id="file-upload" title="File uploads">
           <p className="govuk-body">
-            Users will be able to download these files from this release.
+            These files should be things like infographics or more complex
+            tables and charts which you have not been able to build using the
+            table or chart tools.
           </p>
           <p className="govuk-body">
-            These files should be alternatives to service-generated tables and
-            charts. For example, infographics or unsupported complex tables and
-            charts.
+            Users will be able to download these files from this release.
           </p>
           <table className="govuk-table">
             <caption className="govuk-table__caption govuk-heading-m">
@@ -218,7 +226,7 @@ const PublicationDataPage = () => {
             <thead className="govuk-table__head">
               <tr className="govuk-table__row">
                 <th className="govuk-table__header" scope="col">
-                  Name
+                  Title
                 </th>
                 <th className="govuk-table__header" scope="col">
                   File
@@ -265,10 +273,18 @@ const PublicationDataPage = () => {
                   htmlFor="release-fileupload-name"
                   className="govuk-label"
                 >
-                  Name
+                  Add file title
+                  <span className="govuk-hint">
+                    This will be the name shown to users for the file when they
+                    download it from this release.
+                    <br />
+                    You should also use it as a reference for the file if you
+                    refer to it in this release.
+                  </span>
                 </label>
                 <input
                   type="text"
+                  id="release-fileupload-name"
                   className="govuk-input govuk-!-width-one-half"
                 />
               </div>
