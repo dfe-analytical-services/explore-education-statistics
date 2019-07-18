@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "e40fd965-ed1f-47e0-99da-a9b8db0fd702",
+		"_postman_id": "a184bb8e-f73e-415f-9065-b5192d66d79f",
 		"name": "DfE Data API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -3366,7 +3366,7 @@
 							"name": "By term",
 							"item": [
 								{
-									"name": "Tablebuilder - Absence by term - Country - * - HT6",
+									"name": "Tablebuilder - Absence by term - England - * - HT6",
 									"event": [
 										{
 											"listen": "test",
@@ -3404,7 +3404,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 3,\n    \"geographicLevel\": \"Country\",\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"HT6\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"HT6\"\n    },\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        68, 86, 87, 88\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 3,\n    \"country\": [\"E92000001\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"HT6\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"HT6\"\n    },\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        68, 86, 87, 88\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3419,7 +3419,7 @@
 									"response": []
 								},
 								{
-									"name": "Tablebuilder - Absence by term - Country - * - T1,T2,T3",
+									"name": "Tablebuilder - Absence by term - England - * - T1,T2,T3",
 									"event": [
 										{
 											"listen": "test",
@@ -3457,7 +3457,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 3,\n    \"geographicLevel\": \"Country\",\n    \"timePeriod\": {\n    \t\"startYear\": 2013,\n    \t\"startCode\": \"T2\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"T3\"\n    },\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        68, 86, 87, 88\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 3,\n    \"country\": [\"E92000001\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2013,\n    \t\"startCode\": \"T2\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"T3\"\n    },\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        68, 86, 87, 88\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3472,7 +3472,7 @@
 									"response": []
 								},
 								{
-									"name": "Tablebuilder - Absence by term - Country - England - HT6",
+									"name": "Tablebuilder - Absence by term - England - HT6",
 									"event": [
 										{
 											"listen": "test",
@@ -3505,7 +3505,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 3,\n    \"geographicLevel\": \"Country\",\n    \"country\": [ \"E92000001\" ],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"HT6\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"HT6\"\n    },\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        68, 86, 87, 88\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 3,\n    \"country\": [ \"E92000001\" ],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"HT6\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"HT6\"\n    },\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        68, 86, 87, 88\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3681,7 +3681,7 @@
 							"name": "For four year olds",
 							"item": [
 								{
-									"name": "Tablebuilder - Absence for four year olds - Country - *",
+									"name": "Tablebuilder - Absence for four year olds - England - *",
 									"event": [
 										{
 											"listen": "test",
@@ -3719,7 +3719,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 4,\n    \"geographicLevel\": \"Country\",\n    \"timePeriod\": {\n    \t\"startYear\": 2013,\n    \t\"startCode\": \"HT6\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"HT6\"\n    },\n    \"filters\" : [\n        {{FILT_Special}}, {{FILT_StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        95, 94\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 4,\n    \"country\": [\"E92000001\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2013,\n    \t\"startCode\": \"HT6\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"HT6\"\n    },\n    \"filters\" : [\n        {{FILT_Special}}, {{FILT_StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        95, 94\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3784,6 +3784,59 @@
 										}
 									},
 									"response": []
+								},
+								{
+									"name": "Tablebuilder - Absence for four year olds - Region West Midlands, South East, South West",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"exec": [
+													"var respJson = pm.response.json();",
+													"",
+													"",
+													"pm.test(\"timePeriodRange length should be correct\", function () {",
+													"    pm.expect(respJson.timePeriodRange.length).to.equal(5); ",
+													"});",
+													"",
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(15); });",
+													"",
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Region\");",
+													"    }",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subjectId\": 4,\n    \"region\": [\"E12000005\", \"E12000008\", \"E12000009\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2012,\n    \t\"startCode\": \"HT6\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"HT6\"\n    },\n    \"filters\" : [\n        {{FILT_SchoolType__Total}}\n    ],\n    \"indicators\": [\n        95, 94\n    ]\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/tablebuilder",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"tablebuilder"
+											]
+										}
+									},
+									"response": []
 								}
 							],
 							"event": [
@@ -3793,6 +3846,7 @@
 										"id": "2cb67ee0-9a6d-4616-8d92-02a3aa5184e4",
 										"type": "text/javascript",
 										"exec": [
+											"pm.globals.set(\"FILT_SchoolType__Total\", \"95\");",
 											"pm.globals.set(\"FILT_StateFundedSecondary\", \"92\");",
 											"pm.globals.set(\"FILT_Special\", \"93\");"
 										]
@@ -3820,7 +3874,7 @@
 							"name": "In PRUs",
 							"item": [
 								{
-									"name": "Tablebuilder - Absence in PRUs - no geoLevel - England",
+									"name": "Tablebuilder - Absence in PRUs - England",
 									"event": [
 										{
 											"listen": "test",
@@ -3873,7 +3927,7 @@
 									"response": []
 								},
 								{
-									"name": "Tablebuilder - Absence in PRUs - LA - *",
+									"name": "Tablebuilder - Absence in PRUs - LA Bexley, Buckinghamshire, Derby",
 									"event": [
 										{
 											"listen": "test",
@@ -3883,14 +3937,17 @@
 													"var respJson = pm.response.json();",
 													"",
 													"pm.test(\"timePeriodRange length should be correct\", function () {",
-													"    pm.expect(respJson.timePeriodRange.length).to.equal(1); ",
+													"    pm.expect(respJson.timePeriodRange.length).to.equal(2); ",
 													"});",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(142); });",
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(6); });",
 													"",
-													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"pm.test(\"geographicLevel and indicators/measures should be same as request\", function () {",
 													"    for(var i = 0; i < respJson.result.length; i++) {",
 													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Local_Authority\");",
+													"        pm.expect(pm.response.to.have.jsonBody(`result[${i}].measures.113`));",
+													"        pm.expect(pm.response.to.have.jsonBody(`result[${i}].measures.114`));",
+													"        pm.expect(pm.response.to.have.jsonBody(`result[${i}].measures.115`));",
 													"    }",
 													"});"
 												],
@@ -3910,7 +3967,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 5,\n    \"geographicLevel\": \"Local_Authority\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"HT6\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"HT6\"\n    },\n    \"filters\" : [\n        {{FILT_PupilReferralUnit}}\n    ],\n    \"indicators\": [\n        113, 114, 115\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 5,\n    \"localAuthority\": [\"E09000004\", \"E10000002\", \"E06000015\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"HT6\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"HT6\"\n    },\n    \"filters\" : [\n        {{FILT_PupilReferralUnit}}\n    ],\n    \"indicators\": [\n        113, 114, 115\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3959,6 +4016,56 @@
 										"body": {
 											"mode": "raw",
 											"raw": "{\n    \"subjectId\": 5,\n    \"geographicLevel\": \"Region\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"HT6\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"HT6\"\n    },\n    \"filters\" : [\n        {{FILT_PupilReferralUnit}}\n    ],\n    \"indicators\": [\n        113, 114, 115\n    ]\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/tablebuilder",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"tablebuilder"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Tablebuilder - Absence in PRUs - LA Bury, Devon + Region East of England",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"exec": [
+													"var respJson = pm.response.json();",
+													"",
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(6); }); // LA 4 + Region 2",
+													"",
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"        pm.expect(respJson.result[i].geographicLevel).to.satisfy(function (geoLevel) {",
+													"            return geoLevel === \"Region\" || geoLevel === \"Local_Authority\";",
+													"        });",
+													"    }",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subjectId\": 5,\n    \"localAuthority\": [\"E08000002\", \"E10000008\"],\n    \"region\": [\"E12000006\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2015,\n    \t\"startCode\": \"HT6\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"HT6\"\n    },\n    \"filters\" : [\n        {{FILT_PupilReferralUnit}}\n    ],\n    \"indicators\": [\n        113, 114, 115\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
