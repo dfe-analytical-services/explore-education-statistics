@@ -80,9 +80,7 @@ class MethodologyPage extends Component<Props> {
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-two-thirds">
               <p className="govuk-body-l">
-                {`Find out about the methodology behind ${
-                  data.publication.title
-                } statistics and
+                {`Find out about the methodology behind ${data.publication.title} statistics and
               data and how and why they're collected and published.`}
               </p>
             </div>
