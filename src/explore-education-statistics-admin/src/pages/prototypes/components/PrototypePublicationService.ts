@@ -401,7 +401,7 @@ export default class PrototypePublicationService {
         contact: {
           contactName: 'Mr Smith',
           contactTelNo: '01228 76762',
-          teamEmail: 'team@teamEmail.com',
+          teamEmail: 'team@email.com',
           teamName: 'Team A',
         },
         topic: {
