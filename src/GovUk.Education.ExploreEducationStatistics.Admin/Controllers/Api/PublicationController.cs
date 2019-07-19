@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
-    // TODO rename to Publication once the current Crud publication controller is removed
+    // TODO rename to Publications once the current Crud publication controller is removed
     [ApiController]
     [Authorize]
     public class PublicationController : ControllerBase
@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         // GET api/me/publications?topicId={guid}
         [HttpGet("/me/publications")]
-        [AllowAnonymous] // TODO We will need to do Authorisation checks when we know what the permissions model is.
+        [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
         public ActionResult<List<Publication>> GetPublications(
             [Required] [FromQuery(Name = "topicId")]
             Guid topicId)

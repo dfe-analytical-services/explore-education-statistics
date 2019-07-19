@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
     [ApiController]
     [Authorize]
-    [Route("/api/meta")]
+    [Route("meta")]
     public class MetaController : ControllerBase
     {
         private readonly IMetaService _metaService;
@@ -19,11 +20,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         // GET api/meta/timeidentifiers
-        [HttpGet("/timeidentifiers")]
-        [AllowAnonymous] // Anyone can see the time identifiers
+        [HttpGet("timeidentifiers")]
+        [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
         public ActionResult<List<TimeIdentifierCategoryModel>> GetTimeIdentifiersByCategory()
         {
             return _metaService.GetTimeIdentifiersByCategory();
         }
+        
+        // GET api/meta/releasetypes
+        [HttpGet("releasetypes")]
+        [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
+        public ActionResult<List<ReleaseType>> GetReleaseTypes()
+        {
+            return _metaService.GetReleaseTypes();
+        }
+
+
+        
     }
 }
