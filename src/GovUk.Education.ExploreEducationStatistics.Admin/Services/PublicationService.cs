@@ -5,7 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
+using Microsoft.EntityFrameworkCore;
 using UserId = System.Guid;
 using TopicId = System.Guid;
 
@@ -40,55 +41,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var config = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<Publication, PublicationViewModel>()
+                cfg.CreateMap<Publication, PublicationViewModel>();
+                cfg.CreateMap<Release, ReleaseViewModel>()
                     .ForMember(
-                        dest => dest.Releases, m => m.MapFrom(publication =>
-                            publication.Releases));
+                        dest => dest.LatestRelease, m => m.MapFrom(release => IsLatestRelease(release)));
+                cfg.CreateMap<Methodology, MethodologyViewModel>();
             });
 
             var mapper = config.CreateMapper();
-            
-            
-            // TODO This method simply returns all Publications for a Topic as we currently do not have a concept of how
-            // TODO a user is connected to Publications for the purpose of administration. Once this has been modelled
-            // TODO then this method will need altered reflect this.
-            var publications = _context.Publications.Select(p => new Publication
-                {
-                    Id = p.Id,
-                    Title = p.Title,
-                    NextUpdate = p.NextUpdate, // Null | Partial Date | Complete Date
-                    Contact = p.Contact != null ? new Contact
-                    {
-                        Id = p.Contact.Id,
-                        ContactName = p.Contact.ContactName,
-                        TeamEmail = p.Contact.TeamEmail,
-                        ContactTelNo = p.Contact.ContactTelNo
-                    } : null,
-                    TopicId = p.TopicId,
-                    Methodologies = p.Methodologies.Select(m => new Methodology
-                    {
-                        Id = m.Id,
-                        Title = m.Title
-                    }).ToList(),
-                    Releases = p.Releases.Select(r => new Release
-                        {
-                            Id = r.Id,
-                            Title = r.Title,
-                            Published = r.Published,
-                            ReleaseName = r.ReleaseName,
-                            TimePeriodCoverage = r.TimePeriodCoverage,
-                            Order = r.Order
-                            // TODO isLatestRelease - This needs to be done when we have a chronological concept of 
-                            // TODO different releases. Note it can't be published date as technically there is no
-                            // TODO reason why releases have to be published in order. 
-                            // TODO LastEdited - This needs to be done when we have a concept of release versions
-                        }
-                        
-                    ).ToList()
-                }
-            ).Where(p => p.TopicId == topicId).ToList();
+
+            var publications = _context.Publications.Where(p => p.TopicId == topicId)
+                .Include(p => p.Contact)
+                .Include(p => p.Releases)
+                .Include(p => p.Methodologies)
+                .ToList();
             
             return mapper.Map<List<PublicationViewModel>>(publications);
+        }
+        
+        private bool IsLatestRelease(Release release)
+        {
+            return !release.Publication.Releases.Exists(
+                r => r.Order > release.Order ||
+                     (r.Id != release.Id && r.Order == release.Order && r.Published > release.Published));
         }
     }
 }

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 {
     public class PublicationViewModel
     {
@@ -10,11 +10,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
         
         public string Title { get; set; }
 
-        public DateTime? NextUpdate { get; set; }
+        public DateTime NextUpdate { get; set; }
 
         public List<ReleaseViewModel> Releases { get; set; }
         
-        public List<Methodology> Methodologies { get; set; }
+        public List<MethodologyViewModel> Methodologies { get; set; }
         
         public Guid TopicId { get; set; }
         
