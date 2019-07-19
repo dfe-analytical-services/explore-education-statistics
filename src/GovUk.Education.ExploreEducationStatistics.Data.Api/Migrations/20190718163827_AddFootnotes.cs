@@ -1,10 +1,15 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 {
+    [ExcludeFromCodeCoverage]
     public partial class AddFootnotes : Migration
     {
+        private const string _migrationsPath = "Migrations/";
+        
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -48,6 +53,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                 name: "IX_SubjectFootnote_FootnoteId",
                 table: "SubjectFootnote",
                 column: "FootnoteId");
+            
+            ExecuteFile(migrationBuilder, _migrationsPath + "20190718163827_FootnoteData.sql");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -57,6 +64,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
             migrationBuilder.DropTable(
                 name: "Footnote");
+        }
+        
+        private static void ExecuteFile(MigrationBuilder migrationBuilder, string filename)
+        {
+            var file = Path.Combine(Directory.GetCurrentDirectory(), filename);
+            migrationBuilder.Sql(File.ReadAllText(file));
         }
     }
 }
