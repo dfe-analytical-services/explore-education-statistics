@@ -14,7 +14,11 @@ export class PrototypeLoginService {
   private static USERS: User[] = [
     { id: 'user1', name: 'John Smith', permissions: ['team lead'] },
     { id: 'user2', name: 'Ann Evans', permissions: ['team member'] },
-    { id: 'user3', name: 'Stephen Doherty', permissions: ['team member'] },
+    {
+      id: 'user3',
+      name: 'Stephen Doherty',
+      permissions: ['responsible statistician'],
+    },
     { id: 'user4', name: 'User 4', permissions: ['team member'] },
     { id: 'user5', name: 'User 5', permissions: ['team member'] },
   ];

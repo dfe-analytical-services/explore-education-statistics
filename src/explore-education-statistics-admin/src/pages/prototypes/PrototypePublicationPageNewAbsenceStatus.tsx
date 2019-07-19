@@ -4,6 +4,89 @@ import Link from '../../components/Link';
 import PrototypeAdminNavigation from './components/PrototypeAdminNavigation';
 import PrototypePage from './components/PrototypePage';
 
+const UpdateStatusForm = () => {
+  return (
+    <>
+      <form action="/prototypes/publication-create-new-absence-status">
+        <div className="govuk-form-group">
+          <fieldset className="govuk-fieldset">
+            <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
+              Release status
+            </legend>
+            <p className="govuk-body">Select and update release status.</p>
+            <div className="govuk-radios">
+              <div className="govuk-radios__item">
+                <input
+                  className="govuk-radios__input"
+                  type="radio"
+                  name="status"
+                  id="edit"
+                  value="editRelease"
+                  defaultChecked
+                />
+                <label
+                  className="govuk-label govuk-radios__label"
+                  htmlFor="edit"
+                >
+                  In draft
+                </label>
+              </div>
+
+              <div className="govuk-radios__item">
+                <input
+                  className="govuk-radios__input"
+                  type="radio"
+                  name="status"
+                  id="readyTeamApproval"
+                  value="readyTeamApproval"
+                />
+                <label
+                  className="govuk-label govuk-radios__label"
+                  htmlFor="readyApproval"
+                >
+                  Level 1: in review
+                </label>
+              </div>
+
+              <div className="govuk-radios__item">
+                <input
+                  className="govuk-radios__input"
+                  type="radio"
+                  name="status"
+                  id="readyHigherReview"
+                  value="readyHigherReview"
+                  data-aria-controls="content-for-approval"
+                />
+                <label
+                  className="govuk-label govuk-radios__label"
+                  htmlFor="readyHigherReview"
+                >
+                  Level 2: in higher review
+                </label>
+              </div>
+            </div>
+          </fieldset>
+          <div className="govuk-form-group govuk-!-margin-top-6">
+            <label
+              htmlFor="release-notes"
+              className="govuk-label govuk-label--s"
+            >
+              Release notes
+            </label>
+            <textarea
+              id="release-notes"
+              className="govuk-textarea govuk-!-width-one-half"
+            />
+          </div>
+          <button className="govuk-button govuk-!-margin-top-3" type="submit">
+            Update release status
+          </button>
+        </div>
+      </form>
+    </>
+  );
+};
+
 const PublicationDataPage = ({ location }: RouteChildrenProps) => {
   return (
     <PrototypePage
@@ -17,6 +100,11 @@ const PublicationDataPage = ({ location }: RouteChildrenProps) => {
       ]}
     >
       <PrototypeAdminNavigation sectionId="status" />
+
+      {location.search.includes('?status=ready') === false && (
+        <UpdateStatusForm />
+      )}
+
       {location.search === '?status=readyTeamApproval' && (
         <>
           <div className="govuk-panel govuk-panel--confirmation">
@@ -33,84 +121,23 @@ const PublicationDataPage = ({ location }: RouteChildrenProps) => {
           </div>
         </>
       )}
-      {location.search !== '?status=readyTeamApproval' && (
-        <form action="/prototypes/publication-create-new-absence-status">
-          <div className="govuk-form-group">
-            <fieldset className="govuk-fieldset">
-              <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
-                Release status
-              </legend>
-              <p className="govuk-body">Select and update release status.</p>
-              <div className="govuk-radios">
-                <div className="govuk-radios__item">
-                  <input
-                    className="govuk-radios__input"
-                    type="radio"
-                    name="status"
-                    id="edit"
-                    value="editRelease"
-                    defaultChecked
-                  />
-                  <label
-                    className="govuk-label govuk-radios__label"
-                    htmlFor="edit"
-                  >
-                    In draft
-                  </label>
-                </div>
-
-                <div className="govuk-radios__item">
-                  <input
-                    className="govuk-radios__input"
-                    type="radio"
-                    name="status"
-                    id="readyTeamApproval"
-                    value="readyTeamApproval"
-                  />
-                  <label
-                    className="govuk-label govuk-radios__label"
-                    htmlFor="readyApproval"
-                  >
-                    Level 1: in review
-                  </label>
-                </div>
-
-                <div className="govuk-radios__item">
-                  <input
-                    className="govuk-radios__input"
-                    type="radio"
-                    name="status"
-                    id="cancelEdit"
-                    value="delete"
-                    data-aria-controls="content-for-approval"
-                  />
-                  <label
-                    className="govuk-label govuk-radios__label"
-                    htmlFor="readyTeamLeadApproval"
-                  >
-                    Level 2: in higher review
-                  </label>
-                </div>
-              </div>
-            </fieldset>
-            <div className="govuk-form-group govuk-!-margin-top-6">
-              <label
-                htmlFor="release-notes"
-                className="govuk-label govuk-label--s"
-              >
-                Release notes
-              </label>
-              <textarea
-                id="release-notes"
-                className="govuk-textarea govuk-!-width-one-half"
-              />
+      {location.search === '?status=readyHigherReview' && (
+        <>
+          <div className="govuk-panel govuk-panel--confirmation">
+            <h1 className="govuk-panel__title">
+              Release ready for level 2 higher review
+            </h1>
+            <div className="govuk-panel__body">
+              Check the 'Comments for you to resolve' tab on your{' '}
+              <Link to="/prototypes/admin-dashboard?status=readyHigherReview">
+                dashboard
+              </Link>{' '}
+              for feedback
             </div>
-            <button className="govuk-button govuk-!-margin-top-3" type="submit">
-              Update release status
-            </button>
           </div>
-        </form>
+        </>
       )}
+
       <hr className="govuk-!-margin-top-9" />
       <div className="govuk-grid-row govuk-!-margin-top-9">
         <div className="govuk-grid-column-one-half ">
@@ -124,6 +151,16 @@ const PublicationDataPage = ({ location }: RouteChildrenProps) => {
         {location.search === '?status=readyTeamApproval' && (
           <div className="govuk-grid-column-one-half dfe-align--right">
             <Link to="/prototypes/admin-dashboard?status=readyApproval">
+              <span className="govuk-heading-m govuk-!-margin-bottom-0">
+                Next step
+              </span>
+              Go to dashboard
+            </Link>
+          </div>
+        )}
+        {location.search === '?status=readyHigherReview' && (
+          <div className="govuk-grid-column-one-half dfe-align--right">
+            <Link to="/prototypes/admin-dashboard?status=readyHigherReview">
               <span className="govuk-heading-m govuk-!-margin-bottom-0">
                 Next step
               </span>

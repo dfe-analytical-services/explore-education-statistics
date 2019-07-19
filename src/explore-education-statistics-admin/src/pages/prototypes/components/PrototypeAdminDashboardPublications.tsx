@@ -8,6 +8,7 @@ import Link from '@admin/components/Link';
 
 const PrototypeAdminDashboardPublications = () => {
   const userContext = React.useContext(LoginContext);
+
   return (
     <>
       {userContext.user &&
@@ -34,7 +35,6 @@ const PrototypeAdminDashboardPublications = () => {
           explore.statistics@education.gov.uk
         </a>
       </p>
-
       {userContext.user && userContext.user.permissions.includes('team lead') && (
         <>
           <form>
@@ -87,7 +87,6 @@ const PrototypeAdminDashboardPublications = () => {
         </>
       )}
       <hr />
-
       <h2 className="govuk-heading-l">Pupils and schools</h2>
       <h3 className="govuk-heading-m govuk-!-margin-bottom-0">
         Pupil absence publications
@@ -124,13 +123,19 @@ const PrototypeAdminDashboardPublications = () => {
                       <PrototypeDashboardRelease
                         title="Academic year,"
                         years="2018 to 2019"
-                        tag="Ready for you to review"
+                        tag={
+                          userContext.user &&
+                          userContext.user.permissions.includes(
+                            'responsible statistician',
+                          )
+                            ? 'Ready for your higher review'
+                            : 'Ready for you to review'
+                        }
                         review
                         lastEdited={new Date('2019-03-20 17:37')}
                         lastEditor={{ id: 'me', name: 'me', permissions: [] }}
                         published={new Date('2019-09-20 09:30')}
                         nextRelease={new Date('2020-09-20 09:30')}
-                        dataType="Revised"
                         showComments
                         task="readyReview"
                       />
@@ -150,7 +155,6 @@ const PrototypeAdminDashboardPublications = () => {
                         lastEditor={{ id: 'me', name: 'me', permissions: [] }}
                         published={new Date('2019-09-24 09:30')}
                         nextRelease={new Date('2020-09-25 09:30')}
-                        dataType="Provisional"
                       />
                     </li>
                   )}
@@ -171,7 +175,6 @@ const PrototypeAdminDashboardPublications = () => {
                       lastEditor={{ id: 'me', name: 'me', permissions: [] }}
                       published={new Date('2018-09-24 09:30')}
                       nextRelease={new Date('2019-09-23 09:30')}
-                      dataType="Final"
                     />
                   </li>
                   <li>
@@ -185,7 +188,6 @@ const PrototypeAdminDashboardPublications = () => {
                       lastEdited={new Date('2018-03-20 14:23')}
                       lastEditor={{ id: 'me', name: 'me', permissions: [] }}
                       published={new Date('2017-09-25 09:30')}
-                      dataType="Final"
                     />
                   </li>
                   <li>
@@ -199,7 +201,6 @@ const PrototypeAdminDashboardPublications = () => {
                       lastEdited={new Date('2017-03-20 16:15')}
                       lastEditor={{ id: 'me', name: 'me', permissions: [] }}
                       published={new Date('2016-03-26 09:30')}
-                      dataType="Final"
                     />
                   </li>
                 </ul>

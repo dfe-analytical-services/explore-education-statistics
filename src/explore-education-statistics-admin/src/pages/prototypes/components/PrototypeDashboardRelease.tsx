@@ -121,10 +121,16 @@ const PrototypeDashboardRelease = ({
           <div className="govuk-summary-list__row">
             <dt className="govuk-summary-list__key">Comments</dt>
             <dd className="govuk-summary-list__value">
+              <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
+                Level 1: review
+              </h3>
               <Details
                 summary="Ann Evans, 17 June 2018, 17:35"
                 className="govuk-!-margin-bottom-0"
               >
+                <Link to="/prototypes/publication-review">
+                  General comment or question
+                </Link>
                 <p>
                   Lorem ipsum, dolor sit amet consectetur adipisicing elit.
                   Fugit rem, optio sunt dolorum corrupti harum labore quia
@@ -133,6 +139,9 @@ const PrototypeDashboardRelease = ({
                 </p>
               </Details>
               <Details summary="Stephen Doherty, 17 June 2018, 13:15">
+                <Link to="/prototypes/publication-review">
+                  Section comment: About this release
+                </Link>
                 <p>
                   Corrupti harum labore quia repellat! Quae voluptatem illo
                   soluta optio ducimus at possimus quisquam doloremque veritatis

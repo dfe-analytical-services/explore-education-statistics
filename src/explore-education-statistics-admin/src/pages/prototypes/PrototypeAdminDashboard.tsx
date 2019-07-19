@@ -9,6 +9,26 @@ import { LoginContext } from '@admin/components/Login';
 import Link from '../../components/Link';
 import PrototypePage from './components/PrototypePage';
 
+const UserType = () => {
+  const userContext = React.useContext(LoginContext);
+  return (
+    <>
+      {userContext.user &&
+        userContext.user.permissions.includes('team lead') && (
+          <span className="govuk-body-s"> (Team lead)</span>
+        )}
+      {userContext.user &&
+        userContext.user.permissions.includes('team member') && (
+          <span className="govuk-body-s"> (Team member)</span>
+        )}
+      {userContext.user &&
+        userContext.user.permissions.includes('responsible statistician') && (
+          <span className="govuk-body-s"> (Responsible statistician)</span>
+        )}
+    </>
+  );
+};
+
 const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
   const userContext = React.useContext(LoginContext);
   return (
@@ -18,10 +38,7 @@ const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
           <span className="govuk-caption-xl">Welcome</span>
           <h1 className="govuk-heading-xl">
             {userContext.user && userContext.user.name}
-            {userContext.user &&
-              userContext.user.permissions.includes('team lead') && (
-                <span className="govuk-body-s"> (Team lead)</span>
-              )}{' '}
+            <UserType />{' '}
             <span className="govuk-body-s">
               Not you? <Link to="#">Sign out</Link>
             </span>
@@ -54,7 +71,7 @@ const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
         <TabsSection
           id="task-ready-approval1"
           title={`Ready for you to review ${
-            location.search === '?status=readyApproval' ? '(1)' : '(0)'
+            location.search.includes('?status=readyApproval') ? '(1)' : '(0)'
           }`}
         >
           <AdminDashboardReadyForApproval task="readyReview" />
@@ -62,7 +79,7 @@ const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
         <TabsSection
           id="task-in-progress2"
           title={`Comments for you to resolve ${
-            location.search === '?status=readyApproval' ? '(1)' : '(0)'
+            location.search.includes('?status=readyApproval') ? '(1)' : '(0)'
           }`}
         >
           <AdminDashboardReadyForApproval task="resolveComments" />

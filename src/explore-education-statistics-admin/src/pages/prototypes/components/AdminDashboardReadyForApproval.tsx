@@ -1,14 +1,28 @@
 import PrototypeDashboardRelease from '@admin/pages/prototypes/components/PrototypeDashboardRelease';
+import { LoginContext } from '@admin/components/Login';
 import React from 'react';
 
 interface Props {
   task?: string;
+  reviewType?: string;
 }
 
-const AdminDashboardReadyForApproval = ({ task }: Props) => {
+const AdminDashboardReadyForApproval = ({ task, reviewType }: Props) => {
+  const userContext = React.useContext(LoginContext);
+
+  const tagLabel =
+    userContext.user &&
+    userContext.user.permissions.includes('responsible statistician')
+      ? 'Ready for your higher review'
+      : 'Ready for you to review';
+
+  const checkStatus = window.location.search.includes('?status=readyApproval')
+    ? 'checkReleases'
+    : 'noReleases';
+
   return (
     <>
-      {window.location.search !== '?status=readyApproval' && (
+      {checkStatus === 'noReleases' && (
         <>
           <div className="govuk-inset-text">
             {task === 'readyReview'
@@ -17,8 +31,17 @@ const AdminDashboardReadyForApproval = ({ task }: Props) => {
           </div>
         </>
       )}
-      {window.location.search === '?status=readyApproval' && (
+      {checkStatus === 'checkReleases' && (
         <>
+          {userContext.user &&
+            userContext.user.permissions.includes('team member') && (
+              <p>Level 1: peer review</p>
+            )}
+          {userContext.user &&
+            userContext.user.permissions.includes(
+              'responsible statistician',
+            ) && <p>Level 2: higher review</p>}
+
           <p className="govuk-body">
             {task === 'readyReview' ? (
               'Please review the following draft release(s)'
@@ -43,18 +66,13 @@ const AdminDashboardReadyForApproval = ({ task }: Props) => {
           <PrototypeDashboardRelease
             title="Academic year,"
             years="2018 to 2019"
-            tag={
-              task === 'readyReview'
-                ? 'Ready for you to review'
-                : 'Unresolved comments'
-            }
+            tag={task === 'readyReview' ? tagLabel : 'Unresolved comments'}
             review
             lastEdited={new Date('2019-03-20 17:37')}
             lastEditor={{ id: 'me', name: 'me', permissions: [] }}
             published={new Date('2019-09-20 09:30')}
             nextRelease={new Date('2020-09-20 09:30')}
             showComments
-            dataType="Revised"
             task={task}
           />
         </>
