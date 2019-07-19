@@ -1,11 +1,17 @@
 import Page from '@frontend/components/Page';
 import React from 'react';
-import { cookieBannerSeenName } from '@frontend/components/CookieBanner';
+import {
+  bannerSeenCookieName,
+  cookieSettingsCookieName,
+} from '@frontend/services/cookiesService';
 import Link from '@frontend/components/Link';
 
 function CookiesPage() {
   return (
-    <Page title="Cookies">
+    <Page
+      title="Details about cookies"
+      breadcrumbs={[{ name: 'Cookies', link: '/cookies' }]}
+    >
       <p>
         The Explore education statistics service puts small files (known as
         ‘cookies’) onto your computer to collect information about how you
@@ -97,7 +103,7 @@ function CookiesPage() {
               <td className="govuk-table__cell">
                 Used to manage the rate at which page view requests are made
               </td>
-              <td className="govuk-table__cell">10 minutes</td>
+              <td className="govuk-table__cell">1 minute</td>
             </tr>
           </tbody>
         </table>
@@ -134,7 +140,7 @@ function CookiesPage() {
           </thead>
           <tbody className="govuk-table__body">
             <tr className="govuk-table__row">
-              <td className="govuk-table__cell">{cookieBannerSeenName}</td>
+              <td className="govuk-table__cell">{bannerSeenCookieName}</td>
               <td className="govuk-table__cell">
                 Saves a message to let us know that you’ve seen our cookie
                 message
@@ -143,6 +149,46 @@ function CookiesPage() {
             </tr>
           </tbody>
         </table>
+      </section>
+      <section>
+        <h3>Your cookie settings</h3>
+        <p>
+          We will store your cookie settings as a cookie, so that they remain if
+          you return to GOV.UK: Explore education statistics.
+        </p>
+
+        <table className="govuk-table">
+          <thead className="govuk-table__head">
+            <tr className="govuk-table__row">
+              <th className="govuk-table__header" scope="col">
+                Name
+              </th>
+              <th className="govuk-table__header" scope="col">
+                Purpose
+              </th>
+              <th className="govuk-table__header" scope="col">
+                Expires
+              </th>
+            </tr>
+          </thead>
+          <tbody className="govuk-table__body">
+            <tr className="govuk-table__row">
+              <td className="govuk-table__cell">{cookieSettingsCookieName}</td>
+              <td className="govuk-table__cell">
+                Saves cookie settings, so they remain upon return
+              </td>
+              <td className="govuk-table__cell">1 month</td>
+            </tr>
+          </tbody>
+        </table>
+        <h4>Change your settings</h4>
+        <p>
+          You can{' '}
+          <Link to="/cookies">
+            change which cookies you're happy for us to use
+          </Link>
+          .
+        </p>
       </section>
     </Page>
   );

@@ -1,42 +1,25 @@
 import React from 'react';
 import { useCookies } from 'react-cookie';
 import ButtonText from '@common/components/ButtonText';
-import * as googleAnalytics from '@frontend/services/googleAnalyticsService';
+import * as googleAnalyticsService from '@frontend/services/googleAnalyticsService';
+import {
+  acceptCookies,
+  getCookies,
+  bannerSeenCookieName,
+  cookieSettingsCookieName,
+} from '@frontend/services/cookiesService';
 import useMounted from 'explore-education-statistics-common/src/hooks/useMounted';
 import styles from './CookieBanner.module.scss';
 
-export const cookieBannerSeenName = 'dfe_seen_cookie_message';
-export function getCookies() {
-  // turns document.cookie e.g. 'cookie_name=hello-world; cookietwo=true'
-  // into { cookie_name: "hellow-world", cookietwo: true }
-  const cookies: any = {};
-  document.cookie.split('; ').forEach(cookiesPairString => {
-    const [key, value]: string[] = cookiesPairString.split('=');
-    cookies[key] = value;
-  });
-  return cookies;
-}
-
 const CookieBanner = () => {
   useMounted(() => {
-    if (getCookies()[googleAnalytics.cookieEnabled] !== false) {
-      googleAnalytics.initGA();
+    if (getCookies()[cookieSettingsCookieName] !== false) {
+      googleAnalyticsService.initGA();
     }
   });
-  const [cookies, setCookie] = useCookies([cookieBannerSeenName]);
+  const [cookies, setCookie] = useCookies([bannerSeenCookieName]);
 
-  const dateToday = new Date();
-  const oneMonthFromNow = new Date(
-    dateToday.setMonth(dateToday.getMonth() + 1),
-  );
-  const acceptCookies = () => {
-    getCookies();
-    setCookie(cookieBannerSeenName, true, {
-      expires: oneMonthFromNow,
-    });
-  };
-
-  return !cookies[cookieBannerSeenName] ? (
+  return cookies[bannerSeenCookieName] !== 'true' ? (
     <div className={styles.container}>
       <p>
         <span>GOV.UK uses cookies to make the site simpler.</span>{' '}
