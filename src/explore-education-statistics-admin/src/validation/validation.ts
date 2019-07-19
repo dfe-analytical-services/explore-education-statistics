@@ -1,4 +1,4 @@
-import { dayMonthYearIsComplete } from '@admin/services/common/types/types';
+import { dayMonthYearIsComplete } from '@admin/services/common/types';
 import Yup from '@common/lib/validation/yup';
 import { isValid } from 'date-fns';
 
