@@ -1,15 +1,22 @@
-import { createClient } from '@admin/services/common/service';
 import {
   ReleaseSetupDetails,
   ReleaseSetupDetailsUpdateRequest,
 } from '@admin/services/edit-release/setup/types';
-import mocks from './mock/axios-mock';
+import { createClient } from '@admin/services/util/service';
+import mocks from './mock/mock-service';
 
 const apiClient = createClient({
   mockBehaviourRegistrar: mocks,
 });
 
-export default {
+export interface ReleaseSetupService {
+  getReleaseSetupDetails: (releaseId: string) => Promise<ReleaseSetupDetails>;
+  updateReleaseSetupDetails: (
+    updatedRelease: ReleaseSetupDetailsUpdateRequest,
+  ) => Promise<void>;
+}
+
+const service: ReleaseSetupService = {
   getReleaseSetupDetails(releaseId: string): Promise<ReleaseSetupDetails> {
     return apiClient.then(client =>
       client.get<ReleaseSetupDetails>(`/release/${releaseId}/setup`),
@@ -23,3 +30,5 @@ export default {
     );
   },
 };
+
+export default service;
