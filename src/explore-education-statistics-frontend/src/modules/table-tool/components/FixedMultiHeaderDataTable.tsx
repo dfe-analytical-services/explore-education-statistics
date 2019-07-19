@@ -1,4 +1,5 @@
 import React, { forwardRef, ReactNode, Ref, useRef } from 'react';
+import Footnote from '@frontend/components/Footnote';
 import styles from './FixedMultiHeaderDataTable.module.scss';
 import MultiHeaderTable from './MultiHeaderTable';
 
@@ -9,11 +10,12 @@ interface Props {
   columnHeaders: string[][];
   rowHeaders: string[][];
   rows: string[][];
+  foot?: string[];
 }
 
 const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
   (props, ref) => {
-    const { caption, captionId = 'dataTableCaption' } = props;
+    const { caption, captionId = 'dataTableCaption', foot } = props;
 
     const mainTableRef = useRef<HTMLTableElement>(null);
 
@@ -58,6 +60,7 @@ const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
             ref={mainTableRef}
           />
         </div>
+        {foot && <Footnote content={foot} />}
       </figure>
     );
   },

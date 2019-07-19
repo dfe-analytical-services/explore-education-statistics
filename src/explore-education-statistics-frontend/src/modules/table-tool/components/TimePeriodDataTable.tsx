@@ -7,7 +7,6 @@ import {
   Indicator,
   LocationFilter,
 } from '@frontend/modules/table-tool/components/types/filters';
-import Footnote from '@frontend/components/Footnote';
 import TimePeriod from '@frontend/modules/table-tool/components/types/TimePeriod';
 import last from 'lodash/last';
 import sortBy from 'lodash/sortBy';
@@ -166,8 +165,8 @@ const TimePeriodDataTable = (props: Props) => {
         rowHeaders={rowHeaders}
         rows={rows}
         ref={dataTableRef}
+        foot={footnotes}
       />
-      {footnotes && <Footnote content={footnotes} />}
     </div>
   );
 };
