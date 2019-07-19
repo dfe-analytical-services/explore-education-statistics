@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190718163827_AddFootnotes")]
+    [Migration("20190719135058_AddFootnotes")]
     partial class AddFootnotes
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -105,6 +105,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                     b.HasIndex("IndicatorGroupId");
 
                     b.ToTable("Indicator");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.IndicatorFootnote", b =>
+                {
+                    b.Property<long>("IndicatorId");
+
+                    b.Property<long>("FootnoteId");
+
+                    b.HasKey("IndicatorId", "FootnoteId");
+
+                    b.HasIndex("FootnoteId");
+
+                    b.ToTable("IndicatorFootnote");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.IndicatorGroup", b =>
@@ -827,6 +840,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.IndicatorGroup", "IndicatorGroup")
                         .WithMany("Indicators")
                         .HasForeignKey("IndicatorGroupId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.IndicatorFootnote", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Footnote", "Footnote")
+                        .WithMany()
+                        .HasForeignKey("FootnoteId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Indicator", "Indicator")
+                        .WithMany("Footnotes")
+                        .HasForeignKey("IndicatorId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

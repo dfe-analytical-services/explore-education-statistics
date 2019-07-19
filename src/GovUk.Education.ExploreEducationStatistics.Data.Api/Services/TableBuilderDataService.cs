@@ -45,7 +45,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         private IEnumerable<string> GetFootnotes(ObservationQueryContext queryContext)
         {
-            return _footnoteService.GetFootnotes(queryContext.SubjectId).Select(footnote => footnote.Content);
+            return _footnoteService.GetFootnotes(queryContext.SubjectId, queryContext.Indicators)
+                .Select(footnote => footnote.Content);
         }
 
         private static IEnumerable<TimePeriodMetaViewModel> GetTimePeriodRange(

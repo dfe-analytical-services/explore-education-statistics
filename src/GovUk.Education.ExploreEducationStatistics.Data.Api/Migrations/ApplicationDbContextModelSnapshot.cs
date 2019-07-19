@@ -105,6 +105,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                     b.ToTable("Indicator");
                 });
 
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.IndicatorFootnote", b =>
+                {
+                    b.Property<long>("IndicatorId");
+
+                    b.Property<long>("FootnoteId");
+
+                    b.HasKey("IndicatorId", "FootnoteId");
+
+                    b.HasIndex("FootnoteId");
+
+                    b.ToTable("IndicatorFootnote");
+                });
+
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.IndicatorGroup", b =>
                 {
                     b.Property<long>("Id")
@@ -825,6 +838,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.IndicatorGroup", "IndicatorGroup")
                         .WithMany("Indicators")
                         .HasForeignKey("IndicatorGroupId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.IndicatorFootnote", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Footnote", "Footnote")
+                        .WithMany()
+                        .HasForeignKey("FootnoteId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Indicator", "Indicator")
+                        .WithMany("Footnotes")
+                        .HasForeignKey("IndicatorId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

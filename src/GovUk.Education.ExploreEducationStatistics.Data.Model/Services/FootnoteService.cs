@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
@@ -13,12 +12,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         {
         }
 
-        public IEnumerable<Footnote> GetFootnotes(long subjectId)
+        public IEnumerable<Footnote> GetFootnotes(long subjectId, IEnumerable<long> indicators)
         {
-            return _context.Set<SubjectFootnote>()
-                .AsNoTracking()
-                .Where(footnote => footnote.SubjectId == subjectId)
-                .Select(footnote => footnote.Footnote);
+            return from f in _context.Footnote
+                join s in _context.SubjectFootnote on f.Id equals s.FootnoteId
+                join i in _context.IndicatorFootnote on f.Id equals i.FootnoteId
+                where s.SubjectId == subjectId && indicators.Contains(i.IndicatorId)
+                select f;
         }
     }
 }

@@ -26,6 +26,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "IndicatorFootnote",
+                columns: table => new
+                {
+                    IndicatorId = table.Column<long>(nullable: false),
+                    FootnoteId = table.Column<long>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_IndicatorFootnote", x => new { x.IndicatorId, x.FootnoteId });
+                    table.ForeignKey(
+                        name: "FK_IndicatorFootnote_Footnote_FootnoteId",
+                        column: x => x.FootnoteId,
+                        principalTable: "Footnote",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_IndicatorFootnote_Indicator_IndicatorId",
+                        column: x => x.IndicatorId,
+                        principalTable: "Indicator",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "SubjectFootnote",
                 columns: table => new
                 {
@@ -50,15 +74,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_IndicatorFootnote_FootnoteId",
+                table: "IndicatorFootnote",
+                column: "FootnoteId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_SubjectFootnote_FootnoteId",
                 table: "SubjectFootnote",
                 column: "FootnoteId");
             
-            ExecuteFile(migrationBuilder, _migrationsPath + "20190718163827_FootnoteData.sql");
+            ExecuteFile(migrationBuilder, _migrationsPath + "20190719135058_FootnoteData.sql");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "IndicatorFootnote");
+
             migrationBuilder.DropTable(
                 name: "SubjectFootnote");
 

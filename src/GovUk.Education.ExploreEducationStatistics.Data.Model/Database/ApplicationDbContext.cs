@@ -20,6 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         public DbSet<Footnote> Footnote { get; set; }
         public DbQuery<GeoJson> GeoJson { get; set; }
         public DbSet<Indicator> Indicator { get; set; }
+        public DbSet<IndicatorFootnote> IndicatorFootnote { get; set; }
         public DbSet<IndicatorGroup> IndicatorGroup { get; set; }
         public DbSet<Location> Location { get; set; }
         public DbSet<Observation> Observation { get; set; }
@@ -38,6 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             ConfigureData(modelBuilder);
             ConfigureGeographicLevel(modelBuilder);
             ConfigureGeoJson(modelBuilder);
+            ConfigureIndicatorFootnote(modelBuilder);
             ConfigureLocation(modelBuilder);
             ConfigureMeasures(modelBuilder);
             ConfigureObservationFilterItem(modelBuilder);
@@ -635,6 +637,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                     builder => builder.HasIndex(localAuthorityDistrict => localAuthorityDistrict.Code));
         }
 
+        private static void ConfigureIndicatorFootnote(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<IndicatorFootnote>()
+                .HasKey(item => new {item.IndicatorId, item.FootnoteId});
+
+            modelBuilder.Entity<IndicatorFootnote>()
+                .HasOne(indicatorFootnote => indicatorFootnote.Indicator)
+                .WithMany(indicator => indicator.Footnotes)
+                .HasForeignKey(indicatorFootnote => indicatorFootnote.IndicatorId);
+
+            modelBuilder.Entity<IndicatorFootnote>()
+                .HasOne(indicatorFootnote => indicatorFootnote.Footnote)
+                .WithMany()
+                .HasForeignKey(indicatorFootnote => indicatorFootnote.FootnoteId)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
+        
         private static void ConfigureInstitution(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Location>()
