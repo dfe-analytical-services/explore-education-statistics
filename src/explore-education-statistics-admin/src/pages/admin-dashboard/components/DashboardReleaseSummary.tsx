@@ -63,15 +63,14 @@ const DashboardReleaseSummary = ({ release }: Props) => {
       <SummaryList additionalClassName="govuk-!-margin-bottom-3">
         <SummaryListItem term="Publish date">
           {release.published && (
-            <FormattedDate>
-              {release.published}
-            </FormattedDate>
+            <FormattedDate>{release.published}</FormattedDate>
           )}
-          {!release.published && dayMonthYearIsComplete(release.publishScheduled) && (
-            <FormattedDate>
-              {dayMonthYearToDate(release.publishScheduled)}
-            </FormattedDate>
-          )}
+          {!release.published &&
+            dayMonthYearIsComplete(release.publishScheduled) && (
+              <FormattedDate>
+                {dayMonthYearToDate(release.publishScheduled)}
+              </FormattedDate>
+            )}
         </SummaryListItem>
         <SummaryListItem term="Next release date">
           {dayMonthYearIsComplete(release.nextReleaseExpectedDate) && (
@@ -85,9 +84,7 @@ const DashboardReleaseSummary = ({ release }: Props) => {
             <span>
               {release.contact.contactName}
               <br />
-              <a href="mailto:{lead.teamEmail}">
-                {release.contact.teamEmail}
-              </a>
+              <a href="mailto:{lead.teamEmail}">{release.contact.teamEmail}</a>
               <br />
               {release.contact.contactTelNo}
             </span>
