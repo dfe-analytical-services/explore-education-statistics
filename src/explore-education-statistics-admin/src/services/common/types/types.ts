@@ -1,5 +1,5 @@
-import { ReleaseApprovalStatus } from '@admin/services/api/dashboard/types';
-import { User } from '../../../PrototypeLoginService';
+import { ReleaseApprovalStatus } from '@admin/services/dashboard/types';
+import { User } from '@admin/services/PrototypeLoginService';
 
 export interface IdLabelPair {
   id: string;
@@ -81,17 +81,6 @@ export interface Publication {
   contact: UserContact;
   methodology: IdLabelPair;
   owner: User;
-}
-
-export interface ReleaseSetupDetails {
-  id: string;
-  publicationTitle: string;
-  timePeriodCoverageCode: string;
-  timePeriodCoverageStartDate: Date;
-  releaseType: IdLabelPair;
-  leadStatisticianName: string;
-  scheduledPublishDate: DayMonthYearValues;
-  nextReleaseExpectedDate?: Date;
 }
 
 export interface DayMonthYearValues {

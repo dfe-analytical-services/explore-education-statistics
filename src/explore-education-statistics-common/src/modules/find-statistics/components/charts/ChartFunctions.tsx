@@ -82,6 +82,7 @@ export interface DataSetResult {
 export interface ChartCapabilities {
   dataSymbols: boolean;
   stackable: boolean;
+  lineStyle: boolean;
 }
 
 export interface ChartDefinition {

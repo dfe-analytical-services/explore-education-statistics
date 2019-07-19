@@ -27,6 +27,13 @@ const SummaryListItem = ({
         </dd>
       )}
       {actions && <dd className="govuk-summary-list__actions">{actions}</dd>}
+      {!children && !actions && (
+        <dd
+          className={classNames('govuk-summary-list__value', {
+            'dfe-details-no-margin': detailsNoMargin,
+          })}
+        />
+      )}
     </div>
   );
 };

@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.3-servicing-35854")
+                .HasAnnotation("ProductVersion", "2.2.6-servicing-10079")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -955,9 +955,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                     b.Property<string>("Title")
                         .IsRequired();
 
+                    b.Property<Guid>("TypeId");
+
                     b.HasKey("Id");
 
                     b.HasIndex("PublicationId");
+
+                    b.HasIndex("TypeId");
 
                     b.ToTable("Releases");
 
@@ -975,7 +979,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
 
 Find out how and why these statistics are collected and published - [Pupil absence statistics: methodology](../methodology/pupil-absence-in-schools-in-england).",
                             TimePeriodCoverage = 0,
-                            Title = "Pupil absence data and statistics for schools in England"
+                            Title = "Pupil absence data and statistics for schools in England",
+                            TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c")
                         },
                         new
                         {
@@ -988,7 +993,8 @@ Find out how and why these statistics are collected and published - [Pupil absen
                             Slug = "2015-16",
                             Summary = "Read national statistical summaries and definitions, view charts and tables and download data files across a range of pupil absence subject areas.",
                             TimePeriodCoverage = 0,
-                            Title = "Pupil absence data and statistics for schools in England"
+                            Title = "Pupil absence data and statistics for schools in England",
+                            TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c")
                         },
                         new
                         {
@@ -1003,7 +1009,8 @@ Find out how and why these statistics are collected and published - [Pupil absen
 
 Find out how and why these statistics are collected and published - [Permanent and fixed-period exclusion statistics: methodology](../methodology/permanent-and-fixed-period-exclusions-in-england)",
                             TimePeriodCoverage = 0,
-                            Title = "Permanent and fixed-period exclusions statistics for schools in England"
+                            Title = "Permanent and fixed-period exclusions statistics for schools in England",
+                            TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c")
                         },
                         new
                         {
@@ -1018,7 +1025,33 @@ Find out how and why these statistics are collected and published - [Permanent a
 
 Find out how and why these statistics are collected and published - [Secondary and primary school applications and offers: methodology](../methodology/secondary-and-primary-schools-applications-and-offers)",
                             TimePeriodCoverage = 0,
-                            Title = "Secondary and primary school applications and offers"
+                            Title = "Secondary and primary school applications and offers",
+                            TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c")
+                        });
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseType", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Title")
+                        .IsRequired();
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ReleaseTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
+                            Title = "Official Statistics"
+                        },
+                        new
+                        {
+                            Id = new Guid("1821abb8-68b0-431b-9770-0bea65d02ff0"),
+                            Title = "Ad Hoc"
                         });
                 });
 
@@ -1572,6 +1605,11 @@ Find out how and why these statistics are collected and published - [Secondary a
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Publication", "Publication")
                         .WithMany("Releases")
                         .HasForeignKey("PublicationId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseType", "Type")
+                        .WithMany()
+                        .HasForeignKey("TypeId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

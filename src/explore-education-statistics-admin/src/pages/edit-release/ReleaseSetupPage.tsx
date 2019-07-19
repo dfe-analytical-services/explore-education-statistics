@@ -1,4 +1,5 @@
 import DummyReferenceData from '@admin/pages/DummyReferenceData';
+import { ReleaseSetupDetails } from '@admin/services/edit-release/setup/types';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -6,12 +7,11 @@ import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import { setupEditRoute } from '@admin/routes/releaseRoutes';
 import ReleasePageTemplate from '@admin/pages/edit-release/components/ReleasePageTemplate';
-import DummyPublicationsData from '@admin/pages/DummyPublicationsData';
+import service from '@admin/services/edit-release/setup/service';
 import {
   dayMonthYearIsComplete,
   dayMonthYearToDate,
-  ReleaseSetupDetails,
-} from '@admin/services/api/common/types/types';
+} from '@admin/services/common/types/types';
 import Link from '@admin/components/Link';
 
 interface MatchProps {
@@ -26,17 +26,12 @@ const ReleaseSetupPage = ({ match }: RouteComponentProps<MatchProps>) => {
   >();
 
   useEffect(() => {
-    setReleaseSetupDetails(
-      DummyPublicationsData.getReleaseSetupDetails(releaseId),
-    );
+    service.getReleaseSetupDetails(releaseId).then(setReleaseSetupDetails);
   }, [releaseId]);
 
-  const selectedTimePeriodCoverageGroup =
-    releaseSetupDetails && releaseSetupDetails.timePeriodCoverageCode
-      ? DummyReferenceData.findTimePeriodCoverageGroup(
-          releaseSetupDetails.timePeriodCoverageCode,
-        )
-      : null;
+  const getSelectedTimePeriodCoverageLabel = (timePeriodCoverageCode: string) =>
+    DummyReferenceData.findTimePeriodCoverageOption(timePeriodCoverageCode)
+      .label;
 
   return (
     <>
@@ -52,20 +47,24 @@ const ReleaseSetupPage = ({ match }: RouteComponentProps<MatchProps>) => {
               {releaseSetupDetails.publicationTitle}
             </SummaryListItem>
             <SummaryListItem term="Time period">
-              {selectedTimePeriodCoverageGroup &&
-                selectedTimePeriodCoverageGroup.label}
+              {getSelectedTimePeriodCoverageLabel(
+                releaseSetupDetails.timePeriodCoverageCode,
+              )}
             </SummaryListItem>
             <SummaryListItem term="Release period">
-              <FormattedDate format="yyyy">
-                {releaseSetupDetails.timePeriodCoverageStartDate}
-              </FormattedDate>{' '}
-              to{' '}
-              <FormattedDate format="yyyy">
-                {(
-                  releaseSetupDetails.timePeriodCoverageStartDate.getFullYear() +
-                  1
-                ).toString()}
-              </FormattedDate>
+              {releaseSetupDetails.timePeriodCoverageStartDate.year && (
+                <>
+                  <time>
+                    {releaseSetupDetails.timePeriodCoverageStartDate.year}
+                  </time>{' '}
+                  to{' '}
+                  {releaseSetupDetails.timePeriodCoverageStartDate.year
+                    ? (
+                        releaseSetupDetails.timePeriodCoverageStartDate.year + 1
+                      ).toString()
+                    : ''}
+                </>
+              )}
             </SummaryListItem>
             <SummaryListItem term="Lead statistician">
               {releaseSetupDetails.leadStatisticianName}
@@ -80,9 +79,13 @@ const ReleaseSetupPage = ({ match }: RouteComponentProps<MatchProps>) => {
               )}
             </SummaryListItem>
             <SummaryListItem term="Next release expected">
-              {releaseSetupDetails.nextReleaseExpectedDate && (
+              {dayMonthYearIsComplete(
+                releaseSetupDetails.nextReleaseExpectedDate,
+              ) && (
                 <FormattedDate>
-                  {releaseSetupDetails.nextReleaseExpectedDate}
+                  {dayMonthYearToDate(
+                    releaseSetupDetails.nextReleaseExpectedDate,
+                  )}
                 </FormattedDate>
               )}
             </SummaryListItem>

@@ -469,7 +469,7 @@ exports[`LineChartBlock renders basic chart correctly 1`] = `
             d="M110,101L880,179"
             fill="none"
             height="260"
-            stroke="#3182bd"
+            stroke="#ff0000"
             stroke-width="2"
             width="810"
           />
@@ -480,10 +480,10 @@ exports[`LineChartBlock renders basic chart correctly 1`] = `
               class="recharts-dot recharts-line-dot"
               cx="110"
               cy="101"
-              fill="#fff"
+              fill="#ff0000"
               height="260"
               r="3"
-              stroke="#3182bd"
+              stroke="#ff0000"
               stroke-width="2"
               width="810"
             />
@@ -491,10 +491,10 @@ exports[`LineChartBlock renders basic chart correctly 1`] = `
               class="recharts-dot recharts-line-dot"
               cx="880"
               cy="179"
-              fill="#fff"
+              fill="#ff0000"
               height="260"
               r="3"
-              stroke="#3182bd"
+              stroke="#ff0000"
               stroke-width="2"
               width="810"
             />
@@ -508,7 +508,7 @@ exports[`LineChartBlock renders basic chart correctly 1`] = `
             d="M110,10L880,88"
             fill="none"
             height="260"
-            stroke="#3182bd"
+            stroke="#ff0000"
             stroke-width="2"
             width="810"
           />
@@ -519,10 +519,10 @@ exports[`LineChartBlock renders basic chart correctly 1`] = `
               class="recharts-dot recharts-line-dot"
               cx="110"
               cy="10"
-              fill="#fff"
+              fill="#ff0000"
               height="260"
               r="3"
-              stroke="#3182bd"
+              stroke="#ff0000"
               stroke-width="2"
               width="810"
             />
@@ -530,10 +530,10 @@ exports[`LineChartBlock renders basic chart correctly 1`] = `
               class="recharts-dot recharts-line-dot"
               cx="880"
               cy="88"
-              fill="#fff"
+              fill="#ff0000"
               height="260"
               r="3"
-              stroke="#3182bd"
+              stroke="#ff0000"
               stroke-width="2"
               width="810"
             />
@@ -547,7 +547,7 @@ exports[`LineChartBlock renders basic chart correctly 1`] = `
             d="M110,75L880,127"
             fill="none"
             height="260"
-            stroke="#3182bd"
+            stroke="#ff0000"
             stroke-width="2"
             width="810"
           />
@@ -558,10 +558,10 @@ exports[`LineChartBlock renders basic chart correctly 1`] = `
               class="recharts-dot recharts-line-dot"
               cx="110"
               cy="75"
-              fill="#fff"
+              fill="#ff0000"
               height="260"
               r="3"
-              stroke="#3182bd"
+              stroke="#ff0000"
               stroke-width="2"
               width="810"
             />
@@ -569,10 +569,10 @@ exports[`LineChartBlock renders basic chart correctly 1`] = `
               class="recharts-dot recharts-line-dot"
               cx="880"
               cy="127"
-              fill="#fff"
+              fill="#ff0000"
               height="260"
               r="3"
-              stroke="#3182bd"
+              stroke="#ff0000"
               stroke-width="2"
               width="810"
             />
@@ -606,7 +606,7 @@ exports[`LineChartBlock renders basic chart correctly 1`] = `
             H32M21.333333333333332,16
             A5.333333333333333,5.333333333333333,0,1,1,10.666666666666666,16"
                 fill="none"
-                stroke="#3182bd"
+                stroke="#ff0000"
                 stroke-width="4"
               />
             </svg>
@@ -635,7 +635,7 @@ exports[`LineChartBlock renders basic chart correctly 1`] = `
             H32M21.333333333333332,16
             A5.333333333333333,5.333333333333333,0,1,1,10.666666666666666,16"
                 fill="none"
-                stroke="#3182bd"
+                stroke="#ff0000"
                 stroke-width="4"
               />
             </svg>
@@ -664,7 +664,7 @@ exports[`LineChartBlock renders basic chart correctly 1`] = `
             H32M21.333333333333332,16
             A5.333333333333333,5.333333333333333,0,1,1,10.666666666666666,16"
                 fill="none"
-                stroke="#3182bd"
+                stroke="#ff0000"
                 stroke-width="4"
               />
             </svg>
