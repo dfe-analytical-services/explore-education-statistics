@@ -165,7 +165,7 @@ const TimePeriodDataTable = (props: Props) => {
         rowHeaders={rowHeaders}
         rows={rows}
         ref={dataTableRef}
-        foot={footnotes}
+        footnotes={footnotes}
       />
     </div>
   );
