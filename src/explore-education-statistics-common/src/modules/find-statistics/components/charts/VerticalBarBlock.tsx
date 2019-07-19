@@ -28,6 +28,7 @@ export default class VerticalBarBlock extends Component<StackedBarProps> {
     capabilities: {
       dataSymbols: false,
       stackable: true,
+      lineStyle: false,
     },
 
     data: [
