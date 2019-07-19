@@ -38,74 +38,70 @@ const ReleaseSetupPage = ({ match }: RouteComponentProps<MatchProps>) => {
       {releaseSetupDetails && (
         <ReleasePageTemplate
           releaseId={releaseId}
-          publicationTitle={
-            releaseSetupDetails ? releaseSetupDetails.publicationTitle : ''
-          }
+          publicationTitle={releaseSetupDetails.publicationTitle}
         >
-          {releaseSetupDetails && (
-            <SummaryList>
-              <SummaryListItem term="Publication title">
-                {releaseSetupDetails.publicationTitle}
-              </SummaryListItem>
-              <SummaryListItem term="Time period">
-                {getSelectedTimePeriodCoverageLabel(
-                  releaseSetupDetails.timePeriodCoverageCode,
-                )}
-              </SummaryListItem>
-              <SummaryListItem term="Release period">
-                {releaseSetupDetails.timePeriodCoverageStartDate.year && (
-                  <>
-                    <time>
-                      {releaseSetupDetails.timePeriodCoverageStartDate.year}
-                    </time>{' '}
-                    to{' '}
-                    {releaseSetupDetails.timePeriodCoverageStartDate.year
-                      ? (
-                          releaseSetupDetails.timePeriodCoverageStartDate.year +
-                          1
-                        ).toString()
-                      : ''}
-                  </>
-                )}
-              </SummaryListItem>
-              <SummaryListItem term="Lead statistician">
-                {releaseSetupDetails.leadStatisticianName}
-              </SummaryListItem>
-              <SummaryListItem term="Scheduled release">
-                {dayMonthYearIsComplete(
-                  releaseSetupDetails.scheduledPublishDate,
-                ) && (
-                  <FormattedDate>
-                    {dayMonthYearToDate(
-                      releaseSetupDetails.scheduledPublishDate,
-                    )}
-                  </FormattedDate>
-                )}
-              </SummaryListItem>
-              <SummaryListItem term="Next release expected">
-                {dayMonthYearIsComplete(
-                  releaseSetupDetails.nextReleaseExpectedDate,
-                ) && (
-                  <FormattedDate>
-                    {dayMonthYearToDate(
-                      releaseSetupDetails.nextReleaseExpectedDate,
-                    )}
-                  </FormattedDate>
-                )}
-              </SummaryListItem>
-              <SummaryListItem term="Release type">
-                {releaseSetupDetails.releaseType.label}
-              </SummaryListItem>
-              <SummaryListItem
-                term=""
-                actions={
-                  <Link to={setupEditRoute.generateLink(releaseId)}>
-                    Edit release setup details
-                  </Link>
-                }
-              />
-            </SummaryList>
-          )}
+          <SummaryList>
+            <SummaryListItem term="Publication title">
+              {releaseSetupDetails.publicationTitle}
+            </SummaryListItem>
+            <SummaryListItem term="Time period">
+              {getSelectedTimePeriodCoverageLabel(
+                releaseSetupDetails.timePeriodCoverageCode,
+              )}
+            </SummaryListItem>
+            <SummaryListItem term="Release period">
+              {releaseSetupDetails.timePeriodCoverageStartDate.year && (
+                <>
+                  <time>
+                    {releaseSetupDetails.timePeriodCoverageStartDate.year}
+                  </time>{' '}
+                  to{' '}
+                  {releaseSetupDetails.timePeriodCoverageStartDate.year
+                    ? (
+                        releaseSetupDetails.timePeriodCoverageStartDate.year +
+                        1
+                      ).toString()
+                    : ''}
+                </>
+              )}
+            </SummaryListItem>
+            <SummaryListItem term="Lead statistician">
+              {releaseSetupDetails.leadStatisticianName}
+            </SummaryListItem>
+            <SummaryListItem term="Scheduled release">
+              {dayMonthYearIsComplete(
+                releaseSetupDetails.scheduledPublishDate,
+              ) && (
+                <FormattedDate>
+                  {dayMonthYearToDate(
+                    releaseSetupDetails.scheduledPublishDate,
+                  )}
+                </FormattedDate>
+              )}
+            </SummaryListItem>
+            <SummaryListItem term="Next release expected">
+              {dayMonthYearIsComplete(
+                releaseSetupDetails.nextReleaseExpectedDate,
+              ) && (
+                <FormattedDate>
+                  {dayMonthYearToDate(
+                    releaseSetupDetails.nextReleaseExpectedDate,
+                  )}
+                </FormattedDate>
+              )}
+            </SummaryListItem>
+            <SummaryListItem term="Release type">
+              {releaseSetupDetails.releaseType.label}
+            </SummaryListItem>
+            <SummaryListItem
+              term=""
+              actions={
+                <Link to={setupEditRoute.generateLink(releaseId)}>
+                  Edit release setup details
+                </Link>
+              }
+            />
+          </SummaryList>
         </ReleasePageTemplate>
       )}
     </>
