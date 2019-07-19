@@ -18,7 +18,7 @@ const FormFieldTextInput = <T extends {}>(props: Props<T>) => {
     <Field name={name}>
       {({ field, form }: FieldProps) => {
         const { getError } = createErrorHelper(form);
-        
+
         let errorMessage = error || getError(name);
 
         if (!showError) {
