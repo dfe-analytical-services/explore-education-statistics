@@ -19,6 +19,13 @@ import {
   DropResult,
 } from 'react-beautiful-dnd';
 import { EditableRelease } from '@admin/services/publicationService';
+import {
+  FormGroup,
+  FormFieldset,
+  FormTextInput,
+  FormSelect,
+  FormRadioGroup,
+} from '@common/components/form';
 import AddComment from '@admin/pages/prototypes/components/PrototypeEditableContentAddComment';
 import ResolveComment from '@admin/pages/prototypes/components/PrototypeEditableContentResolveComment';
 
@@ -430,6 +437,32 @@ class EditablePublicationPage extends Component<Props, State> {
                       </Link>
                     </li>
                   </ul>
+
+                  {editing && (
+                    <>
+                      <FormFieldset id="test" legend="Add more related content">
+                        <FormGroup>
+                          <FormTextInput
+                            id="link-title"
+                            name="link-title"
+                            label="Related content title"
+                            value=""
+                          />
+                        </FormGroup>
+                        <FormGroup>
+                          <FormTextInput
+                            id="link-url"
+                            name="link-url"
+                            label="Link url"
+                            value=""
+                          />
+                        </FormGroup>
+                      </FormFieldset>
+                      <button type="submit" className="govuk-button">
+                        Add related content
+                      </button>
+                    </>
+                  )}
                 </nav>
               </RelatedAside>
             </div>
