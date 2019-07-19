@@ -1,25 +1,25 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
-using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Newtonsoft.Json;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Converters
 {
-    public class TimeIdentifierJsonConverterTests
+    public class TimeIdentifierCategoryJsonConverterTests
     {
         private class SampleClass
         {
             public string StringFieldBefore { get; set; }
 
-            [JsonConverter(typeof(TimeIdentifierJsonConverter))]
-            public TimeIdentifier? SampleField { get; set; }
-            
+            [JsonConverter(typeof(TimeIdentifierCategoryJsonConverter))]
+            public TimeIdentifierCategory? SampleField { get; set; }
+
             public string StringFieldAfter { get; set; }
 
             protected bool Equals(SampleClass other)
             {
-                return string.Equals(StringFieldBefore, other.StringFieldBefore) && SampleField == other.SampleField && string.Equals(StringFieldAfter, other.StringFieldAfter);
+                return string.Equals(StringFieldBefore, other.StringFieldBefore) && SampleField == other.SampleField &&
+                       string.Equals(StringFieldAfter, other.StringFieldAfter);
             }
 
             public override bool Equals(object obj)
@@ -48,14 +48,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Converters
             var objectToSerialize = new SampleClass
             {
                 StringFieldBefore = "Hello",
-                SampleField = TimeIdentifier.April,
+                SampleField = TimeIdentifierCategory.Term,
                 StringFieldAfter = "Goodbye",
             };
-            
-            Assert.Equal("{\"StringFieldBefore\":\"Hello\",\"SampleField\":{\"value\":\"M4\",\"label\":\"April\"},\"StringFieldAfter\":\"Goodbye\"}", JsonConvert.SerializeObject(objectToSerialize));
+
+            Assert.Equal(
+                "{\"StringFieldBefore\":\"Hello\",\"SampleField\":{\"value\":\"Term\",\"label\":\"Term\"},\"StringFieldAfter\":\"Goodbye\"}",
+                JsonConvert.SerializeObject(objectToSerialize));
         }
-        
-        
+
+
         [Fact]
         public void SerializeObjectNull()
         {
@@ -65,26 +67,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Converters
                 SampleField = null,
                 StringFieldAfter = "Goodbye",
             };
-            
-            Assert.Equal("{\"StringFieldBefore\":\"Hello\",\"SampleField\":null,\"StringFieldAfter\":\"Goodbye\"}", JsonConvert.SerializeObject(objectToSerialize));
+
+            Assert.Equal("{\"StringFieldBefore\":\"Hello\",\"SampleField\":null,\"StringFieldAfter\":\"Goodbye\"}",
+                JsonConvert.SerializeObject(objectToSerialize));
         }
-        
+
         [Fact]
         public void DeserializeObject()
         {
             const string jsonText =
-                "{\"StringFieldBefore\":\"Hello\",\"SampleField\":{\"value\":\"M4\",\"label\":\"April\"},\"StringFieldAfter\":\"Goodbye\"}";
+                "{\"StringFieldBefore\":\"Hello\",\"SampleField\":{\"value\":\"Term\",\"label\":\"Term\"},\"StringFieldAfter\":\"Goodbye\"}";
 
             var expected = new SampleClass
             {
                 StringFieldBefore = "Hello",
-                SampleField = TimeIdentifier.April,
+                SampleField = TimeIdentifierCategory.Term,
                 StringFieldAfter = "Goodbye",
             };
 
             Assert.Equal(expected, JsonConvert.DeserializeObject<SampleClass>(jsonText));
         }
-        
+
         [Fact]
         public void DeserializeObjectNull()
         {
@@ -100,21 +103,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Converters
 
             Assert.Equal(expected, JsonConvert.DeserializeObject<SampleClass>(jsonText));
         }
-        
+
         [Fact]
         public void DeserializeObjectOutOfOrder()
         {
             const string jsonText =
-                "{\"StringFieldAfter\":\"Goodbye\",\"SampleField\":{\"value\":\"M4\",\"label\":\"April\"},\"StringFieldBefore\":\"Hello\"}";
+                "{\"StringFieldAfter\":\"Goodbye\",\"SampleField\":{\"value\":\"Term\",\"label\":\"Term\"},\"StringFieldBefore\":\"Hello\"}";
 
             var expected = new SampleClass
             {
                 StringFieldBefore = "Hello",
-                SampleField = TimeIdentifier.April,
+                SampleField = TimeIdentifierCategory.Term,
                 StringFieldAfter = "Goodbye",
             };
 
             Assert.Equal(expected, JsonConvert.DeserializeObject<SampleClass>(jsonText));
         }
+        
+        [Fact]
+        public void SerializeDeserializeObject()
+        {
+            var original = new SampleClass
+            {
+                StringFieldBefore = "Hello",
+                SampleField = TimeIdentifierCategory.Term,
+                StringFieldAfter = "Goodbye",
+            };
+            var jsonText = JsonConvert.SerializeObject(original);
+            var deserialized = JsonConvert.DeserializeObject<SampleClass>(jsonText);
+            Assert.Equal(original, deserialized);
+        }
+
     }
 }

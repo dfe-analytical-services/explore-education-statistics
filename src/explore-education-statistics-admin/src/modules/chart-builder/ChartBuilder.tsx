@@ -27,7 +27,11 @@ import LineChartBlock from '@common/modules/find-statistics/components/charts/Li
 import VerticalBarBlock from '@common/modules/find-statistics/components/charts/VerticalBarBlock';
 import HorizontalBarBlock from '@common/modules/find-statistics/components/charts/HorizontalBarBlock';
 import MapBlock from '@common/modules/find-statistics/components/charts/MapBlock';
-import { FormSelect, FormTextInput } from '@common/components/form';
+import {
+  FormSelect,
+  FormTextInput,
+  FormCheckbox,
+} from '@common/components/form';
 import styles from './graph-builder.module.scss';
 import ChartTypeSelector from './ChartTypeSelector';
 import ChartDataConfiguration from './ChartDataConfiguration';
@@ -88,6 +92,7 @@ const chartTypes: ChartDefinition[] = [
 ];
 
 interface ChartOptions {
+  stacked: boolean;
   legend: 'none' | 'top' | 'bottom';
   legendHeight: string;
 }
@@ -111,6 +116,7 @@ const ChartBuilder = ({ data }: Props) => {
   );
 
   const [chartOptions, setChartOptions] = React.useState<ChartOptions>({
+    stacked: false,
     legend: 'top',
     legendHeight: '42',
   });
@@ -257,6 +263,21 @@ const ChartBuilder = ({ data }: Props) => {
           )}
 
           <Details summary="Configure chart" open>
+            {selectedChartType.capabilities.stackable && (
+              <FormCheckbox
+                id="stacked"
+                name="stacked"
+                label="Stacked bars"
+                checked={chartOptions.stacked}
+                value="stacked"
+                onChange={e => {
+                  setChartOptions({
+                    ...chartOptions,
+                    stacked: e.target.checked,
+                  });
+                }}
+              />
+            )}
             <FormSelect
               id="legend-position"
               name="legend-position"
