@@ -1,14 +1,14 @@
 import {
   AdminDashboardPublication,
   ThemeAndTopics,
-} from '@admin/services/api/dashboard/types';
+} from '@admin/services/dashboard/types';
 import React, { useContext, useEffect, useState } from 'react';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import { LoginContext } from '@admin/components/Login';
-import { IdLabelPair } from '@admin/services/api/common/types/types';
-import dashboardService from '@admin/services/api/dashboard/service';
+import { IdLabelPair } from '@admin/services/common/types/types';
+import dashboardService from '@admin/services/dashboard/service';
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import AdminDashboardPublicationsTab from './components/AdminDashboardPublicationsTab';

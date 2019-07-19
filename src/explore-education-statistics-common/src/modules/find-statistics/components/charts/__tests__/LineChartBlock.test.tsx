@@ -1,18 +1,19 @@
 import React from 'react';
 
 import { render } from 'react-testing-library';
+import PrototypeData from '@common/modules/find-statistics/components/charts/__tests__/__data__/testBlockData';
 import LineChartBlock from '../LineChartBlock';
-
-import testData from './__data__/testBlockData';
 
 jest.mock('recharts/lib/util/LogUtils');
 
-const props = testData.AbstractChartProps;
+const props = PrototypeData.AbstractChartProps;
 const { axes } = props;
 
 describe('LineChartBlock', () => {
   test('renders basic chart correctly', () => {
     const { container } = render(<LineChartBlock {...props} />);
+
+    expect(container).toMatchSnapshot();
 
     // axes
     expect(
@@ -41,8 +42,6 @@ describe('LineChartBlock', () => {
     expect(
       Array.from(container.querySelectorAll('.recharts-line')).length,
     ).toBe(3);
-
-    expect(container).toMatchSnapshot();
   });
 
   test('major axis can be hidden', () => {
@@ -116,5 +115,45 @@ describe('LineChartBlock', () => {
     expect(
       container.querySelector('.recharts-default-legend'),
     ).not.toBeInTheDocument();
+  });
+
+  test('can set dashed line styles', () => {
+    const { container } = render(
+      <LineChartBlock
+        {...{
+          ...props,
+          labels: {
+            '23_1_2_____': {
+              ...PrototypeData.AbstractChartProps.labels['23_1_2_____'],
+              lineStyle: 'dashed',
+            },
+          },
+        }}
+      />,
+    );
+
+    expect(
+      container.querySelector('.recharts-line-curve[stroke-dasharray="5 5"]'),
+    ).toBeInTheDocument();
+  });
+
+  test('can set dotted line styles', () => {
+    const { container } = render(
+      <LineChartBlock
+        {...{
+          ...props,
+          labels: {
+            '23_1_2_____': {
+              ...PrototypeData.AbstractChartProps.labels['23_1_2_____'],
+              lineStyle: 'dotted',
+            },
+          },
+        }}
+      />,
+    );
+
+    expect(
+      container.querySelector('.recharts-line-curve[stroke-dasharray="2 2"]'),
+    ).toBeInTheDocument();
   });
 });

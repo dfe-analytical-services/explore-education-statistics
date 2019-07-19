@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
-    // TODO rename to Publication once the current Crud publication controller is removed
+    // TODO rename to Publications once the current Crud publication controller is removed
     [ApiController]
     [Authorize]
     public class PublicationController : ControllerBase

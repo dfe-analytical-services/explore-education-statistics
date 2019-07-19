@@ -177,6 +177,7 @@ class MapBlock extends Component<MapProps, MapState> {
     capabilities: {
       dataSymbols: false,
       stackable: false,
+      lineStyle: false,
     },
 
     data: [
