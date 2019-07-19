@@ -58,8 +58,7 @@ const ReleaseSetupPage = ({ match }: RouteComponentProps<MatchProps>) => {
                   to{' '}
                   {releaseSetupDetails.timePeriodCoverageStartDate.year
                     ? (
-                        releaseSetupDetails.timePeriodCoverageStartDate.year +
-                        1
+                        releaseSetupDetails.timePeriodCoverageStartDate.year + 1
                       ).toString()
                     : ''}
                 </>
@@ -73,9 +72,7 @@ const ReleaseSetupPage = ({ match }: RouteComponentProps<MatchProps>) => {
                 releaseSetupDetails.scheduledPublishDate,
               ) && (
                 <FormattedDate>
-                  {dayMonthYearToDate(
-                    releaseSetupDetails.scheduledPublishDate,
-                  )}
+                  {dayMonthYearToDate(releaseSetupDetails.scheduledPublishDate)}
                 </FormattedDate>
               )}
             </SummaryListItem>

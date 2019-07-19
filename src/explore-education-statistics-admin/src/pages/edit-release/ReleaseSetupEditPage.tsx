@@ -198,9 +198,7 @@ const ReleaseSetupEditPage = ({
                       id={`${formId}-timePeriodCoverage`}
                       label="Type"
                       name="timePeriodCoverageCode"
-                      optGroups={getTimePeriodOptions(
-                        timePeriodCoverageGroups,
-                      )}
+                      optGroups={getTimePeriodOptions(timePeriodCoverageGroups)}
                       onChange={event => {
                         setReleaseSetupDetails({
                           ...releaseSetupDetails,
