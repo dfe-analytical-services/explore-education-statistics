@@ -7,7 +7,10 @@ import testData from './__data__/testBlockData';
 
 jest.mock('recharts/lib/util/LogUtils');
 
-const props = testData.AbstractChartProps;
+const props = {
+  ...testData.AbstractChartProps,
+  height: 900,
+};
 const { axes } = props;
 
 describe('VerticalBarBlock', () => {
@@ -116,5 +119,19 @@ describe('VerticalBarBlock', () => {
     expect(
       container.querySelector('.recharts-default-legend'),
     ).not.toBeInTheDocument();
+  });
+
+  test('can stack data', () => {
+    const { container } = render(
+      <VerticalBarBlock {...props} stacked legend="none" />,
+    );
+
+    // Unsure how to tell stacked data apart, other than the snapshot
+
+    expect(container).toMatchSnapshot();
+
+    expect(
+      Array.from(container.querySelectorAll('.recharts-rectangle')).length,
+    ).toBe(6);
   });
 });

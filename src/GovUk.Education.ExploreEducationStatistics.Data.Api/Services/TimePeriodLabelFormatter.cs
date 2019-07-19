@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         public static string Format(int year, TimeIdentifier timeIdentifier)
         {
-            var labelValueAttribute = timeIdentifier.GetEnumAttribute<TimeIdentifierLabelValueAttribute>();
+            var labelValueAttribute = timeIdentifier.GetEnumAttribute<TimeIdentifierMetaAttribute>();
             var formatter = Formatters[labelValueAttribute.Format];
             return formatter.Format(year, labelValueAttribute.Label, labelValueAttribute.ShortLabel);
         }
