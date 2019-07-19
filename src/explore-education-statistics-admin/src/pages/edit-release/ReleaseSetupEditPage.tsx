@@ -1,9 +1,12 @@
-import DummyPublicationsData from '@admin/pages/DummyPublicationsData';
 import DummyReferenceData, {
   DateType,
   TimePeriodCoverageGroup,
 } from '@admin/pages/DummyReferenceData';
 import ReleasePageTemplate from '@admin/pages/edit-release/components/ReleasePageTemplate';
+import {
+  ReleaseSetupDetails,
+  ReleaseSetupDetailsUpdateRequest,
+} from '@admin/services/edit-release/setup/types';
 import Button from '@common/components/Button';
 import { Form, FormFieldset, Formik } from '@common/components/form';
 import FormFieldDayMonthYear from '@common/components/form/FormFieldDayMonthYear';
@@ -24,12 +27,10 @@ import {
 } from '@admin/validation/validation';
 import Link from '@admin/components/Link';
 import {
-  dateToDayMonthYear,
-  dayMonthYearToDate,
   DayMonthYearValues,
   IdLabelPair,
-  ReleaseSetupDetails,
-} from '@admin/services/api/common/types/types';
+} from '@admin/services/common/types/types';
+import service from '@admin/services/edit-release/setup/service';
 
 interface MatchProps {
   releaseId: string;
@@ -61,11 +62,11 @@ const ReleaseSetupEditPage = ({
   const [releaseTypes, setReleaseTypes] = useState<IdLabelPair[]>();
 
   useEffect(() => {
-    const release = DummyPublicationsData.getReleaseSetupDetails(releaseId);
-
-    setReleaseSetupDetails(release);
-    setTimePeriodCoverageGroups(DummyReferenceData.timePeriodCoverageGroups);
-    setReleaseTypes(DummyReferenceData.releaseTypeOptions);
+    service.getReleaseSetupDetails(releaseId).then(release => {
+      setReleaseSetupDetails(release);
+      setTimePeriodCoverageGroups(DummyReferenceData.timePeriodCoverageGroups);
+      setReleaseTypes(DummyReferenceData.releaseTypeOptions);
+    });
   }, [releaseId]);
 
   const selectedTimePeriodCoverageGroup =
@@ -132,20 +133,17 @@ const ReleaseSetupEditPage = ({
             timePeriodCoverageStartDate: isDayMonthYearDateTypeSelected(
               selectedTimePeriodCoverageGroup,
             )
-              ? dateToDayMonthYear(
-                  releaseSetupDetails.timePeriodCoverageStartDate,
-                )
+              ? releaseSetupDetails.timePeriodCoverageStartDate
               : undefined,
             timePeriodCoverageStartDateYearOnly: isYearOnlyDateTypeSelected(
               selectedTimePeriodCoverageGroup,
             )
-              ? releaseSetupDetails.timePeriodCoverageStartDate.getFullYear()
+              ? releaseSetupDetails.timePeriodCoverageStartDate.year
               : undefined,
             releaseTypeId: releaseSetupDetails.releaseType.id,
             scheduledPublishDate: releaseSetupDetails.scheduledPublishDate,
-            nextReleaseExpectedDate: dateToDayMonthYear(
+            nextReleaseExpectedDate:
               releaseSetupDetails.nextReleaseExpectedDate,
-            ),
           }}
           validationSchema={Yup.object<FormValues>({
             timePeriodCoverageCode: Yup.string().required(
@@ -172,31 +170,27 @@ const ReleaseSetupEditPage = ({
             nextReleaseExpectedDate: validateOptionalPartialDayMonthYearField,
           })}
           onSubmit={async (values: FormValues) => {
-            const release = DummyPublicationsData.getReleaseById(releaseId);
+            const updatedReleaseDetails: ReleaseSetupDetailsUpdateRequest = {
+              id: releaseId,
+              timePeriodCoverageCode: values.timePeriodCoverageCode,
+              timePeriodCoverageStartDate:
+                isDayMonthYearDateTypeCodeSelected(
+                  values.timePeriodCoverageCode,
+                ) && values.timePeriodCoverageStartDate
+                  ? values.timePeriodCoverageStartDate
+                  : {
+                      year: values.timePeriodCoverageStartDateYearOnly,
+                    },
+              scheduledPublishDate: values.scheduledPublishDate,
+              nextReleaseExpectedDate: values.nextReleaseExpectedDate,
+              releaseType: DummyReferenceData.findReleaseType(
+                values.releaseTypeId,
+              ),
+            };
 
-            release.timePeriodCoverage.code = values.timePeriodCoverageCode;
-
-            if (values.timePeriodCoverageStartDate) {
-              release.timePeriodCoverage.startDate = dayMonthYearToDate(
-                values.timePeriodCoverageStartDate,
-              );
-            } else if (values.timePeriodCoverageStartDateYearOnly) {
-              release.timePeriodCoverage.startDate = new Date(
-                values.timePeriodCoverageStartDateYearOnly,
-                1,
-                1,
-              );
-            }
-
-            release.scheduledPublishDate = values.scheduledPublishDate;
-
-            release.nextReleaseExpectedDate = dayMonthYearToDate(
-              values.nextReleaseExpectedDate,
-            );
-            release.releaseType = DummyReferenceData.findReleaseType(
-              values.releaseTypeId,
-            );
-            history.push(setupRoute.generateLink(releaseId));
+            service
+              .updateReleaseSetupDetails(updatedReleaseDetails)
+              .then(_ => history.push(setupRoute.generateLink(releaseId)));
           }}
           render={(form: FormikProps<FormValues>) => {
             return (
