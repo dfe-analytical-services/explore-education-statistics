@@ -1,7 +1,7 @@
 import Link from '@admin/components/Link';
 import { dataRoute } from '@admin/routes/releaseRoutes';
 import service from '@admin/services/edit-release/data/service';
-import { AdhocFile, DataFile } from '@admin/services/edit-release/data/types';
+import { AdhocFile } from '@admin/services/edit-release/data/types';
 import Button from '@common/components/Button';
 import { Form, FormFieldset, Formik } from '@common/components/form';
 import FormFieldFileSelector from '@common/components/form/FormFieldFileSelector';

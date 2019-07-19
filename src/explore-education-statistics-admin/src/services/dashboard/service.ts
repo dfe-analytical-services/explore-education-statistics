@@ -1,3 +1,5 @@
+import publicationPollyfilla from '@admin/services/dashboard/polyfillas';
+import { polyfill } from '@admin/services/util/polyfilla';
 import { createClient } from '@admin/services/util/service';
 import mocks from './mock/mock-service';
 import { AdminDashboardPublication, ThemeAndTopics } from './types';
@@ -7,27 +9,29 @@ const apiClient = createClient({
 });
 
 export interface DashboardService {
-  getThemesAndTopics(userId: string): Promise<ThemeAndTopics[]>;
-  getPublicationsByTopic(
+  getMyThemesAndTopics(): Promise<ThemeAndTopics[]>;
+  getMyPublicationsByTopic(
     topicId: string,
-    userId: string,
   ): Promise<AdminDashboardPublication[]>;
 }
 
 const service: DashboardService = {
-  getThemesAndTopics(userId: string): Promise<ThemeAndTopics[]> {
-    return apiClient.then(client =>
-      client.get<ThemeAndTopics[]>('/Themes', { params: { userId } }),
-    );
+  getMyThemesAndTopics(): Promise<ThemeAndTopics[]> {
+    return apiClient.then(client => client.get<ThemeAndTopics[]>('/me/themes'));
   },
-  getPublicationsByTopic(
+  getMyPublicationsByTopic(
     topicId: string,
-    userId: string,
   ): Promise<AdminDashboardPublication[]> {
     return apiClient.then(client =>
-      client.get<AdminDashboardPublication[]>('/Publications', {
-        params: { topicId, userId },
-      }),
+      client
+        .get<AdminDashboardPublication[]>('/me/publications', {
+          params: { topicId },
+        })
+        .then(publications =>
+          publications.map(publication =>
+            polyfill(publication, publicationPollyfilla),
+          ),
+        ),
     );
   },
 };

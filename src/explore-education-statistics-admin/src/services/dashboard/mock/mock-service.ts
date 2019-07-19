@@ -1,5 +1,4 @@
 import { DashboardService } from '@admin/services/dashboard/service';
-import { PrototypeLoginService } from '@admin/services/PrototypeLoginService';
 import MockAdapter from 'axios-mock-adapter';
 
 export default async (mock: MockAdapter) => {
@@ -8,25 +7,20 @@ export default async (mock: MockAdapter) => {
   )).default;
 
   const service: DashboardService = {
-    getThemesAndTopics: _ => Promise.resolve(mockData.themesAndTopics),
-    getPublicationsByTopic: _ =>
+    getMyThemesAndTopics: () => Promise.resolve(mockData.themesAndTopics),
+    getMyPublicationsByTopic: _ =>
       Promise.resolve(mockData.dashboardPublications),
   };
 
-  // getThemesAndTopics
-  mock
-    .onGet('/Themes', {
-      params: { userId: PrototypeLoginService.getUserList()[0].id },
-    })
-    .reply(200, service.getThemesAndTopics(''));
+  // getMyThemesAndTopics
+  mock.onGet('/me/themes').reply(200, service.getMyThemesAndTopics());
 
-  // getPublicationsByTopic
+  // getMyPublicationsByTopic
   mock
-    .onGet('/Publications', {
+    .onGet('/me/publications', {
       params: {
         topicId: '67c249de-1cca-446e-8ccb-dcdac542f460',
-        userId: PrototypeLoginService.getUserList()[0].id,
       },
     })
-    .reply(200, service.getPublicationsByTopic('', ''));
+    .reply(200, service.getMyPublicationsByTopic(''));
 };
