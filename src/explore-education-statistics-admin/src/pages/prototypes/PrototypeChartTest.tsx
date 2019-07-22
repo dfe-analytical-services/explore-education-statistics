@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import ChartBuilder from '@admin/modules/chart-builder/ChartBuilder';
 import React from 'react';
 
 import LineChartBlock from '@common/modules/find-statistics/components/charts/LineChartBlock';
@@ -13,7 +14,7 @@ const PrototypeChartTest = () => {
 
   return (
     <PrototypePage wide>
-      <LineChartBlock
+      {/*<LineChartBlock
         {...{
           ...TestBlockData.AbstractChartProps,
           labels: {
@@ -25,8 +26,28 @@ const PrototypeChartTest = () => {
               lineStyle: 'dashed',
             },
           },
+
+          axes: {
+            ...TestBlockData.AbstractChartProps.axes,
+            major: {
+              ...TestBlockData.AbstractChartProps.axes.major,
+              referenceLines: [{
+                position: "2014/15",
+                label: "HELLO WORLD"
+              }]
+            },
+            minor: {
+              ...TestBlockData.AbstractChartProps.axes.minor,
+              referenceLines: [{
+                position: 2.5,
+                label: "GoodBYE"
+              }]
+            }
+          }
         }}
-      />
+      />*/}
+
+      <ChartBuilder data={data} />
     </PrototypePage>
   );
 };

@@ -9,9 +9,13 @@ import FormComboBox from '@common/components/form/FormComboBox';
 import {
   AxisConfiguration,
   AxisGroupBy,
+  ReferenceLine,
 } from '@common/services/publicationService';
 import { DataBlockMetadata } from '@common/services/dataBlockService';
 import { ChartCapabilities } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+
+import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
+import styles from './graph-builder.module.scss';
 
 interface Props {
   id: string;
@@ -50,62 +54,86 @@ const ChartAxisConfiguration = ({
     if (onConfigurationChange) onConfigurationChange(newConfiguration);
   };
 
+  const [referenceLine, setReferenceLine] = React.useState<ReferenceLine>({
+    position: '',
+    label: '',
+  });
+  const [referenceOptions] = React.useState<SelectOption[]>(() => {
+    if (axisConfiguration.groupBy) {
+      return [
+        { label: 'Select', value: '' },
+        ...Object.values(meta[axisConfiguration.groupBy]).map(
+          ({ label, value }) => ({ label, value: label }),
+        ),
+      ];
+    }
+    return [];
+  });
+
   return (
-    <FormFieldset id={id} legend={axisConfiguration.title}>
-      <p>{axisConfiguration.name} configuration</p>
-      <FormGroup>
-        <FormCheckbox
-          id={`${id}_show`}
-          name={`${id}_show`}
-          label="Show axis?"
-          checked={axisConfiguration.visible}
-          onChange={e => {
-            updateAxisConfiguration({ visible: e.target.checked });
-          }}
-          value="show"
-          conditional={
-            <React.Fragment>
-              {axisConfiguration.type === 'major' && (
-                <FormComboBox
-                  id={`${id}_unit`}
-                  inputLabel="Unit"
-                  onInputChange={e => setSelectedValue(e.target.value)}
-                  inputValue={selectedValue}
-                  onSelect={selected => {
-                    setSelectedValue(selectableUnits[selected]);
-                  }}
-                  options={selectableUnits}
-                  initialOption={selectedUnit}
-                />
-              )}
-            </React.Fragment>
-          }
-        />
-        {capabilities.gridLines && (
+    <div className={styles.chartAxesConfiguration}>
+      <FormFieldset id={id} legend={axisConfiguration.title}>
+        <p>{axisConfiguration.name} configuration</p>
+        <FormGroup>
           <FormCheckbox
-            id={`${id}_grid`}
-            name={`${id}_grid`}
-            label="Show grid lines"
-            onChange={e =>
-              updateAxisConfiguration({ showGrid: e.target.checked })
+            id={`${id}_show`}
+            name={`${id}_show`}
+            label="Show axis?"
+            checked={axisConfiguration.visible}
+            onChange={e => {
+              updateAxisConfiguration({ visible: e.target.checked });
+            }}
+            value="show"
+            conditional={
+              <React.Fragment>
+                {axisConfiguration.type === 'major' && (
+                  <FormComboBox
+                    id={`${id}_unit`}
+                    inputLabel="Display Unit"
+                    onInputChange={e => setSelectedValue(e.target.value)}
+                    inputValue={selectedValue}
+                    onSelect={selected => {
+                      setSelectedValue(selectableUnits[selected]);
+                    }}
+                    options={selectableUnits}
+                    initialOption={selectedUnit}
+                  />
+                )}
+              </React.Fragment>
             }
-            checked={axisConfiguration.showGrid}
-            value="grid"
           />
-        )}
 
-        <FormTextInput
-          id={`${id}_size`}
-          name={`${id}_size`}
-          type="number"
-          min="0"
-          max="100"
-          label="Size"
-          value={axisConfiguration.size}
-          onChange={e => updateAxisConfiguration({ size: e.target.value })}
-        />
+          <hr />
 
-        {/*
+          {capabilities.gridLines && (
+            <React.Fragment>
+              <FormCheckbox
+                id={`${id}_grid`}
+                name={`${id}_grid`}
+                label="Show grid lines"
+                onChange={e =>
+                  updateAxisConfiguration({ showGrid: e.target.checked })
+                }
+                checked={axisConfiguration.showGrid}
+                value="grid"
+              />
+              <hr />
+            </React.Fragment>
+          )}
+
+          <FormTextInput
+            id={`${id}_size`}
+            name={`${id}_size`}
+            type="number"
+            min="0"
+            max="100"
+            label="Size of axis"
+            value={axisConfiguration.size}
+            onChange={e => updateAxisConfiguration({ size: e.target.value })}
+          />
+          <hr />
+
+          {/*
         <FormSelect
           id={`${id}_labelPosition`}
           name={`${id}_labelPosition`}
@@ -120,9 +148,113 @@ const ChartAxisConfiguration = ({
         />
 */}
 
-        <p>Restrict range of series (years only?) DFE-1009</p>
-      </FormGroup>
-    </FormFieldset>
+          <table className="govuk-table">
+            <caption className="govuk-caption-m">Reference lines</caption>
+            <thead>
+              <tr>
+                <th>Position</th>
+                <th>Label</th>
+                <th />
+              </tr>
+            </thead>
+            <tbody>
+              {axisConfiguration.referenceLines &&
+                axisConfiguration.referenceLines.map((rl, idx) => (
+                  <tr key={`${rl.label}_${rl.position}`}>
+                    <td>{rl.position}</td>
+                    <td>{rl.label}</td>
+                    <td>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newReferenceLines = [
+                            ...(axisConfiguration.referenceLines || []),
+                          ];
+                          newReferenceLines.splice(idx, 1);
+                          updateAxisConfiguration({
+                            referenceLines: newReferenceLines,
+                          });
+                        }}
+                      >
+                        remove
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              <tr>
+                <td>
+                  {axisConfiguration.type === 'minor' && (
+                    <FormTextInput
+                      name=""
+                      id=""
+                      label=""
+                      type="text"
+                      value={`${referenceLine.position}`}
+                      onChange={e => {
+                        setReferenceLine({
+                          ...referenceLine,
+                          position: e.target.value,
+                        });
+                      }}
+                    />
+                  )}
+                  {axisConfiguration.type === 'major' && (
+                    <FormSelect
+                      name=""
+                      id=""
+                      label=""
+                      value={referenceLine.position}
+                      order={[]}
+                      onChange={e => {
+                        setReferenceLine({
+                          ...referenceLine,
+                          position: e.target.value,
+                        });
+                      }}
+                      options={referenceOptions}
+                    />
+                  )}
+                </td>
+                <td>
+                  <FormTextInput
+                    name=""
+                    id=""
+                    label=""
+                    type="text"
+                    value={referenceLine.label}
+                    onChange={e => {
+                      setReferenceLine({
+                        ...referenceLine,
+                        label: e.target.value,
+                      });
+                    }}
+                  />
+                </td>
+                <td>
+                  <button
+                    className="govuk-button govuk-!-padding-bottom-0 govuk-!-margin-bottom-0"
+                    type="button"
+                    onClick={() => {
+                      updateAxisConfiguration({
+                        referenceLines: [
+                          ...(axisConfiguration.referenceLines || []),
+                          referenceLine,
+                        ],
+                      });
+                      setReferenceLine({ label: '', position: '' });
+                    }}
+                  >
+                    Add
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p> Restrict range of series (years only?) DFE-1009</p>
+        </FormGroup>
+      </FormFieldset>
+    </div>
   );
 };
 

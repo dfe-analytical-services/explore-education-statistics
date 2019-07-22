@@ -224,6 +224,7 @@ const ChartBuilder = ({ data }: Props) => {
               visible: true,
               showGrid: true,
               size: '50',
+              referenceLines: [],
             },
           }),
           {},
@@ -316,39 +317,40 @@ const ChartBuilder = ({ data }: Props) => {
           <Details summary="Data label options" open>
             Update the configuration used for each dataset in the chart from the
             default
-            {chartDataConfiguration.map((config, index) => (
-              <ChartDataConfiguration
-                key={config.value}
-                configuration={config}
-                capabilities={selectedChartType.capabilities}
-                onConfigurationChange={updatedConfig => {
-                  const newConfig = [...chartDataConfiguration];
-                  newConfig.splice(index, 1, updatedConfig);
-                  setChartDataConfiguration(newConfig);
-                }}
-              />
-            ))}
+            <div className={styles.axesOptions}>
+              {chartDataConfiguration.map((config, index) => (
+                <ChartDataConfiguration
+                  key={config.value}
+                  configuration={config}
+                  capabilities={selectedChartType.capabilities}
+                  onConfigurationChange={updatedConfig => {
+                    const newConfig = [...chartDataConfiguration];
+                    newConfig.splice(index, 1, updatedConfig);
+                    setChartDataConfiguration(newConfig);
+                  }}
+                />
+              ))}
+            </div>
           </Details>
 
-          <Details summary="Axes options">
-            <p>
-              Add / Remove and update the axes and how they display data ranges
-            </p>
-            {Object.entries(axesConfiguration).map(([key, axis]) => (
-              <ChartAxisConfiguration
-                key={key}
-                id={axis.name}
-                configuration={axis}
-                capabilities={selectedChartType.capabilities}
-                meta={data.metaData}
-                onConfigurationChange={updatedConfig => {
-                  setAxesConfiguration({
-                    ...axesConfiguration,
-                    [key]: updatedConfig,
-                  });
-                }}
-              />
-            ))}
+          <Details summary="Axes configuration">
+            <div className={styles.axesOptions}>
+              {Object.entries(axesConfiguration).map(([key, axis]) => (
+                <ChartAxisConfiguration
+                  key={key}
+                  id={axis.name}
+                  configuration={axis}
+                  capabilities={selectedChartType.capabilities}
+                  meta={data.metaData}
+                  onConfigurationChange={updatedConfig => {
+                    setAxesConfiguration({
+                      ...axesConfiguration,
+                      [key]: updatedConfig,
+                    });
+                  }}
+                />
+              ))}
+            </div>
           </Details>
         </React.Fragment>
       )}
