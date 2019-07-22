@@ -3,14 +3,18 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
-    public class ReleaseService
+    public class ReleaseService : IReleaseService
     {
         private readonly ApplicationDbContext _context;
 
-        public ReleaseService(ApplicationDbContext context)
+        private readonly IPublicationService _publicationService;
+
+        public ReleaseService(ApplicationDbContext context, IPublicationService publicationService)
         {
             _context = context;
         }
@@ -24,10 +28,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return _context.Releases.FirstOrDefault(x => x.Slug == slug);
         }
-
+        
         public List<Release> List()
         {
             return _context.Releases.ToList();
         }
+        
+        // TODO Authorisation will be required when users are introduced
+        public ReleaseViewModel CreateRelease(EditReleaseViewModel createRelease)
+        {
+            // Get the current release order
+            var p = _publicationService.Get(createRelease.PublicationId);
+            var nextReleaseOrder = p.LatestRelease() != null ? p.LatestRelease().Order + 1 : 0;
+            
+            
+            var saved = _context.Releases.Add(new Release
+            {
+                Id = Guid.NewGuid(),
+                Order = nextReleaseOrder,
+                PublicationId = createRelease.PublicationId,
+                Published = null,
+                TypeId = createRelease.ReleaseTypeId,
+                TimePeriodCoverage = createRelease.TimeIdentifier,
+                PublishScheduled = createRelease.PublishScheduled,
+                ReleaseName = createRelease.ReleaseName
+            });
+
+            return null;
+        }
+        
     }
 }

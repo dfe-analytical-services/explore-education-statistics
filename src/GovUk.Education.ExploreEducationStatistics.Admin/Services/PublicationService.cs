@@ -44,7 +44,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 cfg.CreateMap<Publication, PublicationViewModel>();
                 cfg.CreateMap<Release, ReleaseViewModel>()
                     .ForMember(
-                        dest => dest.LatestRelease, m => m.MapFrom(release => IsLatestRelease(release)));
+                        dest => dest.LatestRelease,
+                        m => m.MapFrom(r => r.Publication.LatestRelease().Id == r.Id));
                 cfg.CreateMap<Methodology, MethodologyViewModel>();
             });
 
@@ -57,13 +58,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToList();
             
             return mapper.Map<List<PublicationViewModel>>(publications);
-        }
-        
-        private bool IsLatestRelease(Release release)
-        {
-            return !release.Publication.Releases.Exists(
-                r => r.Order > release.Order ||
-                     (r.Id != release.Id && r.Order == release.Order && r.Published > release.Published));
         }
     }
 }

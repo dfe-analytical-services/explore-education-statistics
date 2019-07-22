@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
@@ -35,5 +37,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public Guid? ContactId { get; set; }
 
         public Contact Contact { get; set; }
+        
+        public Release LatestRelease()
+        {
+            return Releases.OrderBy(r => r.Order).Last();
+        }
     }
 }

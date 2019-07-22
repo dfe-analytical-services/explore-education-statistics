@@ -57,6 +57,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         {
             return Id.Equals(other.Id);
         }
+        
+        public bool IsLatestRelease(Release release)
+        {
+            return !release.Publication.Releases.Exists(
+                r => r.Order > release.Order ||
+                     (r.Id != release.Id && r.Order == release.Order && r.Published > release.Published));
+        }
 
         public override bool Equals(object obj)
         {
