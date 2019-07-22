@@ -29,5 +29,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
         {
             return enumValue.GetEnumAttribute<EnumLabelValueAttribute>();
         }
+        
     }
 }

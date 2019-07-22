@@ -2,11 +2,11 @@ import ButtonLink from '@admin/components/ButtonLink';
 import {
   dayMonthYearIsComplete,
   dayMonthYearToDate,
-} from '@admin/services/api/common/types/types';
+} from '@admin/services/common/types';
 import {
   AdminDashboardRelease,
   ReleaseApprovalStatus,
-} from '@admin/services/api/dashboard/types';
+} from '@admin/services/dashboard/types';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -46,7 +46,7 @@ const DashboardReleaseSummary = ({ release }: Props) => {
       : release.lastEditedUser.name;
 
   const releaseSummaryLabel = `${release.timePeriodCoverage.label}, ${
-    release.dateRangeLabel
+    release.releaseName
   } 
      ${getLiveLatestLabel(release.live, release.latestRelease)}`;
 
@@ -62,11 +62,15 @@ const DashboardReleaseSummary = ({ release }: Props) => {
 
       <SummaryList additionalClassName="govuk-!-margin-bottom-3">
         <SummaryListItem term="Publish date">
-          {dayMonthYearIsComplete(release.scheduledPublishDate) && (
-            <FormattedDate>
-              {dayMonthYearToDate(release.scheduledPublishDate)}
-            </FormattedDate>
+          {release.published && (
+            <FormattedDate>{release.published}</FormattedDate>
           )}
+          {!release.published &&
+            dayMonthYearIsComplete(release.publishScheduled) && (
+              <FormattedDate>
+                {dayMonthYearToDate(release.publishScheduled)}
+              </FormattedDate>
+            )}
         </SummaryListItem>
         <SummaryListItem term="Next release date">
           {dayMonthYearIsComplete(release.nextReleaseExpectedDate) && (
@@ -76,15 +80,13 @@ const DashboardReleaseSummary = ({ release }: Props) => {
           )}
         </SummaryListItem>
         <SummaryListItem term="Lead statistician">
-          {release.leadStatistician && (
+          {release.contact && (
             <span>
-              {release.leadStatistician.name}
+              {release.contact.contactName}
               <br />
-              <a href="mailto:{lead.teamEmail}">
-                {release.leadStatistician.email}
-              </a>
+              <a href="mailto:{lead.teamEmail}">{release.contact.teamEmail}</a>
               <br />
-              {release.leadStatistician.telNo}
+              {release.contact.contactTelNo}
             </span>
           )}
         </SummaryListItem>

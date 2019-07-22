@@ -1,15 +1,22 @@
-import { ReleaseApprovalStatus } from '@admin/services/api/dashboard/types';
-import { User } from '../../../PrototypeLoginService';
+import { ReleaseApprovalStatus } from '@admin/services/dashboard/types';
+import { User } from '@admin/services/PrototypeLoginService';
 
 export interface IdLabelPair {
   id: string;
   label: string;
 }
 
-export interface UserContact {
+export interface ContactDetails {
+  id?: string;
+  contactName: string;
+  contactTelNo: string;
+  teamEmail: string;
+  teamName?: string;
+}
+
+export interface UserDetails {
+  id: string;
   name: string;
-  email: string;
-  telNo: string;
 }
 
 export interface Topic {
@@ -56,7 +63,7 @@ export interface Release {
   releaseType: IdLabelPair;
   slug: string;
   status: ReleaseStatus;
-  lead: UserContact;
+  lead: ContactDetails;
   dataType: ReleaseDataType;
   comments: Comment[];
 }
@@ -78,20 +85,9 @@ export interface Publication {
   releases: Release[];
   legacyReleases: LegacyRelease[];
   topic: Topic;
-  contact: UserContact;
+  contact: ContactDetails;
   methodology: IdLabelPair;
   owner: User;
-}
-
-export interface ReleaseSetupDetails {
-  id: string;
-  publicationTitle: string;
-  timePeriodCoverageCode: string;
-  timePeriodCoverageStartDate: Date;
-  releaseType: IdLabelPair;
-  leadStatisticianName: string;
-  scheduledPublishDate: DayMonthYearValues;
-  nextReleaseExpectedDate?: Date;
 }
 
 export interface DayMonthYearValues {
