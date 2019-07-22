@@ -104,11 +104,7 @@ const PrototypeAdminDashboardPublications = () => {
               <dd className="govuk-summary-list__value">
                 <Link to="#">A guide to absence statistics</Link>
               </dd>
-              <dd className="govuk-summary-list__actions">
-                <Link to="/prototypes/publication-assign-methodology">
-                  Edit methodology
-                </Link>
-              </dd>
+              <dd className="govuk-summary-list__actions" />
             </div>
           </dl>
           <dl className="govuk-summary-list">
@@ -129,7 +125,7 @@ const PrototypeAdminDashboardPublications = () => {
                             'responsible statistician',
                           )
                             ? 'Ready for your higher review'
-                            : 'Ready for you to review'
+                            : 'Ready to review'
                         }
                         review
                         lastEdited={new Date('2019-03-20 17:37')}
@@ -207,8 +203,17 @@ const PrototypeAdminDashboardPublications = () => {
               </dd>
             </div>
           </dl>
-          <Link to="/prototypes/release-create-new" className="govuk-button">
+          <Link
+            to="/prototypes/release-create-new"
+            className="govuk-button govuk-!-margin-right-6"
+          >
             Create a new release
+          </Link>
+          <Link
+            to="/prototypes/publication-assign-methodology"
+            className="govuk-button govuk-button--secondary"
+          >
+            Manage methodology
           </Link>
         </AccordionSection>
         <AccordionSection
@@ -223,11 +228,7 @@ const PrototypeAdminDashboardPublications = () => {
               <dd className="govuk-summary-list__value">
                 <Link to="#">A guide to absence statistics</Link>
               </dd>
-              <dd className="govuk-summary-list__actions">
-                <Link to="/prototypes/publication-assign-methodology">
-                  Edit methodology
-                </Link>
-              </dd>
+              <dd className="govuk-summary-list__actions" />
             </div>
           </dl>
           <dl className="govuk-summary-list">
@@ -271,8 +272,17 @@ const PrototypeAdminDashboardPublications = () => {
               </dd>
             </div>
           </dl>
-          <Link to="/prototypes/release-create-new" className="govuk-button">
+          <Link
+            to="/prototypes/release-create-new"
+            className="govuk-button govuk-!-margin-right-6"
+          >
             Create a new release
+          </Link>
+          <Link
+            to="/prototypes/publication-assign-methodology"
+            className="govuk-button govuk-button--secondary"
+          >
+            Manage methodology
           </Link>
         </AccordionSection>
         <AccordionSection
@@ -288,11 +298,7 @@ const PrototypeAdminDashboardPublications = () => {
               <dd className="govuk-summary-list__value">
                 <Link to="#">A guide to absence statistics</Link>
               </dd>
-              <dd className="govuk-summary-list__actions">
-                <Link to="/prototypes/publication-assign-methodology">
-                  Edit methodology
-                </Link>
-              </dd>
+              <dd className="govuk-summary-list__actions" />
             </div>
           </dl>
           <dl className="govuk-summary-list">
@@ -337,8 +343,17 @@ const PrototypeAdminDashboardPublications = () => {
               </dd>
             </div>
           </dl>
-          <Link to="/prototypes/release-create-new" className="govuk-button">
-            Create new release
+          <Link
+            to="/prototypes/release-create-new"
+            className="govuk-button govuk-!-margin-right-6"
+          >
+            Create a new release
+          </Link>
+          <Link
+            to="/prototypes/publication-assign-methodology"
+            className="govuk-button govuk-button--secondary"
+          >
+            Manage methodology
           </Link>
         </AccordionSection>
         {window.location.search === '?status=newPublication' && (
@@ -354,15 +369,20 @@ const PrototypeAdminDashboardPublications = () => {
                 <dd className="govuk-summary-list__value">
                   No methodology available
                 </dd>
-                <dd className="govuk-summary-list__actions">
-                  <Link to="/prototypes/publication-assign-methodology">
-                    Add methodology
-                  </Link>
-                </dd>
+                <dd className="govuk-summary-list__actions" />
               </div>
             </dl>
-            <Link to="/prototypes/release-create-new" className="govuk-button">
+            <Link
+              to="/prototypes/release-create-new"
+              className="govuk-button govuk-!-margin-right-6"
+            >
               Create new release
+            </Link>
+            <Link
+              to="/prototypes/publication-assign-methodology"
+              className="govuk-button govuk-button--secondary"
+            >
+              Add methodology
             </Link>
           </AccordionSection>
         )}
