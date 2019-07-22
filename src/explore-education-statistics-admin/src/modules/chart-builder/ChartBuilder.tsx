@@ -125,9 +125,18 @@ const ChartBuilder = ({ data }: Props) => {
     DataSetConfiguration[]
   >([]);
 
-  const [axesConfiguration, setAxesConfiguration] = React.useState<
+  const previousAxesConfiguration = React.useRef<Dictionary<AxisConfiguration>>(
+    {},
+  );
+
+  const [axesConfiguration, realSetAxesConfiguration] = React.useState<
     Dictionary<AxisConfiguration>
   >({});
+
+  const setAxesConfiguration = (config: Dictionary<AxisConfiguration>) => {
+    previousAxesConfiguration.current = config;
+    realSetAxesConfiguration(config);
+  };
 
   const onDataAdded = (addedData: SelectedData) => {
     const newDataSets = [...dataSets, addedData];
@@ -225,6 +234,8 @@ const ChartBuilder = ({ data }: Props) => {
               showGrid: true,
               size: '50',
               referenceLines: [],
+              ...(previousAxesConfiguration.current &&
+                previousAxesConfiguration.current[axisDefinition.type]),
             },
           }),
           {},

@@ -57,7 +57,6 @@ export interface ChartProps {
   axes: Dictionary<AxisConfiguration>;
   height?: number;
   width?: number;
-  referenceLines?: ReferenceLine[];
   legend?: 'none' | 'top' | 'bottom';
   legendHeight?: string;
 }

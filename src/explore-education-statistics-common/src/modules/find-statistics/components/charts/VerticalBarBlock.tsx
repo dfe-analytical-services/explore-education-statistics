@@ -14,6 +14,8 @@ import {
   BarChart,
   CartesianGrid,
   Legend,
+  LineChart,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -153,6 +155,26 @@ export default class VerticalBarBlock extends Component<StackedBarProps> {
                 }}
               />
             ))}
+
+            {axes.major &&
+              axes.major.referenceLines &&
+              axes.major.referenceLines.map(referenceLine => (
+                <ReferenceLine
+                  key={`${referenceLine.position}_${referenceLine.label}`}
+                  x={referenceLine.position}
+                  label={referenceLine.label}
+                />
+              ))}
+
+            {axes.minor &&
+              axes.minor.referenceLines &&
+              axes.minor.referenceLines.map(referenceLine => (
+                <ReferenceLine
+                  key={`${referenceLine.position}_${referenceLine.label}`}
+                  y={referenceLine.position}
+                  label={referenceLine.label}
+                />
+              ))}
           </BarChart>
         </ResponsiveContainer>
       );
