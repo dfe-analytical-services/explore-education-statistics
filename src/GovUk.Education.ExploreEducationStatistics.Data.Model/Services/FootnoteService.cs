@@ -14,12 +14,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
         public Dictionary<Footnote, IEnumerable<long>> GetFootnotes(IEnumerable<long> indicators)
         {
-            return (from f in _context.Footnote
-                    join i in _context.IndicatorFootnote on f.Id equals i.FootnoteId
-                    where indicators.Contains(i.IndicatorId)
-                    select new {f, i})
-                .GroupBy(tuple => tuple.f)
-                .ToDictionary(tuples => tuples.Key, tuples => tuples.Select(tuple => tuple.i.IndicatorId));
+            return _context.Footnote
+                .Join(_context.IndicatorFootnote, f => f.Id, i => i.FootnoteId, (f, i) => new
+                {
+                    Footnote = f, i.IndicatorId
+                })
+                .Where(t => indicators.Contains(t.IndicatorId))
+                .GroupBy(tuple => tuple.Footnote)
+                .ToDictionary(
+                    grouping => grouping.Key,
+                    grouping => grouping.Select(tuple => tuple.IndicatorId));
         }
     }
 }
