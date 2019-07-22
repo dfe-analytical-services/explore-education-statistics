@@ -69,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     12, new Dictionary<FilterItemName, int>
                     {
                         {
-                            FilterItemName.School_Type__Total, 423
+                            FilterItemName.School_Type__Total, 727
                         }
                     }
                 },
@@ -1361,7 +1361,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Summary =
                         "Read national statistical summaries, view charts and tables and download data files.\n\n" +
                         "Find out how and why these statistics are collected and published - [Pupil absence statistics: methodology](../methodology/pupil-absence-in-schools-in-england).",
-                    TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                    TimePeriodCoverage = TimeIdentifier.SixHalfTerms,
                     TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
                     KeyStatistics = new DataBlock
                     {
@@ -1372,9 +1372,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             TimePeriod = new TimePeriod
                             {
                                 StartYear = "2012",
-                                StartCode = TimeIdentifier.AcademicYear,
+                                StartCode = TimeIdentifier.SixHalfTerms,
                                 EndYear = "2016",
-                                EndCode = TimeIdentifier.AcademicYear
+                                EndCode = TimeIdentifier.SixHalfTerms
                             },
                             Filters = new List<string>
                             {
@@ -1544,9 +1544,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         TimePeriod = new TimePeriod
                                         {
                                             StartYear = "2012",
-                                            StartCode = TimeIdentifier.AcademicYear,
+                                            StartCode = TimeIdentifier.SixHalfTerms,
                                             EndYear = "2016",
-                                            EndCode = TimeIdentifier.AcademicYear
+                                            EndCode = TimeIdentifier.SixHalfTerms
                                         },
                                         Filters = new List<string>
                                         {
@@ -1822,9 +1822,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         TimePeriod = new TimePeriod
                                         {
                                             StartYear = "2016",
-                                            StartCode = TimeIdentifier.AcademicYear,
+                                            StartCode = TimeIdentifier.SixHalfTerms,
                                             EndYear = "2017",
-                                            EndCode = TimeIdentifier.AcademicYear
+                                            EndCode = TimeIdentifier.SixHalfTerms
                                         },
 
                                         Indicators = new List<string>
