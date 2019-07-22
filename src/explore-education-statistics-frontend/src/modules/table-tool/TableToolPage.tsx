@@ -77,6 +77,7 @@ interface State {
   subjectMeta: PublicationSubjectMeta;
   timePeriodRange: TimePeriod[];
   tableData: TableData['result'];
+  footnotes: TableData['footnotes'];
 }
 
 class TableToolPage extends Component<Props, State> {
@@ -99,6 +100,7 @@ class TableToolPage extends Component<Props, State> {
     subjects: [],
     timePeriodRange: [],
     tableData: [],
+    footnotes: [],
   };
 
   public static async getInitialProps({ query }: NextContext) {
@@ -286,6 +288,7 @@ class TableToolPage extends Component<Props, State> {
       subjects,
       timePeriodRange,
       tableData,
+      footnotes,
     } = this.state;
 
     const locationsList = Object.values(locations).flat();
@@ -378,10 +381,7 @@ class TableToolPage extends Component<Props, State> {
                           locations={locationsList}
                           timePeriods={timePeriodRange}
                           results={tableData}
-                          footnotes={[
-                            'This is an example footnote',
-                            'This is another example footnote',
-                          ]}
+                          footnotes={footnotes}
                         />
                       </div>
 

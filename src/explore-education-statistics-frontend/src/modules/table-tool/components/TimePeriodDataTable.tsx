@@ -23,7 +23,7 @@ interface Props {
   subjectName: string;
   locations: LocationFilter[];
   results: TableData['result'];
-  footnotes?: string[];
+  footnotes?: TableData['footnotes'];
 }
 
 const TimePeriodDataTable = (props: Props) => {
