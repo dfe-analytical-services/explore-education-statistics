@@ -2994,21 +2994,27 @@ const AbstractChartProps: ChartProps = {
   data,
   meta: metaData,
 
+  legend: 'top',
+  legendHeight: '50',
+
   labels: {
     '23_1_2_____': {
       label: metaData.indicators['23'].label,
       unit: '%',
       value: '23_1_2',
+      colour: '#ff0000',
     },
     '26_1_2_____': {
       label: metaData.indicators['26'].label,
       unit: '%',
       value: '26_1_2',
+      colour: '#ff0000',
     },
     '28_1_2_____': {
       label: metaData.indicators['28'].label,
       unit: '%',
       value: '28_1_2',
+      colour: '#ff0000',
     },
   },
 

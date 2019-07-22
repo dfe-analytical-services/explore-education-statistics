@@ -2,12 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta.TableBuilder;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
@@ -53,12 +54,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             };
         }
 
-        private LegendOptionsMetaValueModel<IEnumerable<TimePeriodMetaViewModel>> GetTimePeriods(
+        private TableBuilderTimePeriodsMetaViewModel GetTimePeriods(
             SubjectMetaQueryContext query)
         {
             var timePeriodsMeta = _observationService.GetTimePeriodsMeta(query);
 
-            return new LegendOptionsMetaValueModel<IEnumerable<TimePeriodMetaViewModel>>
+            return new TableBuilderTimePeriodsMetaViewModel
             {
                 Hint = "Filter statistics by a given start and end date",
                 Legend = "Academic Year",
@@ -71,13 +72,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             };
         }
 
-        private Dictionary<string, LegendOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>> GetObservationalUnits(
+        private Dictionary<string, TableBuilderObservationalUnitsMetaViewModel> GetObservationalUnits(
             SubjectMetaQueryContext query)
         {
             var observationalUnits = _locationService.GetObservationalUnits(query.ObservationPredicate());
             return observationalUnits.ToDictionary(
                 pair => pair.Key.ToString().CamelCase(),
-                pair => new LegendOptionsMetaValueModel<IEnumerable<LabelValueViewModel>>
+                pair => new TableBuilderObservationalUnitsMetaViewModel
                 {
                     Hint = "",
                     Legend = pair.Key.GetEnumLabel(),
@@ -85,12 +86,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 });
         }
 
-        private Dictionary<string, LabelOptionsMetaValueModel<IEnumerable<IndicatorMetaViewModel>>> GetIndicators(
+        private Dictionary<string, TableBuilderIndicatorsMetaViewModel> GetIndicators(
             long subjectId)
         {
             return _indicatorGroupService.GetIndicatorGroups(subjectId).ToDictionary(
                 group => group.Label.PascalCase(),
-                group => new LabelOptionsMetaValueModel<IEnumerable<IndicatorMetaViewModel>>
+                group => new TableBuilderIndicatorsMetaViewModel
                 {
                     Label = group.Label,
                     Options = _mapper.Map<IEnumerable<IndicatorMetaViewModel>>(group.Indicators)
@@ -98,32 +99,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             );
         }
 
-        private Dictionary<string, LegendOptionsMetaValueModel<Dictionary<string, FilterItemMetaViewModel>>> GetFilters(
+        private Dictionary<string, TableBuilderFilterMetaViewModel> GetFilters(
             SubjectMetaQueryContext query)
         {
             return _filterItemService.GetFilterItems(query.ObservationPredicate())
                 .GroupBy(item => item.FilterGroup.Filter)
                 .ToDictionary(
                     itemsGroupedByFilter => itemsGroupedByFilter.Key.Label.PascalCase(),
-                    itemsGroupedByFilter => new LegendOptionsMetaValueModel<Dictionary<string, FilterItemMetaViewModel>>
+                    itemsGroupedByFilter => new TableBuilderFilterMetaViewModel
                     {
                         Hint = itemsGroupedByFilter.Key.Hint,
                         Legend = itemsGroupedByFilter.Key.Label,
                         Options = itemsGroupedByFilter.GroupBy(item => item.FilterGroup).ToDictionary(
                             itemsGroupedByFilterGroup => itemsGroupedByFilterGroup.Key.Label.PascalCase(),
                             itemsGroupedByFilterGroup =>
-                                new FilterItemMetaViewModel
+                                new TableBuilderFilterItemMetaViewModel
                                 {
                                     Label = itemsGroupedByFilterGroup.Key.Label,
                                     Options = itemsGroupedByFilterGroup.Select(item => new LabelValueViewModel
                                     {
                                         Label = item.Label,
                                         Value = item.Id.ToString()
-                                    }),
-                                    TotalValue =
-                                        itemsGroupedByFilterGroup.FirstOrDefault(IsFilterItemTotal)?.Id.ToString() ??
-                                        string.Empty
-                                })
+                                    })
+                                }),
+                        TotalValue = itemsGroupedByFilter.FirstOrDefault(IsFilterItemTotal)?.Id.ToString() ??
+                                     string.Empty
                     });
         }
 

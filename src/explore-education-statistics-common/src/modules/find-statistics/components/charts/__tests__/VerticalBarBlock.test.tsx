@@ -7,7 +7,10 @@ import testData from './__data__/testBlockData';
 
 jest.mock('recharts/lib/util/LogUtils');
 
-const props = testData.AbstractChartProps;
+const props = {
+  ...testData.AbstractChartProps,
+  height: 900,
+};
 const { axes } = props;
 
 describe('VerticalBarBlock', () => {
@@ -33,6 +36,10 @@ describe('VerticalBarBlock', () => {
     ).toBeInTheDocument();
     expect(
       container.querySelector('.recharts-cartesian-grid-vertical'),
+    ).toBeInTheDocument();
+
+    expect(
+      container.querySelector('.recharts-default-legend'),
     ).toBeInTheDocument();
 
     // expect there to be rectangles for all 3 data sets across both years
@@ -104,5 +111,80 @@ describe('VerticalBarBlock', () => {
     expect(
       container.querySelector('.recharts-cartesian-axis.xAxis'),
     ).not.toBeInTheDocument();
+  });
+
+  test('can hide legend', () => {
+    const { container } = render(<VerticalBarBlock {...props} legend="none" />);
+
+    expect(
+      container.querySelector('.recharts-default-legend'),
+    ).not.toBeInTheDocument();
+  });
+
+  test('can stack data', () => {
+    const { container } = render(
+      <VerticalBarBlock {...props} stacked legend="none" />,
+    );
+
+    // Unsure how to tell stacked data apart, other than the snapshot
+
+    expect(container).toMatchSnapshot();
+
+    expect(
+      Array.from(container.querySelectorAll('.recharts-rectangle')).length,
+    ).toBe(6);
+  });
+
+  test('can render major axis reference line', () => {
+    const { container } = render(
+      <VerticalBarBlock
+        {...{
+          ...props,
+          axes: {
+            ...props.axes,
+            major: {
+              ...props.axes.major,
+              referenceLines: [
+                {
+                  label: 'hello',
+                  position: '2014/15',
+                },
+              ],
+            },
+          },
+        }}
+        legend="none"
+      />,
+    );
+
+    expect(
+      container.querySelector('.recharts-reference-line'),
+    ).toBeInTheDocument();
+  });
+  test('can render minor axis reference line', () => {
+    const { container } = render(
+      <VerticalBarBlock
+        {...{
+          ...props,
+          axes: {
+            ...props.axes,
+            minor: {
+              ...props.axes.minor,
+              referenceLines: [
+                {
+                  label: 'hello',
+                  position: 0,
+                },
+              ],
+            },
+          },
+        }}
+        legend="none"
+      />,
+    );
+
+    expect(
+      container.querySelector('.recharts-reference-line'),
+    ).toBeInTheDocument();
   });
 });

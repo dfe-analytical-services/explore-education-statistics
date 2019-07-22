@@ -2,15 +2,19 @@ FROM microsoft/dotnet:2.2-sdk
 WORKDIR /app
 
 # copy csproj and restore as distinct layers
+COPY ["GovUk.Education.ExploreEducationStatistics.Common/GovUk.Education.ExploreEducationStatistics.Common.csproj", "GovUk.Education.ExploreEducationStatistics.Common/"]
 COPY ["GovUk.Education.ExploreEducationStatistics.Data.Model/GovUk.Education.ExploreEducationStatistics.Data.Model.csproj", "GovUk.Education.ExploreEducationStatistics.Data.Model/"]
 COPY ["GovUk.Education.ExploreEducationStatistics.Data.Importer/GovUk.Education.ExploreEducationStatistics.Data.Importer.csproj", "GovUk.Education.ExploreEducationStatistics.Data.Importer/"]
 COPY ["GovUk.Education.ExploreEducationStatistics.Data.Seed/GovUk.Education.ExploreEducationStatistics.Data.Seed.csproj", "GovUk.Education.ExploreEducationStatistics.Data.Seed/"]
+COPY ["GovUk.Education.ExploreEducationStatistics.Common/GovUk.Education.ExploreEducationStatistics.Common.csproj", "GovUk.Education.ExploreEducationStatistics.Common/"]
 RUN dotnet restore "GovUk.Education.ExploreEducationStatistics.Data.Seed/GovUk.Education.ExploreEducationStatistics.Data.Seed.csproj"
 
 # copy and build everything else
+COPY ./GovUk.Education.ExploreEducationStatistics.Common ./GovUk.Education.ExploreEducationStatistics.Common
 COPY ./GovUk.Education.ExploreEducationStatistics.Data.Model ./GovUk.Education.ExploreEducationStatistics.Data.Model
 COPY ./GovUk.Education.ExploreEducationStatistics.Data.Importer ./GovUk.Education.ExploreEducationStatistics.Data.Importer
 COPY ./GovUk.Education.ExploreEducationStatistics.Data.Seed ./GovUk.Education.ExploreEducationStatistics.Data.Seed
+COPY ./GovUk.Education.ExploreEducationStatistics.Common ./GovUk.Education.ExploreEducationStatistics.Common
 
 WORKDIR "/app/GovUk.Education.ExploreEducationStatistics.Data.Seed"
 RUN dotnet publish -c Release -o out

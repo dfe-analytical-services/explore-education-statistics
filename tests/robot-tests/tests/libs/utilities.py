@@ -23,7 +23,8 @@ def user_checks_page_contains_accordion(accordion_heading):
 
 def user_checks_accordion_is_in_position(header_starts_with, position):
   try:
-    elem = sl.driver.find_element_by_xpath(f'(.//*[@class="govuk-accordion__section"])[{position}]')
+    # NOTE(mark): When nth-child won't do, you need to do the unholy equivalent of css .class in xpath...
+    elem = sl.driver.find_element_by_xpath(f'(.//*[contains(concat(" ", normalize-space(@class), " "), " govuk-accordion__section ")])[{position}]')
   except:
     raise AssertionError(f"There are less than {position} accordion sections!")
 
@@ -184,8 +185,20 @@ def user_clicks_category_checkbox(subheading_label, category_label):
 def user_clicks_select_all_for_category(category_label):
   sl.driver.find_element_by_xpath(f'//legend[text()="{category_label}"]/..//button[contains(text(),"Select")]').click()
 
-def user_checks_results_table_contains(row, column, expected):
-  sl.table_cell_should_contain('css:table', row, column, expected)
+def user_checks_results_table_column_heading_contains(row, column, expected):
+  elem = sl.driver.find_element_by_xpath(f'//table/thead/tr[{row}]/th[{column}]')
+  if expected not in elem.text:
+    raise AssertionError(f'"{expected} not found in th tag in results table thead row {row}, column {column}')
+
+def user_checks_results_table_row_heading_contains(row, column, expected):
+  elem = sl.driver.find_element_by_xpath(f'//table/tbody/tr[{row}]/th[{column}]')
+  if expected not in elem.text:
+    raise AssertionError(f'"{expected} not found in th tag in results table tbody row {row}, column {column}')
+
+def user_checks_results_table_cell_contains(row, column, expected):
+  elem = sl.driver.find_element_by_xpath(f'//table/tbody/tr[{row}]/td[{column}]')
+  if expected not in elem.text:
+    raise AssertionError(f'"{expected} not found in td tag in results table tbody row {row}, column {column}')
 
 def user_checks_previous_table_tool_step_contains(step, key, value):
   try:

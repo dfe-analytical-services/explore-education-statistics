@@ -3,9 +3,9 @@ import ModalConfirm from '@common/components/ModalConfirm';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import useToggle from '@common/hooks/useToggle';
+import Link from '@admin/components/Link';
 import PrototypeAdminNavigation from './components/PrototypeAdminNavigation';
 import PrototypePage from './components/PrototypePage';
-import Link from '../../components/Link';
 
 const PublicationDataPage = () => {
   const [showReplaceDataModal, toggleReplaceDataModal] = useToggle(false);

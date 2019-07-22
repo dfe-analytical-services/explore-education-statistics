@@ -6,7 +6,7 @@ import TabsSection from '@common/components/TabsSection';
 import React from 'react';
 import { RouteChildrenProps } from 'react-router';
 import { LoginContext } from '@admin/components/Login';
-import Link from '../../components/Link';
+import Link from '@admin/components/Link';
 import PrototypePage from './components/PrototypePage';
 
 const UserType = () => {

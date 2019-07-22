@@ -1,6 +1,6 @@
 import React from 'react';
 import { RouteChildrenProps } from 'react-router';
-import Link from '../../components/Link';
+import Link from '@admin/components/Link';
 import PrototypeAdminNavigation from './components/PrototypeAdminNavigation';
 import PrototypePage from './components/PrototypePage';
 

@@ -1,12 +1,12 @@
 import {
-  generateReferenceLines,
-  ChartDefinition,
   ChartDataB,
+  ChartDefinition,
+  conditionallyAdd,
   createDataForAxis,
   getKeysForChart,
   mapNameToNameLabel,
-  StackedBarProps,
   populateDefaultChartProps,
+  StackedBarProps,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import React, { Component } from 'react';
 import {
@@ -14,6 +14,7 @@ import {
   BarChart,
   CartesianGrid,
   Legend,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -25,6 +26,13 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
   public static definition: ChartDefinition = {
     type: 'horizontalbar',
     name: 'Horizontal Bar',
+
+    capabilities: {
+      dataSymbols: false,
+      stackable: true,
+      lineStyle: false,
+      gridLines: true,
+    },
 
     data: [
       {
@@ -56,10 +64,11 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
       meta,
       height,
       width,
-      referenceLines,
       stacked = false,
       labels,
       axes,
+      legend,
+      legendHeight,
     } = this.props;
 
     if (!axes.major || !data) return <LoadingSpinner />;
@@ -74,16 +83,24 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
 
     return (
       <ResponsiveContainer width={width || '100%'} height={height || 600}>
-        <BarChart data={chartData} layout="vertical" margin={{ left: 30 }}>
+        <BarChart
+          data={chartData}
+          layout="vertical"
+          margin={{
+            left: 30,
+            top: legend === 'top' ? 10 : 0,
+          }}
+        >
           <CartesianGrid
             strokeDasharray="3 3"
             horizontal={axes.minor && axes.minor.showGrid !== false}
             vertical={axes.major && axes.major.showGrid !== false}
           />
 
-          {axes.minor && axes.minor.visible !== false && (
+          {axes.minor && (
             <XAxis
               type="number"
+              hide={axes.minor.visible === false}
               label={{
                 angle: -90,
                 offset: 0,
@@ -91,21 +108,27 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
                 value: '',
               }}
               scale="auto"
+              height={conditionallyAdd(
+                axes.minor && axes.minor.size,
+                legend === 'bottom' ? 0 : undefined,
+              )}
               padding={{ left: 20, right: 20 }}
               tickMargin={10}
             />
           )}
 
-          {axes.major && axes.major.visible !== false && (
+          {axes.major && (
             <YAxis
               type="category"
               dataKey="name"
+              hide={axes.major.visible === false}
               label={{
                 offset: 5,
                 position: 'bottom',
                 value: '',
               }}
               scale="auto"
+              width={conditionallyAdd(axes.major && axes.major.size)}
               interval={
                 axes.minor && axes.minor.visible !== false
                   ? 'preserveStartEnd'
@@ -115,7 +138,9 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
           )}
 
           <Tooltip cursor={false} />
-          <Legend />
+          {(legend === 'top' || legend === 'bottom') && (
+            <Legend verticalAlign={legend} height={+(legendHeight || '50')} />
+          )}
 
           {Array.from(keysForChart).map(name => (
             <Bar
@@ -125,7 +150,25 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
             />
           ))}
 
-          {referenceLines && generateReferenceLines(referenceLines)}
+          {axes.major &&
+            axes.major.referenceLines &&
+            axes.major.referenceLines.map(referenceLine => (
+              <ReferenceLine
+                key={`${referenceLine.position}_${referenceLine.label}`}
+                y={referenceLine.position}
+                label={referenceLine.label}
+              />
+            ))}
+
+          {axes.minor &&
+            axes.minor.referenceLines &&
+            axes.minor.referenceLines.map(referenceLine => (
+              <ReferenceLine
+                key={`${referenceLine.position}_${referenceLine.label}`}
+                x={referenceLine.position}
+                label={referenceLine.label}
+              />
+            ))}
         </BarChart>
       </ResponsiveContainer>
     );

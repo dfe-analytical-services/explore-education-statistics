@@ -1,13 +1,13 @@
 import {
   Axis,
-  ChartDataSet,
-  ChartType,
-  ChartConfiguration,
-  ReferenceLine,
-  AxisConfigurationItem,
-  ChartSymbol,
+  AxisConfiguration,
   AxisGroupBy,
   AxisType,
+  ChartDataSet,
+  ChartSymbol,
+  ChartType,
+  DataSetConfiguration,
+  ReferenceLine,
 } from '@common/services/publicationService';
 import React, { ReactNode } from 'react';
 import {
@@ -53,11 +53,12 @@ export function parseCondensedTimePeriodRange(
 export interface ChartProps {
   data: DataBlockData;
   meta: DataBlockMetadata;
-  labels: Dictionary<ChartConfiguration>;
-  axes: Dictionary<AxisConfigurationItem>;
+  labels: Dictionary<DataSetConfiguration>;
+  axes: Dictionary<AxisConfiguration>;
   height?: number;
   width?: number;
-  referenceLines?: ReferenceLine[];
+  legend?: 'none' | 'top' | 'bottom';
+  legendHeight?: string;
 }
 
 export interface StackedBarProps extends ChartProps {
@@ -77,9 +78,18 @@ export interface DataSetResult {
   results: Result[];
 }
 
+export interface ChartCapabilities {
+  dataSymbols: boolean;
+  stackable: boolean;
+  lineStyle: boolean;
+  gridLines: boolean;
+}
+
 export interface ChartDefinition {
   type: ChartType;
   name: string;
+
+  capabilities: ChartCapabilities;
 
   data: {
     type: string;
@@ -115,32 +125,6 @@ function calculateAxis(
   }
 
   return { size, title };
-}
-
-export function calculateMargins(
-  xAxis: Axis,
-  yAxis: Axis,
-  referenceLines?: ReferenceLine[],
-) {
-  const margin = {
-    top: 15,
-    right: 30,
-    left: 60,
-    bottom: 25,
-  };
-
-  if (referenceLines && referenceLines.length > 0) {
-    referenceLines.forEach(line => {
-      if (line.x) margin.top = 25;
-      if (line.y) margin.left = 75;
-    });
-  }
-
-  if (xAxis.title) {
-    margin.bottom += 25;
-  }
-
-  return margin;
 }
 
 export function calculateXAxis(xAxis: Axis, axisProps: XAxisProps): ReactNode {
@@ -372,7 +356,7 @@ function reduceCombineChartData(
 }
 
 export function createDataForAxis(
-  axisConfiguration: AxisConfigurationItem,
+  axisConfiguration: AxisConfiguration,
   results: Result[],
   meta: DataBlockMetadata,
 ) {
@@ -400,13 +384,13 @@ export function getKeysForChart(chartData: ChartDataB[]) {
 }
 
 const FindFirstInDictionaries = (
-  metaDataObjects: (Dictionary<ChartConfiguration> | undefined)[],
+  metaDataObjects: (Dictionary<DataSetConfiguration> | undefined)[],
   name: string,
-) => (result: string | undefined, meta?: Dictionary<ChartConfiguration>) =>
+) => (result: string | undefined, meta?: Dictionary<DataSetConfiguration>) =>
   result || (meta && meta[name] && meta[name].label);
 
 export function mapNameToNameLabel(
-  ...metaDataObjects: (Dictionary<ChartConfiguration> | undefined)[]
+  ...metaDataObjects: (Dictionary<DataSetConfiguration> | undefined)[]
 ) {
   return ({ name, ...otherdata }: { name: string }) => ({
     ...otherdata,
@@ -420,7 +404,7 @@ export function mapNameToNameLabel(
 
 export function populateDefaultChartProps(
   name: string,
-  config: ChartConfiguration,
+  config: DataSetConfiguration,
 ) {
   return {
     dataKey: name,
@@ -431,3 +415,10 @@ export function populateDefaultChartProps(
     unit: (config && config.unit) || '',
   };
 }
+
+export const conditionallyAdd = (size?: string, add?: number) => {
+  if (size) {
+    return +size + (add !== undefined ? add : 0);
+  }
+  return add;
+};
