@@ -1,9 +1,9 @@
-import { User } from '@admin/services/PrototypeLoginService';
 import {
+  ContactDetails,
   DayMonthYearValues,
   IdLabelPair,
-  UserContact,
-} from '@admin/services/api/common/types/types';
+  UserDetails,
+} from '@admin/services/common/types';
 
 export enum ReleaseApprovalStatus {
   Approved,
@@ -24,12 +24,13 @@ export interface AdminDashboardRelease {
   status: ReleaseApprovalStatus;
   latestRelease: boolean;
   live: boolean;
-  dateRangeLabel: string;
+  releaseName: string;
   timePeriodCoverage: IdLabelPair;
-  leadStatistician: UserContact;
-  lastEditedUser: User;
+  contact: ContactDetails;
+  lastEditedUser: UserDetails;
   lastEditedDateTime: string;
-  scheduledPublishDate: DayMonthYearValues;
+  publishScheduled: DayMonthYearValues;
+  published?: string;
   nextReleaseExpectedDate: DayMonthYearValues;
 }
 
@@ -38,4 +39,5 @@ export interface AdminDashboardPublication {
   title: string;
   methodology: IdLabelPair;
   releases: AdminDashboardRelease[];
+  contact: ContactDetails;
 }

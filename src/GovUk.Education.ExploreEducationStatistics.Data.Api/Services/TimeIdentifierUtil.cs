@@ -1,26 +1,15 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using Category = GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifierCategory;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
     public static class TimeIdentifierUtil
     {
+        
         public static TimeIdentifier[] GetMonths()
         {
-            return new[]
-            {
-                TimeIdentifier.January,
-                TimeIdentifier.February,
-                TimeIdentifier.March,
-                TimeIdentifier.April,
-                TimeIdentifier.May,
-                TimeIdentifier.June,
-                TimeIdentifier.July,
-                TimeIdentifier.August,
-                TimeIdentifier.September,
-                TimeIdentifier.October,
-                TimeIdentifier.November,
-                TimeIdentifier.December
-            };
+            return Category.Month.GetTimeIdentifiers();
         }
 
         public static TimeIdentifier[] GetYears()
@@ -39,13 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         public static TimeIdentifier[] GetTerms()
         {
-            return new[]
-            {
-                TimeIdentifier.AutumnTerm,
-                TimeIdentifier.AutumnSpringTerm,
-                TimeIdentifier.SpringTerm,
-                TimeIdentifier.SummerTerm
-            };
+            return Category.Term.GetTimeIdentifiers();
         }
 
         public static TimeIdentifier[] GetNumberOfTerms()

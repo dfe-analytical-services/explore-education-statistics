@@ -13,5 +13,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Database
             Label = label;
             Value = value;
         }
+        
+        public EnumLabelValueAttribute(string label)
+        {
+            Label = label;
+        }
     }
 }

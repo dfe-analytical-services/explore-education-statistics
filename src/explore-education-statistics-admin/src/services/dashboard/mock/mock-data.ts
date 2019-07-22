@@ -2,7 +2,7 @@ import {
   AdminDashboardPublication,
   ReleaseApprovalStatus,
   ThemeAndTopics,
-} from '@admin/services/api/dashboard/types';
+} from '@admin/services/dashboard/types';
 import { PrototypeLoginService } from '@admin/services/PrototypeLoginService';
 
 const themesAndTopics: ThemeAndTopics[] = [
@@ -226,10 +226,15 @@ const dashboardPublications: AdminDashboardPublication[] = [
       id: 'methodology-1',
       label: 'A guide to absence statistics',
     },
+    contact: {
+      contactName: 'John Smith',
+      contactTelNo: '07654 653763',
+      teamEmail: 'js@example.com',
+    },
     releases: [
       {
         id: 'my-publication-1-release-1',
-        dateRangeLabel: '2017-2018',
+        releaseName: '2017-2018',
         timePeriodCoverage: {
           id: 'AYQ1Q4',
           label: 'Academic year',
@@ -237,7 +242,7 @@ const dashboardPublications: AdminDashboardPublication[] = [
         status: ReleaseApprovalStatus.Approved,
         latestRelease: true,
         live: true,
-        scheduledPublishDate: {
+        publishScheduled: {
           day: 20,
           month: 9,
           year: 2020,
@@ -247,10 +252,10 @@ const dashboardPublications: AdminDashboardPublication[] = [
           month: 9,
           year: 2021,
         },
-        leadStatistician: {
-          name: 'John Smith',
-          telNo: '07654 653763',
-          email: 'js@example.com',
+        contact: {
+          contactName: 'John Smith',
+          contactTelNo: '07654 653763',
+          teamEmail: 'js@example.com',
         },
         lastEditedDateTime: '2019-09-20 09:30',
         lastEditedUser: PrototypeLoginService.getUser(
