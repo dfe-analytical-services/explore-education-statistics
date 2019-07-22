@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         
         public DataBlock KeyStatistics { get; set; }
 
-        public Guid TypeId { get; set; }
+        public Guid? TypeId { get; set; }
 
         public ReleaseType Type { get; set; }
 

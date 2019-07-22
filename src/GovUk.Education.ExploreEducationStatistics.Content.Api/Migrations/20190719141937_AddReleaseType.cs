@@ -10,8 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
             migrationBuilder.AddColumn<Guid>(
                 name: "TypeId",
                 table: "Releases",
-                nullable: false,
-                defaultValue: new Guid("00000000-0000-0000-0000-000000000000"));
+                nullable: true);
 
             migrationBuilder.CreateTable(
                 name: "ReleaseTypes",
@@ -74,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                 column: "TypeId",
                 principalTable: "ReleaseTypes",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Restrict);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

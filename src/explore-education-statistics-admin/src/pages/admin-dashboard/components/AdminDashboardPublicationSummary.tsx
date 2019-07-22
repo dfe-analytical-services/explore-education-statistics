@@ -15,16 +15,20 @@ const AdminDashboardPublicationSummary = ({ publication }: Props) => {
           <dt className="govuk-summary-list__key  dfe-summary-list__key--small">
             Methodology
           </dt>
-          <dd className="govuk-summary-list__value">
-            <Link to={`/methodology/${publication.methodology.id}`}>
-              {publication.methodology.label}
-            </Link>
-          </dd>
-          <dd className="govuk-summary-list__actions">
-            <Link to="/prototypes/publication-assign-methodology">
-              Edit methodology
-            </Link>
-          </dd>
+          {publication.methodology && (
+            <>
+              <dd className="govuk-summary-list__value">
+                <Link to={`/methodology/${publication.methodology.id}`}>
+                  {publication.methodology.label}
+                </Link>
+              </dd>
+              <dd className="govuk-summary-list__actions">
+                <Link to="/prototypes/publication-assign-methodology">
+                  Edit methodology
+                </Link>
+              </dd>
+            </>
+          )}
         </div>
       </dl>
       <dl className="govuk-summary-list">

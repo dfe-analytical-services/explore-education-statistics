@@ -1,18 +1,18 @@
+import Link from '@admin/components/Link';
 import DummyReferenceData from '@admin/pages/DummyReferenceData';
+import ReleasePageTemplate from '@admin/pages/edit-release/components/ReleasePageTemplate';
+import { setupEditRoute } from '@admin/routes/releaseRoutes';
+import {
+  dayMonthYearIsComplete,
+  dayMonthYearToDate,
+} from '@admin/services/common/types';
+import service from '@admin/services/edit-release/setup/service';
 import { ReleaseSetupDetails } from '@admin/services/edit-release/setup/types';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
-import { setupEditRoute } from '@admin/routes/releaseRoutes';
-import ReleasePageTemplate from '@admin/pages/edit-release/components/ReleasePageTemplate';
-import service from '@admin/services/edit-release/setup/service';
-import {
-  dayMonthYearIsComplete,
-  dayMonthYearToDate,
-} from '@admin/services/common/types/types';
-import Link from '@admin/components/Link';
 
 interface MatchProps {
   releaseId: string;
@@ -35,13 +35,11 @@ const ReleaseSetupPage = ({ match }: RouteComponentProps<MatchProps>) => {
 
   return (
     <>
-      <ReleasePageTemplate
-        releaseId={releaseId}
-        publicationTitle={
-          releaseSetupDetails ? releaseSetupDetails.publicationTitle : ''
-        }
-      >
-        {releaseSetupDetails && (
+      {releaseSetupDetails && (
+        <ReleasePageTemplate
+          releaseId={releaseId}
+          publicationTitle={releaseSetupDetails.publicationTitle}
+        >
           <SummaryList>
             <SummaryListItem term="Publication title">
               {releaseSetupDetails.publicationTitle}
@@ -101,8 +99,8 @@ const ReleaseSetupPage = ({ match }: RouteComponentProps<MatchProps>) => {
               }
             />
           </SummaryList>
-        )}
-      </ReleasePageTemplate>
+        </ReleasePageTemplate>
+      )}
     </>
   );
 };
