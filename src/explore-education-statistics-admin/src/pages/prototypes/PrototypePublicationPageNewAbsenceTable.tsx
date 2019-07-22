@@ -1,5 +1,10 @@
 import Details from '@common/components/Details';
-import { FormFieldset, FormGroup, FormSelect, FormTextInput } from '@common/components/form';
+import {
+  FormFieldset,
+  FormGroup,
+  FormSelect,
+  FormTextInput,
+} from '@common/components/form';
 import React from 'react';
 import Link from '../../components/Link';
 import PrototypeAdminExampleTables from './components/PrototypeAdminExampleTables';
