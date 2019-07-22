@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
         public void Get_UserTheme_Returns_Ok()
         {
             var themeService = new Mock<IThemeService>();
-            themeService.Setup(s => s.GetUserThemes(It.IsAny<Guid>())).Returns(
+            themeService.Setup(s => s.GetUserThemes(It.IsAny<Guid>() /* TODO User Id */)).Returns(
                 new List<Theme>
                 {
                     new Theme()
