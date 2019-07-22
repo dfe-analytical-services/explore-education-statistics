@@ -3,7 +3,7 @@ import {
   FormCheckbox,
   FormFieldset,
   FormGroup,
-  FormSelect,
+  FormTextInput,
 } from '@common/components/form';
 import FormComboBox from '@common/components/form/FormComboBox';
 import {
@@ -11,12 +11,14 @@ import {
   AxisGroupBy,
 } from '@common/services/publicationService';
 import { DataBlockMetadata } from '@common/services/dataBlockService';
+import { ChartCapabilities } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 
 interface Props {
   id: string;
   defaultDataType?: AxisGroupBy;
   configuration: AxisConfiguration;
   meta: DataBlockMetadata;
+  capabilities: ChartCapabilities;
   onConfigurationChange: (configuration: AxisConfiguration) => void;
 }
 
@@ -24,6 +26,7 @@ const ChartAxisConfiguration = ({
   id,
   configuration,
   meta,
+  capabilities,
   onConfigurationChange,
 }: Props) => {
   const [axisConfiguration, setAxisConfiguration] = React.useState<
@@ -75,27 +78,34 @@ const ChartAxisConfiguration = ({
                   initialOption={selectedUnit}
                 />
               )}
-
-              {/*
-        <FormTextInput
-          id={`${id}_name`}
-          name={`${id}_name`}
-          defaultValue="hello"
-          label="hello"
-        />*/}
             </React.Fragment>
           }
         />
-        <FormCheckbox
-          id={`${id}_grid`}
-          name={`${id}_grid`}
-          label="Show grid lines"
-          onChange={e =>
-            updateAxisConfiguration({ showGrid: e.target.checked })
-          }
-          checked={axisConfiguration.showGrid}
-          value="grid"
+        {capabilities.gridLines && (
+          <FormCheckbox
+            id={`${id}_grid`}
+            name={`${id}_grid`}
+            label="Show grid lines"
+            onChange={e =>
+              updateAxisConfiguration({ showGrid: e.target.checked })
+            }
+            checked={axisConfiguration.showGrid}
+            value="grid"
+          />
+        )}
+
+        <FormTextInput
+          id={`${id}_size`}
+          name={`${id}_size`}
+          type="number"
+          min="0"
+          max="100"
+          label="Size"
+          value={axisConfiguration.size}
+          onChange={e => updateAxisConfiguration({ size: e.target.value })}
         />
+
+        {/*
         <FormSelect
           id={`${id}_labelPosition`}
           name={`${id}_labelPosition`}
@@ -108,8 +118,8 @@ const ChartAxisConfiguration = ({
             { label: 'On graph', value: 'graph' },
           ]}
         />
+*/}
 
-        <p>Add / remove / edit series labels & range DFE-1018 1017</p>
         <p>Restrict range of series (years only?) DFE-1009</p>
       </FormGroup>
     </FormFieldset>

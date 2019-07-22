@@ -83,6 +83,7 @@ export interface ChartCapabilities {
   dataSymbols: boolean;
   stackable: boolean;
   lineStyle: boolean;
+  gridLines: boolean;
 }
 
 export interface ChartDefinition {
@@ -441,3 +442,10 @@ export function populateDefaultChartProps(
     unit: (config && config.unit) || '',
   };
 }
+
+export const conditionallyAdd = (size?: string, add?: number) => {
+  if (size) {
+    return +size + (add !== undefined ? add : 0);
+  }
+  return add;
+};

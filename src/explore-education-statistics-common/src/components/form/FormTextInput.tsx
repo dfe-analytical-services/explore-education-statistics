@@ -22,6 +22,8 @@ export interface FormTextInputProps {
   width?: 20 | 10 | 5 | 4 | 3 | 2;
   value?: string;
   defaultValue?: string;
+  min?: string;
+  max?: string;
 }
 
 const FormTextInput = ({
