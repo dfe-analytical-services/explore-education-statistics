@@ -62,9 +62,10 @@ const ChartAxisConfiguration = ({
     if (axisConfiguration.groupBy) {
       return [
         { label: 'Select', value: '' },
-        ...Object.values(meta[axisConfiguration.groupBy]).map(
-          ({ label, value }) => ({ label, value: label }),
-        ),
+        ...Object.values(meta[axisConfiguration.groupBy]).map(({ label }) => ({
+          label,
+          value: label,
+        })),
       ];
     }
     return [];
