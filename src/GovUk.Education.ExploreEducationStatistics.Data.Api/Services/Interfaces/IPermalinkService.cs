@@ -1,12 +1,13 @@
 using System;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces
 {
     public interface IPermalinkService
     {
-        Permalink Get(Guid id);
+        Task<Permalink> GetAsync(Guid id);
 
-        Permalink Create();
+        Task<Permalink> CreateAsync();
     }
 }
