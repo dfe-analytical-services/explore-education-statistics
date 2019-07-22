@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Newtonsoft.Json;
 using static System.DateTime;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.PartialDateUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
@@ -27,8 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         // be published and the Published date set.
         public DateTime? PublishScheduled { get; set; }
 
-        [NotMapped]
-        public bool Live => Published.HasValue && (DateTime.Compare(UtcNow, Published.Value) > 0);
+        [NotMapped] public bool Live => Published.HasValue && (DateTime.Compare(UtcNow, Published.Value) > 0);
 
         public string Slug { get; set; }
 
@@ -37,11 +37,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public Guid PublicationId { get; set; }
 
         public Publication Publication { get; set; }
-        
+
         public List<Update> Updates { get; set; }
 
         public List<ContentSection> Content { get; set; }
-        
+
         public DataBlock KeyStatistics { get; set; }
 
         public Guid? TypeId { get; set; }
@@ -50,32 +50,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         [JsonConverter(typeof(TimeIdentifierJsonConverter))]
         public TimeIdentifier TimePeriodCoverage { get; set; }
-        
+
         public int Order { get; set; }
 
-        protected bool Equals(Release other)
+        private string _nextReleaseDate;
+
+        public string NextReleaseDate
         {
-            return Id.Equals(other.Id);
-        }
-        
-        public bool IsLatestRelease(Release release)
-        {
-            return !release.Publication.Releases.Exists(
-                r => r.Order > release.Order ||
-                     (r.Id != release.Id && r.Order == release.Order && r.Published > release.Published));
+            get => _nextReleaseDate;
+            set
+            {
+                if (PartialDateValid(value))
+                {
+                    _nextReleaseDate = value;
+                }
+                throw new FormatException("Must be of the form YYYY-MM-DD where each value can be missing");
+            }
         }
 
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((Release) obj);
-        }
-
-        public override int GetHashCode()
-        {
-            return Id.GetHashCode();
-        }
     }
 }

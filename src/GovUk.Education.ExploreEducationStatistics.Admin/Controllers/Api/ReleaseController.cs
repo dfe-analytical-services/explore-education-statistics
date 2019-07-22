@@ -23,7 +23,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
         public ActionResult<ReleaseViewModel> CreateRelease(EditReleaseViewModel release)
         {
-            return _releaseService.CreateRelease(release);
+            if (ModelState.IsValid)
+            {
+                return _releaseService.CreateRelease(release);
+            }
+
+            return null; // TODO 
         }
     }
 }

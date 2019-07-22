@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
         }
     
 
-    [Fact]
+        [Fact]
         public void Release_Live()
         {
             var releasePublished = new Release {Published = DateTime.Now.AddDays(-1)};
