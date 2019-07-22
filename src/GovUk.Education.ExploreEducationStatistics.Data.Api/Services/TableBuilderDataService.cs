@@ -45,11 +45,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         private IEnumerable<FootnoteViewModel> GetFootnotes(ObservationQueryContext queryContext)
         {
-            return _footnoteService.GetFootnotes(queryContext.SubjectId, queryContext.Indicators)
+            return _footnoteService.GetFootnotes(queryContext.Indicators)
                 .Select(footnote => new FootnoteViewModel
                 {
-                    Indicators = new List<int>(),
-                    Value = footnote.Content
+                    Id = footnote.Key.Id,
+                    Indicators = footnote.Value.Select(indicatorId => indicatorId.ToString()),
+                    Label = footnote.Key.Content
                 });
         }
 

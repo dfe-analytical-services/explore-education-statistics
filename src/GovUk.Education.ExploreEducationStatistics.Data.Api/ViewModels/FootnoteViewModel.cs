@@ -1,10 +1,10 @@
 using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels
 {
-    public class FootnoteViewModel
+    public class FootnoteViewModel : IdLabelViewModel
     {
-        public IEnumerable<int> Indicators { get; set; }
-        public string Value { get; set; }
+        public IEnumerable<string> Indicators { get; set; }
     }
 }

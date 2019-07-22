@@ -5,7 +5,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels
 {
     public class ResultViewModel
     {
-        public IEnumerable<string> Footnotes { get; set; }
+        public IEnumerable<FootnoteViewModel> Footnotes { get; set; }
         
         public IEnumerable<TimePeriodMetaViewModel> TimePeriodRange { get; set; }
 
