@@ -1,6 +1,7 @@
 import {
   ChartDataB,
   ChartDefinition,
+  conditionallyAdd,
   createDataForAxis,
   getKeysForChart,
   mapNameToNameLabel,
@@ -29,6 +30,7 @@ export default class VerticalBarBlock extends Component<StackedBarProps> {
       dataSymbols: false,
       stackable: true,
       lineStyle: false,
+      gridLines: true,
     },
 
     data: [
@@ -103,6 +105,7 @@ export default class VerticalBarBlock extends Component<StackedBarProps> {
                   value: '',
                 }}
                 scale="auto"
+                width={conditionallyAdd(axes.minor && axes.minor.size)}
                 interval={
                   axes.minor && !axes.minor.visible
                     ? 'preserveStartEnd'
@@ -123,7 +126,10 @@ export default class VerticalBarBlock extends Component<StackedBarProps> {
                 }}
                 scale="auto"
                 padding={{ left: 20, right: 20 }}
-                height={legend === 'bottom' ? 50 : undefined}
+                height={conditionallyAdd(
+                  axes.major && axes.major.size,
+                  legend === 'bottom' ? 0 : undefined,
+                )}
                 tickMargin={10}
               />
             )}

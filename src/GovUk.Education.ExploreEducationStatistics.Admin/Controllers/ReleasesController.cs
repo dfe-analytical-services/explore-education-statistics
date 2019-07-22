@@ -64,6 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
             if (ModelState.IsValid)
             {
                 release.Id = Guid.NewGuid();
+                release.Order = NextOrder(release);
                 _context.Add(release);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -158,6 +159,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
         private bool ReleaseExists(Guid id)
         {
             return _context.Releases.Any(e => e.Id == id);
+        }
+
+        private int NextOrder(Release release)
+        {
+            var rel = _context.Releases.OrderByDescending(r => r.Order).FirstOrDefault(r => r.Publication.Id == release.PublicationId);
+            return rel?.Order + 1 ?? 0;
         }
     }
 }

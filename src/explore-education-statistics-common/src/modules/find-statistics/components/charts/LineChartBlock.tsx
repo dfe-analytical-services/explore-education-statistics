@@ -6,6 +6,7 @@ import {
   getKeysForChart,
   mapNameToNameLabel,
   populateDefaultChartProps,
+  conditionallyAdd,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 
 import React, { Component } from 'react';
@@ -69,6 +70,7 @@ export default class LineChartBlock extends Component<ChartProps> {
       dataSymbols: true,
       stackable: false,
       lineStyle: true,
+      gridLines: true,
     },
 
     data: [
@@ -136,9 +138,10 @@ export default class LineChartBlock extends Component<ChartProps> {
               vertical={axes.major.showGrid !== false}
             />
 
-            {axes.major && axes.major.visible && (
+            {axes.major && (
               <XAxis
                 dataKey="name"
+                hide={axes.major.visible === false}
                 label={{
                   offset: 5,
                   position: 'bottom',
@@ -150,7 +153,10 @@ export default class LineChartBlock extends Component<ChartProps> {
                     ? 'preserveStartEnd'
                     : undefined
                 }
-                height={legend === 'bottom' ? 50 : undefined}
+                height={conditionallyAdd(
+                  axes.major && axes.major.size,
+                  legend === 'bottom' ? 0 : undefined,
+                )}
                 padding={{ left: 20, right: 20 }}
                 tickMargin={10}
               />
@@ -167,6 +173,7 @@ export default class LineChartBlock extends Component<ChartProps> {
                 scale="auto"
                 domain={yAxisDomain}
                 dataKey="value"
+                width={conditionallyAdd(axes.minor && axes.minor.size)}
               />
             )}
 

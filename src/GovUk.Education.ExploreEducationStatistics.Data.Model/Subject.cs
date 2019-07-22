@@ -10,6 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public Release Release { get; set; }
         public Guid ReleaseId { get; set; }
         public IEnumerable<Observation> Observations { get; set; }
+        public ICollection<SubjectFootnote> Footnotes { get; set; }
 
         public Subject()
         {

@@ -9,7 +9,7 @@ export interface PageMetaProps {
 
 const PageMeta = ({
   title = 'Explore education statistics',
-  description = 'GOV.UK: Explore education statistics',
+  description = 'Find, download and explore official Department for Education (DfE) statistics and data in England.',
   imgUrl,
 }: PageMetaProps) => {
   return (
