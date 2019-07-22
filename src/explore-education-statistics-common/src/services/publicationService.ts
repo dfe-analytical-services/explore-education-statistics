@@ -82,6 +82,8 @@ export type ChartSymbol =
   | 'triangle'
   | 'wye';
 
+export type LineStyle = 'solid' | 'dashed' | 'dotted';
+
 export interface DataSetConfiguration {
   label: string;
   value: string;
@@ -89,6 +91,7 @@ export interface DataSetConfiguration {
   unit?: string;
   colour?: string;
   symbol?: ChartSymbol;
+  lineStyle?: LineStyle;
 }
 
 export type AxisGroupBy =
@@ -111,6 +114,7 @@ export interface AxisConfiguration {
   title?: string;
   showGrid?: boolean;
   labelPosition?: LabelPosition;
+  size?: string;
 }
 
 export interface Chart {

@@ -1,6 +1,7 @@
 import {
   ChartDataB,
   ChartDefinition,
+  conditionallyAdd,
   createDataForAxis,
   generateReferenceLines,
   getKeysForChart,
@@ -29,6 +30,8 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
     capabilities: {
       dataSymbols: false,
       stackable: true,
+      lineStyle: false,
+      gridLines: true,
     },
 
     data: [
@@ -106,7 +109,10 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
                 value: '',
               }}
               scale="auto"
-              height={legend === 'bottom' ? 50 : undefined}
+              height={conditionallyAdd(
+                axes.minor && axes.minor.size,
+                legend === 'bottom' ? 0 : undefined,
+              )}
               padding={{ left: 20, right: 20 }}
               tickMargin={10}
             />
@@ -123,6 +129,7 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
                 value: '',
               }}
               scale="auto"
+              width={conditionallyAdd(axes.major && axes.major.size)}
               interval={
                 axes.minor && axes.minor.visible !== false
                   ? 'preserveStartEnd'

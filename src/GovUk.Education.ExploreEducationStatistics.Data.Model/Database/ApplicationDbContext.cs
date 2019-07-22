@@ -17,8 +17,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         public DbSet<Filter> Filter { get; set; }
         public DbSet<FilterItem> FilterItem { get; set; }
         public DbSet<FilterGroup> FilterGroup { get; set; }
+        public DbSet<Footnote> Footnote { get; set; }
         public DbQuery<GeoJson> GeoJson { get; set; }
         public DbSet<Indicator> Indicator { get; set; }
+        public DbSet<IndicatorFootnote> IndicatorFootnote { get; set; }
         public DbSet<IndicatorGroup> IndicatorGroup { get; set; }
         public DbSet<Location> Location { get; set; }
         public DbSet<Observation> Observation { get; set; }
@@ -27,6 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         public DbSet<Release> Release { get; set; }
         public DbSet<School> School { get; set; }
         public DbSet<Subject> Subject { get; set; }
+        public DbSet<SubjectFootnote> SubjectFootnote { get; set; }
         public DbSet<Theme> Theme { get; set; }
         public DbSet<Topic> Topic { get; set; }
 
@@ -36,10 +39,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             ConfigureData(modelBuilder);
             ConfigureGeographicLevel(modelBuilder);
             ConfigureGeoJson(modelBuilder);
+            ConfigureIndicatorFootnote(modelBuilder);
             ConfigureLocation(modelBuilder);
             ConfigureMeasures(modelBuilder);
             ConfigureObservationFilterItem(modelBuilder);
             ConfigurePublication(modelBuilder);
+            ConfigureSubjectFootnote(modelBuilder);
             ConfigureTimePeriod(modelBuilder);
             ConfigureUnit(modelBuilder);
         }
@@ -632,6 +637,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                     builder => builder.HasIndex(localAuthorityDistrict => localAuthorityDistrict.Code));
         }
 
+        private static void ConfigureIndicatorFootnote(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<IndicatorFootnote>()
+                .HasKey(item => new {item.IndicatorId, item.FootnoteId});
+
+            modelBuilder.Entity<IndicatorFootnote>()
+                .HasOne(indicatorFootnote => indicatorFootnote.Indicator)
+                .WithMany(indicator => indicator.Footnotes)
+                .HasForeignKey(indicatorFootnote => indicatorFootnote.IndicatorId);
+
+            modelBuilder.Entity<IndicatorFootnote>()
+                .HasOne(indicatorFootnote => indicatorFootnote.Footnote)
+                .WithMany()
+                .HasForeignKey(indicatorFootnote => indicatorFootnote.FootnoteId)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
+        
         private static void ConfigureInstitution(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Location>()
@@ -693,6 +715,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             modelBuilder.Entity<Location>()
                 .OwnsOne(level => level.Sponsor,
                     builder => builder.HasIndex(sponsor => sponsor.Code));
+        }
+
+        private static void ConfigureSubjectFootnote(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<SubjectFootnote>()
+                .HasKey(item => new {item.SubjectId, item.FootnoteId});
+
+            modelBuilder.Entity<SubjectFootnote>()
+                .HasOne(subjectFootnote => subjectFootnote.Subject)
+                .WithMany(subject => subject.Footnotes)
+                .HasForeignKey(subjectFootnote => subjectFootnote.SubjectId);
+
+            modelBuilder.Entity<SubjectFootnote>()
+                .HasOne(subjectFootnote => subjectFootnote.Footnote)
+                .WithMany()
+                .HasForeignKey(subjectFootnote => subjectFootnote.FootnoteId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
         private static void ConfigureWard(ModelBuilder modelBuilder)

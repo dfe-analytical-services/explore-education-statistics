@@ -1,4 +1,4 @@
-import { IdLabelPair } from '@admin/services/api/common/types/types';
+import { IdLabelPair } from '@admin/services/common/types';
 
 export enum DateType {
   DayMonthYear,
@@ -165,6 +165,15 @@ const releaseTypeOptions: IdLabelPair[] = [
   },
 ];
 
+const findTimePeriodCoverageOption = (code: string) => {
+  return (
+    timePeriodCoverageGroups
+      .flatMap(group => group.options)
+      .find(option => option.id === code) ||
+    timePeriodCoverageGroups[0].options[0]
+  );
+};
+
 const findTimePeriodCoverageGroup = (code: string) => {
   return (
     timePeriodCoverageGroups.find(group =>
@@ -182,6 +191,7 @@ const findReleaseType = (id: string) => {
 export default {
   timePeriodCoverageGroups,
   releaseTypeOptions,
+  findTimePeriodCoverageOption,
   findTimePeriodCoverageGroup,
   findReleaseType,
 };

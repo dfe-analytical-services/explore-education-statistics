@@ -14,12 +14,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
     public class TableBuilderDataService : AbstractDataService<ResultViewModel>
     {
+        private readonly IFootnoteService _footnoteService;
         private readonly IResultBuilder<Observation, ObservationViewModel> _resultBuilder;
 
-        public TableBuilderDataService(IObservationService observationService,
+        public TableBuilderDataService(IFootnoteService footnoteService,
+            IObservationService observationService,
             ISubjectService subjectService,
             IResultBuilder<Observation, ObservationViewModel> resultBuilder) : base(observationService, subjectService)
         {
+            _footnoteService = footnoteService;
             _resultBuilder = resultBuilder;
         }
 
@@ -33,10 +36,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
             return new ResultViewModel
             {
+                Footnotes = GetFootnotes(queryContext),
                 TimePeriodRange = GetTimePeriodRange(observations),
                 Result = observations.Select(observation =>
                     _resultBuilder.BuildResult(observation, queryContext.Indicators))
             };
+        }
+
+        private IEnumerable<FootnoteViewModel> GetFootnotes(ObservationQueryContext queryContext)
+        {
+            return _footnoteService.GetFootnotes(queryContext.Indicators)
+                .Select(footnote => new FootnoteViewModel
+                {
+                    Id = footnote.Key.Id,
+                    Indicators = footnote.Value.Select(indicatorId => indicatorId.ToString()),
+                    Label = footnote.Key.Content
+                });
         }
 
         private static IEnumerable<TimePeriodMetaViewModel> GetTimePeriodRange(

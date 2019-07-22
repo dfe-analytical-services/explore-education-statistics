@@ -6,6 +6,7 @@ import {
   getKeysForChart,
   mapNameToNameLabel,
   populateDefaultChartProps,
+  conditionallyAdd,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 
 import React, { Component } from 'react';
@@ -23,6 +24,7 @@ import {
   YAxis,
 } from 'recharts';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import { Dictionary } from '@common/types';
 
 const CustomToolTip = ({ active, payload, label }: TooltipProps) => {
   if (active) {
@@ -53,6 +55,12 @@ const CustomToolTip = ({ active, payload, label }: TooltipProps) => {
   return null;
 };
 
+const LineStyles: Dictionary<string> = {
+  solid: '',
+  dashed: '5 5',
+  dotted: '2 2',
+};
+
 export default class LineChartBlock extends Component<ChartProps> {
   public static definition: ChartDefinition = {
     type: 'line',
@@ -61,6 +69,8 @@ export default class LineChartBlock extends Component<ChartProps> {
     capabilities: {
       dataSymbols: true,
       stackable: false,
+      lineStyle: true,
+      gridLines: true,
     },
 
     data: [
@@ -128,9 +138,10 @@ export default class LineChartBlock extends Component<ChartProps> {
               vertical={axes.major.showGrid !== false}
             />
 
-            {axes.major && axes.major.visible && (
+            {axes.major && (
               <XAxis
                 dataKey="name"
+                hide={axes.major.visible === false}
                 label={{
                   offset: 5,
                   position: 'bottom',
@@ -142,7 +153,10 @@ export default class LineChartBlock extends Component<ChartProps> {
                     ? 'preserveStartEnd'
                     : undefined
                 }
-                height={legend === 'bottom' ? 50 : undefined}
+                height={conditionallyAdd(
+                  axes.major && axes.major.size,
+                  legend === 'bottom' ? 0 : undefined,
+                )}
                 padding={{ left: 20, right: 20 }}
                 tickMargin={10}
               />
@@ -159,6 +173,7 @@ export default class LineChartBlock extends Component<ChartProps> {
                 scale="auto"
                 domain={yAxisDomain}
                 dataKey="value"
+                width={conditionallyAdd(axes.minor && axes.minor.size)}
               />
             )}
 
@@ -175,10 +190,16 @@ export default class LineChartBlock extends Component<ChartProps> {
                     <Symbols
                       {...props}
                       type={labels[name] && labels[name].symbol}
+                      strokeDasharray=""
                     />
                   ))
                 }
                 strokeWidth="2"
+                strokeDasharray={
+                  labels[name] &&
+                  labels[name].lineStyle &&
+                  LineStyles[labels[name].lineStyle || 'solid']
+                }
               />
             ))}
           </LineChart>

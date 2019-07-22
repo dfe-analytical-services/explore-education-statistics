@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
 {
@@ -65,6 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
             if (ModelState.IsValid)
             {
                 release.Id = Guid.NewGuid();
+                release.Order = NextOrder(release);
                 _context.Add(release);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -159,6 +159,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
         private bool ReleaseExists(Guid id)
         {
             return _context.Releases.Any(e => e.Id == id);
+        }
+
+        private int NextOrder(Release release)
+        {
+            var rel = _context.Releases.OrderByDescending(r => r.Order).FirstOrDefault(r => r.Publication.Id == release.PublicationId);
+            return rel?.Order + 1 ?? 0;
         }
     }
 }

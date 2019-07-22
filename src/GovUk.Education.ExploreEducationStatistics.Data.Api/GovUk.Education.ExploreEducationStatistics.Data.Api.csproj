@@ -12,8 +12,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Converters" />
-    <Folder Include="Migrations" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 

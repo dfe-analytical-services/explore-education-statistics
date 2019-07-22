@@ -22,6 +22,8 @@ export interface FormTextInputProps {
   width?: 20 | 10 | 5 | 4 | 3 | 2;
   value?: string;
   defaultValue?: string;
+  min?: string;
+  max?: string;
 }
 
 const FormTextInput = ({
@@ -35,7 +37,12 @@ const FormTextInput = ({
 }: FormTextInputProps) => {
   return (
     <>
-      <label className="govuk-label" htmlFor={id}>
+      <label
+        className={classNames('govuk-label', {
+          'govuk-label--s': type === 'file',
+        })}
+        htmlFor={id}
+      >
         {label}
       </label>
       {hint && (
@@ -51,7 +58,9 @@ const FormTextInput = ({
           error: !!error,
           hint: !!hint,
         })}
-        className={classNames('govuk-input', {
+        className={classNames({
+          'govuk-input': type !== 'file',
+          'govuk-file-upload': type === 'file',
           [`govuk-input--width-${width}`]: width !== undefined,
         })}
         id={id}
