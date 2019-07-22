@@ -20,11 +20,14 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
       {sectionId === 'setup' && (
         <h2 className="govuk-heading-l">Edit release summary</h2>
       )}
+      <p className="govuk-body">
+        These details will be shown to users to help identify this release.
+      </p>
       <form action="/prototypes/publication-create-new-absence-config">
-        <FormFieldset id="test" legend="Select release period">
+        <FormFieldset id="test" legend="Time identifier">
           <FormGroup>
             <label htmlFor="time-period" className="govuk-label">
-              Type
+              Time identifier
             </label>
             <select
               name="time-period"
@@ -112,7 +115,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
             <FormTextInput
               id="release-year"
               name="release-year"
-              label="Year"
+              label="Time period"
               value="2018"
               width={4}
             />
@@ -252,7 +255,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
         </fieldset>
         <fieldset className="govuk-fieldset govuk-!-margin-top-9 govuk-!-margin-bottom-9">
           <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
-            Next release date (optional)
+            Expected next release date (optional)
           </legend>
           <div className="govuk-date-input" id="schedule-publish-date">
             <div className="govuk-date-input__item">

@@ -97,7 +97,8 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
             <FormGroup>
               <FormFieldset
                 id="lead-statisician"
-                legend="Select the lead statistician for this publication"
+                legend="Select the contact for this publication
+                "
               >
                 <p className="govuk-hint">
                   They will be the main point of contact for data and
@@ -105,7 +106,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                 </p>
                 <FormSelect
                   id="select-lead-statisician"
-                  label="Select lead statistician"
+                  label="Select publication and release contact"
                   name="select-lead-statisician"
                   options={[
                     { label: 'Mark Pearson', value: 'mark-pearson' },
@@ -146,7 +147,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
               </div>
 
               <div className="govuk-summary-list__row">
-                <dt className="govuk-summary-list__key">Lead statistician</dt>
+                <dt className="govuk-summary-list__key">Contact</dt>
                 <dd className="govuk-summary-list__value">Alex Miller</dd>
               </div>
 

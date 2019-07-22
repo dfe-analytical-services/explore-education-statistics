@@ -57,7 +57,7 @@ const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
         </div>
       </div>
       <Tabs id="dashboard-tabs">
-        <TabsSection id="publications" title="Manage publications">
+        <TabsSection id="publications" title="Manage releases">
           <PrototypeAdminDashboardPublications />
         </TabsSection>
         {/* <TabsSection
@@ -70,7 +70,7 @@ const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
         </TabsSection> */}
         <TabsSection
           id="task-ready-approval1"
-          title={`Ready for you to review ${
+          title={`View draft releases ${
             location.search.includes('?status=readyApproval') ? '(1)' : '(0)'
           }`}
         >
@@ -78,7 +78,7 @@ const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
         </TabsSection>
         <TabsSection
           id="task-in-progress2"
-          title={`Comments for you to resolve ${
+          title={`View scheduled releases ${
             location.search.includes('?status=readyApproval') ? '(1)' : '(0)'
           }`}
         >

@@ -17,20 +17,42 @@ const PrototypePublicationSummary = () => {
 
       <dl className="govuk-summary-list govuk-!-margin-bottom-9">
         <div className="govuk-summary-list__row">
-          <dt className="govuk-summary-list__key">Release type</dt>
+          <dt className="govuk-summary-list__key">Time identifier</dt>
           <dd className="govuk-summary-list__value">Academic year</dd>
         </div>
         <div className="govuk-summary-list__row">
-          <dt className="govuk-summary-list__key">Release period</dt>
+          <dt className="govuk-summary-list__key">Time period</dt>
           <dd className="govuk-summary-list__value">2018 to 2019</dd>
-        </div>
-        <div className="govuk-summary-list__row">
-          <dt className="govuk-summary-list__key">Lead statistician</dt>
-          <dd className="govuk-summary-list__value">Alex Miller</dd>
         </div>
         <div className="govuk-summary-list__row">
           <dt className="govuk-summary-list__key">Scheduled publish date</dt>
           <dd className="govuk-summary-list__value">20 September 2019</dd>
+        </div>
+        <div className="govuk-summary-list__row">
+          <dt className="govuk-summary-list__key">
+            Expected next release date
+          </dt>
+          <dd className="govuk-summary-list__value">18 September 2020</dd>
+        </div>
+        <div className="govuk-summary-list__row">
+          <dt className="govuk-summary-list__key">Release type</dt>
+          <dd className="govuk-summary-list__value">National statistics</dd>
+        </div>
+        <div className="govuk-summary-list__row">
+          <dt className="govuk-summary-list__key">Release author</dt>
+          <dd className="govuk-summary-list__value">Ann Evans</dd>
+        </div>
+        <div className="govuk-summary-list__row">
+          <dt className="govuk-summary-list__key">
+            Publication and release contact
+          </dt>
+          <dd className="govuk-summary-list__value">Alex Miller</dd>
+        </div>
+        <div className="govuk-summary-list__row">
+          <dt className="govuk-summary-list__key">Template</dt>
+          <dd className="govuk-summary-list__value">
+            Copied existing template (2017/18)
+          </dd>
         </div>
         <div className="govuk-summary-list__row">
           <dt className="govuk-summary-list__key" />
