@@ -7,11 +7,10 @@ export type FootnoteProps = {
 };
 
 const Footnote = ({ content }: FootnoteProps) => {
-  const footnoteList = content.map(function createFootnotes(footnotes, index) {
+  const footnoteList = content.map(function createFootnotes(footnotes) {
     return (
-      // eslint-disable-next-line react/no-array-index-key
-      <p key={index} className="govuk-body-s govuk-!-margin-bottom-1">
-        {footnotes.indicators} + ' ' +{footnotes.value}
+      <p key={footnotes.id} className="govuk-body-s govuk-!-margin-bottom-1">
+        {footnotes.indicators} + ' ' +{footnotes.label}
       </p>
     );
   });
