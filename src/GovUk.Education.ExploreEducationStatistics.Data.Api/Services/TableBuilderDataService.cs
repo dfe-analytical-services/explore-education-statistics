@@ -43,10 +43,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             };
         }
 
-        private IEnumerable<string> GetFootnotes(ObservationQueryContext queryContext)
+        private IEnumerable<FootnoteViewModel> GetFootnotes(ObservationQueryContext queryContext)
         {
             return _footnoteService.GetFootnotes(queryContext.SubjectId, queryContext.Indicators)
-                .Select(footnote => footnote.Content);
+                .Select(footnote => new FootnoteViewModel
+                {
+                    Indicators = new List<int>(),
+                    Value = footnote.Content
+                });
         }
 
         private static IEnumerable<TimePeriodMetaViewModel> GetTimePeriodRange(
