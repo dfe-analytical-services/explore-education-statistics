@@ -131,6 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     public class AxisConfigurationItem
     {
         public string Name;
+        [JsonConverter(typeof(StringEnumConverter))]
         public AxisType Type;
 
         [JsonConverter(typeof(StringEnumConverter))]
@@ -138,9 +139,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public List<ChartDataSet> DataSets;
         public List<ReferenceLine> ReferenceLines;
-        public bool Visible;
+        public bool Visible = true;
         public string Title;
-        public bool ShowGrid;
+        public bool ShowGrid = true;
 
         [JsonConverter(typeof(StringEnumConverter))]
         public LabelPosition LabelPosition;
@@ -166,7 +167,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public ChartSymbol symbol;
 
         [JsonConverter(typeof(StringEnumConverter))]
-        public LineStyle LineStyle;
+        public LineStyle LineStyle = LineStyle.solid;
     }
 
     public class LineChart : IContentBlockChart
