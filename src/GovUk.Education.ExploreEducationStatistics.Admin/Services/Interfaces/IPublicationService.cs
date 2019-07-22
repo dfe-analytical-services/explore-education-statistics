@@ -1,6 +1,7 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using System;
 using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using UserId = System.Guid;
 using TopicId = System.Guid;
 
@@ -14,6 +15,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Publication Get(string slug);
 
-        List<Publication> GetByTopicAndUser(TopicId topicId, UserId userId);
+        List<PublicationViewModel> GetByTopicAndUser(TopicId topicId, UserId userId);
     }
 }
