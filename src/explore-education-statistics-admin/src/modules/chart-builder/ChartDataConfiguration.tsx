@@ -1,14 +1,16 @@
 import {
-  ChartConfiguration,
   ChartSymbol,
+  DataSetConfiguration,
+  LineStyle,
 } from '@common/services/publicationService';
 import * as React from 'react';
 import {
   FormFieldset,
-  FormTextInput,
   FormSelect,
+  FormTextInput,
 } from '@common/components/form';
 import {
+  ChartCapabilities,
   colours,
   symbols,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
@@ -16,9 +18,10 @@ import {
 import { SelectOption } from '@common/components/form/FormSelect';
 
 interface Props {
-  configuration: ChartConfiguration;
+  configuration: DataSetConfiguration;
+  capabilities: ChartCapabilities;
 
-  onConfigurationChange?: (value: ChartConfiguration) => void;
+  onConfigurationChange?: (value: DataSetConfiguration) => void;
 }
 
 const colourOptions: SelectOption[] = colours.map(color => {
@@ -40,13 +43,22 @@ const symbolOptions: SelectOption[] = [
   })),
 ];
 
+const lineStyleOptions: SelectOption[] = [
+  { label: 'Solid', value: 'solid' },
+  { label: 'Dashed', value: 'dashed' },
+  { label: 'Dotted', value: 'dotted' },
+];
+
 const ChartDataConfiguration = ({
   configuration,
+  capabilities,
   onConfigurationChange,
 }: Props) => {
-  const [config, setConfig] = React.useState<ChartConfiguration>(configuration);
+  const [config, setConfig] = React.useState<DataSetConfiguration>(
+    configuration,
+  );
 
-  const updateConfig = (newConfig: ChartConfiguration) => {
+  const updateConfig = (newConfig: DataSetConfiguration) => {
     setConfig(newConfig);
     if (onConfigurationChange) onConfigurationChange(newConfig);
   };
@@ -82,19 +94,38 @@ const ChartDataConfiguration = ({
         options={colourOptions}
       />
 
-      <FormSelect
-        id="symbol"
-        name="symbol"
-        label="Select symbol"
-        value={configuration.symbol}
-        onChange={e =>
-          updateConfig({
-            ...config,
-            symbol: e.target.value as ChartSymbol,
-          })
-        }
-        options={symbolOptions}
-      />
+      {capabilities.dataSymbols && (
+        <FormSelect
+          id="symbol"
+          name="symbol"
+          label="Select symbol"
+          value={configuration.symbol}
+          onChange={e =>
+            updateConfig({
+              ...config,
+              symbol: e.target.value as ChartSymbol,
+            })
+          }
+          options={symbolOptions}
+        />
+      )}
+
+      {capabilities.lineStyle && (
+        <FormSelect
+          id="lineStyle"
+          name="lineStyle"
+          label="Select Line Style"
+          value={configuration.lineStyle}
+          order={[]}
+          onChange={e =>
+            updateConfig({
+              ...config,
+              lineStyle: e.target.value as LineStyle,
+            })
+          }
+          options={lineStyleOptions}
+        />
+      )}
     </FormFieldset>
   );
 };

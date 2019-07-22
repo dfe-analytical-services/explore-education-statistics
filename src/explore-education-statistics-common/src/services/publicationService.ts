@@ -3,6 +3,7 @@ import {
   DataBlockRequest,
 } from '@common/services/dataBlockService';
 import { Dictionary } from '@common/types';
+import { PositionType } from 'recharts';
 import { contentApi } from './api';
 
 export interface Publication {
@@ -81,13 +82,16 @@ export type ChartSymbol =
   | 'triangle'
   | 'wye';
 
-export interface ChartConfiguration {
+export type LineStyle = 'solid' | 'dashed' | 'dotted';
+
+export interface DataSetConfiguration {
   label: string;
   value: string;
   name?: string;
   unit?: string;
   colour?: string;
   symbol?: ChartSymbol;
+  lineStyle?: LineStyle;
 }
 
 export type AxisGroupBy =
@@ -96,23 +100,32 @@ export type AxisGroupBy =
   | 'filters'
   | 'indicators';
 
-export interface AxisConfigurationItem {
+export type AxisType = 'major' | 'minor';
+
+export type LabelPosition = 'axis' | 'graph' | PositionType;
+
+export interface AxisConfiguration {
   name: string;
+  type: AxisType;
   groupBy?: AxisGroupBy;
   dataSets: ChartDataSet[];
 
   visible?: boolean;
   title?: string;
+  showGrid?: boolean;
+  labelPosition?: LabelPosition;
 }
 
 export interface Chart {
   type: ChartType;
-  labels: Dictionary<ChartConfiguration>;
-  axes: Dictionary<AxisConfigurationItem>;
+  labels: Dictionary<DataSetConfiguration>;
+  axes: Dictionary<AxisConfiguration>;
+
   stacked?: boolean;
   referenceLines?: ReferenceLine[];
   width?: number;
   height?: number;
+  showLegend?: boolean;
 }
 
 export interface Table {

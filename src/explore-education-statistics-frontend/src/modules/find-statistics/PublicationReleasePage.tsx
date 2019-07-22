@@ -68,11 +68,22 @@ class PublicationReleasePage extends Component<Props> {
           <div className="govuk-grid-column-two-thirds">
             <div className="govuk-grid-row">
               <div className="govuk-grid-column-three-quarters">
-                {!release && (
+                {!release ? (
                   <strong className="govuk-tag govuk-!-margin-right-6">
                     {' '}
                     This is the latest data{' '}
                   </strong>
+                ) : (
+                  <p>
+                    This is data from {release},{' '}
+                    <Link
+                      className="dfe-print-hidden"
+                      unvisited
+                      to={`/statistics/${data.publication.slug}`}
+                    >
+                      view latest release
+                    </Link>
+                  </p>
                 )}
                 <dl className="dfe-meta-content govuk-!-margin-top-3 govuk-!-margin-bottom-1">
                   <dt className="govuk-caption-m">Published:</dt>
@@ -116,33 +127,33 @@ class PublicationReleasePage extends Component<Props> {
             </div>
 
             <ReactMarkdown className="govuk-body" source={data.summary} />
-
-            <Details
-              summary="Download data files"
-              onToggle={(open: boolean) =>
-                open &&
-                logEvent(
-                  'Downloads',
-                  'Release page download data files dropdown opened',
-                  window.location.pathname,
-                )
-              }
-            >
-              <ul className="govuk-list govuk-list--bullet">
-                {data.dataFiles.map(({ extension, name, path, size }) => (
-                  <li key={path}>
-                    <Link
-                      to={`${baseUrl.data}/api/download/${path}`}
-                      className="govuk-link"
-                    >
-                      {name}
-                    </Link>
-                    {` (${extension}, ${size})`}
-                  </li>
-                ))}
-              </ul>
-            </Details>
-
+            {data.dataFiles && (
+              <Details
+                summary="Download data files"
+                onToggle={(open: boolean) =>
+                  open &&
+                  logEvent(
+                    'Downloads',
+                    'Release page download data files dropdown opened',
+                    window.location.pathname,
+                  )
+                }
+              >
+                <ul className="govuk-list govuk-list--bullet">
+                  {data.dataFiles.map(({ extension, name, path, size }) => (
+                    <li key={path}>
+                      <Link
+                        to={`${baseUrl.data}/api/download/${path}`}
+                        className="govuk-link"
+                      >
+                        {name}
+                      </Link>
+                      {` (${extension}, ${size})`}
+                    </li>
+                  ))}
+                </ul>
+              </Details>
+            )}
             <PageSearchFormWithAnalytics className="govuk-!-margin-top-3 govuk-!-margin-bottom-3" />
           </div>
 
@@ -208,8 +219,8 @@ class PublicationReleasePage extends Component<Props> {
                     onToggle={(open: boolean) =>
                       open &&
                       logEvent(
-                        'Previous Updates',
-                        'Open previous updates accordion',
+                        'Last Updates',
+                        'Release page last updates dropdown opened',
                         window.location.pathname,
                       )
                     }

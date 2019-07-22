@@ -7,37 +7,131 @@ import testData from './__data__/testBlockData';
 
 jest.mock('recharts/lib/util/LogUtils');
 
+const props = {
+  ...testData.AbstractChartProps,
+  height: 900,
+};
+const { axes } = props;
+
 describe('VerticalBarBlock', () => {
-  test('renders with correct output', () => {
-    const { container } = render(
-      <VerticalBarBlock {...testData.AbstractChartProps} />,
-    );
-
-    /*
-    expect(
-      container.querySelector('.xAxis text.recharts-label tspan'),
-    ).toHaveTextContent('test x axis');
-    expect(
-      container.querySelector('.yAxis text.recharts-label tspan'),
-    ).toHaveTextContent('test y axis');
-
-     */
-
-    expect(
-      container.querySelector(
-        '.xAxis .recharts-cartesian-axis-tick:nth-child(1) text tspan',
-      ),
-    ).toHaveTextContent('2014/15');
-    expect(
-      container.querySelector(
-        '.xAxis .recharts-cartesian-axis-tick:nth-child(2) text tspan',
-      ),
-    ).toHaveTextContent('2015/16');
-
-    expect(Array.from(container.querySelectorAll('.recharts-bar')).length).toBe(
-      3,
-    );
+  test('renders basic chart correctly', () => {
+    const { container } = render(<VerticalBarBlock {...props} />);
 
     expect(container).toMatchSnapshot();
+
+    // axes
+    expect(
+      container.querySelector('.recharts-cartesian-axis.xAxis'),
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('.recharts-cartesian-axis.yAxis'),
+    ).toBeInTheDocument();
+
+    // grid & grid lines
+    expect(
+      container.querySelector('.recharts-cartesian-grid'),
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('.recharts-cartesian-grid-horizontal'),
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('.recharts-cartesian-grid-vertical'),
+    ).toBeInTheDocument();
+
+    expect(
+      container.querySelector('.recharts-default-legend'),
+    ).toBeInTheDocument();
+
+    // expect there to be rectangles for all 3 data sets across both years
+    expect(
+      Array.from(container.querySelectorAll('.recharts-rectangle')).length,
+    ).toBe(6);
+  });
+
+  test('major axis can be hidden', () => {
+    const { container } = render(
+      <VerticalBarBlock
+        {...props}
+        axes={{
+          ...axes,
+          major: {
+            ...axes.major,
+            visible: false,
+          },
+        }}
+      />,
+    );
+
+    expect(
+      container.querySelector('.recharts-cartesian-axis.xAxis'),
+    ).not.toBeInTheDocument();
+  });
+
+  test('minor axis can be hidden', () => {
+    const { container } = render(
+      <VerticalBarBlock
+        {...props}
+        axes={{
+          ...axes,
+          minor: {
+            ...axes.minor,
+            visible: false,
+          },
+        }}
+      />,
+    );
+
+    expect(
+      container.querySelector('.recharts-cartesian-axis.yAxis'),
+    ).not.toBeInTheDocument();
+  });
+
+  test('both axes can be hidden', () => {
+    const { container } = render(
+      <VerticalBarBlock
+        {...props}
+        axes={{
+          ...axes,
+          minor: {
+            ...axes.minor,
+            visible: false,
+          },
+          major: {
+            ...axes.major,
+            visible: false,
+          },
+        }}
+      />,
+    );
+
+    expect(
+      container.querySelector('.recharts-cartesian-axis.yAxis'),
+    ).not.toBeInTheDocument();
+
+    expect(
+      container.querySelector('.recharts-cartesian-axis.xAxis'),
+    ).not.toBeInTheDocument();
+  });
+
+  test('can hide legend', () => {
+    const { container } = render(<VerticalBarBlock {...props} legend="none" />);
+
+    expect(
+      container.querySelector('.recharts-default-legend'),
+    ).not.toBeInTheDocument();
+  });
+
+  test('can stack data', () => {
+    const { container } = render(
+      <VerticalBarBlock {...props} stacked legend="none" />,
+    );
+
+    // Unsure how to tell stacked data apart, other than the snapshot
+
+    expect(container).toMatchSnapshot();
+
+    expect(
+      Array.from(container.querySelectorAll('.recharts-rectangle')).length,
+    ).toBe(6);
   });
 });

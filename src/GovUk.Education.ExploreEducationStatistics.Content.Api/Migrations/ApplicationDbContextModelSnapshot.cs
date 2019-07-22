@@ -940,6 +940,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
 
                     b.Property<Guid>("PublicationId");
 
+                    b.Property<DateTime?>("PublishScheduled");
+
                     b.Property<DateTime?>("Published");
 
                     b.Property<string>("ReleaseName");
@@ -953,7 +955,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                     b.Property<string>("Title")
                         .IsRequired();
 
-                    b.Property<Guid>("TypeId");
+                    b.Property<Guid?>("TypeId");
 
                     b.HasKey("Id");
 
@@ -1607,8 +1609,7 @@ Find out how and why these statistics are collected and published - [Secondary a
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseType", "Type")
                         .WithMany()
-                        .HasForeignKey("TypeId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("TypeId");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Topic", b =>
