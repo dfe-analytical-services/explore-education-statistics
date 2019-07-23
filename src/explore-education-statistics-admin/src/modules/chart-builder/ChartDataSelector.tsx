@@ -1,34 +1,71 @@
-import { ChartDefinition } from '@common/modules/find-statistics/components/charts/ChartFunctions';
-import React from 'react';
-import { FormFieldset, FormGroup, FormSelect } from '@common/components/form';
-import { DataBlockMetadata } from '@common/services/dataBlockService';
-import { SelectOption } from '@common/components/form/FormSelect';
+import ChartDataConfiguration from '@admin/modules/chart-builder/ChartDataConfiguration';
 import Button from '@common/components/Button';
+import { FormFieldset, FormGroup, FormSelect } from '@common/components/form';
+import { SelectOption } from '@common/components/form/FormSelect';
+import {
+  ChartCapabilities,
+  ChartDefinition,
+  colours,
+  generateKeyFromDataSet,
+  symbols,
+} from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import { DataBlockMetadata } from '@common/services/dataBlockService';
+import {
+  ChartDataSet,
+  DataSetConfiguration,
+} from '@common/services/publicationService';
+
+import React from 'react';
+
+import styles from './graph-builder.module.scss';
 
 export interface SelectedData {
-  indicator: string;
-  filters: string[];
+  dataSet: {
+    indicator: string;
+    filters: string[];
+  };
+  configuration: DataSetConfiguration;
 }
 
 interface Props {
   chartType: ChartDefinition;
   indicatorIds: string[];
   filterIds: string[][];
-  selectedData?: SelectedData[];
+  selectedData?: ChartDataSetAndConfiguration[];
   metaData: DataBlockMetadata;
   onDataAdded?: (data: SelectedData) => void;
   onDataRemoved?: (data: SelectedData, index: number) => void;
-  onDataUpdated?: (data: SelectedData[]) => void;
+  onDataChanged?: (data: SelectedData[]) => void;
+  capabilities: ChartCapabilities;
+}
+
+export interface ChartDataSetAndConfiguration {
+  dataSet: ChartDataSet;
+  configuration: DataSetConfiguration;
+}
+
+function dataName(
+  meta: DataBlockMetadata,
+  indicator: string,
+  filters: string[],
+) {
+  return [
+    meta.indicators[indicator].label,
+    '(',
+    ...filters.map(filter => meta.filters[filter].label),
+    ')',
+  ].join(' ');
 }
 
 const ChartDataSelector = ({
   indicatorIds,
   filterIds,
   metaData,
-  onDataUpdated,
   onDataRemoved,
   onDataAdded,
+  onDataChanged,
   selectedData = [],
+  capabilities,
 }: Props) => {
   const indicatorSelectOptions = [
     {
@@ -61,23 +98,22 @@ const ChartDataSelector = ({
   const [selectedIndicator, setSelectedIndicator] = React.useState<string>('');
   const [selectedFilters, setSelectedFilters] = React.useState<string>('');
 
-  const [selectedList, setSelectedList] = React.useState<SelectedData[]>([
-    ...selectedData,
-  ]);
+  const [selectedList, setSelectedList] = React.useState<
+    ChartDataSetAndConfiguration[]
+  >([...selectedData]);
 
   const removeSelected = (selected: SelectedData, index: number) => {
     const [removed] = selectedList.splice(index, 1);
     setSelectedList([...selectedList]);
 
     if (onDataRemoved) onDataRemoved(removed, index);
-    if (onDataUpdated) onDataUpdated(selectedList);
   };
 
   return (
     <React.Fragment>
       <FormGroup className="govuk-grid-row">
         <div className="govuk-grid-column-one-half">
-          <FormFieldset id="filter_fieldset" legend="Filters">
+          <FormFieldset id="filter_fieldset" legend="Filters" legendHidden>
             <FormSelect
               id="filters"
               name="filters"
@@ -90,7 +126,11 @@ const ChartDataSelector = ({
           </FormFieldset>
         </div>
         <div className="govuk-grid-column-one-half">
-          <FormFieldset id="indicator_fieldset" legend="Indicators">
+          <FormFieldset
+            id="indicator_fieldset"
+            legend="Indicators"
+            legendHidden
+          >
             <FormSelect
               id="indicators"
               name="indicators"
@@ -110,17 +150,34 @@ const ChartDataSelector = ({
             <Button
               type="button"
               onClick={() => {
-                const added = {
+                const dataSet = {
                   filters: selectedFilters.split(','),
                   indicator: selectedIndicator,
                 };
+
+                const added = {
+                  dataSet,
+                  configuration: {
+                    name: dataName(
+                      metaData,
+                      dataSet.indicator,
+                      dataSet.filters,
+                    ),
+                    value: generateKeyFromDataSet(dataSet),
+                    label: dataName(
+                      metaData,
+                      dataSet.indicator,
+                      dataSet.filters,
+                    ),
+                    colour: colours[selectedList.length % colours.length],
+                    symbol: symbols[selectedList.length % symbols.length],
+                  },
+                };
+
                 selectedList.push(added);
                 setSelectedList([...selectedList]);
 
                 if (onDataAdded) onDataAdded(added);
-                if (onDataUpdated) {
-                  onDataUpdated(selectedList);
-                }
               }}
             >
               Add data
@@ -141,24 +198,45 @@ const ChartDataSelector = ({
           </thead>
           <tbody>
             {selectedList.map((selected, index) => (
-              <tr key={`${selected.indicator}_${selected.filters.join(',')}`}>
-                <td className="govuk-table__cell">
-                  {selected.filters.map(_ => (
-                    <span key={_}>{metaData.filters[_].label}</span>
-                  ))}
-                </td>
-                <td className="govuk-table__cell">
-                  {metaData.indicators[selected.indicator].label}
-                </td>
-                <td className="govuk-table__cell">
-                  <Button
-                    type="button"
-                    onClick={() => removeSelected(selected, index)}
-                  >
-                    remove
-                  </Button>
-                </td>
-              </tr>
+              <React.Fragment
+                key={`${
+                  selected.dataSet.indicator
+                }_${selected.dataSet.filters.join(',')}`}
+              >
+                <tr className={styles.noCellBorder}>
+                  <td className="govuk-table__cell">
+                    {selected.dataSet.filters.map(_ => (
+                      <span key={_}>{metaData.filters[_].label}</span>
+                    ))}
+                  </td>
+                  <td className="govuk-table__cell">
+                    {metaData.indicators[selected.dataSet.indicator].label}
+                  </td>
+                  <td className="govuk-table__cell">
+                    <Button
+                      type="button"
+                      onClick={() => removeSelected(selected, index)}
+                      className="govuk-!-margin-bottom-0"
+                    >
+                      remove
+                    </Button>
+                  </td>
+                </tr>
+                <tr>
+                  <td colSpan={3}>
+                    <ChartDataConfiguration
+                      configuration={selected.configuration}
+                      capabilities={capabilities}
+                      onConfigurationChange={(value: DataSetConfiguration) => {
+                        selectedList[index].configuration = value;
+                        const newData = [...selectedList];
+                        setSelectedList(newData);
+                        if (onDataChanged) onDataChanged(newData);
+                      }}
+                    />
+                  </td>
+                </tr>
+              </React.Fragment>
             ))}
           </tbody>
         </table>

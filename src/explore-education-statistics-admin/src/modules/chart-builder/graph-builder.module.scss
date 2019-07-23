@@ -76,3 +76,33 @@
   flex-basis: 25%;
   padding: 0 2em;
 }
+
+.chartDataConfiguration {
+  padding: 0;
+}
+
+.chartDataLabelConfiguration {
+  display: flex;
+  width: 100%;
+
+  label {
+    margin-top: 10px !important;
+  }
+}
+
+.chartDataItem {
+  display: flex;
+  flex-grow: 1;
+  label {
+    margin-left: 0.75em;
+    margin-right: 0.5em;
+  }
+}
+
+.noCellBorder {
+  td {
+    border-bottom: 0;
+    padding-bottom: 0;
+    padding-top: 0;
+  }
+}
