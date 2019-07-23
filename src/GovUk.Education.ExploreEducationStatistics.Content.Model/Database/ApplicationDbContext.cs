@@ -195,6 +195,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<List<ContentSection>>(v));
+            modelBuilder.Entity<Release>()
+                .Property(b => b.NextReleaseDate)
+                .HasConversion(
+                    v => JsonConvert.SerializeObject(v),
+                    v => JsonConvert.DeserializeObject<PartialDate>(v));
 
             modelBuilder.Entity<Release>()
                 .Property(b => b.KeyStatistics)

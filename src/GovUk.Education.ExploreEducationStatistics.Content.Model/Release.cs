@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Newtonsoft.Json;
 using static System.DateTime;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.PartialDateUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
@@ -53,18 +52,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public int Order { get; set; }
 
-        private string _nextReleaseDate;
+        private PartialDate _nextReleaseDate;
 
-        public string NextReleaseDate
+        public PartialDate NextReleaseDate
         {
             get => _nextReleaseDate;
             set
             {
-                if (PartialDateValid(value))
+                if (value == null || value.IsValid())
                 {
                     _nextReleaseDate = value;
                 }
-                throw new FormatException("Must be of the form YYYY-MM-DD where each value can be missing");
+                throw new FormatException("The next release date is invalid");
             }
         }
 
