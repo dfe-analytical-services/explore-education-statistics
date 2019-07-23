@@ -36,7 +36,7 @@ const PublicationDataPage = () => {
               to="/prototypes/publication-create-new-absence-table"
               className="govuk-tabs__tab govuk-tabs__tab--selected"
             >
-              Create tables and charts
+              Create data blocks
             </Link>
           </li>
           <li className="govuk-tabs__list-item">
@@ -50,17 +50,17 @@ const PublicationDataPage = () => {
         </ul>
         <div className="govuk-tabs__panel">
           <h2 className="govuk-heading-">
-            Create tables and charts for this release
+            Create data blocks for this release
           </h2>
 
           <p className="govuk-body">
             Choose the data from your uploaded files then use filters to create
-            your tables and charts.
+            your <strong>data blocks</strong>.
           </p>
 
           <p className="govuk-body">
-            Once you've created your tables and charts, you can save and embed
-            them in this release.
+            Once you've created your <strong>data blocks</strong>, you can save
+            and embed them in this release.
           </p>
 
           <h2 className="govuk-heading-m">1. Select data file</h2>
@@ -341,7 +341,7 @@ const PublicationDataPage = () => {
                 to="publication-create-new-absence-table?status=step5"
                 className="govuk-button govuk-!-margin-right-5"
               >
-                Update table
+                Create table
               </Link>
               <Link
                 to="publication-create-new-absence-table?status=step3"
@@ -352,7 +352,7 @@ const PublicationDataPage = () => {
             </>
           )}
           <hr />
-          <h2 className="govuk-heading-m">5. View and save table</h2>
+          <h2 className="govuk-heading-m">5. View and save data blocks</h2>
           {['?status=step5'].includes(window.location.search) && (
             <div className="govuk-width-container">
               <PrototypeAdminExampleTables task="edit" />

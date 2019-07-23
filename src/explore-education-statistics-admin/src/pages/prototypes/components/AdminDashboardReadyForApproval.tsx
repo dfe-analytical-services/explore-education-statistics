@@ -13,7 +13,7 @@ const AdminDashboardReadyForApproval = ({ task, reviewType }: Props) => {
   const tagLabel =
     userContext.user &&
     userContext.user.permissions.includes('responsible statistician')
-      ? 'Ready for your higher review'
+      ? 'Ready for final sign off'
       : 'Ready for you to review';
 
   const checkStatus = window.location.search.includes('?status=readyApproval')

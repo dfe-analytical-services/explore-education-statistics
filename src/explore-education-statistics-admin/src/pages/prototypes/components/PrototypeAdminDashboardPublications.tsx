@@ -124,7 +124,7 @@ const PrototypeAdminDashboardPublications = () => {
                           userContext.user.permissions.includes(
                             'responsible statistician',
                           )
-                            ? 'Ready for your higher review'
+                            ? 'Ready for final sign-off'
                             : 'Ready to review'
                         }
                         review
