@@ -8,9 +8,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
     public class PartialDate
     {
-        private readonly Regex _yearRegex = new Regex("@([0-9]{4})?");
-        private readonly Regex _monthRegex = new Regex("@([0-9]{1,2})?");
-        private readonly Regex _dayRegex = new Regex("@([0-9]{1,2})?");
+        private readonly Regex _yearRegex = new Regex(@"^([0-9]{4})?$");
+        private readonly Regex _monthRegex = new Regex(@"^([0-9]{1,2})?$");
+        private readonly Regex _dayRegex = new Regex(@"^([0-9]{1,2})?$");
         private string _year;
         private string _month;
         private string _day;
@@ -67,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         private static bool EmptyOrBetween(string value, int lower, int upper)
         {
-            return IsNullOrEmpty(value) && Parse(value) >= lower && Parse(value) <= upper;
+            return IsNullOrEmpty(value) || (Parse(value) >= lower && Parse(value) <= upper);
         }
     }
 }

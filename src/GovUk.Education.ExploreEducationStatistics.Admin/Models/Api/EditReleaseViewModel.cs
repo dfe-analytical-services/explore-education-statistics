@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 {
     public class EditReleaseViewModel
     {
-        public Guid Id { get; set; } // Null on create
+        public Guid? Id { get; set; } // Null on create
         public Guid PublicationId { get; set; }
 
         public Guid ReleaseTypeId { get; set; }

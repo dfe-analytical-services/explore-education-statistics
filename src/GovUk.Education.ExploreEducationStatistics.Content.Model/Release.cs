@@ -63,7 +63,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
                 {
                     _nextReleaseDate = value;
                 }
-                throw new FormatException("The next release date is invalid");
+                else
+                {
+                    throw new FormatException("The next release date is invalid");
+                }
             }
         }
     }

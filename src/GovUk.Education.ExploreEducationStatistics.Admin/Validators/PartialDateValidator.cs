@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
     {
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            var partialDate = (PartialDate)validationContext.ObjectInstance;
+            var partialDate = (PartialDate)value;
             if (partialDate == null || partialDate.IsValid())
             {
                 return ValidationResult.Success;

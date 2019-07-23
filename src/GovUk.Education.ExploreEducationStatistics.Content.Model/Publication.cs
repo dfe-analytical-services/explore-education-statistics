@@ -40,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         
         public Release LatestRelease()
         {
-            return Releases.OrderBy(r => r.Order).Last();
+            return Releases?.OrderBy(r => r.Order).LastOrDefault();
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Linq;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -40,8 +41,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public ReleaseViewModel CreateRelease(EditReleaseViewModel createRelease)
         {
             // Get the current release order
-            var p = _publicationService.Get(createRelease.PublicationId);
-            var nextReleaseOrder = p.LatestRelease() != null ? p.LatestRelease().Order + 1 : 0;
+            var publication = _context.Publications.Include(p => p.Releases).Single(p => p.Id == createRelease.PublicationId);
+            var nextReleaseOrder = publication?.LatestRelease()?.Order ?? 0;
             
             var saved = _context.Releases.Add(new Release
             {
@@ -64,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             });
             
             var mapper = config.CreateMapper();
-            return mapper.Map<ReleaseViewModel>(saved);
+            return mapper.Map<ReleaseViewModel>(saved.Entity);
         }
         
         public static void LatestReleaseMapperConfig(IMemberConfigurationExpression<Release, ReleaseViewModel, bool> m)
