@@ -10,7 +10,6 @@ services:
     - "5001:5001"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ASPNETCORE_ConnectionStrings__StatisticsDb: Server=db;Database=master;User=SA;Password=Your_Password123;Connection Timeout=1000;
     depends_on:
     - db
     - data-storage
