@@ -20,9 +20,5 @@
     <ItemGroup>
       <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Api\GovUk.Education.ExploreEducationStatistics.Data.Api.csproj" />
     </ItemGroup>
-    
-    <ItemGroup>
-      <Folder Include="Converters" />
-    </ItemGroup>
 
 </Project>
