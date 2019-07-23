@@ -19,7 +19,7 @@ type Props = {
 
 const Page = ({
   title,
-  caption = 'Find, download and explore official Department for Education (DfE) statistics and data in England.',
+  caption = '',
   breadcrumbLabel = '',
   pageMeta,
   children = null,
