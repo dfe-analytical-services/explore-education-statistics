@@ -1102,34 +1102,38 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
     </a>
   </div>
 </details>
-<div class="editableContent  ">
-  <div class="editableButton">
-    <div class="editableButtonContent">
-      Click to edit this section
+<div>
+  <div class="editableContent  ">
+    <div class="editableButton">
+      <div class="editableButtonContent">
+        Click to edit this section
+      </div>
     </div>
-  </div>
-  <div>
-    <div classname="govuk-body">
-      <p>
-        test
-      </p>
+    <div>
+      <div classname="govuk-body">
+        <p>
+          test
+        </p>
+      </div>
     </div>
   </div>
 </div>
 `;
 
 exports[`EditableContentSubBlockRenderer Renders non-editable Markdown block correctly 1`] = `
-<div class>
-  <div class="editableButton">
-    <div class="editableButtonContent">
-      Click to edit this section
+<div>
+  <div class>
+    <div class="editableButton">
+      <div class="editableButtonContent">
+        Click to edit this section
+      </div>
     </div>
-  </div>
-  <div>
-    <div classname="govuk-body">
-      <p>
-        test
-      </p>
+    <div>
+      <div classname="govuk-body">
+        <p>
+          test
+        </p>
+      </div>
     </div>
   </div>
 </div>
