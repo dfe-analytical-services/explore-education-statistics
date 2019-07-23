@@ -1,4 +1,4 @@
-import { Release, ContentBlock } from '@common/services/publicationService';
+import { ContentBlock } from '@common/services/publicationService';
 import React, { Component } from 'react';
 import { EditableRelease } from '@admin/services/publicationService';
 import EditableContentSubBlockRenderer from './EditableContentSubBlockRenderer';

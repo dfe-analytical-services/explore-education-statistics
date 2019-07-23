@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import EditablePublicationPage from '@admin/pages/prototypes/components/EditablePublicationPage';
 import PrototypePublicationService from '@admin/pages/prototypes/components/PrototypePublicationService';
+import Link from '@admin/components/Link';
 import PrototypePage from './components/PrototypePage';
 import PrototypeAdminNavigation from './components/PrototypeAdminNavigation';
-import Link from '../../components/Link';
 
 interface State {
   editing: boolean;

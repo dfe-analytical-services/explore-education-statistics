@@ -66,7 +66,10 @@ Validate Contact page
     [Tags]  HappyPath
     user clicks link    Contact us
     user waits until page contains  Contact explore education statistics
-    user waits until page contains  If you need help and support or have a question about education statistics
+    user waits until page contains  General enquiries
+    user waits until page contains  explore.statistics@education.gov.uk
+    user waits until page contains  DfE Head of Profession for Statistics
+    user waits until page contains  hop.statistics@education.gov.uk
 
     user checks url contains    ${url}/contact
 
@@ -99,6 +102,7 @@ Validate Sitemap page
 Validate Feedback page
     [Tags]  HappyPath
     user clicks link  feedback
+    user selects newly opened window
     user waits until page contains      Explore Education Statistics - Beta banner feedback survey
 
     user checks url contains    www.smartsurvey.co.uk

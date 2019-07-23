@@ -1,19 +1,15 @@
-import React from 'react';
 import Details from '@common/components/Details';
 import {
-  FormGroup,
   FormFieldset,
-  FormTextInput,
+  FormGroup,
   FormSelect,
-  // FormRadioGroup,
+  FormTextInput,
 } from '@common/components/form';
-import Tabs from '@common/components/Tabs';
-import TabsSection from '@common/components/TabsSection';
+import React from 'react';
+import Link from '../../components/Link';
 import PrototypeAdminExampleTables from './components/PrototypeAdminExampleTables';
 import PrototypeAdminNavigation from './components/PrototypeAdminNavigation';
 import PrototypePage from './components/PrototypePage';
-import PrototypeReleasePageViewTables from './components/PrototypeReleasePageViewTables';
-import Link from '../../components/Link';
 
 const PublicationDataPage = () => {
   return (

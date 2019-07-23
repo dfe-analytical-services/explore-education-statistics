@@ -1,11 +1,10 @@
-import { Release } from '@common/services/publicationService';
-import React, { Component } from 'react';
+import React from 'react';
 import { LoginContext } from '@admin/components/Login';
 import { FormGroup, FormRadioGroup } from '@common/components/form';
+import Link from '@admin/components/Link';
 import PrototypePublicationService from '@admin/pages/prototypes/components/PrototypePublicationService';
 import EditablePublicationPage from '@admin/pages/prototypes/components/EditablePublicationPage';
 import PrototypePage from './components/PrototypePage';
-import Link from '../../components/Link';
 
 const PublicationPage = () => {
   const [status, setStatus] = React.useState('');

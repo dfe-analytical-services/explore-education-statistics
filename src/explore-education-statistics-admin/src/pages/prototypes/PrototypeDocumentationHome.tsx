@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from '../../components/Link';
+import Link from '@admin/components/Link';
 import PrototypePage from './components/PrototypePage';
 
 const BrowseReleasesPage = () => {

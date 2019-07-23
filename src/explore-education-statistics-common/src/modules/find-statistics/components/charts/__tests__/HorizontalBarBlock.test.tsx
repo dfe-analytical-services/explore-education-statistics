@@ -8,12 +8,15 @@ import testData from './__data__/testBlockData';
 
 jest.mock('recharts/lib/util/LogUtils');
 
-const props = testData.AbstractChartProps;
+const props = {
+  ...testData.AbstractChartProps,
+  width: 900,
+};
 const { axes } = props;
 
 describe('HorzontalBarBlock', () => {
   test('renders basic chart correctly', () => {
-    const { container } = render(<HorzontalBarBlock {...props} width={900} />);
+    const { container } = render(<HorzontalBarBlock {...props} />);
 
     expect(container).toMatchSnapshot();
 
@@ -34,6 +37,10 @@ describe('HorzontalBarBlock', () => {
     ).toBeInTheDocument();
     expect(
       container.querySelector('.recharts-cartesian-grid-vertical'),
+    ).toBeInTheDocument();
+
+    expect(
+      container.querySelector('.recharts-default-legend'),
     ).toBeInTheDocument();
 
     // expect there to be rectangles for all 3 data sets across both years
@@ -57,7 +64,7 @@ describe('HorzontalBarBlock', () => {
     );
 
     expect(
-      container.querySelector('.recharts-cartesian-axis.xAxis'),
+      container.querySelector('.recharts-cartesian-axis.yAxis'),
     ).not.toBeInTheDocument();
   });
 
@@ -76,7 +83,7 @@ describe('HorzontalBarBlock', () => {
     );
 
     expect(
-      container.querySelector('.recharts-cartesian-axis.yAxis'),
+      container.querySelector('.recharts-cartesian-axis.xAxis'),
     ).not.toBeInTheDocument();
   });
 
@@ -105,5 +112,82 @@ describe('HorzontalBarBlock', () => {
     expect(
       container.querySelector('.recharts-cartesian-axis.xAxis'),
     ).not.toBeInTheDocument();
+  });
+
+  test('can hide legend', () => {
+    const { container } = render(
+      <HorzontalBarBlock {...props} legend="none" />,
+    );
+
+    expect(
+      container.querySelector('.recharts-default-legend'),
+    ).not.toBeInTheDocument();
+  });
+
+  test('can stack data', () => {
+    const { container } = render(
+      <HorzontalBarBlock {...props} stacked legend="none" />,
+    );
+
+    // Unsure how to tell stacked data apart, other than the snapshot
+
+    expect(container).toMatchSnapshot();
+
+    expect(
+      Array.from(container.querySelectorAll('.recharts-rectangle')).length,
+    ).toBe(6);
+  });
+
+  test('can render major axis reference line', () => {
+    const { container } = render(
+      <HorzontalBarBlock
+        {...{
+          ...props,
+          axes: {
+            ...props.axes,
+            major: {
+              ...props.axes.major,
+              referenceLines: [
+                {
+                  label: 'hello',
+                  position: '2014/15',
+                },
+              ],
+            },
+          },
+        }}
+        legend="none"
+      />,
+    );
+
+    expect(
+      container.querySelector('.recharts-reference-line'),
+    ).toBeInTheDocument();
+  });
+  test('can render minor axis reference line', () => {
+    const { container } = render(
+      <HorzontalBarBlock
+        {...{
+          ...props,
+          axes: {
+            ...props.axes,
+            minor: {
+              ...props.axes.minor,
+              referenceLines: [
+                {
+                  label: 'hello',
+                  position: 0,
+                },
+              ],
+            },
+          },
+        }}
+        legend="none"
+      />,
+    );
+
+    expect(
+      container.querySelector('.recharts-reference-line'),
+    ).toBeInTheDocument();
   });
 });

@@ -1,6 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using GovUk.Education.ExploreEducationStatistics.Common.Converters;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using Newtonsoft.Json;
+using static System.DateTime;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
@@ -12,7 +17,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public string ReleaseName { get; set; }
 
+        /**
+         * The last date the release was published - this should be set when the PublishScheduled date is reached and
+         * the release is published.
+         */
         public DateTime? Published { get; set; }
+
+        // The date that the release is scheduled to be published - when this time is reached then the release should
+        // be published and the Published date set.
+        public DateTime? PublishScheduled { get; set; }
+
+        [NotMapped]
+        public bool Live => Published.HasValue && (DateTime.Compare(UtcNow, Published.Value) > 0);
 
         public string Slug { get; set; }
 
@@ -27,6 +43,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public List<ContentSection> Content { get; set; }
         
         public DataBlock KeyStatistics { get; set; }
+
+        public Guid? TypeId { get; set; }
+
+        public ReleaseType Type { get; set; }
+
+        [JsonConverter(typeof(TimeIdentifierJsonConverter))]
+        public TimeIdentifier TimePeriodCoverage { get; set; }
+        
+        public int Order { get; set; }
 
         protected bool Equals(Release other)
         {

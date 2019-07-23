@@ -23,8 +23,6 @@ import {
   FormGroup,
   FormFieldset,
   FormTextInput,
-  FormSelect,
-  FormRadioGroup,
 } from '@common/components/form';
 import AddComment from '@admin/pages/prototypes/components/PrototypeEditableContentAddComment';
 import ResolveComment from '@admin/pages/prototypes/components/PrototypeEditableContentResolveComment';

@@ -6,10 +6,12 @@ ENV ASPNETCORE_URLS=http://+:5010
 
 FROM microsoft/dotnet:2.2-sdk AS build
 WORKDIR /src
+COPY ["GovUk.Education.ExploreEducationStatistics.Common/GovUk.Education.ExploreEducationStatistics.Common.csproj", "GovUk.Education.ExploreEducationStatistics.Common/"]
 COPY ["GovUk.Education.ExploreEducationStatistics.Content.Model/GovUk.Education.ExploreEducationStatistics.Content.Model.csproj", "GovUk.Education.ExploreEducationStatistics.Content.Model/"]
 COPY ["GovUk.Education.ExploreEducationStatistics.Content.Api/GovUk.Education.ExploreEducationStatistics.Content.Api.csproj", "GovUk.Education.ExploreEducationStatistics.Content.Api/"]
 RUN dotnet restore "GovUk.Education.ExploreEducationStatistics.Content.Api/GovUk.Education.ExploreEducationStatistics.Content.Api.csproj"
 
+COPY ./GovUk.Education.ExploreEducationStatistics.Common ./GovUk.Education.ExploreEducationStatistics.Common
 COPY ./GovUk.Education.ExploreEducationStatistics.Content.Model ./GovUk.Education.ExploreEducationStatistics.Content.Model
 COPY ./GovUk.Education.ExploreEducationStatistics.Content.Api ./GovUk.Education.ExploreEducationStatistics.Content.Api
 

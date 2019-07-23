@@ -3,6 +3,7 @@ import findAllParents from '@common/lib/dom/findAllParents';
 import classNames from 'classnames';
 import React, { createElement, ReactNode } from 'react';
 import GoToTopLink from './GoToTopLink';
+import styles from './Accordion.module.scss';
 
 export type ToggleHandler = (open: boolean) => void;
 
@@ -50,7 +51,7 @@ const AccordionSection = ({
 
   return (
     <div
-      className={classNames(classes.section, className, {
+      className={classNames(classes.section, styles.section, className, {
         [classes.expanded]: open,
       })}
       role="presentation"

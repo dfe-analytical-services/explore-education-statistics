@@ -86,7 +86,7 @@ class PageSearchForm extends Component<PageSearchFormProps, State> {
   }
 
   private search = (value: string) => {
-    const { elementSelectors, minInput, id, onSearch } = this.props;
+    const { elementSelectors, minInput, onSearch } = this.props;
 
     const isAcronym = value === value.toUpperCase() && value.length > 1;
 

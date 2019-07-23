@@ -4,8 +4,6 @@ import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 // @ts-ignore
 import CKEditor from '@ckeditor/ckeditor5-react';
 import React, { ChangeEvent, createRef, Fragment } from 'react';
-import AddComment from './PrototypeEditableContentAddComment';
-import ResolveComment from './PrototypeEditableContentResolveComment';
 
 import styles from './PrototypeEditableContent.module.scss';
 
@@ -43,7 +41,7 @@ class PrototypeEditableContent extends React.Component<Props, State> {
   };
 
   public componentDidMount() {
-    const { content, reviewing, resolveComments } = this.props;
+    const { content } = this.props;
     const { editing } = this.state;
 
     this.setState({
@@ -89,12 +87,7 @@ class PrototypeEditableContent extends React.Component<Props, State> {
     }
   };
 
-  private renderEditableArea(
-    unsaved: boolean,
-    editable?: boolean,
-    reviewing?: boolean,
-    resolveComments?: boolean,
-  ) {
+  private renderEditableArea(unsaved: boolean, editable?: boolean) {
     return (
       <div>
         <div
@@ -117,11 +110,7 @@ class PrototypeEditableContent extends React.Component<Props, State> {
     );
   }
 
-  private renderEditor(
-    content: string,
-    reviewing?: boolean,
-    resolveComments?: boolean,
-  ) {
+  private renderEditor(content: string) {
     return (
       <div>
         <div className={styles.editableContentEditing}>
@@ -148,18 +137,13 @@ class PrototypeEditableContent extends React.Component<Props, State> {
   public render() {
     const { editing, content, unsaved } = this.state;
 
-    const { editable, reviewing, resolveComments } = this.props;
+    const { editable } = this.props;
 
     return (
       <Fragment>
         {editable && editing
-          ? this.renderEditor(content, reviewing, resolveComments)
-          : this.renderEditableArea(
-              unsaved,
-              editable,
-              reviewing,
-              resolveComments,
-            )}
+          ? this.renderEditor(content)
+          : this.renderEditableArea(unsaved, editable)}
       </Fragment>
     );
   }

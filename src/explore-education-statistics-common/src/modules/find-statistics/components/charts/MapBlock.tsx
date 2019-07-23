@@ -174,6 +174,13 @@ class MapBlock extends Component<MapProps, MapState> {
     type: 'map',
     name: 'Geographic',
 
+    capabilities: {
+      dataSymbols: false,
+      stackable: false,
+      lineStyle: false,
+      gridLines: false,
+    },
+
     data: [
       {
         type: 'geojson',
@@ -508,9 +515,7 @@ class MapBlock extends Component<MapProps, MapState> {
       if (feature.properties) {
         const content = Object.entries(feature.properties.measures).map(
           ([id, value]) =>
-            `${meta.indicators[id].label} : ${value}${
-              meta.indicators[id].unit
-            }`,
+            `${meta.indicators[id].label} : ${value}${meta.indicators[id].unit}`,
         );
 
         if (feature.id) {
@@ -700,7 +705,7 @@ class MapBlock extends Component<MapProps, MapState> {
               width: (width && `${width}px`) || '100%',
               height: `${height || 600}px`,
             }}
-            className={styles.map}
+            className={classNames(styles.map, 'dfe-print-break-avoid')}
             center={position}
             zoom={6.5}
             // minZoom={6.5}

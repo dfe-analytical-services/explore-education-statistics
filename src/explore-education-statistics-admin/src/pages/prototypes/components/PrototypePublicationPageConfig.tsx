@@ -2,11 +2,10 @@ import React, { useState } from 'react';
 import {
   FormGroup,
   FormFieldset,
-  FormTextInput,
   FormSelect,
   FormRadioGroup,
 } from '@common/components/form';
-import Link from '../../../components/Link';
+import Link from '@admin/components/Link';
 
 interface Props {
   sectionId?: string;
