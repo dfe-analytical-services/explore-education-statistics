@@ -180,14 +180,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             });
         }
 
-        private static Dictionary<long, string> GetMeasures(IReadOnlyList<string> line,
+        private static Dictionary<string, string> GetMeasures(IReadOnlyList<string> line,
             List<string> headers, IEnumerable<(Indicator Indicator, string Column)> indicators)
         {
             var columns = indicators.Select(tuple => tuple.Column);
             var values = CsvUtil.Values(line, headers, columns);
 
             return indicators.Zip(values, (tuple, value) => new {tuple, value})
-                .ToDictionary(item => item.tuple.Indicator.Id, item => item.value);
+                .ToDictionary(item => item.tuple.Indicator.Name, item => item.value);
         }
 
         private static Country GetCountry(IReadOnlyList<string> line, List<string> headers)

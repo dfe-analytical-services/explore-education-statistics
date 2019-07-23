@@ -37,6 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         {
             ConfigureAdditionalTypes(modelBuilder);
             ConfigureData(modelBuilder);
+            ConfigureIndicator(modelBuilder);
             ConfigureGeographicLevel(modelBuilder);
             ConfigureGeoJson(modelBuilder);
             ConfigureIndicatorFootnote(modelBuilder);
@@ -584,7 +585,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                 .Property(data => data.Measures)
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<Dictionary<long, string>>(v));
+                    v => JsonConvert.DeserializeObject<Dictionary<string, string>>(v));
         }
 
         private static void ConfigureTimePeriod(ModelBuilder modelBuilder)
@@ -637,6 +638,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                     builder => builder.HasIndex(localAuthorityDistrict => localAuthorityDistrict.Code));
         }
 
+        private static void ConfigureIndicator(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Indicator>()
+                .HasIndex(indicator => indicator.Name);
+        }
+        
         private static void ConfigureIndicatorFootnote(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<IndicatorFootnote>()

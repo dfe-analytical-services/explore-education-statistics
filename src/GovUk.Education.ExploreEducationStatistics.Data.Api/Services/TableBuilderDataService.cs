@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         private IEnumerable<FootnoteViewModel> GetFootnotes(ObservationQueryContext queryContext)
         {
-            return _footnoteService.GetFootnotes(queryContext.Indicators)
+            return _footnoteService.GetFootnotes(queryContext.SubjectId, queryContext.Indicators)
                 .Select(footnote => new FootnoteViewModel
                 {
                     Id = footnote.Key.Id,

@@ -66,14 +66,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 });
         }
 
-        private Dictionary<string, IndicatorMetaViewModel> GetIndicators(long subjectId, IEnumerable<long> indicators)
+        private Dictionary<string, IndicatorMetaViewModel> GetIndicators(long subjectId, IEnumerable<string> indicators)
         {
             var indicatorList = indicators == null || !indicators.Any()
                 ? _indicatorService.GetIndicators(subjectId)
                 : _indicatorService.GetIndicators(subjectId, indicators);
 
             return indicatorList.ToDictionary(
-                indicator => indicator.Id.ToString(),
+                indicator => indicator.Name,
                 indicator => _mapper.Map<IndicatorMetaViewModel>(indicator));
         }
 

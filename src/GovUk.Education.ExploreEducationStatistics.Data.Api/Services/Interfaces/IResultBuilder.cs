@@ -8,6 +8,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interface
         where TData : Observation
         where TResult : ObservationViewModel
     {
-        TResult BuildResult(TData observation, IEnumerable<long> indicators);
+        TResult BuildResult(TData observation, IEnumerable<string> indicators);
     }
 }

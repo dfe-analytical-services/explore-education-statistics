@@ -111,6 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                         {
                             IndicatorGroup = indicatorGroup,
                             Label = row.Label,
+                            Name = row.ColumnName,
                             Unit = row.IndicatorUnit
                         },
                         column: row.ColumnName

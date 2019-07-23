@@ -25,9 +25,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .Select(t => t.indicator);
         }
 
-        public IEnumerable<Indicator> GetIndicators(long subjectId, IEnumerable<long> indicatorIds)
+        public IEnumerable<Indicator> GetIndicators(long subjectId, IEnumerable<string> indicatorNames)
         {
-            if (indicatorIds == null)
+            if (indicatorNames == null)
             {
                 return new List<Indicator>();
             }
@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .Join(_context.IndicatorGroup, indicator => indicator.IndicatorGroupId,
                     indicatorGroup => indicatorGroup.Id,
                     (indicator, indicatorGroup) => new {indicator, indicatorGroup})
-                .Where(t => indicatorIds.Contains(t.indicator.Id))
+                .Where(t => indicatorNames.Contains(t.indicator.Name))
                 .Where(t => t.indicatorGroup.SubjectId == subjectId)
                 .Select(t => t.indicator);
         }

@@ -5,9 +5,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
     public static class QueryUtil
     {
-        public static Dictionary<long, string> FilterMeasures(
-            Dictionary<long, string> measures,
-            IEnumerable<long> indicators)
+        public static Dictionary<string, string> FilterMeasures(
+            Dictionary<string, string> measures,
+            IEnumerable<string> indicators)
         {
             return (
                 from kvp in measures

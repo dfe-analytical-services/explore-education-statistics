@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
         public long SubjectId { get; set; }
         public TimePeriodQuery TimePeriod { get; set; }
         public GeographicLevel? GeographicLevel { get; set; }
-        public IEnumerable<long> Indicators { get; set; }
+        public IEnumerable<string> Indicators { get; set; }
         public IEnumerable<string> Country { get; set; }
         public IEnumerable<string> Institution { get; set; }
         public IEnumerable<string> LocalAuthority { get; set; }
