@@ -251,8 +251,6 @@ const ChartAxisConfiguration = ({
               </tr>
             </tbody>
           </table>
-
-          <p> Restrict range of series (years only?) DFE-1009</p>
         </FormGroup>
       </FormFieldset>
     </div>

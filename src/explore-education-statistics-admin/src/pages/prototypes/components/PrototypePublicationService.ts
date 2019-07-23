@@ -1,5 +1,4 @@
 import { GeographicLevel } from '@common/services/dataBlockService';
-import { Release } from '@common/services/publicationService';
 import { EditableRelease } from '@admin/services/publicationService';
 
 const LOREM =

@@ -1,5 +1,4 @@
-import { Release } from '@common/services/publicationService';
-import React, { Component } from 'react';
+import React from 'react';
 import { LoginContext } from '@admin/components/Login';
 import { FormGroup, FormRadioGroup } from '@common/components/form';
 import Link from '@admin/components/Link';

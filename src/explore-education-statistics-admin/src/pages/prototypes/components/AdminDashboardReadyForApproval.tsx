@@ -7,7 +7,7 @@ interface Props {
   reviewType?: string;
 }
 
-const AdminDashboardReadyForApproval = ({ task, reviewType }: Props) => {
+const AdminDashboardReadyForApproval = ({ task }: Props) => {
   const userContext = React.useContext(LoginContext);
 
   const tagLabel =

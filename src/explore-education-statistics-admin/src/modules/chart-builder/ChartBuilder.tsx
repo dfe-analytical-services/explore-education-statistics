@@ -256,6 +256,12 @@ const ChartBuilder = ({ data }: Props) => {
         />
       </Details>
 
+      {renderedChartProps && (
+        <Details summary="Chart preview" open>
+          <ChartRenderer {...renderedChartProps} />
+        </Details>
+      )}
+
       {selectedChartType && (
         <React.Fragment>
           <Details summary="Add data to chart" open>
@@ -271,13 +277,7 @@ const ChartBuilder = ({ data }: Props) => {
             />
           </Details>
 
-          {renderedChartProps && (
-            <Details summary="Chart preview" open>
-              <ChartRenderer {...renderedChartProps} />
-            </Details>
-          )}
-
-          <Details summary="Configure chart" open>
+          <Details summary="Configure the chart">
             {selectedChartType.capabilities.stackable && (
               <FormCheckbox
                 id="stacked"
@@ -315,6 +315,7 @@ const ChartBuilder = ({ data }: Props) => {
                 name="legend-height"
                 label="Legend Height (blank for automatic)"
                 value={chartOptions.legendHeight}
+                width={5}
                 onChange={e => {
                   setChartOptions({
                     ...chartOptions,
@@ -325,7 +326,7 @@ const ChartBuilder = ({ data }: Props) => {
             )}
           </Details>
 
-          <Details summary="Data label options" open>
+          <Details summary="Configure the look of each data set">
             Update the configuration used for each dataset in the chart from the
             default
             <div className={styles.axesOptions}>
@@ -344,7 +345,7 @@ const ChartBuilder = ({ data }: Props) => {
             </div>
           </Details>
 
-          <Details summary="Axes configuration">
+          <Details summary="Configure each axis">
             <div className={styles.axesOptions}>
               {Object.entries(axesConfiguration).map(([key, axis]) => (
                 <ChartAxisConfiguration
