@@ -136,6 +136,7 @@ class TableToolPage extends Component<Props, State> {
 
     this.setState({
       publication,
+      footnotes: [],
       subjects,
       subjectName: '',
       tableData: [],
@@ -237,7 +238,11 @@ class TableToolPage extends Component<Props, State> {
       return;
     }
 
-    const { timePeriodRange, result } = await tableBuilderService.getTableData({
+    const {
+      footnotes,
+      timePeriodRange,
+      result,
+    } = await tableBuilderService.getTableData({
       ...mapValues(locations, locationLevel =>
         locationLevel.map(location => location.value),
       ),
@@ -273,6 +278,7 @@ class TableToolPage extends Component<Props, State> {
         timePeriod => new TimePeriod(timePeriod),
       ),
       tableData: result,
+      footnotes,
     });
   };
 
