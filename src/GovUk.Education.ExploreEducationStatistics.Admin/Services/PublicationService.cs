@@ -7,6 +7,7 @@ using System.Linq;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService; 
 using UserId = System.Guid;
 using TopicId = System.Guid;
 
@@ -45,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 cfg.CreateMap<Release, ReleaseViewModel>()
                     .ForMember(
                         dest => dest.LatestRelease,
-                        m => m.MapFrom(r => r.Publication.LatestRelease().Id == r.Id));
+                        LatestReleaseMapperConfig);
                 cfg.CreateMap<Methodology, MethodologyViewModel>();
             });
 

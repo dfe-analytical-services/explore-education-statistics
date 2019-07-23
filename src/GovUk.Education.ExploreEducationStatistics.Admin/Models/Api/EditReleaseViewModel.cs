@@ -1,7 +1,7 @@
 using System;
-using System.ComponentModel.DataAnnotations;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 {
@@ -16,10 +16,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         
         public DateTime? PublishScheduled { get; set; }
         
-        [Required]
-        public string  NextReleaseExpected { get; set; }
-
         [PartialDateValidator]
+        public PartialDate NextReleaseExpected { get; set; }
+        
         public string ReleaseName { get; set; }
     }
 }

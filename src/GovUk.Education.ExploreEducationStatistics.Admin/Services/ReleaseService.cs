@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
@@ -17,6 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public ReleaseService(ApplicationDbContext context, IPublicationService publicationService)
         {
             _context = context;
+            _publicationService = publicationService;
         }
 
         public Release Get(Guid id)
@@ -41,7 +43,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var p = _publicationService.Get(createRelease.PublicationId);
             var nextReleaseOrder = p.LatestRelease() != null ? p.LatestRelease().Order + 1 : 0;
             
-            
             var saved = _context.Releases.Add(new Release
             {
                 Id = Guid.NewGuid(),
@@ -51,10 +52,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 TypeId = createRelease.ReleaseTypeId,
                 TimePeriodCoverage = createRelease.TimeIdentifier,
                 PublishScheduled = createRelease.PublishScheduled,
-                ReleaseName = createRelease.ReleaseName
+                ReleaseName = createRelease.ReleaseName,
+                NextReleaseDate = createRelease.NextReleaseExpected
             });
-
-            return null;
+            
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Release, ReleaseViewModel>()
+                    .ForMember(dest => dest.LatestRelease,
+                        LatestReleaseMapperConfig);
+            });
+            
+            var mapper = config.CreateMapper();
+            return mapper.Map<ReleaseViewModel>(saved);
+        }
+        
+        public static void LatestReleaseMapperConfig(IMemberConfigurationExpression<Release, ReleaseViewModel, bool> m)
+        {
+            m.MapFrom(r => r.Publication.LatestRelease().Id == r.Id);
         }
         
     }

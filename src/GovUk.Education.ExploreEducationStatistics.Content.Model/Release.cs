@@ -66,6 +66,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
                 throw new FormatException("The next release date is invalid");
             }
         }
-
     }
 }

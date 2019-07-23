@@ -8,12 +8,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
     {
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            var partialDate = (string)validationContext.ObjectInstance;
-            if (PartialDateUtil.PartialDateValid(partialDate))
+            var partialDate = (PartialDate)validationContext.ObjectInstance;
+            if (partialDate == null || partialDate.IsValid())
             {
                 return ValidationResult.Success;
             }
-            return new ValidationResult("Must be of the form YYYY-MM-DD where each value can be missing");
+            return new ValidationResult("Partial date not valid");
         }
     }
 }
