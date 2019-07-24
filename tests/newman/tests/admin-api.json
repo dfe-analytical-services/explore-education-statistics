@@ -1,0 +1,93 @@
+{
+	"info": {
+		"_postman_id": "f9350a72-55c4-43ec-9651-bb950caa0dd3",
+		"name": "DfE Admin API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GET contacts",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "2db4ed0b-6eeb-40b6-914f-f1692eb248fb",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+							"",
+							"pm.test(\"Team name should be correct\", function () { ",
+							"    pm.expect(pm.response.json()[0].teamName).to.equal(\"Simon's Team\"); ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{admin_api_url}}/contacts",
+					"host": [
+						"{{admin_api_url}}"
+					],
+					"path": [
+						"contacts"
+					]
+				},
+				"description": "Returns all contacts"
+			},
+			"response": []
+		},
+		{
+			"name": "GET Release Types",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "22802122-a311-43fe-a1b0-a50b371ef289",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+							"",
+							"pm.test(\"Fields are present\", function () {",
+							"    pm.expect(pm.response.to.have.jsonBody(\"title\"));",
+							"});",
+							"",
+							"pm.test(\"Ad Hoc should be present in the results\", function () { ",
+							"    pm.expect(pm.response.json()[0].teamName).to.equal(\"Ad Hoc\"); ",
+							"});",
+							"",
+							"pm.test(\"Number of release types should be correct\", function () {",
+							"    pm.expect(pm.response.json().subjects.length).to.equal(2);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{admin_api_url}}/meta/releasetypes",
+					"host": [
+						"{{admin_api_url}}"
+					],
+					"path": [
+						"meta",
+						"releasetypes"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
