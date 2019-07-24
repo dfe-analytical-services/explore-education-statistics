@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         // POST api/contacts
         [HttpPost("publication/{publicationId}/releases")]
         [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
-        public ActionResult<ReleaseViewModel> CreateRelease(EditReleaseViewModel release)
+        public ActionResult<ReleaseViewModel> CreateRelease(CreateReleaseViewModel release)
         {
             if (ModelState.IsValid)
             {

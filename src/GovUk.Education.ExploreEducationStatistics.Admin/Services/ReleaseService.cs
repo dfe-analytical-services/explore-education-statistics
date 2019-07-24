@@ -41,12 +41,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         // TODO Authorisation will be required when users are introduced
-        public ReleaseViewModel CreateRelease(EditReleaseViewModel createRelease)
+        public ReleaseViewModel CreateRelease(CreateReleaseViewModel createRelease)
         {
             // Get the current release order
             var publication = _context.Publications.Include(p => p.Releases)
                 .Single(p => p.Id == createRelease.PublicationId);
             var nextReleaseOrder = publication?.LatestRelease()?.Order + 1 ?? 0;
+
 
             var saved = _context.Releases.Add(new Release
             {

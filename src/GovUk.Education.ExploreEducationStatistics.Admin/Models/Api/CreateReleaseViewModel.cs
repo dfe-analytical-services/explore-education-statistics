@@ -6,9 +6,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 {
-    public class EditReleaseViewModel
+    public class CreateReleaseViewModel
     {
-        public Guid? Id { get; set; } // Null on create
         public Guid PublicationId { get; set; }
 
         public Guid ReleaseTypeId { get; set; }
@@ -22,5 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
      
         [RegularExpression(@"^([0-9]{4})?$")]
         public string ReleaseName { get; set; }
+
+        public Guid? PreviousReleaseAsBase { get; set; }
     }
 }
