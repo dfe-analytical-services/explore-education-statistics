@@ -1,21 +1,14 @@
 import ReactGA from 'react-ga';
-import {
-  getCookies,
-  deleteCookies,
-  cookieSettingsCookieName,
-} from '@frontend/services/cookiesService';
 
 let initialised = false;
 
-const googleAnalyticsCookies = ['_ga', '_gid', '_gat'];
+export const googleAnalyticsCookies = ['_ga', '_gid', '_gat'];
 
 export function initGA() {
   if (
     process.env.GA_TRACKING_ID !== undefined &&
     process.env.GA_TRACKING === 'true' &&
-    !initialised &&
-    // @ts-ignore
-    getCookies()[cookieSettingsCookieName]
+    !initialised
   ) {
     ReactGA.initialize(process.env.GA_TRACKING_ID);
     initialised = true;
@@ -34,7 +27,6 @@ export function disableGA() {
   console.log('disableGA');
   // @ts-ignore
   window[`ga-disable-${process.env.GA_TRACKING_ID}`] = true;
-  deleteCookies(googleAnalyticsCookies);
 }
 
 export const logPageView = () => {

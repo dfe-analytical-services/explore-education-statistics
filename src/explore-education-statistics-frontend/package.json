@@ -8,6 +8,7 @@
     "applicationinsights": "^1.4.0",
     "axios": "^0.19.0",
     "classnames": "^2.2.6",
+    "cookie": "^0.4.0",
     "core-js": "^2.6.5",
     "cross-env": "^5.2.0",
     "cross-fetch": "^3.0.4",

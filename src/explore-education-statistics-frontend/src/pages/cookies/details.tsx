@@ -1,9 +1,6 @@
 import Page from '@frontend/components/Page';
 import React from 'react';
-import {
-  bannerSeenCookieName,
-  cookieSettingsCookieName,
-} from '@frontend/services/cookiesService';
+import CookieMap from '@frontend/services/cookieMap';
 import Link from '@frontend/components/Link';
 
 function CookiesPage() {
@@ -140,12 +137,16 @@ function CookiesPage() {
           </thead>
           <tbody className="govuk-table__body">
             <tr className="govuk-table__row">
-              <td className="govuk-table__cell">{bannerSeenCookieName}</td>
+              <td className="govuk-table__cell">
+                {CookieMap.bannerSeenCookie.name}
+              </td>
               <td className="govuk-table__cell">
                 Saves a message to let us know that you’ve seen our cookie
                 message
               </td>
-              <td className="govuk-table__cell">1 month</td>
+              <td className="govuk-table__cell">
+                {CookieMap.bannerSeenCookie.duration}
+              </td>
             </tr>
           </tbody>
         </table>
@@ -173,11 +174,15 @@ function CookiesPage() {
           </thead>
           <tbody className="govuk-table__body">
             <tr className="govuk-table__row">
-              <td className="govuk-table__cell">{cookieSettingsCookieName}</td>
+              <td className="govuk-table__cell">
+                {CookieMap.disableGACookie.name}
+              </td>
               <td className="govuk-table__cell">
                 Saves cookie settings, so they remain upon return
               </td>
-              <td className="govuk-table__cell">1 month</td>
+              <td className="govuk-table__cell">
+                {CookieMap.disableGACookie.duration}
+              </td>
             </tr>
           </tbody>
         </table>
