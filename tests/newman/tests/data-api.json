@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "a184bb8e-f73e-415f-9065-b5192d66d79f",
+		"_postman_id": "a754cb44-9e41-48f2-b844-4d025c268b5d",
 		"name": "DfE Data API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -2570,16 +2570,22 @@
 									"response": []
 								},
 								{
-									"name": "Tablebuilder - Absence by characteristic - Country - England",
+									"name": "Tablebuilder - Absence by characteristic - England",
 									"event": [
 										{
 											"listen": "test",
 											"script": {
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
-													"respJson = pm.response.json()",
+													"respJson = pm.response.json();",
 													"",
 													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(16); });",
+													"",
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Country\");",
+													"    }",
+													"});",
 													"",
 													"pm.test(\"First result should have correct fields\", function () {",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].filters\"));",
@@ -2605,7 +2611,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Country\",\n    \"country\": [\n    \t\"E92000001\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"country\": [\n    \t\"E92000001\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2681,7 +2687,7 @@
 									"response": []
 								},
 								{
-									"name": "Tablebuilder - Absence by characteristic - LA - Wandsworth",
+									"name": "Tablebuilder - Absence by characteristic - Wandsworth",
 									"event": [
 										{
 											"listen": "test",
@@ -2702,6 +2708,12 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].location\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].measures\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].timePeriod\"));",
+													"});",
+													"",
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Local_Authority\");",
+													"    }",
 													"});"
 												],
 												"type": "text/javascript"
@@ -2720,7 +2732,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority\",\n    \"localAuthority\": [\n    \t\"E09000032\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"localAuthority\": [\n    \t\"E09000032\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2798,14 +2810,16 @@
 									"response": []
 								},
 								{
-									"name": "Tablebuilder - Absence by characteristic - LA district - Adur",
+									"name": "Tablebuilder - Absence by characteristic - Adur",
 									"event": [
 										{
 											"listen": "test",
 											"script": {
 												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
 												"exec": [
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(11); });",
+													"var respJson = pm.response.json();",
+													"",
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(11); });",
 													"",
 													"pm.test(\"First result should have correct fields\", function () {",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].filters\"));",
@@ -2813,6 +2827,12 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].location\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].measures\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].timePeriod\"));",
+													"});",
+													"",
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Local_Authority_District\");",
+													"    }",
 													"});"
 												],
 												"type": "text/javascript"
@@ -2902,7 +2922,6 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
 													"});",
 													"",
-													"",
 													"pm.test(\"timePeriodRange length should be correct\", function () {",
 													"    pm.expect(respJson.timePeriodRange.length).to.equal(11); ",
 													"});",
@@ -2954,7 +2973,7 @@
 									"response": []
 								},
 								{
-									"name": "Tablebuilder - Absence by geographic level - Country - 200607 - all schoolTypes",
+									"name": "Tablebuilder - Absence by geographic level - England - 200607 - all schoolTypes",
 									"event": [
 										{
 											"listen": "test",
@@ -3139,7 +3158,7 @@
 									"response": []
 								},
 								{
-									"name": "Tablebuilder - Absence by geographic level - Region - Inner London",
+									"name": "Tablebuilder - Absence by geographic level - Inner London",
 									"event": [
 										{
 											"listen": "test",
@@ -3159,7 +3178,13 @@
 													"    pm.expect(respJson.timePeriodRange.length).to.equal(11); ",
 													"});",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(33); });"
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(33); });",
+													"",
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Region\");",
+													"    }",
+													"});"
 												],
 												"type": "text/javascript"
 											}
@@ -3177,7 +3202,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"Region\",\n    \"region\": [\n\t\t\"E13000001\"\n\t],\n    \"timePeriod\": {\n    \t\"startYear\": 2006,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t{{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 2,\n    \"region\": [\n\t\t\"E13000001\"\n\t],\n    \"timePeriod\": {\n    \t\"startYear\": 2006,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t{{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3199,6 +3224,8 @@
 											"script": {
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
+													"var respJson = pm.response.json();",
+													"",
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
 													"pm.test(\"Compulsory fields are present\", function () {",
@@ -3206,12 +3233,17 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
 													"});",
 													"",
-													"",
 													"pm.test(\"timePeriodRange length should be correct\", function () {",
 													"    pm.expect(respJson.timePeriodRange.length).to.equal(1); ",
 													"});",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(938); });"
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(938); });",
+													"",
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"School\");",
+													"    }",
+													"});"
 												],
 												"type": "text/javascript"
 											}
@@ -3251,6 +3283,8 @@
 											"script": {
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
+													"var respJson = pm.response.json();",
+													"",
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
 													"pm.test(\"Compulsory fields are present\", function () {",
@@ -3258,7 +3292,13 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
 													"});",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(60); });"
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(60); });",
+													"",
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"School\");",
+													"    }",
+													"});"
 												],
 												"type": "text/javascript"
 											}
@@ -3298,11 +3338,19 @@
 											"script": {
 												"id": "2c8281ce-e56c-4542-9cb2-b90dcac8f445",
 												"exec": [
+													"var respJson = pm.response.json();",
+													"",
 													"pm.test(\"Status code is 200\", function () {",
 													"    pm.response.to.have.status(200);",
 													"});",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(17838); });"
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(17838); });",
+													"",
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"School\");",
+													"    }",
+													"});"
 												],
 												"type": "text/javascript"
 											}
@@ -4654,13 +4702,15 @@
 									"response": []
 								},
 								{
-									"name": "Data - Absence by characteristic - LA - Wandsworth",
+									"name": "Data - Absence by characteristic - Wandsworth",
 									"event": [
 										{
 											"listen": "test",
 											"script": {
 												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
 												"exec": [
+													"var respJson = pm.response.json();",
+													"",
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
 													"pm.test(\"Should have correct fields\", function () {",
@@ -4673,14 +4723,20 @@
 													"});",
 													"",
 													"pm.test(\"Number of metaData filters should be correct\", function () {",
-													"   pm.expect(Object.keys(pm.response.json().metaData.filters).length).to.equal(4); ",
+													"   pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(4); ",
 													"});",
 													"",
 													"pm.test(\"Number of metaData locations should be correct\", function () {",
-													"   pm.expect(Object.keys(pm.response.json().metaData.locations).length).to.equal(3); ",
+													"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(3); ",
 													"});",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(pm.response.json().result.length).to.equal(4); });"
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(4); });",
+													"",
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Local_Authority\");",
+													"    }",
+													"});"
 												],
 												"type": "text/javascript"
 											}
@@ -4791,7 +4847,7 @@
 									"response": []
 								},
 								{
-									"name": "Data - Absence by characteristic - LA district - Hartlepool",
+									"name": "Data - Absence by characteristic - Hartlepool",
 									"event": [
 										{
 											"listen": "test",
@@ -4864,7 +4920,7 @@
 									"response": []
 								},
 								{
-									"name": "Data - Absence by characteristic - LA district - Adur",
+									"name": "Data - Absence by characteristic - Adur",
 									"event": [
 										{
 											"listen": "test",
@@ -4939,7 +4995,7 @@
 									"response": []
 								},
 								{
-									"name": "Data - Absence by characteristic - LA district Adur + LA Wandsworth",
+									"name": "Data - Absence by characteristic - Adur (LAD) + Wandsworth (LA)",
 									"event": [
 										{
 											"listen": "test",
