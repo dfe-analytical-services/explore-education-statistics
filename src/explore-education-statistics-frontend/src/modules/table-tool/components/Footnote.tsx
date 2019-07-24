@@ -10,10 +10,7 @@ const Footnote = ({ content }: FootnoteProps) => {
   const footnoteList = content.map(function createFootnotes(footnotes) {
     return (
       <p key={footnotes.id} className="govuk-body-s govuk-!-margin-bottom-1">
-        <span className="govuk-!-font-weight-bold">
-          {footnotes.indicators.join(' ')}
-        </span>{' '}
-        - {footnotes.label}
+        {footnotes.label}
       </p>
     );
   });
