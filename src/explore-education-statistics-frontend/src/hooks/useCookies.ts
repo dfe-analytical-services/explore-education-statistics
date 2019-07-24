@@ -4,17 +4,7 @@ import {
   disableGA,
   googleAnalyticsCookies,
 } from '@frontend/services/googleAnalyticsService';
-
-function daysFromNow(days = 0) {
-  const result = new Date();
-  if (!days) {
-    // Add one month
-    result.setMonth([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0][result.getMonth()]);
-  } else {
-    result.setDate(result.getDate() + days);
-  }
-  return result;
-}
+import { addMonths } from 'date-fns';
 
 interface Cookie {
   name: string;
@@ -30,12 +20,12 @@ interface CookieMap {
 export const cookieMap: CookieMap = {
   bannerSeen: {
     name: 'ees_banner_seen',
-    expires: daysFromNow(),
+    expires: addMonths(new Date(), 1),
     duration: '1 month',
   },
   disableGA: {
     name: 'ees_disable_google_analytics',
-    expires: daysFromNow(),
+    expires: addMonths(new Date(), 1),
     duration: '1 month',
   },
 };
