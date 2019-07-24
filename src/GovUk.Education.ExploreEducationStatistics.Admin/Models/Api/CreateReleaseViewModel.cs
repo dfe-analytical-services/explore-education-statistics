@@ -22,6 +22,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         [RegularExpression(@"^([0-9]{4})?$")]
         public string ReleaseName { get; set; }
 
-        public Guid? PreviousReleaseAsBase { get; set; }
+        public Guid? TemplateReleaseId { get; set; }
     }
 }
