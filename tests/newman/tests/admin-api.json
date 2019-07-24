@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "f9350a72-55c4-43ec-9651-bb950caa0dd3",
+		"_postman_id": "1775624b-d484-4c2c-a00e-ae96fd7f2335",
 		"name": "DfE Admin API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -53,16 +53,10 @@
 						"exec": [
 							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 							"",
-							"pm.test(\"Fields are present\", function () {",
-							"    pm.expect(pm.response.to.have.jsonBody(\"title\"));",
-							"});",
+							"pm.test(\"Should return 2 results\", function () { pm.expect(pm.response.json().length).to.equal(2); });",
 							"",
 							"pm.test(\"Ad Hoc should be present in the results\", function () { ",
-							"    pm.expect(pm.response.json()[0].teamName).to.equal(\"Ad Hoc\"); ",
-							"});",
-							"",
-							"pm.test(\"Number of release types should be correct\", function () {",
-							"    pm.expect(pm.response.json().subjects.length).to.equal(2);",
+							"    pm.expect(pm.response.json()[0].title).to.equal(\"Ad Hoc\"); ",
 							"});"
 						],
 						"type": "text/javascript"
