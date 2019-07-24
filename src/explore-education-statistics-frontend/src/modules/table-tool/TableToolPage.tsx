@@ -155,11 +155,13 @@ class TableToolPage extends Component<Props, State> {
     });
   };
 
-  private handleLocationFiltersFormSubmit: LocationFiltersFormSubmitHandler = async values => {
+  private handleLocationFiltersFormSubmit: LocationFiltersFormSubmitHandler = async ({
+    locations,
+  }) => {
     const { subjectId } = this.state;
 
     const subjectMeta = await tableBuilderService.filterPublicationSubjectMeta({
-      ...values,
+      ...locations,
       subjectId,
     });
 
@@ -169,11 +171,11 @@ class TableToolPage extends Component<Props, State> {
         timePeriod: subjectMeta.timePeriod,
       },
       locations: mapValuesWithKeys(
-        values.locations,
-        (locationLevel, locations) =>
-          locations
+        locations,
+        (locationLevel, locationOptions) =>
+          locationOptions
             .map(location =>
-              subjectMeta.locations[locationLevel].options.find(
+              prevState.subjectMeta.locations[locationLevel].options.find(
                 option => option.value === location,
               ),
             )
