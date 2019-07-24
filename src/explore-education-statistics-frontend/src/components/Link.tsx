@@ -31,7 +31,11 @@ const Link = ({
 }: LinkProps) => {
   const handleAnalytics = () => {
     if (analytics) {
-      logEvent(analytics.category, analytics.action, window.location.pathname);
+      logEvent(
+        analytics.category,
+        analytics.action,
+        analytics.label ? analytics.label : window.location.pathname,
+      );
     }
   };
 

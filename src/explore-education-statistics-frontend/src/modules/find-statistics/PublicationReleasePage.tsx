@@ -148,6 +148,7 @@ class PublicationReleasePage extends Component<Props> {
                         analytics={{
                           category: 'Downloads',
                           action: `Release page ${name} file downloaded`,
+                          label: `File URL: /api/download/${path}`,
                         }}
                       >
                         {name}
