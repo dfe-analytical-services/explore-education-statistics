@@ -1,9 +1,8 @@
 import React from 'react';
 import { NextContext } from 'next';
 import cookie from 'cookie';
-import { useCookies } from 'react-cookie';
+import { useCookies, cookieMap } from '@frontend/hooks/useCookies';
 import ButtonText from '@common/components/ButtonText';
-import CookieMap from '@frontend/services/cookieMap';
 import useMounted from 'explore-education-statistics-common/src/hooks/useMounted';
 import styles from './CookieBanner.module.scss';
 
@@ -12,18 +11,14 @@ interface Props {
 }
 
 function CookieBanner({ cookies }: Props) {
-  const [liveCookies, setCookie] = useCookies();
+  const { getCookie, setBannerSeenCookie, setGACookie } = useCookies();
 
   const { isMounted } = useMounted();
 
   const acceptCookies = () => {
-    setCookie(CookieMap.bannerSeenCookie.name, true, {
-      expires: CookieMap.bannerSeenCookie.expires,
-    });
-    if (liveCookies[CookieMap.disableGACookie.name] === undefined) {
-      setCookie(CookieMap.disableGACookie.name, false, {
-        expires: CookieMap.disableGACookie.expires,
-      });
+    setBannerSeenCookie(true);
+    if (getCookie('disableGA') === undefined) {
+      setGACookie(false);
     }
   };
 
@@ -50,11 +45,15 @@ function CookieBanner({ cookies }: Props) {
   }
 
   if (isMounted) {
-    return liveCookies[CookieMap.bannerSeenCookie.name] === 'true'
-      ? null
-      : render();
+    console.log(getCookie('bannerSeen'));
+    return getCookie('bannerSeen') === 'true' ? null : render();
   }
-  return cookies[CookieMap.bannerSeenCookie.name] === 'true' ? null : render();
+  /* console.log(
+    cookies,
+    cookieMap.bannerSeen.name,
+    cookies[cookieMap.bannerSeen.name],
+  ); */
+  return cookies[cookieMap.bannerSeen.name] === 'true' ? null : render();
 }
 
 CookieBanner.getInitialProps = (props: NextContext) => {

@@ -13,8 +13,7 @@ import { FormikProps } from 'formik';
 import Yup from '@common/lib/validation/yup';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import { NextContext } from 'next';
-import CookieMap from '@frontend/services/cookieMap';
-import { useCookies } from 'react-cookie';
+import { useCookies, cookieMap } from '@frontend/hooks/useCookies';
 import styles from './CookiesIndexPage.module.scss';
 
 interface FormValues {
@@ -26,18 +25,14 @@ interface Props {
 }
 
 function CookiesIndexPage({ cookies = {} }: Props) {
-  const [liveCookies, setCookie] = useCookies();
   const [submitted, setSubmitted] = useState();
+  const { setBannerSeenCookie, setGACookie } = useCookies();
 
   const submitCookieSettings = (values: any) => {
     setSubmitted(true);
     window.scrollTo(0, 0);
-    setCookie(CookieMap.bannerSeenCookie.name, true, {
-      expires: CookieMap.bannerSeenCookie.expires,
-    });
-    setCookie(CookieMap.disableGACookie.name, values.googleAnalytics !== 'on', {
-      expires: CookieMap.disableGACookie.expires,
-    });
+    setBannerSeenCookie(true);
+    setGACookie(values.googleAnalytics !== 'on');
   };
 
   return (
@@ -81,7 +76,7 @@ function CookiesIndexPage({ cookies = {} }: Props) {
         enableReinitialize
         initialValues={{
           googleAnalytics:
-            cookies[CookieMap.disableGACookie.name] === 'true' ? 'off' : 'on',
+            cookies[cookieMap.disableGA.name] === 'true' ? 'off' : 'on',
         }}
         onSubmit={values => {
           submitCookieSettings(values);
