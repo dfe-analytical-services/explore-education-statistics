@@ -127,8 +127,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
                         releases[1], filesReleaseB
                     }
                 };
-
-                CollectionAssert.AreEquivalent(expected.ToList(), model.ToList());
+                
+                CollectionAssert.AreEquivalent(expected.ToDictionary(p => p.Key.Id, p => p.Value),
+                    model.ToDictionary(p => p.Key.Id, p => p.Value));
             }
         }
     }

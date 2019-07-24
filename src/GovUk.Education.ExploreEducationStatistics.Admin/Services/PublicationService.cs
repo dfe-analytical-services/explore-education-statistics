@@ -7,7 +7,7 @@ using System.Linq;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService; 
+using static GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
 using UserId = System.Guid;
 using TopicId = System.Guid;
 
@@ -40,25 +40,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         // TODO it maybe necessary to add authorisation to this method
         public List<PublicationViewModel> GetByTopicAndUser(TopicId topicId, UserId userId)
         {
-            var config = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateMap<Publication, PublicationViewModel>();
-                cfg.CreateMap<Release, ReleaseViewModel>()
-                    .ForMember(
-                        dest => dest.LatestRelease,
-                        LatestReleaseMapperConfig);
-                cfg.CreateMap<Methodology, MethodologyViewModel>();
-            });
-
-            var mapper = config.CreateMapper();
-
             var publications = _context.Publications.Where(p => p.TopicId == topicId)
                 .Include(p => p.Contact)
                 .Include(p => p.Releases)
                 .Include(p => p.Methodologies)
                 .ToList();
-            
-            return mapper.Map<List<PublicationViewModel>>(publications);
+
+            return PublicationToPublicationViewModelMapper.Map<List<PublicationViewModel>>(publications);
         }
+        
+        private static readonly IMapper PublicationToPublicationViewModelMapper = new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Publication, PublicationViewModel>();
+            cfg.CreateMap<Release, ReleaseViewModel>()
+                .ForMember(
+                    dest => dest.LatestRelease,
+                    m => m.MapFrom(r => r.Publication.LatestRelease().Id == r.Id));
+            cfg.CreateMap<Methodology, MethodologyViewModel>();
+        }).CreateMapper();
     }
 }

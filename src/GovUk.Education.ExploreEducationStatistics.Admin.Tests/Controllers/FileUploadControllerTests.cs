@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -55,8 +56,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
 
                 var selectList =
                     Assert.IsAssignableFrom<SelectList>(viewResult.ViewData["ReleaseId"]);
-
-                Assert.Equal(releases, selectList.Items);
+                
+                Assert.Equal(releases.Select(r => r.Id), selectList.Items.Cast<Release>().Select(r => r.Id));
             }
         }
 

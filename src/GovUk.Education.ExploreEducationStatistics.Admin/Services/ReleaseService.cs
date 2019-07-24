@@ -14,12 +14,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         private readonly ApplicationDbContext _context;
 
-        private readonly IPublicationService _publicationService;
-
-        public ReleaseService(ApplicationDbContext context, IPublicationService publicationService)
+        public ReleaseService(ApplicationDbContext context)
         {
             _context = context;
-            _publicationService = publicationService;
         }
 
         public Release Get(Guid id)
@@ -31,19 +28,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return _context.Releases.FirstOrDefault(x => x.Slug == slug);
         }
-        
+
         public List<Release> List()
         {
             return _context.Releases.ToList();
         }
-        
+
+        // TODO Authorisation will be required when users are introduced
+        public ReleaseViewModel GetViewModel(Guid id)
+        {
+            return ReleaseToReleaseViewMapper.Map<ReleaseViewModel>(Get(id));
+        }
+
         // TODO Authorisation will be required when users are introduced
         public ReleaseViewModel CreateRelease(EditReleaseViewModel createRelease)
         {
             // Get the current release order
-            var publication = _context.Publications.Include(p => p.Releases).Single(p => p.Id == createRelease.PublicationId);
-            var nextReleaseOrder = publication?.LatestRelease()?.Order ?? 0;
-            
+            var publication = _context.Publications.Include(p => p.Releases)
+                .Single(p => p.Id == createRelease.PublicationId);
+            var nextReleaseOrder = publication?.LatestRelease()?.Order + 1 ?? 0;
+
             var saved = _context.Releases.Add(new Release
             {
                 Id = Guid.NewGuid(),
@@ -57,22 +61,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 NextReleaseDate = createRelease.NextReleaseExpected
             });
             _context.SaveChanges();
-            
-            var config = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateMap<Release, ReleaseViewModel>()
-                    .ForMember(dest => dest.LatestRelease,
-                        LatestReleaseMapperConfig);
-            });
-            
-            var mapper = config.CreateMapper();
-            return mapper.Map<ReleaseViewModel>(saved.Entity);
+            return GetViewModel(saved.Entity.Id);
         }
-        
-        public static void LatestReleaseMapperConfig(IMemberConfigurationExpression<Release, ReleaseViewModel, bool> m)
+
+        private static readonly IMapper ReleaseToReleaseViewMapper = new MapperConfiguration(cfg =>
         {
-            m.MapFrom(r => r.Publication.LatestRelease().Id == r.Id);
-        }
-        
+            cfg.CreateMap<Release, ReleaseViewModel>()
+                .ForMember(dest => dest.LatestRelease,
+                    m => m.MapFrom(r => r.Publication.LatestRelease().Id == r.Id));
+        }).CreateMapper();
     }
 }
