@@ -59,6 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
             ExecuteFile(migrationBuilder, _migrationsPath + "20190524165101_AddGeoJsonView.sql");
 
             // Drop the boundary level fk
+            migrationBuilder.Sql("ALTER TABLE geometry DROP CONSTRAINT geometry_BoundaryLevel_Id_fk");
             migrationBuilder.Sql("ALTER TABLE geometry DROP COLUMN boundary_level_id");
             
             migrationBuilder.DropTable(
