@@ -18,13 +18,11 @@ export function initGA() {
   }
 }
 export function enableGA() {
-  console.log('enableGA');
   // @ts-ignore
   window[`ga-disable-${process.env.GA_TRACKING_ID}`] = false;
   initGA();
 }
 export function disableGA() {
-  console.log('disableGA');
   // @ts-ignore
   window[`ga-disable-${process.env.GA_TRACKING_ID}`] = true;
 }

@@ -45,14 +45,8 @@ function CookieBanner({ cookies }: Props) {
   }
 
   if (isMounted) {
-    console.log(getCookie('bannerSeen'));
     return getCookie('bannerSeen') === 'true' ? null : render();
   }
-  /* console.log(
-    cookies,
-    cookieMap.bannerSeen.name,
-    cookies[cookieMap.bannerSeen.name],
-  ); */
   return cookies[cookieMap.bannerSeen.name] === 'true' ? null : render();
 }
 
