@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import cookie from 'cookie';
 import Page from '@frontend/components/Page';
 import Link from '@frontend/components/Link';
@@ -13,6 +13,9 @@ import { FormikProps } from 'formik';
 import Yup from '@common/lib/validation/yup';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import { NextContext } from 'next';
+import CookieMap from '@frontend/services/cookieMap';
+import { useCookies } from 'react-cookie';
+import styles from './CookiesIndexPage.module.scss';
 
 interface FormValues {
   googleAnalytics: string;
@@ -23,12 +26,44 @@ interface Props {
 }
 
 function CookiesIndexPage({ cookies = {} }: Props) {
+  const [liveCookies, setCookie] = useCookies();
+  const [submitted, setSubmitted] = useState();
+
+  const submitCookieSettings = (values: any) => {
+    setSubmitted(true);
+    window.scrollTo(0, 0);
+    setCookie(CookieMap.bannerSeenCookie.name, true, {
+      expires: CookieMap.bannerSeenCookie.expires,
+    });
+    setCookie(CookieMap.disableGACookie.name, values.googleAnalytics !== 'on', {
+      expires: CookieMap.disableGACookie.expires,
+    });
+  };
+
   return (
     <Page
       title="Cookies on Explore education statistics"
       pageMeta={{ title: 'Cookies' }}
       breadcrumbLabel="Cookies"
     >
+      {!submitted ? null : (
+        <div
+          id="submit-notification"
+          className={`${styles.submitNotification} govuk-!-margin-bottom-6 govuk-!-margin-top-2`}
+        >
+          <h2>Your cookie settings were saved</h2>
+          <p>We have stored your cookie settings.</p>
+          <p>
+            <a
+              href="#"
+              onClick={() => window.history.back()}
+              title="Go back to the previous page"
+            >
+              Go back to the page you were looking at
+            </a>
+          </p>
+        </div>
+      )}
       <p>
         Cookies are files saved on your phone, tablet or computer when you visit
         a website.
@@ -45,9 +80,12 @@ function CookiesIndexPage({ cookies = {} }: Props) {
       <Formik<FormValues>
         enableReinitialize
         initialValues={{
-          googleAnalytics: 'on',
+          googleAnalytics:
+            cookies[CookieMap.disableGACookie.name] === 'true' ? 'off' : 'on',
         }}
-        onSubmit={async values => {}}
+        onSubmit={values => {
+          submitCookieSettings(values);
+        }}
         validationSchema={Yup.object<FormValues>({
           googleAnalytics: Yup.string().required('Select'),
         })}

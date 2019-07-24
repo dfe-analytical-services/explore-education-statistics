@@ -38,13 +38,13 @@ class App extends BaseApp {
   }
 
   public render() {
-    const { Component, pageProps } = this.props;
+    const { Component, pageProps, cookieBannerProps } = this.props;
 
     return (
       <Container>
         <Helmet titleTemplate="%s - GOV.UK" />
         <CookiesProvider>
-          <CookieBanner {...this.props.cookieBannerProps} />
+          <CookieBanner {...cookieBannerProps} />
           <Component {...pageProps} />
         </CookiesProvider>
       </Container>
