@@ -4,8 +4,8 @@ import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import RelatedAside from '@common/components/RelatedAside';
-import DataBlock from '@common/modules/find-statistics/components/DataBlock';
 import { baseUrl } from '@common/services/api';
+import DataBlockWithAnalytics from '@frontend/components/DataBlockWithAnalytics';
 import publicationService, {
   Release,
 } from '@common/services/publicationService';
@@ -261,7 +261,7 @@ class PublicationReleasePage extends Component<Props> {
         </h2>
 
         {data.keyStatistics && (
-          <DataBlock {...data.keyStatistics} id="keystats" />
+          <DataBlockWithAnalytics {...data.keyStatistics} id="keystats" />
         )}
 
         {data.content.length > 0 && (
