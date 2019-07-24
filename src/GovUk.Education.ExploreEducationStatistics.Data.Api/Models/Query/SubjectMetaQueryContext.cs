@@ -13,6 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
     {
         public long SubjectId { get; set; }
         public TimePeriodQuery TimePeriod { get; set; }
+        public long? BoundaryLevel { get; set; }
         public GeographicLevel? GeographicLevel { get; set; }
         public IEnumerable<long> Indicators { get; set; }
         public IEnumerable<string> Country { get; set; }
@@ -28,7 +29,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
         public IEnumerable<string> RscRegion { get; set; }
         public IEnumerable<string> Sponsor { get; set; }
         public IEnumerable<string> Ward { get; set; }
-        public long BoundaryLevelId { get; set; }
 
         public Expression<Func<Observation, bool>> ObservationPredicate()
         {
