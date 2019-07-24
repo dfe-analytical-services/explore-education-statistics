@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     {
         public Guid Id { get; set; }
 
-        public string Title => TimePeriodCoverage.GetEnumLabel() + _releaseName;
+        public string Title => TimePeriodCoverage.GetEnumLabel() + " " + _releaseName;
 
         private string _releaseName;
 
