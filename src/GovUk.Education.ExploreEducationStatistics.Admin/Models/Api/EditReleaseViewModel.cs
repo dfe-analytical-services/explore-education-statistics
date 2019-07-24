@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -18,7 +19,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         
         [PartialDateValidator]
         public PartialDate NextReleaseExpected { get; set; }
-        
+     
+        [RegularExpression(@"^([0-9]{4})?$")]
         public string ReleaseName { get; set; }
     }
 }

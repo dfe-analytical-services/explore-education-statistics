@@ -8,9 +8,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
     public class PartialDate
     {
-        private readonly Regex _yearRegex = new Regex(@"^([0-9]{4})?$");
-        private readonly Regex _monthRegex = new Regex(@"^([0-9]{1,2})?$");
-        private readonly Regex _dayRegex = new Regex(@"^([0-9]{1,2})?$");
+        public static readonly Regex YearRegex = new Regex(@"^([0-9]{4})?$");
+        public static readonly Regex MonthRegex = new Regex(@"^([0-9]{1,2})?$");
+        public static readonly Regex DayRegex = new Regex(@"^([0-9]{1,2})?$");
         private string _year;
         private string _month;
         private string _day;
@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public bool IsValid()
         {
-            if (!_yearRegex.Match(Year).Success || !_monthRegex.Match(Month).Success || !_dayRegex.Match(Day).Success)
+            if (!YearRegex.Match(Year).Success || !MonthRegex.Match(Month).Success || !DayRegex.Match(Day).Success)
             {
                 return false; // Failed rudimentary number validation  
             }

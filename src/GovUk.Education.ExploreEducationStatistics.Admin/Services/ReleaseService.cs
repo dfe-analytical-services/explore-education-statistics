@@ -56,6 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 ReleaseName = createRelease.ReleaseName,
                 NextReleaseDate = createRelease.NextReleaseExpected
             });
+            _context.SaveChanges();
             
             var config = new MapperConfiguration(cfg =>
             {

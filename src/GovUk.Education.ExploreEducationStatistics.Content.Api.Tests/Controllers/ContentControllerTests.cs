@@ -160,7 +160,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             releaseService.Setup(s => s.GetRelease("publication-a")).Returns(
                 new Release
                 {
-                    Title = "Publication A",
                     Slug = "publication-a"
                 });
 
@@ -170,7 +169,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var result = controller.GetRelease("publication-a");
 
             Assert.IsAssignableFrom<Release>(result.Value);
-            Assert.Equal("Publication A", result.Value.Title);
+            Assert.Equal("publication-a", result.Value.Slug);
         }
 
         [Fact]
