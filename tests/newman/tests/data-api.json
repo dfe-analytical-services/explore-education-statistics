@@ -2377,9 +2377,44 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "4305c315-122a-4d29-ace3-0af70e73d69a",
 												"exec": [
 													"respJson = pm.response.json()",
+													"",
+													"pm.test(\"Fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"footnotes\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodRange\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
+													"});",
+													"",
+													"pm.test(\"Validate footnotes\", function () {",
+													"    for(var i = 0; i < respJson.footnotes.length; i++) {",
+													"        switch(respJson.footnotes[i].id) {",
+													"            case 1:",
+													"                pm.expect(respJson.footnotes[i].label).to.equal(\"State-funded primary and secondary schools include middle schools as deemed.\");",
+													"                pm.expect(respJson.footnotes[i].indicators).to.eql([\"1\",\"23\",\"26\",\"28\",\"30\",\"31\"]);",
+													"                break;",
+													"            case 8:",
+													"                pm.expect(respJson.footnotes[i].label).to.equal(\"Absence rates are the number of absence sessions expressed as a percentage of the total number of possible sessions.\");",
+													"                pm.expect(respJson.footnotes[i].indicators).to.eql([\"23\",\"26\",\"28\"]);",
+													"                break;",
+													"            // case 9:",
+													"            //     pm.expect(respJson.footnotes[i].label).to.equal(\"Pupil enrolments missing 10 percent or more of their own possible sessions (due to authorised or unauthorised absence) are classified as persistent absentees.\");",
+													"            //     pm.expect(respJson.footnotes[i].indicators).to.eql([\"30\",\"31\"]);",
+													"            //     break;",
+													"            case 12:",
+													"                pm.expect(respJson.footnotes[i].label).to.equal(\"Number of enrolments includes pupils on the school roll for at least one session who are aged between 5 and 15, excluding boarders. Some pupils may be counted more than once (if they moved schools during the academic year or are registered in more than one school).\");",
+													"                pm.expect(respJson.footnotes[i].indicators).to.eql([\"1\"]);",
+													"                break;",
+													"            case 13:",
+													"                pm.expect(respJson.footnotes[i].id).to.not.equal(13);",
+													"                break;",
+													"            case 24:",
+													"                pm.expect(respJson.footnotes[i].id).to.not.equal(24); // Should only show for absence for four year olds",
+													"                break;",
+													"        }",
+													"    }",
+													"});",
 													"",
 													"pm.test(\"timePeriodRange length should be correct\", function () {",
 													"    pm.expect(respJson.timePeriodRange.length).to.equal(1); ",
@@ -2433,7 +2468,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_AllPupils}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_AllPupils}}\n    ],\n    \"indicators\": [\n        1, 23, 26, 28, 30, 31\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2570,7 +2605,7 @@
 									"response": []
 								},
 								{
-									"name": "Tablebuilder - Absence by characteristic - England",
+									"name": "Tablebuilder - Absence by characteristic - England - Male, Female",
 									"event": [
 										{
 											"listen": "test",
@@ -2579,7 +2614,55 @@
 												"exec": [
 													"respJson = pm.response.json();",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(16); });",
+													"pm.test(\"Fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"footnotes\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodRange\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
+													"});",
+													"",
+													"pm.test(\"Validate footnotes\", function () {",
+													"    for(var i = 0; i < respJson.footnotes.length; i++) {",
+													"        switch(respJson.footnotes[i].id) {",
+													"            case 1:",
+													"                pm.expect(respJson.footnotes[i].label).to.equal(\"State-funded primary and secondary schools include middle schools as deemed.\");",
+													"                pm.expect(respJson.footnotes[i].indicators).to.eql([\"23\",\"26\",\"28\",\"30\",\"31\"]);",
+													"                break;",
+													"            case 8:",
+													"                pm.expect(respJson.footnotes[i].label).to.equal(\"Absence rates are the number of absence sessions expressed as a percentage of the total number of possible sessions.\");",
+													"                pm.expect(respJson.footnotes[i].indicators).to.eql([\"23\",\"26\",\"28\"]);",
+													"                break;",
+													"            // NOTE(mark): Fixed by https://github.com/dfe-analytical-services/explore-education-statistics/pull/447/files",
+													"            // case 9:",
+													"            //     pm.expect(respJson.footnotes[i].label).to.equal(\"Pupil enrolments missing 10 percent or more of their own possible sessions (due to authorised or unauthorised absence) are classified as persistent absentees.\");",
+													"            //     pm.expect(respJson.footnotes[i].indicators).to.eql([\"30\",\"31\"]);",
+													"            //     break;",
+													"            // NOTE(mark): Fixed by https://github.com/dfe-analytical-services/explore-education-statistics/pull/447/files",
+													"            // case 10:",
+													"            //     pm.expect(respJson.footnotes[i].label).to.equal(\"The definition of persistent absence changed from the 2015/16 academic year - The information presented for years prior to 2015/16 has been produced using the same methodology in order to allow users to make comparisons on a consistent basis over time.\");",
+													"            //     pm.expect(respJson.footnotes[i].indicators).to.eql([\"30\",\"31\"]);",
+													"            case 11:",
+													"                pm.expect(respJson.footnotes[i].label).to.equal(\"The persistent absentee rate is the number of persistent absentees expressed as a percentage of the total number of enrolments.\");",
+													"                pm.expect(respJson.footnotes[i].indicators).to.eql([\"30\"]);                ",
+													"            case 13:",
+													"                pm.expect(respJson.footnotes[i].id).to.not.equal(13); // Should only show for time_period < 201516",
+													"                break;",
+													"            // NOTE(mark): To be implemented in future ticket",
+													"            // case 18:",
+													"            //     pm.expect(respJson.footnotes[i].id).to.not.equal(18); // Shouldn't happen, as no SEN provision results returned",
+													"            //     break;",
+													"            // NOTE(mark): To be implemented in future ticket",
+													"            // case 21:",
+													"            //     pm.expect(respJson.footnotes[i].id).to.not.equal(21); // Shouldn't happen, as no Ethnic Group Minor results returned",
+													"            //     break;",
+													"            case 24:",
+													"                pm.expect(respJson.footnotes[i].id).to.not.equal(24); // Should only show for absence for four year olds",
+													"                break;",
+													"        }",
+													"    }",
+													"});",
+													"",
+													"",
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(8); });",
 													"",
 													"pm.test(\"geographicLevel should be same as request\", function () {",
 													"    for(var i = 0; i < respJson.result.length; i++) {",
@@ -2611,7 +2694,107 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"country\": [\n    \t\"E92000001\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"country\": [\n    \t\"E92000001\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2014,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}\n    ],\n    \"indicators\": [\n        23, 26, 28, 30, 31\n    ]\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/tablebuilder",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"tablebuilder"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Tablebuilder - Absence by characteristic - England - Primary, EthMinorIrish",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"exec": [
+													"respJson = pm.response.json();",
+													"",
+													"pm.test(\"Fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"footnotes\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodRange\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
+													"});",
+													"",
+													"pm.test(\"Validate footnotes\", function () {",
+													"    for(var i = 0; i < respJson.footnotes.length; i++) {",
+													"        switch(respJson.footnotes[i].id) {",
+													"            case 1:",
+													"                pm.expect(respJson.footnotes[i].label).to.equal(\"State-funded primary and secondary schools include middle schools as deemed.\");",
+													"                pm.expect(respJson.footnotes[i].indicators).to.eql([\"23\",\"26\",\"28\",\"30\",\"31\"]);",
+													"                break;",
+													"            case 2:",
+													"                pm.expect(respJson.footnotes[i].label).to.equal(\"State-funded primary schools include all primary academies, including free schools.\");",
+													"                pm.expect(respJson.footnotes[i].indicators).to.eql([\"23\",\"26\",\"28\",\"30\",\"31\"]);",
+													"                break;",
+													"            // NOTE(mark): Shouldn't return as no school_type secondary returned. To be implemented in future ticket.",
+													"            // case 3:",
+													"            //     pm.expect(respJson.footnotes[i].id).to.not.equal(3);",
+													"            //     break;",
+													"            case 8:",
+													"                pm.expect(respJson.footnotes[i].label).to.equal(\"Absence rates are the number of absence sessions expressed as a percentage of the total number of possible sessions.\");",
+													"                pm.expect(respJson.footnotes[i].indicators).to.eql([\"23\",\"26\",\"28\"]);",
+													"                break;",
+													"            // NOTE(mark): Fixed by https://github.com/dfe-analytical-services/explore-education-statistics/pull/447/files",
+													"            // case 9:",
+													"            //     pm.expect(respJson.footnotes[i].label).to.equal(\"Pupil enrolments missing 10 percent or more of their own possible sessions (due to authorised or unauthorised absence) are classified as persistent absentees.\");",
+													"            //     pm.expect(respJson.footnotes[i].indicators).to.eql([\"30\",\"31\"]);",
+													"            //     break;",
+													"            // case 10:",
+													"            //     pm.expect(respJson.footnotes[i].label).to.equal(\"The definition of persistent absence changed from the 2015/16 academic year - The information presented for years prior to 2015/16 has been produced using the same methodology in order to allow users to make comparisons on a consistent basis over time.\");",
+													"            //     pm.expect(respJson.footnotes[i].indicators).to.eql([\"30\",\"31\"]);",
+													"            case 11:",
+													"                pm.expect(respJson.footnotes[i].label).to.equal(\"The persistent absentee rate is the number of persistent absentees expressed as a percentage of the total number of enrolments.\");",
+													"                pm.expect(respJson.footnotes[i].indicators).to.eql([\"30\"]);     ",
+													"            case 24:",
+													"                pm.expect(respJson.footnotes[i].id).to.not.equal(24); // Should only show for absence for four year olds",
+													"                break;",
+													"        }",
+													"    }",
+													"});",
+													"",
+													"",
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(1); });",
+													"",
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Country\");",
+													"    }",
+													"});",
+													"",
+													"pm.test(\"First result should have correct fields\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].filters\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].geographicLevel\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].location\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].measures\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result[0].timePeriod\"));",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subjectId\": 1,\n    \"country\": [\n    \t\"E92000001\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2014,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, {{FILT_EthMinor_Irish}}\n    ],\n    \"indicators\": [\n        23, 26, 28, 30, 31\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2880,7 +3063,8 @@
 											"pm.globals.set(\"FILT_StateFundedSecondary\", \"75\");",
 											"pm.globals.set(\"FILT_FSMEligible\", \"43\");",
 											"pm.globals.set(\"FILT_FSMNotEligible\", \"44\");",
-											"pm.globals.set(\"FILT_FSMUnclassified\", \"45\");"
+											"pm.globals.set(\"FILT_FSMUnclassified\", \"45\");",
+											"pm.globals.set(\"FILT_EthMinor_Irish\", \"24\");"
 										]
 									}
 								},
@@ -3875,6 +4059,86 @@
 										"body": {
 											"mode": "raw",
 											"raw": "{\n    \"subjectId\": 4,\n    \"geographicLevel\": \"School\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"HT6\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"HT6\"\n    },\n    \"filters\" : [\n        {{FILT_Special}}\n    ],\n    \"indicators\": [\n        95, 94\n    ]\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/tablebuilder",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"tablebuilder"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Tablebuilder - Absence for four year olds England - Secondary, Special",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"exec": [
+													"var respJson = pm.response.json();",
+													"",
+													"pm.test(\"Fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"footnotes\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodRange\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
+													"});",
+													"",
+													"pm.test(\"Validate footnotes\", function () {",
+													"    for(var i = 0; i < respJson.footnotes.length; i++) {",
+													"        switch(respJson.footnotes[i].id) {",
+													"            // NOTE(mark): To be implemented in future ticket",
+													"            // case 2:",
+													"            //     pm.expect(respJson.footnotes[i].id).to.not.equal(2); // Since school_type !== primary",
+													"            //     break;",
+													"            case 12:",
+													"                pm.expect(respJson.footnotes[i].id).to.not.equal(12); // Since subject == absence for four year olds",
+													"                break;",
+													"            case 24:",
+													"                pm.expect(respJson.footnotes[i].label).to.equal(\"Includes pupils on the school roll for at least one session who are aged 4, excluding boarders. Some pupils may be counted more than once (if they moved schools during the academic year or are registered at more than one school).\");",
+													"                pm.expect(respJson.footnotes[i].indicators).to.eql([\"92\"]);",
+													"                break;",
+													"            case 25:",
+													"                pm.expect(respJson.footnotes[i].label).to.equal(\"Only overall absence is recorded for pupils aged 4, absences are not categorised as authorised or unauthorised.\");",
+													"                pm.expect(respJson.footnotes[i].indicators).to.eql([\"94\",\"95\"]);",
+													"                break;",
+													"        }",
+													"    }",
+													"});",
+													"",
+													"pm.test(\"timePeriodRange length should be correct\", function () {",
+													"    pm.expect(respJson.timePeriodRange.length).to.equal(1); ",
+													"});",
+													"",
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(2); });",
+													"",
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Country\");",
+													"    }",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subjectId\": 4,\n    \"country\": [\"E92000001\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"HT6\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"HT6\"\n    },\n    \"filters\" : [\n        {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        92, 95, 94\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
