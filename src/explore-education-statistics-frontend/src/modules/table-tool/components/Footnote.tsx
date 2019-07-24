@@ -7,13 +7,13 @@ export interface FootnoteProps {
 
 const Footnote = ({ content }: FootnoteProps) => {
   const footnoteList = content.map(function createFootnotes(footnotes) {
-    return (
-      <p key={footnotes.id} className="govuk-body-s govuk-!-margin-bottom-1">
-        {footnotes.label}
-      </p>
-    );
+    return <li key={footnotes.id}>{footnotes.label}</li>;
   });
-  return <div className="govuk-!-margin-bottom-8">{footnoteList}</div>;
+  return (
+    <ol className="govuk-list govuk-list--number govuk-!-margin-bottom-8">
+      {footnoteList}
+    </ol>
+  );
 };
 
 export default Footnote;
