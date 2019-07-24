@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using Microsoft.WindowsAzure.Storage.Table;
+using Microsoft.Azure.Cosmos.Table;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
 {

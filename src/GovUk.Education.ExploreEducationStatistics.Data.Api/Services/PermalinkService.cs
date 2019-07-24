@@ -1,12 +1,12 @@
-using System;
-using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
-using Microsoft.WindowsAzure.Storage.Table;
-
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
+    using System;
+    using System.Threading.Tasks;
+    using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+    using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
+    using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
+    using Microsoft.Azure.Cosmos.Table;
+    
     public class PermalinkService : IPermalinkService
     {
         private const string PermalinkTableName = "permalink";

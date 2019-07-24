@@ -1,9 +1,8 @@
-using System;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using Microsoft.WindowsAzure.Storage.Table;
-
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
 {
+    using System;
+    using Microsoft.Azure.Cosmos.Table;
+    
     public class Permalink : TableEntity
     {
         public Permalink()
