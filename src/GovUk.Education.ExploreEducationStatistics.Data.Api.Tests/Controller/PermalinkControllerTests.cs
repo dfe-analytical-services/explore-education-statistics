@@ -16,14 +16,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controller
     {
         private readonly PermalinkController _controller;
 
-        private readonly Guid _validId = new Guid();
+        private readonly Guid _validId = Guid.NewGuid();
 
         public PermalinkControllerTests()
         {
             var permalinkService = new Mock<IPermalinkService>();
 
-            permalinkService.Setup(s => s.Get(_validId)).Returns(
-                new Permalink() {Id = _validId}
+            permalinkService.Setup(s => s.GetAsync(_validId)).ReturnsAsync(
+                new Permalink() {RowKey = _validId.ToString()}
             );
 
             _controller = new PermalinkController(permalinkService.Object);
@@ -34,7 +34,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controller
         {
             var result = _controller.Get(_validId);
 
-            Assert.IsAssignableFrom<OkObjectResult>(result);
+            Assert.IsAssignableFrom<OkObjectResult>(result.Result);
+        }
+        
+        [Fact]
+        public async void Get_Permalink_NotFound()
+        {
+            var result = _controller.Get(Guid.NewGuid());
+
+            Assert.IsAssignableFrom<NotFoundResult>(result.Result);
         }
 
         [Fact]
