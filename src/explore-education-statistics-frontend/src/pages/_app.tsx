@@ -38,6 +38,7 @@ class App extends BaseApp {
   }
 
   public render() {
+    // @ts-ignore
     const { Component, pageProps, cookieBannerProps } = this.props;
 
     return (
