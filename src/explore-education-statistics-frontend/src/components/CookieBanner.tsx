@@ -50,12 +50,10 @@ function CookieBanner({ cookies }: Props) {
   }
 
   if (isMounted) {
-    console.log('mounted render', liveCookies);
     return liveCookies[CookieMap.bannerSeenCookie.name] === 'true'
       ? null
       : render();
   }
-  console.log('unmounted render', cookies);
   return cookies[CookieMap.bannerSeenCookie.name] === 'true' ? null : render();
 }
 
