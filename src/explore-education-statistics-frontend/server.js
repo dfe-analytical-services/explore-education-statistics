@@ -144,7 +144,7 @@ async function startServer(port = process.env.PORT || 3000) {
 
   server.get('/data-tables/permalink/:permalink/', (req, res) => {
     return app.render(req, res, '/data-tables/permalink', {
-      permalink: req.params.permalink
+      permalink: req.params.permalink,
     });
   });
 
