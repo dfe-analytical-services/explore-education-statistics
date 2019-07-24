@@ -28,6 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
         public IEnumerable<string> RscRegion { get; set; }
         public IEnumerable<string> Sponsor { get; set; }
         public IEnumerable<string> Ward { get; set; }
+        public long BoundaryLevelId { get; set; }
 
         public Expression<Func<Observation, bool>> ObservationPredicate()
         {

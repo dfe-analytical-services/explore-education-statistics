@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             {
                 Filters = GetFilters(observations),
                 Indicators = GetIndicators(subject.Id, query.Indicators),
-                Locations = GetObservationalUnits(observations),
+                Locations = GetObservationalUnits(observations, query.BoundaryLevelId),
                 TimePeriods = GetTimePeriods(observations)
             };
         }
@@ -78,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         }
 
         private Dictionary<string, ObservationalUnitMetaViewModel> GetObservationalUnits(
-            IEnumerable<Observation> observations)
+            IEnumerable<Observation> observations, long boundaryLevelId)
         {
             var locations = observations
                 .GroupBy(observation => observation.Location)
@@ -90,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 pair.Value.Select(observationalUnit =>
                     new ObservationalUnitMetaViewModel
                     {
-                        GeoJson = GetGeoJsonForObservationalUnit(pair.Key, observationalUnit),
+                        GeoJson = GetGeoJsonForObservationalUnit(boundaryLevelId, observationalUnit),
                         Label = observationalUnit.Name,
                         Value = observationalUnit.Code
                     }));
@@ -118,10 +118,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             );
         }
 
-        private dynamic GetGeoJsonForObservationalUnit(GeographicLevel geographicLevel,
-            IObservationalUnit observationalUnit)
+        private dynamic GetGeoJsonForObservationalUnit(long boundaryLevelId, IObservationalUnit observationalUnit)
         {
-            var geoJson = _geoJsonService.Find(geographicLevel, observationalUnit.Code);
+            var geoJson = _geoJsonService.Find(boundaryLevelId, observationalUnit.Code);
             return geoJson != null ? JsonConvert.DeserializeObject(geoJson.Value) : null;
         }
     }
