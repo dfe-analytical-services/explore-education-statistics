@@ -6,18 +6,24 @@ import Router from 'next/router';
 import React from 'react';
 import Helmet from 'react-helmet';
 import './_app.scss';
+import { CookiesProvider } from 'react-cookie';
 
 process.env.APP_ROOT_ID = '__next';
 
 class App extends BaseApp {
   public static async getInitialProps({ Component, ctx }: NextAppContext) {
     let pageProps = {};
+    let cookieBannerProps = {};
 
     if (Component.getInitialProps) {
       pageProps = await Component.getInitialProps(ctx);
     }
 
-    return { pageProps };
+    if (CookieBanner.getInitialProps) {
+      cookieBannerProps = CookieBanner.getInitialProps(ctx);
+    }
+
+    return { pageProps, cookieBannerProps };
   }
 
   public componentDidMount() {
@@ -36,9 +42,11 @@ class App extends BaseApp {
 
     return (
       <Container>
-        <CookieBanner />
         <Helmet titleTemplate="%s - GOV.UK" />
-        <Component {...pageProps} />
+        <CookiesProvider>
+          <CookieBanner {...this.props.cookieBannerProps} />
+          <Component {...pageProps} />
+        </CookiesProvider>
       </Container>
     );
   }
