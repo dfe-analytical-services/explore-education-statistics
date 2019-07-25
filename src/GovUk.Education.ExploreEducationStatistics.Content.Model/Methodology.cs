@@ -20,6 +20,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         
         public List<ContentSection> Annexes { get; set; }
 
-        public List<Publication> Publication { get; set; }
+        public List<Publication> Publications { get; set; }
     }
 }

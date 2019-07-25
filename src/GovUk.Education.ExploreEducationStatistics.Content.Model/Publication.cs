@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public List<Release> Releases { get; set; }
 
-        public Guid MethodologyId { get; set; }
+        public Guid? MethodologyId { get; set; }
         
         public Methodology Methodology { get; set; }
         
