@@ -10,6 +10,7 @@ import publicationService, {
   Release,
 } from '@common/services/publicationService';
 import ButtonLink from '@frontend/components/ButtonLink';
+import AccordionSectionWithAnalytics from '@frontend/components/AccordionSectionWithAnalytics';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
@@ -346,7 +347,7 @@ class PublicationReleasePage extends Component<Props> {
               guidance.
             </p>
           </AccordionSection>
-          <AccordionSection heading="Contact us" headingTag="h3">
+          <AccordionSectionWithAnalytics heading="Contact us" headingTag="h3">
             <div className="govuk-warning-text">
               <span className="govuk-warning-text__icon" aria-hidden="true">
                 !
@@ -392,7 +393,7 @@ class PublicationReleasePage extends Component<Props> {
               Telephone <br />
               [[ DEPT. FOR EDUCATION TEL NO. ]]
             </p>
-          </AccordionSection>
+          </AccordionSectionWithAnalytics>
         </Accordion>
         <h2 className="govuk-heading-m govuk-!-margin-top-9">
           Create your own tables online
