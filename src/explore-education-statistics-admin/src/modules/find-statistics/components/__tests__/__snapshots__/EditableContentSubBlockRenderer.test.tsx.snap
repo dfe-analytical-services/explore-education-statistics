@@ -260,7 +260,7 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
                                     class="chart"
                             >
                               <span class="title">
-                                Vertical Bar
+                                Vertical bar
                               </span>
                               <span class="img verticalbar">
                               </span>
@@ -269,7 +269,7 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
                                     class="chart"
                             >
                               <span class="title">
-                                Horizontal Bar
+                                Horizontal bar
                               </span>
                               <span class="img horizontalbar">
                               </span>
@@ -522,7 +522,7 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
                                     class="chart"
                             >
                               <span class="title">
-                                Vertical Bar
+                                Vertical bar
                               </span>
                               <span class="img verticalbar">
                               </span>
@@ -531,7 +531,7 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
                                     class="chart"
                             >
                               <span class="title">
-                                Horizontal Bar
+                                Horizontal bar
                               </span>
                               <span class="img horizontalbar">
                               </span>
@@ -784,7 +784,7 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
                                     class="chart"
                             >
                               <span class="title">
-                                Vertical Bar
+                                Vertical bar
                               </span>
                               <span class="img verticalbar">
                               </span>
@@ -793,7 +793,7 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
                                     class="chart"
                             >
                               <span class="title">
-                                Horizontal Bar
+                                Horizontal bar
                               </span>
                               <span class="img horizontalbar">
                               </span>
@@ -1046,7 +1046,7 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
                                     class="chart"
                             >
                               <span class="title">
-                                Vertical Bar
+                                Vertical bar
                               </span>
                               <span class="img verticalbar">
                               </span>
@@ -1055,7 +1055,7 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
                                     class="chart"
                             >
                               <span class="title">
-                                Horizontal Bar
+                                Horizontal bar
                               </span>
                               <span class="img horizontalbar">
                               </span>

@@ -75,67 +75,69 @@ const ChartDataSelector = ({
 
   return (
     <React.Fragment>
-      <FormGroup className="govuk-grid-row">
-        <div className="govuk-grid-column-one-half">
-          <FormFieldset id="filter_fieldset" legend="Filters">
+      <FormGroup className="govuk-grid-row govuk-!-margin-0">
+        <FormFieldset id="filter_fieldset" legend="">
+          <div className="govuk-grid-column-one-third">
             <FormSelect
               id="filters"
               name="filters"
               label="Filters"
+              className="govuk-!-width-full"
               options={filterSelectOptions}
               value={selectedFilters}
               onChange={e => setSelectedFilters(e.target.value)}
               order={[]}
             />
-          </FormFieldset>
-        </div>
-        <div className="govuk-grid-column-one-half">
-          <FormFieldset id="indicator_fieldset" legend="Indicators">
+          </div>
+          <div className="govuk-grid-column-one-third">
             <FormSelect
               id="indicators"
               name="indicators"
               label="Indicators"
+              className="govuk-!-width-full"
               options={indicatorSelectOptions}
               value={selectedIndicator}
               onChange={e => setSelectedIndicator(e.target.value)}
               order={[]}
             />
-          </FormFieldset>
-        </div>
+          </div>
+          {selectedIndicator && selectedFilters && (
+            <div className="govuk-grid-column-one-third">
+              <Button
+                type="button"
+                className="govuk-!-margin-top-6"
+                onClick={() => {
+                  const added = {
+                    filters: selectedFilters.split(','),
+                    indicator: selectedIndicator,
+                  };
+                  selectedList.push(added);
+                  setSelectedList([...selectedList]);
+
+                  if (onDataAdded) onDataAdded(added);
+                  if (onDataUpdated) {
+                    onDataUpdated(selectedList);
+                  }
+                }}
+              >
+                Add data
+              </Button>
+            </div>
+          )}
+        </FormFieldset>
       </FormGroup>
 
-      {selectedIndicator && selectedFilters && (
-        <div className="govuk-grid-row">
-          <div className="govuk-grid-column-full">
-            <Button
-              type="button"
-              onClick={() => {
-                const added = {
-                  filters: selectedFilters.split(','),
-                  indicator: selectedIndicator,
-                };
-                selectedList.push(added);
-                setSelectedList([...selectedList]);
-
-                if (onDataAdded) onDataAdded(added);
-                if (onDataUpdated) {
-                  onDataUpdated(selectedList);
-                }
-              }}
-            >
-              Add data
-            </Button>
-          </div>
-        </div>
-      )}
-
       {selectedList.length > 0 && (
-        <table className="govuk-table">
+        <table className="govuk-table govuk-!-margin-left-3 ">
           <caption>Selected data</caption>
           <thead>
             <tr>
-              <th className="govuk-table__header">Filters</th>
-              <th className="govuk-table__header">Indicator</th>
+              <th className="govuk-table__header govuk-!-width-one-third">
+                Filter
+              </th>
+              <th className="govuk-table__header govuk-!-width-one-third">
+                Indicator
+              </th>
               <th />
             </tr>
           </thead>
@@ -150,8 +152,9 @@ const ChartDataSelector = ({
                 <td className="govuk-table__cell">
                   {metaData.indicators[selected.indicator].label}
                 </td>
-                <td className="govuk-table__cell">
+                <td className="govuk-table__cell govuk-table__cell--numeric">
                   <Button
+                    className="govuk-!-margin-0 govuk-button--secondary"
                     type="button"
                     onClick={() => removeSelected(selected, index)}
                   >

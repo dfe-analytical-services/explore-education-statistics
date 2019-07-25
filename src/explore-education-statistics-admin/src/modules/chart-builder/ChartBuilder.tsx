@@ -254,11 +254,18 @@ const ChartBuilder = ({ data }: Props) => {
           onSelectChart={setSelectedChartType}
           selectedChartType={selectedChartType}
         />
+        <div className="govuk-!-margin-top-6 dfe-align--right">
+          <a href="#" className="govuk-body-s govuk-link">
+            Choose an alternative infographic
+          </a>
+        </div>
       </Details>
 
       {renderedChartProps && (
         <Details summary="Chart preview" open>
-          <ChartRenderer {...renderedChartProps} />
+          <div className="govuk-width-container">
+            <ChartRenderer {...renderedChartProps} />
+          </div>
         </Details>
       )}
 
@@ -277,7 +284,7 @@ const ChartBuilder = ({ data }: Props) => {
             />
           </Details>
 
-          <Details summary="Configure the chart">
+          <Details summary="Configure chart">
             {selectedChartType.capabilities.stackable && (
               <FormCheckbox
                 id="stacked"
@@ -326,7 +333,7 @@ const ChartBuilder = ({ data }: Props) => {
             )}
           </Details>
 
-          <Details summary="Configure the look of each data set">
+          <Details summary="Configure series">
             Update the configuration used for each dataset in the chart from the
             default
             <div className={styles.axesOptions}>

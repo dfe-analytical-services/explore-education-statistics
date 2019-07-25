@@ -40,7 +40,7 @@ const PublicationDataPage = () => {
               to="/prototypes/publication-create-new-absence-view-table"
               className="govuk-tabs__tab"
             >
-              View saved tables and charts
+              View data blocks
             </Link>
           </li>
         </ul>
@@ -350,15 +350,57 @@ const PublicationDataPage = () => {
           <hr />
           <h2 className="govuk-heading-m">5. View and save data blocks</h2>
           {['?status=step5'].includes(window.location.search) && (
-            <div className="govuk-width-container">
+            <>
               <PrototypeAdminExampleTables task="edit" />
+              <Link
+                to="/prototypes/publication-create-new-absence-table?status=step5#add-chart"
+                className="govuk-button govuk-button--secondary"
+              >
+                Create chart
+              </Link>
+              <FormFieldset id="table-config" legend="Data block details">
+                <FormGroup>
+                  <FormTextInput
+                    id="table-title"
+                    name="table-title"
+                    label="Data block title"
+                    defaultValue="'Absence by characteristic' from 'Pupil absence' in England between 2012/13 and 2016/17"
+                  />
+                </FormGroup>
+                <FormGroup>
+                  <FormTextInput
+                    id="source"
+                    name="source"
+                    label="Source"
+                    defaultValue="DfE prototype example statistics"
+                    width={20}
+                  />
+                </FormGroup>
+                <FormGroup>
+                  <label htmlFor="footnotes" className="govuk-label">
+                    Foot notes
+                  </label>
+                  <textarea
+                    name="footnotes"
+                    id="footnotes"
+                    className="govuk-textarea"
+                  />
+                </FormGroup>
+              </FormFieldset>
+
+              <hr />
 
               <FormGroup>
+                <p className="govuk-body">
+                  Name and save your data block before viewing it under the
+                  ‘View data blocks tab’ at the top of this page.
+                </p>
+
                 <FormTextInput
                   id="save-table"
                   name="save-table"
-                  label="Save as"
-                  value="Table for absence highlights panel"
+                  label="Name data blocks"
+                  value="Absence highlights panel"
                   width={20}
                 />
               </FormGroup>
@@ -367,21 +409,15 @@ const PublicationDataPage = () => {
                 to="/prototypes/publication-create-new-absence-table?status=step1"
                 className="govuk-button govuk-!-margin-right-3"
               >
-                Save and create another table
+                Save
               </Link>
-
-              <Link
-                to="publication-create-new-absence-view-table"
-                className="govuk-button govuk-!-margin-right-3"
-              >
-                Save and continue
-              </Link>
-            </div>
+              <div className="govuk-!-margin-top-6">
+                <Link to="/prototypes/publication-create-new-absence-view-table">
+                  View saved data blocks
+                </Link>
+              </div>
+            </>
           )}
-
-          <Link to="/prototypes/publication-create-new-absence-view-table">
-            View saved tables
-          </Link>
         </div>
       </div>
       <div className="govuk-grid-row govuk-!-margin-top-9">
