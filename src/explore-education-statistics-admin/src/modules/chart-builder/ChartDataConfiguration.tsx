@@ -73,7 +73,7 @@ const ChartDataConfiguration = ({
             <FormTextInput
               id="label"
               name="label"
-              width={10}
+              width={20}
               value={config.label}
               label="Label"
               onChange={e =>

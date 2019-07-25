@@ -237,10 +237,15 @@ const ChartBuilder = ({ data }: Props) => {
         onSelectChart={setSelectedChartType}
         selectedChartType={selectedChartType}
       />
+      <div className="govuk-!-margin-top-6 govuk-body-s dfe-align--right">
+        <a href="#">Choose an infographic as alternative</a>
+      </div>
 
       {renderedChartProps && (
         <Details summary="Chart preview" open>
-          <ChartRenderer {...renderedChartProps} />
+          <div className="govuk-width-container">
+            <ChartRenderer {...renderedChartProps} />
+          </div>
         </Details>
       )}
 

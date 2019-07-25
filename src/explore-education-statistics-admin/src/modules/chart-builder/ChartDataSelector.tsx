@@ -16,7 +16,7 @@ import {
 } from '@common/services/publicationService';
 
 import React from 'react';
-
+import Details from '@common/components/Details';
 import styles from './graph-builder.module.scss';
 
 export interface SelectedData {
@@ -112,12 +112,13 @@ const ChartDataSelector = ({
   return (
     <React.Fragment>
       <FormGroup className="govuk-grid-row">
-        <div className="govuk-grid-column-one-half">
+        <div className="govuk-grid-column-one-third">
           <FormFieldset id="filter_fieldset" legend="Filters" legendHidden>
             <FormSelect
               id="filters"
               name="filters"
               label="Filters"
+              className="govuk-!-width-full"
               options={filterSelectOptions}
               value={selectedFilters}
               onChange={e => setSelectedFilters(e.target.value)}
@@ -125,7 +126,7 @@ const ChartDataSelector = ({
             />
           </FormFieldset>
         </div>
-        <div className="govuk-grid-column-one-half">
+        <div className="govuk-grid-column-one-third">
           <FormFieldset
             id="indicator_fieldset"
             legend="Indicators"
@@ -135,6 +136,7 @@ const ChartDataSelector = ({
               id="indicators"
               name="indicators"
               label="Indicators"
+              className="govuk-!-width-full"
               options={indicatorSelectOptions}
               value={selectedIndicator}
               onChange={e => setSelectedIndicator(e.target.value)}
@@ -142,13 +144,11 @@ const ChartDataSelector = ({
             />
           </FormFieldset>
         </div>
-      </FormGroup>
-
-      {selectedIndicator && selectedFilters && (
-        <div className="govuk-grid-row">
-          <div className="govuk-grid-column-full">
+        {selectedIndicator && selectedFilters && (
+          <div className="govuk-grid-column-one-third">
             <Button
               type="button"
+              className="govuk-!-margin-bottom-0 govuk-!-margin-top-6"
               onClick={() => {
                 const dataSet = {
                   filters: selectedFilters.split(','),
@@ -183,63 +183,59 @@ const ChartDataSelector = ({
               Add data
             </Button>
           </div>
-        </div>
-      )}
+        )}
+      </FormGroup>
 
       {selectedList.length > 0 && (
-        <table className="govuk-table">
-          <caption>Selected data</caption>
-          <thead>
-            <tr>
-              <th className="govuk-table__header">Filters</th>
-              <th className="govuk-table__header">Indicator</th>
-              <th />
-            </tr>
-          </thead>
-          <tbody>
-            {selectedList.map((selected, index) => (
-              <React.Fragment
-                key={`${
-                  selected.dataSet.indicator
-                }_${selected.dataSet.filters.join(',')}`}
-              >
-                <tr className={styles.noCellBorder}>
-                  <td className="govuk-table__cell">
+        <>
+          {selectedList.map((selected, index) => (
+            <React.Fragment
+              key={`${
+                selected.dataSet.indicator
+              }_${selected.dataSet.filters.join(',')}`}
+            >
+              <dl className="govuk-summary-list govuk-!-margin-bottom-1">
+                <div className="govuk-summary-list__row">
+                  <dt className="govuk-summary-list__key">
+                    Filter / indicator
+                  </dt>
+                  <dd className="govuk-summary-list__value">
                     {selected.dataSet.filters.map(_ => (
                       <span key={_}>{metaData.filters[_].label}</span>
                     ))}
-                  </td>
-                  <td className="govuk-table__cell">
+                    {' / '}
                     {metaData.indicators[selected.dataSet.indicator].label}
-                  </td>
-                  <td className="govuk-table__cell">
+                  </dd>
+
+                  <dd className="govuk-summary-list__actions">
                     <Button
                       type="button"
                       onClick={() => removeSelected(selected, index)}
                       className="govuk-!-margin-bottom-0"
                     >
-                      remove
+                      Remove
                     </Button>
-                  </td>
-                </tr>
-                <tr>
-                  <td colSpan={3}>
-                    <ChartDataConfiguration
-                      configuration={selected.configuration}
-                      capabilities={capabilities}
-                      onConfigurationChange={(value: DataSetConfiguration) => {
-                        selectedList[index].configuration = value;
-                        const newData = [...selectedList];
-                        setSelectedList(newData);
-                        if (onDataChanged) onDataChanged(newData);
-                      }}
-                    />
-                  </td>
-                </tr>
-              </React.Fragment>
-            ))}
-          </tbody>
-        </table>
+                  </dd>
+                </div>
+              </dl>
+              <Details
+                summary="Change styling"
+                className="govuk-!-margin-bottom-3 govuk-body-s"
+              >
+                <ChartDataConfiguration
+                  configuration={selected.configuration}
+                  capabilities={capabilities}
+                  onConfigurationChange={(value: DataSetConfiguration) => {
+                    selectedList[index].configuration = value;
+                    const newData = [...selectedList];
+                    setSelectedList(newData);
+                    if (onDataChanged) onDataChanged(newData);
+                  }}
+                />
+              </Details>
+            </React.Fragment>
+          ))}
+        </>
       )}
     </React.Fragment>
   );
