@@ -14,7 +14,7 @@ import TabsSection, { TabsSectionProps } from './TabsSection';
 interface Props {
   children: ReactNode;
   id: string;
-  onToggle: any;
+  onToggle?: any;
 }
 
 const Tabs = ({ children, id, onToggle }: Props) => {
@@ -67,7 +67,9 @@ const Tabs = ({ children, id, onToggle }: Props) => {
                 onClick={event => {
                   event.preventDefault();
                   setSelectedTab(index);
-                  onToggle(props.title);
+                  if (typeof onToggle === 'function') {
+                    onToggle(props.title);
+                  }
                 }}
                 onKeyDown={event => {
                   switch (event.key) {

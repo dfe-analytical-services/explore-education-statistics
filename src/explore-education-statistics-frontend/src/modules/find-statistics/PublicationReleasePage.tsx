@@ -4,8 +4,8 @@ import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import RelatedAside from '@common/components/RelatedAside';
-import { baseUrl } from '@common/services/api';
 import DataBlockWithAnalytics from '@frontend/components/DataBlockWithAnalytics';
+import { baseUrl } from '@common/services/api';
 import publicationService, {
   Release,
 } from '@common/services/publicationService';
