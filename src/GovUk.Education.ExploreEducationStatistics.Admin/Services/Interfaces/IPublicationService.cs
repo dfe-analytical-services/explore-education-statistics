@@ -16,5 +16,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Publication Get(string slug);
 
         List<PublicationViewModel> GetByTopicAndUser(TopicId topicId, UserId userId);
+        PublicationViewModel CreatePublication(CreatePublicationViewModel publication);
     }
 }

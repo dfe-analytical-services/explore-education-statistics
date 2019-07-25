@@ -48,7 +48,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return PublicationToPublicationViewModelMapper.Map<List<PublicationViewModel>>(publications);
         }
-        
+
+        public PublicationViewModel CreatePublication(CreatePublicationViewModel publication)
+        {
+            _context.Publications.Add(new Publication { });
+            return null;// TODO
+        }
+
         private static readonly IMapper PublicationToPublicationViewModelMapper = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Publication, PublicationViewModel>();

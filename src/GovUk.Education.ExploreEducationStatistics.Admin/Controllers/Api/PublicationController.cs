@@ -38,5 +38,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
             return NoContent();
         }
+
+
+        // POST api/publications
+        [HttpPost("/topic/{topicId}/publications")]
+        [AllowAnonymous] // TODO We will need to do Authorisation checks when we know what the permissions model is.
+        public ActionResult<PublicationViewModel> CreatePublication(CreatePublicationViewModel publication, Guid topicId)
+        {
+            publication.TopicId = topicId;
+            return _publicationService.CreatePublication(publication);
+        }
     }
 }
