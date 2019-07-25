@@ -46,6 +46,19 @@ const TimePeriodDataTable = (props: Props) => {
       [options => options.length],
     );
 
+    for (let i = 0; i < sortedFilters.length; i += 1) {
+      const sortedFilter = sortedFilters[i];
+      if (sortedFilter.length === 1) {
+        if (typeof sortedFilter[0].label === 'string') {
+          const { label } = sortedFilter[0];
+          if (label.toUpperCase() === 'TOTAL') {
+            sortedFilters.splice(i, 1);
+            i -= 1;
+          }
+        }
+      }
+    }
+
     const halfwayIndex = Math.floor(sortedFilters.length / 2);
 
     setTableHeaders({
