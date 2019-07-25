@@ -59,7 +59,7 @@
 							"    pm.expect(pm.response.json()[0].title).to.equal(\"Ad Hoc\"); ",
 							"});",
 							"",
-							"pm.test(\"Ad Hoc should be present in the results\", function () { ",
+							"pm.test(\"Statistics should be present in the results\", function () { ",
 							"    pm.expect(pm.response.json()[1].title).to.equal(\"Official Statistics\"); ",
 							"});"
 						],
