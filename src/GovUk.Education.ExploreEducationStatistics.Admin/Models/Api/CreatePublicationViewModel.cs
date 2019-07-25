@@ -8,12 +8,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 {
     public class CreatePublicationViewModel
     {
-        public string title { get; set; }
+        public string Title { get; set; }
 
         public Guid TopicId { get; set; }
 
         public Guid? MethodologyId { get; set; }
 
-        public Guid Contact { get; set; }
+        public Guid ContactId { get; set; }
     }
 }

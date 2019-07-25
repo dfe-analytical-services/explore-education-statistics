@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using UserId = System.Guid;
 using TopicId = System.Guid;
+using PublicationId = System.Guid;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
@@ -17,5 +18,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         List<PublicationViewModel> GetByTopicAndUser(TopicId topicId, UserId userId);
         PublicationViewModel CreatePublication(CreatePublicationViewModel publication);
+        
+        PublicationViewModel GetViewModel(PublicationId publicationId);
+        
     }
 }

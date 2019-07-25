@@ -7,9 +7,9 @@ using System.Linq;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
 using UserId = System.Guid;
 using TopicId = System.Guid;
+using PublicationId = System.Guid;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -51,8 +51,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public PublicationViewModel CreatePublication(CreatePublicationViewModel publication)
         {
-            _context.Publications.Add(new Publication { });
-            return null;// TODO
+            var saved = _context.Publications.Add(new Publication
+            {
+                Id = Guid.NewGuid(),
+                ContactId = publication.ContactId,
+                Title = publication.Title,
+                TopicId = publication.TopicId
+
+            });
+            _context.SaveChanges();
+            return GetViewModel(saved.Entity.Id);
+        }
+
+        public PublicationViewModel GetViewModel(PublicationId publicationId)
+        {
+            return PublicationToPublicationViewModelMapper.Map<PublicationViewModel>(Get(publicationId));
         }
 
         private static readonly IMapper PublicationToPublicationViewModelMapper = new MapperConfiguration(cfg =>
