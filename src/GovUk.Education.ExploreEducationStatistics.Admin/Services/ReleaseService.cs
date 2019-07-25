@@ -83,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         Caption = c.Caption,
                         Heading = c.Heading,
                         Order = c.Order,
-                        // TODO do we want to copy any more that this?
+                        // TODO in future do we want to copy across more? Is it possible to do so?
                     }).ToList();
                 }
             }
