@@ -11,8 +11,8 @@ Library    utilities.py
 ${browser}    chrome
 ${headless}   1
 
-${timeout}          15
-${implicit_wait}    15
+${timeout}          20
+${implicit_wait}    20
 
 ${url}        about:blank
 ${urlAdmin}   about:blank
@@ -43,7 +43,6 @@ user opens chrome headless
   ${c_opts} =     Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
   Call Method    ${c_opts}   add_argument    headless
   Call Method    ${c_opts}   add_argument    disable-gpu
-  #Call Method    ${c_opts}   add_argument    no-sandbox
   Call Method    ${c_opts}   add_argument    window-size\=1920,1080
   Create Webdriver    Chrome    crm_alias    chrome_options=${c_opts}
 
@@ -60,11 +59,6 @@ user opens chrome with xvfb
 user opens chrome without xvfb
   open browser   about:blank   Chrome
   maximize browser window
-
-  # bug workaround to maximize window: https://github.com/robotframework/Selenium2Library/issues/677
-  #${options}  evaluate  sys.modules['selenium.webdriver'].ChromeOptions()  sys
-  #call method  ${options}  add_argument  --start-fullscreen
-  #create webdriver  Chrome  chrome_options=${options}
 
 user opens firefox headless
   ${f_opts} =     Evaluate     sys.modules['selenium.webdriver'].firefox.options.Options()    sys, selenium.webdriver
@@ -218,10 +212,3 @@ user checks page contains link with text and url
 
 user waits until results table appears
   user waits until page contains element   css:table thead th
-
-#user clicks accordion
-#  [Arguments]   ${text}
-#  # Expand accordion
-##  user clicks element containing text  ${text}
-#  user clicks element   css:[data-testid*="AccordionSection ${text}"]
-#  # Check that it has expanded
