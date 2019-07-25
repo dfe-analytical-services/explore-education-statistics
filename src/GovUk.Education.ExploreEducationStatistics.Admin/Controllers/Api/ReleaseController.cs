@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
+    
+    // TODO rename to Releases once the current Crud releases controller is removed
     [ApiController]
     [Authorize]
     public class ReleasesController : ControllerBase
@@ -23,12 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
         public ActionResult<ReleaseViewModel> CreateRelease(CreateReleaseViewModel release)
         {
-            if (ModelState.IsValid)
-            {
-                return _releaseService.CreateRelease(release);
-            }
-
-            return null; // TODO 
+            return _releaseService.CreateRelease(release);
         }
     }
 }
