@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Newtonsoft.Json;
 using static System.DateTime;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PartialDate;
+using static System.String;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
@@ -14,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     {
         public Guid Id { get; set; }
 
-        public string Title => TimePeriodCoverage.GetEnumLabel() + " " + _releaseName;
+        public string Title => TimePeriodCoverage.GetEnumLabel() + (IsNullOrEmpty(ReleaseName) ? "" : " " + ReleaseName);
 
         private string _releaseName;
 
