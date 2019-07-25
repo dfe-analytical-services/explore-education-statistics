@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var publications = _context.Publications.Where(p => p.TopicId == topicId)
                 .Include(p => p.Contact)
                 .Include(p => p.Releases)
-                .Include(p => p.Methodologies)
+                .Include(p => p.Methodology)
                 .ToList();
 
             return PublicationToPublicationViewModelMapper.Map<List<PublicationViewModel>>(publications);
