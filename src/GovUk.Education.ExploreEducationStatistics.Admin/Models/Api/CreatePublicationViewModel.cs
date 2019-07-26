@@ -1,19 +1,19 @@
 using System;
 using System.ComponentModel.DataAnnotations;
-using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 {
     public class CreatePublicationViewModel
     {
+        [Required]
         public string Title { get; set; }
 
+        [Required]
         public Guid TopicId { get; set; }
 
         public Guid? MethodologyId { get; set; }
 
+        [Required]
         public Guid ContactId { get; set; }
     }
 }
