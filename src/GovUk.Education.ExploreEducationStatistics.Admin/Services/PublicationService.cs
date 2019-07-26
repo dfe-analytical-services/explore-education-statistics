@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using Microsoft.EntityFrameworkCore;
@@ -49,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return PublicationToPublicationViewModelMapper.Map<List<PublicationViewModel>>(publications);
         }
 
-        public PublicationViewModel CreatePublication(CreatePublicationViewModel publication)
+        public async Task<PublicationViewModel> CreatePublication(CreatePublicationViewModel publication)
         {
             var saved = _context.Publications.Add(new Publication
             {
@@ -60,18 +61,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 MethodologyId = publication.MethodologyId
             });
             _context.SaveChanges();
-            return GetViewModel(saved.Entity.Id);
+            return await GetViewModelAsync(saved.Entity.Id);
         }
 
-        public PublicationViewModel GetViewModel(PublicationId publicationId)
+        public async Task<PublicationViewModel> GetViewModelAsync(PublicationId publicationId)
         {
-            var publication = _context.Publications.Include(p => p.Methodology)
+            var publication = await _context.Publications.Include(p => p.Methodology)
                 .Include(p => p.Contact)
                 .Include(p => p.Releases)
                 .Where(p => p.Id == publicationId)
-                .Select(p => PublicationToPublicationViewModelMapper.Map<PublicationViewModel>(p))
-                .FirstOrDefault();
-            return publication;
+                .FirstOrDefaultAsync();
+            return PublicationToPublicationViewModelMapper.Map<PublicationViewModel>(publication);
         }
 
         private static readonly IMapper PublicationToPublicationViewModelMapper = new MapperConfiguration(cfg =>

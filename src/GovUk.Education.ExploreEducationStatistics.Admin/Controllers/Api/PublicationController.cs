@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -43,10 +44,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         // POST api/publications
         [HttpPost("/topic/{topicId}/publications")]
         [AllowAnonymous] // TODO We will need to do Authorisation checks when we know what the permissions model is.
-        public ActionResult<PublicationViewModel> CreatePublication(CreatePublicationViewModel publication, Guid topicId)
+        public async Task<ActionResult<PublicationViewModel>> CreatePublication(CreatePublicationViewModel publication, Guid topicId)
         {
             publication.TopicId = topicId;
-            return _publicationService.CreatePublication(publication);
+            return await _publicationService.CreatePublication(publication);
         }
     }
 }

@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 });
 
                 // Do an in depth check of the saved release
-                var publication = context.Publications.Single(p => p.Id == result.Id);
+                var publication = context.Publications.Single(p => p.Id == result.Result.Id);
                 Assert.Equal(new Guid("1ad5f3dc-20f2-4baf-b715-8dd31ba58942"), publication.ContactId);
                 Assert.Equal("Publication Title", publication.Title);
                 Assert.Equal(new Guid("861517a2-5055-486c-b362-f971d9791943"), publication.TopicId);
@@ -68,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 });
 
                 // Do an in depth check of the saved release
-                var createdPublication = context.Publications.Single(p => p.Id == result.Id);
+                var createdPublication = context.Publications.Single(p => p.Id == result.Result.Id);
                 Assert.Equal(new Guid("cd6c265b-7fbc-4c15-ab36-7c3e0ea216d5"), createdPublication.ContactId);
                 Assert.Equal("Publication Title", createdPublication.Title);
                 Assert.Equal(new Guid("b9ce9ddc-efdc-4853-b709-054dc7eed6e4"), createdPublication.TopicId);

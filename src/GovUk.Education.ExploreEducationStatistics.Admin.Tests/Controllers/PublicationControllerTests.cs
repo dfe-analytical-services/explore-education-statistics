@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -16,14 +17,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
 
             publicationService
                 .Setup(s => s.CreatePublication(It.IsAny<CreatePublicationViewModel>()))
-                .Returns<CreatePublicationViewModel>(p => new PublicationViewModel {TopicId = p.TopicId});
+                .Returns<CreatePublicationViewModel>(p => Task.FromResult(new PublicationViewModel {TopicId = p.TopicId}));
             var controller = new PublicationController(publicationService.Object);
 
             var topicId = Guid.NewGuid();
             // Method under test
             var result = controller.CreatePublication(new CreatePublicationViewModel(), topicId);
-            Assert.IsAssignableFrom<PublicationViewModel>(result.Value);
-            Assert.Equal(topicId, result.Value.TopicId);
+            Assert.IsAssignableFrom<PublicationViewModel>(result.Result.Value);
+            Assert.Equal(topicId, result.Result.Value.TopicId);
         }
     }
 }
