@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _releaseService = releaseService;
         }
 
-        // POST api/contacts
+        // POST api/publication/{publicationId}/releases
         [HttpPost("publication/{publicationId}/releases")]
         [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
         public ActionResult<ReleaseViewModel> CreateRelease(CreateReleaseViewModel release, Guid publicationId)
