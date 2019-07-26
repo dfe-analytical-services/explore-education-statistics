@@ -36,10 +36,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     ReleaseTypeId = new Guid("02e664f2-a4bc-43ee-8ff0-c87354adae72")
                 });
 
-                Assert.Equal("Academic Year 2018", result.Title);
-                Assert.Null(result.Published);
-                Assert.False(result.LatestRelease); // Most recent - but not published yet.
-                Assert.Equal(TimeIdentifier.AcademicYear, result.TimePeriodCoverage);
+                Assert.Equal("Academic Year 2018", result.Result.Title);
+                Assert.Null(result.Result.Published);
+                Assert.False(result.Result.LatestRelease); // Most recent - but not published yet.
+                Assert.Equal(TimeIdentifier.AcademicYear, result.Result.TimePeriodCoverage);
             }
         }
 
@@ -105,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 });
                 
                 // Do an in depth check of the saved release
-                var release = context.Releases.Single(r => r.Id == result.Id);
+                var release = context.Releases.Single(r => r.Id == result.Result.Id);
                 Assert.Equal(2, release.Content.Count);
                 Assert.Equal("Template caption index 0", release.Content[0].Caption);
                 Assert.Equal("Template heading index 0", release.Content[0].Heading);

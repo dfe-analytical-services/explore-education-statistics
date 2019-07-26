@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -22,10 +23,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         // POST api/publication/{publicationId}/releases
         [HttpPost("publication/{publicationId}/releases")]
         [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
-        public ActionResult<ReleaseViewModel> CreateRelease(CreateReleaseViewModel release, Guid publicationId)
+        public async Task<ActionResult<ReleaseViewModel>> CreateRelease(CreateReleaseViewModel release, Guid publicationId)
         {
             release.PublicationId = publicationId;
-            return _releaseService.CreateRelease(release);
+            return await _releaseService.CreateRelease(release);
         }
     }
 }

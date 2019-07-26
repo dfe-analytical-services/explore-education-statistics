@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -25,6 +26,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return _context.Releases.FirstOrDefault(x => x.Id == id);
         }
+        
+        public async Task<Release> GetAsync(Guid id)
+        {
+            return await _context.Releases.FirstOrDefaultAsync(x => x.Id == id);
+        }
 
         public Release Get(string slug)
         {
@@ -37,13 +43,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         // TODO Authorisation will be required when users are introduced
-        public ReleaseViewModel GetViewModel(Guid id)
+        public async Task<ReleaseViewModel> GetViewModel(Guid id)
         {
-            return ReleaseToReleaseViewMapper.Map<ReleaseViewModel>(Get(id));
+            var release = await GetAsync(id);
+            return ReleaseToReleaseViewMapper.Map<ReleaseViewModel>(release);
         }
 
         // TODO Authorisation will be required when users are introduced
-        public ReleaseViewModel CreateRelease(CreateReleaseViewModel createRelease)
+        public async Task<ReleaseViewModel> CreateRelease(CreateReleaseViewModel createRelease)
         {
             var order = OrderForNextReleaseOnPublication(createRelease.PublicationId);
             var content = TemplateFromRelease(createRelease.TemplateReleaseId);                  
@@ -61,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Content = content
             });
             _context.SaveChanges();
-            return GetViewModel(saved.Entity.Id);
+            return await GetViewModel(saved.Entity.Id);
         }
 
         private int OrderForNextReleaseOnPublication(Guid publicationId)
