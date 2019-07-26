@@ -25,21 +25,25 @@ function CookieBanner({ cookies }: Props) {
   function render() {
     return (
       <div className={styles.container}>
-        <p>
-          <span>GOV.UK uses cookies to make the site simpler.</span>{' '}
-          <ButtonText
-            type="button"
-            className={styles.button}
-            onClick={() => {
-              acceptCookies();
-            }}
-          >
-            Accept Cookies
-          </ButtonText>{' '}
-          or{' '}
-          <a href="/cookies">find out more about cookies and cookie settings</a>
-          .
-        </p>
+        <div className="govuk-width-container dfe-width-container--wide">
+          <p>
+            <span>GOV.UK uses cookies to make the site simpler.</span>{' '}
+            <ButtonText
+              type="button"
+              className={styles.button}
+              onClick={() => {
+                acceptCookies();
+              }}
+            >
+              Accept Cookies
+            </ButtonText>{' '}
+            or{' '}
+            <a href="/cookies">
+              find out more about cookies and cookie settings
+            </a>
+            .
+          </p>
+        </div>
       </div>
     );
   }
