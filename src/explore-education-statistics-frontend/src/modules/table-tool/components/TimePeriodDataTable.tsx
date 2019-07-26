@@ -23,10 +23,18 @@ interface Props {
   subjectName: string;
   locations: LocationFilter[];
   results: TableData['result'];
+  footnotes?: TableData['footnotes'];
 }
 
 const TimePeriodDataTable = (props: Props) => {
-  const { filters, timePeriods, locations, indicators, results } = props;
+  const {
+    filters,
+    timePeriods,
+    locations,
+    indicators,
+    results,
+    footnotes,
+  } = props;
 
   const dataTableRef = useRef<HTMLTableElement>(null);
 
@@ -157,6 +165,7 @@ const TimePeriodDataTable = (props: Props) => {
         rowHeaders={rowHeaders}
         rows={rows}
         ref={dataTableRef}
+        footnotes={footnotes}
       />
     </div>
   );

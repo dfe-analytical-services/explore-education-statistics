@@ -13,10 +13,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             _context = context;
         }
 
-        public GeoJson Find(GeographicLevel level, string code)
+        public GeoJson Find(long boundaryLevelId, string code)
         {
             return _context.GeoJson.FirstOrDefault(geoJson =>
-                geoJson.Code.Equals(code) && geoJson.GeographicLevel == level);
+                geoJson.BoundaryLevelId == boundaryLevelId &&
+                geoJson.Code.Equals(code));
         }
     }
 }

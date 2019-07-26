@@ -1,0 +1,154 @@
+{
+	"info": {
+		"_postman_id": "1775624b-d484-4c2c-a00e-ae96fd7f2335",
+		"name": "DfE Admin API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GET contacts",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "2db4ed0b-6eeb-40b6-914f-f1692eb248fb",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+							"",
+							"pm.test(\"Team name should be correct\", function () { ",
+							"    pm.expect(pm.response.json()[0].teamName).to.equal(\"Simon's Team\"); ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{admin_api_url}}/contacts",
+					"host": [
+						"{{admin_api_url}}"
+					],
+					"path": [
+						"contacts"
+					]
+				},
+				"description": "Returns all contacts"
+			},
+			"response": []
+		},
+		{
+			"name": "GET Release Types",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "7a6fd139-bc0d-4c80-96f1-4b6439171c35",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+							"",
+							"pm.test(\"Should return 2 results\", function () { pm.expect(pm.response.json().length).to.equal(2); });",
+							"",
+							"pm.test(\"Ad Hoc should be present in the results\", function () { ",
+							"    pm.expect(pm.response.json()[0].title).to.equal(\"Ad Hoc\"); ",
+							"});",
+							"",
+							"pm.test(\"Statistics should be present in the results\", function () { ",
+							"    pm.expect(pm.response.json()[1].title).to.equal(\"Official Statistics\"); ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{admin_api_url}}/meta/releasetypes",
+					"host": [
+						"{{admin_api_url}}"
+					],
+					"path": [
+						"meta",
+						"releasetypes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET Time Identifers",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "fd44e1ec-7bf1-419d-9a9e-1317325d0595",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+							"",
+							"",
+							"pm.test(\"Exect the correct fields\", function () {",
+							"    for(var i = 0; i < pm.response.json().length; i++) {",
+							"            pm.expect(pm.response.to.have.jsonBody(`[${i}].category`));",
+							"            pm.expect(pm.response.to.have.jsonBody(`[${i}].timeIdentifiers`));",
+							"            pm.expect(pm.response.to.have.jsonBody(`[${i}].timeIdentifiers[0].identifier`));",
+							"            pm.expect(pm.response.to.have.jsonBody(`[${i}].timeIdentifiers[0].identifier.value`));",
+							"            pm.expect(pm.response.to.have.jsonBody(`[${i}].timeIdentifiers[0].identifier.label`));",
+							"    }",
+							"});",
+							"",
+							"pm.test(\"Expect Academic year to be returned\", function () {",
+							"    for(var i = 0; i < pm.response.json().length; i++) {",
+							"            pm.expect(pm.response.json()[0].category.label).to.equal(\"Academic year\");",
+							"    }",
+							"});",
+							"",
+							"pm.test(\"Expect Academic Year Q1 to be returned\", function () {",
+							"    for(var i = 0; i < pm.response.json().length; i++) {",
+							"            pm.expect(pm.response.json()[0].timeIdentifiers[1].identifier.label).to.equal(\"Academic Year Q1\");",
+							"    }",
+							"});",
+							"",
+							"pm.test(\"Expect correct number of identifiers\", function () {",
+							"    for(var i = 0; i < pm.response.json().length; i++) {",
+							"            pm.expect(pm.response.json()[0].timeIdentifiers.length).to.equal(13);",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{admin_api_url}}/meta/timeidentifiers",
+					"host": [
+						"{{admin_api_url}}"
+					],
+					"path": [
+						"meta",
+						"timeidentifiers"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
