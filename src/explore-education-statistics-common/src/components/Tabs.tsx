@@ -14,10 +14,10 @@ import TabsSection, { TabsSectionProps } from './TabsSection';
 interface Props {
   children: ReactNode;
   id: string;
-  onToggle?: (section: { id: string; title: string }) => void;
+  analytics?: (event: { category: string; action: string }) => void;
 }
 
-const Tabs = ({ children, id, onToggle }: Props) => {
+const Tabs = ({ children, id, analytics }: Props) => {
   const [loadedSections, setLoadedSections] = useState(new Set<number>());
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
 
@@ -67,8 +67,11 @@ const Tabs = ({ children, id, onToggle }: Props) => {
                 onClick={event => {
                   event.preventDefault();
                   setSelectedTab(index);
-                  if (typeof onToggle === 'function') {
-                    onToggle({ id: sectionId, title: props.title });
+                  if (typeof analytics === 'function') {
+                    analytics({
+                      category: 'Statistics Tabs',
+                      action: `${props.title} (${sectionId}) Tab Opened`,
+                    });
                   }
                 }}
                 onKeyDown={event => {
@@ -81,8 +84,11 @@ const Tabs = ({ children, id, onToggle }: Props) => {
 
                       setSelectedTab(nextTabIndex);
                       tabElements[nextTabIndex].focus();
-                      if (typeof onToggle === 'function') {
-                        onToggle({ id: sectionId, title: props.title });
+                      if (typeof analytics === 'function') {
+                        analytics({
+                          category: 'Statistics Tabs',
+                          action: `${props.title} (${sectionId}) Tab Opened`,
+                        });
                       }
                       break;
                     }
@@ -94,8 +100,11 @@ const Tabs = ({ children, id, onToggle }: Props) => {
 
                       setSelectedTab(nextTabIndex);
                       tabElements[nextTabIndex].focus();
-                      if (typeof onToggle === 'function') {
-                        onToggle({ id: sectionId, title: props.title });
+                      if (typeof analytics === 'function') {
+                        analytics({
+                          category: 'Statistics Tabs',
+                          action: `${props.title} (${sectionId}) Tab Opened`,
+                        });
                       }
                       break;
                     }

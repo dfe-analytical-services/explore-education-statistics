@@ -40,7 +40,7 @@ export interface DataBlockProps {
   showTables?: boolean;
   additionalTabContent?: ReactNode;
 
-  onToggle?: (section: { id: string; title: string }) => void;
+  analytics?: (eventGA: { category: string; action: string }) => void;
 }
 
 interface DataBlockState {
@@ -128,7 +128,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
       height,
       showTables,
       additionalTabContent,
-      onToggle,
+      analytics,
       id,
     } = this.props;
     const { charts, summary, tables, isLoading } = this.state;
@@ -140,10 +140,10 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
         {isLoading ? (
           <LoadingSpinner text="Loading content..." />
         ) : (
-          <Tabs id={id} onToggle={onToggle}>
+          <Tabs id={id} analytics={analytics}>
             {summary && (
               <TabsSection id={`${id}-summary`} title="Summary">
-                <SummaryRenderer {...summary} />
+                <SummaryRenderer analytics={analytics} {...summary} />
               </TabsSection>
             )}
 

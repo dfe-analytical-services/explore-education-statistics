@@ -14,6 +14,7 @@ export interface SummaryRendererProps {
   dataKeys: string[];
   dataSummary: string[];
   description: { type: string; body: string };
+  analytics?: (eventGA: { category: string; action: string }) => void;
 }
 
 function getLatestMeasures(result: Result[]) {
@@ -33,6 +34,7 @@ export default function SummaryRenderer({
   data,
   dataKeys,
   dataSummary,
+  analytics,
 }: SummaryRendererProps) {
   let measures: { [key: string]: string } = {};
 
@@ -73,7 +75,10 @@ export default function SummaryRenderer({
                   <p className="govuk-body-s">{dataSummary[index]}</p>
                 )}
               </div>
-              <Details summary={`Define '${meta.indicators[key].label}'`}>
+              <Details
+                analytics={analytics}
+                summary={`Define '${meta.indicators[key].label}'`}
+              >
                 <p>
                   This service is not yet available
                   {/*

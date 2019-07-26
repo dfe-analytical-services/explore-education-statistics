@@ -13,6 +13,7 @@ export interface DetailsProps {
   children: ReactNode;
   id?: string;
   onToggle?: (isOpen: boolean, event: MouseEvent<HTMLElement>) => void;
+  analytics?: (eventGA: { category: string; action: string }) => void;
   open?: boolean;
   summary: string | ReactNode;
 }
@@ -23,6 +24,7 @@ const Details = ({
   id = `details-content-${(idCounter += 1)}`,
   open = false,
   onToggle,
+  analytics,
   summary,
   tag,
 }: DetailsProps) => {
@@ -77,6 +79,12 @@ const Details = ({
 
           if (onToggle) {
             onToggle(!isOpened, event);
+            if (analytics) {
+              analytics({
+                category: 'Statistics summary',
+                action: `${summary} - ${tag}`,
+              });
+            }
 
             if (event.isDefaultPrevented()) {
               return;
