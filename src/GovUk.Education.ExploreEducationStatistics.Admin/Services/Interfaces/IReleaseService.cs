@@ -15,6 +15,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Release Get(string slug);
 
-        ReleaseViewModel CreateRelease(CreateReleaseViewModel release);
+        Task<ReleaseViewModel> CreateRelease(CreateReleaseViewModel release);
     }
 }
