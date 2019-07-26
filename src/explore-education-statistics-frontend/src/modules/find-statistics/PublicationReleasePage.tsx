@@ -10,7 +10,7 @@ import publicationService, {
   Release,
 } from '@common/services/publicationService';
 import ButtonLink from '@frontend/components/ButtonLink';
-import AccordionSectionWithAnalytics from '@frontend/components/AccordionSectionWithAnalytics';
+import AccordionWithAnalytics from '@frontend/components/AccordionWithAnalytics';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
@@ -290,7 +290,7 @@ class PublicationReleasePage extends Component<Props> {
         >
           Help and support
         </h2>
-        <Accordion id="extra-information-sections">
+        <AccordionWithAnalytics id="extra-information-sections">
           <AccordionSection
             heading={`${data.title}: methodology`}
             caption="Find out how and why we collect, process and publish these statistics"
@@ -347,7 +347,7 @@ class PublicationReleasePage extends Component<Props> {
               guidance.
             </p>
           </AccordionSection>
-          <AccordionSectionWithAnalytics heading="Contact us" headingTag="h3">
+          <AccordionSection heading="Contact us" headingTag="h3">
             <div className="govuk-warning-text">
               <span className="govuk-warning-text__icon" aria-hidden="true">
                 !
@@ -393,8 +393,8 @@ class PublicationReleasePage extends Component<Props> {
               Telephone <br />
               [[ DEPT. FOR EDUCATION TEL NO. ]]
             </p>
-          </AccordionSectionWithAnalytics>
-        </Accordion>
+          </AccordionSection>
+        </AccordionWithAnalytics>
         <h2 className="govuk-heading-m govuk-!-margin-top-9">
           Create your own tables online
         </h2>

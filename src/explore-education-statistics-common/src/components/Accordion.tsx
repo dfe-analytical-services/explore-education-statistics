@@ -19,9 +19,15 @@ export interface AccordionProps {
   children: ReactNode;
   id: string;
   onToggleAll?: (open: boolean) => void;
+  analytics?: (accordionHeading: { id: string; title: string }) => void;
 }
 
-const Accordion = ({ children, id, onToggleAll }: AccordionProps) => {
+const Accordion = ({
+  children,
+  id,
+  onToggleAll,
+  analytics,
+}: AccordionProps) => {
   const ref = useRef<HTMLDivElement>(null);
 
   const [openSections, updateOpenSections] = useImmer<boolean[]>([]);
@@ -150,6 +156,10 @@ const Accordion = ({ children, id, onToggleAll }: AccordionProps) => {
             updateOpenSections(draft => {
               draft[index] = isOpen;
             });
+
+            if (analytics && isOpen) {
+              analytics({ id: headingId, title: section.props.heading });
+            }
 
             if (section.props.onToggle) {
               section.props.onToggle(isOpen);
