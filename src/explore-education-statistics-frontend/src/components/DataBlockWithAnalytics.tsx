@@ -8,10 +8,10 @@ const DataBlockWithAnalytics = (props: DataBlockProps) => {
   return (
     <DataBlock
       {...props}
-      onToggle={(statisticsTab: { id: string; title: string }) => {
+      onToggle={(section: { id: string; title: string }) => {
         logEvent(
           'Statistics tabs',
-          `${statisticsTab.title} (${statisticsTab.id}) tab opened`,
+          `${section.title} (${section.id}) tab opened`,
           window.location.pathname,
         );
       }}

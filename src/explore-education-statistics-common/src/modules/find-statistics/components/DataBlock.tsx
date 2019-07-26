@@ -40,7 +40,7 @@ export interface DataBlockProps {
   showTables?: boolean;
   additionalTabContent?: ReactNode;
 
-  onToggle?: (statisticsTab: { id: string; title: string }) => void;
+  onToggle?: (section: { id: string; title: string }) => void;
 }
 
 interface DataBlockState {

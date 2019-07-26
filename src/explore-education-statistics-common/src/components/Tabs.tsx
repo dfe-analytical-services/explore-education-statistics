@@ -14,7 +14,7 @@ import TabsSection, { TabsSectionProps } from './TabsSection';
 interface Props {
   children: ReactNode;
   id: string;
-  onToggle?: (statisticsTab: { id: string; title: string }) => void;
+  onToggle?: (section: { id: string; title: string }) => void;
 }
 
 const Tabs = ({ children, id, onToggle }: Props) => {
