@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
         {
             var releaseService = new Mock<IReleaseService>();
 
-            releaseService.Setup(s => s.CreateRelease(It.IsAny<CreateReleaseViewModel>())).Returns(Task.FromResult(new ReleaseViewModel()));
+            releaseService.Setup(s => s.CreateReleaseAsync(It.IsAny<CreateReleaseViewModel>())).Returns(Task.FromResult(new ReleaseViewModel()));
             var controller = new ReleasesController(releaseService.Object);
             
             // Method under test

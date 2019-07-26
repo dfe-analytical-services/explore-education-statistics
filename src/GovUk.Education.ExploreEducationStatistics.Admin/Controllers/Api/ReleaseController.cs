@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<ReleaseViewModel>> CreateRelease(CreateReleaseViewModel release, Guid publicationId)
         {
             release.PublicationId = publicationId;
-            return await _releaseService.CreateRelease(release);
+            return await _releaseService.CreateReleaseAsync(release);
         }
     }
 }

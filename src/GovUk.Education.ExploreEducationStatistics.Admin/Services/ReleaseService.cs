@@ -43,14 +43,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         // TODO Authorisation will be required when users are introduced
-        public async Task<ReleaseViewModel> GetViewModel(Guid id)
+        public async Task<ReleaseViewModel> GetViewModel(ReleaseId id)
         {
             var release = await GetAsync(id);
             return ReleaseToReleaseViewMapper.Map<ReleaseViewModel>(release);
         }
 
         // TODO Authorisation will be required when users are introduced
-        public async Task<ReleaseViewModel> CreateRelease(CreateReleaseViewModel createRelease)
+        public async Task<ReleaseViewModel> CreateReleaseAsync(CreateReleaseViewModel createRelease)
         {
             var order = OrderForNextReleaseOnPublication(createRelease.PublicationId);
             var content = TemplateFromRelease(createRelease.TemplateReleaseId);                  

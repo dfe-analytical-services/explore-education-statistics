@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var context = InMemoryApplicationDbContext("Create"))
             {
                 // Service method under test
-                var result = new ReleaseService(context).CreateRelease(new CreateReleaseViewModel
+                var result = new ReleaseService(context).CreateReleaseAsync(new CreateReleaseViewModel
                 {
                     PublicationId = new Guid("24fcd99c-0508-4437-91c4-90c777414ab9"),
                     ReleaseName = "2018",
@@ -94,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var context = InMemoryApplicationDbContext("Create"))
             {
                 // Service method under test
-                var result = new ReleaseService(context).CreateRelease(new CreateReleaseViewModel
+                var result = new ReleaseService(context).CreateReleaseAsync(new CreateReleaseViewModel
                 {
                     PublicationId = new Guid("403d3c5d-a8cd-4d54-a029-0c74c86c55b2"),
                     TemplateReleaseId = new Guid("26f17bad-fc48-4496-9387-d6e5b2cb0e7f"),
