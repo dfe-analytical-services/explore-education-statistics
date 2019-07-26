@@ -56,8 +56,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Id = Guid.NewGuid(),
                 ContactId = publication.ContactId,
                 Title = publication.Title,
-                TopicId = publication.TopicId
-
+                TopicId = publication.TopicId,
+                MethodologyId = publication.MethodologyId
             });
             _context.SaveChanges();
             return GetViewModel(saved.Entity.Id);
@@ -65,7 +65,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public PublicationViewModel GetViewModel(PublicationId publicationId)
         {
-            return PublicationToPublicationViewModelMapper.Map<PublicationViewModel>(Get(publicationId));
+            var publication = _context.Publications.Include(p => p.Methodology)
+                .Include(p => p.Contact)
+                .Include(p => p.Releases)
+                .Where(p => p.Id == publicationId)
+                .Select(p => PublicationToPublicationViewModelMapper.Map<PublicationViewModel>(p))
+                .FirstOrDefault();
+            return publication;
         }
 
         private static readonly IMapper PublicationToPublicationViewModelMapper = new MapperConfiguration(cfg =>
