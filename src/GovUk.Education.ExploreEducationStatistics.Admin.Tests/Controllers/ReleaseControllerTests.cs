@@ -14,9 +14,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
     {
         
         [Fact]
-        public void Get_UserTheme_Returns_Ok()
+        public void Create_Release_Returns_Ok()
         {
-            var releaseService = new Mock<ReleaseService>();
+            var releaseService = new Mock<IReleaseService>();
 
             releaseService.Setup(s => s.CreateRelease(It.IsAny<CreateReleaseViewModel>())).Returns(new ReleaseViewModel());
             var controller = new ReleasesController(releaseService.Object);
