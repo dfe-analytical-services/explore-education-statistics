@@ -77,6 +77,7 @@ interface State {
   subjectMeta: PublicationSubjectMeta;
   timePeriodRange: TimePeriod[];
   tableData: TableData['result'];
+  footnotes: TableData['footnotes'];
 }
 
 class TableToolPage extends Component<Props, State> {
@@ -99,6 +100,7 @@ class TableToolPage extends Component<Props, State> {
     subjects: [],
     timePeriodRange: [],
     tableData: [],
+    footnotes: [],
   };
 
   public static async getInitialProps({ query }: NextContext) {
@@ -134,6 +136,7 @@ class TableToolPage extends Component<Props, State> {
 
     this.setState({
       publication,
+      footnotes: [],
       subjects,
       subjectName: '',
       tableData: [],
@@ -237,7 +240,11 @@ class TableToolPage extends Component<Props, State> {
       return;
     }
 
-    const { timePeriodRange, result } = await tableBuilderService.getTableData({
+    const {
+      footnotes,
+      timePeriodRange,
+      result,
+    } = await tableBuilderService.getTableData({
       ...mapValues(locations, locationLevel =>
         locationLevel.map(location => location.value),
       ),
@@ -273,6 +280,7 @@ class TableToolPage extends Component<Props, State> {
         timePeriod => new TimePeriod(timePeriod),
       ),
       tableData: result,
+      footnotes,
     });
   };
 
@@ -288,6 +296,7 @@ class TableToolPage extends Component<Props, State> {
       subjects,
       timePeriodRange,
       tableData,
+      footnotes,
     } = this.state;
 
     const locationsList = Object.values(locations).flat();
@@ -380,6 +389,7 @@ class TableToolPage extends Component<Props, State> {
                           locations={locationsList}
                           timePeriods={timePeriodRange}
                           results={tableData}
+                          footnotes={footnotes}
                         />
                       </div>
 
