@@ -54,6 +54,7 @@ export interface PublicationSubjectMeta {
     legend: string;
     hint?: string;
     options: GroupedFilterOptions;
+    totalValue?: string;
   }>;
   indicators: Dictionary<{
     label: string;

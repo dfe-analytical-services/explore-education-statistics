@@ -46,6 +46,7 @@ const TimePeriodDataTable = (props: Props) => {
       [options => options.length],
     );
 
+    // strips siblingless "Total" filters (columns/rows)
     for (let i = 0; i < sortedFilters.length; i += 1) {
       const sortedFilter = sortedFilters[i];
       if (sortedFilter.length === 1) {

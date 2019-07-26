@@ -57,7 +57,14 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
       enableReinitialize
       ref={formikRef}
       initialValues={{
-        filters: mapValues(subjectMeta.filters, () => []),
+        filters: mapValues(subjectMeta.filters, filter => {
+          if (filter.options.Default !== undefined) {
+            return filter.options.Default.options.length === 1
+              ? [filter.options.Default.options[0].value]
+              : [];
+          }
+          return [];
+        }),
         indicators: [],
       }}
       validationSchema={Yup.object<FormValues>({
@@ -75,6 +82,20 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
           ),
         ),
       })}
+      preSubmit={values => {
+        const newValues = values;
+        Object.keys(values.filters).forEach(filterName => {
+          if (
+            newValues.filters[filterName].length === 0 &&
+            subjectMeta.filters[filterName].totalValue
+          ) {
+            newValues.filters[filterName].push(
+              subjectMeta.filters[filterName].totalValue,
+            );
+          }
+        });
+        return newValues;
+      }}
       onSubmit={async values => {
         await onSubmit(values);
         goToNextStep();

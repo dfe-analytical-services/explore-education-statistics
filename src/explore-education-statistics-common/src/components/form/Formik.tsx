@@ -33,6 +33,10 @@ class Formik<FormValues = FormikValues> extends BaseFormik<FormValues> {
       submitCount: prevState.submitCount + 1,
     }));
 
+    this.setState({
+      values: this.preSubmit(),
+    });
+
     return this.runValidations(this.state.values).then(async combinedErrors => {
       if (this.didMount) {
         this.setState({ isValidating: false });
@@ -50,6 +54,13 @@ class Formik<FormValues = FormikValues> extends BaseFormik<FormValues> {
         }
       }
     });
+  };
+
+  public preSubmit = () => {
+    if (this.props.preSubmit) {
+      return this.props.preSubmit(this.state.values);
+    }
+    return this.state.values;
   };
 
   public executeSubmit = () => {
