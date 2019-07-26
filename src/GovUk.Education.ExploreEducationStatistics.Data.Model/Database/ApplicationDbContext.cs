@@ -14,6 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             Database.SetCommandTimeout(int.MaxValue);
         }
 
+        public DbSet<BoundaryLevel> BoundaryLevel { get; set; }
         public DbSet<Filter> Filter { get; set; }
         public DbSet<FilterItem> FilterItem { get; set; }
         public DbSet<FilterGroup> FilterGroup { get; set; }
@@ -37,6 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         {
             ConfigureAdditionalTypes(modelBuilder);
             ConfigureData(modelBuilder);
+            ConfigureBoundaryLevel(modelBuilder);
             ConfigureGeographicLevel(modelBuilder);
             ConfigureGeoJson(modelBuilder);
             ConfigureIndicatorFootnote(modelBuilder);
@@ -529,6 +531,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             });
         }
 
+        private static void ConfigureBoundaryLevel(ModelBuilder modelBuilder)
+        {
+            var geographicLevelConverter = new EnumToEnumValueConverter<GeographicLevel>();
+
+            modelBuilder.Entity<BoundaryLevel>()
+                .Property(boundaryLevel => boundaryLevel.Level)
+                .HasConversion(geographicLevelConverter);
+        }
+
         private static void ConfigureLocation(ModelBuilder modelBuilder)
         {
             ConfigureCountry(modelBuilder);
@@ -743,11 +754,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 
         private static void ConfigureGeoJson(ModelBuilder modelBuilder)
         {
-            var geographicLevelConverter = new EnumToEnumValueConverter<GeographicLevel>();
-
-            modelBuilder.Query<GeoJson>().ToView("geojson")
-                .Property(geoJson => geoJson.GeographicLevel)
-                .HasConversion(geographicLevelConverter);
+            modelBuilder.Query<GeoJson>().ToView("geojson");
         }
 
         private static void ConfigureAdditionalTypes(ModelBuilder modelBuilder)
