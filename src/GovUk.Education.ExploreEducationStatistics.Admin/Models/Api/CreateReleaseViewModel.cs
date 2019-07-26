@@ -10,8 +10,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
     {
         public Guid PublicationId { get; set; }
 
+        [Required]
         public Guid ReleaseTypeId { get; set; }
         
+        [Required]
         public TimeIdentifier TimeIdentifier { get; set; }
         
         public DateTime? PublishScheduled { get; set; }
