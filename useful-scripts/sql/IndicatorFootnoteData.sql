@@ -1038,7 +1038,8 @@ INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (66, 8);
 INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (83, 8);
 INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (113, 8);
 
--- enrolments_PA_10_exact
+-- enrolments_pa_10_exact
+INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (31, 9);
 INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (60, 9);
 -- enrolments_pa_10_exact_percent
 INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (30, 9);
@@ -1065,7 +1066,8 @@ INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (50, 9);
 INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (33, 9);
 INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (49, 9);
 
--- enrolments_PA_10_exact
+-- enrolments_pa_10_exact
+INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (31, 10);
 INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (60, 10);
 -- enrolments_pa_10_exact_percent
 INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (30, 10);
@@ -1100,6 +1102,7 @@ INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (111, 11);
 --enrolments
 INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (1, 12);
 INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (52, 12);
+INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (92, 12);
 INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (120, 12);
 INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (123, 12);
 
