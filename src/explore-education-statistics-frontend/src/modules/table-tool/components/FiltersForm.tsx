@@ -59,6 +59,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
       initialValues={{
         filters: mapValues(subjectMeta.filters, filter => {
           if (filter.options.Default !== undefined) {
+            // Automatically select filter option when there is only one
             return filter.options.Default.options.length === 1
               ? [filter.options.Default.options[0].value]
               : [];
@@ -84,6 +85,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
       })}
       preSubmit={values => {
         const newValues = values;
+        // Automatically select totalValue for filters that haven't had a selection made
         Object.keys(values.filters).forEach(filterName => {
           if (
             newValues.filters[filterName].length === 0 &&
