@@ -12,42 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class ReleaseServiceTests
     {
-        [Fact]
-        public void GetContacts()
-        {
-            using (var context = InMemoryApplicationDbContext("Get"))
-            {
-                var contactsToSave = new List<Contact>
-                {
-                    new Contact()
-                    {
-                        Id = Guid.NewGuid(),
-                        ContactName = "Contact A",
-                        TeamEmail = "ContactA@example.com",
-                        ContactTelNo = "123456789"
-                    },
-                    new Contact()
-                    {
-                        Id = Guid.NewGuid(),
-                        ContactName = "Contact B",
-                        TeamEmail = "ContactB@example.com",
-                        ContactTelNo = "123456789"
-                    }
-                };
-
-
-                context.AddRange(contactsToSave);
-                context.SaveChanges();
-
-                var service = new ContactService(context);
-                // Method under test
-                var retrievedContacts = service.GetContacts();
-                Assert.True(retrievedContacts.Exists(c => c.ContactName == "Contact A"));
-                Assert.True(retrievedContacts.Exists(c => c.ContactName == "Contact B"));
-            }
-        }
-
-
+     
         [Fact]
         public void CreateReleaseNoTemplate()
         {
