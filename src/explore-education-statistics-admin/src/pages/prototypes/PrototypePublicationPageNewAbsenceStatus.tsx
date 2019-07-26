@@ -11,7 +11,7 @@ const UpdateStatusForm = () => {
         <div className="govuk-form-group">
           <fieldset className="govuk-fieldset">
             <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
-              Release status
+              Update release status
             </legend>
             <p className="govuk-body">Select and update release status.</p>
             <div className="govuk-radios">
@@ -28,7 +28,7 @@ const UpdateStatusForm = () => {
                   className="govuk-label govuk-radios__label"
                   htmlFor="edit"
                 >
-                  In draft
+                  First draft
                 </label>
               </div>
 
@@ -44,7 +44,7 @@ const UpdateStatusForm = () => {
                   className="govuk-label govuk-radios__label"
                   htmlFor="readyApproval"
                 >
-                  Level 1: in review
+                  In review
                 </label>
               </div>
 
@@ -61,7 +61,7 @@ const UpdateStatusForm = () => {
                   className="govuk-label govuk-radios__label"
                   htmlFor="readyHigherReview"
                 >
-                  Level 2: in higher review
+                  Final sign off
                 </label>
               </div>
             </div>
@@ -79,7 +79,7 @@ const UpdateStatusForm = () => {
             />
           </div>
           <button className="govuk-button govuk-!-margin-top-3" type="submit">
-            Update release status
+            Update
           </button>
         </div>
       </form>
@@ -108,12 +108,13 @@ const PublicationDataPage = ({ location }: RouteChildrenProps) => {
       {location.search === '?status=readyTeamApproval' && (
         <>
           <div className="govuk-panel govuk-panel--confirmation">
-            <h1 className="govuk-panel__title">
-              Release ready for level 1 team review
-            </h1>
+            <h1 className="govuk-panel__title">Release ready for review</h1>
             <div className="govuk-panel__body">
               Check the 'Comments for you to resolve' tab on your{' '}
-              <Link to="/prototypes/admin-dashboard?status=readyApproval">
+              <Link
+                className="govuk-link dfe-link--white"
+                to="/prototypes/admin-dashboard?status=readyApproval"
+              >
                 dashboard
               </Link>{' '}
               for feedback

@@ -194,45 +194,45 @@ const ChartDataSelector = ({
                 selected.dataSet.indicator
               }_${selected.dataSet.filters.join(',')}`}
             >
-              <dl className="govuk-summary-list govuk-!-margin-bottom-1">
-                <div className="govuk-summary-list__row">
-                  <dt className="govuk-summary-list__key">
-                    Filter / indicator
-                  </dt>
-                  <dd className="govuk-summary-list__value">
+              <div className={styles.selectedData}>
+                <div className={styles.selectedDataRow}>
+                  <div className={styles.selectedDataFilter}>
                     {selected.dataSet.filters.map(_ => (
                       <span key={_}>{metaData.filters[_].label}</span>
                     ))}
-                    {' / '}
+                  </div>
+                  <div className={styles.selectedDataIndicator}>
                     {metaData.indicators[selected.dataSet.indicator].label}
-                  </dd>
+                  </div>
 
-                  <dd className="govuk-summary-list__actions">
+                  <div className={styles.selectedDataAction}>
                     <Button
                       type="button"
                       onClick={() => removeSelected(selected, index)}
-                      className="govuk-!-margin-bottom-0"
+                      className="govuk-!-margin-bottom-0 govuk-button--secondary"
                     >
                       Remove
                     </Button>
-                  </dd>
+                  </div>
                 </div>
-              </dl>
-              <Details
-                summary="Change styling"
-                className="govuk-!-margin-bottom-3 govuk-body-s"
-              >
-                <ChartDataConfiguration
-                  configuration={selected.configuration}
-                  capabilities={capabilities}
-                  onConfigurationChange={(value: DataSetConfiguration) => {
-                    selectedList[index].configuration = value;
-                    const newData = [...selectedList];
-                    setSelectedList(newData);
-                    if (onDataChanged) onDataChanged(newData);
-                  }}
-                />
-              </Details>
+                <div>
+                  <Details
+                    summary="Change styling"
+                    className="govuk-!-margin-bottom-3 govuk-body-s"
+                  >
+                    <ChartDataConfiguration
+                      configuration={selected.configuration}
+                      capabilities={capabilities}
+                      onConfigurationChange={(value: DataSetConfiguration) => {
+                        selectedList[index].configuration = value;
+                        const newData = [...selectedList];
+                        setSelectedList(newData);
+                        if (onDataChanged) onDataChanged(newData);
+                      }}
+                    />
+                  </Details>
+                </div>
+              </div>
             </React.Fragment>
           ))}
         </>

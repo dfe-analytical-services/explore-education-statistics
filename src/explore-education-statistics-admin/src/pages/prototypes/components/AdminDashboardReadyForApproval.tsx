@@ -44,7 +44,7 @@ const AdminDashboardReadyForApproval = ({ task }: Props) => {
 
           <p className="govuk-body">
             {task === 'readyReview' ? (
-              'Please review the following draft release(s)'
+              'Review the following draft releases.'
             ) : (
               <div className="govuk-warning-text">
                 <span className="govuk-warning-text__icon" aria-hidden="true">

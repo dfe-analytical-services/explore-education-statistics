@@ -60,6 +60,11 @@ const PrototypeExampleTable = ({ task, table }: Props) => {
           {Data && <ChartBuilder data={Data} />}
         </TabsSection>
       </Tabs>
+      {task === 'selectTable' && (
+        <a className="govuk-button" href="#">
+          Embed selected data block in this section
+        </a>
+      )}
       {task === 'view' && (
         <>
           <FormGroup>

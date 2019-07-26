@@ -107,3 +107,34 @@
     padding-top: 0;
   }
 }
+
+.selectedData {
+  border-bottom: 1px solid #bfc1c3;
+  margin-bottom: 1em;
+}
+
+.selectedDataRow {
+  display: flex;
+  flex-basis: 50%;
+}
+
+.selectedDataFilter {
+  flex-shrink: 0;
+  width: 34%;
+}
+
+.selectedDataIndicator {
+  width: 30%;
+}
+
+.selectedDataAction {
+  margin-left: auto;
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.formGroup {
+  min-width: 30%;
+}

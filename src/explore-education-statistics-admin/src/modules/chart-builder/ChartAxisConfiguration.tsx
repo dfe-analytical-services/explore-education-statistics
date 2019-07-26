@@ -74,7 +74,9 @@ const ChartAxisConfiguration = ({
   return (
     <div className={styles.chartAxesConfiguration}>
       <FormFieldset id={id} legend={axisConfiguration.title}>
-        <p>{axisConfiguration.name} configuration</p>
+        <h2 className="govuk-heading-s">
+          {axisConfiguration.name} configuration
+        </h2>
         <FormGroup>
           <FormCheckbox
             id={`${id}_show`}
@@ -166,6 +168,7 @@ const ChartAxisConfiguration = ({
                     <td>{rl.label}</td>
                     <td>
                       <button
+                        className="govuk-button govuk-button--secondary govuk-!-margin-0"
                         type="button"
                         onClick={() => {
                           const newReferenceLines = [
@@ -177,7 +180,7 @@ const ChartAxisConfiguration = ({
                           });
                         }}
                       >
-                        remove
+                        Remove
                       </button>
                     </td>
                   </tr>
@@ -233,7 +236,7 @@ const ChartAxisConfiguration = ({
                 </td>
                 <td>
                   <button
-                    className="govuk-button govuk-!-padding-bottom-0 govuk-!-margin-bottom-0"
+                    className="govuk-button govuk-!-margin-bottom-0"
                     type="button"
                     onClick={() => {
                       updateAxisConfiguration({

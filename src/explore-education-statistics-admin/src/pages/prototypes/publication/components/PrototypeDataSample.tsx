@@ -33,6 +33,7 @@ const PrototypeDataSample = ({
       <Tabs id="data-sample-tabs">
         {sectionId === 'headlines' && (
           <TabsSection id={`${sectionId}SummaryData`} title="Summary">
+            {editing && <Button>Add data blocks to this section</Button>}
             <PrototypeDataTilesHighlights />
             {editing && <Button>Add another key indicator</Button>}
             <PrototypeEditableContent

@@ -117,3 +117,10 @@ h1.govuk-panel__title {
     padding: 6px 6px 0;
   }
 }
+
+.govuk-link.dfe-link--white {
+  color: govuk-colour('white');
+  &:hover {
+    text-decoration: none;
+  }
+}

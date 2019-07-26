@@ -18,10 +18,10 @@ const PrototypeExampleTable = () => {
   const [value, setValue] = useState('academic-year');
   return (
     <>
-      <Details summary="Add a table to this section">
+      <Details summary="Add data blocks to this section">
         <FormGroup>
           <FormRadioGroup
-            legend="Select a table"
+            legend="Select a data block"
             id="select-table"
             name="select-table"
             value={value}
@@ -61,9 +61,6 @@ const PrototypeExampleTable = () => {
             ]}
           />
         </FormGroup>
-        <a className="govuk-button" href="#">
-          Add selected table option to section
-        </a>
       </Details>
     </>
   );

@@ -6,6 +6,7 @@ import ChartDataSelector, {
 import Details from '@common/components/Details';
 import {
   FormCheckbox,
+  FormGroup,
   FormSelect,
   FormTextInput,
 } from '@common/components/form';
@@ -268,55 +269,6 @@ const ChartBuilder = ({ data }: Props) => {
             />
           </TabsSection>
 
-          <TabsSection title="Chart">
-            {selectedChartType.capabilities.stackable && (
-              <FormCheckbox
-                id="stacked"
-                name="stacked"
-                label="Stacked bars"
-                checked={chartOptions.stacked}
-                value="stacked"
-                onChange={e => {
-                  setChartOptions({
-                    ...chartOptions,
-                    stacked: e.target.checked,
-                  });
-                }}
-              />
-            )}
-            <FormSelect
-              id="legend-position"
-              name="legend-position"
-              value={chartOptions.legend}
-              label="Legend Position"
-              options={[
-                { label: 'Top', value: 'top' },
-                { label: 'Bottom', value: 'bottom' },
-                { label: 'None', value: 'none' },
-              ]}
-              order={[]}
-              onChange={e => {
-                // @ts-ignore
-                setChartOptions({ ...chartOptions, legend: e.target.value });
-              }}
-            />
-            {chartOptions.legend !== 'none' && (
-              <FormTextInput
-                id="legend-height"
-                name="legend-height"
-                label="Legend Height (blank for automatic)"
-                value={chartOptions.legendHeight}
-                width={5}
-                onChange={e => {
-                  setChartOptions({
-                    ...chartOptions,
-                    legendHeight: e.target.value,
-                  });
-                }}
-              />
-            )}
-          </TabsSection>
-
           <TabsSection title="Axes">
             <div className={styles.axesOptions}>
               {Object.entries(axesConfiguration).map(([key, axis]) => (
@@ -334,6 +286,66 @@ const ChartBuilder = ({ data }: Props) => {
                   }}
                 />
               ))}
+            </div>
+          </TabsSection>
+
+          <TabsSection title="Chart">
+            <div className={styles.axesOptions}>
+              {selectedChartType.capabilities.stackable && (
+                <FormGroup className={styles.fullWidth}>
+                  <FormCheckbox
+                    id="stacked"
+                    name="stacked"
+                    label="Stacked bars"
+                    checked={chartOptions.stacked}
+                    value="stacked"
+                    onChange={e => {
+                      setChartOptions({
+                        ...chartOptions,
+                        stacked: e.target.checked,
+                      });
+                    }}
+                  />
+                </FormGroup>
+              )}
+              <FormGroup className={styles.formGroup}>
+                <FormSelect
+                  id="legend-position"
+                  name="legend-position"
+                  value={chartOptions.legend}
+                  label="Legend Position"
+                  options={[
+                    { label: 'Top', value: 'top' },
+                    { label: 'Bottom', value: 'bottom' },
+                    { label: 'None', value: 'none' },
+                  ]}
+                  order={[]}
+                  onChange={e => {
+                    // @ts-ignore
+                    setChartOptions({
+                      ...chartOptions,
+                      legend: e.target.value,
+                    });
+                  }}
+                />
+              </FormGroup>
+              {chartOptions.legend !== 'none' && (
+                <FormGroup className={styles.formGroup}>
+                  <FormTextInput
+                    id="legend-height"
+                    name="legend-height"
+                    label="Legend Height (blank for automatic)"
+                    value={chartOptions.legendHeight}
+                    width={5}
+                    onChange={e => {
+                      setChartOptions({
+                        ...chartOptions,
+                        legendHeight: e.target.value,
+                      });
+                    }}
+                  />
+                </FormGroup>
+              )}
             </div>
           </TabsSection>
         </Tabs>
