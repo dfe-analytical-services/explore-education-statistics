@@ -5,9 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Services.ModelMappers;
 using UserId = System.Guid;
 using TopicId = System.Guid;
 using PublicationId = System.Guid;
@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Include(p => p.Methodology)
                 .ToList();
 
-            return PublicationToPublicationViewModelMapper.Map<List<PublicationViewModel>>(publications);
+            return PublicationViewModelMapper.Map<List<PublicationViewModel>>(publications);
         }
 
         public async Task<PublicationViewModel> CreatePublication(CreatePublicationViewModel publication)
@@ -71,17 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Include(p => p.Releases)
                 .Where(p => p.Id == publicationId)
                 .FirstOrDefaultAsync();
-            return PublicationToPublicationViewModelMapper.Map<PublicationViewModel>(publication);
+            return PublicationViewModelMapper.Map<PublicationViewModel>(publication);
         }
-
-        private static readonly IMapper PublicationToPublicationViewModelMapper = new MapperConfiguration(cfg =>
-        {
-            cfg.CreateMap<Publication, PublicationViewModel>();
-            cfg.CreateMap<Release, ReleaseViewModel>()
-                .ForMember(
-                    dest => dest.LatestRelease,
-                    m => m.MapFrom(r => r.Publication.LatestRelease().Id == r.Id));
-            cfg.CreateMap<Methodology, MethodologyViewModel>();
-        }).CreateMapper();
     }
 }
