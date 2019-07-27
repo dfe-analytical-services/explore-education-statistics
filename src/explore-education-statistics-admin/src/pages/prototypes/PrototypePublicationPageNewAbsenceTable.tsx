@@ -50,16 +50,11 @@ const PublicationDataPage = () => {
           </h2>
 
           <p className="govuk-body">
-            Choose the data from your uploaded files then use filters to create
-            your <strong>data blocks</strong>.
+            Choose which data file you want to use from your uploaded files and
+            then use filters to create your data blocks.
           </p>
 
-          <p className="govuk-body">
-            Once you've created your <strong>data blocks</strong>, you can save
-            and embed them in this release.
-          </p>
-
-          <h2 className="govuk-heading-m">1. Select data file</h2>
+          <h2 className="govuk-heading-m">1. Choose data file</h2>
           {window.location.search === '?status=step1' && (
             <form method="get">
               <fieldset className="govuk-fieldset govuk-!-margin-bottom-6">
@@ -139,9 +134,10 @@ const PublicationDataPage = () => {
             </dl>
           )}
           <hr />
-          <h2 className="govuk-heading-m">2. Choose location</h2>
+          <h2 className="govuk-heading-m">2. Choose locations</h2>
           {window.location.search === '?status=step2' && (
             <>
+              <p>Select at least one</p>
               <Details summary="National" tag="1 selected">
                 <fieldset
                   className="govuk-fieldset"
@@ -206,7 +202,7 @@ const PublicationDataPage = () => {
             </dl>
           )}
           <hr />
-          <h2 className="govuk-heading-m">3. Time period</h2>
+          <h2 className="govuk-heading-m">3. Choose time period</h2>
           {window.location.search === '?status=step3' && (
             <>
               <FormGroup>
@@ -285,7 +281,7 @@ const PublicationDataPage = () => {
           )}
           <hr />
           <h2 className="govuk-heading-m" id="tableFilters">
-            4. Filters
+            4. Choose filters
           </h2>
           {['?status=step4', '?status=step5'].includes(
             window.location.search,
