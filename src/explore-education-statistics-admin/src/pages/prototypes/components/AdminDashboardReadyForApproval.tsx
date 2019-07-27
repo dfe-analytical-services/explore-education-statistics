@@ -52,7 +52,7 @@ const AdminDashboardReadyForApproval = ({ task }: Props) => {
                 </span>
                 <strong className="govuk-warning-text__text">
                   <span className="govuk-warning-text__assistive">Warning</span>
-                  There are unresolved comments requiring your attention
+                  Resolve comments in the following draft releases
                 </strong>
               </div>
             )}
@@ -66,7 +66,7 @@ const AdminDashboardReadyForApproval = ({ task }: Props) => {
           <PrototypeDashboardRelease
             title="Academic year,"
             years="2018 to 2019"
-            tag={task === 'readyReview' ? tagLabel : 'Unresolved comments'}
+            tag={task === 'readyReview' ? tagLabel : 'Resolve comments'}
             review
             lastEdited={new Date('2019-03-20 17:37')}
             lastEditor={{ id: 'me', name: 'me', permissions: [] }}
@@ -74,6 +74,7 @@ const AdminDashboardReadyForApproval = ({ task }: Props) => {
             nextRelease={new Date('2020-09-20 09:30')}
             showComments
             task={task}
+            isNew
           />
         </>
       )}

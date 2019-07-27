@@ -20,12 +20,12 @@ export class PrototypeLoginService {
     {
       id: '8e3a250b-6153-4c5e-aba5-363a554bc288',
       name: 'Ann Evans',
-      permissions: [''],
+      permissions: ['team member'],
     },
     {
       id: 'b7630cce-7f5f-4233-90fe-a8c751b1c38c',
       name: 'Stephen Doherty',
-      permissions: [''],
+      permissions: ['responsible statistician'],
     },
     {
       id: '97d839e7-67fc-47b7-a40f-00f84d0cc3c4',

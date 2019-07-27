@@ -55,8 +55,7 @@ const PublicationPage = () => {
             </span>
             <strong className="govuk-warning-text__text">
               <span className="govuk-warning-text__assistive">Warning</span>
-              There are {allUnresolved.length} unresolved comments requiring
-              your attention
+              There are {allUnresolved.length} comments for you to resolve
             </strong>
           </div>
         )}

@@ -78,7 +78,7 @@ const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
         </TabsSection>
         <TabsSection
           id="task-in-progress2"
-          title={`Unresolved comments ${
+          title={`View scheduled releases ${
             location.search.includes('?status=readyApproval') ? '(1)' : '(0)'
           }`}
         >

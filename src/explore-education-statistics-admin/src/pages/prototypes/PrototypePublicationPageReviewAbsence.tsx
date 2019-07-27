@@ -20,7 +20,7 @@ const PublicationPage = () => {
     return (
       <div>
         <FormRadioGroup
-          legend="Release status"
+          legend="Update release status"
           id="review-release"
           name="review-release"
           value={status}
@@ -30,7 +30,7 @@ const PublicationPage = () => {
           options={[
             {
               id: 'approve-release',
-              label: 'Approve for higher review',
+              label: 'Approve for final sign-off',
               value: 'approve-release',
               conditional: (
                 <FormGroup>
@@ -80,7 +80,7 @@ const PublicationPage = () => {
     return (
       <div>
         <FormRadioGroup
-          legend="Higher review release status"
+          legend="Final sign-off release status"
           id="higher-review-release"
           name="rhigher-eview-release"
           value={status}
@@ -126,13 +126,15 @@ const PublicationPage = () => {
             },
           ]}
         />
-
         <Link
           to="/prototypes/admin-dashboard?status=readyApproval&amp;level=2"
           className="govuk-button"
         >
           Update
         </Link>
+        <div>
+          <Link to="#">Print this page</Link>
+        </div>
       </div>
     );
   };

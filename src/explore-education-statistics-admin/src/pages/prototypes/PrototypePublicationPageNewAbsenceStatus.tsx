@@ -126,11 +126,14 @@ const PublicationDataPage = ({ location }: RouteChildrenProps) => {
         <>
           <div className="govuk-panel govuk-panel--confirmation">
             <h1 className="govuk-panel__title">
-              Release ready for level 2 higher review
+              Release ready for final sign-off
             </h1>
             <div className="govuk-panel__body">
               Check the 'Comments for you to resolve' tab on your{' '}
-              <Link to="/prototypes/admin-dashboard?status=readyHigherReview">
+              <Link
+                className="dfe-link--white"
+                to="/prototypes/admin-dashboard?status=readyHigherReview"
+              >
                 dashboard
               </Link>{' '}
               for feedback

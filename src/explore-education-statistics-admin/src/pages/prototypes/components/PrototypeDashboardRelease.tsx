@@ -60,11 +60,7 @@ const PrototypeDashboardRelease = ({
               <dd className="govuk-summary-list__value">
                 {format(published, 'd MMMM yyyy')}
               </dd>
-              <dd className="govuk-summary-list__actions">
-                <Link to="/prototypes/publication-create-new-absence-status">
-                  Set status
-                </Link>
-              </dd>
+              <dd className="govuk-summary-list__actions" />
             </>
           )}
           {!isNew && (
@@ -79,7 +75,7 @@ const PrototypeDashboardRelease = ({
         </div>
         {nextRelease && (
           <>
-            <dt className="govuk-summary-list__key">Next release</dt>
+            <dt className="govuk-summary-list__key">Expected next release</dt>
             <dd className="govuk-summary-list__value">
               {format(nextRelease, 'd MMMM yyyy')}
             </dd>
@@ -87,7 +83,9 @@ const PrototypeDashboardRelease = ({
           </>
         )}
         <div className="govuk-summary-list__row">
-          <dt className="govuk-summary-list__key">Lead statistician</dt>
+          <dt className="govuk-summary-list__key">
+            Publication and release contact
+          </dt>
           <dd className="govuk-summary-list__value">
             {lead && (
               <span>
@@ -122,7 +120,7 @@ const PrototypeDashboardRelease = ({
             <dt className="govuk-summary-list__key">Comments</dt>
             <dd className="govuk-summary-list__value">
               <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-                Level 1: review
+                In review
               </h3>
               <Details
                 summary="Ann Evans, 17 June 2018, 17:35"
@@ -149,7 +147,7 @@ const PrototypeDashboardRelease = ({
                 </p>
               </Details>
               <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-                Level 2: higher review
+                Final sign-off
               </h3>
               <Details
                 summary="Stephen Doherty, 17 June 2018, 17:35"
@@ -203,7 +201,7 @@ const PrototypeDashboardRelease = ({
       )}
       {task === 'readyReview' && (
         <Link to="/prototypes/publication-review" className="govuk-button">
-          Review release
+          View and review release
         </Link>
       )}
     </Details>
