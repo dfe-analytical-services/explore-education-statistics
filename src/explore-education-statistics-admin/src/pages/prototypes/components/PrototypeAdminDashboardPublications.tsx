@@ -14,7 +14,7 @@ const PrototypeAdminDashboardPublications = () => {
       {userContext.user &&
         userContext.user.permissions.includes('team lead') && (
           <p className="govuk-body">
-            View existing and create new publications.
+            View existing and create new publications and releases.
           </p>
         )}
       {userContext.user &&
@@ -207,7 +207,7 @@ const PrototypeAdminDashboardPublications = () => {
             to="/prototypes/release-create-new"
             className="govuk-button govuk-!-margin-right-6"
           >
-            Create a new release
+            Create new release
           </Link>
           <Link
             to="/prototypes/publication-assign-methodology"
@@ -276,7 +276,7 @@ const PrototypeAdminDashboardPublications = () => {
             to="/prototypes/release-create-new"
             className="govuk-button govuk-!-margin-right-6"
           >
-            Create a new release
+            Create new release
           </Link>
           <Link
             to="/prototypes/publication-assign-methodology"
@@ -347,7 +347,7 @@ const PrototypeAdminDashboardPublications = () => {
             to="/prototypes/release-create-new"
             className="govuk-button govuk-!-margin-right-6"
           >
-            Create a new release
+            Create new release
           </Link>
           <Link
             to="/prototypes/publication-assign-methodology"
@@ -389,7 +389,7 @@ const PrototypeAdminDashboardPublications = () => {
       </Accordion>
       {userContext.user && userContext.user.permissions.includes('team lead') && (
         <Link to="/prototypes/publication-create-new" className="govuk-button">
-          Create a new publication
+          Create new publication
         </Link>
       )}
     </>

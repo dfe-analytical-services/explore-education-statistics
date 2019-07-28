@@ -57,7 +57,15 @@ const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
         </div>
       </div>
       <Tabs id="dashboard-tabs">
-        <TabsSection id="publications" title="Manage releases">
+        <TabsSection
+          id="publications"
+          title={
+            userContext.user &&
+            userContext.user.permissions.includes('team lead')
+              ? 'Manage publications and releases'
+              : 'Manage releases'
+          }
+        >
           <PrototypeAdminDashboardPublications />
         </TabsSection>
         {/* <TabsSection
