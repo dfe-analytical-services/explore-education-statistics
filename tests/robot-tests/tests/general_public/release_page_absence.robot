@@ -108,9 +108,11 @@ Validate accordion sections order
 
 Clicking "Create tables" takes user to Table Tool page with absence publication selected
     [Documentation]  DFE-898
-    [Tags]  HappyPath       Failing
+    [Tags]  HappyPath    Failing
     user clicks link    Create tables
     user waits until page contains  Create your own tables online
-    user clicks button   css:#publicationForm-submit
+
+    user clicks element   css:#publicationForm-submit
+
     user waits until page contains  Choose a subject
     user checks previous table tool step contains  1   Publication   Pupil absence in schools in England
