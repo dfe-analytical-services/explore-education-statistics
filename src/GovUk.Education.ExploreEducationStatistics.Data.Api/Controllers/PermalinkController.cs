@@ -1,9 +1,7 @@
 using System;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.WindowsAzure.Storage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 {
@@ -19,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        public  async Task<IActionResult> Get(Guid id)
+        public async Task<IActionResult> Get(Guid id)
         {
             var permalink = await _permalinkService.GetAsync(id);
 
