@@ -37,6 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 {
                     Id = permalink.RowKey,
                     Title = permalink.Title,
+                    Created = permalink.Timestamp.UtcDateTime,
                     Data = JsonConvert.DeserializeObject<ResultWithMetaViewModel>(permalink.Data)
                 };
 
@@ -69,6 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 {
                     Id = insertedPermalink.RowKey,
                     Title = insertedPermalink.Title,
+                    Created = insertedPermalink.Timestamp.UtcDateTime,
                     Data = JsonConvert.DeserializeObject<ResultWithMetaViewModel>(insertedPermalink.Data)
                 };
 
