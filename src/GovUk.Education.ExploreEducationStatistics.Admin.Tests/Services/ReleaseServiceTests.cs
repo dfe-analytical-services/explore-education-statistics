@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     ReleaseTypeId = new Guid("02e664f2-a4bc-43ee-8ff0-c87354adae72")
                 });
 
-                Assert.Equal("Academic Year 2018", result.Result.Title);
+                Assert.Equal("Academic Year 2018/19", result.Result.Title);
                 Assert.Null(result.Result.Published);
                 Assert.False(result.Result.LatestRelease); // Most recent - but not published yet.
                 Assert.Equal(TimeIdentifier.AcademicYear, result.Result.TimePeriodCoverage);

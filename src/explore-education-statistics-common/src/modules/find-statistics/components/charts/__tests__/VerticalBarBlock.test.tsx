@@ -134,4 +134,57 @@ describe('VerticalBarBlock', () => {
       Array.from(container.querySelectorAll('.recharts-rectangle')).length,
     ).toBe(6);
   });
+
+  test('can render major axis reference line', () => {
+    const { container } = render(
+      <VerticalBarBlock
+        {...{
+          ...props,
+          axes: {
+            ...props.axes,
+            major: {
+              ...props.axes.major,
+              referenceLines: [
+                {
+                  label: 'hello',
+                  position: '2014/15',
+                },
+              ],
+            },
+          },
+        }}
+        legend="none"
+      />,
+    );
+
+    expect(
+      container.querySelector('.recharts-reference-line'),
+    ).toBeInTheDocument();
+  });
+  test('can render minor axis reference line', () => {
+    const { container } = render(
+      <VerticalBarBlock
+        {...{
+          ...props,
+          axes: {
+            ...props.axes,
+            minor: {
+              ...props.axes.minor,
+              referenceLines: [
+                {
+                  label: 'hello',
+                  position: 0,
+                },
+              ],
+            },
+          },
+        }}
+        legend="none"
+      />,
+    );
+
+    expect(
+      container.querySelector('.recharts-reference-line'),
+    ).toBeInTheDocument();
+  });
 });
