@@ -45,8 +45,7 @@ export interface DataQuery {
 
 export interface ReferenceLine {
   label: string;
-  x?: number | string;
-  y?: number | string;
+  position: number | string;
 }
 
 export interface Axis {
@@ -110,6 +109,8 @@ export interface AxisConfiguration {
   groupBy?: AxisGroupBy;
   dataSets: ChartDataSet[];
 
+  referenceLines?: ReferenceLine[];
+
   visible?: boolean;
   title?: string;
   showGrid?: boolean;
@@ -123,7 +124,6 @@ export interface Chart {
   axes: Dictionary<AxisConfiguration>;
 
   stacked?: boolean;
-  referenceLines?: ReferenceLine[];
   width?: number;
   height?: number;
   showLegend?: boolean;
