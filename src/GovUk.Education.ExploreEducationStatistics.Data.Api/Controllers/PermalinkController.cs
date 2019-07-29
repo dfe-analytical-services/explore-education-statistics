@@ -1,3 +1,4 @@
+
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 {
     using System;
@@ -5,6 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
     using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
     using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
     using Microsoft.AspNetCore.Mvc;
+    using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
     
     [Route("api/[controller]")]
     [ApiController]
@@ -20,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         [HttpGet("{id}")]
         public  async Task<IActionResult> Get(Guid id)
         {
-            var permalink = await _permalinkService.GetAsync(id);
+            var permalink = await _permalinkService.GetAsync(id);    
 
             if (permalink == null)
             {

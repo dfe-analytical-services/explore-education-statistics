@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
@@ -27,6 +28,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         }
 
         public override ResultViewModel Query(ObservationQueryContext queryContext)
+        {
+            var observations = GetObservations(queryContext).ToList();
+            if (!observations.Any())
+            {
+                return new ResultViewModel();
+            }
+
+            return new ResultViewModel
+            {
+                Footnotes = GetFootnotes(queryContext),
+                TimePeriodRange = GetTimePeriodRange(observations),
+                Result = observations.Select(observation =>
+                    _resultBuilder.BuildResult(observation, queryContext.Indicators))
+            };
+        }
+        
+        public override async Task<ResultViewModel> QueryAsync(ObservationQueryContext queryContext)
         {
             var observations = GetObservations(queryContext).ToList();
             if (!observations.Any())

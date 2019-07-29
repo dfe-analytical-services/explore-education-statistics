@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -20,6 +21,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         }
 
         public abstract TResult Query(ObservationQueryContext queryContext);
+        
+        public abstract Task<TResult> QueryAsync(ObservationQueryContext queryContext);
+
         
         protected IEnumerable<Observation> GetObservations(ObservationQueryContext queryContext)
         {

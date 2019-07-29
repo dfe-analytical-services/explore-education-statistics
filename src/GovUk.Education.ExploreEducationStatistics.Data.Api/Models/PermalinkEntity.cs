@@ -3,9 +3,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
     using System;
     using Microsoft.Azure.Cosmos.Table;
     
-    public class Permalink : TableEntity
+    public class PermalinkEntity : TableEntity
     {
-        public Permalink()
+        public PermalinkEntity()
         {
             // TODO: im not sure about the partition key, requires some more thought
             PartitionKey = "the-publication-id";
