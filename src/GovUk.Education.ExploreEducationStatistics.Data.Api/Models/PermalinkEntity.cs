@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
         public PermalinkEntity()
         {
             // TODO: im not sure about the partition key, requires some more thought
-            PartitionKey = "the-publication-id";
+            PartitionKey = "permalink";
             RowKey = Guid.NewGuid().ToString();
         }
 

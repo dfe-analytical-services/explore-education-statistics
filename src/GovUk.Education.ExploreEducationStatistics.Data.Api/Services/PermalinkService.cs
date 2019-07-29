@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         {
             var table = await _tableStorageService.GetTableAsync(PermalinkTableName);
 
-            var retrieveOperation = TableOperation.Retrieve<PermalinkEntity>("the-publication-id", id.ToString());
+            var retrieveOperation = TableOperation.Retrieve<PermalinkEntity>("permalink", id.ToString());
             var result = await table.ExecuteAsync(retrieveOperation);
 
             if (result.Result is PermalinkEntity permalink)
