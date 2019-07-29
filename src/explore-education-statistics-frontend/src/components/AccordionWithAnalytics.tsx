@@ -6,11 +6,11 @@ const AccordionWithAnalytics = (props: AccordionProps) => {
   return (
     <Accordion
       {...props}
-      analytics={(accordionHeading: { id: string; title: string }) => {
+      onToggle={accordionSection => {
         logEvent(
           'Accordion',
-          `${accordionHeading.title} accordion opened`,
-          `URL: ${window.location.pathname} | Accordion ID: ${accordionHeading.id}`,
+          `${accordionSection.title} accordion opened`,
+          `URL: ${window.location.pathname} | Accordion ID: ${accordionSection.id}`,
         );
       }}
     />
