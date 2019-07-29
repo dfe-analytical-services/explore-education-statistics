@@ -1,4 +1,3 @@
-
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 {
     using System;
@@ -20,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        public  async Task<IActionResult> Get(Guid id)
+        public async Task<IActionResult> Get(Guid id)
         {
             var permalink = await _permalinkService.GetAsync(id);    
 

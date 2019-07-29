@@ -1,5 +1,3 @@
-using System.Threading.Tasks;
-
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controller
 {
     using System;

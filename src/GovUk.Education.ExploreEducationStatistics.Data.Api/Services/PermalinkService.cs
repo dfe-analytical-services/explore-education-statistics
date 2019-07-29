@@ -75,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 return model;
             }
 
-            throw new Microsoft.WindowsAzure.Storage.StorageException();
+            return null;
         }
     }
 }
