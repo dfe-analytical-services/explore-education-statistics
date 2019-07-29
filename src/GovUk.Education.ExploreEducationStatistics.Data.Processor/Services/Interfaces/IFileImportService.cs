@@ -2,8 +2,8 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces
 {
-    public interface IImportService
+    public interface IFileImportService
     {
-        void Import(ImportMessage message);
+        void ImportFiles(ImportMessage message);
     }
 }

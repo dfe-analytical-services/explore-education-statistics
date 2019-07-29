@@ -1,7 +1,12 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
@@ -35,19 +40,66 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             await dataBlob.FetchAttributesAsync();
 
             var metaBlob = blobContainer.GetBlockBlobReference(
-                $"{publication}/{release}/{GetMetaFileName(dataBlob)}");
+                $"{publication}/{release}/{BlobUtils.GetMetaFileName(dataBlob)}");
 
-            return new SubjectData(dataBlob, metaBlob, GetName(dataBlob));
+            return new SubjectData(dataBlob, metaBlob, BlobUtils.GetName(dataBlob));
+        }
+        
+        public async Task<Boolean> UploadFilesAsync(string publication, string release, IFormFile dataFile, string metaFileName,
+            string name)
+        {
+            var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
+
+            var blobClient = storageAccount.CreateCloudBlobClient();
+            var blobContainer = blobClient.GetContainerReference(ContainerName);
+            await blobContainer.CreateIfNotExistsAsync();
+
+            var permissions = new BlobContainerPermissions
+            {
+                PublicAccess = BlobContainerPublicAccessType.Blob
+            };
+            await blobContainer.SetPermissionsAsync(permissions);
+            
+            await UploadFileAsync(blobContainer, publication, release, dataFile, new List<KeyValuePair<string, string>>
+            {
+                new KeyValuePair<string, string>("name", name),
+                new KeyValuePair<string, string>("metafile", metaFileName)
+            });
+            return true;
         }
 
-        private static string GetName(CloudBlob blob)
+        private static async Task UploadFileAsync(CloudBlobContainer blobContainer, string publication, string release,
+            IFormFile file, IEnumerable<KeyValuePair<string, string>> metaValues)
         {
-            return blob.Metadata["name"];
+            var blob = blobContainer.GetBlockBlobReference($"{publication}/{release}/{file.FileName}");
+            blob.Properties.ContentType = file.ContentType;
+            var path = await UploadToTemporaryFile(file);
+            await blob.UploadFromFileAsync(path);
+            await AddMetaValuesAsync(blob, metaValues);
+        }
+        
+        private static async Task<string> UploadToTemporaryFile(IFormFile file)
+        {
+            var path = Path.GetTempFileName();
+            if (file.Length > 0)
+            {
+                using (var stream = new FileStream(path, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+            }
+
+            return path;
         }
 
-        private static string GetMetaFileName(CloudBlob blob)
+        private static async Task AddMetaValuesAsync(CloudBlob blob, IEnumerable<KeyValuePair<string, string>> values)
         {
-            return blob.Metadata["metafile"];
+            foreach (var value in values)
+            {
+                blob.Metadata.Add(value);
+            }
+
+            await blob.SetMetadataAsync();
         }
     }
 }

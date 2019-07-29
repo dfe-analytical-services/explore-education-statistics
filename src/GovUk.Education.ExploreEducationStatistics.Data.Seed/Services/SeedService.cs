@@ -1,9 +1,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Seed.Extensions;
 using Microsoft.Extensions.Logging;
 
@@ -63,12 +64,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
             foreach (var subject in subjects)
             {
                 var file = SamplePublications.SubjectFiles.GetValueOrDefault(subject.Id);
-                _logger.LogInformation("Seeding Subject {Subject}", subject.Name);
 
-                var lines = file.GetCsvLines();
-                var metaLines = file.GetMetaCsvLines();
+                if (file.Equals(DataCsvFile.clean_data_fe)) {
+                    _logger.LogInformation("Seeding Subject {Subject}", subject.Name);
 
-                _importerService.Import(lines, metaLines, subject);
+                    var csvLines = file.GetCsvLines();
+                    var subjectMeta = _importerService.ImportMeta(file.GetMetaCsvLines().ToList(), subject, false);
+                    var batches = csvLines.Skip(1).Batch(10000);
+                    var index = 0;
+                    
+                    foreach (var batch in batches)
+                    {
+                        var lines = batch.ToList();
+                        index++;
+                        // Insert the header at the beginning of each file/batch
+                        lines.Insert(0, csvLines.First());
+                        _logger.LogInformation("Processing batch {0} of {1} batches,", index, batches.Count());
+                        _importerService.ImportObservations(lines, subject, subjectMeta);
+                    }
+                }
             }
         }
     }

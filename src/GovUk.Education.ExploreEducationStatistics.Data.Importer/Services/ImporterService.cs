@@ -5,9 +5,9 @@ using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Models;
+using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         private readonly ImporterFilterService _importerFilterService;
         private readonly ImporterMetaService _importerMetaService;
         private readonly ApplicationDbContext _context;
-        private readonly ILogger _logger;
+        private readonly ILogger<ImporterService> _logger;
 
         public ImporterService(
             ImporterFilterService importerFilterService,
@@ -34,44 +34,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             _logger = logger;
         }
 
-        public void Import(IEnumerable<string> lines, IEnumerable<string> metaLines, Subject subject)
+        public SubjectMeta ImportMeta(List<string> metaLines, Subject subject, bool existingSubject)
         {
-            _logger.LogInformation("Importing {count} lines", lines.Count());
-
-            var subjectMeta = ImportMeta(metaLines, subject);
-            ImportObservations(lines, metaLines, subject, subjectMeta);
+            _logger.LogInformation("Importing meta lines for Publication {Publication}, {Subject}", subject.Release.Publication.Title, subject.Name);
+            
+            return _importerMetaService.Import(metaLines, subject, existingSubject);
         }
 
-        private SubjectMeta ImportMeta(IEnumerable<string> metaLines, Subject subject)
+        public void ImportObservations(List<string> lines, Subject subject, SubjectMeta subjectMeta)
         {
-            return _importerMetaService.Import(metaLines, subject);
-        }
-
-        private void ImportObservations(IEnumerable<string> lines, IEnumerable<string> metaLines, Subject subject,
-            SubjectMeta subjectMeta)
-        {
-            var index = 1;
-            var headers = lines.First().Split(',').ToList();
-            var batches = lines.Skip(1).Batch(10000);
             var stopWatch = new Stopwatch();
-
             stopWatch.Start();
-            foreach (var batch in batches)
-            {
-                _logger.LogInformation(
-                    "Importing batch {Index} of {TotalCount} for Publication {Publication}, {Subject}", index,
-                    batches.Count(), subject.Release.Publication.Title, subject.Name);
 
-                var observations = GetObservations(batch, headers, subject, subjectMeta);
-                _context.Observation.AddRange(observations);
-                _context.SaveChanges();
-                index++;
+            _logger.LogInformation("Importing batch for Publication {Publication}, {Subject}", subject.Release.Publication.Title, subject.Name);
 
-                _logger.LogInformation("Imported {Count} records in {Duration}. {TimerPerRecord}ms per record",
-                    batch.Count(),
-                    stopWatch.Elapsed.ToString(), stopWatch.Elapsed.TotalMilliseconds / batch.Count());
-                stopWatch.Restart();
-            }
+            var headers = lines.First().Split(',').ToList();
+            lines.RemoveAt(0);
+            
+            var observations = GetObservations(lines, headers, subject, subjectMeta);
+            _context.Observation.AddRange(observations);
+            _context.SaveChanges();
 
             stopWatch.Stop();
         }

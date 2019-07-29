@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             _context = context;
         }
 
-        public SubjectMeta Import(IEnumerable<string> lines, Subject subject)
+        public SubjectMeta Import(IEnumerable<string> lines, Subject subject, bool existingSubject)
         {
             var headers = lines.First().Split(',').ToList();
             var metaRows = lines
@@ -25,8 +25,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
             return new SubjectMeta
             {
-                Filters = ImportFilters(metaRows, subject),
-                Indicators = ImportIndicators(metaRows, subject)
+                Filters = ImportFilters(metaRows, subject, existingSubject),
+                Indicators = ImportIndicators(metaRows, subject, existingSubject)
             };
         }
 
@@ -56,36 +56,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         }
 
         private IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)> ImportFilters(
-            IEnumerable<MetaRow> metaRows, Subject subject)
+            IEnumerable<MetaRow> metaRows, Subject subject, bool existingSubject)
         {
             var filters = GetFilters(metaRows, subject).ToList();
             
-            _context.Filter.AddRange(filters.Select(triple => triple.Filter));
-            _context.SaveChanges();
+            // Persist for a new subject
+            if (!existingSubject)
+            {
+                _context.Filter.AddRange(filters.Select(triple => triple.Filter));
+                _context.SaveChanges();
+            }
+
             return filters;
         }
 
         private IEnumerable<(Indicator Indicator, string Column)> ImportIndicators(IEnumerable<MetaRow> metaRows,
-            Subject subject)
+            Subject subject, bool existingSubject)
         {
             var indicators = GetIndicators(metaRows, subject).ToList();
-            _context.Indicator.AddRange(indicators.Select(tuple => tuple.Indicator));
-            _context.SaveChanges();
+            
+            // Persist for a new subject
+            if (!existingSubject)
+            {
+                _context.Indicator.AddRange(indicators.Select(tuple => tuple.Indicator));
+                _context.SaveChanges();
+            }
+
             return indicators;
         }
 
-        private static IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)> GetFilters(
+        private IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)> GetFilters(
             IEnumerable<MetaRow> metaRows, Subject subject)
         {
             return metaRows
                 .Where(row => row.ColumnType == ColumnType.Filter)
                 .Select(filter => (
-                    filter: new Filter(filter.FilterHint, filter.Label, subject),
+                    filter: 
+                        _context.Filter.Any(f => f.SubjectId == subject.Id && f.Label == filter.Label && f.Hint == filter.FilterHint) ?
+                        _context.Filter.First(f => f.SubjectId == subject.Id && f.Label == filter.Label && f.Hint == filter.FilterHint) : 
+                        new Filter(filter.FilterHint, filter.Label, subject),
                     column: filter.ColumnName,
                     filterGroupingColumn: filter.FilterGroupingColumn));
         }
 
-        private static IEnumerable<(Indicator Indicator, string Column)> GetIndicators(IEnumerable<MetaRow> metaRows,
+        private IEnumerable<(Indicator Indicator, string Column)> GetIndicators(IEnumerable<MetaRow> metaRows,
             Subject subject)
         {
             var indicatorRows = metaRows.Where(row => row.ColumnType == ColumnType.Indicator).ToList();
@@ -100,14 +114,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             
             var indicatorGroups = indicatorRows
                 .GroupBy(row => row.IndicatorGrouping)
-                .ToDictionary(rows => rows.Key, rows => new IndicatorGroup(rows.Key, subject));
+                .ToDictionary(rows => rows.Key, rows =>
+                _context.IndicatorGroup.Any(ig => ig.SubjectId == subject.Id && ig.Label == rows.Key) ?
+                _context.IndicatorGroup.First(ig => ig.SubjectId == subject.Id && ig.Label == rows.Key) : 
+                new IndicatorGroup(rows.Key, subject)
+                );
 
             return indicatorRows
                 .Select(row =>
                 {
                     indicatorGroups.TryGetValue(row.IndicatorGrouping, out var indicatorGroup);
                     return (
-                        indicator: new Indicator
+                        
+                        indicator: 
+                            _context.Indicator.Any(i => i.IndicatorGroupId == indicatorGroup.Id && i.Label == row.Label && i.Unit == row.IndicatorUnit) ?
+                            _context.Indicator.First(i => i.IndicatorGroupId == indicatorGroup.Id && i.Label == row.Label && i.Unit == row.IndicatorUnit) : 
+                            new Indicator
                         {
                             IndicatorGroup = indicatorGroup,
                             Label = row.Label,
