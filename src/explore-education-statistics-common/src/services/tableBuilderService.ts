@@ -87,6 +87,11 @@ export type LocationLevelKeys =
   | 'ward';
 
 export interface TableData {
+  footnotes: {
+    indicators: number[];
+    id: number;
+    label: string;
+  }[];
   timePeriodRange: {
     code: string;
     label: string;

@@ -19,6 +19,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.BoundaryLevel", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Label");
+
+                    b.Property<string>("Level")
+                        .IsRequired();
+
+                    b.Property<DateTime>("Published");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BoundaryLevel");
+                });
+
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Filter", b =>
                 {
                     b.Property<long>("Id")

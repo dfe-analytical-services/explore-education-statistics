@@ -167,6 +167,12 @@ def user_checks_update_exists(date, text_starts_with):
 def user_selects_radio(radio_label):
   sl.driver.find_element_by_xpath(f'//label[text()="{radio_label}"]').click()
 
+def user_checks_radio_is_checked(radio_label):
+  try:
+    sl.driver.find_element_by_css_selector(f'input[data-testid="{radio_label}"][checked]')
+  except NoSuchElementException:
+    raise AssertionError('Unable to find checked radio!')
+
 def user_clicks_checkbox(checkbox_label):
   sl.driver.find_element_by_xpath(f'//label[text()="{checkbox_label}"]').click()
 

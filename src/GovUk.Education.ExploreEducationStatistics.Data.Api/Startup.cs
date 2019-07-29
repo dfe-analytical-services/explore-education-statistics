@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
@@ -57,6 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             });
 
             services.AddTransient<IResultBuilder<Observation, ObservationViewModel>, ResultBuilder>();
+            services.AddTransient<IBoundaryLevelService, BoundaryLevelService>();
             services.AddTransient<IDataService<ResultViewModel>, TableBuilderDataService>();
             services.AddTransient<IDataService<ResultWithMetaViewModel>, DataService>();
             services.AddTransient<IPublicationMetaService, PublicationMetaService>();
@@ -75,6 +78,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<IReleaseService, ReleaseService>();
             services.AddTransient<ISchoolService, SchoolService>();
             services.AddTransient<ISubjectService, SubjectService>();
+            services.AddTransient<IPermalinkService, PermalinkService>();
+            services.AddTransient<ITableStorageService, TableStorageService>(s => new TableStorageService(Configuration.GetConnectionString("PublicStorage")));
 
             services.AddMvc()
                 .AddJsonOptions(options => {
