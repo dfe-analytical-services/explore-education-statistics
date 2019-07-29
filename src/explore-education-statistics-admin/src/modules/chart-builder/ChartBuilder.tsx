@@ -1,6 +1,6 @@
 import ChartDataSelector, {
-  SelectedData,
   ChartDataSetAndConfiguration,
+  SelectedData,
 } from '@admin/modules/chart-builder/ChartDataSelector';
 
 import Details from '@common/components/Details';
@@ -15,23 +15,14 @@ import TabsSection from '@common/components/TabsSection';
 import ChartRenderer, {
   ChartRendererProps,
 } from '@common/modules/find-statistics/components/ChartRenderer';
-import {
-  ChartDefinition,
-  colours,
-  generateKeyFromDataSet,
-  symbols,
-} from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import { ChartDefinition } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import HorizontalBarBlock from '@common/modules/find-statistics/components/charts/HorizontalBarBlock';
 import LineChartBlock from '@common/modules/find-statistics/components/charts/LineChartBlock';
 import MapBlock from '@common/modules/find-statistics/components/charts/MapBlock';
 import VerticalBarBlock from '@common/modules/find-statistics/components/charts/VerticalBarBlock';
-import {
-  DataBlockMetadata,
-  DataBlockResponse,
-} from '@common/services/dataBlockService';
+import { DataBlockResponse } from '@common/services/dataBlockService';
 import {
   AxisConfiguration,
-  ChartDataSet,
   DataSetConfiguration,
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';

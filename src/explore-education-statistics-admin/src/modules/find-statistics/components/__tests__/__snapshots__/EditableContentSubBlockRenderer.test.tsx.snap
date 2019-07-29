@@ -5,7 +5,7 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
          role="group"
 >
   <summary class="govuk-details__summary"
-           aria-controls="details-content-6"
+           aria-controls="details-content-2"
            aria-expanded="false"
            role="button"
            tabindex="0"
@@ -13,12 +13,12 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
     <span class="govuk-details__summary-text"
           data-testid="details--expand"
     >
-      Add a table to this section
+      Add data blocks to this section
     </span>
   </summary>
   <div class="govuk-details__text"
        aria-hidden="true"
-       id="details-content-6"
+       id="details-content-2"
   >
     <div class="govuk-form-group">
       <div class="govuk-form-group">
@@ -26,7 +26,7 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
                   id="select-table"
         >
           <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-            Select a table
+            Select a data block
           </legend>
           <div class="govuk-radios">
             <div class="govuk-radios__item">
@@ -47,51 +47,51 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
             <div class="govuk-radios__conditional govuk-radios__conditional--hidden"
                  id="table-1-conditional"
             >
-              <div class="govuk-width-container">
-                <div class="govuk-tabs">
-                  <ul class="govuk-tabs__list"
-                      role="tablist"
+              <div class="govuk-tabs">
+                <ul class="govuk-tabs__list"
+                    role="tablist"
+                >
+                  <li class="govuk-tabs__list-item"
+                      role="presentation"
                   >
-                    <li class="govuk-tabs__list-item"
-                        role="presentation"
+                    <a class="govuk-tabs__tab govuk-tabs__tab--selected"
+                       href="#table-preview"
+                       id="table-preview-tab"
+                       aria-controls="table-preview"
+                       aria-selected="true"
+                       role="tab"
                     >
-                      <a class="govuk-tabs__tab govuk-tabs__tab--selected"
-                         href="#table-preview"
-                         id="table-preview-tab"
-                         aria-controls="table-preview"
-                         aria-selected="true"
-                         role="tab"
-                      >
-                        Table preview
-                      </a>
-                    </li>
-                    <li class="govuk-tabs__list-item"
-                        role="presentation"
-                    >
-                      <a class="govuk-tabs__tab"
-                         href="#add-chart"
-                         id="add-chart-tab"
-                         tabindex="-1"
-                         aria-controls="add-chart"
-                         aria-selected="false"
-                         role="tab"
-                      >
-                        Add a chart
-                      </a>
-                    </li>
-                  </ul>
-                  <section class="govuk-tabs__panel dfe-content-overflow panel"
-                           id="table-preview"
-                           aria-labelledby="table-preview-tab"
-                           role="tabpanel"
-                           tabindex="-1"
-                  >
-                    <h3>
                       Table preview
-                    </h3>
+                    </a>
+                  </li>
+                  <li class="govuk-tabs__list-item"
+                      role="presentation"
+                  >
+                    <a class="govuk-tabs__tab"
+                       href="#add-chart"
+                       id="add-chart-tab"
+                       tabindex="-1"
+                       aria-controls="add-chart"
+                       aria-selected="false"
+                       role="tab"
+                    >
+                      Create chart
+                    </a>
+                  </li>
+                </ul>
+                <section class="govuk-tabs__panel dfe-content-overflow panel"
+                         id="table-preview"
+                         aria-labelledby="table-preview-tab"
+                         role="tabpanel"
+                         tabindex="-1"
+                >
+                  <h3>
+                    Table preview
+                  </h3>
+                  <div class="govuk-width-container">
                     <table class="govuk-table">
                       <caption class="govuk-table__caption govuk-!-margin-bottom-6">
-                        Table showing 'Absence by characteristic' from 'Pupil absence' in England between 2012/13 and 2016/17
+                        'Absence by characteristic' from 'Pupil absence' in England between 2012/13 and 2016/17
                       </caption>
                       <thead class="govuk-table__head">
                         <tr>
@@ -215,81 +215,69 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
                     <p class="govuk-body-s">
                       Source: DfE prototype example statistics
                     </p>
-                  </section>
-                  <section class="govuk-tabs__panel dfe-content-overflow panel govuk-tabs__panel--hidden"
-                           id="add-chart"
-                           aria-labelledby="add-chart-tab"
-                           role="tabpanel"
-                           tabindex="-1"
-                  >
-                    <h3>
-                      Add a chart
-                    </h3>
-                    <div class="editor">
-                      <details class="govuk-details"
-                               open
-                               role="group"
+                  </div>
+                </section>
+                <section class="govuk-tabs__panel dfe-content-overflow panel govuk-tabs__panel--hidden"
+                         id="add-chart"
+                         aria-labelledby="add-chart-tab"
+                         role="tabpanel"
+                         tabindex="-1"
+                >
+                  <h3>
+                    Create chart
+                  </h3>
+                  <div class="editor">
+                    <div class="chartContainer">
+                      <button type="button"
+                              class="chart"
                       >
-                        <summary class="govuk-details__summary"
-                                 aria-controls="details-content-7"
-                                 aria-expanded="true"
-                                 role="button"
-                                 tabindex="0"
-                        >
-                          <span class="govuk-details__summary-text"
-                                data-testid="details--expand"
-                          >
-                            Select chart type
-                          </span>
-                        </summary>
-                        <div class="govuk-details__text"
-                             aria-hidden="false"
-                             id="details-content-7"
-                        >
-                          <div class="chartContainer">
-                            <button type="button"
-                                    class="chart"
-                            >
-                              <span class="title">
-                                Line
-                              </span>
-                              <span class="img line">
-                              </span>
-                            </button>
-                            <button type="button"
-                                    class="chart"
-                            >
-                              <span class="title">
-                                Vertical bar
-                              </span>
-                              <span class="img verticalbar">
-                              </span>
-                            </button>
-                            <button type="button"
-                                    class="chart"
-                            >
-                              <span class="title">
-                                Horizontal bar
-                              </span>
-                              <span class="img horizontalbar">
-                              </span>
-                            </button>
-                            <button type="button"
-                                    class="chart"
-                            >
-                              <span class="title">
-                                Geographic
-                              </span>
-                              <span class="img map">
-                              </span>
-                            </button>
-                          </div>
-                        </div>
-                      </details>
+                        <span class="title">
+                          Line
+                        </span>
+                        <span class="img line">
+                        </span>
+                      </button>
+                      <button type="button"
+                              class="chart"
+                      >
+                        <span class="title">
+                          Vertical bar
+                        </span>
+                        <span class="img verticalbar">
+                        </span>
+                      </button>
+                      <button type="button"
+                              class="chart"
+                      >
+                        <span class="title">
+                          Horizontal bar
+                        </span>
+                        <span class="img horizontalbar">
+                        </span>
+                      </button>
+                      <button type="button"
+                              class="chart"
+                      >
+                        <span class="title">
+                          Geographic
+                        </span>
+                        <span class="img map">
+                        </span>
+                      </button>
                     </div>
-                  </section>
-                </div>
+                    <div class="govuk-!-margin-top-6 govuk-body-s dfe-align--right">
+                      <a href="#">
+                        Choose an infographic as alternative
+                      </a>
+                    </div>
+                  </div>
+                </section>
               </div>
+              <a class="govuk-button"
+                 href="#"
+              >
+                Embed selected data block in this section
+              </a>
             </div>
             <div class="govuk-radios__item">
               <input data-aria-controls="table-2-conditional"
@@ -309,51 +297,51 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
             <div class="govuk-radios__conditional govuk-radios__conditional--hidden"
                  id="table-2-conditional"
             >
-              <div class="govuk-width-container">
-                <div class="govuk-tabs">
-                  <ul class="govuk-tabs__list"
-                      role="tablist"
+              <div class="govuk-tabs">
+                <ul class="govuk-tabs__list"
+                    role="tablist"
+                >
+                  <li class="govuk-tabs__list-item"
+                      role="presentation"
                   >
-                    <li class="govuk-tabs__list-item"
-                        role="presentation"
+                    <a class="govuk-tabs__tab govuk-tabs__tab--selected"
+                       href="#table-preview"
+                       id="table-preview-tab"
+                       aria-controls="table-preview"
+                       aria-selected="true"
+                       role="tab"
                     >
-                      <a class="govuk-tabs__tab govuk-tabs__tab--selected"
-                         href="#table-preview"
-                         id="table-preview-tab"
-                         aria-controls="table-preview"
-                         aria-selected="true"
-                         role="tab"
-                      >
-                        Table preview
-                      </a>
-                    </li>
-                    <li class="govuk-tabs__list-item"
-                        role="presentation"
-                    >
-                      <a class="govuk-tabs__tab"
-                         href="#add-chart"
-                         id="add-chart-tab"
-                         tabindex="-1"
-                         aria-controls="add-chart"
-                         aria-selected="false"
-                         role="tab"
-                      >
-                        Add a chart
-                      </a>
-                    </li>
-                  </ul>
-                  <section class="govuk-tabs__panel dfe-content-overflow panel"
-                           id="table-preview"
-                           aria-labelledby="table-preview-tab"
-                           role="tabpanel"
-                           tabindex="-1"
-                  >
-                    <h3>
                       Table preview
-                    </h3>
+                    </a>
+                  </li>
+                  <li class="govuk-tabs__list-item"
+                      role="presentation"
+                  >
+                    <a class="govuk-tabs__tab"
+                       href="#add-chart"
+                       id="add-chart-tab"
+                       tabindex="-1"
+                       aria-controls="add-chart"
+                       aria-selected="false"
+                       role="tab"
+                    >
+                      Create chart
+                    </a>
+                  </li>
+                </ul>
+                <section class="govuk-tabs__panel dfe-content-overflow panel"
+                         id="table-preview"
+                         aria-labelledby="table-preview-tab"
+                         role="tabpanel"
+                         tabindex="-1"
+                >
+                  <h3>
+                    Table preview
+                  </h3>
+                  <div class="govuk-width-container">
                     <table class="govuk-table">
                       <caption class="govuk-table__caption govuk-!-margin-bottom-6">
-                        Table showing 'Absence by characteristic' from 'Pupil absence' in England between 2012/13 and 2016/17
+                        'Absence by characteristic' from 'Pupil absence' in England between 2012/13 and 2016/17
                       </caption>
                       <thead class="govuk-table__head">
                         <tr>
@@ -477,81 +465,69 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
                     <p class="govuk-body-s">
                       Source: DfE prototype example statistics
                     </p>
-                  </section>
-                  <section class="govuk-tabs__panel dfe-content-overflow panel govuk-tabs__panel--hidden"
-                           id="add-chart"
-                           aria-labelledby="add-chart-tab"
-                           role="tabpanel"
-                           tabindex="-1"
-                  >
-                    <h3>
-                      Add a chart
-                    </h3>
-                    <div class="editor">
-                      <details class="govuk-details"
-                               open
-                               role="group"
+                  </div>
+                </section>
+                <section class="govuk-tabs__panel dfe-content-overflow panel govuk-tabs__panel--hidden"
+                         id="add-chart"
+                         aria-labelledby="add-chart-tab"
+                         role="tabpanel"
+                         tabindex="-1"
+                >
+                  <h3>
+                    Create chart
+                  </h3>
+                  <div class="editor">
+                    <div class="chartContainer">
+                      <button type="button"
+                              class="chart"
                       >
-                        <summary class="govuk-details__summary"
-                                 aria-controls="details-content-8"
-                                 aria-expanded="true"
-                                 role="button"
-                                 tabindex="0"
-                        >
-                          <span class="govuk-details__summary-text"
-                                data-testid="details--expand"
-                          >
-                            Select chart type
-                          </span>
-                        </summary>
-                        <div class="govuk-details__text"
-                             aria-hidden="false"
-                             id="details-content-8"
-                        >
-                          <div class="chartContainer">
-                            <button type="button"
-                                    class="chart"
-                            >
-                              <span class="title">
-                                Line
-                              </span>
-                              <span class="img line">
-                              </span>
-                            </button>
-                            <button type="button"
-                                    class="chart"
-                            >
-                              <span class="title">
-                                Vertical bar
-                              </span>
-                              <span class="img verticalbar">
-                              </span>
-                            </button>
-                            <button type="button"
-                                    class="chart"
-                            >
-                              <span class="title">
-                                Horizontal bar
-                              </span>
-                              <span class="img horizontalbar">
-                              </span>
-                            </button>
-                            <button type="button"
-                                    class="chart"
-                            >
-                              <span class="title">
-                                Geographic
-                              </span>
-                              <span class="img map">
-                              </span>
-                            </button>
-                          </div>
-                        </div>
-                      </details>
+                        <span class="title">
+                          Line
+                        </span>
+                        <span class="img line">
+                        </span>
+                      </button>
+                      <button type="button"
+                              class="chart"
+                      >
+                        <span class="title">
+                          Vertical bar
+                        </span>
+                        <span class="img verticalbar">
+                        </span>
+                      </button>
+                      <button type="button"
+                              class="chart"
+                      >
+                        <span class="title">
+                          Horizontal bar
+                        </span>
+                        <span class="img horizontalbar">
+                        </span>
+                      </button>
+                      <button type="button"
+                              class="chart"
+                      >
+                        <span class="title">
+                          Geographic
+                        </span>
+                        <span class="img map">
+                        </span>
+                      </button>
                     </div>
-                  </section>
-                </div>
+                    <div class="govuk-!-margin-top-6 govuk-body-s dfe-align--right">
+                      <a href="#">
+                        Choose an infographic as alternative
+                      </a>
+                    </div>
+                  </div>
+                </section>
               </div>
+              <a class="govuk-button"
+                 href="#"
+              >
+                Embed selected data block in this section
+              </a>
             </div>
             <div class="govuk-radios__item">
               <input data-aria-controls="table-3-conditional"
@@ -571,51 +547,51 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
             <div class="govuk-radios__conditional govuk-radios__conditional--hidden"
                  id="table-3-conditional"
             >
-              <div class="govuk-width-container">
-                <div class="govuk-tabs">
-                  <ul class="govuk-tabs__list"
-                      role="tablist"
+              <div class="govuk-tabs">
+                <ul class="govuk-tabs__list"
+                    role="tablist"
+                >
+                  <li class="govuk-tabs__list-item"
+                      role="presentation"
                   >
-                    <li class="govuk-tabs__list-item"
-                        role="presentation"
+                    <a class="govuk-tabs__tab govuk-tabs__tab--selected"
+                       href="#table-preview"
+                       id="table-preview-tab"
+                       aria-controls="table-preview"
+                       aria-selected="true"
+                       role="tab"
                     >
-                      <a class="govuk-tabs__tab govuk-tabs__tab--selected"
-                         href="#table-preview"
-                         id="table-preview-tab"
-                         aria-controls="table-preview"
-                         aria-selected="true"
-                         role="tab"
-                      >
-                        Table preview
-                      </a>
-                    </li>
-                    <li class="govuk-tabs__list-item"
-                        role="presentation"
-                    >
-                      <a class="govuk-tabs__tab"
-                         href="#add-chart"
-                         id="add-chart-tab"
-                         tabindex="-1"
-                         aria-controls="add-chart"
-                         aria-selected="false"
-                         role="tab"
-                      >
-                        Add a chart
-                      </a>
-                    </li>
-                  </ul>
-                  <section class="govuk-tabs__panel dfe-content-overflow panel"
-                           id="table-preview"
-                           aria-labelledby="table-preview-tab"
-                           role="tabpanel"
-                           tabindex="-1"
-                  >
-                    <h3>
                       Table preview
-                    </h3>
+                    </a>
+                  </li>
+                  <li class="govuk-tabs__list-item"
+                      role="presentation"
+                  >
+                    <a class="govuk-tabs__tab"
+                       href="#add-chart"
+                       id="add-chart-tab"
+                       tabindex="-1"
+                       aria-controls="add-chart"
+                       aria-selected="false"
+                       role="tab"
+                    >
+                      Create chart
+                    </a>
+                  </li>
+                </ul>
+                <section class="govuk-tabs__panel dfe-content-overflow panel"
+                         id="table-preview"
+                         aria-labelledby="table-preview-tab"
+                         role="tabpanel"
+                         tabindex="-1"
+                >
+                  <h3>
+                    Table preview
+                  </h3>
+                  <div class="govuk-width-container">
                     <table class="govuk-table">
                       <caption class="govuk-table__caption govuk-!-margin-bottom-6">
-                        Table showing 'Absence by characteristic' from 'Pupil absence' in England between 2012/13 and 2016/17
+                        'Absence by characteristic' from 'Pupil absence' in England between 2012/13 and 2016/17
                       </caption>
                       <thead class="govuk-table__head">
                         <tr>
@@ -739,81 +715,69 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
                     <p class="govuk-body-s">
                       Source: DfE prototype example statistics
                     </p>
-                  </section>
-                  <section class="govuk-tabs__panel dfe-content-overflow panel govuk-tabs__panel--hidden"
-                           id="add-chart"
-                           aria-labelledby="add-chart-tab"
-                           role="tabpanel"
-                           tabindex="-1"
-                  >
-                    <h3>
-                      Add a chart
-                    </h3>
-                    <div class="editor">
-                      <details class="govuk-details"
-                               open
-                               role="group"
+                  </div>
+                </section>
+                <section class="govuk-tabs__panel dfe-content-overflow panel govuk-tabs__panel--hidden"
+                         id="add-chart"
+                         aria-labelledby="add-chart-tab"
+                         role="tabpanel"
+                         tabindex="-1"
+                >
+                  <h3>
+                    Create chart
+                  </h3>
+                  <div class="editor">
+                    <div class="chartContainer">
+                      <button type="button"
+                              class="chart"
                       >
-                        <summary class="govuk-details__summary"
-                                 aria-controls="details-content-9"
-                                 aria-expanded="true"
-                                 role="button"
-                                 tabindex="0"
-                        >
-                          <span class="govuk-details__summary-text"
-                                data-testid="details--expand"
-                          >
-                            Select chart type
-                          </span>
-                        </summary>
-                        <div class="govuk-details__text"
-                             aria-hidden="false"
-                             id="details-content-9"
-                        >
-                          <div class="chartContainer">
-                            <button type="button"
-                                    class="chart"
-                            >
-                              <span class="title">
-                                Line
-                              </span>
-                              <span class="img line">
-                              </span>
-                            </button>
-                            <button type="button"
-                                    class="chart"
-                            >
-                              <span class="title">
-                                Vertical bar
-                              </span>
-                              <span class="img verticalbar">
-                              </span>
-                            </button>
-                            <button type="button"
-                                    class="chart"
-                            >
-                              <span class="title">
-                                Horizontal bar
-                              </span>
-                              <span class="img horizontalbar">
-                              </span>
-                            </button>
-                            <button type="button"
-                                    class="chart"
-                            >
-                              <span class="title">
-                                Geographic
-                              </span>
-                              <span class="img map">
-                              </span>
-                            </button>
-                          </div>
-                        </div>
-                      </details>
+                        <span class="title">
+                          Line
+                        </span>
+                        <span class="img line">
+                        </span>
+                      </button>
+                      <button type="button"
+                              class="chart"
+                      >
+                        <span class="title">
+                          Vertical bar
+                        </span>
+                        <span class="img verticalbar">
+                        </span>
+                      </button>
+                      <button type="button"
+                              class="chart"
+                      >
+                        <span class="title">
+                          Horizontal bar
+                        </span>
+                        <span class="img horizontalbar">
+                        </span>
+                      </button>
+                      <button type="button"
+                              class="chart"
+                      >
+                        <span class="title">
+                          Geographic
+                        </span>
+                        <span class="img map">
+                        </span>
+                      </button>
                     </div>
-                  </section>
-                </div>
+                    <div class="govuk-!-margin-top-6 govuk-body-s dfe-align--right">
+                      <a href="#">
+                        Choose an infographic as alternative
+                      </a>
+                    </div>
+                  </div>
+                </section>
               </div>
+              <a class="govuk-button"
+                 href="#"
+              >
+                Embed selected data block in this section
+              </a>
             </div>
             <div class="govuk-radios__item">
               <input data-aria-controls="table-3-conditional"
@@ -833,51 +797,51 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
             <div class="govuk-radios__conditional govuk-radios__conditional--hidden"
                  id="table-3-conditional"
             >
-              <div class="govuk-width-container">
-                <div class="govuk-tabs">
-                  <ul class="govuk-tabs__list"
-                      role="tablist"
+              <div class="govuk-tabs">
+                <ul class="govuk-tabs__list"
+                    role="tablist"
+                >
+                  <li class="govuk-tabs__list-item"
+                      role="presentation"
                   >
-                    <li class="govuk-tabs__list-item"
-                        role="presentation"
+                    <a class="govuk-tabs__tab govuk-tabs__tab--selected"
+                       href="#table-preview"
+                       id="table-preview-tab"
+                       aria-controls="table-preview"
+                       aria-selected="true"
+                       role="tab"
                     >
-                      <a class="govuk-tabs__tab govuk-tabs__tab--selected"
-                         href="#table-preview"
-                         id="table-preview-tab"
-                         aria-controls="table-preview"
-                         aria-selected="true"
-                         role="tab"
-                      >
-                        Table preview
-                      </a>
-                    </li>
-                    <li class="govuk-tabs__list-item"
-                        role="presentation"
-                    >
-                      <a class="govuk-tabs__tab"
-                         href="#add-chart"
-                         id="add-chart-tab"
-                         tabindex="-1"
-                         aria-controls="add-chart"
-                         aria-selected="false"
-                         role="tab"
-                      >
-                        Add a chart
-                      </a>
-                    </li>
-                  </ul>
-                  <section class="govuk-tabs__panel dfe-content-overflow panel"
-                           id="table-preview"
-                           aria-labelledby="table-preview-tab"
-                           role="tabpanel"
-                           tabindex="-1"
-                  >
-                    <h3>
                       Table preview
-                    </h3>
+                    </a>
+                  </li>
+                  <li class="govuk-tabs__list-item"
+                      role="presentation"
+                  >
+                    <a class="govuk-tabs__tab"
+                       href="#add-chart"
+                       id="add-chart-tab"
+                       tabindex="-1"
+                       aria-controls="add-chart"
+                       aria-selected="false"
+                       role="tab"
+                    >
+                      Create chart
+                    </a>
+                  </li>
+                </ul>
+                <section class="govuk-tabs__panel dfe-content-overflow panel"
+                         id="table-preview"
+                         aria-labelledby="table-preview-tab"
+                         role="tabpanel"
+                         tabindex="-1"
+                >
+                  <h3>
+                    Table preview
+                  </h3>
+                  <div class="govuk-width-container">
                     <table class="govuk-table">
                       <caption class="govuk-table__caption govuk-!-margin-bottom-6">
-                        Table showing 'Absence by characteristic' from 'Pupil absence' in England between 2012/13 and 2016/17
+                        'Absence by characteristic' from 'Pupil absence' in England between 2012/13 and 2016/17
                       </caption>
                       <thead class="govuk-table__head">
                         <tr>
@@ -1001,81 +965,69 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
                     <p class="govuk-body-s">
                       Source: DfE prototype example statistics
                     </p>
-                  </section>
-                  <section class="govuk-tabs__panel dfe-content-overflow panel govuk-tabs__panel--hidden"
-                           id="add-chart"
-                           aria-labelledby="add-chart-tab"
-                           role="tabpanel"
-                           tabindex="-1"
-                  >
-                    <h3>
-                      Add a chart
-                    </h3>
-                    <div class="editor">
-                      <details class="govuk-details"
-                               open
-                               role="group"
+                  </div>
+                </section>
+                <section class="govuk-tabs__panel dfe-content-overflow panel govuk-tabs__panel--hidden"
+                         id="add-chart"
+                         aria-labelledby="add-chart-tab"
+                         role="tabpanel"
+                         tabindex="-1"
+                >
+                  <h3>
+                    Create chart
+                  </h3>
+                  <div class="editor">
+                    <div class="chartContainer">
+                      <button type="button"
+                              class="chart"
                       >
-                        <summary class="govuk-details__summary"
-                                 aria-controls="details-content-10"
-                                 aria-expanded="true"
-                                 role="button"
-                                 tabindex="0"
-                        >
-                          <span class="govuk-details__summary-text"
-                                data-testid="details--expand"
-                          >
-                            Select chart type
-                          </span>
-                        </summary>
-                        <div class="govuk-details__text"
-                             aria-hidden="false"
-                             id="details-content-10"
-                        >
-                          <div class="chartContainer">
-                            <button type="button"
-                                    class="chart"
-                            >
-                              <span class="title">
-                                Line
-                              </span>
-                              <span class="img line">
-                              </span>
-                            </button>
-                            <button type="button"
-                                    class="chart"
-                            >
-                              <span class="title">
-                                Vertical bar
-                              </span>
-                              <span class="img verticalbar">
-                              </span>
-                            </button>
-                            <button type="button"
-                                    class="chart"
-                            >
-                              <span class="title">
-                                Horizontal bar
-                              </span>
-                              <span class="img horizontalbar">
-                              </span>
-                            </button>
-                            <button type="button"
-                                    class="chart"
-                            >
-                              <span class="title">
-                                Geographic
-                              </span>
-                              <span class="img map">
-                              </span>
-                            </button>
-                          </div>
-                        </div>
-                      </details>
+                        <span class="title">
+                          Line
+                        </span>
+                        <span class="img line">
+                        </span>
+                      </button>
+                      <button type="button"
+                              class="chart"
+                      >
+                        <span class="title">
+                          Vertical bar
+                        </span>
+                        <span class="img verticalbar">
+                        </span>
+                      </button>
+                      <button type="button"
+                              class="chart"
+                      >
+                        <span class="title">
+                          Horizontal bar
+                        </span>
+                        <span class="img horizontalbar">
+                        </span>
+                      </button>
+                      <button type="button"
+                              class="chart"
+                      >
+                        <span class="title">
+                          Geographic
+                        </span>
+                        <span class="img map">
+                        </span>
+                      </button>
                     </div>
-                  </section>
-                </div>
+                    <div class="govuk-!-margin-top-6 govuk-body-s dfe-align--right">
+                      <a href="#">
+                        Choose an infographic as alternative
+                      </a>
+                    </div>
+                  </div>
+                </section>
               </div>
+              <a class="govuk-button"
+                 href="#"
+              >
+                Embed selected data block in this section
+              </a>
             </div>
             <div class="govuk-radios__item">
               <input class="govuk-radios__input"
@@ -1095,11 +1047,6 @@ exports[`EditableContentSubBlockRenderer Renders editable Markdown block correct
         </fieldset>
       </div>
     </div>
-    <a class="govuk-button"
-       href="#"
-    >
-      Add selected table option to section
-    </a>
   </div>
 </details>
 <div>

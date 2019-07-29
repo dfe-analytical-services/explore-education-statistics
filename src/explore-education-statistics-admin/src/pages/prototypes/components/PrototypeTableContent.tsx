@@ -1,9 +1,3 @@
-import {
-  FormFieldset,
-  FormGroup,
-  FormTextInput,
-} from '@common/components/form';
-import Link from '@admin/components/Link';
 import React from 'react';
 import { PrototypeTable } from '@admin/pages/prototypes/PrototypeData';
 
