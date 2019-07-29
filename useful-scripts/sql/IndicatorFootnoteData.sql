@@ -1102,7 +1102,6 @@ INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (111, 11);
 --enrolments
 INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (1, 12);
 INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (52, 12);
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (92, 12);
 INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (120, 12);
 INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (123, 12);
 
