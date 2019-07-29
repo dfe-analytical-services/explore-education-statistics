@@ -20,7 +20,6 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 
 export default class VerticalBarBlock extends Component<StackedBarProps> {
   public static definition: ChartDefinition = {
