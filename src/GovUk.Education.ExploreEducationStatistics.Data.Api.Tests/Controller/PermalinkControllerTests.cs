@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -48,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controller
         [Fact]
         public async void Create_Permalink_Returns_Id()
         {
-            var result = await  _controller.Create();
+            var result = await  _controller.Create(new ObservationQueryContext());
 
             Assert.IsAssignableFrom<OkObjectResult>(result);
         }

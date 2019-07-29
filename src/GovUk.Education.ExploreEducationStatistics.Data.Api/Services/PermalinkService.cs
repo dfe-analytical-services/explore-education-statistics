@@ -1,9 +1,12 @@
+using Newtonsoft.Json;
+
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
     using System;
     using System.Threading.Tasks;
     using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
     using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
+    using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
     using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
     using Microsoft.Azure.Cosmos.Table;
     
@@ -28,11 +31,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return permalink;
         }
 
-        public async Task<Permalink> CreateAsync()
+        public async Task<Permalink> CreateAsync(ObservationQueryContext tableQuery)
         {
             var table = await _tableStorageService.GetTableAsync(PermalinkTableName);
 
-            var permalink = new Permalink();
+            var permalink = new Permalink()
+            {
+                Title = "The table title",
+                Data = "the data",
+                Query = JsonConvert.SerializeObject(tableQuery)
+            };
 
             var insertOperation = TableOperation.Insert(permalink);
             var result = await table.ExecuteAsync(insertOperation);
