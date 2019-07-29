@@ -2,11 +2,11 @@ import {
   ChartDataB,
   ChartDefinition,
   ChartProps,
+  conditionallyAdd,
   createDataForAxis,
   getKeysForChart,
   mapNameToNameLabel,
   populateDefaultChartProps,
-  conditionallyAdd,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 
 import React, { Component } from 'react';
@@ -24,7 +24,6 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 import { Dictionary } from '@common/types';
 
 const CustomToolTip = ({ active, payload, label }: TooltipProps) => {
@@ -228,6 +227,6 @@ export default class LineChartBlock extends Component<ChartProps> {
       );
     }
 
-    return <LoadingSpinner />;
+    return <div>Unable to render chart</div>;
   }
 }
