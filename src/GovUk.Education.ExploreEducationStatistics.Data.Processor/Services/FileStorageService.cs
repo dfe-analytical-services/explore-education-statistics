@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Files;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return new SubjectData(dataBlob, metaBlob, BlobUtils.GetName(dataBlob));
         }
         
-        public async Task<Boolean> UploadFilesAsync(string publication, string release, IFormFile dataFile, string metaFileName,
+        public async Task<Boolean> UploadDataFileAsync(string publication, string release, IFormFile dataFile, string metaFileName,
             string name)
         {
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
@@ -73,23 +73,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             var blob = blobContainer.GetBlockBlobReference($"{publication}/{release}/{file.FileName}");
             blob.Properties.ContentType = file.ContentType;
-            var path = await UploadToTemporaryFile(file);
+            var path = await FileUtils.UploadToTemporaryFile(file);
             await blob.UploadFromFileAsync(path);
             await AddMetaValuesAsync(blob, metaValues);
-        }
-        
-        private static async Task<string> UploadToTemporaryFile(IFormFile file)
-        {
-            var path = Path.GetTempFileName();
-            if (file.Length > 0)
-            {
-                using (var stream = new FileStream(path, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream);
-                }
-            }
-
-            return path;
         }
 
         private static async Task AddMetaValuesAsync(CloudBlob blob, IEnumerable<KeyValuePair<string, string>> values)

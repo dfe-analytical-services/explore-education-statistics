@@ -19,17 +19,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
         {
             builder.Services
                 .AddAutoMapper()
-                .AddMemoryCache()
                 .AddDbContext<ApplicationDbContext>(options =>
                     options.UseSqlServer(GetSqlAzureConnectionString("StatisticsDb"),
                         providerOptions => providerOptions.EnableRetryOnFailure()))
                 .AddTransient<IFileStorageService, FileStorageService>()
                 .AddTransient<IFileImportService, FileImportService>()
                 .AddTransient<IImporterService, ImporterService>()
+                .AddTransient<ISplitFileService, SplitFileService>()
                 .AddTransient<ImporterFilterService>()
                 .AddTransient<ImporterLocationService>()
                 .AddTransient<ImporterMetaService>()
-                .AddTransient<IValidationService, ValidationService>()
+                .AddTransient<IReleaseProcessorService, ReleaseProcessorService>()
+                .AddTransient<MyMemoryCache>()
                 .BuildServiceProvider();
         }
 

@@ -92,8 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 .Where(row => row.ColumnType == ColumnType.Filter)
                 .Select(filter => (
                     filter: 
-                        _context.Filter.Any(f => f.SubjectId == subject.Id && f.Label == filter.Label && f.Hint == filter.FilterHint) ?
-                        _context.Filter.First(f => f.SubjectId == subject.Id && f.Label == filter.Label && f.Hint == filter.FilterHint) : 
+                        _context.Filter.FirstOrDefault(f => f.SubjectId == subject.Id && f.Label == filter.Label && f.Hint == filter.FilterHint) ??
                         new Filter(filter.FilterHint, filter.Label, subject),
                     column: filter.ColumnName,
                     filterGroupingColumn: filter.FilterGroupingColumn));

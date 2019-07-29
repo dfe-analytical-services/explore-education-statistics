@@ -69,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
                     _logger.LogInformation("Seeding Subject {Subject}", subject.Name);
 
                     var csvLines = file.GetCsvLines();
-                    var subjectMeta = _importerService.ImportMeta(file.GetMetaCsvLines().ToList(), subject, false);
+                    var subjectMeta = _importerService.ImportMeta(file.GetMetaCsvLines().ToList(), subject);
                     var batches = csvLines.Skip(1).Batch(10000);
                     var index = 0;
                     

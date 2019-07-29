@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Files;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage;
@@ -65,23 +65,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var blob = blobContainer.GetBlockBlobReference($"{publication}/{release}/{file.FileName}");
             blob.Properties.ContentType = file.ContentType;
-            var path = await UploadToTemporaryFile(file);
+            var path = await FileUtils.UploadToTemporaryFile(file);
             await blob.UploadFromFileAsync(path);
             await AddMetaValuesAsync(blob, metaValues);
-        }
-
-        private static async Task<string> UploadToTemporaryFile(IFormFile file)
-        {
-            var path = Path.GetTempFileName();
-            if (file.Length > 0)
-            {
-                using (var stream = new FileStream(path, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream);
-                }
-            }
-
-            return path;
         }
 
         public IEnumerable<FileInfo> ListFiles(string publication, string release)

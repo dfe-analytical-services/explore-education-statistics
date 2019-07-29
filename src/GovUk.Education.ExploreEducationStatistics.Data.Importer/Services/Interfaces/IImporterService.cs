@@ -6,9 +6,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Inte
 {
     public interface IImporterService
     {
-        SubjectMeta ImportMeta(List<string> metaLines, Subject subject, bool existingSubject);
+        SubjectMeta ImportMeta(List<string> metaLines, Subject subject);
+
+        SubjectMeta GetMeta(List<string> metaLines, Subject subject);
 
         void ImportObservations(List<string> batch, Subject subject,
             SubjectMeta subjectMeta);
+
+        void ImportFiltersAndLocations(List<string> lines, SubjectMeta subjectMeta);
     }
 }

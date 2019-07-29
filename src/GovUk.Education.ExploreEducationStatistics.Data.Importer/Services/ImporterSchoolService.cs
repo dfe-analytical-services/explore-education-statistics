@@ -11,13 +11,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
     [Obsolete]
     public class ImporterSchoolService
     {
-        private readonly IMemoryCache _cache;
+        private readonly MemoryCache _cache;
         private readonly ApplicationDbContext _context;
 
-        public ImporterSchoolService(IMemoryCache cache,
+        public ImporterSchoolService(MyMemoryCache cache,
             ApplicationDbContext context)
         {
-            _cache = cache;
+            _cache = cache.Cache;
             _context = context;
         }
 

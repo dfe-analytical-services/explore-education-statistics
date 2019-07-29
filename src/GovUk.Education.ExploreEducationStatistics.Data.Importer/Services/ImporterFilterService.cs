@@ -2,20 +2,18 @@ using System;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 {
     public class ImporterFilterService
     {
-        //private readonly IMemoryCache _cache;
         private readonly ApplicationDbContext _context;
-        private readonly IMemoryCache _cache;
+        private readonly MemoryCache _cache;
 
-        public ImporterFilterService(IMemoryCache cache, ApplicationDbContext context)
+        public ImporterFilterService(MyMemoryCache cache, ApplicationDbContext context)
         {
-             _cache = cache;
+             _cache = cache.Cache;
             _context = context;
         }
 
@@ -31,34 +29,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             {
                 label = "Not specified";
             }
-/*
+
             var cacheKey = GetFilterItemCacheKey(filterGroup, label);
             if (_cache.TryGetValue(cacheKey, out FilterItem filterItem))
             {
-                _context.FilterItem.Attach(filterItem);
-                _context.Entry<FilterItem>(filterItem).State = EntityState.Modified;
                 return filterItem;
             }
-*/
+            
             // TODO change expiry or introduce lookup
 
-            var filterItem = CreateFilterItem(filterGroup, label);
-            
-            /*
+            filterItem = CreateFilterItem(filterGroup, label);
+      
             _cache.Set(cacheKey, filterItem,
                 new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(5)));
-*/
+            
             return filterItem;
         }
 
         private FilterItem CreateFilterItem(FilterGroup filterGroup, string label)
         {
-            var filterItem = _context.FilterItem.FirstOrDefault(fi => fi.FilterGroupId == filterGroup.Id && fi.Label == label);
+            var filterItem = _context.FilterItem
+                .FirstOrDefault(fi => fi.FilterGroupId == filterGroup.Id && fi.Label == label);
+            
             if (filterItem == null)
             {
-
                 filterItem = _context.FilterItem.Add(new FilterItem(label, filterGroup)).Entity;
-                _context.SaveChanges();
             }
 
             return filterItem;
@@ -70,24 +65,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             {
                 label = "Default";
             }
-/*
+            
             var cacheKey = GetFilterGroupCacheKey(filter, label);
             if (_cache.TryGetValue(cacheKey, out FilterGroup filterGroup))
             {
-                _context.FilterGroup.Attach(filterGroup);
-                _context.Entry<FilterGroup>(filterGroup).State = EntityState.Modified;
-
                 return filterGroup;
             }
-*/
+    
             // TODO change expiry or introduce lookup
 
-            var filterGroup = CreateFilterGroup(filter, label);
-            
-            /*
+            filterGroup = CreateFilterGroup(filter, label);
+ 
             _cache.Set(cacheKey, filterGroup,
                 new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(5)));
-*/
+            
             return filterGroup;
         }
 
@@ -95,11 +86,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         {
             try
             {
-                var filterGroup = _context.FilterGroup.FirstOrDefault(fg => fg.FilterId == filter.Id && fg.Label == label);
+                var filterGroup = _context.FilterGroup
+                    .FirstOrDefault(fg => fg.FilterId == filter.Id && fg.Label == label);
+                
                 if (filterGroup == null)
                 {
                     filterGroup = _context.FilterGroup.Add(new FilterGroup(filter, label)).Entity;
-                    _context.SaveChanges();
                 }
 
                 return filterGroup;

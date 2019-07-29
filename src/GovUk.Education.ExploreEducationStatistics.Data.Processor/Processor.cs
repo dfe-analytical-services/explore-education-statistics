@@ -1,4 +1,8 @@
 using System;
+using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
@@ -10,15 +14,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
     public class Processor
     {
         private readonly IFileImportService _fileImportService;
-        private readonly IValidationService _validationService;
-
+        private readonly IReleaseProcessorService _releaseProcessorService;
+        private readonly IFileStorageService _fileStorageService;
+        private readonly ISplitFileService _splitFileService;
+        private readonly IImporterService _importerService;
+        private readonly ApplicationDbContext _context;
+        
         public Processor(
             IFileImportService fileImportService,
-            IValidationService validationService
+            IReleaseProcessorService releaseProcessorService,
+            IFileStorageService fileStorageService,
+            ISplitFileService splitFileService,
+            IImporterService importerService,
+            ApplicationDbContext context
         )
         {
             _fileImportService = fileImportService;
-            _validationService = validationService;
+            _releaseProcessorService = releaseProcessorService;
+            _fileStorageService = fileStorageService;
+            _splitFileService = splitFileService;
+            _importerService = importerService;
+            _context = context;
         }
 
         [FunctionName("ProcessUploads")]
@@ -32,17 +48,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
         {
             try
             {
-                logger.LogInformation($"{GetType().Name} function triggered: {message}");
-                _validationService.Validate(collector, message);
+                logger.LogInformation($"{GetType().Name} function STARTED for : Datafile: {message.DataFileName}");
+                
+                var subjectData = _fileStorageService.GetSubjectData(message).Result;
+                
+                var subject =_releaseProcessorService.CreateOrUpdateRelease(subjectData, message);
+                
+                // is this a new subject?
+                if (subject.Id <= 0)
+                {
+                    _context.SaveChanges();
+
+                    _importerService.ImportMeta(subjectData.GetMetaLines().ToList(), subject);
+                    
+                    _fileImportService.ImportFilters(message);
+
+                    _context.SaveChanges();
+                }
+                else
+                {
+                    // TODO - Delete collections
+                    _context.SaveChanges();
+                }
+
+                _splitFileService.SplitDataFile(collector, message, subjectData);
+                
             }
             catch (Exception e)
             {
-                // TODO Handle exceptions via notifications etc
-                logger.LogError($"{GetType().Name} function FAILED: {e}");
+                logger.LogError($"{GetType().Name} function FAILED for : Datafile: {message.DataFileName}\n{e}");
                 throw;
             }
 
-            logger.LogInformation($"{GetType().Name} function completed");
+            logger.LogInformation($"{GetType().Name} function COMPLETE for : Datafile: {message.DataFileName}");
         }
         
         [FunctionName("ImportFiles")]
@@ -54,17 +92,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
         {
             try
             {
-                logger.LogInformation($"{GetType().Name} function triggered: {message}");
+                logger.LogInformation($"{GetType().Name} function STARTED for : Batch: {message.BatchNo} Datafile: {message.DataFileName}");
+                
                 _fileImportService.ImportFiles(message);
             }
             catch (Exception e)
             {
-                // TODO Handle exceptions via notifications etc
-                logger.LogError($"{GetType().Name} function FAILED: {e}");
+                logger.LogError($"{GetType().Name} function FAILED: : Batch: {message.BatchNo} Datafile: {message.DataFileName}\n{e}");
                 throw;
             }
 
-            logger.LogInformation($"{GetType().Name} function completed");
+            logger.LogInformation($"{GetType().Name} function COMPLETE for : Batch: {message.BatchNo} Datafile: {message.DataFileName}");
         }
     }
 }

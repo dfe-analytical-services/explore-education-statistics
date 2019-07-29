@@ -9,13 +9,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 {
     public class ImporterLocationService
     {
-        private readonly IMemoryCache _cache;
+        private readonly MemoryCache _cache;
         private readonly ApplicationDbContext _context;
 
-        public ImporterLocationService(IMemoryCache cache,
+        public ImporterLocationService(MyMemoryCache cache,
             ApplicationDbContext context)
         {
-            _cache = cache;
+            _cache = cache.Cache;
             _context = context;
         }
 
@@ -129,7 +129,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                     Ward = ward ?? Ward.Empty()
                 });
 
-                _context.SaveChanges();
                 return entityEntry.Entity;
             }
 

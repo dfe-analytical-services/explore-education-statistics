@@ -34,11 +34,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             _logger = logger;
         }
 
-        public SubjectMeta ImportMeta(List<string> metaLines, Subject subject, bool existingSubject)
+        public SubjectMeta ImportMeta(List<string> metaLines, Subject subject)
         {
             _logger.LogInformation("Importing meta lines for Publication {Publication}, {Subject}", subject.Release.Publication.Title, subject.Name);
             
-            return _importerMetaService.Import(metaLines, subject, existingSubject);
+            return _importerMetaService.Import(metaLines, subject, false);
+        }
+        
+        public SubjectMeta GetMeta(List<string> metaLines, Subject subject)
+        {
+            _logger.LogInformation("Importing meta lines for Publication {Publication}, {Subject}", subject.Release.Publication.Title, subject.Name);
+            
+            return _importerMetaService.Import(metaLines, subject, true);
+        }
+
+        public void ImportFiltersAndLocations(List<string> lines, SubjectMeta subjectMeta)
+        {
+            var headers = lines.First().Split(',').ToList();
+            lines.RemoveAt(0);
+            lines.ForEach(line => CreateFiltersAndLocationsFromCsv(line, headers, subjectMeta));
         }
 
         public void ImportObservations(List<string> lines, Subject subject, SubjectMeta subjectMeta)
@@ -86,6 +100,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             };
             return observation;
         }
+        
+        private void CreateFiltersAndLocationsFromCsv(string raw,
+            List<string> headers,
+            SubjectMeta subjectMeta)
+        {
+            var line = raw.Split(',');
+            GetFilterItems(line, headers, subjectMeta.Filters);
+            GetLocationId(line, headers);
+        }
 
         private ICollection<ObservationFilterItem> GetFilterItems(IReadOnlyList<string> line,
             List<string> headers,
@@ -98,6 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 var filterItem = _importerFilterService.Find(filterItemLabel, filterGroupLabel, filterMeta.Filter);
                 return new ObservationFilterItem
                 {
+                    FilterItemId = filterItem.Id,
                     FilterItem = filterItem
                 };
             }).ToList();
