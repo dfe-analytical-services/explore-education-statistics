@@ -8,9 +8,16 @@ interface Props {
   block: ContentBlock;
   id: string;
   publication: Publication;
+
+  onToggle?: (section: { id: string; title: string }) => void;
 }
 
-const ContentSubBlockRenderer = ({ block, id, publication }: Props) => {
+const ContentSubBlockRenderer = ({
+  block,
+  id,
+  publication,
+  onToggle,
+}: Props) => {
   switch (block.type) {
     case 'MarkDownBlock':
       return <ReactMarkdown className="govuk-body" source={block.body} />;
@@ -46,6 +53,7 @@ const ContentSubBlockRenderer = ({ block, id, publication }: Props) => {
               </ButtonLink>
             </div>
           }
+          onToggle={onToggle}
         />
       );
     default:
