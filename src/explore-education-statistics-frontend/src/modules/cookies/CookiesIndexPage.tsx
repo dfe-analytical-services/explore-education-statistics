@@ -21,7 +21,9 @@ interface FormValues {
 }
 
 interface Props {
-  cookies?: any;
+  cookies?: {
+    [key: string]: string;
+  };
 }
 
 function CookiesIndexPage({ cookies = {} }: Props) {

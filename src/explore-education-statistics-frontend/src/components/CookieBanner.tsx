@@ -17,7 +17,7 @@ function CookieBanner({ cookies }: Props) {
 
   const acceptCookies = () => {
     setBannerSeenCookie(true);
-    if (getCookie('disableGA') === undefined) {
+    if (typeof getCookie('disableGA') === 'undefined') {
       setGACookie(false);
     }
   };
