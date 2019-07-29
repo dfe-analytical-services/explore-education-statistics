@@ -1,4 +1,4 @@
-import Details from '@common/components/Details';
+import Details, { DetailsToggleHandler } from '@common/components/Details';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import {
@@ -14,7 +14,7 @@ export interface SummaryRendererProps {
   dataKeys: string[];
   dataSummary: string[];
   description: { type: string; body: string };
-  analytics?: (eventGA: { category: string; action: string }) => void;
+  onToggle?: DetailsToggleHandler;
 }
 
 function getLatestMeasures(result: Result[]) {
@@ -34,7 +34,7 @@ export default function SummaryRenderer({
   data,
   dataKeys,
   dataSummary,
-  analytics,
+  onToggle,
 }: SummaryRendererProps) {
   let measures: { [key: string]: string } = {};
 
@@ -76,7 +76,7 @@ export default function SummaryRenderer({
                 )}
               </div>
               <Details
-                analytics={analytics}
+                onToggle={onToggle}
                 summary={`Define '${meta.indicators[key].label}'`}
               >
                 <p>

@@ -23,7 +23,7 @@ import {
   Summary,
   Table,
 } from '@common/services/publicationService';
-import React, { Component, ReactNode } from 'react';
+import React, { Component, MouseEvent, ReactNode } from 'react';
 import DownloadDetails from './DownloadDetails';
 
 export interface DataBlockProps {
@@ -40,7 +40,11 @@ export interface DataBlockProps {
   showTables?: boolean;
   additionalTabContent?: ReactNode;
 
-  analytics?: (eventGA: { category: string; action: string }) => void;
+  onToggle?: (section: { id: string; title: string }) => void;
+  onSummaryDetailsToggle?: (
+    isOpened: boolean,
+    event: MouseEvent<HTMLElement>,
+  ) => void;
 }
 
 interface DataBlockState {
@@ -128,11 +132,11 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
       height,
       showTables,
       additionalTabContent,
-      analytics,
+      onToggle,
+      onSummaryDetailsToggle,
       id,
     } = this.props;
     const { charts, summary, tables, isLoading } = this.state;
-
     return (
       <>
         {heading && <h3>{heading}</h3>}
@@ -140,10 +144,13 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
         {isLoading ? (
           <LoadingSpinner text="Loading content..." />
         ) : (
-          <Tabs id={id} analytics={analytics}>
+          <Tabs id={id} onToggle={onToggle}>
             {summary && (
               <TabsSection id={`${id}-summary`} title="Summary">
-                <SummaryRenderer analytics={analytics} {...summary} />
+                <SummaryRenderer
+                  onToggle={onSummaryDetailsToggle}
+                  {...summary}
+                />
               </TabsSection>
             )}
 

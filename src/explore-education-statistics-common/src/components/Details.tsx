@@ -7,13 +7,17 @@ import React, { MouseEvent, ReactNode, useEffect, useRef } from 'react';
 let hasNativeDetails: boolean;
 let idCounter = 0;
 
+export type DetailsToggleHandler = (
+  isOpen: boolean,
+  event: MouseEvent<HTMLElement>,
+) => void;
+
 export interface DetailsProps {
   className?: string;
   tag?: string;
   children: ReactNode;
   id?: string;
-  onToggle?: (isOpen: boolean, event: MouseEvent<HTMLElement>) => void;
-  analytics?: (eventGA: { category: string; action: string }) => void;
+  onToggle?: DetailsToggleHandler;
   open?: boolean;
   summary: string | ReactNode;
 }
@@ -24,7 +28,6 @@ const Details = ({
   id = `details-content-${(idCounter += 1)}`,
   open = false,
   onToggle,
-  analytics,
   summary,
   tag,
 }: DetailsProps) => {
@@ -78,15 +81,8 @@ const Details = ({
           event.persist();
 
           if (onToggle) {
-            onToggle(!isOpened, event);
-            if (analytics) {
-              analytics({
-                category: 'Statistics summary',
-                action: `${summary} - ${tag}`,
-              });
-            }
-
             if (event.isDefaultPrevented()) {
+              onToggle(isOpened, event);
               return;
             }
           }

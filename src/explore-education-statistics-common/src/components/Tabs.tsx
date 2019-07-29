@@ -14,10 +14,10 @@ import TabsSection, { TabsSectionProps } from './TabsSection';
 interface Props {
   children: ReactNode;
   id: string;
-  analytics?: (event: { category: string; action: string }) => void;
+  onToggle?: (section: { id: string; title: string }) => void;
 }
 
-const Tabs = ({ children, id, analytics }: Props) => {
+const Tabs = ({ children, id, onToggle }: Props) => {
   const [loadedSections, setLoadedSections] = useState(new Set<number>());
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
 
@@ -67,10 +67,10 @@ const Tabs = ({ children, id, analytics }: Props) => {
                 onClick={event => {
                   event.preventDefault();
                   setSelectedTab(index);
-                  if (typeof analytics === 'function') {
-                    analytics({
-                      category: 'Statistics Tabs',
-                      action: `${props.title} (${sectionId}) Tab Opened`,
+                  if (typeof onToggle === 'function') {
+                    onToggle({
+                      title: `${props.title}`,
+                      id: `${sectionId}`,
                     });
                   }
                 }}
@@ -84,10 +84,10 @@ const Tabs = ({ children, id, analytics }: Props) => {
 
                       setSelectedTab(nextTabIndex);
                       tabElements[nextTabIndex].focus();
-                      if (typeof analytics === 'function') {
-                        analytics({
-                          category: 'Statistics Tabs',
-                          action: `${props.title} (${sectionId}) Tab Opened`,
+                      if (typeof onToggle === 'function') {
+                        onToggle({
+                          title: `${props.title}`,
+                          id: `${sectionId}`,
                         });
                       }
                       break;
@@ -100,10 +100,10 @@ const Tabs = ({ children, id, analytics }: Props) => {
 
                       setSelectedTab(nextTabIndex);
                       tabElements[nextTabIndex].focus();
-                      if (typeof analytics === 'function') {
-                        analytics({
-                          category: 'Statistics Tabs',
-                          action: `${props.title} (${sectionId}) Tab Opened`,
+                      if (typeof onToggle === 'function') {
+                        onToggle({
+                          title: `${props.title}`,
+                          id: `${sectionId}`,
                         });
                       }
                       break;
