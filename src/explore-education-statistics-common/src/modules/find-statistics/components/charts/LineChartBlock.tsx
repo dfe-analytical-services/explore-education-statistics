@@ -135,7 +135,7 @@ export default class LineChartBlock extends Component<ChartProps> {
             )}
             <CartesianGrid
               strokeDasharray="3 3"
-              horizontal={axes.minor.showGrid !== false}
+              horizontal={axes.minor && axes.minor.showGrid !== false}
               vertical={axes.major.showGrid !== false}
             />
 
