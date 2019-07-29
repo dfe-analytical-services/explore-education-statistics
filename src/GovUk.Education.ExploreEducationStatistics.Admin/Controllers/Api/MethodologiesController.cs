@@ -9,7 +9,6 @@ using TopicId = System.Guid;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
-    // TODO rename to Themes once the current Crud theme controller is removed
     [ApiController]
     [Authorize]
     public class MethodologyController : ControllerBase
@@ -26,14 +25,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
         public ActionResult<List<MethodologyViewModel>> GetTopicMethodologies([Required]TopicId topicId)
         {
-            var result = _methodologyService.GetTopicMethodologies(topicId);
-
-            if (result.Any())
-            {
-                return result;
-            }
-
-            return NoContent();
+            return _methodologyService.GetTopicMethodologies(topicId);
         }
+        
+        [HttpGet("/methodologies")]
+        [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
+        public ActionResult<List<MethodologyViewModel>> GetMethodologies()
+        {
+            return _methodologyService.List();
+        }
+        
     }
 }
