@@ -4,14 +4,16 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190722150412_AddingDefaultsToCharts")]
+    partial class AddingDefaultsToCharts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -938,8 +940,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
 
                     b.Property<string>("KeyStatistics");
 
-                    b.Property<string>("NextReleaseDate");
-
                     b.Property<int>("Order");
 
                     b.Property<Guid>("PublicationId");
@@ -955,6 +955,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                     b.Property<string>("Summary");
 
                     b.Property<int>("TimePeriodCoverage");
+
+                    b.Property<string>("Title")
+                        .IsRequired();
 
                     b.Property<Guid?>("TypeId");
 
@@ -975,12 +978,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                             Order = 0,
                             PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                             Published = new DateTime(2018, 3, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            ReleaseName = "2016",
+                            ReleaseName = "2016 to 2017",
                             Slug = "2016-17",
                             Summary = @"Read national statistical summaries, view charts and tables and download data files.
 
 Find out how and why these statistics are collected and published - [Pupil absence statistics: methodology](../methodology/pupil-absence-in-schools-in-england).",
                             TimePeriodCoverage = 0,
+                            Title = "Pupil absence data and statistics for schools in England",
                             TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c")
                         },
                         new
@@ -991,10 +995,11 @@ Find out how and why these statistics are collected and published - [Pupil absen
                             Order = 0,
                             PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                             Published = new DateTime(2016, 3, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            ReleaseName = "2015",
+                            ReleaseName = "2015 to 2016",
                             Slug = "2015-16",
                             Summary = "Read national statistical summaries and definitions, view charts and tables and download data files across a range of pupil absence subject areas.",
                             TimePeriodCoverage = 0,
+                            Title = "Pupil absence data and statistics for schools in England",
                             TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c")
                         },
                         new
@@ -1005,12 +1010,13 @@ Find out how and why these statistics are collected and published - [Pupil absen
                             Order = 0,
                             PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                             Published = new DateTime(2018, 7, 19, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            ReleaseName = "2016",
+                            ReleaseName = "2016 to 2017",
                             Slug = "2016-17",
                             Summary = @"Read national statistical summaries, view charts and tables and download data files.
 
 Find out how and why these statistics are collected and published - [Permanent and fixed-period exclusion statistics: methodology](../methodology/permanent-and-fixed-period-exclusions-in-england)",
                             TimePeriodCoverage = 0,
+                            Title = "Permanent and fixed-period exclusions statistics for schools in England",
                             TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c")
                         },
                         new
@@ -1027,6 +1033,7 @@ Find out how and why these statistics are collected and published - [Permanent a
 
 Find out how and why these statistics are collected and published - [Secondary and primary school applications and offers: methodology](../methodology/secondary-and-primary-schools-applications-and-offers)",
                             TimePeriodCoverage = 0,
+                            Title = "Secondary and primary school applications and offers",
                             TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c")
                         });
                 });
