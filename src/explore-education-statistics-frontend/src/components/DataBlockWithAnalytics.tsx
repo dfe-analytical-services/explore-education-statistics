@@ -8,8 +8,12 @@ const DataBlockWithAnalytics = (props: DataBlockProps) => {
   return (
     <DataBlock
       {...props}
-      analytics={(eventGA: { category: string; action: string }) => {
-        logEvent(eventGA.category, eventGA.action, window.location.pathname);
+      onToggle={(section: { id: string; title: string }) => {
+        logEvent(
+          'Publication Release Data Tabs',
+          `${section.title} (${section.id}) tab opened`,
+          window.location.pathname,
+        );
       }}
     />
   );
