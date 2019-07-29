@@ -71,7 +71,8 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
       legendHeight,
     } = this.props;
 
-    if (!axes.major || !data) return <LoadingSpinner />;
+    if (axes.major === undefined || data === undefined || meta === undefined)
+      return <div>Unable to render chart</div>;
 
     const chartData: ChartDataB[] = createDataForAxis(
       axes.major,
