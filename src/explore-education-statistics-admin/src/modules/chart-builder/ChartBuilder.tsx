@@ -193,29 +193,43 @@ const ChartBuilder = ({ data }: Props) => {
       if (selectedChartType) {
         const axisConfiguration = selectedChartType.axes.reduce<
           Dictionary<AxisConfiguration>
-        >(
-          (axesConfigurationDictionary, axisDefinition) => ({
+        >((axesConfigurationDictionary, axisDefinition) => {
+          const previousConfig =
+            (previousAxesConfiguration.current &&
+              previousAxesConfiguration.current[axisDefinition.type]) ||
+            {};
+
+          return {
             ...axesConfigurationDictionary,
 
             [axisDefinition.type]: {
-              name: `${axisDefinition.title} (${axisDefinition.type} axis)`,
-              type: axisDefinition.type,
-              groupBy: axisDefinition.defaultDataType,
+              referenceLines: [],
 
+              ...previousConfig,
+
+              // hard-coded defaults
+              type: axisDefinition.type,
+              name: `${axisDefinition.title} (${axisDefinition.type} axis)`,
+              groupBy: previousConfig.groupBy || axisDefinition.defaultDataType,
               dataSets:
                 axisDefinition.type === 'major'
                   ? dataSetAndConfiguration.map(dsc => dsc.dataSet)
                   : [],
-              visible: true,
-              showGrid: true,
-              size: '50',
-              referenceLines: [],
-              ...(previousAxesConfiguration.current &&
-                previousAxesConfiguration.current[axisDefinition.type]),
+
+              // defaults that can be undefined and may be overriden
+              visible:
+                previousConfig.visible === undefined
+                  ? true
+                  : previousConfig.visible,
+              showGrid:
+                previousConfig.showGrid === undefined
+                  ? true
+                  : previousConfig.showGrid,
+              size:
+                previousConfig.size === undefined ? '50' : previousConfig.size,
             },
-          }),
-          {},
-        );
+          };
+        }, {});
 
         setAxesConfiguration(axisConfiguration);
       }
