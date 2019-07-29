@@ -1,5 +1,5 @@
 import { ReleaseApprovalStatus } from '@admin/services/dashboard/types';
-import { User } from '@admin/services/PrototypeLoginService';
+import {User} from "@admin/services/sign-in/service";
 
 export interface IdLabelPair {
   id: string;

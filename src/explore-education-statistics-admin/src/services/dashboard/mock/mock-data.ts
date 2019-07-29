@@ -3,7 +3,7 @@ import {
   ReleaseApprovalStatus,
   ThemeAndTopics,
 } from '@admin/services/dashboard/types';
-import { PrototypeLoginService } from '@admin/services/PrototypeLoginService';
+import PrototypeLoginService from '@admin/services/PrototypeLoginService';
 
 const themesAndTopics: ThemeAndTopics[] = [
   {
