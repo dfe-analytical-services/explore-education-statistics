@@ -13,7 +13,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
         // GET
         public IActionResult Index()
         {
-            Response.Cookies.Delete("DFEUserDetails");
+            // TODO - we'll probably need to do something more robust to tell AD that
+            // the user is logging out of this particular service - at the moment hitting
+            // sign-in would immediately log them back in as AD will recognise that this
+            // user has already requested a cookie before and will reissue it without
+            // enforcing another login
             Response.Cookies.Delete(".AspNetCore.AzureADCookie");
             return Redirect("/signed-out");
         }

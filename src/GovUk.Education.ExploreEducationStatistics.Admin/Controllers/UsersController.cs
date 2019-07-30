@@ -12,6 +12,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
         // GET
         public ActionResult<UserDetailsViewModel> MyDetails()
         {
+            // TODO - we need to something cleverer here - we need to 
+            // validate that their AD cookie is still valid, not simply
+            // to check for its existence.  However, this is just in here
+            // temporarily as a stopgap
             if (Request.Cookies.ContainsKey(".AspNetCore.AzureADCookie"))
             {
                 return new UserDetailsViewModel()

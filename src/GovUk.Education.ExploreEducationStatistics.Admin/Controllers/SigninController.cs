@@ -14,23 +14,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
         {
             return Redirect("/admin-dashboard");
         }
-        
-        // GET
-        public ActionResult<UserDetailsViewModel> UserDetails()
-        {
-            if (Request.Cookies.ContainsKey(".AspNetCore.AzureADCookie"))
-            {
-                return new UserDetailsViewModel()
-                {
-                    Id = Guid.Parse("4add7621-4aef-4abc-b2e6-0938b37fe5b9"),
-                    Email = "john.smith@example.com",
-                    Name = "John Smith",
-                    Permissions = new string[] { "team lead" },
-                };
-            }
-
-            Response.StatusCode = 403;
-            return null;
-        }
     }
 }
