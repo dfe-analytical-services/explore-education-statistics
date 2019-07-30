@@ -8,11 +8,32 @@ import Link from '@admin/components/Link';
 
 const PrototypeAdminDashboardPublications = () => {
   const userContext = React.useContext(LoginContext);
+
   return (
     <>
-      <p className="govuk-body">
-        Edit an existing release or create a new release for current
-        publications.
+      {userContext.user &&
+        userContext.user.permissions.includes('team lead') && (
+          <p className="govuk-body">
+            View existing and create new publications and releases.
+          </p>
+        )}
+      {userContext.user &&
+        userContext.user.permissions.includes('team member') && (
+          <p className="govuk-body">
+            View existing publications and create new releases.
+          </p>
+        )}
+      <p className="govuk-body">Select publications to:</p>
+      <ul className="govuk-list--bullet">
+        <li>create new releases and methodologies</li>
+        <li>edit exiting releases and methodologies</li>
+        <li>view and sign-off releases and methodologies</li>
+      </ul>
+      <p className="govuk-bo">
+        To remove publications, releases and methodologies email{' '}
+        <a href="mailto:explore.statistics@education.gov.uk">
+          explore.statistics@education.gov.uk
+        </a>
       </p>
       {userContext.user && userContext.user.permissions.includes('team lead') && (
         <>
@@ -66,7 +87,6 @@ const PrototypeAdminDashboardPublications = () => {
         </>
       )}
       <hr />
-
       <h2 className="govuk-heading-l">Pupils and schools</h2>
       <h3 className="govuk-heading-m govuk-!-margin-bottom-0">
         Pupil absence publications
@@ -84,11 +104,7 @@ const PrototypeAdminDashboardPublications = () => {
               <dd className="govuk-summary-list__value">
                 <Link to="#">A guide to absence statistics</Link>
               </dd>
-              <dd className="govuk-summary-list__actions">
-                <Link to="/prototypes/publication-assign-methodology">
-                  Edit methodology
-                </Link>
-              </dd>
+              <dd className="govuk-summary-list__actions" />
             </div>
           </dl>
           <dl className="govuk-summary-list">
@@ -103,14 +119,21 @@ const PrototypeAdminDashboardPublications = () => {
                       <PrototypeDashboardRelease
                         title="Academic year,"
                         years="2018 to 2019"
-                        tag="Ready to review"
+                        tag={
+                          userContext.user &&
+                          userContext.user.permissions.includes(
+                            'responsible statistician',
+                          )
+                            ? 'Ready for final sign-off'
+                            : 'Ready to review'
+                        }
                         review
                         lastEdited={new Date('2019-03-20 17:37')}
                         lastEditor={{ id: 'me', name: 'me', permissions: [] }}
                         published={new Date('2019-09-20 09:30')}
                         nextRelease={new Date('2020-09-20 09:30')}
-                        dataType="Revised"
                         showComments
+                        task="readyReview"
                       />
                     </li>
                   )}
@@ -128,7 +151,6 @@ const PrototypeAdminDashboardPublications = () => {
                         lastEditor={{ id: 'me', name: 'me', permissions: [] }}
                         published={new Date('2019-09-24 09:30')}
                         nextRelease={new Date('2020-09-25 09:30')}
-                        dataType="Provisional"
                       />
                     </li>
                   )}
@@ -149,7 +171,6 @@ const PrototypeAdminDashboardPublications = () => {
                       lastEditor={{ id: 'me', name: 'me', permissions: [] }}
                       published={new Date('2018-09-24 09:30')}
                       nextRelease={new Date('2019-09-23 09:30')}
-                      dataType="Final"
                     />
                   </li>
                   <li>
@@ -163,7 +184,6 @@ const PrototypeAdminDashboardPublications = () => {
                       lastEdited={new Date('2018-03-20 14:23')}
                       lastEditor={{ id: 'me', name: 'me', permissions: [] }}
                       published={new Date('2017-09-25 09:30')}
-                      dataType="Final"
                     />
                   </li>
                   <li>
@@ -177,15 +197,23 @@ const PrototypeAdminDashboardPublications = () => {
                       lastEdited={new Date('2017-03-20 16:15')}
                       lastEditor={{ id: 'me', name: 'me', permissions: [] }}
                       published={new Date('2016-03-26 09:30')}
-                      dataType="Final"
                     />
                   </li>
                 </ul>
               </dd>
             </div>
           </dl>
-          <Link to="/prototypes/release-create-new" className="govuk-button">
-            Create a new release
+          <Link
+            to="/prototypes/release-create-new"
+            className="govuk-button govuk-!-margin-right-6"
+          >
+            Create new release
+          </Link>
+          <Link
+            to="/prototypes/publication-assign-methodology"
+            className="govuk-button govuk-button--secondary"
+          >
+            Manage methodology
           </Link>
         </AccordionSection>
         <AccordionSection
@@ -200,11 +228,7 @@ const PrototypeAdminDashboardPublications = () => {
               <dd className="govuk-summary-list__value">
                 <Link to="#">A guide to absence statistics</Link>
               </dd>
-              <dd className="govuk-summary-list__actions">
-                <Link to="/prototypes/publication-assign-methodology">
-                  Edit methodology
-                </Link>
-              </dd>
+              <dd className="govuk-summary-list__actions" />
             </div>
           </dl>
           <dl className="govuk-summary-list">
@@ -248,8 +272,17 @@ const PrototypeAdminDashboardPublications = () => {
               </dd>
             </div>
           </dl>
-          <Link to="/prototypes/release-create-new" className="govuk-button">
-            Create a new release
+          <Link
+            to="/prototypes/release-create-new"
+            className="govuk-button govuk-!-margin-right-6"
+          >
+            Create new release
+          </Link>
+          <Link
+            to="/prototypes/publication-assign-methodology"
+            className="govuk-button govuk-button--secondary"
+          >
+            Manage methodology
           </Link>
         </AccordionSection>
         <AccordionSection
@@ -265,11 +298,7 @@ const PrototypeAdminDashboardPublications = () => {
               <dd className="govuk-summary-list__value">
                 <Link to="#">A guide to absence statistics</Link>
               </dd>
-              <dd className="govuk-summary-list__actions">
-                <Link to="/prototypes/publication-assign-methodology">
-                  Edit methodology
-                </Link>
-              </dd>
+              <dd className="govuk-summary-list__actions" />
             </div>
           </dl>
           <dl className="govuk-summary-list">
@@ -314,14 +343,23 @@ const PrototypeAdminDashboardPublications = () => {
               </dd>
             </div>
           </dl>
-          <Link to="/prototypes/release-create-new" className="govuk-button">
+          <Link
+            to="/prototypes/release-create-new"
+            className="govuk-button govuk-!-margin-right-6"
+          >
             Create new release
+          </Link>
+          <Link
+            to="/prototypes/publication-assign-methodology"
+            className="govuk-button govuk-button--secondary"
+          >
+            Manage methodology
           </Link>
         </AccordionSection>
         {window.location.search === '?status=newPublication' && (
           <AccordionSection
-            heading="Pupil absence statistics and data for schools in England: summer term"
-            caption="New publication, requires release adding"
+            heading="Pupil absence statistics and data for schools in England: summer term (NEW)"
+            caption="Create new release"
           >
             <dl className="govuk-summary-list">
               <div className="govuk-summary-list__row">
@@ -331,22 +369,27 @@ const PrototypeAdminDashboardPublications = () => {
                 <dd className="govuk-summary-list__value">
                   No methodology available
                 </dd>
-                <dd className="govuk-summary-list__actions">
-                  <Link to="/prototypes/publication-assign-methodology">
-                    Add methodology
-                  </Link>
-                </dd>
+                <dd className="govuk-summary-list__actions" />
               </div>
             </dl>
-            <Link to="/prototypes/release-create-new" className="govuk-button">
+            <Link
+              to="/prototypes/release-create-new"
+              className="govuk-button govuk-!-margin-right-6"
+            >
               Create new release
+            </Link>
+            <Link
+              to="/prototypes/publication-assign-methodology"
+              className="govuk-button govuk-button--secondary"
+            >
+              Add methodology
             </Link>
           </AccordionSection>
         )}
       </Accordion>
       {userContext.user && userContext.user.permissions.includes('team lead') && (
         <Link to="/prototypes/publication-create-new" className="govuk-button">
-          Create a new publication
+          Create new publication
         </Link>
       )}
     </>

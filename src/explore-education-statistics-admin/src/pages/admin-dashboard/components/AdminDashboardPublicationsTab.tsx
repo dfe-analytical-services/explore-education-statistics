@@ -91,7 +91,7 @@ const AdminDashboardPublicationsTab = ({
         <div className="govuk-inset-text">{noResultsMessage}</div>
       )}
       <Link to="/prototypes/publication-create-new" className="govuk-button">
-        Create a new publication
+        Create new publication
       </Link>
     </section>
   );

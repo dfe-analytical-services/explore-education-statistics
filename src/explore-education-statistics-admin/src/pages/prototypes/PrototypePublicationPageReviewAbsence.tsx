@@ -1,135 +1,173 @@
-import { Release } from '@common/services/publicationService';
-import React, { Component } from 'react';
+import React from 'react';
+import { LoginContext } from '@admin/components/Login';
 import { FormGroup, FormRadioGroup } from '@common/components/form';
 import Link from '@admin/components/Link';
 import PrototypePublicationService from '@admin/pages/prototypes/components/PrototypePublicationService';
 import EditablePublicationPage from '@admin/pages/prototypes/components/EditablePublicationPage';
 import PrototypePage from './components/PrototypePage';
 
-interface State {
-  data: Release | undefined;
-  // publication: string | undefined;
-  // editing: boolean;
-}
+const PublicationPage = () => {
+  const [status, setStatus] = React.useState('');
+  const userContext = React.useContext(LoginContext);
 
-class PublicationPage extends Component<{}, State> {
-  public state = {
-    data: undefined,
-    // publication: undefined,
-    // editing: false,
+  const reviewType =
+    userContext.user &&
+    userContext.user.permissions.includes('responsible statistician')
+      ? 'level2'
+      : 'level1';
+
+  const Level1ReviewForm = () => {
+    return (
+      <div>
+        <FormRadioGroup
+          legend="Update release status"
+          id="review-release"
+          name="review-release"
+          value={status}
+          onChange={e => {
+            setStatus(e.target.value);
+          }}
+          options={[
+            {
+              id: 'first-draft',
+              label: 'First draft',
+              value: 'first-draft',
+            },
+
+            {
+              id: 'approve-release',
+              label: 'Final sign-off',
+              value: 'approve-release',
+              conditional: (
+                <FormGroup>
+                  <label htmlFor="approved-comments" className="govuk-label">
+                    Add any extra comments
+                  </label>
+                  <textarea
+                    name="approved-comments"
+                    id="approved-comments"
+                    className="govuk-textarea"
+                  />
+                </FormGroup>
+              ),
+            },
+
+            {
+              id: 'question',
+              label: 'In review',
+              value: 'question',
+              conditional: (
+                <FormGroup>
+                  <label htmlFor="question" className="govuk-label">
+                    Add your comment or question
+                  </label>
+                  <textarea
+                    name="question"
+                    id="question"
+                    className="govuk-textarea"
+                  />
+                </FormGroup>
+              ),
+            },
+          ]}
+        />
+
+        <Link
+          to="/prototypes/admin-dashboard?status=readyApproval"
+          className="govuk-button"
+        >
+          Update
+        </Link>
+      </div>
+    );
   };
 
-  public async componentDidMount() {
-    const publication = 'pupil-absence-in-schools-in-england';
-
-    const request = PrototypePublicationService.getLatestPublicationRelease(
-      publication,
-    );
-
-    const data = await request;
-
-    this.setState({
-      data,
-      // publication,
-    });
-  }
-
-  public render() {
-    const { data } = this.state;
-
+  const Level2ReviewForm = () => {
     return (
-      <PrototypePage
-        wide
-        breadcrumbs={[
-          {
-            link: '/prototypes/admin-dashboard?status=readyApproval',
-            text: 'Administrator dashboard',
-          },
-          { text: 'Review release', link: '#' },
-        ]}
-      >
-        {' '}
-        <div className="govuk-width-container">
-          <FormGroup>
-            <FormRadioGroup
-              legend="Review this release"
-              id="review-release"
-              name="review-release"
-              options={[
-                {
-                  id: 'approve-release',
-                  label: 'Approved for publication',
-                  value: 'approve-release',
-                  conditional: (
-                    <FormGroup>
-                      <label
-                        htmlFor="approved-comments"
-                        className="govuk-label"
-                      >
-                        Add any extra comments
-                      </label>
-                      <textarea
-                        name="approved-comments"
-                        id="approved-comments"
-                        className="govuk-textarea"
-                      />
-                    </FormGroup>
-                  ),
-                },
-                {
-                  id: 'requires-work',
-                  label: 'Requires work',
-                  value: 'requires-work',
-                  conditional: (
-                    <FormGroup>
-                      <label
-                        htmlFor="requires-work-comments"
-                        className="govuk-label"
-                      >
-                        Please provide feedback
-                      </label>
-                      <textarea
-                        name="requires-work-comments"
-                        id="requires-work-comments"
-                        className="govuk-textarea"
-                      />
-                    </FormGroup>
-                  ),
-                },
-                {
-                  id: 'question',
-                  label: 'Add a comment or question',
-                  value: 'question',
-                  conditional: (
-                    <FormGroup>
-                      <label htmlFor="question" className="govuk-label">
-                        Add your comment or question
-                      </label>
-                      <textarea
-                        name="question"
-                        id="question"
-                        className="govuk-textarea"
-                      />
-                    </FormGroup>
-                  ),
-                },
-              ]}
-            />
-          </FormGroup>
-          <Link
-            to="/prototypes/admin-dashboard?status=readyApproval"
-            className="govuk-button"
-          >
-            Update
-          </Link>
+      <div>
+        <FormRadioGroup
+          legend="Final sign-off release status"
+          id="higher-review-release"
+          name="rhigher-eview-release"
+          value={status}
+          onChange={e => {
+            setStatus(e.target.value);
+          }}
+          options={[
+            {
+              id: 'approve-release-higher-review',
+              label: 'Approve for publication',
+              value: 'approve-release-higher-review',
+              conditional: (
+                <FormGroup>
+                  <label htmlFor="approved-comments" className="govuk-label">
+                    Add any extra comments
+                  </label>
+                  <textarea
+                    name="approved-comments"
+                    id="approved-comments"
+                    className="govuk-textarea"
+                  />
+                </FormGroup>
+              ),
+            },
+
+            {
+              id: 'question',
+              label:
+                'In higher review - add comments and questions for author / team lead',
+              value: 'question',
+              conditional: (
+                <FormGroup>
+                  <label htmlFor="question" className="govuk-label">
+                    Add your comment or question
+                  </label>
+                  <textarea
+                    name="question"
+                    id="question"
+                    className="govuk-textarea"
+                  />
+                </FormGroup>
+              ),
+            },
+          ]}
+        />
+        <Link
+          to="/prototypes/admin-dashboard?status=readyApproval&amp;level=2"
+          className="govuk-button"
+        >
+          Update
+        </Link>
+        <div>
+          <Link to="#">Print this page</Link>
         </div>
-        <hr />
-        <div className="govuk-width-container">
-          <EditablePublicationPage data={data} />
-        </div>
-      </PrototypePage>
+      </div>
     );
-  }
-}
+  };
+
+  return (
+    <PrototypePage
+      wide
+      breadcrumbs={[
+        {
+          link: '/prototypes/admin-dashboard?status=readyApproval',
+          text: 'Administrator dashboard',
+        },
+        { text: 'Review release', link: '#' },
+      ]}
+    >
+      {reviewType === 'level1' && <Level1ReviewForm />}
+      {reviewType === 'level2' && <Level2ReviewForm />}
+
+      <hr />
+      <div className="govuk-width-container dfe-align--comments">
+        <EditablePublicationPage
+          reviewing
+          data={PrototypePublicationService.getNewPublication()}
+        />
+      </div>
+    </PrototypePage>
+  );
+};
 
 export default PublicationPage;

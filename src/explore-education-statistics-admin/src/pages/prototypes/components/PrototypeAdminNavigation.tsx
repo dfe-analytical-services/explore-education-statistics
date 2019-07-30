@@ -27,7 +27,7 @@ const PrototypeAdminNavigation = ({ sectionId }: Props) => {
               to="/prototypes/publication-create-new-absence-config"
               className="govuk-link govuk-link--no-visited-state"
             >
-              Release setup
+              Release summary
             </Link>
           </li>
           <li
@@ -41,7 +41,7 @@ const PrototypeAdminNavigation = ({ sectionId }: Props) => {
               to="/prototypes/publication-create-new-absence-data"
               className="govuk-link govuk-link--no-visited-state"
             >
-              Add / edit data
+              Manage data
             </Link>
           </li>
           <li
@@ -55,23 +55,10 @@ const PrototypeAdminNavigation = ({ sectionId }: Props) => {
               to="/prototypes/publication-create-new-absence-table?status=step1"
               className="govuk-link govuk-link--no-visited-state"
             >
-              Build tables
+              Manage data blocks
             </Link>
           </li>
-          <li
-            className={
-              sectionId === 'viewTables'
-                ? 'app-navigation--current-page'
-                : 'app-navigation--non-selected-page'
-            }
-          >
-            <Link
-              to="/prototypes/publication-create-new-absence-view-table"
-              className="govuk-link govuk-link--no-visited-state"
-            >
-              View / edit tables
-            </Link>
-          </li>
+
           <li
             className={
               sectionId === 'addContent'
@@ -83,7 +70,7 @@ const PrototypeAdminNavigation = ({ sectionId }: Props) => {
               to="/prototypes/publication-create-new-absence"
               className="govuk-link govuk-link--no-visited-state"
             >
-              Add / edit content
+              Manage content
             </Link>
           </li>
           {/* <li
@@ -111,7 +98,7 @@ const PrototypeAdminNavigation = ({ sectionId }: Props) => {
               to="/prototypes/publication-create-new-absence-status"
               className="govuk-link govuk-link--no-visited-state"
             >
-              Set publish status
+              Release status
             </Link>
           </li>
         </ul>
