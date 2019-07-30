@@ -22,26 +22,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
             {
                 var publications = new List<Publication>
                 {
-                };
-
-                var methodologies = new List<Methodology>
-                {
-                    new Methodology
+                    new Publication
                     {
-                        Id = new Guid("0144e3f2-41e1-4aec-9c55-2671f454c85f"),
-                        Title = "Methodology A",
-                        PublicationId = new Guid("ed70afba-f7e1-4ab3-bded-74d078b6fca0"),
-                        Publication = new Publication
+                        Id = new Guid("ed70afba-f7e1-4ab3-bded-74d078b6fca0"),
+                        Title = "Publication A",
+                        Slug = "publication-a-slug",
+                        Methodology = new Methodology
                         {
-                            Id = new Guid("ed70afba-f7e1-4ab3-bded-74d078b6fca0"),
-                            Title = "Publication A",
-                            Slug = "publication-a-slug"
-                        },
-                    }
+                            Id = new Guid("0144e3f2-41e1-4aec-9c55-2671f454c85f"),
+                            Title = "Methodology A",
+                        } 
+                    },
+                    
                 };
 
                 context.AddRange(publications);
-                context.AddRange(methodologies);
                 context.SaveChanges();
             }
 
@@ -71,7 +66,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                     {
                         Id = new Guid("ed70afba-f7e1-4ab3-bded-74d078b6fca0"),
                         Title = "Publication A",
-                        Slug = "publication-a-slug"
+                        Slug = "publication-a-slug",
+                        MethodologyId = new Guid("0144e3f2-41e1-4aec-9c55-2671f454c85f")
                     },
                 };
 
@@ -81,7 +77,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                     {
                         Id = new Guid("0144e3f2-41e1-4aec-9c55-2671f454c85f"),
                         Title = "Methodology A",
-                        PublicationId = new Guid("ed70afba-f7e1-4ab3-bded-74d078b6fca0")
                     }
                 };
 
@@ -99,7 +94,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 Assert.True(result == null);
             }
         }
-
         
         [Fact (Skip = "Bug with in memory database")]
         public void MethodologyService_GetTree()
@@ -117,14 +111,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                     {
                         Id = new Guid("ddcb9b8a-c071-4d19-a315-f742682b1e18"), 
                         Title = "Methodology A",
-                        PublicationId = new Guid("ed70afba-f7e1-4ab3-bded-74d078b6fca0"),
                         Summary = "first methodology"
                     },
                     new Methodology
                     {
                         Id = new Guid("22a27c18-3d09-41e5-88ea-b85eb3268ccc"),
                         Title = "Methodology B",
-                        PublicationId = new Guid("e45cf030-f29b-42c3-8270-3cc8267026f0"),
                         Summary = "second methodology"
                     }
                 };
@@ -139,7 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                         TopicId = new Guid("0144e3f2-41e1-4aec-9c55-2671f454c85f"),
                         Slug = "publication-a",
                         Summary = "first publication",
-                        Methodologies = methodologies.Where(m => m.PublicationId == new Guid("ed70afba-f7e1-4ab3-bded-74d078b6fca0")).ToList()
+                        MethodologyId = new Guid("ed70afba-f7e1-4ab3-bded-74d078b6fca0"),
                     },
                     new Publication
                     {
@@ -148,8 +140,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                         TopicId = new Guid("0144e3f2-41e1-4aec-9c55-2671f454c85f"),
                         Slug = "publication-b",
                         Summary = "second publication",
-                        Methodologies = methodologies.Where(m => m.PublicationId == new Guid("e45cf030-f29b-42c3-8270-3cc8267026f0")).ToList()
-
+                        MethodologyId = new Guid("e45cf030-f29b-42c3-8270-3cc8267026f0"),
                     },
                 };
                 
