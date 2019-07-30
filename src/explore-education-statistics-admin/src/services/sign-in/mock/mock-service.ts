@@ -7,17 +7,16 @@ export default async (mock: MockAdapter) => {
 
   // getMyThemesAndTopics
   mock.onGet('/users/mydetails').reply(_ => {
-
     const loggedInUserId = window.sessionStorage.getItem('mockLoginUserId');
 
     if (!loggedInUserId) {
       return [403];
     }
 
-    const matchingUser = mockData.users.find(user => user.id === loggedInUserId)
-      || mockData.users[0];
+    const matchingUser =
+      mockData.users.find(user => user.id === loggedInUserId) ||
+      mockData.users[0];
 
     return [200, Promise.resolve(matchingUser)];
-
   });
 };

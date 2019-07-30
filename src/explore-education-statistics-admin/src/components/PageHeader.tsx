@@ -1,16 +1,15 @@
-import {LoginContext} from '@admin/components/Login';
+import { LoginContext } from '@admin/components/Login';
 import loginService from '@admin/services/sign-in/service';
-import {Authentication} from '@admin/services/sign-in/types';
+import { Authentication } from '@admin/services/sign-in/types';
 import classNames from 'classnames';
 import logo from 'govuk-frontend/assets/images/govuk-logotype-crown.png';
-import React, {useContext} from 'react';
+import React, { useContext } from 'react';
 
 interface Props {
   wide?: boolean;
 }
 
 const PageHeader = ({ wide }: Props) => {
-
   const authentication = useContext(LoginContext);
 
   return (
@@ -74,9 +73,11 @@ const PageHeader = ({ wide }: Props) => {
                     Administrators' guide
                   </a>
                 </li>
-                {authentication.user
-                  ? <LoggedInLinks user={authentication.user} />
-                  : <NotLoggedInLinks />}
+                {authentication.user ? (
+                  <LoggedInLinks user={authentication.user} />
+                ) : (
+                  <NotLoggedInLinks />
+                )}
               </ul>
             </nav>
           </div>

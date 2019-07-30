@@ -1,6 +1,6 @@
 import { LoginContext } from '@admin/components/Login';
 import loginService from '@admin/services/sign-in/service';
-import {Authentication} from "@admin/services/sign-in/types";
+import { Authentication } from '@admin/services/sign-in/types';
 import React, { useEffect, useState } from 'react';
 import { Redirect, Route, RouteProps } from 'react-router';
 
@@ -58,7 +58,12 @@ const AuthenticationCheckingComponent = ({
  * @constructor
  */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-const ProtectedRoute = ({ component, location, redirectIfNotLoggedIn = true, ...rest }: ProtectedRouteProps) => {
+const ProtectedRoute = ({
+  component,
+  location,
+  redirectIfNotLoggedIn = true,
+  ...rest
+}: ProtectedRouteProps) => {
   const routeComponent = (props: any) => (
     <AuthenticationCheckingComponent
       component={component}

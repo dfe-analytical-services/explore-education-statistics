@@ -10,7 +10,10 @@ const SignedOutPage = () => {
         Signed out
       </h1>
       <p className="govuk-body">You have successfully signed out.</p>
-      <a href={loginService.getSignInLink()} className="govuk-button govuk-button--start">
+      <a
+        href={loginService.getSignInLink()}
+        className="govuk-button govuk-button--start"
+      >
         Sign-in
       </a>
     </Page>

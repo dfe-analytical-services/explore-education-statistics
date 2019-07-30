@@ -1,4 +1,4 @@
-import PrototypeLoginService from "@admin/services/PrototypeLoginService";
+import PrototypeLoginService from '@admin/services/PrototypeLoginService';
 
 const users = PrototypeLoginService.getUserList();
 
