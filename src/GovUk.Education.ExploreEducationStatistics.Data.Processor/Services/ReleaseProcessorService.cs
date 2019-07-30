@@ -40,11 +40,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             var subject = _context.Subject
                 .FirstOrDefault(s => s.Name.Equals(name) && s.ReleaseId == release.Id);
+            
+            // If the subject exists then this must be a reload of the same release/subject so delete & re-create.
 
-            if (subject == null)
+            if (subject != null)
             {
-                subject = _context.Subject.Add(new Subject(name, release)).Entity;
+                _context.Subject.Remove(subject);
             }
+
+            subject = _context.Subject.Add(new Subject(name, release)).Entity;
 
             return subject;
         }

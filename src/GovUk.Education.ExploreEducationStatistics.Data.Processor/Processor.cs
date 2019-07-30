@@ -65,11 +65,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
 
                     _context.SaveChanges();
                 }
-                else
-                {
-                    // TODO - Delete collections
-                    _context.SaveChanges();
-                }
 
                 _splitFileService.SplitDataFile(collector, message, subjectData);
                 
@@ -92,17 +87,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
         {
             try
             {
-                logger.LogInformation($"{GetType().Name} function STARTED for : Batch: {message.BatchNo} Datafile: {message.DataFileName}");
+                logger.LogInformation($"{GetType().Name} function STARTED for : Batch: {message.BatchNo} of {message.BatchSize} with Datafile: {message.DataFileName}");
                 
                 _fileImportService.ImportFiles(message);
+
+                // If the batch size is > 1 i.e. The file was split into batches
+                // then delete each split batch processed
+                
+                if (message.BatchSize > 1)
+                {
+                    _fileStorageService.Delete(message);
+                }
             }
             catch (Exception e)
             {
-                logger.LogError($"{GetType().Name} function FAILED: : Batch: {message.BatchNo} Datafile: {message.DataFileName}\n{e}");
+                logger.LogError($"{GetType().Name} function FAILED: : Batch: {message.BatchNo} of {message.BatchSize} with Datafile: {message.DataFileName}\n{e}");
                 throw;
             }
 
-            logger.LogInformation($"{GetType().Name} function COMPLETE for : Batch: {message.BatchNo} Datafile: {message.DataFileName}");
+            logger.LogInformation($"{GetType().Name} function COMPLETE for : Batch: {message.BatchNo}  of {message.BatchSize} with Datafile: {message.DataFileName}");
         }
     }
 }

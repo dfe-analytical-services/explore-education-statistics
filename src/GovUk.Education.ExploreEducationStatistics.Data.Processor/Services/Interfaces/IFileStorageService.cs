@@ -12,5 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
 
         Task<Boolean> UploadDataFileAsync(string publication, string release, IFormFile dataFile, string metaFileName,
             string name);
+
+        void Delete(ImportMessage importMessage);
     }
 }

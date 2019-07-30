@@ -114,8 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             var indicatorGroups = indicatorRows
                 .GroupBy(row => row.IndicatorGrouping)
                 .ToDictionary(rows => rows.Key, rows =>
-                _context.IndicatorGroup.Any(ig => ig.SubjectId == subject.Id && ig.Label == rows.Key) ?
-                _context.IndicatorGroup.First(ig => ig.SubjectId == subject.Id && ig.Label == rows.Key) : 
+                _context.IndicatorGroup.FirstOrDefault(ig => ig.SubjectId == subject.Id && ig.Label == rows.Key) ??
                 new IndicatorGroup(rows.Key, subject)
                 );
 
@@ -126,8 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                     return (
                         
                         indicator: 
-                            _context.Indicator.Any(i => i.IndicatorGroupId == indicatorGroup.Id && i.Label == row.Label && i.Unit == row.IndicatorUnit) ?
-                            _context.Indicator.First(i => i.IndicatorGroupId == indicatorGroup.Id && i.Label == row.Label && i.Unit == row.IndicatorUnit) : 
+                            _context.Indicator.FirstOrDefault(i => i.IndicatorGroupId == indicatorGroup.Id && i.Label == row.Label && i.Unit == row.IndicatorUnit) ??
                             new Indicator
                         {
                             IndicatorGroup = indicatorGroup,

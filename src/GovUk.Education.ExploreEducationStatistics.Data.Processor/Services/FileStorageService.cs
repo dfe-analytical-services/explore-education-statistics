@@ -68,6 +68,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return true;
         }
 
+        public void Delete(ImportMessage importMessage)
+        {
+            var publication = importMessage.Release.Publication.Slug;
+            var release = importMessage.Release.Slug;
+            var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
+            var blobClient = storageAccount.CreateCloudBlobClient();
+            var blobContainer = blobClient.GetContainerReference(ContainerName);
+            var blob = blobContainer.GetBlockBlobReference($"{publication}/{release}/{importMessage.DataFileName}");
+            blob.DeleteAsync();
+        }
+
         private static async Task UploadFileAsync(CloudBlobContainer blobContainer, string publication, string release,
             IFormFile file, IEnumerable<KeyValuePair<string, string>> metaValues)
         {
