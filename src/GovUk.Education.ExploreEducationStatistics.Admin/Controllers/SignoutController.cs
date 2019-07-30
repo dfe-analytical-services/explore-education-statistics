@@ -15,7 +15,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
         {
             Response.Cookies.Delete("DFEUserDetails");
             Response.Cookies.Delete(".AspNetCore.AzureADCookie");
-            
             return Redirect("/signed-out");
         }
     }

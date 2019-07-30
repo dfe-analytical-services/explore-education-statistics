@@ -42,6 +42,23 @@ function App() {
   return (
 
     <BrowserRouter>
+
+      {/* Non-Prototype Routes*/}
+      <Route exact path="/sign-in" component={SignInPage} />
+
+      <Route exact path="/signed-out" component={SignedOutPage} />
+
+      <ProtectedRoute exact path="/admin-dashboard" component={AdminDashboardPage} />
+
+      {releaseRoutes.map(route => (
+        <ProtectedRoute
+          exact
+          key={route.path}
+          path={route.path}
+          component={route.component}
+        />
+      ))}
+      
       <Route exact path="/" component={IndexPage} />
 
       <LoginContext.Provider value={PrototypeLoginService.login()}>
@@ -152,22 +169,6 @@ function App() {
           component={AdminDocumentationGlossary}
         />
       </LoginContext.Provider>
-
-      {/* Non-Prototype Routes*/}
-      <Route exact path="/sign-in" component={SignInPage} />
-
-      <Route exact path="/signed-out" component={SignedOutPage} />
-
-      <ProtectedRoute exact path="/admin-dashboard" component={AdminDashboardPage} />
-
-      {releaseRoutes.map(route => (
-        <ProtectedRoute
-          exact
-          key={route.path}
-          path={route.path}
-          component={route.component}
-        />
-      ))}
 
     </BrowserRouter>
   );
