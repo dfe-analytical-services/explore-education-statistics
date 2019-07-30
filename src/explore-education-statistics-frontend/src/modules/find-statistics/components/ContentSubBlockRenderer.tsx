@@ -8,7 +8,6 @@ interface Props {
   block: ContentBlock;
   id: string;
   publication: Publication;
-
   onToggle?: (section: { id: string; title: string }) => void;
 }
 

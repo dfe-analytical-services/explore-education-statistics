@@ -79,13 +79,13 @@ const Details = ({
         tabIndex={onMounted(0)}
         onClick={event => {
           event.persist();
-
           if (onToggle) {
-            onToggle(isOpened, event);
-            return;
+            onToggle(!isOpened, event);
+            if (event.isDefaultPrevented()) {
+              return;
+            }
           }
-
-          setOpened(!isOpened);
+          setOpened(isOpened);
         }}
         onKeyPress={event => {
           if (event.key === 'Enter' || event.key === ' ') {

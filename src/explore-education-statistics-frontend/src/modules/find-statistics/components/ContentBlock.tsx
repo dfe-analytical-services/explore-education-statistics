@@ -6,7 +6,6 @@ export interface ContentBlockProps {
   content: Release['content'][0]['content'];
   id: string;
   publication: Publication;
-
   onToggle?: (section: { id: string; title: string }) => void;
 }
 
