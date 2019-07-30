@@ -20,20 +20,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
     public class SeedService : ISeedService
     {
         private readonly ILogger _logger;
-        private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
         private readonly string _storageConnectionString;
         private readonly IFileStorageService _fileStorageService;
         
         public SeedService(
             ILogger<SeedService> logger,
-            ApplicationDbContext context,
             IMapper mapper,
             IConfiguration config,
             IFileStorageService fileStorageService)
         {
             _logger = logger;
-            _context = context;
             _mapper = mapper;
             _storageConnectionString = config.GetConnectionString("CoreStorage");
             _fileStorageService = fileStorageService;
@@ -154,7 +151,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
         {
             var mStream = new MemoryStream();
             var writer = new StreamWriter(mStream);
-            lines.Skip(1);
             
             foreach (var line in lines)
             {
