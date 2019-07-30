@@ -20,7 +20,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 
         public Methodology Get(string slug)
         {
-            return _context.Methodologies.Include(x => x.Publication).FirstOrDefault(x => x.Publication.Slug == slug);
+            var publication = _context.Publications.Include(p => p.Methodology).FirstOrDefault(p => p.Methodology != null && p.Slug == slug);
+            return publication?.Methodology;
         }
 
         public List<ThemeTree> GetTree()
@@ -34,12 +35,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
                     Id = x.Id,
                     Title = x.Title,
                     Summary = x.Summary,
-                    Publications = x.Publications.Where(p => p.Methodologies.Any())
+                    Publications = x.Publications
                         .Select(p => new PublicationTree
                         {
-                            Id = p.Methodologies.FirstOrDefault().Id,
-                            Title = p.Methodologies.FirstOrDefault().Title,
-                            Summary = p.Methodologies.FirstOrDefault().Summary,
+                            Id = p.Methodology.Id,
+                            Title = p.Methodology.Title,
+                            Summary = p.Methodology.Summary,
                             Slug = p.Slug
                         }).OrderBy(publication => publication.Title).ToList()
                 }).Where(x => x.Publications.Any()).OrderBy(topic => topic.Title).ToList()
