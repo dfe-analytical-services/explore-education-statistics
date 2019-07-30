@@ -1,5 +1,4 @@
 using System;
-using System.Security.Policy;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels
 {

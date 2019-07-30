@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
@@ -21,9 +22,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public DateTime? NextUpdate { get; set; }
 
         public List<Release> Releases { get; set; }
-        
-        public List<Methodology> Methodologies { get; set; }
 
+        public Guid? MethodologyId { get; set; }
+        
+        public Methodology Methodology { get; set; }
+        
         public Uri LegacyPublicationUrl { get; set; }
 
         public List<Link> LegacyReleases { get; set; }
@@ -35,5 +38,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public Guid? ContactId { get; set; }
 
         public Contact Contact { get; set; }
+        
+        public Release LatestRelease()
+        {
+            return Releases?.Where(r => r.Published != null)
+                .OrderBy(r => r.Order)
+                .ThenBy(r => r.Published)
+                .LastOrDefault();
+        }
     }
 }
