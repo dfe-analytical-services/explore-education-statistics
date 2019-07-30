@@ -1,21 +1,22 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TopicId = System.Guid;
+//using TopicId = System.Guid;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
     [ApiController]
     [Authorize]
-    public class MethodologyController : ControllerBase
+    public class MethodologiesController : ControllerBase
     {
         private readonly IMethodologyService _methodologyService;
 
-        public MethodologyController(IMethodologyService methodologyService)
+        public MethodologiesController(IMethodologyService methodologyService)
         {
             _methodologyService = methodologyService;
         }
@@ -23,16 +24,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         // GET api/topic/{topicId}/methodologies
         [HttpGet("/topic/{topicId}/methodologies")]
         [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
-        public ActionResult<List<MethodologyViewModel>> GetTopicMethodologies([Required]TopicId topicId)
+        public async Task<ActionResult<List<MethodologyViewModel>>> GetTopicMethodologiesAsync([Required]Guid topicId)
         {
-            return _methodologyService.GetTopicMethodologies(topicId);
+            return await _methodologyService.GetTopicMethodologiesAsync(topicId);
         }
         
         [HttpGet("/methodologies")]
         [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
-        public ActionResult<List<MethodologyViewModel>> GetMethodologies()
+        public async Task<ActionResult<List<MethodologyViewModel>>> GetMethodologiesAsync()
         {
-            return _methodologyService.List();
+            return await _methodologyService.ListAsync();
         }
         
     }

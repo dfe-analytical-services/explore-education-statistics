@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -18,20 +19,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _context = context;
         }
         
-        public List<MethodologyViewModel> List()
+        public async Task<List<MethodologyViewModel>> ListAsync()
         {
-            return MethodologyViewModelMapper.Map<List<MethodologyViewModel>>(_context.Methodologies);
+            var result = await _context.Methodologies.ToListAsync();
+            return MethodologyViewModelMapper.Map<List<MethodologyViewModel>>(result);
             
         }
         
-        public List<MethodologyViewModel> GetTopicMethodologies(TopicId topicId)
+        public async Task<List<MethodologyViewModel>> GetTopicMethodologiesAsync(TopicId topicId)
         {
-            var methodologies = _context.Publications
+            var methodologies = await _context.Publications
                 .Where(p => p.TopicId == topicId)
                 .Include(p => p.Methodology)
                 .Select(p => p.Methodology)
                 .Distinct()
-                .ToList();
+                .ToListAsync();
             return MethodologyViewModelMapper.Map<List<MethodologyViewModel>>(methodologies);
         }
     }

@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
     {
         
         [Fact]
-        public void Create_Release_Returns_Ok()
+        public async void Create_Release_Returns_Ok()
         {
             var releaseService = new Mock<IReleaseService>();
 
@@ -23,8 +23,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
             var controller = new ReleasesController(releaseService.Object);
             
             // Method under test
-            var result = controller.CreateRelease(new CreateReleaseViewModel(), Guid.NewGuid());
-            Assert.IsAssignableFrom<ReleaseViewModel>(result.Result.Value);
+            var result = await controller.CreateReleaseAsync(new CreateReleaseViewModel(), Guid.NewGuid());
+            Assert.IsAssignableFrom<ReleaseViewModel>(result.Value);
         }
     }
 }

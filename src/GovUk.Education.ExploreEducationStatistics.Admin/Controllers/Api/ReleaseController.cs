@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         // POST api/publication/{publicationId}/releases
         [HttpPost("publication/{publicationId}/releases")]
         [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
-        public async Task<ActionResult<ReleaseViewModel>> CreateRelease(CreateReleaseViewModel release, Guid publicationId)
+        public async Task<ActionResult<ReleaseViewModel>> CreateReleaseAsync(CreateReleaseViewModel release, Guid publicationId)
         {
             release.PublicationId = publicationId;
             return await _releaseService.CreateReleaseAsync(release);

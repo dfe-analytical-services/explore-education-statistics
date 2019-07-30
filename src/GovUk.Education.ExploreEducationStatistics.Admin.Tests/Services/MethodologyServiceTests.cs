@@ -65,10 +65,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var context = DbUtils.InMemoryApplicationDbContext("TopicMethodologies"))
             {
                 // Method under test
-                var topicMethodologies = new MethodologyService(context).GetTopicMethodologies(new Guid("d5ed05f4-8364-4682-b6fe-7dde181d6c46"));
-                Assert.Contains(topicMethodologies, m => m.Id == new Guid("d5ed05f4-8364-4682-b6fe-7dde181d6c46"));
-                Assert.Contains(topicMethodologies, m => m.Id == new Guid("ebeb2b2d-fc6b-4734-9420-4e4dd37816ba"));
-                Assert.Equal(2, topicMethodologies.Count); // Check we don't have duplicates
+                var topicMethodologies = new MethodologyService(context).GetTopicMethodologiesAsync(new Guid("d5ed05f4-8364-4682-b6fe-7dde181d6c46"));
+                Assert.Contains(topicMethodologies.Result, m => m.Id == new Guid("d5ed05f4-8364-4682-b6fe-7dde181d6c46"));
+                Assert.Contains(topicMethodologies.Result, m => m.Id == new Guid("ebeb2b2d-fc6b-4734-9420-4e4dd37816ba"));
+                Assert.Equal(2, topicMethodologies.Result.Count); // Check we don't have duplicates
             }
         }
 
@@ -98,9 +98,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var context = DbUtils.InMemoryApplicationDbContext("Get"))
             {
                 // Method under test
-                var methodologies = new MethodologyService(context).List();
-                Assert.Contains(methodologies, m => m.Id == new Guid("d5ed05f4-8364-4682-b6fe-7dde181d6c46") && m.Title == "Methodology 1");
-                Assert.Contains(methodologies, m => m.Id == new Guid("ebeb2b2d-fc6b-4734-9420-4e4dd37816ba") && m.Title == "Methodology 2");
+                var methodologies = new MethodologyService(context).ListAsync();
+                Assert.Contains(methodologies.Result, m => m.Id == new Guid("d5ed05f4-8364-4682-b6fe-7dde181d6c46") && m.Title == "Methodology 1");
+                Assert.Contains(methodologies.Result, m => m.Id == new Guid("ebeb2b2d-fc6b-4734-9420-4e4dd37816ba") && m.Title == "Methodology 2");
             }
         }
 
