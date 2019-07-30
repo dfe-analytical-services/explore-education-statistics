@@ -58,7 +58,7 @@ function App() {
           component={route.component}
         />
       ))}
-      
+
       <Route exact path="/" component={IndexPage} />
 
       <LoginContext.Provider value={PrototypeLoginService.login()}>

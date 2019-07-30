@@ -14,7 +14,6 @@ import {Redirect, Route, RouteProps} from 'react-router';
  * @constructor
  */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable react/display-name */
 const ProtectedRoute = ({component, location, ...rest}: RouteProps) => {
 
   const [authentication, setAuthentication] = useState<Authentication>();
