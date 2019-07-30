@@ -3,11 +3,11 @@ using Microsoft.Extensions.Caching.Memory;
 namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 {
 
-    public class MyMemoryCache
+    public class ImporterMemoryCache
     {
         public MemoryCache Cache { get; set; }
     
-        public MyMemoryCache()
+        public ImporterMemoryCache()
         {
             /*
             Cache = new MemoryCache(new MemoryCacheOptions

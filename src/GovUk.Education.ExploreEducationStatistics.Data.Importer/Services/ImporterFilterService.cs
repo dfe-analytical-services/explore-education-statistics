@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         private readonly ApplicationDbContext _context;
         private readonly MemoryCache _cache;
 
-        public ImporterFilterService(MyMemoryCache cache, ApplicationDbContext context)
+        public ImporterFilterService(ImporterMemoryCache cache, ApplicationDbContext context)
         {
              _cache = cache.Cache;
             _context = context;

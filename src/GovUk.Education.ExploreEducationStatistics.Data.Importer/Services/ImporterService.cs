@@ -121,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 var filterItem = _importerFilterService.Find(filterItemLabel, filterGroupLabel, filterMeta.Filter);
                 return new ObservationFilterItem
                 {
-                    FilterItemId = filterItem.Id,
+                    //FilterItemId = filterItem.Id,
                     FilterItem = filterItem
                 };
             }).ToList();

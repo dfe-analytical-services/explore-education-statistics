@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         private readonly MemoryCache _cache;
         private readonly ApplicationDbContext _context;
 
-        public ImporterLocationService(MyMemoryCache cache,
+        public ImporterLocationService(ImporterMemoryCache cache,
             ApplicationDbContext context)
         {
             _cache = cache.Cache;

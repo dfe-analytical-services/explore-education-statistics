@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 .AddTransient<ImporterLocationService>()
                 .AddTransient<ImporterMetaService>()
                 .AddTransient<IReleaseProcessorService, ReleaseProcessorService>()
-                .AddTransient<MyMemoryCache>()
+                .AddTransient<ImporterMemoryCache>()
                 .BuildServiceProvider();
         }
 
