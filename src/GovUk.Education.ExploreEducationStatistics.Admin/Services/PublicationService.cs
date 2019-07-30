@@ -7,6 +7,7 @@ using System.Linq;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Services.ModelMappers;
 using UserId = System.Guid;
 using TopicId = System.Guid;
 
@@ -39,31 +40,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         // TODO it maybe necessary to add authorisation to this method
         public List<PublicationViewModel> GetByTopicAndUser(TopicId topicId, UserId userId)
         {
-            var config = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateMap<Publication, PublicationViewModel>();
-                cfg.CreateMap<Release, ReleaseViewModel>()
-                    .ForMember(
-                        dest => dest.LatestRelease, m => m.MapFrom(release => IsLatestRelease(release)));
-                cfg.CreateMap<Methodology, MethodologyViewModel>();
-            });
-
-            var mapper = config.CreateMapper();
-
             var publications = _context.Publications.Where(p => p.TopicId == topicId)
                 .Include(p => p.Contact)
                 .Include(p => p.Releases)
                 .Include(p => p.Methodologies)
                 .ToList();
-            
-            return mapper.Map<List<PublicationViewModel>>(publications);
+
+            return PublicationToPublicationViewModelMapper.Map<List<PublicationViewModel>>(publications);
         }
         
-        private bool IsLatestRelease(Release release)
-        {
-            return !release.Publication.Releases.Exists(
-                r => r.Order > release.Order ||
-                     (r.Id != release.Id && r.Order == release.Order && r.Published > release.Published));
-        }
+        
     }
 }

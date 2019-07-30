@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
@@ -68,8 +69,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
                 
                 var releases = new List<Release>
                 {
-                    new Release {Id = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"), PublicationId = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"), Title = "Release A"},
-                    new Release {Id = new Guid("22c52d89-88c0-44b5-96c4-042f1bde6ddd"), PublicationId = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"), Title = "Release B"},
+                    new Release {Id = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"), PublicationId = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852")},
+                    new Release {Id = new Guid("22c52d89-88c0-44b5-96c4-042f1bde6ddd"), PublicationId = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852")},
                 };
                 
                 context.AddRange(publications);
@@ -100,8 +101,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
             {
                 var releases = new List<Release>
                 {
-                    new Release {Id = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"), PublicationId = new Guid("24fcd99c-0508-4437-91c4-90c777414ab9"), Title = "Release A"},
-                    new Release {Id = new Guid("22c52d89-88c0-44b5-96c4-042f1bde6ddd"), PublicationId = new Guid("24fcd99c-0508-4437-91c4-90c777414ab9"), Title = "Release B"},
+                    new Release {Id = new Guid("1003fa5c-b60a-4036-a178-e3a69a81b852"), PublicationId = new Guid("24fcd99c-0508-4437-91c4-90c777414ab9"), TimePeriodCoverage = TimeIdentifier.AcademicYearQ1},
+                    new Release {Id = new Guid("22c52d89-88c0-44b5-96c4-042f1bde6ddd"), PublicationId = new Guid("24fcd99c-0508-4437-91c4-90c777414ab9")},
                 };
 
                 var publications = new List<Publication>
@@ -120,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
 
                 var result = service.GetRelease("1003fa5c-b60a-4036-a178-e3a69a81b852");
 
-                Assert.Equal("Release A", result.Title);
+                Assert.Equal("Academic Year Q1", result.Title);
             }
         }
     }

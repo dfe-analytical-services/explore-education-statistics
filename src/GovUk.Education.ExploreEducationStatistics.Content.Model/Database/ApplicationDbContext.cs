@@ -195,6 +195,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<List<ContentSection>>(v));
+            modelBuilder.Entity<Release>()
+                .Property(b => b.NextReleaseDate)
+                .HasConversion(
+                    v => JsonConvert.SerializeObject(v),
+                    v => JsonConvert.DeserializeObject<PartialDate>(v));
 
             modelBuilder.Entity<Release>()
                 .Property(b => b.KeyStatistics)
@@ -1353,8 +1358,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new Release
                 {
                     Id = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
-                    Title = "Pupil absence data and statistics for schools in England",
-                    ReleaseName = "2016 to 2017",
+                    ReleaseName = "2016",
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                     Published = new DateTime(2018, 3, 22),
                     Slug = "2016-17",
@@ -1938,8 +1942,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new Release
                 {
                     Id = new Guid("f75bc75e-ae58-4bc4-9b14-305ad5e4ff7d"),
-                    Title = "Pupil absence data and statistics for schools in England",
-                    ReleaseName = "2015 to 2016",
+                    ReleaseName = "2015",
                     PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
                     Published = new DateTime(2016, 3, 25),
                     Slug = "2015-16",
@@ -1987,8 +1990,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new Release
                 {
                     Id = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
-                    Title = "Permanent and fixed-period exclusions statistics for schools in England",
-                    ReleaseName = "2016 to 2017",
+                    ReleaseName = "2016",
                     PublicationId = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
                     Published = new DateTime(2018, 7, 19),
                     Slug = "2016-17",
@@ -2485,7 +2487,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new Release
                 {
                     Id = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
-                    Title = "Secondary and primary school applications and offers",
                     ReleaseName = "2018",
                     PublicationId = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
                     Published = new DateTime(2018, 6, 14),
