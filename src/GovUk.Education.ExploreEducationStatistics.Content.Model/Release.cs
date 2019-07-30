@@ -1,11 +1,16 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Newtonsoft.Json;
 using static System.DateTime;
+using static System.Int32;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.PartialDate;
+using static System.String;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifierCategory;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
@@ -13,9 +18,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     {
         public Guid Id { get; set; }
 
-        [Required] public string Title { get; set; }
+        public string Title
+        {
+            get
+            {
+                // Calendar year time identifiers we just use the year, all others we use a year range.
+                // We express this range in the format e.g. 2019/20
+                if (!IsNullOrEmpty(_releaseName) && YearRegex.Match(_releaseName).Success &&
+                    !CalendarYear.GetTimeIdentifiers().Contains(TimePeriodCoverage))
+                {
+                    var releaseStartYear = Int32.Parse(_releaseName);
+                    var releaseEndYear = (releaseStartYear % 100) + 1; // Only want the last two digits
+                    return TimePeriodCoverage.GetEnumLabel() +  " " + releaseStartYear + "/" + releaseEndYear;
 
-        public string ReleaseName { get; set; }
+
+                }
+                
+                // For calendar year time identifiers we just want the year not a range. If there is no year then we
+                // just output the time period identifier
+                return TimePeriodCoverage.GetEnumLabel() + (IsNullOrEmpty(ReleaseName) ? "" : " " + ReleaseName);
+            }
+        }
+
+        private string _releaseName;
+
+        public string ReleaseName
+        {
+            get => _releaseName;
+            set
+            {
+                if (value == null || YearRegex.Match(value).Success)
+                {
+                    _releaseName = value;
+                }
+                else
+                {
+                    throw new FormatException("The release name is invalid");
+                }
+            }
+        }
 
         /**
          * The last date the release was published - this should be set when the PublishScheduled date is reached and
@@ -27,8 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         // be published and the Published date set.
         public DateTime? PublishScheduled { get; set; }
 
-        [NotMapped]
-        public bool Live => Published.HasValue && (DateTime.Compare(UtcNow, Published.Value) > 0);
+        [NotMapped] public bool Live => Published.HasValue && (Compare(UtcNow, Published.Value) > 0);
 
         public string Slug { get; set; }
 
@@ -37,11 +77,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public Guid PublicationId { get; set; }
 
         public Publication Publication { get; set; }
-        
+
         public List<Update> Updates { get; set; }
 
         public List<ContentSection> Content { get; set; }
-        
+
         public DataBlock KeyStatistics { get; set; }
 
         public Guid? TypeId { get; set; }
@@ -50,25 +90,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         [JsonConverter(typeof(TimeIdentifierJsonConverter))]
         public TimeIdentifier TimePeriodCoverage { get; set; }
-        
+
         public int Order { get; set; }
 
-        protected bool Equals(Release other)
-        {
-            return Id.Equals(other.Id);
-        }
+        private PartialDate _nextReleaseDate;
 
-        public override bool Equals(object obj)
+        public PartialDate NextReleaseDate
         {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((Release) obj);
-        }
-
-        public override int GetHashCode()
-        {
-            return Id.GetHashCode();
+            get => _nextReleaseDate;
+            set
+            {
+                if (value == null || value.IsValid())
+                {
+                    _nextReleaseDate = value;
+                }
+                else
+                {
+                    throw new FormatException("The next release date is invalid");
+                }
+            }
         }
     }
 }

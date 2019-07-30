@@ -7,14 +7,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
     public class TableStorageService : ITableStorageService
     {
         private readonly CloudTableClient _client;
-        
+
         public TableStorageService(string connectionString)
         {
             var account = CloudStorageAccount.Parse(connectionString);
 
             _client = account.CreateCloudTableClient();
         }
-        
+
         /// <summary>
         /// Gets a table by name, will create the table if it does not exist
         /// </summary>
@@ -31,6 +31,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             }
 
             return table;
-        }   
+        }
     }
 }

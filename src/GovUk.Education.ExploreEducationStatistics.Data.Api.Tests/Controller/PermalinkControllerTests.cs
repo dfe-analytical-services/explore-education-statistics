@@ -1,14 +1,10 @@
 using System;
-using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
-using Microsoft.WindowsAzure.Storage.Table;
-
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controller
 {
