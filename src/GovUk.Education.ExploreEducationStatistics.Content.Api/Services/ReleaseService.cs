@@ -39,7 +39,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
                 releases.ForEach(r => release.Publication.Releases.Add(new Release
                 {
                     Id = r.Id,
-                    Title = r.Title,
                     ReleaseName = r.ReleaseName,
                     Published = r.Published,
                     Slug = r.Slug,
@@ -83,7 +82,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
                 releases.ForEach(r => release.Publication.Releases.Add(new Release
                 {
                     Id = r.Id,
-                    Title = r.Title,
                     ReleaseName = r.ReleaseName,
                     Published = r.Published,
                     Slug = r.Slug,
