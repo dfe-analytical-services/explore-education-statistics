@@ -4,12 +4,13 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Services.ModelMappers;
 using UserId = System.Guid;
 using TopicId = System.Guid;
+using PublicationId = System.Guid;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -43,12 +44,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var publications = _context.Publications.Where(p => p.TopicId == topicId)
                 .Include(p => p.Contact)
                 .Include(p => p.Releases)
-                .Include(p => p.Methodologies)
+                .Include(p => p.Methodology)
                 .ToList();
 
             return PublicationToPublicationViewModelMapper.Map<List<PublicationViewModel>>(publications);
         }
-        
-        
+
+        public async Task<PublicationViewModel> CreatePublication(CreatePublicationViewModel publication)
+        {
+            var saved = _context.Publications.Add(new Publication
+            {
+                Id = Guid.NewGuid(),
+                ContactId = publication.ContactId,
+                Title = publication.Title,
+                TopicId = publication.TopicId,
+                MethodologyId = publication.MethodologyId
+            });
+            _context.SaveChanges();
+            return await GetViewModelAsync(saved.Entity.Id);
+        }
+
+        public async Task<PublicationViewModel> GetViewModelAsync(PublicationId publicationId)
+        {
+            var publication = await _context.Publications.Include(p => p.Methodology)
+                .Include(p => p.Contact)
+                .Include(p => p.Releases)
+                .Where(p => p.Id == publicationId)
+                .FirstOrDefaultAsync();
+            return PublicationToPublicationViewModelMapper.Map<PublicationViewModel>(publication);
+        }
+
+        private static readonly IMapper PublicationToPublicationViewModelMapper = new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Publication, PublicationViewModel>();
+            cfg.CreateMap<Release, ReleaseViewModel>()
+                .ForMember(
+                    dest => dest.LatestRelease,
+                    m => m.MapFrom(r => r.Publication.LatestRelease().Id == r.Id));
+            cfg.CreateMap<Methodology, MethodologyViewModel>();
+        }).CreateMapper();
     }
 }
