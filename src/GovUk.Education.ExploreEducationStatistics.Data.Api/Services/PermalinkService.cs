@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             
             var model = new PermalinkViewModel
             {
-                Id = permalink.Id.ToString(),
+                Id = permalink.Id,
                 Title = permalink.Title,
                 Created = permalink.Created,
                 Data = permalink.Data
@@ -78,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
             var model = new PermalinkViewModel()
             {
-                Id = permalink.Id.ToString(),
+                Id = permalink.Id,
                 Title = permalink.Title,
                 Created = permalink.Created,
             };
