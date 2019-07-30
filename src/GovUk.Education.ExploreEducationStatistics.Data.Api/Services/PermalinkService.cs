@@ -2,8 +2,11 @@ using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using Microsoft.Azure.Cosmos.Table;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
@@ -12,33 +15,69 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private const string PermalinkTableName = "permalink";
         private readonly ITableStorageService _tableStorageService;
 
-        public PermalinkService(ITableStorageService tableStorageService)
+        private readonly IDataService<ResultWithMetaViewModel> _dataService;
+
+
+        public PermalinkService(ITableStorageService tableStorageService, IDataService<ResultWithMetaViewModel> dataService)
         {
             _tableStorageService = tableStorageService;
+            _dataService = dataService;
         }
 
-        public async Task<Permalink> GetAsync(Guid id)
+        public async Task<PermalinkViewModel> GetAsync(Guid id)
         {
             var table = await _tableStorageService.GetTableAsync(PermalinkTableName);
 
-            var retrieveOperation = TableOperation.Retrieve<Permalink>("the-publication-id", id.ToString());
+            var retrieveOperation = TableOperation.Retrieve<PermalinkEntity>("permalink", id.ToString());
             var result = await table.ExecuteAsync(retrieveOperation);
-            var permalink = result.Result as Permalink;
 
-            return permalink;
+            if (result.Result is PermalinkEntity permalink)
+            {
+                var model = new PermalinkViewModel
+                {
+                    Id = permalink.RowKey,
+                    Title = permalink.Title,
+                    Created = permalink.Timestamp.UtcDateTime,
+                    Data = JsonConvert.DeserializeObject<ResultWithMetaViewModel>(permalink.Data)
+                };
+
+                return model;
+            }
+
+            return null;
         }
 
-        public async Task<Permalink> CreateAsync()
+        public async Task<PermalinkViewModel> CreateAsync(ObservationQueryContext tableQuery)
         {
             var table = await _tableStorageService.GetTableAsync(PermalinkTableName);
 
-            var permalink = new Permalink();
+            var data = await _dataService.QueryAsync(tableQuery);
+
+            var permalink = new PermalinkEntity()
+            {
+                // TODO: passing the title generated from the frontend could be exploited so we'll need to generate something
+                Title = "Auto-generated table title",
+                Data = JsonConvert.SerializeObject(data),
+                Query = JsonConvert.SerializeObject(tableQuery)
+            };
 
             var insertOperation = TableOperation.Insert(permalink);
             var result = await table.ExecuteAsync(insertOperation);
-            var insertedPermalink = result.Result as Permalink;
 
-            return insertedPermalink;
+            if (result.Result is PermalinkEntity insertedPermalink)
+            {
+                var model = new PermalinkViewModel()
+                {
+                    Id = insertedPermalink.RowKey,
+                    Title = insertedPermalink.Title,
+                    Created = insertedPermalink.Timestamp.UtcDateTime,
+                    Data = JsonConvert.DeserializeObject<ResultWithMetaViewModel>(insertedPermalink.Data)
+                };
+
+                return model;
+            }
+
+            return null;
         }
     }
 }
