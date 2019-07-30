@@ -1,6 +1,10 @@
 import React from 'react';
 
 import { render } from 'react-testing-library';
+import {
+  DataBlockData,
+  DataBlockMetadata,
+} from '@common/services/dataBlockService';
 import VerticalBarBlock from '../VerticalBarBlock';
 
 import testData from './__data__/testBlockData';
@@ -186,5 +190,20 @@ describe('VerticalBarBlock', () => {
     expect(
       container.querySelector('.recharts-reference-line'),
     ).toBeInTheDocument();
+  });
+
+  test('dies gracefully with bad data', () => {
+    const invalidData: DataBlockData = (undefined as unknown) as DataBlockData;
+    const invalidMeta: DataBlockMetadata = (undefined as unknown) as DataBlockMetadata;
+
+    const { container } = render(
+      <VerticalBarBlock
+        data={invalidData}
+        labels={{}}
+        meta={invalidMeta}
+        axes={{}}
+      />,
+    );
+    expect(container).toHaveTextContent('Unable to render chart');
   });
 });
