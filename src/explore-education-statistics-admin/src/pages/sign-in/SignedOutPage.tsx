@@ -1,5 +1,6 @@
-import React from 'react';
 import Page from '@admin/components/Page';
+import loginService from '@admin/services/sign-in/service';
+import React from 'react';
 
 const SignedOutPage = () => {
   return (
@@ -9,7 +10,7 @@ const SignedOutPage = () => {
         Signed out
       </h1>
       <p className="govuk-body">You have successfully signed out.</p>
-      <a href="/api/signin" className="govuk-button govuk-button--start">
+      <a href={loginService.getSignInLink()} className="govuk-button govuk-button--start">
         Sign-in
       </a>
     </Page>

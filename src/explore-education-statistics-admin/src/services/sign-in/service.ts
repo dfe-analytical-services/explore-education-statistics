@@ -1,20 +1,22 @@
+import {User} from "@admin/services/sign-in/types";
 import { createClient } from '@admin/services/util/service';
+import mocks from './mock/mock-service';
 
-const apiClient = createClient({});
+const apiClient = createClient({
+  mockBehaviourRegistrar: mocks,
+});
 
-export interface User {
-  id: string;
-  name: string;
-  permissions: string[];
+export interface LoginService {
+  getUserDetails: () => Promise<User>;
+  getSignInLink: () => string;
+  getSignOutLink: () => string;
 }
 
-export interface Authentication {
-  user?: User;
-}
-
-const getUserDetails: () => Promise<User> = () =>
-  apiClient.then(client => client.get('/users/mydetails'));
-
-export default {
-  getUserDetails,
+const service: LoginService = {
+  getUserDetails: () =>
+    apiClient.then(client => client.get('/users/mydetails')),
+  getSignInLink: () => '/api/signin',
+  getSignOutLink: () => '/api/signout',
 };
+
+export default service;
