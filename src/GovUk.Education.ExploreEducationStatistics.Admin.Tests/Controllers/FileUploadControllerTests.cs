@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -32,11 +33,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
             {
                 new Release
                 {
-                    Id = new Guid("c023de5b-0432-49ee-9768-fe7bf8b7711b"), Title = "Release A"
+                    Id = new Guid("c023de5b-0432-49ee-9768-fe7bf8b7711b"), 
                 },
                 new Release
                 {
-                    Id = new Guid("69a6cb4f-1ec7-4b34-a2cf-0a8114dfe15f"), Title = "Release B"
+                    Id = new Guid("69a6cb4f-1ec7-4b34-a2cf-0a8114dfe15f"),
                 }
             };
 
@@ -55,8 +56,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
 
                 var selectList =
                     Assert.IsAssignableFrom<SelectList>(viewResult.ViewData["ReleaseId"]);
-
-                Assert.Equal(releases, selectList.Items);
+                
+                Assert.Equal(releases.Select(r => r.Id), selectList.Items.Cast<Release>().Select(r => r.Id));
             }
         }
 
@@ -75,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
 
             var release = new Release
             {
-                Id = new Guid("7d00da4b-8948-4db6-bf33-aa1091df9d02"), Title = "Release", Slug = "release",
+                Id = new Guid("7d00da4b-8948-4db6-bf33-aa1091df9d02"), Slug = "release",
                 Publication = publication
             };
 
