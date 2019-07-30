@@ -8,9 +8,7 @@ const SignedOutPage = () => {
         <span className="govuk-caption-l">Explore education statistics</span>
         Signed out
       </h1>
-      <p className="govuk-body">
-        You have successfully signed out.
-      </p>
+      <p className="govuk-body">You have successfully signed out.</p>
       <a href="/api/signin" className="govuk-button govuk-button--start">
         Sign-in
       </a>

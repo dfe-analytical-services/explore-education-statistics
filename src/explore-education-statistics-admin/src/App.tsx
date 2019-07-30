@@ -1,15 +1,15 @@
-import ProtectedRoute from "@admin/components/ProtectedRoute";
-import SignedOutPage from "@admin/pages/sign-in/SignedOutPage";
+import ProtectedRoute from '@admin/components/ProtectedRoute';
+import SignedOutPage from '@admin/pages/sign-in/SignedOutPage';
 import SignInPage from '@admin/pages/sign-in/SignInPage';
 import releaseRoutes from '@admin/routes/releaseRoutes';
 import PrototypeLoginService from '@admin/services/PrototypeLoginService';
 import React from 'react';
-import {Route} from 'react-router';
-import {BrowserRouter} from 'react-router-dom';
+import { Route } from 'react-router';
+import { BrowserRouter } from 'react-router-dom';
 
 import './App.scss';
 
-import {LoginContext} from './components/Login';
+import { LoginContext } from './components/Login';
 import AdminDashboardPage from './pages/admin-dashboard/AdminDashboardPage';
 import IndexPage from './pages/IndexPage';
 import PrototypeAdminDashboard from './pages/prototypes/PrototypeAdminDashboard';
@@ -38,17 +38,18 @@ import ReleaseCreateNew from './pages/prototypes/PrototypeReleasePageCreateNew';
 import PrototypesIndexPage from './pages/prototypes/PrototypesIndexPage';
 
 function App() {
-
   return (
-
     <BrowserRouter>
-
       {/* Non-Prototype Routes*/}
       <Route exact path="/sign-in" component={SignInPage} />
 
       <Route exact path="/signed-out" component={SignedOutPage} />
 
-      <ProtectedRoute exact path="/admin-dashboard" component={AdminDashboardPage} />
+      <ProtectedRoute
+        exact
+        path="/admin-dashboard"
+        component={AdminDashboardPage}
+      />
 
       {releaseRoutes.map(route => (
         <ProtectedRoute
@@ -169,7 +170,6 @@ function App() {
           component={AdminDocumentationGlossary}
         />
       </LoginContext.Provider>
-
     </BrowserRouter>
   );
 }

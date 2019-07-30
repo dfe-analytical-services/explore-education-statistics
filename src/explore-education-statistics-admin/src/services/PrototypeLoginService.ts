@@ -1,7 +1,6 @@
-import {User} from "@admin/services/sign-in/service";
+import { User } from '@admin/services/sign-in/service';
 
 export default class PrototypeLoginService {
-
   private static USERS: User[] = [
     {
       id: '4add7621-4aef-4abc-b2e6-0938b37fe5b9',

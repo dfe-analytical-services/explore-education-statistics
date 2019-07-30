@@ -1,10 +1,13 @@
-import {LoginContext} from "@admin/components/Login";
-import loginService, {Authentication} from "@admin/services/sign-in/service";
-import React, {useEffect, useState} from 'react';
-import {Redirect, Route, RouteProps} from 'react-router';
+import { LoginContext } from '@admin/components/Login';
+import loginService, { Authentication } from '@admin/services/sign-in/service';
+import React, { useEffect, useState } from 'react';
+import { Redirect, Route, RouteProps } from 'react-router';
 
-const AuthenticationCheckingComponent = ({component, location, ...props}: RouteProps) => {
-
+const AuthenticationCheckingComponent = ({
+  component,
+  location,
+  ...props
+}: RouteProps) => {
   const redirect = () => (
     <Redirect
       to={{
@@ -17,10 +20,10 @@ const AuthenticationCheckingComponent = ({component, location, ...props}: RouteP
   const [authentication, setAuthentication] = useState<Authentication>();
 
   useEffect(() => {
-    loginService.
-    getUserDetails().
-    then(user => setAuthentication({user})).
-    catch(_ => setAuthentication({}))
+    loginService
+      .getUserDetails()
+      .then(user => setAuthentication({ user }))
+      .catch(_ => setAuthentication({}));
   }, []);
 
   if (!authentication) {
@@ -38,7 +41,6 @@ const AuthenticationCheckingComponent = ({component, location, ...props}: RouteP
   );
 };
 
-
 /**
  * Creates a <Route> that firstly checks the user's authentication
  * status and then renders the protected component if the user has been
@@ -50,8 +52,7 @@ const AuthenticationCheckingComponent = ({component, location, ...props}: RouteP
  * @constructor
  */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-const ProtectedRoute = ({component, location, ...rest}: RouteProps) => {
-
+const ProtectedRoute = ({ component, location, ...rest }: RouteProps) => {
   const routeComponent = (props: any) => (
     <AuthenticationCheckingComponent
       component={component}
@@ -60,12 +61,7 @@ const ProtectedRoute = ({component, location, ...rest}: RouteProps) => {
     />
   );
 
-  return (
-    <Route
-      {...rest}
-      render={routeComponent}
-    />
-  );
+  return <Route {...rest} render={routeComponent} />;
 };
 
 export default ProtectedRoute;

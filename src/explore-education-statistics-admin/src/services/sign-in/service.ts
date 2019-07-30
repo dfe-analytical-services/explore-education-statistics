@@ -1,4 +1,4 @@
-import {createClient} from "@admin/services/util/service";
+import { createClient } from '@admin/services/util/service';
 
 const apiClient = createClient({});
 
@@ -17,4 +17,4 @@ const getUserDetails: () => Promise<User> = () =>
 
 export default {
   getUserDetails,
-}
+};

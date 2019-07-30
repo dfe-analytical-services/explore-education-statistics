@@ -4,7 +4,7 @@ import {
   ThemeAndTopics,
 } from '@admin/services/dashboard/types';
 import PrototypeLoginService from '@admin/services/PrototypeLoginService';
-import {Dictionary} from "@common/types";
+import { Dictionary } from '@common/types';
 
 const themesAndTopics: ThemeAndTopics[] = [
   {
@@ -219,7 +219,9 @@ const themesAndTopics: ThemeAndTopics[] = [
   },
 ];
 
-const dashboardPublicationsByTopicId: Dictionary<AdminDashboardPublication[]> = {
+const dashboardPublicationsByTopicId: Dictionary<
+  AdminDashboardPublication[]
+> = {
   '67c249de-1cca-446e-8ccb-dcdac542f460': [
     {
       id: 'publication-1',
@@ -266,7 +268,7 @@ const dashboardPublicationsByTopicId: Dictionary<AdminDashboardPublication[]> = 
         },
       ],
     },
-  ]
+  ],
 };
 
 export default {

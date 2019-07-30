@@ -1,4 +1,4 @@
-import {Authentication} from "@admin/services/sign-in/service";
+import { Authentication } from '@admin/services/sign-in/service';
 import classNames from 'classnames';
 import logo from 'govuk-frontend/assets/images/govuk-logotype-crown.png';
 import React from 'react';
