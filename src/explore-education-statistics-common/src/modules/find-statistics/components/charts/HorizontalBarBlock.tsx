@@ -20,7 +20,6 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 
 export default class HorizontalBarBlock extends Component<StackedBarProps> {
   public static definition: ChartDefinition = {
@@ -71,7 +70,8 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
       legendHeight,
     } = this.props;
 
-    if (!axes.major || !data) return <LoadingSpinner />;
+    if (axes.major === undefined || data === undefined || meta === undefined)
+      return <div>Unable to render chart</div>;
 
     const chartData: ChartDataB[] = createDataForAxis(
       axes.major,

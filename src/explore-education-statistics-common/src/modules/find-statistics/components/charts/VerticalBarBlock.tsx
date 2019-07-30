@@ -20,7 +20,6 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 
 export default class VerticalBarBlock extends Component<StackedBarProps> {
   public static definition: ChartDefinition = {
@@ -71,114 +70,110 @@ export default class VerticalBarBlock extends Component<StackedBarProps> {
       legendHeight,
     } = this.props;
 
-    if (axes.major && data) {
-      const chartData: ChartDataB[] = createDataForAxis(
-        axes.major,
-        data.result,
-        meta,
-      ).map(mapNameToNameLabel(labels, meta.timePeriods, meta.locations));
+    if (axes.major === undefined || data === undefined || meta === undefined)
+      return <div>Unable to render chart</div>;
 
-      const keysForChart = getKeysForChart(chartData);
+    const chartData: ChartDataB[] = createDataForAxis(
+      axes.major,
+      data.result,
+      meta,
+    ).map(mapNameToNameLabel(labels, meta.timePeriods, meta.locations));
 
-      return (
-        <ResponsiveContainer width={width || 900} height={height || 300}>
-          <BarChart
-            data={chartData}
-            margin={{
-              left: 30,
-              top: legend === 'top' ? 10 : 0,
-            }}
-          >
-            <CartesianGrid
-              strokeDasharray="3 3"
-              vertical={axes.minor && axes.minor.showGrid !== false}
-              horizontal={axes.major && axes.major.showGrid !== false}
+    const keysForChart = getKeysForChart(chartData);
+
+    return (
+      <ResponsiveContainer width={width || 900} height={height || 300}>
+        <BarChart
+          data={chartData}
+          margin={{
+            left: 30,
+            top: legend === 'top' ? 10 : 0,
+          }}
+        >
+          <CartesianGrid
+            strokeDasharray="3 3"
+            vertical={axes.minor && axes.minor.showGrid !== false}
+            horizontal={axes.major && axes.major.showGrid !== false}
+          />
+
+          {axes.minor && (
+            <YAxis
+              type="number"
+              hide={axes.minor.visible === false}
+              label={{
+                angle: -90,
+                offset: 0,
+                position: 'left',
+                value: '',
+              }}
+              scale="auto"
+              width={conditionallyAdd(axes.minor && axes.minor.size)}
+              interval={
+                axes.minor && !axes.minor.visible
+                  ? 'preserveStartEnd'
+                  : undefined
+              }
             />
+          )}
 
-            {axes.minor && (
-              <YAxis
-                type="number"
-                hide={axes.minor.visible === false}
-                label={{
-                  angle: -90,
-                  offset: 0,
-                  position: 'left',
-                  value: '',
-                }}
-                scale="auto"
-                width={conditionallyAdd(axes.minor && axes.minor.size)}
-                interval={
-                  axes.minor && !axes.minor.visible
-                    ? 'preserveStartEnd'
-                    : undefined
-                }
-              />
-            )}
+          {axes.major && (
+            <XAxis
+              type="category"
+              dataKey="name"
+              hide={axes.major.visible === false}
+              label={{
+                offset: 5,
+                position: 'bottom',
+                value: '',
+              }}
+              scale="auto"
+              padding={{ left: 20, right: 20 }}
+              height={conditionallyAdd(
+                axes.major && axes.major.size,
+                legend === 'bottom' ? 0 : undefined,
+              )}
+              tickMargin={10}
+            />
+          )}
 
-            {axes.major && (
-              <XAxis
-                type="category"
-                dataKey="name"
-                hide={axes.major.visible === false}
-                label={{
-                  offset: 5,
-                  position: 'bottom',
-                  value: '',
-                }}
-                scale="auto"
-                padding={{ left: 20, right: 20 }}
-                height={conditionallyAdd(
-                  axes.major && axes.major.size,
-                  legend === 'bottom' ? 0 : undefined,
-                )}
-                tickMargin={10}
-              />
-            )}
+          <Tooltip />
+          {(legend === 'top' || legend === 'bottom') && (
+            <Legend
+              verticalAlign={legend}
+              height={+(legendHeight || '50')}
+              margin={{ top: 5, bottom: 5 }}
+            />
+          )}
 
-            <Tooltip />
-            {(legend === 'top' || legend === 'bottom') && (
-              <Legend
-                verticalAlign={legend}
-                height={+(legendHeight || '50')}
-                margin={{ top: 5, bottom: 5 }}
-              />
-            )}
+          {Array.from(keysForChart).map(name => (
+            <Bar
+              key={name}
+              {...populateDefaultChartProps(name, labels[name])}
+              stackId={stacked ? 'a' : undefined}
+            />
+          ))}
 
-            {Array.from(keysForChart).map(name => (
-              <Bar
-                key={name}
-                {...populateDefaultChartProps(name, labels[name])}
-                stackId={stacked ? 'a' : undefined}
-                label={{
-                  content: <span>hello</span>,
-                }}
+          {axes.major &&
+            axes.major.referenceLines &&
+            axes.major.referenceLines.map(referenceLine => (
+              <ReferenceLine
+                key={`${referenceLine.position}_${referenceLine.label}`}
+                x={referenceLine.position}
+                label={referenceLine.label}
               />
             ))}
 
-            {axes.major &&
-              axes.major.referenceLines &&
-              axes.major.referenceLines.map(referenceLine => (
-                <ReferenceLine
-                  key={`${referenceLine.position}_${referenceLine.label}`}
-                  x={referenceLine.position}
-                  label={referenceLine.label}
-                />
-              ))}
-
-            {axes.minor &&
-              axes.minor.referenceLines &&
-              axes.minor.referenceLines.map(referenceLine => (
-                <ReferenceLine
-                  key={`${referenceLine.position}_${referenceLine.label}`}
-                  y={referenceLine.position}
-                  label={referenceLine.label}
-                />
-              ))}
-          </BarChart>
-        </ResponsiveContainer>
-      );
-    }
-
-    return <LoadingSpinner />;
+          {axes.minor &&
+            axes.minor.referenceLines &&
+            axes.minor.referenceLines.map(referenceLine => (
+              <ReferenceLine
+                key={`${referenceLine.position}_${referenceLine.label}`}
+                y={referenceLine.position}
+                label={referenceLine.label}
+              />
+            ))}
+        </BarChart>
+      </ResponsiveContainer>
+    );
   }
 }

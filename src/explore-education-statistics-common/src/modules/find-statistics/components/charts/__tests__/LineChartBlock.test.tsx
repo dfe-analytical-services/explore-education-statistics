@@ -2,6 +2,10 @@ import React from 'react';
 
 import { render } from 'react-testing-library';
 import PrototypeData from '@common/modules/find-statistics/components/charts/__tests__/__data__/testBlockData';
+import {
+  DataBlockData,
+  DataBlockMetadata,
+} from '@common/services/dataBlockService';
 import LineChartBlock from '../LineChartBlock';
 
 jest.mock('recharts/lib/util/LogUtils');
@@ -183,6 +187,7 @@ describe('LineChartBlock', () => {
       container.querySelector('.recharts-reference-line'),
     ).toBeInTheDocument();
   });
+
   test('can render minor axis reference line', () => {
     const { container } = render(
       <LineChartBlock
@@ -208,5 +213,20 @@ describe('LineChartBlock', () => {
     expect(
       container.querySelector('.recharts-reference-line'),
     ).toBeInTheDocument();
+  });
+
+  test('dies gracefully with bad data', () => {
+    const invalidData: DataBlockData = (undefined as unknown) as DataBlockData;
+    const invalidMeta: DataBlockMetadata = (undefined as unknown) as DataBlockMetadata;
+
+    const { container } = render(
+      <LineChartBlock
+        data={invalidData}
+        labels={{}}
+        meta={invalidMeta}
+        axes={{}}
+      />,
+    );
+    expect(container).toHaveTextContent('Unable to render chart');
   });
 });
