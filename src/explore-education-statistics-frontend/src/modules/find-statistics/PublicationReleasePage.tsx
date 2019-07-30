@@ -54,13 +54,12 @@ class PublicationReleasePage extends Component<Props> {
     const { data, release } = this.props;
 
     const releaseCount =
-      data.publication.releases.slice(1).length +
-      data.publication.legacyReleases.length;
+      data.publication.releases.length + data.publication.legacyReleases.length;
 
     return (
       <Page
-        title={data.title}
-        caption="Publication"
+        title={data.publication.title}
+        caption={data.title}
         breadcrumbs={[
           { name: 'Find statistics and data', link: '/statistics' },
         ]}
@@ -163,9 +162,9 @@ class PublicationReleasePage extends Component<Props> {
               <h3>About these statistics</h3>
 
               <dl className="dfe-meta-content">
-                <dt className="govuk-caption-m">For school year:</dt>
+                <dt className="govuk-caption-m">For {data.coverageTitle}:</dt>
                 <dd data-testid="release-name">
-                  <strong>{data.releaseName}</strong>
+                  <strong>{data.yearTitle}</strong>
                 </dd>
                 <dd>
                   <Details
@@ -258,7 +257,7 @@ class PublicationReleasePage extends Component<Props> {
         </div>
         <hr />
         <h2 className="dfe-print-break-before">
-          Headline facts and figures - {data.releaseName}
+          Headline facts and figures - {data.yearTitle}
         </h2>
 
         {data.keyStatistics && (
@@ -292,7 +291,7 @@ class PublicationReleasePage extends Component<Props> {
         </h2>
         <AccordionWithAnalytics id="extra-information-sections">
           <AccordionSection
-            heading={`${data.title}: methodology`}
+            heading={`${data.publication.title}: methodology`}
             caption="Find out how and why we collect, process and publish these statistics"
             headingTag="h3"
           >

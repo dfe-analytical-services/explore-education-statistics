@@ -158,6 +158,8 @@ export interface ContentBlock {
 export interface Release {
   id: string;
   title: string;
+  yearTitle: string;
+  coverageTitle: string;
   releaseName: string;
   published: string;
   slug: string;
