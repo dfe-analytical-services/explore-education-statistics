@@ -291,7 +291,7 @@ class PublicationReleasePage extends Component<Props> {
         </h2>
         <AccordionWithAnalytics id="extra-information-sections">
           <AccordionSection
-            heading={`${data.title}: methodology`}
+            heading={`${data.publication.title}: methodology`}
             caption="Find out how and why we collect, process and publish these statistics"
             headingTag="h3"
           >
