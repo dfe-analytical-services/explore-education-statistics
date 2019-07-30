@@ -40,18 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         
         public override async Task<ResultWithMetaViewModel> QueryAsync(ObservationQueryContext queryContext)
         {
-            var observations = GetObservations(queryContext).ToList();
-            if (!observations.Any())
-            {
-                return new ResultWithMetaViewModel();
-            }
-
-            return new ResultWithMetaViewModel
-            {
-                Result = observations.Select(observation =>
-                    _resultBuilder.BuildResult(observation, queryContext.Indicators)),
-                MetaData = _subjectMetaService.GetSubjectMeta(queryContext.ToSubjectMetaQueryContext(), observations)
-            };
+            return Query(queryContext);
         }
     }
 }

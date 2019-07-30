@@ -46,19 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         
         public override async Task<ResultViewModel> QueryAsync(ObservationQueryContext queryContext)
         {
-            var observations = GetObservations(queryContext).ToList();
-            if (!observations.Any())
-            {
-                return new ResultViewModel();
-            }
-
-            return new ResultViewModel
-            {
-                Footnotes = GetFootnotes(queryContext),
-                TimePeriodRange = GetTimePeriodRange(observations),
-                Result = observations.Select(observation =>
-                    _resultBuilder.BuildResult(observation, queryContext.Indicators))
-            };
+            return Query(queryContext);
         }
 
         private IEnumerable<FootnoteViewModel> GetFootnotes(ObservationQueryContext queryContext)

@@ -1,15 +1,15 @@
+using System;
+using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
+using Microsoft.Azure.Cosmos.Table;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
+using Newtonsoft.Json;
+
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
-    using System;
-    using System.Threading.Tasks;
-    using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-    using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
-    using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
-    using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
-    using Microsoft.Azure.Cosmos.Table;
-    using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
-    using Newtonsoft.Json;
-
     public class PermalinkService : IPermalinkService
     {
         private const string PermalinkTableName = "permalink";
@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
             if (result.Result is PermalinkEntity permalink)
             {
-                var model = new PermalinkViewModel()
+                var model = new PermalinkViewModel
                 {
                     Id = permalink.RowKey,
                     Title = permalink.Title,
@@ -55,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
             var permalink = new PermalinkEntity()
             {
-                // passing the title generated from the frontend could be exploited so we'll need to generate something
+                // TODO: passing the title generated from the frontend could be exploited so we'll need to generate something
                 Title = "Auto-generated table title",
                 Data = JsonConvert.SerializeObject(data),
                 Query = JsonConvert.SerializeObject(tableQuery)

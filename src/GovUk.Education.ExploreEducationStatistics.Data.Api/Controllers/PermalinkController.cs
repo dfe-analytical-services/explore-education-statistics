@@ -1,11 +1,12 @@
+using System;
+using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc;
+
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 {
-    using System;
-    using System.Threading.Tasks;
-    using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
-    using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
-    using Microsoft.AspNetCore.Mvc;
-    using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
+
     
     [Route("api/[controller]")]
     [ApiController]
