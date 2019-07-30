@@ -1,5 +1,5 @@
 import Details, { DetailsToggleHandler } from '@common/components/Details';
-import React from 'react';
+import React, { MouseEvent } from 'react';
 import ReactMarkdown from 'react-markdown';
 import {
   DataBlockData,
@@ -14,7 +14,7 @@ export interface SummaryRendererProps {
   dataKeys: string[];
   dataSummary: string[];
   description: { type: string; body: string };
-  onToggle?: DetailsToggleHandler;
+  onToggle?: (isOpened: boolean, event: MouseEvent<HTMLElement>) => void;
 }
 
 function getLatestMeasures(result: Result[]) {

@@ -81,10 +81,8 @@ const Details = ({
           event.persist();
 
           if (onToggle) {
-            if (event.isDefaultPrevented()) {
-              onToggle(isOpened, event);
-              return;
-            }
+            onToggle(isOpened, event);
+            return;
           }
 
           setOpened(!isOpened);
