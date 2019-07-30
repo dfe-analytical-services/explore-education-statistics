@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -98,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
 
                                 var file = SamplePublications.SubjectFiles.GetValueOrDefault(subject.Id);
 
-                                StoreFiles(r, file);
+                                StoreFiles(r, file, subject.Name);
                                 
                                 Seed(file.ToString() + ".csv", r);
                             }   
@@ -122,6 +121,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
             aQueue.CreateIfNotExists();
             
             var message = BuildMessage(dataFileName, release);
+
+            //_logger.LogInformation("Adding message : {0}", message.AsString);
+            
             pQueue.AddMessage(message);
         }
 
@@ -140,12 +142,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
             return new CloudQueueMessage(JsonConvert.SerializeObject(message));
         }
 
-        private void StoreFiles(Release release, DataCsvFile file)
+        private void StoreFiles(Release release, DataCsvFile file, string subjectName)
         {
             var dataFile = CreateFormFile(file.GetCsvLines(), file.ToString() + ".csv", "file");
             var metaFile = CreateFormFile(file.GetMetaCsvLines(), file.ToString() + ".meta.csv", "metaFile");
 
-            _fileStorageService.UploadFilesAsync(release.Publication.Slug, release.Slug, dataFile, metaFile, "2016/2017").Wait();
+            _fileStorageService.UploadFilesAsync(release.Publication.Slug, release.Slug, dataFile, metaFile, subjectName).Wait();
         }
 
         private IFormFile CreateFormFile(IEnumerable<string> lines, string fileName, string name)
