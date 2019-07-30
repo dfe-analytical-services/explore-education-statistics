@@ -132,7 +132,7 @@ const UserGreeting = () => {
       <h1 className="govuk-heading-xl">
         {user ? user.name : ''}{' '}
         <span className="govuk-body-s">
-          Not you? <Link to="#">Sign out</Link>
+          Not you? <a className="govuk-link" href="/api/signout">Sign out</a>
         </span>
       </h1>
     </>

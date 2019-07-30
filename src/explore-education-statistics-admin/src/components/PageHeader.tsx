@@ -94,7 +94,7 @@ const LoggedInLinks = ({ user }: Authentication) => (
       </a>
     </li>
     <li className="govuk-header__navigation-item">
-      <a className="govuk-header__link" href="#">
+      <a className="govuk-header__link" href="/api/signout">
         Sign out
       </a>
     </li>
