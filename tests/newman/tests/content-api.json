@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "fd9a0739-ac15-4b7c-90bc-e94413ca473f",
+		"_postman_id": "a987d317-8b66-4fa6-adac-ad3e331dec3f",
 		"name": "Dfe Content API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -12,7 +12,7 @@
 					"name": "Publication",
 					"item": [
 						{
-							"name": "Get Latest Specific Publication",
+							"name": "Get Latest Release for Specific Publication",
 							"event": [
 								{
 									"listen": "prerequest",
@@ -346,21 +346,21 @@
 								"exec": [
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 									"",
-									"pm.test(\"Response should have id, summary, published, content, annexes, publication\", function () {",
+									"pm.test(\"Response should have correct fields\", function () {",
 									"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"title\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"published\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"content\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"annexes\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"publication\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"publications\"));",
 									"});",
-									"",
 									"",
 									"pm.test(\"Title should be correct\", function () {",
 									"    pm.expect(pm.response.json().title).to.equal(\"Pupil absence statistics: methodology\"); ",
 									"});",
 									"",
 									"pm.test(\"PublicationId should be correct\", function () {",
-									"pm.expect(pm.response.json().publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\");",
+									"    pm.expect(pm.response.json().publications[0].id).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\");",
 									"});"
 								],
 								"type": "text/javascript"

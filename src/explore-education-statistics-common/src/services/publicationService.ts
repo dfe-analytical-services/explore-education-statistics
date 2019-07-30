@@ -158,6 +158,8 @@ export interface ContentBlock {
 export interface AbstractRelease<ContentBlockType> {
   id: string;
   title: string;
+  yearTitle: string;
+  coverageTitle: string;
   releaseName: string;
   published: string;
   slug: string;
