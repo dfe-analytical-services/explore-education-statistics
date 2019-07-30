@@ -106,6 +106,7 @@ export default class LineChartBlock extends Component<ChartProps> {
       labels,
       legend,
       legendHeight,
+      width,
     } = this.props;
 
     if (axes.major === undefined || data === undefined || meta === undefined)
@@ -122,7 +123,7 @@ export default class LineChartBlock extends Component<ChartProps> {
     const keysForChart = getKeysForChart(chartData);
 
     return (
-      <ResponsiveContainer width={900} height={height || 300}>
+      <ResponsiveContainer width={width || '100%'} height={height || 300}>
         <LineChart
           data={chartData}
           margin={{

@@ -82,7 +82,7 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
     const keysForChart = getKeysForChart(chartData);
 
     return (
-      <ResponsiveContainer width={width || '100%'} height={height || 600}>
+      <ResponsiveContainer width={width || '100%'} height={height || 300}>
         <BarChart
           data={chartData}
           layout="vertical"
