@@ -18,7 +18,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     {
         public Guid Id { get; set; }
 
-        public string Title
+        public string Title => TimeIdentifierTitle + (IsNullOrEmpty(YearTitle) ? "" : " " + YearTitle);
+        
+        public string YearTitle
         {
             get
             {
@@ -29,17 +31,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
                 {
                     var releaseStartYear = Int32.Parse(_releaseName);
                     var releaseEndYear = (releaseStartYear % 100) + 1; // Only want the last two digits
-                    return TimePeriodCoverage.GetEnumLabel() +  " " + releaseStartYear + "/" + releaseEndYear;
-
-
+                    return releaseStartYear + "/" + releaseEndYear;
                 }
-                
                 // For calendar year time identifiers we just want the year not a range. If there is no year then we
                 // just output the time period identifier
-                return TimePeriodCoverage.GetEnumLabel() + (IsNullOrEmpty(ReleaseName) ? "" : " " + ReleaseName);
+                return IsNullOrEmpty(ReleaseName) ? "" : ReleaseName;
             }
         }
 
+
+        public string TimeIdentifierTitle => TimePeriodCoverage.GetEnumLabel(); 
+        
         private string _releaseName;
 
         public string ReleaseName
