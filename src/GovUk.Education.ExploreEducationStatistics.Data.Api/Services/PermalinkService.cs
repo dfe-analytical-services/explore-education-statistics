@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
@@ -20,7 +19,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private const string _containerName = "permalinks";
 
         private readonly IDataService<ResultWithMetaViewModel> _dataService;
-
 
         public PermalinkService(IConfiguration config, IDataService<ResultWithMetaViewModel> dataService)
         {
@@ -55,7 +53,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         public async Task<PermalinkViewModel> CreateAsync(ObservationQueryContext tableQuery)
         {
-            // get the data
             var data = await _dataService.QueryAsync(tableQuery);
 
             var container = _client.GetContainerReference(_containerName);
