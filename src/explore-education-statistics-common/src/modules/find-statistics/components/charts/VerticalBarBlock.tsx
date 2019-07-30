@@ -150,9 +150,6 @@ export default class VerticalBarBlock extends Component<StackedBarProps> {
               key={name}
               {...populateDefaultChartProps(name, labels[name])}
               stackId={stacked ? 'a' : undefined}
-              label={{
-                content: <span>hello</span>,
-              }}
             />
           ))}
 
