@@ -1,6 +1,8 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using Moq;
@@ -17,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
 
             publicationService
                 .Setup(s => s.CreatePublication(It.IsAny<CreatePublicationViewModel>()))
-                .Returns<CreatePublicationViewModel>(p => Task.FromResult(new PublicationViewModel {TopicId = p.TopicId}));
+                .Returns<CreatePublicationViewModel>(p => Task.FromResult(new Either<ValidationResult, PublicationViewModel>(new PublicationViewModel {TopicId = p.TopicId})));
             var controller = new PublicationController(publicationService.Object);
 
             var topicId = Guid.NewGuid();
