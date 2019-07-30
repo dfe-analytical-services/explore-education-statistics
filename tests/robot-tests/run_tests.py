@@ -88,8 +88,13 @@ else:
     load_dotenv(os.path.join(os.path.dirname(__file__), '.env.' + args.env))
     url = os.getenv('publicAppUrl')
     urlAdmin = os.getenv('adminAppUrl')
-robotArgs += ["-v", "url:" + url]
-robotArgs += ["-v", "urlAdmin:" + urlAdmin]
+
+    print("qqRP")
+    print(url)
+    print(urlAdmin)
+    print("qqRP")
+robotArgs += ["-v", "url:" + str(url)]
+robotArgs += ["-v", "urlAdmin:" + str(urlAdmin)]
 
 if args.visual:
     robotArgs += ["-v", "headless:0"]
