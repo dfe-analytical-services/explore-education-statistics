@@ -23,6 +23,7 @@ import PublicationConfirmNew from './pages/prototypes/PrototypePublicationPageCo
 import PublicationCreateNew from './pages/prototypes/PrototypePublicationPageCreateNew';
 
 import PublicationEditPage from './pages/prototypes/PrototypePublicationPageEditAbsence';
+import PublicationEditUnresolvedComments from './pages/prototypes/PrototypePublicationPageEditAbsenceUnresolvedComments';
 import PublicationEditNew from './pages/prototypes/PrototypePublicationPageEditNew';
 import PublicationCreateNewAbsence from './pages/prototypes/PrototypePublicationPageNewAbsence';
 import PublicationCreateNewAbsenceConfig from './pages/prototypes/PrototypePublicationPageNewAbsenceConfig';
@@ -78,6 +79,11 @@ function App() {
           exact
           path="/prototypes/publication-edit"
           component={PublicationEditPage}
+        />
+        <Route
+          exact
+          path="/prototypes/publication-unresolved-comments"
+          component={PublicationEditUnresolvedComments}
         />
         <Route
           exact

@@ -1,27 +1,42 @@
-import { Release, ContentBlock } from '@common/services/publicationService';
+import { ContentBlock } from '@common/services/publicationService';
 import React, { Component } from 'react';
+import { EditableRelease } from '@admin/services/publicationService';
 import EditableContentSubBlockRenderer from './EditableContentSubBlockRenderer';
+import AddComment from '../../../pages/prototypes/components/PrototypeEditableContentAddComment';
+import ResolveComment from '../../../pages/prototypes/components/PrototypeEditableContentResolveComment';
 
 interface Props {
-  content: Release['content'][0]['content'];
+  content: EditableRelease['content'][0]['content'];
   id?: string;
   editable?: boolean;
+  reviewing?: boolean;
+  resolveComments?: boolean;
   onContentChange?: (block: ContentBlock, content: string) => void;
 }
 
 class EditableContentBlock extends Component<Props> {
   public render() {
-    const { content, id = '', editable, onContentChange } = this.props;
+    const {
+      content,
+      id = '',
+      editable,
+      onContentChange,
+      reviewing,
+      resolveComments,
+    } = this.props;
 
     return content.length > 0 ? (
       content.map((block, index) => {
         const key = `${index}-${block.heading}-${block.type}`;
         return (
-          <>
+          <React.Fragment key={key}>
+            {reviewing && <AddComment initialComments={block.comments} />}
+            {resolveComments && (
+              <ResolveComment initialComments={block.comments} />
+            )}
             <EditableContentSubBlockRenderer
               editable={editable}
               block={block}
-              key={key}
               id={id}
               index={index}
               onContentChange={newContent => {
@@ -30,7 +45,7 @@ class EditableContentBlock extends Component<Props> {
                 }
               }}
             />
-          </>
+          </React.Fragment>
         );
       })
     ) : (
