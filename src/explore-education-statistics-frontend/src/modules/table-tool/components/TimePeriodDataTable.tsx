@@ -37,28 +37,19 @@ const TimePeriodDataTable = (props: Props) => {
     rows: [],
   });
 
+  const removeSiblinglessTotalRows = (
+    categoryFilters: Dictionary<CategoryFilter[]>,
+  ): CategoryFilter[][] => {
+    return Object.values(categoryFilters).filter(filter => {
+      return filter.length > 1 || filter[0].label.toUpperCase() !== 'TOTAL';
+    });
+  };
+
   useEffect(() => {
     const sortedFilters = sortBy(
-      Object.values({
-        ...filters,
-        locations,
-      }),
+      [...removeSiblinglessTotalRows(filters), locations],
       [options => options.length],
     );
-
-    // strips siblingless "Total" filters (columns/rows)
-    for (let i = 0; i < sortedFilters.length; i += 1) {
-      const sortedFilter = sortedFilters[i];
-      if (sortedFilter.length === 1) {
-        if (typeof sortedFilter[0].label === 'string') {
-          const { label } = sortedFilter[0];
-          if (label.toUpperCase() === 'TOTAL') {
-            sortedFilters.splice(i, 1);
-            i -= 1;
-          }
-        }
-      }
-    }
 
     const halfwayIndex = Math.floor(sortedFilters.length / 2);
 

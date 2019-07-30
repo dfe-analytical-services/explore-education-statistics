@@ -58,7 +58,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
       ref={formikRef}
       initialValues={{
         filters: mapValues(subjectMeta.filters, filter => {
-          if (filter.options.Default !== undefined) {
+          if (typeof filter.options.Default !== 'undefined') {
             // Automatically select filter option when there is only one
             return filter.options.Default.options.length === 1
               ? [filter.options.Default.options[0].value]
