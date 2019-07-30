@@ -12,6 +12,7 @@ interface Props {
   stepNumber: InjectedWizardProps['stepNumber'];
   submitText?: string;
   submittingText?: string;
+  submitOnClick?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
 }
 
 const WizardStepFormActions = ({
@@ -22,6 +23,7 @@ const WizardStepFormActions = ({
   stepNumber,
   submitText = 'Next step',
   submittingText = 'Submitting',
+  submitOnClick = () => {},
 }: Props) => {
   return (
     <FormGroup>
@@ -29,6 +31,7 @@ const WizardStepFormActions = ({
         disabled={form.isSubmitting}
         id={`${formId}-submit`}
         type="submit"
+        onClick={submitOnClick}
       >
         {form.isSubmitting ? submittingText : submitText}
       </Button>

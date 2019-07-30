@@ -83,21 +83,6 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
           ),
         ),
       })}
-      preSubmit={values => {
-        const newValues = values;
-        // Automatically select totalValue for filters that haven't had a selection made
-        Object.keys(values.filters).forEach(filterName => {
-          if (
-            newValues.filters[filterName].length === 0 &&
-            subjectMeta.filters[filterName].totalValue
-          ) {
-            newValues.filters[filterName].push(
-              subjectMeta.filters[filterName].totalValue,
-            );
-          }
-        });
-        return newValues;
-      }}
       onSubmit={async values => {
         await onSubmit(values);
         goToNextStep();
@@ -172,6 +157,20 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                 {...props}
                 form={form}
                 formId={formId}
+                submitOnClick={e => {
+                  // Automatically select totalValue for filters that haven't had a selection made
+                  console.log(form.values);
+                  Object.keys(form.values.filters).forEach(filterName => {
+                    if (
+                      form.values.filters[filterName].length === 0 &&
+                      subjectMeta.filters[filterName].totalValue
+                    ) {
+                      form.setFieldValue(`filters.${filterName}`, [
+                        subjectMeta.filters[filterName].totalValue,
+                      ]);
+                    }
+                  });
+                }}
                 submitText="Create table"
                 submittingText="Creating table"
               />
