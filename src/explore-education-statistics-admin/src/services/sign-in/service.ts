@@ -1,4 +1,6 @@
-import PrototypeLoginService from "@admin/services/PrototypeLoginService";
+import {createClient} from "@admin/services/util/service";
+
+const apiClient = createClient({});
 
 export interface User {
   id: string;
@@ -10,11 +12,9 @@ export interface Authentication {
   user?: User;
 }
 
-const setLoggedInUser = (email: string): Authentication => {
-  PrototypeLoginService.setActiveUser('4add7621-4aef-4abc-b2e6-0938b37fe5b9');
-  return PrototypeLoginService.getAuthentication('4add7621-4aef-4abc-b2e6-0938b37fe5b9');
-};
+const getUserDetails: () => Promise<User> = () =>
+  apiClient.then(client => client.get('/users/mydetails'));
 
 export default {
-  setLoggedInUser,
+  getUserDetails,
 }

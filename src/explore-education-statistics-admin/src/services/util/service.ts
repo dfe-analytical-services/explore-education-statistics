@@ -13,7 +13,7 @@ export type MockBehaviourRegistrar = (mock: MockAdapter) => Promise<void>;
 
 interface Config {
   customBaseUrl?: string;
-  mockBehaviourRegistrar: MockBehaviourRegistrar;
+  mockBehaviourRegistrar?: MockBehaviourRegistrar;
 }
 
 /**
@@ -37,7 +37,7 @@ export const createClient = async ({
     paramsSerializer: commaSeparated,
   });
 
-  if (process.env.USE_MOCK_API === 'true') {
+  if (process.env.USE_MOCK_API === 'true' && mockBehaviourRegistrar) {
     const MockAdaptor = (await import(
       /* webpackChunkName: "axios-mock-adapter" */ 'axios-mock-adapter'
     )).default;

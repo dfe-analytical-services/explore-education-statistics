@@ -1,4 +1,4 @@
-import { DashboardService } from '@admin/services/dashboard/service';
+import {DashboardService} from '@admin/services/dashboard/service';
 import MockAdapter from 'axios-mock-adapter';
 
 export default async (mock: MockAdapter) => {
@@ -8,8 +8,8 @@ export default async (mock: MockAdapter) => {
 
   const service: DashboardService = {
     getMyThemesAndTopics: () => Promise.resolve(mockData.themesAndTopics),
-    getMyPublicationsByTopic: _ =>
-      Promise.resolve(mockData.dashboardPublications),
+    getMyPublicationsByTopic: topicId =>
+      Promise.resolve(mockData.dashboardPublicationsByTopicId[topicId] || []),
   };
 
   // getMyThemesAndTopics
@@ -17,10 +17,9 @@ export default async (mock: MockAdapter) => {
 
   // getMyPublicationsByTopic
   mock
-    .onGet('/me/publications', {
-      params: {
-        topicId: '67c249de-1cca-446e-8ccb-dcdac542f460',
-      },
-    })
-    .reply(200, service.getMyPublicationsByTopic(''));
+    .onGet('/me/publications')
+    .reply(config => {
+      const {topicId} = config.params;
+      return [200, service.getMyPublicationsByTopic(topicId)];
+    });
 };

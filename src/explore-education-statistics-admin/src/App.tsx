@@ -40,6 +40,7 @@ import PrototypesIndexPage from './pages/prototypes/PrototypesIndexPage';
 function App() {
 
   return (
+
     <BrowserRouter>
       <Route exact path="/" component={IndexPage} />
 

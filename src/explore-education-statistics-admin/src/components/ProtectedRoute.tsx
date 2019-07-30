@@ -1,7 +1,6 @@
 import {LoginContext} from "@admin/components/Login";
-import loginService from "@admin/services/sign-in/service";
-import React from 'react';
-import {useCookies} from 'react-cookie';
+import loginService, {Authentication} from "@admin/services/sign-in/service";
+import React, {useEffect, useState} from 'react';
 import {Redirect, Route, RouteProps} from 'react-router';
 
 /**
@@ -15,21 +14,20 @@ import {Redirect, Route, RouteProps} from 'react-router';
  * @constructor
  */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react/display-name */
 const ProtectedRoute = ({component, location, ...rest}: RouteProps) => {
 
-  const [cookies] = useCookies(['DFEUserDetails']);
+  const [authentication, setAuthentication] = useState<Authentication>();
 
-  const authCookie = cookies.DFEUserDetails;
+  useEffect(() => {
+    loginService.
+    getUserDetails().
+    then(user => setAuthentication({user})).
+    catch(_ => setAuthentication({}))
+  }, []);
 
-  function createProtectedComponent(props: any) {
-    return component && (
-      <LoginContext.Provider value={loginService.setLoggedInUser(authCookie)}>
-        {React.createElement(component, props)}
-      </LoginContext.Provider>
-    );
-  }
 
-  const redirect = (
+  const redirect = () => (
     <Redirect
       to={{
         pathname: '/sign-in',
@@ -38,11 +36,22 @@ const ProtectedRoute = ({component, location, ...rest}: RouteProps) => {
     />
   );
 
-  const routeComponent = (props: any) => (
-    authCookie
-      ? createProtectedComponent(props)
-      : redirect
-  );
+  const routeComponent = (props: any) => {
+
+    if (!authentication) {
+      return null;
+    }
+
+    if (!authentication.user || !component) {
+      return redirect();
+    }
+
+    return (
+      <LoginContext.Provider value={authentication}>
+        {React.createElement(component, props)}
+      </LoginContext.Provider>
+    );
+  };
 
   return (
     <Route

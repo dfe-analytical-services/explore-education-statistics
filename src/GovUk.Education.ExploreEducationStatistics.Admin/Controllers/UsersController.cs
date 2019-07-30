@@ -5,18 +5,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
 {
-    [Authorize]
+    [AllowAnonymous]
     [ApiExplorerSettings(IgnoreApi=true)]
-    public class SigninController : Controller
+    public class UsersController : Controller
     {
         // GET
-        public IActionResult Index()
-        {
-            return Redirect("/admin-dashboard");
-        }
-        
-        // GET
-        public ActionResult<UserDetailsViewModel> UserDetails()
+        public ActionResult<UserDetailsViewModel> MyDetails()
         {
             if (Request.Cookies.ContainsKey(".AspNetCore.AzureADCookie"))
             {
