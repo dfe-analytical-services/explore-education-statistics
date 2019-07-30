@@ -29,8 +29,7 @@ export const createClient = async ({
   customBaseUrl,
   mockBehaviourRegistrar,
 }: Config): Promise<Client> => {
-  const baseURL = `${customBaseUrl ||
-    `${process.env.CONTENT_API_BASE_URL}/api/`}`;
+  const baseURL = `${customBaseUrl || `/api/`}`;
 
   const axiosInstance = axios.create({
     baseURL,
