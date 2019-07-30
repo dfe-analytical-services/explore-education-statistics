@@ -1,9 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System.IO;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 {
     public partial class AddFilterFootnotes : Migration
     {
+        private const string _migrationsPath = "Migrations/";
+        
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -92,10 +95,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                 name: "IX_FilterItemFootnote_FootnoteId",
                 table: "FilterItemFootnote",
                 column: "FootnoteId");
+            
+            ExecuteFile(migrationBuilder, _migrationsPath + "20190730094336_FilteredFootnotes.sql");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.Sql("DROP PROCEDURE dbo.FilteredFootnotes");
+
             migrationBuilder.DropTable(
                 name: "FilterFootnote");
 
@@ -104,6 +111,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
             migrationBuilder.DropTable(
                 name: "FilterItemFootnote");
+        }
+        
+        private static void ExecuteFile(MigrationBuilder migrationBuilder, string filename)
+        {
+            var file = Path.Combine(Directory.GetCurrentDirectory(), filename);
+            migrationBuilder.Sql(File.ReadAllText(file));
         }
     }
 }

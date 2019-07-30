@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
@@ -12,18 +13,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         {
         }
 
-        public Dictionary<Footnote, IEnumerable<long>> GetFootnotes(IEnumerable<long> indicators)
+        public Dictionary<Footnote, IEnumerable<long>> GetFootnotes(IEnumerable<Observation> observations,
+            IEnumerable<long> indicators)
         {
-            return _context.Footnote
-                .Join(_context.IndicatorFootnote, f => f.Id, i => i.FootnoteId, (f, i) => new
-                {
-                    Footnote = f, i.IndicatorId
-                })
-                .Where(t => indicators.Contains(t.IndicatorId))
-                .GroupBy(tuple => tuple.Footnote)
+            var filterItems = observations.SelectMany(observation => observation.FilterItems)
+                .Select(item => item.FilterItem.Id).Distinct();
+
+            var indicatorListParam = CreateIdListType("indicatorList", indicators);
+            var filterItemListParam = CreateIdListType("filterItemList", filterItems);
+
+            var inner = _context.Query<IdWrapper>().AsNoTracking()
+                .FromSql("EXEC dbo.FilteredFootnotes " +
+                         "@indicatorList," +
+                         "@filterItemList",
+                    indicatorListParam,
+                    filterItemListParam);
+
+            var ids = inner.Select(obs => obs.Id).ToList();
+
+            return Find(ids.ToArray())
                 .ToDictionary(
-                    grouping => grouping.Key,
-                    grouping => grouping.Select(tuple => tuple.IndicatorId));
+                    footnote => footnote,
+                    // TODO DFE-1127 What indicator ids are going to be returned here?
+                    footnote => new List<long>().AsEnumerable());
         }
     }
 }

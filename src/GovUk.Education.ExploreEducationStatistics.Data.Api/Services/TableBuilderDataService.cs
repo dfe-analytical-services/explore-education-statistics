@@ -36,16 +36,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
             return new ResultViewModel
             {
-                Footnotes = GetFootnotes(queryContext),
+                Footnotes = GetFootnotes(observations, queryContext),
                 TimePeriodRange = GetTimePeriodRange(observations),
                 Result = observations.Select(observation =>
                     _resultBuilder.BuildResult(observation, queryContext.Indicators))
             };
         }
 
-        private IEnumerable<FootnoteViewModel> GetFootnotes(ObservationQueryContext queryContext)
+        private IEnumerable<FootnoteViewModel> GetFootnotes(IEnumerable<Observation> observations, 
+            ObservationQueryContext queryContext)
         {
-            return _footnoteService.GetFootnotes(queryContext.Indicators)
+            return _footnoteService.GetFootnotes(observations, queryContext.Indicators)
                 .Select(footnote => new FootnoteViewModel
                 {
                     Id = footnote.Key.Id,
