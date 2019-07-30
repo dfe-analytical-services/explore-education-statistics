@@ -278,7 +278,7 @@ const ReleaseSetupEditPage = ({
                   />
 
                   <Button type="submit" className="govuk-!-margin-top-6">
-                    Update release setup
+                    Update release status
                   </Button>
 
                   <div className="govuk-!-margin-top-6">

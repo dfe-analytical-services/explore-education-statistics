@@ -66,69 +66,77 @@ const ChartDataConfiguration = ({
   };
 
   return (
-    <div className={styles.chartAxesConfiguration}>
+    <div className={styles.chartDataConfiguration}>
       <FormFieldset id={configuration.value} legend="" legendHidden>
-        <p>{configuration.name}</p>
+        <div className={styles.chartDataLabelConfiguration}>
+          <div className={styles.chartDataItem}>
+            <FormTextInput
+              id="label"
+              name="label"
+              value={config.label}
+              label="Label"
+              onChange={e =>
+                updateConfig({
+                  ...config,
+                  label: e.target.value,
+                })
+              }
+            />
+          </div>
 
-        <FormTextInput
-          id="label"
-          name="label"
-          value={config.label}
-          label="Enter Label"
-          onChange={e =>
-            updateConfig({
-              ...config,
-              label: e.target.value,
-            })
-          }
-        />
+          <div className={styles.chartDataItem}>
+            <FormSelect
+              id="colour"
+              name="colour"
+              label="Colour"
+              value={configuration.colour}
+              onChange={e =>
+                updateConfig({
+                  ...config,
+                  colour: e.target.value,
+                })
+              }
+              options={colourOptions}
+            />
+          </div>
 
-        <FormSelect
-          id="colour"
-          name="colour"
-          label="Select colour"
-          value={configuration.colour}
-          onChange={e =>
-            updateConfig({
-              ...config,
-              colour: e.target.value,
-            })
-          }
-          options={colourOptions}
-        />
+          {capabilities.dataSymbols && (
+            <div className={styles.chartDataItem}>
+              <FormSelect
+                id="symbol"
+                name="symbol"
+                label="Symbol"
+                value={configuration.symbol}
+                onChange={e =>
+                  updateConfig({
+                    ...config,
+                    symbol: e.target.value as ChartSymbol,
+                  })
+                }
+                options={symbolOptions}
+              />
+            </div>
+          )}
 
-        {capabilities.dataSymbols && (
-          <FormSelect
-            id="symbol"
-            name="symbol"
-            label="Select symbol"
-            value={configuration.symbol}
-            onChange={e =>
-              updateConfig({
-                ...config,
-                symbol: e.target.value as ChartSymbol,
-              })
-            }
-            options={symbolOptions}
-          />
-        )}
-
-        {capabilities.lineStyle && (
-          <FormSelect
-            id="lineStyle"
-            name="lineStyle"
-            label="Select Line Style"
-            value={configuration.lineStyle}
-            order={[]}
-            onChange={e =>
-              updateConfig({
-                ...config,
-                lineStyle: e.target.value as LineStyle,
-              })
-            }
-            options={lineStyleOptions}
-          />
-        )}
+          {capabilities.lineStyle && (
+            <div className={styles.chartDataItem}>
+              <FormSelect
+                id="lineStyle"
+                name="lineStyle"
+                label="Style"
+                value={configuration.lineStyle}
+                order={[]}
+                onChange={e =>
+                  updateConfig({
+                    ...config,
+                    lineStyle: e.target.value as LineStyle,
+                  })
+                }
+                options={lineStyleOptions}
+              />
+            </div>
+          )}
+        </div>
       </FormFieldset>
     </div>
   );

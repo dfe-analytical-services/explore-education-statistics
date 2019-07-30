@@ -9,6 +9,26 @@ import { LoginContext } from '@admin/components/Login';
 import Link from '@admin/components/Link';
 import PrototypePage from './components/PrototypePage';
 
+const UserType = () => {
+  const userContext = React.useContext(LoginContext);
+  return (
+    <>
+      {userContext.user &&
+        userContext.user.permissions.includes('team lead') && (
+          <span className="govuk-body-s"> (Team lead)</span>
+        )}
+      {userContext.user &&
+        userContext.user.permissions.includes('team member') && (
+          <span className="govuk-body-s"> (Team member)</span>
+        )}
+      {userContext.user &&
+        userContext.user.permissions.includes('responsible statistician') && (
+          <span className="govuk-body-s"> (Responsible statistician)</span>
+        )}
+    </>
+  );
+};
+
 const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
   const userContext = React.useContext(LoginContext);
   return (
@@ -18,10 +38,7 @@ const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
           <span className="govuk-caption-xl">Welcome</span>
           <h1 className="govuk-heading-xl">
             {userContext.user && userContext.user.name}
-            {userContext.user &&
-              userContext.user.permissions.includes('team lead') && (
-                <span className="govuk-body-s"> (Team lead)</span>
-              )}{' '}
+            <UserType />{' '}
             <span className="govuk-body-s">
               Not you? <Link to="#">Sign out</Link>
             </span>
@@ -40,7 +57,15 @@ const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
         </div>
       </div>
       <Tabs id="dashboard-tabs">
-        <TabsSection id="publications" title="Publications">
+        <TabsSection
+          id="publications"
+          title={
+            userContext.user &&
+            userContext.user.permissions.includes('team lead')
+              ? 'Manage publications and releases'
+              : 'Manage releases'
+          }
+        >
           <PrototypeAdminDashboardPublications />
         </TabsSection>
         {/* <TabsSection
@@ -53,11 +78,19 @@ const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
         </TabsSection> */}
         <TabsSection
           id="task-ready-approval1"
-          title={`In progress ${
-            location.search === '?status=readyApproval' ? '(1)' : ''
+          title={`View draft releases ${
+            location.search.includes('?status=readyApproval') ? '(1)' : '(0)'
           }`}
         >
-          <AdminDashboardReadyForApproval />
+          <AdminDashboardReadyForApproval task="readyReview" />
+        </TabsSection>
+        <TabsSection
+          id="task-in-progress2"
+          title={`View scheduled releases ${
+            location.search.includes('?status=readyApproval') ? '(1)' : '(0)'
+          }`}
+        >
+          <AdminDashboardReadyForApproval task="resolveComments" />
         </TabsSection>
       </Tabs>
 

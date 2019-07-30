@@ -48,7 +48,7 @@ const AdminDashboardPublicationSummary = ({ publication }: Props) => {
         </div>
       </dl>
       <Link to="/prototypes/release-create-new" className="govuk-button">
-        Create a new release
+        Create new release
       </Link>
     </>
   );

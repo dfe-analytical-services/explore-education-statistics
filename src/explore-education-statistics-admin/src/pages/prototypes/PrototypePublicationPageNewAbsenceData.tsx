@@ -24,6 +24,11 @@ const PublicationDataPage = () => {
       <PrototypeAdminNavigation sectionId="addData" />
       <Tabs id="dataUploadTab">
         <TabsSection id="data-upload" title="Data uploads">
+          <div className="govuk-body">
+            This data will be used to create your data blocks and users will be
+            able to download this data from this release.
+          </div>
+
           <div className="govuk-table">
             <caption className="govuk-table__caption govuk-heading-m">
               Current data for this release
@@ -31,7 +36,7 @@ const PublicationDataPage = () => {
             <thead className="govuk-table__head">
               <tr className="govuk-table__row">
                 <th className="govuk-table__header" scope="col">
-                  Subject title
+                  Title
                 </th>
                 <th className="govuk-table__header" scope="col">
                   Data file
@@ -139,71 +144,26 @@ const PublicationDataPage = () => {
           <form>
             <fieldset className="govuk-fieldset">
               <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
-                Add new data to release
+                Upload new data to this release
               </legend>
 
               <div className="govuk-form-group">
                 <label htmlFor="release-title" className="govuk-label">
-                  Subject title
+                  Add data file title
+                  <span className="govuk-hint">
+                    This will be the name shown to users for the data file when
+                    they download it from this release.
+                    <br />
+                    You should also use it as a reference for the data file if
+                    you refer to it in this release.
+                  </span>
                 </label>
                 <input
                   type="text"
+                  id="release-title"
                   className="govuk-input govuk-!-width-one-half"
                 />
               </div>
-
-              <fieldset className="govuk-fieldset">
-                <legend className="govuk-fieldset__legend govuk-fieldset__legend--s">
-                  Data type
-                </legend>
-                <div className="govuk-radios">
-                  <div className="govuk-radios__item">
-                    <input
-                      type="radio"
-                      name="data-type"
-                      id="data-type-final"
-                      value="final"
-                      className="govuk-radios__input"
-                    />
-                    <label
-                      htmlFor="data-type=final"
-                      className="govuk-label govuk-radios__label"
-                    >
-                      Final
-                    </label>
-                  </div>
-                  <div className="govuk-radios__item">
-                    <input
-                      type="radio"
-                      name="data-type"
-                      id="data-type-provisional"
-                      value="provisional"
-                      className="govuk-radios__input"
-                    />
-                    <label
-                      htmlFor="data-type-final"
-                      className="govuk-label govuk-radios__label"
-                    >
-                      Provisional
-                    </label>
-                  </div>
-                  <div className="govuk-radios__item">
-                    <input
-                      type="radio"
-                      name="data-type"
-                      id="data-type-revised"
-                      value="revised"
-                      className="govuk-radios__input"
-                    />
-                    <label
-                      htmlFor="data-type-revised"
-                      className="govuk-label govuk-radios__label"
-                    >
-                      Revised
-                    </label>
-                  </div>
-                </div>
-              </fieldset>
 
               <div className="govuk-form-group govuk-!-margin-top-6">
                 <label
@@ -235,6 +195,15 @@ const PublicationDataPage = () => {
                 />
               </div>
             </fieldset>
+            <p className="govuk-body govuk-!-margin-top-9">
+              Depending on your internet connection speed, files may take some
+              time to upload. Do not close this page until the file has
+              uploaded.
+            </p>
+            <p className="govuk-body">
+              If you close this page while the file is still uploading - the
+              upload will fail.
+            </p>
             <div className="govuk-form-group govuk-!-margin-top-6">
               <button className="govuk-button" type="button">
                 Upload data files
@@ -243,14 +212,22 @@ const PublicationDataPage = () => {
           </form>
         </TabsSection>
         <TabsSection id="file-upload" title="File uploads">
+          <p className="govuk-body">
+            These files should be things like infographics or more complex
+            tables and charts which you have not been able to build using the
+            table or chart tools.
+          </p>
+          <p className="govuk-body">
+            Users will be able to download these files from this release.
+          </p>
           <table className="govuk-table">
             <caption className="govuk-table__caption govuk-heading-m">
-              File uploads available for this release
+              Current files for this release
             </caption>
             <thead className="govuk-table__head">
               <tr className="govuk-table__row">
                 <th className="govuk-table__header" scope="col">
-                  Name
+                  Title
                 </th>
                 <th className="govuk-table__header" scope="col">
                   File
@@ -289,7 +266,7 @@ const PublicationDataPage = () => {
           <form>
             <fieldset className="govuk-fieldset">
               <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
-                Upload file
+                Upload files to this release
               </legend>
 
               <div className="govuk-form-group">
@@ -297,10 +274,18 @@ const PublicationDataPage = () => {
                   htmlFor="release-fileupload-name"
                   className="govuk-label"
                 >
-                  Name
+                  Add file title
+                  <span className="govuk-hint">
+                    This will be the name shown to users for the file when they
+                    download it from this release.
+                    <br />
+                    You should also use it as a reference for the file if you
+                    refer to it in this release.
+                  </span>
                 </label>
                 <input
                   type="text"
+                  id="release-fileupload-name"
                   className="govuk-input govuk-!-width-one-half"
                 />
               </div>
@@ -320,9 +305,18 @@ const PublicationDataPage = () => {
                 />
               </div>
             </fieldset>
+            <p className="govuk-body govuk-!-margin-top-9">
+              Depending on your internet connection speed, files may take some
+              time to upload. Do not close this page until the file has
+              uploaded.
+            </p>
+            <p className="govuk-body">
+              If you close this page while the file is still uploading - the
+              upload will fail.
+            </p>
             <div className="govuk-form-group govuk-!-margin-top-6">
               <button className="govuk-button" type="button">
-                Upload file
+                Upload files
               </button>
             </div>
           </form>
@@ -352,12 +346,18 @@ const PublicationDataPage = () => {
       <div className="govuk-grid-row govuk-!-margin-top-9">
         <div className="govuk-grid-column-one-half ">
           <Link to="/prototypes/publication-create-new-absence-config">
-            Previous step, release setup
+            <span className="govuk-heading-m govuk-!-margin-bottom-0">
+              Previous step
+            </span>
+            Release summary
           </Link>
         </div>
         <div className="govuk-grid-column-one-half dfe-align--right">
           <Link to="/prototypes/publication-create-new-absence-table?status=step1">
-            Next step, build tables
+            <span className="govuk-heading-m govuk-!-margin-bottom-0">
+              Next step
+            </span>
+            Manage tables and charts
           </Link>
         </div>
       </div>
