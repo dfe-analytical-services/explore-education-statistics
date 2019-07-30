@@ -1,6 +1,5 @@
 import {User} from "@admin/services/sign-in/service";
 import React from 'react';
-// import {User} from "@admin/services/PrototypeLoginService";
 import Link from '@admin/components/Link';
 import { format } from 'date-fns';
 import Details from '@common/components/Details';
