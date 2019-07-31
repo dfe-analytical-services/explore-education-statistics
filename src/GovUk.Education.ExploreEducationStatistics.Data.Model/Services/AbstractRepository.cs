@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -84,6 +86,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .OrderByDescending(expression)
                 .Select(expression)
                 .FirstOrDefault();
+        }
+        
+        protected static SqlParameter CreateIdListType(string parameterName, IEnumerable<long> values)
+        {
+            return CreateListType(parameterName, values.AsIdListTable(), "dbo.IdListIntegerType");
+        }
+
+        protected static SqlParameter CreateIdListType(string parameterName, IEnumerable<string> values)
+        {
+            return CreateListType(parameterName, values.AsIdListTable(), "dbo.IdListVarcharType");
+        }
+        
+        protected static SqlParameter CreateListType(string parameterName, object value, string typeName)
+        {
+            return new SqlParameter(parameterName, value)
+            {
+                SqlDbType = SqlDbType.Structured,
+                TypeName = typeName
+            };
         }
     }
 }
