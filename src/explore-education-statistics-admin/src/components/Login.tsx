@@ -1,5 +1,5 @@
+import { Authentication } from '@admin/services/sign-in/service';
 import * as React from 'react';
-import { Authentication } from '@admin/services/PrototypeLoginService';
 
 export const LoginContext = React.createContext<Authentication>({
   user: {

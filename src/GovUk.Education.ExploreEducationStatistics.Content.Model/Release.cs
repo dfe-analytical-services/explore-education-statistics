@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     {
         public Guid Id { get; set; }
 
-        public string Title => TimeIdentifierTitle + (IsNullOrEmpty(YearTitle) ? "" : " " + YearTitle);
+        public string Title => CoverageTitle + (IsNullOrEmpty(YearTitle) ? "" : " " + YearTitle);
         
         public string YearTitle
         {
@@ -38,9 +38,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
                 return IsNullOrEmpty(ReleaseName) ? "" : ReleaseName;
             }
         }
-
-
-        public string TimeIdentifierTitle => TimePeriodCoverage.GetEnumLabel(); 
+        
+        public string CoverageTitle => TimePeriodCoverage.GetEnumLabel(); 
         
         private string _releaseName;
 
