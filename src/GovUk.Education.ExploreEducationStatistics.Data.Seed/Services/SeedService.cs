@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Seed.Extensions;
@@ -18,18 +17,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
     public class SeedService : ISeedService
     {
         private readonly ILogger _logger;
-        private readonly IMapper _mapper;
         private readonly string _storageConnectionString;
         private readonly IFileStorageService _fileStorageService;
         
         public SeedService(
             ILogger<SeedService> logger,
-            IMapper mapper,
             IConfiguration config,
             IFileStorageService fileStorageService)
         {
             _logger = logger;
-            _mapper = mapper;
             _storageConnectionString = config.GetConnectionString("CoreStorage");
             _fileStorageService = fileStorageService;
         }
@@ -93,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
                                 var file = SamplePublications.SubjectFiles.GetValueOrDefault(subject.Id);
 
                                 StoreFiles(r, file, subject.Name);
-                                Seed(file.ToString() + ".csv", r);
+                                Seed(file + ".csv", r);
                             }   
                         }
                     } 
@@ -121,12 +117,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
 
         private CloudQueueMessage BuildMessage(string dataFileName, Release release)
         {
-
-            var importMessageRelease = _mapper.Map<Release>(release);
+            //var importMessageRelease = _mapper.Map<Release>(release);
             var message = new ImportMessage
             {
                 DataFileName = dataFileName,
-                Release = importMessageRelease,
+                Release = release,
                 BatchNo = 1,
                 BatchSize = 1
             };
@@ -136,8 +131,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
 
         private void StoreFiles(Release release, DataCsvFile file, string subjectName)
         {
-            var dataFile = CreateFormFile(file.GetCsvLines(), file.ToString() + ".csv", "file");
-            var metaFile = CreateFormFile(file.GetMetaCsvLines(), file.ToString() + ".meta.csv", "metaFile");
+            var dataFile = CreateFormFile(file.GetCsvLines(), file + ".csv", "file");
+            var metaFile = CreateFormFile(file.GetMetaCsvLines(), file + ".meta.csv", "metaFile");
 
             _fileStorageService.UploadFilesAsync(release.Publication.Slug, release.Slug, dataFile, metaFile, subjectName).Wait();
         }
@@ -161,8 +156,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
             };
             return f;
         }
-    
-        
+
         class ImportMessage
         {
             public string DataFileName { get; set; }

@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -46,19 +45,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 return schoolOut;
             }
             
-            school = CreateSchool(school);
+            school = _context.School
+                     .FirstOrDefault(s => s.LaEstab == school.LaEstab) ?? _context.School.Add(school).Entity;
       
             _cache.Set(cacheKey, school);
             
             return school;
-        }
-
-        private School CreateSchool(School school)
-        {
-            var sch = _context.School
-                      .FirstOrDefault(s => s.LaEstab == school.LaEstab) ?? _context.School.Add(school).Entity;
-
-            return sch;
         }
 
         private static string GetSchoolCacheKey(string laEstab)

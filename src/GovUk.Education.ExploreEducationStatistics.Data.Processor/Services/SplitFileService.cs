@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
         }
         
-        private List<IFormFile> SplitFile(ImportMessage message, IEnumerable<string> csvLines)
+        private static List<IFormFile> SplitFile(ImportMessage message, IEnumerable<string> csvLines)
         {
             var files = new List<IFormFile>();    
             var header = csvLines.First();

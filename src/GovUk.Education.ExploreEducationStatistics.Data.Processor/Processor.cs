@@ -61,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
 
                     _importerService.ImportMeta(subjectData.GetMetaLines().ToList(), subject);
                     
-                    _fileImportService.ImportFilters(message);
+                    _fileImportService.ImportFiltersLocationsAndSchools(message);
 
                     _context.SaveChanges();
                 }
@@ -88,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             {
                 logger.LogInformation($"{GetType().Name} function STARTED for : Batch: {message.BatchNo} of {message.BatchSize} with Datafile: {message.DataFileName}");
                 
-                _fileImportService.ImportFiles(message);
+                _fileImportService.ImportObservations(message);
 
                 // If the batch size is > 1 i.e. The file was split into batches
                 // then delete each split batch processed

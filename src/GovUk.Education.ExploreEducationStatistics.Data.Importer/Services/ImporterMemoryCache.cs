@@ -9,12 +9,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
     
         public ImporterMemoryCache()
         {
-            /*
-            Cache = new MemoryCache(new MemoryCacheOptions
-            {
-                SizeLimit = 1024
-            });
-            */
             Cache = new MemoryCache(new MemoryCacheOptions());
         }
     }

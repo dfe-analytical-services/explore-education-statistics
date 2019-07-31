@@ -4,8 +4,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
 {
     public interface IFileImportService
     {
-        void ImportFiles(ImportMessage message);
+        void ImportObservations(ImportMessage message);
 
-        void ImportFilters(ImportMessage message);
+        void ImportFiltersLocationsAndSchools(ImportMessage message);
     }
 }

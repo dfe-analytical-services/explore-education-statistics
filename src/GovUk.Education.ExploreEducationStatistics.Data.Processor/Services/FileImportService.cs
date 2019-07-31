@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _importerService = importerService;
         }
 
-        public void ImportFiles(ImportMessage message)
+        public void ImportObservations(ImportMessage message)
         {
             var subjectData = _fileStorageService.GetSubjectData(message).Result;
             var batch = subjectData.GetCsvLines().ToList();
@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 _importerService.GetMeta(metaLines, subject));
         }
         
-        public void ImportFilters(ImportMessage message)
+        public void ImportFiltersLocationsAndSchools(ImportMessage message)
         {
             var subjectData = _fileStorageService.GetSubjectData(message).Result;
             var batch = subjectData.GetCsvLines().ToList();

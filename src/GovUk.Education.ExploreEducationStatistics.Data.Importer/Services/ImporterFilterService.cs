@@ -1,7 +1,7 @@
-using System;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
@@ -36,23 +36,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 return filterItem;
             }
             
-            filterItem = CreateFilterItem(filterGroup, label);
-      
+            filterItem = _context.FilterItem.Include(f => f.FilterGroup)
+                         .FirstOrDefault(fi => fi.FilterGroupId == filterGroup.Id && fi.Label == label) 
+                         ??_context.FilterItem.Add(new FilterItem(label, filterGroup)).Entity;
+
             _cache.Set(cacheKey, filterItem);
             
-            return filterItem;
-        }
-
-        private FilterItem CreateFilterItem(FilterGroup filterGroup, string label)
-        {
-            var filterItem = _context.FilterItem
-                .FirstOrDefault(fi => fi.FilterGroupId == filterGroup.Id && fi.Label == label);
-            
-            if (filterItem == null)
-            {
-                filterItem = _context.FilterItem.Add(new FilterItem(label, filterGroup)).Entity;
-            }
-
             return filterItem;
         }
 
@@ -69,32 +58,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 return filterGroup;
             }
             
-            filterGroup = CreateFilterGroup(filter, label);
- 
+            filterGroup = _context.FilterGroup
+                          .FirstOrDefault(fg => fg.FilterId == filter.Id && fg.Label == label) 
+                          ?? _context.FilterGroup.Add(new FilterGroup(filter, label)).Entity;
+
             _cache.Set(cacheKey, filterGroup);
             
             return filterGroup;
-        }
-
-        private FilterGroup CreateFilterGroup(Filter filter, string label)
-        {
-            try
-            {
-                var filterGroup = _context.FilterGroup
-                                  .FirstOrDefault(fg => fg.FilterId == filter.Id && fg.Label == label) ?? _context.FilterGroup.Add(new FilterGroup(filter, label)).Entity;
-
-                if (filterGroup == null)
-                {
-                    filterGroup = _context.FilterGroup.Add(new FilterGroup(filter, label)).Entity;
-                }
-                
-                return filterGroup;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
         }
 
         private static string GetFilterGroupCacheKey(Filter filter, string filterGroupLabel)
