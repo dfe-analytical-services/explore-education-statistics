@@ -2,12 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using Assert = Xunit.Assert;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
@@ -27,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var context = InMemoryApplicationDbContext("Create"))
             {
                 // Service method under test
-                var result = new PublicationService(context).CreatePublication(new CreatePublicationViewModel()
+                var result = new PublicationService(context, MapperForProfile<MappingProfiles>()).CreatePublication(new CreatePublicationViewModel()
                 {
                     Title = "Publication Title",
                     ContactId = new Guid("1ad5f3dc-20f2-4baf-b715-8dd31ba58942"),
@@ -63,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var context = InMemoryApplicationDbContext("CreatePublication"))
             {
                 // Service method under test
-                var result = new PublicationService(context).CreatePublication(new CreatePublicationViewModel()
+                var result = new PublicationService(context, MapperForProfile<MappingProfiles>()).CreatePublication(new CreatePublicationViewModel()
                 {
                     Title = "Publication Title",
                     ContactId = new Guid("cd6c265b-7fbc-4c15-ab36-7c3e0ea216d5"),
@@ -92,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             using (var context = InMemoryApplicationDbContext("Create"))
             {
-                var result = new PublicationService(context).CreatePublication(
+                var result = new PublicationService(context, MapperForProfile<MappingProfiles>()).CreatePublication(
                     new CreatePublicationViewModel
                     {
                         Title = titleToBeDuplicated
@@ -103,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var context = InMemoryApplicationDbContext("Create"))
             {
                 // Service method under test
-                var result = new PublicationService(context).CreatePublication(
+                var result = new PublicationService(context, MapperForProfile<MappingProfiles>()).CreatePublication(
                     new CreatePublicationViewModel()
                     {
                         Title = titleToBeDuplicated,

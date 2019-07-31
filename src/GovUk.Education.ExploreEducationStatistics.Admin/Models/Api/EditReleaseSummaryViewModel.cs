@@ -8,16 +8,17 @@ using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 {
-    public class CreateReleaseViewModel
+    public class EditReleaseViewModel
     {
-        public Guid PublicationId { get; set; }
-
-        [Required]
-        public Guid ReleaseTypeId { get; set; }
+        
+        public Guid Id { get; set; }
         
         [Required]
+        public Guid? ReleaseTypeId { get; set; }
+        
         [JsonConverter(typeof(TimeIdentifierJsonConverter))]
-        public TimeIdentifier TimePeriodCoverage { get; set; }
+        [Required]
+        public TimeIdentifier? TimePeriodCoverage { get; set; }
         
         public DateTime? PublishScheduled { get; set; }
         
@@ -26,7 +27,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
      
         [RegularExpression(@"^([0-9]{4})?$")]
         public string ReleaseName { get; set; }
-
-        public Guid? TemplateReleaseId { get; set; }
     }
 }

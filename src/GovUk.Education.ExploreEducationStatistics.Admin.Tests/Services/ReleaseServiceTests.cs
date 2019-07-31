@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -26,12 +28,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             using (var context = InMemoryApplicationDbContext("Create"))
             {
-                // Service method under test
-                var result = new ReleaseService(context).CreateReleaseAsync(new CreateReleaseViewModel
+                var result = new ReleaseService(context, MapperForProfile<MappingProfiles>()).CreateReleaseAsync(new CreateReleaseViewModel
                 {
                     PublicationId = new Guid("24fcd99c-0508-4437-91c4-90c777414ab9"),
                     ReleaseName = "2018",
-                    TimeIdentifier = TimeIdentifier.AcademicYear,
+                    TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     PublishScheduled = DateTime.Parse("2050/01/01"),
                     ReleaseTypeId = new Guid("02e664f2-a4bc-43ee-8ff0-c87354adae72")
                 });
@@ -94,12 +95,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var context = InMemoryApplicationDbContext("Create"))
             {
                 // Service method under test
-                var result = new ReleaseService(context).CreateReleaseAsync(new CreateReleaseViewModel
+                var result = new ReleaseService(context, MapperForProfile<MappingProfiles>()).CreateReleaseAsync(new CreateReleaseViewModel
                 {
                     PublicationId = new Guid("403d3c5d-a8cd-4d54-a029-0c74c86c55b2"),
                     TemplateReleaseId = new Guid("26f17bad-fc48-4496-9387-d6e5b2cb0e7f"),
                     ReleaseName = "2018",
-                    TimeIdentifier = TimeIdentifier.AcademicYear,
+                    TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     PublishScheduled = DateTime.Parse("2050/01/01"),
                     ReleaseTypeId = new Guid("2a0217ca-c514-45da-a8b3-44c68a6737e8")
                 });
@@ -116,6 +117,52 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Template heading index 1", release.Content[1].Heading);
                 Assert.Equal(1, release.Content[1].Order);
                 Assert.Null(release.Content[1].Content);// TODO currently is not copied - should it be?
+            }
+        }
+        
+        
+        [Fact]
+        public async void LatestReleaseCorrectlyReported()
+        {
+
+            var latestReleaseId = new Guid("274d4621-7d21-431b-80de-77b62a4374d2");
+            var notLatestReleaseId = new Guid("49b73c2f-141a-4dc7-a2d4-69316aef8bbc");
+            using (var context = InMemoryApplicationDbContext("LatestReleaseCorrectlyReported"))
+            {
+                context.Add(new Publication
+                    {
+                        Id = new Guid("24fcd99c-0508-4437-91c4-90c777414ab9"), 
+                        Title = "Publication",
+                        Releases = new List<Release>
+                        {
+                            new Release
+                            {
+                                Id = notLatestReleaseId,
+                                Order = 0,
+                                Published = DateTime.Now.AddDays(-2)// Is published but not the latest by order
+                                
+                            },
+                            new Release 
+                            {
+                            Id = latestReleaseId,
+                            Order = 1,
+                            Published = DateTime.Now.AddDays(-1) // Is published and the the latest by order
+                        }
+                        }
+                    });
+                
+                context.SaveChanges();
+            }
+
+            using (var context = InMemoryApplicationDbContext("LatestReleaseCorrectlyReported"))
+            {
+                // Method under test
+                var latest = await new ReleaseService(context, MapperForProfile<MappingProfiles>()).GetViewModel(latestReleaseId);
+                Assert.True(latest.LatestRelease);
+                
+                // Method under test
+                var notLatest = await new ReleaseService(context, MapperForProfile<MappingProfiles>()).GetViewModel(notLatestReleaseId);
+                Assert.False(notLatest.LatestRelease);
             }
         }
     }
