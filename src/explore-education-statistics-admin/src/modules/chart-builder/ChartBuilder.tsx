@@ -15,7 +15,7 @@ import TabsSection from '@common/components/TabsSection';
 import ChartRenderer, {
   ChartRendererProps,
 } from '@common/modules/find-statistics/components/ChartRenderer';
-import { ChartDefinition } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import { ChartDefinition, AxesConfiguration } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import HorizontalBarBlock from '@common/modules/find-statistics/components/charts/HorizontalBarBlock';
 import LineChartBlock from '@common/modules/find-statistics/components/charts/LineChartBlock';
 import MapBlock from '@common/modules/find-statistics/components/charts/MapBlock';
@@ -148,21 +148,16 @@ const ChartBuilder = ({ data }: Props) => {
 
         meta: data.metaData,
 
-        axes: Object.entries(axesConfiguration).reduce<
-          Dictionary<AxisConfiguration>
-        >(
-          (populatedData, [key, value]) => ({
-            ...populatedData,
-            [key]: {
-              ...value,
-              dataSets:
-                value.type === 'major'
-                  ? dataSetAndConfiguration.map(dsc => dsc.dataSet)
-                  : [],
-            },
-          }),
-          {},
-        ),
+        axes: {
+          major: {
+            ...axesConfiguration.major,
+            dataSets: dataSetAndConfiguration.map(dsc => dsc.dataSet)
+          },
+          minor: {
+            ...axesConfiguration.minor,
+            dataSets: []
+          }
+        },
         labels: {
           ...dataSetAndConfiguration.reduce<Dictionary<DataSetConfiguration>>(
             (mapped, { configuration }) => ({

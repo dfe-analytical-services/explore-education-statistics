@@ -25,7 +25,7 @@ const PrototypeChartTest = () => {
     <PrototypePage wide>
       <ChartBuilder data={data} />
 
-      <ChartRenderer type="horizontalbar" {...newChartData} />
+      <ChartRenderer type="line" {...newChartData} />
     </PrototypePage>
   );
 };
