@@ -1,16 +1,6 @@
-export interface User {
-  id: string;
-  name: string;
-  permissions: string[];
-}
+import { User } from '@admin/services/sign-in/service';
 
-export interface Authentication {
-  user?: User;
-}
-
-export class PrototypeLoginService {
-  private static currentUser: User;
-
+export default class PrototypeLoginService {
   private static USERS: User[] = [
     {
       id: '4add7621-4aef-4abc-b2e6-0938b37fe5b9',
@@ -62,9 +52,5 @@ export class PrototypeLoginService {
       window.localStorage.getItem('userId') ||
         '4add7621-4aef-4abc-b2e6-0938b37fe5b9',
     );
-  }
-
-  public static getNoLoggedInUser() {
-    return {};
   }
 }

@@ -29,8 +29,14 @@ const PublicationPage = () => {
           }}
           options={[
             {
+              id: 'first-draft',
+              label: 'First draft',
+              value: 'first-draft',
+            },
+
+            {
               id: 'approve-release',
-              label: 'Approve for final sign-off',
+              label: 'Final sign-off',
               value: 'approve-release',
               conditional: (
                 <FormGroup>
@@ -48,7 +54,7 @@ const PublicationPage = () => {
 
             {
               id: 'question',
-              label: 'In review - add comments and questions',
+              label: 'In review',
               value: 'question',
               conditional: (
                 <FormGroup>

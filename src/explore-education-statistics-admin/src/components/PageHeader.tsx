@@ -1,8 +1,8 @@
+import { Authentication } from '@admin/services/sign-in/service';
 import classNames from 'classnames';
 import logo from 'govuk-frontend/assets/images/govuk-logotype-crown.png';
 import React from 'react';
 import { LoginContext } from '@admin/components/Login';
-import { Authentication } from '@admin/services/PrototypeLoginService';
 
 interface Props {
   wide?: boolean;
@@ -94,7 +94,7 @@ const LoggedInLinks = ({ user }: Authentication) => (
       </a>
     </li>
     <li className="govuk-header__navigation-item">
-      <a className="govuk-header__link" href="#">
+      <a className="govuk-header__link" href="/api/signout">
         Sign out
       </a>
     </li>

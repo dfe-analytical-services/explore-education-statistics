@@ -14,6 +14,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 
         public string ReleaseName { get; set; }
         
+        public string CoverageTitle { get; set; }
+        
+        public string YearTitle { get; set; }
+        
         public DateTime? Published { get; set; }
 
         public TimeIdentifier TimePeriodCoverage { get; set; }

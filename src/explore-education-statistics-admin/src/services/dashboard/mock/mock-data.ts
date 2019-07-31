@@ -3,7 +3,8 @@ import {
   ReleaseApprovalStatus,
   ThemeAndTopics,
 } from '@admin/services/dashboard/types';
-import { PrototypeLoginService } from '@admin/services/PrototypeLoginService';
+import PrototypeLoginService from '@admin/services/PrototypeLoginService';
+import { Dictionary } from '@common/types';
 
 const themesAndTopics: ThemeAndTopics[] = [
   {
@@ -218,55 +219,59 @@ const themesAndTopics: ThemeAndTopics[] = [
   },
 ];
 
-const dashboardPublications: AdminDashboardPublication[] = [
-  {
-    id: 'publication-1',
-    title: 'Pupil absence statistics and data for schools in England',
-    methodology: {
-      id: 'methodology-1',
-      label: 'A guide to absence statistics',
-    },
-    contact: {
-      contactName: 'John Smith',
-      contactTelNo: '07654 653763',
-      teamEmail: 'js@example.com',
-    },
-    releases: [
-      {
-        id: 'my-publication-1-release-1',
-        releaseName: '2017-2018',
-        timePeriodCoverage: {
-          id: 'AYQ1Q4',
-          label: 'Academic year',
-        },
-        status: ReleaseApprovalStatus.Approved,
-        latestRelease: true,
-        live: true,
-        publishScheduled: {
-          day: 20,
-          month: 9,
-          year: 2020,
-        },
-        nextReleaseExpectedDate: {
-          day: 20,
-          month: 9,
-          year: 2021,
-        },
-        contact: {
-          contactName: 'John Smith',
-          contactTelNo: '07654 653763',
-          teamEmail: 'js@example.com',
-        },
-        lastEditedDateTime: '2019-09-20 09:30',
-        lastEditedUser: PrototypeLoginService.getUser(
-          '4add7621-4aef-4abc-b2e6-0938b37fe5b9',
-        ),
+const dashboardPublicationsByTopicId: Dictionary<
+  AdminDashboardPublication[]
+> = {
+  '67c249de-1cca-446e-8ccb-dcdac542f460': [
+    {
+      id: 'publication-1',
+      title: 'Pupil absence statistics and data for schools in England',
+      methodology: {
+        id: 'methodology-1',
+        label: 'A guide to absence statistics',
       },
-    ],
-  },
-];
+      contact: {
+        contactName: 'John Smith',
+        contactTelNo: '07654 653763',
+        teamEmail: 'js@example.com',
+      },
+      releases: [
+        {
+          id: 'my-publication-1-release-1',
+          releaseName: '2017-2018',
+          timePeriodCoverage: {
+            id: 'AYQ1Q4',
+            label: 'Academic year',
+          },
+          status: ReleaseApprovalStatus.Approved,
+          latestRelease: true,
+          live: true,
+          publishScheduled: {
+            day: 20,
+            month: 9,
+            year: 2020,
+          },
+          nextReleaseExpectedDate: {
+            day: 20,
+            month: 9,
+            year: 2021,
+          },
+          contact: {
+            contactName: 'John Smith',
+            contactTelNo: '07654 653763',
+            teamEmail: 'js@example.com',
+          },
+          lastEditedDateTime: '2019-09-20 09:30',
+          lastEditedUser: PrototypeLoginService.getUser(
+            '4add7621-4aef-4abc-b2e6-0938b37fe5b9',
+          ),
+        },
+      ],
+    },
+  ],
+};
 
 export default {
   themesAndTopics,
-  dashboardPublications,
+  dashboardPublicationsByTopicId,
 };

@@ -25,7 +25,8 @@ const PublicationDataPage = () => {
       <Tabs id="dataUploadTab">
         <TabsSection id="data-upload" title="Data uploads">
           <div className="govuk-body">
-            Users will be able to download this data from this release.
+            This data will be used to create your data blocks and users will be
+            able to download this data from this release.
           </div>
 
           <div className="govuk-table">

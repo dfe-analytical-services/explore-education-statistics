@@ -2,7 +2,6 @@ import React from 'react';
 import { PrototypeTable } from '@admin/pages/prototypes/PrototypeData';
 
 const PrototypeTableContent = ({
-  task,
   table,
 }: {
   task?: string;
