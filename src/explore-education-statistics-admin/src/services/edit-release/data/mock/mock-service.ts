@@ -1,12 +1,10 @@
 import { EditReleaseService } from '@admin/services/edit-release/data/service';
-import getCaptureGroups from '@admin/services/util/mock/mock-service';
+import {
+  generateRandomInteger,
+  generateRandomIntegerString,
+  getCaptureGroups,
+} from '@admin/services/util/mock/mock-service';
 import MockAdapter from 'axios-mock-adapter';
-
-const generateRandomInteger = (max: number) =>
-  Math.floor(Math.random() * Math.floor(max));
-
-const generateRandomIntegerString = (max: number) =>
-  generateRandomInteger(max).toString();
 
 export default async (mock: MockAdapter) => {
   const mockData = (await import(

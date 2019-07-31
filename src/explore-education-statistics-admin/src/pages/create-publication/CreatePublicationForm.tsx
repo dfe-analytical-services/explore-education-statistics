@@ -66,7 +66,7 @@ const CreatePublicationForm = ({
           otherwise: Yup.string(),
         }),
       })}
-      onSubmit={async (values: FormValues) => {
+      onSubmit={(values: FormValues) => {
         const valuesToStore: FormValues = {
           ...values,
           selectedMethodologyId:

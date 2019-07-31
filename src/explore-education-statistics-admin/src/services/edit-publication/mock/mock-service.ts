@@ -1,5 +1,8 @@
 import { PublicationService } from '@admin/services/edit-publication/service';
-import getCaptureGroups from '@admin/services/util/mock/mock-service';
+import {
+  getCaptureGroups,
+  generateRandomIntegerString,
+} from '@admin/services/util/mock/mock-service';
 import MockAdapter from 'axios-mock-adapter';
 
 export default async (mock: MockAdapter) => {
@@ -44,7 +47,7 @@ export default async (mock: MockAdapter) => {
     );
 
     const newPublication = {
-      id: '1234',
+      id: generateRandomIntegerString(1000000),
       title: request.title,
       methodology: selectedMethodology,
       contact: selectedContact,
