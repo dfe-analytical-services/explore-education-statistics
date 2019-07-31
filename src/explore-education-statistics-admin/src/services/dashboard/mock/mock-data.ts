@@ -228,7 +228,7 @@ const dashboardPublicationsByTopicId: Dictionary<
       title: 'Pupil absence statistics and data for schools in England',
       methodology: {
         id: 'methodology-1',
-        label: 'A guide to absence statistics',
+        title: 'A guide to absence statistics',
       },
       contact: {
         id: 'contact-1',
@@ -242,7 +242,7 @@ const dashboardPublicationsByTopicId: Dictionary<
           releaseName: '2017-2018',
           timePeriodCoverage: {
             id: 'AYQ1Q4',
-            label: 'Academic year',
+            title: 'Academic year',
           },
           status: ReleaseApprovalStatus.Approved,
           latestRelease: true,

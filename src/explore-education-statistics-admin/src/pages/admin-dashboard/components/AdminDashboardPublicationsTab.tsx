@@ -3,15 +3,15 @@ import FormSelect from '@common/components/form/FormSelect';
 import React from 'react';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
-import { IdLabelPair } from '@admin/services/common/types';
+import { IdTitlePair } from '@admin/services/common/types';
 import Link from '@admin/components/Link';
 import AdminDashboardPublicationSummary from './AdminDashboardPublicationSummary';
 
 interface AdminDashboardPublicationsTabProps {
   publications: AdminDashboardPublication[];
   noResultsMessage: string;
-  themes: IdLabelPair[];
-  topics: IdLabelPair[];
+  themes: IdTitlePair[];
+  topics: IdTitlePair[];
   selectedThemeId: string;
   selectedTopicId: string;
   onThemeChange: (selectedThemeId: string) => void;
@@ -36,7 +36,7 @@ const AdminDashboardPublicationsTab = ({
   return (
     <section>
       <h2 className="govuk-heading-l govuk-!-margin-bottom-0">
-        {`${selectedTheme.label}, ${selectedTopic.label}`}
+        {`${selectedTheme.title}, ${selectedTopic.title}`}
       </h2>
       <p className="govuk-body">
         Edit an existing release or create a new release for current
@@ -49,7 +49,7 @@ const AdminDashboardPublicationsTab = ({
             label="Select theme"
             name="selectTheme"
             options={themes.map(theme => ({
-              label: theme.label,
+              label: theme.title,
               value: theme.id,
             }))}
             value={selectedThemeId}
@@ -64,7 +64,7 @@ const AdminDashboardPublicationsTab = ({
             label="Select topic"
             name="selectTopic"
             options={topics.map(topic => ({
-              label: topic.label,
+              label: topic.title,
               value: topic.id,
             }))}
             value={selectedTopicId}

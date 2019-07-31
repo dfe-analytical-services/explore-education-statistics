@@ -2,7 +2,7 @@ import ReleasePageTemplate from '@admin/pages/edit-release/components/ReleasePag
 import ReleaseDataUploadsSection from '@admin/pages/edit-release/data/ReleaseDataUploadsSection';
 import ReleaseFileUploadsSection from '@admin/pages/edit-release/data/ReleaseFileUploadsSection';
 import service from '@admin/services/common/service';
-import { IdLabelPair } from '@admin/services/common/types';
+import { IdTitlePair } from '@admin/services/common/types';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import React, { useEffect, useState } from 'react';
@@ -14,7 +14,7 @@ interface MatchProps {
 
 const ReleaseDataPage = ({ match }: RouteComponentProps<MatchProps>) => {
   const { releaseId } = match.params;
-  const [publicationDetails, setPublicationDetails] = useState<IdLabelPair>();
+  const [publicationDetails, setPublicationDetails] = useState<IdTitlePair>();
 
   useEffect(() => {
     service
@@ -26,7 +26,7 @@ const ReleaseDataPage = ({ match }: RouteComponentProps<MatchProps>) => {
     <>
       {publicationDetails && (
         <ReleasePageTemplate
-          publicationTitle={publicationDetails.label}
+          publicationTitle={publicationDetails.title}
           releaseId={releaseId}
         >
           <h3>Data uploads</h3>

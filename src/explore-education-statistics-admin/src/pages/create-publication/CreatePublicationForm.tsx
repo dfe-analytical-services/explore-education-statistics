@@ -1,5 +1,5 @@
 import Link from '@admin/components/Link';
-import { ContactDetails, IdLabelPair } from '@admin/services/common/types';
+import { ContactDetails, IdTitlePair } from '@admin/services/common/types';
 import Button from '@common/components/Button';
 import { Form, FormFieldset, Formik } from '@common/components/form';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
@@ -20,7 +20,7 @@ interface FormValues {
 
 interface Props {
   contacts: ContactDetails[];
-  methodologies: IdLabelPair[];
+  methodologies: IdTitlePair[];
   currentValues?: FormValues;
   onSubmitHandler: (values: FormValues) => void;
   onCancelHandler: () => void;
@@ -105,7 +105,7 @@ const CreatePublicationForm = ({
                 name="selectedMethodologyId"
                 label="Select methodology"
                 options={methodologies.map(methodology => ({
-                  label: methodology.label,
+                  label: methodology.title,
                   value: methodology.id,
                 }))}
               />

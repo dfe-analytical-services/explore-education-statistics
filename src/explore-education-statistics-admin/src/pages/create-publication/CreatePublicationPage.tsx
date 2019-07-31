@@ -1,7 +1,7 @@
 import Page from '@admin/components/Page';
 import CreatePublicationForm from '@admin/pages/create-publication/CreatePublicationForm';
 import CreatePublicationSummary from '@admin/pages/create-publication/CreatePublicationSummary';
-import { ContactDetails, IdLabelPair } from '@admin/services/common/types';
+import { ContactDetails, IdTitlePair } from '@admin/services/common/types';
 import service from '@admin/services/edit-publication/service';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
@@ -23,7 +23,7 @@ const CreatePublicationPage = ({
 }: RouteComponentProps<MatchProps>) => {
   const { topicId } = match.params;
 
-  const [methodologies, setMethodologies] = useState<IdLabelPair[]>();
+  const [methodologies, setMethodologies] = useState<IdTitlePair[]>();
   const [contacts, setContacts] = useState<ContactDetails[]>();
   const [confirmationView, setConfirmationView] = useState(false);
   const [currentValues, setCurrentValues] = useState<FormValues>();

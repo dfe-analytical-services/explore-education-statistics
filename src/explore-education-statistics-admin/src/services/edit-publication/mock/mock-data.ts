@@ -1,21 +1,21 @@
-import { ContactDetails, IdLabelPair } from '@admin/services/common/types';
+import { ContactDetails, IdTitlePair } from '@admin/services/common/types';
 
-const methodologies: IdLabelPair[] = [
+const methodologies: IdTitlePair[] = [
   {
     id: 'methodology-1',
-    label: 'A guide to absence statistics',
+    title: 'A guide to absence statistics',
   },
   {
     id: 'methodology-2',
-    label: 'Children missing education',
+    title: 'Children missing education',
   },
   {
     id: 'methodology-3',
-    label: 'School attendance',
+    title: 'School attendance',
   },
   {
     id: 'methodology-4',
-    label: 'School attendance parental responsibility measures',
+    title: 'School attendance parental responsibility measures',
   },
 ];
 

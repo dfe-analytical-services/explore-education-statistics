@@ -1,9 +1,9 @@
 import { ReleaseApprovalStatus } from '@admin/services/dashboard/types';
 import { User } from '@admin/services/sign-in/types';
 
-export interface IdLabelPair {
+export interface IdTitlePair {
   id: string;
-  label: string;
+  title: string;
 }
 
 export interface ContactDetails {
@@ -22,7 +22,7 @@ export interface UserDetails {
 export interface Topic {
   id: string;
   title: string;
-  theme: IdLabelPair;
+  theme: IdTitlePair;
 }
 
 export interface TimePeriodCoverage {
@@ -60,7 +60,7 @@ export interface Release {
   timePeriodCoverage: TimePeriodCoverage;
   scheduledPublishDate: DayMonthYearValues;
   nextReleaseExpectedDate: Date;
-  releaseType: IdLabelPair;
+  releaseType: IdTitlePair;
   slug: string;
   status: ReleaseStatus;
   lead: ContactDetails;
@@ -86,7 +86,7 @@ export interface Publication {
   legacyReleases: LegacyRelease[];
   topic: Topic;
   contact: ContactDetails;
-  methodology: IdLabelPair;
+  methodology: IdTitlePair;
   owner: User;
 }
 

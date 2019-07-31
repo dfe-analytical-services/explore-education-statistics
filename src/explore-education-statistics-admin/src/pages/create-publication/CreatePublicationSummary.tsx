@@ -1,5 +1,5 @@
 import Link from '@admin/components/Link';
-import { ContactDetails, IdLabelPair } from '@admin/services/common/types';
+import { ContactDetails, IdTitlePair } from '@admin/services/common/types';
 import Button from '@common/components/Button';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -14,7 +14,7 @@ interface FormValues {
 
 interface Props {
   contacts: ContactDetails[];
-  methodologies: IdLabelPair[];
+  methodologies: IdTitlePair[];
   values: FormValues;
   onEditHandler: () => void;
   onConfirmHandler: (values: FormValues) => void;
@@ -45,7 +45,7 @@ const CreatePublicationSummary = ({
         </SummaryListItem>
         <SummaryListItem term="Methodology">
           {values.selectedMethodologyId
-            ? getSelectedMethodology(values.selectedMethodologyId).label
+            ? getSelectedMethodology(values.selectedMethodologyId).title
             : 'Create new methodology'}
         </SummaryListItem>
         <SummaryListItem term="Contact">
