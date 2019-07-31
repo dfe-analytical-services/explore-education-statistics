@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -47,7 +48,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<PublicationViewModel>> CreatePublication(CreatePublicationViewModel publication, Guid topicId)
         {
             publication.TopicId = topicId;
-            return await _publicationService.CreatePublication(publication);
+            var result = await _publicationService.CreatePublication(publication);
+            if (result.IsLeft)
+            {
+                ValidationUtils.AddErrors(ModelState, result.Left);
+                return ValidationProblem();
+            }
+            return result.Right;
         }
     }
 }
