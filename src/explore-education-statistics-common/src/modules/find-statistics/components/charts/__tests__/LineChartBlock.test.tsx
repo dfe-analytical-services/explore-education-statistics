@@ -7,6 +7,7 @@ import {
   DataBlockMetadata,
 } from '@common/services/dataBlockService';
 import LineChartBlock from '../LineChartBlock';
+import { AxesConfiguration } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 
 jest.mock('recharts/lib/util/LogUtils');
 
@@ -197,6 +198,8 @@ describe('LineChartBlock', () => {
             ...props.axes,
             minor: {
               ...props.axes.minor,
+              min: -10,
+              max: 10,
               referenceLines: [
                 {
                   label: 'hello',
@@ -218,13 +221,14 @@ describe('LineChartBlock', () => {
   test('dies gracefully with bad data', () => {
     const invalidData: DataBlockData = (undefined as unknown) as DataBlockData;
     const invalidMeta: DataBlockMetadata = (undefined as unknown) as DataBlockMetadata;
+    const invalidAxes: AxesConfiguration = (undefined as unknown) as AxesConfiguration;
 
     const { container } = render(
       <LineChartBlock
         data={invalidData}
         labels={{}}
         meta={invalidMeta}
-        axes={{}}
+        axes={invalidAxes}
       />,
     );
     expect(container).toHaveTextContent('Unable to render chart');

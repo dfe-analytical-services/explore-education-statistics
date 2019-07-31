@@ -58,8 +58,8 @@ exports[`VerticalBarBlock can stack data 1`] = `
               x1="90"
               x2="900"
               y="0"
-              y1="652.5"
-              y2="652.5"
+              y1="621.4285714285714"
+              y2="621.4285714285714"
             />
             <line
               fill="none"
@@ -71,21 +71,8 @@ exports[`VerticalBarBlock can stack data 1`] = `
               x1="90"
               x2="900"
               y="0"
-              y1="435"
-              y2="435"
-            />
-            <line
-              fill="none"
-              height="870"
-              stroke="#ccc"
-              stroke-dasharray="3 3"
-              width="810"
-              x="90"
-              x1="90"
-              x2="900"
-              y="0"
-              y1="217.5"
-              y2="217.5"
+              y1="372.8571428571429"
+              y2="372.8571428571429"
             />
             <line
               fill="none"
@@ -207,7 +194,7 @@ exports[`VerticalBarBlock can stack data 1`] = `
                   dy="0.355em"
                   x="82"
                 >
-                  -6
+                  -3
                 </tspan>
               </text>
             </g>
@@ -224,8 +211,8 @@ exports[`VerticalBarBlock can stack data 1`] = `
                 x1="84"
                 x2="90"
                 y="0"
-                y1="652.5"
-                y2="652.5"
+                y1="621.4285714285714"
+                y2="621.4285714285714"
               />
               <text
                 class="recharts-text recharts-cartesian-axis-tick-value"
@@ -235,13 +222,13 @@ exports[`VerticalBarBlock can stack data 1`] = `
                 text-anchor="end"
                 width="60"
                 x="82"
-                y="652.5"
+                y="621.4285714285714"
               >
                 <tspan
                   dy="0.355em"
                   x="82"
                 >
-                  0
+                  3
                 </tspan>
               </text>
             </g>
@@ -258,8 +245,8 @@ exports[`VerticalBarBlock can stack data 1`] = `
                 x1="84"
                 x2="90"
                 y="0"
-                y1="435"
-                y2="435"
+                y1="372.8571428571429"
+                y2="372.8571428571429"
               />
               <text
                 class="recharts-text recharts-cartesian-axis-tick-value"
@@ -269,47 +256,13 @@ exports[`VerticalBarBlock can stack data 1`] = `
                 text-anchor="end"
                 width="60"
                 x="82"
-                y="435"
+                y="372.8571428571429"
               >
                 <tspan
                   dy="0.355em"
                   x="82"
                 >
-                  6
-                </tspan>
-              </text>
-            </g>
-            <g
-              class="recharts-layer recharts-cartesian-axis-tick"
-            >
-              <line
-                class="recharts-cartesian-axis-tick-line"
-                fill="none"
-                height="870"
-                stroke="#666"
-                width="60"
-                x="30"
-                x1="84"
-                x2="90"
-                y="0"
-                y1="217.5"
-                y2="217.5"
-              />
-              <text
-                class="recharts-text recharts-cartesian-axis-tick-value"
-                fill="#666"
-                height="870"
-                stroke="none"
-                text-anchor="end"
-                width="60"
-                x="82"
-                y="217.5"
-              >
-                <tspan
-                  dy="0.355em"
-                  x="82"
-                >
-                  12
+                  9
                 </tspan>
               </text>
             </g>
@@ -472,14 +425,14 @@ exports[`VerticalBarBlock can stack data 1`] = `
             >
               <path
                 class="recharts-rectangle"
-                d="M 148.5,543.75 h 308 v 108.75 h -308 Z"
+                d="M 148.5,621.4285714285714 h 308 v 124.28571428571433 h -308 Z"
                 fill="#ff0000"
-                height="108.75"
+                height="124.28571428571433"
                 radius="0"
                 stroke="#ff0000"
                 width="308"
                 x="148.5"
-                y="543.75"
+                y="621.4285714285714"
               />
             </g>
             <g
@@ -487,14 +440,14 @@ exports[`VerticalBarBlock can stack data 1`] = `
             >
               <path
                 class="recharts-rectangle"
-                d="M 533.5,761.25 h 308 v -108.75 h -308 Z"
+                d="M 533.5,870 h 308 v -124.28571428571422 h -308 Z"
                 fill="#ff0000"
-                height="-108.75"
+                height="-124.28571428571422"
                 radius="0"
                 stroke="#ff0000"
                 width="308"
                 x="533.5"
-                y="761.25"
+                y="870"
               />
             </g>
           </g>
@@ -510,14 +463,14 @@ exports[`VerticalBarBlock can stack data 1`] = `
             >
               <path
                 class="recharts-rectangle"
-                d="M 148.5,181.25 h 308 v 362.5 h -308 Z"
+                d="M 148.5,207.14285714285722 h 308 v 414.2857142857142 h -308 Z"
                 fill="#ff0000"
-                height="362.5"
+                height="414.2857142857142"
                 radius="0"
                 stroke="#ff0000"
                 width="308"
                 x="148.5"
-                y="181.25"
+                y="207.14285714285722"
               />
             </g>
             <g
@@ -525,14 +478,14 @@ exports[`VerticalBarBlock can stack data 1`] = `
             >
               <path
                 class="recharts-rectangle"
-                d="M 533.5,616.25 h 308 v 145 h -308 Z"
+                d="M 533.5,704.2857142857143 h 308 v 165.71428571428567 h -308 Z"
                 fill="#ff0000"
-                height="145"
+                height="165.71428571428567"
                 radius="0"
                 stroke="#ff0000"
                 width="308"
                 x="533.5"
-                y="616.25"
+                y="704.2857142857143"
               />
             </g>
           </g>
@@ -548,9 +501,9 @@ exports[`VerticalBarBlock can stack data 1`] = `
             >
               <path
                 class="recharts-rectangle"
-                d="M 148.5,0 h 308 v 181.25 h -308 Z"
+                d="M 148.5,0 h 308 v 207.14285714285722 h -308 Z"
                 fill="#ff0000"
-                height="181.25"
+                height="207.14285714285722"
                 radius="0"
                 stroke="#ff0000"
                 width="308"
@@ -563,14 +516,14 @@ exports[`VerticalBarBlock can stack data 1`] = `
             >
               <path
                 class="recharts-rectangle"
-                d="M 533.5,580 h 308 v 36.25 h -308 Z"
+                d="M 533.5,662.8571428571429 h 308 v 41.428571428571445 h -308 Z"
                 fill="#ff0000"
-                height="36.25"
+                height="41.428571428571445"
                 radius="0"
                 stroke="#ff0000"
                 width="308"
                 x="533.5"
-                y="580"
+                y="662.8571428571429"
               />
             </g>
           </g>
@@ -656,8 +609,8 @@ exports[`VerticalBarBlock renders basic chart correctly 1`] = `
               x1="90"
               x2="900"
               y="10"
-              y1="655"
-              y2="655"
+              y1="605.3846153846154"
+              y2="605.3846153846154"
             />
             <line
               fill="none"
@@ -669,21 +622,8 @@ exports[`VerticalBarBlock renders basic chart correctly 1`] = `
               x1="90"
               x2="900"
               y="10"
-              y1="440"
-              y2="440"
-            />
-            <line
-              fill="none"
-              height="860"
-              stroke="#ccc"
-              stroke-dasharray="3 3"
-              width="810"
-              x="90"
-              x1="90"
-              x2="900"
-              y="10"
-              y1="225"
-              y2="225"
+              y1="340.7692307692307"
+              y2="340.7692307692307"
             />
             <line
               fill="none"
@@ -822,8 +762,8 @@ exports[`VerticalBarBlock renders basic chart correctly 1`] = `
                 x1="84"
                 x2="90"
                 y="10"
-                y1="655"
-                y2="655"
+                y1="605.3846153846154"
+                y2="605.3846153846154"
               />
               <text
                 class="recharts-text recharts-cartesian-axis-tick-value"
@@ -833,13 +773,13 @@ exports[`VerticalBarBlock renders basic chart correctly 1`] = `
                 text-anchor="end"
                 width="60"
                 x="82"
-                y="655"
+                y="605.3846153846154"
               >
                 <tspan
                   dy="0.355em"
                   x="82"
                 >
-                  0
+                  1
                 </tspan>
               </text>
             </g>
@@ -856,8 +796,8 @@ exports[`VerticalBarBlock renders basic chart correctly 1`] = `
                 x1="84"
                 x2="90"
                 y="10"
-                y1="440"
-                y2="440"
+                y1="340.7692307692307"
+                y2="340.7692307692307"
               />
               <text
                 class="recharts-text recharts-cartesian-axis-tick-value"
@@ -867,47 +807,13 @@ exports[`VerticalBarBlock renders basic chart correctly 1`] = `
                 text-anchor="end"
                 width="60"
                 x="82"
-                y="440"
+                y="340.7692307692307"
               >
                 <tspan
                   dy="0.355em"
                   x="82"
                 >
-                  3
-                </tspan>
-              </text>
-            </g>
-            <g
-              class="recharts-layer recharts-cartesian-axis-tick"
-            >
-              <line
-                class="recharts-cartesian-axis-tick-line"
-                fill="none"
-                height="860"
-                stroke="#666"
-                width="60"
-                x="30"
-                x1="84"
-                x2="90"
-                y="10"
-                y1="225"
-                y2="225"
-              />
-              <text
-                class="recharts-text recharts-cartesian-axis-tick-value"
-                fill="#666"
-                height="860"
-                stroke="none"
-                text-anchor="end"
-                width="60"
-                x="82"
-                y="225"
-              >
-                <tspan
-                  dy="0.355em"
-                  x="82"
-                >
-                  6
+                  5
                 </tspan>
               </text>
             </g>
@@ -941,7 +847,7 @@ exports[`VerticalBarBlock renders basic chart correctly 1`] = `
                   dy="0.355em"
                   x="82"
                 >
-                  9
+                  10
                 </tspan>
               </text>
             </g>
@@ -1070,14 +976,14 @@ exports[`VerticalBarBlock renders basic chart correctly 1`] = `
             >
               <path
                 class="recharts-rectangle"
-                d="M 148.5,440 h 100 v 215 h -100 Z"
+                d="M 148.5,473.07692307692304 h 100 v 198.4615384615385 h -100 Z"
                 fill="#ff0000"
-                height="215"
+                height="198.4615384615385"
                 radius="0"
                 stroke="#ff0000"
                 width="100"
                 x="148.5"
-                y="440"
+                y="473.07692307692304"
               />
             </g>
             <g
@@ -1085,9 +991,9 @@ exports[`VerticalBarBlock renders basic chart correctly 1`] = `
             >
               <path
                 class="recharts-rectangle"
-                d="M 533.5,870 h 100 v -215 h -100 Z"
+                d="M 533.5,870 h 100 v -198.46153846153845 h -100 Z"
                 fill="#ff0000"
-                height="-215"
+                height="-198.46153846153845"
                 radius="0"
                 stroke="#ff0000"
                 width="100"
@@ -1108,14 +1014,14 @@ exports[`VerticalBarBlock renders basic chart correctly 1`] = `
             >
               <path
                 class="recharts-rectangle"
-                d="M 252.5,-61.66666666666663 h 100 v 716.6666666666666 h -100 Z"
+                d="M 252.5,10 h 100 v 661.5384615384615 h -100 Z"
                 fill="#ff0000"
-                height="716.6666666666666"
+                height="661.5384615384615"
                 radius="0"
                 stroke="#ff0000"
                 width="100"
                 x="252.5"
-                y="-61.66666666666663"
+                y="10"
               />
             </g>
             <g
@@ -1123,14 +1029,14 @@ exports[`VerticalBarBlock renders basic chart correctly 1`] = `
             >
               <path
                 class="recharts-rectangle"
-                d="M 637.5,368.3333333333333 h 100 v 286.6666666666667 h -100 Z"
+                d="M 637.5,406.92307692307696 h 100 v 264.6153846153846 h -100 Z"
                 fill="#ff0000"
-                height="286.6666666666667"
+                height="264.6153846153846"
                 radius="0"
                 stroke="#ff0000"
                 width="100"
                 x="637.5"
-                y="368.3333333333333"
+                y="406.92307692307696"
               />
             </g>
           </g>
@@ -1146,14 +1052,14 @@ exports[`VerticalBarBlock renders basic chart correctly 1`] = `
             >
               <path
                 class="recharts-rectangle"
-                d="M 356.5,296.66666666666674 h 100 v 358.33333333333326 h -100 Z"
+                d="M 356.5,340.7692307692307 h 100 v 330.76923076923083 h -100 Z"
                 fill="#ff0000"
-                height="358.33333333333326"
+                height="330.76923076923083"
                 radius="0"
                 stroke="#ff0000"
                 width="100"
                 x="356.5"
-                y="296.66666666666674"
+                y="340.7692307692307"
               />
             </g>
             <g
@@ -1161,14 +1067,14 @@ exports[`VerticalBarBlock renders basic chart correctly 1`] = `
             >
               <path
                 class="recharts-rectangle"
-                d="M 741.5,583.3333333333334 h 100 v 71.66666666666663 h -100 Z"
+                d="M 741.5,605.3846153846154 h 100 v 66.15384615384619 h -100 Z"
                 fill="#ff0000"
-                height="71.66666666666663"
+                height="66.15384615384619"
                 radius="0"
                 stroke="#ff0000"
                 width="100"
                 x="741.5"
-                y="583.3333333333334"
+                y="605.3846153846154"
               />
             </g>
           </g>

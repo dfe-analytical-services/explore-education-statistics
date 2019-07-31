@@ -5,6 +5,7 @@ import {
   DataBlockData,
   DataBlockMetadata,
 } from '@common/services/dataBlockService';
+import { AxesConfiguration } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import VerticalBarBlock from '../VerticalBarBlock';
 
 import testData from './__data__/testBlockData';
@@ -195,13 +196,14 @@ describe('VerticalBarBlock', () => {
   test('dies gracefully with bad data', () => {
     const invalidData: DataBlockData = (undefined as unknown) as DataBlockData;
     const invalidMeta: DataBlockMetadata = (undefined as unknown) as DataBlockMetadata;
+    const invalidAxes: AxesConfiguration = (undefined as unknown) as AxesConfiguration;
 
     const { container } = render(
       <VerticalBarBlock
         data={invalidData}
         labels={{}}
         meta={invalidMeta}
-        axes={{}}
+        axes={invalidAxes}
       />,
     );
     expect(container).toHaveTextContent('Unable to render chart');

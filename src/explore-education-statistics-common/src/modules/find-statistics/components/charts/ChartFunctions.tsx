@@ -50,11 +50,16 @@ export function parseCondensedTimePeriodRange(
   return [range.substring(0, 4), range.substring(4, 6)].join(separator);
 }
 
+export interface AxesConfiguration {
+  major: AxisConfiguration;
+  minor: AxisConfiguration;
+}
+
 export interface ChartProps {
   data: DataBlockData;
   meta: DataBlockMetadata;
   labels: Dictionary<DataSetConfiguration>;
-  axes: Dictionary<AxisConfiguration>;
+  axes: AxesConfiguration;
   height?: number;
   width?: number;
   legend?: 'none' | 'top' | 'bottom';
@@ -422,3 +427,31 @@ export const conditionallyAdd = (size?: string, add?: number) => {
   }
   return add;
 };
+
+const calculateMinMaxReduce = (
+  { min, max }: { min: number; max: number },
+  next: string,
+) => {
+  const nextValue = parseFloat(next);
+  if (Number.isNaN(nextValue) && Number.isFinite(nextValue))
+    return { min, max };
+
+  return {
+    min: nextValue < min ? nextValue : min,
+    max: nextValue > max ? nextValue : max,
+  };
+};
+
+export function calculateDataRange(chartData: ChartDataB[]) {
+  // removing the 'name' variable from the object and just keeping the rest of the values
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const allValuesInData = chartData.reduce<string[]>(
+    (all, { name, ...values }) => [...all, ...Object.values(values)],
+    [],
+  );
+
+  return allValuesInData.reduce(calculateMinMaxReduce, {
+    min: +Infinity,
+    max: -Infinity,
+  });
+}

@@ -1,4 +1,5 @@
 import {
+  calculateDataRange,
   ChartDataB,
   ChartDefinition,
   conditionallyAdd,
@@ -10,6 +11,7 @@ import {
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import React, { Component } from 'react';
 import {
+  AxisDomain,
   Bar,
   BarChart,
   CartesianGrid,
@@ -74,7 +76,12 @@ export default class VerticalBarBlock extends Component<StackedBarProps> {
       legendHeight,
     } = this.props;
 
-    if (axes.major === undefined || data === undefined || meta === undefined)
+    if (
+      axes === undefined ||
+      axes.major === undefined ||
+      data === undefined ||
+      meta === undefined
+    )
       return <div>Unable to render chart</div>;
 
     const chartData: ChartDataB[] = createDataForAxis(
@@ -84,6 +91,12 @@ export default class VerticalBarBlock extends Component<StackedBarProps> {
     ).map(mapNameToNameLabel(labels, meta.timePeriods, meta.locations));
 
     const keysForChart = getKeysForChart(chartData);
+
+    const { min, max } = calculateDataRange(chartData);
+    const minorAxisDomain: [AxisDomain, AxisDomain] = [
+      axes.minor.min || min,
+      axes.minor.max || max,
+    ];
 
     return (
       <ResponsiveContainer width={width || 900} height={height || 300}>
@@ -112,6 +125,7 @@ export default class VerticalBarBlock extends Component<StackedBarProps> {
                 value: '',
               }}
               scale="auto"
+              domain={minorAxisDomain}
               width={conditionallyAdd(axes.minor && axes.minor.size)}
               interval={
                 axes.minor && !axes.minor.visible

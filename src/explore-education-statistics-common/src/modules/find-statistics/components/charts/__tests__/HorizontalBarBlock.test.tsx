@@ -9,6 +9,7 @@ import {
 import HorzontalBarBlock from '../HorizontalBarBlock';
 
 import testData from './__data__/testBlockData';
+import { AxesConfiguration } from '../ChartFunctions';
 
 jest.mock('recharts/lib/util/LogUtils');
 
@@ -198,13 +199,14 @@ describe('HorzontalBarBlock', () => {
   test('dies gracefully with bad data', () => {
     const invalidData: DataBlockData = (undefined as unknown) as DataBlockData;
     const invalidMeta: DataBlockMetadata = (undefined as unknown) as DataBlockMetadata;
+    const invalidAxes: AxesConfiguration = (undefined as unknown) as AxesConfiguration;
 
     const { container } = render(
       <HorzontalBarBlock
         data={invalidData}
         labels={{}}
         meta={invalidMeta}
-        axes={{}}
+        axes={invalidAxes}
       />,
     );
     expect(container).toHaveTextContent('Unable to render chart');

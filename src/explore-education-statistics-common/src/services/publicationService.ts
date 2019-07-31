@@ -5,6 +5,7 @@ import {
 import { Dictionary } from '@common/types';
 import { PositionType } from 'recharts';
 import { contentApi } from './api';
+import { AxesConfiguration } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 
 export interface Publication {
   id: string;
@@ -116,12 +117,15 @@ export interface AxisConfiguration {
   showGrid?: boolean;
   labelPosition?: LabelPosition;
   size?: string;
+
+  min?: string;
+  max?: string;
 }
 
 export interface Chart {
   type: ChartType;
   labels: Dictionary<DataSetConfiguration>;
-  axes: Dictionary<AxisConfiguration>;
+  axes: AxesConfiguration;
 
   stacked?: boolean;
   width?: number;
