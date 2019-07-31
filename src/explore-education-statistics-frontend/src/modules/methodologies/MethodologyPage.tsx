@@ -52,7 +52,7 @@ class MethodologyPage extends Component<Props> {
             <dl className="dfe-meta-content govuk-!-margin-0">
               <div>
                 <dt className="govuk-caption-m">Published: </dt>
-                <dd>
+                <dd data-testid="published-date">
                   <strong>
                     <FormattedDate>{data.published}</FormattedDate>{' '}
                   </strong>
@@ -61,7 +61,7 @@ class MethodologyPage extends Component<Props> {
               {data.lastUpdated && data.lastUpdated.length > 0 && (
                 <>
                   <dt className="govuk-caption-m">Last updated: </dt>
-                  <dd>
+                  <dd data-testid="last-updated">
                     <strong>
                       <FormattedDate>{data.lastUpdated}</FormattedDate>{' '}
                     </strong>
@@ -75,7 +75,6 @@ class MethodologyPage extends Component<Props> {
           </div>
         </div>
 
-        <hr />
         {data.publication && (
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-two-thirds">

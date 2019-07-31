@@ -2,11 +2,11 @@ import {
   ChartDataB,
   ChartDefinition,
   ChartProps,
+  conditionallyAdd,
   createDataForAxis,
   getKeysForChart,
   mapNameToNameLabel,
   populateDefaultChartProps,
-  conditionallyAdd,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 
 import React, { Component } from 'react';
@@ -16,6 +16,7 @@ import {
   Legend,
   Line,
   LineChart,
+  ReferenceLine,
   ResponsiveContainer,
   Symbols,
   Tooltip,
@@ -23,8 +24,11 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 import { Dictionary } from '@common/types';
+
+import classnames from 'classnames';
+
+import './charts.scss';
 
 const CustomToolTip = ({ active, payload, label }: TooltipProps) => {
   if (active) {
@@ -71,6 +75,7 @@ export default class LineChartBlock extends Component<ChartProps> {
       stackable: false,
       lineStyle: true,
       gridLines: true,
+      canSize: true,
     },
 
     data: [
@@ -106,107 +111,130 @@ export default class LineChartBlock extends Component<ChartProps> {
       labels,
       legend,
       legendHeight,
+      width,
     } = this.props;
+
+    if (axes.major === undefined || data === undefined || meta === undefined)
+      return <div>Unable to render chart</div>;
 
     const yAxisDomain: [AxisDomain, AxisDomain] = [-10, 10];
 
-    if (axes.major && data) {
-      const chartData: ChartDataB[] = createDataForAxis(
-        axes.major,
-        data.result,
-        meta,
-      ).map(mapNameToNameLabel(labels, meta.timePeriods, meta.locations));
+    const chartData: ChartDataB[] = createDataForAxis(
+      axes.major,
+      data.result,
+      meta,
+    ).map(mapNameToNameLabel(labels, meta.timePeriods, meta.locations));
 
-      const keysForChart = getKeysForChart(chartData);
+    const keysForChart = getKeysForChart(chartData);
 
-      return (
-        <ResponsiveContainer width={900} height={height || 300}>
-          <LineChart
-            data={chartData}
-            margin={{
-              left: 30,
-              top: legend === 'top' ? 10 : 0,
-            }}
-          >
-            <Tooltip content={CustomToolTip} />
-            {(legend === 'top' || legend === 'bottom') && (
-              <Legend verticalAlign={legend} height={+(legendHeight || '50')} />
-            )}
-            <CartesianGrid
-              strokeDasharray="3 3"
-              horizontal={axes.minor.showGrid !== false}
-              vertical={axes.major.showGrid !== false}
+    return (
+      <ResponsiveContainer width={width || '100%'} height={height || 300}>
+        <LineChart
+          data={chartData}
+          className={classnames({ 'legend-bottom': legend === 'bottom' })}
+          margin={{
+            left: 30,
+            top: legend === 'top' ? 10 : 0,
+          }}
+        >
+          <Tooltip content={CustomToolTip} />
+
+          {(legend === 'top' || legend === 'bottom') && (
+            <Legend verticalAlign={legend} height={+(legendHeight || '50')} />
+          )}
+
+          <CartesianGrid
+            strokeDasharray="3 3"
+            horizontal={axes.minor && axes.minor.showGrid !== false}
+            vertical={axes.major.showGrid !== false}
+          />
+
+          {axes.major && (
+            <XAxis
+              dataKey="name"
+              hide={axes.major.visible === false}
+              label={{
+                offset: 5,
+                position: 'bottom',
+                value: '',
+              }}
+              scale="auto"
+              interval={
+                axes.minor && !axes.minor.visible
+                  ? 'preserveStartEnd'
+                  : undefined
+              }
+              height={conditionallyAdd(
+                axes.major && axes.major.size,
+                legend === 'bottom' ? 0 : undefined,
+              )}
+              padding={{ left: 20, right: 20 }}
+              tickMargin={10}
             />
+          )}
 
-            {axes.major && (
-              <XAxis
-                dataKey="name"
-                hide={axes.major.visible === false}
-                label={{
-                  offset: 5,
-                  position: 'bottom',
-                  value: '',
-                }}
-                scale="auto"
-                interval={
-                  axes.minor && !axes.minor.visible
-                    ? 'preserveStartEnd'
-                    : undefined
-                }
-                height={conditionallyAdd(
-                  axes.major && axes.major.size,
-                  legend === 'bottom' ? 0 : undefined,
-                )}
-                padding={{ left: 20, right: 20 }}
-                tickMargin={10}
-              />
-            )}
+          {axes.minor && axes.minor.visible && (
+            <YAxis
+              label={{
+                angle: -90,
+                offset: 0,
+                position: 'left',
+                value: '',
+              }}
+              scale="auto"
+              domain={yAxisDomain}
+              dataKey="value"
+              width={conditionallyAdd(axes.minor && axes.minor.size)}
+            />
+          )}
 
-            {axes.minor && axes.minor.visible && (
-              <YAxis
-                label={{
-                  angle: -90,
-                  offset: 0,
-                  position: 'left',
-                  value: '',
-                }}
-                scale="auto"
-                domain={yAxisDomain}
-                dataKey="value"
-                width={conditionallyAdd(axes.minor && axes.minor.size)}
-              />
-            )}
+          {keysForChart.map(name => (
+            <Line
+              key={name}
+              {...populateDefaultChartProps(name, labels[name])}
+              type="linear"
+              legendType={labels[name] && labels[name].symbol}
+              dot={
+                labels[name] &&
+                labels[name].symbol &&
+                (props => (
+                  <Symbols
+                    {...props}
+                    type={labels[name] && labels[name].symbol}
+                    strokeDasharray=""
+                  />
+                ))
+              }
+              strokeWidth="2"
+              strokeDasharray={
+                labels[name] &&
+                labels[name].lineStyle &&
+                LineStyles[labels[name].lineStyle || 'solid']
+              }
+            />
+          ))}
 
-            {keysForChart.map(name => (
-              <Line
-                key={name}
-                {...populateDefaultChartProps(name, labels[name])}
-                type="linear"
-                legendType={labels[name] && labels[name].symbol}
-                dot={
-                  labels[name] &&
-                  labels[name].symbol &&
-                  (props => (
-                    <Symbols
-                      {...props}
-                      type={labels[name] && labels[name].symbol}
-                      strokeDasharray=""
-                    />
-                  ))
-                }
-                strokeWidth="2"
-                strokeDasharray={
-                  labels[name] &&
-                  labels[name].lineStyle &&
-                  LineStyles[labels[name].lineStyle || 'solid']
-                }
+          {axes.major &&
+            axes.major.referenceLines &&
+            axes.major.referenceLines.map(referenceLine => (
+              <ReferenceLine
+                key={`${referenceLine.position}_${referenceLine.label}`}
+                x={referenceLine.position}
+                label={referenceLine.label}
               />
             ))}
-          </LineChart>
-        </ResponsiveContainer>
-      );
-    }
 
-    return <LoadingSpinner />;
+          {axes.minor &&
+            axes.minor.referenceLines &&
+            axes.minor.referenceLines.map(referenceLine => (
+              <ReferenceLine
+                key={`${referenceLine.position}_${referenceLine.label}`}
+                y={referenceLine.position}
+                label={referenceLine.label}
+              />
+            ))}
+        </LineChart>
+      </ResponsiveContainer>
+    );
   }
 }

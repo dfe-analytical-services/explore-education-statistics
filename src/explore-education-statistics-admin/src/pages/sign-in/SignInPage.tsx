@@ -1,6 +1,6 @@
-import React from 'react';
 import Page from '@admin/components/Page';
-import ButtonLink from '@admin/components/ButtonLink';
+import loginService from '@admin/services/sign-in/service';
+import React from 'react';
 
 const SignInPage = () => {
   return (
@@ -13,12 +13,12 @@ const SignInPage = () => {
         Use this service to publish official Department for Education (DfE)
         statistics and data for state-funded schools in England.
       </p>
-      <ButtonLink
-        to="/tools/azuread/account/signin"
-        className="govuk-button--start"
+      <a
+        href={loginService.getSignInLink()}
+        className="govuk-button govuk-button--start"
       >
         Sign-in
-      </ButtonLink>
+      </a>
     </Page>
   );
 };

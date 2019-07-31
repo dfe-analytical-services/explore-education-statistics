@@ -19,7 +19,7 @@ const AdminDashboardPublicationSummary = ({ publication }: Props) => {
             <>
               <dd className="govuk-summary-list__value">
                 <Link to={`/methodology/${publication.methodology.id}`}>
-                  {publication.methodology.label}
+                  {publication.methodology.title}
                 </Link>
               </dd>
               <dd className="govuk-summary-list__actions">
@@ -48,7 +48,7 @@ const AdminDashboardPublicationSummary = ({ publication }: Props) => {
         </div>
       </dl>
       <Link to="/prototypes/release-create-new" className="govuk-button">
-        Create a new release
+        Create new release
       </Link>
     </>
   );

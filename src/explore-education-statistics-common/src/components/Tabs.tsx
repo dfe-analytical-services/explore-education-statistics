@@ -14,9 +14,10 @@ import TabsSection, { TabsSectionProps } from './TabsSection';
 interface Props {
   children: ReactNode;
   id: string;
+  onToggle?: (section: { id: string; title: string }) => void;
 }
 
-const Tabs = ({ children, id }: Props) => {
+const Tabs = ({ children, id, onToggle }: Props) => {
   const [loadedSections, setLoadedSections] = useState(new Set<number>());
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
 
@@ -66,6 +67,9 @@ const Tabs = ({ children, id }: Props) => {
                 onClick={event => {
                   event.preventDefault();
                   setSelectedTab(index);
+                  if (typeof onToggle === 'function') {
+                    onToggle({ id: sectionId, title: props.title });
+                  }
                 }}
                 onKeyDown={event => {
                   switch (event.key) {
@@ -77,7 +81,9 @@ const Tabs = ({ children, id }: Props) => {
 
                       setSelectedTab(nextTabIndex);
                       tabElements[nextTabIndex].focus();
-
+                      if (typeof onToggle === 'function') {
+                        onToggle({ id: sectionId, title: props.title });
+                      }
                       break;
                     }
                     case 'ArrowRight': {
@@ -88,7 +94,9 @@ const Tabs = ({ children, id }: Props) => {
 
                       setSelectedTab(nextTabIndex);
                       tabElements[nextTabIndex].focus();
-
+                      if (typeof onToggle === 'function') {
+                        onToggle({ id: sectionId, title: props.title });
+                      }
                       break;
                     }
                     case 'ArrowDown':

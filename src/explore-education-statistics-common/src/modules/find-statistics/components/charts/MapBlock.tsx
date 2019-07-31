@@ -179,6 +179,7 @@ class MapBlock extends Component<MapProps, MapState> {
       stackable: false,
       lineStyle: false,
       gridLines: false,
+      canSize: false,
     },
 
     data: [
@@ -677,7 +678,7 @@ class MapBlock extends Component<MapProps, MapState> {
             ''
           )}
 
-          {selected.indicator !== '' ? (
+          {selected.indicator !== '' && (
             <div>
               <h3 className="govuk-heading-s">
                 Key to {meta.indicators[selected.indicator].label}
@@ -693,8 +694,6 @@ class MapBlock extends Component<MapProps, MapState> {
                   ))}
               </dl>
             </div>
-          ) : (
-            ''
           )}
         </div>
 

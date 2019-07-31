@@ -45,8 +45,7 @@ export interface DataQuery {
 
 export interface ReferenceLine {
   label: string;
-  x?: number | string;
-  y?: number | string;
+  position: number | string;
 }
 
 export interface Axis {
@@ -110,6 +109,8 @@ export interface AxisConfiguration {
   groupBy?: AxisGroupBy;
   dataSets: ChartDataSet[];
 
+  referenceLines?: ReferenceLine[];
+
   visible?: boolean;
   title?: string;
   showGrid?: boolean;
@@ -123,7 +124,6 @@ export interface Chart {
   axes: Dictionary<AxisConfiguration>;
 
   stacked?: boolean;
-  referenceLines?: ReferenceLine[];
   width?: number;
   height?: number;
   showLegend?: boolean;
@@ -155,9 +155,11 @@ export interface ContentBlock {
   summary?: Summary;
 }
 
-export interface Release {
+export interface AbstractRelease<ContentBlockType> {
   id: string;
   title: string;
+  yearTitle: string;
+  coverageTitle: string;
   releaseName: string;
   published: string;
   slug: string;
@@ -174,9 +176,9 @@ export interface Release {
     order: number;
     heading: string;
     caption: string;
-    content: ContentBlock[];
+    content: ContentBlockType[];
   }[];
-  keyStatistics: ContentBlock;
+  keyStatistics: ContentBlockType;
   dataFiles: {
     extension: string;
     name: string;
@@ -184,6 +186,8 @@ export interface Release {
     size: string;
   }[];
 }
+
+export type Release = AbstractRelease<ContentBlock>;
 
 export default {
   getPublication(publicationSlug: string): Promise<Release> {

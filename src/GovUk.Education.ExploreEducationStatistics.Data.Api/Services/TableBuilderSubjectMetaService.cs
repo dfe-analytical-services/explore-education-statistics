@@ -122,14 +122,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                                         Value = item.Id.ToString()
                                     })
                                 }),
-                        TotalValue = itemsGroupedByFilter.FirstOrDefault(IsFilterItemTotal)?.Id.ToString() ??
-                                     string.Empty
+                        TotalValue = GetTotalValue(itemsGroupedByFilter)
                     });
+        }
+
+        private static string GetTotalValue(IEnumerable<FilterItem> filterItems)
+        {
+            return GetTotalGroup(filterItems)?.FirstOrDefault(IsFilterItemTotal)?.Id.ToString() ?? string.Empty;
+        }
+
+        private static IEnumerable<FilterItem> GetTotalGroup(IEnumerable<FilterItem> filterItems)
+        {
+            var itemsGroupedByFilterGroup = filterItems.GroupBy(item => item.FilterGroup).ToList();
+            // Return the 'Default' group if there is only one, otherwise the 'Total' group if it exists
+            return itemsGroupedByFilterGroup.Count == 1 ?
+                itemsGroupedByFilterGroup.First(items => IsFilterGroupDefault(items.Key)) :
+                itemsGroupedByFilterGroup.FirstOrDefault(items => IsFilterGroupTotal(items.Key));
         }
 
         private static bool IsFilterItemTotal(FilterItem item)
         {
-            return item.Label.Equals("Total", StringComparison.InvariantCultureIgnoreCase);
+            return IsEqualToIgnoreCase(item.Label, "Total");
+        }
+
+        private static bool IsFilterGroupDefault(FilterGroup group)
+        {
+            return IsEqualToIgnoreCase(group.Label, "Default");
+        }
+
+        private static bool IsFilterGroupTotal(FilterGroup group)
+        {
+            return IsEqualToIgnoreCase(group.Label, "Total");
+        }
+
+        private static bool IsEqualToIgnoreCase(string value, string compareTo)
+        {
+            return value.Equals(compareTo, StringComparison.InvariantCultureIgnoreCase);
         }
     }
 }

@@ -1,61 +1,107 @@
+import ProtectedRoute from '@admin/components/ProtectedRoute';
+import CreatePublicationPage from '@admin/pages/create-publication/CreatePublicationPage';
+import MockSignInProcess from '@admin/pages/sign-in/mock/MockSignInProcess';
+import MockSignOutProcess from '@admin/pages/sign-in/mock/MockSignOutProcess';
+import SignedOutPage from '@admin/pages/sign-in/SignedOutPage';
+import SignInPage from '@admin/pages/sign-in/SignInPage';
+import signInRoutes from '@admin/routes/sign-in/routes';
+import dashboardRoutes from '@admin/routes/dashboard/routes';
+import releaseRoutes from '@admin/routes/edit-release/routes';
+import publicationRoutes from '@admin/routes/edit-publication/routes';
+import PrototypeLoginService from '@admin/services/PrototypeLoginService';
 import React from 'react';
 import { Route } from 'react-router';
+import { BrowserRouter } from 'react-router-dom';
 
 import './App.scss';
-import { PrototypeLoginService } from '@admin/services/PrototypeLoginService';
-import { BrowserRouter } from 'react-router-dom';
-import releaseRoutes from '@admin/routes/releaseRoutes';
-import SignInPage from '@admin/pages/sign-in/SignInPage';
+
+import { LoginContext } from './components/Login';
 import AdminDashboardPage from './pages/admin-dashboard/AdminDashboardPage';
+import IndexPage from './pages/IndexPage';
 import PrototypeAdminDashboard from './pages/prototypes/PrototypeAdminDashboard';
+
+import PrototypeChartTest from './pages/prototypes/PrototypeChartTest';
 import AdminDocumentationGlossary from './pages/prototypes/PrototypeDocumentationGlossary';
 import AdminDocumentationHome from './pages/prototypes/PrototypeDocumentationHome';
-
-import PublicationCreateNew from './pages/prototypes/PrototypePublicationPageCreateNew';
 import PublicationAssignMethodology from './pages/prototypes/PrototypePublicationPageAssignMethodology';
 import PublicationConfirmNew from './pages/prototypes/PrototypePublicationPageConfirmNew';
-import PublicationEditNew from './pages/prototypes/PrototypePublicationPageEditNew';
-import ReleaseCreateNew from './pages/prototypes/PrototypeReleasePageCreateNew';
+
+import PublicationCreateNew from './pages/prototypes/PrototypePublicationPageCreateNew';
 
 import PublicationEditPage from './pages/prototypes/PrototypePublicationPageEditAbsence';
-import PublicationReviewPage from './pages/prototypes/PrototypePublicationPageReviewAbsence';
+import PublicationEditUnresolvedComments from './pages/prototypes/PrototypePublicationPageEditAbsenceUnresolvedComments';
+import PublicationEditNew from './pages/prototypes/PrototypePublicationPageEditNew';
 import PublicationCreateNewAbsence from './pages/prototypes/PrototypePublicationPageNewAbsence';
 import PublicationCreateNewAbsenceConfig from './pages/prototypes/PrototypePublicationPageNewAbsenceConfig';
 import PublicationCreateNewAbsenceConfigEdit from './pages/prototypes/PrototypePublicationPageNewAbsenceConfigEdit';
 import PublicationCreateNewAbsenceData from './pages/prototypes/PrototypePublicationPageNewAbsenceData';
-import PublicationCreateNewAbsenceTable from './pages/prototypes/PrototypePublicationPageNewAbsenceTable';
-import PublicationCreateNewAbsenceViewTables from './pages/prototypes/PrototypePublicationPageNewAbsenceViewTables';
 import PublicationCreateNewAbsenceSchedule from './pages/prototypes/PrototypePublicationPageNewAbsenceSchedule';
 import PublicationCreateNewAbsenceScheduleEdit from './pages/prototypes/PrototypePublicationPageNewAbsenceScheduleEdit';
 import PublicationCreateNewAbsenceStatus from './pages/prototypes/PrototypePublicationPageNewAbsenceStatus';
+import PublicationCreateNewAbsenceTable from './pages/prototypes/PrototypePublicationPageNewAbsenceTable';
+import PublicationCreateNewAbsenceViewTables from './pages/prototypes/PrototypePublicationPageNewAbsenceViewTables';
+import PublicationReviewPage from './pages/prototypes/PrototypePublicationPageReviewAbsence';
+import ReleaseCreateNew from './pages/prototypes/PrototypeReleasePageCreateNew';
 import PrototypesIndexPage from './pages/prototypes/PrototypesIndexPage';
-import IndexPage from './pages/IndexPage';
-
-import PrototypeChartTest from './pages/prototypes/PrototypeChartTest';
-
-import { LoginContext } from './components/Login';
 
 function App() {
   return (
     <BrowserRouter>
-      <Route exact path="/" component={IndexPage} />
+      {/* Non-Prototype Routes*/}
+      <ProtectedRoute
+        exact
+        path={dashboardRoutes.adminDashboard}
+        component={AdminDashboardPage}
+      />
 
-      <LoginContext.Provider value={PrototypeLoginService.login()}>
-        {/* Non-Prototype Routes*/}
-        <Route exact path="/admin-dashboard" component={AdminDashboardPage} />
+      <ProtectedRoute
+        exact
+        path={signInRoutes.signIn}
+        component={SignInPage}
+        redirectIfNotLoggedIn={false}
+      />
 
-        <Route exact path="/sign-in" component={SignInPage} />
+      <ProtectedRoute
+        exact
+        path={signInRoutes.signOut}
+        component={SignedOutPage}
+        redirectIfNotLoggedIn={false}
+      />
 
-        {releaseRoutes.map(route => (
+      <ProtectedRoute
+        exact
+        path={publicationRoutes.createPublication.route}
+        component={CreatePublicationPage}
+      />
+
+      {releaseRoutes.map(route => (
+        <ProtectedRoute
+          exact
+          key={route.path}
+          path={route.path}
+          component={route.component}
+        />
+      ))}
+
+      {process.env.USE_MOCK_API === 'true' && (
+        <>
           <Route
             exact
-            key={route.path}
-            path={route.path}
-            component={route.component}
+            path={signInRoutes.signInViaApiLink}
+            component={MockSignInProcess}
           />
-        ))}
+          <Route
+            exact
+            path={signInRoutes.signOutViaApiLink}
+            component={MockSignOutProcess}
+          />
+        </>
+      )}
 
-        {/* Prototype Routes*/}
+      {/* Prototype Routes */}
+      <Route exact path="/index" component={IndexPage} />
+
+      <LoginContext.Provider value={PrototypeLoginService.login()}>
         <Route exact path="/prototypes/" component={PrototypesIndexPage} />
 
         <Route
@@ -70,6 +116,11 @@ function App() {
           exact
           path="/prototypes/publication-edit"
           component={PublicationEditPage}
+        />
+        <Route
+          exact
+          path="/prototypes/publication-unresolved-comments"
+          component={PublicationEditUnresolvedComments}
         />
         <Route
           exact

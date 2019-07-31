@@ -1,14 +1,7 @@
-import {
-  FormFieldset,
-  FormGroup,
-  FormTextInput,
-} from '@common/components/form';
-import Link from '@admin/components/Link';
 import React from 'react';
 import { PrototypeTable } from '@admin/pages/prototypes/PrototypeData';
 
 const PrototypeTableContent = ({
-  task,
   table,
 }: {
   task?: string;
@@ -16,7 +9,7 @@ const PrototypeTableContent = ({
 }) => {
   const title =
     (table && table.title) ||
-    "Table showing 'Absence by characteristic' from 'Pupil absence' in England between 2012/13 and 2016/17";
+    "'Absence by characteristic' from 'Pupil absence' in England between 2012/13 and 2016/17";
 
   return (
     <>
@@ -83,46 +76,6 @@ const PrototypeTableContent = ({
         </tbody>
       </table>
       <p className="govuk-body-s">Source: DfE prototype example statistics</p>
-      {task === 'edit' && (
-        <>
-          <hr />
-          <FormFieldset id="table-config" legend="Table details">
-            <FormGroup>
-              <FormTextInput
-                id="table-title"
-                name="table-title"
-                label="Table title"
-                defaultValue="Table showing 'Absence by characteristic' from 'Pupil absence' in England between 2012/13 and 2016/17"
-              />
-            </FormGroup>
-            <FormGroup>
-              <FormTextInput
-                id="source"
-                name="source"
-                label="Source"
-                defaultValue="DfE prototype example statistics"
-                width={20}
-              />
-            </FormGroup>
-            <FormGroup>
-              <label htmlFor="footnotes" className="govuk-label">
-                Foot notes
-              </label>
-              <textarea
-                name="footnotes"
-                id="footnotes"
-                className="govuk-textarea"
-              />
-            </FormGroup>
-          </FormFieldset>
-          <Link
-            to="/prototypes/publication-create-new-absence-table?status=step5"
-            className="govuk-button"
-          >
-            Update table
-          </Link>
-        </>
-      )}
     </>
   );
 };
