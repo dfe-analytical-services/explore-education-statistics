@@ -6,7 +6,7 @@ import {
   DataBlockData,
   DataBlockMetadata,
 } from '@common/services/dataBlockService';
-import LineChartBlock from '../LineChartBlock';
+import Chart from '../LineChartBlock';
 
 jest.mock('recharts/lib/util/LogUtils');
 
@@ -15,7 +15,7 @@ const { axes } = props;
 
 describe('LineChartBlock', () => {
   test('renders basic chart correctly', () => {
-    const { container } = render(<LineChartBlock {...props} />);
+    const { container } = render(<Chart {...props} />);
 
     expect(container).toMatchSnapshot();
 
@@ -50,7 +50,7 @@ describe('LineChartBlock', () => {
 
   test('major axis can be hidden', () => {
     const { container } = render(
-      <LineChartBlock
+      <Chart
         {...props}
         axes={{
           ...axes,
@@ -69,7 +69,7 @@ describe('LineChartBlock', () => {
 
   test('minor axis can be hidden', () => {
     const { container } = render(
-      <LineChartBlock
+      <Chart
         {...props}
         axes={{
           ...axes,
@@ -88,7 +88,7 @@ describe('LineChartBlock', () => {
 
   test('both axes can be hidden', () => {
     const { container } = render(
-      <LineChartBlock
+      <Chart
         {...props}
         axes={{
           ...axes,
@@ -114,7 +114,7 @@ describe('LineChartBlock', () => {
   });
 
   test('can hide legend', () => {
-    const { container } = render(<LineChartBlock {...props} legend="none" />);
+    const { container } = render(<Chart {...props} legend="none" />);
 
     expect(
       container.querySelector('.recharts-default-legend'),
@@ -123,7 +123,7 @@ describe('LineChartBlock', () => {
 
   test('can set dashed line styles', () => {
     const { container } = render(
-      <LineChartBlock
+      <Chart
         {...{
           ...props,
           labels: {
@@ -143,7 +143,7 @@ describe('LineChartBlock', () => {
 
   test('can set dotted line styles', () => {
     const { container } = render(
-      <LineChartBlock
+      <Chart
         {...{
           ...props,
           labels: {
@@ -163,7 +163,7 @@ describe('LineChartBlock', () => {
 
   test('can render major axis reference line', () => {
     const { container } = render(
-      <LineChartBlock
+      <Chart
         {...{
           ...props,
           axes: {
@@ -190,7 +190,7 @@ describe('LineChartBlock', () => {
 
   test('can render minor axis reference line', () => {
     const { container } = render(
-      <LineChartBlock
+      <Chart
         {...{
           ...props,
           axes: {
@@ -220,13 +220,48 @@ describe('LineChartBlock', () => {
     const invalidMeta: DataBlockMetadata = (undefined as unknown) as DataBlockMetadata;
 
     const { container } = render(
-      <LineChartBlock
-        data={invalidData}
-        labels={{}}
-        meta={invalidMeta}
-        axes={{}}
-      />,
+      <Chart data={invalidData} labels={{}} meta={invalidMeta} axes={{}} />,
     );
     expect(container).toHaveTextContent('Unable to render chart');
+  });
+
+  test('Can change width of chart', () => {
+    const propsWithSize = {
+      ...props,
+      width: 200,
+    };
+
+    const { container } = render(<Chart {...propsWithSize} />);
+
+    const responsiveContainer = container.querySelector(
+      '.recharts-responsive-container',
+    );
+
+    expect(responsiveContainer).toHaveProperty('style');
+
+    if (responsiveContainer) {
+      const div = responsiveContainer as HTMLElement;
+      expect(div.style.width).toEqual('200px');
+    }
+  });
+
+  test('Can change height of chart', () => {
+    const propsWithSize = {
+      ...props,
+      height: 200,
+    };
+
+    const { container } = render(<Chart {...propsWithSize} />);
+
+    const responsiveContainer = container.querySelector(
+      '.recharts-responsive-container',
+    );
+
+    expect(responsiveContainer).toHaveProperty('style');
+
+    if (responsiveContainer) {
+      const div = responsiveContainer as HTMLElement;
+      expect(div.style.height).toEqual('200px');
+    }
   });
 });

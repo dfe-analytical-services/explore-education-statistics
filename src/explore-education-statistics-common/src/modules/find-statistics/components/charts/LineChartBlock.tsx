@@ -71,6 +71,7 @@ export default class LineChartBlock extends Component<ChartProps> {
       stackable: false,
       lineStyle: true,
       gridLines: true,
+      canSize: true,
     },
 
     data: [
@@ -132,9 +133,11 @@ export default class LineChartBlock extends Component<ChartProps> {
           }}
         >
           <Tooltip content={CustomToolTip} />
+
           {(legend === 'top' || legend === 'bottom') && (
             <Legend verticalAlign={legend} height={+(legendHeight || '50')} />
           )}
+
           <CartesianGrid
             strokeDasharray="3 3"
             horizontal={axes.minor.showGrid !== false}
