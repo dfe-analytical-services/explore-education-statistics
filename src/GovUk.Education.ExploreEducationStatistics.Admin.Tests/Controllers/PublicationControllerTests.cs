@@ -15,8 +15,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
     public class PublicationControllerTests
     {
 
-        [Fact] 
-        public void Create_Publication_Returns_Ok()
+        [Fact]
+        public async void Create_Publication_Returns_Ok()
         {
             var publicationService = new Mock<IPublicationService>();
 
@@ -27,9 +27,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
 
             var topicId = Guid.NewGuid();
             // Method under test
-            var result = controller.CreatePublication(new CreatePublicationViewModel(), topicId);
-            Assert.IsAssignableFrom<PublicationViewModel>(result.Result.Value);
-            Assert.Equal(topicId, result.Result.Value.TopicId);
+            var result = await controller.CreatePublicationAsync(new CreatePublicationViewModel(), topicId);
+            Assert.IsAssignableFrom<PublicationViewModel>(result.Value);
+            Assert.Equal(topicId, result.Value.TopicId);
         }
         
         [Fact] 
@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
 
             var topicId = Guid.NewGuid();
             // Method under test
-            var result = controller.CreatePublication(new CreatePublicationViewModel(), topicId);
+            var result = controller.CreatePublicationAsync(new CreatePublicationViewModel(), topicId);
             var badRequestObjectResult = result.Result.Result;
             Assert.IsAssignableFrom<BadRequestObjectResult>(badRequestObjectResult);
             var validationProblemDetails = (badRequestObjectResult as BadRequestObjectResult)?.Value;  

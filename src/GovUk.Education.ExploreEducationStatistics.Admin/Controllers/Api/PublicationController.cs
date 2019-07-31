@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         // POST api/topic/{topicId}/publications
         [HttpPost("/topic/{topicId}/publications")]
         [AllowAnonymous] // TODO We will need to do Authorisation checks when we know what the permissions model is.
-        public async Task<ActionResult<PublicationViewModel>> CreatePublication(CreatePublicationViewModel publication, Guid topicId)
+        public async Task<ActionResult<PublicationViewModel>> CreatePublicationAsync(CreatePublicationViewModel publication, Guid topicId)
         {
             publication.TopicId = topicId;
             var result = await _publicationService.CreatePublication(publication);
