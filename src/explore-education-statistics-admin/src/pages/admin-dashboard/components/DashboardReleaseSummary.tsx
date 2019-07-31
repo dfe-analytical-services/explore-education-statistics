@@ -14,7 +14,7 @@ import React, { useContext } from 'react';
 import { format } from 'date-fns';
 import Details from '@common/components/Details';
 import { LoginContext } from '@admin/components/Login';
-import { setupRoute } from '../../../routes/releaseRoutes';
+import { setupRoute } from '../../../routes/edit-release/routes';
 
 const getLiveLatestLabel = (isLive: boolean, isLatest: boolean) => {
   if (isLive && isLatest) {

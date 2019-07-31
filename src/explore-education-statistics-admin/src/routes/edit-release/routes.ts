@@ -1,10 +1,10 @@
-import ReleaseSetupEditPage from '@admin/pages/edit-release/ReleaseSetupEditPage';
-import ReleaseSetupPage from '@admin/pages/edit-release/ReleaseSetupPage';
-import ReleaseDataPage from '@admin/pages/edit-release/data/ReleaseDataPage';
-import ReleaseBuildTablesPage from '@admin/pages/edit-release/ReleaseBuildTablesPage';
-import ReleaseTablesPage from '@admin/pages/edit-release/ReleaseTablesPage';
-import ReleaseContentPage from '@admin/pages/edit-release/ReleaseContentPage';
-import ReleasePublishStatusPage from '@admin/pages/edit-release/ReleasePublishStatusPage';
+import ReleaseSetupEditPage from '../../pages/edit-release/ReleaseSetupEditPage';
+import ReleaseSetupPage from '../../pages/edit-release/ReleaseSetupPage';
+import ReleaseDataPage from '../../pages/edit-release/data/ReleaseDataPage';
+import ReleaseBuildTablesPage from '../../pages/edit-release/ReleaseBuildTablesPage';
+import ReleaseTablesPage from '../../pages/edit-release/ReleaseTablesPage';
+import ReleaseContentPage from '../../pages/edit-release/ReleaseContentPage';
+import ReleasePublishStatusPage from '../../pages/edit-release/ReleasePublishStatusPage';
 
 export interface ReleaseRoute {
   path: string;

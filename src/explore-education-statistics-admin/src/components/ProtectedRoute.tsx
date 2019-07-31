@@ -1,4 +1,5 @@
 import { LoginContext } from '@admin/components/Login';
+import signInRoutes from "@admin/routes/sign-in/routes";
 import loginService from '@admin/services/sign-in/service';
 import { Authentication } from '@admin/services/sign-in/types';
 import React, { useEffect, useState } from 'react';
@@ -17,7 +18,7 @@ const AuthenticationCheckingComponent = ({
   const redirect = () => (
     <Redirect
       to={{
-        pathname: '/sign-in',
+        pathname: signInRoutes.signIn,
         state: { from: location },
       }}
     />
