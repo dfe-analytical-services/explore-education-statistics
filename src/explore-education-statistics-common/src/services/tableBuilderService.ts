@@ -88,7 +88,6 @@ export type LocationLevelKeys =
 
 export interface TableData {
   footnotes: {
-    indicators: number[];
     id: number;
     label: string;
   }[];
