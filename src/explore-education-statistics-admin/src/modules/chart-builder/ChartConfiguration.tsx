@@ -32,7 +32,6 @@ const ChartConfiguration = (props: Props) => {
   const [chartOptions, setChartOptions] = React.useState<ChartOptions>(
     initialChartOptions,
   );
-
   const updateChartOptions = (options: ChartOptions) => {
     setChartOptions(options);
     if (onChange) onChange(options);

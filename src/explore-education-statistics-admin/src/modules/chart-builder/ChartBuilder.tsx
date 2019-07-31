@@ -184,15 +184,13 @@ const ChartBuilder = ({ data }: Props) => {
       previousSelectionChartType.current = selectedChartType;
 
       if (selectedChartType) {
-        const axisConfiguration = selectedChartType.axes.reduce<
+        const newAxesConfiguration = selectedChartType.axes.reduce<
           Dictionary<AxisConfiguration>
         >(
           (axesConfigurationDictionary, axisDefinition) => ({
             ...axesConfigurationDictionary,
 
             [axisDefinition.type]: {
-              name: `${axisDefinition.title} (${axisDefinition.type} axis)`,
-              type: axisDefinition.type,
               groupBy: axisDefinition.defaultDataType,
 
               dataSets:
@@ -203,14 +201,18 @@ const ChartBuilder = ({ data }: Props) => {
               showGrid: true,
               size: '50',
               referenceLines: [],
+
               ...(previousAxesConfiguration.current &&
                 previousAxesConfiguration.current[axisDefinition.type]),
+
+              name: `${axisDefinition.type} axis (${axisDefinition.title})`,
+              type: axisDefinition.type,
             },
           }),
           {},
         );
 
-        setAxesConfiguration(axisConfiguration);
+        setAxesConfiguration(newAxesConfiguration);
       }
     }
   }, [selectedChartType, dataSetAndConfiguration]);
