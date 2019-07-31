@@ -13,7 +13,7 @@ export type MockBehaviourRegistrar = (mock: MockAdapter) => Promise<void>;
 
 interface Config {
   customBaseUrl?: string;
-  mockBehaviourRegistrar: MockBehaviourRegistrar;
+  mockBehaviourRegistrar?: MockBehaviourRegistrar;
 }
 
 /**
@@ -29,15 +29,14 @@ export const createClient = async ({
   customBaseUrl,
   mockBehaviourRegistrar,
 }: Config): Promise<Client> => {
-  const baseURL = `${customBaseUrl ||
-    `${process.env.CONTENT_API_BASE_URL}/api/`}`;
+  const baseURL = `${customBaseUrl || `/api/`}`;
 
   const axiosInstance = axios.create({
     baseURL,
     paramsSerializer: commaSeparated,
   });
 
-  if (process.env.USE_MOCK_API === 'true') {
+  if (process.env.USE_MOCK_API === 'true' && mockBehaviourRegistrar) {
     const MockAdaptor = (await import(
       /* webpackChunkName: "axios-mock-adapter" */ 'axios-mock-adapter'
     )).default;

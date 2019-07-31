@@ -182,45 +182,6 @@ const PublicationPage = () => {
       <h2 className="govuk-heading-l">
         Headline facts and figures - 2016 to 2017 school year
       </h2>
-      <PrototypeDataSample
-        sectionId="headlines"
-        chartTitle="change in absence types in England"
-        xAxisLabel="School Year"
-        yAxisLabel="Absence Rate"
-        chartData={[
-          {
-            authorised: 4.2,
-            name: '2012/13',
-            overall: 5.3,
-            unauthorised: 1.1,
-          },
-          {
-            authorised: 3.5,
-            name: '2013/14',
-            overall: 4.5,
-            unauthorised: 1.1,
-          },
-          {
-            authorised: 3.5,
-            name: '2014/15',
-            overall: 4.6,
-            unauthorised: 1.1,
-          },
-          {
-            authorised: 3.4,
-            name: '2015/16',
-            overall: 4.6,
-            unauthorised: 1.1,
-          },
-          {
-            authorised: 3.4,
-            name: '2016/17',
-            overall: 4.7,
-            unauthorised: 1.3,
-          },
-        ]}
-        chartDataKeys={['unauthorised', 'authorised', 'overall']}
-      />
 
       <Accordion id="contents-sections">
         <AccordionSection heading="Pupil absence rates">

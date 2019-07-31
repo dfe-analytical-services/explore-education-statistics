@@ -4979,7 +4979,9 @@
 													"*/",
 													"",
 													"pm.test(\"Number of metaData locations should be correct\", function () {",
-													"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(163); ",
+													"    var locations = Object.keys(respJson.metaData.locations)",
+													"    pm.expect(locations.length).to.equal(163);",
+													"    //locations.forEach(item => item !== \"E13000001\" && item !== \"E13000002\" ? pm.expect(pm.response.to.have.jsonBody(`metaData.locations.${item}.geoJson`)) : null);",
 													"});",
 													"",
 													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(2412); });",
@@ -5049,8 +5051,11 @@
 													"   pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(4); ",
 													"});",
 													"",
-													"pm.test(\"Number of metaData locations should be correct\", function () {",
-													"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(3); ",
+													"pm.test(\"Number of metaData locations should be correct and have associated geoJson data\", function () {",
+													"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(3);",
+													"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E92000001.geoJson\"));",
+													"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E09000032.geoJson\"));",
+													"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E13000001\")); // No geoJson for Inner London -- DFE-729",
 													"});",
 													"",
 													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(4); });",
@@ -5092,7 +5097,7 @@
 									"response": []
 								},
 								{
-									"name": "Data - Absence by characteristic - LA district - *",
+									"name": "Data - Absence by characteristic - LAD - *",
 									"event": [
 										{
 											"listen": "test",
@@ -5200,8 +5205,11 @@
 													"    pm.expect(respJson.result.length).to.equal(7);",
 													"});",
 													"",
-													"pm.test(\"Number of metaData locations should be correct\", function () {",
-													"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(3); ",
+													"pm.test(\"Number of metaData locations should be correct and to have associated geoJson data\", function () {",
+													"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(3);",
+													"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E92000001.geoJson\"));",
+													"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E06000001.geoJson\"));",
+													"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E12000001.geoJson\"));",
 													"});",
 													"",
 													"pm.test(\"All results should have LA District name Hartlepool\", function () {",
@@ -5229,6 +5237,243 @@
 										"body": {
 											"mode": "raw",
 											"raw": "{\n    \"subjectId\": 1,\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"localAuthorityDistrict\": [\"E06000001\"],\n    \"filters\" : [\n    \t{{FILT_AllPupils}}, {{FILT_FSMEligible}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/data",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"data"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Data - Absence by characteristic - Hartlepool - boundaryLevel 1",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+												"exec": [
+													"var respJson = pm.response.json();",
+													"",
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Should have correct fields\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodRange\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
+													"});",
+													"",
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Local_Authority_District\");",
+													"    }",
+													"});",
+													"",
+													"pm.test(\"Number of results should be correct\", function () { ",
+													"    pm.expect(respJson.result.length).to.equal(7);",
+													"});",
+													"",
+													"pm.test(\"Number of metaData locations should be correct and not have associated geoJson data\", function () {",
+													"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(3);",
+													"   // boundaryLevel 1 only includes geoJson for countries",
+													"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E92000001.geoJson\"));",
+													"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E06000001\"));",
+													"   pm.expect(pm.response.to.not.have.jsonBody(\"metaData.locations.E06000001.geoJson\"));",
+													"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E12000001\"));",
+													"   pm.expect(pm.response.to.not.have.jsonBody(\"metaData.locations.E12000001.geoJson\"));",
+													"});",
+													"",
+													"pm.test(\"All results should have LA District name Hartlepool\", function () {",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"        pm.expect(respJson.result[i].location.country.name).to.equal(\"England\");",
+													"        pm.expect(respJson.result[i].location.localAuthorityDistrict.name).to.equal(\"Hartlepool\");",
+													"        pm.expect(respJson.result[i].location.region.name).to.equal(\"North East\");",
+													"    }",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subjectId\": 1,\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"localAuthorityDistrict\": [\"E06000001\"],\n    \"filters\" : [\n    \t{{FILT_AllPupils}}, {{FILT_FSMEligible}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ],\n    \"boundaryLevel\": 1\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/data",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"data"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Data - Absence by characteristic - Hartlepool - boundaryLevel 3",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+												"exec": [
+													"var respJson = pm.response.json();",
+													"",
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Should have correct fields\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodRange\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
+													"});",
+													"",
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Local_Authority_District\");",
+													"    }",
+													"});",
+													"",
+													"pm.test(\"Number of results should be correct\", function () { ",
+													"    pm.expect(respJson.result.length).to.equal(7);",
+													"});",
+													"",
+													"pm.test(\"Number of metaData locations should be correct and to have associated geoJson data\", function () {",
+													"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(3);",
+													"   // Because LAD boundaryLevel is explicitly asked for, no geoJson returned for country or region",
+													"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E92000001\"));",
+													"   pm.expect(pm.response.to.not.have.jsonBody(\"metaData.locations.E92000001.geoJson\"));",
+													"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E06000001.geoJson\"));",
+													"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E12000001\"));",
+													"   pm.expect(pm.response.to.not.have.jsonBody(\"metaData.locations.E12000001.geoJson\"));",
+													"});",
+													"",
+													"pm.test(\"All results should have LA District name Hartlepool\", function () {",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"        pm.expect(respJson.result[i].location.country.name).to.equal(\"England\");",
+													"        pm.expect(respJson.result[i].location.localAuthorityDistrict.name).to.equal(\"Hartlepool\");",
+													"        pm.expect(respJson.result[i].location.region.name).to.equal(\"North East\");",
+													"    }",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subjectId\": 1,\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"localAuthorityDistrict\": [\"E06000001\"],\n    \"filters\" : [\n    \t{{FILT_AllPupils}}, {{FILT_FSMEligible}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ],\n    \"boundaryLevel\": 3\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/data",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"data"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Data - Absence by characteristic - Hartlepool - boundaryLevel 6",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+												"exec": [
+													"var respJson = pm.response.json();",
+													"",
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Should have correct fields\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodRange\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
+													"});",
+													"",
+													"pm.test(\"geographicLevel should be same as request\", function () {",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Local_Authority_District\");",
+													"    }",
+													"});",
+													"",
+													"pm.test(\"Number of results should be correct\", function () { ",
+													"    pm.expect(respJson.result.length).to.equal(7);",
+													"});",
+													"",
+													"pm.test(\"Number of metaData locations should be correct and to have associated geoJson data\", function () {",
+													"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(3);",
+													"   // boundaryLevel 6 should only have geoJson data for regions",
+													"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E92000001\"));",
+													"   pm.expect(pm.response.to.not.have.jsonBody(\"metaData.locations.E92000001.geoJson\"));",
+													"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E06000001\"));",
+													"   pm.expect(pm.response.to.not.have.jsonBody(\"metaData.locations.E06000001.geoJson\"));",
+													"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E12000001.geoJson\"));",
+													"});",
+													"",
+													"pm.test(\"All results should have LA District name Hartlepool\", function () {",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"        pm.expect(respJson.result[i].location.country.name).to.equal(\"England\");",
+													"        pm.expect(respJson.result[i].location.localAuthorityDistrict.name).to.equal(\"Hartlepool\");",
+													"        pm.expect(respJson.result[i].location.region.name).to.equal(\"North East\");",
+													"    }",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subjectId\": 1,\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"localAuthorityDistrict\": [\"E06000001\"],\n    \"filters\" : [\n    \t{{FILT_AllPupils}}, {{FILT_FSMEligible}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ],\n    \"boundaryLevel\": 6\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/data",
