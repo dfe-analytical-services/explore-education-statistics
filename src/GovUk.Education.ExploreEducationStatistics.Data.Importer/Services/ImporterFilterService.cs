@@ -36,12 +36,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 return filterItem;
             }
             
-            // TODO change expiry or introduce lookup
-
             filterItem = CreateFilterItem(filterGroup, label);
       
-            _cache.Set(cacheKey, filterItem,
-                new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(5)));
+            _cache.Set(cacheKey, filterItem);
             
             return filterItem;
         }
@@ -71,13 +68,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             {
                 return filterGroup;
             }
-    
-            // TODO change expiry or introduce lookup
-
+            
             filterGroup = CreateFilterGroup(filter, label);
  
-            _cache.Set(cacheKey, filterGroup,
-                new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(5)));
+            _cache.Set(cacheKey, filterGroup);
             
             return filterGroup;
         }
@@ -89,6 +83,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 var filterGroup = _context.FilterGroup
                                   .FirstOrDefault(fg => fg.FilterId == filter.Id && fg.Label == label) ?? _context.FilterGroup.Add(new FilterGroup(filter, label)).Entity;
 
+                if (filterGroup == null)
+                {
+                    filterGroup = _context.FilterGroup.Add(new FilterGroup(filter, label)).Entity;
+                }
+                
                 return filterGroup;
             }
             catch (Exception e)

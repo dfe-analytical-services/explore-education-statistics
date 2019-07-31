@@ -33,8 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             }
 
             school = LookupOrCreateSchool(source);
-            _cache.Set(cacheKey, source,
-                new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(5)));
+            _cache.Set(cacheKey, source);
 
             return school;
         }
@@ -49,8 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             
             school = CreateSchool(school);
       
-            _cache.Set(cacheKey, school,
-                new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(5)));
+            _cache.Set(cacheKey, school);
             
             return school;
         }

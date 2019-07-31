@@ -45,8 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             location = LookupOrCreate(country, institution, localAuthority, localAuthorityDistrict,
                 localEnterprisePartnership, mayoralCombinedAuthority, multiAcademyTrust, opportunityArea,
                 parliamentaryConstituency, region, rscRegion, sponsor, ward);
-            _cache.Set(cacheKey, location,
-                new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(5)));
+            _cache.Set(cacheKey, location);
 
             return location;
         }

@@ -69,6 +69,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             lines.RemoveAt(0);
             
             var observations = GetObservations(lines, headers, subject, subjectMeta);
+
+            // Due to nasty EF bug temporarily assigned ids need to be reset before save
+            //int i = -1;
+            //observations.Select(o => { o.Id = i--; return o; });
+            
             _context.Observation.AddRange(observations);
             _context.SaveChanges();
 
@@ -109,7 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             SubjectMeta subjectMeta)
         {
             var line = raw.Split(',');
-            GetFilterItems(line, headers, subjectMeta.Filters);
+            CreateFilterItems(line, headers, subjectMeta.Filters);
             GetLocationId(line, headers);
             GetSchool(line, headers);
         }
@@ -125,10 +130,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 var filterItem = _importerFilterService.Find(filterItemLabel, filterGroupLabel, filterMeta.Filter);
                 return new ObservationFilterItem
                 {
-                    //FilterItemId = filterItem.Id,
+                    FilterItemId = filterItem.Id,
                     FilterItem = filterItem
                 };
             }).ToList();
+        }
+        
+        private void CreateFilterItems(IReadOnlyList<string> line,
+            List<string> headers,
+            IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)> filtersMeta)
+        {
+            filtersMeta.Select(filterMeta =>
+            {
+                var filterItemLabel = CsvUtil.Value(line, headers, filterMeta.Column);
+                var filterGroupLabel = CsvUtil.Value(line, headers, filterMeta.FilterGroupingColumn);
+                return _importerFilterService.Find(filterItemLabel, filterGroupLabel, filterMeta.Filter);
+            });
         }
 
         private static TimeIdentifier GetTimeIdentifier(IReadOnlyList<string> line, List<string> headers)
