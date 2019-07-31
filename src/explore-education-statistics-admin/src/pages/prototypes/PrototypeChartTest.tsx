@@ -13,8 +13,12 @@ import ChartRenderer from '@common/modules/find-statistics/components/ChartRende
 const PrototypeChartTest = () => {
   const [data] = React.useState<DataBlockResponse>(PrototypeData.testResponse);
 
-  const chartData: ChartProps = {
-    ...ChartData.AbstractChartProps,
+  const chartData = ChartData.AbstractChartProps;
+
+  const newChartData: ChartProps = {
+    ...chartData,
+    legend: 'top',
+    legendHeight: '50',
   };
 
   return (

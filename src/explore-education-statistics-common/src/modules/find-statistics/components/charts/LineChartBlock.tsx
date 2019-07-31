@@ -26,6 +26,10 @@ import {
 } from 'recharts';
 import { Dictionary } from '@common/types';
 
+import classnames from 'classnames';
+
+import './charts.scss';
+
 const CustomToolTip = ({ active, payload, label }: TooltipProps) => {
   if (active) {
     return (
@@ -127,6 +131,7 @@ export default class LineChartBlock extends Component<ChartProps> {
       <ResponsiveContainer width={width || '100%'} height={height || 300}>
         <LineChart
           data={chartData}
+          className={classnames({ 'legend-bottom': legend === 'bottom' })}
           margin={{
             left: 30,
             top: legend === 'top' ? 10 : 0,
@@ -140,7 +145,7 @@ export default class LineChartBlock extends Component<ChartProps> {
 
           <CartesianGrid
             strokeDasharray="3 3"
-            horizontal={axes.minor.showGrid !== false}
+            horizontal={axes.minor && axes.minor.showGrid !== false}
             vertical={axes.major.showGrid !== false}
           />
 
