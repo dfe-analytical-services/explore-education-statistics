@@ -1,11 +1,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Seed.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
@@ -95,7 +93,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
                                 var file = SamplePublications.SubjectFiles.GetValueOrDefault(subject.Id);
 
                                 StoreFiles(r, file, subject.Name);
-                                
                                 Seed(file.ToString() + ".csv", r);
                             }   
                         }
@@ -118,8 +115,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
             aQueue.CreateIfNotExists();
             
             var message = BuildMessage(dataFileName, release);
-
-            //_logger.LogInformation("Adding message : {0}", message.AsString);
             
             pQueue.AddMessage(message);
         }

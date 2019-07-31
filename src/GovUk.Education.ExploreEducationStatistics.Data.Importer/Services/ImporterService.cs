@@ -17,6 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         private readonly ImporterLocationService _importerLocationService;
         private readonly ImporterFilterService _importerFilterService;
         private readonly ImporterMetaService _importerMetaService;
+        private readonly ImporterSchoolService _importerSchoolService;
         private readonly ApplicationDbContext _context;
         private readonly ILogger<ImporterService> _logger;
 
@@ -24,6 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             ImporterFilterService importerFilterService,
             ImporterLocationService importerLocationService,
             ImporterMetaService importerMetaService,
+            ImporterSchoolService importerSchoolService,
             ApplicationDbContext context,
             ILogger<ImporterService> logger)
         {
@@ -32,6 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             _importerMetaService = importerMetaService;
             _context = context;
             _logger = logger;
+            _importerSchoolService = importerSchoolService;
         }
 
         public SubjectMeta ImportMeta(List<string> metaLines, Subject subject)
@@ -48,11 +51,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             return _importerMetaService.Import(metaLines, subject, true);
         }
 
-        public void ImportFiltersAndLocations(List<string> lines, SubjectMeta subjectMeta)
+        public void ImportFiltersLocationsAndSchools(List<string> lines, SubjectMeta subjectMeta)
         {
             var headers = lines.First().Split(',').ToList();
             lines.RemoveAt(0);
-            lines.ForEach(line => CreateFiltersAndLocationsFromCsv(line, headers, subjectMeta));
+            lines.ForEach(line => CreateFiltersLocationsAndSchoolsFromCsv(line, headers, subjectMeta));
         }
 
         public void ImportObservations(List<string> lines, Subject subject, SubjectMeta subjectMeta)
@@ -101,13 +104,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             return observation;
         }
         
-        private void CreateFiltersAndLocationsFromCsv(string raw,
+        private void CreateFiltersLocationsAndSchoolsFromCsv(string raw,
             List<string> headers,
             SubjectMeta subjectMeta)
         {
             var line = raw.Split(',');
             GetFilterItems(line, headers, subjectMeta.Filters);
             GetLocationId(line, headers);
+            GetSchool(line, headers);
         }
 
         private ICollection<ObservationFilterItem> GetFilterItems(IReadOnlyList<string> line,
@@ -170,11 +174,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             ).Id;
         }
 
-        private static School GetSchool(IReadOnlyList<string> line, List<string> headers)
+        private School GetSchool(IReadOnlyList<string> line, List<string> headers)
         {
             var columns = new[]
                 {"academy_open_date", "academy_type", "estab", "laestab", "school_name", "school_postcode", "urn"};
-            return CsvUtil.BuildType(line, headers, columns, values => new School
+            var school = CsvUtil.BuildType(line, headers, columns, values => new School
             {
                 AcademyOpenDate = values[0],
                 AcademyType = values[1],
@@ -184,6 +188,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 Postcode = values[5],
                 Urn = values[6]
             });
+            
+            return _importerSchoolService.Find(school);
         }
 
         private static Dictionary<long, string> GetMeasures(IReadOnlyList<string> line,

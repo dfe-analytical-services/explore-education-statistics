@@ -13,6 +13,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Inte
         void ImportObservations(List<string> batch, Subject subject,
             SubjectMeta subjectMeta);
 
-        void ImportFiltersAndLocations(List<string> lines, SubjectMeta subjectMeta);
+        void ImportFiltersLocationsAndSchools(List<string> lines, SubjectMeta subjectMeta);
     }
 }

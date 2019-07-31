@@ -87,12 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             try
             {
                 var filterGroup = _context.FilterGroup
-                    .FirstOrDefault(fg => fg.FilterId == filter.Id && fg.Label == label);
-                
-                if (filterGroup == null)
-                {
-                    filterGroup = _context.FilterGroup.Add(new FilterGroup(filter, label)).Entity;
-                }
+                                  .FirstOrDefault(fg => fg.FilterId == filter.Id && fg.Label == label) ?? _context.FilterGroup.Add(new FilterGroup(filter, label)).Entity;
 
                 return filterGroup;
             }

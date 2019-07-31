@@ -24,6 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                         providerOptions => providerOptions.EnableRetryOnFailure()))
                 .AddTransient<IFileStorageService, FileStorageService>()
                 .AddTransient<IFileImportService, FileImportService>()
+                .AddTransient<ImporterSchoolService>()
                 .AddTransient<IImporterService, ImporterService>()
                 .AddTransient<ISplitFileService, SplitFileService>()
                 .AddTransient<ImporterFilterService>()

@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .ThenInclude(t => t.Theme)
                 .FirstOrDefault(s => s.Name.Equals(subjectData.Name) && s.ReleaseId == message.Release.Id);
             
-            _importerService.ImportFiltersAndLocations(
+            _importerService.ImportFiltersLocationsAndSchools(
                 batch,
                 _importerService.GetMeta(metaLines, subject));
         }
