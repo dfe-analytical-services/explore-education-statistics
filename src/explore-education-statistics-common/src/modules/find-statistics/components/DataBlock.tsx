@@ -81,8 +81,6 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
     this.query = undefined;
   }
 
-  // eslint-disable-next-line class-methods-use-this
-
   private parseDataResponse(response: DataBlockResponse): void {
     const newState: DataBlockState = { isLoading: false };
 

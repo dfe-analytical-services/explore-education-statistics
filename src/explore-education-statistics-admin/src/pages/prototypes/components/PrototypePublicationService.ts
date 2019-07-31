@@ -1,5 +1,5 @@
 import { GeographicLevel } from '@common/services/dataBlockService';
-import { Release } from '@common/services/publicationService';
+import { EditableRelease } from '@admin/services/publicationService';
 
 const LOREM =
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec elementum, mauris eget vulputate iaculis, dui orci efficitur mi, at consectetur metus lorem tempor neque. Etiam in eleifend magna. Sed hendrerit vitae ante at semper. Mauris a erat a ex porta mollis. Aliquam quis justo eu lectus luctus porttitor nec at dolor. Nunc interdum, diam sed lobortis porta, massa arcu volutpat nunc, eget scelerisque arcu neque vel tortor. Fusce sit amet mauris augue. Praesent sed urna vel lacus suscipit mollis id quis nulla. Duis porta sapien et arcu ornare, eget mollis justo finibus. Nunc commodo felis justo, at efficitur purus mattis in. Donec nibh quam, mollis at eros ac, fringilla porta mi.';
@@ -7,7 +7,9 @@ const LOREM =
 // const LOREM_SMALL = "Lorem ipsum dolor sit ame";
 
 export default class PrototypePublicationService {
-  public static getLatestPublicationRelease(_: string): Promise<Release> {
+  public static getLatestPublicationRelease(
+    _: string,
+  ): Promise<EditableRelease> {
     // @ts-ignore
     return Promise.resolve({
       id: '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5',
@@ -378,8 +380,10 @@ export default class PrototypePublicationService {
     });
   }
 
-  public static getNewPublication(): Release {
+  public static getNewPublication(): EditableRelease {
     return {
+      yearTitle: '',
+      coverageTitle: '',
       id: '00000000-0000-0000-0000-000000000000',
       title: 'Pupil absence data and statistics for schools in England',
       releaseName: '2018 to 2019',
@@ -420,6 +424,14 @@ export default class PrototypePublicationService {
             {
               type: 'MarkDownBlock',
               body: LOREM,
+              comments: [
+                {
+                  comment: LOREM.substring(0, 120),
+                  name: 'John Smith',
+                  time: new Date(),
+                  state: 'open',
+                },
+              ],
             },
           ],
         },
@@ -431,6 +443,14 @@ export default class PrototypePublicationService {
             {
               type: 'MarkDownBlock',
               body: LOREM,
+              comments: [
+                {
+                  comment: LOREM.substring(0, 120),
+                  name: 'John Smith',
+                  time: new Date(),
+                  state: 'open',
+                },
+              ],
             },
           ],
         },
@@ -493,14 +513,23 @@ export default class PrototypePublicationService {
             type: 'line',
           },
         ],
-        // @ts-ignore
+
         summary: {
           dataKeys: [],
+          dataSummary: [],
           description: {
             type: 'MarkDownBlock',
             body: LOREM,
           },
         },
+        comments: [
+          {
+            comment: LOREM.substring(0, 120),
+            name: 'John Smith',
+            time: new Date(),
+            state: 'open',
+          },
+        ],
       },
       dataFiles: [
         {

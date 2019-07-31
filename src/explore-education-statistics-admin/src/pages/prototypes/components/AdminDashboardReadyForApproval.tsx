@@ -1,21 +1,61 @@
 import PrototypeDashboardRelease from '@admin/pages/prototypes/components/PrototypeDashboardRelease';
+import { LoginContext } from '@admin/components/Login';
 import React from 'react';
 
-const AdminDashboardReadyForApproval = () => {
+interface Props {
+  task?: string;
+  reviewType?: string;
+}
+
+const AdminDashboardReadyForApproval = ({ task }: Props) => {
+  const userContext = React.useContext(LoginContext);
+
+  const tagLabel =
+    userContext.user &&
+    userContext.user.permissions.includes('responsible statistician')
+      ? 'Ready for final sign off'
+      : 'Ready for you to review';
+
+  const checkStatus = window.location.search.includes('?status=readyApproval')
+    ? 'checkReleases'
+    : 'noReleases';
+
   return (
     <>
-      {window.location.search !== '?status=readyApproval' && (
-        <div className="govuk-inset-text">
-          There are currenly no releases ready for approval
-        </div>
-      )}
-      {window.location.search === '?status=readyApproval' && (
+      {checkStatus === 'noReleases' && (
         <>
-          <h2 className="govuk-heading-l govuk-!-margin-bottom-0">
-            Pupils and schools, pupil absence
-          </h2>
+          <div className="govuk-inset-text">
+            {task === 'readyReview'
+              ? 'There are currenly no releases ready for you to review'
+              : 'There are currently no unresolved comments'}
+          </div>
+        </>
+      )}
+      {checkStatus === 'checkReleases' && (
+        <>
+          {userContext.user &&
+            userContext.user.permissions.includes('team member') && (
+              <p>Level 1: peer review</p>
+            )}
+          {userContext.user &&
+            userContext.user.permissions.includes(
+              'responsible statistician',
+            ) && <p>Level 2: higher review</p>}
+
           <p className="govuk-body">
-            Please review the following draft release(s)
+            {task === 'readyReview' ? (
+              'Review the following draft releases.'
+            ) : (
+              <div className="govuk-warning-text">
+                <span className="govuk-warning-text__icon" aria-hidden="true">
+                  !
+                </span>
+                <strong className="govuk-warning-text__text">
+                  <span className="govuk-warning-text__assistive">Warning</span>
+                  Resolve comments in the following draft releases
+                </strong>
+              </div>
+            )}
           </p>
 
           <hr />
@@ -26,14 +66,15 @@ const AdminDashboardReadyForApproval = () => {
           <PrototypeDashboardRelease
             title="Academic year,"
             years="2018 to 2019"
-            tag="Ready to review"
+            tag={task === 'readyReview' ? tagLabel : 'Resolve comments'}
             review
             lastEdited={new Date('2019-03-20 17:37')}
             lastEditor={{ id: 'me', name: 'me', permissions: [] }}
             published={new Date('2019-09-20 09:30')}
             nextRelease={new Date('2020-09-20 09:30')}
             showComments
-            dataType="Revised"
+            task={task}
+            isNew
           />
         </>
       )}

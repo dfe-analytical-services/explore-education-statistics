@@ -31,6 +31,10 @@
   text-align: right;
 }
 
+.dfe-align--comments {
+  margin-right: 0;
+}
+
 // stylelint-disable-next-line selector-no-qualifying-type
 h1.govuk-panel__title {
   color: govuk-colour('white');
@@ -111,5 +115,12 @@ h1.govuk-panel__title {
   .govuk-radios {
     background: govuk-colour('white');
     padding: 6px 6px 0;
+  }
+}
+
+.govuk-link.dfe-link--white {
+  color: govuk-colour('white');
+  &:hover {
+    text-decoration: none;
   }
 }

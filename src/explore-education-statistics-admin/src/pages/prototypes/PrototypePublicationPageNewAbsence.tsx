@@ -82,12 +82,18 @@ class PublicationPage extends Component<{}, State> {
         <div className="govuk-grid-row govuk-!-margin-top-9">
           <div className="govuk-grid-column-one-half ">
             <Link to="/prototypes/publication-create-new-absence-view-table">
-              Previous step, view / edit tables
+              <span className="govuk-heading-m govuk-!-margin-bottom-0">
+                Previous step
+              </span>
+              Manage tables and charts
             </Link>
           </div>
           <div className="govuk-grid-column-one-half dfe-align--right">
             <Link to="/prototypes/publication-create-new-absence-status">
-              Next step, set publish status
+              <span className="govuk-heading-m govuk-!-margin-bottom-0">
+                Next step
+              </span>
+              Set publish status
             </Link>
           </div>
         </div>

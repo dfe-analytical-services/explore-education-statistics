@@ -35,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
                     Id = x.Id,
                     Title = x.Title,
                     Summary = x.Summary,
-                    Publications = x.Publications
+                    Publications = x.Publications.Where(p => p.Methodology != null)
                         .Select(p => new PublicationTree
                         {
                             Id = p.Methodology.Id,

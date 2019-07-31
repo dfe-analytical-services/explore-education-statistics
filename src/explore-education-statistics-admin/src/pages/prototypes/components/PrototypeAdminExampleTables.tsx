@@ -49,15 +49,22 @@ const PrototypeExampleTable = ({ task, table }: Props) => {
    */
 
   return (
-    <div className="govuk-width-container">
+    <>
       <Tabs id="tablePreviewTab">
         <TabsSection id="table-preview" title="Table preview">
-          <PrototypeTableContent table={table} task={task} />
+          <div className="govuk-width-container">
+            <PrototypeTableContent table={table} task={task} />
+          </div>
         </TabsSection>
-        <TabsSection id="add-chart" title="Add a chart">
+        <TabsSection id="add-chart" title="Create chart">
           {Data && <ChartBuilder data={Data} />}
         </TabsSection>
       </Tabs>
+      {task === 'selectTable' && (
+        <a className="govuk-button" href="#">
+          Embed selected data block in this section
+        </a>
+      )}
       {task === 'view' && (
         <>
           <FormGroup>
@@ -65,7 +72,8 @@ const PrototypeExampleTable = ({ task, table }: Props) => {
               id="permalink"
               name="permalink"
               label="Permalink"
-              hint="Copy this URL to view a standalone verion of this table"
+              hint="Copy this link to view a standalone version of this table. You can use this link to refer to your table within your commentary.
+              "
               defaultValue="http://dfe-url.gov.uk/example-permalink"
               width={20}
               onClick={e =>
@@ -76,15 +84,15 @@ const PrototypeExampleTable = ({ task, table }: Props) => {
               }
             />
           </FormGroup>
-          <Link
+          <a
             className="govuk-button govuk-!-margin-right-3"
-            to="/prototypes/publication-create-new-absence-table?status=step5"
+            href="/prototypes/publication-create-new-absence-table?status=step5#table-builder"
           >
-            Edit this table
-          </Link>
+            Edit table
+          </a>
 
           <Button variant="warning" onClick={() => toggleDeleteModal(true)}>
-            Delete this table
+            Delete table
           </Button>
 
           <ModalConfirm
@@ -98,7 +106,7 @@ const PrototypeExampleTable = ({ task, table }: Props) => {
           </ModalConfirm>
         </>
       )}
-    </div>
+    </>
   );
 };
 
