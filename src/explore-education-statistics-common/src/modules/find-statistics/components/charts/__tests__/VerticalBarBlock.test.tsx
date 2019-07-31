@@ -5,7 +5,7 @@ import {
   DataBlockData,
   DataBlockMetadata,
 } from '@common/services/dataBlockService';
-import VerticalBarBlock from '../VerticalBarBlock';
+import Chart from '../VerticalBarBlock';
 
 import testData from './__data__/testBlockData';
 
@@ -19,7 +19,7 @@ const { axes } = props;
 
 describe('VerticalBarBlock', () => {
   test('renders basic chart correctly', () => {
-    const { container } = render(<VerticalBarBlock {...props} />);
+    const { container } = render(<Chart {...props} />);
 
     expect(container).toMatchSnapshot();
 
@@ -54,7 +54,7 @@ describe('VerticalBarBlock', () => {
 
   test('major axis can be hidden', () => {
     const { container } = render(
-      <VerticalBarBlock
+      <Chart
         {...props}
         axes={{
           ...axes,
@@ -73,7 +73,7 @@ describe('VerticalBarBlock', () => {
 
   test('minor axis can be hidden', () => {
     const { container } = render(
-      <VerticalBarBlock
+      <Chart
         {...props}
         axes={{
           ...axes,
@@ -92,7 +92,7 @@ describe('VerticalBarBlock', () => {
 
   test('both axes can be hidden', () => {
     const { container } = render(
-      <VerticalBarBlock
+      <Chart
         {...props}
         axes={{
           ...axes,
@@ -118,7 +118,7 @@ describe('VerticalBarBlock', () => {
   });
 
   test('can hide legend', () => {
-    const { container } = render(<VerticalBarBlock {...props} legend="none" />);
+    const { container } = render(<Chart {...props} legend="none" />);
 
     expect(
       container.querySelector('.recharts-default-legend'),
@@ -126,9 +126,7 @@ describe('VerticalBarBlock', () => {
   });
 
   test('can stack data', () => {
-    const { container } = render(
-      <VerticalBarBlock {...props} stacked legend="none" />,
-    );
+    const { container } = render(<Chart {...props} stacked legend="none" />);
 
     // Unsure how to tell stacked data apart, other than the snapshot
 
@@ -141,7 +139,7 @@ describe('VerticalBarBlock', () => {
 
   test('can render major axis reference line', () => {
     const { container } = render(
-      <VerticalBarBlock
+      <Chart
         {...{
           ...props,
           axes: {
@@ -167,7 +165,7 @@ describe('VerticalBarBlock', () => {
   });
   test('can render minor axis reference line', () => {
     const { container } = render(
-      <VerticalBarBlock
+      <Chart
         {...{
           ...props,
           axes: {
@@ -197,13 +195,48 @@ describe('VerticalBarBlock', () => {
     const invalidMeta: DataBlockMetadata = (undefined as unknown) as DataBlockMetadata;
 
     const { container } = render(
-      <VerticalBarBlock
-        data={invalidData}
-        labels={{}}
-        meta={invalidMeta}
-        axes={{}}
-      />,
+      <Chart data={invalidData} labels={{}} meta={invalidMeta} axes={{}} />,
     );
     expect(container).toHaveTextContent('Unable to render chart');
+  });
+
+  test('Can change width of chart', () => {
+    const propsWithSize = {
+      ...props,
+      width: 200,
+    };
+
+    const { container } = render(<Chart {...propsWithSize} />);
+
+    const responsiveContainer = container.querySelector(
+      '.recharts-responsive-container',
+    );
+
+    expect(responsiveContainer).toHaveProperty('style');
+
+    if (responsiveContainer) {
+      const div = responsiveContainer as HTMLElement;
+      expect(div.style.width).toEqual('200px');
+    }
+  });
+
+  test('Can change height of chart', () => {
+    const propsWithSize = {
+      ...props,
+      height: 200,
+    };
+
+    const { container } = render(<Chart {...propsWithSize} />);
+
+    const responsiveContainer = container.querySelector(
+      '.recharts-responsive-container',
+    );
+
+    expect(responsiveContainer).toHaveProperty('style');
+
+    if (responsiveContainer) {
+      const div = responsiveContainer as HTMLElement;
+      expect(div.style.height).toEqual('200px');
+    }
   });
 });
