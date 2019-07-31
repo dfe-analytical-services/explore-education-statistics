@@ -1,5 +1,6 @@
-import {PublicationService} from "@admin/services/edit-publication/service";
-import {CreatePublicationRequest} from "@admin/services/edit-publication/types";
+import { PublicationService } from '@admin/services/edit-publication/service';
+import { CreatePublicationRequest } from '@admin/services/edit-publication/types';
+import { generateRandomIntegerString } from '@admin/services/util/mock/mock-service';
 import MockAdapter from 'axios-mock-adapter';
 
 export default async (mock: MockAdapter) => {
@@ -9,7 +10,7 @@ export default async (mock: MockAdapter) => {
 
   const dashboardMockData = (await import(
     /* webpackChunkName: "dashboard-mock-data" */ '@admin/services/dashboard/mock/mock-data'
-    )).default;
+  )).default;
 
   const getMethodologiesUrl = /\/methodologies/;
   const getPublicationAndReleaseContactsUrl = /\/publication\/contacts/;
@@ -17,24 +18,28 @@ export default async (mock: MockAdapter) => {
 
   const service: PublicationService = {
     getMethodologies: () => Promise.resolve(mockData.getMethodologies()),
-    getPublicationAndReleaseContacts: () => Promise.resolve(mockData.getPublicationAndReleaseContacts()),
-    createPublication: (_) => Promise.resolve(),
+    getPublicationAndReleaseContacts: () =>
+      Promise.resolve(mockData.getPublicationAndReleaseContacts()),
+    createPublication: _ => Promise.resolve(),
   };
 
   mock.onGet(getMethodologiesUrl).reply(200, service.getMethodologies());
-  mock.onGet(getPublicationAndReleaseContactsUrl).reply(200, service.getPublicationAndReleaseContacts());
+  mock
+    .onGet(getPublicationAndReleaseContactsUrl)
+    .reply(200, service.getPublicationAndReleaseContacts());
   mock.onPost(createPublicationUrl).reply(config => {
-
-    const request = JSON.parse(
-      config.data,
-    ) as CreatePublicationRequest;
+    const request = JSON.parse(config.data) as CreatePublicationRequest;
 
     const contacts = mockData.getPublicationAndReleaseContacts();
     const methodologies = mockData.getMethodologies();
-    const selectedContact = contacts.find(contact => contact.id === request.selectedContactId) || contacts[0];
-    const selectedMethodology = methodologies.find(methodology => methodology.id === request.selectedMethodologyId);
+    const selectedContact =
+      contacts.find(contact => contact.id === request.selectedContactId) ||
+      contacts[0];
+    const selectedMethodology = methodologies.find(
+      methodology => methodology.id === request.selectedMethodologyId,
+    );
     const newPublication = {
-      id: '1234',
+      id: generateRandomIntegerString(1000000),
       title: request.publicationTitle,
       methodology: selectedMethodology,
       contact: selectedContact,
@@ -44,8 +49,11 @@ export default async (mock: MockAdapter) => {
     const publicationsForTopic =
       dashboardMockData.dashboardPublicationsByTopicId[request.topicId];
 
-    dashboardMockData.dashboardPublicationsByTopicId[request.topicId] =
-      publicationsForTopic ? publicationsForTopic.concat(newPublication) : [newPublication];
+    dashboardMockData.dashboardPublicationsByTopicId[
+      request.topicId
+    ] = publicationsForTopic
+      ? publicationsForTopic.concat(newPublication)
+      : [newPublication];
 
     return [200];
   });

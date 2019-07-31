@@ -90,7 +90,10 @@ const AdminDashboardPublicationsTab = ({
       {publications.length === 0 && (
         <div className="govuk-inset-text">{noResultsMessage}</div>
       )}
-      <Link to={`/topic/${selectedTopicId}/publication/create`} className="govuk-button">
+      <Link
+        to={`/topic/${selectedTopicId}/publication/create`}
+        className="govuk-button"
+      >
         Create new publication
       </Link>
     </section>

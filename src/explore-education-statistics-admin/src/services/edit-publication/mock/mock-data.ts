@@ -1,4 +1,4 @@
-import {ContactDetails, IdLabelPair} from "@admin/services/common/types";
+import { ContactDetails, IdLabelPair } from '@admin/services/common/types';
 
 const methodologies: IdLabelPair[] = [
   {

@@ -1,10 +1,10 @@
-import Page from "@admin/components/Page";
-import CreatePublicationForm from "@admin/pages/create-publication/CreatePublicationForm";
-import CreatePublicationSummary from "@admin/pages/create-publication/CreatePublicationSummary";
-import {ContactDetails, IdLabelPair} from "@admin/services/common/types";
+import Page from '@admin/components/Page';
+import CreatePublicationForm from '@admin/pages/create-publication/CreatePublicationForm';
+import CreatePublicationSummary from '@admin/pages/create-publication/CreatePublicationSummary';
+import { ContactDetails, IdLabelPair } from '@admin/services/common/types';
 import service from '@admin/services/edit-publication/service';
-import React, {useEffect, useState} from 'react';
-import {RouteComponentProps} from 'react-router';
+import React, { useEffect, useState } from 'react';
+import { RouteComponentProps } from 'react-router';
 
 interface MatchProps {
   topicId: string;
@@ -17,8 +17,10 @@ interface FormValues {
   selectedContactId: string;
 }
 
-const CreatePublicationPage = ({ match, history }: RouteComponentProps<MatchProps>) => {
-
+const CreatePublicationPage = ({
+  match,
+  history,
+}: RouteComponentProps<MatchProps>) => {
   const { topicId } = match.params;
 
   const [methodologies, setMethodologies] = useState<IdLabelPair[]>();
@@ -29,11 +31,11 @@ const CreatePublicationPage = ({ match, history }: RouteComponentProps<MatchProp
   useEffect(() => {
     const methodologyPromise = service.getMethodologies();
     const contactsPromise = service.getPublicationAndReleaseContacts();
-    Promise.all([methodologyPromise, contactsPromise]).
-      then(([methodologiesResult, contactsResult]) => {
+    Promise.all([methodologyPromise, contactsPromise]).then(
+      ([methodologiesResult, contactsResult]) => {
         setMethodologies(methodologiesResult);
         setContacts(contactsResult);
-      }
+      },
     );
   }, []);
 
@@ -47,10 +49,12 @@ const CreatePublicationPage = ({ match, history }: RouteComponentProps<MatchProp
   };
 
   const confirmHandler = (values: FormValues) => {
-    service.createPublication({
-      topicId,
-      ...values
-    }).then(() => history.push('/admin-dashboard'));
+    service
+      .createPublication({
+        topicId,
+        ...values,
+      })
+      .then(() => history.push('/admin-dashboard'));
   };
 
   const cancelHandler = () => {
@@ -61,21 +65,20 @@ const CreatePublicationPage = ({ match, history }: RouteComponentProps<MatchProp
     <Page
       wide
       breadcrumbs={[
-      {
-        name: 'Administrator dashboard',
-        link: '/admin-dashboard',
-      },
-      {
-        name: 'Create new publication',
-      }]}
+        {
+          name: 'Administrator dashboard',
+          link: '/admin-dashboard',
+        },
+        {
+          name: 'Create new publication',
+        },
+      ]}
     >
-      <h1 className="govuk-heading-l">
-        Create new publication
-      </h1>
-      {contacts && methodologies && (
-        confirmationView && currentValues ? (
+      <h1 className="govuk-heading-l">Create new publication</h1>
+      {contacts &&
+        methodologies &&
+        (confirmationView && currentValues ? (
           <CreatePublicationSummary
-            topicId={topicId}
             contacts={contacts}
             methodologies={methodologies}
             values={currentValues}
@@ -85,15 +88,13 @@ const CreatePublicationPage = ({ match, history }: RouteComponentProps<MatchProp
           />
         ) : (
           <CreatePublicationForm
-            topicId={topicId}
             contacts={contacts}
             methodologies={methodologies}
             currentValues={currentValues}
             onSubmitHandler={submitFormHandler}
             onCancelHandler={cancelHandler}
           />
-        )
-      )}
+        ))}
     </Page>
   );
 };

@@ -1,6 +1,6 @@
-import {ContactDetails, IdLabelPair} from "@admin/services/common/types";
-import {CreatePublicationRequest} from "@admin/services/edit-publication/types";
-import {createClient} from '@admin/services/util/service';
+import { ContactDetails, IdLabelPair } from '@admin/services/common/types';
+import { CreatePublicationRequest } from '@admin/services/edit-publication/types';
+import { createClient } from '@admin/services/util/service';
 import mocks from './mock/mock-service';
 
 const apiClient = createClient({
@@ -28,7 +28,7 @@ const service: PublicationService = {
     return apiClient.then(client =>
       client.post(`/publication/create`, createRequest),
     );
-  }
+  },
 };
 
 export default service;

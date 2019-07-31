@@ -1,8 +1,8 @@
-import Link from "@admin/components/Link";
-import {ContactDetails, IdLabelPair} from "@admin/services/common/types";
-import Button from "@common/components/Button";
-import SummaryList from "@common/components/SummaryList";
-import SummaryListItem from "@common/components/SummaryListItem";
+import Link from '@admin/components/Link';
+import { ContactDetails, IdLabelPair } from '@admin/services/common/types';
+import Button from '@common/components/Button';
+import SummaryList from '@common/components/SummaryList';
+import SummaryListItem from '@common/components/SummaryListItem';
 import React from 'react';
 
 interface FormValues {
@@ -13,7 +13,6 @@ interface FormValues {
 }
 
 interface Props {
-  topicId: string;
   contacts: ContactDetails[];
   methodologies: IdLabelPair[];
   values: FormValues;
@@ -22,10 +21,18 @@ interface Props {
   onCancelHandler: () => void;
 }
 
-const CreatePublicationSummary = ({topicId, contacts, methodologies, values, onEditHandler, onConfirmHandler, onCancelHandler}: Props) => {
-
+const CreatePublicationSummary = ({
+  contacts,
+  methodologies,
+  values,
+  onEditHandler,
+  onConfirmHandler,
+  onCancelHandler,
+}: Props) => {
   const getSelectedMethodology = (selectedMethodologyId: string) =>
-    methodologies.find(methodology => methodology.id === selectedMethodologyId) || methodologies[0];
+    methodologies.find(
+      methodology => methodology.id === selectedMethodologyId,
+    ) || methodologies[0];
 
   const getSelectedContact = (contactId: string) =>
     contacts.find(contact => contact.id === contactId) || contacts[0];
@@ -33,25 +40,31 @@ const CreatePublicationSummary = ({topicId, contacts, methodologies, values, onE
   return (
     <>
       <SummaryList>
-        <SummaryListItem term='Publication title'>
+        <SummaryListItem term="Publication title">
           {values.publicationTitle}
         </SummaryListItem>
-        <SummaryListItem term='Methodology'>
+        <SummaryListItem term="Methodology">
           {values.selectedMethodologyId
             ? getSelectedMethodology(values.selectedMethodologyId).label
-            : 'Create new methodology'
-          }
+            : 'Create new methodology'}
         </SummaryListItem>
-        <SummaryListItem term='Contact'>
+        <SummaryListItem term="Contact">
           {getSelectedContact(values.selectedContactId).contactName}
         </SummaryListItem>
-        <SummaryListItem term='' actions={<Link to='#' onClick={onEditHandler}>Edit publication details</Link>} />
+        <SummaryListItem
+          term=""
+          actions={
+            <Link to="#" onClick={onEditHandler}>
+              Edit publication details
+            </Link>
+          }
+        />
       </SummaryList>
       <Button onClick={() => onConfirmHandler(values)}>
         Confirm and create new publication
       </Button>
       <div className="govuk-!-margin-top-6">
-        <Link to='#' onClick={onCancelHandler}>
+        <Link to="#" onClick={onCancelHandler}>
           Cancel publication
         </Link>
       </div>
