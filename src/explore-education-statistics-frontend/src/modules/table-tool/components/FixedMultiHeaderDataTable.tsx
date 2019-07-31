@@ -61,7 +61,12 @@ const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
             ref={mainTableRef}
           />
         </div>
-        {footnotes && <Footnote content={footnotes} />}
+        {footnotes && (
+          <>
+            <h3>Footnotes</h3>
+            <Footnote content={footnotes} />
+          </>
+        )}
       </figure>
     );
   },
