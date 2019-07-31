@@ -1,4 +1,4 @@
-import { User } from '@admin/services/sign-in/service';
+import { User } from '@admin/services/sign-in/types';
 import React from 'react';
 import Link from '@admin/components/Link';
 import { format } from 'date-fns';
