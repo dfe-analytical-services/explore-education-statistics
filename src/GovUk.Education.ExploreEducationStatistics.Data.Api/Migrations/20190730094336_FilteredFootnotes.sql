@@ -15,11 +15,8 @@ SELECT FG.FilterId
 FROM FilterGroup FG
 WHERE FG.Id IN (SELECT id FROM @filterGroupList);
 
-SELECT DISTINCT F.Id              AS Id
-              --I.IndicatorId,
-              --FF.FilterId       AS FilterId,
-              --FGF.FilterGroupId AS FilterGroupId,
-              --FIF.FilterItemId  AS FilterItemId
+SELECT DISTINCT F.Id,
+                F.Content
 FROM Footnote F
          LEFT JOIN IndicatorFootnote I ON F.Id = I.FootnoteId
          LEFT JOIN FilterFootnote FF on F.Id = FF.FootnoteId

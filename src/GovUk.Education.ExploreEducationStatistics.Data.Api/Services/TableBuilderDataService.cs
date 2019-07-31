@@ -43,21 +43,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                     _resultBuilder.BuildResult(observation, queryContext.Indicators))
             };
         }
-        
+
         public override async Task<ResultViewModel> QueryAsync(ObservationQueryContext queryContext)
         {
             return Query(queryContext);
         }
 
-        private IEnumerable<FootnoteViewModel> GetFootnotes(IEnumerable<Observation> observations, 
+        private IEnumerable<FootnoteViewModel> GetFootnotes(IEnumerable<Observation> observations,
             ObservationQueryContext queryContext)
         {
             return _footnoteService.GetFootnotes(observations, queryContext.Indicators)
                 .Select(footnote => new FootnoteViewModel
                 {
-                    Id = footnote.Key.Id,
-                    Indicators = footnote.Value.Select(indicatorId => indicatorId.ToString()),
-                    Label = footnote.Key.Content
+                    Id = footnote.Id,
+                    Label = footnote.Content
                 });
         }
 

@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         {
         }
 
-        public Dictionary<Footnote, IEnumerable<long>> GetFootnotes(IEnumerable<Observation> observations,
+        public IEnumerable<Footnote> GetFootnotes(IEnumerable<Observation> observations,
             IEnumerable<long> indicators)
         {
             var filterItems = observations.SelectMany(observation => observation.FilterItems)
@@ -22,20 +22,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             var indicatorListParam = CreateIdListType("indicatorList", indicators);
             var filterItemListParam = CreateIdListType("filterItemList", filterItems);
 
-            var inner = _context.Query<IdWrapper>().AsNoTracking()
-                .FromSql("EXEC dbo.FilteredFootnotes " +
-                         "@indicatorList," +
-                         "@filterItemList",
-                    indicatorListParam,
-                    filterItemListParam);
-
-            var ids = inner.Select(obs => obs.Id).ToList();
-
-            return Find(ids.ToArray())
-                .ToDictionary(
-                    footnote => footnote,
-                    // TODO DFE-1127 What indicator ids are going to be returned here?
-                    footnote => new List<long>().AsEnumerable());
+            return _context.Footnote.AsNoTracking().FromSql(
+                "EXEC dbo.FilteredFootnotes " +
+                "@indicatorList," +
+                "@filterItemList",
+                indicatorListParam,
+                filterItemListParam);
         }
     }
 }
