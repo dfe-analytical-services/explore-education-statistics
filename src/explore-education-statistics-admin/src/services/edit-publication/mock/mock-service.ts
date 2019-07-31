@@ -12,6 +12,7 @@ export default async (mock: MockAdapter) => {
   const service: PublicationService = {
     getMethodologies: () => Promise.resolve(mockData.getMethodologies()),
     getPublicationAndReleaseContacts: () => Promise.resolve(mockData.getPublicationAndReleaseContacts()),
+    createPublication: (_) => Promise.resolve(),
   };
 
   mock.onGet(getMethodologiesUrl).reply(200, service.getMethodologies());

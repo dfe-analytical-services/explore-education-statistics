@@ -231,6 +231,7 @@ const dashboardPublicationsByTopicId: Dictionary<
         label: 'A guide to absence statistics',
       },
       contact: {
+        id: 'contact-1',
         contactName: 'John Smith',
         contactTelNo: '07654 653763',
         teamEmail: 'js@example.com',
@@ -257,6 +258,7 @@ const dashboardPublicationsByTopicId: Dictionary<
             year: 2021,
           },
           contact: {
+            id: 'contact-1',
             contactName: 'John Smith',
             contactTelNo: '07654 653763',
             teamEmail: 'js@example.com',
