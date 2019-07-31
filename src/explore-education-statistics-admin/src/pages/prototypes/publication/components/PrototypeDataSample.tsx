@@ -9,6 +9,7 @@ import PrototypeTableSample from '@common/prototypes/publication/components/Prot
 
 interface Props {
   editing?: boolean;
+  reviewing?: boolean;
   sectionId?: string;
   chartTitle?: string;
   xAxisLabel?: string;
@@ -19,6 +20,7 @@ interface Props {
 
 const PrototypeDataSample = ({
   editing,
+  reviewing,
   sectionId,
   chartTitle,
   xAxisLabel,
@@ -31,10 +33,12 @@ const PrototypeDataSample = ({
       <Tabs id="data-sample-tabs">
         {sectionId === 'headlines' && (
           <TabsSection id={`${sectionId}SummaryData`} title="Summary">
+            {editing && <Button>Add data block to this section</Button>}
             <PrototypeDataTilesHighlights />
             {editing && <Button>Add another key indicator</Button>}
             <PrototypeEditableContent
               editable={editing}
+              reviewing={reviewing}
               content={`
             <ul className="govuk-list govuk-list--bullet">
               <li>pupils missed on average 8.2 school days</li>

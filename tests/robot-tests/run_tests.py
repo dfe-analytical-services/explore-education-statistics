@@ -6,6 +6,7 @@
 Run 'python run_tests.py -h' to see argument options
 """
 
+import sys
 import os
 import argparse
 from robot import run_cli as robot_run_cli
@@ -88,8 +89,15 @@ else:
     load_dotenv(os.path.join(os.path.dirname(__file__), '.env.' + args.env))
     url = os.getenv('publicAppUrl')
     urlAdmin = os.getenv('adminAppUrl')
-robotArgs += ["-v", "url:" + url]
-robotArgs += ["-v", "urlAdmin:" + urlAdmin]
+
+if url is None or urlAdmin is None:
+    print("url and/or urlAdmin are None")
+    print(f'url: {url}')
+    print(f'urlAdmin: {urlAdmin}')
+    sys.exit(1)
+
+robotArgs += ["-v", "url:" + str(url)]
+robotArgs += ["-v", "urlAdmin:" + str(urlAdmin)]
 
 if args.visual:
     robotArgs += ["-v", "headless:0"]

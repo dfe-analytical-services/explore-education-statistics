@@ -1,16 +1,6 @@
-export interface User {
-  id: string;
-  name: string;
-  permissions: string[];
-}
+import { User } from '@admin/services/sign-in/service';
 
-export interface Authentication {
-  user?: User;
-}
-
-export class PrototypeLoginService {
-  private static currentUser: User;
-
+export default class PrototypeLoginService {
   private static USERS: User[] = [
     {
       id: '4add7621-4aef-4abc-b2e6-0938b37fe5b9',
@@ -20,12 +10,12 @@ export class PrototypeLoginService {
     {
       id: '8e3a250b-6153-4c5e-aba5-363a554bc288',
       name: 'Ann Evans',
-      permissions: [''],
+      permissions: ['team member'],
     },
     {
       id: 'b7630cce-7f5f-4233-90fe-a8c751b1c38c',
       name: 'Stephen Doherty',
-      permissions: [''],
+      permissions: ['responsible statistician'],
     },
     {
       id: '97d839e7-67fc-47b7-a40f-00f84d0cc3c4',
@@ -54,17 +44,13 @@ export class PrototypeLoginService {
   }
 
   public static setActiveUser(userId: string) {
-    window.sessionStorage.setItem('userId', userId);
+    window.localStorage.setItem('userId', userId);
   }
 
   public static login() {
     return PrototypeLoginService.getAuthentication(
-      window.sessionStorage.getItem('userId') ||
+      window.localStorage.getItem('userId') ||
         '4add7621-4aef-4abc-b2e6-0938b37fe5b9',
     );
-  }
-
-  public static getNoLoggedInUser() {
-    return {};
   }
 }

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
   FormGroup,
   FormFieldset,
-  FormTextInput,
   FormSelect,
   FormRadioGroup,
 } from '@common/components/form';
@@ -32,7 +31,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
           <>
             <div className="govuk-form-group">
               <label htmlFor="title" className="govuk-label govuk-label--s">
-                Publication title
+                Enter publication title
               </label>
               <input
                 className="govuk-input"
@@ -45,7 +44,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
 
             <FormGroup>
               <FormRadioGroup
-                legend="Methodology"
+                legend="Choose a methodology for this publication"
                 id="methodology"
                 name="methodology"
                 value={value}
@@ -55,7 +54,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                 options={[
                   {
                     id: 'existing-methodology',
-                    label: 'Add existing methodology to this publication',
+                    label: 'Add existing methodology',
                     value: 'existing-methodlogy',
                     conditional: (
                       <FormSelect
@@ -84,33 +83,10 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                       />
                     ),
                   },
-                  {
-                    id: 'url-methodology',
-                    label: 'Link to externally hosted methodology',
-                    value: 'url-methodology',
-                    conditional: (
-                      <>
-                        <FormGroup>
-                          <FormTextInput
-                            id="external-url"
-                            name="external-url"
-                            label="URL"
-                            value="http://"
-                          />
-                        </FormGroup>
-                        <FormGroup>
-                          <FormTextInput
-                            id="external-title"
-                            name="external-title"
-                            label="Link title"
-                          />
-                        </FormGroup>
-                      </>
-                    ),
-                  },
+
                   {
                     id: 'new-methodology',
-                    label: 'This publication requires new methodology creating',
+                    label: 'Create new methodology',
                     value: 'new-methodology',
                   },
                 ]}
@@ -118,10 +94,18 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
             </FormGroup>
 
             <FormGroup>
-              <FormFieldset id="lead-statisician" legend="Lead statistician">
+              <FormFieldset
+                id="lead-statisician"
+                legend="Choose the contact for this publication
+                "
+              >
+                <p className="govuk-hint">
+                  They will be the main point of contact for data and
+                  methodology enquiries for this publication and its releases.
+                </p>
                 <FormSelect
                   id="select-lead-statisician"
-                  label="Select lead statistician"
+                  label="Publication and release contact"
                   name="select-lead-statisician"
                   options={[
                     { label: 'Mark Pearson', value: 'mark-pearson' },
@@ -132,13 +116,13 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
             </FormGroup>
             <dl className="govuk-summary-list govuk-width-container">
               <div className="govuk-summary-list__row">
-                <dt className="govuk-summary-list__key">Email:</dt>
+                <dt className="govuk-summary-list__key">Email</dt>
                 <dd className="govuk-summary-list__value">
                   example@email.co.uk
                 </dd>
               </div>
               <div className="govuk-summary-list__row">
-                <dt className="govuk-summary-list__key">Telephone:</dt>
+                <dt className="govuk-summary-list__key">Telephone</dt>
                 <dd className="govuk-summary-list__value">07954 765423</dd>
               </div>
             </dl>
@@ -162,7 +146,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
               </div>
 
               <div className="govuk-summary-list__row">
-                <dt className="govuk-summary-list__key">Lead statistician</dt>
+                <dt className="govuk-summary-list__key">Contact</dt>
                 <dd className="govuk-summary-list__value">Alex Miller</dd>
               </div>
 
@@ -186,7 +170,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
               className="govuk-button govuk-!-margin-right-3"
               formAction="publication-confirm-new"
             >
-              Create new publication
+              Continue
             </button>
             <div className="govuk-!-margin-top-6">
               <Link to="/prototypes/admin-dashboard">Cancel publication</Link>

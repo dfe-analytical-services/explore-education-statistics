@@ -1,8 +1,7 @@
+import { User } from '@admin/services/sign-in/service';
 import React from 'react';
-// import {User} from "@admin/services/PrototypeLoginService";
 import Link from '@admin/components/Link';
 import { format } from 'date-fns';
-import { User } from '@admin/services/PrototypeLoginService';
 import Details from '@common/components/Details';
 
 interface Props {
@@ -21,6 +20,7 @@ interface Props {
   nextRelease?: Date;
   dataType?: string;
   showComments?: boolean;
+  task?: string;
 }
 
 const PrototypeDashboardRelease = ({
@@ -39,6 +39,7 @@ const PrototypeDashboardRelease = ({
   nextRelease,
   dataType,
   showComments,
+  task,
 }: Props) => {
   return (
     <Details
@@ -48,19 +49,6 @@ const PrototypeDashboardRelease = ({
       }`}
       tag={tag}
     >
-      {!editing && !review && (
-        <Link to="/prototypes/publication-edit" className="govuk-button">
-          Edit this release
-        </Link>
-      )}
-      {editing && (
-        <Link
-          to="/prototypes/publication-create-new-absence-config"
-          className="govuk-button"
-        >
-          View / edit this draft
-        </Link>
-      )}
       <dl className="govuk-summary-list govuk-!-margin-bottom-3">
         <div className="govuk-summary-list__row">
           {isNew && (
@@ -71,11 +59,7 @@ const PrototypeDashboardRelease = ({
               <dd className="govuk-summary-list__value">
                 {format(published, 'd MMMM yyyy')}
               </dd>
-              <dd className="govuk-summary-list__actions">
-                <Link to="/prototypes/publication-create-new-absence-status">
-                  Set status
-                </Link>
-              </dd>
+              <dd className="govuk-summary-list__actions" />
             </>
           )}
           {!isNew && (
@@ -90,7 +74,7 @@ const PrototypeDashboardRelease = ({
         </div>
         {nextRelease && (
           <>
-            <dt className="govuk-summary-list__key">Next release</dt>
+            <dt className="govuk-summary-list__key">Expected next release</dt>
             <dd className="govuk-summary-list__value">
               {format(nextRelease, 'd MMMM yyyy')}
             </dd>
@@ -98,7 +82,9 @@ const PrototypeDashboardRelease = ({
           </>
         )}
         <div className="govuk-summary-list__row">
-          <dt className="govuk-summary-list__key">Lead statistician</dt>
+          <dt className="govuk-summary-list__key">
+            Publication and release contact
+          </dt>
           <dd className="govuk-summary-list__value">
             {lead && (
               <span>
@@ -132,10 +118,16 @@ const PrototypeDashboardRelease = ({
           <div className="govuk-summary-list__row">
             <dt className="govuk-summary-list__key">Comments</dt>
             <dd className="govuk-summary-list__value">
+              <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
+                In review
+              </h3>
               <Details
                 summary="Ann Evans, 17 June 2018, 17:35"
                 className="govuk-!-margin-bottom-0"
               >
+                <Link to="/prototypes/publication-review">
+                  General comment or question
+                </Link>
                 <p>
                   Lorem ipsum, dolor sit amet consectetur adipisicing elit.
                   Fugit rem, optio sunt dolorum corrupti harum labore quia
@@ -143,11 +135,31 @@ const PrototypeDashboardRelease = ({
                   possimus quisquam doloremque veritatis provident!
                 </p>
               </Details>
-              <Details summary="Stephen Doherty, 17 June 2018, 13:15">
+              <Details summary="John Smith, 17 June 2018, 13:15">
+                <Link to="/prototypes/publication-review">
+                  Section comment: About this release
+                </Link>
                 <p>
                   Corrupti harum labore quia repellat! Quae voluptatem illo
                   soluta optio ducimus at possimus quisquam doloremque veritatis
                   provident!
+                </p>
+              </Details>
+              <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
+                Final sign-off
+              </h3>
+              <Details
+                summary="Stephen Doherty, 17 June 2018, 17:35"
+                className="govuk-!-margin-bottom-0"
+              >
+                <Link to="/prototypes/publication-review">
+                  General comment or question
+                </Link>
+                <p>
+                  Lorem ipsum, dolor sit amet consectetur adipisicing elit.
+                  Fugit rem, optio sunt dolorum corrupti harum labore quia
+                  repellat! Quae voluptatem illo soluta optio ducimus at
+                  possimus quisquam doloremque veritatis provident!
                 </p>
               </Details>
             </dd>
@@ -162,15 +174,35 @@ const PrototypeDashboardRelease = ({
             {' at '}
             {format(lastEdited, 'HH:mm')} by <a href="#">{lastEditor.name}</a>
           </dd>
-          <dd className="govuk-summary-list__actions">
-            {review && (
-              <Link to="/prototypes/publication-review">
-                Review this release
-              </Link>
-            )}
-          </dd>
+          <dd className="govuk-summary-list__actions" />
         </div>
       </dl>
+      {!editing && !review && (
+        <Link to="/prototypes/publication-edit" className="govuk-button">
+          Edit this release
+        </Link>
+      )}
+      {editing && (
+        <Link
+          to="/prototypes/publication-create-new-absence-config"
+          className="govuk-button"
+        >
+          View / edit this draft
+        </Link>
+      )}
+      {task === 'resolveComments' && (
+        <Link
+          to="/prototypes/publication-unresolved-comments"
+          className="govuk-button"
+        >
+          View release and resolve comments
+        </Link>
+      )}
+      {task === 'readyReview' && (
+        <Link to="/prototypes/publication-review" className="govuk-button">
+          View and review release
+        </Link>
+      )}
     </Details>
   );
 };

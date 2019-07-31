@@ -24,7 +24,7 @@ import {
 export default class HorizontalBarBlock extends Component<StackedBarProps> {
   public static definition: ChartDefinition = {
     type: 'horizontalbar',
-    name: 'Horizontal Bar',
+    name: 'Horizontal bar',
 
     capabilities: {
       dataSymbols: false,

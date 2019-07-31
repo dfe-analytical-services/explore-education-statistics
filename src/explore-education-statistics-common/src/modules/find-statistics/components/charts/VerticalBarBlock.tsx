@@ -24,7 +24,7 @@ import {
 export default class VerticalBarBlock extends Component<StackedBarProps> {
   public static definition: ChartDefinition = {
     type: 'verticalbar',
-    name: 'Vertical Bar',
+    name: 'Vertical bar',
 
     capabilities: {
       dataSymbols: false,

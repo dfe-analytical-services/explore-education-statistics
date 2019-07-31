@@ -1,60 +1,69 @@
+import ProtectedRoute from '@admin/components/ProtectedRoute';
+import SignedOutPage from '@admin/pages/sign-in/SignedOutPage';
+import SignInPage from '@admin/pages/sign-in/SignInPage';
+import releaseRoutes from '@admin/routes/releaseRoutes';
+import PrototypeLoginService from '@admin/services/PrototypeLoginService';
 import React from 'react';
 import { Route } from 'react-router';
+import { BrowserRouter } from 'react-router-dom';
 
 import './App.scss';
-import { PrototypeLoginService } from '@admin/services/PrototypeLoginService';
-import { BrowserRouter } from 'react-router-dom';
-import releaseRoutes from '@admin/routes/releaseRoutes';
-import SignInPage from '@admin/pages/sign-in/SignInPage';
+
+import { LoginContext } from './components/Login';
 import AdminDashboardPage from './pages/admin-dashboard/AdminDashboardPage';
+import IndexPage from './pages/IndexPage';
 import PrototypeAdminDashboard from './pages/prototypes/PrototypeAdminDashboard';
+
+import PrototypeChartTest from './pages/prototypes/PrototypeChartTest';
 import AdminDocumentationGlossary from './pages/prototypes/PrototypeDocumentationGlossary';
 import AdminDocumentationHome from './pages/prototypes/PrototypeDocumentationHome';
-
-import PublicationCreateNew from './pages/prototypes/PrototypePublicationPageCreateNew';
 import PublicationAssignMethodology from './pages/prototypes/PrototypePublicationPageAssignMethodology';
 import PublicationConfirmNew from './pages/prototypes/PrototypePublicationPageConfirmNew';
-import PublicationEditNew from './pages/prototypes/PrototypePublicationPageEditNew';
-import ReleaseCreateNew from './pages/prototypes/PrototypeReleasePageCreateNew';
+
+import PublicationCreateNew from './pages/prototypes/PrototypePublicationPageCreateNew';
 
 import PublicationEditPage from './pages/prototypes/PrototypePublicationPageEditAbsence';
-import PublicationReviewPage from './pages/prototypes/PrototypePublicationPageReviewAbsence';
+import PublicationEditUnresolvedComments from './pages/prototypes/PrototypePublicationPageEditAbsenceUnresolvedComments';
+import PublicationEditNew from './pages/prototypes/PrototypePublicationPageEditNew';
 import PublicationCreateNewAbsence from './pages/prototypes/PrototypePublicationPageNewAbsence';
 import PublicationCreateNewAbsenceConfig from './pages/prototypes/PrototypePublicationPageNewAbsenceConfig';
 import PublicationCreateNewAbsenceConfigEdit from './pages/prototypes/PrototypePublicationPageNewAbsenceConfigEdit';
 import PublicationCreateNewAbsenceData from './pages/prototypes/PrototypePublicationPageNewAbsenceData';
-import PublicationCreateNewAbsenceTable from './pages/prototypes/PrototypePublicationPageNewAbsenceTable';
-import PublicationCreateNewAbsenceViewTables from './pages/prototypes/PrototypePublicationPageNewAbsenceViewTables';
 import PublicationCreateNewAbsenceSchedule from './pages/prototypes/PrototypePublicationPageNewAbsenceSchedule';
 import PublicationCreateNewAbsenceScheduleEdit from './pages/prototypes/PrototypePublicationPageNewAbsenceScheduleEdit';
 import PublicationCreateNewAbsenceStatus from './pages/prototypes/PrototypePublicationPageNewAbsenceStatus';
+import PublicationCreateNewAbsenceTable from './pages/prototypes/PrototypePublicationPageNewAbsenceTable';
+import PublicationCreateNewAbsenceViewTables from './pages/prototypes/PrototypePublicationPageNewAbsenceViewTables';
+import PublicationReviewPage from './pages/prototypes/PrototypePublicationPageReviewAbsence';
+import ReleaseCreateNew from './pages/prototypes/PrototypeReleasePageCreateNew';
 import PrototypesIndexPage from './pages/prototypes/PrototypesIndexPage';
-import IndexPage from './pages/IndexPage';
-
-import PrototypeChartTest from './pages/prototypes/PrototypeChartTest';
-
-import { LoginContext } from './components/Login';
 
 function App() {
   return (
     <BrowserRouter>
+      {/* Non-Prototype Routes*/}
+      <Route exact path="/sign-in" component={SignInPage} />
+
+      <Route exact path="/signed-out" component={SignedOutPage} />
+
+      <ProtectedRoute
+        exact
+        path="/admin-dashboard"
+        component={AdminDashboardPage}
+      />
+
+      {releaseRoutes.map(route => (
+        <ProtectedRoute
+          exact
+          key={route.path}
+          path={route.path}
+          component={route.component}
+        />
+      ))}
+
       <Route exact path="/" component={IndexPage} />
 
       <LoginContext.Provider value={PrototypeLoginService.login()}>
-        {/* Non-Prototype Routes*/}
-        <Route exact path="/admin-dashboard" component={AdminDashboardPage} />
-
-        <Route exact path="/sign-in" component={SignInPage} />
-
-        {releaseRoutes.map(route => (
-          <Route
-            exact
-            key={route.path}
-            path={route.path}
-            component={route.component}
-          />
-        ))}
-
         {/* Prototype Routes*/}
         <Route exact path="/prototypes/" component={PrototypesIndexPage} />
 
@@ -70,6 +79,11 @@ function App() {
           exact
           path="/prototypes/publication-edit"
           component={PublicationEditPage}
+        />
+        <Route
+          exact
+          path="/prototypes/publication-unresolved-comments"
+          component={PublicationEditUnresolvedComments}
         />
         <Route
           exact

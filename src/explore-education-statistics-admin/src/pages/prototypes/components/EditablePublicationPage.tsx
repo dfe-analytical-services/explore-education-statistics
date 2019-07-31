@@ -10,7 +10,6 @@ import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import RelatedAside from '@common/components/RelatedAside';
-import { Release } from '@common/services/publicationService';
 import React, { Component } from 'react';
 import {
   DragDropContext,
@@ -19,15 +18,25 @@ import {
   Droppable,
   DropResult,
 } from 'react-beautiful-dnd';
+import { EditableRelease } from '@admin/services/publicationService';
+import {
+  FormGroup,
+  FormFieldset,
+  FormTextInput,
+} from '@common/components/form';
+import AddComment from '@admin/pages/prototypes/components/PrototypeEditableContentAddComment';
+import ResolveComment from '@admin/pages/prototypes/components/PrototypeEditableContentResolveComment';
 
 interface State {
   reordering: boolean;
-  data?: Release | undefined;
+  data?: EditableRelease | undefined;
 }
 
 interface Props {
   editing?: boolean;
-  data: Release | undefined;
+  reviewing?: boolean;
+  resolveComments?: boolean;
+  data: EditableRelease | undefined;
 }
 
 const ACCORDION_ID_REGEXP = /accordion[(]([0-9]+)[)]/;
@@ -68,7 +77,7 @@ class EditablePublicationPage extends Component<Props, State> {
         if (sourceAccordion && targetAccordion) {
           if (source.index !== target.index) {
             if (data) {
-              const release: Release = (data as unknown) as Release;
+              const release: EditableRelease = (data as unknown) as EditableRelease;
 
               const resultList = Array.from(release.content);
 
@@ -97,6 +106,7 @@ class EditablePublicationPage extends Component<Props, State> {
           {
             type: 'MarkDownBlock',
             body: 'editable',
+            comments: [],
           },
         ],
       });
@@ -105,16 +115,31 @@ class EditablePublicationPage extends Component<Props, State> {
     }
   }
 
-  private renderContentSections(data: Release, editing: boolean | undefined) {
+  private renderContentSections(
+    data: EditableRelease,
+    editing: boolean | undefined,
+    reviewing: boolean | undefined,
+    resolveComments: boolean | undefined,
+  ) {
     const { reordering } = this.state;
 
     if (reordering) {
       return this.renderDraggableSections(data);
     }
-    return this.renderEditableSections(data, editing);
+    return this.renderEditableSections(
+      data,
+      editing,
+      reviewing,
+      resolveComments,
+    );
   }
 
-  private renderEditableSections(data: Release, editing: boolean | undefined) {
+  private renderEditableSections(
+    data: EditableRelease,
+    editing: boolean | undefined,
+    reviewing: boolean | undefined,
+    resolveComments: boolean | undefined,
+  ) {
     return (
       <div>
         <h2 className="govuk-heading-l reorderable-relative">
@@ -134,11 +159,13 @@ class EditablePublicationPage extends Component<Props, State> {
               heading={heading}
               caption={caption}
               index={index}
-              key={`${order}`}
+              key={`${order}_${heading}`}
             >
               <EditableContentBlock
                 editable={editing}
                 content={content}
+                reviewing={reviewing}
+                resolveComments={resolveComments}
                 id={`editable-block-${index}`}
                 onContentChange={(block, newContent) => {
                   block.body = newContent;
@@ -161,7 +188,7 @@ class EditablePublicationPage extends Component<Props, State> {
     );
   }
 
-  private renderDraggableSections(data: Release) {
+  private renderDraggableSections(data: EditableRelease) {
     return (
       <DragDropContext onDragEnd={this.onDragEnd}>
         <h2 className="govuk-heading-l reorderable-relative">
@@ -224,30 +251,68 @@ class EditablePublicationPage extends Component<Props, State> {
   }
 
   public render() {
+    const { reviewing } = this.props;
+    const { resolveComments } = this.props;
     const { editing } = this.props;
     const { data } = this.state;
 
     return (
       <>
         <div className={editing ? 'page-editing' : ''}>
-          <span className="govuk-tag">
-            {data ? 'New release in progress' : 'Editing in progress'}
-          </span>
-          <span className="govuk-caption-l">Academic year 2018 to 2019</span>
+          <span className="govuk-caption-l">Publication</span>
 
           <h1 className="govuk-heading-l">
             Pupil absence statistics and data for schools in England
           </h1>
 
-          <dl className="dfe-meta-content">
-            <dt className="govuk-caption-m">Published:</dt>
-            <dd>
-              <strong>To be set</strong>
-            </dd>
-          </dl>
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-two-thirds">
+              <div className="govuk-grid-row">
+                <div className="govuk-grid-column-three-quarters">
+                  <span className="govuk-tag">
+                    {!reviewing && (
+                      <>
+                        {data
+                          ? 'New release in progress'
+                          : 'Editing in progress'}
+                      </>
+                    )}
+                    {reviewing && <>Review release</>}
+                  </span>
+
+                  <dl className="dfe-meta-content">
+                    <dt className="govuk-caption-m">Publish date: </dt>
+                    <dd>
+                      <strong>20 September 2019</strong>
+                    </dd>
+                    <div>
+                      <dt className="govuk-caption-m">Next update: </dt>
+                      <dd>
+                        <strong>20 September 2020</strong>
+                      </dd>
+                    </div>
+                  </dl>
+                </div>
+
+                <div className="govuk-grid-column-one-quarter">
+                  <img
+                    src="/static/images/UKSA-quality-mark.jpg"
+                    alt="UK statistics authority quality mark"
+                    height="120"
+                    width="120"
+                  />
+                </div>
+              </div>
+
+              {reviewing && data && (
+                <AddComment initialComments={data.keyStatistics.comments} />
+              )}
+              {resolveComments && data && (
+                <ResolveComment initialComments={data.keyStatistics.comments} />
+              )}
               <PrototypeEditableContent
+                reviewing={reviewing}
+                resolveComments={resolveComments}
                 editable={editing}
                 content={`
           <p className="govuk-body">
@@ -266,8 +331,9 @@ class EditablePublicationPage extends Component<Props, State> {
               />
               <p>
                 <Link to="/prototypes/methodology-absence">
-                  Find out more about our pupil absence data and statistics
-                  methodology and terminology
+                  Find out how and why these statistics are collected and
+                  published -{' '}
+                  <Link to="#">Pupil absence statistics: methodology</Link>
                 </Link>
               </p>
               <Details summary="Download underlying data files">
@@ -302,83 +368,80 @@ class EditablePublicationPage extends Component<Props, State> {
                   About these statistics
                 </h2>
 
-                <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-                  <span className="govuk-caption-m govuk-caption-inline">
-                    For school year:{' '}
-                  </span>
-                  2018/19 (latest data)
-                </h3>
+                <dl className="dfe-meta-content">
+                  <dt className="govuk-caption-m">For school year:</dt>
+                  <dd data-testid="release-name">
+                    <strong>2018 to 2019</strong>
+                  </dd>
 
-                <Details summary="See previous 7 releases">
-                  <ul className="govuk-list">
-                    <li>
-                      <a
-                        className="govuk-link"
-                        href="/themes/schools/absence-and-exclusions/pupil-absence-in-schools-in-england/2015-16"
-                      >
-                        2015 to 2016
-                      </a>
-                    </li>
-                    <li>
-                      <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015">
-                        2014 to 2015
-                      </a>
-                    </li>
-                    <li>
-                      <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2013-to-2014">
-                        2013 to 2014
-                      </a>
-                    </li>
-                    <li>
-                      <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2012-to-2013">
-                        2012 to 2013
-                      </a>
-                    </li>
-                    <li>
-                      <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics">
-                        2011 to 2012
-                      </a>
-                    </li>
-                    <li>
-                      <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2010-to-2011">
-                        2010 to 2011
-                      </a>
-                    </li>
-                    <li>
-                      <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2009-to-2010">
-                        2009 to 2010
-                      </a>
-                    </li>
-                  </ul>
-                </Details>
+                  <dd>
+                    <Details summary="See previous 7 releases">
+                      <ul className="govuk-list">
+                        <li>
+                          <a
+                            className="govuk-link"
+                            href="/themes/schools/absence-and-exclusions/pupil-absence-in-schools-in-england/2015-16"
+                          >
+                            2015 to 2016
+                          </a>
+                        </li>
+                        <li>
+                          <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015">
+                            2014 to 2015
+                          </a>
+                        </li>
+                        <li>
+                          <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2013-to-2014">
+                            2013 to 2014
+                          </a>
+                        </li>
+                        <li>
+                          <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2012-to-2013">
+                            2012 to 2013
+                          </a>
+                        </li>
+                        <li>
+                          <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics">
+                            2011 to 2012
+                          </a>
+                        </li>
+                        <li>
+                          <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2010-to-2011">
+                            2010 to 2011
+                          </a>
+                        </li>
+                        <li>
+                          <a href="https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2009-to-2010">
+                            2009 to 2010
+                          </a>
+                        </li>
+                      </ul>
+                    </Details>
+                  </dd>
+                </dl>
 
-                <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-                  <span className="govuk-caption-m">Last updated: </span>20 June
-                  2018
-                </h3>
-
-                <Details summary="See all 2 updates">
-                  <div data-testid="publication-page--update-element">
-                    <h3 className="govuk-heading-s">19 April 2017</h3>
-                    <p>
-                      Underlying data file updated to include absence data by
-                      pupil residency and school location, andupdated metadata
-                      document.
-                    </p>
-                  </div>
-                  <div data-testid="publication-page--update-element">
-                    <h3 className="govuk-heading-s">22 March 2017</h3>
-                    <p>First published.</p>
-                  </div>
-                </Details>
-
-                <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-                  <span className="govuk-caption-m">Next update: </span>22 March
-                  2019
-                </h3>
-                <p className="govuk-caption-m govuk-!-margin-top-0">
-                  <a href="#">Notify me</a>
-                </p>
+                <dl className="dfe-meta-content">
+                  <dt className="govuk-caption-m">Last updated: </dt>
+                  <dd data-testid="last-updated">
+                    <strong>19 April 2019</strong>
+                  </dd>
+                  <dd>
+                    <Details summary="See all 2 updates">
+                      <div data-testid="publication-page--update-element">
+                        <h3 className="govuk-heading-s">19 April 2017</h3>
+                        <p>
+                          Underlying data file updated to include absence data
+                          by pupil residency and school location, andupdated
+                          metadata document.
+                        </p>
+                      </div>
+                      <div data-testid="publication-page--update-element">
+                        <h3 className="govuk-heading-s">22 March 2017</h3>
+                        <p>First published.</p>
+                      </div>
+                    </Details>
+                  </dd>
+                </dl>
 
                 <nav role="navigation" aria-labelledby="related-content">
                   <h2
@@ -395,6 +458,32 @@ class EditablePublicationPage extends Component<Props, State> {
                       </Link>
                     </li>
                   </ul>
+
+                  {editing && (
+                    <>
+                      <FormFieldset id="test" legend="Add more related content">
+                        <FormGroup>
+                          <FormTextInput
+                            id="link-title"
+                            name="link-title"
+                            label="Related content title"
+                            value=""
+                          />
+                        </FormGroup>
+                        <FormGroup>
+                          <FormTextInput
+                            id="link-url"
+                            name="link-url"
+                            label="Link url"
+                            value=""
+                          />
+                        </FormGroup>
+                      </FormFieldset>
+                      <button type="submit" className="govuk-button">
+                        Add related content
+                      </button>
+                    </>
+                  )}
                 </nav>
               </RelatedAside>
             </div>
@@ -403,9 +492,16 @@ class EditablePublicationPage extends Component<Props, State> {
           <h2 className="govuk-heading-l">
             Latest headline facts and figures - 2018/19
           </h2>
+          {reviewing && data && (
+            <AddComment initialComments={data.keyStatistics.comments} />
+          )}
+          {resolveComments && data && (
+            <ResolveComment initialComments={data.keyStatistics.comments} />
+          )}
 
           <PrototypeDataSample
             editing={editing}
+            reviewing={reviewing}
             sectionId="headlines"
             chartTitle="change in absence types in England"
             xAxisLabel="School Year"
@@ -446,7 +542,12 @@ class EditablePublicationPage extends Component<Props, State> {
           />
           {data &&
             data.content.length > 0 &&
-            this.renderContentSections(data, editing)}
+            this.renderContentSections(
+              data,
+              editing,
+              reviewing,
+              resolveComments,
+            )}
           <h2 className="govuk-heading-m govuk-!-margin-top-9">
             Extra information
           </h2>
