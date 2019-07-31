@@ -1,4 +1,4 @@
-import signInRoutes from "@admin/routes/sign-in/routes";
+import signInRoutes from '@admin/routes/sign-in/routes';
 import { User } from '@admin/services/sign-in/types';
 import { createClient } from '@admin/services/util/service';
 import mocks from './mock/mock-service';

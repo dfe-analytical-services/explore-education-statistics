@@ -3,4 +3,4 @@ export default {
   signOut: '/sign-out',
   signInViaApiLink: '/api/signin',
   signOutViaApiLink: '/api/signout',
-}
+};

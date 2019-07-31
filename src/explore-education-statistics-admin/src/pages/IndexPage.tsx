@@ -1,4 +1,4 @@
-import dashboardRoutes from "@admin/routes/dashboard/routes";
+import dashboardRoutes from '@admin/routes/dashboard/routes';
 import React from 'react';
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
@@ -11,7 +11,9 @@ function IndexPage() {
       <h3>Dashboards</h3>
       <ul>
         <li>
-          <Link to={dashboardRoutes.adminDashboard}>Administrators' dashboard page</Link>
+          <Link to={dashboardRoutes.adminDashboard}>
+            Administrators' dashboard page
+          </Link>
         </li>
       </ul>
 

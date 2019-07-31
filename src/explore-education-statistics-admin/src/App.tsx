@@ -85,8 +85,16 @@ function App() {
 
       {process.env.USE_MOCK_API === 'true' && (
         <>
-          <Route exact path={signInRoutes.signInViaApiLink} component={MockSignInProcess} />
-          <Route exact path={signInRoutes.signOutViaApiLink} component={MockSignOutProcess} />
+          <Route
+            exact
+            path={signInRoutes.signInViaApiLink}
+            component={MockSignInProcess}
+          />
+          <Route
+            exact
+            path={signInRoutes.signOutViaApiLink}
+            component={MockSignOutProcess}
+          />
         </>
       )}
 

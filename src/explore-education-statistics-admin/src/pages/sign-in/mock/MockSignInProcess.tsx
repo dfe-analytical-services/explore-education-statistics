@@ -1,4 +1,4 @@
-import dashboardRoutes from "@admin/routes/dashboard/routes";
+import dashboardRoutes from '@admin/routes/dashboard/routes';
 import PrototypeLoginService from '@admin/services/PrototypeLoginService';
 import React from 'react';
 import { Redirect } from 'react-router';

@@ -1,4 +1,4 @@
-import dashboardRoutes from "@admin/routes/dashboard/routes";
+import dashboardRoutes from '@admin/routes/dashboard/routes';
 import React, { ReactNode } from 'react';
 import PreviousNextLinks from '@admin/components/PreviousNextLinks';
 import NavLink from '@admin/components/NavLink';
