@@ -1,7 +1,8 @@
-import DashboardReleaseSummary from '@admin/pages/admin-dashboard/components/DashboardReleaseSummary';
-import { AdminDashboardPublication } from '@admin/services/dashboard/types';
-import React from 'react';
 import Link from '@admin/components/Link';
+import DashboardReleaseSummary from '@admin/pages/admin-dashboard/components/DashboardReleaseSummary';
+import releaseRoutes from "@admin/routes/edit-release/routes";
+import {AdminDashboardPublication} from '@admin/services/dashboard/types';
+import React from 'react';
 
 export interface Props {
   publication: AdminDashboardPublication;
@@ -47,7 +48,7 @@ const AdminDashboardPublicationSummary = ({ publication }: Props) => {
           </dd>
         </div>
       </dl>
-      <Link to="/prototypes/release-create-new" className="govuk-button">
+      <Link to={releaseRoutes.createReleaseRoute.generateLink(publication.id)} className="govuk-button">
         Create new release
       </Link>
     </>

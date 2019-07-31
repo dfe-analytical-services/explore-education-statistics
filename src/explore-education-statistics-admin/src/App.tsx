@@ -1,5 +1,6 @@
 import ProtectedRoute from '@admin/components/ProtectedRoute';
 import CreatePublicationPage from '@admin/pages/create-publication/CreatePublicationPage';
+import CreateReleasePage from "@admin/pages/release/create-release/CreateReleasePage";
 import MockSignInProcess from '@admin/pages/sign-in/mock/MockSignInProcess';
 import MockSignOutProcess from '@admin/pages/sign-in/mock/MockSignOutProcess';
 import SignedOutPage from '@admin/pages/sign-in/SignedOutPage';
@@ -74,7 +75,13 @@ function App() {
         component={CreatePublicationPage}
       />
 
-      {releaseRoutes.map(route => (
+      <ProtectedRoute
+        exact
+        path={releaseRoutes.createReleaseRoute.route}
+        component={CreateReleasePage}
+      />
+
+      {releaseRoutes.manageReleaseRoutes.map(route => (
         <ProtectedRoute
           exact
           key={route.path}

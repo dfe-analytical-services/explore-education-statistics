@@ -1,17 +1,17 @@
 import Link from '@admin/components/Link';
-import { dataRoute } from '@admin/routes/edit-release/routes';
+import {dataRoute} from '@admin/routes/edit-release/routes';
 import service from '@admin/services/edit-release/data/service';
-import { DataFile } from '@admin/services/edit-release/data/types';
+import {DataFile} from '@admin/services/edit-release/data/types';
 import Button from '@common/components/Button';
-import { Form, FormFieldset, Formik } from '@common/components/form';
 import FormFieldFileSelector from '@common/components/form/FormFieldFileSelector';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
+import {Form, FormFieldset, Formik} from '@common/components/form/index';
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import Yup from '@common/lib/validation/yup';
-import { FormikProps } from 'formik';
-import React, { useEffect, useState } from 'react';
+import Yup from '@common/lib/validation/yup/index';
+import {FormikProps} from 'formik';
+import React, {useEffect, useState} from 'react';
 
 interface FormValues {
   subjectTitle: string;

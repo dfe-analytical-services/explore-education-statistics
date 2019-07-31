@@ -1,6 +1,6 @@
 import React from 'react';
-import { RouteComponentProps } from 'react-router';
-import ReleasePageTemplate from '@admin/pages/edit-release/components/ReleasePageTemplate';
+import {RouteComponentProps} from 'react-router';
+import ReleasePageTemplate from './components/ReleasePageTemplate';
 
 interface MatchProps {
   releaseId: string;

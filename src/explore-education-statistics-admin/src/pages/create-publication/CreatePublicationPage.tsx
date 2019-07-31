@@ -67,10 +67,6 @@ const CreatePublicationPage = ({
       wide
       breadcrumbs={[
         {
-          name: 'Administrator dashboard',
-          link: dashboardRoutes.adminDashboard,
-        },
-        {
           name: 'Create new publication',
         },
       ]}
