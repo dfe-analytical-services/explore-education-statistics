@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
 
                 
                 // TOOO - temp work around for dfe accounts to get name
-                if (email.Contains("education.gov.uk"))
+                if (email.ToLower().Contains("education.gov.uk"))
                 {
                     var address = email.Split('@').First();
                     givenname = address.Split('.').First();
