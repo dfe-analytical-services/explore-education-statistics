@@ -379,7 +379,6 @@ class TableToolPage extends Component<Props, State> {
                           indicators={indicators}
                           publicationName={publication ? publication.title : ''}
                           subjectName={subjectName}
-                          subjectMeta={subjectMeta}
                           locations={locationsList}
                           timePeriods={timePeriodRange}
                           results={tableData}
