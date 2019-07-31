@@ -192,6 +192,8 @@ const ChartBuilder = ({ data }: Props) => {
 
             [axisDefinition.type]: {
               referenceLines: [],
+              min: '',
+              max: '',
 
               ...previousConfig,
 
@@ -215,6 +217,8 @@ const ChartBuilder = ({ data }: Props) => {
                   : previousConfig.showGrid,
               size:
                 previousConfig.size === undefined ? '50' : previousConfig.size,
+              tickConfig: previousConfig.tickConfig || 'default',
+              tickSpacing: previousConfig.tickSpacing || ''
             },
           };
         }, {});
@@ -267,7 +271,7 @@ const ChartBuilder = ({ data }: Props) => {
               {Object.entries(axesConfiguration).map(([key, axis]) => (
                 <ChartAxisConfiguration
                   key={key}
-                  id={axis.name}
+                  id={key}
                   configuration={axis}
                   capabilities={selectedChartType.capabilities}
                   meta={data.metaData}

@@ -96,6 +96,36 @@ const generateLegendType = (symbol: LegendType | undefined): LegendType => {
   return symbol;
 };
 
+function calculateMinorTicks(config: string | undefined, min: number, max:number, spacing: string = "5") : number[] | undefined {
+  let spacingValue = +spacing;
+
+  if (spacingValue <=0) spacingValue = 1.0;
+  if (Number.isNaN(min) || Number.isNaN(max) || !Number.isFinite(min) || !Number.isFinite(max)) return undefined;
+
+  if (config === 'custom') {
+    const result = [];
+
+    let [start,end] = [min,max];
+    if (start>end) [start,end]=[end,start];
+
+    for(let i=start; i<end; i+=spacingValue) {
+      result.push(parseFloat(i.toPrecision(10)));
+    }
+
+    result.push(max);
+
+    return result;
+  }
+
+  if (config === "startEnd" ) {
+    return [
+      min,
+      max
+    ]
+  }
+  return undefined;
+}
+
 const LineChartBlock = (props: ChartProps) => {
   const {
     data,
@@ -125,10 +155,13 @@ const LineChartBlock = (props: ChartProps) => {
   const keysForChart = getKeysForChart(chartData);
 
   const { min, max } = calculateDataRange(chartData);
-  const minorAxisDomain: [AxisDomain, AxisDomain] = [
-    parseNumberOrDefault(axes.minor.min, min),
-    parseNumberOrDefault(axes.minor.max, max),
-  ];
+
+  const axisMin = parseNumberOrDefault(axes.minor.min, min);
+  const axisMax = parseNumberOrDefault(axes.minor.max, max);
+
+  const minorAxisDomain: [AxisDomain, AxisDomain] = [axisMin, axisMax];
+
+  const minorTicks = calculateMinorTicks(axes.minor.tickConfig, axisMin, axisMax, axes.minor.tickSpacing);
 
   return (
     <ResponsiveContainer width={width || '100%'} height={height || 300}>
@@ -184,6 +217,8 @@ const LineChartBlock = (props: ChartProps) => {
             }}
             scale="auto"
             domain={minorAxisDomain}
+            ticks={minorTicks}
+            interval="preserveStartEnd"
             dataKey="value"
             width={conditionallyAdd(axes.minor && axes.minor.size)}
           />

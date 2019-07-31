@@ -120,6 +120,9 @@ export interface AxisConfiguration {
 
   min?: string;
   max?: string;
+
+  tickConfig?: 'default' | 'startEnd' | 'custom';
+  tickSpacing?: string;
 }
 
 export interface Chart {
