@@ -2,21 +2,27 @@
 
 This test framework runs UI tests against the Explore Education Statistics service using selenium and robot framework.
 
-Currently, these tests are being maintained so they can be run on Linux or Windows. They're not being maintained for MacOS, but they may work without too much trouble. If you try MacOS, ensure you're using python3 and not python2!
+Currently, these tests are being maintained so they can be run on Linux. They're not being maintained for Windows or MacOS, but they may work without too much trouble. If you try MacOS, ensure you're using python3 and not python2!
 
 # What do I need to install?
 
-Firstly, install python3
+Firstly, install python3.7 or greater
    * For Windows, you'll need to download python3 from here: https://www.python.org/downloads/
-   * For Linux, use the package manager (i.e. "sudo apt-get install python3")
+   * For Linux, use the package manager (i.e. On ubuntu, "sudo apt-get install python3.7")
 
 Then ensure python and pip are included in your PATH environment variable
-   * You can check whether this is necessary by entering `python3` and `pip3` into a terminal. The commands should be recognised.
-   * For Windows, I needed to add `C:\Program Files\Python36` and `C:\Program Files\Python36\Scripts`. Check your Program Files directory to find out where python is installed on your computer. A search engine will tell you how to add them to the PATH. 
+   * `python --version` should return a version >= 3.7. If it doesn't you can try using the commands `python3` or `python3.7`, if you have multiple versions of python installed on your machine.
+   * To verify pip is installed, it is probably easiest to run entering `python -m pip` into a terminal. You should see the pip help text in response.
+   * For Windows, I needed to add `C:\Program Files\Python37` and `C:\Program Files\Python37\Scripts`. Check your Program Files directory to find out where python is installed on your computer. A search engine will tell you how to add them to the PATH.
    
 Then install pipenv
 ```
-pip3 install pipenv
+pip install pipenv
+```
+
+NOTE: If the above command doesn't work (or any of the subsequent commands in this README) then you can use `python -m` as below:
+```
+python -m pip install pipenv
 ```
 
 Then in the robot-tests directory run
@@ -53,7 +59,9 @@ This directory holds the output of a test run, including the test report and log
 This holds the actual robot framework/selenium tests. The tests are themselves organised into different folders. The `libs` folder holds python and robot framework libraries used by the tests themselves.
 
 ### webdriver
-This holds chromedriver, used by selenium to interact with the browser. If chromedriver isn't present in this directory, it is automatically downloaded when the tests are run. If you're having trouble (e.g. browser and chromedriver versions aren't compatible) you can also manually place your chromedriver of choice in this directory.
+This holds chromedriver, used by selenium to interact with the browser. If chromedriver isn't present in this directory, it is automatically downloaded when the tests are run. You can explicitly download the chromedriver version of your choice with "--chromedriver <version>". Alternatively, you can place the chromedriver of your choice into the webdriver directory.
+
+The run_tests.py defaults to using the chromedriver existing in the webdriver directory. If you wish the run script to download a different version, you'll first have to delete the preexisting chromedriver.
 
 # Guidelines for people writing UI tests
 

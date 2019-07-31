@@ -4,7 +4,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels
 {
     public class PermalinkViewModel
     {
-        public string Id { get; set; }
+        public Guid Id { get; set; }
         
         public string Title { get; set; }
         

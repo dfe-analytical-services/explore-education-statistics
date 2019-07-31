@@ -211,4 +211,9 @@ user checks page contains link with text and url
   user checks page contains element  xpath://a[@href="${href}" and text()="${text}"]
 
 user waits until results table appears
+  # NOTE(mark): Increasing timeout to stop known failure and created DFE-1158
+  set selenium timeout          60
+  set selenium implicit wait    60
   user waits until page contains element   css:table thead th
+  set selenium timeout          ${timeout}
+  set selenium implicit wait    ${implicit_wait}

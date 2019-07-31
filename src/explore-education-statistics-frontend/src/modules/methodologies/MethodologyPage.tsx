@@ -75,7 +75,6 @@ class MethodologyPage extends Component<Props> {
           </div>
         </div>
 
-        <hr />
         {data.publication && (
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-two-thirds">

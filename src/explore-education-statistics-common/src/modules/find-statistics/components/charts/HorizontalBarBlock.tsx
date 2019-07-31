@@ -21,6 +21,10 @@ import {
   YAxis,
 } from 'recharts';
 
+import classnames from 'classnames';
+
+import './charts.scss';
+
 export default class HorizontalBarBlock extends Component<StackedBarProps> {
   public static definition: ChartDefinition = {
     type: 'horizontalbar',
@@ -86,6 +90,7 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
         <BarChart
           data={chartData}
           layout="vertical"
+          className={classnames({ 'legend-bottom': legend === 'bottom' })}
           margin={{
             left: 30,
             top: legend === 'top' ? 10 : 0,
@@ -110,7 +115,7 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
               scale="auto"
               height={conditionallyAdd(
                 axes.minor && axes.minor.size,
-                legend === 'bottom' ? 0 : undefined,
+                legend === 'bottom' ? 50 : undefined,
               )}
               padding={{ left: 20, right: 20 }}
               tickMargin={10}

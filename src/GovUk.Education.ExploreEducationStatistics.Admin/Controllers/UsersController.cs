@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,14 +17,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
             // validate that their AD cookie is still valid, not simply
             // to check for its existence.  However, this is just in here
             // temporarily as a stopgap
-            if (Request.Cookies.ContainsKey(".AspNetCore.AzureADCookie"))
+            if (User.Identity.IsAuthenticated)
             {
                 return new UserDetailsViewModel()
                 {
-                    Id = Guid.Parse("4add7621-4aef-4abc-b2e6-0938b37fe5b9"),
-                    Email = "john.smith@example.com",
-                    Name = "John Smith",
-                    Permissions = new string[] { "team lead" },
+                    Id = Guid.Parse(User.Claims.FirstOrDefault(x => x.Type == "http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value),
+                    Email = User.Claims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")?.Value,
+                    Name = User.Claims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname")?.Value + " " + User.Claims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname")?.Value,
+                    Permissions = new [] { "team lead" }
                 };
             }
 
