@@ -1,7 +1,7 @@
 import Link from '@admin/components/Link';
 import DummyReferenceData from '@admin/pages/DummyReferenceData';
 import ReleasePageTemplate from '@admin/pages/edit-release/components/ReleasePageTemplate';
-import { setupEditRoute } from '@admin/routes/releaseRoutes';
+import { setupEditRoute } from '@admin/routes/edit-release/routes';
 import {
   dayMonthYearIsComplete,
   dayMonthYearToDate,

@@ -1,3 +1,4 @@
+import publicationRoutes from '@admin/routes/edit-publication/routes';
 import { AdminDashboardPublication } from '@admin/services/dashboard/types';
 import FormSelect from '@common/components/form/FormSelect';
 import React from 'react';
@@ -91,7 +92,7 @@ const AdminDashboardPublicationsTab = ({
         <div className="govuk-inset-text">{noResultsMessage}</div>
       )}
       <Link
-        to={`/topic/${selectedTopicId}/publication/create`}
+        to={publicationRoutes.createPublication.generateLink(selectedTopicId)}
         className="govuk-button"
       >
         Create new publication

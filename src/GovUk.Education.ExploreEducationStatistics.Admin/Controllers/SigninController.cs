@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
         // GET
         public IActionResult Index()
         {
-            return Redirect("/admin-dashboard");
+            return Redirect("/");
         }
     }
 }

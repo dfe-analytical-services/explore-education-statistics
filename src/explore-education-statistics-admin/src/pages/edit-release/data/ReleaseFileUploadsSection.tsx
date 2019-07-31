@@ -1,5 +1,5 @@
 import Link from '@admin/components/Link';
-import { dataRoute } from '@admin/routes/releaseRoutes';
+import { dataRoute } from '@admin/routes/edit-release/routes';
 import service from '@admin/services/edit-release/data/service';
 import { AdhocFile } from '@admin/services/edit-release/data/types';
 import Button from '@common/components/Button';

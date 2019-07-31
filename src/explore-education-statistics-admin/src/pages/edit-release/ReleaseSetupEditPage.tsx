@@ -4,7 +4,7 @@ import DummyReferenceData, {
   TimePeriodCoverageGroup,
 } from '@admin/pages/DummyReferenceData';
 import ReleasePageTemplate from '@admin/pages/edit-release/components/ReleasePageTemplate';
-import { setupRoute } from '@admin/routes/releaseRoutes';
+import { setupRoute } from '@admin/routes/edit-release/routes';
 import { DayMonthYearValues, IdTitlePair } from '@admin/services/common/types';
 import service from '@admin/services/edit-release/setup/service';
 import {
