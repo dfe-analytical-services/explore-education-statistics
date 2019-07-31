@@ -3,8 +3,8 @@ import { dataApi } from './api';
 export interface Permalink {
   id: string;
   title: string;
-  footnotes: string;
-  timestamp: string;
+  created: string;
+  data: string
 }
 
 export default {
