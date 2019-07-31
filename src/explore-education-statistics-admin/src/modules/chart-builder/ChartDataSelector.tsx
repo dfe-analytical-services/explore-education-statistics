@@ -17,6 +17,7 @@ import {
 
 import React from 'react';
 import Details from '@common/components/Details';
+import { difference } from 'lodash';
 import styles from './graph-builder.module.scss';
 
 export interface SelectedData {
@@ -102,6 +103,22 @@ const ChartDataSelector = ({
     ChartDataSetAndConfiguration[]
   >([...selectedData]);
 
+  const [alreadyAdded, setAlreadyAdded] = React.useState(false);
+
+  React.useEffect(() => {
+    const filters = selectedFilters.split(',');
+
+    const added =
+      selectedList.find(({ dataSet }) => {
+        return (
+          dataSet.indicator === selectedIndicator &&
+          difference(dataSet.filters, filters).length === 0
+        );
+      }) !== undefined;
+
+    setAlreadyAdded(added);
+  }, [selectedIndicator, selectedFilters, selectedList]);
+
   const removeSelected = (selected: SelectedData, index: number) => {
     const [removed] = selectedList.splice(index, 1);
     setSelectedList([...selectedList]);
@@ -144,7 +161,7 @@ const ChartDataSelector = ({
             />
           </FormFieldset>
         </div>
-        {selectedIndicator && selectedFilters && (
+        {selectedIndicator && selectedFilters && !alreadyAdded && (
           <div className="govuk-grid-column-one-third">
             <Button
               type="button"
