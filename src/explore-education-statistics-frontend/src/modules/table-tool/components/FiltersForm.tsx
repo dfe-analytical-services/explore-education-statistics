@@ -157,7 +157,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                 {...props}
                 form={form}
                 formId={formId}
-                submitOnClick={() => {
+                onSubmitClick={() => {
                   // Automatically select totalValue for filters that haven't had a selection made
                   Object.keys(form.values.filters).forEach(filterName => {
                     if (
