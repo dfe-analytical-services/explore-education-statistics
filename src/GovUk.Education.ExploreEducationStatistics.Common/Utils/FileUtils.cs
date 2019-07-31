@@ -2,7 +2,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.Files
+namespace GovUk.Education.ExploreEducationStatistics.Common.Utils
 {
     public static class FileUtils
     {
