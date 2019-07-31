@@ -4,7 +4,7 @@ import {
 } from '@common/services/tableBuilderService';
 import camelCase from 'lodash/camelCase';
 
-abstract class Filter {
+export abstract class Filter {
   public readonly value: string;
 
   public readonly label: string;
