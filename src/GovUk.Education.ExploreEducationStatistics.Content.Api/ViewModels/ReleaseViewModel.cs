@@ -13,6 +13,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels
         [Required] public string Title { get; set; }
 
         public string ReleaseName { get; set; }
+        
+        public string CoverageTitle { get; set; }
+        
+        public string YearTitle { get; set; }
 
         public DateTime? Published { get; set; }
 
@@ -29,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels
         public List<ContentSection> Content { get; set; }
 
         public DataBlock KeyStatistics { get; set; }
-
+        
         public List<FileInfo> DataFiles { get; set; }
     }
 }

@@ -382,6 +382,8 @@ export default class PrototypePublicationService {
 
   public static getNewPublication(): EditableRelease {
     return {
+      yearTitle: '',
+      coverageTitle: '',
       id: '00000000-0000-0000-0000-000000000000',
       title: 'Pupil absence data and statistics for schools in England',
       releaseName: '2018 to 2019',
