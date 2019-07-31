@@ -15,7 +15,14 @@ abstract class Filter {
   }
 }
 
-export class CategoryFilter extends Filter {}
+export class CategoryFilter extends Filter {
+  public readonly isTotal: boolean;
+
+  public constructor({ value, label }: FilterOption, isTotal = false) {
+    super({ value, label });
+    this.isTotal = isTotal;
+  }
+}
 
 export class LocationFilter extends Filter {
   public readonly level: string;

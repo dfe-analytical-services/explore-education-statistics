@@ -41,7 +41,7 @@ const TimePeriodDataTable = (props: Props) => {
     categoryFilters: Dictionary<CategoryFilter[]>,
   ): CategoryFilter[][] => {
     return Object.values(categoryFilters).filter(filter => {
-      return filter.length > 1 || filter[0].label.toUpperCase() !== 'TOTAL';
+      return filter.length > 1 || !filter[0].isTotal;
     });
   };
 
