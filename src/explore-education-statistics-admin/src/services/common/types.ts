@@ -7,7 +7,7 @@ export interface IdLabelPair {
 }
 
 export interface ContactDetails {
-  id?: string;
+  id: string;
   contactName: string;
   contactTelNo: string;
   teamEmail: string;

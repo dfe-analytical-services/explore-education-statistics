@@ -1,4 +1,5 @@
 import ProtectedRoute from '@admin/components/ProtectedRoute';
+import CreatePublicationPage from '@admin/pages/create-publication/CreatePublicationPage';
 import MockSignInProcess from '@admin/pages/sign-in/mock/MockSignInProcess';
 import MockSignOutProcess from '@admin/pages/sign-in/mock/MockSignOutProcess';
 import SignedOutPage from '@admin/pages/sign-in/SignedOutPage';
@@ -62,6 +63,12 @@ function App() {
         exact
         path="/admin-dashboard"
         component={AdminDashboardPage}
+      />
+
+      <ProtectedRoute
+        exact
+        path="/topic/:topicId/publication/create"
+        component={CreatePublicationPage}
       />
 
       {releaseRoutes.map(route => (

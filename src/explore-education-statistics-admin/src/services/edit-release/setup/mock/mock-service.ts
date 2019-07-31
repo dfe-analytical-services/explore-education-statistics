@@ -1,5 +1,5 @@
 import { ReleaseSetupDetailsUpdateRequest } from '@admin/services/edit-release/setup/types';
-import getCaptureGroups from '@admin/services/util/mock/mock-service';
+import { getCaptureGroups } from '@admin/services/util/mock/mock-service';
 import MockAdapter from 'axios-mock-adapter';
 
 export default async (mock: MockAdapter) => {
