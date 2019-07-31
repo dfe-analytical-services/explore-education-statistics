@@ -58,7 +58,17 @@ const CreatePublicationPage = ({ match, history }: RouteComponentProps<MatchProp
   };
 
   return (
-    <Page wide breadcrumbs={[{ name: 'Create new publication' }]}>
+    <Page
+      wide
+      breadcrumbs={[
+      {
+        name: 'Administrator dashboard',
+        link: '/admin-dashboard',
+      },
+      {
+        name: 'Create new publication',
+      }]}
+    >
       <h1 className="govuk-heading-l">
         Create new publication
       </h1>
