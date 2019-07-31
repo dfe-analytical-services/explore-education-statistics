@@ -9,6 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public long FilterId { get; set; }
         public string Label { get; set; }
         public ICollection<FilterItem> FilterItems { get; set; }
+        public ICollection<FilterGroupFootnote> Footnotes { get; set; }
 
         private FilterGroup()
         {

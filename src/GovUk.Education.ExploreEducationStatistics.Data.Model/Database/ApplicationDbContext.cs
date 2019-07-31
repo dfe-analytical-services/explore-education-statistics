@@ -16,8 +16,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 
         public DbSet<BoundaryLevel> BoundaryLevel { get; set; }
         public DbSet<Filter> Filter { get; set; }
-        public DbSet<FilterItem> FilterItem { get; set; }
+        public DbSet<FilterFootnote> FilterFootnote { get; set; }
         public DbSet<FilterGroup> FilterGroup { get; set; }
+        public DbSet<FilterGroupFootnote> FilterGroupFootnote { get; set; }
+        public DbSet<FilterItem> FilterItem { get; set; }
+        public DbSet<FilterItemFootnote> FilterItemFootnote { get; set; }
         public DbSet<Footnote> Footnote { get; set; }
         public DbQuery<GeoJson> GeoJson { get; set; }
         public DbSet<Indicator> Indicator { get; set; }
@@ -41,6 +44,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             ConfigureBoundaryLevel(modelBuilder);
             ConfigureGeographicLevel(modelBuilder);
             ConfigureGeoJson(modelBuilder);
+            ConfigureFilterFootnote(modelBuilder);
+            ConfigureFilterGroupFootnote(modelBuilder);
+            ConfigureFilterItemFootnote(modelBuilder);
             ConfigureIndicatorFootnote(modelBuilder);
             ConfigureLocation(modelBuilder);
             ConfigureMeasures(modelBuilder);
@@ -648,6 +654,57 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                     builder => builder.HasIndex(localAuthorityDistrict => localAuthorityDistrict.Code));
         }
 
+        private static void ConfigureFilterFootnote(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<FilterFootnote>()
+                .HasKey(item => new {item.FilterId, item.FootnoteId});
+            
+            modelBuilder.Entity<FilterFootnote>()
+                .HasOne(filterFootnote => filterFootnote.Filter)
+                .WithMany(filter => filter.Footnotes)
+                .HasForeignKey(filterFootnote => filterFootnote.FilterId);
+            
+            modelBuilder.Entity<FilterFootnote>()
+                .HasOne(filterFootnote => filterFootnote.Footnote)
+                .WithMany()
+                .HasForeignKey(filterFootnote => filterFootnote.FootnoteId)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
+        
+        private static void ConfigureFilterGroupFootnote(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<FilterGroupFootnote>()
+                .HasKey(item => new {item.FilterGroupId, item.FootnoteId});
+            
+            modelBuilder.Entity<FilterGroupFootnote>()
+                .HasOne(filterGroupFootnote => filterGroupFootnote.FilterGroup)
+                .WithMany(filterGroup => filterGroup.Footnotes)
+                .HasForeignKey(filterGroupFootnote => filterGroupFootnote.FilterGroupId);
+            
+            modelBuilder.Entity<FilterGroupFootnote>()
+                .HasOne(filterGroupFootnote => filterGroupFootnote.Footnote)
+                .WithMany()
+                .HasForeignKey(filterGroupFootnote => filterGroupFootnote.FootnoteId)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
+        
+        private static void ConfigureFilterItemFootnote(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<FilterItemFootnote>()
+                .HasKey(item => new {item.FilterItemId, item.FootnoteId});
+            
+            modelBuilder.Entity<FilterItemFootnote>()
+                .HasOne(filterItemFootnote => filterItemFootnote.FilterItem)
+                .WithMany(filterItem => filterItem.Footnotes)
+                .HasForeignKey(filterItemFootnote => filterItemFootnote.FilterItemId);
+            
+            modelBuilder.Entity<FilterItemFootnote>()
+                .HasOne(filterItemFootnote => filterItemFootnote.Footnote)
+                .WithMany()
+                .HasForeignKey(filterItemFootnote => filterItemFootnote.FootnoteId)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
+        
         private static void ConfigureIndicatorFootnote(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<IndicatorFootnote>()
