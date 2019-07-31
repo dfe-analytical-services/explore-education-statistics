@@ -1,14 +1,14 @@
-import Link from "@admin/components/Link";
-import {ContactDetails, IdLabelPair} from "@admin/services/common/types";
-import Button from "@common/components/Button";
-import {Form, FormFieldset, Formik} from "@common/components/form";
-import FormFieldRadioGroup from "@common/components/form/FormFieldRadioGroup";
-import FormFieldSelect from "@common/components/form/FormFieldSelect";
-import FormFieldTextInput from "@common/components/form/FormFieldTextInput";
-import SummaryList from "@common/components/SummaryList";
-import SummaryListItem from "@common/components/SummaryListItem";
-import Yup from "@common/lib/validation/yup";
-import {FormikProps} from "formik";
+import Link from '@admin/components/Link';
+import { ContactDetails, IdTitlePair } from '@admin/services/common/types';
+import Button from '@common/components/Button';
+import { Form, FormFieldset, Formik } from '@common/components/form';
+import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
+import FormFieldSelect from '@common/components/form/FormFieldSelect';
+import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
+import SummaryList from '@common/components/SummaryList';
+import SummaryListItem from '@common/components/SummaryListItem';
+import Yup from '@common/lib/validation/yup';
+import { FormikProps } from 'formik';
 import React from 'react';
 
 interface FormValues {
@@ -19,16 +19,20 @@ interface FormValues {
 }
 
 interface Props {
-  topicId: string;
   contacts: ContactDetails[];
-  methodologies: IdLabelPair[];
+  methodologies: IdTitlePair[];
   currentValues?: FormValues;
   onSubmitHandler: (values: FormValues) => void;
   onCancelHandler: () => void;
 }
 
-const CreatePublicationForm = ({topicId, contacts, methodologies, currentValues, onSubmitHandler, onCancelHandler}: Props) => {
-
+const CreatePublicationForm = ({
+  contacts,
+  methodologies,
+  currentValues,
+  onSubmitHandler,
+  onCancelHandler,
+}: Props) => {
   const getSelectedContact = (contactId: string) =>
     contacts.find(contact => contact.id === contactId) || contacts[0];
 
@@ -39,22 +43,23 @@ const CreatePublicationForm = ({topicId, contacts, methodologies, currentValues,
       enableReinitialize
       initialValues={{
         publicationTitle: currentValues ? currentValues.publicationTitle : '',
-        selectedContactId: currentValues ? currentValues.selectedContactId : contacts[0].id,
-        methodologyChoice: currentValues ? currentValues.methodologyChoice : undefined,
-        selectedMethodologyId: currentValues && currentValues.selectedMethodologyId
-          ? currentValues.selectedMethodologyId
-          : methodologies[0].id,
+        selectedContactId: currentValues
+          ? currentValues.selectedContactId
+          : contacts[0].id,
+        methodologyChoice: currentValues
+          ? currentValues.methodologyChoice
+          : undefined,
+        selectedMethodologyId:
+          currentValues && currentValues.selectedMethodologyId
+            ? currentValues.selectedMethodologyId
+            : methodologies[0].id,
       }}
       validationSchema={Yup.object<FormValues>({
-        publicationTitle: Yup.string().required(
-          'Enter a publication title',
-        ),
+        publicationTitle: Yup.string().required('Enter a publication title'),
         selectedContactId: Yup.string().required(
-          'Choose a publication and release contact'
+          'Choose a publication and release contact',
         ),
-        methodologyChoice: Yup.mixed().required(
-          'Choose a methodology'
-        ),
+        methodologyChoice: Yup.mixed().required('Choose a methodology'),
         selectedMethodologyId: Yup.string().when('methodologyChoice', {
           is: 'existing',
           then: Yup.string().required('Choose a methodology'),
@@ -64,7 +69,10 @@ const CreatePublicationForm = ({topicId, contacts, methodologies, currentValues,
       onSubmit={async (values: FormValues) => {
         const valuesToStore: FormValues = {
           ...values,
-          selectedMethodologyId: values.methodologyChoice === 'existing' ? values.selectedMethodologyId : undefined
+          selectedMethodologyId:
+            values.methodologyChoice === 'existing'
+              ? values.selectedMethodologyId
+              : undefined,
         };
         onSubmitHandler(valuesToStore);
       }}
@@ -73,13 +81,13 @@ const CreatePublicationForm = ({topicId, contacts, methodologies, currentValues,
           <Form id={formId}>
             <FormFieldTextInput
               id={`${formId}-publicationTitle`}
-              label='Enter publication title'
-              name='publicationTitle'
+              label="Enter publication title"
+              name="publicationTitle"
             />
             <FormFieldRadioGroup
               id={`${formId}-methodologyChoice`}
-              legend='Choose a methodology for this publication'
-              name='methodologyChoice'
+              legend="Choose a methodology for this publication"
+              name="methodologyChoice"
               options={[
                 {
                   value: 'existing',
@@ -94,23 +102,23 @@ const CreatePublicationForm = ({topicId, contacts, methodologies, currentValues,
             {form.values.methodologyChoice === 'existing' && (
               <FormFieldSelect
                 id={`${formId}-selectedMethodologyId`}
-                name='selectedMethodologyId'
-                label='Select methodology'
+                name="selectedMethodologyId"
+                label="Select methodology"
                 options={methodologies.map(methodology => ({
-                  label: methodology.label,
+                  label: methodology.title,
                   value: methodology.id,
                 }))}
               />
             )}
             <FormFieldset
               id={`${formId}-selectedContactIdFieldset`}
-              legend='Choose the contact for this publication'
-              hint='They will be the main point of contact for data and methodology enquiries for this publication and its releases.'
+              legend="Choose the contact for this publication"
+              hint="They will be the main point of contact for data and methodology enquiries for this publication and its releases."
             >
               <FormFieldSelect
                 id={`${formId}-selectedContactId`}
-                label='Publication and release contact'
-                name='selectedContactId'
+                label="Publication and release contact"
+                name="selectedContactId"
                 options={contacts.map(contact => ({
                   label: contact.contactName,
                   value: contact.id,
@@ -119,11 +127,14 @@ const CreatePublicationForm = ({topicId, contacts, methodologies, currentValues,
             </FormFieldset>
             {form.values.selectedContactId && (
               <SummaryList>
-                <SummaryListItem term='Email'>
+                <SummaryListItem term="Email">
                   {getSelectedContact(form.values.selectedContactId).teamEmail}
                 </SummaryListItem>
-                <SummaryListItem term='Telephone'>
-                  {getSelectedContact(form.values.selectedContactId).contactTelNo}
+                <SummaryListItem term="Telephone">
+                  {
+                    getSelectedContact(form.values.selectedContactId)
+                      .contactTelNo
+                  }
                 </SummaryListItem>
               </SummaryList>
             )}
@@ -131,7 +142,7 @@ const CreatePublicationForm = ({topicId, contacts, methodologies, currentValues,
               Continue
             </Button>
             <div className="govuk-!-margin-top-6">
-              <Link to='#' onClick={onCancelHandler}>
+              <Link to="#" onClick={onCancelHandler}>
                 Cancel publication
               </Link>
             </div>

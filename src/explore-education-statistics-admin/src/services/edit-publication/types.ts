@@ -1,6 +1,8 @@
 export interface CreatePublicationRequest {
-  topicId: string,
+  topicId: string;
   publicationTitle: string;
   selectedMethodologyId?: string;
   selectedContactId: string;
 }
+
+export default {};

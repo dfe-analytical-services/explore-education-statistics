@@ -45,7 +45,7 @@ const DashboardReleaseSummary = ({ release }: Props) => {
       ? 'me'
       : release.lastEditedUser.name;
 
-  const releaseSummaryLabel = `${release.timePeriodCoverage.label}, ${
+  const releaseSummaryLabel = `${release.timePeriodCoverage.title}, ${
     release.releaseName
   } 
      ${getLiveLatestLabel(release.live, release.latestRelease)}`;

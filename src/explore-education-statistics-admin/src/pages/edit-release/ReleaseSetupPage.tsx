@@ -31,7 +31,7 @@ const ReleaseSetupPage = ({ match }: RouteComponentProps<MatchProps>) => {
 
   const getSelectedTimePeriodCoverageLabel = (timePeriodCoverageCode: string) =>
     DummyReferenceData.findTimePeriodCoverageOption(timePeriodCoverageCode)
-      .label;
+      .title;
 
   return (
     <>
@@ -88,7 +88,7 @@ const ReleaseSetupPage = ({ match }: RouteComponentProps<MatchProps>) => {
               )}
             </SummaryListItem>
             <SummaryListItem term="Release type">
-              {releaseSetupDetails.releaseType.label}
+              {releaseSetupDetails.releaseType.title}
             </SummaryListItem>
             <SummaryListItem
               term=""

@@ -5,7 +5,7 @@ import DummyReferenceData, {
 } from '@admin/pages/DummyReferenceData';
 import ReleasePageTemplate from '@admin/pages/edit-release/components/ReleasePageTemplate';
 import { setupRoute } from '@admin/routes/releaseRoutes';
-import { DayMonthYearValues, IdLabelPair } from '@admin/services/common/types';
+import { DayMonthYearValues, IdTitlePair } from '@admin/services/common/types';
 import service from '@admin/services/edit-release/setup/service';
 import {
   ReleaseSetupDetails,
@@ -56,7 +56,7 @@ const ReleaseSetupEditPage = ({
     TimePeriodCoverageGroup[]
   >();
 
-  const [releaseTypes, setReleaseTypes] = useState<IdLabelPair[]>();
+  const [releaseTypes, setReleaseTypes] = useState<IdTitlePair[]>();
 
   useEffect(() => {
     service.getReleaseSetupDetails(releaseId).then(release => {
@@ -77,8 +77,8 @@ const ReleaseSetupEditPage = ({
   ) => {
     const optGroups: Dictionary<SelectOption[]> = {};
     timePeriodGroups.forEach(group => {
-      optGroups[group.label] = group.options.map(option => ({
-        label: `${option.label} - ${option.id}`,
+      optGroups[group.title] = group.options.map(option => ({
+        label: `${option.title} - ${option.id}`,
         value: option.id,
       }));
     });
@@ -272,7 +272,7 @@ const ReleaseSetupEditPage = ({
                     legend="Release Type"
                     name="releaseTypeId"
                     options={releaseTypes.map(type => ({
-                      label: type.label,
+                      label: type.title,
                       value: `${type.id}`,
                     }))}
                   />
