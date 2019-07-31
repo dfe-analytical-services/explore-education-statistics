@@ -27,6 +27,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             release.PublicationId = publicationId;
             return await _releaseService.CreateReleaseAsync(release);
-        }
+       }
     }
 }

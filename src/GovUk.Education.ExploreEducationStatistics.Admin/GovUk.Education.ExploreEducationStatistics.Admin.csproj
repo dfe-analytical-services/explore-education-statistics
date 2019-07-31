@@ -89,6 +89,26 @@
     <_ContentIncludedByDefault Remove="wwwroot\assets\images\icon-important.png" />
     <_ContentIncludedByDefault Remove="wwwroot\assets\images\icon-pointer-2x.png" />
     <_ContentIncludedByDefault Remove="wwwroot\assets\images\icon-pointer.png" />
+    <_ContentIncludedByDefault Remove="Views\Releases\Create.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Releases\Delete.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Releases\Details.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Releases\Edit.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Releases\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Themes\Create.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Themes\Delete.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Themes\Details.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Themes\Edit.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Themes\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Topics\Create.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Topics\Delete.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Topics\Details.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Topics\Edit.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Topics\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Publications\Create.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Publications\Delete.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Publications\Details.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Publications\Edit.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Publications\Index.cshtml" />
   </ItemGroup>
 
 
