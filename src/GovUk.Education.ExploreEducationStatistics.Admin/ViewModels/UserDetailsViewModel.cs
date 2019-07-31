@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Security.Claims;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 {
@@ -9,5 +11,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public string Name { get; set; }
         public string Email { get; set; }
         public string[] Permissions { get; set; }
+        public IEnumerable<Claim> Claims { get; set; }
     }
 }
