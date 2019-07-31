@@ -25,6 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
                     Email = User.Claims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")?.Value,
                     Name = User.Claims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname")?.Value + " " + User.Claims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname")?.Value,
                     Permissions = new string[] { "team lead" },
+                    Claims = User.Claims
                 };
             }
 
