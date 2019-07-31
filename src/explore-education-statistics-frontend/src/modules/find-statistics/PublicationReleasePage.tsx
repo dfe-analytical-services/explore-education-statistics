@@ -145,6 +145,11 @@ class PublicationReleasePage extends Component<Props> {
                       <Link
                         to={`${baseUrl.data}/api/download/${path}`}
                         className="govuk-link"
+                        analytics={{
+                          category: 'Downloads',
+                          action: `Release page ${name} file downloaded`,
+                          label: `File URL: /api/download/${path}`,
+                        }}
                       >
                         {name}
                       </Link>

@@ -1,13 +1,15 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Services.ModelMappers;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using UserId = System.Guid;
 using TopicId = System.Guid;
 using PublicationId = System.Guid;
@@ -23,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _context = context;
         }
 
-        public Publication Get(Guid id)
+        public Publication Get(UserId id)
         {
             return _context.Publications.FirstOrDefault(x => x.Id == id);
         }
@@ -50,18 +52,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return PublicationViewModelMapper.Map<List<PublicationViewModel>>(publications);
         }
 
-        public async Task<PublicationViewModel> CreatePublication(CreatePublicationViewModel publication)
+        public async Task<Either<ValidationResult, PublicationViewModel>> CreatePublication(CreatePublicationViewModel publication)
         {
+            if (_context.Publications.Any(p => p.Slug == publication.Slug))
+            {
+                return ValidationResult("Slug", "Slug is not unique");
+            }
+            
             var saved = _context.Publications.Add(new Publication
             {
-                Id = Guid.NewGuid(),
+                Id = UserId.NewGuid(),
                 ContactId = publication.ContactId,
                 Title = publication.Title,
                 TopicId = publication.TopicId,
-                MethodologyId = publication.MethodologyId
+                MethodologyId = publication.MethodologyId,
+                Slug = publication.Slug
             });
             _context.SaveChanges();
             return await GetViewModelAsync(saved.Entity.Id);
+            
         }
 
         public async Task<PublicationViewModel> GetViewModelAsync(PublicationId publicationId)
