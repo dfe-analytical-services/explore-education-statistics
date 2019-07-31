@@ -1,11 +1,10 @@
-import React, {useEffect, useState} from 'react';
-import {RouteComponentProps} from 'react-router';
+import DummyReferenceData, {DateType, TimePeriodCoverageGroup,} from '@admin/pages/DummyReferenceData';
 import ReleaseSetupForm, {FormValues} from "@admin/pages/release/setup/ReleaseSetupForm";
 import {setupRoute} from "@admin/routes/edit-release/routes";
-import {IdTitlePair} from '@admin/services/common/types';
 import service from '@admin/services/edit-release/setup/service';
 import {ReleaseSetupDetails, ReleaseSetupDetailsUpdateRequest,} from '@admin/services/edit-release/setup/types';
-import DummyReferenceData, {DateType, TimePeriodCoverageGroup,} from '@admin/pages/DummyReferenceData';
+import React, {useEffect, useState} from 'react';
+import {RouteComponentProps} from 'react-router';
 import ReleasePageTemplate from '../components/ReleasePageTemplate';
 
 interface MatchProps {
@@ -22,17 +21,9 @@ const ReleaseSetupEditPage = ({
     ReleaseSetupDetails
   >();
 
-  const [timePeriodCoverageGroups, setTimePeriodCoverageGroups] = useState<
-    TimePeriodCoverageGroup[]
-  >();
-
-  const [releaseTypes, setReleaseTypes] = useState<IdTitlePair[]>();
-
   useEffect(() => {
     service.getReleaseSetupDetails(releaseId).then(release => {
       setReleaseSetupDetails(release);
-      setTimePeriodCoverageGroups(DummyReferenceData.timePeriodCoverageGroups);
-      setReleaseTypes(DummyReferenceData.releaseTypeOptions);
     });
   }, [releaseId]);
 
@@ -75,7 +66,7 @@ const ReleaseSetupEditPage = ({
 
   return (
     <>
-      {releaseSetupDetails && timePeriodCoverageGroups && releaseTypes && (
+      {releaseSetupDetails && (
         <ReleasePageTemplate
           releaseId={releaseId}
           publicationTitle={releaseSetupDetails.publicationTitle}
@@ -84,8 +75,6 @@ const ReleaseSetupEditPage = ({
 
           <ReleaseSetupForm
             releaseSetupDetails={releaseSetupDetails}
-            timePeriodCoverageGroups={timePeriodCoverageGroups}
-            releaseTypes={releaseTypes}
             onSubmitHandler={submitHandler}
           />
 
