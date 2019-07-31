@@ -4,8 +4,8 @@ import {
 } from '@common/services/dataBlockService';
 import { Dictionary } from '@common/types';
 import { PositionType } from 'recharts';
-import { contentApi } from './api';
 import { AxesConfiguration } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import { contentApi } from './api';
 
 export interface Publication {
   id: string;

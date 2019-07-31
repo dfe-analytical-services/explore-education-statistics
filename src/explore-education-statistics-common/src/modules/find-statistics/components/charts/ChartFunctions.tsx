@@ -23,6 +23,7 @@ import {
   DataBlockData,
   DataBlockMetadata,
   Result,
+  Location,
 } from '@common/services/dataBlockService';
 import difference from 'lodash/difference';
 import { Dictionary } from '@common/types';
@@ -190,6 +191,10 @@ export function filterResultsBySingleDataSet(
   );
 }
 
+function existAndCodesDoNotMatch(a?: Location, b?: Location) {
+  return a !== undefined && b !== undefined && a.code !== b.code;
+}
+
 function filterResultsForDataSet(ds: ChartDataSet) {
   return (result: Result) => {
     // fail fast with the two things that are most likely to not match
@@ -197,34 +202,31 @@ function filterResultsForDataSet(ds: ChartDataSet) {
       return false;
 
     if (ds.filters) {
-      if (difference(ds.filters, result.filters).length !== 0) return false;
+      if (difference(ds.filters, result.filters).length > 0) return false;
     }
 
     if (ds.location) {
       const { location } = result;
+
+      if (existAndCodesDoNotMatch(location.country, ds.location.country))
+        return false;
+
+      if (existAndCodesDoNotMatch(location.region, ds.location.region))
+        return false;
+
       if (
-        location.country &&
-        ds.location.country &&
-        location.country.code !== ds.location.country.code
+        existAndCodesDoNotMatch(
+          location.localAuthorityDistrict,
+          ds.location.localAuthorityDistrict,
+        )
       )
         return false;
+
       if (
-        location.region &&
-        ds.location.region &&
-        location.region.code !== ds.location.region.code
-      )
-        return false;
-      if (
-        location.localAuthorityDistrict &&
-        ds.location.localAuthorityDistrict &&
-        location.localAuthorityDistrict.code !==
-          ds.location.localAuthorityDistrict.code
-      )
-        return false;
-      if (
-        location.localAuthority &&
-        ds.location.localAuthority &&
-        location.localAuthority.code !== ds.location.localAuthority.code
+        existAndCodesDoNotMatch(
+          location.localAuthority,
+          ds.location.localAuthority,
+        )
       )
         return false;
     }
