@@ -37,6 +37,7 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
       stackable: true,
       lineStyle: false,
       gridLines: true,
+      canSize: true,
     },
 
     data: [
@@ -99,7 +100,7 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
     ];
 
     return (
-      <ResponsiveContainer width={width || '100%'} height={height || 600}>
+      <ResponsiveContainer width={width || '100%'} height={height || 300}>
         <BarChart
           data={chartData}
           layout="vertical"

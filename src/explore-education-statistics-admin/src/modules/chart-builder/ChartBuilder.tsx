@@ -4,18 +4,15 @@ import ChartDataSelector, {
 } from '@admin/modules/chart-builder/ChartDataSelector';
 
 import Details from '@common/components/Details';
-import {
-  FormCheckbox,
-  FormGroup,
-  FormSelect,
-  FormTextInput,
-} from '@common/components/form';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import ChartRenderer, {
   ChartRendererProps,
 } from '@common/modules/find-statistics/components/ChartRenderer';
-import { ChartDefinition, AxesConfiguration } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import {
+  ChartDefinition,
+  AxesConfiguration,
+} from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import HorizontalBarBlock from '@common/modules/find-statistics/components/charts/HorizontalBarBlock';
 import LineChartBlock from '@common/modules/find-statistics/components/charts/LineChartBlock';
 import MapBlock from '@common/modules/find-statistics/components/charts/MapBlock';
@@ -27,6 +24,9 @@ import {
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import React from 'react';
+import ChartConfiguration, {
+  ChartOptions,
+} from '@admin/modules/chart-builder/ChartConfiguration';
 import ChartAxisConfiguration from './ChartAxisConfiguration';
 import ChartTypeSelector from './ChartTypeSelector';
 import styles from './graph-builder.module.scss';
@@ -76,12 +76,6 @@ const chartTypes: ChartDefinition[] = [
   MapBlock.definition,
 ];
 
-interface ChartOptions {
-  stacked: boolean;
-  legend: 'none' | 'top' | 'bottom';
-  legendHeight: string;
-}
-
 const ChartBuilder = ({ data }: Props) => {
   const [selectedChartType, setSelectedChartType] = React.useState<
     ChartDefinition | undefined
@@ -104,6 +98,8 @@ const ChartBuilder = ({ data }: Props) => {
     stacked: false,
     legend: 'top',
     legendHeight: '42',
+    height: 300,
+    width: undefined,
   });
   const previousAxesConfiguration = React.useRef<Dictionary<AxisConfiguration>>(
     {},
@@ -151,12 +147,12 @@ const ChartBuilder = ({ data }: Props) => {
         axes: {
           major: {
             ...axesConfiguration.major,
-            dataSets: dataSetAndConfiguration.map(dsc => dsc.dataSet)
+            dataSets: dataSetAndConfiguration.map(dsc => dsc.dataSet),
           },
           minor: {
             ...axesConfiguration.minor,
-            dataSets: []
-          }
+            dataSets: [],
+          },
         },
         labels: {
           ...dataSetAndConfiguration.reduce<Dictionary<DataSetConfiguration>>(
@@ -186,7 +182,7 @@ const ChartBuilder = ({ data }: Props) => {
       previousSelectionChartType.current = selectedChartType;
 
       if (selectedChartType) {
-        const axisConfiguration = selectedChartType.axes.reduce<
+        const newAxesConfiguration = selectedChartType.axes.reduce<
           Dictionary<AxisConfiguration>
         >((axesConfigurationDictionary, axisDefinition) => {
           const previousConfig =
@@ -226,7 +222,7 @@ const ChartBuilder = ({ data }: Props) => {
           };
         }, {});
 
-        setAxesConfiguration(axisConfiguration);
+        setAxesConfiguration(newAxesConfiguration);
       }
     }
   }, [selectedChartType, dataSetAndConfiguration]);
@@ -290,63 +286,11 @@ const ChartBuilder = ({ data }: Props) => {
           </TabsSection>
 
           <TabsSection title="Chart">
-            <div className={styles.axesOptions}>
-              {selectedChartType.capabilities.stackable && (
-                <FormGroup className={styles.fullWidth}>
-                  <FormCheckbox
-                    id="stacked"
-                    name="stacked"
-                    label="Stacked bars"
-                    checked={chartOptions.stacked}
-                    value="stacked"
-                    onChange={e => {
-                      setChartOptions({
-                        ...chartOptions,
-                        stacked: e.target.checked,
-                      });
-                    }}
-                  />
-                </FormGroup>
-              )}
-              <FormGroup className={styles.formGroup}>
-                <FormSelect
-                  id="legend-position"
-                  name="legend-position"
-                  value={chartOptions.legend}
-                  label="Legend Position"
-                  options={[
-                    { label: 'Top', value: 'top' },
-                    { label: 'Bottom', value: 'bottom' },
-                    { label: 'None', value: 'none' },
-                  ]}
-                  order={[]}
-                  onChange={e => {
-                    // @ts-ignore
-                    setChartOptions({
-                      ...chartOptions,
-                      legend: e.target.value,
-                    });
-                  }}
-                />
-              </FormGroup>
-              {chartOptions.legend !== 'none' && (
-                <FormGroup className={styles.formGroup}>
-                  <FormTextInput
-                    id="legend-height"
-                    name="legend-height"
-                    label="Legend Height (blank for automatic)"
-                    value={chartOptions.legendHeight}
-                    width={5}
-                    onChange={e => {
-                      setChartOptions({
-                        ...chartOptions,
-                        legendHeight: e.target.value,
-                      });
-                    }}
-                  />
-                </FormGroup>
-              )}
-            </div>
+            <ChartConfiguration
+              selectedChartType={selectedChartType}
+              chartOptions={chartOptions}
+              onChange={setChartOptions}
+            />
           </TabsSection>
         </Tabs>
       )}

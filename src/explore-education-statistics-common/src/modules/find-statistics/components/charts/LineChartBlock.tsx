@@ -15,11 +15,13 @@ import {
   AxisDomain,
   CartesianGrid,
   Legend,
+  LegendType,
   Line,
   LineChart,
   ReferenceLine,
   ResponsiveContainer,
   Symbols,
+  SymbolsProps,
   Tooltip,
   TooltipProps,
   XAxis,
@@ -30,6 +32,7 @@ import { Dictionary } from '@common/types';
 import classnames from 'classnames';
 
 import './charts.scss';
+import { ChartSymbol } from '@common/services/publicationService';
 
 const CustomToolTip = ({ active, payload, label }: TooltipProps) => {
   if (active) {
@@ -66,8 +69,44 @@ const LineStyles: Dictionary<string> = {
   dotted: '2 2',
 };
 
+const parseNumberOrDefault = (
+  number: string | undefined,
+  def: number,
+): number => {
+  const parsed = number === undefined ? undefined : Number.parseFloat(number);
+
+  if (parsed === undefined || Number.isNaN(parsed)) return def;
+  return parsed;
+};
+
+// eslint-disable-next-line react/display-name
+const generateDot = (symbol: string | undefined) => (props: SymbolsProps) => {
+  // eslint-disable-line react/display-name
+
+  if (symbol === 'none' || symbol === undefined || symbol === '')
+    return undefined;
+
+  const chartSymbol: ChartSymbol = symbol as ChartSymbol;
+
+  return <Symbols {...props} type={chartSymbol} />;
+};
+
+const generateLegendType = (symbol: LegendType | undefined): LegendType => {
+  if (symbol === 'none' || symbol === undefined) return 'line';
+  return symbol;
+};
+
 const LineChartBlock = (props: ChartProps) => {
-  const { data, meta, height, axes, labels, legend, legendHeight } = props;
+  const {
+    data,
+    meta,
+    height,
+    axes,
+    labels,
+    legend,
+    legendHeight,
+    width,
+  } = props;
 
   if (
     axes === undefined ||
@@ -87,12 +126,12 @@ const LineChartBlock = (props: ChartProps) => {
 
   const { min, max } = calculateDataRange(chartData);
   const minorAxisDomain: [AxisDomain, AxisDomain] = [
-    axes.minor.min || min,
-    axes.minor.max || max,
+    parseNumberOrDefault(axes.minor.min, min),
+    parseNumberOrDefault(axes.minor.max, max),
   ];
 
   return (
-    <ResponsiveContainer width={900} height={height || 300}>
+    <ResponsiveContainer width={width || '100%'} height={height || 300}>
       <LineChart
         data={chartData}
         className={classnames({ 'legend-bottom': legend === 'bottom' })}
@@ -102,9 +141,11 @@ const LineChartBlock = (props: ChartProps) => {
         }}
       >
         <Tooltip content={CustomToolTip} />
+
         {(legend === 'top' || legend === 'bottom') && (
           <Legend verticalAlign={legend} height={+(legendHeight || '50')} />
         )}
+
         <CartesianGrid
           strokeDasharray="3 3"
           horizontal={axes.minor && axes.minor.showGrid !== false}
@@ -153,20 +194,8 @@ const LineChartBlock = (props: ChartProps) => {
             key={name}
             {...populateDefaultChartProps(name, labels[name])}
             type="linear"
-            legendType={labels[name] && labels[name].symbol}
-            dot={
-              labels[name] &&
-              labels[name].symbol &&
-              ((
-                p, // eslint-disable-line react/display-name
-              ) => (
-                <Symbols
-                  {...p}
-                  type={labels[name] && labels[name].symbol}
-                  strokeDasharray=""
-                />
-              ))
-            }
+            legendType={generateLegendType(labels[name] && labels[name].symbol)}
+            dot={generateDot(labels[name] && labels[name].symbol)}
             strokeWidth="2"
             strokeDasharray={
               labels[name] &&
@@ -209,6 +238,7 @@ const definition: ChartDefinition = {
     stackable: false,
     lineStyle: true,
     gridLines: true,
+    canSize: true,
   },
 
   data: [

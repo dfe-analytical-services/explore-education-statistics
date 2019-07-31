@@ -428,30 +428,7 @@ exports[`LineChartBlock renders basic chart correctly 1`] = `
           />
           <g
             class="recharts-layer recharts-line-dots"
-          >
-            <circle
-              class="recharts-dot recharts-line-dot"
-              cx="110"
-              cy="150"
-              fill="#ff0000"
-              height="260"
-              r="3"
-              stroke="#ff0000"
-              stroke-width="2"
-              width="810"
-            />
-            <circle
-              class="recharts-dot recharts-line-dot"
-              cx="880"
-              cy="270"
-              fill="#ff0000"
-              height="260"
-              r="3"
-              stroke="#ff0000"
-              stroke-width="2"
-              width="810"
-            />
-          </g>
+          />
         </g>
         <g
           class="recharts-layer recharts-line"
@@ -467,30 +444,7 @@ exports[`LineChartBlock renders basic chart correctly 1`] = `
           />
           <g
             class="recharts-layer recharts-line-dots"
-          >
-            <circle
-              class="recharts-dot recharts-line-dot"
-              cx="110"
-              cy="10"
-              fill="#ff0000"
-              height="260"
-              r="3"
-              stroke="#ff0000"
-              stroke-width="2"
-              width="810"
-            />
-            <circle
-              class="recharts-dot recharts-line-dot"
-              cx="880"
-              cy="130"
-              fill="#ff0000"
-              height="260"
-              r="3"
-              stroke="#ff0000"
-              stroke-width="2"
-              width="810"
-            />
-          </g>
+          />
         </g>
         <g
           class="recharts-layer recharts-line"
@@ -506,30 +460,7 @@ exports[`LineChartBlock renders basic chart correctly 1`] = `
           />
           <g
             class="recharts-layer recharts-line-dots"
-          >
-            <circle
-              class="recharts-dot recharts-line-dot"
-              cx="110"
-              cy="110"
-              fill="#ff0000"
-              height="260"
-              r="3"
-              stroke="#ff0000"
-              stroke-width="2"
-              width="810"
-            />
-            <circle
-              class="recharts-dot recharts-line-dot"
-              cx="880"
-              cy="190"
-              fill="#ff0000"
-              height="260"
-              r="3"
-              stroke="#ff0000"
-              stroke-width="2"
-              width="810"
-            />
-          </g>
+          />
         </g>
       </svg>
       <div

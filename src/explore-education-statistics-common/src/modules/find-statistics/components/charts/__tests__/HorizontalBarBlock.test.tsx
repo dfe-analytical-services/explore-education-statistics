@@ -6,7 +6,7 @@ import {
   DataBlockData,
   DataBlockMetadata,
 } from '@common/services/dataBlockService';
-import HorzontalBarBlock from '../HorizontalBarBlock';
+import Chart from '../HorizontalBarBlock';
 
 import testData from './__data__/testBlockData';
 import { AxesConfiguration } from '../ChartFunctions';
@@ -21,7 +21,7 @@ const { axes } = props;
 
 describe('HorzontalBarBlock', () => {
   test('renders basic chart correctly', () => {
-    const { container } = render(<HorzontalBarBlock {...props} />);
+    const { container } = render(<Chart {...props} />);
 
     expect(container).toMatchSnapshot();
 
@@ -56,7 +56,7 @@ describe('HorzontalBarBlock', () => {
 
   test('major axis can be hidden', () => {
     const { container } = render(
-      <HorzontalBarBlock
+      <Chart
         {...props}
         axes={{
           ...axes,
@@ -75,7 +75,7 @@ describe('HorzontalBarBlock', () => {
 
   test('minor axis can be hidden', () => {
     const { container } = render(
-      <HorzontalBarBlock
+      <Chart
         {...props}
         axes={{
           ...axes,
@@ -94,7 +94,7 @@ describe('HorzontalBarBlock', () => {
 
   test('both axes can be hidden', () => {
     const { container } = render(
-      <HorzontalBarBlock
+      <Chart
         {...props}
         axes={{
           ...axes,
@@ -120,9 +120,7 @@ describe('HorzontalBarBlock', () => {
   });
 
   test('can hide legend', () => {
-    const { container } = render(
-      <HorzontalBarBlock {...props} legend="none" />,
-    );
+    const { container } = render(<Chart {...props} legend="none" />);
 
     expect(
       container.querySelector('.recharts-default-legend'),
@@ -130,9 +128,7 @@ describe('HorzontalBarBlock', () => {
   });
 
   test('can stack data', () => {
-    const { container } = render(
-      <HorzontalBarBlock {...props} stacked legend="none" />,
-    );
+    const { container } = render(<Chart {...props} stacked legend="none" />);
 
     // Unsure how to tell stacked data apart, other than the snapshot
 
@@ -145,7 +141,7 @@ describe('HorzontalBarBlock', () => {
 
   test('can render major axis reference line', () => {
     const { container } = render(
-      <HorzontalBarBlock
+      <Chart
         {...{
           ...props,
           axes: {
@@ -171,7 +167,7 @@ describe('HorzontalBarBlock', () => {
   });
   test('can render minor axis reference line', () => {
     const { container } = render(
-      <HorzontalBarBlock
+      <Chart
         {...{
           ...props,
           axes: {
@@ -202,7 +198,7 @@ describe('HorzontalBarBlock', () => {
     const invalidAxes: AxesConfiguration = (undefined as unknown) as AxesConfiguration;
 
     const { container } = render(
-      <HorzontalBarBlock
+      <Chart
         data={invalidData}
         labels={{}}
         meta={invalidMeta}
@@ -210,5 +206,45 @@ describe('HorzontalBarBlock', () => {
       />,
     );
     expect(container).toHaveTextContent('Unable to render chart');
+  });
+
+  test('Can change width of chart', () => {
+    const propsWithSize = {
+      ...props,
+      width: 200,
+    };
+
+    const { container } = render(<Chart {...propsWithSize} />);
+
+    const responsiveContainer = container.querySelector(
+      '.recharts-responsive-container',
+    );
+
+    expect(responsiveContainer).toHaveProperty('style');
+
+    if (responsiveContainer) {
+      const div = responsiveContainer as HTMLElement;
+      expect(div.style.width).toEqual('200px');
+    }
+  });
+
+  test('Can change height of chart', () => {
+    const propsWithSize = {
+      ...props,
+      height: 200,
+    };
+
+    const { container } = render(<Chart {...propsWithSize} />);
+
+    const responsiveContainer = container.querySelector(
+      '.recharts-responsive-container',
+    );
+
+    expect(responsiveContainer).toHaveProperty('style');
+
+    if (responsiveContainer) {
+      const div = responsiveContainer as HTMLElement;
+      expect(div.style.height).toEqual('200px');
+    }
   });
 });

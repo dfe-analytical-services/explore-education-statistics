@@ -88,6 +88,7 @@ export interface ChartCapabilities {
   stackable: boolean;
   lineStyle: boolean;
   gridLines: boolean;
+  canSize: boolean;
 }
 
 export interface ChartDefinition {
