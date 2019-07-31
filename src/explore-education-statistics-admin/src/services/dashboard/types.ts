@@ -37,7 +37,7 @@ export interface AdminDashboardRelease {
 export interface AdminDashboardPublication {
   id: string;
   title: string;
-  methodology: IdLabelPair;
+  methodology?: IdLabelPair;
   releases: AdminDashboardRelease[];
   contact: ContactDetails;
 }

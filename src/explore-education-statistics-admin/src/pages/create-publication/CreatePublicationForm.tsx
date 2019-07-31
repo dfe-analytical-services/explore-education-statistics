@@ -41,7 +41,9 @@ const CreatePublicationForm = ({topicId, contacts, methodologies, currentValues,
         publicationTitle: currentValues ? currentValues.publicationTitle : '',
         selectedContactId: currentValues ? currentValues.selectedContactId : contacts[0].id,
         methodologyChoice: currentValues ? currentValues.methodologyChoice : undefined,
-        selectedMethodologyId: currentValues ? currentValues.selectedMethodologyId : undefined,
+        selectedMethodologyId: currentValues && currentValues.selectedMethodologyId
+          ? currentValues.selectedMethodologyId
+          : methodologies[0].id,
       }}
       validationSchema={Yup.object<FormValues>({
         publicationTitle: Yup.string().required(
