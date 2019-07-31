@@ -60,6 +60,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
             var permalink = new PermalinkEntity()
             {
+                Id = Guid.NewGuid(),
+                Created = DateTime.UtcNow,
                 // TODO: passing the title generated from the frontend could be exploited so we'll need to generate something
                 Title = "Auto-generated table title",
                 Data = data,
