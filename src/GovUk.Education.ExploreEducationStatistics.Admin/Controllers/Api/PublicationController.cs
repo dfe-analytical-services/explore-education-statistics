@@ -51,10 +51,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             var result = await _publicationService.CreatePublication(publication);
             if (result.IsLeft)
             {
-                ValidationUtils.AddErrors(ModelState, result.Left());
+                ValidationUtils.AddErrors(ModelState, result.Left);
                 return ValidationProblem();
             }
-            return result.Right();
+            return result.Right;
         }
     }
 }

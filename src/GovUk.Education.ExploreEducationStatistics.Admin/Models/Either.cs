@@ -20,9 +20,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
         
         public bool IsLeft { get; }
 
-        public TL Left() => IsLeft ? _left : throw new ArgumentException("Calling Left on a Right");
+        public TL Left => IsLeft ? _left : throw new ArgumentException("Calling Left on a Right");
 
-        public TR Right() => !IsLeft ? _right : throw new ArgumentException("Calling Right on a Left");
+        public TR Right => !IsLeft ? _right : throw new ArgumentException("Calling Right on a Left");
         
         public static implicit operator Either<TL, TR>(TL left) => new Either<TL, TR>(left);
         
