@@ -6,7 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public static class ModelMappers
     {
-        public static readonly IMapper PublicationToPublicationViewModelMapper = new MapperConfiguration(cfg =>
+        public static readonly IMapper PublicationViewModelMapper = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Publication, PublicationViewModel>();
             cfg.CreateMap<Release, ReleaseViewModel>()
@@ -14,6 +14,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     dest => dest.LatestRelease,
                     m => m.MapFrom(r => r.Publication.LatestRelease().Id == r.Id));
             cfg.CreateMap<Methodology, MethodologyViewModel>();
-        }).CreateMapper(); 
+        }).CreateMapper();
+
+
+        public static readonly IMapper MethodologyViewModelMapper = new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Methodology, MethodologyViewModel>();
+        }).CreateMapper();
     }
 }

@@ -1,21 +1,27 @@
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
+
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
 {
     using System;
     using Microsoft.Azure.Cosmos.Table;
     
-    public class PermalinkEntity : TableEntity
+    public class PermalinkEntity
     {
         public PermalinkEntity()
         {
-            // TODO: im not sure about the partition key, requires some more thought
-            PartitionKey = "permalink";
-            RowKey = Guid.NewGuid().ToString();
+            Id = Guid.NewGuid();
+            Created = DateTime.UtcNow;
         }
-
+        
+        public Guid Id { get; }
+        
+        public DateTime Created { get; set; }
+        
         public string Title { get; set; }
         
-        public string Data { get; set; }
+        public ResultWithMetaViewModel Data { get; set; }
         
-        public string Query { get; set; }
+        public ObservationQueryContext Query { get; set; }
     }
 }

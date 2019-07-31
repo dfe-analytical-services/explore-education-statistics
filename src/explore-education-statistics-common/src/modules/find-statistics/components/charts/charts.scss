@@ -1,0 +1,22 @@
+.recharts-legend-wrapper ul {
+  align-content: center;
+  display: flex;
+  flex-wrap: wrap;
+  height: 100%;
+  justify-content: center;
+
+  li {
+    align-self: flex-start;
+    flex-shrink: 1;
+    margin: 0 !important;
+    max-width: 32%;
+    padding: 0 10px 0 0;
+  }
+}
+
+.legend-bottom .recharts-legend-wrapper ul {
+  /* stylelint-disable-next-line */
+  li {
+    align-self: flex-end;
+  }
+}

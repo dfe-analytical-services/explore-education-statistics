@@ -41,5 +41,6 @@ export interface AnalyticProps {
   analytics?: {
     category: string;
     action: string;
+    label?: string;
   };
 }
