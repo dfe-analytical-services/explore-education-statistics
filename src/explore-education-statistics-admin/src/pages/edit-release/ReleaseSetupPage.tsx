@@ -1,7 +1,7 @@
 import Link from '@admin/components/Link';
 import DummyReferenceData from '@admin/pages/DummyReferenceData';
 import ReleasePageTemplate from '@admin/pages/edit-release/components/ReleasePageTemplate';
-import { setupEditRoute } from '@admin/routes/releaseRoutes';
+import { setupEditRoute } from '@admin/routes/edit-release/routes';
 import {
   dayMonthYearIsComplete,
   dayMonthYearToDate,
@@ -31,7 +31,7 @@ const ReleaseSetupPage = ({ match }: RouteComponentProps<MatchProps>) => {
 
   const getSelectedTimePeriodCoverageLabel = (timePeriodCoverageCode: string) =>
     DummyReferenceData.findTimePeriodCoverageOption(timePeriodCoverageCode)
-      .label;
+      .title;
 
   return (
     <>
@@ -88,7 +88,7 @@ const ReleaseSetupPage = ({ match }: RouteComponentProps<MatchProps>) => {
               )}
             </SummaryListItem>
             <SummaryListItem term="Release type">
-              {releaseSetupDetails.releaseType.label}
+              {releaseSetupDetails.releaseType.title}
             </SummaryListItem>
             <SummaryListItem
               term=""

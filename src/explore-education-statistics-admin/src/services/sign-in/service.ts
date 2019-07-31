@@ -1,3 +1,4 @@
+import signInRoutes from '@admin/routes/sign-in/routes';
 import { User } from '@admin/services/sign-in/types';
 import { createClient } from '@admin/services/util/service';
 import mocks from './mock/mock-service';
@@ -15,8 +16,8 @@ export interface LoginService {
 const service: LoginService = {
   getUserDetails: () =>
     apiClient.then(client => client.get('/users/mydetails')),
-  getSignInLink: () => '/api/signin',
-  getSignOutLink: () => '/api/signout',
+  getSignInLink: () => signInRoutes.signInViaApiLink,
+  getSignOutLink: () => signInRoutes.signOutViaApiLink,
 };
 
 export default service;

@@ -1,7 +1,7 @@
-const getCaptureGroups: (regex: RegExp, string?: string) => RegExpMatchArray = (
-  regex,
-  string,
-) => {
+export const getCaptureGroups: (
+  regex: RegExp,
+  string?: string,
+) => RegExpMatchArray = (regex, string) => {
   if (!string) {
     return [];
   }
@@ -11,4 +11,10 @@ const getCaptureGroups: (regex: RegExp, string?: string) => RegExpMatchArray = (
   return matches ? matches.slice(1) : [];
 };
 
-export default getCaptureGroups;
+export const generateRandomInteger = (max: number) =>
+  Math.floor(Math.random() * Math.floor(max));
+
+export const generateRandomIntegerString = (max: number) =>
+  generateRandomInteger(max).toString();
+
+export default {};

@@ -1,9 +1,13 @@
 import ProtectedRoute from '@admin/components/ProtectedRoute';
+import CreatePublicationPage from '@admin/pages/create-publication/CreatePublicationPage';
 import MockSignInProcess from '@admin/pages/sign-in/mock/MockSignInProcess';
 import MockSignOutProcess from '@admin/pages/sign-in/mock/MockSignOutProcess';
 import SignedOutPage from '@admin/pages/sign-in/SignedOutPage';
 import SignInPage from '@admin/pages/sign-in/SignInPage';
-import releaseRoutes from '@admin/routes/releaseRoutes';
+import signInRoutes from '@admin/routes/sign-in/routes';
+import dashboardRoutes from '@admin/routes/dashboard/routes';
+import releaseRoutes from '@admin/routes/edit-release/routes';
+import publicationRoutes from '@admin/routes/edit-publication/routes';
 import PrototypeLoginService from '@admin/services/PrototypeLoginService';
 import React from 'react';
 import { Route } from 'react-router';
@@ -46,22 +50,28 @@ function App() {
       {/* Non-Prototype Routes*/}
       <ProtectedRoute
         exact
-        path="/sign-in"
+        path={dashboardRoutes.adminDashboard}
+        component={AdminDashboardPage}
+      />
+
+      <ProtectedRoute
+        exact
+        path={signInRoutes.signIn}
         component={SignInPage}
         redirectIfNotLoggedIn={false}
       />
 
       <ProtectedRoute
         exact
-        path="/signed-out"
+        path={signInRoutes.signOut}
         component={SignedOutPage}
         redirectIfNotLoggedIn={false}
       />
 
       <ProtectedRoute
         exact
-        path="/admin-dashboard"
-        component={AdminDashboardPage}
+        path={publicationRoutes.createPublication.route}
+        component={CreatePublicationPage}
       />
 
       {releaseRoutes.map(route => (
@@ -75,15 +85,23 @@ function App() {
 
       {process.env.USE_MOCK_API === 'true' && (
         <>
-          <Route exact path="/api/signin" component={MockSignInProcess} />
-          <Route exact path="/api/signout" component={MockSignOutProcess} />
+          <Route
+            exact
+            path={signInRoutes.signInViaApiLink}
+            component={MockSignInProcess}
+          />
+          <Route
+            exact
+            path={signInRoutes.signOutViaApiLink}
+            component={MockSignOutProcess}
+          />
         </>
       )}
 
-      <Route exact path="/" component={IndexPage} />
+      {/* Prototype Routes */}
+      <Route exact path="/index" component={IndexPage} />
 
       <LoginContext.Provider value={PrototypeLoginService.login()}>
-        {/* Prototype Routes*/}
         <Route exact path="/prototypes/" component={PrototypesIndexPage} />
 
         <Route

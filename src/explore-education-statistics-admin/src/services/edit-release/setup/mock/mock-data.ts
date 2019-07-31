@@ -14,7 +14,7 @@ const setupByReleaseId: Dictionary<ReleaseSetupDetails> = {
     },
     releaseType: {
       id: 'national-stats',
-      label: 'National Statistics',
+      title: 'National Statistics',
     },
     leadStatisticianName: 'John Smith',
     scheduledPublishDate: {
