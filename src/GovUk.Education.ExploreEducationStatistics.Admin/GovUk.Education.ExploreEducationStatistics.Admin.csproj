@@ -89,6 +89,8 @@
     <_ContentIncludedByDefault Remove="wwwroot\assets\images\icon-important.png" />
     <_ContentIncludedByDefault Remove="wwwroot\assets\images\icon-pointer-2x.png" />
     <_ContentIncludedByDefault Remove="wwwroot\assets\images\icon-pointer.png" />
+    <_ContentIncludedByDefault Remove="Views\FileUpload\Upload.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\File\List.cshtml" />
   </ItemGroup>
 
 
