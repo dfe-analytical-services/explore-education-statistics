@@ -1,4 +1,6 @@
 import ProtectedRoute from '@admin/components/ProtectedRoute';
+import MockSignInProcess from '@admin/pages/sign-in/mock/MockSignInProcess';
+import MockSignOutProcess from '@admin/pages/sign-in/mock/MockSignOutProcess';
 import SignedOutPage from '@admin/pages/sign-in/SignedOutPage';
 import SignInPage from '@admin/pages/sign-in/SignInPage';
 import releaseRoutes from '@admin/routes/releaseRoutes';
@@ -42,9 +44,19 @@ function App() {
   return (
     <BrowserRouter>
       {/* Non-Prototype Routes*/}
-      <Route exact path="/sign-in" component={SignInPage} />
+      <ProtectedRoute
+        exact
+        path="/sign-in"
+        component={SignInPage}
+        redirectIfNotLoggedIn={false}
+      />
 
-      <Route exact path="/signed-out" component={SignedOutPage} />
+      <ProtectedRoute
+        exact
+        path="/signed-out"
+        component={SignedOutPage}
+        redirectIfNotLoggedIn={false}
+      />
 
       <ProtectedRoute
         exact
@@ -60,6 +72,13 @@ function App() {
           component={route.component}
         />
       ))}
+
+      {process.env.USE_MOCK_API === 'true' && (
+        <>
+          <Route exact path="/api/signin" component={MockSignInProcess} />
+          <Route exact path="/api/signout" component={MockSignOutProcess} />
+        </>
+      )}
 
       <Route exact path="/" component={IndexPage} />
 
