@@ -236,7 +236,8 @@
 							"",
 							"pm.test(\"Title should should be correct\", function () { ",
 							"    pm.expect(pm.response.json().title).to.equal(\"December 2014/15\"); ",
-							"});"
+							"});",
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -347,6 +348,77 @@
 							"key": "themeId",
 							"value": "2CA22E34-B87A-4281-A0EB-B80F4F8DD374"
 						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST Create new publication",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "256d11e0-8766-43c9-a53c-477b764c85dc",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "4b4d0e5b-d1e9-4e6a-af9e-514f3c3ad225",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+							"",
+							"pm.test(\"Fields are present\", function () {",
+							"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"title\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"nextUpdate\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"releases\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"methodology\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"topicId\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"contact\"));",
+							"});",
+							"",
+							"pm.test(\"topicId should should be correct\", function () { ",
+							"    pm.expect(pm.response.json().topicId).to.equal(\"53a1fbb7-5234-435f-892b-9baad4c82535\"); ",
+							"});",
+							"",
+							"pm.test(\"teamName should should be correct\", function () { ",
+							"    pm.expect(pm.response.json().contact.teamName).to.equal(\"Simon's Team\"); ",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"title\": \"{{$guid}}\",\n\t\"methodologyId\": \"\",\n\t\"contactId\": \"11BB7387-E85E-4571-9669-8A760DCB004F\"\n}"
+				},
+				"url": {
+					"raw": "{{admin_api_url}}/topic/53A1FBB7-5234-435F-892B-9BAAD4C82535/publications",
+					"host": [
+						"{{admin_api_url}}"
+					],
+					"path": [
+						"topic",
+						"53A1FBB7-5234-435F-892B-9BAAD4C82535",
+						"publications"
 					]
 				}
 			},
