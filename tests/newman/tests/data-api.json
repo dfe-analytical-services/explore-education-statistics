@@ -4821,7 +4821,7 @@
 													"});",
 													"",
 													"pm.test(\"Every result should contain location country England only\", function () {",
-													"    for(var i = 0; i < pm.response.json().result.length; i++) {",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
 													"        pm.expect(respJson.result[i].location.country.name).to.equal(\"England\");",
 													"        pm.expect(pm.response.to.not.have.jsonBody(`result[${i}].location.localAuthority`));",
 													"        pm.expect(pm.response.to.not.have.jsonBody(`result[${i}].location.localAuthorityDistrict`));",
@@ -5940,6 +5940,229 @@
 						}
 					],
 					"_postman_isSubFolder": true
+				}
+			]
+		},
+		{
+			"name": "Permalink",
+			"item": [
+				{
+					"name": "Permalink - Absence by characteristic - create permalink",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bf224cd6-d62d-4b6b-afd4-8cf2e352fcbd",
+								"exec": [
+									"var respJson = pm.response.json();",
+									"",
+									"",
+									"// NOTE: Save permalink id for use in the next request",
+									"pm.globals.set(\"permalink_id\", respJson.id);",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Fields are present\", function () {",
+									"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"title\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"created\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"url\"));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "2cec492a-fc8e-4e42-9663-af2f42ae27c7",
+								"exec": [
+									"pm.globals.set(\"FILT_AllPupils\", \"70\");",
+									"pm.globals.set(\"FILT_GenderMale\", \"4\");",
+									"pm.globals.set(\"FILT_GenderFemale\", \"5\");",
+									"pm.globals.set(\"FILT_StateFundedPrimary\", \"71\");",
+									"pm.globals.set(\"FILT_StateFundedSecondary\", \"75\");",
+									"pm.globals.set(\"FILT_FSMEligible\", \"43\");",
+									"pm.globals.set(\"FILT_FSMNotEligible\", \"44\");",
+									"pm.globals.set(\"FILT_FSMUnclassified\", \"45\");",
+									"pm.globals.set(\"FILT_EthMinor_Irish\", \"24\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"subjectId\": 1,\n    \"country\": [\"E92000001\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_AllPupils}}\n    ],\n    \"indicators\": [\n        1, 23, 26\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{data_api_url}}/permalink",
+							"host": [
+								"{{data_api_url}}"
+							],
+							"path": [
+								"permalink"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Permalink - Absence by characteristic - get created permalink",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "4305c315-122a-4d29-ace3-0af70e73d69a",
+								"exec": [
+									"var respJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Should have correct fields\", function () {",
+									"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"title\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"created\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"url\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"data.metaData\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"data.metaData.filters\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"data.metaData.indicators\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"data.metaData.locations\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"data.timePeriodRange\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"data.result\"));",
+									"});",
+									"",
+									"pm.test(\"Response id should match request permalink id\", function () {",
+									"    pm.expect(respJson.id).to.equal(pm.globals.get(\"permalink_id\"));",
+									"});",
+									"",
+									"pm.test(\"Number of metaData filters should be correct\", function () {",
+									"   pm.expect(Object.keys(respJson.data.metaData.filters).length).to.equal(5);",
+									"   ",
+									"   pm.expect(pm.response.to.have.jsonBody(\"data.metaData.filters.3\"));",
+									"   pm.expect(pm.response.to.have.jsonBody(\"data.metaData.filters.70\"));",
+									"   pm.expect(pm.response.to.have.jsonBody(\"data.metaData.filters.71\"));",
+									"   pm.expect(pm.response.to.have.jsonBody(\"data.metaData.filters.74\"));",
+									"   pm.expect(pm.response.to.have.jsonBody(\"data.metaData.filters.75\"));",
+									"});",
+									"",
+									"pm.test(\"Number of metaData locations should be correct\", function () {",
+									"   pm.expect(Object.keys(respJson.data.metaData.locations).length).to.equal(1); ",
+									"   pm.expect(pm.response.to.have.jsonBody(\"data.metaData.locations.E92000001\"));",
+									"});",
+									"",
+									"pm.test(\"geographicLevel should be same as request\", function () {",
+									"    for(var i = 0; i < respJson.data.result.length; i++) {",
+									"        pm.expect(respJson.data.result[i].geographicLevel).to.equal(\"Country\");",
+									"    }",
+									"});",
+									"",
+									"pm.test(\"Number of results should be correct\", function () { ",
+									"    pm.expect(respJson.data.result.length).to.equal(3); ",
+									"});",
+									"",
+									"pm.test(\"Every result should contain location country England only\", function () {",
+									"    for(var i = 0; i < respJson.data.result.length; i++) {",
+									"        pm.expect(respJson.data.result[i].location.country.name).to.equal(\"England\");",
+									"        pm.expect(pm.response.to.not.have.jsonBody(`data.result[${i}].location.localAuthority`));",
+									"        pm.expect(pm.response.to.not.have.jsonBody(`data.result[${i}].location.localAuthorityDistrict`));",
+									"        pm.expect(pm.response.to.not.have.jsonBody(`data.result[${i}].location.region`));",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{data_api_url}}/permalink/{{permalink_id}}",
+							"host": [
+								"{{data_api_url}}"
+							],
+							"path": [
+								"permalink",
+								"{{permalink_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Permalink - Absence by characteristic - invalid permalinkId",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "4305c315-122a-4d29-ace3-0af70e73d69a",
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{data_api_url}}/permalink/5948f25b-25ae-488a-bf54-e8913e89de18",
+							"host": [
+								"{{data_api_url}}"
+							],
+							"path": [
+								"permalink",
+								"5948f25b-25ae-488a-bf54-e8913e89de18"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
