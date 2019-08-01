@@ -1,7 +1,13 @@
 import PrototypeData from '@common/modules/find-statistics/components/charts/__tests__/__data__/testBlockData';
 import { expectTicks } from '@common/modules/find-statistics/components/charts/__tests__/testUtils';
-import { AxesConfiguration, ChartProps } from '@common/modules/find-statistics/components/charts/ChartFunctions';
-import { DataBlockData, DataBlockMetadata } from '@common/services/dataBlockService';
+import {
+  AxesConfiguration,
+  ChartProps,
+} from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import {
+  DataBlockData,
+  DataBlockMetadata,
+} from '@common/services/dataBlockService';
 import React from 'react';
 
 import { render } from 'react-testing-library';
@@ -304,9 +310,7 @@ describe('LineChartBlock', () => {
     const { container } = render(<Chart {...propsWithTicks} />);
 
     expectTicks(container, 'y', '-3', '10');
-
   });
-
 
   test('Can limit range of minor ticks to custom', () => {
     const propsWithTicks: ChartProps = {
@@ -323,7 +327,24 @@ describe('LineChartBlock', () => {
 
     const { container } = render(<Chart {...propsWithTicks} />);
 
-    expectTicks(container, 'y', '-3', '-2', '-1', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10');
+    expectTicks(
+      container,
+      'y',
+      '-3',
+      '-2',
+      '-1',
+      '0',
+      '1',
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+      '7',
+      '8',
+      '9',
+      '10',
+    );
   });
 
   test('Can limit range of major ticks to default', () => {
@@ -340,7 +361,7 @@ describe('LineChartBlock', () => {
 
     const { container } = render(<Chart {...propsWithTicks} />);
 
-    expectTicks(container, 'x', "2014/15", "2015/16");
+    expectTicks(container, 'x', '2014/15', '2015/16');
   });
 
   test('Can limit range of major ticks to start and end', () => {
@@ -357,10 +378,8 @@ describe('LineChartBlock', () => {
 
     const { container } = render(<Chart {...propsWithTicks} />);
 
-    expectTicks(container, 'x', "2014/15", "2015/16");
-
+    expectTicks(container, 'x', '2014/15', '2015/16');
   });
-
 
   test('Can limit range of minor ticks to custom', () => {
     const propsWithTicks: ChartProps = {
@@ -377,8 +396,6 @@ describe('LineChartBlock', () => {
 
     const { container } = render(<Chart {...propsWithTicks} />);
 
-    expectTicks(container, 'x', "2014/15", "2015/16");
+    expectTicks(container, 'x', '2014/15', '2015/16');
   });
-
-
 });

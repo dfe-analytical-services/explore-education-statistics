@@ -23,7 +23,7 @@ const PrototypeChartTest = () => {
       minor: {
         ...chartData.axes.minor,
         tickConfig: 'startEnd',
-        tickSpacing: "1"
+        tickSpacing: '1',
       },
     },
   };

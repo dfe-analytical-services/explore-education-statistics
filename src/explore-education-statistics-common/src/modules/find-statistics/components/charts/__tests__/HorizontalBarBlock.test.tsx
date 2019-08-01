@@ -1,6 +1,9 @@
 import { expectTicks } from '@common/modules/find-statistics/components/charts/__tests__/testUtils';
 
-import { DataBlockData, DataBlockMetadata } from '@common/services/dataBlockService';
+import {
+  DataBlockData,
+  DataBlockMetadata,
+} from '@common/services/dataBlockService';
 import React from 'react';
 
 import { render } from 'react-testing-library';
@@ -246,7 +249,6 @@ describe('HorzontalBarBlock', () => {
     }
   });
 
-
   test('Can limit range of minor ticks to default', () => {
     const propsWithTicks: ChartProps = {
       ...props,
@@ -279,9 +281,7 @@ describe('HorzontalBarBlock', () => {
     const { container } = render(<Chart {...propsWithTicks} />);
 
     expectTicks(container, 'x', '-3', '10');
-
   });
-
 
   test('Can limit range of minor ticks to custom', () => {
     const propsWithTicks: ChartProps = {
@@ -298,7 +298,24 @@ describe('HorzontalBarBlock', () => {
 
     const { container } = render(<Chart {...propsWithTicks} />);
 
-    expectTicks(container, 'x', '-3', '-2', '-1', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10');
+    expectTicks(
+      container,
+      'x',
+      '-3',
+      '-2',
+      '-1',
+      '0',
+      '1',
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+      '7',
+      '8',
+      '9',
+      '10',
+    );
   });
 
   test('Can limit range of major ticks to default', () => {
@@ -315,7 +332,7 @@ describe('HorzontalBarBlock', () => {
 
     const { container } = render(<Chart {...propsWithTicks} />);
 
-    expectTicks(container, 'y', "2014/15", "2015/16");
+    expectTicks(container, 'y', '2014/15', '2015/16');
   });
 
   test('Can limit range of major ticks to start and end', () => {
@@ -332,10 +349,8 @@ describe('HorzontalBarBlock', () => {
 
     const { container } = render(<Chart {...propsWithTicks} />);
 
-    expectTicks(container, 'y', "2014/15", "2015/16");
-
+    expectTicks(container, 'y', '2014/15', '2015/16');
   });
-
 
   test('Can limit range of minor ticks to custom', () => {
     const propsWithTicks: ChartProps = {
@@ -352,6 +367,6 @@ describe('HorzontalBarBlock', () => {
 
     const { container } = render(<Chart {...propsWithTicks} />);
 
-    expectTicks(container, 'y', "2014/15", "2015/16");
+    expectTicks(container, 'y', '2014/15', '2015/16');
   });
 });
