@@ -6152,13 +6152,13 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{data_api_url}}/permalink/invalid",
+							"raw": "{{data_api_url}}/permalink/5948f25b-25ae-488a-bf54-e8913e89de18",
 							"host": [
 								"{{data_api_url}}"
 							],
 							"path": [
 								"permalink",
-								"invalid"
+								"5948f25b-25ae-488a-bf54-e8913e89de18"
 							]
 						}
 					},
