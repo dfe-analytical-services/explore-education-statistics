@@ -1,6 +1,6 @@
 import ProtectedRoute from '@admin/components/ProtectedRoute';
 import CreatePublicationPage from '@admin/pages/create-publication/CreatePublicationPage';
-import CreateReleasePage from "@admin/pages/release/create-release/CreateReleasePage";
+import CreateReleasePage from '@admin/pages/release/create-release/CreateReleasePage';
 import MockSignInProcess from '@admin/pages/sign-in/mock/MockSignInProcess';
 import MockSignOutProcess from '@admin/pages/sign-in/mock/MockSignOutProcess';
 import SignedOutPage from '@admin/pages/sign-in/SignedOutPage';

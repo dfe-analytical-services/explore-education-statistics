@@ -1,12 +1,18 @@
-import {AdminDashboardRelease, ReleaseApprovalStatus} from "@admin/services/dashboard/types";
+import {
+  AdminDashboardRelease,
+  ReleaseApprovalStatus,
+} from '@admin/services/dashboard/types';
 import {
   CreateReleaseRequest,
   ReleaseSetupDetails,
-  UpdateReleaseSetupDetailsRequest
+  UpdateReleaseSetupDetailsRequest,
 } from '@admin/services/edit-release/setup/types';
-import {generateRandomIntegerString, getCaptureGroups} from '@admin/services/util/mock/mock-service';
+import {
+  generateRandomIntegerString,
+  getCaptureGroups,
+} from '@admin/services/util/mock/mock-service';
 import MockAdapter from 'axios-mock-adapter';
-import {format} from "date-fns";
+import { format } from 'date-fns';
 
 export default async (mock: MockAdapter) => {
   const mockData = (await import(
@@ -19,25 +25,25 @@ export default async (mock: MockAdapter) => {
 
   const mockReferenceData = (await import(
     /* webpackChunkName: "mock-dashboard-data" */ '@admin/pages/DummyReferenceData'
-    )).default;
+  )).default;
 
   const createReleaseUrl = /\/publication\/(.*)\/releases/;
   const getReleaseSetupDetailsUrl = /\/release\/(.*)\/setup/;
   const updateReleaseSetupDetailsUrl = /\/release\/(.*)\/setup/;
 
   mock.onPost(createReleaseUrl).reply(config => {
-
     const publicationId = getCaptureGroups(createReleaseUrl, config.url)[0];
 
-    const createRequest = JSON.parse(
-      config.data,
-    ) as CreateReleaseRequest;
+    const createRequest = JSON.parse(config.data) as CreateReleaseRequest;
 
-    const allPublications = Object.values(mockDashboardData.dashboardPublicationsByTopicId).flat();
-    const matchingPublication = allPublications.find(publication => publication.id === publicationId);
+    const allPublications = Object.values(
+      mockDashboardData.dashboardPublicationsByTopicId,
+    ).flat();
+    const matchingPublication = allPublications.find(
+      publication => publication.id === publicationId,
+    );
 
     if (matchingPublication) {
-
       const newReleaseDetails: ReleaseSetupDetails = {
         id: generateRandomIntegerString(),
         leadStatisticianName: 'Bob',
@@ -61,7 +67,9 @@ export default async (mock: MockAdapter) => {
         },
         lastEditedDateTime: format(new Date(), 'yyyy-MM-dd HH:mm:ss'),
         latestRelease: true,
-        timePeriodCoverage: mockReferenceData.findTimePeriodCoverageOption(createRequest.timePeriodCoverageCode),
+        timePeriodCoverage: mockReferenceData.findTimePeriodCoverageOption(
+          createRequest.timePeriodCoverageCode,
+        ),
         live: false,
         publishScheduled: createRequest.scheduledPublishDate,
         releaseName: `${startYear} - ${startYear}`,
@@ -90,7 +98,9 @@ export default async (mock: MockAdapter) => {
       config.data,
     ) as UpdateReleaseSetupDetailsRequest;
 
-    const existingRelease = mockData.getReleaseSetupDetailsForRelease(updateRequest.releaseId);
+    const existingRelease = mockData.getReleaseSetupDetailsForRelease(
+      updateRequest.releaseId,
+    );
 
     /* eslint-disable no-param-reassign */
     existingRelease.timePeriodCoverageCode =

@@ -102,13 +102,17 @@ export interface DayMonthYearInputs {
   year: string;
 }
 
-export const dayMonthYearValuesToInputs = (dmy: DayMonthYearValues): DayMonthYearInputs => ({
+export const dayMonthYearValuesToInputs = (
+  dmy: DayMonthYearValues,
+): DayMonthYearInputs => ({
   day: dmy.day ? dmy.day.toString() : '',
   month: dmy.month ? dmy.month.toString() : '',
   year: dmy.year ? dmy.year.toString() : '',
 });
 
-export const dayMonthYearInputsToValues = (dmy: DayMonthYearInputs): DayMonthYearValues => ({
+export const dayMonthYearInputsToValues = (
+  dmy: DayMonthYearInputs,
+): DayMonthYearValues => ({
   day: dmy.day ? parseInt(dmy.day, 10) : undefined,
   month: dmy.month ? parseInt(dmy.month, 10) : undefined,
   year: dmy.year ? parseInt(dmy.year, 10) : undefined,

@@ -1,10 +1,12 @@
-import ReleaseSetupForm, {FormValues} from "@admin/pages/release/setup/ReleaseSetupForm";
-import {assembleUpdateReleaseSetupRequestFromForm} from "@admin/pages/release/setup/util/releaseSetupUtil";
-import {setupRoute} from "@admin/routes/edit-release/routes";
+import ReleaseSetupForm, {
+  FormValues,
+} from '@admin/pages/release/setup/ReleaseSetupForm';
+import { assembleUpdateReleaseSetupRequestFromForm } from '@admin/pages/release/setup/util/releaseSetupUtil';
+import { setupRoute } from '@admin/routes/edit-release/routes';
 import service from '@admin/services/edit-release/setup/service';
-import {ReleaseSetupDetails,} from '@admin/services/edit-release/setup/types';
-import React, {useEffect, useState} from 'react';
-import {RouteComponentProps} from 'react-router';
+import { ReleaseSetupDetails } from '@admin/services/edit-release/setup/types';
+import React, { useEffect, useState } from 'react';
+import { RouteComponentProps } from 'react-router';
 import ReleasePageTemplate from '../components/ReleasePageTemplate';
 
 interface MatchProps {
@@ -28,9 +30,10 @@ const ReleaseSetupEditPage = ({
   }, [releaseId]);
 
   const submitHandler = (values: FormValues) => {
-
-    const updatedReleaseDetails =
-      assembleUpdateReleaseSetupRequestFromForm(releaseId, values);
+    const updatedReleaseDetails = assembleUpdateReleaseSetupRequestFromForm(
+      releaseId,
+      values,
+    );
 
     service
       .updateReleaseSetupDetails(updatedReleaseDetails)
@@ -50,11 +53,10 @@ const ReleaseSetupEditPage = ({
 
           <ReleaseSetupForm
             releaseSetupDetails={releaseSetupDetails}
-            submitButtonText='Update release status'
+            submitButtonText="Update release status"
             onSubmitHandler={submitHandler}
             onCancelHandler={cancelHandler}
           />
-
         </ReleasePageTemplate>
       )}
     </>

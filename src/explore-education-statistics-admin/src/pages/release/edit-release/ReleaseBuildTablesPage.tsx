@@ -1,5 +1,5 @@
 import React from 'react';
-import {RouteComponentProps} from 'react-router';
+import { RouteComponentProps } from 'react-router';
 import ReleasePageTemplate from './components/ReleasePageTemplate';
 
 interface MatchProps {

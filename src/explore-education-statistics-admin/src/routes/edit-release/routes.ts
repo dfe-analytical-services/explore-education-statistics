@@ -124,12 +124,10 @@ export const editRoutes = [
 ];
 
 export default {
-  manageReleaseRoutes: [
-    ...viewRoutes,
-    ...editRoutes,
-  ],
+  manageReleaseRoutes: [...viewRoutes, ...editRoutes],
   createReleaseRoute: {
     route: '/publication/:publicationId/create-release',
-    generateLink: (publicationId: string) => `/publication/${publicationId}/create-release`
+    generateLink: (publicationId: string) =>
+      `/publication/${publicationId}/create-release`,
   },
 };

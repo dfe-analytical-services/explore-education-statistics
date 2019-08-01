@@ -19,7 +19,8 @@ export interface BaseReleaseSetupDetailsRequest {
   nextReleaseExpectedDate: DayMonthYearValues;
 }
 
-export interface UpdateReleaseSetupDetailsRequest extends BaseReleaseSetupDetailsRequest {
+export interface UpdateReleaseSetupDetailsRequest
+  extends BaseReleaseSetupDetailsRequest {
   releaseId: string;
 }
 

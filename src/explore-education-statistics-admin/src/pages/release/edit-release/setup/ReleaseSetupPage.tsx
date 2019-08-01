@@ -1,14 +1,17 @@
 import Link from '@admin/components/Link';
 import DummyReferenceData from '@admin/pages/DummyReferenceData';
-import {setupEditRoute} from '@admin/routes/edit-release/routes';
-import {dayMonthYearIsComplete, dayMonthYearToDate,} from '@admin/services/common/types';
+import { setupEditRoute } from '@admin/routes/edit-release/routes';
+import {
+  dayMonthYearIsComplete,
+  dayMonthYearToDate,
+} from '@admin/services/common/types';
 import service from '@admin/services/edit-release/setup/service';
-import {ReleaseSetupDetails} from '@admin/services/edit-release/setup/types';
+import { ReleaseSetupDetails } from '@admin/services/edit-release/setup/types';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import React, {useEffect, useState} from 'react';
-import {RouteComponentProps} from 'react-router';
+import React, { useEffect, useState } from 'react';
+import { RouteComponentProps } from 'react-router';
 import ReleasePageTemplate from '../components/ReleasePageTemplate';
 
 interface MatchProps {

@@ -11,7 +11,9 @@ const apiClient = createClient({
 });
 
 export interface ReleaseSetupService {
-  createRelease: (createRequest: CreateReleaseRequest) => Promise<ReleaseSetupDetails>;
+  createRelease: (
+    createRequest: CreateReleaseRequest,
+  ) => Promise<ReleaseSetupDetails>;
   getReleaseSetupDetails: (releaseId: string) => Promise<ReleaseSetupDetails>;
   updateReleaseSetupDetails: (
     updatedRelease: UpdateReleaseSetupDetailsRequest,
@@ -23,7 +25,10 @@ const service: ReleaseSetupService = {
     createRequest: CreateReleaseRequest,
   ): Promise<ReleaseSetupDetails> {
     return apiClient.then(client =>
-      client.post(`/publication/${createRequest.publicationId}/releases`, createRequest),
+      client.post(
+        `/publication/${createRequest.publicationId}/releases`,
+        createRequest,
+      ),
     );
   },
   getReleaseSetupDetails(releaseId: string): Promise<ReleaseSetupDetails> {
