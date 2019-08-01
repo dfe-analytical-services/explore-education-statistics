@@ -11,7 +11,7 @@ interface Props {
   columnHeaders: string[][];
   rowHeaders: string[][];
   rows: string[][];
-  footnotes?: TableData['footnotes'];
+  footnotes: TableData['footnotes'];
 }
 
 const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
@@ -61,7 +61,7 @@ const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
             ref={mainTableRef}
           />
         </div>
-        {footnotes && footnotes.length > 0 && (
+        {footnotes.length > 0 && (
           <>
             <h3>Footnotes</h3>
             <Footnote content={footnotes} />
