@@ -23,11 +23,11 @@ export default async (mock: MockAdapter) => {
         {
           title: request.subjectTitle,
           file: {
-            id: generateRandomIntegerString(100000),
+            id: generateRandomIntegerString(),
             fileName: request.dataFile.name,
           },
           metadataFile: {
-            id: generateRandomIntegerString(100000),
+            id: generateRandomIntegerString(),
             fileName: request.metadataFile.name,
           },
           fileSize: {
@@ -67,7 +67,7 @@ export default async (mock: MockAdapter) => {
         {
           title: request.name,
           file: {
-            id: generateRandomIntegerString(100000),
+            id: generateRandomIntegerString(),
             fileName: request.file.name,
           },
           fileSize: {

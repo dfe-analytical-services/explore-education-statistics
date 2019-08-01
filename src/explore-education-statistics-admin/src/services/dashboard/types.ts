@@ -8,6 +8,7 @@ import {
 export enum ReleaseApprovalStatus {
   Approved,
   ReadyToReview,
+  None,
 }
 
 export interface ThemeAndTopics {

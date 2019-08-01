@@ -31,6 +31,7 @@ const setupByReleaseId: Dictionary<ReleaseSetupDetails> = {
 };
 
 export default {
+  setupByReleaseId,
   getReleaseSetupDetailsForRelease: (releaseId: string) =>
     setupByReleaseId[releaseId],
 };

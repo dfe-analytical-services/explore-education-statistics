@@ -1,10 +1,9 @@
-import dashboardRoutes from '@admin/routes/dashboard/routes';
-import React, { ReactNode } from 'react';
-import PreviousNextLinks from '@admin/components/PreviousNextLinks';
 import NavLink from '@admin/components/NavLink';
-import { RouteComponentProps, withRouter } from 'react-router';
-import { viewRoutes } from '@admin/routes/edit-release/routes';
 import Page from '@admin/components/Page';
+import PreviousNextLinks from '@admin/components/PreviousNextLinks';
+import { viewRoutes } from '@admin/routes/edit-release/routes';
+import React, { ReactNode } from 'react';
+import { RouteComponentProps, withRouter } from 'react-router';
 
 interface Props extends RouteComponentProps {
   releaseId: string;
@@ -39,16 +38,7 @@ const ReleasePageTemplate = withRouter(
       : undefined;
 
     return (
-      <Page
-        wide
-        breadcrumbs={[
-          {
-            link: dashboardRoutes.adminDashboard,
-            name: 'Administrator dashboard',
-          },
-          { name: 'Edit release', link: '#' },
-        ]}
-      >
+      <Page wide breadcrumbs={[{ name: 'Edit release' }]}>
         <h1 className="govuk-heading-l">
           {publicationTitle}
           <span className="govuk-caption-l">Edit release</span>
