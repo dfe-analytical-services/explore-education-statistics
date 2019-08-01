@@ -2,15 +2,12 @@ import {
   ChartDataB,
   ChartDefinition,
   conditionallyAdd,
-  createDataForAxis,
+  createSortedAndMappedDataForAxis,
   GenerateMajorAxis,
   GenerateMinorAxis,
   getKeysForChart,
-  mapNameToNameLabel,
   populateDefaultChartProps,
-  sortChartData,
   StackedBarProps,
-  createSortedAndMappedDataForAxis,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 
 import classnames from 'classnames';
