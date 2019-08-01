@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
+using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -65,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var context = DbUtils.InMemoryApplicationDbContext("TopicMethodologies"))
             {
                 // Method under test
-                var topicMethodologies = new MethodologyService(context).GetTopicMethodologiesAsync(new Guid("d5ed05f4-8364-4682-b6fe-7dde181d6c46"));
+                var topicMethodologies = new MethodologyService(context, MapperForProfile<MappingProfiles>()).GetTopicMethodologiesAsync(new Guid("d5ed05f4-8364-4682-b6fe-7dde181d6c46"));
                 Assert.Contains(topicMethodologies.Result, m => m.Id == new Guid("d5ed05f4-8364-4682-b6fe-7dde181d6c46"));
                 Assert.Contains(topicMethodologies.Result, m => m.Id == new Guid("ebeb2b2d-fc6b-4734-9420-4e4dd37816ba"));
                 Assert.Equal(2, topicMethodologies.Result.Count); // Check we don't have duplicates
@@ -97,8 +100,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             
             using (var context = DbUtils.InMemoryApplicationDbContext("Get"))
             {
+                
+                
                 // Method under test
-                var methodologies = new MethodologyService(context).ListAsync();
+                var methodologies = new MethodologyService(context, MapperForProfile<MappingProfiles>()).ListAsync();
                 Assert.Contains(methodologies.Result, m => m.Id == new Guid("d5ed05f4-8364-4682-b6fe-7dde181d6c46") && m.Title == "Methodology 1");
                 Assert.Contains(methodologies.Result, m => m.Id == new Guid("ebeb2b2d-fc6b-4734-9420-4e4dd37816ba") && m.Title == "Methodology 2");
             }
