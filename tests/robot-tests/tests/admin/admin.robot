@@ -10,7 +10,7 @@ Suite Teardown    user closes the browser
 Verify admin index page loads
     [Tags]  HappyPath
     user goes to url  ${urlAdmin}
-    user waits until page contains  Index page for administrative application
+    user waits until page contains Sign-in
 
 Go to Admin dashboard
     [Tags]  HappyPath   UnderConstruction
