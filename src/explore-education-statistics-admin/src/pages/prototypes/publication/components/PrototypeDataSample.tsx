@@ -30,11 +30,11 @@ const PrototypeDataSample = ({
 }: Props) => {
   return (
     <>
+      {editing && <Button>Add data block to summary section</Button>}
       <Tabs id="data-sample-tabs">
         {sectionId === 'headlines' && (
           <TabsSection id={`${sectionId}SummaryData`} title="Summary">
-            {editing && <Button>Add data block to this section</Button>}
-            <PrototypeDataTilesHighlights />
+            <PrototypeDataTilesHighlights editing={editing} />
             {editing && <Button>Add another key indicator</Button>}
             <PrototypeEditableContent
               editable={editing}

@@ -138,3 +138,12 @@
 .formGroup {
   min-width: 30%;
 }
+
+.axisRange {
+  display: flex;
+  flex-wrap: 0;
+
+  .formGroup {
+    width: 50%;
+  }
+}
