@@ -43,18 +43,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         // TODO it maybe necessary to add authorisation to this method
-        public List<PublicationViewModel> GetByTopicAndUser(TopicId topicId, UserId userId)
+        public async Task<List<PublicationViewModel>> GetByTopicAndUserAsync(TopicId topicId, UserId userId)
         {
-            var publications = _context.Publications.Where(p => p.TopicId == topicId)
+            var publications = await _context.Publications.Where(p => p.TopicId == topicId)
                 .Include(p => p.Contact)
                 .Include(p => p.Releases)
                 .Include(p => p.Methodology)
-                .ToList();
+                .ToListAsync();
 
             return _mapper.Map<List<PublicationViewModel>>(publications);
         }
 
-        public async Task<Either<ValidationResult, PublicationViewModel>> CreatePublication(CreatePublicationViewModel publication)
+        public async Task<Either<ValidationResult, PublicationViewModel>> CreatePublicationAsync(CreatePublicationViewModel publication)
         {
             if (_context.Publications.Any(p => p.Slug == publication.Slug))
             {
