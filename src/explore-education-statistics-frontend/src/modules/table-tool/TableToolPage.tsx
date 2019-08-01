@@ -270,7 +270,11 @@ class TableToolPage extends Component<Props, State> {
     this.setState({
       filters: mapValuesWithKeys(filters, (filterGroup, selectedFilters) =>
         selectedFilters.map(
-          filter => new CategoryFilter(filtersByValue[filterGroup][filter]),
+          filter =>
+            new CategoryFilter(
+              filtersByValue[filterGroup][filter],
+              filter === subjectMeta.filters[filterGroup].totalValue,
+            ),
         ),
       ),
       indicators: indicators.map(
