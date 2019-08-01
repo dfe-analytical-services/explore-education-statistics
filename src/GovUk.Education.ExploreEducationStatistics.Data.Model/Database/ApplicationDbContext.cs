@@ -75,13 +75,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                 },
                 new Theme
                 {
-                    Id = new Guid("9aa81762-e52c-40d4-8a90-f469977360a7"),
+                    Id = new Guid("92C5DF93-C4DA-4629-AB25-51BD2920CDCA"),
                     Title = "Further education",
                     Slug = "further-education"
                 },
                 new Theme
                 {
-                    Id = new Guid("fe805471-17e9-4ac6-a555-c7d0ebec1b90"),
+                    Id = new Guid("74648781-85A9-4233-8BE3-FE6F137165F4"),
                     Title = "School and college outcomes and performance",
                     Slug = "outcomes-and-performance"
                 }
@@ -119,45 +119,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                 },
                 new Topic
                 {
-                    Id = new Guid("dfc908db-242a-4e3a-b6c6-e3f66cd152af"),
+                    Id = new Guid("85349B0A-19C7-4089-A56B-AD8DBE85449A"),
                     Title = "Special educational needs (SEN)",
                     Slug = "sen",
                     ThemeId = new Guid("ee1855ca-d1e1-4f04-a795-cbd61d326a1f")
                 },
                 new Topic
                 {
-                    Id = new Guid("721048b9-8c06-4bad-8585-8789fa38a03b"),
+                    Id = new Guid("DC7B7A89-E968-4A7E-AF5F-BD7D19C346A5"),
                     Title = "National achievement rates tables",
                     Slug = "national-achievement-rates-tables",
-                    ThemeId = new Guid("9aa81762-e52c-40d4-8a90-f469977360a7")
+                    ThemeId = new Guid("92C5DF93-C4DA-4629-AB25-51BD2920CDCA")
                 },
                 new Topic
                 {
-                    Id = new Guid("71444ff6-614f-405b-b6c7-f72077d42e34"),
+                    Id = new Guid("88D08425-FCFD-4C87-89DA-70B2062A7367"),
                     Title = "Further education and skills",
                     Slug = "further-education-and-skills",
-                    ThemeId = new Guid("9aa81762-e52c-40d4-8a90-f469977360a7")
+                    ThemeId = new Guid("92C5DF93-C4DA-4629-AB25-51BD2920CDCA")
                 },
                 new Topic
                 {
-                    Id = new Guid("9e4fa097-2999-4c4d-9ecd-0c4733fc71b4"),
+                    Id = new Guid("85B5454B-3761-43B1-8E84-BD056A8EFCD3"),
                     Title = "16 to 19 attainment",
                     Slug = "sixteen-to-nineteen-attainment",
-                    ThemeId = new Guid("fe805471-17e9-4ac6-a555-c7d0ebec1b90")
+                    ThemeId = new Guid("74648781-85A9-4233-8BE3-FE6F137165F4")
                 },
                 new Topic
                 {
-                    Id = new Guid("f38469bd-a5f7-46b1-96bb-3b0a01e9e53f"),
+                    Id = new Guid("EAC38700-B968-4029-B8AC-0EB8E1356480"),
                     Title = "Key stage 2",
                     Slug = "key-stage-two",
-                    ThemeId = new Guid("fe805471-17e9-4ac6-a555-c7d0ebec1b90")
+                    ThemeId = new Guid("74648781-85A9-4233-8BE3-FE6F137165F4")
                 },
                 new Topic
                 {
-                    Id = new Guid("81fbb21d-3c49-46a2-8b43-0076974114f7"),
+                    Id = new Guid("1E763F55-BF09-4497-B838-7C5B054BA87B"),
                     Title = "GCSEs (key stage 4)",
                     Slug = "key-stage-four",
-                    ThemeId = new Guid("fe805471-17e9-4ac6-a555-c7d0ebec1b90")
+                    ThemeId = new Guid("74648781-85A9-4233-8BE3-FE6F137165F4")
                 }
             });
 
@@ -193,49 +193,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                 },
                 new Publication
                 {
-                    Id = new Guid("2d94e5c8-a272-497c-bda0-c1f6b75155b0"),
+                    Id = new Guid("88312CC0-FE1D-4AB5-81DF-33FD708185CB"),
                     Title = "Statements of SEN and EHC plans",
                     Slug = "statements-of-sen-and-ehc-plans",
-                    TopicId = new Guid("dfc908db-242a-4e3a-b6c6-e3f66cd152af")
+                    TopicId = new Guid("85349B0A-19C7-4089-A56B-AD8DBE85449A")
                 },
                 new Publication
                 {
-                    Id = new Guid("99ce35fb-3fe2-48bb-9b73-23159df9d5ea"),
+                    Id = new Guid("7A57D4C0-5233-4D46-8E27-748FBC365715"),
                     Title = "National achievement rates tables",
                     Slug = "national-achievement-rates-tables",
-                    TopicId = new Guid("721048b9-8c06-4bad-8585-8789fa38a03b")
+                    TopicId = new Guid("DC7B7A89-E968-4A7E-AF5F-BD7D19C346A5")
                 },
                 new Publication
                 {
-                    Id = new Guid("5aea252e-fddc-42b3-a1da-47f12e523e70"),
+                    Id = new Guid("CF0EC981-3583-42A5-B21B-3F2F32008F1B"),
                     Title = "Apprenticeships and traineeships",
                     Slug = "apprenticeships-and-traineeships",
-                    TopicId = new Guid("71444ff6-614f-405b-b6c7-f72077d42e34")
+                    TopicId = new Guid("88D08425-FCFD-4C87-89DA-70B2062A7367")
                 },
                 new Publication
                 {
-                    Id = new Guid("d5a01a5c-cd57-482f-8a19-803b266e1012"),
+                    Id = new Guid("13B81BCB-E8CD-4431-9807-CA588FD1D02A"),
                     Title = "Further education and skills",
                     Slug = "further-education-and-skills",
-                    TopicId = new Guid("71444ff6-614f-405b-b6c7-f72077d42e34")
+                    TopicId = new Guid("88D08425-FCFD-4C87-89DA-70B2062A7367")
                 },
                 new Publication
                 {
-                    Id = new Guid("adb95888-64c7-4aa7-ba70-a9e535f8a30f"),
+                    Id = new Guid("2E95F880-629C-417B-981F-0901E97776FF"),
                     Title = "Level 2 and 3 attainment by young people aged 19",
                     Slug = "Level 2 and 3 attainment by young people aged 19",
-                    TopicId = new Guid("9e4fa097-2999-4c4d-9ecd-0c4733fc71b4")
+                    TopicId = new Guid("85B5454B-3761-43B1-8E84-BD056A8EFCD3")
                 },
                 new Publication
                 {
-                    Id = new Guid("90ecb3d3-bd05-4f84-a73e-1d153568b320"),
+                    Id = new Guid("10370062-93B0-4DDE-9097-5A56BF5B3064"),
                     Title = "National curriculum assessments at key stage 2",
                     Slug = "national-curriculum-assessments-key-stage2",
-                    TopicId = new Guid("f38469bd-a5f7-46b1-96bb-3b0a01e9e53f")
+                    TopicId = new Guid("EAC38700-B968-4029-B8AC-0EB8E1356480")
                 },
                 new Publication
                 {
-                    Id = new Guid("15659c96-a624-4457-846d-2ab5f3db6aec"),
+                    Id = new Guid("BFDCAAE1-CE6B-4F63-9B2B-0A1F3942887F"),
                     Title = "GCSE and equivalent results, including pupil characteristics",
                     Slug = "gcse-results-including-pupil-characteristics",
                     TopicId = new Guid("81fbb21d-3c49-46a2-8b43-0076974114f7")
@@ -282,7 +282,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                     ReleaseDate = new DateTime(2019, 4, 29),
                     Title = "2018",
                     Slug = "2018",
-                    PublicationId = new Guid("2d94e5c8-a272-497c-bda0-c1f6b75155b0")
+                    PublicationId = new Guid("88312CC0-FE1D-4AB5-81DF-33FD708185CB")
                 },
                 new Release
                 {
@@ -290,7 +290,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                     ReleaseDate = new DateTime(2019, 4, 29),
                     Title = "2018",
                     Slug = "2018",
-                    PublicationId = new Guid("99ce35fb-3fe2-48bb-9b73-23159df9d5ea")
+                    PublicationId = new Guid("7A57D4C0-5233-4D46-8E27-748FBC365715")
                 },
                 new Release
                 {
@@ -298,7 +298,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                     ReleaseDate = new DateTime(2019, 4, 29),
                     Title = "2018",
                     Slug = "2018",
-                    PublicationId = new Guid("5aea252e-fddc-42b3-a1da-47f12e523e70")
+                    PublicationId = new Guid("CF0EC981-3583-42A5-B21B-3F2F32008F1B")
                 },
                 new Release
                 {
@@ -306,7 +306,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                     ReleaseDate = new DateTime(2019, 4, 29),
                     Title = "2018",
                     Slug = "2018",
-                    PublicationId = new Guid("d5a01a5c-cd57-482f-8a19-803b266e1012")
+                    PublicationId = new Guid("13B81BCB-E8CD-4431-9807-CA588FD1D02A")
                 },
                 new Release
                 {
@@ -314,7 +314,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                     ReleaseDate = new DateTime(2019, 4, 29),
                     Title = "2018",
                     Slug = "2018",
-                    PublicationId = new Guid("adb95888-64c7-4aa7-ba70-a9e535f8a30f")
+                    PublicationId = new Guid("2E95F880-629C-417B-981F-0901E97776FF")
                 },
                 new Release
                 {
@@ -322,7 +322,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                     ReleaseDate = new DateTime(2019, 4, 29),
                     Title = "2018",
                     Slug = "2018",
-                    PublicationId = new Guid("90ecb3d3-bd05-4f84-a73e-1d153568b320")
+                    PublicationId = new Guid("10370062-93B0-4DDE-9097-5A56BF5B3064")
                 },
                 new Release
                 {
@@ -330,7 +330,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                     ReleaseDate = new DateTime(2019, 4, 29),
                     Title = "2018",
                     Slug = "2018",
-                    PublicationId = new Guid("15659c96-a624-4457-846d-2ab5f3db6aec")
+                    PublicationId = new Guid("BFDCAAE1-CE6B-4F63-9B2B-0A1F3942887F")
                 }
             });
 
