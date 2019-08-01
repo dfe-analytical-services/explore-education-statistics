@@ -6,14 +6,31 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
-    [Route("api/[controller]")]
     [ApiController]
-    [AllowAnonymous]
-//    [ApiExplorerSettings(IgnoreApi=true)]
-    public class UsersController : ControllerBase
+    [Authorize]
+    public class AccountController : ControllerBase
     {
-        // GET
-        [HttpGet("mydetails")]
+        [HttpGet("api/signin")]
+        public IActionResult Signin()
+        {
+            return Redirect("/");
+        }
+        
+        [HttpGet("api/signout")]
+        public IActionResult Signout()
+        {
+            // TODO - we'll probably need to do something more robust to tell AD that
+            // the user is logging out of this particular service - at the moment hitting
+            // sign-in would immediately log them back in as AD will recognise that this
+            // user has already requested a cookie before and will reissue it without
+            // enforcing another login
+            
+            Response.Cookies.Delete(".AspNetCore.AzureADCookie");
+            return Redirect("/signed-out");
+        }
+        
+        [AllowAnonymous]
+        [HttpGet("api/users/mydetails")]
         public ActionResult<UserDetailsViewModel> MyDetails()
         {
             // TODO - we need to something cleverer here - we need to 
