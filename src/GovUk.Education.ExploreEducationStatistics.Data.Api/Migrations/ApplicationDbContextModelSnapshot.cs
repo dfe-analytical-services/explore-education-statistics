@@ -370,7 +370,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                             Id = new Guid("bfdcaae1-ce6b-4f63-9b2b-0a1f3942887f"),
                             Slug = "gcse-results-including-pupil-characteristics",
                             Title = "GCSE and equivalent results, including pupil characteristics",
-                            TopicId = new Guid("81fbb21d-3c49-46a2-8b43-0076974114f7")
+                            TopicId = new Guid("1e763f55-bf09-4497-b838-7c5b054ba87b")
                         });
                 });
 

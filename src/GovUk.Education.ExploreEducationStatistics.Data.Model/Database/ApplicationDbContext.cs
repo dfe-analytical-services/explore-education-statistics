@@ -238,7 +238,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                     Id = new Guid("BFDCAAE1-CE6B-4F63-9B2B-0A1F3942887F"),
                     Title = "GCSE and equivalent results, including pupil characteristics",
                     Slug = "gcse-results-including-pupil-characteristics",
-                    TopicId = new Guid("81fbb21d-3c49-46a2-8b43-0076974114f7")
+                    TopicId = new Guid("1E763F55-BF09-4497-B838-7C5B054BA87B")
                 }
             });
 
