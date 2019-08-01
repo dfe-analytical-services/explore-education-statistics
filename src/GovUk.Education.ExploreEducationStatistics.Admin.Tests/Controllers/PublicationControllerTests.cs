@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
             var publicationService = new Mock<IPublicationService>();
 
             publicationService
-                .Setup(s => s.CreatePublication(It.IsAny<CreatePublicationViewModel>()))
+                .Setup(s => s.CreatePublicationAsync(It.IsAny<CreatePublicationViewModel>()))
                 .Returns<CreatePublicationViewModel>(p => Task.FromResult(new Either<ValidationResult, PublicationViewModel>(new PublicationViewModel {TopicId = p.TopicId})));
             var controller = new PublicationController(publicationService.Object);
 
@@ -33,19 +33,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
         }
         
         [Fact] 
-        public void Create_Publication_Validation_Failure()
+        public async void Create_Publication_Validation_Failure()
         {
             var publicationService = new Mock<IPublicationService>();
 
             publicationService
-                .Setup(s => s.CreatePublication(It.IsAny<CreatePublicationViewModel>()))
+                .Setup(s => s.CreatePublicationAsync(It.IsAny<CreatePublicationViewModel>()))
                 .Returns<CreatePublicationViewModel>(p => Task.FromResult(new Either<ValidationResult, PublicationViewModel>(new ValidationResult("Slug Error", new List<string>{"Slug"}))));
             var controller = new PublicationController(publicationService.Object);
 
             var topicId = Guid.NewGuid();
             // Method under test
-            var result = controller.CreatePublicationAsync(new CreatePublicationViewModel(), topicId);
-            var badRequestObjectResult = result.Result.Result;
+            var result = await controller.CreatePublicationAsync(new CreatePublicationViewModel(), topicId);
+            var badRequestObjectResult = result.Result;
             Assert.IsAssignableFrom<BadRequestObjectResult>(badRequestObjectResult);
             var validationProblemDetails = (badRequestObjectResult as BadRequestObjectResult)?.Value;  
             Assert.IsAssignableFrom<ValidationProblemDetails>(validationProblemDetails);
