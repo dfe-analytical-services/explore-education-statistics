@@ -218,7 +218,7 @@ const ChartBuilder = ({ data }: Props) => {
               size:
                 previousConfig.size === undefined ? '50' : previousConfig.size,
               tickConfig: previousConfig.tickConfig || 'default',
-              tickSpacing: previousConfig.tickSpacing || ''
+              tickSpacing: previousConfig.tickSpacing || '',
             },
           };
         }, {});

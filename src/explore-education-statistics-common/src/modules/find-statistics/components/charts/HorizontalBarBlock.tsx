@@ -1,17 +1,19 @@
 import {
-  calculateDataRange,
   ChartDataB,
   ChartDefinition,
   conditionallyAdd,
   createDataForAxis,
+  GenerateMajorAxis,
+  GenerateMinorAxis,
   getKeysForChart,
   mapNameToNameLabel,
   populateDefaultChartProps,
   StackedBarProps,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+
+import classnames from 'classnames';
 import React, { Component } from 'react';
 import {
-  AxisDomain,
   Bar,
   BarChart,
   CartesianGrid,
@@ -22,8 +24,6 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-
-import classnames from 'classnames';
 
 import './charts.scss';
 
@@ -93,11 +93,8 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
 
     const keysForChart = getKeysForChart(chartData);
 
-    const { min, max } = calculateDataRange(chartData);
-    const minorAxisDomain: [AxisDomain, AxisDomain] = [
-      axes.minor.min || min,
-      axes.minor.max || max,
-    ];
+    const minorDomainTicks = GenerateMinorAxis(chartData, axes.minor);
+    const majorDomainTicks = GenerateMajorAxis(chartData, axes.major);
 
     return (
       <ResponsiveContainer width={width || '100%'} height={height || 300}>
@@ -127,7 +124,7 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
                 value: '',
               }}
               scale="auto"
-              domain={minorAxisDomain}
+              {...minorDomainTicks}
               height={conditionallyAdd(
                 axes.minor && axes.minor.size,
                 legend === 'bottom' ? 50 : undefined,
@@ -147,6 +144,7 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
                 position: 'bottom',
                 value: '',
               }}
+              {...majorDomainTicks}
               scale="auto"
               width={conditionallyAdd(axes.major && axes.major.size)}
               interval={

@@ -1,18 +1,22 @@
 import {
-  calculateDataRange,
   ChartDataB,
   ChartDefinition,
   ChartProps,
   conditionallyAdd,
   createDataForAxis,
+  GenerateMajorAxis,
+  GenerateMinorAxis,
   getKeysForChart,
   mapNameToNameLabel,
   populateDefaultChartProps,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import { ChartSymbol } from '@common/services/publicationService';
+import { Dictionary } from '@common/types';
+
+import classnames from 'classnames';
 
 import React from 'react';
 import {
-  AxisDomain,
   CartesianGrid,
   Legend,
   LegendType,
@@ -27,12 +31,8 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { Dictionary } from '@common/types';
-
-import classnames from 'classnames';
 
 import './charts.scss';
-import { ChartSymbol } from '@common/services/publicationService';
 
 const CustomToolTip = ({ active, payload, label }: TooltipProps) => {
   if (active) {
@@ -69,16 +69,6 @@ const LineStyles: Dictionary<string> = {
   dotted: '2 2',
 };
 
-const parseNumberOrDefault = (
-  number: string | undefined,
-  def: number,
-): number => {
-  const parsed = number === undefined ? undefined : Number.parseFloat(number);
-
-  if (parsed === undefined || Number.isNaN(parsed)) return def;
-  return parsed;
-};
-
 // eslint-disable-next-line react/display-name
 const generateDot = (symbol: string | undefined) => (props: SymbolsProps) => {
   // eslint-disable-line react/display-name
@@ -95,36 +85,6 @@ const generateLegendType = (symbol: LegendType | undefined): LegendType => {
   if (symbol === 'none' || symbol === undefined) return 'line';
   return symbol;
 };
-
-function calculateMinorTicks(config: string | undefined, min: number, max:number, spacing: string = "5") : number[] | undefined {
-  let spacingValue = +spacing;
-
-  if (spacingValue <=0) spacingValue = 1.0;
-  if (Number.isNaN(min) || Number.isNaN(max) || !Number.isFinite(min) || !Number.isFinite(max)) return undefined;
-
-  if (config === 'custom') {
-    const result = [];
-
-    let [start,end] = [min,max];
-    if (start>end) [start,end]=[end,start];
-
-    for(let i=start; i<end; i+=spacingValue) {
-      result.push(parseFloat(i.toPrecision(10)));
-    }
-
-    result.push(max);
-
-    return result;
-  }
-
-  if (config === "startEnd" ) {
-    return [
-      min,
-      max
-    ]
-  }
-  return undefined;
-}
 
 const LineChartBlock = (props: ChartProps) => {
   const {
@@ -154,14 +114,8 @@ const LineChartBlock = (props: ChartProps) => {
 
   const keysForChart = getKeysForChart(chartData);
 
-  const { min, max } = calculateDataRange(chartData);
-
-  const axisMin = parseNumberOrDefault(axes.minor.min, min);
-  const axisMax = parseNumberOrDefault(axes.minor.max, max);
-
-  const minorAxisDomain: [AxisDomain, AxisDomain] = [axisMin, axisMax];
-
-  const minorTicks = calculateMinorTicks(axes.minor.tickConfig, axisMin, axisMax, axes.minor.tickSpacing);
+  const minorDomainTicks = GenerateMinorAxis(chartData, axes.minor);
+  const majorDomainTicks = GenerateMajorAxis(chartData, axes.major);
 
   return (
     <ResponsiveContainer width={width || '100%'} height={height || 300}>
@@ -194,6 +148,7 @@ const LineChartBlock = (props: ChartProps) => {
               position: 'bottom',
               value: '',
             }}
+            {...majorDomainTicks}
             scale="auto"
             interval={
               axes.minor && !axes.minor.visible ? 'preserveStartEnd' : undefined
@@ -216,8 +171,7 @@ const LineChartBlock = (props: ChartProps) => {
               value: '',
             }}
             scale="auto"
-            domain={minorAxisDomain}
-            ticks={minorTicks}
+            {...minorDomainTicks}
             interval="preserveStartEnd"
             dataKey="value"
             width={conditionallyAdd(axes.minor && axes.minor.size)}
