@@ -121,6 +121,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
+                    name: "Areas",
+                    template: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+                
+                routes.MapRoute(
                     name: "default",
                     template: "{controller}/{action=Index}/{id?}");
             });

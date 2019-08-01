@@ -4,29 +4,28 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Tools.Controllers
 {
+    [Area("Tools")]
     [ApiExplorerSettings(IgnoreApi=true)]
-    public class TopicsController : Controller
+    public class ThemesController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public TopicsController(ApplicationDbContext context)
+        public ThemesController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Topics
+        // GET: Themes
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Topics.Include(t => t.Theme).OrderBy(t => t.Title);
-            return View(await applicationDbContext.ToListAsync());
+            return View(await _context.Themes.OrderBy(t => t.Title).ToListAsync());
         }
 
-        // GET: Topics/Details/5
+        // GET: Themes/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
             if (id == null)
@@ -34,44 +33,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
                 return NotFound();
             }
 
-            var topic = await _context.Topics
-                .Include(t => t.Theme)
-                .Include(t => t.Publications).OrderBy(t => t.Title)
+            var theme = await _context.Themes
+                .Include(t => t.Topics).OrderBy(t => t.Title)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (topic == null)
+            if (theme == null)
             {
                 return NotFound();
             }
 
-            return View(topic);
+            return View(theme);
         }
 
-        // GET: Topics/Create
+        // GET: Themes/Create
         public IActionResult Create()
         {
-            ViewData["ThemeId"] = new SelectList(_context.Themes.OrderBy(t => t.Title), "Id", "Title");
             return View();
         }
 
-        // POST: Topics/Create
+        // POST: Themes/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Slug,Description,ThemeId,Summary")] Topic topic)
+        public async Task<IActionResult> Create([Bind("Id,Slug,Title,Summary")] Theme theme)
         {
             if (ModelState.IsValid)
             {
-                topic.Id = Guid.NewGuid();
-                _context.Add(topic);
+                theme.Id = Guid.NewGuid();
+                _context.Add(theme);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ThemeId"] = new SelectList(_context.Themes, "Id", "Title", topic.ThemeId);
-            return View(topic);
+            return View(theme);
         }
 
-        // GET: Topics/Edit/5
+        // GET: Themes/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null)
@@ -79,23 +75,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
                 return NotFound();
             }
 
-            var topic = await _context.Topics.FindAsync(id);
-            if (topic == null)
+            var theme = await _context.Themes.FindAsync(id);
+            if (theme == null)
             {
                 return NotFound();
             }
-            ViewData["ThemeId"] = new SelectList(_context.Themes, "Id", "Title", topic.ThemeId);
-            return View(topic);
+            return View(theme);
         }
 
-        // POST: Topics/Edit/5
+        // POST: Themes/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Id,Title,Slug,Description,ThemeId,Summary")] Topic topic)
+        public async Task<IActionResult> Edit(Guid id, [Bind("Id,Slug,Title,Summary")] Theme theme)
         {
-            if (id != topic.Id)
+            if (id != theme.Id)
             {
                 return NotFound();
             }
@@ -104,12 +99,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
             {
                 try
                 {
-                    _context.Update(topic);
+                    _context.Update(theme);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TopicExists(topic.Id))
+                    if (!ThemeExists(theme.Id))
                     {
                         return NotFound();
                     }
@@ -120,11 +115,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ThemeId"] = new SelectList(_context.Themes, "Id", "Title", topic.ThemeId);
-            return View(topic);
+            return View(theme);
         }
 
-        // GET: Topics/Delete/5
+        // GET: Themes/Delete/5
         public async Task<IActionResult> Delete(Guid? id)
         {
             if (id == null)
@@ -132,31 +126,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
                 return NotFound();
             }
 
-            var topic = await _context.Topics
-                .Include(t => t.Theme)
+            var theme = await _context.Themes
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (topic == null)
+            if (theme == null)
             {
                 return NotFound();
             }
 
-            return View(topic);
+            return View(theme);
         }
 
-        // POST: Topics/Delete/5
+        // POST: Themes/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            var topic = await _context.Topics.FindAsync(id);
-            _context.Topics.Remove(topic);
+            var theme = await _context.Themes.FindAsync(id);
+            _context.Themes.Remove(theme);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool TopicExists(Guid id)
+        private bool ThemeExists(Guid id)
         {
-            return _context.Topics.Any(e => e.Id == id);
+            return _context.Themes.Any(e => e.Id == id);
         }
     }
 }

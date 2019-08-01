@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Tools.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
