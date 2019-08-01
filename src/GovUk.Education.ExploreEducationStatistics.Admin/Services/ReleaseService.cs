@@ -92,6 +92,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await _context.SaveChangesAsync();
             return await GetViewModel(model.Id);
         }
+        
+        // TODO Authorisation will be required when users are introduced
+        public async Task<List<ReleaseViewModel>> GetReleasesForPublicationAsync(PublicationId publicationId)
+        {
+            var release = await _context.Releases
+                .Include(r => r.Publication)
+                .Where(r => r.Publication.Id == publicationId)
+                .ToListAsync();
+            return _mapper.Map<List<ReleaseViewModel>>(release);
+        }
+        
+        
 
         private int OrderForNextReleaseOnPublication(PublicationId publicationId)
         {
