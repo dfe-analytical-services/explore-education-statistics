@@ -3,11 +3,16 @@ import {
   ChartDefinition,
   ChartProps,
   conditionallyAdd,
-  createSortedAndMappedDataForAxis,
+<<<<<<< HEAD
+  createDataForAxis, createSortedAndMappedDataForAxis,
+=======
+  createDataForAxis,
   GenerateMajorAxis,
   GenerateMinorAxis,
+>>>>>>> origin/master
   getKeysForChart,
-  populateDefaultChartProps,
+  mapNameToNameLabel,
+  populateDefaultChartProps, sortChartData,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import { ChartSymbol } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
@@ -39,22 +44,22 @@ const CustomToolTip = ({ active, payload, label }: TooltipProps) => {
       <div className="graph-tooltip">
         <p>{label}</p>
         {payload &&
-          payload
-            .sort((a, b) => {
-              if (typeof b.value === 'number' && typeof a.value === 'number') {
-                return b.value - a.value;
-              }
+        payload
+          .sort((a, b) => {
+            if (typeof b.value === 'number' && typeof a.value === 'number') {
+              return b.value - a.value;
+            }
 
-              return 0;
-            })
-            .map((_, index) => {
-              return (
-                // eslint-disable-next-line react/no-array-index-key
-                <p key={index}>
-                  {`${payload[index].name} : ${payload[index].value}`}
-                </p>
-              );
-            })}
+            return 0;
+          })
+          .map((_, index) => {
+            return (
+              // eslint-disable-next-line react/no-array-index-key
+              <p key={index}>
+                {`${payload[index].name} : ${payload[index].value}`}
+              </p>
+            );
+          })}
       </div>
     );
   }
@@ -72,8 +77,62 @@ const LineStyles: Dictionary<string> = {
 const generateDot = (symbol: string | undefined) => (props: SymbolsProps) => {
   // eslint-disable-line react/display-name
 
+<<<<<<< HEAD
+    data: [
+      {
+        type: 'line',
+        title: 'Line',
+        entryCount: 'multiple',
+        targetAxis: 'xaxis',
+      },
+    ],
+
+    axes: [
+      {
+        id: 'xaxis',
+        title: 'X Axis',
+        type: 'major',
+        defaultDataType: 'timePeriods',
+      },
+      {
+        id: 'yaxis',
+        title: 'Y Axis',
+        type: 'minor',
+      },
+    ],
+  };
+
+  public render() {
+    const {
+      data,
+      meta,
+      height,
+      axes,
+      labels,
+      legend,
+      legendHeight,
+      width,
+    } = this.props;
+
+    if (axes.major === undefined || data === undefined || meta === undefined)
+      return <div>Unable to render chart</div>;
+
+    const yAxisDomain: [AxisDomain, AxisDomain] = [-10, 10];
+
+
+    const chartData: ChartDataB[] = createSortedAndMappedDataForAxis(
+      axes.major,
+      data.result,
+      meta,
+      labels,
+    );
+
+
+    const keysForChart = getKeysForChart(chartData);
+=======
   if (symbol === 'none' || symbol === undefined || symbol === '')
     return undefined;
+>>>>>>> origin/master
 
   const chartSymbol: ChartSymbol = symbol as ChartSymbol;
 
@@ -105,12 +164,11 @@ const LineChartBlock = (props: ChartProps) => {
   )
     return <div>Unable to render chart</div>;
 
-  const chartData: ChartDataB[] = createSortedAndMappedDataForAxis(
+  const chartData: ChartDataB[] = createDataForAxis(
     axes.major,
     data.result,
     meta,
-    labels,
-  );
+  ).map(mapNameToNameLabel(labels, meta.timePeriods, meta.locations));
 
   const keysForChart = getKeysForChart(chartData);
 
@@ -218,6 +276,32 @@ const LineChartBlock = (props: ChartProps) => {
   );
 };
 
+<<<<<<< HEAD
+          {axes.major &&
+          axes.major.referenceLines &&
+          axes.major.referenceLines.map(referenceLine => (
+            <ReferenceLine
+              key={`${referenceLine.position}_${referenceLine.label}`}
+              x={referenceLine.position}
+              label={referenceLine.label}
+            />
+          ))}
+
+          {axes.minor &&
+          axes.minor.referenceLines &&
+          axes.minor.referenceLines.map(referenceLine => (
+            <ReferenceLine
+              key={`${referenceLine.position}_${referenceLine.label}`}
+              y={referenceLine.position}
+              label={referenceLine.label}
+            />
+          ))}
+        </LineChart>
+      </ResponsiveContainer>
+    );
+  }
+}
+=======
 const definition: ChartDefinition = {
   type: 'line',
   name: 'Line',
@@ -257,3 +341,4 @@ const definition: ChartDefinition = {
 LineChartBlock.definition = definition;
 
 export default LineChartBlock;
+>>>>>>> origin/master

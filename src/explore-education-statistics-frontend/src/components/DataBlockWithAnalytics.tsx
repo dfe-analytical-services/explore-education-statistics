@@ -10,7 +10,7 @@ const DataBlockWithAnalytics = (props: DataBlockProps) => {
       {...props}
       onToggle={(section: { id: string; title: string }) => {
         logEvent(
-          'Statistics tabs',
+          'Publication Release Data Tabs',
           `${section.title} (${section.id}) tab opened`,
           window.location.pathname,
         );

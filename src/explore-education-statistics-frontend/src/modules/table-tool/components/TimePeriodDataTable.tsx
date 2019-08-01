@@ -45,12 +45,17 @@ const TimePeriodDataTable = (props: Props) => {
     rows: [],
   });
 
+  const removeSiblinglessTotalRows = (
+    categoryFilters: Dictionary<CategoryFilter[]>,
+  ): CategoryFilter[][] => {
+    return Object.values(categoryFilters).filter(filter => {
+      return filter.length > 1 || !filter[0].isTotal;
+    });
+  };
+
   useEffect(() => {
     const sortedFilters = sortBy(
-      Object.values({
-        ...filters,
-        locations,
-      }),
+      [...removeSiblinglessTotalRows(filters), locations],
       [options => options.length],
     );
 

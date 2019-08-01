@@ -3296,19 +3296,19 @@ const AbstractLargeDataChartProps_smaller_datasets: ChartProps = {
       label: metaData.indicators['23'].label,
       unit: '%',
       value: '23_1_2',
-      colour: "#285252"
+      colour: '#285252',
     },
     '26_1_2_____': {
       label: metaData.indicators['26'].label,
       unit: '%',
       value: '26_1_2',
-      colour: "#572957"
+      colour: '#572957',
     },
     '28_1_2_____': {
       label: metaData.indicators['28'].label,
       unit: '%',
       value: '28_1_2',
-      colour: "#454520"
+      colour: '#454520',
     },
   },
 

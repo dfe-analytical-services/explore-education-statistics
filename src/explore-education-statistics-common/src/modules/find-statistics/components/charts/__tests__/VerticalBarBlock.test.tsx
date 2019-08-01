@@ -1,13 +1,18 @@
-import React from 'react';
-
-import { render } from 'react-testing-library';
+import {
+  AxesConfiguration,
+  ChartProps,
+} from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import {
   DataBlockData,
   DataBlockMetadata,
 } from '@common/services/dataBlockService';
+import React from 'react';
+
+import { render } from 'react-testing-library';
 import Chart from '../VerticalBarBlock';
 
 import testData from './__data__/testBlockData';
+import { expectTicks } from './testUtils';
 
 jest.mock('recharts/lib/util/LogUtils');
 
@@ -193,9 +198,15 @@ describe('VerticalBarBlock', () => {
   test('dies gracefully with bad data', () => {
     const invalidData: DataBlockData = (undefined as unknown) as DataBlockData;
     const invalidMeta: DataBlockMetadata = (undefined as unknown) as DataBlockMetadata;
+    const invalidAxes: AxesConfiguration = (undefined as unknown) as AxesConfiguration;
 
     const { container } = render(
-      <Chart data={invalidData} labels={{}} meta={invalidMeta} axes={{}} />,
+      <Chart
+        data={invalidData}
+        labels={{}}
+        meta={invalidMeta}
+        axes={invalidAxes}
+      />,
     );
     expect(container).toHaveTextContent('Unable to render chart');
   });
@@ -238,5 +249,126 @@ describe('VerticalBarBlock', () => {
       const div = responsiveContainer as HTMLElement;
       expect(div.style.height).toEqual('200px');
     }
+  });
+
+  test('Can limit range of minor ticks to default', () => {
+    const propsWithTicks: ChartProps = {
+      ...props,
+      axes: {
+        major: props.axes.major,
+        minor: {
+          ...props.axes.minor,
+          tickConfig: 'default',
+        },
+      },
+    };
+
+    const { container } = render(<Chart {...propsWithTicks} />);
+
+    expectTicks(container, 'y', '-3', '1', '5', '10');
+  });
+
+  test('Can limit range of minor ticks to start and end', () => {
+    const propsWithTicks: ChartProps = {
+      ...props,
+      axes: {
+        major: props.axes.major,
+        minor: {
+          ...props.axes.minor,
+          tickConfig: 'startEnd',
+        },
+      },
+    };
+
+    const { container } = render(<Chart {...propsWithTicks} />);
+
+    expectTicks(container, 'y', '-3', '10');
+  });
+
+  test('Can limit range of minor ticks to custom', () => {
+    const propsWithTicks: ChartProps = {
+      ...props,
+      axes: {
+        major: props.axes.major,
+        minor: {
+          ...props.axes.minor,
+          tickConfig: 'custom',
+          tickSpacing: '1',
+        },
+      },
+    };
+
+    const { container } = render(<Chart {...propsWithTicks} />);
+
+    expectTicks(
+      container,
+      'y',
+      '-3',
+      '-2',
+      '-1',
+      '0',
+      '1',
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+      '7',
+      '8',
+      '9',
+      '10',
+    );
+  });
+
+  test('Can limit range of major ticks to default', () => {
+    const propsWithTicks: ChartProps = {
+      ...props,
+      axes: {
+        minor: props.axes.minor,
+        major: {
+          ...props.axes.major,
+          tickConfig: 'default',
+        },
+      },
+    };
+
+    const { container } = render(<Chart {...propsWithTicks} />);
+
+    expectTicks(container, 'x', '2014/15', '2015/16');
+  });
+
+  test('Can limit range of major ticks to start and end', () => {
+    const propsWithTicks: ChartProps = {
+      ...props,
+      axes: {
+        minor: props.axes.minor,
+        major: {
+          ...props.axes.major,
+          tickConfig: 'startEnd',
+        },
+      },
+    };
+
+    const { container } = render(<Chart {...propsWithTicks} />);
+
+    expectTicks(container, 'x', '2014/15', '2015/16');
+  });
+
+  test('Can limit range of minor ticks to custom', () => {
+    const propsWithTicks: ChartProps = {
+      ...props,
+      axes: {
+        minor: props.axes.minor,
+        major: {
+          ...props.axes.major,
+          tickConfig: 'custom',
+          tickSpacing: '2',
+        },
+      },
+    };
+
+    const { container } = render(<Chart {...propsWithTicks} />);
+
+    expectTicks(container, 'x', '2014/15', '2015/16');
   });
 });

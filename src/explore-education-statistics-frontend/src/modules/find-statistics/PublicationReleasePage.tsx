@@ -282,6 +282,13 @@ class PublicationReleasePage extends Component<Props> {
                     content={content}
                     id={`content_${order}`}
                     publication={data.publication}
+                    onToggle={(section: { id: string; title: string }) => {
+                      logEvent(
+                        'Publication Release Data Tabs',
+                        `${section.title} (${section.id}) tab opened`,
+                        window.location.pathname,
+                      );
+                    }}
                   />
                 </AccordionSection>
               );
