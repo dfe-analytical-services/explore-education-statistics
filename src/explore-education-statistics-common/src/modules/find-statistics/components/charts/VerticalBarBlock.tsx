@@ -5,8 +5,9 @@ import {
   createDataForAxis,
   getKeysForChart,
   mapNameToNameLabel,
-  populateDefaultChartProps,
+  populateDefaultChartProps, sortChartData,
   StackedBarProps,
+  createSortedAndMappedDataForAxis,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import React, { Component } from 'react';
 import {
@@ -78,11 +79,12 @@ export default class VerticalBarBlock extends Component<StackedBarProps> {
     if (axes.major === undefined || data === undefined || meta === undefined)
       return <div>Unable to render chart</div>;
 
-    const chartData: ChartDataB[] = createDataForAxis(
-      axes.major,
-      data.result,
-      meta,
-    ).map(mapNameToNameLabel(labels, meta.timePeriods, meta.locations));
+    const chartData: ChartDataB[] = createSortedAndMappedDataForAxis(
+        axes.major,
+        data.result,
+        meta,
+        labels,
+      );
 
     const keysForChart = getKeysForChart(chartData);
 
@@ -160,24 +162,24 @@ export default class VerticalBarBlock extends Component<StackedBarProps> {
           ))}
 
           {axes.major &&
-            axes.major.referenceLines &&
-            axes.major.referenceLines.map(referenceLine => (
-              <ReferenceLine
-                key={`${referenceLine.position}_${referenceLine.label}`}
-                x={referenceLine.position}
-                label={referenceLine.label}
-              />
-            ))}
+          axes.major.referenceLines &&
+          axes.major.referenceLines.map(referenceLine => (
+            <ReferenceLine
+              key={`${referenceLine.position}_${referenceLine.label}`}
+              x={referenceLine.position}
+              label={referenceLine.label}
+            />
+          ))}
 
           {axes.minor &&
-            axes.minor.referenceLines &&
-            axes.minor.referenceLines.map(referenceLine => (
-              <ReferenceLine
-                key={`${referenceLine.position}_${referenceLine.label}`}
-                y={referenceLine.position}
-                label={referenceLine.label}
-              />
-            ))}
+          axes.minor.referenceLines &&
+          axes.minor.referenceLines.map(referenceLine => (
+            <ReferenceLine
+              key={`${referenceLine.position}_${referenceLine.label}`}
+              y={referenceLine.position}
+              label={referenceLine.label}
+            />
+          ))}
         </BarChart>
       </ResponsiveContainer>
     );

@@ -3,10 +3,10 @@ import {
   ChartDefinition,
   ChartProps,
   conditionallyAdd,
-  createDataForAxis,
+  createDataForAxis, createSortedAndMappedDataForAxis,
   getKeysForChart,
   mapNameToNameLabel,
-  populateDefaultChartProps,
+  populateDefaultChartProps, sortChartData,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 
 import React, { Component } from 'react';
@@ -36,22 +36,22 @@ const CustomToolTip = ({ active, payload, label }: TooltipProps) => {
       <div className="graph-tooltip">
         <p>{label}</p>
         {payload &&
-          payload
-            .sort((a, b) => {
-              if (typeof b.value === 'number' && typeof a.value === 'number') {
-                return b.value - a.value;
-              }
+        payload
+          .sort((a, b) => {
+            if (typeof b.value === 'number' && typeof a.value === 'number') {
+              return b.value - a.value;
+            }
 
-              return 0;
-            })
-            .map((_, index) => {
-              return (
-                // eslint-disable-next-line react/no-array-index-key
-                <p key={index}>
-                  {`${payload[index].name} : ${payload[index].value}`}
-                </p>
-              );
-            })}
+            return 0;
+          })
+          .map((_, index) => {
+            return (
+              // eslint-disable-next-line react/no-array-index-key
+              <p key={index}>
+                {`${payload[index].name} : ${payload[index].value}`}
+              </p>
+            );
+          })}
       </div>
     );
   }
@@ -119,11 +119,14 @@ export default class LineChartBlock extends Component<ChartProps> {
 
     const yAxisDomain: [AxisDomain, AxisDomain] = [-10, 10];
 
-    const chartData: ChartDataB[] = createDataForAxis(
+
+    const chartData: ChartDataB[] = createSortedAndMappedDataForAxis(
       axes.major,
       data.result,
       meta,
-    ).map(mapNameToNameLabel(labels, meta.timePeriods, meta.locations));
+      labels,
+    );
+
 
     const keysForChart = getKeysForChart(chartData);
 
@@ -215,24 +218,24 @@ export default class LineChartBlock extends Component<ChartProps> {
           ))}
 
           {axes.major &&
-            axes.major.referenceLines &&
-            axes.major.referenceLines.map(referenceLine => (
-              <ReferenceLine
-                key={`${referenceLine.position}_${referenceLine.label}`}
-                x={referenceLine.position}
-                label={referenceLine.label}
-              />
-            ))}
+          axes.major.referenceLines &&
+          axes.major.referenceLines.map(referenceLine => (
+            <ReferenceLine
+              key={`${referenceLine.position}_${referenceLine.label}`}
+              x={referenceLine.position}
+              label={referenceLine.label}
+            />
+          ))}
 
           {axes.minor &&
-            axes.minor.referenceLines &&
-            axes.minor.referenceLines.map(referenceLine => (
-              <ReferenceLine
-                key={`${referenceLine.position}_${referenceLine.label}`}
-                y={referenceLine.position}
-                label={referenceLine.label}
-              />
-            ))}
+          axes.minor.referenceLines &&
+          axes.minor.referenceLines.map(referenceLine => (
+            <ReferenceLine
+              key={`${referenceLine.position}_${referenceLine.label}`}
+              y={referenceLine.position}
+              label={referenceLine.label}
+            />
+          ))}
         </LineChart>
       </ResponsiveContainer>
     );

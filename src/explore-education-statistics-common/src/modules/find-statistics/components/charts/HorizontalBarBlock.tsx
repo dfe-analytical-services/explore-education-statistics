@@ -2,7 +2,7 @@ import {
   ChartDataB,
   ChartDefinition,
   conditionallyAdd,
-  createDataForAxis,
+  createDataForAxis, createSortedAndMappedDataForAxis,
   getKeysForChart,
   mapNameToNameLabel,
   populateDefaultChartProps,
@@ -78,11 +78,13 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
     if (axes.major === undefined || data === undefined || meta === undefined)
       return <div>Unable to render chart</div>;
 
-    const chartData: ChartDataB[] = createDataForAxis(
+    const chartData: ChartDataB[] = createSortedAndMappedDataForAxis(
       axes.major,
       data.result,
       meta,
-    ).map(mapNameToNameLabel(labels, meta.timePeriods));
+      labels,
+    );
+
 
     const keysForChart = getKeysForChart(chartData);
 
