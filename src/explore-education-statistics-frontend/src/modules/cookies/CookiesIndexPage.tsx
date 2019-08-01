@@ -28,13 +28,13 @@ interface Props {
 
 function CookiesIndexPage({ cookies = {} }: Props) {
   const [submitted, setSubmitted] = useState();
-  const { setBannerSeenCookie, setGACookie } = useCookies();
+  const { setBannerSeenCookie, setGADisabledCookie } = useCookies();
 
   const submitCookieSettings = (values: any) => {
     setSubmitted(true);
     window.scrollTo(0, 0);
     setBannerSeenCookie(true);
-    setGACookie(values.googleAnalytics !== 'on');
+    setGADisabledCookie(values.googleAnalytics !== 'on');
   };
 
   return (

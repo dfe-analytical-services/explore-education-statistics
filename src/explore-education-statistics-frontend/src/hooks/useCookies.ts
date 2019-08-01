@@ -42,7 +42,7 @@ export function useCookies() {
         expires: cookieMap.bannerSeen.expires,
       });
     },
-    setGACookie(isDisabled: boolean) {
+    setGADisabledCookie(isDisabled: boolean) {
       setCookie(cookieMap.disableGA.name, isDisabled, {
         expires: cookieMap.disableGA.expires,
       });

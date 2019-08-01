@@ -7,18 +7,20 @@ import useMounted from 'explore-education-statistics-common/src/hooks/useMounted
 import styles from './CookieBanner.module.scss';
 
 interface Props {
-  cookies?: any;
+  cookies?: {
+    [key: string]: string;
+  };
 }
 
 function CookieBanner({ cookies }: Props) {
-  const { getCookie, setBannerSeenCookie, setGACookie } = useCookies();
+  const { getCookie, setBannerSeenCookie, setGADisabledCookie } = useCookies();
 
   const { isMounted } = useMounted();
 
   const acceptCookies = () => {
     setBannerSeenCookie(true);
     if (typeof getCookie('disableGA') === 'undefined') {
-      setGACookie(false);
+      setGADisabledCookie(false);
     }
   };
 
