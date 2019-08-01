@@ -6,8 +6,6 @@ import styles from './CookieBanner.module.scss';
 function CookieBanner() {
   const { getCookie, setBannerSeenCookie, setGADisabledCookie } = useCookies();
 
-  console.log('±±', getCookie('bannerSeen'));
-
   const acceptCookies = () => {
     setBannerSeenCookie(true);
     if (typeof getCookie('disableGA') === 'undefined') {
