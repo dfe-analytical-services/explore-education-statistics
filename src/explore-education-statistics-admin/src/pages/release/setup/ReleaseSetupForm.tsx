@@ -1,40 +1,26 @@
 import Link from '@admin/components/Link';
+import {DayMonthYearInputs, dayMonthYearValuesToInputs, IdTitlePair,} from '@admin/services/common/types';
+import {ReleaseSetupDetails} from '@admin/services/edit-release/setup/types';
 import {
-  isDayMonthYearDateTypeCodeSelected,
-  isDayMonthYearDateTypeSelected,
-  isYearOnlyDateTypeCodeSelected,
-  isYearOnlyDateTypeSelected,
-} from '@admin/pages/release/setup/util/releaseSetupUtil';
-import {
-  DayMonthYearInputs,
-  dayMonthYearValuesToInputs,
-  IdTitlePair,
-} from '@admin/services/common/types';
-import { ReleaseSetupDetails } from '@admin/services/edit-release/setup/types';
-import {
-  shapeOfDayMonthYearField,
   validateMandatoryDayMonthYearField,
   validateOptionalPartialDayMonthYearField,
 } from '@admin/validation/validation';
 import Button from '@common/components/Button';
+import {Form, FormFieldset, Formik} from '@common/components/form';
 import FormFieldDayMonthYear from '@common/components/form/FormFieldDayMonthYear';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
-import { SelectOption } from '@common/components/form/FormSelect';
-import { Form, FormFieldset, Formik } from '@common/components/form';
+import {SelectOption} from '@common/components/form/FormSelect';
 import Yup from '@common/lib/validation/yup';
-import { Dictionary } from '@common/types';
-import { FormikProps } from 'formik';
-import React, { useEffect, useState } from 'react';
-import DummyReferenceData, {
-  TimePeriodCoverageGroup,
-} from '../../DummyReferenceData';
+import {Dictionary} from '@common/types';
+import {FormikProps} from 'formik';
+import React, {useEffect, useState} from 'react';
+import DummyReferenceData, {TimePeriodCoverageGroup,} from '../../DummyReferenceData';
 
 export interface FormValues {
   timePeriodCoverageCode: string;
-  timePeriodCoverageStartDate: DayMonthYearInputs;
-  timePeriodCoverageStartDateYearOnly: string;
+  timePeriodCoverageStartYear: string;
   releaseTypeId: string;
   scheduledPublishDate: DayMonthYearInputs;
   nextReleaseExpectedDate: DayMonthYearInputs;
@@ -63,12 +49,6 @@ const ReleaseSetupForm = ({
     setTimePeriodCoverageGroups(DummyReferenceData.timePeriodCoverageGroups);
     setReleaseTypes(DummyReferenceData.releaseTypeOptions);
   }, []);
-
-  const selectedTimePeriodCoverageGroup = releaseSetupDetails
-    ? DummyReferenceData.findTimePeriodCoverageGroup(
-        releaseSetupDetails.timePeriodCoverageCode,
-      )
-    : DummyReferenceData.timePeriodCoverageGroups[0];
 
   const getTimePeriodOptions = (
     timePeriodGroups: TimePeriodCoverageGroup[],
@@ -100,18 +80,8 @@ const ReleaseSetupForm = ({
             timePeriodCoverageCode: releaseSetupDetails
               ? releaseSetupDetails.timePeriodCoverageCode
               : timePeriodCoverageGroups[0].options[0].id,
-            timePeriodCoverageStartDate:
-              releaseSetupDetails &&
-              isDayMonthYearDateTypeSelected(selectedTimePeriodCoverageGroup)
-                ? dayMonthYearValuesToInputs(
-                    releaseSetupDetails.timePeriodCoverageStartDate,
-                  )
-                : emptyDayMonthYear(),
-            timePeriodCoverageStartDateYearOnly:
-              releaseSetupDetails &&
-              isYearOnlyDateTypeSelected(selectedTimePeriodCoverageGroup) &&
-              releaseSetupDetails.timePeriodCoverageStartDate.year
-                ? releaseSetupDetails.timePeriodCoverageStartDate.year.toString()
+            timePeriodCoverageStartYear:
+              releaseSetupDetails ? releaseSetupDetails.timePeriodCoverageStartYear.toString()
                 : '',
             releaseTypeId: releaseSetupDetails
               ? releaseSetupDetails.releaseType.id
@@ -131,24 +101,9 @@ const ReleaseSetupForm = ({
             timePeriodCoverageCode: Yup.string().required(
               'Choose a time period',
             ),
-            timePeriodCoverageStartDate: Yup.object<DayMonthYearInputs>().when(
-              'timePeriodCoverageCode',
-              {
-                is: (val: string) => isDayMonthYearDateTypeCodeSelected(val),
-                then: validateMandatoryDayMonthYearField,
-                otherwise: shapeOfDayMonthYearField,
-              },
-            ),
-            timePeriodCoverageStartDateYearOnly: Yup.string().when(
-              'timePeriodCoverageCode',
-              {
-                is: (val: string) => isYearOnlyDateTypeCodeSelected(val),
-                then: Yup.number().required('Enter a start year'),
-                otherwise: Yup.number(),
-              },
-            ),
+            timePeriodCoverageStartYear: Yup.string().required('Enter a start year'),
             releaseTypeId: Yup.string(),
-            scheduledPublishDate: validateOptionalPartialDayMonthYearField,
+            scheduledPublishDate: validateMandatoryDayMonthYearField,
             nextReleaseExpectedDate: validateOptionalPartialDayMonthYearField,
           })}
           onSubmit={onSubmitHandler}
@@ -165,58 +120,27 @@ const ReleaseSetupForm = ({
                     name="timePeriodCoverageCode"
                     optGroups={getTimePeriodOptions(timePeriodCoverageGroups)}
                   />
-                  {isYearOnlyDateTypeCodeSelected(
-                    form.values.timePeriodCoverageCode,
-                  ) && (
-                    <FormFieldTextInput<FormValues>
-                      id={`${formId}-timePeriodCoverageStartYearOnly`}
-                      name="timePeriodCoverageStartDateYearOnly"
-                      label={
-                        DummyReferenceData.findTimePeriodCoverageGroup(
-                          form.values.timePeriodCoverageCode,
-                        ).startDateLabel
-                      }
-                      width={4}
-                      type="number"
-                      pattern="[0-9]*"
-                    />
-                  )}
-                  {isDayMonthYearDateTypeCodeSelected(
-                    form.values.timePeriodCoverageCode,
-                  ) && (
-                    <FormFieldDayMonthYear<FormValues>
-                      formId={formId}
-                      fieldName="timePeriodCoverageStartDate"
-                      fieldsetLegend={
-                        DummyReferenceData.findTimePeriodCoverageGroup(
-                          form.values.timePeriodCoverageCode,
-                        ).startDateLabel
-                      }
-                      day={
-                        form.values.timePeriodCoverageStartDate &&
-                        form.values.timePeriodCoverageStartDate.day
-                      }
-                      month={
-                        form.values.timePeriodCoverageStartDate &&
-                        form.values.timePeriodCoverageStartDate.month
-                      }
-                      year={
-                        form.values.timePeriodCoverageStartDate &&
-                        form.values.timePeriodCoverageStartDate.year
-                      }
-                    />
-                  )}
+                  <FormFieldTextInput<FormValues>
+                    id={`${formId}-timePeriodCoverageStartYear`}
+                    name="timePeriodCoverageStartYear"
+                    label={
+                      DummyReferenceData.findTimePeriodCoverageGroup(
+                        form.values.timePeriodCoverageCode,
+                      ).startDateLabel
+                    }
+                    width={4}
+                    type="number"
+                    pattern="[0-9]*"
+                  />
                 </FormFieldset>
-
                 <FormFieldDayMonthYear<FormValues>
                   formId={formId}
                   fieldName="scheduledPublishDate"
-                  fieldsetLegend="Schedule publish date (optional)"
+                  fieldsetLegend="Schedule publish date"
                   day={form.values.scheduledPublishDate.day}
                   month={form.values.scheduledPublishDate.month}
                   year={form.values.scheduledPublishDate.year}
                 />
-
                 <FormFieldDayMonthYear<FormValues>
                   formId={formId}
                   fieldName="nextReleaseExpectedDate"
@@ -225,7 +149,6 @@ const ReleaseSetupForm = ({
                   month={form.values.nextReleaseExpectedDate.month}
                   year={form.values.nextReleaseExpectedDate.year}
                 />
-
                 <FormFieldRadioGroup<FormValues>
                   id={`${formId}-releaseTypeId`}
                   legend="Release Type"
@@ -235,11 +158,9 @@ const ReleaseSetupForm = ({
                     value: `${type.id}`,
                   }))}
                 />
-
                 <Button type="submit" className="govuk-!-margin-top-6">
                   {submitButtonText}
                 </Button>
-
                 <div className="govuk-!-margin-top-6">
                   <Link to="#" onClick={onCancelHandler}>
                     Cancel update

@@ -130,6 +130,10 @@ export const dayMonthYearIsComplete = (dmy?: DayMonthYearValues) => {
   return dmy && dmy.day && dmy.month && dmy.year;
 };
 
+export const dayMonthYearIsEmpty = (dmy?: DayMonthYearValues) => {
+  return !dmy || (!dmy.day && !dmy.month && !dmy.year);
+};
+
 export const dayMonthYearToDate = (dmy: DayMonthYearValues) => {
   if (!dayMonthYearIsComplete(dmy)) {
     throw Error(

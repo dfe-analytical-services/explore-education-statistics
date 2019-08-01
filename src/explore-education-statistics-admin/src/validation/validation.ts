@@ -1,4 +1,4 @@
-import { dayMonthYearIsComplete } from '@admin/services/common/types';
+import {dayMonthYearIsComplete, dayMonthYearIsEmpty} from '@admin/services/common/types';
 import Yup from '@common/lib/validation/yup';
 import { isValid } from 'date-fns';
 
@@ -29,6 +29,23 @@ export const validateOptionalPartialDayMonthYearField = Yup.object({
 }).test('validDateIfAllFieldsDefined', 'Enter a valid date', value => {
   // if not all fields have yet been filled in, this is valid
   if (!dayMonthYearIsComplete(value)) {
+    return true;
+  }
+
+  // but if all fields have been filled in, they should represent a valid date
+  return isValid(new Date(value.year, value.month, value.day));
+});
+
+/**
+ * A validator that allows for a user to either not enter a date at all, or enter a full valid date.
+ */
+export const validateOptionalFullDayMonthYearField = Yup.object({
+  day: yupNumberOrUndefinedIfBlank.nullable(),
+  month: yupNumberOrUndefinedIfBlank.nullable(),
+  year: yupNumberOrUndefinedIfBlank.nullable(),
+}).test('validDateIfAllFieldsDefined', 'Enter a valid date', value => {
+  // if not all fields have yet been filled in, this is valid
+  if (dayMonthYearIsEmpty(value)) {
     return true;
   }
 

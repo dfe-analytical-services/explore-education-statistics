@@ -4,7 +4,7 @@ export interface ReleaseSetupDetails {
   id: string;
   publicationTitle: string;
   timePeriodCoverageCode: string;
-  timePeriodCoverageStartDate: DayMonthYearValues;
+  timePeriodCoverageStartYear: number;
   releaseType: IdTitlePair;
   leadStatisticianName: string;
   scheduledPublishDate: DayMonthYearValues;
@@ -13,7 +13,7 @@ export interface ReleaseSetupDetails {
 
 export interface BaseReleaseSetupDetailsRequest {
   timePeriodCoverageCode: string;
-  timePeriodCoverageStartDate: DayMonthYearValues;
+  timePeriodCoverageStartYear: number;
   releaseType: IdTitlePair;
   scheduledPublishDate: DayMonthYearValues;
   nextReleaseExpectedDate: DayMonthYearValues;

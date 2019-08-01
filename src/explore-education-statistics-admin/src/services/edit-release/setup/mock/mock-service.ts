@@ -49,13 +49,13 @@ export default async (mock: MockAdapter) => {
         leadStatisticianName: 'Bob',
         publicationTitle: matchingPublication.title,
         releaseType: createRequest.releaseType,
-        timePeriodCoverageStartDate: createRequest.timePeriodCoverageStartDate,
+        timePeriodCoverageStartYear: createRequest.timePeriodCoverageStartYear,
         timePeriodCoverageCode: createRequest.timePeriodCoverageCode,
         scheduledPublishDate: createRequest.scheduledPublishDate,
         nextReleaseExpectedDate: createRequest.nextReleaseExpectedDate,
       };
 
-      const startYear = createRequest.timePeriodCoverageStartDate.year || 0;
+      const startYear = createRequest.timePeriodCoverageStartYear;
 
       const newRelease: AdminDashboardRelease = {
         id: newReleaseDetails.id,
@@ -105,8 +105,7 @@ export default async (mock: MockAdapter) => {
     /* eslint-disable no-param-reassign */
     existingRelease.timePeriodCoverageCode =
       updateRequest.timePeriodCoverageCode;
-    existingRelease.timePeriodCoverageStartDate =
-      updateRequest.timePeriodCoverageStartDate;
+    existingRelease.timePeriodCoverageStartYear = updateRequest.timePeriodCoverageStartYear;
     existingRelease.scheduledPublishDate = updateRequest.scheduledPublishDate;
     existingRelease.nextReleaseExpectedDate =
       updateRequest.nextReleaseExpectedDate;
