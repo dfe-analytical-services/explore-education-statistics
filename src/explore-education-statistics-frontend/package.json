@@ -40,6 +40,7 @@
     "react-markdown": "^4.1.0",
     "recharts": "^1.6.2",
     "referrer-policy": "^1.1.0",
+    "universal-cookie": "^4.0.2",
     "universal-cookie-express": "^4.0.1",
     "use-immer": "^0.3.2",
     "webpack": "^4.35.3",
