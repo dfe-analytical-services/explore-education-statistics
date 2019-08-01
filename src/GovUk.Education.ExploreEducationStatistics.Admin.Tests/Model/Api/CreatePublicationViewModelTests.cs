@@ -18,8 +18,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Model.Api
                 new CreatePublicationViewModel {Title = "A sentence with non alpha numeric characters at the end !@£('\\)"}.Slug);
             Assert.Equal("a-sentence-with-big-spaces",
                 new CreatePublicationViewModel {Title = "a sentence with      big     spaces   "}.Slug);
-            Assert.Equal("a-sentence-with-big-spaces",
-                new CreatePublicationViewModel {Title = "a sentence with      big     spaces   "}.Slug);
             Assert.Equal("a-sentence-with-numbers-1-2-3-and-4",
                 new CreatePublicationViewModel {Title = "a sentence with numbers 1 2 3 and 4"}.Slug);
         }
