@@ -56,8 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpGet("/publications/{publicationId}/releases")]
         [AllowAnonymous] // TODO We will need to do Authorisation checks when we know what the permissions model is.
         public async Task<ActionResult<List<ReleaseViewModel>>> GetReleaseForPublicationBasic(
-            [Required] [FromQuery(Name = "publicationId")]
-            PublicationId publicationId)
+            [Required]PublicationId publicationId)
         {
             var result = await _releaseService.GetReleasesForPublicationAsync(publicationId);
 
