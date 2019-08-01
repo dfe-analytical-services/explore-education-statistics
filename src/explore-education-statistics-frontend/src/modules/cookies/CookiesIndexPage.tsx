@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import cookie from 'cookie';
 import Page from '@frontend/components/Page';
 import Link from '@frontend/components/Link';
 import {
@@ -12,7 +11,6 @@ import {
 import { FormikProps } from 'formik';
 import Yup from '@common/lib/validation/yup';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
-import { NextContext } from 'next';
 import { useCookies, cookieMap } from '@frontend/hooks/useCookies';
 import styles from './CookiesIndexPage.module.scss';
 
@@ -167,16 +165,5 @@ function CookiesIndexPage({ cookies = {} }: Props) {
     </Page>
   );
 }
-
-CookiesIndexPage.getInitialProps = (props: NextContext) => {
-  if (props && props.req && props.req.headers && props.req.headers.cookie) {
-    return {
-      cookies: cookie.parse(props.req.headers.cookie),
-    };
-  }
-  return {
-    cookies: {},
-  };
-};
 
 export default CookiesIndexPage;

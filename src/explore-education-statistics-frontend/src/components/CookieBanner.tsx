@@ -1,21 +1,12 @@
 import React from 'react';
-import { NextContext } from 'next';
-import cookie from 'cookie';
-import { useCookies, cookieMap } from '@frontend/hooks/useCookies';
+import { useCookies } from '@frontend/hooks/useCookies';
 import ButtonText from '@common/components/ButtonText';
-import useMounted from 'explore-education-statistics-common/src/hooks/useMounted';
 import styles from './CookieBanner.module.scss';
 
-interface Props {
-  cookies?: {
-    [key: string]: string;
-  };
-}
-
-function CookieBanner({ cookies }: Props) {
+function CookieBanner() {
   const { getCookie, setBannerSeenCookie, setGADisabledCookie } = useCookies();
 
-  const { isMounted } = useMounted();
+  console.log('±±', getCookie('bannerSeen'));
 
   const acceptCookies = () => {
     setBannerSeenCookie(true);
@@ -49,22 +40,7 @@ function CookieBanner({ cookies }: Props) {
       </div>
     );
   }
-
-  if (isMounted) {
-    return getCookie('bannerSeen') === 'true' ? null : render();
-  }
-  return cookies[cookieMap.bannerSeen.name] === 'true' ? null : render();
+  return getCookie('bannerSeen') === 'true' ? null : render();
 }
-
-CookieBanner.getInitialProps = (props: NextContext) => {
-  if (props && props.req && props.req.headers && props.req.headers.cookie) {
-    return {
-      cookies: cookie.parse(props.req.headers.cookie),
-    };
-  }
-  return {
-    cookies: {},
-  };
-};
 
 export default CookieBanner;
