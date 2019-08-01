@@ -28,7 +28,7 @@ function CookiesIndexPage({ cookies = {} }: Props) {
   const [submitted, setSubmitted] = useState();
   const { setBannerSeenCookie, setGADisabledCookie } = useCookies();
 
-  const submitCookieSettings = (values: any) => {
+  const submitCookieSettings = (values: { [key: string]: string }) => {
     setSubmitted(true);
     window.scrollTo(0, 0);
     setBannerSeenCookie(true);
