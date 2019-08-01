@@ -1,14 +1,13 @@
-using System;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
     [Route("api/[controller]")]
     [Authorize]
+    [ApiController]
     [ApiExplorerSettings(IgnoreApi=true)]
-    public class SigninController : Controller
+    public class SigninController : ControllerBase
     {
         // GET
         public IActionResult Index()

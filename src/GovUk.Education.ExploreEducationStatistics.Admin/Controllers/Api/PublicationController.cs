@@ -13,6 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
     // TODO rename to Publications once the current Crud publication controller is removed
     [Authorize]
+    [ApiController]
     public class PublicationController : ControllerBase
     {
         private readonly IPublicationService _publicationService;

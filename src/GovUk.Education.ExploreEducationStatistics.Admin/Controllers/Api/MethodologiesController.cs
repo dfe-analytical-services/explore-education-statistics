@@ -11,6 +11,7 @@ using TopicId = System.Guid;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
     [Authorize]
+    [ApiController]
     public class MethodologiesController : ControllerBase
     {
         private readonly IMethodologyService _methodologyService;

@@ -4,12 +4,13 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
     [Route("api/[controller]")]
+    [ApiController]
     [AllowAnonymous]
     [ApiExplorerSettings(IgnoreApi=true)]
-    public class UsersController : Controller
+    public class UsersController : ControllerBase
     {
         // GET
         public ActionResult<UserDetailsViewModel> MyDetails()

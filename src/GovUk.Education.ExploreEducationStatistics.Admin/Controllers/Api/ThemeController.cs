@@ -10,6 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
     // TODO rename to Themes once the current Crud theme controller is removed
     [Authorize]
+    [ApiController]
     public class ThemeController : ControllerBase
     {
         private readonly IThemeService _themeService;
