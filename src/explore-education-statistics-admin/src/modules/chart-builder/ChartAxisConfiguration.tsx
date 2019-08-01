@@ -1,3 +1,4 @@
+import { ChartDataSetAndConfiguration } from '@admin/modules/chart-builder/ChartDataSelector';
 import {
   FormCheckbox,
   FormFieldset,
@@ -8,12 +9,16 @@ import {
 import FormComboBox from '@common/components/form/FormComboBox';
 
 import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
-import { ChartCapabilities } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import {
+  ChartCapabilities,
+  generateKeyFromDataSet,
+} from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import { DataBlockMetadata } from '@common/services/dataBlockService';
 import {
   AxisConfiguration,
   AxisGroupBy,
   ReferenceLine,
+  ChartDataSet,
 } from '@common/services/publicationService';
 import * as React from 'react';
 import styles from './graph-builder.module.scss';
@@ -24,8 +29,29 @@ interface Props {
   configuration: AxisConfiguration;
   meta: DataBlockMetadata;
   capabilities: ChartCapabilities;
+  chartDataConfiguration: ChartDataSetAndConfiguration[];
   onConfigurationChange: (configuration: AxisConfiguration) => void;
 }
+
+const getSelectableUnits = (configuration: AxisConfiguration, meta: DataBlockMetadata) => {
+  return configuration.dataSets
+    .map(dataSet => meta.indicators[dataSet.indicator])
+    .filter(indicator => indicator !== null)
+    .map(indicator => indicator.unit);
+};
+
+const getSortOptions = (chartDataConfiguration: ChartDataSetAndConfiguration[]): SelectOption[] => {
+  return [
+    {
+      label: 'default',
+      value: 'default',
+    },
+    ...chartDataConfiguration.map<SelectOption>(config => ({
+      label: config.configuration.label,
+      value: config.configuration.value,
+    })),
+  ];
+};
 
 const ChartAxisConfiguration = ({
   id,
@@ -33,21 +59,23 @@ const ChartAxisConfiguration = ({
   meta,
   capabilities,
   onConfigurationChange,
+  chartDataConfiguration,
 }: Props) => {
-  const [axisConfiguration, setAxisConfiguration] = React.useState<
-    AxisConfiguration
-  >(configuration);
+  const [axisConfiguration, setAxisConfiguration] = React.useState<AxisConfiguration>(configuration);
+
+  const [selectableUnits, setSelectableUnits] = React.useState<string[]>(() => {
+    return getSelectableUnits(configuration, meta);
+  });
+
+  const [sortOptions, setSortOptions] = React.useState<SelectOption[]>(() =>
+    getSortOptions(chartDataConfiguration),
+  );
 
   React.useEffect(() => {
     setAxisConfiguration(configuration);
-  }, [configuration]);
-
-  const [selectableUnits] = React.useState<string[]>(() => {
-    return configuration.dataSets
-      .map(dataSet => meta.indicators[dataSet.indicator])
-      .filter(indicator => indicator !== null)
-      .map(indicator => indicator.unit);
-  });
+    setSelectableUnits(getSelectableUnits(configuration, meta));
+    setSortOptions(getSortOptions(chartDataConfiguration));
+  }, [configuration, meta, chartDataConfiguration]);
 
   const [selectedUnit] = React.useState<number>(0);
 
@@ -223,6 +251,37 @@ const ChartAxisConfiguration = ({
             />
             <hr />
 
+            {axisConfiguration.type === 'major' && (
+              <>
+                <FormFieldset id={`${id}sort_order_set`} legend="Sort order">
+                  <FormGroup>
+                    <FormSelect
+                      id={`${id}_sort_by`}
+                      name="sort_by"
+                      label="Sort By"
+                      order={[]}
+                      value={axisConfiguration.sortBy}
+                      onChange={e => {
+                        updateAxisConfiguration({ sortBy: e.target.value });
+                      }}
+                      options={sortOptions}
+                    />
+                    <FormCheckbox
+                      id={`${id}_sort_asc`}
+                      name="sort_asc"
+                      label="Sort Ascending"
+                      value="asc"
+                      checked={axisConfiguration.sortAsc}
+                      onChange={e => {
+                        updateAxisConfiguration({ sortAsc: e.target.checked });
+                      }}
+                    />
+                  </FormGroup>
+                </FormFieldset>
+                <hr />
+              </>
+            )}
+
             {/*
         <FormSelect
           id={`${id}_labelPosition`}
@@ -249,29 +308,29 @@ const ChartAxisConfiguration = ({
               </thead>
               <tbody>
                 {axisConfiguration.referenceLines &&
-                  axisConfiguration.referenceLines.map((rl, idx) => (
-                    <tr key={`${rl.label}_${rl.position}`}>
-                      <td>{rl.position}</td>
-                      <td>{rl.label}</td>
-                      <td>
-                        <button
-                          className="govuk-button govuk-button--secondary govuk-!-margin-0"
-                          type="button"
-                          onClick={() => {
-                            const newReferenceLines = [
-                              ...(axisConfiguration.referenceLines || []),
-                            ];
-                            newReferenceLines.splice(idx, 1);
-                            updateAxisConfiguration({
-                              referenceLines: newReferenceLines,
-                            });
-                          }}
-                        >
-                          Remove
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                axisConfiguration.referenceLines.map((rl, idx) => (
+                  <tr key={`${rl.label}_${rl.position}`}>
+                    <td>{rl.position}</td>
+                    <td>{rl.label}</td>
+                    <td>
+                      <button
+                        className="govuk-button govuk-button--secondary govuk-!-margin-0"
+                        type="button"
+                        onClick={() => {
+                          const newReferenceLines = [
+                            ...(axisConfiguration.referenceLines || []),
+                          ];
+                          newReferenceLines.splice(idx, 1);
+                          updateAxisConfiguration({
+                            referenceLines: newReferenceLines,
+                          });
+                        }}
+                      >
+                        Remove
+                      </button>
+                    </td>
+                  </tr>
+                ))}
                 <tr>
                   <td>
                     {axisConfiguration.type === 'minor' && (
