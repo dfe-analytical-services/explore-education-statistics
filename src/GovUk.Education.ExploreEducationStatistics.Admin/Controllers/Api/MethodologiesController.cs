@@ -10,7 +10,6 @@ using TopicId = System.Guid;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
-    [ApiController]
     [Authorize]
     public class MethodologiesController : ControllerBase
     {
@@ -22,14 +21,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         // GET api/topic/{topicId}/methodologies
-        [HttpGet("/topic/{topicId}/methodologies")]
+        [HttpGet("api/topic/{topicId}/methodologies")]
         [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
         public async Task<ActionResult<List<MethodologyViewModel>>> GetTopicMethodologiesAsync([Required]TopicId topicId)
         {
             return await _methodologyService.GetTopicMethodologiesAsync(topicId);
         }
         
-        [HttpGet("/methodologies")]
+        [HttpGet("api/methodologies")]
         [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
         public async Task<ActionResult<List<MethodologyViewModel>>> GetMethodologiesAsync()
         {

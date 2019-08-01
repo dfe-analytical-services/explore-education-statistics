@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
     // TODO rename to Themes once the current Crud theme controller is removed
-    [ApiController]
     [Authorize]
     public class ThemeController : ControllerBase
     {
@@ -21,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         // GET api/me/themes/
-        [HttpGet("/me/themes")]
+        [HttpGet("api/me/themes")]
         [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
         public ActionResult<List<Theme>> GetMyThemes()
         {
