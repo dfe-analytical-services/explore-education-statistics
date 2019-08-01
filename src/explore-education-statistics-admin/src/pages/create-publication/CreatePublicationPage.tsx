@@ -1,7 +1,7 @@
 import Page from '@admin/components/Page';
 import CreatePublicationForm from '@admin/pages/create-publication/CreatePublicationForm';
 import CreatePublicationSummary from '@admin/pages/create-publication/CreatePublicationSummary';
-import dashboardRoutes from "@admin/routes/dashboard/routes";
+import dashboardRoutes from '@admin/routes/dashboard/routes';
 import { ContactDetails, IdTitlePair } from '@admin/services/common/types';
 import service from '@admin/services/edit-publication/service';
 import React, { useEffect, useState } from 'react';

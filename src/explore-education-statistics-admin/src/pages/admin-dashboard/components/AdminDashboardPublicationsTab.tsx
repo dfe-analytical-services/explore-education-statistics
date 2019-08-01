@@ -1,4 +1,4 @@
-import publicationRoutes from "@admin/routes/edit-publication/routes";
+import publicationRoutes from '@admin/routes/edit-publication/routes';
 import { AdminDashboardPublication } from '@admin/services/dashboard/types';
 import FormSelect from '@common/components/form/FormSelect';
 import React from 'react';

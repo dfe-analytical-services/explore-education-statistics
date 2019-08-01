@@ -48,7 +48,7 @@ class PermalinkPage extends Component<Props> {
               <dd data-testid="created-date">
                 <strong>
                   {' '}
-                  <FormattedDate>{data.timestamp}</FormattedDate>{' '}
+                  <FormattedDate>{data.created}</FormattedDate>{' '}
                 </strong>
               </dd>
             </dl>
@@ -155,7 +155,6 @@ class PermalinkPage extends Component<Props> {
           </tbody>
         </table>
         <p className="govuk-body-s">Source: DfE prototype example statistics</p>
-
         <h2 className="govuk-heading-m govuk-!-margin-top-9">
           Create your own tables online
         </h2>

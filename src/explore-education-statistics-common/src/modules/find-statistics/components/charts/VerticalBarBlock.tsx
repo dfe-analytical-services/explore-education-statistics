@@ -35,6 +35,7 @@ export default class VerticalBarBlock extends Component<StackedBarProps> {
       stackable: true,
       lineStyle: false,
       gridLines: true,
+      canSize: true,
     },
 
     data: [
@@ -86,7 +87,7 @@ export default class VerticalBarBlock extends Component<StackedBarProps> {
     const keysForChart = getKeysForChart(chartData);
 
     return (
-      <ResponsiveContainer width={width || 900} height={height || 300}>
+      <ResponsiveContainer width={width || '100%'} height={height || 300}>
         <BarChart
           data={chartData}
           className={classnames({ 'legend-bottom': legend === 'bottom' })}

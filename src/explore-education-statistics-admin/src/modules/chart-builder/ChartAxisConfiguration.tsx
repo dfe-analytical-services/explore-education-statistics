@@ -37,6 +37,10 @@ const ChartAxisConfiguration = ({
     AxisConfiguration
   >(configuration);
 
+  React.useEffect(() => {
+    setAxisConfiguration(configuration);
+  }, [configuration]);
+
   const [selectableUnits] = React.useState<string[]>(() => {
     return configuration.dataSets
       .map(dataSet => meta.indicators[dataSet.indicator])
