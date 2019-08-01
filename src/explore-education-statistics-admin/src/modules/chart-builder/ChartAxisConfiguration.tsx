@@ -9,16 +9,12 @@ import {
 import FormComboBox from '@common/components/form/FormComboBox';
 
 import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
-import {
-  ChartCapabilities,
-  generateKeyFromDataSet,
-} from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import { ChartCapabilities } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import { DataBlockMetadata } from '@common/services/dataBlockService';
 import {
   AxisConfiguration,
   AxisGroupBy,
   ReferenceLine,
-  ChartDataSet,
 } from '@common/services/publicationService';
 import * as React from 'react';
 import styles from './graph-builder.module.scss';
@@ -33,14 +29,19 @@ interface Props {
   onConfigurationChange: (configuration: AxisConfiguration) => void;
 }
 
-const getSelectableUnits = (configuration: AxisConfiguration, meta: DataBlockMetadata) => {
+const getSelectableUnits = (
+  configuration: AxisConfiguration,
+  meta: DataBlockMetadata,
+) => {
   return configuration.dataSets
     .map(dataSet => meta.indicators[dataSet.indicator])
     .filter(indicator => indicator !== null)
     .map(indicator => indicator.unit);
 };
 
-const getSortOptions = (chartDataConfiguration: ChartDataSetAndConfiguration[]): SelectOption[] => {
+const getSortOptions = (
+  chartDataConfiguration: ChartDataSetAndConfiguration[],
+): SelectOption[] => {
   return [
     {
       label: 'default',
@@ -61,7 +62,9 @@ const ChartAxisConfiguration = ({
   onConfigurationChange,
   chartDataConfiguration,
 }: Props) => {
-  const [axisConfiguration, setAxisConfiguration] = React.useState<AxisConfiguration>(configuration);
+  const [axisConfiguration, setAxisConfiguration] = React.useState<
+    AxisConfiguration
+  >(configuration);
 
   const [selectableUnits, setSelectableUnits] = React.useState<string[]>(() => {
     return getSelectableUnits(configuration, meta);
@@ -308,29 +311,29 @@ const ChartAxisConfiguration = ({
               </thead>
               <tbody>
                 {axisConfiguration.referenceLines &&
-                axisConfiguration.referenceLines.map((rl, idx) => (
-                  <tr key={`${rl.label}_${rl.position}`}>
-                    <td>{rl.position}</td>
-                    <td>{rl.label}</td>
-                    <td>
-                      <button
-                        className="govuk-button govuk-button--secondary govuk-!-margin-0"
-                        type="button"
-                        onClick={() => {
-                          const newReferenceLines = [
-                            ...(axisConfiguration.referenceLines || []),
-                          ];
-                          newReferenceLines.splice(idx, 1);
-                          updateAxisConfiguration({
-                            referenceLines: newReferenceLines,
-                          });
-                        }}
-                      >
-                        Remove
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                  axisConfiguration.referenceLines.map((rl, idx) => (
+                    <tr key={`${rl.label}_${rl.position}`}>
+                      <td>{rl.position}</td>
+                      <td>{rl.label}</td>
+                      <td>
+                        <button
+                          className="govuk-button govuk-button--secondary govuk-!-margin-0"
+                          type="button"
+                          onClick={() => {
+                            const newReferenceLines = [
+                              ...(axisConfiguration.referenceLines || []),
+                            ];
+                            newReferenceLines.splice(idx, 1);
+                            updateAxisConfiguration({
+                              referenceLines: newReferenceLines,
+                            });
+                          }}
+                        >
+                          Remove
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
                 <tr>
                   <td>
                     {axisConfiguration.type === 'minor' && (
