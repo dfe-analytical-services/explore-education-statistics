@@ -59,7 +59,7 @@ class PermalinkPage extends Component<Props> {
             </RelatedAside> */}
           </div>
         </div>
-        
+
         <table className="govuk-table">
           <caption className="govuk-heading-s">Example table</caption>
           <thead className="govuk-table__head">

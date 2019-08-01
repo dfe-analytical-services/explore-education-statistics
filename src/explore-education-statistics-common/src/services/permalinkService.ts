@@ -4,7 +4,7 @@ export interface Permalink {
   id: string;
   title: string;
   created: string;
-  data: string
+  data: string;
 }
 
 export default {
