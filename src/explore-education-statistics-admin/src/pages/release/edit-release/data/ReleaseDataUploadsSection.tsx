@@ -5,11 +5,11 @@ import { DataFile } from '@admin/services/edit-release/data/types';
 import Button from '@common/components/Button';
 import FormFieldFileSelector from '@common/components/form/FormFieldFileSelector';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
-import { Form, FormFieldset, Formik } from '@common/components/form/index';
+import { Form, FormFieldset, Formik } from '@common/components/form';
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import Yup from '@common/lib/validation/yup/index';
+import Yup from '@common/lib/validation/yup';
 import { FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
 

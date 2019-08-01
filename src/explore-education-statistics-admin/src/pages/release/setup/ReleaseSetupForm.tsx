@@ -22,8 +22,8 @@ import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { SelectOption } from '@common/components/form/FormSelect';
-import { Form, FormFieldset, Formik } from '@common/components/form/index';
-import Yup from '@common/lib/validation/yup/index';
+import { Form, FormFieldset, Formik } from '@common/components/form';
+import Yup from '@common/lib/validation/yup';
 import { Dictionary } from '@common/types';
 import { FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
@@ -241,7 +241,7 @@ const ReleaseSetupForm = ({
                 </Button>
 
                 <div className="govuk-!-margin-top-6">
-                  <Link to="" onClick={onCancelHandler}>
+                  <Link to="#" onClick={onCancelHandler}>
                     Cancel update
                   </Link>
                 </div>

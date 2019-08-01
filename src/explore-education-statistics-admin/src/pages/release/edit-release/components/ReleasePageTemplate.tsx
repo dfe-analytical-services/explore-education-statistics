@@ -42,10 +42,6 @@ const ReleasePageTemplate = withRouter(
       <Page
         wide
         breadcrumbs={[
-          {
-            link: dashboardRoutes.adminDashboard,
-            name: 'Administrator dashboard',
-          },
           { name: 'Edit release' },
         ]}
       >
