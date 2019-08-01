@@ -9,10 +9,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     [Route("api/[controller]")]
     [ApiController]
     [AllowAnonymous]
-    [ApiExplorerSettings(IgnoreApi=true)]
+//    [ApiExplorerSettings(IgnoreApi=true)]
     public class UsersController : ControllerBase
     {
         // GET
+        [HttpGet("mydetails")]
         public ActionResult<UserDetailsViewModel> MyDetails()
         {
             // TODO - we need to something cleverer here - we need to 
