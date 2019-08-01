@@ -18,6 +18,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(
                     dest => dest.LatestRelease,
                     m => m.MapFrom(r => r.Publication.LatestRelease().Id == r.Id));
+            
+            CreateMap<EditReleaseSummaryViewModel, Release>();
         }
     }
 }

@@ -1,14 +1,11 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using Microsoft.AspNetCore.Mvc;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using PublicationId = System.Guid;
 using ReleaseId = System.Guid;
@@ -26,12 +23,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _mapper = mapper;
         }
 
-        public Release Get(Guid id)
+        public Release Get(PublicationId id)
         {
             return _context.Releases.FirstOrDefault(x => x.Id == id);
         }
         
-        public async Task<Release> GetAsync(Guid id)
+        public async Task<Release> GetAsync(PublicationId id)
         {
             return await _context.Releases.Include(r => r.Publication).ThenInclude(p => p.Releases).FirstOrDefaultAsync(x => x.Id == id);
         }
@@ -64,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var content = TemplateFromRelease(createRelease.TemplateReleaseId);                  
             var saved = _context.Releases.Add(new Release
             {
-                Id = Guid.NewGuid(),
+                Id = PublicationId.NewGuid(),
                 Order = order,
                 PublicationId = createRelease.PublicationId,
                 Published = null,
@@ -80,23 +77,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
         
         // TODO Authorisation will be required when users are introduced
-        public async Task<ActionResult<EditReleaseViewModel>> GetReleaseSummaryAsync(ReleaseId releaseId)
+        public async Task<EditReleaseSummaryViewModel> GetReleaseSummaryAsync(ReleaseId releaseId)
         {
             var release = await _context.Releases.FirstOrDefaultAsync(r => r.Id == releaseId);
-            return _mapper.Map<EditReleaseViewModel>(release);
+            return _mapper.Map<EditReleaseSummaryViewModel>(release);
         }
         
         // TODO Authorisation will be required when users are introduced
-        public async Task<ActionResult<ReleaseViewModel>> EditReleaseSummaryAsync(EditReleaseViewModel model)
+        public async Task<ReleaseViewModel> EditReleaseSummaryAsync(EditReleaseSummaryViewModel model)
         {
             var release = await _context.Releases.FirstOrDefaultAsync(r => r.Id == model.Id);
             _context.Releases.Update(release);
-            _mapper.Map(release, model);
+            _mapper.Map(model, release);
             await _context.SaveChangesAsync();
             return await GetViewModel(model.Id);
         }
 
-        private int OrderForNextReleaseOnPublication(Guid publicationId)
+        private int OrderForNextReleaseOnPublication(PublicationId publicationId)
         {
             var publication = _context.Publications.Include(p => p.Releases)
                 .Single(p => p.Id == publicationId);

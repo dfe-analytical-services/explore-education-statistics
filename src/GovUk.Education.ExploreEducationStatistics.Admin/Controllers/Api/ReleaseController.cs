@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         [HttpGet("releases/{releaseId}/summary")]
         [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
-        public async Task<ActionResult<EditReleaseViewModel>> GetReleaseSummaryAsync(ReleaseId releaseId)
+        public async Task<ActionResult<EditReleaseSummaryViewModel>> GetReleaseSummaryAsync(ReleaseId releaseId)
         {
             return await _releaseService.GetReleaseSummaryAsync(releaseId);
         }
@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         
         [HttpPut("releases/{releaseId}/summary")]
         [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
-        public async Task<ActionResult<ReleaseViewModel>> EditReleaseSummaryAsync(EditReleaseViewModel model, ReleaseId releaseId)
+        public async Task<ActionResult<ReleaseViewModel>> EditReleaseSummaryAsync(EditReleaseSummaryViewModel model, ReleaseId releaseId)
         {
             model.Id = releaseId;
             return await _releaseService.EditReleaseSummaryAsync(model);

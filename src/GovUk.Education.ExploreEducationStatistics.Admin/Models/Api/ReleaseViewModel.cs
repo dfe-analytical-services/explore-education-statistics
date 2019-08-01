@@ -19,7 +19,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         public string CoverageTitle { get; set; }
         
         public string YearTitle { get; set; }
-        
+
+        public Guid TypeId { get; set; }
+
+        public PartialDate NextReleaseDate { get; set; }
+
+        public DateTime? PublishScheduled { get; set; }
+
         public DateTime? Published { get; set; }
 
         [JsonConverter(typeof(TimeIdentifierJsonConverter))]

@@ -20,8 +20,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<ReleaseViewModel> GetViewModel(ReleaseId id);
         
-        Task<ActionResult<EditReleaseViewModel>> GetReleaseSummaryAsync(ReleaseId releaseId);
+        Task<EditReleaseSummaryViewModel> GetReleaseSummaryAsync(ReleaseId releaseId);
         
-        Task<ActionResult<ReleaseViewModel>> EditReleaseSummaryAsync(EditReleaseViewModel model);
+        Task<ReleaseViewModel> EditReleaseSummaryAsync(EditReleaseSummaryViewModel model);
     }
 }
