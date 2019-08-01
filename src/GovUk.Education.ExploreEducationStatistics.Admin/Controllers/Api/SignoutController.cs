@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
 {
+    [Route("api/[controller]")]
     [Authorize]
     [ApiExplorerSettings(IgnoreApi=true)]
     public class SignoutController : Controller

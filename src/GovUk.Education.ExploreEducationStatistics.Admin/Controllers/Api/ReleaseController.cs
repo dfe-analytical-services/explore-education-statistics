@@ -11,6 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
     
     // TODO rename to Releases once the current Crud releases controller is removed
+    [Route("api")]
     [ApiController]
     [Authorize]
     public class ReleasesController : ControllerBase
