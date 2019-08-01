@@ -23,7 +23,7 @@ const PrototypeChartTest = () => {
       minor: {
         ...chartData.axes.minor,
         tickConfig: 'startEnd',
-        tickSpacing: '1',
+        tickSpacing: "1"
       },
     },
   };
@@ -32,7 +32,7 @@ const PrototypeChartTest = () => {
     <PrototypePage wide>
       <ChartBuilder data={data} />
 
-      <ChartRenderer type="line" {...newChartData} height={500} />
+      <ChartRenderer type="horizontalbar" {...newChartData} height={500} />
     </PrototypePage>
   );
 };
