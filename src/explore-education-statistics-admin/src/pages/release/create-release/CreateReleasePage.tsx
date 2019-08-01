@@ -5,8 +5,8 @@ import ReleaseSetupForm, {
 import { assembleCreateReleaseRequestFromForm } from '@admin/pages/release/setup/util/releaseSetupUtil';
 import { setupRoute } from '@admin/routes/edit-release/routes';
 import dashboardRoutes from '@admin/routes/dashboard/routes';
-import service from '@admin/services/edit-release/setup/service';
-import { CreateReleaseRequest } from '@admin/services/edit-release/setup/types';
+import service from '@admin/services/release/create-release/service';
+import { CreateReleaseRequest } from '@admin/services/release/create-release/types';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
 

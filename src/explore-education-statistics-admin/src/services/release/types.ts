@@ -18,13 +18,3 @@ export interface BaseReleaseSetupDetailsRequest {
   scheduledPublishDate: DayMonthYearValues;
   nextReleaseExpectedDate: DayMonthYearValues;
 }
-
-export interface UpdateReleaseSetupDetailsRequest
-  extends BaseReleaseSetupDetailsRequest {
-  releaseId: string;
-}
-
-// TODO - move to different location
-export interface CreateReleaseRequest extends BaseReleaseSetupDetailsRequest {
-  publicationId: string;
-}

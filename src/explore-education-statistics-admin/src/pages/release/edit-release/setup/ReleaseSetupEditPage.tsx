@@ -3,8 +3,8 @@ import ReleaseSetupForm, {
 } from '@admin/pages/release/setup/ReleaseSetupForm';
 import { assembleUpdateReleaseSetupRequestFromForm } from '@admin/pages/release/setup/util/releaseSetupUtil';
 import { setupRoute } from '@admin/routes/edit-release/routes';
-import service from '@admin/services/edit-release/setup/service';
-import { ReleaseSetupDetails } from '@admin/services/edit-release/setup/types';
+import service from '@admin/services/release/edit-release/setup/service';
+import { ReleaseSetupDetails } from '@admin/services/release/types';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import ReleasePageTemplate from '../components/ReleasePageTemplate';

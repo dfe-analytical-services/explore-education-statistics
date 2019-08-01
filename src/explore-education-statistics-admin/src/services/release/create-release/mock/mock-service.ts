@@ -2,11 +2,8 @@ import {
   AdminDashboardRelease,
   ReleaseApprovalStatus,
 } from '@admin/services/dashboard/types';
-import {
-  CreateReleaseRequest,
-  ReleaseSetupDetails,
-  UpdateReleaseSetupDetailsRequest,
-} from '@admin/services/edit-release/setup/types';
+import {CreateReleaseRequest} from '@admin/services/release/create-release/types';
+import {ReleaseSetupDetails} from "@admin/services/release/types";
 import {
   generateRandomIntegerString,
   getCaptureGroups,
@@ -16,7 +13,7 @@ import { format } from 'date-fns';
 
 export default async (mock: MockAdapter) => {
   const mockData = (await import(
-    /* webpackChunkName: "mock-data" */ './mock-data'
+    /* webpackChunkName: "mock-data" */ '@admin/services/release/edit-release/setup/mock/mock-data'
   )).default;
 
   const mockDashboardData = (await import(
@@ -28,8 +25,6 @@ export default async (mock: MockAdapter) => {
   )).default;
 
   const createReleaseUrl = /\/publication\/(.*)\/releases/;
-  const getReleaseSetupDetailsUrl = /\/release\/(.*)\/setup/;
-  const updateReleaseSetupDetailsUrl = /\/release\/(.*)\/setup/;
 
   mock.onPost(createReleaseUrl).reply(config => {
     const publicationId = getCaptureGroups(createReleaseUrl, config.url)[0];
@@ -86,32 +81,5 @@ export default async (mock: MockAdapter) => {
     }
 
     return [404];
-  });
-
-  mock.onGet(getReleaseSetupDetailsUrl).reply(({ url }) => {
-    const [releaseId] = getCaptureGroups(getReleaseSetupDetailsUrl, url);
-    return [200, mockData.getReleaseSetupDetailsForRelease(releaseId)];
-  });
-
-  mock.onPost(updateReleaseSetupDetailsUrl).reply(config => {
-    const updateRequest = JSON.parse(
-      config.data,
-    ) as UpdateReleaseSetupDetailsRequest;
-
-    const existingRelease = mockData.getReleaseSetupDetailsForRelease(
-      updateRequest.releaseId,
-    );
-
-    /* eslint-disable no-param-reassign */
-    existingRelease.timePeriodCoverageCode =
-      updateRequest.timePeriodCoverageCode;
-    existingRelease.timePeriodCoverageStartYear = updateRequest.timePeriodCoverageStartYear;
-    existingRelease.scheduledPublishDate = updateRequest.scheduledPublishDate;
-    existingRelease.nextReleaseExpectedDate =
-      updateRequest.nextReleaseExpectedDate;
-    existingRelease.releaseType = updateRequest.releaseType;
-    /* eslint-enable no-param-reassign */
-
-    return [200];
   });
 };

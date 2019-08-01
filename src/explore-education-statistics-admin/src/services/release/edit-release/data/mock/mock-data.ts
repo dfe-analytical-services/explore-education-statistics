@@ -1,4 +1,4 @@
-import { AdhocFile, DataFile } from '@admin/services/edit-release/data/types';
+import {AdhocFile, DataFile} from "@admin/services/release/edit-release/data/types";
 import { Dictionary } from '@common/types';
 
 export interface DataFileView {
