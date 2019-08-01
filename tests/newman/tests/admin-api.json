@@ -59,7 +59,7 @@
 							"    pm.expect(pm.response.json()[0].title).to.equal(\"Ad Hoc\"); ",
 							"});",
 							"",
-							"pm.test(\"Ad Hoc should be present in the results\", function () { ",
+							"pm.test(\"Official Statistics should be present in the results\", function () { ",
 							"    pm.expect(pm.response.json()[1].title).to.equal(\"Official Statistics\"); ",
 							"});"
 						],
@@ -212,6 +212,167 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "POST Create new release",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "98057100-77fb-42b7-9c21-f1d4921917ab",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+							"",
+							"pm.test(\"Fields are present\", function () {",
+							"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"title\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"releaseName\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"coverageTitle\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"yearTitle\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"published\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"latestRelease\"));",
+							"});",
+							"",
+							"pm.test(\"Title should should be correct\", function () { ",
+							"    pm.expect(pm.response.json().title).to.equal(\"December 2014/15\"); ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"PublicationId\": \"8b12776b-3d36-4475-8115-00974d7de1d0\",\n    \"ReleaseTypeId\": \"1821abb8-68b0-431b-9770-0bea65d02ff0\",\n    \"TimeIdentifier\": 62,\n    \"PublishScheduled\": \"0001-01-01T00:00:00\",\n    \"NextReleaseExpected\": {\n        \"Year\": \"2018\",\n        \"Month\": \"01\",\n        \"Day\": \"01\"\n    },\n    \"ReleaseName\": \"2014\",\n    \"TemplateReleaseId\": \"63227211-7CB3-408C-B5C2-40D3D7CB2717\"\n}"
+				},
+				"url": {
+					"raw": "{{admin_api_url}}/publication/8b12776b-3d36-4475-8115-00974d7de1d0/releases",
+					"host": [
+						"{{admin_api_url}}"
+					],
+					"path": [
+						"publication",
+						"8b12776b-3d36-4475-8115-00974d7de1d0",
+						"releases"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET Admin dashboard publications",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "aad25515-6076-4a4a-b609-61fe0a986e11",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+							"",
+							"pm.test(\"Should return some results\", function () {",
+							"    pm.expect(pm.response.json().length).to.be.above(0);    ",
+							"});",
+							"",
+							"pm.test(\"Further education outcome-based success measures should be present\", function () { ",
+							"    pm.expect(pm.response.json()[0].title).to.equal(\"Further education outcome-based success measures\"); ",
+							"});",
+							"",
+							"pm.test(\"Expect latestRelease flag if releases is more than 0\", function () {",
+							"    for(var i = 0; i < pm.response.json().length; i++) {",
+							"        if(pm.response.json()[i].releases !== null) {",
+							"            for(var j = 0; j < pm.response.json()[i].releases.length; j++) {",
+							"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].releases[${j}].latestRelease`));",
+							"            }",
+							"        }",
+							"    }",
+							"});",
+							"",
+							"pm.test(\"Expect title if methodology is more than 0\", function () {",
+							"    for(var i = 0; i < pm.response.json().length; i++) {",
+							"        if(pm.response.json()[i].methodology !== null) {",
+							"            for(var j = 0; j < pm.response.json()[i].methodology.length; j++) {",
+							"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].methodology[${j}].title`));",
+							"            }",
+							"        }",
+							"    }",
+							"});",
+							"",
+							"pm.test(\"Expect the correct fields\", function () {",
+							"    for(var i = 0; i < pm.response.json().length; i++) {",
+							"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topicId`));",
+							"            pm.expect(pm.response.to.have.jsonBody(`[${i}].nextUpdate`));",
+							"            pm.expect(pm.response.to.have.jsonBody(`[${i}].releases`));",
+							"            pm.expect(pm.response.to.have.jsonBody(`[${i}].methodology`));",
+							"            pm.expect(pm.response.to.have.jsonBody(`[${i}].contact`));",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{admin_api_url}}/me/publications?topicId=A7CE9542-20E6-401D-91F4-F832C9E58B12&themeId=2CA22E34-B87A-4281-A0EB-B80F4F8DD374",
+					"host": [
+						"{{admin_api_url}}"
+					],
+					"path": [
+						"me",
+						"publications"
+					],
+					"query": [
+						{
+							"key": "topicId",
+							"value": "A7CE9542-20E6-401D-91F4-F832C9E58B12"
+						},
+						{
+							"key": "themeId",
+							"value": "2CA22E34-B87A-4281-A0EB-B80F4F8DD374"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "6464fc17-e41b-4120-9ac9-00c93234437a",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "8d33b604-23a0-45bf-9ff6-91ec28db96e4",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
 		}
 	]
 }
