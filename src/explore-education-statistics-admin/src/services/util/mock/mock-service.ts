@@ -11,10 +11,10 @@ export const getCaptureGroups: (
   return matches ? matches.slice(1) : [];
 };
 
-export const generateRandomInteger = (max: number) =>
+export const generateRandomInteger = (max: number = 999999999) =>
   Math.floor(Math.random() * Math.floor(max));
 
-export const generateRandomIntegerString = (max: number) =>
+export const generateRandomIntegerString = (max: number = 999999999) =>
   generateRandomInteger(max).toString();
 
 export default {};

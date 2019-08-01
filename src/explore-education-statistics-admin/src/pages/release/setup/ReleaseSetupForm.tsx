@@ -1,7 +1,11 @@
 import Link from "@admin/components/Link";
-import {setupRoute} from "@admin/routes/edit-release/routes";
-import {DayMonthYearValues, IdTitlePair} from "@admin/services/common/types";
-import service from "@admin/services/edit-release/setup/service";
+import {
+  isDayMonthYearDateTypeCodeSelected,
+  isDayMonthYearDateTypeSelected,
+  isYearOnlyDateTypeCodeSelected,
+  isYearOnlyDateTypeSelected
+} from "@admin/pages/release/setup/util/releaseSetupUtil";
+import {DayMonthYearInputs, dayMonthYearValuesToInputs, IdTitlePair} from "@admin/services/common/types";
 import {ReleaseSetupDetails} from "@admin/services/edit-release/setup/types";
 import {
   shapeOfDayMonthYearField,
@@ -19,23 +23,25 @@ import Yup from "@common/lib/validation/yup/index";
 import {Dictionary} from "@common/types";
 import {FormikProps} from "formik";
 import React, {useEffect, useState} from "react";
-import DummyReferenceData, {DateType, TimePeriodCoverageGroup} from "../../DummyReferenceData";
+import DummyReferenceData, {TimePeriodCoverageGroup} from "../../DummyReferenceData";
 
 export interface FormValues {
   timePeriodCoverageCode: string;
-  timePeriodCoverageStartDate?: DayMonthYearValues;
-  timePeriodCoverageStartDateYearOnly?: number;
+  timePeriodCoverageStartDate: DayMonthYearInputs;
+  timePeriodCoverageStartDateYearOnly: string;
   releaseTypeId: string;
-  scheduledPublishDate: DayMonthYearValues;
-  nextReleaseExpectedDate: DayMonthYearValues;
+  scheduledPublishDate: DayMonthYearInputs;
+  nextReleaseExpectedDate: DayMonthYearInputs;
 }
 
 interface Props {
-  releaseSetupDetails: ReleaseSetupDetails;
+  releaseSetupDetails?: ReleaseSetupDetails;
+  submitButtonText: string,
   onSubmitHandler: (values: FormValues) => void;
+  onCancelHandler: () => void;
 }
 
-const ReleaseSetupForm = ({releaseSetupDetails, onSubmitHandler}: Props) => {
+const ReleaseSetupForm = ({releaseSetupDetails, submitButtonText, onSubmitHandler, onCancelHandler}: Props) => {
 
   const [timePeriodCoverageGroups, setTimePeriodCoverageGroups] = useState<
     TimePeriodCoverageGroup[]
@@ -44,16 +50,13 @@ const ReleaseSetupForm = ({releaseSetupDetails, onSubmitHandler}: Props) => {
   const [releaseTypes, setReleaseTypes] = useState<IdTitlePair[]>();
 
   useEffect(() => {
-    service.getReleaseSetupDetails(releaseSetupDetails.id).then(release => {
-      setTimePeriodCoverageGroups(DummyReferenceData.timePeriodCoverageGroups);
-      setReleaseTypes(DummyReferenceData.releaseTypeOptions);
-    });
+    setTimePeriodCoverageGroups(DummyReferenceData.timePeriodCoverageGroups);
+    setReleaseTypes(DummyReferenceData.releaseTypeOptions);
   }, []);
 
-  const selectedTimePeriodCoverageGroup =
-    DummyReferenceData.findTimePeriodCoverageGroup(
-      releaseSetupDetails.timePeriodCoverageCode,
-    );
+  const selectedTimePeriodCoverageGroup = releaseSetupDetails 
+    ? DummyReferenceData.findTimePeriodCoverageGroup(releaseSetupDetails.timePeriodCoverageCode)
+    : DummyReferenceData.timePeriodCoverageGroups[0];
 
   const getTimePeriodOptions = (
     timePeriodGroups: TimePeriodCoverageGroup[],
@@ -68,31 +71,11 @@ const ReleaseSetupForm = ({releaseSetupDetails, onSubmitHandler}: Props) => {
     return optGroups;
   };
 
-  const isDayMonthYearDateTypeSelected = (
-    timePeriodGroup?: TimePeriodCoverageGroup,
-  ) =>
-    timePeriodGroup
-      ? DateType.DayMonthYear === timePeriodGroup.startDateType
-      : false;
-
-  const isYearOnlyDateTypeSelected = (
-    timePeriodGroup?: TimePeriodCoverageGroup,
-  ) =>
-    timePeriodGroup ? DateType.Year === timePeriodGroup.startDateType : false;
-
-  const isDayMonthYearDateTypeCodeSelected = (timePeriodGroupCode?: string) =>
-    timePeriodGroupCode
-      ? isDayMonthYearDateTypeSelected(
-      DummyReferenceData.findTimePeriodCoverageGroup(timePeriodGroupCode),
-      )
-      : false;
-
-  const isYearOnlyDateTypeCodeSelected = (timePeriodGroupCode?: string) =>
-    timePeriodGroupCode
-      ? isYearOnlyDateTypeSelected(
-      DummyReferenceData.findTimePeriodCoverageGroup(timePeriodGroupCode),
-      )
-      : false;
+  const emptyDayMonthYear = (): DayMonthYearInputs => ({
+    day: '',
+    month: '',
+    year: '',
+  });
 
   const formId = 'releaseSetupForm';
 
@@ -103,34 +86,34 @@ const ReleaseSetupForm = ({releaseSetupDetails, onSubmitHandler}: Props) => {
           enableReinitialize
           initialValues={{
             timePeriodCoverageCode:
-            releaseSetupDetails.timePeriodCoverageCode,
-            timePeriodCoverageStartDate: isDayMonthYearDateTypeSelected(
+            releaseSetupDetails ? releaseSetupDetails.timePeriodCoverageCode : timePeriodCoverageGroups[0].options[0].id,
+            timePeriodCoverageStartDate: releaseSetupDetails && isDayMonthYearDateTypeSelected(
               selectedTimePeriodCoverageGroup,
             )
-              ? releaseSetupDetails.timePeriodCoverageStartDate
-              : undefined,
-            timePeriodCoverageStartDateYearOnly: isYearOnlyDateTypeSelected(
+              ? dayMonthYearValuesToInputs(releaseSetupDetails.timePeriodCoverageStartDate)
+              : emptyDayMonthYear(),
+            timePeriodCoverageStartDateYearOnly: releaseSetupDetails && isYearOnlyDateTypeSelected(
               selectedTimePeriodCoverageGroup,
-            )
-              ? releaseSetupDetails.timePeriodCoverageStartDate.year
-              : undefined,
-            releaseTypeId: releaseSetupDetails.releaseType.id,
-            scheduledPublishDate: releaseSetupDetails.scheduledPublishDate,
+            ) && releaseSetupDetails.timePeriodCoverageStartDate.year
+              ? releaseSetupDetails.timePeriodCoverageStartDate.year.toString()
+              : '',
+            releaseTypeId: releaseSetupDetails ? releaseSetupDetails.releaseType.id : '',
+            scheduledPublishDate: releaseSetupDetails ? dayMonthYearValuesToInputs(releaseSetupDetails.scheduledPublishDate) : emptyDayMonthYear(),
             nextReleaseExpectedDate:
-            releaseSetupDetails.nextReleaseExpectedDate,
+              releaseSetupDetails ? dayMonthYearValuesToInputs(releaseSetupDetails.nextReleaseExpectedDate) : emptyDayMonthYear(),
           }}
           validationSchema={Yup.object<FormValues>({
             timePeriodCoverageCode: Yup.string().required(
               'Choose a time period',
             ),
             timePeriodCoverageStartDate: Yup.object<
-              DayMonthYearValues
+              DayMonthYearInputs
               >().when('timePeriodCoverageCode', {
               is: (val: string) => isDayMonthYearDateTypeCodeSelected(val),
               then: validateMandatoryDayMonthYearField,
               otherwise: shapeOfDayMonthYearField,
             }),
-            timePeriodCoverageStartDateYearOnly: Yup.number().when(
+            timePeriodCoverageStartDateYearOnly: Yup.string().when(
               'timePeriodCoverageCode',
               {
                 is: (val: string) => isYearOnlyDateTypeCodeSelected(val),
@@ -228,11 +211,11 @@ const ReleaseSetupForm = ({releaseSetupDetails, onSubmitHandler}: Props) => {
                 />
 
                 <Button type="submit" className="govuk-!-margin-top-6">
-                  Update release status
+                  {submitButtonText}
                 </Button>
 
                 <div className="govuk-!-margin-top-6">
-                  <Link to={setupRoute.generateLink(releaseSetupDetails.id)}>
+                  <Link to="" onClick={onCancelHandler}>
                     Cancel update
                   </Link>
                 </div>

@@ -11,11 +11,19 @@ export interface ReleaseSetupDetails {
   nextReleaseExpectedDate: DayMonthYearValues;
 }
 
-export interface ReleaseSetupDetailsUpdateRequest {
-  id: string;
+export interface BaseReleaseSetupDetailsRequest {
   timePeriodCoverageCode: string;
   timePeriodCoverageStartDate: DayMonthYearValues;
   releaseType: IdTitlePair;
   scheduledPublishDate: DayMonthYearValues;
   nextReleaseExpectedDate: DayMonthYearValues;
+}
+
+export interface UpdateReleaseSetupDetailsRequest extends BaseReleaseSetupDetailsRequest {
+  releaseId: string;
+}
+
+// TODO - move to different location
+export interface CreateReleaseRequest extends BaseReleaseSetupDetailsRequest {
+  publicationId: string;
 }

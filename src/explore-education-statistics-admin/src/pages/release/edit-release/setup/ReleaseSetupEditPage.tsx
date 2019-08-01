@@ -1,8 +1,8 @@
-import DummyReferenceData, {DateType, TimePeriodCoverageGroup,} from '@admin/pages/DummyReferenceData';
 import ReleaseSetupForm, {FormValues} from "@admin/pages/release/setup/ReleaseSetupForm";
+import {assembleUpdateReleaseSetupRequestFromForm} from "@admin/pages/release/setup/util/releaseSetupUtil";
 import {setupRoute} from "@admin/routes/edit-release/routes";
 import service from '@admin/services/edit-release/setup/service';
-import {ReleaseSetupDetails, ReleaseSetupDetailsUpdateRequest,} from '@admin/services/edit-release/setup/types';
+import {ReleaseSetupDetails,} from '@admin/services/edit-release/setup/types';
 import React, {useEffect, useState} from 'react';
 import {RouteComponentProps} from 'react-router';
 import ReleasePageTemplate from '../components/ReleasePageTemplate';
@@ -27,42 +27,17 @@ const ReleaseSetupEditPage = ({
     });
   }, [releaseId]);
 
-  const isDayMonthYearDateTypeSelected = (
-    timePeriodGroup?: TimePeriodCoverageGroup,
-  ) =>
-    timePeriodGroup
-      ? DateType.DayMonthYear === timePeriodGroup.startDateType
-      : false;
-
-  const isDayMonthYearDateTypeCodeSelected = (timePeriodGroupCode?: string) =>
-    timePeriodGroupCode
-      ? isDayMonthYearDateTypeSelected(
-      DummyReferenceData.findTimePeriodCoverageGroup(timePeriodGroupCode),
-      )
-      : false;
-
   const submitHandler = (values: FormValues) => {
-    const updatedReleaseDetails: ReleaseSetupDetailsUpdateRequest = {
-      id: releaseId,
-      timePeriodCoverageCode: values.timePeriodCoverageCode,
-      timePeriodCoverageStartDate:
-        isDayMonthYearDateTypeCodeSelected(
-          values.timePeriodCoverageCode,
-        ) && values.timePeriodCoverageStartDate
-          ? values.timePeriodCoverageStartDate
-          : {
-            year: values.timePeriodCoverageStartDateYearOnly,
-          },
-      scheduledPublishDate: values.scheduledPublishDate,
-      nextReleaseExpectedDate: values.nextReleaseExpectedDate,
-      releaseType: DummyReferenceData.findReleaseType(
-        values.releaseTypeId,
-      ),
-    };
+
+    const updatedReleaseDetails =
+      assembleUpdateReleaseSetupRequestFromForm(releaseId, values);
+
     service
       .updateReleaseSetupDetails(updatedReleaseDetails)
       .then(_ => history.push(setupRoute.generateLink(releaseId)));
   };
+
+  const cancelHandler = () => history.push(setupRoute.generateLink(releaseId));
 
   return (
     <>
@@ -75,7 +50,9 @@ const ReleaseSetupEditPage = ({
 
           <ReleaseSetupForm
             releaseSetupDetails={releaseSetupDetails}
+            submitButtonText='Update release status'
             onSubmitHandler={submitHandler}
+            onCancelHandler={cancelHandler}
           />
 
         </ReleasePageTemplate>
