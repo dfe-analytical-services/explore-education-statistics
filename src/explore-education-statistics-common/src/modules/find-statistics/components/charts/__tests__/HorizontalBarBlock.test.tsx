@@ -377,8 +377,8 @@ describe('HorzontalBarBlock', () => {
         minor: props.axes.minor,
         major: {
           ...props.axes.major,
-          sortBy: "name",
-          sortAsc: true
+          sortBy: 'name',
+          sortAsc: true,
         },
       },
     };
@@ -395,8 +395,8 @@ describe('HorzontalBarBlock', () => {
         minor: props.axes.minor,
         major: {
           ...props.axes.major,
-          sortBy: "name",
-          sortAsc: false
+          sortBy: 'name',
+          sortAsc: false,
         },
       },
     };
