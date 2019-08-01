@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "37cd712d-51f6-4bfd-ac63-ae39bb18e25c",
+		"_postman_id": "1931315c-617e-4071-bc24-64c0d944c6a8",
 		"name": "DfE Data API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -2018,7 +2018,6 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations.country\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations.region\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.localAuthority\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
@@ -2026,8 +2025,8 @@
 													"});",
 													"",
 													"pm.test(\"Number of YearOfAdmission options should be correct\", function () { ",
-													"    pm.expect(pm.response.json().filters.YearOfAdmission.options.Primary.options.length).to.equal(2);",
-													"    pm.expect(pm.response.json().filters.YearOfAdmission.options.Secondary.options.length).to.equal(2);",
+													"    pm.expect(pm.response.json().filters.YearOfAdmission.options.Primary.options.length).to.equal(1);",
+													"    pm.expect(pm.response.json().filters.YearOfAdmission.options.Secondary.options.length).to.equal(1);",
 													"});",
 													"",
 													"pm.test(\"Time periods options should be correct\", function() {",
@@ -2037,7 +2036,6 @@
 													"pm.test(\"Number of location options should be correct\", function() {",
 													"    pm.expect(pm.response.json().locations.country.options.length).to.equal(1);",
 													"    pm.expect(pm.response.json().locations.region.options.length).to.equal(2);",
-													"    pm.expect(pm.response.json().locations.localAuthority.options.length).to.equal(34);",
 													"});",
 													"",
 													"pm.test(\"Expect correct number of indicator categories\", function () {",
