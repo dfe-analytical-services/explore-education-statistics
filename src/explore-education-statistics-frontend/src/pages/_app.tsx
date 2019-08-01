@@ -1,14 +1,20 @@
 import { logPageView } from '@frontend/services/googleAnalyticsService';
 import { initHotJar } from '@frontend/services/hotjarService';
+import CookieBanner from '@frontend/components/CookieBanner';
 import BaseApp, { Container, NextAppContext } from 'next/app';
 import Router from 'next/router';
 import React from 'react';
 import Helmet from 'react-helmet';
 import './_app.scss';
+import { CookiesProvider, Cookies } from 'react-cookie';
 
 process.env.APP_ROOT_ID = '__next';
 
-class App extends BaseApp {
+interface Props {
+  cookies: Cookies;
+}
+
+class App extends BaseApp<Props> {
   public static async getInitialProps({ Component, ctx }: NextAppContext) {
     let pageProps = {};
 
@@ -16,7 +22,8 @@ class App extends BaseApp {
       pageProps = await Component.getInitialProps(ctx);
     }
 
-    return { pageProps };
+    // @ts-ignore
+    return { pageProps, cookies: ctx.req.universalCookies.cookies };
   }
 
   public componentDidMount() {
@@ -31,12 +38,16 @@ class App extends BaseApp {
   }
 
   public render() {
-    const { Component, pageProps } = this.props;
+    // @ts-ignore
+    const { Component, pageProps, cookies } = this.props;
 
     return (
       <Container>
         <Helmet titleTemplate="%s - GOV.UK" />
-        <Component {...pageProps} />
+        <CookiesProvider cookies={new Cookies(cookies)}>
+          <CookieBanner />
+          <Component {...pageProps} />
+        </CookiesProvider>
       </Container>
     );
   }
