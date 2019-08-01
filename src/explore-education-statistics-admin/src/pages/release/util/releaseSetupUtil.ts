@@ -1,11 +1,9 @@
-import DummyReferenceData from '@admin/pages/DummyReferenceData';
-import {FormValues} from '@admin/pages/release/setup/ReleaseSetupForm';
 import {dayMonthYearInputsToValues} from '@admin/services/common/types';
-import {
-  BaseReleaseSetupDetailsRequest,
-  CreateReleaseRequest,
-  UpdateReleaseSetupDetailsRequest,
-} from '@admin/services/edit-release/setup/types';
+import {CreateReleaseRequest} from "@admin/services/release/create-release/types";
+import {UpdateReleaseSetupDetailsRequest} from "@admin/services/release/edit-release/setup/types";
+import {BaseReleaseSetupDetailsRequest} from "@admin/services/release/types";
+import DummyReferenceData from '../../DummyReferenceData';
+import {FormValues} from '../setup/ReleaseSetupForm';
 
 export const assembleBaseReleaseSetupRequestFromForm = (
   values: FormValues,

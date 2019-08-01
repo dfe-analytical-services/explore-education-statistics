@@ -5,8 +5,8 @@ import {
   dayMonthYearIsComplete,
   dayMonthYearToDate,
 } from '@admin/services/common/types';
-import service from '@admin/services/edit-release/setup/service';
-import { ReleaseSetupDetails } from '@admin/services/edit-release/setup/types';
+import service from '@admin/services/release/edit-release/setup/service';
+import { ReleaseSetupDetails } from '@admin/services/release/types';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';

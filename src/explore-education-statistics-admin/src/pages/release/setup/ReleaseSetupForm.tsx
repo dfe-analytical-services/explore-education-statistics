@@ -1,6 +1,6 @@
 import Link from '@admin/components/Link';
 import {DayMonthYearInputs, dayMonthYearValuesToInputs, IdTitlePair,} from '@admin/services/common/types';
-import {ReleaseSetupDetails} from '@admin/services/edit-release/setup/types';
+import {ReleaseSetupDetails} from '@admin/services/release/types';
 import {
   validateMandatoryDayMonthYearField,
   validateOptionalPartialDayMonthYearField,

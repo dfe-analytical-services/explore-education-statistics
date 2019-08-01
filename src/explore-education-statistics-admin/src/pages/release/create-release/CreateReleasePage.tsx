@@ -2,7 +2,7 @@ import Page from '@admin/components/Page';
 import ReleaseSetupForm, {
   FormValues,
 } from '@admin/pages/release/setup/ReleaseSetupForm';
-import { assembleCreateReleaseRequestFromForm } from '@admin/pages/release/setup/util/releaseSetupUtil';
+import { assembleCreateReleaseRequestFromForm } from '@admin/pages/release/util/releaseSetupUtil';
 import { setupRoute } from '@admin/routes/edit-release/routes';
 import dashboardRoutes from '@admin/routes/dashboard/routes';
 import service from '@admin/services/release/create-release/service';

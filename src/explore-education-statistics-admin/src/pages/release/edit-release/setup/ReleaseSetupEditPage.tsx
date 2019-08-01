@@ -1,7 +1,7 @@
 import ReleaseSetupForm, {
   FormValues,
 } from '@admin/pages/release/setup/ReleaseSetupForm';
-import { assembleUpdateReleaseSetupRequestFromForm } from '@admin/pages/release/setup/util/releaseSetupUtil';
+import { assembleUpdateReleaseSetupRequestFromForm } from '@admin/pages/release/util/releaseSetupUtil';
 import { setupRoute } from '@admin/routes/edit-release/routes';
 import service from '@admin/services/release/edit-release/setup/service';
 import { ReleaseSetupDetails } from '@admin/services/release/types';
