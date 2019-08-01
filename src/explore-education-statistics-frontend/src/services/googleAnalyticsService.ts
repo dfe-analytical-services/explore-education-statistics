@@ -4,23 +4,21 @@ let initialised = false;
 
 export const googleAnalyticsCookies = ['_ga', '_gid', '_gat'];
 
-export function initGA() {
-  if (
-    process.env.GA_TRACKING_ID !== undefined &&
-    process.env.GA_TRACKING === 'true' &&
-    !initialised
-  ) {
-    ReactGA.initialize(process.env.GA_TRACKING_ID);
-    initialised = true;
+if (
+  process.env.GA_TRACKING_ID !== undefined &&
+  process.env.GA_TRACKING === 'true' &&
+  !initialised
+) {
+  ReactGA.initialize(process.env.GA_TRACKING_ID);
+  initialised = true;
 
-    // eslint-disable-next-line no-console
-    console.log('GA initialised');
-  }
+  // eslint-disable-next-line no-console
+  console.log('GA initialised');
 }
+
 export function enableGA() {
   // @ts-ignore
   window[`ga-disable-${process.env.GA_TRACKING_ID}`] = false;
-  initGA();
 }
 export function disableGA() {
   // @ts-ignore

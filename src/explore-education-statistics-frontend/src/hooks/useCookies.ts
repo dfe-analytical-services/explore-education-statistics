@@ -4,7 +4,7 @@ import {
   disableGA,
   googleAnalyticsCookies,
 } from '@frontend/services/googleAnalyticsService';
-import { addMonths } from 'date-fns';
+import { addMonths, addYears } from 'date-fns';
 
 interface Cookie {
   name: string;
@@ -25,8 +25,8 @@ export const cookieMap: CookieMap = {
   },
   disableGA: {
     name: 'ees_disable_google_analytics',
-    expires: addMonths(new Date(), 1),
-    duration: '1 month',
+    expires: addYears(new Date(), 10),
+    duration: '10 years',
   },
 };
 

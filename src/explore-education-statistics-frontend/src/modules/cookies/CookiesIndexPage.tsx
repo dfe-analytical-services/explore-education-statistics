@@ -11,22 +11,16 @@ import {
 import { FormikProps } from 'formik';
 import Yup from '@common/lib/validation/yup';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
-import { useCookies, cookieMap } from '@frontend/hooks/useCookies';
+import { useCookies } from '@frontend/hooks/useCookies';
 import styles from './CookiesIndexPage.module.scss';
 
 interface FormValues {
-  googleAnalytics: string;
+  [key: string]: string;
 }
 
-interface Props {
-  cookies?: {
-    [key: string]: string;
-  };
-}
-
-function CookiesIndexPage({ cookies = {} }: Props) {
+function CookiesIndexPage() {
   const [submitted, setSubmitted] = useState();
-  const { setBannerSeenCookie, setGADisabledCookie } = useCookies();
+  const { getCookie, setBannerSeenCookie, setGADisabledCookie } = useCookies();
 
   const submitCookieSettings = (values: { [key: string]: string }) => {
     setSubmitted(true);
@@ -75,8 +69,7 @@ function CookiesIndexPage({ cookies = {} }: Props) {
       <Formik<FormValues>
         enableReinitialize
         initialValues={{
-          googleAnalytics:
-            cookies[cookieMap.disableGA.name] === 'true' ? 'off' : 'on',
+          googleAnalytics: getCookie('disableGA') === 'true' ? 'off' : 'on',
         }}
         onSubmit={values => {
           submitCookieSettings(values);

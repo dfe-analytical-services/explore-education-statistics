@@ -1,11 +1,16 @@
 import React from 'react';
-import { useCookies } from '@frontend/hooks/useCookies';
+import useMounted from '@common/hooks/useMounted';
 import ButtonText from '@common/components/ButtonText';
+import { useCookies } from '@frontend/hooks/useCookies';
 import styles from './CookieBanner.module.scss';
 
 function CookieBanner() {
   const { getCookie, setBannerSeenCookie, setGADisabledCookie } = useCookies();
-
+  useMounted(() => {
+    if (getCookie('disableGA') === 'true') {
+      setGADisabledCookie(true);
+    }
+  });
   const acceptCookies = () => {
     setBannerSeenCookie(true);
     if (typeof getCookie('disableGA') === 'undefined') {
