@@ -20,7 +20,7 @@ const Footnote = ({ content }: FootnoteProps) => {
       {footnoteList.slice(0, 3)}
       {footnoteList.length > 3 && (
         <Details summary="View additional footnotes">
-          <ol className="govuk-list">{footnoteList.splice(3)}</ol>
+          <ol className="govuk-list">{footnoteList.slice(3)}</ol>
         </Details>
       )}
     </ol>
