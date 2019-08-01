@@ -13,10 +13,6 @@ export default class TimePeriod extends Filter {
     this.code = code;
     this.year = year;
   }
-
-  public get value(): string {
-    return `${this.year}_${this.code}`;
-  }
 }
 
 export function parseYearCodeTuple(value: string): [number, string] {
