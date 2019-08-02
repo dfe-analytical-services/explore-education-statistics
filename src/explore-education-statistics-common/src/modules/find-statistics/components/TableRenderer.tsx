@@ -4,6 +4,7 @@ import {
   DataBlockData,
   DataBlockMetadata,
 } from '@common/services/dataBlockService';
+import formatPretty from '@common/lib/utils/number/formatPretty';
 
 export interface Props {
   data: DataBlockData;
@@ -54,7 +55,7 @@ const TableBody = ({ data, meta, indicators }: Props) => {
                 key={`${indicator}_${result.timePeriod}`}
                 className="govuk-table__cell govuk-table__cell--numeric"
               >
-                {result.measures[indicator]}
+                {formatPretty(result.measures[indicator])}
               </td>
             ))}
         </tr>
