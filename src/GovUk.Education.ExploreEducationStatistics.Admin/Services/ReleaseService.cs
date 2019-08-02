@@ -125,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return new List<ContentSection>();
         }
     }
-    public static class LinqExtensions
+    public static class ReleaseLinqExtensions
     {
         public static IQueryable<Release> HydrateReleaseForReleaseViewModel(this IQueryable<Release> values)
         {

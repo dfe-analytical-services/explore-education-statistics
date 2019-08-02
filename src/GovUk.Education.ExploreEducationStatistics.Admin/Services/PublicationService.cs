@@ -45,10 +45,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         // TODO it maybe necessary to add authorisation to this method
         public async Task<List<PublicationViewModel>> GetByTopicAndUserAsync(TopicId topicId, UserId userId)
         {
-            var publications = await _context.Publications.Where(p => p.TopicId == topicId)
-                .Include(p => p.Contact)
-                .Include(p => p.Releases)
-                .Include(p => p.Methodology)
+            var publications = await _context.Publications
+                .Where(p => p.TopicId == topicId)
+                .HydratePublicationForPublicationViewModel()
                 .ToListAsync();
 
             return _mapper.Map<List<PublicationViewModel>>(publications);
@@ -77,12 +76,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<PublicationViewModel> GetViewModelAsync(PublicationId publicationId)
         {
-            var publication = await _context.Publications.Include(p => p.Methodology)
-                .Include(p => p.Contact)
-                .Include(p => p.Releases)
+            var publication = await _context.Publications
                 .Where(p => p.Id == publicationId)
+                .HydratePublicationForPublicationViewModel()
                 .FirstOrDefaultAsync();
             return _mapper.Map<PublicationViewModel>(publication);
+        }
+    }
+    
+    
+    public static class PublicationLinqExtensions
+    {
+        public static IQueryable<Publication> HydratePublicationForPublicationViewModel(this IQueryable<Publication> values)
+        {
+            return values.Include(p => p.Contact)
+                .Include(p => p.Releases)
+                .ThenInclude(r => r.Type)
+                .Include(p => p.Methodology);
         }
     }
 }
