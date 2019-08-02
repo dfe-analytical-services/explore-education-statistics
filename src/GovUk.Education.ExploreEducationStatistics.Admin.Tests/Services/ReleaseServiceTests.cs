@@ -236,19 +236,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(timePeriodCoverageEdited, edited.TimePeriodCoverage);
             }
         }
-        
-        
-        
+
+
         [Fact]
-        public async void GetEditReleaseSummary()
+        public async void GetEditReleaseSummaryAsync()
         {
             var releaseId = new Guid("5cf345d4-7f7b-425c-8267-de785cfc040b");
             var addHocReleaseTypeId = new Guid("19b024dc-339c-4e2c-b2ca-b55e5c509ad2");
             var publishScheduled = DateTime.Now.AddDays(1);
-            var nextReleaseDate = new PartialDate { Day = "1", Month = "1", Year = "2040"};
+            var nextReleaseDate = new PartialDate {Day = "1", Month = "1", Year = "2040"};
             const string releaseName = "2035";
             const TimeIdentifier timePeriodCoverage = TimeIdentifier.January;
-            using (var context = InMemoryApplicationDbContext("GetEditReleaseSummary"))
+            using (var context = InMemoryApplicationDbContext("GetEditReleaseSummaryAsync"))
             {
                 context.AddRange(new List<ReleaseType>
                 {
@@ -270,13 +269,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     });
                 context.SaveChanges();
             }
-            
-            using (var context = InMemoryApplicationDbContext("GetEditReleaseSummary"))
+
+            using (var context = InMemoryApplicationDbContext("GetEditReleaseSummaryAsync"))
             {
                 // Method under test 
                 var summary = await new ReleaseService(context, MapperForProfile<MappingProfiles>())
                     .GetReleaseSummaryAsync(releaseId);
-                        
+
 
                 Assert.Equal(publishScheduled, summary.PublishScheduled);
                 Assert.Equal(nextReleaseDate, summary.NextReleaseDate);
@@ -286,5 +285,66 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
+
+        [Fact]
+        public async void GetReleasesForPublicationAsync()
+        {
+            var addHocReleaseTypeId = new Guid("19b024dc-339c-4e2c-b2ca-b55e5c509ad2");
+            var publicationId = new Guid("94af186f-5dbe-4f46-8a8e-f5480ed9f4fc");
+            var publishScheduledForFirstRelease = DateTime.Now.AddDays(1);
+            var publishScheduledForSecondRelease = DateTime.Now.AddDays(2);
+            var firstReleaseId = new Guid("8781ebf8-790c-484b-8a34-19ea501c9c74");
+            var secondReleaseId = new Guid("cace48cf-9f08-4471-815c-b3703aade096");
+                
+            using (var context = InMemoryApplicationDbContext("GetReleasesForPublicationAsync"))
+            {
+                context.AddRange(new List<ReleaseType>
+                {
+                    new ReleaseType
+                    {
+                        Id = addHocReleaseTypeId,
+                        Title = "Ad Hoc"
+                    },
+                });
+                context.Add(new Publication
+                {
+                    Id = publicationId,
+                    Releases = new List<Release>
+                    {
+                        new Release
+                        {
+                            Id = firstReleaseId,
+                            TypeId = addHocReleaseTypeId,
+                            TimePeriodCoverage = TimeIdentifier.February,
+                            PublishScheduled = publishScheduledForFirstRelease,
+                            NextReleaseDate = new PartialDate{Day = "01", Month = "01", Year = "2040"},
+                            ReleaseName = "2035",
+                        },
+                        new Release
+                        {
+                            Id = secondReleaseId,
+                            TypeId = addHocReleaseTypeId,
+                            TimePeriodCoverage = TimeIdentifier.January,
+                            PublishScheduled = publishScheduledForSecondRelease,
+                            NextReleaseDate = new PartialDate{Day = "01", Month = "01", Year = "2041"},
+                            ReleaseName = "2036"
+                        }
+                    }
+                });
+                context.SaveChanges();
+            }
+
+            using (var context = InMemoryApplicationDbContext("GetReleasesForPublicationAsync"))
+            {
+                // Method under test 
+                var summary = await new ReleaseService(context, MapperForProfile<MappingProfiles>())
+                    .GetReleasesForPublicationAsync(publicationId);
+                Assert.Equal(2, summary.Count);
+                Assert.True(summary.Exists(r => r.Id == firstReleaseId && r.TypeId == addHocReleaseTypeId));
+                Assert.True(summary.Exists(r => r.Id == firstReleaseId && r.TimePeriodCoverage== TimeIdentifier.February));
+                Assert.True(summary.Exists(r => r.Id == firstReleaseId && r.PublishScheduled == publishScheduledForFirstRelease));
+                Assert.True(summary.Exists(r => r.Id == firstReleaseId && r.ReleaseName == "2035"));
+            }
+        }
     }
 }
