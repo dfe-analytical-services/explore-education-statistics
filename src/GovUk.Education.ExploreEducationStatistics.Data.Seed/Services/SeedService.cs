@@ -19,6 +19,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
         private readonly ILogger _logger;
         private readonly string _storageConnectionString;
         private readonly IFileStorageService _fileStorageService;
+
+        private ImportMessage[] messages = new ImportMessage[SamplePublications.SubjectFiles.Count - 3];
+        
+        private const bool PROCESS_SEQUENTIALLY = true;
         
         public SeedService(
             ILogger<SeedService> logger,
@@ -36,6 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
 
             var stopWatch = new Stopwatch();
             stopWatch.Start();
+            var count = 0;
 
             foreach (var theme in SamplePublications.Themes)
             {
@@ -92,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
                                 _logger.LogInformation("Seeding Subject {Subject}", subject.Name);
 
                                 StoreFiles(r, file, subject.Name);
-                                Seed(file + ".csv", r);
+                                Seed(file + ".csv", r, count++);
                             }   
                         }
                     } 
@@ -103,22 +108,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
             _logger.LogInformation("Seeding completed with duration {duration} ", stopWatch.Elapsed.ToString());
         }
 
-        private void Seed(string dataFileName, Release release)
+        private void Seed(string dataFileName, Release release, int count)
         {
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
             var client = storageAccount.CreateCloudQueueClient();
-            var pQueue = client.GetQueueReference("imports-pending");
+            
             var aQueue = client.GetQueueReference("imports-available");
-            
-            pQueue.CreateIfNotExists();
             aQueue.CreateIfNotExists();
-            
-            var message = BuildMessage(dataFileName, release);
-            
-            pQueue.AddMessage(message);
+
+            if (PROCESS_SEQUENTIALLY)
+            {
+                messages[count] = new ImportMessage
+                {
+                    DataFileName = dataFileName,
+                    Release = release,
+                    BatchNo = 1,
+                    BatchSize = 1
+                };
+                
+                if (count == SamplePublications.SubjectFiles.Count - 4)
+                {
+                    var sQueue = client.GetQueueReference("imports-pending-sequential");
+                    sQueue.CreateIfNotExists();
+                    sQueue.AddMessage(new CloudQueueMessage(JsonConvert.SerializeObject(messages)));
+                }
+            }
+            else
+            {
+                var pQueue = client.GetQueueReference("imports-pending");
+
+                pQueue.CreateIfNotExists();
+
+                var cloudMessage = BuildCloudMessage(dataFileName, release);
+
+                pQueue.AddMessage(cloudMessage);
+            }
         }
 
-        private CloudQueueMessage BuildMessage(string dataFileName, Release release)
+        private CloudQueueMessage BuildCloudMessage(string dataFileName, Release release)
         {
             //var importMessageRelease = _mapper.Map<Release>(release);
             var message = new ImportMessage

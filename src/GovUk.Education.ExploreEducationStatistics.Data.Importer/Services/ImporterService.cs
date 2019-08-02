@@ -60,9 +60,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
         public void ImportObservations(List<string> lines, Subject subject, SubjectMeta subjectMeta)
         {
-            var stopWatch = new Stopwatch();
-            stopWatch.Start();
-
             _logger.LogDebug("Importing batch for Publication {Publication}, {Subject}", subject.Release.Publication.Title, subject.Name);
 
             var headers = lines.First().Split(',').ToList();
@@ -71,8 +68,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             var observations = GetObservations(lines, headers, subject, subjectMeta);
 
             _context.Observation.AddRange(observations);
-
-            stopWatch.Stop();
         }
 
         private IEnumerable<Observation> GetObservations(IEnumerable<string> lines,
@@ -81,6 +76,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             SubjectMeta subjectMeta)
         {
             return lines.Select(line => ObservationsFromCsv(line, headers, subject, subjectMeta));
+        }
+        
+        private void AddObservationsBatched(IEnumerable<string> lines,
+            List<string> headers,
+            Subject subject,
+            SubjectMeta subjectMeta)
+        {
+            List<Observation> observations = new List<Observation>();
+            foreach (var line in lines)
+            {
+                observations.Add(ObservationsFromCsv(line, headers, subject, subjectMeta));
+
+                if (observations.Count >= 2000)
+                {
+                    _context.Observation.AddRange(observations);
+                    _context.SaveChanges();
+                    observations.Clear();
+                }
+            }
+            _context.Observation.AddRange(observations);
+            _context.SaveChanges();
         }
 
         private Observation ObservationsFromCsv(string raw,
