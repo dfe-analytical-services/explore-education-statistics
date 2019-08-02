@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -37,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
         public async Task<ReleaseViewModel> GetReleaseAsync(ReleaseId releaseId)
         {
-            return await _releaseService.GetViewModel(releaseId);
+            return await _releaseService.GetReleaseForId(releaseId);
         }
 
         [HttpGet("releases/{releaseId}/summary")]

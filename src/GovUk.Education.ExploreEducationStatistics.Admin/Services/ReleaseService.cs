@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         // TODO Authorisation will be required when users are introduced
-        public async Task<ReleaseViewModel> GetViewModel(ReleaseId id)
+        public async Task<ReleaseViewModel> GetReleaseForId(ReleaseId id)
         {
             var release = await _context.Releases
                 .Where(x => x.Id == id)
@@ -67,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Content = content
             });
             await _context.SaveChangesAsync();
-            return await GetViewModel(saved.Entity.Id);
+            return await GetReleaseForId(saved.Entity.Id);
         }
         
         // TODO Authorisation will be required when users are introduced
@@ -84,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _context.Releases.Update(release);
             _mapper.Map(model, release);
             await _context.SaveChangesAsync();
-            return await GetViewModel(model.Id);
+            return await GetReleaseForId(model.Id);
         }
         
         // TODO Authorisation will be required when users are introduced
