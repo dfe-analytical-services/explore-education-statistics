@@ -47,8 +47,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
                         {
                             foreach (var subject in release.Subjects)
                             {
-                                _logger.LogInformation("Seeding Subject {Subject}", subject.Name);
-
                                 Release r = new Release
                                 {
                                     Id = release.Id,
@@ -86,7 +84,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
                                     }
                                 };
 
+                                // ignore these subjects for now until we are provided with valid data files.
+                                if (subject.Id == 27 || subject.Id == 29 || subject.Id == 32) continue;
+                                
                                 var file = SamplePublications.SubjectFiles.GetValueOrDefault(subject.Id);
+
+                                _logger.LogInformation("Seeding Subject {Subject}", subject.Name);
 
                                 StoreFiles(r, file, subject.Name);
                                 Seed(file + ".csv", r);

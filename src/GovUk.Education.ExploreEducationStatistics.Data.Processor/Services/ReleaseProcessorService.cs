@@ -33,10 +33,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         public Subject CreateOrUpdateRelease(SubjectData subjectData, ImportMessage message)
         {
             var release = CreateOrUpdateRelease(message);
-            return CreateOrUpdateSubject(subjectData.Name, release);
+            return RemoveAndCreateSubject(subjectData.Name, release);
         }
 
-        private Subject CreateOrUpdateSubject(string name, Release release)
+        private Subject RemoveAndCreateSubject(string name, Release release)
         {
             var subject = _context.Subject
                 .FirstOrDefault(s => s.Name.Equals(name) && s.ReleaseId == release.Id);

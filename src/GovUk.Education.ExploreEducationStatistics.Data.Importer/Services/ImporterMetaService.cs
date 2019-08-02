@@ -2,12 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Models;
+using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 {
-    public class ImporterMetaService
+    public class ImporterMetaService : IImporterMetaService
     {
         private readonly ApplicationDbContext _context;
 
@@ -16,20 +17,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             _context = context;
         }
 
-        public SubjectMeta Import(IEnumerable<string> lines, Subject subject, bool existingSubject)
+        public SubjectMeta Import(IEnumerable<string> lines, Subject subject)
         {
-            var headers = lines.First().Split(',').ToList();
-            var metaRows = lines
-                .Skip(1)
-                .Select(line => GetMetaRow(line, headers));
+            var headers = GetHeaders(lines);
+            var metaRows = GetMetaRows(lines, headers);
 
             return new SubjectMeta
             {
-                Filters = ImportFilters(metaRows, subject, existingSubject),
-                Indicators = ImportIndicators(metaRows, subject, existingSubject)
+                Filters = ImportFilters(metaRows, subject),
+                Indicators = ImportIndicators(metaRows, subject)
             };
         }
 
+        public SubjectMeta Get(IEnumerable<string> lines, Subject subject)
+        {
+            var headers = GetHeaders(lines);
+            var metaRows = GetMetaRows(lines, headers);
+
+            return new SubjectMeta
+            {
+                Filters = GetFilters(metaRows, subject),
+                Indicators = GetIndicators(metaRows, subject)
+            };
+        }
+
+        private static List<string> GetHeaders(IEnumerable<string> lines)
+        {
+            return lines.First().Split(',').ToList();
+        }
+        
+        private static IEnumerable<MetaRow> GetMetaRows(IEnumerable<string> lines, List<string> headers)
+        {
+            return lines
+                .Skip(1)
+                .Select(line => GetMetaRow(line, headers));
+        }
+        
         private static MetaRow GetMetaRow(string line, List<string> headers)
         {
             var columns = new[]
@@ -56,31 +79,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         }
 
         private IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)> ImportFilters(
-            IEnumerable<MetaRow> metaRows, Subject subject, bool existingSubject)
+            IEnumerable<MetaRow> metaRows, Subject subject)
         {
             var filters = GetFilters(metaRows, subject).ToList();
-            
-            // Persist for a new subject
-            if (!existingSubject)
-            {
-                _context.Filter.AddRange(filters.Select(triple => triple.Filter));
-                _context.SaveChanges();
-            }
+            _context.Filter.AddRange(filters.Select(triple => triple.Filter));
 
             return filters;
         }
 
         private IEnumerable<(Indicator Indicator, string Column)> ImportIndicators(IEnumerable<MetaRow> metaRows,
-            Subject subject, bool existingSubject)
+            Subject subject)
         {
             var indicators = GetIndicators(metaRows, subject).ToList();
             
-            // Persist for a new subject
-            if (!existingSubject)
-            {
-                _context.Indicator.AddRange(indicators.Select(tuple => tuple.Indicator));
-                _context.SaveChanges();
-            }
+            _context.Indicator.AddRange(indicators.Select(tuple => tuple.Indicator));
 
             return indicators;
         }

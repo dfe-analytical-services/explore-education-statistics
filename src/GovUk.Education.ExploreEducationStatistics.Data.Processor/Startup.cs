@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 .AddTransient<ISplitFileService, SplitFileService>()
                 .AddTransient<ImporterFilterService>()
                 .AddTransient<ImporterLocationService>()
-                .AddTransient<ImporterMetaService>()
+                .AddTransient<IImporterMetaService, ImporterMetaService>()
                 .AddTransient<IReleaseProcessorService, ReleaseProcessorService>()
                 .AddTransient<ImporterMemoryCache>()
                 .BuildServiceProvider();

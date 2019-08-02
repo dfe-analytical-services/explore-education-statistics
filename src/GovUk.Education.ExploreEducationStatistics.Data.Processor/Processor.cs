@@ -54,17 +54,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 
                 var subject =_releaseProcessorService.CreateOrUpdateRelease(subjectData, message);
                 
-                // is this a new subject?
-                if (subject.Id <= 0)
-                {
-                    _context.SaveChanges();
+                _context.SaveChanges();
 
-                    _importerService.ImportMeta(subjectData.GetMetaLines().ToList(), subject);
-                    
-                    _fileImportService.ImportFiltersLocationsAndSchools(message);
+                _importerService.ImportMeta(subjectData.GetMetaLines().ToList(), subject);
+                
+                _context.SaveChanges();
+                
+                _fileImportService.ImportFiltersLocationsAndSchools(message);
 
-                    _context.SaveChanges();
-                }
+                _context.SaveChanges();
 
                 _splitFileService.SplitDataFile(collector, message, subjectData);
             }

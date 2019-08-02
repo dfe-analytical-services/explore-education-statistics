@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
     {
         private readonly ImporterLocationService _importerLocationService;
         private readonly ImporterFilterService _importerFilterService;
-        private readonly ImporterMetaService _importerMetaService;
+        private readonly IImporterMetaService _importerMetaService;
         private readonly ImporterSchoolService _importerSchoolService;
         private readonly ApplicationDbContext _context;
         private readonly ILogger<ImporterService> _logger;
@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         public ImporterService(
             ImporterFilterService importerFilterService,
             ImporterLocationService importerLocationService,
-            ImporterMetaService importerMetaService,
+            IImporterMetaService importerMetaService,
             ImporterSchoolService importerSchoolService,
             ApplicationDbContext context,
             ILogger<ImporterService> logger)
@@ -39,16 +39,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
         public SubjectMeta ImportMeta(List<string> metaLines, Subject subject)
         {
-            _logger.LogInformation("Importing meta lines for Publication {Publication}, {Subject}", subject.Release.Publication.Title, subject.Name);
+            _logger.LogDebug("Importing meta lines for Publication {Publication}, {Subject}", subject.Release.Publication.Title, subject.Name);
             
-            return _importerMetaService.Import(metaLines, subject, false);
+            return _importerMetaService.Import(metaLines, subject);
         }
         
         public SubjectMeta GetMeta(List<string> metaLines, Subject subject)
         {
-            _logger.LogInformation("Importing meta lines for Publication {Publication}, {Subject}", subject.Release.Publication.Title, subject.Name);
+            _logger.LogDebug("Importing meta lines for Publication {Publication}, {Subject}", subject.Release.Publication.Title, subject.Name);
             
-            return _importerMetaService.Import(metaLines, subject, true);
+            return _importerMetaService.Get(metaLines, subject);
         }
 
         public void ImportFiltersLocationsAndSchools(List<string> lines, SubjectMeta subjectMeta)
@@ -63,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             var stopWatch = new Stopwatch();
             stopWatch.Start();
 
-            _logger.LogInformation("Importing batch for Publication {Publication}, {Subject}", subject.Release.Publication.Title, subject.Name);
+            _logger.LogDebug("Importing batch for Publication {Publication}, {Subject}", subject.Release.Publication.Title, subject.Name);
 
             var headers = lines.First().Split(',').ToList();
             lines.RemoveAt(0);
