@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "c0584e54-44f5-4913-adb4-3e250c3a765b",
+		"_postman_id": "84f121d3-70d3-4467-ad54-cc06542d795d",
 		"name": "DfE Data API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -126,7 +126,6 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations.country\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations.localAuthority\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations.localAuthorityDistrict\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.region\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
@@ -166,7 +165,6 @@
 													"",
 													"pm.test(\"Number of location options should be correct\", function() {",
 													"    pm.expect(respJson.locations.country.options.length).to.equal(1);",
-													"    pm.expect(respJson.locations.region.options.length).to.equal(10);",
 													"    pm.expect(respJson.locations.localAuthority.options.length).to.equal(152);",
 													"    pm.expect(respJson.locations.localAuthorityDistrict.options.length).to.equal(326);",
 													"});",
