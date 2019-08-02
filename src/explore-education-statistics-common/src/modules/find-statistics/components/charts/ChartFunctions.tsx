@@ -371,7 +371,7 @@ function reduceCombineChartData(
 export function sortChartData(
   chartData: ChartDataB[],
   sortBy: string | undefined,
-  sortAsc: boolean = false,
+  sortAsc: boolean,
 ) {
   if (sortBy === undefined) return chartData;
 
@@ -439,7 +439,7 @@ export function createSortedAndMappedDataForAxis(
   const sorted = sortChartData(
     chartData,
     axisConfiguration.sortBy,
-    axisConfiguration.sortAsc,
+    axisConfiguration.sortAsc !== false,
   );
 
   if (axisConfiguration.dataRange) {
