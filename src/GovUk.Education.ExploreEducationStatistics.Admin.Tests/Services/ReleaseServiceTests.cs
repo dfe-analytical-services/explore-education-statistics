@@ -152,15 +152,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 context.SaveChanges();
             }
-
+            // Note that we use different contexts for each method call - this is to avoid misleadingly optimistic
+            // loading of the entity graph as we go.
             using (var context = InMemoryApplicationDbContext("LatestReleaseCorrectlyReported"))
             {
                 // Method under test
-                var latest =
-                    await new ReleaseService(context, MapperForProfile<MappingProfiles>())
-                        .GetViewModel(latestReleaseId);
-                Assert.True(latest.LatestRelease);
-
+                var notLatest =
+                    await new ReleaseService(context, MapperForProfile<MappingProfiles>()).GetViewModel(
+                        notLatestReleaseId);
+                Assert.False(notLatest.LatestRelease);
+            }
+            using (var context = InMemoryApplicationDbContext("LatestReleaseCorrectlyReported"))
+            {
                 // Method under test
                 var notLatest =
                     await new ReleaseService(context, MapperForProfile<MappingProfiles>()).GetViewModel(

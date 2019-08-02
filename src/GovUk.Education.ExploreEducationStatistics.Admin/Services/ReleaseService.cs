@@ -28,11 +28,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _context.Releases.FirstOrDefault(x => x.Id == id);
         }
         
-        public async Task<Release> GetAsync(PublicationId id)
-        {
-            return await _context.Releases.Include(r => r.Publication).ThenInclude(p => p.Releases).FirstOrDefaultAsync(x => x.Id == id);
-        }
-
         public Release Get(string slug)
         {
             return _context.Releases.FirstOrDefault(x => x.Slug == slug);
@@ -46,11 +41,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         // TODO Authorisation will be required when users are introduced
         public async Task<ReleaseViewModel> GetViewModel(ReleaseId id)
         {
-            // Require publication / release graph to be able to work out if the release is the latest. 
             var release = await _context.Releases
-                .Include(r => r.Publication)
-                .ThenInclude(p => p.Releases)
-                .FirstOrDefaultAsync(x => x.Id == id); 
+                .Where(x => x.Id == id)
+                .HydrateReleaseForReleaseViewModel()
+                .FirstOrDefaultAsync(); 
             return _mapper.Map<ReleaseViewModel>(release);
         }
 
@@ -97,8 +91,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<List<ReleaseViewModel>> GetReleasesForPublicationAsync(PublicationId publicationId)
         {
             var release = await _context.Releases
-                .Include(r => r.Publication)
                 .Where(r => r.Publication.Id == publicationId)
+                .HydrateReleaseForReleaseViewModel()
                 .ToListAsync();
             return _mapper.Map<List<ReleaseViewModel>>(release);
         }
@@ -130,9 +124,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
             return new List<ContentSection>();
         }
-        
-        
-        
-        
+    }
+    public static class LinqExtensions
+    {
+        public static IQueryable<Release> HydrateReleaseForReleaseViewModel(this IQueryable<Release> values)
+        {
+            // Require publication / release / contact / type graph to be able to work out:
+            // If the release is the latest
+            // The contact
+            // The type
+            return values.Include(r => r.Publication)
+                .Include(r => r.Publication.Releases) // Back refs required to work out latest
+                .Include(r => r.Publication.Contact) 
+                .Include(r => r.Type);
+        }
     }
 }
