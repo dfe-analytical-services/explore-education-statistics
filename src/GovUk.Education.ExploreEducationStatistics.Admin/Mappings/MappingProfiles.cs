@@ -17,7 +17,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<Release, ReleaseViewModel>()
                 .ForMember(
                     dest => dest.LatestRelease,
-                    m => m.MapFrom(r => r.Publication.LatestRelease().Id == r.Id));
+                    m => m.MapFrom(r => r.Publication.LatestRelease().Id == r.Id))
+                .ForMember(dest => dest.Contact, 
+                    m => m.MapFrom(r => r.Publication.Contact))
+                .ForMember(dest => dest.PublicationTitle, 
+                    m => m.MapFrom(r => r.Publication.Title));;
             
             CreateMap<EditReleaseSummaryViewModel, Release>();
         }

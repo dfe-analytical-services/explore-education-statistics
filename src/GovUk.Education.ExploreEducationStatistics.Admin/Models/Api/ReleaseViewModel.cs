@@ -14,6 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 
         public string Title { get; set; }
 
+        public string PublicationTitle { get; set; }
         public string ReleaseName { get; set; }
         
         public string CoverageTitle { get; set; }
@@ -32,5 +33,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         public TimeIdentifier TimePeriodCoverage { get; set; }
 
         public bool LatestRelease { get; set; }
+        
+        public ReleaseType Type { get; set; }
+        
+        public Contact Contact { get; set; }
+        
+        
     }
 }

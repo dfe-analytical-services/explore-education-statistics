@@ -1,4 +1,5 @@
-using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -32,6 +33,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await _releaseService.CreateReleaseAsync(release);
         }
 
+        [HttpGet("releases/{releaseId}")]
+        [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
+        public async Task<ReleaseViewModel> GetReleaseAsync(ReleaseId releaseId)
+        {
+            return await _releaseService.GetReleaseForIdAsync(releaseId);
+        }
+
         [HttpGet("releases/{releaseId}/summary")]
         [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
         public async Task<ActionResult<EditReleaseSummaryViewModel>> GetReleaseSummaryAsync(ReleaseId releaseId)
@@ -46,6 +54,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             model.Id = releaseId;
             return await _releaseService.EditReleaseSummaryAsync(model);
+        }
+
+        // GET api/publications/{publicationId}/releases
+        [HttpGet("/publications/{publicationId}/releases")]
+        [AllowAnonymous] // TODO We will need to do Authorisation checks when we know what the permissions model is.
+        public async Task<ActionResult<List<ReleaseViewModel>>> GetReleaseForPublicationAsync(
+            [Required]PublicationId publicationId)
+        {
+            return await _releaseService.GetReleasesForPublicationAsync(publicationId);
         }
     }
 }
