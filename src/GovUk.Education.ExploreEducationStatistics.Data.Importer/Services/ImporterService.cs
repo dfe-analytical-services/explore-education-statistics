@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -55,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         {
             var headers = lines.First().Split(',').ToList();
             lines.RemoveAt(0);
-            lines.ForEach(line => CreateFiltersLocationsAndSchoolsFromCsv(line, headers, subjectMeta));
+            lines.ForEach(line => CreateFiltersLocationsAndSchoolsFromCsv(line, headers, subjectMeta.Filters));
         }
 
         public void ImportObservations(List<string> lines, Subject subject, SubjectMeta subjectMeta)
@@ -122,10 +121,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         
         private void CreateFiltersLocationsAndSchoolsFromCsv(string raw,
             List<string> headers,
-            SubjectMeta subjectMeta)
+            IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)> filtersMeta)
         {
             var line = raw.Split(',');
-            CreateFilterItems(line, headers, subjectMeta.Filters);
+            CreateFilterItems(line, headers, filtersMeta);
             GetLocationId(line, headers);
             GetSchool(line, headers);
         }

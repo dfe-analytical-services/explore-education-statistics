@@ -38,7 +38,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
         }
 
         [FunctionName("ProcessUploads")]
-        // ReSharper disable once UnusedMember.Global
         public void ProcessUploads(
             [QueueTrigger("imports-pending", Connection = "")]
             ImportMessage message,
@@ -46,25 +45,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             [Queue("imports-available")] ICollector<ImportMessage> collector
             )
         {
+            logger.LogInformation($"{GetType().Name} function STARTED for : Datafile: {message.DataFileName}");
+
             try
             {
-                logger.LogInformation($"{GetType().Name} function STARTED for : Datafile: {message.DataFileName}");
-                
-                var subjectData = _fileStorageService.GetSubjectData(message).Result;
-                
-                var subject =_releaseProcessorService.CreateOrUpdateRelease(subjectData, message);
-                
-                _context.SaveChanges();
-
-                _importerService.ImportMeta(subjectData.GetMetaLines().ToList(), subject);
-                
-                _context.SaveChanges();
-                
-                _fileImportService.ImportFiltersLocationsAndSchools(message);
-
-                _context.SaveChanges();
-
-                _splitFileService.SplitDataFile(collector, message, subjectData);
+                ProcessSubject(message, collector);
             }
             catch (Exception e)
             {
@@ -76,7 +61,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
         }
         
         [FunctionName("ProcessUploadsSequentially")]
-        // ReSharper disable once UnusedMember.Global
         public void ProcessUploadsSequentially(
             [QueueTrigger("imports-pending-sequential", Connection = "")]
             ImportMessage[] messages,
@@ -98,21 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                     logger.LogInformation(
                         $"Re-seeding for : Datafile: {message.DataFileName}");
                     
-                    var subjectData = _fileStorageService.GetSubjectData(message).Result;
-
-                    var subject = _releaseProcessorService.CreateOrUpdateRelease(subjectData, message);
-
-                    _context.SaveChanges();
-
-                    _importerService.ImportMeta(subjectData.GetMetaLines().ToList(), subject);
-
-                    _context.SaveChanges();
-
-                    _fileImportService.ImportFiltersLocationsAndSchools(message);
-
-                    _context.SaveChanges();
-
-                    _splitFileService.SplitDataFile(collector, message, subjectData);
+                    ProcessSubject(message, collector);
                 }
                 catch (Exception e)
                 {
@@ -126,7 +96,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
         }
         
         [FunctionName("ImportFiles")]
-        // ReSharper disable once UnusedMember.Global
         public void ImportFiles(
             [QueueTrigger("imports-available", Connection = "")]
             ImportMessage message,
@@ -156,6 +125,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             }
 
             logger.LogInformation($"{GetType().Name} function COMPLETE for : Batch: {message.BatchNo}  of {message.BatchSize} with Datafile: {message.DataFileName}");
+        }
+
+        private void ProcessSubject(ImportMessage message, ICollector<ImportMessage> collector)
+        {
+            var subjectData = _fileStorageService.GetSubjectData(message).Result;
+                
+            var subject =_releaseProcessorService.CreateOrUpdateRelease(subjectData, message);
+                
+            _context.SaveChanges();
+
+            _importerService.ImportMeta(subjectData.GetMetaLines().ToList(), subject);
+                
+            _context.SaveChanges();
+                
+            _fileImportService.ImportFiltersLocationsAndSchools(message);
+
+            _context.SaveChanges();
+
+            _splitFileService.SplitDataFile(collector, message, subjectData);
         }
     }
 }
