@@ -8,7 +8,10 @@ def cookie_names_should_be_on_page():
   for cookie in cookies:
     if cookie['name'] == '_hjIncludedInSample':
       continue
-    sl.page_should_contain(cookie['name'])
+    try:
+      sl.wait_until_element_contains('css:table', cookie['name'])
+    except:
+      raise AssertionError(f"Table containing cookie names should be on page, containing cookie name {cookie['name']}")
 
 def user_should_be_at_top_of_page():
   (x, y) = sl.get_window_position()

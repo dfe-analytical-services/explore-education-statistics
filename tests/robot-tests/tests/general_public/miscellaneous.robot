@@ -39,16 +39,25 @@ Validate homepage
 Validate Cookies page
     [Tags]  HappyPath
     user clicks link   Cookies
-    user waits until page contains element   xpath://h1[text()="Cookies"]
-    user waits until page contains  How cookies are used on this service
-
-    cookie names should be on page
-
+    user waits until page contains element   xpath://h1[text()="Cookies on Explore education statistics"]
     user checks url contains   ${url}/cookies
 
     user checks element count is x  css:[data-testid="breadcrumbs--list"] li     2
     user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(1)   Home
     user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(2)   Cookies
+
+Validate Cookies Details page
+    [Tags]  HappyPath
+    user clicks link    Find out more about cookies on Explore education statistics
+    user waits until page contains element   xpath://h1[text()="Details about cookies"]
+    user checks url contains   ${url}/cookies/details
+
+    user checks element count is x  css:[data-testid="breadcrumbs--list"] li     3
+    user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(1)   Home
+    user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(2)   Cookies
+    user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(3)   Details about cookies
+
+    cookie names should be on page
 
 Validate Privacy notice page
     [Tags]  HappyPath
