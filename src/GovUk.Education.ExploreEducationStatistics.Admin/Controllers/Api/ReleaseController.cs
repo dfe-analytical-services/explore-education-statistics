@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
         public async Task<ReleaseViewModel> GetReleaseAsync(ReleaseId releaseId)
         {
-            return await _releaseService.GetReleaseForId(releaseId);
+            return await _releaseService.GetReleaseForIdAsync(releaseId);
         }
 
         [HttpGet("releases/{releaseId}/summary")]

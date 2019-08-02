@@ -158,7 +158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 // Method under test
                 var notLatest =
-                    await new ReleaseService(context, MapperForProfile<MappingProfiles>()).GetReleaseForId(
+                    await new ReleaseService(context, MapperForProfile<MappingProfiles>()).GetReleaseForIdAsync(
                         notLatestReleaseId);
                 Assert.False(notLatest.LatestRelease);
             }
@@ -166,7 +166,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 // Method under test
                 var notLatest =
-                    await new ReleaseService(context, MapperForProfile<MappingProfiles>()).GetReleaseForId(
+                    await new ReleaseService(context, MapperForProfile<MappingProfiles>()).GetReleaseForIdAsync(
                         notLatestReleaseId);
                 Assert.False(notLatest.LatestRelease);
             }
