@@ -12,6 +12,18 @@ Verify Public Page Loads
     user goes to url  ${url}
     user checks element contains  css:body   Explore education statistics
 
+Verify can accept cookie banner
+    [Tags]  HappyPath
+    user checks page contains  GOV.UK uses cookies to make the site simpler.
+
+    cookie should not exist   ees_banner_seen
+    cookie should not exist   ees_disable_google_analytics
+
+    user clicks element  xpath://button[text()="Accept Cookies"]
+
+    cookie should have value  ees_banner_seen   true
+    cookie should have value  ees_disable_google_analytics   false
+
 Validate homepage
     [Tags]  HappyPath
     user checks page contains element  link:Find statistics and data
@@ -45,6 +57,26 @@ Validate Cookies page
     user checks element count is x  css:[data-testid="breadcrumbs--list"] li     2
     user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(1)   Home
     user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(2)   Cookies
+
+Disable google analytics
+    [Tags]  HappyPath
+    user clicks element   css:#googleAnalytics-off
+    user clicks element   xpath://button[text()="Save changes"]
+    user waits until page contains   Your cookie settings were saved
+
+    cookie should have value  ees_banner_seen   true
+    cookie should have value  ees_disable_google_analytics   true
+
+Enable google analytics
+    [Tags]  HappyPath
+    reload page
+
+    user clicks element   css:#googleAnalytics-on
+    user clicks element   xpath://button[text()="Save changes"]
+    user waits until page contains   Your cookie settings were saved
+
+    cookie should have value  ees_banner_seen   true
+    cookie should have value  ees_disable_google_analytics   false
 
 Validate Cookies Details page
     [Tags]  HappyPath
