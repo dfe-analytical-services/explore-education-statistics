@@ -7,10 +7,7 @@ import PrototypePage from '@admin/pages/prototypes/components/PrototypePage';
 import PrototypeData from '@admin/pages/prototypes/PrototypeData';
 import ChartData from '@common/modules/find-statistics/components/charts/__tests__/__data__/testBlockData';
 import { DataBlockResponse } from '@common/services/dataBlockService';
-import {
-  ChartProps,
-  StackedBarProps,
-} from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import { StackedBarProps } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import ChartRenderer from '@common/modules/find-statistics/components/ChartRenderer';
 
 const PrototypeChartTest = () => {
@@ -26,19 +23,13 @@ const PrototypeChartTest = () => {
       ...chartData.axes,
       major: {
         ...chartData.axes.major,
-        groupBy: 'locations',
-        sortBy: 'name',
+        sortBy: '23_1_2_____',
         sortAsc: false,
-        dataSets: [
-          {
-            indicator: '23',
-            filters: ['1', '2'],
-          },
-          {
-            indicator: '26',
-            filters: ['1', '2'],
-          },
-        ],
+        dataRange: [0, 20],
+      },
+      minor: {
+        ...chartData.axes.minor,
+        min: '0',
       },
     },
   };
@@ -47,7 +38,7 @@ const PrototypeChartTest = () => {
     <PrototypePage wide>
       <ChartBuilder data={data} />
 
-      <ChartRenderer type="line" {...ChartData.AbstractChartProps} />
+      <ChartRenderer type="verticalbar" {...newChartData} />
     </PrototypePage>
   );
 };

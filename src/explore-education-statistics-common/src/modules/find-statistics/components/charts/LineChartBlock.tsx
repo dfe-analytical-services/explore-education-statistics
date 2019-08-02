@@ -4,8 +4,8 @@ import {
   ChartProps,
   conditionallyAdd,
   createSortedAndMappedDataForAxis,
-  GenerateMajorAxis,
-  GenerateMinorAxis,
+  generateMajorAxis,
+  generateMinorAxis,
   getKeysForChart,
   populateDefaultChartProps,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
@@ -114,8 +114,8 @@ const LineChartBlock = (props: ChartProps) => {
 
   const keysForChart = getKeysForChart(chartData);
 
-  const minorDomainTicks = GenerateMinorAxis(chartData, axes.minor);
-  const majorDomainTicks = GenerateMajorAxis(chartData, axes.major);
+  const minorDomainTicks = generateMinorAxis(chartData, axes.minor);
+  const majorDomainTicks = generateMajorAxis(chartData, axes.major);
 
   return (
     <ResponsiveContainer width={width || '100%'} height={height || 300}>

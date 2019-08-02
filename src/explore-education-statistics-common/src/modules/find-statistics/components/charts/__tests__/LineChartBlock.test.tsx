@@ -434,4 +434,23 @@ describe('LineChartBlock', () => {
 
     expectTicks(container, 'x', '2015/16', '2014/15');
   });
+
+  test('Can filter a data range', () => {
+    const propsWithTicks: ChartProps = {
+      ...props,
+      axes: {
+        minor: props.axes.minor,
+        major: {
+          ...props.axes.major,
+          sortBy: 'name',
+          sortAsc: true,
+          dataRange: [0, 1],
+        },
+      },
+    };
+
+    const { container } = render(<Chart {...propsWithTicks} />);
+
+    expectTicks(container, 'x', '2014/15');
+  });
 });
