@@ -8,8 +8,12 @@ import { addMonths, addYears } from 'date-fns';
 
 interface Cookie {
   name: string;
-  expires: Date;
   duration?: string;
+  options: {
+    expires: Date;
+    secure?: boolean;
+    [key: string]: any;
+  };
 }
 
 interface CookieMap {
@@ -20,13 +24,19 @@ interface CookieMap {
 export const cookieMap: CookieMap = {
   bannerSeen: {
     name: 'ees_banner_seen',
-    expires: addMonths(new Date(), 1),
     duration: '1 month',
+    options: {
+      expires: addMonths(new Date(), 1),
+      secure: true,
+    },
   },
   disableGA: {
     name: 'ees_disable_google_analytics',
-    expires: addYears(new Date(), 10),
     duration: '10 years',
+    options: {
+      expires: addYears(new Date(), 10),
+      secure: true,
+    },
   },
 };
 
@@ -38,14 +48,18 @@ export function useCookies() {
       return liveCookies[cookieMap[cookieKey].name];
     },
     setBannerSeenCookie(isSeen: boolean) {
-      setCookie(cookieMap.bannerSeen.name, isSeen, {
-        expires: cookieMap.bannerSeen.expires,
-      });
+      setCookie(
+        cookieMap.bannerSeen.name,
+        isSeen,
+        cookieMap.bannerSeen.options,
+      );
     },
     setGADisabledCookie(isDisabled: boolean) {
-      setCookie(cookieMap.disableGA.name, isDisabled, {
-        expires: cookieMap.disableGA.expires,
-      });
+      setCookie(
+        cookieMap.disableGA.name,
+        isDisabled,
+        cookieMap.disableGA.options,
+      );
       if (isDisabled) {
         disableGA();
         googleAnalyticsCookies.forEach(cookieName => removeCookie(cookieName));
