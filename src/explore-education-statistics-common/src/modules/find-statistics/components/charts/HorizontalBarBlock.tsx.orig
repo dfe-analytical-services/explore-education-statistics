@@ -2,10 +2,15 @@ import {
   ChartDataB,
   ChartDefinition,
   conditionallyAdd,
-  createSortedAndMappedDataForAxis,
+<<<<<<< HEAD
+  createDataForAxis, createSortedAndMappedDataForAxis,
+=======
+  createDataForAxis,
   GenerateMajorAxis,
   GenerateMinorAxis,
+>>>>>>> origin/master
   getKeysForChart,
+  mapNameToNameLabel,
   populateDefaultChartProps,
   StackedBarProps,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
@@ -90,6 +95,7 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
       meta,
       labels,
     );
+
 
     const keysForChart = getKeysForChart(chartData);
 

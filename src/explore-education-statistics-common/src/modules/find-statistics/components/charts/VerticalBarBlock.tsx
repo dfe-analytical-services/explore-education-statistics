@@ -2,11 +2,10 @@ import {
   ChartDataB,
   ChartDefinition,
   conditionallyAdd,
-  createDataForAxis,
+  createSortedAndMappedDataForAxis,
   GenerateMajorAxis,
   GenerateMinorAxis,
   getKeysForChart,
-  mapNameToNameLabel,
   populateDefaultChartProps,
   StackedBarProps,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
@@ -85,11 +84,12 @@ export default class VerticalBarBlock extends Component<StackedBarProps> {
     )
       return <div>Unable to render chart</div>;
 
-    const chartData: ChartDataB[] = createDataForAxis(
+    const chartData: ChartDataB[] = createSortedAndMappedDataForAxis(
       axes.major,
       data.result,
       meta,
-    ).map(mapNameToNameLabel(labels, meta.timePeriods, meta.locations));
+      labels,
+    );
 
     const keysForChart = getKeysForChart(chartData);
 

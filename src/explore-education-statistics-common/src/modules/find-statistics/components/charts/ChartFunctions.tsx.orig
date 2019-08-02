@@ -216,10 +216,17 @@ function filterResultsForDataSet(ds: ChartDataSet) {
         return false;
 
       if (
+<<<<<<< HEAD
+        location.localAuthorityDistrict &&
+        ds.location.localAuthorityDistrict &&
+        location.localAuthorityDistrict.code !==
+        ds.location.localAuthorityDistrict.code
+=======
         existAndCodesDoNotMatch(
           location.localAuthorityDistrict,
           ds.location.localAuthorityDistrict,
         )
+>>>>>>> origin/master
       )
         return false;
 
@@ -261,22 +268,22 @@ export function generateKeyFromDataSet(
       location &&
       location.country &&
       location.country.code) ||
-      '',
+    '',
     (dontIgnoreLocations &&
       location &&
       location.region &&
       location.region.code) ||
-      '',
+    '',
     (dontIgnoreLocations &&
       location &&
       location.localAuthorityDistrict &&
       location.localAuthorityDistrict.code) ||
-      '',
+    '',
     (dontIgnoreLocations &&
       location &&
       location.localAuthority &&
       location.localAuthority.code) ||
-      '',
+    '',
   ];
 
   return [
@@ -297,10 +304,9 @@ function generateNameForAxisConfiguration(
     case 'timePeriods':
       return result.timePeriod;
     case 'locations':
-      if (result.location.localAuthorityDistrict)
-        return `${result.location.localAuthorityDistrict.code}`;
-      if (result.location.localAuthority)
-        return `${result.location.localAuthority.code}`;
+
+      if (result.location.localAuthorityDistrict) return `${result.location.localAuthorityDistrict.code}`;
+      if (result.location.localAuthority) return `${result.location.localAuthority.code}`;
 
       return '';
     default:
@@ -338,7 +344,7 @@ function getChartDataForAxis(
         [name]: {
           name,
           [generateKeyFromDataSet(dataSet, groupBy)]:
-            result.measures[dataSet.indicator] || 'NaN',
+          result.measures[dataSet.indicator] || 'NaN',
         },
       };
     }, nameDictionary),
@@ -368,21 +374,26 @@ function reduceCombineChartData(
   ];
 }
 
-export function sortChartData(
-  chartData: ChartDataB[],
-  sortBy: string | undefined,
-  sortAsc: boolean = false,
-) {
-  if (sortBy === undefined) return chartData;
+export function sortChartData(chartData: ChartDataB[], sortBy: string | undefined, sortAsc: boolean = false) {
+  if (sortBy !== undefined) {
 
-  return [...chartData].sort(({ [sortBy]: sortByA }, { [sortBy]: sortByB }) => {
-    if (sortByA !== undefined && sortByB !== undefined) {
-      return sortAsc
-        ? sortByA.localeCompare(sortByB)
-        : sortByB.localeCompare(sortByA);
-    }
-    return 0;
-  });
+    const sortedArray = [...chartData];
+    console.log(sortedArray);
+    return sortedArray.sort(({ [sortBy]: sortByA }, { [sortBy]: sortByB }) => {
+
+      if (sortByA !== undefined && sortByB !== undefined) {
+        return sortAsc ?
+          sortByA.localeCompare(sortByB)
+          : sortByB.localeCompare(sortByA)
+        ;
+      }
+      return 0;
+
+    });
+
+  }
+
+  return chartData;
 }
 
 export function createDataForAxis(
@@ -392,7 +403,7 @@ export function createDataForAxis(
 ) {
   if (axisConfiguration === undefined || results === undefined) return [];
 
-  return axisConfiguration.dataSets.reduce<ChartDataB[]>(
+  return  axisConfiguration.dataSets.reduce<ChartDataB[]>(
     (combinedChartData, dataSetForAxisConfiguration) => {
       return getChartDataForAxis(
         results.filter(filterResultsForDataSet(dataSetForAxisConfiguration)),
@@ -403,6 +414,7 @@ export function createDataForAxis(
     },
     [],
   );
+
 }
 
 const FindFirstInDictionaries = (
@@ -410,6 +422,7 @@ const FindFirstInDictionaries = (
   name: string,
 ) => (result: string | undefined, meta?: Dictionary<DataSetConfiguration>) =>
   result || (meta && meta[name] && meta[name].label);
+
 
 export function mapNameToNameLabel(
   ...metaDataObjects: (Dictionary<DataSetConfiguration> | undefined)[]
@@ -428,19 +441,17 @@ export function createSortedAndMappedDataForAxis(
   axisConfiguration: AxisConfiguration,
   results: Result[],
   meta: DataBlockMetadata,
-  labels: Dictionary<DataSetConfiguration>,
-): ChartDataB[] {
-  const chartData: ChartDataB[] = createDataForAxis(
-    axisConfiguration,
-    results,
-    meta,
-  ).map(mapNameToNameLabel(labels, meta.timePeriods, meta.locations));
+  labels: Dictionary<DataSetConfiguration>
+) : ChartDataB[] {
 
-  return sortChartData(
-    chartData,
-    axisConfiguration.sortBy,
-    axisConfiguration.sortAsc,
-  );
+  const chartData: ChartDataB[] =
+    createDataForAxis(
+      axisConfiguration,
+      results,
+      meta,
+    ).map(mapNameToNameLabel(labels, meta.timePeriods, meta.locations));
+
+  return sortChartData(chartData, axisConfiguration.sortBy, axisConfiguration.sortAsc);
 }
 
 export function getKeysForChart(chartData: ChartDataB[]) {
@@ -450,6 +461,8 @@ export function getKeysForChart(chartData: ChartDataB[]) {
     }, new Set<string>()),
   );
 }
+
+
 
 export function populateDefaultChartProps(
   name: string,
@@ -472,6 +485,8 @@ export const conditionallyAdd = (size?: string, add?: number) => {
   return add;
 };
 
+<<<<<<< HEAD
+=======
 const calculateMinMaxReduce = (
   { min, max }: { min: number; max: number },
   next: string,
@@ -627,3 +642,4 @@ export function GenerateMajorAxis(
   );
   return { domain, ticks };
 }
+>>>>>>> origin/master
