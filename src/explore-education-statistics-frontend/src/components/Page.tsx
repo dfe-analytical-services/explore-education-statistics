@@ -1,5 +1,6 @@
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
+import CookieBanner from '@frontend/components/CookieBanner';
 import Breadcrumbs, { BreadcrumbsProps } from './Breadcrumbs';
 import PageBanner from './PageBanner';
 import PageFooter from './PageFooter';
@@ -29,6 +30,7 @@ const Page = ({
 }: Props) => {
   return (
     <>
+      <CookieBanner wide={wide} />
       <PageMeta title={title} description={caption} {...pageMeta} />
       <PageHeader wide={wide} />
 
