@@ -20,3 +20,5 @@ export interface BaseReleaseSetupDetailsRequest {
   publishScheduled: DayMonthYearValues;
   nextReleaseExpected: DayMonthYearValues;
 }
+
+export default {};

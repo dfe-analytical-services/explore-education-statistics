@@ -4,3 +4,5 @@ export interface UpdateReleaseSetupDetailsRequest
   extends BaseReleaseSetupDetailsRequest {
   releaseId: string;
 }
+
+export default {};
