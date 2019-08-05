@@ -63,6 +63,7 @@ export interface ChartProps {
   meta: DataBlockMetadata;
   labels: Dictionary<DataSetConfiguration>;
   axes: AxesConfiguration;
+  title?: string;
   height?: number;
   width?: number;
   legend?: 'none' | 'top' | 'bottom';
@@ -372,7 +373,7 @@ function reduceCombineChartData(
 export function sortChartData(
   chartData: ChartDataB[],
   sortBy: string | undefined,
-  sortAsc: boolean = false,
+  sortAsc: boolean,
 ) {
   if (sortBy === undefined) return chartData;
 
@@ -437,11 +438,17 @@ export function createSortedAndMappedDataForAxis(
     meta,
   ).map(mapNameToNameLabel(labels, meta.timePeriods, meta.locations));
 
-  return sortChartData(
+  const sorted = sortChartData(
     chartData,
     axisConfiguration.sortBy,
-    axisConfiguration.sortAsc,
+    axisConfiguration.sortAsc !== false,
   );
+
+  if (axisConfiguration.dataRange) {
+    return sorted.slice(...axisConfiguration.dataRange);
+  }
+
+  return sorted;
 }
 
 export function getKeysForChart(chartData: ChartDataB[]) {
@@ -468,7 +475,7 @@ export function populateDefaultChartProps(
 
 export const conditionallyAdd = (size?: string, add?: number) => {
   if (size) {
-    return +size + (add !== undefined ? add : 0);
+    return +size + (add === undefined ? 0 : add);
   }
   return add;
 };
@@ -588,7 +595,7 @@ function calculateMajorTicks(
   return undefined;
 }
 
-export function GenerateMinorAxis(
+export function generateMinorAxis(
   chartData: ChartDataB[],
   axis: AxisConfiguration,
 ) {
@@ -608,7 +615,7 @@ export function GenerateMinorAxis(
   return { domain, ticks };
 }
 
-export function GenerateMajorAxis(
+export function generateMajorAxis(
   chartData: ChartDataB[],
   axis: AxisConfiguration,
 ) {

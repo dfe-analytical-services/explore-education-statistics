@@ -5,13 +5,13 @@ import {
   conditionallyAdd,
   createSortedAndMappedDataForAxis,
   CustomToolTip,
-  GenerateMajorAxis,
-  GenerateMinorAxis,
+  generateMajorAxis,
+  generateMinorAxis,
   getKeysForChart,
   populateDefaultChartProps,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
-import {ChartSymbol} from '@common/services/publicationService';
-import {Dictionary} from '@common/types';
+import { ChartSymbol } from '@common/services/publicationService';
+import { Dictionary } from '@common/types';
 
 import classnames from 'classnames';
 
@@ -86,8 +86,8 @@ const LineChartBlock = (props: ChartProps) => {
 
   const keysForChart = getKeysForChart(chartData);
 
-  const minorDomainTicks = GenerateMinorAxis(chartData, axes.minor);
-  const majorDomainTicks = GenerateMajorAxis(chartData, axes.major);
+  const minorDomainTicks = generateMinorAxis(chartData, axes.minor);
+  const majorDomainTicks = generateMajorAxis(chartData, axes.major);
 
   return (
     <ResponsiveContainer width={width || '100%'} height={height || 300}>
