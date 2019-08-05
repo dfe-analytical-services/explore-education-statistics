@@ -154,17 +154,6 @@ const timePeriodCoverageGroups: TimePeriodCoverageGroup[] = [
   },
 ];
 
-const releaseTypeOptions: IdTitlePair[] = [
-  {
-    id: 'national-stats',
-    title: 'National statistics',
-  },
-  {
-    id: 'adhoc-stats',
-    title: 'Official / adhoc statistics',
-  },
-];
-
 const findTimePeriodCoverageOption = (code: string) => {
   return (
     timePeriodCoverageGroups
@@ -182,16 +171,8 @@ const findTimePeriodCoverageGroup = (code: string) => {
   );
 };
 
-const findReleaseType = (id: string) => {
-  return (
-    releaseTypeOptions.find(type => type.id === id) || releaseTypeOptions[0]
-  );
-};
-
 export default {
   timePeriodCoverageGroups,
-  releaseTypeOptions,
   findTimePeriodCoverageOption,
   findTimePeriodCoverageGroup,
-  findReleaseType,
 };

@@ -7,9 +7,9 @@ export default async (mock: MockAdapter) => {
     /* webpackChunkName: "mock-data" */ './mock-data'
   )).default;
 
-  const mockReferenceData = (await import(
-    /* webpackChunkName: "mock-dashboard-data" */ '@admin/pages/DummyReferenceData'
-  )).default;
+  const mockCommonData = (await import(
+    /* webpackChunkName: "mock-dashboard-data" */ '@admin/services/common/mock/mock-data'
+    )).default;
 
   const getReleaseSetupDetailsUrl = /\/release\/(.*)\/setup/;
 
@@ -33,9 +33,9 @@ export default async (mock: MockAdapter) => {
       updateRequest.timePeriodCoverage.value;
     existingRelease.scheduledPublishDate = updateRequest.publishScheduled;
     existingRelease.nextReleaseExpectedDate = updateRequest.nextReleaseExpected;
-    existingRelease.releaseType = mockReferenceData.findReleaseType(
-      updateRequest.releaseTypeId,
-    );
+    existingRelease.releaseType =
+      mockCommonData.getReleaseTypes().find(type => type.id === updateRequest.releaseTypeId)
+      || mockCommonData.getReleaseTypes()[0];
     /* eslint-enable no-param-reassign */
 
     return [200];

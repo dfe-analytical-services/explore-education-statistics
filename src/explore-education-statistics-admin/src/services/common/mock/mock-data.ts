@@ -8,7 +8,19 @@ const publicationDetailsByReleaseId: Dictionary<IdTitlePair> = {
   },
 };
 
+const releaseTypes: IdTitlePair[] = [
+  {
+    id: 'national-statistics',
+    title: 'National Statistics',
+  },
+  {
+    id: 'adhoc-statistics',
+    title: 'Official / ad hoc statistics',
+  },
+];
+
 export default {
   getPublicationDetailsForRelease: (releaseId: string) =>
     publicationDetailsByReleaseId[releaseId],
+  getReleaseTypes: () => releaseTypes,
 };

@@ -24,6 +24,10 @@ export default async (mock: MockAdapter) => {
     /* webpackChunkName: "mock-dashboard-data" */ '@admin/pages/DummyReferenceData'
   )).default;
 
+  const mockCommonData = (await import(
+    /* webpackChunkName: "mock-dashboard-data" */ '@admin/services/common/mock/mock-data'
+    )).default;
+
   const createReleaseUrl = /\/publication\/(.*)\/releases/;
 
   mock.onPost(createReleaseUrl).reply(config => {
@@ -44,9 +48,8 @@ export default async (mock: MockAdapter) => {
         id: generateRandomIntegerString(),
         leadStatisticianName: 'Bob',
         publicationTitle: matchingPublication.title,
-        releaseType: mockReferenceData.findReleaseType(
-          createRequest.releaseTypeId,
-        ),
+        releaseType: mockCommonData.getReleaseTypes().find(type => type.id === createRequest.releaseTypeId)
+          || mockCommonData.getReleaseTypes()[0],
         timePeriodCoverageStartYear: createRequest.releaseName,
         timePeriodCoverageCode: createRequest.timePeriodCoverage.value,
         scheduledPublishDate: createRequest.publishScheduled,

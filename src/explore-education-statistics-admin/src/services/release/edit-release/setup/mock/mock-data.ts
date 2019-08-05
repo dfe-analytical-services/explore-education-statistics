@@ -9,7 +9,7 @@ const setupByReleaseId: Dictionary<ReleaseSetupDetails> = {
     timePeriodCoverageCode: 'AY',
     timePeriodCoverageStartYear: 2017,
     releaseType: {
-      id: 'national-stats',
+      id: 'national-statistics',
       title: 'National Statistics',
     },
     leadStatisticianName: 'John Smith',

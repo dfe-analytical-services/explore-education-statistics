@@ -1,4 +1,5 @@
 import Link from '@admin/components/Link';
+import service from "@admin/services/common/service";
 import { DayMonthYearInputs, IdTitlePair } from '@admin/services/common/types';
 import {
   validateMandatoryDayMonthYearField,
@@ -57,7 +58,7 @@ const ReleaseSetupForm = <FormValues extends EditFormValues>({
 
   useEffect(() => {
     setTimePeriodCoverageGroups(DummyReferenceData.timePeriodCoverageGroups);
-    setReleaseTypes(DummyReferenceData.releaseTypeOptions);
+    service.getReleaseTypes().then(setReleaseTypes);
   }, []);
 
   const getTimePeriodOptions = (
