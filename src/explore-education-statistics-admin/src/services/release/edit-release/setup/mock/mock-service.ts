@@ -29,11 +29,6 @@ export default async (mock: MockAdapter) => {
       updateRequest.releaseId,
     );
 
-    const timePeriodCoverage = mockReferenceData.findTimePeriodCoverageOption(
-      updateRequest.timePeriodCoverage.value,
-    );
-
-      /* eslint-disable no-param-reassign */
     existingRelease.timePeriodCoverageCode = updateRequest.timePeriodCoverage.value;
     existingRelease.scheduledPublishDate = updateRequest.publishScheduled;
     existingRelease.nextReleaseExpectedDate =

@@ -1,6 +1,5 @@
 import Link from '@admin/components/Link';
 import {DayMonthYearInputs, IdTitlePair,} from '@admin/services/common/types';
-import {ReleaseSetupDetails} from '@admin/services/release/types';
 import {
   validateMandatoryDayMonthYearField,
   validateOptionalPartialDayMonthYearField,
@@ -28,7 +27,6 @@ export interface BaseFormValues {
 }
 
 interface Props<FormValues extends BaseFormValues> {
-  releaseSetupDetails?: ReleaseSetupDetails;
   submitButtonText: string;
   initialValuesSupplier: (timePeriodCoverageGroups: TimePeriodCoverageGroup[]) => FormValues;
   validationRulesSupplier: (baseValidationRules: ObjectSchemaDefinition<BaseFormValues>) => ObjectSchemaDefinition<FormValues>;
@@ -38,7 +36,6 @@ interface Props<FormValues extends BaseFormValues> {
 }
 
 const ReleaseSetupForm = <FormValues extends BaseFormValues>({
-  releaseSetupDetails,
   submitButtonText,
   initialValuesSupplier,
   validationRulesSupplier,
