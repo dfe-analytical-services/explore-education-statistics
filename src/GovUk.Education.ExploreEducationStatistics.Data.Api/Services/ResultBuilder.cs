@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             _mapper = mapper;
         }
 
-        public ObservationViewModel BuildResult(Observation observation, IEnumerable<string> indicators)
+        public ObservationViewModel BuildResult(Observation observation, IEnumerable<long> indicators)
         {
             return new ObservationViewModel
             {
@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return observation.FilterItems.Select(item => item.FilterItemId).OrderBy(l => l).Select(l => l.ToString());
         }
 
-        private static Dictionary<string, string> Measures(Observation observation, IEnumerable<string> indicators)
+        private static Dictionary<string, string> Measures(Observation observation, IEnumerable<long> indicators)
         {
             var measures = indicators != null && indicators.Any()
                 ? QueryUtil.FilterMeasures(observation.Measures, indicators)

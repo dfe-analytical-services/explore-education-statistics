@@ -6,6 +6,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
     {
         IEnumerable<Indicator> GetIndicators(long subjectId);
         
-        IEnumerable<Indicator> GetIndicators(long subjectId, IEnumerable<string> indicatorNames);
+        IEnumerable<Indicator> GetIndicators(long subjectId, IEnumerable<long> indicatorIds);
     }
 }

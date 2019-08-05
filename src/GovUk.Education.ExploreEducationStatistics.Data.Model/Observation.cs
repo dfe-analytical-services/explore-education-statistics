@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public string SchoolLaEstab { get; set; }
         public int Year { get; set; }
         public TimeIdentifier TimeIdentifier { get; set; }
-        public Dictionary<string, string> Measures { get; set; }
+        public Dictionary<long, string> Measures { get; set; }
         public ICollection<ObservationFilterItem> FilterItems { get; set; }
     }
 }
