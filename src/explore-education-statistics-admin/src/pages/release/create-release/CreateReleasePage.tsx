@@ -6,12 +6,12 @@ import ReleaseSetupForm, {
 import { assembleCreateReleaseRequestFromForm } from '@admin/pages/release/util/releaseSetupUtil';
 import dashboardRoutes from '@admin/routes/dashboard/routes';
 import { setupRoute } from '@admin/routes/edit-release/routes';
-import { emptyDayMonthYear } from '@admin/services/common/types';
+import {emptyDayMonthYear, IdTitlePair} from '@admin/services/common/types';
 import service from '@admin/services/release/create-release/service';
 import { CreateReleaseRequest } from '@admin/services/release/create-release/types';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import Yup from '@common/lib/validation/yup';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { RouteComponentProps } from 'react-router';
 import { ObjectSchemaDefinition } from 'yup';
 
@@ -28,6 +28,12 @@ const CreateReleasePage = ({
   history,
 }: RouteComponentProps<MatchProps>) => {
   const { publicationId } = match.params;
+
+  const [templateRelease, setTemplateRelease] = useState<IdTitlePair>();
+
+  useEffect(() => {
+    service.getTemplateRelease(publicationId).then(setTemplateRelease);
+  }, [publicationId]);
 
   const submitHandler = (values: FormValues) => {
     const createReleaseDetails: CreateReleaseRequest = assembleCreateReleaseRequestFromForm(
@@ -69,26 +75,30 @@ const CreateReleasePage = ({
           baseValidationRules: ObjectSchemaDefinition<EditFormValues>,
         ): ObjectSchemaDefinition<FormValues> => ({
           ...baseValidationRules,
-          templateReleaseId: Yup.string().required('Choose a template'),
+          templateReleaseId: templateRelease
+            ? Yup.string().required('Choose a template')
+            : Yup.string(),
         })}
         onSubmitHandler={submitHandler}
         onCancelHandler={cancelHandler}
         additionalFields={
-          <FormFieldRadioGroup<FormValues>
-            id="releaseSetupForm-templateReleaseId"
-            legend="Select template"
-            name="templateReleaseId"
-            options={[
-              {
-                label: 'Create new template',
-                value: `new`,
-              },
-              {
-                label: 'Copy existing template (2017 / 2018)',
-                value: `existing`,
-              },
-            ]}
-          />
+          templateRelease && (
+            <FormFieldRadioGroup<FormValues>
+              id="releaseSetupForm-templateReleaseId"
+              legend="Select template"
+              name="templateReleaseId"
+              options={[
+                {
+                  label: 'Create new template',
+                  value: '',
+                },
+                {
+                  label: `Copy existing template (${templateRelease.title})`,
+                  value: `${templateRelease.id}`,
+                },
+              ]}
+            />
+          )
         }
       />
     </Page>

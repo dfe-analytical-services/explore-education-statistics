@@ -1,3 +1,4 @@
+import {dateToDayMonthYear} from "@admin/services/common/types";
 import { UpdateReleaseSetupDetailsRequest } from '@admin/services/release/edit-release/setup/types';
 import { getCaptureGroups } from '@admin/services/util/mock/mock-service';
 import MockAdapter from 'axios-mock-adapter';
@@ -31,7 +32,7 @@ export default async (mock: MockAdapter) => {
 
     existingRelease.timePeriodCoverageCode =
       updateRequest.timePeriodCoverage.value;
-    existingRelease.scheduledPublishDate = updateRequest.publishScheduled;
+    existingRelease.scheduledPublishDate = dateToDayMonthYear(updateRequest.publishScheduled);
     existingRelease.nextReleaseExpectedDate = updateRequest.nextReleaseExpected;
     existingRelease.releaseType =
       mockCommonData.getReleaseTypes().find(type => type.id === updateRequest.releaseTypeId)

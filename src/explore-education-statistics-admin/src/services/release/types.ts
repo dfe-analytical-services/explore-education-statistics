@@ -17,7 +17,7 @@ export interface BaseReleaseSetupDetailsRequest {
   };
   releaseName: number;
   releaseTypeId: string;
-  publishScheduled: DayMonthYearValues;
+  publishScheduled: Date;
   nextReleaseExpected: DayMonthYearValues;
 }
 

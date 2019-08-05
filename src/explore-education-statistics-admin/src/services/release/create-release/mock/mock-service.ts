@@ -1,3 +1,4 @@
+import {dateToDayMonthYear} from "@admin/services/common/types";
 import {
   AdminDashboardRelease,
   ReleaseApprovalStatus,
@@ -28,8 +29,36 @@ export default async (mock: MockAdapter) => {
     /* webpackChunkName: "mock-dashboard-data" */ '@admin/services/common/mock/mock-data'
     )).default;
 
-  const createReleaseUrl = /\/publication\/(.*)\/releases/;
+  const getReleasesUrl = /\/publications\/(.*)\/releases/;
+  const createReleaseUrl = /\/publications\/(.*)\/releases/;
 
+  // getTemplateRelease()
+  mock.onGet(getReleasesUrl).reply(config => {
+    const publicationId = getCaptureGroups(createReleaseUrl, config.url)[0];
+
+    const allPublications = Object.values(
+      mockDashboardData.dashboardPublicationsByTopicId,
+    ).flat();
+
+    const matchingPublication = allPublications.find(
+      publication => publication.id === publicationId,
+    );
+
+    if (matchingPublication) {
+
+      const latestRelease = matchingPublication.releases.map(release => ({
+        id: release.id,
+        title: release.releaseName,
+        latestRelease: release.latestRelease ? 'true' : 'false',
+      }));
+
+      return [200, latestRelease];
+    }
+
+    return [200, []];
+  });
+
+  // createRelease()
   mock.onPost(createReleaseUrl).reply(config => {
     const publicationId = getCaptureGroups(createReleaseUrl, config.url)[0];
 
@@ -52,7 +81,7 @@ export default async (mock: MockAdapter) => {
           || mockCommonData.getReleaseTypes()[0],
         timePeriodCoverageStartYear: createRequest.releaseName,
         timePeriodCoverageCode: createRequest.timePeriodCoverage.value,
-        scheduledPublishDate: createRequest.publishScheduled,
+        scheduledPublishDate: dateToDayMonthYear(createRequest.publishScheduled),
         nextReleaseExpectedDate: createRequest.nextReleaseExpected,
       };
 
@@ -72,7 +101,7 @@ export default async (mock: MockAdapter) => {
           createRequest.timePeriodCoverage.value,
         ),
         live: false,
-        publishScheduled: createRequest.publishScheduled,
+        publishScheduled: dateToDayMonthYear(createRequest.publishScheduled),
         releaseName: `${startYear} - ${startYear}`,
         status: ReleaseApprovalStatus.None,
       };

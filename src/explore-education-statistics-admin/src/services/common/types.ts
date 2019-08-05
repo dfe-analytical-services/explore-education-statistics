@@ -150,3 +150,7 @@ export const dayMonthYearToDate = (dmy: DayMonthYearValues) => {
   }
   return new Date(dmy.year || 0, (dmy.month || 0) - 1, dmy.day);
 };
+
+export const dayMonthYearInputsToDate = (
+  dmy: DayMonthYearInputs,
+): Date => dayMonthYearToDate(dayMonthYearInputsToValues(dmy));

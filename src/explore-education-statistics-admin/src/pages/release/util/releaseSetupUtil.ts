@@ -1,4 +1,4 @@
-import {dayMonthYearInputsToValues} from '@admin/services/common/types';
+import {dayMonthYearInputsToDate, dayMonthYearInputsToValues} from '@admin/services/common/types';
 import {CreateReleaseRequest} from '@admin/services/release/create-release/types';
 import {UpdateReleaseSetupDetailsRequest} from '@admin/services/release/edit-release/setup/types';
 import {BaseReleaseSetupDetailsRequest} from '@admin/services/release/types';
@@ -13,7 +13,7 @@ export const assembleBaseReleaseSetupRequestFromForm = (
       value: values.timePeriodCoverageCode,
     },
     releaseName: parseInt(values.timePeriodCoverageStartYear, 10),
-    publishScheduled: dayMonthYearInputsToValues(values.scheduledPublishDate),
+    publishScheduled: dayMonthYearInputsToDate(values.scheduledPublishDate),
     nextReleaseExpected: dayMonthYearInputsToValues(
       values.nextReleaseExpectedDate,
     ),
