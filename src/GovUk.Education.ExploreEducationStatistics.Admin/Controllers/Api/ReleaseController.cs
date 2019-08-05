@@ -48,9 +48,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [Produces("application/json")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
-        [RequestSizeLimit(int.MaxValue)]
-        [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<IEnumerable<FileInfo>>> GetDataFiles(Guid releaseId)
+        [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
+        public async Task<ActionResult<IEnumerable<FileInfo>>> GetDataFiles(ReleaseId releaseId)
         {
             var release = await _releaseService.GetAsync(releaseId);
             if (release == null)
