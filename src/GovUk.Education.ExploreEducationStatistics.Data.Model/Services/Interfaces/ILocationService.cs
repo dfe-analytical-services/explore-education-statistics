@@ -10,6 +10,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
             Expression<Func<Observation, bool>> observationPredicate);
 
         Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> GetObservationalUnits(
-            IEnumerable<Location> locations);
+            IEnumerable<Observation> observations);
     }
 }

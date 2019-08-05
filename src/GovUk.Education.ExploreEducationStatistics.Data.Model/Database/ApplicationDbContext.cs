@@ -14,9 +14,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             Database.SetCommandTimeout(int.MaxValue);
         }
 
+        public DbSet<BoundaryLevel> BoundaryLevel { get; set; }
         public DbSet<Filter> Filter { get; set; }
-        public DbSet<FilterItem> FilterItem { get; set; }
+        public DbSet<FilterFootnote> FilterFootnote { get; set; }
         public DbSet<FilterGroup> FilterGroup { get; set; }
+        public DbSet<FilterGroupFootnote> FilterGroupFootnote { get; set; }
+        public DbSet<FilterItem> FilterItem { get; set; }
+        public DbSet<FilterItemFootnote> FilterItemFootnote { get; set; }
         public DbSet<Footnote> Footnote { get; set; }
         public DbQuery<GeoJson> GeoJson { get; set; }
         public DbSet<Indicator> Indicator { get; set; }
@@ -37,9 +41,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         {
             ConfigureAdditionalTypes(modelBuilder);
             ConfigureData(modelBuilder);
+            ConfigureBoundaryLevel(modelBuilder);
             ConfigureIndicator(modelBuilder);
             ConfigureGeographicLevel(modelBuilder);
             ConfigureGeoJson(modelBuilder);
+            ConfigureFilterFootnote(modelBuilder);
+            ConfigureFilterGroupFootnote(modelBuilder);
+            ConfigureFilterItemFootnote(modelBuilder);
             ConfigureIndicatorFootnote(modelBuilder);
             ConfigureLocation(modelBuilder);
             ConfigureMeasures(modelBuilder);
@@ -530,6 +538,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             });
         }
 
+        private static void ConfigureBoundaryLevel(ModelBuilder modelBuilder)
+        {
+            var geographicLevelConverter = new EnumToEnumValueConverter<GeographicLevel>();
+
+            modelBuilder.Entity<BoundaryLevel>()
+                .Property(boundaryLevel => boundaryLevel.Level)
+                .HasConversion(geographicLevelConverter);
+        }
+
         private static void ConfigureLocation(ModelBuilder modelBuilder)
         {
             ConfigureCountry(modelBuilder);
@@ -585,7 +602,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                 .Property(data => data.Measures)
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<Dictionary<string, string>>(v));
+                    v => JsonConvert.DeserializeObject<Dictionary<long, string>>(v));
         }
 
         private static void ConfigureTimePeriod(ModelBuilder modelBuilder)
@@ -642,6 +659,57 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         {
             modelBuilder.Entity<Indicator>()
                 .HasIndex(indicator => indicator.Name);
+        }
+        
+        private static void ConfigureFilterFootnote(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<FilterFootnote>()
+                .HasKey(item => new {item.FilterId, item.FootnoteId});
+            
+            modelBuilder.Entity<FilterFootnote>()
+                .HasOne(filterFootnote => filterFootnote.Filter)
+                .WithMany(filter => filter.Footnotes)
+                .HasForeignKey(filterFootnote => filterFootnote.FilterId);
+            
+            modelBuilder.Entity<FilterFootnote>()
+                .HasOne(filterFootnote => filterFootnote.Footnote)
+                .WithMany()
+                .HasForeignKey(filterFootnote => filterFootnote.FootnoteId)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
+        
+        private static void ConfigureFilterGroupFootnote(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<FilterGroupFootnote>()
+                .HasKey(item => new {item.FilterGroupId, item.FootnoteId});
+            
+            modelBuilder.Entity<FilterGroupFootnote>()
+                .HasOne(filterGroupFootnote => filterGroupFootnote.FilterGroup)
+                .WithMany(filterGroup => filterGroup.Footnotes)
+                .HasForeignKey(filterGroupFootnote => filterGroupFootnote.FilterGroupId);
+            
+            modelBuilder.Entity<FilterGroupFootnote>()
+                .HasOne(filterGroupFootnote => filterGroupFootnote.Footnote)
+                .WithMany()
+                .HasForeignKey(filterGroupFootnote => filterGroupFootnote.FootnoteId)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
+        
+        private static void ConfigureFilterItemFootnote(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<FilterItemFootnote>()
+                .HasKey(item => new {item.FilterItemId, item.FootnoteId});
+            
+            modelBuilder.Entity<FilterItemFootnote>()
+                .HasOne(filterItemFootnote => filterItemFootnote.FilterItem)
+                .WithMany(filterItem => filterItem.Footnotes)
+                .HasForeignKey(filterItemFootnote => filterItemFootnote.FilterItemId);
+            
+            modelBuilder.Entity<FilterItemFootnote>()
+                .HasOne(filterItemFootnote => filterItemFootnote.Footnote)
+                .WithMany()
+                .HasForeignKey(filterItemFootnote => filterItemFootnote.FootnoteId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
         
         private static void ConfigureIndicatorFootnote(ModelBuilder modelBuilder)
@@ -750,11 +818,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 
         private static void ConfigureGeoJson(ModelBuilder modelBuilder)
         {
-            var geographicLevelConverter = new EnumToEnumValueConverter<GeographicLevel>();
-
-            modelBuilder.Query<GeoJson>().ToView("geojson")
-                .Property(geoJson => geoJson.GeographicLevel)
-                .HasConversion(geographicLevelConverter);
+            modelBuilder.Query<GeoJson>().ToView("geojson");
         }
 
         private static void ConfigureAdditionalTypes(ModelBuilder modelBuilder)

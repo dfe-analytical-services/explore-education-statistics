@@ -45,7 +45,7 @@ function HelpSupportPage() {
         <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics">
           Statistics at DfE
         </a>{' '}
-        pages GOV.UK browse our
+        pages GOV.UK browse our{' '}
         <a href="/statistics">Find statistics and data</a> section.
       </p>
       <p>

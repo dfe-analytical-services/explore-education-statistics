@@ -49,11 +49,6 @@ Select Indicators
     [Tags]  HappyPath
     user clicks indicator checkbox   Absence fields        Number of schools
 
-Select Characteristics
-    [Tags]   HappyPath
-    user opens details dropdown     School type
-    user clicks category checkbox   School type     Pupil Referral Unit
-
 Create table
     [Tags]  HappyPath
     user clicks element     css:#filtersForm-submit
@@ -74,9 +69,32 @@ Validate results table row headings
     user checks results table row heading contains  1     2     Number of schools
 
 Validate Number of schools row results
-    [Tags]  HappyPath   Failing
+    [Tags]  HappyPath
     user checks results table cell contains     1     1     361
     user checks results table cell contains     1     2     363
     user checks results table cell contains     1     3     350
     user checks results table cell contains     1     4     349
 
+Go back to Locations step
+    [Tags]  HappyPath   UnderConstruction
+    user clicks element  xpath://button[contains(text(), "Choose locations")]
+    user waits until page contains element  xpath://h1[text()="Go back to previous step"]
+    user clicks element  xpath://button[text()="Confirm"]
+
+Unselect England as a location
+    [Documentation]  DFE-1142
+    [Tags]  HappyPath    UnderConstruction
+    user opens details dropdown     Country
+    user clicks checkbox            England
+    user closes details dropdown    Country
+
+    #user checks page does not contain element   css:#locationFiltersForm-levels-error
+
+Select locations LAs Barnet, Barnsley, Bedford
+    [Tags]  HappyPath   UnderConstruction
+    user opens details dropdown     Local Authority
+    user clicks checkbox            Barnet
+    user clicks checkbox            Barnsley
+    user clicks checkbox            Bedford
+
+    user clicks element   css:#locationFiltersForm-submit

@@ -23,10 +23,18 @@ interface Props {
   subjectName: string;
   locations: LocationFilter[];
   results: TableData['result'];
+  footnotes?: TableData['footnotes'];
 }
 
 const TimePeriodDataTable = (props: Props) => {
-  const { filters, timePeriods, locations, indicators, results } = props;
+  const {
+    filters,
+    timePeriods,
+    locations,
+    indicators,
+    results,
+    footnotes,
+  } = props;
 
   const dataTableRef = useRef<HTMLTableElement>(null);
 
@@ -37,12 +45,17 @@ const TimePeriodDataTable = (props: Props) => {
     rows: [],
   });
 
+  const removeSiblinglessTotalRows = (
+    categoryFilters: Dictionary<CategoryFilter[]>,
+  ): CategoryFilter[][] => {
+    return Object.values(categoryFilters).filter(filter => {
+      return filter.length > 1 || !filter[0].isTotal;
+    });
+  };
+
   useEffect(() => {
     const sortedFilters = sortBy(
-      Object.values({
-        ...filters,
-        locations,
-      }),
+      [...removeSiblinglessTotalRows(filters), locations],
       [options => options.length],
     );
 
@@ -157,6 +170,7 @@ const TimePeriodDataTable = (props: Props) => {
         rowHeaders={rowHeaders}
         rows={rows}
         ref={dataTableRef}
+        footnotes={footnotes}
       />
     </div>
   );

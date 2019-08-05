@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
+    [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    [Route("contacts")]
     public class ContactsController : ControllerBase
     {
         private readonly IContactService _contactService;

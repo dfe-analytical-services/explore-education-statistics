@@ -57,16 +57,6 @@ Select Characteristics
     user clicks category checkbox   Characteristic   Gender female
     user clicks category checkbox   Characteristic   Gender male
 
-Select School types
-    [Tags]  HappyPath
-    user opens details dropdown       School type
-    user clicks category checkbox     School type    Total
-
-Select Year breakdown
-    [Tags]  HappyPath
-    user opens details dropdown     Year breakdown
-    user clicks category checkbox   Year breakdown     six half terms
-
 Create table
     [Tags]  HappyPath
     user clicks element     css:#filtersForm-submit
@@ -74,14 +64,12 @@ Create table
 
 Validate results table column headings
     [Tags]  HappyPath
-    user checks results table column heading contains  1   1   Total
+    user checks results table column heading contains  1   1   six half terms
 
-    user checks results table column heading contains  2   1   six half terms
-
-    user checks results table column heading contains  3   1   2012/13
-    user checks results table column heading contains  3   2   2013/14
-    user checks results table column heading contains  3   3   2014/15
-    user checks results table column heading contains  3   4   2015/16
+    user checks results table column heading contains  2   1   2012/13
+    user checks results table column heading contains  2   2   2013/14
+    user checks results table column heading contains  2   3   2014/15
+    user checks results table column heading contains  2   4   2015/16
 
 Validate results table row headings
     [Tags]  HappyPath

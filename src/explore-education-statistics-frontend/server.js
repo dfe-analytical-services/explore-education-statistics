@@ -28,6 +28,7 @@ const helmet = require('helmet');
 const nextApp = require('next');
 const referrerPolicy = require('referrer-policy');
 const url = require('url');
+const cookiesMiddleware = require('universal-cookie-express');
 
 const app = nextApp({
   dev: process.env.NODE_ENV !== 'production',
@@ -68,6 +69,7 @@ async function startServer(port = process.env.PORT || 3000) {
   // Use Helmet for configuration of headers and disable express powered by header
   server.disable('x-powered-by');
   server.use(helmet());
+  server.use(cookiesMiddleware());
   server.use(
     helmet.contentSecurityPolicy({
       directives: {
@@ -104,10 +106,10 @@ async function startServer(port = process.env.PORT || 3000) {
   );
   server.use(referrerPolicy({ policy: 'no-referrer-when-downgrade' }));
 
-  // Strip trailing slashes as these
-  // don't work well with Next
   server.use((req, res, next) => {
     if (req.path !== '/' && req.path.endsWith('/')) {
+      // Strip trailing slashes as these
+      // don't work well with Next
       const parsedUrl = url.parse(req.url);
       const redirectUrl = req.path.slice(0, -1) + (parsedUrl.search || '');
 
@@ -139,6 +141,12 @@ async function startServer(port = process.env.PORT || 3000) {
     return app.render(req, res, '/methodologies/methodology', {
       publication: req.params.publication,
       release: req.params.release,
+    });
+  });
+
+  server.get('/data-tables/permalink/:permalink/', (req, res) => {
+    return app.render(req, res, '/data-tables/permalink', {
+      permalink: req.params.permalink,
     });
   });
 

@@ -8,6 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
         public long SubjectId { get; set; }
         public TimePeriodQuery TimePeriod { get; set; }
         public IEnumerable<long> Filters { get; set; }
+        public long? BoundaryLevel { get; set; }
         public GeographicLevel? GeographicLevel { get; set; }
         public IEnumerable<string> Indicators { get; set; }
         public IEnumerable<string> Country { get; set; }
@@ -30,6 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
             {
                 SubjectId = SubjectId,
                 TimePeriod = TimePeriod,
+                BoundaryLevel = BoundaryLevel,
                 GeographicLevel = GeographicLevel,
                 Indicators = Indicators,
                 Country = Country,

@@ -1,6 +1,9 @@
 using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
@@ -11,20 +14,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         {
         }
 
-        public Dictionary<Footnote, IEnumerable<long>> GetFootnotes(long subjectId, IEnumerable<string> indicators)
+        public IEnumerable<Footnote> GetFootnotes(long subjectId,
+            IEnumerable<Observation> observations,
+            IEnumerable<long> indicators)
         {
-//            return _context.Footnote
-//                .Join(_context.IndicatorFootnote, f => f.Id, i => i.FootnoteId, (f, i) => new
-//                {
-//                    Footnote = f, i.IndicatorId
-//                })
-//                .Where(t => indicators.Contains(t.IndicatorId))
-//                .GroupBy(tuple => tuple.Footnote)
-//                .ToDictionary(
-//                    grouping => grouping.Key,
-//                    grouping => grouping.Select(tuple => tuple.IndicatorId));
-// TODO DFE-1087
-return new Dictionary<Footnote, IEnumerable<long>>();
+            var filterItems = observations.SelectMany(observation => observation.FilterItems)
+                .Select(item => item.FilterItem.Id).Distinct();
+
+            var subjectIdParam = new SqlParameter("subjectId", subjectId);
+            var indicatorListParam = CreateIdListType("indicatorList", indicators);
+            var filterItemListParam = CreateIdListType("filterItemList", filterItems);
+
+            return _context.Footnote.AsNoTracking().FromSql(
+                "EXEC dbo.FilteredFootnotes " +
+                "@subjectId," +
+                "@indicatorList," +
+                "@filterItemList",
+                subjectIdParam,
+                indicatorListParam,
+                filterItemListParam);
         }
     }
 }

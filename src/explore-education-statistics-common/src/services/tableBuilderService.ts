@@ -54,6 +54,7 @@ export interface PublicationSubjectMeta {
     legend: string;
     hint?: string;
     options: GroupedFilterOptions;
+    totalValue?: string;
   }>;
   indicators: Dictionary<{
     label: string;
@@ -87,6 +88,10 @@ export type LocationLevelKeys =
   | 'ward';
 
 export interface TableData {
+  footnotes: {
+    id: number;
+    label: string;
+  }[];
   timePeriodRange: {
     code: string;
     label: string;

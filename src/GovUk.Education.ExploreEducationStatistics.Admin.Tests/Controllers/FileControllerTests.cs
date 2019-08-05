@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Tools.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -79,12 +80,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
             {
                 new Release
                 {
-                    Id = new Guid("3ca848be-0da2-470f-beee-bd7b57f521e8"), Title = "Release A", Slug = slugReleaseA,
+                    Id = new Guid("3ca848be-0da2-470f-beee-bd7b57f521e8"), Slug = slugReleaseA,
                     Publication = publications[0]
                 },
                 new Release
                 {
-                    Id = new Guid("386ee741-67e2-4e2c-89e4-51faf46fd362"), Title = "Release B", Slug = slugReleaseB,
+                    Id = new Guid("386ee741-67e2-4e2c-89e4-51faf46fd362"), Slug = slugReleaseB,
                     Publication = publications[1]
                 }
             };
@@ -127,8 +128,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
                         releases[1], filesReleaseB
                     }
                 };
-
-                CollectionAssert.AreEquivalent(expected.ToList(), model.ToList());
+                
+                CollectionAssert.AreEquivalent(expected.ToDictionary(p => p.Key.Id, p => p.Value),
+                    model.ToDictionary(p => p.Key.Id, p => p.Value));
             }
         }
     }

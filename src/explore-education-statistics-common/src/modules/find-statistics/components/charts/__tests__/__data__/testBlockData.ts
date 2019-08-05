@@ -2994,6 +2994,9 @@ const AbstractChartProps: ChartProps = {
   data,
   meta: metaData,
 
+  width: 900,
+  height: 300,
+
   legend: 'top',
   legendHeight: '50',
 
@@ -3062,6 +3065,9 @@ const AbstractChartProps2: ChartProps = {
     },
   },
 
+  width: 900,
+  height: 300,
+
   labels: {
     '23_1_2_____': {
       label: metaData.indicators['23'].label,
@@ -3114,6 +3120,8 @@ const AbstractChartProps2: ChartProps = {
 const AbstractMultipleChartProps: ChartProps = {
   data: multipleData,
   meta: metaData,
+  width: 900,
+  height: 300,
 
   labels: {
     '23': {
@@ -3209,6 +3217,8 @@ const testResponseData_23_26__1_2_LAD: DataBlockResponse = {
 const AbstractLargeDataChartProps: ChartProps = {
   data: testResponseData_23_26_28__1_2_LAD,
   meta: testResponseData_23_26_28__1_2_LAD.metaData,
+  width: 900,
+  height: 300,
 
   labels: {
     '2014_HT6': {
@@ -3270,6 +3280,9 @@ const AbstractLargeDataChartProps_smaller_datasets: ChartProps = {
   data: testResponseData_23_26__1_2_LAD,
   meta: testResponseData_23_26__1_2_LAD.metaData,
 
+  width: 900,
+  height: 300,
+
   labels: {
     '2014_HT6': {
       label: metaData.timePeriods['2014_HT6'].label,
@@ -3283,16 +3296,19 @@ const AbstractLargeDataChartProps_smaller_datasets: ChartProps = {
       label: metaData.indicators['23'].label,
       unit: '%',
       value: '23_1_2',
+      colour: '#285252',
     },
     '26_1_2_____': {
       label: metaData.indicators['26'].label,
       unit: '%',
       value: '26_1_2',
+      colour: '#572957',
     },
     '28_1_2_____': {
       label: metaData.indicators['28'].label,
       unit: '%',
       value: '28_1_2',
+      colour: '#454520',
     },
   },
 
@@ -3325,6 +3341,8 @@ const AbstractLargeDataChartProps_smaller_datasets: ChartProps = {
 
 const AbstractMissingDataChartProps: ChartProps = {
   data: missingData,
+  width: 900,
+  height: 300,
 
   meta: {
     ...metaData,

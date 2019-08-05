@@ -9,7 +9,13 @@ const PublicationPage = () => {
       wide
       breadcrumbs={[{ text: 'Create new publication', link: '#' }]}
     >
-      <h1 className="govuk-heading-xl">Create new publication</h1>
+      <h1 className="govuk-heading-xl">
+        <span className="govuk-caption-l">
+          Pupils and schools / Pupil absence
+        </span>{' '}
+        Create new publication
+      </h1>
+
       <PrototypePublicationConfig sectionId={sectionId} />
     </PrototypePage>
   );

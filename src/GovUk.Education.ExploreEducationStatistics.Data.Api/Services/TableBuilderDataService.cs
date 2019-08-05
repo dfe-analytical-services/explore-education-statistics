@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
@@ -36,21 +37,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
             return new ResultViewModel
             {
-                Footnotes = GetFootnotes(queryContext),
+                Footnotes = GetFootnotes(observations, queryContext),
                 TimePeriodRange = GetTimePeriodRange(observations),
                 Result = observations.Select(observation =>
                     _resultBuilder.BuildResult(observation, queryContext.Indicators))
             };
         }
 
-        private IEnumerable<FootnoteViewModel> GetFootnotes(ObservationQueryContext queryContext)
+        public override async Task<ResultViewModel> QueryAsync(ObservationQueryContext queryContext)
         {
-            return _footnoteService.GetFootnotes(queryContext.SubjectId, queryContext.Indicators)
+            return Query(queryContext);
+        }
+
+        private IEnumerable<FootnoteViewModel> GetFootnotes(IEnumerable<Observation> observations,
+            ObservationQueryContext queryContext)
+        {
+            return _footnoteService.GetFootnotes(queryContext.SubjectId, observations, queryContext.Indicators)
                 .Select(footnote => new FootnoteViewModel
                 {
-                    Id = footnote.Key.Id,
-                    Indicators = footnote.Value.Select(indicatorId => indicatorId.ToString()),
-                    Label = footnote.Key.Content
+                    Id = footnote.Id,
+                    Label = footnote.Content
                 });
         }
 

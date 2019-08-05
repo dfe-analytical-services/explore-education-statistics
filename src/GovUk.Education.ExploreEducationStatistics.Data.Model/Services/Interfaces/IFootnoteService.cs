@@ -4,6 +4,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
 {
     public interface IFootnoteService
     {
-        Dictionary<Footnote, IEnumerable<long>> GetFootnotes(long subjectId, IEnumerable<string> indicators);
+        IEnumerable<Footnote> GetFootnotes(
+            long subjectId,
+            IEnumerable<Observation> observations,
+            IEnumerable<long> indicators
+        );
     }
 }

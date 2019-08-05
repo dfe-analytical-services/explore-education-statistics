@@ -77,6 +77,7 @@ interface State {
   subjectMeta: PublicationSubjectMeta;
   timePeriodRange: TimePeriod[];
   tableData: TableData['result'];
+  footnotes: TableData['footnotes'];
 }
 
 class TableToolPage extends Component<Props, State> {
@@ -99,6 +100,7 @@ class TableToolPage extends Component<Props, State> {
     subjects: [],
     timePeriodRange: [],
     tableData: [],
+    footnotes: [],
   };
 
   public static async getInitialProps({ query }: NextContext) {
@@ -134,6 +136,7 @@ class TableToolPage extends Component<Props, State> {
 
     this.setState({
       publication,
+      footnotes: [],
       subjects,
       subjectName: '',
       tableData: [],
@@ -155,11 +158,13 @@ class TableToolPage extends Component<Props, State> {
     });
   };
 
-  private handleLocationFiltersFormSubmit: LocationFiltersFormSubmitHandler = async values => {
+  private handleLocationFiltersFormSubmit: LocationFiltersFormSubmitHandler = async ({
+    locations,
+  }) => {
     const { subjectId } = this.state;
 
     const subjectMeta = await tableBuilderService.filterPublicationSubjectMeta({
-      ...values,
+      ...locations,
       subjectId,
     });
 
@@ -169,11 +174,11 @@ class TableToolPage extends Component<Props, State> {
         timePeriod: subjectMeta.timePeriod,
       },
       locations: mapValuesWithKeys(
-        values.locations,
-        (locationLevel, locations) =>
-          locations
+        locations,
+        (locationLevel, locationOptions) =>
+          locationOptions
             .map(location =>
-              subjectMeta.locations[locationLevel].options.find(
+              prevState.subjectMeta.locations[locationLevel].options.find(
                 option => option.value === location,
               ),
             )
@@ -235,7 +240,11 @@ class TableToolPage extends Component<Props, State> {
       return;
     }
 
-    const { timePeriodRange, result } = await tableBuilderService.getTableData({
+    const {
+      footnotes,
+      timePeriodRange,
+      result,
+    } = await tableBuilderService.getTableData({
       ...mapValues(locations, locationLevel =>
         locationLevel.map(location => location.value),
       ),
@@ -261,7 +270,11 @@ class TableToolPage extends Component<Props, State> {
     this.setState({
       filters: mapValuesWithKeys(filters, (filterGroup, selectedFilters) =>
         selectedFilters.map(
-          filter => new CategoryFilter(filtersByValue[filterGroup][filter]),
+          filter =>
+            new CategoryFilter(
+              filtersByValue[filterGroup][filter],
+              filter === subjectMeta.filters[filterGroup].totalValue,
+            ),
         ),
       ),
       indicators: indicators.map(
@@ -271,6 +284,7 @@ class TableToolPage extends Component<Props, State> {
         timePeriod => new TimePeriod(timePeriod),
       ),
       tableData: result,
+      footnotes,
     });
   };
 
@@ -286,6 +300,7 @@ class TableToolPage extends Component<Props, State> {
       subjects,
       timePeriodRange,
       tableData,
+      footnotes,
     } = this.state;
 
     const locationsList = Object.values(locations).flat();
@@ -378,6 +393,7 @@ class TableToolPage extends Component<Props, State> {
                           locations={locationsList}
                           timePeriods={timePeriodRange}
                           results={tableData}
+                          footnotes={footnotes}
                         />
                       </div>
 

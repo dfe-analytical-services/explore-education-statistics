@@ -38,8 +38,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Converter
             
             var result = jObject.ToObject<InsetTextBlock>(serializer);
             
-            Assert.Equal(result.Heading, "Heading text");
-            Assert.Equal(result.Body, "heading body text");
+            Assert.Equal("Heading text", result.Heading);
+            Assert.Equal("heading body text", result.Body);
+        }
+        
+        [Fact]
+        public void ContentBlockConverterReturnsHtmlBlock()
+        {
+            const string testString = "{\"Type\":\"HtmlBlock\", \"Body\":\"some html\"}";
+            
+            var serializerSettings = new JsonSerializerSettings();
+            serializerSettings.Converters.Add(new ContentBlockConverter());
+
+            var serializer = JsonSerializer.Create(serializerSettings);
+
+            var jObject = JObject.Parse(testString);
+            
+            var result = jObject.ToObject<HtmlBlock>(serializer);
+            
+            Assert.Equal("some html", result.Body);
+        }
+        
+        [Fact]
+        public void ContentBlockConverterReturnsDataBlock()
+        {
+            const string testString = "{\"Type\":\"DataBlock\", \"Heading\":\"heading\"}";
+            
+            var serializerSettings = new JsonSerializerSettings();
+            serializerSettings.Converters.Add(new ContentBlockConverter());
+
+            var serializer = JsonSerializer.Create(serializerSettings);
+
+            var jObject = JObject.Parse(testString);
+            
+            var result = jObject.ToObject<DataBlock>(serializer);
+            
+            Assert.Equal("heading", result.Heading);
         }
     }
 }

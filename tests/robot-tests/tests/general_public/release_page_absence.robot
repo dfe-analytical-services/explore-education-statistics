@@ -18,7 +18,7 @@ Navigate to Absence publication
     user opens accordion section  Pupils and schools
     user opens details dropdown   Pupil absence
     user clicks element   css:[data-testid="view-stats-pupil-absence-in-schools-in-england"]
-    user waits until page contains  Pupil absence data and statistics for schools in England
+    user waits until page contains element   xpath://h1[text()="Pupil absence in schools in England"]
 
 Validate URL
     [Documentation]  DFE-325
@@ -102,15 +102,17 @@ Validate accordion sections order
     user checks accordion is in position  Absence for 4-year-olds           7
     user checks accordion is in position  Pupil referral unit absence       8
     user checks accordion is in position  Regional and local authority (LA) breakdown  9
-    user checks accordion is in position  Pupil absence data and statistics for schools in England: methodology     10
+    user checks accordion is in position  Pupil absence in schools in England: methodology     10
     user checks accordion is in position  National Statistics               11
     user checks accordion is in position  Contact us                        12
 
 Clicking "Create tables" takes user to Table Tool page with absence publication selected
     [Documentation]  DFE-898
-    [Tags]  HappyPath       Failing
+    [Tags]  HappyPath    Failing
     user clicks link    Create tables
     user waits until page contains  Create your own tables online
-    user clicks button   css:#publicationForm-submit
+
+    user clicks element   css:#publicationForm-submit
+
     user waits until page contains  Choose a subject
     user checks previous table tool step contains  1   Publication   Pupil absence in schools in England

@@ -12,6 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="Migrations" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 
@@ -36,5 +37,4 @@
   <ItemGroup>
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Model\GovUk.Education.ExploreEducationStatistics.Data.Model.csproj" />
   </ItemGroup>
-
 </Project>

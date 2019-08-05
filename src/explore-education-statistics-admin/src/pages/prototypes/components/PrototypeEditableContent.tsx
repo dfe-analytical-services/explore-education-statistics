@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions,jsx-a11y/click-events-have-key-events */
 // @ts-ignore
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 // @ts-ignore
@@ -10,6 +11,8 @@ import styles from './PrototypeEditableContent.module.scss';
 
 interface Props {
   editable?: boolean;
+  reviewing?: boolean;
+  resolveComments?: boolean;
   content: string;
   onContentChange?: (content: string) => void;
 }
@@ -27,6 +30,8 @@ class PrototypeEditableContent extends React.Component<Props, State> {
 
   public static defaultProps = {
     editable: false,
+    reviewing: false,
+    resolveComments: false,
   };
 
   public state: State = {
@@ -84,44 +89,47 @@ class PrototypeEditableContent extends React.Component<Props, State> {
 
   private renderEditableArea(unsaved: boolean, editable?: boolean) {
     return (
-      // eslint-disable-next-line jsx-a11y/no-static-element-interactions,jsx-a11y/click-events-have-key-events
-      <div
-        className={
-          editable
-            ? `${styles.editableContent}  ${unsaved ? styles.unsaved : ''}`
-            : ''
-        }
-        onClick={this.setEditing}
-      >
-        <div className={styles.editableButton}>
-          <div className={styles.editableButtonContent}>
-            Click to edit this section
-            {unsaved ? '\u000amodified' : ''}
+      <div>
+        <div
+          className={
+            editable
+              ? `${styles.editableContent}  ${unsaved ? styles.unsaved : ''}`
+              : ''
+          }
+          onClick={this.setEditing}
+        >
+          <div className={styles.editableButton}>
+            <div className={styles.editableButtonContent}>
+              Click to edit this section
+              {unsaved ? '\u000amodified' : ''}
+            </div>
           </div>
+          <div ref={this.ref} />
         </div>
-        <div ref={this.ref} />
       </div>
     );
   }
 
   private renderEditor(content: string) {
     return (
-      <div className={styles.editableContentEditing}>
-        <div className={styles.editableButton}>
-          <button className="govuk-button" onClick={this.save} type="button">
-            Save
-          </button>
+      <div>
+        <div className={styles.editableContentEditing}>
+          <div className={styles.editableButton}>
+            <button className="govuk-button" onClick={this.save} type="button">
+              Save
+            </button>
+          </div>
+          <CKEditor
+            editor={ClassicEditor}
+            data={content}
+            onChange={(event: ChangeEvent, editor: { getData(): string }) => {
+              this.temporaryContent = editor.getData();
+            }}
+            onInit={(editor: { editing: { view: { focus(): void } } }) => {
+              editor.editing.view.focus();
+            }}
+          />
         </div>
-        <CKEditor
-          editor={ClassicEditor}
-          data={content}
-          onChange={(event: ChangeEvent, editor: { getData(): string }) => {
-            this.temporaryContent = editor.getData();
-          }}
-          onInit={(editor: { editing: { view: { focus(): void } } }) => {
-            editor.editing.view.focus();
-          }}
-        />
       </div>
     );
   }

@@ -116,34 +116,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return result;
         }
 
-        private static SqlParameter CreateIdListType(string parameterName, IEnumerable<int> values)
-        {
-            return CreateListType(parameterName, values.AsIdListTable(), "dbo.IdListIntegerType");
-        }
-
-        private static SqlParameter CreateIdListType(string parameterName, IEnumerable<long> values)
-        {
-            return CreateListType(parameterName, values.AsIdListTable(), "dbo.IdListIntegerType");
-        }
-
-        private static SqlParameter CreateIdListType(string parameterName, IEnumerable<string> values)
-        {
-            return CreateListType(parameterName, values.AsIdListTable(), "dbo.IdListVarcharType");
-        }
-
         private static SqlParameter CreateTimePeriodListType(string parameterName,
             IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> values)
         {
             return CreateListType(parameterName, values.AsTimePeriodListTable(), "dbo.TimePeriodListType");
-        }
-
-        private static SqlParameter CreateListType(string parameterName, object value, string typeName)
-        {
-            return new SqlParameter(parameterName, value)
-            {
-                SqlDbType = SqlDbType.Structured,
-                TypeName = typeName
-            };
         }
 
         private static IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriodRange(
