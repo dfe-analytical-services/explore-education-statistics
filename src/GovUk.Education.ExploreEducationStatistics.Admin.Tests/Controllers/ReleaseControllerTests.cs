@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Http;
@@ -43,19 +44,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
 
             var dataFile = MockFile("datafile.csv");
             var metaFile = MockFile("metafile.csv");
-
+            
             releaseService.Setup(s => s.GetAsync(It.IsAny<Guid>()))
                 .Returns(Task.FromResult(new Release {Id = releaseId}));
             fileStorageService
-                .Setup(service => service.UploadFilesAsync(releaseId, dataFile, metaFile, "Subject name"))
-                .Returns(Task.CompletedTask);
+                .Setup(service => service.UploadDataFilesAsync(releaseId, dataFile, metaFile, "Subject name"))
+                .Returns(Task.FromResult<IEnumerable<FileInfo>>(new List<FileInfo>()));
 
             var controller = new ReleasesController(releaseService.Object, fileStorageService.Object,
                 importService.Object);
 
             var actionResult = await controller.AddDataFiles(releaseId, "Subject name", dataFile, metaFile);
 
-            Assert.IsAssignableFrom<OkResult>(actionResult);
+            Assert.IsAssignableFrom<ActionResult<IEnumerable<FileInfo>>>(actionResult);
         }
 
         [Fact]
@@ -73,14 +74,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
 
             var actionResult = await controller.AddDataFiles(Guid.NewGuid(), "Subject name", dataFile, metaFile);
 
-            Assert.IsAssignableFrom<NotFoundResult>(actionResult);
+            Assert.IsAssignableFrom<NotFoundResult>(actionResult.Result);
         }
 
         [Fact]
         public async Task GetDataFiles_Returns_A_List_Of_Files()
         {
             var releaseId = Guid.NewGuid();
-            var testFiles = new List<FileInfo>
+            IEnumerable<FileInfo> testFiles = new []
             {
                 new FileInfo
                 {
@@ -105,7 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
 
             releaseService.Setup(s => s.GetAsync(It.IsAny<Guid>()))
                 .Returns(Task.FromResult(new Release {Id = releaseId}));
-            fileStorageService.Setup(s => s.ListFiles(releaseId)).Returns(testFiles);
+            fileStorageService.Setup(s => s.ListFilesAsync(releaseId, ReleaseFileTypes.Data)).Returns(Task.FromResult(testFiles));
 
 
             var controller = new ReleasesController(releaseService.Object, fileStorageService.Object,

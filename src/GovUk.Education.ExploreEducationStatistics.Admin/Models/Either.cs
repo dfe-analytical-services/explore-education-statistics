@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
             _right = right;
             IsLeft = false;
         }
-        
+                
         public bool IsLeft { get; }
 
         public TL Left => IsLeft ? _left : throw new ArgumentException("Calling Left on a Right");
