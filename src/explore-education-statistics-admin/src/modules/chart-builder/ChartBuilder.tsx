@@ -194,6 +194,9 @@ const ChartBuilder = ({ data }: Props) => {
               referenceLines: [],
               min: '',
               max: '',
+              tickSpacing: '',
+              unit: '',
+              tickConfig: 'default',
 
               ...previousConfig,
 
@@ -217,8 +220,6 @@ const ChartBuilder = ({ data }: Props) => {
                   : previousConfig.showGrid,
               size:
                 previousConfig.size === undefined ? '50' : previousConfig.size,
-              tickConfig: previousConfig.tickConfig || 'default',
-              tickSpacing: previousConfig.tickSpacing || '',
             },
           };
         }, {});

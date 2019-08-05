@@ -131,11 +131,25 @@ describe('VerticalBarBlock', () => {
   });
 
   test('can stack data', () => {
-    const { container } = render(<Chart {...props} stacked legend="none" />);
+    const { container } = render(
+      <Chart
+        {...{
+          ...props,
+          axes: {
+            ...props.axes,
+            minor: {
+              ...props.axes.minor,
+              min: '-10',
+              max: '20',
+            },
+          },
+        }}
+        stacked
+        legend="none"
+      />,
+    );
 
     // Unsure how to tell stacked data apart, other than the snapshot
-
-    expect(container).toMatchSnapshot();
 
     expect(
       Array.from(container.querySelectorAll('.recharts-rectangle')).length,

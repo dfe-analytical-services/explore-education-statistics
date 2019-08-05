@@ -1,20 +1,9 @@
-import {
-  FormCheckbox,
-  FormFieldset,
-  FormGroup,
-  FormRadioGroup,
-  FormTextInput,
-} from '@common/components/form';
-import FormComboBox from '@common/components/form/FormComboBox';
+import {FormCheckbox, FormFieldset, FormGroup, FormRadioGroup, FormTextInput,} from '@common/components/form';
 
-import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
-import { ChartCapabilities } from '@common/modules/find-statistics/components/charts/ChartFunctions';
-import { DataBlockMetadata } from '@common/services/dataBlockService';
-import {
-  AxisConfiguration,
-  AxisGroupBy,
-  ReferenceLine,
-} from '@common/services/publicationService';
+import FormSelect, {SelectOption} from '@common/components/form/FormSelect';
+import {ChartCapabilities} from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import {DataBlockMetadata} from '@common/services/dataBlockService';
+import {AxisConfiguration, AxisGroupBy, ReferenceLine,} from '@common/services/publicationService';
 import * as React from 'react';
 import styles from './graph-builder.module.scss';
 
@@ -41,17 +30,6 @@ const ChartAxisConfiguration = ({
   React.useEffect(() => {
     setAxisConfiguration(configuration);
   }, [configuration]);
-
-  const [selectableUnits] = React.useState<string[]>(() => {
-    return configuration.dataSets
-      .map(dataSet => meta.indicators[dataSet.indicator])
-      .filter(indicator => indicator !== null)
-      .map(indicator => indicator.unit);
-  });
-
-  const [selectedUnit] = React.useState<number>(0);
-
-  const [selectedValue, setSelectedValue] = React.useState<string>();
 
   const updateAxisConfiguration = (newValues: object) => {
     const newConfiguration = { ...axisConfiguration, ...newValues };
@@ -92,19 +70,15 @@ const ChartAxisConfiguration = ({
               value="show"
               conditional={
                 <React.Fragment>
-                  {axisConfiguration.type === 'major' && (
-                    <FormComboBox
-                      id={`${id}_unit`}
-                      inputLabel="Display Unit"
-                      onInputChange={e => setSelectedValue(e.target.value)}
-                      inputValue={selectedValue}
-                      onSelect={selected => {
-                        setSelectedValue(selectableUnits[selected]);
-                      }}
-                      options={selectableUnits}
-                      initialOption={selectedUnit}
-                    />
-                  )}
+                  <FormTextInput
+                    id={`${id}_unit`}
+                    label="Override displayed unit (leave blank to use default from metadata)"
+                    name="unit"
+                    onChange={e =>
+                      updateAxisConfiguration({ unit: e.target.value })
+                    }
+                    value={axisConfiguration.unit}
+                  />
                 </React.Fragment>
               }
             />

@@ -7,7 +7,10 @@ import PrototypePage from '@admin/pages/prototypes/components/PrototypePage';
 import PrototypeData from '@admin/pages/prototypes/PrototypeData';
 import ChartData from '@common/modules/find-statistics/components/charts/__tests__/__data__/testBlockData';
 import { DataBlockResponse } from '@common/services/dataBlockService';
-import { ChartProps } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import {
+  ChartProps,
+  StackedBarProps,
+} from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import ChartRenderer from '@common/modules/find-statistics/components/ChartRenderer';
 
 const PrototypeChartTest = () => {
@@ -15,15 +18,16 @@ const PrototypeChartTest = () => {
 
   const chartData = ChartData.AbstractChartProps;
 
-  const newChartData: ChartProps = {
+  const newChartData: StackedBarProps = {
     ...chartData,
+    stacked: true,
     axes: {
       ...chartData.axes,
 
       minor: {
         ...chartData.axes.minor,
-        tickConfig: 'startEnd',
-        tickSpacing: '1',
+        min: '-10',
+        max: '20',
       },
     },
   };

@@ -112,47 +112,36 @@ export default class VerticalBarBlock extends Component<StackedBarProps> {
             horizontal={axes.major && axes.major.showGrid !== false}
           />
 
-          {axes.minor && (
-            <YAxis
-              type="number"
-              hide={axes.minor.visible === false}
-              label={{
-                angle: -90,
-                offset: 0,
-                position: 'left',
-                value: '',
-              }}
-              scale="auto"
-              {...minorDomainTicks}
-              width={conditionallyAdd(axes.minor && axes.minor.size)}
-              interval={
-                axes.minor && !axes.minor.visible
-                  ? 'preserveStartEnd'
-                  : undefined
-              }
-            />
-          )}
+          <YAxis
+            type="number"
+            dataKey="value"
+            hide={axes.minor.visible === false}
+            unit={
+              (axes.minor.unit && axes.minor.unit !== '' && axes.minor.unit) ||
+              ''
+            }
+            scale="auto"
+            {...minorDomainTicks}
+            width={conditionallyAdd(axes.minor && axes.minor.size)}
+          />
 
-          {axes.major && (
-            <XAxis
-              type="category"
-              dataKey="name"
-              hide={axes.major.visible === false}
-              label={{
-                offset: 5,
-                position: 'bottom',
-                value: '',
-              }}
-              scale="auto"
-              {...majorDomainTicks}
-              padding={{ left: 20, right: 20 }}
-              height={conditionallyAdd(
-                axes.major && axes.major.size,
-                legend === 'bottom' ? 50 : undefined,
-              )}
-              tickMargin={10}
-            />
-          )}
+          <XAxis
+            type="category"
+            dataKey="name"
+            hide={axes.major.visible === false}
+            unit={
+              (axes.major.unit && axes.major.unit !== '' && axes.major.unit) ||
+              ''
+            }
+            scale="auto"
+            {...majorDomainTicks}
+            padding={{ left: 20, right: 20 }}
+            height={conditionallyAdd(
+              axes.major.size,
+              legend === 'bottom' ? 0 : undefined,
+            )}
+            tickMargin={10}
+          />
 
           <Tooltip />
           {(legend === 'top' || legend === 'bottom') && (
