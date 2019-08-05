@@ -1,5 +1,5 @@
 import Link from '@admin/components/Link';
-import {DayMonthYearInputs, dayMonthYearValuesToInputs, IdTitlePair,} from '@admin/services/common/types';
+import {DayMonthYearInputs, IdTitlePair,} from '@admin/services/common/types';
 import {ReleaseSetupDetails} from '@admin/services/release/types';
 import {
   validateMandatoryDayMonthYearField,
@@ -16,9 +16,10 @@ import Yup from '@common/lib/validation/yup';
 import {Dictionary} from '@common/types';
 import {FormikProps} from 'formik';
 import React, {useEffect, useState} from 'react';
+import {ObjectSchemaDefinition} from "yup";
 import DummyReferenceData, {TimePeriodCoverageGroup,} from '../../DummyReferenceData';
 
-export interface FormValues {
+export interface BaseFormValues {
   timePeriodCoverageCode: string;
   timePeriodCoverageStartYear: string;
   releaseTypeId: string;
@@ -26,19 +27,26 @@ export interface FormValues {
   nextReleaseExpectedDate: DayMonthYearInputs;
 }
 
-interface Props {
+interface Props<FormValues extends BaseFormValues> {
   releaseSetupDetails?: ReleaseSetupDetails;
   submitButtonText: string;
+  initialValuesSupplier: (timePeriodCoverageGroups: TimePeriodCoverageGroup[]) => FormValues;
+  validationRulesSupplier: (baseValidationRules: ObjectSchemaDefinition<BaseFormValues>) => ObjectSchemaDefinition<FormValues>;
   onSubmitHandler: (values: FormValues) => void;
   onCancelHandler: () => void;
+  additionalFields?: React.ReactNode;
 }
 
-const ReleaseSetupForm = ({
+const ReleaseSetupForm = <FormValues extends BaseFormValues>({
   releaseSetupDetails,
   submitButtonText,
+  initialValuesSupplier,
+  validationRulesSupplier,
   onSubmitHandler,
   onCancelHandler,
-}: Props) => {
+  additionalFields,
+}: Props<FormValues>) => {
+
   const [timePeriodCoverageGroups, setTimePeriodCoverageGroups] = useState<
     TimePeriodCoverageGroup[]
   >();
@@ -63,11 +71,15 @@ const ReleaseSetupForm = ({
     return optGroups;
   };
 
-  const emptyDayMonthYear = (): DayMonthYearInputs => ({
-    day: '',
-    month: '',
-    year: '',
-  });
+  const baseValidationRules = {
+    timePeriodCoverageCode: Yup.string().required(
+      'Choose a time period',
+    ),
+    timePeriodCoverageStartYear: Yup.string().required('Enter a start year'),
+    releaseTypeId: Yup.string(),
+    scheduledPublishDate: validateMandatoryDayMonthYearField,
+    nextReleaseExpectedDate: validateOptionalPartialDayMonthYearField,
+  };
 
   const formId = 'releaseSetupForm';
 
@@ -76,36 +88,8 @@ const ReleaseSetupForm = ({
       {timePeriodCoverageGroups && releaseTypes && (
         <Formik<FormValues>
           enableReinitialize
-          initialValues={{
-            timePeriodCoverageCode: releaseSetupDetails
-              ? releaseSetupDetails.timePeriodCoverageCode
-              : timePeriodCoverageGroups[0].options[0].id,
-            timePeriodCoverageStartYear:
-              releaseSetupDetails ? releaseSetupDetails.timePeriodCoverageStartYear.toString()
-                : '',
-            releaseTypeId: releaseSetupDetails
-              ? releaseSetupDetails.releaseType.id
-              : '',
-            scheduledPublishDate: releaseSetupDetails
-              ? dayMonthYearValuesToInputs(
-                  releaseSetupDetails.scheduledPublishDate,
-                )
-              : emptyDayMonthYear(),
-            nextReleaseExpectedDate: releaseSetupDetails
-              ? dayMonthYearValuesToInputs(
-                  releaseSetupDetails.nextReleaseExpectedDate,
-                )
-              : emptyDayMonthYear(),
-          }}
-          validationSchema={Yup.object<FormValues>({
-            timePeriodCoverageCode: Yup.string().required(
-              'Choose a time period',
-            ),
-            timePeriodCoverageStartYear: Yup.string().required('Enter a start year'),
-            releaseTypeId: Yup.string(),
-            scheduledPublishDate: validateMandatoryDayMonthYearField,
-            nextReleaseExpectedDate: validateOptionalPartialDayMonthYearField,
-          })}
+          initialValues={initialValuesSupplier(timePeriodCoverageGroups)}
+          validationSchema={Yup.object<FormValues>(validationRulesSupplier(baseValidationRules))}
           onSubmit={onSubmitHandler}
           render={(form: FormikProps<FormValues>) => {
             return (
@@ -158,6 +142,7 @@ const ReleaseSetupForm = ({
                     value: `${type.id}`,
                   }))}
                 />
+                {additionalFields}
                 <Button type="submit" className="govuk-!-margin-top-6">
                   {submitButtonText}
                 </Button>

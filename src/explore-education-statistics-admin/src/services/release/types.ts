@@ -12,9 +12,11 @@ export interface ReleaseSetupDetails {
 }
 
 export interface BaseReleaseSetupDetailsRequest {
-  timePeriodCoverageCode: string;
-  timePeriodCoverageStartYear: number;
-  releaseType: IdTitlePair;
-  scheduledPublishDate: DayMonthYearValues;
-  nextReleaseExpectedDate: DayMonthYearValues;
+  timePeriodCoverage: {
+    value: string;
+  };
+  releaseName: number;
+  releaseTypeId: string;
+  publishScheduled: DayMonthYearValues;
+  nextReleaseExpected: DayMonthYearValues;
 }

@@ -34,6 +34,7 @@ export default async (mock: MockAdapter) => {
     const allPublications = Object.values(
       mockDashboardData.dashboardPublicationsByTopicId,
     ).flat();
+
     const matchingPublication = allPublications.find(
       publication => publication.id === publicationId,
     );
@@ -43,19 +44,19 @@ export default async (mock: MockAdapter) => {
         id: generateRandomIntegerString(),
         leadStatisticianName: 'Bob',
         publicationTitle: matchingPublication.title,
-        releaseType: createRequest.releaseType,
-        timePeriodCoverageStartYear: createRequest.timePeriodCoverageStartYear,
-        timePeriodCoverageCode: createRequest.timePeriodCoverageCode,
-        scheduledPublishDate: createRequest.scheduledPublishDate,
-        nextReleaseExpectedDate: createRequest.nextReleaseExpectedDate,
+        releaseType: mockReferenceData.findReleaseType(createRequest.releaseTypeId),
+        timePeriodCoverageStartYear: createRequest.releaseName,
+        timePeriodCoverageCode: createRequest.timePeriodCoverage.value,
+        scheduledPublishDate: createRequest.publishScheduled,
+        nextReleaseExpectedDate: createRequest.nextReleaseExpected,
       };
 
-      const startYear = createRequest.timePeriodCoverageStartYear;
+      const startYear = createRequest.releaseName;
 
       const newRelease: AdminDashboardRelease = {
         id: newReleaseDetails.id,
         contact: matchingPublication.contact,
-        nextReleaseExpectedDate: createRequest.nextReleaseExpectedDate,
+        nextReleaseExpectedDate: createRequest.nextReleaseExpected,
         lastEditedUser: {
           id: '1234',
           name: 'John Smith',
@@ -63,10 +64,10 @@ export default async (mock: MockAdapter) => {
         lastEditedDateTime: format(new Date(), 'yyyy-MM-dd HH:mm:ss'),
         latestRelease: true,
         timePeriodCoverage: mockReferenceData.findTimePeriodCoverageOption(
-          createRequest.timePeriodCoverageCode,
+          createRequest.timePeriodCoverage.value,
         ),
         live: false,
-        publishScheduled: createRequest.scheduledPublishDate,
+        publishScheduled: createRequest.publishScheduled,
         releaseName: `${startYear} - ${startYear}`,
         status: ReleaseApprovalStatus.None,
       };

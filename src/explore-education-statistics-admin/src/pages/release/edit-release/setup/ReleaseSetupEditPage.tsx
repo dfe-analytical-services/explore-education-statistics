@@ -1,15 +1,22 @@
+import {TimePeriodCoverageGroup} from "@admin/pages/DummyReferenceData";
 import ReleaseSetupForm, {
-  FormValues,
+  BaseFormValues,
 } from '@admin/pages/release/setup/ReleaseSetupForm';
 import { assembleUpdateReleaseSetupRequestFromForm } from '@admin/pages/release/util/releaseSetupUtil';
 import { setupRoute } from '@admin/routes/edit-release/routes';
+import {dayMonthYearValuesToInputs} from "@admin/services/common/types";
 import service from '@admin/services/release/edit-release/setup/service';
 import { ReleaseSetupDetails } from '@admin/services/release/types';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
+import {ObjectSchemaDefinition} from "yup";
 import ReleasePageTemplate from '../components/ReleasePageTemplate';
 
 interface MatchProps {
+  releaseId: string;
+}
+
+export interface FormValues extends BaseFormValues {
   releaseId: string;
 }
 
@@ -54,6 +61,15 @@ const ReleaseSetupEditPage = ({
           <ReleaseSetupForm
             releaseSetupDetails={releaseSetupDetails}
             submitButtonText="Update release status"
+            validationRulesSupplier={(baseValidationRules: ObjectSchemaDefinition<BaseFormValues>) => baseValidationRules as ObjectSchemaDefinition<FormValues>}
+            initialValuesSupplier={(timePeriodCoverageGroups: TimePeriodCoverageGroup[]): FormValues => ({
+              releaseId,
+              timePeriodCoverageCode: releaseSetupDetails.timePeriodCoverageCode,
+              timePeriodCoverageStartYear: releaseSetupDetails.timePeriodCoverageStartYear.toString(),
+              releaseTypeId: releaseSetupDetails.releaseType.id,
+              scheduledPublishDate: dayMonthYearValuesToInputs(releaseSetupDetails.scheduledPublishDate),
+              nextReleaseExpectedDate: dayMonthYearValuesToInputs(releaseSetupDetails.nextReleaseExpectedDate),
+            })}
             onSubmitHandler={submitHandler}
             onCancelHandler={cancelHandler}
           />

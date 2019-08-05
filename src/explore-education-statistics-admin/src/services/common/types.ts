@@ -126,6 +126,12 @@ export const dateToDayMonthYear = (date?: Date) => {
   };
 };
 
+export const emptyDayMonthYear = (): DayMonthYearInputs => ({
+  day: '',
+  month: '',
+  year: '',
+});
+
 export const dayMonthYearIsComplete = (dmy?: DayMonthYearValues) => {
   return dmy && dmy.day && dmy.month && dmy.year;
 };

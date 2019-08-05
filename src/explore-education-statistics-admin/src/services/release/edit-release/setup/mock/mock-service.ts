@@ -7,7 +7,12 @@ export default async (mock: MockAdapter) => {
     /* webpackChunkName: "mock-data" */ './mock-data'
   )).default;
 
+  const mockReferenceData = (await import(
+    /* webpackChunkName: "mock-dashboard-data" */ '@admin/pages/DummyReferenceData'
+    )).default;
+
   const getReleaseSetupDetailsUrl = /\/release\/(.*)\/setup/;
+
   const updateReleaseSetupDetailsUrl = /\/release\/(.*)\/setup/;
 
   mock.onGet(getReleaseSetupDetailsUrl).reply(({ url }) => {
@@ -24,14 +29,16 @@ export default async (mock: MockAdapter) => {
       updateRequest.releaseId,
     );
 
-    /* eslint-disable no-param-reassign */
-    existingRelease.timePeriodCoverageCode =
-      updateRequest.timePeriodCoverageCode;
-    existingRelease.timePeriodCoverageStartYear = updateRequest.timePeriodCoverageStartYear;
-    existingRelease.scheduledPublishDate = updateRequest.scheduledPublishDate;
+    const timePeriodCoverage = mockReferenceData.findTimePeriodCoverageOption(
+      updateRequest.timePeriodCoverage.value,
+    );
+
+      /* eslint-disable no-param-reassign */
+    existingRelease.timePeriodCoverageCode = updateRequest.timePeriodCoverage.value;
+    existingRelease.scheduledPublishDate = updateRequest.publishScheduled;
     existingRelease.nextReleaseExpectedDate =
-      updateRequest.nextReleaseExpectedDate;
-    existingRelease.releaseType = updateRequest.releaseType;
+      updateRequest.nextReleaseExpected;
+    existingRelease.releaseType = mockReferenceData.findReleaseType(updateRequest.releaseTypeId);
     /* eslint-enable no-param-reassign */
 
     return [200];
