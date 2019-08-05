@@ -323,6 +323,10 @@ const ChartAxisConfiguration = ({
                   </td>
                   <td>
                     <button
+                      disabled={
+                        referenceLine.position === '' ||
+                        referenceLine.label === ''
+                      }
                       className="govuk-button govuk-!-margin-bottom-0"
                       type="button"
                       onClick={() => {
