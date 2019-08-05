@@ -11,12 +11,12 @@ interface Props {
   columnHeaders: string[][];
   rowHeaders: string[][];
   rows: string[][];
-  footnotes: TableData['footnotes'];
+  footnotes?: TableData['footnotes'];
 }
 
 const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
   (props, ref) => {
-    const { caption, captionId = 'dataTableCaption', footnotes } = props;
+    const { caption, captionId = 'dataTableCaption', footnotes = [] } = props;
 
     const mainTableRef = useRef<HTMLTableElement>(null);
 
