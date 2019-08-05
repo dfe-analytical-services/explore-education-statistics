@@ -9,8 +9,8 @@ const PublicationPage = () => {
       breadcrumbs={[{ text: 'Create new release', link: '#' }]}
     >
       <h1 className="govuk-heading-xl">
+        <span className="govuk-caption-xl">Create new release</span>
         Pupil absence statistics and data for schools in England
-        <span className="govuk-caption-l">Create new release</span>
       </h1>
 
       <PrototypeReleaseConfig />
