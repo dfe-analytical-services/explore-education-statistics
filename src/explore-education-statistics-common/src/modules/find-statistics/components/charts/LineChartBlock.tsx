@@ -4,15 +4,14 @@ import {
   ChartProps,
   conditionallyAdd,
   createSortedAndMappedDataForAxis,
-  createDataForAxis,
   CustomToolTip,
   GenerateMajorAxis,
   GenerateMinorAxis,
   getKeysForChart,
   populateDefaultChartProps,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
-import { ChartSymbol } from '@common/services/publicationService';
-import { Dictionary } from '@common/types';
+import {ChartSymbol} from '@common/services/publicationService';
+import {Dictionary} from '@common/types';
 
 import classnames from 'classnames';
 
