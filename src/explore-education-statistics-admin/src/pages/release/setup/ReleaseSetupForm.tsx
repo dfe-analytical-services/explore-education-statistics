@@ -1,22 +1,24 @@
 import Link from '@admin/components/Link';
-import {DayMonthYearInputs, IdTitlePair,} from '@admin/services/common/types';
+import { DayMonthYearInputs, IdTitlePair } from '@admin/services/common/types';
 import {
   validateMandatoryDayMonthYearField,
   validateOptionalPartialDayMonthYearField,
 } from '@admin/validation/validation';
 import Button from '@common/components/Button';
-import {Form, FormFieldset, Formik} from '@common/components/form';
+import { Form, FormFieldset, Formik } from '@common/components/form';
 import FormFieldDayMonthYear from '@common/components/form/FormFieldDayMonthYear';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
-import {SelectOption} from '@common/components/form/FormSelect';
+import { SelectOption } from '@common/components/form/FormSelect';
 import Yup from '@common/lib/validation/yup';
-import {Dictionary} from '@common/types';
-import {FormikProps} from 'formik';
-import React, {useEffect, useState} from 'react';
-import {ObjectSchemaDefinition} from "yup";
-import DummyReferenceData, {TimePeriodCoverageGroup,} from '../../DummyReferenceData';
+import { Dictionary } from '@common/types';
+import { FormikProps } from 'formik';
+import React, { useEffect, useState } from 'react';
+import { ObjectSchemaDefinition } from 'yup';
+import DummyReferenceData, {
+  TimePeriodCoverageGroup,
+} from '../../DummyReferenceData';
 
 export interface BaseFormValues {
   timePeriodCoverageCode: string;
@@ -28,8 +30,12 @@ export interface BaseFormValues {
 
 interface Props<FormValues extends BaseFormValues> {
   submitButtonText: string;
-  initialValuesSupplier: (timePeriodCoverageGroups: TimePeriodCoverageGroup[]) => FormValues;
-  validationRulesSupplier: (baseValidationRules: ObjectSchemaDefinition<BaseFormValues>) => ObjectSchemaDefinition<FormValues>;
+  initialValuesSupplier: (
+    timePeriodCoverageGroups: TimePeriodCoverageGroup[],
+  ) => FormValues;
+  validationRulesSupplier: (
+    baseValidationRules: ObjectSchemaDefinition<BaseFormValues>,
+  ) => ObjectSchemaDefinition<FormValues>;
   onSubmitHandler: (values: FormValues) => void;
   onCancelHandler: () => void;
   additionalFields?: React.ReactNode;
@@ -43,7 +49,6 @@ const ReleaseSetupForm = <FormValues extends BaseFormValues>({
   onCancelHandler,
   additionalFields,
 }: Props<FormValues>) => {
-
   const [timePeriodCoverageGroups, setTimePeriodCoverageGroups] = useState<
     TimePeriodCoverageGroup[]
   >();
@@ -69,9 +74,7 @@ const ReleaseSetupForm = <FormValues extends BaseFormValues>({
   };
 
   const baseValidationRules = {
-    timePeriodCoverageCode: Yup.string().required(
-      'Choose a time period',
-    ),
+    timePeriodCoverageCode: Yup.string().required('Choose a time period'),
     timePeriodCoverageStartYear: Yup.string().required('Enter a start year'),
     releaseTypeId: Yup.string(),
     scheduledPublishDate: validateMandatoryDayMonthYearField,
@@ -86,7 +89,9 @@ const ReleaseSetupForm = <FormValues extends BaseFormValues>({
         <Formik<FormValues>
           enableReinitialize
           initialValues={initialValuesSupplier(timePeriodCoverageGroups)}
-          validationSchema={Yup.object<FormValues>(validationRulesSupplier(baseValidationRules))}
+          validationSchema={Yup.object<FormValues>(
+            validationRulesSupplier(baseValidationRules),
+          )}
           onSubmit={onSubmitHandler}
           render={(form: FormikProps<FormValues>) => {
             return (

@@ -1,17 +1,19 @@
 import Page from '@admin/components/Page';
-import {TimePeriodCoverageGroup} from "@admin/pages/DummyReferenceData";
-import ReleaseSetupForm, {BaseFormValues,} from '@admin/pages/release/setup/ReleaseSetupForm';
-import {assembleCreateReleaseRequestFromForm} from '@admin/pages/release/util/releaseSetupUtil';
+import { TimePeriodCoverageGroup } from '@admin/pages/DummyReferenceData';
+import ReleaseSetupForm, {
+  BaseFormValues,
+} from '@admin/pages/release/setup/ReleaseSetupForm';
+import { assembleCreateReleaseRequestFromForm } from '@admin/pages/release/util/releaseSetupUtil';
 import dashboardRoutes from '@admin/routes/dashboard/routes';
-import {setupRoute} from '@admin/routes/edit-release/routes';
-import {emptyDayMonthYear} from "@admin/services/common/types";
+import { setupRoute } from '@admin/routes/edit-release/routes';
+import { emptyDayMonthYear } from '@admin/services/common/types';
 import service from '@admin/services/release/create-release/service';
-import {CreateReleaseRequest} from '@admin/services/release/create-release/types';
-import FormFieldRadioGroup from "@common/components/form/FormFieldRadioGroup";
+import { CreateReleaseRequest } from '@admin/services/release/create-release/types';
+import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import Yup from '@common/lib/validation/yup';
 import React from 'react';
-import {RouteComponentProps} from 'react-router';
-import {ObjectSchemaDefinition} from "yup";
+import { RouteComponentProps } from 'react-router';
+import { ObjectSchemaDefinition } from 'yup';
 
 interface MatchProps {
   publicationId: string;
@@ -53,7 +55,9 @@ const CreateReleasePage = ({
     >
       <ReleaseSetupForm<FormValues>
         submitButtonText="Create new release"
-        initialValuesSupplier={(timePeriodCoverageGroups: TimePeriodCoverageGroup[]): FormValues => ({
+        initialValuesSupplier={(
+          timePeriodCoverageGroups: TimePeriodCoverageGroup[],
+        ): FormValues => ({
           timePeriodCoverageCode: timePeriodCoverageGroups[0].options[0].id,
           timePeriodCoverageStartYear: '',
           releaseTypeId: '',
@@ -61,26 +65,31 @@ const CreateReleasePage = ({
           nextReleaseExpectedDate: emptyDayMonthYear(),
           templateReleaseId: '',
         })}
-        validationRulesSupplier={(baseValidationRules: ObjectSchemaDefinition<BaseFormValues>): ObjectSchemaDefinition<FormValues> => ({
+        validationRulesSupplier={(
+          baseValidationRules: ObjectSchemaDefinition<BaseFormValues>,
+        ): ObjectSchemaDefinition<FormValues> => ({
           ...baseValidationRules,
           templateReleaseId: Yup.string().required('Choose a template'),
         })}
         onSubmitHandler={submitHandler}
         onCancelHandler={cancelHandler}
-        additionalFields={(
+        additionalFields={
           <FormFieldRadioGroup<FormValues>
-            id='releaseSetupForm-templateReleaseId'
+            id="releaseSetupForm-templateReleaseId"
             legend="Select template"
             name="templateReleaseId"
-            options={[{
-              label: 'Create new template',
-              value: `new`,
-            }, {
-              label: 'Copy existing template (2017 / 2018)',
-              value: `existing`,
-            }]}
+            options={[
+              {
+                label: 'Create new template',
+                value: `new`,
+              },
+              {
+                label: 'Copy existing template (2017 / 2018)',
+                value: `existing`,
+              },
+            ]}
           />
-        )}
+        }
       />
     </Page>
   );

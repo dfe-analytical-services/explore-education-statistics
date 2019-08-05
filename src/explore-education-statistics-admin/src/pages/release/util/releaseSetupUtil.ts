@@ -1,10 +1,10 @@
-import {dayMonthYearInputsToValues} from '@admin/services/common/types';
-import {CreateReleaseRequest} from "@admin/services/release/create-release/types";
-import {UpdateReleaseSetupDetailsRequest} from "@admin/services/release/edit-release/setup/types";
-import {BaseReleaseSetupDetailsRequest} from "@admin/services/release/types";
-import {BaseFormValues} from '../setup/ReleaseSetupForm';
-import {FormValues as CreateFormValues} from '../create-release/CreateReleasePage';
-import {FormValues as ReleaaseSetupEditPage} from '../edit-release/setup/ReleaseSetupEditPage';
+import { dayMonthYearInputsToValues } from '@admin/services/common/types';
+import { CreateReleaseRequest } from '@admin/services/release/create-release/types';
+import { UpdateReleaseSetupDetailsRequest } from '@admin/services/release/edit-release/setup/types';
+import { BaseReleaseSetupDetailsRequest } from '@admin/services/release/types';
+import { BaseFormValues } from '../setup/ReleaseSetupForm';
+import { FormValues as CreateFormValues } from '../create-release/CreateReleasePage';
+import { FormValues as ReleaaseSetupEditPage } from '../edit-release/setup/ReleaseSetupEditPage';
 
 export const assembleBaseReleaseSetupRequestFromForm = (
   values: BaseFormValues,
@@ -14,9 +14,7 @@ export const assembleBaseReleaseSetupRequestFromForm = (
       value: values.timePeriodCoverageCode,
     },
     releaseName: parseInt(values.timePeriodCoverageStartYear, 10),
-    publishScheduled: dayMonthYearInputsToValues(
-      values.scheduledPublishDate,
-    ),
+    publishScheduled: dayMonthYearInputsToValues(values.scheduledPublishDate),
     nextReleaseExpected: dayMonthYearInputsToValues(
       values.nextReleaseExpectedDate,
     ),

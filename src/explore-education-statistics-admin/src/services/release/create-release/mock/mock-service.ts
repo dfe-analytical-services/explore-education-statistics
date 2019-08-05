@@ -2,8 +2,8 @@ import {
   AdminDashboardRelease,
   ReleaseApprovalStatus,
 } from '@admin/services/dashboard/types';
-import {CreateReleaseRequest} from '@admin/services/release/create-release/types';
-import {ReleaseSetupDetails} from "@admin/services/release/types";
+import { CreateReleaseRequest } from '@admin/services/release/create-release/types';
+import { ReleaseSetupDetails } from '@admin/services/release/types';
 import {
   generateRandomIntegerString,
   getCaptureGroups,
@@ -44,7 +44,9 @@ export default async (mock: MockAdapter) => {
         id: generateRandomIntegerString(),
         leadStatisticianName: 'Bob',
         publicationTitle: matchingPublication.title,
-        releaseType: mockReferenceData.findReleaseType(createRequest.releaseTypeId),
+        releaseType: mockReferenceData.findReleaseType(
+          createRequest.releaseTypeId,
+        ),
         timePeriodCoverageStartYear: createRequest.releaseName,
         timePeriodCoverageCode: createRequest.timePeriodCoverage.value,
         scheduledPublishDate: createRequest.publishScheduled,

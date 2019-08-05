@@ -1,5 +1,5 @@
-import {ReleaseSetupDetails} from '@admin/services/release//types';
-import {UpdateReleaseSetupDetailsRequest} from "@admin/services/release/edit-release/setup/types";
+import { ReleaseSetupDetails } from '@admin/services/release//types';
+import { UpdateReleaseSetupDetailsRequest } from '@admin/services/release/edit-release/setup/types';
 import { createClient } from '@admin/services/util/service';
 import mocks from './mock/mock-service';
 

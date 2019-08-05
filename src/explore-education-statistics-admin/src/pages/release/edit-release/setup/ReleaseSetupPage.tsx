@@ -50,13 +50,8 @@ const ReleaseSetupPage = ({ match }: RouteComponentProps<MatchProps>) => {
               )}
             </SummaryListItem>
             <SummaryListItem term="Release period">
-              <time>
-                {releaseSetupDetails.timePeriodCoverageStartYear}
-              </time>
-              {' '}to{' '}
-              <time>
-                {releaseSetupDetails.timePeriodCoverageStartYear + 1}
-              </time>
+              <time>{releaseSetupDetails.timePeriodCoverageStartYear}</time> to{' '}
+              <time>{releaseSetupDetails.timePeriodCoverageStartYear + 1}</time>
             </SummaryListItem>
             <SummaryListItem term="Lead statistician">
               {releaseSetupDetails.leadStatisticianName}

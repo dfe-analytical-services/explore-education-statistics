@@ -1,5 +1,5 @@
-import {UpdateReleaseSetupDetailsRequest} from "@admin/services/release/edit-release/setup/types";
-import {getCaptureGroups,} from '@admin/services/util/mock/mock-service';
+import { UpdateReleaseSetupDetailsRequest } from '@admin/services/release/edit-release/setup/types';
+import { getCaptureGroups } from '@admin/services/util/mock/mock-service';
 import MockAdapter from 'axios-mock-adapter';
 
 export default async (mock: MockAdapter) => {
@@ -9,7 +9,7 @@ export default async (mock: MockAdapter) => {
 
   const mockReferenceData = (await import(
     /* webpackChunkName: "mock-dashboard-data" */ '@admin/pages/DummyReferenceData'
-    )).default;
+  )).default;
 
   const getReleaseSetupDetailsUrl = /\/release\/(.*)\/setup/;
 
@@ -29,11 +29,13 @@ export default async (mock: MockAdapter) => {
       updateRequest.releaseId,
     );
 
-    existingRelease.timePeriodCoverageCode = updateRequest.timePeriodCoverage.value;
+    existingRelease.timePeriodCoverageCode =
+      updateRequest.timePeriodCoverage.value;
     existingRelease.scheduledPublishDate = updateRequest.publishScheduled;
-    existingRelease.nextReleaseExpectedDate =
-      updateRequest.nextReleaseExpected;
-    existingRelease.releaseType = mockReferenceData.findReleaseType(updateRequest.releaseTypeId);
+    existingRelease.nextReleaseExpectedDate = updateRequest.nextReleaseExpected;
+    existingRelease.releaseType = mockReferenceData.findReleaseType(
+      updateRequest.releaseTypeId,
+    );
     /* eslint-enable no-param-reassign */
 
     return [200];

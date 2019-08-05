@@ -1,6 +1,6 @@
-import {CreateReleaseRequest} from "@admin/services/release/create-release/types";
-import {ReleaseSetupDetails} from "@admin/services/release/types";
-import {createClient} from '@admin/services/util/service';
+import { CreateReleaseRequest } from '@admin/services/release/create-release/types';
+import { ReleaseSetupDetails } from '@admin/services/release/types';
+import { createClient } from '@admin/services/util/service';
 import mocks from './mock/mock-service';
 
 const apiClient = createClient({
