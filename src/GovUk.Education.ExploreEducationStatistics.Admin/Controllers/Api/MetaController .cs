@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
+    [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    [Route("meta")]
     public class MetaController : ControllerBase
     {
         private readonly IMetaService _metaService;

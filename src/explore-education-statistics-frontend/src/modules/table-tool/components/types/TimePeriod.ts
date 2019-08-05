@@ -1,21 +1,17 @@
 import { TimePeriodOption } from '@common/services/tableBuilderService';
 import { TimePeriodCode } from '@common/services/types/TimePeriod';
+import { Filter } from './filters';
 
-export default class TimePeriod {
+export default class TimePeriod extends Filter {
   public readonly year: number;
 
   public readonly code: string;
 
-  public readonly label: string;
-
   public constructor({ year, code, label }: TimePeriodOption) {
+    super({ label, value: `${year}_${code}` });
+
     this.code = code;
     this.year = year;
-    this.label = label;
-  }
-
-  public get value(): string {
-    return `${this.year}_${this.code}`;
   }
 }
 

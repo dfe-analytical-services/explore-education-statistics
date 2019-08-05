@@ -1,13 +1,13 @@
 import { ReleaseApprovalStatus } from '@admin/services/dashboard/types';
-import { User } from '@admin/services/sign-in/service';
+import { User } from '@admin/services/sign-in/types';
 
-export interface IdLabelPair {
+export interface IdTitlePair {
   id: string;
-  label: string;
+  title: string;
 }
 
 export interface ContactDetails {
-  id?: string;
+  id: string;
   contactName: string;
   contactTelNo: string;
   teamEmail: string;
@@ -22,7 +22,7 @@ export interface UserDetails {
 export interface Topic {
   id: string;
   title: string;
-  theme: IdLabelPair;
+  theme: IdTitlePair;
 }
 
 export interface TimePeriodCoverage {
@@ -60,7 +60,7 @@ export interface Release {
   timePeriodCoverage: TimePeriodCoverage;
   scheduledPublishDate: DayMonthYearValues;
   nextReleaseExpectedDate: Date;
-  releaseType: IdLabelPair;
+  releaseType: IdTitlePair;
   slug: string;
   status: ReleaseStatus;
   lead: ContactDetails;
@@ -86,7 +86,7 @@ export interface Publication {
   legacyReleases: LegacyRelease[];
   topic: Topic;
   contact: ContactDetails;
-  methodology: IdLabelPair;
+  methodology: IdTitlePair;
   owner: User;
 }
 
@@ -95,6 +95,28 @@ export interface DayMonthYearValues {
   month?: number;
   year?: number;
 }
+
+export interface DayMonthYearInputs {
+  day: string;
+  month: string;
+  year: string;
+}
+
+export const dayMonthYearValuesToInputs = (
+  dmy: DayMonthYearValues,
+): DayMonthYearInputs => ({
+  day: dmy.day ? dmy.day.toString() : '',
+  month: dmy.month ? dmy.month.toString() : '',
+  year: dmy.year ? dmy.year.toString() : '',
+});
+
+export const dayMonthYearInputsToValues = (
+  dmy: DayMonthYearInputs,
+): DayMonthYearValues => ({
+  day: dmy.day ? parseInt(dmy.day, 10) : undefined,
+  month: dmy.month ? parseInt(dmy.month, 10) : undefined,
+  year: dmy.year ? parseInt(dmy.year, 10) : undefined,
+});
 
 export const dateToDayMonthYear = (date?: Date) => {
   return {

@@ -1,8 +1,10 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
+using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 {
@@ -14,7 +16,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         public Guid ReleaseTypeId { get; set; }
         
         [Required]
-        public TimeIdentifier TimeIdentifier { get; set; }
+        [JsonConverter(typeof(TimeIdentifierJsonConverter))]
+        public TimeIdentifier TimePeriodCoverage { get; set; }
         
         public DateTime? PublishScheduled { get; set; }
         

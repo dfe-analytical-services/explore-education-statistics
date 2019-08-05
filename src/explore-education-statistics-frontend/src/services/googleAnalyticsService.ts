@@ -2,15 +2,27 @@ import ReactGA from 'react-ga';
 
 let initialised = false;
 
+export const googleAnalyticsCookies = ['_ga', '_gid', '_gat'];
+
 if (
   process.env.GA_TRACKING_ID !== undefined &&
-  process.env.GA_TRACKING === 'true'
+  process.env.GA_TRACKING === 'true' &&
+  !initialised
 ) {
   ReactGA.initialize(process.env.GA_TRACKING_ID);
   initialised = true;
 
   // eslint-disable-next-line no-console
   console.log('GA initialised');
+}
+
+export function enableGA() {
+  // @ts-ignore
+  window[`ga-disable-${process.env.GA_TRACKING_ID}`] = false;
+}
+export function disableGA() {
+  // @ts-ignore
+  window[`ga-disable-${process.env.GA_TRACKING_ID}`] = true;
 }
 
 export const logPageView = () => {
@@ -41,5 +53,6 @@ export interface AnalyticProps {
   analytics?: {
     category: string;
     action: string;
+    label?: string;
   };
 }

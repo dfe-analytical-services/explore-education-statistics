@@ -1,17 +1,18 @@
+import publicationRoutes from '@admin/routes/edit-publication/routes';
 import { AdminDashboardPublication } from '@admin/services/dashboard/types';
 import FormSelect from '@common/components/form/FormSelect';
 import React from 'react';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
-import { IdLabelPair } from '@admin/services/common/types';
+import { IdTitlePair } from '@admin/services/common/types';
 import Link from '@admin/components/Link';
 import AdminDashboardPublicationSummary from './AdminDashboardPublicationSummary';
 
 interface AdminDashboardPublicationsTabProps {
   publications: AdminDashboardPublication[];
   noResultsMessage: string;
-  themes: IdLabelPair[];
-  topics: IdLabelPair[];
+  themes: IdTitlePair[];
+  topics: IdTitlePair[];
   selectedThemeId: string;
   selectedTopicId: string;
   onThemeChange: (selectedThemeId: string) => void;
@@ -35,12 +36,17 @@ const AdminDashboardPublicationsTab = ({
 
   return (
     <section>
-      <h2 className="govuk-heading-l govuk-!-margin-bottom-0">
-        {`${selectedTheme.label}, ${selectedTopic.label}`}
-      </h2>
-      <p className="govuk-body">
-        Edit an existing release or create a new release for current
-        publications.
+      <p className="govuk-body">Select publications to:</p>
+      <ul className="govuk-list--bullet">
+        <li>create new releases and methodologies</li>
+        <li>edit exiting releases and methodologies</li>
+        <li>view and sign-off releases and methodologies</li>
+      </ul>
+      <p className="govuk-bo">
+        To remove publications, releases and methodologies email{' '}
+        <a href="mailto:explore.statistics@education.gov.uk">
+          explore.statistics@education.gov.uk
+        </a>
       </p>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-one-half">
@@ -49,7 +55,7 @@ const AdminDashboardPublicationsTab = ({
             label="Select theme"
             name="selectTheme"
             options={themes.map(theme => ({
-              label: theme.label,
+              label: theme.title,
               value: theme.id,
             }))}
             value={selectedThemeId}
@@ -64,7 +70,7 @@ const AdminDashboardPublicationsTab = ({
             label="Select topic"
             name="selectTopic"
             options={topics.map(topic => ({
-              label: topic.label,
+              label: topic.title,
               value: topic.id,
             }))}
             value={selectedTopicId}
@@ -74,6 +80,9 @@ const AdminDashboardPublicationsTab = ({
           />
         </div>
       </div>
+      <hr />
+      <h2>{selectedTheme.title}</h2>
+      <h3>{selectedTopic.title}</h3>
       {publications.length > 0 && (
         <Accordion id="publications">
           {publications.map(publication => (
@@ -90,7 +99,10 @@ const AdminDashboardPublicationsTab = ({
       {publications.length === 0 && (
         <div className="govuk-inset-text">{noResultsMessage}</div>
       )}
-      <Link to="/prototypes/publication-create-new" className="govuk-button">
+      <Link
+        to={publicationRoutes.createPublication.generateLink(selectedTopicId)}
+        className="govuk-button"
+      >
         Create new publication
       </Link>
     </section>

@@ -21,10 +21,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controller
             var permalinkService = new Mock<IPermalinkService>();
 
             permalinkService.Setup(s => s.GetAsync(_validId)).ReturnsAsync(
-                new PermalinkViewModel() {Id = _validId.ToString(), Title = "Example title", Data = new ResultWithMetaViewModel()}
+                new PermalinkViewModel() {Id = _validId, Title = "Example title", Data = new ResultWithMetaViewModel()}
             );
             permalinkService.Setup(s => s.CreateAsync(_query)).ReturnsAsync(
-                new PermalinkViewModel() {Id = Guid.NewGuid().ToString(), Title = "Example title", Data = new ResultWithMetaViewModel()}
+                new PermalinkViewModel() {Id = Guid.NewGuid(), Title = "Example title", Data = new ResultWithMetaViewModel()}
             );
             
             _controller = new PermalinkController(permalinkService.Object);
@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controller
 
             var link = result.Value as PermalinkViewModel;
             
-            Assert.Equal(_validId.ToString(), link.Id);
+            Assert.Equal(_validId, link.Id);
             Assert.Equal("Example title", link.Title);
             Assert.Equal("/data-tables/permalink/" + _validId, link.Url);
 

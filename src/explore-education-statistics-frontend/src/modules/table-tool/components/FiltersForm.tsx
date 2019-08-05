@@ -57,7 +57,15 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
       enableReinitialize
       ref={formikRef}
       initialValues={{
-        filters: mapValues(subjectMeta.filters, () => []),
+        filters: mapValues(subjectMeta.filters, filter => {
+          if (typeof filter.options.Default !== 'undefined') {
+            // Automatically select filter option when there is only one
+            return filter.options.Default.options.length === 1
+              ? [filter.options.Default.options[0].value]
+              : [];
+          }
+          return [];
+        }),
         indicators: [],
       }}
       validationSchema={Yup.object<FormValues>({
@@ -149,6 +157,19 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                 {...props}
                 form={form}
                 formId={formId}
+                onSubmitClick={() => {
+                  // Automatically select totalValue for filters that haven't had a selection made
+                  Object.keys(form.values.filters).forEach(filterName => {
+                    if (
+                      form.values.filters[filterName].length === 0 &&
+                      subjectMeta.filters[filterName].totalValue
+                    ) {
+                      form.setFieldValue(`filters.${filterName}`, [
+                        subjectMeta.filters[filterName].totalValue,
+                      ]);
+                    }
+                  });
+                }}
                 submitText="Create table"
                 submittingText="Creating table"
               />

@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "ce5e094d-54fd-40d5-ad57-9ed3a567fc1a",
+		"_postman_id": "c0584e54-44f5-4913-adb4-3e250c3a765b",
 		"name": "DfE Data API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -785,6 +785,116 @@
 										"body": {
 											"mode": "raw",
 											"raw": "{\n\tsubjectId: 1\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/meta/subject",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"meta",
+												"subject"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Subject Meta - Filter SubjectId 1 LA Barking and Dagenham + LAD Adur Copy",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "08c7178b-9b71-4fb9-8c3e-9770e6d90e49",
+												"exec": [
+													"var respJson = pm.response.json();",
+													"",
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"filters\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"filters.Characteristic\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"filters.SchoolType\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"filters.YearBreakdown\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceFields\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceByReason\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceForPersistentAbsentees\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.localAuthority\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.localAuthorityDistrict\"));",
+													"    // NOTE(mark): Will be fixed in DFE-1101",
+													"    //pm.expect(pm.response.to.not.have.jsonBody(\"locations.country\"));",
+													"    //pm.expect(pm.response.to.not.have.jsonBody(\"locations.region\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.options\"));",
+													"});",
+													"",
+													"pm.test(\"Number of characteristic options should be correct\", function () { ",
+													"    pm.expect(Object.keys(respJson.filters.Characteristic.options).length).to.equal(11);",
+													"    pm.expect(respJson.filters.Characteristic.options.AllPupils.options.length).to.equal(1);",
+													"    pm.expect(respJson.filters.Characteristic.options.Gender.options.length).to.equal(2);",
+													"    pm.expect(respJson.filters.Characteristic.options.EthnicGroupMajor.options.length).to.equal(8);",
+													"    pm.expect(respJson.filters.Characteristic.options.EthnicGroupMinor.options.length).to.equal(19);",
+													"    pm.expect(respJson.filters.Characteristic.options.NCYear.options.length).to.equal(14);",
+													"    pm.expect(respJson.filters.Characteristic.options.FSM.options.length).to.equal(3);",
+													"    pm.expect(respJson.filters.Characteristic.options.FSMEver6.options.length).to.equal(3);",
+													"    pm.expect(respJson.filters.Characteristic.options.SENProvision.options.length).to.equal(7);",
+													"    pm.expect(respJson.filters.Characteristic.options.SENPrimaryNeed.options.length).to.equal(14);",
+													"    pm.expect(respJson.filters.Characteristic.options.FirstLanguage.options.length).to.equal(4);",
+													"});",
+													"",
+													"pm.test(\"Number of school type default options should be correct\", function () { ",
+													"    pm.expect(Object.keys(respJson.filters.SchoolType.options.Default.options).length).to.equal(4);",
+													"});",
+													"",
+													"pm.test(\"Number of time periods options should be correct\", function() {",
+													"    pm.expect(respJson.timePeriod.options.length).to.equal(5); ",
+													"});",
+													"",
+													"pm.test(\"Number of location options should be correct\", function() {",
+													"    pm.expect(respJson.locations.localAuthority.options.length).to.equal(1);",
+													"    pm.expect(respJson.locations.localAuthority.options[0].label).to.equal(\"Barking and Dagenham\");",
+													"    ",
+													"    pm.expect(respJson.locations.localAuthorityDistrict.options.length).to.equal(1);",
+													"    pm.expect(respJson.locations.localAuthorityDistrict.options[0].label).to.equal(\"Adur\");",
+													"});",
+													"",
+													"pm.test(\"Expect indicators to have correct properties\", function () {",
+													"    pm.expect(respJson.indicators.AbsenceFields.options.length).to.equal(10);",
+													"    pm.expect(respJson.indicators.AbsenceByReason.options.length).to.equal(16);",
+													"    pm.expect(respJson.indicators.AbsenceForPersistentAbsentees.options.length).to.equal(7);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "6db8370e-6078-4279-94d7-438d85a476f7",
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"subjectId\": 1,\n    \"localAuthority\": [\"E09000002\"],\n    \"localAuthorityDistrict\": [\"E07000223\"]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject",
@@ -2018,7 +2128,6 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations.country\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations.region\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.localAuthority\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
@@ -2026,8 +2135,8 @@
 													"});",
 													"",
 													"pm.test(\"Number of YearOfAdmission options should be correct\", function () { ",
-													"    pm.expect(pm.response.json().filters.YearOfAdmission.options.Primary.options.length).to.equal(2);",
-													"    pm.expect(pm.response.json().filters.YearOfAdmission.options.Secondary.options.length).to.equal(2);",
+													"    pm.expect(pm.response.json().filters.YearOfAdmission.options.Primary.options.length).to.equal(1);",
+													"    pm.expect(pm.response.json().filters.YearOfAdmission.options.Secondary.options.length).to.equal(1);",
 													"});",
 													"",
 													"pm.test(\"Time periods options should be correct\", function() {",
@@ -2037,7 +2146,6 @@
 													"pm.test(\"Number of location options should be correct\", function() {",
 													"    pm.expect(pm.response.json().locations.country.options.length).to.equal(1);",
 													"    pm.expect(pm.response.json().locations.region.options.length).to.equal(2);",
-													"    pm.expect(pm.response.json().locations.localAuthority.options.length).to.equal(34);",
 													"});",
 													"",
 													"pm.test(\"Expect correct number of indicator categories\", function () {",
@@ -2394,7 +2502,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "4305c315-122a-4d29-ace3-0af70e73d69a",
+												"id": "25b228b2-a5ae-4b3b-a65c-e3c449b7a46d",
 												"exec": [
 													"respJson = pm.response.json()",
 													"",
@@ -2409,30 +2517,15 @@
 													"        switch(respJson.footnotes[i].id) {",
 													"            case 1:",
 													"                pm.expect(respJson.footnotes[i].label).to.equal(\"State-funded primary and secondary schools include middle schools as deemed.\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"1\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"23\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"26\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"28\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"30\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"31\");",
-													"                pm.expect(respJson.footnotes[i].indicators.length).to.equal(6);",
 													"                break;",
 													"            case 8:",
 													"                pm.expect(respJson.footnotes[i].label).to.equal(\"Absence rates are the number of absence sessions expressed as a percentage of the total number of possible sessions.\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"23\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"26\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"28\");",
-													"                pm.expect(respJson.footnotes[i].indicators.length).to.equal(3);",
 													"                break;",
 													"            case 9:",
 													"                pm.expect(respJson.footnotes[i].label).to.equal(\"Pupil enrolments missing 10 percent or more of their own possible sessions (due to authorised or unauthorised absence) are classified as persistent absentees.\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"30\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"31\");",
-													"                pm.expect(respJson.footnotes[i].indicators.length).to.equal(2);",
 													"                break;",
 													"            case 12:",
 													"                pm.expect(respJson.footnotes[i].label).to.equal(\"Number of enrolments includes pupils on the school roll for at least one session who are aged between 5 and 15, excluding boarders. Some pupils may be counted more than once (if they moved schools during the academic year or are registered in more than one school).\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.eql([\"1\"]);",
 													"                break;",
 													"            case 13:",
 													"                pm.expect(respJson.footnotes[i].id).to.not.equal(13);",
@@ -2638,7 +2731,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
+												"id": "be43473c-e6d5-4af2-bd3b-69ab2f3c948c",
 												"exec": [
 													"respJson = pm.response.json();",
 													"",
@@ -2653,47 +2746,28 @@
 													"        switch(respJson.footnotes[i].id) {",
 													"            case 1:",
 													"                pm.expect(respJson.footnotes[i].label).to.equal(\"State-funded primary and secondary schools include middle schools as deemed.\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"23\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"26\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"28\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"30\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"31\");",
-													"                pm.expect(respJson.footnotes[i].indicators.length).to.equal(5);",
 													"                break;",
 													"            case 8:",
 													"                pm.expect(respJson.footnotes[i].label).to.equal(\"Absence rates are the number of absence sessions expressed as a percentage of the total number of possible sessions.\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"23\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"26\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"28\");",
-													"                pm.expect(respJson.footnotes[i].indicators.length).to.equal(3);",
 													"                break;",
 													"            case 9:",
 													"                pm.expect(respJson.footnotes[i].label).to.equal(\"Pupil enrolments missing 10 percent or more of their own possible sessions (due to authorised or unauthorised absence) are classified as persistent absentees.\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"30\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"31\");",
-													"                pm.expect(respJson.footnotes[i].indicators.length).to.equal(2);",
 													"                break;",
 													"            case 10:",
 													"                pm.expect(respJson.footnotes[i].label).to.equal(\"The definition of persistent absence changed from the 2015/16 academic year - The information presented for years prior to 2015/16 has been produced using the same methodology in order to allow users to make comparisons on a consistent basis over time.\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"30\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"31\");",
-													"                pm.expect(respJson.footnotes[i].indicators.length).to.equal(2);                ",
 													"                break;",
 													"            case 11:",
 													"                pm.expect(respJson.footnotes[i].label).to.equal(\"The persistent absentee rate is the number of persistent absentees expressed as a percentage of the total number of enrolments.\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.eql([\"30\"]);",
 													"                break;",
 													"            case 13:",
 													"                pm.expect(respJson.footnotes[i].id).to.not.equal(13);",
 													"                break;",
-													"            // NOTE(mark): To be implemented in DFE-1127",
-													"            // case 18:",
-													"            //     pm.expect(respJson.footnotes[i].id).to.not.equal(18); // Shouldn't happen, as no SEN provision results returned",
-													"            //     break;",
-													"            // NOTE(mark): To be implemented in DFE-1127",
-													"            // case 21:",
-													"            //     pm.expect(respJson.footnotes[i].id).to.not.equal(21); // Shouldn't happen, as no Ethnic Group Minor results returned",
-													"            //     break;",
+													"            case 18:",
+													"                pm.expect(respJson.footnotes[i].id).to.not.equal(18); // Shouldn't happen, as no SEN provision results returned",
+													"                break;",
+													"            case 21:",
+													"                pm.expect(respJson.footnotes[i].id).to.not.equal(21); // Shouldn't happen, as no Ethnic Group Minor results returned",
+													"                break;",
 													"            case 24:",
 													"                pm.expect(respJson.footnotes[i].id).to.not.equal(24); // Should only show for absence for four year olds",
 													"                break;",
@@ -2769,49 +2843,25 @@
 													"        switch(respJson.footnotes[i].id) {",
 													"            case 1:",
 													"                pm.expect(respJson.footnotes[i].label).to.equal(\"State-funded primary and secondary schools include middle schools as deemed.\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"23\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"26\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"28\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"30\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"31\");",
-													"                pm.expect(respJson.footnotes[i].indicators.length).to.equal(5);",
 													"                break;",
 													"            case 2:",
 													"                pm.expect(respJson.footnotes[i].label).to.equal(\"State-funded primary schools include all primary academies, including free schools.\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"23\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"26\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"28\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"30\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"31\");",
-													"                pm.expect(respJson.footnotes[i].indicators.length).to.equal(5);",
 													"                break;",
-													"            // NOTE(mark): Shouldn't return as no school_type secondary returned. To be implemented in future ticket.",
-													"            // case 3:",
-													"            //     pm.expect(respJson.footnotes[i].id).to.not.equal(3);",
-													"            //     break;",
+													"            case 3:",
+													"                pm.expect(respJson.footnotes[i].id).to.not.equal(3); // Shouldn't return as no school_type secondary",
+													"                break;",
 													"            case 8:",
 													"                pm.expect(respJson.footnotes[i].label).to.equal(\"Absence rates are the number of absence sessions expressed as a percentage of the total number of possible sessions.\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"23\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"26\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"28\");",
-													"                pm.expect(respJson.footnotes[i].indicators.length).to.equal(3);",
 													"                break;",
 													"            // NOTE(mark): Fixed by https://github.com/dfe-analytical-services/explore-education-statistics/pull/447/files",
 													"            case 9:",
 													"                pm.expect(respJson.footnotes[i].label).to.equal(\"Pupil enrolments missing 10 percent or more of their own possible sessions (due to authorised or unauthorised absence) are classified as persistent absentees.\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"30\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"31\");",
-													"                pm.expect(respJson.footnotes[i].indicators.length).to.equal(2);",
 													"                break;",
 													"            case 10:",
 													"                pm.expect(respJson.footnotes[i].label).to.equal(\"The definition of persistent absence changed from the 2015/16 academic year - The information presented for years prior to 2015/16 has been produced using the same methodology in order to allow users to make comparisons on a consistent basis over time.\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"30\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.include(\"31\");",
-													"                pm.expect(respJson.footnotes[i].indicators.length).to.equal(2);",
 													"                break;",
 													"            case 11:",
 													"                pm.expect(respJson.footnotes[i].label).to.equal(\"The persistent absentee rate is the number of persistent absentees expressed as a percentage of the total number of enrolments.\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.eql([\"30\"]);",
 													"                break;",
 													"            case 24:",
 													"                pm.expect(respJson.footnotes[i].id).to.not.equal(24); // Should only show for absence for four year olds",
@@ -4150,20 +4200,17 @@
 													"pm.test(\"Validate footnotes\", function () {",
 													"    for(var i = 0; i < respJson.footnotes.length; i++) {",
 													"        switch(respJson.footnotes[i].id) {",
-													"            // NOTE(mark): To be implemented in DFE-1127",
-													"            // case 2:",
-													"            //     pm.expect(respJson.footnotes[i].id).to.not.equal(2); // Since school_type !== primary",
-													"            //     break;",
+													"            case 2:",
+													"                pm.expect(respJson.footnotes[i].id).to.not.equal(2); // Since school_type !== primary",
+													"                break;",
 													"            case 12:",
 													"                pm.expect(respJson.footnotes[i].id).to.not.equal(12); // Since subject == absence for four year olds",
 													"                break;",
 													"            case 24:",
 													"                pm.expect(respJson.footnotes[i].label).to.equal(\"Includes pupils on the school roll for at least one session who are aged 4, excluding boarders. Some pupils may be counted more than once (if they moved schools during the academic year or are registered at more than one school).\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.eql([\"92\"]);",
 													"                break;",
 													"            case 25:",
 													"                pm.expect(respJson.footnotes[i].label).to.equal(\"Only overall absence is recorded for pupils aged 4, absences are not categorised as authorised or unauthorised.\");",
-													"                pm.expect(respJson.footnotes[i].indicators).to.eql([\"94\",\"95\"]);",
 													"                break;",
 													"        }",
 													"    }",
@@ -4821,7 +4868,7 @@
 													"});",
 													"",
 													"pm.test(\"Every result should contain location country England only\", function () {",
-													"    for(var i = 0; i < pm.response.json().result.length; i++) {",
+													"    for(var i = 0; i < respJson.result.length; i++) {",
 													"        pm.expect(respJson.result[i].location.country.name).to.equal(\"England\");",
 													"        pm.expect(pm.response.to.not.have.jsonBody(`result[${i}].location.localAuthority`));",
 													"        pm.expect(pm.response.to.not.have.jsonBody(`result[${i}].location.localAuthorityDistrict`));",
@@ -5940,6 +5987,229 @@
 						}
 					],
 					"_postman_isSubFolder": true
+				}
+			]
+		},
+		{
+			"name": "Permalink",
+			"item": [
+				{
+					"name": "Permalink - Absence by characteristic - create permalink",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bf224cd6-d62d-4b6b-afd4-8cf2e352fcbd",
+								"exec": [
+									"var respJson = pm.response.json();",
+									"",
+									"",
+									"// NOTE: Save permalink id for use in the next request",
+									"pm.globals.set(\"permalink_id\", respJson.id);",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Fields are present\", function () {",
+									"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"title\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"created\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"url\"));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "2cec492a-fc8e-4e42-9663-af2f42ae27c7",
+								"exec": [
+									"pm.globals.set(\"FILT_AllPupils\", \"70\");",
+									"pm.globals.set(\"FILT_GenderMale\", \"4\");",
+									"pm.globals.set(\"FILT_GenderFemale\", \"5\");",
+									"pm.globals.set(\"FILT_StateFundedPrimary\", \"71\");",
+									"pm.globals.set(\"FILT_StateFundedSecondary\", \"75\");",
+									"pm.globals.set(\"FILT_FSMEligible\", \"43\");",
+									"pm.globals.set(\"FILT_FSMNotEligible\", \"44\");",
+									"pm.globals.set(\"FILT_FSMUnclassified\", \"45\");",
+									"pm.globals.set(\"FILT_EthMinor_Irish\", \"24\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"subjectId\": 1,\n    \"country\": [\"E92000001\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_AllPupils}}\n    ],\n    \"indicators\": [\n        1, 23, 26\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{data_api_url}}/permalink",
+							"host": [
+								"{{data_api_url}}"
+							],
+							"path": [
+								"permalink"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Permalink - Absence by characteristic - get created permalink",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "4305c315-122a-4d29-ace3-0af70e73d69a",
+								"exec": [
+									"var respJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Should have correct fields\", function () {",
+									"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"title\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"created\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"url\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"data.metaData\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"data.metaData.filters\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"data.metaData.indicators\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"data.metaData.locations\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"data.timePeriodRange\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"data.result\"));",
+									"});",
+									"",
+									"pm.test(\"Response id should match request permalink id\", function () {",
+									"    pm.expect(respJson.id).to.equal(pm.globals.get(\"permalink_id\"));",
+									"});",
+									"",
+									"pm.test(\"Number of metaData filters should be correct\", function () {",
+									"   pm.expect(Object.keys(respJson.data.metaData.filters).length).to.equal(5);",
+									"   ",
+									"   pm.expect(pm.response.to.have.jsonBody(\"data.metaData.filters.3\"));",
+									"   pm.expect(pm.response.to.have.jsonBody(\"data.metaData.filters.70\"));",
+									"   pm.expect(pm.response.to.have.jsonBody(\"data.metaData.filters.71\"));",
+									"   pm.expect(pm.response.to.have.jsonBody(\"data.metaData.filters.74\"));",
+									"   pm.expect(pm.response.to.have.jsonBody(\"data.metaData.filters.75\"));",
+									"});",
+									"",
+									"pm.test(\"Number of metaData locations should be correct\", function () {",
+									"   pm.expect(Object.keys(respJson.data.metaData.locations).length).to.equal(1); ",
+									"   pm.expect(pm.response.to.have.jsonBody(\"data.metaData.locations.E92000001\"));",
+									"});",
+									"",
+									"pm.test(\"geographicLevel should be same as request\", function () {",
+									"    for(var i = 0; i < respJson.data.result.length; i++) {",
+									"        pm.expect(respJson.data.result[i].geographicLevel).to.equal(\"Country\");",
+									"    }",
+									"});",
+									"",
+									"pm.test(\"Number of results should be correct\", function () { ",
+									"    pm.expect(respJson.data.result.length).to.equal(3); ",
+									"});",
+									"",
+									"pm.test(\"Every result should contain location country England only\", function () {",
+									"    for(var i = 0; i < respJson.data.result.length; i++) {",
+									"        pm.expect(respJson.data.result[i].location.country.name).to.equal(\"England\");",
+									"        pm.expect(pm.response.to.not.have.jsonBody(`data.result[${i}].location.localAuthority`));",
+									"        pm.expect(pm.response.to.not.have.jsonBody(`data.result[${i}].location.localAuthorityDistrict`));",
+									"        pm.expect(pm.response.to.not.have.jsonBody(`data.result[${i}].location.region`));",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{data_api_url}}/permalink/{{permalink_id}}",
+							"host": [
+								"{{data_api_url}}"
+							],
+							"path": [
+								"permalink",
+								"{{permalink_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Permalink - Absence by characteristic - invalid permalinkId",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "4305c315-122a-4d29-ace3-0af70e73d69a",
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{data_api_url}}/permalink/5948f25b-25ae-488a-bf54-e8913e89de18",
+							"host": [
+								"{{data_api_url}}"
+							],
+							"path": [
+								"permalink",
+								"5948f25b-25ae-488a-bf54-e8913e89de18"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
