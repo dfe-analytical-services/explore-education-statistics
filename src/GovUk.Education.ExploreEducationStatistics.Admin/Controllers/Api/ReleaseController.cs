@@ -24,18 +24,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         private readonly IFileStorageService _fileStorageService;
         private readonly IImportService _importService;
 
-        public ReleasesController(IReleaseService releaseService, IFileStorageService fileStorageService, IImportService importService)
+        public ReleasesController(IReleaseService releaseService, IFileStorageService fileStorageService,
+            IImportService importService)
         {
             _releaseService = releaseService;
             _fileStorageService = fileStorageService;
             _importService = importService;
-
         }
 
         // POST api/publication/{publicationId}/releases
         [HttpPost("publication/{publicationId}/releases")]
         [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
-        public async Task<ActionResult<ReleaseViewModel>> CreateReleaseAsync(CreateReleaseViewModel release, PublicationId publicationId)
+        public async Task<ActionResult<ReleaseViewModel>> CreateReleaseAsync(CreateReleaseViewModel release,
+            PublicationId publicationId)
         {
             release.PublicationId = publicationId;
             return await _releaseService.CreateReleaseAsync(release);
@@ -58,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             }
 
             var files = _fileStorageService.ListFiles(release.Id);
-            
+
             return Ok(files);
         }
 
@@ -69,7 +70,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [ProducesResponseType(404)]
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<IActionResult> AddDataFiles(Guid releaseId, string name, IFormFile file, IFormFile metaFile)
+        [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
+        public async Task<IActionResult> AddDataFiles(ReleaseId releaseId,
+            [Required] [FromQuery(Name = "name")] string name, IFormFile file, IFormFile metaFile)
         {
             var release = await _releaseService.GetAsync(releaseId);
             if (release == null)
@@ -99,11 +102,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             return await _releaseService.GetReleaseSummaryAsync(releaseId);
         }
-        
-        
+
+
         [HttpPut("releases/{releaseId}/summary")]
         [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
-        public async Task<ActionResult<ReleaseViewModel>> EditReleaseSummaryAsync(EditReleaseSummaryViewModel model, ReleaseId releaseId)
+        public async Task<ActionResult<ReleaseViewModel>> EditReleaseSummaryAsync(EditReleaseSummaryViewModel model,
+            ReleaseId releaseId)
         {
             model.Id = releaseId;
             return await _releaseService.EditReleaseSummaryAsync(model);
@@ -113,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpGet("/publications/{publicationId}/releases")]
         [AllowAnonymous] // TODO We will need to do Authorisation checks when we know what the permissions model is.
         public async Task<ActionResult<List<ReleaseViewModel>>> GetReleaseForPublicationAsync(
-            [Required]PublicationId publicationId)
+            [Required] PublicationId publicationId)
         {
             return await _releaseService.GetReleasesForPublicationAsync(publicationId);
         }
