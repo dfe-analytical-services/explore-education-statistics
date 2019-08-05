@@ -39,24 +39,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _storageConnectionString = config.GetConnectionString("CoreStorage");
         }
 
-        public async Task<IEnumerable<FileInfo>> UploadDataFilesAsync(Guid releaseId, IFormFile dataFile, IFormFile metaFile,
+        public async Task<Either<ValidationResult, IEnumerable<FileInfo>>> UploadDataFilesAsync(Guid releaseId,
+            IFormFile dataFile, IFormFile metaFile,
             string name)
         {
             var blobContainer = await GetCloudBlobContainer();
-            var result = await UploadFileAsync(blobContainer, releaseId, dataFile, ReleaseFileTypes.Data, new List<KeyValuePair<string, string>>
-            {
-                new KeyValuePair<string, string>("name", name),
-                new KeyValuePair<string, string>("metafile", metaFile.FileName)
-            });
-            
-            await UploadFileAsync(blobContainer, releaseId, metaFile, ReleaseFileTypes.Data, new List<KeyValuePair<string, string>>
-            {
-                new KeyValuePair<string, string>("datafile", dataFile.FileName)
-            });
-            return await ListFilesAsync(releaseId, ReleaseFileTypes.Data);
+            return await UploadFileAsync(blobContainer, releaseId, dataFile, ReleaseFileTypes.Data,
+                new List<KeyValuePair<string, string>>
+                {
+                    new KeyValuePair<string, string>("name", name),
+                    new KeyValuePair<string, string>("metafile", metaFile.FileName)
+                }).Map(async result =>
+                await UploadFileAsync(blobContainer, releaseId, metaFile, ReleaseFileTypes.Data,
+                    new List<KeyValuePair<string, string>>
+                    {
+                        new KeyValuePair<string, string>("datafile", dataFile.FileName)
+                    })).Map(async result => await ListFilesAsync(releaseId, ReleaseFileTypes.Data));
         }
-        
-        public async Task<IEnumerable<FileInfo>> UploadFilesAsync(Guid releaseId, IFormFile dataFile, string name, ReleaseFileTypes type)
+
+        public async Task<IEnumerable<FileInfo>> UploadFilesAsync(Guid releaseId, IFormFile dataFile, string name,
+            ReleaseFileTypes type)
         {
             var blobContainer = await GetCloudBlobContainer();
             await UploadFileAsync(blobContainer, releaseId, dataFile, type, new List<KeyValuePair<string, string>>
@@ -75,7 +77,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return blobContainer;
         }
 
-        private static async Task<Either<ValidationResult, bool>> UploadFileAsync(CloudBlobContainer blobContainer, Guid releaseId,
+        private static async Task<Either<ValidationResult, bool>> UploadFileAsync(CloudBlobContainer blobContainer,
+            Guid releaseId,
             IFormFile file, ReleaseFileTypes type, IEnumerable<KeyValuePair<string, string>> metaValues)
         {
             var blob = blobContainer.GetBlockBlobReference(ReleasePath(releaseId, type) + $"/{file.FileName}");
@@ -85,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await AddMetaValuesAsync(blob, metaValues);
             return true;
         }
-        
+
         private static async Task<string> UploadToTemporaryFile(IFormFile file)
         {
             var path = Path.GetTempFileName();
@@ -96,6 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await file.CopyToAsync(stream);
                 }
             }
+
             return path;
         }
 
@@ -103,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await ListFilesAsync(releaseId.ToString(), type);
         }
-        
+
         public async Task<IEnumerable<FileInfo>> ListFilesAsync(string releaseId, ReleaseFileTypes type)
         {
             var blobContainer = await GetCloudBlobContainer();
@@ -138,7 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return blob.Metadata.TryGetValue("name", out var name) ? name : "";
         }
-        
+
         private static string GetMetaFileName(CloudBlob blob)
         {
             return blob.Metadata.TryGetValue("metafile", out var name) ? name : "";

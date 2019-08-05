@@ -123,10 +123,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await CheckReleaseExistsAsync(releaseId, async () =>
             {
                 // upload the files
-                var result = await _fileStorageService.UploadDataFilesAsync(releaseId, file, metaFile, name);
-                // add message to queue to process these files
-                _importService.Import(file.FileName, releaseId);
-                return Ok(result);
+                var result = await _fileStorageService.UploadDataFilesAsync(releaseId, file, metaFile, name)
+                    .Map(() => _importService.Import(file.FileName, releaseId));
+                if (result.IsLeft)
+                {
+                    ValidationUtils.AddErrors(ModelState, result.Left);
+                    return ValidationProblem();
+                }
+                return Ok(result.Right);
             });
         }
 
