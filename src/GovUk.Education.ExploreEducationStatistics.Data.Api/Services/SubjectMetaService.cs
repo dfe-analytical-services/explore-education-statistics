@@ -76,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 : _indicatorService.GetIndicators(subjectId, indicators);
 
             return indicatorList.ToDictionary(
-                indicator => indicator.Name,
+                indicator => indicator.Id.ToString(),
                 indicator => _mapper.Map<IndicatorMetaViewModel>(indicator));
         }
 
