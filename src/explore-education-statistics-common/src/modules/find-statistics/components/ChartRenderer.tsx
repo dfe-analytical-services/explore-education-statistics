@@ -17,8 +17,23 @@ export interface ChartRendererProps extends ChartProps, StackedBarProps {
   type: ChartType;
 }
 
+function ChartTypeRenderer({ type, ...chartProps }: ChartRendererProps) {
+  switch (type.toLowerCase()) {
+    case 'line':
+      return <LineChartBlock {...chartProps} />;
+    case 'verticalbar':
+      return <VerticalBarBlock {...chartProps} />;
+    case 'horizontalbar':
+      return <HorizontalBarBlock {...chartProps} />;
+    case 'map':
+      return <DynamicMapBlock {...chartProps} />;
+    default:
+      return <div>[ Unimplemented chart type requested ${type} ]</div>;
+  }
+}
+
 function ChartRenderer(props: ChartRendererProps) {
-  const { type, data, meta, ...remainingProps } = props;
+  const { type, data, meta, title, ...remainingProps } = props;
 
   // TODO : Temporary sort on the results to get them in date order
   data.result.sort((a, b) => a.timePeriod.localeCompare(b.timePeriod));
@@ -32,18 +47,12 @@ function ChartRenderer(props: ChartRendererProps) {
       ...remainingProps,
     };
 
-    switch (type.toLowerCase()) {
-      case 'line':
-        return <LineChartBlock {...chartProps} />;
-      case 'verticalbar':
-        return <VerticalBarBlock {...chartProps} />;
-      case 'horizontalbar':
-        return <HorizontalBarBlock {...chartProps} />;
-      case 'map':
-        return <DynamicMapBlock {...chartProps} />;
-      default:
-        return <div>[ Unimplemented chart type requested ${type} ]</div>;
-    }
+    return (
+      <>
+        {title && <h3>{title}</h3>}
+        <ChartTypeRenderer type={type} {...chartProps} />
+      </>
+    );
   }
 
   return <div>Invalid data specified</div>;

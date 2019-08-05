@@ -97,6 +97,7 @@ const ChartBuilder = ({ data }: Props) => {
     legendHeight: '42',
     height: 300,
     width: undefined,
+    title: '',
   });
   const previousAxesConfiguration = React.useRef<Dictionary<AxisConfiguration>>(
     {},
