@@ -219,6 +219,8 @@ const ChartBuilder = ({ data }: Props) => {
                 previousConfig.size === undefined ? '50' : previousConfig.size,
               tickConfig: previousConfig.tickConfig || 'default',
               tickSpacing: previousConfig.tickSpacing || '',
+              sortBy: previousConfig.sortBy || 'default',
+              sortAsc: previousConfig.sortAsc || false,
             },
           };
         }, {});
@@ -275,6 +277,7 @@ const ChartBuilder = ({ data }: Props) => {
                   configuration={axis}
                   capabilities={selectedChartType.capabilities}
                   meta={data.metaData}
+                  chartDataConfiguration={dataSetAndConfiguration}
                   onConfigurationChange={updatedConfig => {
                     setAxesConfiguration({
                       ...axesConfiguration,
