@@ -5,18 +5,17 @@ import React from 'react';
 interface Props {
   task?: string;
   reviewType?: string;
+  user?: string;
 }
 
-const AdminDashboardReadyForApproval = ({ task }: Props) => {
+const AdminDashboardReadyForApproval = ({ task, user }: Props) => {
   const userContext = React.useContext(LoginContext);
 
-  const tagLabel =
-    userContext.user &&
-    userContext.user.permissions.includes('responsible statistician')
-      ? 'Ready for final sign off'
-      : 'Ready for you to review';
+  const tagLabel = window.location.search.includes('status=readyHigherReview')
+    ? 'In higher review'
+    : 'First draft';
 
-  const checkStatus = window.location.search.includes('?status=readyApproval')
+  const checkStatus = window.location.search.includes('status=ready')
     ? 'checkReleases'
     : 'noReleases';
 
@@ -42,7 +41,7 @@ const AdminDashboardReadyForApproval = ({ task }: Props) => {
               'responsible statistician',
             ) && <p>Level 2: higher review</p>}
 
-          <p className="govuk-body">
+          {/*<p className="govuk-body">
             {task === 'readyReview' ? (
               'Review the following draft releases.'
             ) : (
@@ -56,7 +55,7 @@ const AdminDashboardReadyForApproval = ({ task }: Props) => {
                 </strong>
               </div>
             )}
-          </p>
+            </p>*/}
 
           <hr />
 
@@ -66,7 +65,7 @@ const AdminDashboardReadyForApproval = ({ task }: Props) => {
           <PrototypeDashboardRelease
             title="Academic year,"
             years="2018 to 2019"
-            tag={task === 'readyReview' ? tagLabel : 'Resolve comments'}
+            tag={tagLabel}
             review
             lastEdited={new Date('2019-03-20 17:37')}
             lastEditor={{ id: 'me', name: 'me', permissions: [] }}
@@ -74,6 +73,7 @@ const AdminDashboardReadyForApproval = ({ task }: Props) => {
             nextRelease={new Date('2020-09-20 09:30')}
             showComments
             task={task}
+            user={user}
             isNew
           />
         </>

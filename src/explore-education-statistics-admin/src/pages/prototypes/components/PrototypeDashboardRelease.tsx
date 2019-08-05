@@ -21,6 +21,7 @@ interface Props {
   dataType?: string;
   showComments?: boolean;
   task?: string;
+  user?: string;
 }
 
 const PrototypeDashboardRelease = ({
@@ -40,6 +41,7 @@ const PrototypeDashboardRelease = ({
   dataType,
   showComments,
   task,
+  user,
 }: Props) => {
   return (
     <Details
@@ -119,7 +121,7 @@ const PrototypeDashboardRelease = ({
             <dt className="govuk-summary-list__key">Comments</dt>
             <dd className="govuk-summary-list__value">
               <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-                In review
+                First draft comments
               </h3>
               <Details
                 summary="Ann Evans, 17 June 2018, 17:35"
@@ -146,7 +148,7 @@ const PrototypeDashboardRelease = ({
                 </p>
               </Details>
               <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-                Final sign-off
+                HIgher review comments
               </h3>
               <Details
                 summary="Stephen Doherty, 17 June 2018, 17:35"
@@ -198,9 +200,25 @@ const PrototypeDashboardRelease = ({
           View release and resolve comments
         </Link>
       )}
-      {task === 'readyReview' && (
+      {task === 'readyApproval' && (
         <Link to="/prototypes/publication-review" className="govuk-button">
-          View and review release
+          View and edit release
+        </Link>
+      )}
+      {task === 'readyHigherReview' && user === 'standardUser' && (
+        <Link
+          to="/prototypes/publication-higher-review"
+          className="govuk-button"
+        >
+          View release
+        </Link>
+      )}
+      {task === 'readyHigherReview' && user === 'higherReviewUser' && (
+        <Link
+          to="/prototypes/publication-higher-review"
+          className="govuk-button"
+        >
+          View and review release for publication
         </Link>
       )}
     </Details>

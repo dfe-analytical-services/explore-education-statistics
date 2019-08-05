@@ -11,6 +11,7 @@ import PrototypePage from './components/PrototypePage';
 
 const UserType = () => {
   const userContext = React.useContext(LoginContext);
+
   return (
     <>
       {userContext.user &&
@@ -31,11 +32,20 @@ const UserType = () => {
 
 const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
   const userContext = React.useContext(LoginContext);
+  const task = location.search.includes('?status=readyApproval')
+    ? 'readyApproval'
+    : 'readyHigherReview';
+  const user =
+    userContext.user &&
+    userContext.user.permissions.includes('responsible statistician')
+      ? 'higherReviewUser'
+      : 'standardUser';
+
   return (
     <PrototypePage wide>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <span className="govuk-caption-xl">Welcome</span>
+          <span className="govuk-caption-xl">Welcome {user}</span>
           <h1 className="govuk-heading-xl">
             {userContext.user && userContext.user.name}
             <UserType />{' '}
@@ -79,15 +89,17 @@ const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
         <TabsSection
           id="task-ready-approval1"
           title={`View draft releases ${
-            location.search.includes('?status=readyApproval') ? '(1)' : '(0)'
+            location.search.includes('status=ready') ? '(1)' : '(0)'
           }`}
         >
-          <AdminDashboardReadyForApproval task="readyReview" />
+          <AdminDashboardReadyForApproval task={task} user={user} />
         </TabsSection>
         <TabsSection
           id="task-in-progress2"
           title={`View scheduled releases ${
-            location.search.includes('?status=readyApproval') ? '(1)' : '(0)'
+            location.search.includes('status=approvedPublication')
+              ? '(1)'
+              : '(0)'
           }`}
         >
           <AdminDashboardReadyForApproval task="resolveComments" />

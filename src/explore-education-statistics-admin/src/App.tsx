@@ -34,7 +34,7 @@ import PublicationCreateNewAbsenceScheduleEdit from './pages/prototypes/Prototyp
 import PublicationCreateNewAbsenceStatus from './pages/prototypes/PrototypePublicationPageNewAbsenceStatus';
 import PublicationCreateNewAbsenceTable from './pages/prototypes/PrototypePublicationPageNewAbsenceTable';
 import PublicationCreateNewAbsenceViewTables from './pages/prototypes/PrototypePublicationPageNewAbsenceViewTables';
-// import PublicationReviewPage from './pages/prototypes/PrototypePublicationPageReviewAbsence';
+import PublicationReviewPage from './pages/prototypes/PrototypePublicationPageReviewAbsence';
 import ReleaseCreateNew from './pages/prototypes/PrototypeReleasePageCreateNew';
 import PrototypesIndexPage from './pages/prototypes/PrototypesIndexPage';
 
@@ -89,6 +89,11 @@ function App() {
           exact
           path="/prototypes/publication-review"
           render={() => <PublicationEditUnresolvedComments reviewing />}
+        />
+        <Route
+          exact
+          path="/prototypes/publication-higher-review"
+          component={PublicationReviewPage}
         />
         <Route
           exact

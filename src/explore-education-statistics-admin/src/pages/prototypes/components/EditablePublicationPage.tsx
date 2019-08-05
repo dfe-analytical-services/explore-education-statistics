@@ -34,6 +34,7 @@ interface State {
 
 interface Props {
   editing?: boolean;
+  higherReview?: boolean;
   reviewing?: boolean;
   resolveComments?: boolean;
   data: EditableRelease | undefined;
@@ -252,6 +253,7 @@ class EditablePublicationPage extends Component<Props, State> {
 
   public render() {
     const { reviewing } = this.props;
+    const { higherReview } = this.props;
     const { resolveComments } = this.props;
     const { editing } = this.props;
     const { data } = this.state;
@@ -269,10 +271,9 @@ class EditablePublicationPage extends Component<Props, State> {
               <div className="govuk-grid-row">
                 <div className="govuk-grid-column-three-quarters">
                   <span className="govuk-tag">
-                    {!reviewing && (
-                      <>{data ? 'First draft' : 'Editing in progress'}</>
+                    {higherReview && (
+                      <>{data ? 'In higher review' : 'First draft'}</>
                     )}
-                    {reviewing && <>First draft</>}
                   </span>
 
                   <dl className="dfe-meta-content">
