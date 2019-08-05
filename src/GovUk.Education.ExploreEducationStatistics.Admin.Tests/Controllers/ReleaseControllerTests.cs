@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
@@ -62,5 +63,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
             Assert.IsAssignableFrom<EditReleaseSummaryViewModel>(result.Value);
             Assert.Equal(result.Value.Id, releaseId);
         }
+        
+        
+        [Fact]
+        public async void Get_Releases_For_Publication_Returns_Ok()
+        {
+            var releaseService = new Mock<IReleaseService>();
+            var releaseId = new Guid("fc570a6c-d230-40ae-a5e5-febab330fb12");
+            releaseService
+                .Setup(s => s.GetReleasesForPublicationAsync(It.Is<Guid>(id => id == releaseId)))
+                .Returns<Guid>(x => Task.FromResult(new List<ReleaseViewModel>()));
+            var controller = new ReleasesController(releaseService.Object);
+
+            // Method under test
+            var result = await controller.GetReleaseForPublicationAsync(releaseId);
+            Assert.IsAssignableFrom<List<ReleaseViewModel>>(result.Value);
+        }                                    
     }
 }

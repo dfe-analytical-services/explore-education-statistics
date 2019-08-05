@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PublicationId = System.Guid;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
@@ -40,7 +41,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
             return NoContent();
         }
-
 
         // POST api/topic/{topicId}/publications
         [HttpPost("api/topic/{topicId}/publications")]

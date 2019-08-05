@@ -49,11 +49,6 @@ Select Indicators
     [Tags]  HappyPath
     user clicks indicator checkbox   Absence fields        Number of schools
 
-Select Characteristics
-    [Tags]   HappyPath
-    user opens details dropdown     School type
-    user clicks category checkbox   School type     Pupil Referral Unit
-
 Create table
     [Tags]  HappyPath
     user clicks element     css:#filtersForm-submit

@@ -28,11 +28,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _context.Releases.FirstOrDefault(x => x.Id == id);
         }
         
-        public async Task<Release> GetAsync(PublicationId id)
-        {
-            return await _context.Releases.Include(r => r.Publication).ThenInclude(p => p.Releases).FirstOrDefaultAsync(x => x.Id == id);
-        }
-
         public Release Get(string slug)
         {
             return _context.Releases.FirstOrDefault(x => x.Slug == slug);
@@ -44,13 +39,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         // TODO Authorisation will be required when users are introduced
-        public async Task<ReleaseViewModel> GetViewModel(ReleaseId id)
+        public async Task<ReleaseViewModel> GetReleaseForIdAsync(ReleaseId id)
         {
-            // Require publication / release graph to be able to work out if the release is the latest. 
             var release = await _context.Releases
-                .Include(r => r.Publication)
-                .ThenInclude(p => p.Releases)
-                .FirstOrDefaultAsync(x => x.Id == id); 
+                .Where(x => x.Id == id)
+                .HydrateReleaseForReleaseViewModel()
+                .FirstOrDefaultAsync(); 
             return _mapper.Map<ReleaseViewModel>(release);
         }
 
@@ -73,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Content = content
             });
             await _context.SaveChangesAsync();
-            return await GetViewModel(saved.Entity.Id);
+            return await GetReleaseForIdAsync(saved.Entity.Id);
         }
         
         // TODO Authorisation will be required when users are introduced
@@ -90,8 +84,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _context.Releases.Update(release);
             _mapper.Map(model, release);
             await _context.SaveChangesAsync();
-            return await GetViewModel(model.Id);
+            return await GetReleaseForIdAsync(model.Id);
         }
+        
+        // TODO Authorisation will be required when users are introduced
+        public async Task<List<ReleaseViewModel>> GetReleasesForPublicationAsync(PublicationId publicationId)
+        {
+            var release = await _context.Releases
+                .Where(r => r.Publication.Id == publicationId)
+                .HydrateReleaseForReleaseViewModel()
+                .ToListAsync();
+            return _mapper.Map<List<ReleaseViewModel>>(release);
+        }
+        
+        
 
         private int OrderForNextReleaseOnPublication(PublicationId publicationId)
         {
@@ -118,9 +124,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
             return new List<ContentSection>();
         }
-        
-        
-        
-        
+    }
+    public static class ReleaseLinqExtensions
+    {
+        public static IQueryable<Release> HydrateReleaseForReleaseViewModel(this IQueryable<Release> values)
+        {
+            // Require publication / release / contact / type graph to be able to work out:
+            // If the release is the latest
+            // The contact
+            // The type
+            return values.Include(r => r.Publication)
+                .Include(r => r.Publication.Releases) // Back refs required to work out latest
+                .Include(r => r.Publication.Contact) 
+                .Include(r => r.Type);
+        }
     }
 }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using ReleaseId = System.Guid;
+using PublicationId  = System.Guid;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
@@ -17,10 +18,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<ReleaseViewModel> CreateReleaseAsync(CreateReleaseViewModel release);
 
-        Task<ReleaseViewModel> GetViewModel(ReleaseId id);
+        Task<ReleaseViewModel> GetReleaseForIdAsync(ReleaseId id);
         
         Task<EditReleaseSummaryViewModel> GetReleaseSummaryAsync(ReleaseId releaseId);
         
         Task<ReleaseViewModel> EditReleaseSummaryAsync(EditReleaseSummaryViewModel model);
+
+        Task<List<ReleaseViewModel>> GetReleasesForPublicationAsync(PublicationId publicationId);
     }
 }

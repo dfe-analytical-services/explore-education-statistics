@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "1931315c-617e-4071-bc24-64c0d944c6a8",
+		"_postman_id": "c0584e54-44f5-4913-adb4-3e250c3a765b",
 		"name": "DfE Data API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -785,6 +785,116 @@
 										"body": {
 											"mode": "raw",
 											"raw": "{\n\tsubjectId: 1\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/meta/subject",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"meta",
+												"subject"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Subject Meta - Filter SubjectId 1 LA Barking and Dagenham + LAD Adur Copy",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "08c7178b-9b71-4fb9-8c3e-9770e6d90e49",
+												"exec": [
+													"var respJson = pm.response.json();",
+													"",
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"filters\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"filters.Characteristic\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"filters.SchoolType\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"filters.YearBreakdown\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceFields\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceByReason\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceForPersistentAbsentees\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.localAuthority\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.localAuthorityDistrict\"));",
+													"    // NOTE(mark): Will be fixed in DFE-1101",
+													"    //pm.expect(pm.response.to.not.have.jsonBody(\"locations.country\"));",
+													"    //pm.expect(pm.response.to.not.have.jsonBody(\"locations.region\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.options\"));",
+													"});",
+													"",
+													"pm.test(\"Number of characteristic options should be correct\", function () { ",
+													"    pm.expect(Object.keys(respJson.filters.Characteristic.options).length).to.equal(11);",
+													"    pm.expect(respJson.filters.Characteristic.options.AllPupils.options.length).to.equal(1);",
+													"    pm.expect(respJson.filters.Characteristic.options.Gender.options.length).to.equal(2);",
+													"    pm.expect(respJson.filters.Characteristic.options.EthnicGroupMajor.options.length).to.equal(8);",
+													"    pm.expect(respJson.filters.Characteristic.options.EthnicGroupMinor.options.length).to.equal(19);",
+													"    pm.expect(respJson.filters.Characteristic.options.NCYear.options.length).to.equal(14);",
+													"    pm.expect(respJson.filters.Characteristic.options.FSM.options.length).to.equal(3);",
+													"    pm.expect(respJson.filters.Characteristic.options.FSMEver6.options.length).to.equal(3);",
+													"    pm.expect(respJson.filters.Characteristic.options.SENProvision.options.length).to.equal(7);",
+													"    pm.expect(respJson.filters.Characteristic.options.SENPrimaryNeed.options.length).to.equal(14);",
+													"    pm.expect(respJson.filters.Characteristic.options.FirstLanguage.options.length).to.equal(4);",
+													"});",
+													"",
+													"pm.test(\"Number of school type default options should be correct\", function () { ",
+													"    pm.expect(Object.keys(respJson.filters.SchoolType.options.Default.options).length).to.equal(4);",
+													"});",
+													"",
+													"pm.test(\"Number of time periods options should be correct\", function() {",
+													"    pm.expect(respJson.timePeriod.options.length).to.equal(5); ",
+													"});",
+													"",
+													"pm.test(\"Number of location options should be correct\", function() {",
+													"    pm.expect(respJson.locations.localAuthority.options.length).to.equal(1);",
+													"    pm.expect(respJson.locations.localAuthority.options[0].label).to.equal(\"Barking and Dagenham\");",
+													"    ",
+													"    pm.expect(respJson.locations.localAuthorityDistrict.options.length).to.equal(1);",
+													"    pm.expect(respJson.locations.localAuthorityDistrict.options[0].label).to.equal(\"Adur\");",
+													"});",
+													"",
+													"pm.test(\"Expect indicators to have correct properties\", function () {",
+													"    pm.expect(respJson.indicators.AbsenceFields.options.length).to.equal(10);",
+													"    pm.expect(respJson.indicators.AbsenceByReason.options.length).to.equal(16);",
+													"    pm.expect(respJson.indicators.AbsenceForPersistentAbsentees.options.length).to.equal(7);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "6db8370e-6078-4279-94d7-438d85a476f7",
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"subjectId\": 1,\n    \"localAuthority\": [\"E09000002\"],\n    \"localAuthorityDistrict\": [\"E07000223\"]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/meta/subject",
