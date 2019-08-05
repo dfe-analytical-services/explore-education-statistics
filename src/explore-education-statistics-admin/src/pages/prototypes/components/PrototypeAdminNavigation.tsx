@@ -9,9 +9,9 @@ interface Props {
 const PrototypeAdminNavigation = ({ sectionId }: Props) => {
   return (
     <>
-      <h1 className="govuk-heading-l">
+      <h1 className="govuk-heading-xl">
+        <span className="govuk-caption-xl">Create new release</span>
         Pupil absence statistics and data for schools in England{' '}
-        <span className="govuk-caption-l">Create new release</span>
       </h1>
 
       <nav className="app-navigation govuk-!-margin-bottom-9">

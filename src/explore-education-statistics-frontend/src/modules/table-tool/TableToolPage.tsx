@@ -6,9 +6,11 @@ import tableBuilderService, {
   PublicationSubject,
   PublicationSubjectMeta,
   TableData,
+  TableDataQuery,
   ThemeMeta,
 } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types/util';
+import ButtonText from '@common/components/ButtonText';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PreviousStepModalConfirm from '@frontend/modules/table-tool/components/PreviousStepModalConfirm';
@@ -22,7 +24,8 @@ import TimePeriod, {
 } from '@frontend/modules/table-tool/components/types/TimePeriod';
 import mapValues from 'lodash/mapValues';
 import { NextContext } from 'next';
-import React, { Component } from 'react';
+import Router from 'next/router';
+import React, { Component, MouseEventHandler } from 'react';
 import DownloadCsvButton from './components/DownloadCsvButton';
 import FiltersForm, { FilterFormSubmitHandler } from './components/FiltersForm';
 import LocationFiltersForm, {
@@ -222,10 +225,10 @@ class TableToolPage extends Component<Props, State> {
     }));
   };
 
-  private handleFiltersFormSubmit: FilterFormSubmitHandler = async ({
-    filters,
-    indicators,
-  }) => {
+  private createQuery = (
+    filters: Dictionary<CategoryFilter[]>,
+    indicators: Indicator[],
+  ): TableDataQuery => {
     const {
       subjectId,
       startYear,
@@ -233,31 +236,36 @@ class TableToolPage extends Component<Props, State> {
       endYear,
       endCode,
       locations,
-      subjectMeta,
     } = this.state;
 
     if (!startYear || !startCode || !endYear || !endCode) {
-      return;
+      throw new Error('Missing required timePeriod parameters');
     }
 
-    const {
-      footnotes,
-      timePeriodRange,
-      result,
-    } = await tableBuilderService.getTableData({
+    return {
       ...mapValues(locations, locationLevel =>
         locationLevel.map(location => location.value),
       ),
       subjectId,
-      indicators,
-      filters: Object.values(filters).flat(),
+      indicators: indicators.map(indicator => indicator.value),
+      filters: Object.values(filters).flatMap(categoryFilters =>
+        categoryFilters.flatMap(filter => filter.value),
+      ),
       timePeriod: {
         startYear,
         startCode,
         endYear,
         endCode,
       },
-    });
+    };
+  };
+
+  private handleFiltersFormSubmit: FilterFormSubmitHandler = async values => {
+    const { startYear, startCode, endYear, endCode, subjectMeta } = this.state;
+
+    if (!startYear || !startCode || !endYear || !endCode) {
+      return;
+    }
 
     const filtersByValue = mapValues(subjectMeta.filters, value =>
       mapOptionValues(value.options),
@@ -267,8 +275,9 @@ class TableToolPage extends Component<Props, State> {
       subjectMeta.indicators,
     );
 
-    this.setState({
-      filters: mapValuesWithKeys(filters, (filterGroup, selectedFilters) =>
+    const filters = mapValuesWithKeys(
+      values.filters,
+      (filterGroup, selectedFilters) =>
         selectedFilters.map(
           filter =>
             new CategoryFilter(
@@ -276,16 +285,39 @@ class TableToolPage extends Component<Props, State> {
               filter === subjectMeta.filters[filterGroup].totalValue,
             ),
         ),
-      ),
-      indicators: indicators.map(
-        indicator => new Indicator(indicatorsByValue[indicator]),
-      ),
+    );
+
+    const indicators = values.indicators.map(
+      indicator => new Indicator(indicatorsByValue[indicator]),
+    );
+
+    const {
+      footnotes,
+      timePeriodRange,
+      result,
+    } = await tableBuilderService.getTableData(
+      this.createQuery(filters, indicators),
+    );
+
+    this.setState({
+      filters,
+      indicators,
       timePeriodRange: timePeriodRange.map(
         timePeriod => new TimePeriod(timePeriod),
       ),
       tableData: result,
       footnotes,
     });
+  };
+
+  private handlePermalinkClick: MouseEventHandler = async () => {
+    const { filters, indicators } = this.state;
+
+    const { url } = await tableBuilderService.getTablePermalink(
+      this.createQuery(filters, indicators),
+    );
+
+    Router.push(url);
   };
 
   public render() {
@@ -409,6 +441,11 @@ class TableToolPage extends Component<Props, State> {
                               >
                                 Go to publication
                               </Link>
+                            </li>
+                            <li>
+                              <ButtonText onClick={this.handlePermalinkClick}>
+                                Create permanent link
+                              </ButtonText>
                             </li>
                             <li>
                               <DownloadCsvButton

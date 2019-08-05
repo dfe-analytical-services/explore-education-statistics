@@ -2,11 +2,13 @@ import React from 'react';
 
 interface Props {
   caption?: string;
+  editing?: boolean;
 }
 
-const PrototypeTableSample = ({ caption }: Props) => {
+const PrototypeTableSample = ({ caption, editing }: Props) => {
   return (
     <>
+      {editing}
       <div className="dfe-content-overflow">
         <table className="govuk-table">
           <caption className="govuk-heading-s">{caption}</caption>
