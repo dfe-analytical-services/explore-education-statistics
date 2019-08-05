@@ -259,9 +259,8 @@ class EditablePublicationPage extends Component<Props, State> {
     return (
       <>
         <div className={editing ? 'page-editing' : ''}>
-          <span className="govuk-caption-l">Publication</span>
-
           <h1 className="govuk-heading-l">
+            <span className="govuk-caption-l">Academic year 2016/17</span>
             Pupil absence statistics and data for schools in England
           </h1>
 
@@ -271,13 +270,9 @@ class EditablePublicationPage extends Component<Props, State> {
                 <div className="govuk-grid-column-three-quarters">
                   <span className="govuk-tag">
                     {!reviewing && (
-                      <>
-                        {data
-                          ? 'New release in progress'
-                          : 'Editing in progress'}
-                      </>
+                      <>{data ? 'First draft' : 'Editing in progress'}</>
                     )}
-                    {reviewing && <>Review release</>}
+                    {reviewing && <>First draft</>}
                   </span>
 
                   <dl className="dfe-meta-content">
@@ -456,6 +451,21 @@ class EditablePublicationPage extends Component<Props, State> {
                       <Link to="/prototypes/methodology-absence">
                         Pupil absence statistics: guidance and methodology
                       </Link>
+                    </li>
+                    <li>
+                      <Link to="/prototypes/methodology-absence">
+                        This is an example of a related information link
+                      </Link>
+                      {editing && (
+                        <div>
+                          <Link
+                            to="#"
+                            className="govuk-button govuk-button--secondary"
+                          >
+                            Remove link
+                          </Link>
+                        </div>
+                      )}
                     </li>
                   </ul>
 

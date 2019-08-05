@@ -1,9 +1,8 @@
-import ButtonLink from '@frontend/components/ButtonLink';
 import FormattedDate from '@common/components/FormattedDate';
+import permalinkService, { Permalink } from '@common/services/permalinkService';
+import ButtonLink from '@frontend/components/ButtonLink';
 import Page from '@frontend/components/Page';
 import PrintThisPage from '@frontend/components/PrintThisPage';
-import RelatedAside from '@common/components/RelatedAside';
-import permalinkService, { Permalink } from '@common/services/permalinkService';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
 

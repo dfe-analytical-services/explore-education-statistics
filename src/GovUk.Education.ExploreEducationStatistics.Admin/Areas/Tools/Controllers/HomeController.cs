@@ -4,8 +4,9 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Tools.Controllers
 {
+    [Area("Tools")]
     [ApiExplorerSettings(IgnoreApi=true)]
     [Authorize]
     public class HomeController : Controller
@@ -16,11 +17,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
             return View();
         }
         
-        public async Task<IActionResult> Privacy()
-        {
-            return View();
-        }
-
         [AllowAnonymous]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> Error()

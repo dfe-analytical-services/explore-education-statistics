@@ -5,8 +5,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Tools.Controllers
 {
+    [Area("Tools")]
     [ApiExplorerSettings(IgnoreApi=true)]
     [Authorize]
     public class FileController : Controller

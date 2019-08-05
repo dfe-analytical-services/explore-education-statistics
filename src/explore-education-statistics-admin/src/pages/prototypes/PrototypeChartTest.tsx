@@ -17,15 +17,22 @@ const PrototypeChartTest = () => {
 
   const newChartData: ChartProps = {
     ...chartData,
-    legend: 'top',
-    legendHeight: '50',
+    axes: {
+      ...chartData.axes,
+
+      minor: {
+        ...chartData.axes.minor,
+        tickConfig: 'startEnd',
+        tickSpacing: '1',
+      },
+    },
   };
 
   return (
     <PrototypePage wide>
       <ChartBuilder data={data} />
 
-      <ChartRenderer type="line" {...chartData} />
+      <ChartRenderer type="horizontalbar" {...newChartData} height={500} />
     </PrototypePage>
   );
 };

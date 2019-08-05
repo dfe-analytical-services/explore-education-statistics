@@ -3,32 +3,31 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Tools.Controllers
 {
+    [Area("Tools")]
     [ApiExplorerSettings(IgnoreApi=true)]
-    [Authorize]
-    public class ReleasesController : Controller
+    public class TopicsController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public ReleasesController(ApplicationDbContext context)
+        public TopicsController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Releases
+        // GET: Topics
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Releases.Include(r => r.Publication).OrderBy(r => r.Title);
+            var applicationDbContext = _context.Topics.Include(t => t.Theme).OrderBy(t => t.Title);
             return View(await applicationDbContext.ToListAsync());
         }
 
-        // GET: Releases/Details/5
+        // GET: Topics/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
             if (id == null)
@@ -36,44 +35,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
                 return NotFound();
             }
 
-            var release = await _context.Releases
-                .Include(r => r.Publication)
+            var topic = await _context.Topics
+                .Include(t => t.Theme)
+                .Include(t => t.Publications).OrderBy(t => t.Title)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (release == null)
+            if (topic == null)
             {
                 return NotFound();
             }
 
-            return View(release);
+            return View(topic);
         }
 
-        // GET: Releases/Create
+        // GET: Topics/Create
         public IActionResult Create()
         {
-            ViewData["PublicationId"] = new SelectList(_context.Publications.OrderBy(p => p.Title), "Id", "Title");
+            ViewData["ThemeId"] = new SelectList(_context.Themes.OrderBy(t => t.Title), "Id", "Title");
             return View();
         }
 
-        // POST: Releases/Create
+        // POST: Topics/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,ReleaseName,Published,Slug,Summary,PublicationId,Content,KeyStatistics")] Release release)
+        public async Task<IActionResult> Create([Bind("Id,Title,Slug,Description,ThemeId,Summary")] Topic topic)
         {
             if (ModelState.IsValid)
             {
-                release.Id = Guid.NewGuid();
-                release.Order = NextOrder(release);
-                _context.Add(release);
+                topic.Id = Guid.NewGuid();
+                _context.Add(topic);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["PublicationId"] = new SelectList(_context.Publications, "Id", "Title", release.PublicationId);
-            return View(release);
+            ViewData["ThemeId"] = new SelectList(_context.Themes, "Id", "Title", topic.ThemeId);
+            return View(topic);
         }
 
-        // GET: Releases/Edit/5
+        // GET: Topics/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null)
@@ -81,23 +80,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
                 return NotFound();
             }
 
-            var release = await _context.Releases.FindAsync(id);
-            if (release == null)
+            var topic = await _context.Topics.FindAsync(id);
+            if (topic == null)
             {
                 return NotFound();
             }
-            ViewData["PublicationId"] = new SelectList(_context.Publications, "Id", "Title", release.PublicationId);
-            return View(release);
+            ViewData["ThemeId"] = new SelectList(_context.Themes, "Id", "Title", topic.ThemeId);
+            return View(topic);
         }
 
-        // POST: Releases/Edit/5
+        // POST: Topics/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Id,Title,ReleaseName,Published,Slug,Summary,PublicationId,Content,KeyStatistics")] Release release)
+        public async Task<IActionResult> Edit(Guid id, [Bind("Id,Title,Slug,Description,ThemeId,Summary")] Topic topic)
         {
-            if (id != release.Id)
+            if (id != topic.Id)
             {
                 return NotFound();
             }
@@ -106,12 +105,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
             {
                 try
                 {
-                    _context.Update(release);
+                    _context.Update(topic);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ReleaseExists(release.Id))
+                    if (!TopicExists(topic.Id))
                     {
                         return NotFound();
                     }
@@ -122,11 +121,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["PublicationId"] = new SelectList(_context.Publications, "Id", "Title", release.PublicationId);
-            return View(release);
+            ViewData["ThemeId"] = new SelectList(_context.Themes, "Id", "Title", topic.ThemeId);
+            return View(topic);
         }
 
-        // GET: Releases/Delete/5
+        // GET: Topics/Delete/5
         public async Task<IActionResult> Delete(Guid? id)
         {
             if (id == null)
@@ -134,37 +133,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers
                 return NotFound();
             }
 
-            var release = await _context.Releases
-                .Include(r => r.Publication)
+            var topic = await _context.Topics
+                .Include(t => t.Theme)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (release == null)
+            if (topic == null)
             {
                 return NotFound();
             }
 
-            return View(release);
+            return View(topic);
         }
 
-        // POST: Releases/Delete/5
+        // POST: Topics/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            var release = await _context.Releases.FindAsync(id);
-            _context.Releases.Remove(release);
+            var topic = await _context.Topics.FindAsync(id);
+            _context.Topics.Remove(topic);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ReleaseExists(Guid id)
+        private bool TopicExists(Guid id)
         {
-            return _context.Releases.Any(e => e.Id == id);
-        }
-
-        private int NextOrder(Release release)
-        {
-            var rel = _context.Releases.OrderByDescending(r => r.Order).FirstOrDefault(r => r.Publication.Id == release.PublicationId);
-            return rel?.Order + 1 ?? 0;
+            return _context.Topics.Any(e => e.Id == id);
         }
     }
 }

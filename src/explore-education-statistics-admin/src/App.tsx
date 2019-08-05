@@ -32,7 +32,7 @@ import PublicationCreateNew from './pages/prototypes/PrototypePublicationPageCre
 import PublicationEditPage from './pages/prototypes/PrototypePublicationPageEditAbsence';
 import PublicationEditUnresolvedComments from './pages/prototypes/PrototypePublicationPageEditAbsenceUnresolvedComments';
 import PublicationEditNew from './pages/prototypes/PrototypePublicationPageEditNew';
-import PublicationCreateNewAbsence from './pages/prototypes/PrototypePublicationPageNewAbsence';
+// import PublicationCreateNewAbsence from './pages/prototypes/PrototypePublicationPageNewAbsence';
 import PublicationCreateNewAbsenceConfig from './pages/prototypes/PrototypePublicationPageNewAbsenceConfig';
 import PublicationCreateNewAbsenceConfigEdit from './pages/prototypes/PrototypePublicationPageNewAbsenceConfigEdit';
 import PublicationCreateNewAbsenceData from './pages/prototypes/PrototypePublicationPageNewAbsenceData';
@@ -41,7 +41,7 @@ import PublicationCreateNewAbsenceScheduleEdit from './pages/prototypes/Prototyp
 import PublicationCreateNewAbsenceStatus from './pages/prototypes/PrototypePublicationPageNewAbsenceStatus';
 import PublicationCreateNewAbsenceTable from './pages/prototypes/PrototypePublicationPageNewAbsenceTable';
 import PublicationCreateNewAbsenceViewTables from './pages/prototypes/PrototypePublicationPageNewAbsenceViewTables';
-import PublicationReviewPage from './pages/prototypes/PrototypePublicationPageReviewAbsence';
+// import PublicationReviewPage from './pages/prototypes/PrototypePublicationPageReviewAbsence';
 import ReleaseCreateNew from './pages/prototypes/PrototypeReleasePageCreateNew';
 import PrototypesIndexPage from './pages/prototypes/PrototypesIndexPage';
 
@@ -132,7 +132,7 @@ function App() {
         <Route
           exact
           path="/prototypes/publication-review"
-          component={PublicationReviewPage}
+          render={() => <PublicationEditUnresolvedComments reviewing />}
         />
         <Route
           exact
@@ -162,7 +162,7 @@ function App() {
         <Route
           exact
           path="/prototypes/publication-create-new-absence"
-          component={PublicationCreateNewAbsence}
+          render={() => <PublicationEditUnresolvedComments newBlankRelease />}
         />
         <Route
           exact

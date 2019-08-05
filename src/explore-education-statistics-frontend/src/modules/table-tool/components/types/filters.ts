@@ -4,7 +4,7 @@ import {
 } from '@common/services/tableBuilderService';
 import camelCase from 'lodash/camelCase';
 
-abstract class Filter {
+export abstract class Filter {
   public readonly value: string;
 
   public readonly label: string;
@@ -15,7 +15,14 @@ abstract class Filter {
   }
 }
 
-export class CategoryFilter extends Filter {}
+export class CategoryFilter extends Filter {
+  public readonly isTotal: boolean;
+
+  public constructor({ value, label }: FilterOption, isTotal = false) {
+    super({ value, label });
+    this.isTotal = isTotal;
+  }
+}
 
 export class LocationFilter extends Filter {
   public readonly level: string;
