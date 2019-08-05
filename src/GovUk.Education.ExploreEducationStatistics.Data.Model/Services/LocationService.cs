@@ -35,7 +35,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         {
             return locations.ToDictionary(
                 pair => pair.Key,
-                pair => pair.Value.Select(location => GetObservationalUnit(pair.Key, location)));
+                pair => pair.Value.Select(location => GetObservationalUnit(pair.Key, location))
+                    // TODO DFE-679 Filter null values caused by blank local authorities
+                    .Where(unit => unit != null)
+            );
         }
 
         private static IObservationalUnit GetObservationalUnit(GeographicLevel geographicLevel, Location location)
