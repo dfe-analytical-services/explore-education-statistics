@@ -62,6 +62,7 @@ export interface ChartProps {
   meta: DataBlockMetadata;
   labels: Dictionary<DataSetConfiguration>;
   axes: AxesConfiguration;
+  title?: string;
   height?: number;
   width?: number;
   legend?: 'none' | 'top' | 'bottom';
