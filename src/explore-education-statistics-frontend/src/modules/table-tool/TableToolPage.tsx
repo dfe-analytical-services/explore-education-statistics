@@ -248,9 +248,9 @@ class TableToolPage extends Component<Props, State> {
       ),
       subjectId,
       indicators: indicators.map(indicator => indicator.value),
-      filters: Object.values(filters)
-        .map(categoryFilters => categoryFilters.map(filter => filter.value))
-        .flat(),
+      filters: Object.values(filters).flatMap(categoryFilters =>
+        categoryFilters.flatMap(filter => filter.value),
+      ),
       timePeriod: {
         startYear,
         startCode,
