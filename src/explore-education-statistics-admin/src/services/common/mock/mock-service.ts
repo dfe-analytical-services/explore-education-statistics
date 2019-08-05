@@ -1,5 +1,5 @@
 import { CommonService } from '@admin/services/common/service';
-import getCaptureGroups from '@admin/services/util/mock/mock-service';
+import { getCaptureGroups } from '@admin/services/util/mock/mock-service';
 import MockAdapter from 'axios-mock-adapter';
 
 export default async (mock: MockAdapter) => {

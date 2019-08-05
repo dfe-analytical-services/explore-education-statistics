@@ -114,6 +114,7 @@
     "coreStorageAccountName": "[concat(parameters('subscription'), 'storage', variables('storageEnv'), 'core')]",
     "coreStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('coreStorageAccountName'))]",
     "sqlserverName": "[concat(parameters('subscription'), '-sqlsvr-', parameters('environment'), '-01')]",
+    "publicSqlServerName": "[concat(parameters('subscription'), '-sqlsvr-', parameters('environment'), '-02')]",
     "importerAppName": "[concat(parameters('subscription'), '-fa-', parameters('environment'), '-importer')]",
     "importerPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-importer')]",
     "importerAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-importer')]",
@@ -660,6 +661,53 @@
           "apiVersion": "2014-04-01",
           "dependsOn": [
             "[variables('sqlserverName')]"
+          ],
+          "location": "[resourceGroup().location]",
+          "name": "AllowAllWindowsAzureIps",
+          "properties": {
+            "endIpAddress": "0.0.0.0",
+            "startIpAddress": "0.0.0.0"
+          }
+        }
+      ]
+    },
+    {
+      "name": "[variables('publicSqlServerName')]",
+      "type": "Microsoft.Sql/servers",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "SqlServer"
+      },
+      "apiVersion": "2014-04-01",
+      "properties": {
+        "administratorLogin": "[parameters('sqlAdministratorLogin')]",
+        "administratorLoginPassword": "[parameters('sqlAdministratorLoginPassword')]",
+        "version": "12.0"
+      },
+      "resources": [
+        {
+          "name": "public-statistics",
+          "type": "databases",
+          "location": "[resourceGroup().location]",
+          "tags": {
+            "displayName": "Database"
+          },
+          "apiVersion": "2015-01-01",
+          "dependsOn": [
+            "[variables('publicSqlServerName')]"
+          ],
+          "properties": {
+            "edition": "Standard",
+            "collation": "SQL_Latin1_General_CP1_CI_AS",
+            "maxSizeBytes": "268435456000",
+            "requestedServiceObjectiveName": "S3"
+          }
+        },
+        {
+          "type": "firewallrules",
+          "apiVersion": "2014-04-01",
+          "dependsOn": [
+            "[variables('publicSqlServerName')]"
           ],
           "location": "[resourceGroup().location]",
           "name": "AllowAllWindowsAzureIps",

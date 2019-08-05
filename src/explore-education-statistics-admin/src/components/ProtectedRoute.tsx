@@ -1,17 +1,24 @@
 import { LoginContext } from '@admin/components/Login';
-import loginService, { Authentication } from '@admin/services/sign-in/service';
+import signInRoutes from '@admin/routes/sign-in/routes';
+import loginService from '@admin/services/sign-in/service';
+import { Authentication } from '@admin/services/sign-in/types';
 import React, { useEffect, useState } from 'react';
 import { Redirect, Route, RouteProps } from 'react-router';
+
+interface ProtectedRouteProps extends RouteProps {
+  redirectIfNotLoggedIn?: boolean;
+}
 
 const AuthenticationCheckingComponent = ({
   component,
   location,
+  redirectIfNotLoggedIn,
   ...props
-}: RouteProps) => {
+}: ProtectedRouteProps) => {
   const redirect = () => (
     <Redirect
       to={{
-        pathname: '/sign-in',
+        pathname: signInRoutes.signIn,
         state: { from: location },
       }}
     />
@@ -26,11 +33,11 @@ const AuthenticationCheckingComponent = ({
       .catch(_ => setAuthentication({}));
   }, []);
 
-  if (!authentication) {
+  if (!authentication || !component) {
     return null;
   }
 
-  if (!authentication.user || !component) {
+  if (redirectIfNotLoggedIn && !authentication.user) {
     return redirect();
   }
 
@@ -52,11 +59,17 @@ const AuthenticationCheckingComponent = ({
  * @constructor
  */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-const ProtectedRoute = ({ component, location, ...rest }: RouteProps) => {
+const ProtectedRoute = ({
+  component,
+  location,
+  redirectIfNotLoggedIn = true,
+  ...rest
+}: ProtectedRouteProps) => {
   const routeComponent = (props: any) => (
     <AuthenticationCheckingComponent
       component={component}
       location={location}
+      redirectIfNotLoggedIn={redirectIfNotLoggedIn}
       {...props}
     />
   );

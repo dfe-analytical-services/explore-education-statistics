@@ -10,6 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public Subject Subject { get; set; }
         public long SubjectId { get; set; }
         public ICollection<FilterGroup> FilterGroups { get; set; }
+        public ICollection<FilterFootnote> Footnotes { get; set; }
 
         private Filter()
         {

@@ -14,7 +14,7 @@ import React, { useContext } from 'react';
 import { format } from 'date-fns';
 import Details from '@common/components/Details';
 import { LoginContext } from '@admin/components/Login';
-import { setupRoute } from '../../../routes/releaseRoutes';
+import { setupRoute } from '@admin/routes/edit-release/routes';
 
 const getLiveLatestLabel = (isLive: boolean, isLatest: boolean) => {
   if (isLive && isLatest) {
@@ -23,7 +23,7 @@ const getLiveLatestLabel = (isLive: boolean, isLatest: boolean) => {
   if (isLive) {
     return '(Live)';
   }
-  return undefined;
+  return '(not Live)';
 };
 
 const getTag = (approvalStatus: ReleaseApprovalStatus) => {
@@ -45,7 +45,7 @@ const DashboardReleaseSummary = ({ release }: Props) => {
       ? 'me'
       : release.lastEditedUser.name;
 
-  const releaseSummaryLabel = `${release.timePeriodCoverage.label}, ${
+  const releaseSummaryLabel = `${release.timePeriodCoverage.title}, ${
     release.releaseName
   } 
      ${getLiveLatestLabel(release.live, release.latestRelease)}`;

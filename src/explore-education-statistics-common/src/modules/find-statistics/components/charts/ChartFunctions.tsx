@@ -1,4 +1,10 @@
 import {
+  DataBlockData,
+  DataBlockMetadata,
+  Location,
+  Result,
+} from '@common/services/dataBlockService';
+import {
   Axis,
   AxisConfiguration,
   AxisGroupBy,
@@ -9,8 +15,11 @@ import {
   DataSetConfiguration,
   ReferenceLine,
 } from '@common/services/publicationService';
+import { Dictionary } from '@common/types';
+import difference from 'lodash/difference';
 import React, { ReactNode } from 'react';
 import {
+  AxisDomain,
   Label,
   PositionType,
   ReferenceLine as RechartsReferenceLine,
@@ -19,13 +28,6 @@ import {
   YAxis,
   YAxisProps,
 } from 'recharts';
-import {
-  DataBlockData,
-  DataBlockMetadata,
-  Result,
-} from '@common/services/dataBlockService';
-import difference from 'lodash/difference';
-import { Dictionary } from '@common/types';
 
 export const colours: string[] = [
   '#4763a5',
@@ -50,11 +52,16 @@ export function parseCondensedTimePeriodRange(
   return [range.substring(0, 4), range.substring(4, 6)].join(separator);
 }
 
+export interface AxesConfiguration {
+  major: AxisConfiguration;
+  minor: AxisConfiguration;
+}
+
 export interface ChartProps {
   data: DataBlockData;
   meta: DataBlockMetadata;
   labels: Dictionary<DataSetConfiguration>;
-  axes: Dictionary<AxisConfiguration>;
+  axes: AxesConfiguration;
   height?: number;
   width?: number;
   legend?: 'none' | 'top' | 'bottom';
@@ -83,6 +90,7 @@ export interface ChartCapabilities {
   stackable: boolean;
   lineStyle: boolean;
   gridLines: boolean;
+  canSize: boolean;
 }
 
 export interface ChartDefinition {
@@ -184,6 +192,10 @@ export function filterResultsBySingleDataSet(
   );
 }
 
+function existAndCodesDoNotMatch(a?: Location, b?: Location) {
+  return a !== undefined && b !== undefined && a.code !== b.code;
+}
+
 function filterResultsForDataSet(ds: ChartDataSet) {
   return (result: Result) => {
     // fail fast with the two things that are most likely to not match
@@ -191,34 +203,31 @@ function filterResultsForDataSet(ds: ChartDataSet) {
       return false;
 
     if (ds.filters) {
-      if (difference(ds.filters, result.filters).length !== 0) return false;
+      if (difference(ds.filters, result.filters).length > 0) return false;
     }
 
     if (ds.location) {
       const { location } = result;
+
+      if (existAndCodesDoNotMatch(location.country, ds.location.country))
+        return false;
+
+      if (existAndCodesDoNotMatch(location.region, ds.location.region))
+        return false;
+
       if (
-        location.country &&
-        ds.location.country &&
-        location.country.code !== ds.location.country.code
+        existAndCodesDoNotMatch(
+          location.localAuthorityDistrict,
+          ds.location.localAuthorityDistrict,
+        )
       )
         return false;
+
       if (
-        location.region &&
-        ds.location.region &&
-        location.region.code !== ds.location.region.code
-      )
-        return false;
-      if (
-        location.localAuthorityDistrict &&
-        ds.location.localAuthorityDistrict &&
-        location.localAuthorityDistrict.code !==
-          ds.location.localAuthorityDistrict.code
-      )
-        return false;
-      if (
-        location.localAuthority &&
-        ds.location.localAuthority &&
-        location.localAuthority.code !== ds.location.localAuthority.code
+        existAndCodesDoNotMatch(
+          location.localAuthority,
+          ds.location.localAuthority,
+        )
       )
         return false;
     }
@@ -422,3 +431,159 @@ export const conditionallyAdd = (size?: string, add?: number) => {
   }
   return add;
 };
+
+const calculateMinMaxReduce = (
+  { min, max }: { min: number; max: number },
+  next: string,
+) => {
+  const nextValue = parseFloat(next);
+  if (Number.isNaN(nextValue) && Number.isFinite(nextValue))
+    return { min, max };
+
+  return {
+    min: nextValue < min ? nextValue : min,
+    max: nextValue > max ? nextValue : max,
+  };
+};
+
+export function calculateDataRange(chartData: ChartDataB[]) {
+  // removing the 'name' variable from the object and just keeping the rest of the values
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const allValuesInData = chartData.reduce<string[]>(
+    (all, { name, ...values }) => [...all, ...Object.values(values)], // eslint-disable-line
+    [],
+  );
+
+  return allValuesInData.reduce(calculateMinMaxReduce, {
+    min: +Infinity,
+    max: -Infinity,
+  });
+}
+
+const parseNumberOrDefault = (
+  number: string | undefined,
+  def: number,
+): number => {
+  const parsed = number === undefined ? undefined : Number.parseFloat(number);
+
+  if (parsed === undefined || Number.isNaN(parsed)) return def;
+  return parsed;
+};
+
+function calculateMinorTicks(
+  config: string | undefined,
+  min: number,
+  max: number,
+  spacing: string = '5',
+): number[] | undefined {
+  let spacingValue = +spacing;
+
+  if (spacingValue <= 0) spacingValue = 1.0;
+  if (
+    Number.isNaN(min) ||
+    Number.isNaN(max) ||
+    !Number.isFinite(min) ||
+    !Number.isFinite(max)
+  )
+    return undefined;
+
+  if (config === 'custom') {
+    const result = [];
+
+    let [start, end] = [min, max];
+    if (start > end) [start, end] = [end, start];
+
+    for (let i = start; i < end; i += spacingValue) {
+      result.push(parseFloat(i.toPrecision(10)));
+    }
+
+    result.push(max);
+
+    return result;
+  }
+
+  if (config === 'startEnd') {
+    return [min, max];
+  }
+  return undefined;
+}
+
+function calculateMajorTicks(
+  config: string | undefined,
+  categories: string[],
+  min: number,
+  max: number,
+  spacing: string = '1',
+): string[] | undefined {
+  let spacingValue = parseInt(spacing, 10);
+
+  if (spacingValue <= 0) spacingValue = 1.0;
+  if (
+    Number.isNaN(min) ||
+    Number.isNaN(max) ||
+    !Number.isFinite(min) ||
+    !Number.isFinite(max)
+  )
+    return undefined;
+
+  if (config === 'custom') {
+    const result = [];
+
+    let [start, end] = [min, max];
+    if (start > end) [start, end] = [end, start];
+
+    for (let i = start; i < end; i += spacingValue) {
+      result.push(categories[i]);
+    }
+
+    result.push(categories[max]);
+
+    return result;
+  }
+
+  if (config === 'startEnd') {
+    return [categories[min], categories[max]];
+  }
+  return undefined;
+}
+
+export function GenerateMinorAxis(
+  chartData: ChartDataB[],
+  axis: AxisConfiguration,
+) {
+  const { min, max } = calculateDataRange(chartData);
+
+  const axisMin = parseNumberOrDefault(axis.min, min);
+  const axisMax = parseNumberOrDefault(axis.max, max);
+
+  const domain: [AxisDomain, AxisDomain] = [axisMin, axisMax];
+
+  const ticks = calculateMinorTicks(
+    axis.tickConfig,
+    axisMin,
+    axisMax,
+    axis.tickSpacing,
+  );
+  return { domain, ticks };
+}
+
+export function GenerateMajorAxis(
+  chartData: ChartDataB[],
+  axis: AxisConfiguration,
+) {
+  const majorAxisCateories = chartData.map(({ name }) => name);
+
+  const min = parseNumberOrDefault(axis.min, 0);
+  const max = parseNumberOrDefault(axis.max, majorAxisCateories.length - 1);
+
+  const domain: [AxisDomain, AxisDomain] = [min, max];
+
+  const ticks = calculateMajorTicks(
+    axis.tickConfig,
+    majorAxisCateories,
+    min,
+    max,
+    axis.tickSpacing,
+  );
+  return { domain, ticks };
+}

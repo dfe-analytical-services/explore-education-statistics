@@ -7,31 +7,31 @@ import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import { LoginContext } from '@admin/components/Login';
-import { IdLabelPair } from '@admin/services/common/types';
+import { IdTitlePair } from '@admin/services/common/types';
 import dashboardService from '@admin/services/dashboard/service';
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import AdminDashboardPublicationsTab from './components/AdminDashboardPublicationsTab';
 
-const themeToThemeWithIdLabelAndTopics = (theme: ThemeAndTopics) => ({
+const themeToThemeWithIdTitleAndTopics = (theme: ThemeAndTopics) => ({
   id: theme.id,
-  label: theme.title,
+  title: theme.title,
   topics: theme.topics.map(topic => ({
     id: topic.id,
-    label: topic.title,
+    title: topic.title,
   })),
 });
 
 const findThemeById = (
   themeId: string,
-  availableThemes: ThemeAndTopicsIdsAndLabels[],
+  availableThemes: ThemeAndTopicsIdsAndTitles[],
 ) => availableThemes.find(theme => theme.id === themeId) || availableThemes[0];
 
-const findTopicById = (topicId: string, theme: ThemeAndTopicsIdsAndLabels) =>
+const findTopicById = (topicId: string, theme: ThemeAndTopicsIdsAndTitles) =>
   theme.topics.find(topic => topic.id === topicId) || theme.topics[0];
 
-interface ThemeAndTopicsIdsAndLabels extends IdLabelPair {
-  topics: IdLabelPair[];
+interface ThemeAndTopicsIdsAndTitles extends IdTitlePair {
+  topics: IdTitlePair[];
 }
 
 const AdminDashboardPage = () => {
@@ -39,11 +39,11 @@ const AdminDashboardPage = () => {
     AdminDashboardPublication[]
   >([]);
 
-  const [themes, setThemes] = useState<ThemeAndTopicsIdsAndLabels[]>();
+  const [themes, setThemes] = useState<ThemeAndTopicsIdsAndTitles[]>();
 
   const [selectedThemeAndTopic, setSelectedThemeAndTopic] = useState<{
-    theme: ThemeAndTopicsIdsAndLabels;
-    topic: IdLabelPair;
+    theme: ThemeAndTopicsIdsAndTitles;
+    topic: IdTitlePair;
   }>();
 
   const authentication = useContext(LoginContext);
@@ -51,15 +51,15 @@ const AdminDashboardPage = () => {
   useEffect(() => {
     if (!themes) {
       dashboardService.getMyThemesAndTopics().then(themeList => {
-        const themesAsIdLabelPairs = themeList.map(
-          themeToThemeWithIdLabelAndTopics,
+        const themesAsIdTitlePairs = themeList.map(
+          themeToThemeWithIdTitleAndTopics,
         );
 
-        setThemes(themesAsIdLabelPairs);
+        setThemes(themesAsIdTitlePairs);
 
         setSelectedThemeAndTopic({
-          theme: themesAsIdLabelPairs[0],
-          topic: themesAsIdLabelPairs[0].topics[0],
+          theme: themesAsIdTitlePairs[0],
+          topic: themesAsIdTitlePairs[0].topics[0],
         });
       });
     }
@@ -90,7 +90,10 @@ const AdminDashboardPage = () => {
         </div>
       </div>
       <Tabs id="publicationTabs">
-        <TabsSection id="my-publications" title="Publications">
+        <TabsSection
+          id="my-publications"
+          title="Manage publications and releases"
+        >
           {themes && selectedThemeAndTopic && (
             <AdminDashboardPublicationsTab
               publications={myPublications}
@@ -114,8 +117,18 @@ const AdminDashboardPage = () => {
             />
           )}
         </TabsSection>
-        <TabsSection id="in-progress-publications" title="In progress">
-          Hi
+        <TabsSection id="draft-releases" title="View draft releases (0)">
+          <div className="govuk-inset-text">
+            There are currently no releases ready for you to review
+          </div>
+        </TabsSection>
+        <TabsSection
+          id="scheduled-releases"
+          title="View scheduled releases (0)"
+        >
+          <div className="govuk-inset-text">
+            There are currently no unresolved comments
+          </div>
         </TabsSection>
       </Tabs>
     </Page>
@@ -133,7 +146,7 @@ const UserGreeting = () => {
         {user ? user.name : ''}{' '}
         <span className="govuk-body-s">
           Not you?{' '}
-          <a className="govuk-link" href="/api/signout">
+          <a className="govuk-link" href="{loginService.getSignOutLink()}">
             Sign out
           </a>
         </span>

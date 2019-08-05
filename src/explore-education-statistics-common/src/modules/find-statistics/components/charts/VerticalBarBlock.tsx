@@ -3,11 +3,15 @@ import {
   ChartDefinition,
   conditionallyAdd,
   createDataForAxis,
+  GenerateMajorAxis,
+  GenerateMinorAxis,
   getKeysForChart,
   mapNameToNameLabel,
   populateDefaultChartProps,
   StackedBarProps,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+
+import classnames from 'classnames';
 import React, { Component } from 'react';
 import {
   Bar,
@@ -21,8 +25,6 @@ import {
   YAxis,
 } from 'recharts';
 
-import classnames from 'classnames';
-
 import './charts.scss';
 
 export default class VerticalBarBlock extends Component<StackedBarProps> {
@@ -35,6 +37,7 @@ export default class VerticalBarBlock extends Component<StackedBarProps> {
       stackable: true,
       lineStyle: false,
       gridLines: true,
+      canSize: true,
     },
 
     data: [
@@ -74,7 +77,12 @@ export default class VerticalBarBlock extends Component<StackedBarProps> {
       legendHeight,
     } = this.props;
 
-    if (axes.major === undefined || data === undefined || meta === undefined)
+    if (
+      axes === undefined ||
+      axes.major === undefined ||
+      data === undefined ||
+      meta === undefined
+    )
       return <div>Unable to render chart</div>;
 
     const chartData: ChartDataB[] = createDataForAxis(
@@ -85,8 +93,11 @@ export default class VerticalBarBlock extends Component<StackedBarProps> {
 
     const keysForChart = getKeysForChart(chartData);
 
+    const minorDomainTicks = GenerateMinorAxis(chartData, axes.minor);
+    const majorDomainTicks = GenerateMajorAxis(chartData, axes.major);
+
     return (
-      <ResponsiveContainer width={width || 900} height={height || 300}>
+      <ResponsiveContainer width={width || '100%'} height={height || 300}>
         <BarChart
           data={chartData}
           className={classnames({ 'legend-bottom': legend === 'bottom' })}
@@ -112,6 +123,7 @@ export default class VerticalBarBlock extends Component<StackedBarProps> {
                 value: '',
               }}
               scale="auto"
+              {...minorDomainTicks}
               width={conditionallyAdd(axes.minor && axes.minor.size)}
               interval={
                 axes.minor && !axes.minor.visible
@@ -132,6 +144,7 @@ export default class VerticalBarBlock extends Component<StackedBarProps> {
                 value: '',
               }}
               scale="auto"
+              {...majorDomainTicks}
               padding={{ left: 20, right: 20 }}
               height={conditionallyAdd(
                 axes.major && axes.major.size,

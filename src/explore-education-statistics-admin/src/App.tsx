@@ -1,7 +1,14 @@
 import ProtectedRoute from '@admin/components/ProtectedRoute';
+import CreatePublicationPage from '@admin/pages/create-publication/CreatePublicationPage';
+import CreateReleasePage from '@admin/pages/release/create-release/CreateReleasePage';
+import MockSignInProcess from '@admin/pages/sign-in/mock/MockSignInProcess';
+import MockSignOutProcess from '@admin/pages/sign-in/mock/MockSignOutProcess';
 import SignedOutPage from '@admin/pages/sign-in/SignedOutPage';
 import SignInPage from '@admin/pages/sign-in/SignInPage';
-import releaseRoutes from '@admin/routes/releaseRoutes';
+import signInRoutes from '@admin/routes/sign-in/routes';
+import dashboardRoutes from '@admin/routes/dashboard/routes';
+import releaseRoutes from '@admin/routes/edit-release/routes';
+import publicationRoutes from '@admin/routes/edit-publication/routes';
 import PrototypeLoginService from '@admin/services/PrototypeLoginService';
 import React from 'react';
 import { Route } from 'react-router';
@@ -42,17 +49,39 @@ function App() {
   return (
     <BrowserRouter>
       {/* Non-Prototype Routes*/}
-      <Route exact path="/sign-in" component={SignInPage} />
-
-      <Route exact path="/signed-out" component={SignedOutPage} />
-
       <ProtectedRoute
         exact
-        path="/admin-dashboard"
+        path={dashboardRoutes.adminDashboard}
         component={AdminDashboardPage}
       />
 
-      {releaseRoutes.map(route => (
+      <ProtectedRoute
+        exact
+        path={signInRoutes.signIn}
+        component={SignInPage}
+        redirectIfNotLoggedIn={false}
+      />
+
+      <ProtectedRoute
+        exact
+        path={signInRoutes.signOut}
+        component={SignedOutPage}
+        redirectIfNotLoggedIn={false}
+      />
+
+      <ProtectedRoute
+        exact
+        path={publicationRoutes.createPublication.route}
+        component={CreatePublicationPage}
+      />
+
+      <ProtectedRoute
+        exact
+        path={releaseRoutes.createReleaseRoute.route}
+        component={CreateReleasePage}
+      />
+
+      {releaseRoutes.manageReleaseRoutes.map(route => (
         <ProtectedRoute
           exact
           key={route.path}
@@ -61,10 +90,25 @@ function App() {
         />
       ))}
 
-      <Route exact path="/" component={IndexPage} />
+      {process.env.USE_MOCK_API === 'true' && (
+        <>
+          <Route
+            exact
+            path={signInRoutes.signInViaApiLink}
+            component={MockSignInProcess}
+          />
+          <Route
+            exact
+            path={signInRoutes.signOutViaApiLink}
+            component={MockSignOutProcess}
+          />
+        </>
+      )}
+
+      {/* Prototype Routes */}
+      <Route exact path="/index" component={IndexPage} />
 
       <LoginContext.Provider value={PrototypeLoginService.login()}>
-        {/* Prototype Routes*/}
         <Route exact path="/prototypes/" component={PrototypesIndexPage} />
 
         <Route
