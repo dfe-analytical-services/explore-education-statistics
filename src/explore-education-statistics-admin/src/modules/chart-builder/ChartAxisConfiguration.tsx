@@ -1,13 +1,22 @@
-import {FormCheckbox, FormFieldset, FormGroup, FormRadioGroup, FormTextInput,} from '@common/components/form';
+import {
+  FormCheckbox,
+  FormFieldset,
+  FormGroup,
+  FormRadioGroup,
+  FormTextInput,
+} from '@common/components/form';
 import FormComboBox from '@common/components/form/FormComboBox';
 
-import FormSelect, {SelectOption} from '@common/components/form/FormSelect';
+import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
 import {
   ChartCapabilities,
   ChartDataB,
   createSortedAndMappedDataForAxis,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
-import {DataBlockData, DataBlockMetadata,} from '@common/services/dataBlockService';
+import {
+  DataBlockData,
+  DataBlockMetadata,
+} from '@common/services/dataBlockService';
 import {
   AxisConfiguration,
   AxisGroupBy,
@@ -16,7 +25,7 @@ import {
   ReferenceLine,
 } from '@common/services/publicationService';
 import * as React from 'react';
-import {Dictionary} from '@common/types';
+import { Dictionary } from '@common/types';
 import styles from './graph-builder.module.scss';
 
 interface Props {
