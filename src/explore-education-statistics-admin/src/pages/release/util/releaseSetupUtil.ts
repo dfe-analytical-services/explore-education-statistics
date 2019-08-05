@@ -1,13 +1,12 @@
-import { dayMonthYearInputsToValues } from '@admin/services/common/types';
-import { CreateReleaseRequest } from '@admin/services/release/create-release/types';
-import { UpdateReleaseSetupDetailsRequest } from '@admin/services/release/edit-release/setup/types';
-import { BaseReleaseSetupDetailsRequest } from '@admin/services/release/types';
-import { BaseFormValues } from '../setup/ReleaseSetupForm';
-import { FormValues as CreateFormValues } from '../create-release/CreateReleasePage';
-import { FormValues as ReleaaseSetupEditPage } from '../edit-release/setup/ReleaseSetupEditPage';
+import {dayMonthYearInputsToValues} from '@admin/services/common/types';
+import {CreateReleaseRequest} from '@admin/services/release/create-release/types';
+import {UpdateReleaseSetupDetailsRequest} from '@admin/services/release/edit-release/setup/types';
+import {BaseReleaseSetupDetailsRequest} from '@admin/services/release/types';
+import {FormValues as CreateFormValues} from '../create-release/CreateReleasePage';
+import {EditFormValues} from '../setup/ReleaseSetupForm';
 
 export const assembleBaseReleaseSetupRequestFromForm = (
-  values: BaseFormValues,
+  values: EditFormValues,
 ): BaseReleaseSetupDetailsRequest => {
   return {
     timePeriodCoverage: {
@@ -35,7 +34,7 @@ export const assembleCreateReleaseRequestFromForm = (
 
 export const assembleUpdateReleaseSetupRequestFromForm = (
   releaseId: string,
-  values: ReleaaseSetupEditPage,
+  values: EditFormValues,
 ): UpdateReleaseSetupDetailsRequest => {
   return {
     releaseId,

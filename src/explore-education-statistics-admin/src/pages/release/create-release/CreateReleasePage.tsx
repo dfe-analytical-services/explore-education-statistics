@@ -1,7 +1,7 @@
 import Page from '@admin/components/Page';
 import { TimePeriodCoverageGroup } from '@admin/pages/DummyReferenceData';
 import ReleaseSetupForm, {
-  BaseFormValues,
+  EditFormValues,
 } from '@admin/pages/release/setup/ReleaseSetupForm';
 import { assembleCreateReleaseRequestFromForm } from '@admin/pages/release/util/releaseSetupUtil';
 import dashboardRoutes from '@admin/routes/dashboard/routes';
@@ -21,7 +21,7 @@ interface MatchProps {
 
 export type FormValues = {
   templateReleaseId: string;
-} & BaseFormValues;
+} & EditFormValues;
 
 const CreateReleasePage = ({
   match,
@@ -66,7 +66,7 @@ const CreateReleasePage = ({
           templateReleaseId: '',
         })}
         validationRulesSupplier={(
-          baseValidationRules: ObjectSchemaDefinition<BaseFormValues>,
+          baseValidationRules: ObjectSchemaDefinition<EditFormValues>,
         ): ObjectSchemaDefinition<FormValues> => ({
           ...baseValidationRules,
           templateReleaseId: Yup.string().required('Choose a template'),

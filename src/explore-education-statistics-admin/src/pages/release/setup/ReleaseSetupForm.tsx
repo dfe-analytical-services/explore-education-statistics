@@ -20,7 +20,7 @@ import DummyReferenceData, {
   TimePeriodCoverageGroup,
 } from '../../DummyReferenceData';
 
-export interface BaseFormValues {
+export interface EditFormValues {
   timePeriodCoverageCode: string;
   timePeriodCoverageStartYear: string;
   releaseTypeId: string;
@@ -28,20 +28,20 @@ export interface BaseFormValues {
   nextReleaseExpectedDate: DayMonthYearInputs;
 }
 
-interface Props<FormValues extends BaseFormValues> {
+interface Props<FormValues extends EditFormValues> {
   submitButtonText: string;
   initialValuesSupplier: (
     timePeriodCoverageGroups: TimePeriodCoverageGroup[],
   ) => FormValues;
-  validationRulesSupplier: (
-    baseValidationRules: ObjectSchemaDefinition<BaseFormValues>,
+  validationRulesSupplier?: (
+    baseValidationRules: ObjectSchemaDefinition<EditFormValues>,
   ) => ObjectSchemaDefinition<FormValues>;
   onSubmitHandler: (values: FormValues) => void;
   onCancelHandler: () => void;
   additionalFields?: React.ReactNode;
 }
 
-const ReleaseSetupForm = <FormValues extends BaseFormValues>({
+const ReleaseSetupForm = <FormValues extends EditFormValues>({
   submitButtonText,
   initialValuesSupplier,
   validationRulesSupplier,
@@ -73,7 +73,7 @@ const ReleaseSetupForm = <FormValues extends BaseFormValues>({
     return optGroups;
   };
 
-  const baseValidationRules = {
+  const baseValidationRules: ObjectSchemaDefinition<EditFormValues> = {
     timePeriodCoverageCode: Yup.string().required('Choose a time period'),
     timePeriodCoverageStartYear: Yup.string().required('Enter a start year'),
     releaseTypeId: Yup.string(),
@@ -90,7 +90,9 @@ const ReleaseSetupForm = <FormValues extends BaseFormValues>({
           enableReinitialize
           initialValues={initialValuesSupplier(timePeriodCoverageGroups)}
           validationSchema={Yup.object<FormValues>(
-            validationRulesSupplier(baseValidationRules),
+            validationRulesSupplier
+              ? validationRulesSupplier(baseValidationRules)
+              : baseValidationRules as ObjectSchemaDefinition<FormValues>,
           )}
           onSubmit={onSubmitHandler}
           render={(form: FormikProps<FormValues>) => {
