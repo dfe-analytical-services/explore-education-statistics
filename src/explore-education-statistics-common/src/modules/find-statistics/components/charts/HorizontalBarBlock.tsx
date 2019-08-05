@@ -3,8 +3,8 @@ import {
   ChartDefinition,
   conditionallyAdd,
   createSortedAndMappedDataForAxis,
-  GenerateMajorAxis,
-  GenerateMinorAxis,
+  generateMajorAxis,
+  generateMinorAxis,
   getKeysForChart,
   populateDefaultChartProps,
   StackedBarProps,
@@ -93,8 +93,8 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
 
     const keysForChart = getKeysForChart(chartData);
 
-    const minorDomainTicks = GenerateMinorAxis(chartData, axes.minor);
-    const majorDomainTicks = GenerateMajorAxis(chartData, axes.major);
+    const minorDomainTicks = generateMinorAxis(chartData, axes.minor);
+    const majorDomainTicks = generateMajorAxis(chartData, axes.major);
 
     return (
       <ResponsiveContainer width={width || '100%'} height={height || 300}>
