@@ -6,7 +6,7 @@ import PrototypePage from '@admin/pages/prototypes/components/PrototypePage';
 
 import PrototypeData from '@admin/pages/prototypes/PrototypeData';
 import ChartData from '@common/modules/find-statistics/components/charts/__tests__/__data__/testBlockData';
-import { DataBlockResponse } from '@common/services/dataBlockService';
+import {DataBlockResponse} from '@common/services/dataBlockService';
 import {
   ChartProps,
   StackedBarProps,
@@ -14,31 +14,25 @@ import {
 import ChartRenderer from '@common/modules/find-statistics/components/ChartRenderer';
 
 const PrototypeChartTest = () => {
-  const [data] = React.useState<DataBlockResponse>(PrototypeData.testResponse);
+    const [data] = React.useState<DataBlockResponse>(PrototypeData.testResponse);
 
-  const chartData = ChartData.AbstractChartProps;
+    const chartData = ChartData.AbstractLargeDataChartProps_smaller_datasets;
 
-  const newChartData: StackedBarProps = {
-    ...chartData,
-    stacked: true,
-    axes: {
-      ...chartData.axes,
-
-      minor: {
-        ...chartData.axes.minor,
-        min: '-10',
-        max: '20',
+    const newChartData: StackedBarProps = {
+      ...chartData,
+      stacked: true,
+      axes: {
+        ...chartData.axes,
       },
-    },
-  };
+    };
 
-  return (
-    <PrototypePage wide>
-      <ChartBuilder data={data} />
+    return (
+      <PrototypePage wide>
+        <ChartBuilder data={data} />
 
-      <ChartRenderer type="horizontalbar" {...newChartData} height={500} />
-    </PrototypePage>
-  );
-};
+      </PrototypePage>
+    );
+  }
+;
 
 export default PrototypeChartTest;

@@ -4,139 +4,142 @@ import React from 'react';
 
 interface Props {
   editing?: boolean;
+  indicatorOrder?: string;
+  indicator?: string;
+  indicatorValue?: string;
+  trend?: string;
+  guidanceTitle?: string;
+  guidanceText?: string;
 }
+
+const KeyIndicator = ({
+  editing,
+  indicatorOrder,
+  indicator,
+  indicatorValue,
+  trend,
+  guidanceTitle,
+  guidanceText,
+}: Props) => {
+  return (
+    <div className={styles.keyStatTile}>
+      {!editing && (
+        <>
+          <div className={styles.keyStat}>
+            <h3 className="govuk-heading-s">{indicator}</h3>{' '}
+            <p className="govuk-heading-xl govuk-!-margin-bottom-2">
+              {indicatorValue}
+            </p>
+            <p className="govuk-body-s">{trend}</p>
+          </div>
+          <Details summary={guidanceTitle}>{guidanceText}</Details>
+        </>
+      )}
+      {editing && (
+        <>
+          <form>
+            <legend className="govuk-heading-s">
+              Key indicator {indicatorOrder}
+            </legend>
+            <div className={styles.keyStat}>
+              <label htmlFor={`key-indicator-${indicatorOrder}`}>
+                Indicator
+              </label>
+              <input
+                type="text"
+                className="govuk-!-margin-bottom-2 govuk-input govuk-!-width-full"
+                placeholder={indicator}
+                name={`key-indicator-${indicatorOrder}`}
+                id={`key-indicator-${indicatorOrder}`}
+              />
+              <label htmlFor={`value-1-${indicatorOrder}`}>Value</label>
+              <input
+                type="text"
+                className="govuk-!-margin-bottom-2 govuk-input"
+                placeholder={indicatorValue}
+                id={`value-1-${indicatorOrder}`}
+                name={`value-1-${indicatorOrder}`}
+              />
+              <label htmlFor={`trend-1-${indicatorOrder}`}>Trend</label>
+              <input
+                type="text"
+                className="govuk-!-margin-bottom-3 govuk-input govuk-!-width-full"
+                placeholder={trend}
+                id={`trend-1-${indicatorOrder}`}
+                name={`trend-1-${indicatorOrder}`}
+              />
+            </div>
+            <Details summary="Guidance text">
+              <label htmlFor={`help-title-${indicatorOrder}`}>
+                Guidance title
+              </label>
+              <input
+                type="text"
+                className="govuk-!-margin-bottom-2 govuk-input govuk-!-width-full"
+                placeholder={guidanceTitle}
+                id={`help-title-${indicatorOrder}`}
+                name={`help-title-${indicatorOrder}`}
+              />
+              <label htmlFor={`help-text-1${indicatorOrder}`}>
+                Guidance text
+              </label>
+              <textarea
+                id={`help-text-1${indicatorOrder}`}
+                className="govuk-!-margin-bottom-2 govuk-body-s govuk-textarea govuk-!-width-full"
+                rows={5}
+                placeholder={`
+                  ${guidanceText}
+                  is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.`}
+              />
+            </Details>
+            <button
+              type="button"
+              className="govuk-button govuk-!-margin-top-3 govuk-!-margin-right-3"
+            >
+              Save
+            </button>
+            <button
+              type="button"
+              className="govuk-button govuk-button--secondary govuk-!-margin-top-3"
+            >
+              Remove
+            </button>
+          </form>
+        </>
+      )}
+    </div>
+  );
+};
 
 const PrototypeDataTileHighlights = ({ editing }: Props) => (
   <div className={styles.keyStatsContainer}>
-    <div className={styles.keyStatTile}>
-      <div className={styles.keyStat}>
-        {!editing && <h3 className="govuk-heading-s">Overall absence</h3>}
-        {editing && (
-          <input
-            type="text"
-            className="govuk-input govuk-!-width-full"
-            placeholder="Key indicator"
-            value="Overall absence"
-            id="key-indicator-1"
-            name="key-indicator-1"
-          />
-        )}
-        {!editing && (
-          <p className="govuk-heading-xl govuk-!-margin-bottom-2">4.7%</p>
-        )}
-        {editing && (
-          <input
-            type="text"
-            className="govuk-!-margin-top-3 govuk-input govuk-!-width-full"
-            value="4.7%"
-            id="value-1"
-            name="value-1"
-          />
-        )}
-        {!editing && <p className="govuk-body-s">Up from 4.6% in 2015/16</p>}
-        {editing && (
-          <input
-            type="text"
-            className="govuk-!-margin-top-3 govuk-input govuk-!-width-full"
-            value="Up from 4.6% in 2015/16"
-            id="trend-1"
-            name="trend-1"
-          />
-        )}
-      </div>
-      <Details summary="What is overall absence?">
-        Overall absence is the adipisicing elit. Dolorum hic nobis voluptas
-        quidem fugiat enim ipsa reprehenderit nulla.
-      </Details>
-    </div>
-
-    <div className={styles.keyStatTile}>
-      <div className={styles.keyStat}>
-        {!editing && (
-          <h3 className="govuk-heading-s">Authorised absence rate</h3>
-        )}
-        {editing && (
-          <input
-            type="text"
-            className="govuk-input govuk-!-width-full"
-            placeholder="Key indicator"
-            value="Authorised absence rate"
-            id="key-indicator-2"
-            name="key-indicator-2"
-          />
-        )}
-        {!editing && (
-          <p className="govuk-heading-xl govuk-!-margin-bottom-2">3.4%</p>
-        )}
-        {editing && (
-          <input
-            type="text"
-            className="govuk-!-margin-top-3 govuk-input govuk-!-width-full"
-            value="3.4%"
-            id="value-2"
-            name="value-2"
-          />
-        )}
-        {!editing && <p className="govuk-body-s">Similar to previous years</p>}
-        {editing && (
-          <input
-            type="text"
-            className="govuk-!-margin-top-3 govuk-input govuk-!-width-full"
-            value="Similar to previous years"
-            id="trend-2"
-            name="trend-2"
-          />
-        )}
-      </div>
-      <Details summary="What is authorised absence?">
-        Authorised absence is the adipisicing elit. Dolorum hic nobis voluptas
-        quidem fugiat enim ipsa reprehenderit nulla.
-      </Details>
-    </div>
-
-    <div className={styles.keyStatTile}>
-      <div className={styles.keyStat}>
-        {!editing && (
-          <h3 className="govuk-heading-s">Unauthorised absence rate</h3>
-        )}
-        {editing && (
-          <input
-            type="text"
-            className="govuk-input govuk-!-width-full"
-            placeholder="Key indicator"
-            value="Unauthorised absence rate"
-            id="key-indicator-3"
-            name="key-indicator-3"
-          />
-        )}
-        {!editing && (
-          <p className="govuk-heading-xl govuk-!-margin-bottom-2">1.3%</p>
-        )}
-        {editing && (
-          <input
-            type="text"
-            className="govuk-!-margin-top-3 govuk-input govuk-!-width-full"
-            value="1.3%"
-            id="value-3"
-            name="value-3"
-          />
-        )}
-        {!editing && <p className="govuk-body-s">Up from 1.1% in 2015/16</p>}
-        {editing && (
-          <input
-            type="text"
-            className="govuk-!-margin-top-3 govuk-input govuk-!-width-full"
-            value="Up from 1.1% in 2015/16"
-            id="trend-3"
-            name="trend-3"
-          />
-        )}
-      </div>
-      <Details summary="What is unauthorised absence?">
-        Unauthorised absence is the adipisicing elit. Dolorum hic nobis voluptas
-        quidem fugiat enim ipsa reprehenderit nulla.
-      </Details>
-    </div>
+    <KeyIndicator
+      editing={editing}
+      indicatorOrder="1"
+      indicator="Overall absence"
+      indicatorValue="4.7%"
+      trend="Up from 4.7% in 2015/16"
+      guidanceTitle="What is overall absence?"
+      guidanceText="Overall absence is"
+    />
+    <KeyIndicator
+      editing={editing}
+      indicatorOrder="2"
+      indicator="Authorised absence rate"
+      indicatorValue="3.4%"
+      trend="Similar to previous years"
+      guidanceTitle="What is authorised absence?"
+      guidanceText="Authorised absence is"
+    />
+    <KeyIndicator
+      editing={editing}
+      indicatorOrder="3"
+      indicator="Unauthorised absence rate"
+      indicatorValue="1.3%"
+      trend="Up from 1.1% in 2015/16"
+      guidanceTitle="What is unauthorised absence?"
+      guidanceText="Unauthorised absence is"
+    />
   </div>
 );
 

@@ -1,3 +1,4 @@
+import { ChartDataSetAndConfiguration } from '@admin/modules/chart-builder/ChartDataSelector';
 import {
   FormCheckbox,
   FormFieldset,
@@ -23,8 +24,24 @@ interface Props {
   configuration: AxisConfiguration;
   meta: DataBlockMetadata;
   capabilities: ChartCapabilities;
+  chartDataConfiguration: ChartDataSetAndConfiguration[];
   onConfigurationChange: (configuration: AxisConfiguration) => void;
 }
+
+const getSortOptions = (
+  chartDataConfiguration: ChartDataSetAndConfiguration[],
+): SelectOption[] => {
+  return [
+    {
+      label: 'default',
+      value: 'default',
+    },
+    ...chartDataConfiguration.map<SelectOption>(config => ({
+      label: config.configuration.label,
+      value: config.configuration.value,
+    })),
+  ];
+};
 
 const ChartAxisConfiguration = ({
   id,
@@ -32,14 +49,20 @@ const ChartAxisConfiguration = ({
   meta,
   capabilities,
   onConfigurationChange,
+  chartDataConfiguration,
 }: Props) => {
   const [axisConfiguration, setAxisConfiguration] = React.useState<
     AxisConfiguration
   >(configuration);
 
+  const [sortOptions, setSortOptions] = React.useState<SelectOption[]>(() =>
+    getSortOptions(chartDataConfiguration),
+  );
+
   React.useEffect(() => {
     setAxisConfiguration(configuration);
-  }, [configuration]);
+    setSortOptions(getSortOptions(chartDataConfiguration));
+  }, [configuration, meta, chartDataConfiguration]);
 
   const updateAxisConfiguration = (newValues: object) => {
     const newConfiguration = { ...axisConfiguration, ...newValues };
@@ -203,6 +226,37 @@ const ChartAxisConfiguration = ({
               ]}
             />
             <hr />
+
+            {axisConfiguration.type === 'major' && (
+              <>
+                <FormFieldset id={`${id}sort_order_set`} legend="Sort order">
+                  <FormGroup>
+                    <FormSelect
+                      id={`${id}_sort_by`}
+                      name="sort_by"
+                      label="Sort By"
+                      order={[]}
+                      value={axisConfiguration.sortBy}
+                      onChange={e => {
+                        updateAxisConfiguration({ sortBy: e.target.value });
+                      }}
+                      options={sortOptions}
+                    />
+                    <FormCheckbox
+                      id={`${id}_sort_asc`}
+                      name="sort_asc"
+                      label="Sort Ascending"
+                      value="asc"
+                      checked={axisConfiguration.sortAsc}
+                      onChange={e => {
+                        updateAxisConfiguration({ sortAsc: e.target.checked });
+                      }}
+                    />
+                  </FormGroup>
+                </FormFieldset>
+                <hr />
+              </>
+            )}
 
             {/*
         <FormSelect

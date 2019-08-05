@@ -6,8 +6,13 @@ import React from 'react';
 import PrototypeAdminNavigation from './components/PrototypeAdminNavigation';
 import PrototypePage from './components/PrototypePage';
 
-const PublicationPage = () => {
-  const [editing, setEditing] = React.useState(true);
+interface Props {
+  newBlankRelease?: boolean;
+  reviewing?: boolean;
+}
+
+const PublicationPage = ({ reviewing, newBlankRelease }: Props) => {
+  const [editing, setEditing] = React.useState(newBlankRelease);
 
   const [data] = React.useState(
     PrototypePublicationService.getNewPublication(),
@@ -55,7 +60,7 @@ const PublicationPage = () => {
             </span>
             <strong className="govuk-warning-text__text">
               <span className="govuk-warning-text__assistive">Warning</span>
-              There are {allUnresolved.length} comments for you to resolve
+              There are {allUnresolved.length} comments
             </strong>
           </div>
         )}
@@ -66,32 +71,62 @@ const PublicationPage = () => {
           </legend>
           <div className="govuk-radios govuk-radios--inline">
             <div className="govuk-radios__item">
-              <input
-                className="govuk-radios__input"
-                type="radio"
-                name="status"
-                id="edit"
-                value="edit"
-                defaultChecked
-                onChange={() => {
-                  setEditing(true);
-                }}
-              />
+              {newBlankRelease && (
+                <input
+                  className="govuk-radios__input"
+                  type="radio"
+                  name="status"
+                  id="edit"
+                  value="edit"
+                  defaultChecked
+                  onChange={() => {
+                    setEditing(true);
+                  }}
+                />
+              )}
+              {reviewing && (
+                <input
+                  className="govuk-radios__input"
+                  type="radio"
+                  name="status"
+                  id="edit"
+                  value="edit"
+                  onChange={() => {
+                    setEditing(true);
+                  }}
+                />
+              )}
               <label className="govuk-label govuk-radios__label" htmlFor="edit">
                 Edit content
               </label>
             </div>
             <div className="govuk-radios__item">
-              <input
-                className="govuk-radios__input"
-                type="radio"
-                name="status"
-                id="edit"
-                value="edit"
-                onChange={() => {
-                  setEditing(false);
-                }}
-              />
+              {newBlankRelease && (
+                <input
+                  className="govuk-radios__input"
+                  type="radio"
+                  name="status"
+                  id="edit"
+                  value="edit"
+                  onChange={() => {
+                    setEditing(false);
+                  }}
+                />
+              )}
+              {reviewing && (
+                <input
+                  className="govuk-radios__input"
+                  type="radio"
+                  name="status"
+                  id="edit"
+                  value="edit"
+                  defaultChecked
+                  onChange={() => {
+                    setEditing(false);
+                  }}
+                />
+              )}
+
               <label className="govuk-label govuk-radios__label" htmlFor="edit">
                 Preview content
               </label>
@@ -102,11 +137,7 @@ const PublicationPage = () => {
 
       <hr />
       <div className="govuk-width-container  dfe-align--comments">
-        <EditablePublicationPage
-          editing={editing}
-          resolveComments
-          data={data}
-        />
+        <EditablePublicationPage editing={editing} reviewing data={data} />
       </div>
     </PrototypePage>
   );

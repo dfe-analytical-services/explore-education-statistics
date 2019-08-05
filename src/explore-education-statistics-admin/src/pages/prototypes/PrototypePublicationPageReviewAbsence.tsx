@@ -162,6 +162,7 @@ const PublicationPage = () => {
       <hr />
       <div className="govuk-width-container dfe-align--comments">
         <EditablePublicationPage
+          editing
           reviewing
           data={PrototypePublicationService.getNewPublication()}
         />
