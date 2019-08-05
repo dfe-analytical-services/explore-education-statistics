@@ -80,14 +80,11 @@ const ChartAxisConfiguration = ({
     <div className={styles.chartAxesConfiguration}>
       <form>
         <FormFieldset id={id} legend={axisConfiguration.title}>
-          <h2 className="govuk-heading-s">
-            {axisConfiguration.name} configuration
-          </h2>
           <FormGroup>
             <FormCheckbox
               id={`${id}_show`}
               name={`${id}_show`}
-              label="Show axis?"
+              label="Show axis labels?"
               checked={axisConfiguration.visible}
               onChange={e => {
                 updateAxisConfiguration({ visible: e.target.checked });

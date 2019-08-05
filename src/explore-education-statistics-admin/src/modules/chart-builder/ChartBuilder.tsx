@@ -266,11 +266,18 @@ const ChartBuilder = ({ data }: Props) => {
             />
           </TabsSection>
 
-          <TabsSection title="Axes">
-            <div className={styles.axesOptions}>
-              {Object.entries(axesConfiguration).map(([key, axis]) => (
+          <TabsSection title="Chart Configuration">
+            <ChartConfiguration
+              selectedChartType={selectedChartType}
+              chartOptions={chartOptions}
+              onChange={setChartOptions}
+            />
+          </TabsSection>
+
+          {Object.entries(axesConfiguration).map(([key, axis]) => (
+            <TabsSection title={axis.name} key={key}>
+              <div className={styles.axesOptions}>
                 <ChartAxisConfiguration
-                  key={key}
                   id={key}
                   configuration={axis}
                   capabilities={selectedChartType.capabilities}
@@ -282,17 +289,9 @@ const ChartBuilder = ({ data }: Props) => {
                     });
                   }}
                 />
-              ))}
-            </div>
-          </TabsSection>
-
-          <TabsSection title="Chart">
-            <ChartConfiguration
-              selectedChartType={selectedChartType}
-              chartOptions={chartOptions}
-              onChange={setChartOptions}
-            />
-          </TabsSection>
+              </div>
+            </TabsSection>
+          ))}
         </Tabs>
       )}
     </div>
