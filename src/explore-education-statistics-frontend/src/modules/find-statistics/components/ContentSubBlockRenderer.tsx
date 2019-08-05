@@ -4,11 +4,13 @@ import ButtonLink from '@frontend/components/ButtonLink';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 
+export type SectionHandler = (section: { id: string; title: string }) => void;
+
 interface Props {
   block: ContentBlock;
   id: string;
   publication: Publication;
-  onToggle?: (section: { id: string; title: string }) => void;
+  onToggle?: SectionHandler;
 }
 
 const ContentSubBlockRenderer = ({

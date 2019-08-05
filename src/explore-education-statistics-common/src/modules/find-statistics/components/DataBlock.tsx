@@ -148,7 +148,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
             {summary && (
               <TabsSection id={`${id}-summary`} title="Summary">
                 <SummaryRenderer
-                  DetailsToggleHandler={onSummaryDetailsToggle}
+                  onToggle={onSummaryDetailsToggle}
                   {...summary}
                 />
               </TabsSection>

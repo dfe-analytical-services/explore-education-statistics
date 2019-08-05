@@ -84,8 +84,9 @@ const Details = ({
             if (event.isDefaultPrevented()) {
               return;
             }
+            setOpened(isOpened);
           }
-          setOpened(isOpened);
+          setOpened(!isOpened);
         }}
         onKeyPress={event => {
           if (event.key === 'Enter' || event.key === ' ') {
