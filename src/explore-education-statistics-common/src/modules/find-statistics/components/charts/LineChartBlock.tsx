@@ -4,29 +4,33 @@ import {
   ChartProps,
   conditionallyAdd,
   createDataForAxis,
+  GenerateMajorAxis,
+  GenerateMinorAxis,
   getKeysForChart,
   mapNameToNameLabel,
   populateDefaultChartProps,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import { ChartSymbol } from '@common/services/publicationService';
+import { Dictionary } from '@common/types';
 
-import React, { Component } from 'react';
+import classnames from 'classnames';
+
+import React from 'react';
 import {
-  AxisDomain,
   CartesianGrid,
   Legend,
+  LegendType,
   Line,
   LineChart,
   ReferenceLine,
   ResponsiveContainer,
   Symbols,
+  SymbolsProps,
   Tooltip,
   TooltipProps,
   XAxis,
   YAxis,
 } from 'recharts';
-import { Dictionary } from '@common/types';
-
-import classnames from 'classnames';
 
 import './charts.scss';
 
@@ -65,176 +69,191 @@ const LineStyles: Dictionary<string> = {
   dotted: '2 2',
 };
 
-export default class LineChartBlock extends Component<ChartProps> {
-  public static definition: ChartDefinition = {
-    type: 'line',
-    name: 'Line',
+// eslint-disable-next-line react/display-name
+const generateDot = (symbol: string | undefined) => (props: SymbolsProps) => {
+  // eslint-disable-line react/display-name
 
-    capabilities: {
-      dataSymbols: true,
-      stackable: false,
-      lineStyle: true,
-      gridLines: true,
-      canSize: true,
-    },
+  if (symbol === 'none' || symbol === undefined || symbol === '')
+    return undefined;
 
-    data: [
-      {
-        type: 'line',
-        title: 'Line',
-        entryCount: 'multiple',
-        targetAxis: 'xaxis',
-      },
-    ],
+  const chartSymbol: ChartSymbol = symbol as ChartSymbol;
 
-    axes: [
-      {
-        id: 'xaxis',
-        title: 'X Axis',
-        type: 'major',
-        defaultDataType: 'timePeriods',
-      },
-      {
-        id: 'yaxis',
-        title: 'Y Axis',
-        type: 'minor',
-      },
-    ],
-  };
+  return <Symbols {...props} type={chartSymbol} />;
+};
 
-  public render() {
-    const {
-      data,
-      meta,
-      height,
-      axes,
-      labels,
-      legend,
-      legendHeight,
-      width,
-    } = this.props;
+const generateLegendType = (symbol: LegendType | undefined): LegendType => {
+  if (symbol === 'none' || symbol === undefined) return 'line';
+  return symbol;
+};
 
-    if (axes.major === undefined || data === undefined || meta === undefined)
-      return <div>Unable to render chart</div>;
+const LineChartBlock = (props: ChartProps) => {
+  const {
+    data,
+    meta,
+    height,
+    axes,
+    labels,
+    legend,
+    legendHeight,
+    width,
+  } = props;
 
-    const yAxisDomain: [AxisDomain, AxisDomain] = [-10, 10];
+  if (
+    axes === undefined ||
+    axes.major === undefined ||
+    data === undefined ||
+    meta === undefined
+  )
+    return <div>Unable to render chart</div>;
 
-    const chartData: ChartDataB[] = createDataForAxis(
-      axes.major,
-      data.result,
-      meta,
-    ).map(mapNameToNameLabel(labels, meta.timePeriods, meta.locations));
+  const chartData: ChartDataB[] = createDataForAxis(
+    axes.major,
+    data.result,
+    meta,
+  ).map(mapNameToNameLabel(labels, meta.timePeriods, meta.locations));
 
-    const keysForChart = getKeysForChart(chartData);
+  const keysForChart = getKeysForChart(chartData);
 
-    return (
-      <ResponsiveContainer width={width || '100%'} height={height || 300}>
-        <LineChart
-          data={chartData}
-          className={classnames({ 'legend-bottom': legend === 'bottom' })}
-          margin={{
-            left: 30,
-            top: legend === 'top' ? 10 : 0,
-          }}
-        >
-          <Tooltip content={CustomToolTip} />
+  const minorDomainTicks = GenerateMinorAxis(chartData, axes.minor);
+  const majorDomainTicks = GenerateMajorAxis(chartData, axes.major);
 
-          {(legend === 'top' || legend === 'bottom') && (
-            <Legend verticalAlign={legend} height={+(legendHeight || '50')} />
-          )}
+  return (
+    <ResponsiveContainer width={width || '100%'} height={height || 300}>
+      <LineChart
+        data={chartData}
+        className={classnames({ 'legend-bottom': legend === 'bottom' })}
+        margin={{
+          left: 30,
+          top: legend === 'top' ? 10 : 0,
+        }}
+      >
+        <Tooltip content={CustomToolTip} />
 
-          <CartesianGrid
-            strokeDasharray="3 3"
-            horizontal={axes.minor && axes.minor.showGrid !== false}
-            vertical={axes.major.showGrid !== false}
+        {(legend === 'top' || legend === 'bottom') && (
+          <Legend verticalAlign={legend} height={+(legendHeight || '50')} />
+        )}
+
+        <CartesianGrid
+          strokeDasharray="3 3"
+          horizontal={axes.minor && axes.minor.showGrid !== false}
+          vertical={axes.major.showGrid !== false}
+        />
+
+        {axes.major && (
+          <XAxis
+            dataKey="name"
+            hide={axes.major.visible === false}
+            label={{
+              offset: 5,
+              position: 'bottom',
+              value: '',
+            }}
+            {...majorDomainTicks}
+            scale="auto"
+            interval={
+              axes.minor && !axes.minor.visible ? 'preserveStartEnd' : undefined
+            }
+            height={conditionallyAdd(
+              axes.major && axes.major.size,
+              legend === 'bottom' ? 0 : undefined,
+            )}
+            padding={{ left: 20, right: 20 }}
+            tickMargin={10}
           />
+        )}
 
-          {axes.major && (
-            <XAxis
-              dataKey="name"
-              hide={axes.major.visible === false}
-              label={{
-                offset: 5,
-                position: 'bottom',
-                value: '',
-              }}
-              scale="auto"
-              interval={
-                axes.minor && !axes.minor.visible
-                  ? 'preserveStartEnd'
-                  : undefined
-              }
-              height={conditionallyAdd(
-                axes.major && axes.major.size,
-                legend === 'bottom' ? 0 : undefined,
-              )}
-              padding={{ left: 20, right: 20 }}
-              tickMargin={10}
-            />
-          )}
+        {axes.minor && axes.minor.visible && (
+          <YAxis
+            label={{
+              angle: -90,
+              offset: 0,
+              position: 'left',
+              value: '',
+            }}
+            scale="auto"
+            {...minorDomainTicks}
+            interval="preserveStartEnd"
+            dataKey="value"
+            width={conditionallyAdd(axes.minor && axes.minor.size)}
+          />
+        )}
 
-          {axes.minor && axes.minor.visible && (
-            <YAxis
-              label={{
-                angle: -90,
-                offset: 0,
-                position: 'left',
-                value: '',
-              }}
-              scale="auto"
-              domain={yAxisDomain}
-              dataKey="value"
-              width={conditionallyAdd(axes.minor && axes.minor.size)}
-            />
-          )}
+        {keysForChart.map(name => (
+          <Line
+            key={name}
+            {...populateDefaultChartProps(name, labels[name])}
+            type="linear"
+            legendType={generateLegendType(labels[name] && labels[name].symbol)}
+            dot={generateDot(labels[name] && labels[name].symbol)}
+            strokeWidth="2"
+            strokeDasharray={
+              labels[name] &&
+              labels[name].lineStyle &&
+              LineStyles[labels[name].lineStyle || 'solid']
+            }
+          />
+        ))}
 
-          {keysForChart.map(name => (
-            <Line
-              key={name}
-              {...populateDefaultChartProps(name, labels[name])}
-              type="linear"
-              legendType={labels[name] && labels[name].symbol}
-              dot={
-                labels[name] &&
-                labels[name].symbol &&
-                (props => (
-                  <Symbols
-                    {...props}
-                    type={labels[name] && labels[name].symbol}
-                    strokeDasharray=""
-                  />
-                ))
-              }
-              strokeWidth="2"
-              strokeDasharray={
-                labels[name] &&
-                labels[name].lineStyle &&
-                LineStyles[labels[name].lineStyle || 'solid']
-              }
+        {axes.major &&
+          axes.major.referenceLines &&
+          axes.major.referenceLines.map(referenceLine => (
+            <ReferenceLine
+              key={`${referenceLine.position}_${referenceLine.label}`}
+              x={referenceLine.position}
+              label={referenceLine.label}
             />
           ))}
 
-          {axes.major &&
-            axes.major.referenceLines &&
-            axes.major.referenceLines.map(referenceLine => (
-              <ReferenceLine
-                key={`${referenceLine.position}_${referenceLine.label}`}
-                x={referenceLine.position}
-                label={referenceLine.label}
-              />
-            ))}
+        {axes.minor &&
+          axes.minor.referenceLines &&
+          axes.minor.referenceLines.map(referenceLine => (
+            <ReferenceLine
+              key={`${referenceLine.position}_${referenceLine.label}`}
+              y={referenceLine.position}
+              label={referenceLine.label}
+            />
+          ))}
+      </LineChart>
+    </ResponsiveContainer>
+  );
+};
 
-          {axes.minor &&
-            axes.minor.referenceLines &&
-            axes.minor.referenceLines.map(referenceLine => (
-              <ReferenceLine
-                key={`${referenceLine.position}_${referenceLine.label}`}
-                y={referenceLine.position}
-                label={referenceLine.label}
-              />
-            ))}
-        </LineChart>
-      </ResponsiveContainer>
-    );
-  }
-}
+const definition: ChartDefinition = {
+  type: 'line',
+  name: 'Line',
+
+  capabilities: {
+    dataSymbols: true,
+    stackable: false,
+    lineStyle: true,
+    gridLines: true,
+    canSize: true,
+  },
+
+  data: [
+    {
+      type: 'line',
+      title: 'Line',
+      entryCount: 'multiple',
+      targetAxis: 'xaxis',
+    },
+  ],
+
+  axes: [
+    {
+      id: 'xaxis',
+      title: 'X Axis',
+      type: 'major',
+      defaultDataType: 'timePeriods',
+    },
+    {
+      id: 'yaxis',
+      title: 'Y Axis',
+      type: 'minor',
+    },
+  ],
+};
+
+LineChartBlock.definition = definition;
+
+export default LineChartBlock;

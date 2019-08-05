@@ -1,9 +1,8 @@
-import ButtonLink from '@frontend/components/ButtonLink';
 import FormattedDate from '@common/components/FormattedDate';
+import permalinkService, { Permalink } from '@common/services/permalinkService';
+import ButtonLink from '@frontend/components/ButtonLink';
 import Page from '@frontend/components/Page';
 import PrintThisPage from '@frontend/components/PrintThisPage';
-import RelatedAside from '@common/components/RelatedAside';
-import permalinkService, { Permalink } from '@common/services/permalinkService';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
 
@@ -59,7 +58,7 @@ class PermalinkPage extends Component<Props> {
             </RelatedAside> */}
           </div>
         </div>
-        
+
         <table className="govuk-table">
           <caption className="govuk-heading-s">Example table</caption>
           <thead className="govuk-table__head">

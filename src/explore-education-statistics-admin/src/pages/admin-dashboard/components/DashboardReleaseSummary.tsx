@@ -23,7 +23,7 @@ const getLiveLatestLabel = (isLive: boolean, isLatest: boolean) => {
   if (isLive) {
     return '(Live)';
   }
-  return undefined;
+  return '(not Live)';
 };
 
 const getTag = (approvalStatus: ReleaseApprovalStatus) => {

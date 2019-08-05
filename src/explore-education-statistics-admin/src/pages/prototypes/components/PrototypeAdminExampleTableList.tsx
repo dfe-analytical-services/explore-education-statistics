@@ -43,18 +43,6 @@ const PrototypeExampleTable = () => {
                   label: 'Absence by characteristic table with chart',
                   value: 'table-1',
                 },
-                {
-                  label: 'Absence highlights table only',
-                  value: 'table-2',
-                },
-                {
-                  label: 'Example table 3',
-                  value: 'table-3',
-                },
-                {
-                  label: 'Example table 4',
-                  value: 'table-4',
-                },
               ]}
             />
           </FormGroup>

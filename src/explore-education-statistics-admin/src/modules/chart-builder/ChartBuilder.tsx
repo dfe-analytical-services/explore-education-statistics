@@ -141,21 +141,16 @@ const ChartBuilder = ({ data }: Props) => {
 
         meta: data.metaData,
 
-        axes: Object.entries(axesConfiguration).reduce<
-          Dictionary<AxisConfiguration>
-        >(
-          (populatedData, [key, value]) => ({
-            ...populatedData,
-            [key]: {
-              ...value,
-              dataSets:
-                value.type === 'major'
-                  ? dataSetAndConfiguration.map(dsc => dsc.dataSet)
-                  : [],
-            },
-          }),
-          {},
-        ),
+        axes: {
+          major: {
+            ...axesConfiguration.major,
+            dataSets: dataSetAndConfiguration.map(dsc => dsc.dataSet),
+          },
+          minor: {
+            ...axesConfiguration.minor,
+            dataSets: [],
+          },
+        },
         labels: {
           ...dataSetAndConfiguration.reduce<Dictionary<DataSetConfiguration>>(
             (mapped, { configuration }) => ({
@@ -197,6 +192,8 @@ const ChartBuilder = ({ data }: Props) => {
 
             [axisDefinition.type]: {
               referenceLines: [],
+              min: '',
+              max: '',
 
               ...previousConfig,
 
@@ -220,6 +217,8 @@ const ChartBuilder = ({ data }: Props) => {
                   : previousConfig.showGrid,
               size:
                 previousConfig.size === undefined ? '50' : previousConfig.size,
+              tickConfig: previousConfig.tickConfig || 'default',
+              tickSpacing: previousConfig.tickSpacing || '',
             },
           };
         }, {});
@@ -272,7 +271,7 @@ const ChartBuilder = ({ data }: Props) => {
               {Object.entries(axesConfiguration).map(([key, axis]) => (
                 <ChartAxisConfiguration
                   key={key}
-                  id={axis.name}
+                  id={key}
                   configuration={axis}
                   capabilities={selectedChartType.capabilities}
                   meta={data.metaData}

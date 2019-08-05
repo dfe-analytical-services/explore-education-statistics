@@ -374,7 +374,7 @@ const PublicationDataPage = () => {
                 </FormGroup>
                 <FormGroup>
                   <label htmlFor="footnotes" className="govuk-label">
-                    Foot notes
+                    Footnotes
                   </label>
                   <textarea
                     name="footnotes"

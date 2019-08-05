@@ -36,12 +36,17 @@ const AdminDashboardPublicationsTab = ({
 
   return (
     <section>
-      <h2 className="govuk-heading-l govuk-!-margin-bottom-0">
-        {`${selectedTheme.title}, ${selectedTopic.title}`}
-      </h2>
-      <p className="govuk-body">
-        Edit an existing release or create a new release for current
-        publications.
+      <p className="govuk-body">Select publications to:</p>
+      <ul className="govuk-list--bullet">
+        <li>create new releases and methodologies</li>
+        <li>edit exiting releases and methodologies</li>
+        <li>view and sign-off releases and methodologies</li>
+      </ul>
+      <p className="govuk-bo">
+        To remove publications, releases and methodologies email{' '}
+        <a href="mailto:explore.statistics@education.gov.uk">
+          explore.statistics@education.gov.uk
+        </a>
       </p>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-one-half">
@@ -75,6 +80,9 @@ const AdminDashboardPublicationsTab = ({
           />
         </div>
       </div>
+      <hr />
+      <h2>{selectedTheme.title}</h2>
+      <h3>{selectedTopic.title}</h3>
       {publications.length > 0 && (
         <Accordion id="publications">
           {publications.map(publication => (
