@@ -1,9 +1,19 @@
-import {FormCheckbox, FormFieldset, FormGroup, FormRadioGroup, FormTextInput,} from '@common/components/form';
+import {
+  FormCheckbox,
+  FormFieldset,
+  FormGroup,
+  FormRadioGroup,
+  FormTextInput,
+} from '@common/components/form';
 
-import FormSelect, {SelectOption} from '@common/components/form/FormSelect';
-import {ChartCapabilities} from '@common/modules/find-statistics/components/charts/ChartFunctions';
-import {DataBlockMetadata} from '@common/services/dataBlockService';
-import {AxisConfiguration, AxisGroupBy, ReferenceLine,} from '@common/services/publicationService';
+import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
+import { ChartCapabilities } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import { DataBlockMetadata } from '@common/services/dataBlockService';
+import {
+  AxisConfiguration,
+  AxisGroupBy,
+  ReferenceLine,
+} from '@common/services/publicationService';
 import * as React from 'react';
 import styles from './graph-builder.module.scss';
 
