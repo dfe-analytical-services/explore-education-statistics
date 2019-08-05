@@ -6,6 +6,7 @@ import {
   DataBlockMetadata,
   Result,
 } from '@common/services/dataBlockService';
+import formatPretty from '@common/lib/utils/number/formatPretty';
 import styles from './SummaryRenderer.module.scss';
 
 export interface SummaryRendererProps {
@@ -69,7 +70,7 @@ export default function SummaryRenderer({
                   className="govuk-heading-xl"
                   data-testid="key-stat-tile-value"
                 >
-                  {`${measures[key]}${meta.indicators[key].unit}`}
+                  {`${formatPretty(measures[key])}${meta.indicators[key].unit}`}
                 </p>
                 {dataSummary && (
                   <p className="govuk-body-s">{dataSummary[index]}</p>

@@ -71,6 +71,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IPublicationService, PublicationService>();
             services.AddTransient<IMetaService, MetaService>();
             services.AddTransient<IContactService, ContactService>();
+            services.AddTransient<IReleaseService, ReleaseService>();
+            services.AddTransient<IMethodologyService, MethodologyService>();
 
             services.AddSwaggerGen(c =>
             {
@@ -87,12 +89,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
-
+                app.UseExceptionHandler("/Error");
                 app.UseHsts(hsts => hsts.MaxAge(365).IncludeSubdomains());
             }
-
-            app.UseHttpsRedirection();
 
             // Security Headers
             app.UseXContentTypeOptions();
@@ -112,26 +111,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 .ScriptSources(s => s.UnsafeInline())
             );
 
+            app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
             app.UseCookiePolicy();
 
             app.UseAuthentication();
 
-            // adds a application root specific for the serverside admin tools built to aid development
-            app.Map("/tools", adminApp =>
-                adminApp.UseMvc(routes =>
-                {
-                    routes.MapRoute(
-                        name: "default",
-                        template: "{controller=Home}/{action=Index}/{id?}");
-                })
-            );
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute(
+                    name: "Areas",
+                    template: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+                
+                routes.MapRoute(
+                    name: "default",
+                    template: "{controller}/{action=Index}/{id?}");
+            });
 
-            // TODO Is this the best solution to the routing - controllers can be accessed on both "/tools" and "/api"
-            // TODO We could perhaps move everything to the toplevel "/" and have routes specified in the controllers
-            // TODO themselves but this will have an effect on the react app we serve up.
-            app.Map("/api", apiApp => apiApp.UseMvc());
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {

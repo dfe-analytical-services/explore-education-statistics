@@ -10,6 +10,7 @@ import publicationService, {
   Release,
 } from '@common/services/publicationService';
 import ButtonLink from '@frontend/components/ButtonLink';
+import AccordionWithAnalytics from '@frontend/components/AccordionWithAnalytics';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
@@ -53,13 +54,12 @@ class PublicationReleasePage extends Component<Props> {
     const { data, release } = this.props;
 
     const releaseCount =
-      data.publication.releases.slice(1).length +
-      data.publication.legacyReleases.length;
+      data.publication.releases.length + data.publication.legacyReleases.length;
 
     return (
       <Page
-        title={data.title}
-        caption="Publication"
+        title={data.publication.title}
+        caption={data.title}
         breadcrumbs={[
           { name: 'Find statistics and data', link: '/statistics' },
         ]}
@@ -86,14 +86,14 @@ class PublicationReleasePage extends Component<Props> {
                   </p>
                 )}
                 <dl className="dfe-meta-content govuk-!-margin-top-3 govuk-!-margin-bottom-1">
-                  <dt className="govuk-caption-m">Published:</dt>
+                  <dt className="govuk-caption-m">Published: </dt>
                   <dd data-testid="published-date">
                     <strong>
                       <FormattedDate>{data.published}</FormattedDate>{' '}
                     </strong>
                   </dd>
                   <div>
-                    <dt className="govuk-caption-m">Next update:</dt>
+                    <dt className="govuk-caption-m">Next update: </dt>
                     <dd data-testid="next-update">
                       <strong>
                         <FormattedDate format="MMMM yyyy">
@@ -145,6 +145,11 @@ class PublicationReleasePage extends Component<Props> {
                       <Link
                         to={`${baseUrl.data}/api/download/${path}`}
                         className="govuk-link"
+                        analytics={{
+                          category: 'Downloads',
+                          action: `Release page ${name} file downloaded`,
+                          label: `File URL: /api/download/${path}`,
+                        }}
                       >
                         {name}
                       </Link>
@@ -162,9 +167,9 @@ class PublicationReleasePage extends Component<Props> {
               <h3>About these statistics</h3>
 
               <dl className="dfe-meta-content">
-                <dt className="govuk-caption-m">For school year:</dt>
+                <dt className="govuk-caption-m">For {data.coverageTitle}: </dt>
                 <dd data-testid="release-name">
-                  <strong>{data.releaseName}</strong>
+                  <strong>{data.yearTitle}</strong>
                 </dd>
                 <dd>
                   <Details
@@ -210,7 +215,7 @@ class PublicationReleasePage extends Component<Props> {
                 </dd>
               </dl>
               <dl className="dfe-meta-content">
-                <dt className="govuk-caption-m">Last updated:</dt>
+                <dt className="govuk-caption-m">Last updated: </dt>
                 <dd data-testid="last-updated">
                   <strong>
                     <FormattedDate>{data.updates[0].on}</FormattedDate>
@@ -257,7 +262,7 @@ class PublicationReleasePage extends Component<Props> {
         </div>
         <hr />
         <h2 className="dfe-print-break-before">
-          Headline facts and figures - {data.releaseName}
+          Headline facts and figures - {data.yearTitle}
         </h2>
 
         {data.keyStatistics && (
@@ -296,9 +301,9 @@ class PublicationReleasePage extends Component<Props> {
         >
           Help and support
         </h2>
-        <Accordion id="extra-information-sections">
+        <AccordionWithAnalytics id="extra-information-sections">
           <AccordionSection
-            heading={`${data.title}: methodology`}
+            heading={`${data.publication.title}: methodology`}
             caption="Find out how and why we collect, process and publish these statistics"
             headingTag="h3"
           >
@@ -400,7 +405,7 @@ class PublicationReleasePage extends Component<Props> {
               [[ DEPT. FOR EDUCATION TEL NO. ]]
             </p>
           </AccordionSection>
-        </Accordion>
+        </AccordionWithAnalytics>
         <h2 className="govuk-heading-m govuk-!-margin-top-9">
           Create your own tables online
         </h2>

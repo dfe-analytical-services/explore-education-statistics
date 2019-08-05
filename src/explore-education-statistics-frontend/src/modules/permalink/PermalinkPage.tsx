@@ -1,9 +1,8 @@
-import ButtonLink from '@frontend/components/ButtonLink';
 import FormattedDate from '@common/components/FormattedDate';
+import permalinkService, { Permalink } from '@common/services/permalinkService';
+import ButtonLink from '@frontend/components/ButtonLink';
 import Page from '@frontend/components/Page';
 import PrintThisPage from '@frontend/components/PrintThisPage';
-import RelatedAside from '@common/components/RelatedAside';
-import permalinkService, { Permalink } from '@common/services/permalinkService';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
 
@@ -48,7 +47,7 @@ class PermalinkPage extends Component<Props> {
               <dd data-testid="created-date">
                 <strong>
                   {' '}
-                  <FormattedDate>{data.timestamp}</FormattedDate>{' '}
+                  <FormattedDate>{data.created}</FormattedDate>{' '}
                 </strong>
               </dd>
             </dl>
@@ -155,7 +154,6 @@ class PermalinkPage extends Component<Props> {
           </tbody>
         </table>
         <p className="govuk-body-s">Source: DfE prototype example statistics</p>
-
         <h2 className="govuk-heading-m govuk-!-margin-top-9">
           Create your own tables online
         </h2>

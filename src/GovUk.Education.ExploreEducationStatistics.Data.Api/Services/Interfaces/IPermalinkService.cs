@@ -1,13 +1,14 @@
 using System;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces
 {
     public interface IPermalinkService
     {
-        Task<Permalink> GetAsync(Guid id);
+        Task<PermalinkViewModel> GetAsync(Guid id);
 
-        Task<Permalink> CreateAsync();
+        Task<PermalinkViewModel> CreateAsync(ObservationQueryContext tableQuery);
     }
 }

@@ -134,7 +134,7 @@ function PrivacyNoticePage() {
         <p>
           Further information about your data protection rights can be found on
           the{' '}
-          <a href="https://ico.org.uk/for-organisations/guide-to-data-protection/principle-6-rights">
+          <a href="https://ico.org.uk/for-organisations/guide-to-data-protection/">
             Information Commissioner’s Office (ICO)
           </a>{' '}
           website.

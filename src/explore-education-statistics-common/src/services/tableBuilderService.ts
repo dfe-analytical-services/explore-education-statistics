@@ -54,6 +54,7 @@ export interface PublicationSubjectMeta {
     legend: string;
     hint?: string;
     options: GroupedFilterOptions;
+    totalValue?: string;
   }>;
   indicators: Dictionary<{
     label: string;
@@ -88,7 +89,6 @@ export type LocationLevelKeys =
 
 export interface TableData {
   footnotes: {
-    indicators: number[];
     id: number;
     label: string;
   }[];

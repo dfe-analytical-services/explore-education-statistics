@@ -59,7 +59,7 @@ class PublicationPage extends Component<{}, State> {
                   id="edit"
                   value="edit"
                   defaultChecked
-                  onChange={() => this.setState({ editing: false })}
+                  onClick={() => this.setState({ editing: false })}
                 />
                 <label
                   className="govuk-label govuk-radios__label"

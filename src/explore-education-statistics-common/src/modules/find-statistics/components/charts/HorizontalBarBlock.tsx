@@ -3,35 +3,41 @@ import {
   ChartDefinition,
   conditionallyAdd,
   createDataForAxis,
-  generateReferenceLines,
+  GenerateMajorAxis,
+  GenerateMinorAxis,
   getKeysForChart,
   mapNameToNameLabel,
   populateDefaultChartProps,
   StackedBarProps,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+
+import classnames from 'classnames';
 import React, { Component } from 'react';
 import {
   Bar,
   BarChart,
   CartesianGrid,
   Legend,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from 'recharts';
-import LoadingSpinner from '@common/components/LoadingSpinner';
+
+import './charts.scss';
 
 export default class HorizontalBarBlock extends Component<StackedBarProps> {
   public static definition: ChartDefinition = {
     type: 'horizontalbar',
-    name: 'Horizontal Bar',
+    name: 'Horizontal bar',
 
     capabilities: {
       dataSymbols: false,
       stackable: true,
       lineStyle: false,
       gridLines: true,
+      canSize: true,
     },
 
     data: [
@@ -64,7 +70,6 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
       meta,
       height,
       width,
-      referenceLines,
       stacked = false,
       labels,
       axes,
@@ -72,7 +77,13 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
       legendHeight,
     } = this.props;
 
-    if (!axes.major || !data) return <LoadingSpinner />;
+    if (
+      axes === undefined ||
+      axes.major === undefined ||
+      data === undefined ||
+      meta === undefined
+    )
+      return <div>Unable to render chart</div>;
 
     const chartData: ChartDataB[] = createDataForAxis(
       axes.major,
@@ -82,11 +93,15 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
 
     const keysForChart = getKeysForChart(chartData);
 
+    const minorDomainTicks = GenerateMinorAxis(chartData, axes.minor);
+    const majorDomainTicks = GenerateMajorAxis(chartData, axes.major);
+
     return (
-      <ResponsiveContainer width={width || '100%'} height={height || 600}>
+      <ResponsiveContainer width={width || '100%'} height={height || 300}>
         <BarChart
           data={chartData}
           layout="vertical"
+          className={classnames({ 'legend-bottom': legend === 'bottom' })}
           margin={{
             left: 30,
             top: legend === 'top' ? 10 : 0,
@@ -109,9 +124,10 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
                 value: '',
               }}
               scale="auto"
+              {...minorDomainTicks}
               height={conditionallyAdd(
                 axes.minor && axes.minor.size,
-                legend === 'bottom' ? 0 : undefined,
+                legend === 'bottom' ? 50 : undefined,
               )}
               padding={{ left: 20, right: 20 }}
               tickMargin={10}
@@ -128,6 +144,7 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
                 position: 'bottom',
                 value: '',
               }}
+              {...majorDomainTicks}
               scale="auto"
               width={conditionallyAdd(axes.major && axes.major.size)}
               interval={
@@ -151,7 +168,25 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
             />
           ))}
 
-          {referenceLines && generateReferenceLines(referenceLines)}
+          {axes.major &&
+            axes.major.referenceLines &&
+            axes.major.referenceLines.map(referenceLine => (
+              <ReferenceLine
+                key={`${referenceLine.position}_${referenceLine.label}`}
+                y={referenceLine.position}
+                label={referenceLine.label}
+              />
+            ))}
+
+          {axes.minor &&
+            axes.minor.referenceLines &&
+            axes.minor.referenceLines.map(referenceLine => (
+              <ReferenceLine
+                key={`${referenceLine.position}_${referenceLine.label}`}
+                x={referenceLine.position}
+                label={referenceLine.label}
+              />
+            ))}
         </BarChart>
       </ResponsiveContainer>
     );
