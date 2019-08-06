@@ -1,12 +1,12 @@
 import { TimePeriodCoverageGroup } from '@admin/pages/DummyReferenceData';
-import ReleaseSetupForm, {
+import ReleaseSummaryForm, {
   EditFormValues,
-} from '@admin/pages/release/setup/ReleaseSetupForm';
-import { assembleUpdateReleaseSetupRequestFromForm } from '@admin/pages/release/util/releaseSetupUtil';
+} from '@admin/pages/release/summary/ReleaseSummaryForm';
+import { assembleUpdateReleaseSummaryRequestFromForm } from '@admin/pages/release/util/releaseSummaryUtil';
 import { setupRoute } from '@admin/routes/edit-release/routes';
 import { dayMonthYearValuesToInputs } from '@admin/services/common/types';
-import service from '@admin/services/release/edit-release/setup/service';
-import { ReleaseSetupDetails } from '@admin/services/release/types';
+import service from '@admin/services/release/edit-release/summary/service';
+import { ReleaseSummaryDetails } from '@admin/services/release/types';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import ReleasePageTemplate from '../components/ReleasePageTemplate';
@@ -15,30 +15,30 @@ interface MatchProps {
   releaseId: string;
 }
 
-const ReleaseSetupEditPage = ({
+const ReleaseSummaryEditPage = ({
   match,
   history,
 }: RouteComponentProps<MatchProps>) => {
   const { releaseId } = match.params;
 
-  const [releaseSetupDetails, setReleaseSetupDetails] = useState<
-    ReleaseSetupDetails
+  const [releaseSummaryDetails, setReleaseSummaryDetails] = useState<
+    ReleaseSummaryDetails
   >();
 
   useEffect(() => {
-    service.getReleaseSetupDetails(releaseId).then(release => {
-      setReleaseSetupDetails(release);
+    service.getReleaseSummaryDetails(releaseId).then(release => {
+      setReleaseSummaryDetails(release);
     });
   }, [releaseId]);
 
   const submitHandler = (values: EditFormValues) => {
-    const updatedReleaseDetails = assembleUpdateReleaseSetupRequestFromForm(
+    const updatedReleaseDetails = assembleUpdateReleaseSummaryRequestFromForm(
       releaseId,
       values,
     );
 
     service
-      .updateReleaseSetupDetails(updatedReleaseDetails)
+      .updateReleaseSummaryDetails(updatedReleaseDetails)
       .then(_ => history.push(setupRoute.generateLink(releaseId)));
   };
 
@@ -46,27 +46,27 @@ const ReleaseSetupEditPage = ({
 
   return (
     <>
-      {releaseSetupDetails && (
+      {releaseSummaryDetails && (
         <ReleasePageTemplate
           releaseId={releaseId}
-          publicationTitle={releaseSetupDetails.publicationTitle}
+          publicationTitle={releaseSummaryDetails.publicationTitle}
         >
           <h2 className="govuk-heading-m">Edit release setup</h2>
 
-          <ReleaseSetupForm
+          <ReleaseSummaryForm
             submitButtonText="Update release status"
             initialValuesSupplier={(
               _: TimePeriodCoverageGroup[],
             ): EditFormValues => ({
               timePeriodCoverageCode:
-                releaseSetupDetails.timePeriodCoverageCode,
-              timePeriodCoverageStartYear: releaseSetupDetails.timePeriodCoverageStartYear.toString(),
-              releaseTypeId: releaseSetupDetails.releaseType.id,
+                releaseSummaryDetails.timePeriodCoverageCode,
+              timePeriodCoverageStartYear: releaseSummaryDetails.timePeriodCoverageStartYear.toString(),
+              releaseTypeId: releaseSummaryDetails.releaseType.id,
               scheduledPublishDate: dayMonthYearValuesToInputs(
-                releaseSetupDetails.scheduledPublishDate,
+                releaseSummaryDetails.scheduledPublishDate,
               ),
               nextReleaseExpectedDate: dayMonthYearValuesToInputs(
-                releaseSetupDetails.nextReleaseExpectedDate,
+                releaseSummaryDetails.nextReleaseExpectedDate,
               ),
             })}
             onSubmitHandler={submitHandler}
@@ -78,4 +78,4 @@ const ReleaseSetupEditPage = ({
   );
 };
 
-export default ReleaseSetupEditPage;
+export default ReleaseSummaryEditPage;

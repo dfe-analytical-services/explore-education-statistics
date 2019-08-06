@@ -1,6 +1,6 @@
 import { IdTitlePair } from '@admin/services/common/types';
 import { CreateReleaseRequest } from '@admin/services/release/create-release/types';
-import { ReleaseSetupDetails } from '@admin/services/release/types';
+import { ReleaseSummaryDetails } from '@admin/services/release/types';
 import { createClient } from '@admin/services/util/service';
 import mocks from './mock/mock-service';
 
@@ -8,16 +8,16 @@ const apiClient = createClient({
   mockBehaviourRegistrar: mocks,
 });
 
-export interface ReleaseSetupService {
+export interface ReleaseSummaryService {
   getTemplateRelease: (
     publicationId: string,
   ) => Promise<IdTitlePair | undefined>;
   createRelease: (
     createRequest: CreateReleaseRequest,
-  ) => Promise<ReleaseSetupDetails>;
+  ) => Promise<ReleaseSummaryDetails>;
 }
 
-const service: ReleaseSetupService = {
+const service: ReleaseSummaryService = {
   getTemplateRelease: (
     publicationId: string,
   ): Promise<IdTitlePair | undefined> => {
@@ -44,7 +44,7 @@ const service: ReleaseSetupService = {
   },
   createRelease(
     createRequest: CreateReleaseRequest,
-  ): Promise<ReleaseSetupDetails> {
+  ): Promise<ReleaseSummaryDetails> {
     return apiClient.then(client =>
       client.post(
         `/publications/${createRequest.publicationId}/releases`,

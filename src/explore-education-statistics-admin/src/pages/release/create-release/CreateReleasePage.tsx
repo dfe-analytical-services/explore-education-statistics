@@ -1,9 +1,9 @@
 import Page from '@admin/components/Page';
 import { TimePeriodCoverageGroup } from '@admin/pages/DummyReferenceData';
-import ReleaseSetupForm, {
+import ReleaseSummaryForm, {
   EditFormValues,
-} from '@admin/pages/release/setup/ReleaseSetupForm';
-import { assembleCreateReleaseRequestFromForm } from '@admin/pages/release/util/releaseSetupUtil';
+} from '@admin/pages/release/summary/ReleaseSummaryForm';
+import { assembleCreateReleaseRequestFromForm } from '@admin/pages/release/util/releaseSummaryUtil';
 import dashboardRoutes from '@admin/routes/dashboard/routes';
 import { setupRoute } from '@admin/routes/edit-release/routes';
 import { emptyDayMonthYear, IdTitlePair } from '@admin/services/common/types';
@@ -60,7 +60,7 @@ const CreateReleasePage = ({
         },
       ]}
     >
-      <ReleaseSetupForm<FormValues>
+      <ReleaseSummaryForm<FormValues>
         submitButtonText="Create new release"
         initialValuesSupplier={(
           timePeriodCoverageGroups: TimePeriodCoverageGroup[],
@@ -85,7 +85,7 @@ const CreateReleasePage = ({
         additionalFields={
           templateRelease && (
             <FormFieldRadioGroup<FormValues>
-              id="releaseSetupForm-templateReleaseId"
+              id="releaseSummaryForm-templateReleaseId"
               legend="Select template"
               name="templateReleaseId"
               options={[

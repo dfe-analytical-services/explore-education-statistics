@@ -42,7 +42,7 @@ interface Props<FormValues extends EditFormValues> {
   additionalFields?: React.ReactNode;
 }
 
-const ReleaseSetupForm = <FormValues extends EditFormValues>({
+const ReleaseSummaryForm = <FormValues extends EditFormValues>({
   submitButtonText,
   initialValuesSupplier,
   validationRulesSupplier,
@@ -82,7 +82,7 @@ const ReleaseSetupForm = <FormValues extends EditFormValues>({
     nextReleaseExpectedDate: validateOptionalPartialDayMonthYearField,
   };
 
-  const formId = 'releaseSetupForm';
+  const formId = 'releaseSummaryForm';
 
   return (
     <>
@@ -165,4 +165,4 @@ const ReleaseSetupForm = <FormValues extends EditFormValues>({
   );
 };
 
-export default ReleaseSetupForm;
+export default ReleaseSummaryForm;
