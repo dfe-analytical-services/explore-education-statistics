@@ -1,7 +1,7 @@
 import Link from '@admin/components/Link';
 import { dataRoute } from '@admin/routes/edit-release/routes';
-import service from '@admin/services/edit-release/data/service';
-import { DataFile } from '@admin/services/edit-release/data/types';
+import service from '@admin/services/release/edit-release/data/service';
+import { DataFile } from '@admin/services/release/edit-release/data/types';
 import Button from '@common/components/Button';
 import FormFieldFileSelector from '@common/components/form/FormFieldFileSelector';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
