@@ -98,7 +98,7 @@ const PrototypeAdminNavigation = ({ sectionId }: Props) => {
               to="/prototypes/publication-create-new-absence-status"
               className="govuk-link govuk-link--no-visited-state"
             >
-              Release status
+              Update release status
             </Link>
           </li>
         </ul>

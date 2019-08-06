@@ -28,7 +28,7 @@ const UpdateStatusForm = () => {
                   className="govuk-label govuk-radios__label"
                   htmlFor="edit"
                 >
-                  First draft
+                  In draft
                 </label>
               </div>
 

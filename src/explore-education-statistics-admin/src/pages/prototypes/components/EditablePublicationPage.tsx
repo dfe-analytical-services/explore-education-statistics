@@ -470,12 +470,12 @@ class EditablePublicationPage extends Component<Props, State> {
 
                   {editing && (
                     <>
-                      <FormFieldset id="test" legend="Add more related content">
+                      <FormFieldset id="test" legend="Add related information">
                         <FormGroup>
                           <FormTextInput
                             id="link-title"
                             name="link-title"
-                            label="Related content title"
+                            label="Title"
                             value=""
                           />
                         </FormGroup>
@@ -489,7 +489,7 @@ class EditablePublicationPage extends Component<Props, State> {
                         </FormGroup>
                       </FormFieldset>
                       <button type="submit" className="govuk-button">
-                        Add related content
+                        Add related information
                       </button>
                     </>
                   )}
