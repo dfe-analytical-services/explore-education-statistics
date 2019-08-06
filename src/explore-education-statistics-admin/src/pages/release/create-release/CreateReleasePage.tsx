@@ -44,7 +44,10 @@ const CreateReleasePage = ({
     service
       .createRelease(createReleaseDetails)
       .then(createdRelease =>
-        history.push(setupRoute.generateLink(createdRelease.id)),
+        // TODO remove this conditional redirect when the Release Summary page is wired up to the API
+        process.env.USE_MOCK_API === "true"
+          ? history.push(setupRoute.generateLink(createdRelease.id))
+          : history.push(dashboardRoutes.adminDashboard)
       );
   };
 
