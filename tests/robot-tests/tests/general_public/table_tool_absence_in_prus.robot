@@ -9,7 +9,8 @@ Suite Teardown    user closes the browser
 *** Test Cases ***
 Go to Table Tool page
     [Tags]  HappyPath
-    user goes to url  ${url}/table-tool
+    environment variable should be set  PUBLIC_URL
+    user goes to url  %{PUBLIC_URL}/table-tool
     user waits until page contains   Create your own tables online
 
 Select "Pupil absence" publication

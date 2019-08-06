@@ -369,4 +369,59 @@ describe('HorzontalBarBlock', () => {
 
     expectTicks(container, 'y', '2014/15', '2015/16');
   });
+
+  test('Can sort by name', () => {
+    const propsWithTicks: ChartProps = {
+      ...props,
+      axes: {
+        minor: props.axes.minor,
+        major: {
+          ...props.axes.major,
+          sortBy: 'name',
+          sortAsc: true,
+        },
+      },
+    };
+
+    const { container } = render(<Chart {...propsWithTicks} />);
+
+    expectTicks(container, 'y', '2014/15', '2015/16');
+  });
+
+  test('Can sort by name descending', () => {
+    const propsWithTicks: ChartProps = {
+      ...props,
+      axes: {
+        minor: props.axes.minor,
+        major: {
+          ...props.axes.major,
+          sortBy: 'name',
+          sortAsc: false,
+        },
+      },
+    };
+
+    const { container } = render(<Chart {...propsWithTicks} />);
+
+    expectTicks(container, 'y', '2015/16', '2014/15');
+  });
+
+  test('Can filter a data range', () => {
+    const propsWithTicks: ChartProps = {
+      ...props,
+      axes: {
+        minor: props.axes.minor,
+        major: {
+          ...props.axes.major,
+          sortBy: 'name',
+          sortAsc: true,
+          dataRange: [0, 1],
+        },
+      },
+    };
+
+    const { container } = render(<Chart {...propsWithTicks} />);
+
+    expectTicks(container, 'y', '2014/15');
+  });
 });

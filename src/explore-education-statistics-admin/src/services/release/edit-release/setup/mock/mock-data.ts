@@ -1,4 +1,4 @@
-import { ReleaseSetupDetails } from '@admin/services/edit-release/setup/types';
+import { ReleaseSetupDetails } from '@admin/services/release/types';
 import { Dictionary } from '@common/types';
 
 const setupByReleaseId: Dictionary<ReleaseSetupDetails> = {
@@ -7,13 +7,9 @@ const setupByReleaseId: Dictionary<ReleaseSetupDetails> = {
     publicationTitle:
       'Pupil absence statistics and data for schools in England',
     timePeriodCoverageCode: 'AY',
-    timePeriodCoverageStartDate: {
-      day: 1,
-      month: 6,
-      year: 2017,
-    },
+    timePeriodCoverageStartYear: 2017,
     releaseType: {
-      id: 'national-stats',
+      id: 'national-statistics',
       title: 'National Statistics',
     },
     leadStatisticianName: 'John Smith',

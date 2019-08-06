@@ -9,7 +9,8 @@ Suite Teardown    user closes the browser
 *** Test Cases ***
 Navigate to /methodologies page
     [Tags]  HappyPath
-    user goes to url   ${url}/methodologies
+    environment variable should be set  PUBLIC_URL
+    user goes to url   %{PUBLIC_URL}/methodologies
     user waits until page contains element   xpath://h1[text()="Methodologies"]
 
 Validate page contents

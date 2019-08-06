@@ -1,10 +1,12 @@
+import { TimePeriodCoverageGroup } from '@admin/pages/DummyReferenceData';
 import ReleaseSetupForm, {
-  FormValues,
+  EditFormValues,
 } from '@admin/pages/release/setup/ReleaseSetupForm';
-import { assembleUpdateReleaseSetupRequestFromForm } from '@admin/pages/release/setup/util/releaseSetupUtil';
+import { assembleUpdateReleaseSetupRequestFromForm } from '@admin/pages/release/util/releaseSetupUtil';
 import { setupRoute } from '@admin/routes/edit-release/routes';
-import service from '@admin/services/edit-release/setup/service';
-import { ReleaseSetupDetails } from '@admin/services/edit-release/setup/types';
+import { dayMonthYearValuesToInputs } from '@admin/services/common/types';
+import service from '@admin/services/release/edit-release/setup/service';
+import { ReleaseSetupDetails } from '@admin/services/release/types';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import ReleasePageTemplate from '../components/ReleasePageTemplate';
@@ -29,7 +31,7 @@ const ReleaseSetupEditPage = ({
     });
   }, [releaseId]);
 
-  const submitHandler = (values: FormValues) => {
+  const submitHandler = (values: EditFormValues) => {
     const updatedReleaseDetails = assembleUpdateReleaseSetupRequestFromForm(
       releaseId,
       values,
@@ -52,8 +54,21 @@ const ReleaseSetupEditPage = ({
           <h2 className="govuk-heading-m">Edit release setup</h2>
 
           <ReleaseSetupForm
-            releaseSetupDetails={releaseSetupDetails}
             submitButtonText="Update release status"
+            initialValuesSupplier={(
+              _: TimePeriodCoverageGroup[],
+            ): EditFormValues => ({
+              timePeriodCoverageCode:
+                releaseSetupDetails.timePeriodCoverageCode,
+              timePeriodCoverageStartYear: releaseSetupDetails.timePeriodCoverageStartYear.toString(),
+              releaseTypeId: releaseSetupDetails.releaseType.id,
+              scheduledPublishDate: dayMonthYearValuesToInputs(
+                releaseSetupDetails.scheduledPublishDate,
+              ),
+              nextReleaseExpectedDate: dayMonthYearValuesToInputs(
+                releaseSetupDetails.nextReleaseExpectedDate,
+              ),
+            })}
             onSubmitHandler={submitHandler}
             onCancelHandler={cancelHandler}
           />
