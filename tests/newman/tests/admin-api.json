@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "226b89d3-7ffd-49a3-a46f-71ad07dc0968",
+		"_postman_id": "1d44cd5a-0e76-413b-b3fd-d6134af597c2",
 		"name": "DfE Admin API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -26,10 +26,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{admin_api_url}}/contacts",
 					"host": [
@@ -70,10 +66,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{admin_api_url}}/meta/releasetypes",
 					"host": [
@@ -133,10 +125,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{admin_api_url}}/meta/timeidentifiers",
 					"host": [
@@ -190,10 +178,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{admin_api_url}}/me/publications?topicId=67C249DE-1CCA-446E-8CCB-DCDAC542F460",
 					"host": [
@@ -258,12 +242,12 @@
 					"raw": "{\n    \"PublicationId\": \"8b12776b-3d36-4475-8115-00974d7de1d0\",\n    \"ReleaseTypeId\": \"1821abb8-68b0-431b-9770-0bea65d02ff0\",\n    \"TimeIdentifier\": 62,\n    \"PublishScheduled\": \"0001-01-01T00:00:00\",\n    \"NextReleaseExpected\": {\n        \"Year\": \"2018\",\n        \"Month\": \"01\",\n        \"Day\": \"01\"\n    },\n    \"ReleaseName\": \"2014\",\n    \"TemplateReleaseId\": \"63227211-7CB3-408C-B5C2-40D3D7CB2717\"\n}"
 				},
 				"url": {
-					"raw": "{{admin_api_url}}/publication/8b12776b-3d36-4475-8115-00974d7de1d0/releases",
+					"raw": "{{admin_api_url}}/publications/8b12776b-3d36-4475-8115-00974d7de1d0/releases",
 					"host": [
 						"{{admin_api_url}}"
 					],
 					"path": [
-						"publication",
+						"publications",
 						"8b12776b-3d36-4475-8115-00974d7de1d0",
 						"releases"
 					]
@@ -326,10 +310,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{admin_api_url}}/me/publications?topicId=A7CE9542-20E6-401D-91F4-F832C9E58B12&themeId=2CA22E34-B87A-4281-A0EB-B80F4F8DD374",
 					"host": [
@@ -449,10 +429,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{admin_api_url}}/methodologies",
 					"host": [
@@ -490,10 +466,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{admin_api_url}}/topic/77941B7D-BBD6-4069-9107-565AF89E2DEC/methodologies",
 					"host": [
@@ -540,10 +512,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{admin_api_url}}/releases/E7774A74-1F62-4B76-B9B5-84F14DAC7278/summary/",
 					"host": [
@@ -681,10 +649,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{admin_api_url}}/me/publications?topicId=67C249DE-1CCA-446E-8CCB-DCDAC542F460",
 					"host": [
