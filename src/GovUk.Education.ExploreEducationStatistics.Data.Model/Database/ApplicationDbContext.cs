@@ -42,6 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             ConfigureAdditionalTypes(modelBuilder);
             ConfigureData(modelBuilder);
             ConfigureBoundaryLevel(modelBuilder);
+            ConfigureIndicator(modelBuilder);
             ConfigureGeographicLevel(modelBuilder);
             ConfigureGeoJson(modelBuilder);
             ConfigureFilterFootnote(modelBuilder);
@@ -654,6 +655,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                     builder => builder.HasIndex(localAuthorityDistrict => localAuthorityDistrict.Code));
         }
 
+        private static void ConfigureIndicator(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Indicator>()
+                .HasIndex(indicator => indicator.Name);
+        }
+        
         private static void ConfigureFilterFootnote(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<FilterFootnote>()
