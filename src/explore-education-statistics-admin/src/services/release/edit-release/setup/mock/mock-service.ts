@@ -1,4 +1,4 @@
-import {dateToDayMonthYear} from "@admin/services/common/types";
+import { dateToDayMonthYear } from '@admin/services/common/types';
 import { UpdateReleaseSetupDetailsRequest } from '@admin/services/release/edit-release/setup/types';
 import { getCaptureGroups } from '@admin/services/util/mock/mock-service';
 import MockAdapter from 'axios-mock-adapter';
@@ -10,7 +10,7 @@ export default async (mock: MockAdapter) => {
 
   const mockCommonData = (await import(
     /* webpackChunkName: "mock-dashboard-data" */ '@admin/services/common/mock/mock-data'
-    )).default;
+  )).default;
 
   const getReleaseSetupDetailsUrl = /\/release\/(.*)\/setup/;
 
@@ -32,11 +32,15 @@ export default async (mock: MockAdapter) => {
 
     existingRelease.timePeriodCoverageCode =
       updateRequest.timePeriodCoverage.value;
-    existingRelease.scheduledPublishDate = dateToDayMonthYear(updateRequest.publishScheduled);
+    existingRelease.scheduledPublishDate = dateToDayMonthYear(
+      updateRequest.publishScheduled,
+    );
     existingRelease.nextReleaseExpectedDate = updateRequest.nextReleaseExpected;
     existingRelease.releaseType =
-      mockCommonData.getReleaseTypes().find(type => type.id === updateRequest.releaseTypeId)
-      || mockCommonData.getReleaseTypes()[0];
+      mockCommonData
+        .getReleaseTypes()
+        .find(type => type.id === updateRequest.releaseTypeId) ||
+      mockCommonData.getReleaseTypes()[0];
     /* eslint-enable no-param-reassign */
 
     return [200];

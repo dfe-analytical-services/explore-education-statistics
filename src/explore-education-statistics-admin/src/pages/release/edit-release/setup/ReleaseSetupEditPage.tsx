@@ -1,12 +1,14 @@
-import {TimePeriodCoverageGroup} from '@admin/pages/DummyReferenceData';
-import ReleaseSetupForm, {EditFormValues,} from '@admin/pages/release/setup/ReleaseSetupForm';
-import {assembleUpdateReleaseSetupRequestFromForm} from '@admin/pages/release/util/releaseSetupUtil';
-import {setupRoute} from '@admin/routes/edit-release/routes';
-import {dayMonthYearValuesToInputs} from '@admin/services/common/types';
+import { TimePeriodCoverageGroup } from '@admin/pages/DummyReferenceData';
+import ReleaseSetupForm, {
+  EditFormValues,
+} from '@admin/pages/release/setup/ReleaseSetupForm';
+import { assembleUpdateReleaseSetupRequestFromForm } from '@admin/pages/release/util/releaseSetupUtil';
+import { setupRoute } from '@admin/routes/edit-release/routes';
+import { dayMonthYearValuesToInputs } from '@admin/services/common/types';
 import service from '@admin/services/release/edit-release/setup/service';
-import {ReleaseSetupDetails} from '@admin/services/release/types';
-import React, {useEffect, useState} from 'react';
-import {RouteComponentProps} from 'react-router';
+import { ReleaseSetupDetails } from '@admin/services/release/types';
+import React, { useEffect, useState } from 'react';
+import { RouteComponentProps } from 'react-router';
 import ReleasePageTemplate from '../components/ReleasePageTemplate';
 
 interface MatchProps {

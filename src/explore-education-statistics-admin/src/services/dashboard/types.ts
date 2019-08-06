@@ -1,6 +1,7 @@
 import {
   ContactDetails,
-  DayMonthYearValues, IdLabelPair,
+  DayMonthYearValues,
+  IdLabelPair,
   IdTitlePair,
   UserDetails,
 } from '@admin/services/common/types';

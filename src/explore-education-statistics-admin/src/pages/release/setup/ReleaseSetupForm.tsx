@@ -1,5 +1,5 @@
 import Link from '@admin/components/Link';
-import service from "@admin/services/common/service";
+import service from '@admin/services/common/service';
 import { DayMonthYearInputs, IdTitlePair } from '@admin/services/common/types';
 import {
   validateMandatoryDayMonthYearField,
@@ -93,7 +93,7 @@ const ReleaseSetupForm = <FormValues extends EditFormValues>({
           validationSchema={Yup.object<FormValues>(
             validationRulesSupplier
               ? validationRulesSupplier(baseValidationRules)
-              : baseValidationRules as ObjectSchemaDefinition<FormValues>,
+              : (baseValidationRules as ObjectSchemaDefinition<FormValues>),
           )}
           onSubmit={onSubmitHandler}
           render={(form: FormikProps<FormValues>) => {

@@ -1,9 +1,12 @@
-import {dayMonthYearInputsToDate, dayMonthYearInputsToValues} from '@admin/services/common/types';
-import {CreateReleaseRequest} from '@admin/services/release/create-release/types';
-import {UpdateReleaseSetupDetailsRequest} from '@admin/services/release/edit-release/setup/types';
-import {BaseReleaseSetupDetailsRequest} from '@admin/services/release/types';
-import {FormValues as CreateFormValues} from '../create-release/CreateReleasePage';
-import {EditFormValues} from '../setup/ReleaseSetupForm';
+import {
+  dayMonthYearInputsToDate,
+  dayMonthYearInputsToValues,
+} from '@admin/services/common/types';
+import { CreateReleaseRequest } from '@admin/services/release/create-release/types';
+import { UpdateReleaseSetupDetailsRequest } from '@admin/services/release/edit-release/setup/types';
+import { BaseReleaseSetupDetailsRequest } from '@admin/services/release/types';
+import { FormValues as CreateFormValues } from '../create-release/CreateReleasePage';
+import { EditFormValues } from '../setup/ReleaseSetupForm';
 
 export const assembleBaseReleaseSetupRequestFromForm = (
   values: EditFormValues,

@@ -1,9 +1,9 @@
 import service from '@admin/services/common/service';
-import {IdTitlePair} from '@admin/services/common/types';
+import { IdTitlePair } from '@admin/services/common/types';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import React, {useEffect, useState} from 'react';
-import {RouteComponentProps} from 'react-router';
+import React, { useEffect, useState } from 'react';
+import { RouteComponentProps } from 'react-router';
 import ReleasePageTemplate from '../components/ReleasePageTemplate';
 import ReleaseDataUploadsSection from './ReleaseDataUploadsSection';
 import ReleaseFileUploadsSection from './ReleaseFileUploadsSection';

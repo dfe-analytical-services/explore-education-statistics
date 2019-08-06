@@ -1,4 +1,4 @@
-import {dateToDayMonthYear} from "@admin/services/common/types";
+import { dateToDayMonthYear } from '@admin/services/common/types';
 import {
   AdminDashboardRelease,
   ReleaseApprovalStatus,
@@ -27,7 +27,7 @@ export default async (mock: MockAdapter) => {
 
   const mockCommonData = (await import(
     /* webpackChunkName: "mock-dashboard-data" */ '@admin/services/common/mock/mock-data'
-    )).default;
+  )).default;
 
   const getReleasesUrl = /\/publications\/(.*)\/releases/;
   const createReleaseUrl = /\/publications\/(.*)\/releases/;
@@ -45,7 +45,6 @@ export default async (mock: MockAdapter) => {
     );
 
     if (matchingPublication) {
-
       const latestRelease = matchingPublication.releases.map(release => ({
         id: release.id,
         title: release.releaseName,
@@ -77,11 +76,16 @@ export default async (mock: MockAdapter) => {
         id: generateRandomIntegerString(),
         leadStatisticianName: 'Bob',
         publicationTitle: matchingPublication.title,
-        releaseType: mockCommonData.getReleaseTypes().find(type => type.id === createRequest.releaseTypeId)
-          || mockCommonData.getReleaseTypes()[0],
+        releaseType:
+          mockCommonData
+            .getReleaseTypes()
+            .find(type => type.id === createRequest.releaseTypeId) ||
+          mockCommonData.getReleaseTypes()[0],
         timePeriodCoverageStartYear: createRequest.releaseName,
         timePeriodCoverageCode: createRequest.timePeriodCoverage.value,
-        scheduledPublishDate: dateToDayMonthYear(createRequest.publishScheduled),
+        scheduledPublishDate: dateToDayMonthYear(
+          createRequest.publishScheduled,
+        ),
         nextReleaseExpectedDate: createRequest.nextReleaseExpected,
       };
 

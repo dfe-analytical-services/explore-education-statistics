@@ -6,12 +6,12 @@ import ReleaseSetupForm, {
 import { assembleCreateReleaseRequestFromForm } from '@admin/pages/release/util/releaseSetupUtil';
 import dashboardRoutes from '@admin/routes/dashboard/routes';
 import { setupRoute } from '@admin/routes/edit-release/routes';
-import {emptyDayMonthYear, IdTitlePair} from '@admin/services/common/types';
+import { emptyDayMonthYear, IdTitlePair } from '@admin/services/common/types';
 import service from '@admin/services/release/create-release/service';
 import { CreateReleaseRequest } from '@admin/services/release/create-release/types';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import Yup from '@common/lib/validation/yup';
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import { ObjectSchemaDefinition } from 'yup';
 
@@ -41,14 +41,12 @@ const CreateReleasePage = ({
       values,
     );
 
-    service
-      .createRelease(createReleaseDetails)
-      .then(createdRelease =>
-        // TODO remove this conditional redirect when the Release Summary page is wired up to the API
-        process.env.USE_MOCK_API === "true"
-          ? history.push(setupRoute.generateLink(createdRelease.id))
-          : history.push(dashboardRoutes.adminDashboard)
-      );
+    service.createRelease(createReleaseDetails).then(createdRelease =>
+      // TODO remove this conditional redirect when the Release Summary page is wired up to the API
+      process.env.USE_MOCK_API === 'true'
+        ? history.push(setupRoute.generateLink(createdRelease.id))
+        : history.push(dashboardRoutes.adminDashboard),
+    );
   };
 
   const cancelHandler = () => history.push(dashboardRoutes.adminDashboard);
