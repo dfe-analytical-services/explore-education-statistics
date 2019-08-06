@@ -13,7 +13,12 @@ import ChartRenderer from '@common/modules/find-statistics/components/ChartRende
 const PrototypeChartTest = () => {
   const [data] = React.useState<DataBlockResponse>(PrototypeData.testResponse);
 
-  const chartData = ChartData.AbstractLargeDataChartProps_smaller_datasets;
+  const chartData = ChartData.AbstractLargeDataChartProps;
+
+  const testResponse : DataBlockResponse = {
+    ...chartData.data,
+    metaData: chartData.meta
+  };
 
   const newChartData: StackedBarProps = {
     ...chartData,
@@ -35,7 +40,7 @@ const PrototypeChartTest = () => {
 
   return (
     <PrototypePage wide>
-      <ChartBuilder data={data} />
+      <ChartBuilder data={testResponse} />
       <ChartRenderer type="verticalbar" {...newChartData} />
     </PrototypePage>
   );

@@ -6,7 +6,7 @@ import {
   FormTextInput,
 } from '@common/components/form';
 
-import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
+import FormSelect, {SelectOption} from '@common/components/form/FormSelect';
 import {
   ChartCapabilities,
   ChartDataB,
@@ -24,7 +24,7 @@ import {
   ReferenceLine,
 } from '@common/services/publicationService';
 import * as React from 'react';
-import { Dictionary } from '@common/types';
+import {Dictionary} from '@common/types';
 import styles from './graph-builder.module.scss';
 
 interface Props {
@@ -79,7 +79,7 @@ const getAxisLabels = (
       label: 'default',
       value: '',
     },
-    ...chartData.map(({ name }, index) => ({
+    ...chartData.map(({name}, index) => ({
       label: name,
       value: `${index}`,
     })),
@@ -87,18 +87,16 @@ const getAxisLabels = (
 };
 
 const ChartAxisConfiguration = ({
-  id,
-  configuration,
-  data,
-  meta,
-  labels,
-  capabilities,
-  onConfigurationChange,
-  dataSets = [],
-}: Props) => {
-  const [axisConfiguration, setAxisConfiguration] = React.useState<
-    AxisConfiguration
-  >(configuration);
+                                  id,
+                                  configuration,
+                                  data,
+                                  meta,
+                                  labels,
+                                  capabilities,
+                                  onConfigurationChange,
+                                  dataSets = [],
+                                }: Props) => {
+  const [axisConfiguration, setAxisConfiguration] = React.useState<AxisConfiguration>(configuration);
 
   const [sortOptions, setSortOptions] = React.useState<SelectOption[]>(() =>
     getSortOptions(labels),
@@ -120,7 +118,7 @@ const ChartAxisConfiguration = ({
   );
 
   const updateAxisConfiguration = (newValues: object) => {
-    const newConfiguration = { ...axisConfiguration, ...newValues };
+    const newConfiguration = {...axisConfiguration, ...newValues};
     setAxisConfiguration(newConfiguration);
     if (onConfigurationChange) onConfigurationChange(newConfiguration);
   };
@@ -164,8 +162,8 @@ const ChartAxisConfiguration = ({
   const [referenceOptions] = React.useState<SelectOption[]>(() => {
     if (axisConfiguration.groupBy) {
       return [
-        { label: 'Select', value: '' },
-        ...Object.values(meta[axisConfiguration.groupBy]).map(({ label }) => ({
+        {label: 'Select', value: ''},
+        ...Object.values(meta[axisConfiguration.groupBy]).map(({label}) => ({
           label,
           value: label,
         })),
@@ -179,13 +177,39 @@ const ChartAxisConfiguration = ({
       <form>
         <FormFieldset id={id} legend={axisConfiguration.title}>
           <FormGroup>
+            {axisConfiguration.type === 'major' && (
+              <>
+                <FormSelect
+                  id={`${id}_groupBy`}
+                  label="Group data by"
+                  name={`${id}_groupBy`}
+                  value={axisConfiguration.groupBy}
+                  onChange={e => {
+                    updateAxisConfiguration({groupBy: e.target.value});
+                  }}
+                  options={[
+                    {
+                      label: "Time periods",
+                      value: "timePeriods" as AxisGroupBy
+                    },
+                    {
+                      label: "Locations",
+                      value: "locations" as AxisGroupBy
+                    },
+                  ]}
+                />
+
+                <hr />
+              </>
+            )}
+
             <FormCheckbox
               id={`${id}_show`}
               name={`${id}_show`}
               label="Show axis labels?"
               checked={axisConfiguration.visible}
               onChange={e => {
-                updateAxisConfiguration({ visible: e.target.checked });
+                updateAxisConfiguration({visible: e.target.checked});
               }}
               value="show"
               conditional={
@@ -195,7 +219,7 @@ const ChartAxisConfiguration = ({
                     label="Override displayed unit (leave blank to use default from metadata)"
                     name="unit"
                     onChange={e =>
-                      updateAxisConfiguration({ unit: e.target.value })
+                      updateAxisConfiguration({unit: e.target.value})
                     }
                     value={axisConfiguration.unit}
                   />
@@ -211,7 +235,7 @@ const ChartAxisConfiguration = ({
                   name={`${id}_grid`}
                   label="Show grid lines"
                   onChange={e =>
-                    updateAxisConfiguration({ showGrid: e.target.checked })
+                    updateAxisConfiguration({showGrid: e.target.checked})
                   }
                   checked={axisConfiguration.showGrid}
                   value="grid"
@@ -219,6 +243,7 @@ const ChartAxisConfiguration = ({
                 <hr />
               </React.Fragment>
             )}
+
 
             <FormTextInput
               id={`${id}_size`}
@@ -228,7 +253,7 @@ const ChartAxisConfiguration = ({
               max="100"
               label="Size of axis"
               value={axisConfiguration.size}
-              onChange={e => updateAxisConfiguration({ size: e.target.value })}
+              onChange={e => updateAxisConfiguration({size: e.target.value})}
             />
             <hr />
 
@@ -250,7 +275,7 @@ const ChartAxisConfiguration = ({
                         label="Minimum value"
                         value={axisConfiguration.min}
                         onChange={e =>
-                          updateAxisConfiguration({ min: e.target.value })
+                          updateAxisConfiguration({min: e.target.value})
                         }
                       />
                     </FormGroup>
@@ -263,7 +288,7 @@ const ChartAxisConfiguration = ({
                         label="Maximum Value"
                         value={axisConfiguration.max}
                         onChange={e =>
-                          updateAxisConfiguration({ max: e.target.value })
+                          updateAxisConfiguration({max: e.target.value})
                         }
                       />
                     </FormGroup>
@@ -280,7 +305,7 @@ const ChartAxisConfiguration = ({
               legendSize="s"
               value={axisConfiguration.tickConfig}
               onChange={e => {
-                updateAxisConfiguration({ tickConfig: e.target.value });
+                updateAxisConfiguration({tickConfig: e.target.value});
               }}
               order={[]}
               options={[
@@ -304,7 +329,7 @@ const ChartAxisConfiguration = ({
                       label="Every nth value"
                       value={axisConfiguration.tickSpacing}
                       onChange={e =>
-                        updateAxisConfiguration({ tickSpacing: e.target.value })
+                        updateAxisConfiguration({tickSpacing: e.target.value})
                       }
                     />
                   ),
@@ -323,7 +348,7 @@ const ChartAxisConfiguration = ({
                     order={[]}
                     value={axisConfiguration.sortBy}
                     onChange={e => {
-                      updateAxisConfiguration({ sortBy: e.target.value });
+                      updateAxisConfiguration({sortBy: e.target.value});
                     }}
                     options={sortOptions}
                   />
@@ -334,7 +359,7 @@ const ChartAxisConfiguration = ({
                     value="asc"
                     checked={axisConfiguration.sortAsc}
                     onChange={e => {
-                      updateAxisConfiguration({ sortAsc: e.target.checked });
+                      updateAxisConfiguration({sortAsc: e.target.checked});
                     }}
                   />
                 </FormFieldset>
@@ -377,29 +402,29 @@ const ChartAxisConfiguration = ({
               </thead>
               <tbody>
                 {axisConfiguration.referenceLines &&
-                  axisConfiguration.referenceLines.map((rl, idx) => (
-                    <tr key={`${rl.label}_${rl.position}`}>
-                      <td>{rl.position}</td>
-                      <td>{rl.label}</td>
-                      <td>
-                        <button
-                          className="govuk-button govuk-button--secondary govuk-!-margin-0"
-                          type="button"
-                          onClick={() => {
-                            const newReferenceLines = [
-                              ...(axisConfiguration.referenceLines || []),
-                            ];
-                            newReferenceLines.splice(idx, 1);
-                            updateAxisConfiguration({
-                              referenceLines: newReferenceLines,
-                            });
-                          }}
-                        >
-                          Remove
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                axisConfiguration.referenceLines.map((rl, idx) => (
+                  <tr key={`${rl.label}_${rl.position}`}>
+                    <td>{rl.position}</td>
+                    <td>{rl.label}</td>
+                    <td>
+                      <button
+                        className="govuk-button govuk-button--secondary govuk-!-margin-0"
+                        type="button"
+                        onClick={() => {
+                          const newReferenceLines = [
+                            ...(axisConfiguration.referenceLines || []),
+                          ];
+                          newReferenceLines.splice(idx, 1);
+                          updateAxisConfiguration({
+                            referenceLines: newReferenceLines,
+                          });
+                        }}
+                      >
+                        Remove
+                      </button>
+                    </td>
+                  </tr>
+                ))}
                 <tr>
                   <td>
                     {axisConfiguration.type === 'minor' && (
@@ -464,7 +489,7 @@ const ChartAxisConfiguration = ({
                             referenceLine,
                           ],
                         });
-                        setReferenceLine({ label: '', position: '' });
+                        setReferenceLine({label: '', position: ''});
                       }}
                     >
                       Add

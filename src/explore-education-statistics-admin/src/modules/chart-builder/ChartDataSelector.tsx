@@ -76,6 +76,8 @@ const ChartDataSelector = ({
     ...indicatorIds.map<SelectOption>(id => ({ ...metaData.indicators[id] })),
   ];
 
+  console.log(filterIds);
+
   const filterSelectOptions = filterIds
     .map(ids => ids.map(id => metaData.filters[id]))
     .reduce<SelectOption[]>(
