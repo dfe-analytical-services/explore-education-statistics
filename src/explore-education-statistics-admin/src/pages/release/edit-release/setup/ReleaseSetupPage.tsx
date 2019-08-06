@@ -5,8 +5,8 @@ import {
   dayMonthYearIsComplete,
   dayMonthYearToDate,
 } from '@admin/services/common/types';
-import service from '@admin/services/edit-release/setup/service';
-import { ReleaseSetupDetails } from '@admin/services/edit-release/setup/types';
+import service from '@admin/services/release/edit-release/setup/service';
+import { ReleaseSetupDetails } from '@admin/services/release/types';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -31,7 +31,7 @@ const ReleaseSetupPage = ({ match }: RouteComponentProps<MatchProps>) => {
 
   const getSelectedTimePeriodCoverageLabel = (timePeriodCoverageCode: string) =>
     DummyReferenceData.findTimePeriodCoverageOption(timePeriodCoverageCode)
-      .title;
+      .label;
 
   return (
     <>
@@ -50,19 +50,8 @@ const ReleaseSetupPage = ({ match }: RouteComponentProps<MatchProps>) => {
               )}
             </SummaryListItem>
             <SummaryListItem term="Release period">
-              {releaseSetupDetails.timePeriodCoverageStartDate.year && (
-                <>
-                  <time>
-                    {releaseSetupDetails.timePeriodCoverageStartDate.year}
-                  </time>{' '}
-                  to{' '}
-                  {releaseSetupDetails.timePeriodCoverageStartDate.year
-                    ? (
-                        releaseSetupDetails.timePeriodCoverageStartDate.year + 1
-                      ).toString()
-                    : ''}
-                </>
-              )}
+              <time>{releaseSetupDetails.timePeriodCoverageStartYear}</time> to{' '}
+              <time>{releaseSetupDetails.timePeriodCoverageStartYear + 1}</time>
             </SummaryListItem>
             <SummaryListItem term="Lead statistician">
               {releaseSetupDetails.leadStatisticianName}

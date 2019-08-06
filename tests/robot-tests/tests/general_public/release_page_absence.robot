@@ -9,7 +9,8 @@ Suite Teardown    user closes the browser
 *** Test Cases ***
 Navigate to Absence publication
     [Tags]  HappyPath
-    user goes to url  ${url}
+    environment variable should be set  PUBLIC_URL
+    user goes to url  %{PUBLIC_URL}
     user waits until page contains  Select an option to find the national and regional
 
     user clicks link  Find statistics and data
@@ -23,7 +24,7 @@ Navigate to Absence publication
 Validate URL
     [Documentation]  DFE-325
     [Tags]  HappyPath
-    user checks url contains  ${url}/statistics/pupil-absence-in-schools-in-england
+    user checks url contains  %{PUBLIC_URL}/statistics/pupil-absence-in-schools-in-england
 
 Validate Published date, Next update date, and Email alerts link
     [Tags]     HappyPath

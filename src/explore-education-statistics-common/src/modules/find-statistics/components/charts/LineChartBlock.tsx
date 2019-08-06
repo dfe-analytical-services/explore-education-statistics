@@ -3,11 +3,10 @@ import {
   ChartDefinition,
   ChartProps,
   conditionallyAdd,
-  createDataForAxis,
-  GenerateMajorAxis,
-  GenerateMinorAxis,
+  createSortedAndMappedDataForAxis,
+  generateMajorAxis,
+  generateMinorAxis,
   getKeysForChart,
-  mapNameToNameLabel,
   populateDefaultChartProps,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import { ChartSymbol } from '@common/services/publicationService';
@@ -106,16 +105,17 @@ const LineChartBlock = (props: ChartProps) => {
   )
     return <div>Unable to render chart</div>;
 
-  const chartData: ChartDataB[] = createDataForAxis(
+  const chartData: ChartDataB[] = createSortedAndMappedDataForAxis(
     axes.major,
     data.result,
     meta,
-  ).map(mapNameToNameLabel(labels, meta.timePeriods, meta.locations));
+    labels,
+  );
 
   const keysForChart = getKeysForChart(chartData);
 
-  const minorDomainTicks = GenerateMinorAxis(chartData, axes.minor);
-  const majorDomainTicks = GenerateMajorAxis(chartData, axes.major);
+  const minorDomainTicks = generateMinorAxis(chartData, axes.minor);
+  const majorDomainTicks = generateMajorAxis(chartData, axes.major);
 
   return (
     <ResponsiveContainer width={width || '100%'} height={height || 300}>

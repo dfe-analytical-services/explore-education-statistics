@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -34,9 +35,108 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
             releaseService.Setup(s => s.CreateReleaseAsync(It.IsAny<CreateReleaseViewModel>()))
                 .Returns(Task.FromResult(new ReleaseViewModel()));
         }
+        
+        [Fact]
+        public async Task AddAncillaryFilesAsync_UploadsTheFiles_Returns_Ok()
+        {
+            var releaseId = Guid.NewGuid();
+            var releaseService = new Mock<IReleaseService>();
+            var fileStorageService = new Mock<IFileStorageService>();
+            var importService = new Mock<IImportService>();
+
+            var ancillaryFile = MockFile("ancillaryFile.doc");
+
+            releaseService.Setup(s => s.GetAsync(It.IsAny<Guid>()))
+                .Returns(Task.FromResult(new Release {Id = releaseId}));
+            fileStorageService
+                .Setup(service => service.UploadFilesAsync(releaseId, ancillaryFile,"File name", ReleaseFileTypes.Ancillary))
+                .Returns(Task.FromResult<Either<ValidationResult,IEnumerable<FileInfo>>>(new List<FileInfo>()));
+
+            var controller = new ReleasesController(releaseService.Object, fileStorageService.Object,
+                importService.Object);
+
+            // Call the method under test
+            var actionResult = await controller.AddAncillaryFilesAsync(releaseId, "File name", ancillaryFile);
+
+            Assert.IsAssignableFrom<ActionResult<IEnumerable<FileInfo>>>(actionResult);
+        }
 
         [Fact]
-        public async Task UploadFilesAsync_UploadsTheFiles_Returns_Ok()
+        public async Task AddAncillaryFilesAsync_UploadsTheFiles_Returns_NotFound()
+        {
+            var releaseService = new Mock<IReleaseService>();
+            var fileStorageService = new Mock<IFileStorageService>();
+            var importService = new Mock<IImportService>();
+
+            var ancillaryFile = MockFile("ancillaryFile.doc");
+
+            var controller = new ReleasesController(releaseService.Object, fileStorageService.Object,
+                importService.Object);
+
+            // Call the method under test
+            var actionResult = await controller.AddAncillaryFilesAsync(Guid.NewGuid(),  "File name", ancillaryFile );
+
+            Assert.IsAssignableFrom<NotFoundResult>(actionResult.Result);
+        }
+
+        [Fact]
+        public async Task GetAncillaryFilesAsync_Returns_A_List_Of_Files()
+        {
+            var releaseId = Guid.NewGuid();
+            IEnumerable<FileInfo> testFiles = new []
+            {
+                new FileInfo
+                {
+                    Extension = "doc",
+                    Name = "Ancillary 1",
+                    Path = "file1.doc",
+                    Size = "1 Kb"
+                },
+                new FileInfo
+                {
+                    Extension = "doc",
+                    Name = "Ancillary 2",
+                    Path = "file2.doc",
+                    Size = "1 Kb"
+                }
+            };
+
+            var releaseService = new Mock<IReleaseService>();
+            var fileStorageService = new Mock<IFileStorageService>();
+            var importService = new Mock<IImportService>();
+
+
+            releaseService.Setup(s => s.GetAsync(It.IsAny<Guid>()))
+                .Returns(Task.FromResult(new Release {Id = releaseId}));
+            fileStorageService.Setup(s => s.ListFilesAsync(releaseId, ReleaseFileTypes.Ancillary)).Returns(Task.FromResult(testFiles));
+
+
+            var controller = new ReleasesController(releaseService.Object, fileStorageService.Object,
+                importService.Object);
+            // Call the method under test
+            var actionResult = await controller.GetAncillaryFilesAsync(releaseId);
+
+            Assert.IsAssignableFrom<OkObjectResult>(actionResult.Result);
+        }
+
+        [Fact]
+        public async Task GetAncillaryFilesAsync_Returns_NotFound()
+        {
+            var releaseService = new Mock<IReleaseService>();
+            var fileStorageService = new Mock<IFileStorageService>();
+            var importService = new Mock<IImportService>();
+            var controller = new ReleasesController(releaseService.Object, fileStorageService.Object,
+                importService.Object);
+
+            // Call the method under test 
+            var actionResult = await controller.GetAncillaryFilesAsync(Guid.NewGuid());
+
+            Assert.Null(actionResult.Value);
+            Assert.IsAssignableFrom<NotFoundResult>(actionResult.Result);
+        }
+        
+        [Fact]
+        public async Task AddDataFilesAsync_UploadsTheFiles_Returns_Ok()
         {
             var releaseId = Guid.NewGuid();
 
@@ -56,13 +156,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
             var controller = new ReleasesController(releaseService.Object, fileStorageService.Object,
                 importService.Object);
 
-            var actionResult = await controller.AddDataFiles(releaseId, "Subject name", dataFile, metaFile);
+            var actionResult = await controller.AddDataFilesAsync(releaseId, "Subject name", dataFile, metaFile);
 
             Assert.IsAssignableFrom<ActionResult<IEnumerable<FileInfo>>>(actionResult);
         }
 
         [Fact]
-        public async Task UploadFilesAsync_UploadsTheFiles_Returns_NotFound()
+        public async Task AddDataFilesAsync_UploadsTheFiles_Returns_NotFound()
         {
             var releaseService = new Mock<IReleaseService>();
             var fileStorageService = new Mock<IFileStorageService>();
@@ -74,13 +174,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
             var controller = new ReleasesController(releaseService.Object, fileStorageService.Object,
                 importService.Object);
 
-            var actionResult = await controller.AddDataFiles(Guid.NewGuid(), "Subject name", dataFile, metaFile);
+            var actionResult = await controller.AddDataFilesAsync(Guid.NewGuid(), "Subject name", dataFile, metaFile);
 
             Assert.IsAssignableFrom<NotFoundResult>(actionResult.Result);
         }
+        
+        [Fact]
+        public async Task AddDataFilesAsync_UploadsTheFiles_Returns_ValidationProblem()
+        {
+            var releaseId = Guid.NewGuid();
+
+            var releaseService = new Mock<IReleaseService>();
+            var fileStorageService = new Mock<IFileStorageService>();
+            var importService = new Mock<IImportService>();
+
+            var dataFile = MockFile("datafile.csv");
+            var metaFile = MockFile("metafile.csv");
+            
+            releaseService.Setup(s => s.GetAsync(It.IsAny<Guid>()))
+                .Returns(Task.FromResult(new Release {Id = releaseId}));
+            fileStorageService
+                .Setup(service => service.UploadDataFilesAsync(releaseId, dataFile, metaFile, "Subject name"))
+                .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<FileInfo>>>(ValidationUtils.ValidationResult("File Name", "File Error")));
+
+            var controller = new ReleasesController(releaseService.Object, fileStorageService.Object,
+                importService.Object);
+
+            // Call the method under test
+            var actionResult = await controller.AddDataFilesAsync(releaseId, "Subject name", dataFile, metaFile);
+
+            Assert.IsAssignableFrom<BadRequestObjectResult>(actionResult.Result);
+            Assert.IsAssignableFrom<ValidationProblemDetails>((actionResult.Result as BadRequestObjectResult)?.Value);
+        }
 
         [Fact]
-        public async Task GetDataFiles_Returns_A_List_Of_Files()
+        public async Task GetDataFilesAsync_Returns_A_List_Of_Files()
         {
             var releaseId = Guid.NewGuid();
             IEnumerable<FileInfo> testFiles = new []
@@ -114,13 +242,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
             var controller = new ReleasesController(releaseService.Object, fileStorageService.Object,
                 importService.Object);
 
-            var actionResult = await controller.GetDataFiles(releaseId);
+            var actionResult = await controller.GetDataFilesAsync(releaseId);
 
             Assert.IsAssignableFrom<OkObjectResult>(actionResult.Result);
         }
 
         [Fact]
-        public async Task GetDataFiles_Returns_NotFound()
+        public async Task GetDataFilesAsync_Returns_NotFound()
         {
             var releaseService = new Mock<IReleaseService>();
             var fileStorageService = new Mock<IFileStorageService>();
@@ -128,7 +256,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
             var controller = new ReleasesController(releaseService.Object, fileStorageService.Object,
                 importService.Object);
 
-            var actionResult = await controller.GetDataFiles(Guid.NewGuid());
+            var actionResult = await controller.GetDataFilesAsync(Guid.NewGuid());
 
             Assert.Null(actionResult.Value);
             Assert.IsAssignableFrom<NotFoundResult>(actionResult.Result);
@@ -206,7 +334,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
             // Method under test
             var result = await controller.GetReleaseForPublicationAsync(releaseId);
             Assert.IsAssignableFrom<List<ReleaseViewModel>>(result.Value);
-        }                                    
+        }            
+        
+        
         
     }
 }
