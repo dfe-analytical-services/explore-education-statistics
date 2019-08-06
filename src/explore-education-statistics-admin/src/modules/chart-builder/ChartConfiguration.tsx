@@ -20,6 +20,7 @@ export interface ChartOptions {
   legendHeight: string;
   height?: number;
   width?: number;
+  title?: string;
 }
 
 const ChartConfiguration = (props: Props) => {
@@ -46,14 +47,28 @@ const ChartConfiguration = (props: Props) => {
 
   return (
     <div className={styles.axesOptions}>
-      {selectedChartType.capabilities.stackable && (
-        <FormGroup className={styles.fullWidth}>
+      <FormGroup className={styles.formGroup}>
+        <FormTextInput
+          id="chart-title"
+          name="chart-title"
+          label="Chart title"
+          value={chartOptions.title}
+          width={20}
+          onChange={e => {
+            updateChartOptions({
+              ...chartOptions,
+              title: e.target.value,
+            });
+          }}
+        />
+        {selectedChartType.capabilities.stackable && (
           <FormCheckbox
             id="stacked"
             name="stacked"
             label="Stacked bars"
             checked={chartOptions.stacked}
             value="stacked"
+            className={styles['margin-top-30']}
             onChange={e => {
               updateChartOptions({
                 ...chartOptions,
@@ -61,8 +76,8 @@ const ChartConfiguration = (props: Props) => {
               });
             }}
           />
-        </FormGroup>
-      )}
+        )}
+      </FormGroup>
       <FormGroup className={styles.formGroup}>
         <FormSelect
           id="legend-position"
@@ -83,9 +98,7 @@ const ChartConfiguration = (props: Props) => {
             });
           }}
         />
-      </FormGroup>
-      {chartOptions.legend !== 'none' && (
-        <FormGroup className={styles.formGroup}>
+        {chartOptions.legend !== 'none' && (
           <FormTextInput
             id="legend-height"
             name="legend-height"
@@ -99,8 +112,8 @@ const ChartConfiguration = (props: Props) => {
               });
             }}
           />
-        </FormGroup>
-      )}
+        )}
+      </FormGroup>
 
       {selectedChartType.capabilities.canSize && (
         <FormGroup className={styles.formGroup}>

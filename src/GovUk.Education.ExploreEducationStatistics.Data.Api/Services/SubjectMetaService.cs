@@ -83,11 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private Dictionary<string, ObservationalUnitMetaViewModel> GetObservationalUnits(
             IEnumerable<Observation> observations, long? boundaryLevelId = null)
         {
-            var locations = observations
-                .GroupBy(observation => observation.Location)
-                .Select(group => group.Key);
-
-            var observationalUnits = _locationService.GetObservationalUnits(locations);
+            var observationalUnits = _locationService.GetObservationalUnits(observations);
 
             var observationalUnitMetaViewModels = observationalUnits.SelectMany(pair =>
                 pair.Value.Select(observationalUnit => new ObservationalUnitMetaViewModel
