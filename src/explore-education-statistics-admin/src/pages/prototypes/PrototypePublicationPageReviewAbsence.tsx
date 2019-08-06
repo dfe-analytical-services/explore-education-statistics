@@ -16,10 +16,6 @@ const PublicationPage = () => {
       ? 'level2'
       : 'level1';
 
-  const Level1ReviewForm = () => {
-    return <div>Preview release</div>;
-  };
-
   const Level2ReviewForm = () => {
     return (
       <form action="/prototypes/admin-dashboard">
@@ -91,17 +87,28 @@ const PublicationPage = () => {
         { text: 'Review release', link: '#' },
       ]}
     >
-      {reviewType === 'level1' && <Level1ReviewForm />}
-      {reviewType === 'level2' && <Level2ReviewForm />}
-
-      <hr />
-      <div className="govuk-width-container dfe-align--comments">
-        <EditablePublicationPage
-          higherReview
-          reviewing
-          data={PrototypePublicationService.getNewPublication()}
-        />
-      </div>
+      {reviewType === 'level1' && (
+        <>
+          <div className="govuk-width-container">
+            <EditablePublicationPage
+              higherReview
+              data={PrototypePublicationService.getNewPublication()}
+            />
+          </div>
+        </>
+      )}
+      {reviewType === 'level2' && (
+        <>
+          <Level2ReviewForm />
+          <div className="govuk-width-container dfe-align--comments">
+            <EditablePublicationPage
+              higherReview
+              reviewing
+              data={PrototypePublicationService.getNewPublication()}
+            />
+          </div>
+        </>
+      )}
     </PrototypePage>
   );
 };

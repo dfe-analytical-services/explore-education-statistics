@@ -133,6 +133,7 @@ const PrototypeAdminDashboardPublications = () => {
                         published={new Date('2019-09-20 09:30')}
                         nextRelease={new Date('2020-09-20 09:30')}
                         showComments
+                        editing
                         task="readyReview"
                       />
                     </li>

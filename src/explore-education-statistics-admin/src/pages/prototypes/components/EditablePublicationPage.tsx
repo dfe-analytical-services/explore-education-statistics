@@ -271,9 +271,7 @@ class EditablePublicationPage extends Component<Props, State> {
               <div className="govuk-grid-row">
                 <div className="govuk-grid-column-three-quarters">
                   <span className="govuk-tag">
-                    {higherReview && (
-                      <>{data ? 'In higher review' : 'First draft'}</>
-                    )}
+                    {higherReview ? 'In higher review' : 'First draft'}
                   </span>
 
                   <dl className="dfe-meta-content">

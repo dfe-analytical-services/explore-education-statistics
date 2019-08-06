@@ -1,5 +1,6 @@
 import PrototypeAdminDashboardPublications from '@admin/pages/prototypes/components/PrototypeAdminDashboardPublications';
 import AdminDashboardReadyForApproval from '@admin/pages/prototypes/components/AdminDashboardReadyForApproval';
+import AdminDashboardReadyForPublication from '@admin/pages/prototypes/components/AdminDashboardReadyForPublication';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
@@ -45,7 +46,7 @@ const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
     <PrototypePage wide>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <span className="govuk-caption-xl">Welcome {user}</span>
+          <span className="govuk-caption-xl">Welcome</span>
           <h1 className="govuk-heading-xl">
             {userContext.user && userContext.user.name}
             <UserType />{' '}
@@ -102,7 +103,7 @@ const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
               : '(0)'
           }`}
         >
-          <AdminDashboardReadyForApproval task="resolveComments" />
+          <AdminDashboardReadyForPublication task="approvedPublication" />
         </TabsSection>
       </Tabs>
 
