@@ -19,6 +19,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         private readonly ImporterSchoolService _importerSchoolService;
         private readonly ApplicationDbContext _context;
         private readonly ILogger<ImporterService> _logger;
+        
+        private int _importCount;
+        
+        private static readonly string[] SCHOOL_COLS = {"academy_open_date", "academy_type", "estab", "laestab", "school_name", "school_postcode", "urn"};
 
         public ImporterService(
             ImporterFilterService importerFilterService,
@@ -50,11 +54,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             return _importerMetaService.Get(metaLines, subject);
         }
 
-        public void ImportFiltersLocationsAndSchools(List<string> lines, SubjectMeta subjectMeta)
+        public void ImportFiltersLocationsAndSchools(List<string> lines, SubjectMeta subjectMeta, string subjectName)
         {
+            // Clear cache - only relevant if we are using the seeder otherwise each service instance will have own cache instance
+            ClearCaches();
+            _importCount = 0;
             var headers = lines.First().Split(',').ToList();
             lines.RemoveAt(0);
-            lines.ForEach(line => CreateFiltersLocationsAndSchoolsFromCsv(line, headers, subjectMeta.Filters));
+            lines.ForEach(line => CreateFiltersLocationsAndSchoolsFromCsv(line, headers, subjectMeta.Filters, subjectName));
         }
 
         public void ImportObservations(List<string> lines, Subject subject, SubjectMeta subjectMeta)
@@ -65,8 +72,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             lines.RemoveAt(0);
             
             var observations = GetObservations(lines, headers, subject, subjectMeta);
+            
+            Console.WriteLine($"Adding {observations.Count()} observations for {subject.Name}");
 
             _context.Observation.AddRange(observations);
+        }
+
+        private void ClearCaches()
+        {
+            _importerFilterService.ClearCache();
+            _importerLocationService.ClearCache();
+            _importerSchoolService.ClearCache();
         }
 
         private IEnumerable<Observation> GetObservations(IEnumerable<string> lines,
@@ -75,27 +91,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             SubjectMeta subjectMeta)
         {
             return lines.Select(line => ObservationsFromCsv(line, headers, subject, subjectMeta));
-        }
-        
-        private void AddObservationsBatched(IEnumerable<string> lines,
-            List<string> headers,
-            Subject subject,
-            SubjectMeta subjectMeta)
-        {
-            List<Observation> observations = new List<Observation>();
-            foreach (var line in lines)
-            {
-                observations.Add(ObservationsFromCsv(line, headers, subject, subjectMeta));
-
-                if (observations.Count >= 2000)
-                {
-                    _context.Observation.AddRange(observations);
-                    _context.SaveChanges();
-                    observations.Clear();
-                }
-            }
-            _context.Observation.AddRange(observations);
-            _context.SaveChanges();
         }
 
         private Observation ObservationsFromCsv(string raw,
@@ -121,12 +116,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         
         private void CreateFiltersLocationsAndSchoolsFromCsv(string raw,
             List<string> headers,
-            IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)> filtersMeta)
+            IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)> filtersMeta,
+            string subjectName)
         {
             var line = raw.Split(',');
             CreateFilterItems(line, headers, filtersMeta);
             GetLocationId(line, headers);
             GetSchool(line, headers);
+
+            var mod = _importCount++;
+            if (mod % 1000 == 0)
+            {
+                Console.WriteLine($"{mod} lines processed during first pass for {subjectName}");
+            }
         }
 
         private ICollection<ObservationFilterItem> GetFilterItems(IReadOnlyList<string> line,
@@ -206,9 +208,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
         private School GetSchool(IReadOnlyList<string> line, List<string> headers)
         {
-            var columns = new[]
-                {"academy_open_date", "academy_type", "estab", "laestab", "school_name", "school_postcode", "urn"};
-            var school = CsvUtil.BuildType(line, headers, columns, values => new School
+
+            var school = CsvUtil.BuildType(line, headers, SCHOOL_COLS, values => new School
             {
                 AcademyOpenDate = values[0],
                 AcademyType = values[1],

@@ -58,7 +58,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             
             _importerService.ImportFiltersLocationsAndSchools(
                 batch,
-                _importerService.GetMeta(metaLines, subject));
+                _importerService.GetMeta(metaLines, subject),
+                subject.Name);
         }
     }
 }

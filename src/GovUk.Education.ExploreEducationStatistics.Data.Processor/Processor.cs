@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
@@ -49,7 +51,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
 
             try
             {
-                ProcessSubject(message, collector);
+                var subjectData = ProcessSubject(message);
+                
+                SplitFile(message, collector, subjectData);
             }
             catch (Exception e)
             {
@@ -74,6 +78,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             // If processing from seeder then remove all subjects
             _context.Subject.RemoveRange(_context.Subject);
             _context.SaveChanges();
+
+            var successes = new List<ImportMessage>();
             
             foreach (var message in messages)
             {
@@ -82,17 +88,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                     logger.LogInformation(
                         $"Re-seeding for : Datafile: {message.DataFileName}");
                     
-                    ProcessSubject(message, collector);
+                    ProcessSubject(message);
+                    successes.Add(message);
                 }
                 catch (Exception e)
                 {
                     logger.LogError(
-                        $"{GetType().Name} function FAILED for : Datafile: {message.DataFileName} : {e.InnerException.Message} : retrying...");
-                    throw;
+                        $"Seeding FAILED for : Datafile: {message.DataFileName} : {e.InnerException.Message} : will not retry...");
                 }
 
-                logger.LogInformation($"{GetType().Name} function COMPLETE for : Datafile: {message.DataFileName}");
+                logger.LogInformation($"First pass COMPLETE for : Datafile: {message.DataFileName}");
             }
+
+            // Having imported all the filters etc check if file needs splitting
+            foreach (var message in successes)
+            {
+                var subjectData = _fileStorageService.GetSubjectData(message).Result;
+                SplitFile(message, collector, subjectData); 
+            }
+
+            logger.LogInformation($"{GetType().Name} function COMPLETE");
         }
         
         [FunctionName("ImportFiles")]
@@ -127,7 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             logger.LogInformation($"{GetType().Name} function COMPLETE for : Batch: {message.BatchNo}  of {message.BatchSize} with Datafile: {message.DataFileName}");
         }
 
-        private void ProcessSubject(ImportMessage message, ICollector<ImportMessage> collector)
+        private SubjectData ProcessSubject(ImportMessage message)
         {
             var subjectData = _fileStorageService.GetSubjectData(message).Result;
                 
@@ -143,6 +158,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
 
             _context.SaveChanges();
 
+            return subjectData;
+        }
+
+        private void SplitFile(ImportMessage message, ICollector<ImportMessage> collector, SubjectData subjectData)
+        {
             _splitFileService.SplitDataFile(collector, message, subjectData);
         }
     }

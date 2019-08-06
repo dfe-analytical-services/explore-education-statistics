@@ -5,14 +5,12 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 {
-    public class ImporterFilterService
+    public class ImporterFilterService : BaseImporterService
     {
         private readonly ApplicationDbContext _context;
-        private readonly MemoryCache _cache;
 
-        public ImporterFilterService(ImporterMemoryCache cache, ApplicationDbContext context)
+        public ImporterFilterService(ImporterMemoryCache cache, ApplicationDbContext context) : base(cache)
         {
-             _cache = cache.Cache;
             _context = context;
         }
 
@@ -30,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             }
 
             var cacheKey = GetFilterItemCacheKey(filterGroup, label);
-            if (_cache.TryGetValue(cacheKey, out FilterItem filterItem))
+            if (GetCache().TryGetValue(cacheKey, out FilterItem filterItem))
             {
                 return filterItem;
             }
@@ -38,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             filterItem = _context.FilterItem.FirstOrDefault(fi => fi.FilterGroupId == filterGroup.Id && fi.Label == label) 
                          ??_context.FilterItem.Add(new FilterItem(label, filterGroup)).Entity;
 
-            _cache.Set(cacheKey, filterItem);
+            GetCache().Set(cacheKey, filterItem);
             
             return filterItem;
         }
@@ -51,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             }
             
             var cacheKey = GetFilterGroupCacheKey(filter, label);
-            if (_cache.TryGetValue(cacheKey, out FilterGroup filterGroup))
+            if (GetCache().TryGetValue(cacheKey, out FilterGroup filterGroup))
             {
                 return filterGroup;
             }
@@ -60,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                           .FirstOrDefault(fg => fg.FilterId == filter.Id && fg.Label == label) 
                           ?? _context.FilterGroup.Add(new FilterGroup(filter, label)).Entity;
 
-            _cache.Set(cacheKey, filterGroup);
+            GetCache().Set(cacheKey, filterGroup);
             
             return filterGroup;
         }
