@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -47,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
                 .Returns(Task.FromResult(new Release {Id = releaseId}));
             fileStorageService
                 .Setup(service => service.UploadFilesAsync(releaseId, ancillaryFile,"File name", ReleaseFileTypes.Ancillary))
-                .Returns(Task.FromResult<IEnumerable<FileInfo>>(new List<FileInfo>()));
+                .Returns(Task.FromResult<Either<ValidationResult,IEnumerable<FileInfo>>>(new List<FileInfo>()));
 
             var controller = new ReleasesController(releaseService.Object, fileStorageService.Object,
                 importService.Object);
@@ -148,7 +151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
                 .Returns(Task.FromResult(new Release {Id = releaseId}));
             fileStorageService
                 .Setup(service => service.UploadDataFilesAsync(releaseId, dataFile, metaFile, "Subject name"))
-                .Returns(Task.FromResult<IEnumerable<FileInfo>>(new List<FileInfo>()));
+                .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<FileInfo>>>(new List<FileInfo>()));
 
             var controller = new ReleasesController(releaseService.Object, fileStorageService.Object,
                 importService.Object);
@@ -174,6 +177,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
             var actionResult = await controller.AddDataFilesAsync(Guid.NewGuid(), "Subject name", dataFile, metaFile);
 
             Assert.IsAssignableFrom<NotFoundResult>(actionResult.Result);
+        }
+        
+        [Fact]
+        public async Task AddDataFilesAsync_UploadsTheFiles_Returns_ValidationProblem()
+        {
+            var releaseId = Guid.NewGuid();
+
+            var releaseService = new Mock<IReleaseService>();
+            var fileStorageService = new Mock<IFileStorageService>();
+            var importService = new Mock<IImportService>();
+
+            var dataFile = MockFile("datafile.csv");
+            var metaFile = MockFile("metafile.csv");
+            
+            releaseService.Setup(s => s.GetAsync(It.IsAny<Guid>()))
+                .Returns(Task.FromResult(new Release {Id = releaseId}));
+            fileStorageService
+                .Setup(service => service.UploadDataFilesAsync(releaseId, dataFile, metaFile, "Subject name"))
+                .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<FileInfo>>>(ValidationUtils.ValidationResult("File Name", "File Error")));
+
+            var controller = new ReleasesController(releaseService.Object, fileStorageService.Object,
+                importService.Object);
+
+            // Call the method under test
+            var actionResult = await controller.AddDataFilesAsync(releaseId, "Subject name", dataFile, metaFile);
+
+            Assert.IsAssignableFrom<BadRequestObjectResult>(actionResult.Result);
+            Assert.IsAssignableFrom<ValidationProblemDetails>((actionResult.Result as BadRequestObjectResult)?.Value);
         }
 
         [Fact]

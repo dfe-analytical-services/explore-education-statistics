@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.AspNetCore.Http;
@@ -11,8 +12,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using MimeTypes;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using FileInfo = GovUk.Education.ExploreEducationStatistics.Admin.Models.FileInfo;
 using ReleaseId = System.Guid;
+using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -37,31 +40,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _storageConnectionString = config.GetConnectionString("CoreStorage");
         }
 
-        public async Task<IEnumerable<FileInfo>> UploadDataFilesAsync(Guid releaseId, IFormFile dataFile, IFormFile metaFile,
+        public async Task<Either<ValidationResult,IEnumerable<FileInfo>>> UploadDataFilesAsync(Guid releaseId, IFormFile dataFile, IFormFile metaFile,
             string name)
         {
             var blobContainer = await GetCloudBlobContainer();
-            await UploadFileAsync(blobContainer, releaseId, dataFile, ReleaseFileTypes.Data, new List<KeyValuePair<string, string>>
+            var dataInfo = new List<KeyValuePair<string, string>>
             {
                 new KeyValuePair<string, string>("name", name),
                 new KeyValuePair<string, string>("metafile", metaFile.FileName)
-            });
-            
-            await UploadFileAsync(blobContainer, releaseId, metaFile, ReleaseFileTypes.Data, new List<KeyValuePair<string, string>>
+            };
+            var metaDataInfo = new List<KeyValuePair<string, string>>
             {
                 new KeyValuePair<string, string>("datafile", dataFile.FileName)
-            });
-            return await ListFilesAsync(releaseId, ReleaseFileTypes.Data);
+            };
+            
+            
+            var uploadDataResult = await UploadFileAsync(blobContainer, releaseId, dataFile, ReleaseFileTypes.Data, dataInfo);
+            if (uploadDataResult.IsLeft)
+            {
+                return uploadDataResult.Left;
+            }
+            
+            var uploadMetaDataResult = await UploadFileAsync(blobContainer, releaseId, metaFile, ReleaseFileTypes.Data, metaDataInfo);
+            if (uploadMetaDataResult.IsLeft)
+            {
+                return uploadMetaDataResult.Left;
+            }
+            
+            return new Either<ValidationResult,IEnumerable<FileInfo>>(await ListFilesAsync(releaseId, ReleaseFileTypes.Data));
         }
         
-        public async Task<IEnumerable<FileInfo>> UploadFilesAsync(Guid releaseId, IFormFile dataFile, string name, ReleaseFileTypes type)
+        public async Task<Either<ValidationResult,IEnumerable<FileInfo>>> UploadFilesAsync(Guid releaseId, IFormFile file, string name, ReleaseFileTypes type)
         {
             var blobContainer = await GetCloudBlobContainer();
-            await UploadFileAsync(blobContainer, releaseId, dataFile, type, new List<KeyValuePair<string, string>>
+            var info = new List<KeyValuePair<string, string>> {new KeyValuePair<string, string>("name", name)}; 
+            var uploadResult = await UploadFileAsync(blobContainer, releaseId, file, type, info, true);
+            if (uploadResult.IsLeft)
             {
-                new KeyValuePair<string, string>("name", name)
-            });
-            return await ListFilesAsync(releaseId, type);
+                return uploadResult.Left;
+            }
+            return new Either<ValidationResult, IEnumerable<FileInfo>>(await ListFilesAsync(releaseId, type));
         }
 
         private async Task<CloudBlobContainer> GetCloudBlobContainer()
@@ -73,14 +91,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return blobContainer;
         }
 
-        private static async Task UploadFileAsync(CloudBlobContainer blobContainer, Guid releaseId,
-            IFormFile file, ReleaseFileTypes type, IEnumerable<KeyValuePair<string, string>> metaValues)
+        private static async Task<Either<ValidationResult, bool>> UploadFileAsync(CloudBlobContainer blobContainer, Guid releaseId,
+            IFormFile file, ReleaseFileTypes type, IEnumerable<KeyValuePair<string, string>> metaValues, bool overwrite = false)
         {
             var blob = blobContainer.GetBlockBlobReference(ReleasePath(releaseId, type) + $"/{file.FileName}");
+            if (blob.Exists() && !overwrite)
+            {
+                return ValidationResult("File name", "Cannot overwrite");
+            }   
             blob.Properties.ContentType = file.ContentType;
             var path = await UploadToTemporaryFile(file);
             await blob.UploadFromFileAsync(path);
             await AddMetaValuesAsync(blob, metaValues);
+            return true;
         }
         
         private static async Task<string> UploadToTemporaryFile(IFormFile file)
@@ -104,7 +127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<IEnumerable<FileInfo>> ListFilesAsync(string releaseId, ReleaseFileTypes type)
         {
             var blobContainer = await GetCloudBlobContainer();
-
+    
             return blobContainer.ListBlobs(ReleasePath(releaseId, type), true, BlobListingDetails.Metadata)
                 .OfType<CloudBlockBlob>()
                 .Select(file => new FileInfo
@@ -156,9 +179,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private static async Task AddMetaValuesAsync(CloudBlob blob, IEnumerable<KeyValuePair<string, string>> values)
         {
-            foreach (var value in values)
+            foreach (var (key, value) in values)
             {
-                blob.Metadata.Add(value);
+                if (blob.Metadata.ContainsKey(key))
+                {
+                    blob.Metadata.Remove(key);
+                }
+                blob.Metadata.Add(key, value);
             }
 
             await blob.SetMetadataAsync();

@@ -92,8 +92,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [Required] [FromQuery(Name = "name")] string name, IFormFile file)
         {
             return await CheckReleaseExistsAsync(releaseId,
-                async () => Ok(
-                    await _fileStorageService.UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Ancillary)));
+                async () =>
+                {
+                    var result = await _fileStorageService.UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Ancillary);
+                    if (!result.IsLeft) return Ok(result.Right);
+                    ValidationUtils.AddErrors(ModelState, result.Left);
+                    return ValidationProblem();
+                });
         }
 
         // POST api/release/{releaseId}/chart-files
@@ -108,8 +113,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [Required] [FromQuery(Name = "name")] string name, IFormFile file)
         {
             return await CheckReleaseExistsAsync(releaseId,
-                async () => Ok(
-                    await _fileStorageService.UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Chart)));
+                async () =>
+                {
+                    var result = await _fileStorageService.UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Chart);
+                    if (!result.IsLeft) return Ok(result.Right);
+                    ValidationUtils.AddErrors(ModelState, result.Left);
+                    return ValidationProblem();
+                });
         }
 
         // POST api/release/{releaseId}/data-files
@@ -127,9 +137,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             {
                 // upload the files
                 var result = await _fileStorageService.UploadDataFilesAsync(releaseId, file, metaFile, name);
+                if (result.IsLeft)
+                {
+                    ValidationUtils.AddErrors(ModelState, result.Left);
+                    return ValidationProblem();
+                }
                 // add message to queue to process these files
                 _importService.Import(file.FileName, releaseId);
-                return Ok(result);
+                return Ok(result.Right);
             });
         }
 
