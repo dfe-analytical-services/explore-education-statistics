@@ -39,7 +39,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             var measures = indicators != null && indicators.Any()
                 ? QueryUtil.FilterMeasures(observation.Measures, indicators)
                 : observation.Measures;
-            return measures.ToDictionary(pair => pair.Key.ToString(), pair => pair.Value);
+            return measures.Where(pair => pair.Value != null)
+                .ToDictionary(pair => pair.Key.ToString(), pair => pair.Value);
         }
     }
 }
