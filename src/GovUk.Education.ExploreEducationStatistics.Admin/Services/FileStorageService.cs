@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.AspNetCore.Http;
@@ -43,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             string name)
         {
             var blobContainer = await GetCloudBlobContainer();
-            var result = await UploadFileAsync(blobContainer, releaseId, dataFile, ReleaseFileTypes.Data, new List<KeyValuePair<string, string>>
+            await UploadFileAsync(blobContainer, releaseId, dataFile, ReleaseFileTypes.Data, new List<KeyValuePair<string, string>>
             {
                 new KeyValuePair<string, string>("name", name),
                 new KeyValuePair<string, string>("metafile", metaFile.FileName)
@@ -75,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return blobContainer;
         }
 
-        private static async Task<Either<ValidationResult, bool>> UploadFileAsync(CloudBlobContainer blobContainer, Guid releaseId,
+        private static async Task UploadFileAsync(CloudBlobContainer blobContainer, Guid releaseId,
             IFormFile file, ReleaseFileTypes type, IEnumerable<KeyValuePair<string, string>> metaValues)
         {
             var blob = blobContainer.GetBlockBlobReference(ReleasePath(releaseId, type) + $"/{file.FileName}");
@@ -83,7 +81,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var path = await UploadToTemporaryFile(file);
             await blob.UploadFromFileAsync(path);
             await AddMetaValuesAsync(blob, metaValues);
-            return true;
         }
         
         private static async Task<string> UploadToTemporaryFile(IFormFile file)
