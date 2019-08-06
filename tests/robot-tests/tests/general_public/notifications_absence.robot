@@ -40,8 +40,8 @@ Visit confirmation link from email
 
 
 Send dummy release notification
-    environment varaible should be set   adminAppUrl
-    user goes to url    %{adminAppUrl}/release/notify
+    environment varaible should be set   ADMIN_URL
+    user goes to url    %{ADMIN_URL}/release/notify
     # TODO: Send dummy notification
 
 Check publication notification email is received
