@@ -45,6 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             ConfigureIndicator(modelBuilder);
             ConfigureGeographicLevel(modelBuilder);
             ConfigureGeoJson(modelBuilder);
+            ConfigureFilter(modelBuilder);
             ConfigureFilterFootnote(modelBuilder);
             ConfigureFilterGroupFootnote(modelBuilder);
             ConfigureFilterItemFootnote(modelBuilder);
@@ -659,6 +660,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         {
             modelBuilder.Entity<Indicator>()
                 .HasIndex(indicator => indicator.Name);
+        }
+
+        private static void ConfigureFilter(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Filter>()
+                .HasIndex(filter => filter.Name);
         }
         
         private static void ConfigureFilterFootnote(ModelBuilder modelBuilder)
