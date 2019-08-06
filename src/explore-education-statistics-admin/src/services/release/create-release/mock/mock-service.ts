@@ -62,7 +62,9 @@ export default async (mock: MockAdapter) => {
     const publicationId = getCaptureGroups(createReleaseUrl, config.url)[0];
 
     const createRequest = JSON.parse(config.data) as CreateReleaseRequest;
-    createRequest.publishScheduled = new Date(createRequest.publishScheduled as unknown as string);
+    createRequest.publishScheduled = new Date(
+      (createRequest.publishScheduled as unknown) as string,
+    );
 
     const allPublications = Object.values(
       mockDashboardData.dashboardPublicationsByTopicId,
