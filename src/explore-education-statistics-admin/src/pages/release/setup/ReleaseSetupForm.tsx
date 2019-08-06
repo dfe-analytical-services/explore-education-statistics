@@ -66,8 +66,8 @@ const ReleaseSetupForm = <FormValues extends EditFormValues>({
   ) => {
     const optGroups: Dictionary<SelectOption[]> = {};
     timePeriodGroups.forEach(group => {
-      optGroups[group.title] = group.options.map(option => ({
-        label: `${option.title} - ${option.id}`,
+      optGroups[group.label] = group.options.map(option => ({
+        label: `${option.label} - ${option.id}`,
         value: option.id,
       }));
     });

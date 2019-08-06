@@ -6,6 +6,11 @@ export interface IdTitlePair {
   title: string;
 }
 
+export interface IdLabelPair {
+  id: string;
+  label: string;
+}
+
 export interface ContactDetails {
   id: string;
   contactName: string;
