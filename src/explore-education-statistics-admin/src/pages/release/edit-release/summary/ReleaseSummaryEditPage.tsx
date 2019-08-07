@@ -3,8 +3,8 @@ import ReleaseSummaryForm, {
   EditFormValues,
 } from '@admin/pages/release/summary/ReleaseSummaryForm';
 import { assembleUpdateReleaseSummaryRequestFromForm } from '@admin/pages/release/util/releaseSummaryUtil';
-import { setupRoute } from '@admin/routes/edit-release/routes';
-import { dayMonthYearValuesToInputs } from '@admin/services/common/types';
+import { summaryRoute } from '@admin/routes/edit-release/routes';
+import {dateToDayMonthYear, dayMonthYearValuesToInputs} from '@admin/services/common/types';
 import service from '@admin/services/release/edit-release/summary/service';
 import { ReleaseSummaryDetails } from '@admin/services/release/types';
 import React, { useEffect, useState } from 'react';
@@ -39,10 +39,10 @@ const ReleaseSummaryEditPage = ({
 
     service
       .updateReleaseSummaryDetails(updatedReleaseDetails)
-      .then(_ => history.push(setupRoute.generateLink(releaseId)));
+      .then(_ => history.push(summaryRoute.generateLink(releaseId)));
   };
 
-  const cancelHandler = () => history.push(setupRoute.generateLink(releaseId));
+  const cancelHandler = () => history.push(summaryRoute.generateLink(releaseId));
 
   return (
     <>
@@ -60,13 +60,13 @@ const ReleaseSummaryEditPage = ({
             ): EditFormValues => ({
               timePeriodCoverageCode:
                 releaseSummaryDetails.timePeriodCoverageCode,
-              timePeriodCoverageStartYear: releaseSummaryDetails.timePeriodCoverageStartYear.toString(),
-              releaseTypeId: releaseSummaryDetails.releaseType.id,
+              timePeriodCoverageStartYear: releaseSummaryDetails.releaseName.toString(),
+              releaseTypeId: releaseSummaryDetails.typeId,
               scheduledPublishDate: dayMonthYearValuesToInputs(
-                releaseSummaryDetails.scheduledPublishDate,
+                dateToDayMonthYear(new Date(releaseSummaryDetails.publishScheduled)),
               ),
-              nextReleaseExpectedDate: dayMonthYearValuesToInputs(
-                releaseSummaryDetails.nextReleaseExpectedDate,
+              nextReleaseDate: dayMonthYearValuesToInputs(
+                releaseSummaryDetails.nextReleaseDate,
               ),
             })}
             onSubmitHandler={submitHandler}

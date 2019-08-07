@@ -5,7 +5,7 @@ import ReleaseSummaryForm, {
 } from '@admin/pages/release/summary/ReleaseSummaryForm';
 import { assembleCreateReleaseRequestFromForm } from '@admin/pages/release/util/releaseSummaryUtil';
 import dashboardRoutes from '@admin/routes/dashboard/routes';
-import { setupRoute } from '@admin/routes/edit-release/routes';
+import { summaryRoute } from '@admin/routes/edit-release/routes';
 import { emptyDayMonthYear, IdTitlePair } from '@admin/services/common/types';
 import service from '@admin/services/release/create-release/service';
 import { CreateReleaseRequest } from '@admin/services/release/create-release/types';
@@ -44,7 +44,7 @@ const CreateReleasePage = ({
     service.createRelease(createReleaseDetails).then(createdRelease =>
       // TODO remove this conditional redirect when the Release Summary page is wired up to the API
       process.env.USE_MOCK_API === 'true'
-        ? history.push(setupRoute.generateLink(createdRelease.id))
+        ? history.push(summaryRoute.generateLink(createdRelease.id))
         : history.push(dashboardRoutes.adminDashboard),
     );
   };
@@ -69,7 +69,7 @@ const CreateReleasePage = ({
           timePeriodCoverageStartYear: '',
           releaseTypeId: '',
           scheduledPublishDate: emptyDayMonthYear(),
-          nextReleaseExpectedDate: emptyDayMonthYear(),
+          nextReleaseDate: emptyDayMonthYear(),
           templateReleaseId: '',
         })}
         validationRulesSupplier={(

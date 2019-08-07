@@ -26,7 +26,7 @@ export interface EditFormValues {
   timePeriodCoverageStartYear: string;
   releaseTypeId: string;
   scheduledPublishDate: DayMonthYearInputs;
-  nextReleaseExpectedDate: DayMonthYearInputs;
+  nextReleaseDate: DayMonthYearInputs;
 }
 
 interface Props<FormValues extends EditFormValues> {
@@ -79,7 +79,7 @@ const ReleaseSummaryForm = <FormValues extends EditFormValues>({
     timePeriodCoverageStartYear: Yup.string().required('Enter a start year'),
     releaseTypeId: Yup.string(),
     scheduledPublishDate: validateMandatoryDayMonthYearField,
-    nextReleaseExpectedDate: validateOptionalPartialDayMonthYearField,
+    nextReleaseDate: validateOptionalPartialDayMonthYearField,
   };
 
   const formId = 'releaseSummaryForm';
@@ -110,8 +110,8 @@ const ReleaseSummaryForm = <FormValues extends EditFormValues>({
                     optGroups={getTimePeriodOptions(timePeriodCoverageGroups)}
                   />
                   <FormFieldTextInput<FormValues>
-                    id={`${formId}-timePeriodCoverageStartYear`}
-                    name="timePeriodCoverageStartYear"
+                    id={`${formId}-releaseName`}
+                    name="releaseName"
                     label={
                       DummyReferenceData.findTimePeriodCoverageGroup(
                         form.values.timePeriodCoverageCode,
@@ -132,11 +132,11 @@ const ReleaseSummaryForm = <FormValues extends EditFormValues>({
                 />
                 <FormFieldDayMonthYear<FormValues>
                   formId={formId}
-                  fieldName="nextReleaseExpectedDate"
+                  fieldName="nextReleaseDate"
                   fieldsetLegend="Next release expected (optional)"
-                  day={form.values.nextReleaseExpectedDate.day}
-                  month={form.values.nextReleaseExpectedDate.month}
-                  year={form.values.nextReleaseExpectedDate.year}
+                  day={form.values.nextReleaseDate.day}
+                  month={form.values.nextReleaseDate.month}
+                  year={form.values.nextReleaseDate.year}
                 />
                 <FormFieldRadioGroup<FormValues>
                   id={`${formId}-releaseTypeId`}

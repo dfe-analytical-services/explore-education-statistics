@@ -252,7 +252,7 @@ const dashboardPublicationsByTopicId: Dictionary<
             month: 9,
             year: 2020,
           },
-          nextReleaseExpectedDate: {
+          nextReleaseDate: {
             day: 20,
             month: 9,
             year: 2021,

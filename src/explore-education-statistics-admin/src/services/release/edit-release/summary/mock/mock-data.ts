@@ -7,18 +7,11 @@ const setupByReleaseId: Dictionary<ReleaseSummaryDetails> = {
     publicationTitle:
       'Pupil absence statistics and data for schools in England',
     timePeriodCoverageCode: 'AY',
-    timePeriodCoverageStartYear: 2017,
-    releaseType: {
-      id: 'national-statistics',
-      title: 'National Statistics',
-    },
+    releaseName: 2017,
+    typeId: 'national-statistics',
     leadStatisticianName: 'John Smith',
-    scheduledPublishDate: {
-      day: 20,
-      month: 9,
-      year: 2018,
-    },
-    nextReleaseExpectedDate: {
+    publishScheduled: new Date(2018, 9, 20).toISOString(),
+    nextReleaseDate: {
       day: 20,
       month: 9,
       year: 2019,

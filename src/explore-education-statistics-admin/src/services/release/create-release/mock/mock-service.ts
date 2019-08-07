@@ -25,10 +25,6 @@ export default async (mock: MockAdapter) => {
     /* webpackChunkName: "mock-dashboard-data" */ '@admin/pages/DummyReferenceData'
   )).default;
 
-  const mockCommonData = (await import(
-    /* webpackChunkName: "mock-dashboard-data" */ '@admin/services/common/mock/mock-data'
-  )).default;
-
   const getReleasesUrl = /\/publications\/(.*)\/releases/;
   const createReleaseUrl = /\/publications\/(.*)\/releases/;
 
@@ -79,17 +75,11 @@ export default async (mock: MockAdapter) => {
         id: generateRandomIntegerString(),
         leadStatisticianName: 'Bob',
         publicationTitle: matchingPublication.title,
-        releaseType:
-          mockCommonData
-            .getReleaseTypes()
-            .find(type => type.id === createRequest.releaseTypeId) ||
-          mockCommonData.getReleaseTypes()[0],
-        timePeriodCoverageStartYear: createRequest.releaseName,
+        typeId: createRequest.releaseTypeId,
+        releaseName: createRequest.releaseName,
         timePeriodCoverageCode: createRequest.timePeriodCoverage.value,
-        scheduledPublishDate: dateToDayMonthYear(
-          createRequest.publishScheduled,
-        ),
-        nextReleaseExpectedDate: createRequest.nextReleaseExpected,
+        publishScheduled: createRequest.publishScheduled.toISOString(),
+        nextReleaseDate: createRequest.nextReleaseDate,
       };
 
       const startYear = createRequest.releaseName;
@@ -97,7 +87,7 @@ export default async (mock: MockAdapter) => {
       const newRelease: AdminDashboardRelease = {
         id: newReleaseDetails.id,
         contact: matchingPublication.contact,
-        nextReleaseExpectedDate: createRequest.nextReleaseExpected,
+        nextReleaseDate: createRequest.nextReleaseDate,
         lastEditedUser: {
           id: '1234',
           name: 'John Smith',

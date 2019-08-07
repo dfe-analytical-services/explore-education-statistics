@@ -8,10 +8,6 @@ export default async (mock: MockAdapter) => {
     /* webpackChunkName: "mock-data" */ './mock-data'
   )).default;
 
-  const mockCommonData = (await import(
-    /* webpackChunkName: "mock-dashboard-data" */ '@admin/services/common/mock/mock-data'
-  )).default;
-
   const getReleaseSummaryDetailsUrl = /\/releases\/(.*)\/summary/;
 
   const updateReleaseSummaryDetailsUrl = /\/releases\/(.*)\/summary/;
@@ -32,15 +28,9 @@ export default async (mock: MockAdapter) => {
 
     existingRelease.timePeriodCoverageCode =
       updateRequest.timePeriodCoverage.value;
-    existingRelease.scheduledPublishDate = dateToDayMonthYear(
-      updateRequest.publishScheduled,
-    );
-    existingRelease.nextReleaseExpectedDate = updateRequest.nextReleaseExpected;
-    existingRelease.releaseType =
-      mockCommonData
-        .getReleaseTypes()
-        .find(type => type.id === updateRequest.releaseTypeId) ||
-      mockCommonData.getReleaseTypes()[0];
+    existingRelease.publishScheduled = updateRequest.publishScheduled.toISOString();
+    existingRelease.nextReleaseDate = updateRequest.nextReleaseDate;
+    existingRelease.typeId = updateRequest.releaseTypeId;
     /* eslint-enable no-param-reassign */
 
     return [200];

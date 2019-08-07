@@ -44,9 +44,9 @@ const createEditRoute = (
   };
 };
 
-export const setupRoute = createReadonlyRoute(
-  'setup',
-  'Release setup',
+export const summaryRoute = createReadonlyRoute(
+  'summary',
+  'Release summary',
   ReleaseSummaryPage,
 );
 export const dataRoute = createReadonlyRoute(
@@ -74,9 +74,9 @@ export const publishStatusRoute = createReadonlyRoute(
   'Set publish status',
   ReleasePublishStatusPage,
 );
-export const setupEditRoute = createEditRoute(
-  'setup',
-  'Release setup',
+export const summaryEditRoute = createEditRoute(
+  'summary',
+  'Release summary',
   ReleaseSummaryEditPage,
 );
 export const dataEditRoute = createEditRoute(
@@ -106,7 +106,7 @@ export const publishStatusEditRoute = createEditRoute(
 );
 
 export const viewRoutes = [
-  setupRoute,
+  summaryRoute,
   dataRoute,
   buildTablesRoute,
   tablesRoute,
@@ -115,7 +115,7 @@ export const viewRoutes = [
 ];
 
 export const editRoutes = [
-  setupEditRoute,
+  summaryEditRoute,
   dataEditRoute,
   buildTablesEditRoute,
   tablesEditRoute,

@@ -33,7 +33,7 @@ export interface AdminDashboardRelease {
   lastEditedDateTime: string;
   publishScheduled: DayMonthYearValues;
   published?: string;
-  nextReleaseExpectedDate: DayMonthYearValues;
+  nextReleaseDate: DayMonthYearValues;
 }
 
 export interface AdminDashboardPublication {
