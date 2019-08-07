@@ -9,6 +9,7 @@ import {
   CategoryFilter,
   Indicator,
   LocationFilter,
+  Filter,
 } from '@frontend/modules/table-tool/components/types/filters';
 import TimePeriod from '@frontend/modules/table-tool/components/types/TimePeriod';
 import { saveAs } from 'file-saver';
@@ -51,7 +52,7 @@ const DownloadCsvButton = ({
       ...indicatorColumns,
     ];
 
-    const rows = cartesian(
+    const rows = cartesian<Filter>(
       locations,
       timePeriods,
       ...Object.values(filters),

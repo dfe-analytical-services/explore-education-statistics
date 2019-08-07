@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 
         private string SlugFromTitle()
         {
-            var removeNonAlphaNumeric = new string(Title.Where(c => IsLetter(c) || IsWhiteSpace(c)).ToArray()).Trim();
+            var removeNonAlphaNumeric = new string(Title.Where(c => IsLetter(c) || IsWhiteSpace(c) || IsDigit(c)).ToArray()).Trim();
             var toLower = new string(removeNonAlphaNumeric.Select(ToLower).ToArray());
             var removeMultipleSpaces = Replace(toLower, @"\s+", " ");
             var replaceSpaces = new string(removeMultipleSpaces.Select(c => IsWhiteSpace(c) ? '-' : c).ToArray());

@@ -47,7 +47,7 @@ export default async (mock: MockAdapter) => {
     );
 
     const newPublication = {
-      id: generateRandomIntegerString(1000000),
+      id: generateRandomIntegerString(),
       title: request.title,
       methodology: selectedMethodology,
       contact: selectedContact,

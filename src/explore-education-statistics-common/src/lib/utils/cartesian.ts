@@ -1,6 +1,6 @@
 /**
  * Form a cartesian product of some {@param lists}.
- * e.g. [a, b], [c, d] => [ab], [ac], [bc], [bd].
+ * e.g. [a, b], [c, d] => [ac], [ad], [bc], [bd].
  *
  * Note that if one of the lists is empty, this will
  * result in an empty list being returned as this is

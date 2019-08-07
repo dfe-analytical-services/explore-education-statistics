@@ -3,12 +3,26 @@ from selenium.webdriver.common.action_chains  import ActionChains
 from selenium.common.exceptions import NoSuchElementException
 sl = BuiltIn().get_library_instance('SeleniumLibrary')
 
+def cookie_should_not_exist(name):
+  for cookie in sl.driver.get_cookies():
+      if cookie['name'] == name:
+        raise AssertionError(f'Cookie {name} exists when it shouldn\'t!')
+
+def cookie_should_have_value(name, value):
+  for cookie in sl.driver.get_cookies():
+    if cookie['name'] == name and cookie['value'] == value:
+      return
+  raise AssertionError(f"Couldn't find cookie {name} with value {value}")
+
 def cookie_names_should_be_on_page():
   cookies = sl.driver.get_cookies()
   for cookie in cookies:
-    if cookie['name'] == '_hjIncludedInSample':
+    if cookie['name'] in ['_hjIncludedInSample', '_hjid']:
       continue
-    sl.page_should_contain(cookie['name'])
+    try:
+      sl.page_should_contain(cookie['name'])
+    except:
+      raise AssertionError(f"Page should contain text \"{cookie['name']}\"!")
 
 def user_should_be_at_top_of_page():
   (x, y) = sl.get_window_position()

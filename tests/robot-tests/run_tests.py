@@ -75,29 +75,18 @@ robotArgs = ["--outputdir", "test-results/", "--exclude", "Failing",
 if args.tags:
     robotArgs += ["--include", args.tags]
 
-url = "about:blank"
-urlAdmin = "about:blank"
 if args.env == "ci":
     robotArgs += ["--xunit", "xunit", "-v", "timeout:" + str(timeout), "-v", "implicit_wait:" + str(implicit_wait)]
-    url = os.getenv('publicAppUrl')
-    urlAdmin = os.getenv('adminAppUrl')
 elif args.env == 'local':
-    url = "http://localhost:3000"
-    urlAdmin = "http://localhost:3001"
+    os.environ['PUBLIC_URL'] = "http://localhost:3000"
+    os.environ['ADMIN_URL'] = "http://localhost:3001"
     robotArgs += ['--exclude', 'NotAgainstLocal']
 else:
     load_dotenv(os.path.join(os.path.dirname(__file__), '.env.' + args.env))
-    url = os.getenv('publicAppUrl')
-    urlAdmin = os.getenv('adminAppUrl')
 
-if url is None or urlAdmin is None:
-    print("url and/or urlAdmin are None")
-    print(f'url: {url}')
-    print(f'urlAdmin: {urlAdmin}')
+if os.getenv('PUBLIC_URL') is None or os.getenv('ADMIN_URL') is None:
+    print("PUBLIC_URL and/or ADMIN_URL are None -- .env.{env} file needs to be set")
     sys.exit(1)
-
-robotArgs += ["-v", "url:" + str(url)]
-robotArgs += ["-v", "urlAdmin:" + str(urlAdmin)]
 
 if args.visual:
     robotArgs += ["-v", "headless:0"]
@@ -105,7 +94,6 @@ else:
     robotArgs += ["-v", "headless:1"]
 
 robotArgs += ["-v", "browser:" + args.browser]
-
 robotArgs += [args.tests]
 
 # Install chromedriver and add it to PATH

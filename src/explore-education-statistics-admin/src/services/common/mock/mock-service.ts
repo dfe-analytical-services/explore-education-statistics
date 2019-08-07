@@ -10,9 +10,11 @@ export default async (mock: MockAdapter) => {
   const service: CommonService = {
     getPublicationDetailsForRelease: releaseId =>
       Promise.resolve(mockData.getPublicationDetailsForRelease(releaseId)),
+    getReleaseTypes: () => Promise.resolve(mockData.getReleaseTypes()),
   };
 
   const getPublicationDetailsForReleaseUrl = /\/release\/(.*)\/publication/;
+  const getReleaseTypesUrl = /\/meta\/releasetypes/;
 
   // getPublicationDetailsForRelease
   mock.onGet(getPublicationDetailsForReleaseUrl).reply(({ url }) => {
@@ -22,4 +24,7 @@ export default async (mock: MockAdapter) => {
     );
     return [200, service.getPublicationDetailsForRelease(releaseId)];
   });
+
+  // getReleaseTypes
+  mock.onGet(getReleaseTypesUrl).reply(200, service.getReleaseTypes());
 };

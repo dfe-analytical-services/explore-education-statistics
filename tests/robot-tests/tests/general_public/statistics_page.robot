@@ -9,7 +9,8 @@ Suite Teardown    user closes the browser
 *** Test Cases ***
 Navigate to Find Statistics page
     [Tags]  HappyPath
-    user goes to url   ${url}/statistics
+    environment variable should be set   PUBLIC_URL
+    user goes to url   %{PUBLIC_URL}/statistics
     user waits until page contains  Browse to find the statistics and data you’re looking for
 
 User uses search

@@ -41,10 +41,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         
         public Release LatestRelease()
         {
-            return Releases?.Where(r => r.Published != null)
+            var latest = Releases?.Where(r => r.Published != null)
                 .OrderBy(r => r.Order)
                 .ThenBy(r => r.Published)
                 .LastOrDefault();
+            return latest;
         }
     }
 }

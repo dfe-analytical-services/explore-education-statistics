@@ -9,7 +9,8 @@ Suite Teardown    user closes the browser
 *** Test Cases ***
 Go to Table Tool page
     [Tags]  HappyPath
-    user goes to url  ${url}/table-tool
+    environment variable should be set  PUBLIC_URL
+    user goes to url  %{PUBLIC_URL}/table-tool
     user waits until page contains   Create your own tables online
 
 Select "Pupil absence" publication
@@ -48,11 +49,6 @@ Select Start date and End date
 Select Indicators
     [Tags]  HappyPath
     user clicks indicator checkbox   Absence fields        Number of schools
-
-Select Characteristics
-    [Tags]   HappyPath
-    user opens details dropdown     School type
-    user clicks category checkbox   School type     Pupil Referral Unit
 
 Create table
     [Tags]  HappyPath

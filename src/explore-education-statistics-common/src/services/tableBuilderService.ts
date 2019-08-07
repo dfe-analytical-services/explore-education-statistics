@@ -54,6 +54,7 @@ export interface PublicationSubjectMeta {
     legend: string;
     hint?: string;
     options: GroupedFilterOptions;
+    totalValue?: string;
   }>;
   indicators: Dictionary<{
     label: string;
@@ -107,12 +108,27 @@ export interface TableData {
   }[];
 }
 
+export interface TablePermalink {
+  id: string;
+  title: string;
+  created: string;
+  url: string;
+}
+
 interface TimePeriodQuery {
   startYear: number;
   startCode: string;
   endYear: number;
   endCode: string;
 }
+
+export type TableDataQuery = {
+  subjectId: string;
+  filters: string[];
+  indicators: string[];
+  timePeriod?: TimePeriodQuery;
+  geographicLevel?: string;
+} & PartialRecord<LocationLevelKeys, string[]>;
 
 export default {
   getThemes(): Promise<ThemeMeta[]> {
@@ -135,15 +151,10 @@ export default {
   ): Promise<PublicationSubjectMeta> {
     return dataApi.post('/meta/subject', query);
   },
-  getTableData(
-    query: {
-      subjectId: string;
-      filters: string[];
-      indicators: string[];
-      timePeriod?: TimePeriodQuery;
-      geographicLevel?: string;
-    } & PartialRecord<LocationLevelKeys, string[]>,
-  ): Promise<TableData> {
+  getTableData(query: TableDataQuery): Promise<TableData> {
     return dataApi.post('/tablebuilder', query);
+  },
+  getTablePermalink(query: TableDataQuery): Promise<TablePermalink> {
+    return dataApi.post('/permalink', query);
   },
 };

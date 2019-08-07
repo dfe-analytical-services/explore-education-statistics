@@ -4,6 +4,7 @@ import {
 } from '@common/services/dataBlockService';
 import { Dictionary } from '@common/types';
 import { PositionType } from 'recharts';
+import { AxesConfiguration } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import { contentApi } from './api';
 
 export interface Publication {
@@ -107,21 +108,31 @@ export interface AxisConfiguration {
   name: string;
   type: AxisType;
   groupBy?: AxisGroupBy;
+  sortBy?: string;
+  sortAsc?: boolean;
   dataSets: ChartDataSet[];
+  dataRange?: [number | undefined, number | undefined];
 
   referenceLines?: ReferenceLine[];
 
   visible?: boolean;
   title?: string;
+  unit?: string;
   showGrid?: boolean;
   labelPosition?: LabelPosition;
   size?: string;
+
+  min?: string;
+  max?: string;
+
+  tickConfig?: 'default' | 'startEnd' | 'custom';
+  tickSpacing?: string;
 }
 
 export interface Chart {
   type: ChartType;
   labels: Dictionary<DataSetConfiguration>;
-  axes: Dictionary<AxisConfiguration>;
+  axes: AxesConfiguration;
 
   stacked?: boolean;
   width?: number;

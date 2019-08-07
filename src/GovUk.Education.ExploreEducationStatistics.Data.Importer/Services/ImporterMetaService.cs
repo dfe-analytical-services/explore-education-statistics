@@ -45,14 +45,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         {
             return lines.First().Split(',').ToList();
         }
-        
+
         private static IEnumerable<MetaRow> GetMetaRows(IEnumerable<string> lines, List<string> headers)
         {
             return lines
                 .Skip(1)
                 .Select(line => GetMetaRow(line, headers));
         }
-        
+
         private static MetaRow GetMetaRow(string line, List<string> headers)
         {
             var columns = new[]
@@ -91,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             Subject subject)
         {
             var indicators = GetIndicators(metaRows, subject).ToList();
-            
+
             _context.Indicator.AddRange(indicators.Select(tuple => tuple.Indicator));
 
             return indicators;
@@ -103,9 +103,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             return metaRows
                 .Where(row => row.ColumnType == ColumnType.Filter)
                 .Select(filter => (
-                    filter: 
-                        _context.Filter.FirstOrDefault(f => f.SubjectId == subject.Id && f.Label == filter.Label && f.Hint == filter.FilterHint) ??
-                        new Filter(filter.FilterHint, filter.Label, subject),
+                    filter:
+                    _context.Filter.FirstOrDefault(f =>
+                        f.SubjectId == subject.Id && f.Label == filter.Label && f.Hint == filter.FilterHint) ??
+                    new Filter(filter.FilterHint, filter.Label, filter.ColumnName, subject),
                     column: filter.ColumnName,
                     filterGroupingColumn: filter.FilterGroupingColumn));
         }
@@ -114,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             Subject subject)
         {
             var indicatorRows = metaRows.Where(row => row.ColumnType == ColumnType.Indicator).ToList();
-            
+
             indicatorRows.ForEach(row =>
             {
                 if (string.IsNullOrWhiteSpace(row.IndicatorGrouping))
@@ -122,12 +123,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                     row.IndicatorGrouping = "Default";
                 }
             });
-            
+
             var indicatorGroups = indicatorRows
                 .GroupBy(row => row.IndicatorGrouping)
                 .ToDictionary(rows => rows.Key, rows =>
-                _context.IndicatorGroup.FirstOrDefault(ig => ig.SubjectId == subject.Id && ig.Label == rows.Key) ??
-                new IndicatorGroup(rows.Key, subject)
+                    _context.IndicatorGroup.FirstOrDefault(ig => ig.SubjectId == subject.Id && ig.Label == rows.Key) ??
+                    new IndicatorGroup(rows.Key, subject)
                 );
 
             return indicatorRows
@@ -135,13 +136,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 {
                     indicatorGroups.TryGetValue(row.IndicatorGrouping, out var indicatorGroup);
                     return (
-                        
-                        indicator: 
-                            _context.Indicator.FirstOrDefault(i => i.IndicatorGroupId == indicatorGroup.Id && i.Label == row.Label && i.Unit == row.IndicatorUnit) ??
-                            new Indicator
+                        indicator:
+                        _context.Indicator.FirstOrDefault(i =>
+                            i.IndicatorGroupId == indicatorGroup.Id && i.Label == row.Label &&
+                            i.Unit == row.IndicatorUnit) ?? new Indicator
                         {
                             IndicatorGroup = indicatorGroup,
                             Label = row.Label,
+                            Name = row.ColumnName,
                             Unit = row.IndicatorUnit
                         },
                         column: row.ColumnName

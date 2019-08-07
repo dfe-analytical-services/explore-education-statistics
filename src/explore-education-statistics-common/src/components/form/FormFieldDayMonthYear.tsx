@@ -5,9 +5,9 @@ import { Field, FieldProps } from 'formik';
 import React, { ReactNode } from 'react';
 
 interface DayMonthYearValues {
-  day?: number;
-  month?: number;
-  year?: number;
+  day: string;
+  month: string;
+  year: string;
 }
 
 interface Props<FormValues> extends DayMonthYearValues {

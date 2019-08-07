@@ -90,7 +90,10 @@ const AdminDashboardPage = () => {
         </div>
       </div>
       <Tabs id="publicationTabs">
-        <TabsSection id="my-publications" title="Publications">
+        <TabsSection
+          id="my-publications"
+          title="Manage publications and releases"
+        >
           {themes && selectedThemeAndTopic && (
             <AdminDashboardPublicationsTab
               publications={myPublications}
@@ -114,8 +117,18 @@ const AdminDashboardPage = () => {
             />
           )}
         </TabsSection>
-        <TabsSection id="in-progress-publications" title="In progress">
-          Hi
+        <TabsSection id="draft-releases" title="View draft releases (0)">
+          <div className="govuk-inset-text">
+            There are currently no releases ready for you to review
+          </div>
+        </TabsSection>
+        <TabsSection
+          id="scheduled-releases"
+          title="View scheduled releases (0)"
+        >
+          <div className="govuk-inset-text">
+            There are currently no unresolved comments
+          </div>
         </TabsSection>
       </Tabs>
     </Page>
