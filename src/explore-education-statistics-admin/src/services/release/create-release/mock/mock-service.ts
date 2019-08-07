@@ -1,12 +1,10 @@
+import { dateToDayMonthYear } from '@admin/services/common/types';
 import {
   AdminDashboardRelease,
   ReleaseApprovalStatus,
 } from '@admin/services/dashboard/types';
-import {
-  CreateReleaseRequest,
-  ReleaseSetupDetails,
-  UpdateReleaseSetupDetailsRequest,
-} from '@admin/services/edit-release/setup/types';
+import { CreateReleaseRequest } from '@admin/services/release/create-release/types';
+import { ReleaseSetupDetails } from '@admin/services/release/types';
 import {
   generateRandomIntegerString,
   getCaptureGroups,
@@ -16,7 +14,7 @@ import { format } from 'date-fns';
 
 export default async (mock: MockAdapter) => {
   const mockData = (await import(
-    /* webpackChunkName: "mock-data" */ './mock-data'
+    /* webpackChunkName: "mock-data" */ '@admin/services/release/edit-release/setup/mock/mock-data'
   )).default;
 
   const mockDashboardData = (await import(
@@ -27,18 +25,51 @@ export default async (mock: MockAdapter) => {
     /* webpackChunkName: "mock-dashboard-data" */ '@admin/pages/DummyReferenceData'
   )).default;
 
-  const createReleaseUrl = /\/publication\/(.*)\/releases/;
-  const getReleaseSetupDetailsUrl = /\/release\/(.*)\/setup/;
-  const updateReleaseSetupDetailsUrl = /\/release\/(.*)\/setup/;
+  const mockCommonData = (await import(
+    /* webpackChunkName: "mock-dashboard-data" */ '@admin/services/common/mock/mock-data'
+  )).default;
 
-  mock.onPost(createReleaseUrl).reply(config => {
+  const getReleasesUrl = /\/publications\/(.*)\/releases/;
+  const createReleaseUrl = /\/publications\/(.*)\/releases/;
+
+  // getTemplateRelease()
+  mock.onGet(getReleasesUrl).reply(config => {
     const publicationId = getCaptureGroups(createReleaseUrl, config.url)[0];
-
-    const createRequest = JSON.parse(config.data) as CreateReleaseRequest;
 
     const allPublications = Object.values(
       mockDashboardData.dashboardPublicationsByTopicId,
     ).flat();
+
+    const matchingPublication = allPublications.find(
+      publication => publication.id === publicationId,
+    );
+
+    if (matchingPublication) {
+      const latestRelease = matchingPublication.releases.map(release => ({
+        id: release.id,
+        title: release.releaseName,
+        latestRelease: release.latestRelease ? 'true' : 'false',
+      }));
+
+      return [200, latestRelease];
+    }
+
+    return [200, []];
+  });
+
+  // createRelease()
+  mock.onPost(createReleaseUrl).reply(config => {
+    const publicationId = getCaptureGroups(createReleaseUrl, config.url)[0];
+
+    const createRequest = JSON.parse(config.data) as CreateReleaseRequest;
+    createRequest.publishScheduled = new Date(
+      (createRequest.publishScheduled as unknown) as string,
+    );
+
+    const allPublications = Object.values(
+      mockDashboardData.dashboardPublicationsByTopicId,
+    ).flat();
+
     const matchingPublication = allPublications.find(
       publication => publication.id === publicationId,
     );
@@ -48,19 +79,25 @@ export default async (mock: MockAdapter) => {
         id: generateRandomIntegerString(),
         leadStatisticianName: 'Bob',
         publicationTitle: matchingPublication.title,
-        releaseType: createRequest.releaseType,
-        timePeriodCoverageStartDate: createRequest.timePeriodCoverageStartDate,
-        timePeriodCoverageCode: createRequest.timePeriodCoverageCode,
-        scheduledPublishDate: createRequest.scheduledPublishDate,
-        nextReleaseExpectedDate: createRequest.nextReleaseExpectedDate,
+        releaseType:
+          mockCommonData
+            .getReleaseTypes()
+            .find(type => type.id === createRequest.releaseTypeId) ||
+          mockCommonData.getReleaseTypes()[0],
+        timePeriodCoverageStartYear: createRequest.releaseName,
+        timePeriodCoverageCode: createRequest.timePeriodCoverage.value,
+        scheduledPublishDate: dateToDayMonthYear(
+          createRequest.publishScheduled,
+        ),
+        nextReleaseExpectedDate: createRequest.nextReleaseExpected,
       };
 
-      const startYear = createRequest.timePeriodCoverageStartDate.year || 0;
+      const startYear = createRequest.releaseName;
 
       const newRelease: AdminDashboardRelease = {
         id: newReleaseDetails.id,
         contact: matchingPublication.contact,
-        nextReleaseExpectedDate: createRequest.nextReleaseExpectedDate,
+        nextReleaseExpectedDate: createRequest.nextReleaseExpected,
         lastEditedUser: {
           id: '1234',
           name: 'John Smith',
@@ -68,10 +105,10 @@ export default async (mock: MockAdapter) => {
         lastEditedDateTime: format(new Date(), 'yyyy-MM-dd HH:mm:ss'),
         latestRelease: true,
         timePeriodCoverage: mockReferenceData.findTimePeriodCoverageOption(
-          createRequest.timePeriodCoverageCode,
+          createRequest.timePeriodCoverage.value,
         ),
         live: false,
-        publishScheduled: createRequest.scheduledPublishDate,
+        publishScheduled: dateToDayMonthYear(createRequest.publishScheduled),
         releaseName: `${startYear} - ${startYear}`,
         status: ReleaseApprovalStatus.None,
       };
@@ -86,33 +123,5 @@ export default async (mock: MockAdapter) => {
     }
 
     return [404];
-  });
-
-  mock.onGet(getReleaseSetupDetailsUrl).reply(({ url }) => {
-    const [releaseId] = getCaptureGroups(getReleaseSetupDetailsUrl, url);
-    return [200, mockData.getReleaseSetupDetailsForRelease(releaseId)];
-  });
-
-  mock.onPost(updateReleaseSetupDetailsUrl).reply(config => {
-    const updateRequest = JSON.parse(
-      config.data,
-    ) as UpdateReleaseSetupDetailsRequest;
-
-    const existingRelease = mockData.getReleaseSetupDetailsForRelease(
-      updateRequest.releaseId,
-    );
-
-    /* eslint-disable no-param-reassign */
-    existingRelease.timePeriodCoverageCode =
-      updateRequest.timePeriodCoverageCode;
-    existingRelease.timePeriodCoverageStartDate =
-      updateRequest.timePeriodCoverageStartDate;
-    existingRelease.scheduledPublishDate = updateRequest.scheduledPublishDate;
-    existingRelease.nextReleaseExpectedDate =
-      updateRequest.nextReleaseExpectedDate;
-    existingRelease.releaseType = updateRequest.releaseType;
-    /* eslint-enable no-param-reassign */
-
-    return [200];
   });
 };

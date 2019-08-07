@@ -1,4 +1,4 @@
-import { EditReleaseService } from '@admin/services/edit-release/data/service';
+import { EditReleaseService } from '@admin/services/release/edit-release/data/service';
 import {
   generateRandomInteger,
   generateRandomIntegerString,

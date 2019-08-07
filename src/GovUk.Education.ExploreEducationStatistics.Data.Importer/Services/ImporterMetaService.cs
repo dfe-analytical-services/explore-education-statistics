@@ -80,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             return metaRows
                 .Where(row => row.ColumnType == ColumnType.Filter)
                 .Select(filter => (
-                    filter: new Filter(filter.FilterHint, filter.Label, subject),
+                    filter: new Filter(filter.FilterHint, filter.Label, filter.ColumnName, subject),
                     column: filter.ColumnName,
                     filterGroupingColumn: filter.FilterGroupingColumn));
         }
@@ -111,6 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                         {
                             IndicatorGroup = indicatorGroup,
                             Label = row.Label,
+                            Name = row.ColumnName,
                             Unit = row.IndicatorUnit
                         },
                         column: row.ColumnName
