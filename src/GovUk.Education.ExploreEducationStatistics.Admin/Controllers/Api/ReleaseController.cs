@@ -92,8 +92,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [Required] [FromQuery(Name = "name")] string name, IFormFile file)
         {
             return await CheckReleaseExistsAsync(releaseId,
-                async () => await _fileStorageService.UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Ancillary));
-
+                async () => await _fileStorageService.UploadFilesAsync(releaseId, file, name,
+                    ReleaseFileTypes.Ancillary));
         }
 
         // POST api/release/{releaseId}/chart-files
@@ -165,6 +165,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await _releaseService.GetReleasesForPublicationAsync(publicationId);
         }
 
+        [HttpDelete("release/{releaseId}/data-files/{fileName}")]
+        [AllowAnonymous] // TODO We will need to do Authorisation checks when we know what the permissions model is.
+        public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteDataFiles(ReleaseId releaseId, string fileName)
+        {
+            return await CheckReleaseExistsAsync(releaseId,
+                async () => await _fileStorageService.DeleteDataFileAsync(releaseId, fileName));
+        }
+
         // DELETE api/release/{releaseId}/ancillary-files/{fileName}
         [HttpDelete("release/{releaseId}/ancillary-files/{fileName}")]
         [AllowAnonymous] // TODO We will need to do Authorisation checks when we know what the permissions model is.
@@ -172,7 +180,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             ReleaseId releaseId, string fileName)
         {
             return await CheckReleaseExistsAsync(releaseId,
-                async () => Ok(await _fileStorageService.DeleteFileAsync(releaseId, ReleaseFileTypes.Ancillary, fileName)));
+                async () => await _fileStorageService.DeleteFileAsync(releaseId, ReleaseFileTypes.Ancillary, fileName));
+        }
+
+        // DELETE api/release/{releaseId}/chart-files/{fileName}
+        [HttpDelete("release/{releaseId}/chart-files/{fileName}")]
+        [AllowAnonymous] // TODO We will need to do Authorisation checks when we know what the permissions model is.
+        public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteChartFile(
+            ReleaseId releaseId, string fileName)
+        {
+            return await CheckReleaseExistsAsync(releaseId,
+                async () => await _fileStorageService.DeleteFileAsync(releaseId, ReleaseFileTypes.Chart, fileName));
         }
 
         private async Task<ActionResult> CheckReleaseExistsAsync(ReleaseId releaseId, Func<Task<ActionResult>> andThen)
@@ -185,9 +203,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
             return await andThen.Invoke();
         }
-        
-        
-        private async Task<ActionResult> CheckReleaseExistsAsync<T>(ReleaseId releaseId, Func<Task<Either<ValidationResult,T>>> andThen)
+
+
+        private async Task<ActionResult> CheckReleaseExistsAsync<T>(ReleaseId releaseId,
+            Func<Task<Either<ValidationResult, T>>> andThen)
         {
             var release = await _releaseService.GetAsync(releaseId);
             if (release == null)

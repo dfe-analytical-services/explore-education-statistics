@@ -25,6 +25,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private const string ContainerName = "releases";
 
+        private const string MetaFileKey = "metafile";
+        
+        private const string DataFileKey = "datafile";
+        
+        private const string NameKey = "name";
+
         [SuppressMessage("ReSharper", "UnusedMember.Local")]
         private enum FileSizeUnit : byte
         {
@@ -48,8 +54,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ValidationResult, IEnumerable<FileInfo>>> UploadDataFilesAsync(Guid releaseId, IFormFile dataFile, IFormFile metaFile, string name)
         {
             var blobContainer = await GetCloudBlobContainer();
-            var dataInfo = new Dictionary<string, string> {{"name", name}, {"metafile", metaFile.FileName}};
-            var metaDataInfo = new Dictionary<string, string> {{"datafile", dataFile.FileName}};
+            var dataInfo = new Dictionary<string, string> {{NameKey, name}, {MetaFileKey, metaFile.FileName}};
+            var metaDataInfo = new Dictionary<string, string> {{DataFileKey, dataFile.FileName}};
             return await UploadFileAsync(blobContainer, releaseId, dataFile, ReleaseFileTypes.Data, dataInfo)
                 .OnSuccess(async () =>
                     await UploadFileAsync(blobContainer, releaseId, metaFile, ReleaseFileTypes.Data, metaDataInfo))
@@ -57,37 +63,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await ListFilesAsync(releaseId, ReleaseFileTypes.Data));
         }
 
-        public async Task<IEnumerable<FileInfo>> DeleteDataFileAsync(Guid releaseId, string fileName)
+        public async Task<Either<ValidationResult,IEnumerable<FileInfo>>> DeleteDataFileAsync(Guid releaseId, string fileName)
         {
             // TODO what are the conditions in which we allow deletion?
             var blobContainer = await GetCloudBlobContainer();
             var dataBlob = blobContainer.GetBlockBlobReference(ReleasePath(releaseId, ReleaseFileTypes.Data, fileName));
-            var metaFileName = dataBlob.Metadata["metafile"];
-
-            // Delete the data and the metadata
-            await DeleteFileAsync(blobContainer, ReleasePath(releaseId, ReleaseFileTypes.Data, fileName));
-            await DeleteFileAsync(blobContainer, ReleasePath(releaseId, ReleaseFileTypes.Data, metaFileName));
-            return await ListFilesAsync(releaseId, ReleaseFileTypes.Data);
+            await dataBlob.FetchAttributesAsync(); 
+            if (!dataBlob.Metadata.ContainsKey(MetaFileKey))
+            {
+                return ValidationResult("File name", "Unable to find meta data file to delete");
+            }
+            var metaFileName = dataBlob.Metadata[MetaFileKey];
+            // Delete the data 
+            return await DeleteFileAsync(blobContainer, ReleasePath(releaseId, ReleaseFileTypes.Data, fileName))
+                // and the metadata
+                .OnSuccess(async () => await DeleteFileAsync(blobContainer, ReleasePath(releaseId, ReleaseFileTypes.Data, metaFileName)))
+                // and return the remaining files
+                .OnSuccess(async () => await ListFilesAsync(releaseId, ReleaseFileTypes.Data));
         }
 
         public async Task<Either<ValidationResult, IEnumerable<FileInfo>>> UploadFilesAsync(Guid releaseId, IFormFile file, string name, ReleaseFileTypes type)
         {
             var blobContainer = await GetCloudBlobContainer();
-            var info = new Dictionary<string, string> {{"name", name}};
+            var info = new Dictionary<string, string> {{NameKey, name}};
             return await UploadFileAsync(blobContainer, releaseId, file, type, info, true)
                 .OnSuccess(async () => await ListFilesAsync(releaseId, type));
         }
 
-        public async Task<IEnumerable<FileInfo>> DeleteFileAsync(Guid releaseId, ReleaseFileTypes type, string fileName)
+        public async Task<Either<ValidationResult, IEnumerable<FileInfo>>> DeleteFileAsync(Guid releaseId, ReleaseFileTypes type, string fileName)
         {
             // TODO Are there conditions in which we would not allow deletion?
             if (type == ReleaseFileTypes.Data)
             {
-                throw new ArgumentException("Deleting data files required calling DeleteDataFilesAsync");
+                return ValidationResult("File name", "Cannot use generic functionality to delete data files");
             }
 
-            await DeleteFileAsync(await GetCloudBlobContainer(), ReleasePath(releaseId, type, fileName));
-            return await ListFilesAsync(releaseId, type);
+            return await DeleteFileAsync(await GetCloudBlobContainer(), ReleasePath(releaseId, type, fileName))
+                .OnSuccess(async () => await ListFilesAsync(releaseId, type));
         }
 
         private async Task<IEnumerable<FileInfo>> ListFilesAsync(string releaseId, ReleaseFileTypes type)
@@ -122,10 +134,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return true;
         }
 
-        private static async Task DeleteFileAsync(CloudBlobContainer blobContainer, string path)
+        private static async Task<Either<ValidationResult, bool>> DeleteFileAsync(CloudBlobContainer blobContainer, string path)
         {
             var blob = blobContainer.GetBlockBlobReference(path);
-            await blob.DeleteIfExistsAsync();
+            return await blob.DeleteIfExistsAsync();
         }
 
         private async Task<CloudBlobContainer> GetCloudBlobContainer()
@@ -171,12 +183,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private static string GetName(CloudBlob blob)
         {
-            return blob.Metadata.TryGetValue("name", out var name) ? name : "";
+            return blob.Metadata.TryGetValue(NameKey, out var name) ? name : "";
         }
 
         private static string GetMetaFileName(CloudBlob blob)
         {
-            return blob.Metadata.TryGetValue("metafile", out var name) ? name : "";
+            return blob.Metadata.TryGetValue(MetaFileKey, out var name) ? name : "";
         }
 
         private static string GetSize(CloudBlob blob)
