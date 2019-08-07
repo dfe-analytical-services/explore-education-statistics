@@ -92,7 +92,7 @@ const CreateReleasePage = ({
               options={[
                 {
                   label: 'Create new template',
-                  value: '',
+                  value: 'new',
                 },
                 {
                   label: `Copy existing template (${templateRelease.title})`,

@@ -28,7 +28,7 @@ export const assembleCreateReleaseRequestFromForm = (
 ): CreateReleaseRequest => {
   return {
     publicationId,
-    templateReleaseId: values.templateReleaseId,
+    templateReleaseId: values.templateReleaseId !== 'new' ? values.templateReleaseId : '',
     ...assembleBaseReleaseSummaryRequestFromForm(values),
   };
 };
