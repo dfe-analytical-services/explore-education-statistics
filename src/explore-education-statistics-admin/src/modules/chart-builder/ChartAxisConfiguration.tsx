@@ -196,6 +196,14 @@ const ChartAxisConfiguration = ({
                       label: "Locations",
                       value: "locations" as AxisGroupBy
                     },
+                    {
+                      label: "Indicators",
+                      value: "indicators" as AxisGroupBy
+                    },
+                    {
+                      label: "Filters",
+                      value: "filters" as AxisGroupBy
+                    },
                   ]}
                 />
 

@@ -293,17 +293,21 @@ export function generateKeyFromDataSet(
 
 function generateNameForAxisConfiguration(
   result: Result,
+  dataSet: ChartDataSet,
   groupBy?: AxisGroupBy,
 ): string {
   switch (groupBy) {
     case 'timePeriods':
       return result.timePeriod;
+    case 'indicators':
+      return `${dataSet.indicator}`;
+    case 'filters':
+      return result.filters.join("_");
     case 'locations':
       if (result.location.localAuthorityDistrict)
         return `${result.location.localAuthorityDistrict.code}`;
       if (result.location.localAuthority)
         return `${result.location.localAuthority.code}`;
-
       return '';
     default:
       return '';
@@ -333,7 +337,7 @@ function getChartDataForAxis(
 
   return Object.values(
     dataForAxis.reduce<Dictionary<ChartDataB>>((r, result) => {
-      const name = generateNameForAxisConfiguration(result, groupBy);
+      const name = generateNameForAxisConfiguration(result, dataSet, groupBy);
 
       return {
         ...r,
