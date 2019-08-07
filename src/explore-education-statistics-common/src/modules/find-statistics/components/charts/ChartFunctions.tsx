@@ -23,6 +23,7 @@ import {
   Label,
   PositionType,
   ReferenceLine as RechartsReferenceLine,
+  TooltipProps,
   XAxis,
   XAxisProps,
   YAxis,
@@ -634,3 +635,32 @@ export function generateMajorAxis(
   );
   return { domain, ticks };
 }
+
+export const CustomToolTip = ({ active, payload, label }: TooltipProps) => {
+  if (active) {
+    return (
+      <div className="graph-tooltip">
+        <p>{label}</p>
+        {payload &&
+          payload
+            .sort((a, b) => {
+              if (typeof b.value === 'number' && typeof a.value === 'number') {
+                return b.value - a.value;
+              }
+
+              return 0;
+            })
+            .map((_, index) => {
+              return (
+                // eslint-disable-next-line react/no-array-index-key
+                <p key={index}>
+                  {`${payload[index].name} : ${payload[index].value}`}
+                </p>
+              );
+            })}
+      </div>
+    );
+  }
+
+  return null;
+};

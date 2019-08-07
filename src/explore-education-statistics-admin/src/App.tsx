@@ -22,6 +22,7 @@ import PrototypeAdminDashboard from './pages/prototypes/PrototypeAdminDashboard'
 
 import PrototypeChartTest from './pages/prototypes/PrototypeChartTest';
 import AdminDocumentationGlossary from './pages/prototypes/PrototypeDocumentationGlossary';
+import AdminDocumentationStyle from './pages/prototypes/PrototypeDocumentationStyle';
 import AdminDocumentationHome from './pages/prototypes/PrototypeDocumentationHome';
 import PublicationAssignMethodology from './pages/prototypes/PrototypePublicationPageAssignMethodology';
 import PublicationConfirmNew from './pages/prototypes/PrototypePublicationPageConfirmNew';
@@ -39,6 +40,7 @@ import PublicationCreateNewAbsenceScheduleEdit from './pages/prototypes/Prototyp
 import PublicationCreateNewAbsenceStatus from './pages/prototypes/PrototypePublicationPageNewAbsenceStatus';
 import PublicationCreateNewAbsenceTable from './pages/prototypes/PrototypePublicationPageNewAbsenceTable';
 import PublicationCreateNewAbsenceViewTables from './pages/prototypes/PrototypePublicationPageNewAbsenceViewTables';
+import PublicationReviewPage from './pages/prototypes/PrototypePublicationPageReviewAbsence';
 import ReleaseCreateNew from './pages/prototypes/PrototypeReleasePageCreateNew';
 import PrototypesIndexPage from './pages/prototypes/PrototypesIndexPage';
 
@@ -111,6 +113,11 @@ function App() {
           exact
           path="/prototypes/publication-review"
           render={() => <PublicationEditUnresolvedComments reviewing />}
+        />
+        <Route
+          exact
+          path="/prototypes/publication-higher-review"
+          component={PublicationReviewPage}
         />
         <Route
           exact
@@ -195,7 +202,7 @@ function App() {
         <Route
           exact
           path="/prototypes/documentation/style-guide"
-          component={AdminDocumentationGlossary}
+          component={AdminDocumentationStyle}
         />
       </LoginContext.Provider>
     </BrowserRouter>

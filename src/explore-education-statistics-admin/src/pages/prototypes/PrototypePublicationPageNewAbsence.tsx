@@ -85,7 +85,7 @@ class PublicationPage extends Component<{}, State> {
               <span className="govuk-heading-m govuk-!-margin-bottom-0">
                 Previous step
               </span>
-              Manage tables and charts
+              Manage data blocks
             </Link>
           </div>
           <div className="govuk-grid-column-one-half dfe-align--right">
@@ -93,7 +93,7 @@ class PublicationPage extends Component<{}, State> {
               <span className="govuk-heading-m govuk-!-margin-bottom-0">
                 Next step
               </span>
-              Set publish status
+              Update release status
             </Link>
           </div>
         </div>
