@@ -127,7 +127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 // upload the files
                 var result = await _fileStorageService.UploadDataFilesAsync(releaseId, file, metaFile, name)
                     // add message to queue to process these files
-                    .Map(() => _importService.Import(file.FileName, releaseId));
+                    .OnSuccess(() => _importService.Import(file.FileName, releaseId));
                 return result;
             });
         }
