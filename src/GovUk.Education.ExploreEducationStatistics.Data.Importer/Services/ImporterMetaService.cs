@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -74,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 FilterGroupingColumn = values[3],
                 FilterHint = values[4],
                 IndicatorGrouping = values[5],
-                IndicatorUnit = values[6] == "%" ? Unit.Percent : Unit.Number
+                IndicatorUnit = EnumUtil.GetFromString<Unit>(values[6])
             });
         }
 
@@ -104,8 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 .Where(row => row.ColumnType == ColumnType.Filter)
                 .Select(filter => (
                     filter:
-                    _context.Filter.FirstOrDefault(f =>
-                        f.SubjectId == subject.Id && f.Label == filter.Label && f.Hint == filter.FilterHint) ??
+                    _context.Filter.FirstOrDefault(f => f.SubjectId == subject.Id && f.Label == filter.Label && f.Hint == filter.FilterHint) ??
                     new Filter(filter.FilterHint, filter.Label, filter.ColumnName, subject),
                     column: filter.ColumnName,
                     filterGroupingColumn: filter.FilterGroupingColumn));

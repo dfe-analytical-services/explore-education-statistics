@@ -23,6 +23,7 @@ import PrototypeAdminDashboard from './pages/prototypes/PrototypeAdminDashboard'
 
 import PrototypeChartTest from './pages/prototypes/PrototypeChartTest';
 import AdminDocumentationGlossary from './pages/prototypes/PrototypeDocumentationGlossary';
+import AdminDocumentationStyle from './pages/prototypes/PrototypeDocumentationStyle';
 import AdminDocumentationHome from './pages/prototypes/PrototypeDocumentationHome';
 import PublicationAssignMethodology from './pages/prototypes/PrototypePublicationPageAssignMethodology';
 import PublicationConfirmNew from './pages/prototypes/PrototypePublicationPageConfirmNew';
@@ -217,7 +218,7 @@ function App() {
         <Route
           exact
           path="/prototypes/documentation/style-guide"
-          component={AdminDocumentationGlossary}
+          component={AdminDocumentationStyle}
         />
       </LoginContext.Provider>
     </BrowserRouter>

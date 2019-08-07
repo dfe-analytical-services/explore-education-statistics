@@ -72,12 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             [Queue("imports-available")] ICollector<ImportMessage> collector
         )
         {
-            logger.LogInformation(
-                $"{GetType().Name} function STARTED");
-
-            // If processing from seeder then remove all subjects
-            _context.Subject.RemoveRange(_context.Subject);
-            _context.SaveChanges();
+            logger.LogInformation($"{GetType().Name} function STARTED");
 
             var successes = new List<ImportMessage>();
             
@@ -85,9 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             {
                 try
                 {
-                    logger.LogInformation(
-                        $"Re-seeding for : Datafile: {message.DataFileName}");
-                    
+                    logger.LogInformation($"Re-seeding for : Datafile: {message.DataFileName}");
                     ProcessSubject(message);
                     successes.Add(message);
                 }
@@ -118,7 +111,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
         {
             try
             {
-                logger.LogInformation($"{GetType().Name} function STARTED for : Batch: {message.BatchNo} of {message.BatchSize} with Datafile: {message.DataFileName}");
+                logger.LogInformation(
+                    $"{GetType().Name} function STARTED for : Batch: {message.BatchNo} of {message.BatchSize} with Datafile: {message.DataFileName}");
                 
                 _fileImportService.ImportObservations(message);
                 
@@ -139,7 +133,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 throw;
             }
 
-            logger.LogInformation($"{GetType().Name} function COMPLETE for : Batch: {message.BatchNo}  of {message.BatchSize} with Datafile: {message.DataFileName}");
+            logger.LogInformation(
+                $"{GetType().Name} function COMPLETE for : Batch: {message.BatchNo}  of {message.BatchSize} with Datafile: {message.DataFileName}");
         }
 
         private SubjectData ProcessSubject(ImportMessage message)
