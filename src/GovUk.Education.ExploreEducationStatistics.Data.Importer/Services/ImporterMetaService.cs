@@ -104,10 +104,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             return metaRows
                 .Where(row => row.ColumnType == ColumnType.Filter)
                 .Select(filter => (
-                    filter:
-                    _context.Filter.FirstOrDefault(f =>
-                        f.SubjectId == subject.Id && f.Label == filter.Label && f.Hint == filter.FilterHint) ??
-                    new Filter(filter.FilterHint, filter.Label, filter.ColumnName, subject),
+                    filter: 
+                        _context.Filter.FirstOrDefault(f => f.SubjectId == subject.Id && f.Name == filter.ColumnName) ??
+                        new Filter(filter.FilterHint, filter.Label, filter.ColumnName, subject),
                     column: filter.ColumnName,
                     filterGroupingColumn: filter.FilterGroupingColumn));
         }

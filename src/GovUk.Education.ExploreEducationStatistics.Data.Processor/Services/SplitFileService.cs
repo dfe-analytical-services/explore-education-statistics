@@ -37,8 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 // Upload the split data files & send message to process to imports-available queue
                 foreach (var f in files)
                 {
-                    var result = _fileStorageService.UploadDataFileAsync(message.Release.Publication.Slug,
-                        message.Release.Slug,
+                    var result = _fileStorageService.UploadDataFileAsync(message.Release.Id,
                         f, BlobUtils.GetMetaFileName(subjectData.DataBlob), BlobUtils.GetName(subjectData.DataBlob)).Result;
 
                     var iMessage = new ImportMessage
