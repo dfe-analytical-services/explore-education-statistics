@@ -11,7 +11,7 @@ export interface ReleaseRoute {
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   component: (props: any) => JSX.Element;
   title: string;
-  generateLink: (releaseId: string) => string;
+  generateLink: (publicationId: string, releaseId: string) => string;
 }
 
 const createReadonlyRoute = (
@@ -20,12 +20,15 @@ const createReadonlyRoute = (
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   component: (props: any) => JSX.Element,
 ): ReleaseRoute => {
-  const path = `/release/:releaseId/${section}`;
+  const path = `/publication/:publicationId/release/:releaseId/${section}`;
   return {
     path,
     component,
     title,
-    generateLink: (releaseId: string) => path.replace(':releaseId', releaseId),
+    generateLink: (publicationId: string, releaseId: string) =>
+      path
+        .replace(':publicationId', publicationId)
+        .replace(':releaseId', releaseId),
   };
 };
 
@@ -35,18 +38,21 @@ const createEditRoute = (
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   component: (props: any) => JSX.Element,
 ): ReleaseRoute => {
-  const path = `/release/:releaseId/${section}/edit`;
+  const path = `/publication/:publicationId/release/:releaseId/${section}/edit`;
   return {
     path,
     component,
     title,
-    generateLink: (releaseId: string) => path.replace(':releaseId', releaseId),
+    generateLink: (publicationId: string, releaseId: string) =>
+      path
+        .replace(':publicationId', publicationId)
+        .replace(':releaseId', releaseId),
   };
 };
 
-export const setupRoute = createReadonlyRoute(
-  'setup',
-  'Release setup',
+export const summaryRoute = createReadonlyRoute(
+  'summary',
+  'Release summary',
   ReleaseSummaryPage,
 );
 export const dataRoute = createReadonlyRoute(
@@ -74,9 +80,9 @@ export const publishStatusRoute = createReadonlyRoute(
   'Set publish status',
   ReleasePublishStatusPage,
 );
-export const setupEditRoute = createEditRoute(
-  'setup',
-  'Release setup',
+export const summaryEditRoute = createEditRoute(
+  'summary',
+  'Release summary',
   ReleaseSummaryEditPage,
 );
 export const dataEditRoute = createEditRoute(
@@ -106,7 +112,7 @@ export const publishStatusEditRoute = createEditRoute(
 );
 
 export const viewRoutes = [
-  setupRoute,
+  summaryRoute,
   dataRoute,
   buildTablesRoute,
   tablesRoute,
@@ -115,7 +121,7 @@ export const viewRoutes = [
 ];
 
 export const editRoutes = [
-  setupEditRoute,
+  summaryEditRoute,
   dataEditRoute,
   buildTablesEditRoute,
   tablesEditRoute,

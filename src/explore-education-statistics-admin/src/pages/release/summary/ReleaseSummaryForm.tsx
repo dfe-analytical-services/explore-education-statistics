@@ -26,7 +26,7 @@ export interface EditFormValues {
   timePeriodCoverageStartYear: string;
   releaseTypeId: string;
   scheduledPublishDate: DayMonthYearInputs;
-  nextReleaseExpectedDate: DayMonthYearInputs;
+  nextReleaseDate: DayMonthYearInputs;
 }
 
 interface Props<FormValues extends EditFormValues> {
@@ -77,9 +77,9 @@ const ReleaseSummaryForm = <FormValues extends EditFormValues>({
   const baseValidationRules: ObjectSchemaDefinition<EditFormValues> = {
     timePeriodCoverageCode: Yup.string().required('Choose a time period'),
     timePeriodCoverageStartYear: Yup.string().required('Enter a start year'),
-    releaseTypeId: Yup.string(),
+    releaseTypeId: Yup.string().required('Choose a release type'),
     scheduledPublishDate: validateMandatoryDayMonthYearField,
-    nextReleaseExpectedDate: validateOptionalPartialDayMonthYearField,
+    nextReleaseDate: validateOptionalPartialDayMonthYearField,
   };
 
   const formId = 'releaseSummaryForm';
@@ -132,11 +132,11 @@ const ReleaseSummaryForm = <FormValues extends EditFormValues>({
                 />
                 <FormFieldDayMonthYear<FormValues>
                   formId={formId}
-                  fieldName="nextReleaseExpectedDate"
+                  fieldName="nextReleaseDate"
                   fieldsetLegend="Next release expected (optional)"
-                  day={form.values.nextReleaseExpectedDate.day}
-                  month={form.values.nextReleaseExpectedDate.month}
-                  year={form.values.nextReleaseExpectedDate.year}
+                  day={form.values.nextReleaseDate.day}
+                  month={form.values.nextReleaseDate.month}
+                  year={form.values.nextReleaseDate.year}
                 />
                 <FormFieldRadioGroup<FormValues>
                   id={`${formId}-releaseTypeId`}

@@ -17,10 +17,8 @@ export const assembleBaseReleaseSummaryRequestFromForm = (
     },
     releaseName: parseInt(values.timePeriodCoverageStartYear, 10),
     publishScheduled: dayMonthYearInputsToDate(values.scheduledPublishDate),
-    nextReleaseExpected: dayMonthYearInputsToValues(
-      values.nextReleaseExpectedDate,
-    ),
-    releaseTypeId: values.releaseTypeId,
+    nextReleaseDate: dayMonthYearInputsToValues(values.nextReleaseDate),
+    typeId: values.releaseTypeId,
   };
 };
 
@@ -30,7 +28,8 @@ export const assembleCreateReleaseRequestFromForm = (
 ): CreateReleaseRequest => {
   return {
     publicationId,
-    templateReleaseId: values.templateReleaseId,
+    templateReleaseId:
+      values.templateReleaseId !== 'new' ? values.templateReleaseId : '',
     ...assembleBaseReleaseSummaryRequestFromForm(values),
   };
 };

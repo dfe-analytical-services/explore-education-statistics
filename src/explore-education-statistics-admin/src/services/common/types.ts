@@ -64,7 +64,7 @@ export interface Release {
   releaseName: string;
   timePeriodCoverage: TimePeriodCoverage;
   scheduledPublishDate: DayMonthYearValues;
-  nextReleaseExpectedDate: Date;
+  nextReleaseDate: Date;
   releaseType: IdTitlePair;
   slug: string;
   status: ReleaseStatus;
@@ -93,6 +93,12 @@ export interface Publication {
   contact: ContactDetails;
   methodology: IdTitlePair;
   owner: User;
+}
+
+export interface BasicPublicationDetails {
+  id: string;
+  title: string;
+  contact?: ContactDetails;
 }
 
 export interface DayMonthYearValues {
