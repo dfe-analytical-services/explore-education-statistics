@@ -108,12 +108,16 @@ export interface AxisConfiguration {
   name: string;
   type: AxisType;
   groupBy?: AxisGroupBy;
+  sortBy?: string;
+  sortAsc?: boolean;
   dataSets: ChartDataSet[];
+  dataRange?: [number | undefined, number | undefined];
 
   referenceLines?: ReferenceLine[];
 
   visible?: boolean;
   title?: string;
+  unit?: string;
   showGrid?: boolean;
   labelPosition?: LabelPosition;
   size?: string;

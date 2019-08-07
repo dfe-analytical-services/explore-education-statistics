@@ -146,106 +146,6 @@ exports[`LineChartBlock renders basic chart correctly 1`] = `
           </g>
         </g>
         <g
-          class="recharts-layer recharts-cartesian-axis recharts-xAxis xAxis"
-        >
-          <line
-            class="recharts-cartesian-axis-line"
-            fill="none"
-            height="30"
-            stroke="#666"
-            width="810"
-            x="90"
-            x1="90"
-            x2="900"
-            y="270"
-            y1="270"
-            y2="270"
-          />
-          <g
-            class="recharts-cartesian-axis-ticks"
-          >
-            <g
-              class="recharts-layer recharts-cartesian-axis-tick"
-            >
-              <line
-                class="recharts-cartesian-axis-tick-line"
-                fill="none"
-                height="30"
-                stroke="#666"
-                width="810"
-                x="90"
-                x1="110"
-                x2="110"
-                y="270"
-                y1="276"
-                y2="270"
-              />
-              <text
-                class="recharts-text recharts-cartesian-axis-tick-value"
-                fill="#666"
-                height="30"
-                stroke="none"
-                text-anchor="middle"
-                width="810"
-                x="110"
-                y="286"
-              >
-                <tspan
-                  dy="0.71em"
-                  x="110"
-                >
-                  2014/15
-                </tspan>
-              </text>
-            </g>
-            <g
-              class="recharts-layer recharts-cartesian-axis-tick"
-            >
-              <line
-                class="recharts-cartesian-axis-tick-line"
-                fill="none"
-                height="30"
-                stroke="#666"
-                width="810"
-                x="90"
-                x1="880"
-                x2="880"
-                y="270"
-                y1="276"
-                y2="270"
-              />
-              <text
-                class="recharts-text recharts-cartesian-axis-tick-value"
-                fill="#666"
-                height="30"
-                stroke="none"
-                text-anchor="middle"
-                width="810"
-                x="880"
-                y="286"
-              >
-                <tspan
-                  dy="0.71em"
-                  x="880"
-                >
-                  2015/16
-                </tspan>
-              </text>
-            </g>
-          </g>
-          <text
-            class="recharts-text recharts-label"
-            text-anchor="middle"
-            x="495"
-            y="305"
-          >
-            <tspan
-              dy="0.71em"
-              x="495"
-            />
-          </text>
-        </g>
-        <g
           class="recharts-layer recharts-cartesian-axis recharts-yAxis yAxis"
         >
           <line
@@ -401,18 +301,95 @@ exports[`LineChartBlock renders basic chart correctly 1`] = `
               </text>
             </g>
           </g>
-          <text
-            class="recharts-text recharts-label"
-            text-anchor="end"
-            transform="rotate(-90, 30, 140)"
-            x="30"
-            y="140"
+        </g>
+        <g
+          class="recharts-layer recharts-cartesian-axis recharts-xAxis xAxis"
+        >
+          <line
+            class="recharts-cartesian-axis-line"
+            fill="none"
+            height="30"
+            stroke="#666"
+            width="810"
+            x="90"
+            x1="90"
+            x2="900"
+            y="270"
+            y1="270"
+            y2="270"
+          />
+          <g
+            class="recharts-cartesian-axis-ticks"
           >
-            <tspan
-              dy="0.355em"
-              x="30"
-            />
-          </text>
+            <g
+              class="recharts-layer recharts-cartesian-axis-tick"
+            >
+              <line
+                class="recharts-cartesian-axis-tick-line"
+                fill="none"
+                height="30"
+                stroke="#666"
+                width="810"
+                x="90"
+                x1="110"
+                x2="110"
+                y="270"
+                y1="276"
+                y2="270"
+              />
+              <text
+                class="recharts-text recharts-cartesian-axis-tick-value"
+                fill="#666"
+                height="30"
+                stroke="none"
+                text-anchor="middle"
+                width="810"
+                x="110"
+                y="286"
+              >
+                <tspan
+                  dy="0.71em"
+                  x="110"
+                >
+                  2014/15
+                </tspan>
+              </text>
+            </g>
+            <g
+              class="recharts-layer recharts-cartesian-axis-tick"
+            >
+              <line
+                class="recharts-cartesian-axis-tick-line"
+                fill="none"
+                height="30"
+                stroke="#666"
+                width="810"
+                x="90"
+                x1="880"
+                x2="880"
+                y="270"
+                y1="276"
+                y2="270"
+              />
+              <text
+                class="recharts-text recharts-cartesian-axis-tick-value"
+                fill="#666"
+                height="30"
+                stroke="none"
+                text-anchor="middle"
+                width="810"
+                x="880"
+                y="286"
+              >
+                <tspan
+                  dy="0.71em"
+                  x="880"
+                >
+                  2015/16
+                </tspan>
+              </text>
+            </g>
+          </g>
         </g>
         <g
           class="recharts-layer recharts-line"
@@ -438,7 +415,7 @@ exports[`LineChartBlock renders basic chart correctly 1`] = `
             d="M110,10L880,130"
             fill="none"
             height="260"
-            stroke="#ff0000"
+            stroke="#00ff00"
             stroke-width="2"
             width="810"
           />
@@ -454,7 +431,7 @@ exports[`LineChartBlock renders basic chart correctly 1`] = `
             d="M110,110L880,190"
             fill="none"
             height="260"
-            stroke="#ff0000"
+            stroke="#0000ff"
             stroke-width="2"
             width="810"
           />
@@ -519,7 +496,7 @@ exports[`LineChartBlock renders basic chart correctly 1`] = `
             H32M21.333333333333332,16
             A5.333333333333333,5.333333333333333,0,1,1,10.666666666666666,16"
                 fill="none"
-                stroke="#ff0000"
+                stroke="#00ff00"
                 stroke-width="4"
               />
             </svg>
@@ -548,7 +525,7 @@ exports[`LineChartBlock renders basic chart correctly 1`] = `
             H32M21.333333333333332,16
             A5.333333333333333,5.333333333333333,0,1,1,10.666666666666666,16"
                 fill="none"
-                stroke="#ff0000"
+                stroke="#0000ff"
                 stroke-width="4"
               />
             </svg>

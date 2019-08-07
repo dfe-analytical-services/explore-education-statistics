@@ -8,12 +8,18 @@ const apiClient = createClient({
 
 export interface CommonService {
   getPublicationDetailsForRelease(releaseId: string): Promise<IdTitlePair>;
+  getReleaseTypes(): Promise<IdTitlePair[]>;
 }
 
 const service: CommonService = {
   getPublicationDetailsForRelease(releaseId: string): Promise<IdTitlePair> {
     return apiClient.then(client =>
       client.get<IdTitlePair>(`/release/${releaseId}/publication`),
+    );
+  },
+  getReleaseTypes(): Promise<IdTitlePair[]> {
+    return apiClient.then(client =>
+      client.get<IdTitlePair[]>('/meta/releasetypes'),
     );
   },
 };

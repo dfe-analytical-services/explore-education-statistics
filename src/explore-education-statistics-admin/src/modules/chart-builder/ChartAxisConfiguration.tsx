@@ -5,59 +5,157 @@ import {
   FormRadioGroup,
   FormTextInput,
 } from '@common/components/form';
-import FormComboBox from '@common/components/form/FormComboBox';
 
 import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
-import { ChartCapabilities } from '@common/modules/find-statistics/components/charts/ChartFunctions';
-import { DataBlockMetadata } from '@common/services/dataBlockService';
+import {
+  ChartCapabilities,
+  ChartDataB,
+  createSortedAndMappedDataForAxis,
+} from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import {
+  DataBlockData,
+  DataBlockMetadata,
+} from '@common/services/dataBlockService';
 import {
   AxisConfiguration,
   AxisGroupBy,
+  ChartDataSet,
+  DataSetConfiguration,
   ReferenceLine,
 } from '@common/services/publicationService';
 import * as React from 'react';
+import { Dictionary } from '@common/types';
 import styles from './graph-builder.module.scss';
 
 interface Props {
   id: string;
   defaultDataType?: AxisGroupBy;
   configuration: AxisConfiguration;
+  data: DataBlockData;
   meta: DataBlockMetadata;
+  labels: Dictionary<DataSetConfiguration>;
   capabilities: ChartCapabilities;
   onConfigurationChange: (configuration: AxisConfiguration) => void;
+  dataSets: ChartDataSet[];
 }
+
+const getSortOptions = (
+  labels: Dictionary<DataSetConfiguration>,
+): SelectOption[] => {
+  return [
+    {
+      label: 'default',
+      value: 'name',
+    },
+    ...Object.values(labels).map<SelectOption>(config => ({
+      label: config.label,
+      value: config.value,
+    })),
+  ];
+};
+
+const getAxisLabels = (
+  configuration: AxisConfiguration,
+  data: DataBlockData,
+  meta: DataBlockMetadata,
+  labels: Dictionary<DataSetConfiguration>,
+  dataSets: ChartDataSet[],
+): SelectOption[] => {
+  const configurationWithDataSet: AxisConfiguration = {
+    ...configuration,
+    dataRange: [undefined, undefined],
+    dataSets,
+  };
+
+  const chartData: ChartDataB[] = createSortedAndMappedDataForAxis(
+    configurationWithDataSet,
+    data.result,
+    meta,
+    labels,
+  );
+
+  return [
+    {
+      label: 'default',
+      value: '',
+    },
+    ...chartData.map(({ name }, index) => ({
+      label: name,
+      value: `${index}`,
+    })),
+  ];
+};
 
 const ChartAxisConfiguration = ({
   id,
   configuration,
+  data,
   meta,
+  labels,
   capabilities,
   onConfigurationChange,
+  dataSets = [],
 }: Props) => {
   const [axisConfiguration, setAxisConfiguration] = React.useState<
     AxisConfiguration
   >(configuration);
 
+  const [sortOptions, setSortOptions] = React.useState<SelectOption[]>(() =>
+    getSortOptions(labels),
+  );
+
   React.useEffect(() => {
     setAxisConfiguration(configuration);
   }, [configuration]);
 
-  const [selectableUnits] = React.useState<string[]>(() => {
-    return configuration.dataSets
-      .map(dataSet => meta.indicators[dataSet.indicator])
-      .filter(indicator => indicator !== null)
-      .map(indicator => indicator.unit);
-  });
+  const [limitOptions, setLimitOptions] = React.useState<SelectOption[]>(() =>
+    getAxisLabels(configuration, data, meta, labels, dataSets),
+  );
 
-  const [selectedUnit] = React.useState<number>(0);
-
-  const [selectedValue, setSelectedValue] = React.useState<string>();
+  const [dataRangeMin, setDataRangeMin] = React.useState<string>(
+    `${configuration.dataRange || [''][0]}`,
+  );
+  const [dataRangeMax, setDataRangeMax] = React.useState<string>(
+    `${configuration.dataRange || ['', ''][1]}`,
+  );
 
   const updateAxisConfiguration = (newValues: object) => {
     const newConfiguration = { ...axisConfiguration, ...newValues };
     setAxisConfiguration(newConfiguration);
     if (onConfigurationChange) onConfigurationChange(newConfiguration);
   };
+
+  const updateDataRangeMin = (value: string) => {
+    setDataRangeMin(value);
+    const valueOrUndef = value === '' ? undefined : value;
+    updateAxisConfiguration({
+      dataRange: [
+        valueOrUndef,
+        configuration.dataRange && configuration.dataRange[1],
+      ],
+    });
+  };
+
+  const updateDataRangeMax = (value: string) => {
+    setDataRangeMax(value);
+    const valueOrUndef =
+      value === '' ? undefined : Number.parseInt(value, 10) + 1;
+    updateAxisConfiguration({
+      dataRange: [
+        configuration.dataRange && configuration.dataRange[0],
+        valueOrUndef,
+      ],
+    });
+  };
+
+  React.useEffect(() => {
+    setAxisConfiguration(configuration);
+    setSortOptions(getSortOptions(labels));
+
+    setLimitOptions(getAxisLabels(configuration, data, meta, labels, dataSets));
+
+    // updateAxisConfiguration({dataRange: configuration.dataRange});
+  }, [configuration, data, meta, labels, dataSets]);
 
   const [referenceLine, setReferenceLine] = React.useState<ReferenceLine>({
     position: '',
@@ -80,14 +178,11 @@ const ChartAxisConfiguration = ({
     <div className={styles.chartAxesConfiguration}>
       <form>
         <FormFieldset id={id} legend={axisConfiguration.title}>
-          <h2 className="govuk-heading-s">
-            {axisConfiguration.name} configuration
-          </h2>
           <FormGroup>
             <FormCheckbox
               id={`${id}_show`}
               name={`${id}_show`}
-              label="Show axis?"
+              label="Show axis labels?"
               checked={axisConfiguration.visible}
               onChange={e => {
                 updateAxisConfiguration({ visible: e.target.checked });
@@ -95,23 +190,18 @@ const ChartAxisConfiguration = ({
               value="show"
               conditional={
                 <React.Fragment>
-                  {axisConfiguration.type === 'major' && (
-                    <FormComboBox
-                      id={`${id}_unit`}
-                      inputLabel="Display Unit"
-                      onInputChange={e => setSelectedValue(e.target.value)}
-                      inputValue={selectedValue}
-                      onSelect={selected => {
-                        setSelectedValue(selectableUnits[selected]);
-                      }}
-                      options={selectableUnits}
-                      initialOption={selectedUnit}
-                    />
-                  )}
+                  <FormTextInput
+                    id={`${id}_unit`}
+                    label="Override displayed unit (leave blank to use default from metadata)"
+                    name="unit"
+                    onChange={e =>
+                      updateAxisConfiguration({ unit: e.target.value })
+                    }
+                    value={axisConfiguration.unit}
+                  />
                 </React.Fragment>
               }
             />
-
             <hr />
 
             {capabilities.gridLines && (
@@ -143,7 +233,7 @@ const ChartAxisConfiguration = ({
             <hr />
 
             {axisConfiguration.type === 'minor' && (
-              <>
+              <React.Fragment>
                 <FormFieldset
                   id="axis_range"
                   legend="Axis range"
@@ -180,7 +270,7 @@ const ChartAxisConfiguration = ({
                   </div>
                 </FormFieldset>
                 <hr />
-              </>
+              </React.Fragment>
             )}
 
             <FormRadioGroup
@@ -223,20 +313,58 @@ const ChartAxisConfiguration = ({
             />
             <hr />
 
-            {/*
-        <FormSelect
-          id={`${id}_labelPosition`}
-          name={`${id}_labelPosition`}
-          label="Label position"
-          onChange={e =>
-            updateAxisConfiguration({ labelPosition: e.target.value })
-          }
-          options={[
-            { label: 'On axis', value: 'axis' },
-            { label: 'On graph', value: 'graph' },
-          ]}
-        />
-*/}
+            {axisConfiguration.type === 'major' && (
+              <React.Fragment>
+                <FormFieldset id={`${id}sort_order_set`} legend="Sorting">
+                  <FormSelect
+                    id={`${id}_sort_by`}
+                    name="sort_by"
+                    label="Sort By"
+                    order={[]}
+                    value={axisConfiguration.sortBy}
+                    onChange={e => {
+                      updateAxisConfiguration({ sortBy: e.target.value });
+                    }}
+                    options={sortOptions}
+                  />
+                  <FormCheckbox
+                    id={`${id}_sort_asc`}
+                    name="sort_asc"
+                    label="Sort Ascending"
+                    value="asc"
+                    checked={axisConfiguration.sortAsc}
+                    onChange={e => {
+                      updateAxisConfiguration({ sortAsc: e.target.checked });
+                    }}
+                  />
+                </FormFieldset>
+
+                <hr />
+
+                <FormFieldset id={`${id}sort_order_set`} legend="Limiting data">
+                  <FormSelect
+                    id={`${id}dataRangeMin`}
+                    label="Minimum"
+                    name="minimum"
+                    value={dataRangeMin}
+                    options={limitOptions}
+                    order={[]}
+                    onChange={e => updateDataRangeMin(e.target.value)}
+                  />
+                  <FormSelect
+                    id={`${id}dataRangeMin`}
+                    label="Maximum"
+                    name="maximum"
+                    value={dataRangeMax}
+                    options={limitOptions}
+                    order={[]}
+                    onChange={e => updateDataRangeMax(e.target.value)}
+                  />
+                </FormFieldset>
+
+                <hr />
+              </React.Fragment>
+            )}
 
             <table className="govuk-table">
               <caption className="govuk-caption-m">Reference lines</caption>
@@ -323,6 +451,10 @@ const ChartAxisConfiguration = ({
                   </td>
                   <td>
                     <button
+                      disabled={
+                        referenceLine.position === '' ||
+                        referenceLine.label === ''
+                      }
                       className="govuk-button govuk-!-margin-bottom-0"
                       type="button"
                       onClick={() => {

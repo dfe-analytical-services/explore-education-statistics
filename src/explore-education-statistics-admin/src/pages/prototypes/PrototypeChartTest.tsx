@@ -7,23 +7,28 @@ import PrototypePage from '@admin/pages/prototypes/components/PrototypePage';
 import PrototypeData from '@admin/pages/prototypes/PrototypeData';
 import ChartData from '@common/modules/find-statistics/components/charts/__tests__/__data__/testBlockData';
 import { DataBlockResponse } from '@common/services/dataBlockService';
-import { ChartProps } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import { StackedBarProps } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import ChartRenderer from '@common/modules/find-statistics/components/ChartRenderer';
 
 const PrototypeChartTest = () => {
   const [data] = React.useState<DataBlockResponse>(PrototypeData.testResponse);
 
-  const chartData = ChartData.AbstractChartProps;
+  const chartData = ChartData.AbstractLargeDataChartProps_smaller_datasets;
 
-  const newChartData: ChartProps = {
+  const newChartData: StackedBarProps = {
     ...chartData,
+    stacked: true,
     axes: {
       ...chartData.axes,
-
+      major: {
+        ...chartData.axes.major,
+        sortBy: '23_1_2_____',
+        sortAsc: false,
+        dataRange: [0, 20],
+      },
       minor: {
         ...chartData.axes.minor,
-        tickConfig: 'startEnd',
-        tickSpacing: '1',
+        min: '0',
       },
     },
   };
@@ -31,8 +36,7 @@ const PrototypeChartTest = () => {
   return (
     <PrototypePage wide>
       <ChartBuilder data={data} />
-
-      <ChartRenderer type="horizontalbar" {...newChartData} height={500} />
+      <ChartRenderer type="verticalbar" {...newChartData} />
     </PrototypePage>
   );
 };

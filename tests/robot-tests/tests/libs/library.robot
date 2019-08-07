@@ -14,14 +14,11 @@ ${headless}   1
 ${timeout}          20
 ${implicit_wait}    20
 
-${url}        about:blank
-${urlAdmin}   about:blank
-
 *** Keywords ***
 do this on failure
   capture page screenshot
-#  set selenium timeout  3
-#  set selenium implicit wait  3
+  set selenium timeout  3
+  set selenium implicit wait  3
 
 user opens the browser
   run keyword if    "${browser}" == "chrome"    user opens chrome
@@ -83,6 +80,9 @@ user goes to url
 
 user goes back
   go back
+
+user reloads page
+  reload page
 
 user scrolls to the top of the page
   execute javascript      window.scrollTo(0, 0);
