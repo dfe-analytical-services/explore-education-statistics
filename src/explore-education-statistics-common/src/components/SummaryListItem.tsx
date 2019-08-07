@@ -22,7 +22,8 @@ const SummaryListItem = ({
         className={classNames('govuk-summary-list__key', {
           'dfe-details-no-margin': detailsNoMargin,
           'dfe-summary-list__key--small': smallKey,
-        })}      >
+        })}
+      >
         {term}
       </dt>
       {children && (
