@@ -14,26 +14,22 @@ const ReleaseDataPage = () => {
 
   return (
     <>
-      {publication && (
-        <>
-          <h3>Data uploads</h3>
+      <h3>Data uploads</h3>
 
-          <Tabs id="dataUploadTab">
-            <TabsSection id="data-upload" title="Data uploads">
-              <ReleaseDataUploadsSection
-                publicationId={publication.id}
-                releaseId={releaseId}
-              />
-            </TabsSection>
-            <TabsSection id="file-upload" title="File uploads">
-              <ReleaseFileUploadsSection
-                publicationId={publication.id}
-                releaseId={releaseId}
-              />
-            </TabsSection>
-          </Tabs>
-        </>
-      )}
+      <Tabs id="dataUploadTab">
+        <TabsSection id="data-upload" title="Data uploads">
+          <ReleaseDataUploadsSection
+            publicationId={publication.id}
+            releaseId={releaseId}
+          />
+        </TabsSection>
+        <TabsSection id="file-upload" title="File uploads">
+          <ReleaseFileUploadsSection
+            publicationId={publication.id}
+            releaseId={releaseId}
+          />
+        </TabsSection>
+      </Tabs>
     </>
   );
 };

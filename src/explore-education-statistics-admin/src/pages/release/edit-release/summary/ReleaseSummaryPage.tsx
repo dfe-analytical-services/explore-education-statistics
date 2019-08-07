@@ -52,7 +52,7 @@ const ReleaseSummaryPage = () => {
 
   return (
     <>
-      {releaseSummaryDetails && releaseTypes && publication && (
+      {releaseSummaryDetails && releaseTypes && (
         <SummaryList>
           <SummaryListItem term="Publication title">
             {publication.title}
