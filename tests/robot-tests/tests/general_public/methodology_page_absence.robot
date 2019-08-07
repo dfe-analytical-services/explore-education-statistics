@@ -9,7 +9,8 @@ Suite Teardown    user closes the browser
 *** Test Cases ***
 Navigate to Pupil absence in schools in England methodology page
     [Tags]  HappyPath
-    user goes to url  ${url}/methodologies
+    environment variable should be set  PUBLIC_URL
+    user goes to url   %{PUBLIC_URL}/methodology
     user waits until page contains element   xpath://h1[text()="Methodologies"]
     user opens accordion section  Pupils and schools
     user opens details dropdown   Pupil absence
@@ -48,4 +49,3 @@ Validate search works
     user presses keys    number of pupil enrolments
     user checks element contains  css:#pageSearchForm-resultsLabel   Found 1 result
     user clicks element   css:#pageSearchForm-option-0 div
-    sleep  10

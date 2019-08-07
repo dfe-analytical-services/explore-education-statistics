@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -51,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 FilterGroupingColumn = values[3],
                 FilterHint = values[4],
                 IndicatorGrouping = values[5],
-                IndicatorUnit = values[6] == "%" ? Unit.Percent : Unit.Number
+                IndicatorUnit = EnumUtil.GetFromString<Unit>(values[6])
             });
         }
 
@@ -80,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             return metaRows
                 .Where(row => row.ColumnType == ColumnType.Filter)
                 .Select(filter => (
-                    filter: new Filter(filter.FilterHint, filter.Label, subject),
+                    filter: new Filter(filter.FilterHint, filter.Label, filter.ColumnName, subject),
                     column: filter.ColumnName,
                     filterGroupingColumn: filter.FilterGroupingColumn));
         }
@@ -111,6 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                         {
                             IndicatorGroup = indicatorGroup,
                             Label = row.Label,
+                            Name = row.ColumnName,
                             Unit = row.IndicatorUnit
                         },
                         column: row.ColumnName

@@ -51,7 +51,7 @@ const PrototypeExampleTable = ({ task, table }: Props) => {
   return (
     <>
       <Tabs id="tablePreviewTab">
-        <TabsSection id="table-preview" title="Table preview">
+        <TabsSection id="table-preview" title="Table">
           <div className="govuk-width-container">
             <PrototypeTableContent table={table} task={task} />
           </div>
@@ -72,7 +72,7 @@ const PrototypeExampleTable = ({ task, table }: Props) => {
               id="permalink"
               name="permalink"
               label="Permalink"
-              hint="Copy this link to view a standalone version of this table. You can use this link to refer to your table within your commentary.
+              hint="Copy this link to view a standalone version of this table. Use this link to refer to your table within your release.
               "
               defaultValue="http://dfe-url.gov.uk/example-permalink"
               width={20}

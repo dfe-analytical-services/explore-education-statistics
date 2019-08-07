@@ -17,7 +17,10 @@ function HomePage() {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-three-quarters">
           <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
-            <Link to="/statistics" data-testid="home--find-statistics-link">
+            <Link
+              to="/find-statistics"
+              data-testid="home--find-statistics-link"
+            >
               Find statistics and data
             </Link>
           </h2>
@@ -27,7 +30,7 @@ function HomePage() {
             and data.
           </p>
           <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
-            <Link to="/table-tool" data-testid="home--table-tool-link">
+            <Link to="/data-tables" data-testid="home--table-tool-link">
               Create your own tables online
             </Link>
           </h2>
@@ -36,7 +39,7 @@ function HomePage() {
             regional data.
           </p>
           <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
-            <Link to="/download" data-testid="home--download-data-link">
+            <Link to="/download-data" data-testid="home--download-data-link">
               Download data files
             </Link>
           </h2>
@@ -54,7 +57,7 @@ function HomePage() {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-one-half">
           <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
-            <Link to="/methodologies">Education statistics: methodology</Link>
+            <Link to="/methodology">Education statistics: methodology</Link>
           </h2>
           <p className="govuk-caption-m govuk-!-margin-top-2">
             Browse to find out more about the methodology behind education

@@ -21,7 +21,7 @@ function PrototypesIndexPage() {
           <Link to="/prototypes/publication">Publication page example</Link>
           {` `}
           (Outdated design){` `}
-          <Link to="/statistics/pupil-absence-in-schools-in-england">
+          <Link to="/find-statistics/pupil-absence-in-schools-in-england">
             See working app for latest version
           </Link>
         </li>

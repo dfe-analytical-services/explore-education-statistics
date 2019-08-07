@@ -28,23 +28,7 @@ const UpdateStatusForm = () => {
                   className="govuk-label govuk-radios__label"
                   htmlFor="edit"
                 >
-                  First draft
-                </label>
-              </div>
-
-              <div className="govuk-radios__item">
-                <input
-                  className="govuk-radios__input"
-                  type="radio"
-                  name="status"
-                  id="readyTeamApproval"
-                  value="readyTeamApproval"
-                />
-                <label
-                  className="govuk-label govuk-radios__label"
-                  htmlFor="readyApproval"
-                >
-                  In review
+                  In draft
                 </label>
               </div>
 
@@ -61,7 +45,7 @@ const UpdateStatusForm = () => {
                   className="govuk-label govuk-radios__label"
                   htmlFor="readyHigherReview"
                 >
-                  Final sign off
+                  Ready for higher review
                 </label>
               </div>
             </div>

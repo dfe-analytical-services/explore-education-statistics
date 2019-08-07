@@ -26,7 +26,7 @@ const PublicationDataPage = () => {
         <TabsSection id="data-upload" title="Data uploads">
           <div className="govuk-body">
             This data will be used to create your data blocks and users will be
-            able to download this data from this release.
+            able to view and download this data from within this release.
           </div>
 
           <div className="govuk-table">
@@ -105,7 +105,7 @@ const PublicationDataPage = () => {
                   <a href="#">meta_absence_lacharacteristics.csv</a>
                 </td>
                 <td className="govuk-table__cell">
-                  <a href="#">Delete files</a>
+                  <a href="#">Delete file</a>
                 </td>
                 <td className="govuk-table__cell">
                   <a href="#">Replace data</a>
@@ -129,7 +129,7 @@ const PublicationDataPage = () => {
                   <a href="#">meta_absence_natcharacteristics.csv</a>
                 </td>
                 <td className="govuk-table__cell">
-                  <a href="#">Delete files</a>
+                  <a href="#">Delete file</a>
                 </td>
                 <td className="govuk-table__cell">
                   <a href="#">Replace data</a>
@@ -149,13 +149,13 @@ const PublicationDataPage = () => {
 
               <div className="govuk-form-group">
                 <label htmlFor="release-title" className="govuk-label">
-                  Add data file title
+                  Add data title
                   <span className="govuk-hint">
-                    This will be the name shown to users for the data file when
-                    they download it from this release.
+                    This will be the name shown to users when they view and
+                    download the data from within this release.
                     <br />
-                    You should also use it as a reference for the data file if
-                    you refer to it in this release.
+                    Use it as a reference for the data if you refer to it in
+                    this release.
                   </span>
                 </label>
                 <input
@@ -206,19 +206,20 @@ const PublicationDataPage = () => {
             </p>
             <div className="govuk-form-group govuk-!-margin-top-6">
               <button className="govuk-button" type="button">
-                Upload data files
+                Upload data
               </button>
             </div>
           </form>
         </TabsSection>
         <TabsSection id="file-upload" title="File uploads">
           <p className="govuk-body">
-            These files should be things like infographics or more complex
-            tables and charts which you have not been able to build using the
-            table or chart tools.
+            These files should be things like infographics or images of more
+            complex tables and charts which you have not been able to build
+            within the service.
           </p>
           <p className="govuk-body">
-            Users will be able to download these files from this release.
+            Users will be able to view and download these files from within this
+            release.
           </p>
           <table className="govuk-table">
             <caption className="govuk-table__caption govuk-heading-m">
@@ -266,7 +267,7 @@ const PublicationDataPage = () => {
           <form>
             <fieldset className="govuk-fieldset">
               <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
-                Upload files to this release
+                Upload file to this release
               </legend>
 
               <div className="govuk-form-group">
@@ -276,11 +277,11 @@ const PublicationDataPage = () => {
                 >
                   Add file title
                   <span className="govuk-hint">
-                    This will be the name shown to users for the file when they
-                    download it from this release.
+                    This will be the name shown to users when they view and
+                    download the file within this release.
                     <br />
-                    You should also use it as a reference for the file if you
-                    refer to it in this release.
+                    Use it as a reference for the file if you refer to it in
+                    this release.
                   </span>
                 </label>
                 <input
@@ -316,7 +317,7 @@ const PublicationDataPage = () => {
             </p>
             <div className="govuk-form-group govuk-!-margin-top-6">
               <button className="govuk-button" type="button">
-                Upload files
+                Upload file
               </button>
             </div>
           </form>
@@ -330,7 +331,7 @@ const PublicationDataPage = () => {
         onConfirm={() => toggleReplaceDataModal(false)}
         onCancel={() => toggleReplaceDataModal(false)}
       >
-        <p>Please ensure supporting meta data file is still correct</p>
+        <p>Make sure supporting meta data file is still correct</p>
       </ModalConfirm>
 
       <ModalConfirm
@@ -357,7 +358,7 @@ const PublicationDataPage = () => {
             <span className="govuk-heading-m govuk-!-margin-bottom-0">
               Next step
             </span>
-            Manage tables and charts
+            Manage data blocks
           </Link>
         </div>
       </div>

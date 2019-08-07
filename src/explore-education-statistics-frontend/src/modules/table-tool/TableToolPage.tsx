@@ -464,8 +464,8 @@ class TableToolPage extends Component<Props, State> {
                             </li>
                             <li>
                               <Link
-                                as={`/methodologies/${publication.slug}`}
-                                to={`/methodologies/methodology?methodology=${publication.slug}`}
+                                as={`/methodology/${publication.slug}`}
+                                to={`/methodology/methodology?methodology=${publication.slug}`}
                               >
                                 Go to methodology
                               </Link>

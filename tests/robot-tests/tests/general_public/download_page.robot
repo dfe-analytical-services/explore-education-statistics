@@ -7,6 +7,6 @@ Suite Setup       user opens the browser
 Suite Teardown    user closes the browser
 
 *** Test Cases ***
-Navigate to /download page
+Navigate to /download-data page
     [Tags]  HappyPath   UnderConstruction
     user checks page contains element   css:body

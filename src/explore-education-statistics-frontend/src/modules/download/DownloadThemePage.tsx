@@ -12,7 +12,7 @@ function DownloadIndexPage() {
       title="Pupils and schools"
       breadcrumbs={[
         {
-          link: '/download',
+          link: '/download-data',
           name: 'Download data',
         },
       ]}
@@ -28,7 +28,7 @@ function DownloadIndexPage() {
           <RelatedInformation>
             <ul className="govuk-list">
               <li>
-                <Link to="/statistics">Find statistics and data</Link>
+                <Link to="/find-statistics">Find statistics and data</Link>
               </li>
               <li>
                 <Link to="/glossary">Education statistics: glossary</Link>
