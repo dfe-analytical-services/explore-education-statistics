@@ -26,9 +26,9 @@ const createReadonlyRoute = (
     component,
     title,
     generateLink: (publicationId: string, releaseId: string) =>
-      path.
-        replace(':publicationId', publicationId).
-        replace(':releaseId', releaseId),
+      path
+        .replace(':publicationId', publicationId)
+        .replace(':releaseId', releaseId),
   };
 };
 
@@ -44,9 +44,9 @@ const createEditRoute = (
     component,
     title,
     generateLink: (publicationId: string, releaseId: string) =>
-      path.
-      replace(':publicationId', publicationId).
-      replace(':releaseId', releaseId),
+      path
+        .replace(':publicationId', publicationId)
+        .replace(':releaseId', releaseId),
   };
 };
 

@@ -1,17 +1,17 @@
 import Link from '@admin/components/Link';
-import {dataRoute} from '@admin/routes/edit-release/routes';
+import { dataRoute } from '@admin/routes/edit-release/routes';
 import service from '@admin/services/release/edit-release/data/service';
-import {DataFile} from '@admin/services/release/edit-release/data/types';
+import { DataFile } from '@admin/services/release/edit-release/data/types';
 import Button from '@common/components/Button';
-import {Form, FormFieldset, Formik} from '@common/components/form';
+import { Form, FormFieldset, Formik } from '@common/components/form';
 import FormFieldFileSelector from '@common/components/form/FormFieldFileSelector';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
-import {FormikProps} from 'formik';
-import React, {useEffect, useState} from 'react';
+import { FormikProps } from 'formik';
+import React, { useEffect, useState } from 'react';
 
 interface FormValues {
   subjectTitle: string;
@@ -146,7 +146,9 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
               </Button>
 
               <div className="govuk-!-margin-top-6">
-                <Link to={dataRoute.generateLink(publicationId, releaseId)}>Cancel</Link>
+                <Link to={dataRoute.generateLink(publicationId, releaseId)}>
+                  Cancel
+                </Link>
               </div>
             </Form>
           );

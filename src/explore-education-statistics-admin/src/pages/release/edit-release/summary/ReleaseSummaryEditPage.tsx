@@ -4,12 +4,14 @@ import ReleaseSummaryForm, {
 } from '@admin/pages/release/summary/ReleaseSummaryForm';
 import { assembleUpdateReleaseSummaryRequestFromForm } from '@admin/pages/release/util/releaseSummaryUtil';
 import { summaryRoute } from '@admin/routes/edit-release/routes';
-import {dateToDayMonthYear, dayMonthYearValuesToInputs} from '@admin/services/common/types';
+import {
+  dateToDayMonthYear,
+  dayMonthYearValuesToInputs,
+} from '@admin/services/common/types';
 import service from '@admin/services/release/edit-release/summary/service';
 import { ReleaseSummaryDetails } from '@admin/services/release/types';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
-import ReleasePageTemplate from '../components/ReleasePageTemplate';
 
 interface MatchProps {
   publicationId: string;
@@ -40,10 +42,13 @@ const ReleaseSummaryEditPage = ({
 
     service
       .updateReleaseSummaryDetails(updatedReleaseDetails)
-      .then(_ => history.push(summaryRoute.generateLink(publicationId, releaseId)));
+      .then(_ =>
+        history.push(summaryRoute.generateLink(publicationId, releaseId)),
+      );
   };
 
-  const cancelHandler = () => history.push(summaryRoute.generateLink(publicationId, releaseId));
+  const cancelHandler = () =>
+    history.push(summaryRoute.generateLink(publicationId, releaseId));
 
   return (
     <>
@@ -61,7 +66,9 @@ const ReleaseSummaryEditPage = ({
               timePeriodCoverageStartYear: releaseSummaryDetails.releaseName.toString(),
               releaseTypeId: releaseSummaryDetails.typeId,
               scheduledPublishDate: dayMonthYearValuesToInputs(
-                dateToDayMonthYear(new Date(releaseSummaryDetails.publishScheduled)),
+                dateToDayMonthYear(
+                  new Date(releaseSummaryDetails.publishScheduled),
+                ),
               ),
               nextReleaseDate: dayMonthYearValuesToInputs(
                 releaseSummaryDetails.nextReleaseDate,

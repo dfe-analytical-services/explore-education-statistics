@@ -117,7 +117,9 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
               </Button>
 
               <div className="govuk-!-margin-top-6">
-                <Link to={dataRoute.generateLink(publicationId, releaseId)}>Cancel</Link>
+                <Link to={dataRoute.generateLink(publicationId, releaseId)}>
+                  Cancel
+                </Link>
               </div>
             </Form>
           );

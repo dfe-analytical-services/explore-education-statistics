@@ -17,9 +17,7 @@ export const assembleBaseReleaseSummaryRequestFromForm = (
     },
     releaseName: parseInt(values.timePeriodCoverageStartYear, 10),
     publishScheduled: dayMonthYearInputsToDate(values.scheduledPublishDate),
-    nextReleaseDate: dayMonthYearInputsToValues(
-      values.nextReleaseDate,
-    ),
+    nextReleaseDate: dayMonthYearInputsToValues(values.nextReleaseDate),
     releaseTypeId: values.releaseTypeId,
   };
 };

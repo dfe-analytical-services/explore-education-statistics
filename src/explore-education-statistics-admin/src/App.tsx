@@ -1,9 +1,7 @@
 import ProtectedRoute from '@admin/components/ProtectedRoute';
 import CreatePublicationPage from '@admin/pages/create-publication/CreatePublicationPage';
 import CreateReleasePage from '@admin/pages/release/create-release/CreateReleasePage';
-import ManageReleasePageContainer from "@admin/pages/release/ManageReleasePageContainer";
-import MockSignInProcess from '@admin/pages/sign-in/mock/MockSignInProcess';
-import MockSignOutProcess from '@admin/pages/sign-in/mock/MockSignOutProcess';
+import ManageReleasePageContainer from '@admin/pages/release/ManageReleasePageContainer';
 import SignedOutPage from '@admin/pages/sign-in/SignedOutPage';
 import SignInPage from '@admin/pages/sign-in/SignInPage';
 import dashboardRoutes from '@admin/routes/dashboard/routes';
@@ -12,12 +10,12 @@ import releaseRoutes from '@admin/routes/edit-release/routes';
 import signInRoutes from '@admin/routes/sign-in/routes';
 import PrototypeLoginService from '@admin/services/PrototypeLoginService';
 import React from 'react';
-import {Route} from 'react-router';
-import {BrowserRouter} from 'react-router-dom';
+import { Route } from 'react-router';
+import { BrowserRouter } from 'react-router-dom';
 
 import './App.scss';
 
-import {LoginContext} from './components/Login';
+import { LoginContext } from './components/Login';
 import AdminDashboardPage from './pages/admin-dashboard/AdminDashboardPage';
 import IndexPage from './pages/IndexPage';
 import PrototypeAdminDashboard from './pages/prototypes/PrototypeAdminDashboard';
@@ -31,8 +29,7 @@ import PublicationConfirmNew from './pages/prototypes/PrototypePublicationPageCo
 import PublicationCreateNew from './pages/prototypes/PrototypePublicationPageCreateNew';
 
 import PublicationEditPage from './pages/prototypes/PrototypePublicationPageEditAbsence';
-import PublicationEditUnresolvedComments
-  from './pages/prototypes/PrototypePublicationPageEditAbsenceUnresolvedComments';
+import PublicationEditUnresolvedComments from './pages/prototypes/PrototypePublicationPageEditAbsenceUnresolvedComments';
 import PublicationEditNew from './pages/prototypes/PrototypePublicationPageEditNew';
 import PublicationCreateNewAbsenceConfig from './pages/prototypes/PrototypePublicationPageNewAbsenceConfig';
 import PublicationCreateNewAbsenceConfigEdit from './pages/prototypes/PrototypePublicationPageNewAbsenceConfigEdit';
@@ -82,24 +79,9 @@ function App() {
       />
 
       <Route
-        path='/publication/:publicationId/release/:releaseId'
+        path="/publication/:publicationId/release/:releaseId"
         component={ManageReleasePageContainer}
       />
-
-      {process.env.USE_MOCK_API === 'true' && (
-        <>
-          <Route
-            exact
-            path={signInRoutes.signInViaApiLink}
-            component={MockSignInProcess}
-          />
-          <Route
-            exact
-            path={signInRoutes.signOutViaApiLink}
-            component={MockSignOutProcess}
-          />
-        </>
-      )}
 
       {/* Prototype Routes */}
       <Route exact path="/index" component={IndexPage} />

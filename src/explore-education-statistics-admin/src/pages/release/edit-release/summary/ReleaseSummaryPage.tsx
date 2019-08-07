@@ -1,20 +1,20 @@
 import Link from '@admin/components/Link';
 import DummyReferenceData from '@admin/pages/DummyReferenceData';
-import PublicationContext from "@admin/pages/release/PublicationContext";
+import PublicationContext from '@admin/pages/release/PublicationContext';
 import { summaryEditRoute } from '@admin/routes/edit-release/routes';
+import commonService from '@admin/services/common/service';
 import {
   dayMonthYearIsComplete,
-  dayMonthYearToDate, IdTitlePair,
+  dayMonthYearToDate,
+  IdTitlePair,
 } from '@admin/services/common/types';
 import service from '@admin/services/release/edit-release/summary/service';
-import commonService from '@admin/services/common/service';
 import { ReleaseSummaryDetails } from '@admin/services/release/types';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import React, {useContext, useEffect, useState} from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
-import ReleasePageTemplate from '../components/ReleasePageTemplate';
 
 interface MatchProps {
   publicationId: string;
@@ -28,32 +28,35 @@ const ReleaseSummaryPage = ({ match }: RouteComponentProps<MatchProps>) => {
     ReleaseSummaryDetails
   >();
 
-  const [releaseTypes, setReleaseTypes] = useState<
-    IdTitlePair[]
-    >();
+  const [releaseTypes, setReleaseTypes] = useState<IdTitlePair[]>();
 
-  const {publication} = useContext(PublicationContext);
+  const { publication } = useContext(PublicationContext);
 
   useEffect(() => {
     const releaseSummaryPromise = service.getReleaseSummaryDetails(releaseId);
     const releaseTypesPromise = commonService.getReleaseTypes();
-    Promise.all([releaseSummaryPromise, releaseTypesPromise]).
-      then(([releaseSummaryResult, releaseTypesResult]) => {
+    Promise.all([releaseSummaryPromise, releaseTypesPromise]).then(
+      ([releaseSummaryResult, releaseTypesResult]) => {
         setReleaseSummaryDetails(releaseSummaryResult);
         setReleaseTypes(releaseTypesResult);
-      })
+      },
+    );
   }, [releaseId]);
 
   const getSelectedTimePeriodCoverageLabel = (timePeriodCoverageCode: string) =>
     DummyReferenceData.findTimePeriodCoverageOption(timePeriodCoverageCode)
       .label;
 
-  const getSelectedReleaseTypeTitle = (releaseTypeId: string, availableReleaseTypes: IdTitlePair[]) =>
-    availableReleaseTypes.find(type => type.title === releaseTypeId) || availableReleaseTypes[0].title;
+  const getSelectedReleaseTypeTitle = (
+    releaseTypeId: string,
+    availableReleaseTypes: IdTitlePair[],
+  ) =>
+    availableReleaseTypes.find(type => type.title === releaseTypeId) ||
+    availableReleaseTypes[0].title;
 
   return (
     <>
-      {releaseSummaryDetails &&  releaseTypes && publication && (
+      {releaseSummaryDetails && releaseTypes && publication && (
         <SummaryList>
           <SummaryListItem term="Publication title">
             {publication.title}
@@ -76,23 +79,24 @@ const ReleaseSummaryPage = ({ match }: RouteComponentProps<MatchProps>) => {
             </FormattedDate>
           </SummaryListItem>
           <SummaryListItem term="Next release expected">
-            {dayMonthYearIsComplete(
-              releaseSummaryDetails.nextReleaseDate,
-            ) && (
+            {dayMonthYearIsComplete(releaseSummaryDetails.nextReleaseDate) && (
               <FormattedDate>
-                {dayMonthYearToDate(
-                  releaseSummaryDetails.nextReleaseDate,
-                )}
+                {dayMonthYearToDate(releaseSummaryDetails.nextReleaseDate)}
               </FormattedDate>
             )}
           </SummaryListItem>
           <SummaryListItem term="Release type">
-            {getSelectedReleaseTypeTitle(releaseSummaryDetails.id, releaseTypes)}
+            {getSelectedReleaseTypeTitle(
+              releaseSummaryDetails.id,
+              releaseTypes,
+            )}
           </SummaryListItem>
           <SummaryListItem
             term=""
             actions={
-              <Link to={summaryEditRoute.generateLink(publicationId, releaseId)}>
+              <Link
+                to={summaryEditRoute.generateLink(publicationId, releaseId)}
+              >
                 Edit release setup details
               </Link>
             }

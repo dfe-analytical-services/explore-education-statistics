@@ -1,4 +1,4 @@
-import {BasicPublicationDetails} from "@admin/services/common/types";
+import { BasicPublicationDetails } from '@admin/services/common/types';
 import * as React from 'react';
 
 export interface BasicPublicationDetailsContextHolder {

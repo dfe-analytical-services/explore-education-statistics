@@ -1,14 +1,11 @@
 import { ReleaseSummaryDetails } from '@admin/services/release/types';
 import { UpdateReleaseSummaryDetailsRequest } from '@admin/services/release/edit-release/summary/types';
-import { createClient } from '@admin/services/util/service';
-import mocks from './mock/mock-service';
-
-const apiClient = createClient({
-  mockBehaviourRegistrar: mocks,
-});
+import client from '@admin/services/util/service';
 
 export interface ReleaseSummaryService {
-  getReleaseSummaryDetails: (releaseId: string) => Promise<ReleaseSummaryDetails>;
+  getReleaseSummaryDetails: (
+    releaseId: string,
+  ) => Promise<ReleaseSummaryDetails>;
   updateReleaseSummaryDetails: (
     updatedRelease: UpdateReleaseSummaryDetailsRequest,
   ) => Promise<void>;
@@ -16,15 +13,14 @@ export interface ReleaseSummaryService {
 
 const service: ReleaseSummaryService = {
   getReleaseSummaryDetails(releaseId: string): Promise<ReleaseSummaryDetails> {
-    return apiClient.then(client =>
-      client.get<ReleaseSummaryDetails>(`/releases/${releaseId}/summary`),
-    );
+    return client.get<ReleaseSummaryDetails>(`/releases/${releaseId}/summary`);
   },
   updateReleaseSummaryDetails(
     updateRequest: UpdateReleaseSummaryDetailsRequest,
   ): Promise<void> {
-    return apiClient.then(client =>
-      client.post(`/releases/${updateRequest.releaseId}/summary`, updateRequest),
+    return client.post(
+      `/releases/${updateRequest.releaseId}/summary`,
+      updateRequest,
     );
   },
 };

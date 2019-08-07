@@ -41,7 +41,10 @@ const AdminDashboardPublicationSummary = ({ publication }: Props) => {
             <ul className="govuk-list dfe-admin">
               {publication.releases.map(release => (
                 <li key={release.id}>
-                  <DashboardReleaseSummary publicationId={publication.id} release={release} />
+                  <DashboardReleaseSummary
+                    publicationId={publication.id}
+                    release={release}
+                  />
                 </li>
               ))}
             </ul>

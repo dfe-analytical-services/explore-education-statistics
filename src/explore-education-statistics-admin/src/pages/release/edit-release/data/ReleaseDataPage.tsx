@@ -1,10 +1,8 @@
-import PublicationContext from "@admin/pages/release/PublicationContext";
-import service from '@admin/services/common/service';
-import {IdTitlePair} from '@admin/services/common/types';
+import PublicationContext from '@admin/pages/release/PublicationContext';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import React, {useContext, useEffect, useState} from 'react';
-import {RouteComponentProps} from 'react-router';
+import React, { useContext } from 'react';
+import { RouteComponentProps } from 'react-router';
 import ReleaseDataUploadsSection from './ReleaseDataUploadsSection';
 import ReleaseFileUploadsSection from './ReleaseFileUploadsSection';
 
@@ -15,7 +13,7 @@ interface MatchProps {
 const ReleaseDataPage = ({ match }: RouteComponentProps<MatchProps>) => {
   const { releaseId } = match.params;
 
-  const {publication} = useContext(PublicationContext);
+  const { publication } = useContext(PublicationContext);
 
   return (
     <>

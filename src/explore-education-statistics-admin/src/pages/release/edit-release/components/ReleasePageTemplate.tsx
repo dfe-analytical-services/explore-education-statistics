@@ -13,10 +13,17 @@ interface Props extends RouteComponentProps {
 }
 
 const ReleasePageTemplate = withRouter(
-  ({ releaseId, publicationId, publicationTitle, children, location }: Props) => {
+  ({
+    releaseId,
+    publicationId,
+    publicationTitle,
+    children,
+    location,
+  }: Props) => {
     const currentRouteIndex =
       viewRoutes.findIndex(
-        route => route.generateLink(publicationId, releaseId) === location.pathname,
+        route =>
+          route.generateLink(publicationId, releaseId) === location.pathname,
       ) || 0;
 
     const previousRoute =
@@ -35,7 +42,10 @@ const ReleasePageTemplate = withRouter(
       : undefined;
 
     const nextSection = nextRoute
-      ? { label: nextRoute.title, linkTo: nextRoute.generateLink(publicationId, releaseId) }
+      ? {
+          label: nextRoute.title,
+          linkTo: nextRoute.generateLink(publicationId, releaseId),
+        }
       : undefined;
 
     return (
