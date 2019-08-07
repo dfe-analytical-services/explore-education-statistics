@@ -1,25 +1,32 @@
 import Link from '@admin/components/Link';
 import DummyReferenceData from '@admin/pages/DummyReferenceData';
-import ManageReleaseContext, {ManageRelease} from '@admin/pages/release/ManageReleaseContext';
-import {summaryEditRoute} from '@admin/routes/edit-release/routes';
+import ManageReleaseContext, {
+  ManageRelease,
+} from '@admin/pages/release/ManageReleaseContext';
+import { summaryEditRoute } from '@admin/routes/edit-release/routes';
 import commonService from '@admin/services/common/service';
-import {dayMonthYearIsComplete, dayMonthYearToDate, IdTitlePair,} from '@admin/services/common/types';
+import {
+  dayMonthYearIsComplete,
+  dayMonthYearToDate,
+  IdTitlePair,
+} from '@admin/services/common/types';
 import service from '@admin/services/release/edit-release/summary/service';
-import {ReleaseSummaryDetails} from '@admin/services/release/types';
+import { ReleaseSummaryDetails } from '@admin/services/release/types';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import React, {useContext, useEffect, useState} from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 const ReleaseSummaryPage = () => {
-
   const [releaseSummaryDetails, setReleaseSummaryDetails] = useState<
     ReleaseSummaryDetails
   >();
 
   const [releaseTypes, setReleaseTypes] = useState<IdTitlePair[]>();
 
-  const {publication, releaseId} = useContext(ManageReleaseContext) as ManageRelease;
+  const { publication, releaseId } = useContext(
+    ManageReleaseContext,
+  ) as ManageRelease;
 
   useEffect(() => {
     const releaseSummaryPromise = service.getReleaseSummaryDetails(releaseId);

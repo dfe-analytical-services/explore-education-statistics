@@ -1,8 +1,8 @@
-import NavLink from "@admin/components/NavLink";
-import Page from "@admin/components/Page";
-import PreviousNextLinks from "@admin/components/PreviousNextLinks";
+import NavLink from '@admin/components/NavLink';
+import Page from '@admin/components/Page';
+import PreviousNextLinks from '@admin/components/PreviousNextLinks';
 import ProtectedRoute from '@admin/components/ProtectedRoute';
-import releaseRoutes, {viewRoutes} from '@admin/routes/edit-release/routes';
+import releaseRoutes, { viewRoutes } from '@admin/routes/edit-release/routes';
 import service from '@admin/services/common/service';
 import { BasicPublicationDetails } from '@admin/services/common/types';
 import React, { useEffect, useState } from 'react';
@@ -42,22 +42,22 @@ const ManageReleasePageContainer = ({
 
   const previousSection = previousRoute
     ? {
-      label: previousRoute.title,
-      linkTo: previousRoute.generateLink(publicationId, releaseId),
-    }
+        label: previousRoute.title,
+        linkTo: previousRoute.generateLink(publicationId, releaseId),
+      }
     : undefined;
 
   const nextSection = nextRoute
     ? {
-      label: nextRoute.title,
-      linkTo: nextRoute.generateLink(publicationId, releaseId),
-    }
+        label: nextRoute.title,
+        linkTo: nextRoute.generateLink(publicationId, releaseId),
+      }
     : undefined;
 
   return (
     <>
-      {publication &&
-        <Page wide breadcrumbs={[{name: 'Edit release'}]}>
+      {publication && (
+        <Page wide breadcrumbs={[{ name: 'Edit release' }]}>
           <h1 className="govuk-heading-l">
             {publication.title}
             <span className="govuk-caption-l">Edit release</span>
@@ -78,7 +78,7 @@ const ManageReleasePageContainer = ({
             </ul>
           </nav>
 
-          <ManageReleaseContext.Provider value={{publication, releaseId}}>
+          <ManageReleaseContext.Provider value={{ publication, releaseId }}>
             {releaseRoutes.manageReleaseRoutes.map(route => (
               <ProtectedRoute
                 exact
@@ -94,7 +94,7 @@ const ManageReleasePageContainer = ({
             nextSection={nextSection}
           />
         </Page>
-      }
+      )}
     </>
   );
 };

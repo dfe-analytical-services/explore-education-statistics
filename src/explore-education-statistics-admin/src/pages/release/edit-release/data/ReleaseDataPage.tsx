@@ -1,14 +1,16 @@
-import ManageReleaseContext, {ManageRelease} from '@admin/pages/release/ManageReleaseContext';
+import ManageReleaseContext, {
+  ManageRelease,
+} from '@admin/pages/release/ManageReleaseContext';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import React, {useContext, useEffect} from 'react';
-import { RouteComponentProps } from 'react-router';
+import React, { useContext } from 'react';
 import ReleaseDataUploadsSection from './ReleaseDataUploadsSection';
 import ReleaseFileUploadsSection from './ReleaseFileUploadsSection';
 
 const ReleaseDataPage = () => {
-
-  const {publication, releaseId} = useContext(ManageReleaseContext) as ManageRelease;
+  const { publication, releaseId } = useContext(
+    ManageReleaseContext,
+  ) as ManageRelease;
 
   return (
     <>
