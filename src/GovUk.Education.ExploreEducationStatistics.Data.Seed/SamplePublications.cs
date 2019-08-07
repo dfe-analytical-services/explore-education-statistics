@@ -54,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
             DataCsvFile.clean_data_fe
         };
 
-        public static IEnumerable<Subject> GetSubjects()
+        public static List<Subject> GetSubjects()
         {
             var subjects = GetThemes()
                 .SelectMany(theme => theme.Topics)
@@ -62,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                 .SelectMany(publication => publication.Releases)
                 .SelectMany(release => release.Subjects);
 
-            return subjects.Where(subject => !IgnoredSubjectFiles.Contains(SubjectFiles[subject.Id]));
+            return subjects.Where(subject => !IgnoredSubjectFiles.Contains(SubjectFiles[subject.Id])).ToList();
         }
 
         private static IEnumerable<Theme> GetThemes()
