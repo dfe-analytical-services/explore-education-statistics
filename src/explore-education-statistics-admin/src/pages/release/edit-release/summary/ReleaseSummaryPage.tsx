@@ -50,8 +50,11 @@ const ReleaseSummaryPage = ({ match }: RouteComponentProps<MatchProps>) => {
               )}
             </SummaryListItem>
             <SummaryListItem term="Release period">
-              <time>{releaseSummaryDetails.timePeriodCoverageStartYear}</time> to{' '}
-              <time>{releaseSummaryDetails.timePeriodCoverageStartYear + 1}</time>
+              <time>{releaseSummaryDetails.timePeriodCoverageStartYear}</time>{' '}
+              to{' '}
+              <time>
+                {releaseSummaryDetails.timePeriodCoverageStartYear + 1}
+              </time>
             </SummaryListItem>
             <SummaryListItem term="Lead statistician">
               {releaseSummaryDetails.leadStatisticianName}
@@ -61,7 +64,9 @@ const ReleaseSummaryPage = ({ match }: RouteComponentProps<MatchProps>) => {
                 releaseSummaryDetails.scheduledPublishDate,
               ) && (
                 <FormattedDate>
-                  {dayMonthYearToDate(releaseSummaryDetails.scheduledPublishDate)}
+                  {dayMonthYearToDate(
+                    releaseSummaryDetails.scheduledPublishDate,
+                  )}
                 </FormattedDate>
               )}
             </SummaryListItem>

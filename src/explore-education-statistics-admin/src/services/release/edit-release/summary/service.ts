@@ -8,7 +8,9 @@ const apiClient = createClient({
 });
 
 export interface ReleaseSummaryService {
-  getReleaseSummaryDetails: (releaseId: string) => Promise<ReleaseSummaryDetails>;
+  getReleaseSummaryDetails: (
+    releaseId: string,
+  ) => Promise<ReleaseSummaryDetails>;
   updateReleaseSummaryDetails: (
     updatedRelease: UpdateReleaseSummaryDetailsRequest,
   ) => Promise<void>;
@@ -24,7 +26,10 @@ const service: ReleaseSummaryService = {
     updateRequest: UpdateReleaseSummaryDetailsRequest,
   ): Promise<void> {
     return apiClient.then(client =>
-      client.post(`/releases/${updateRequest.releaseId}/summary`, updateRequest),
+      client.post(
+        `/releases/${updateRequest.releaseId}/summary`,
+        updateRequest,
+      ),
     );
   },
 };
