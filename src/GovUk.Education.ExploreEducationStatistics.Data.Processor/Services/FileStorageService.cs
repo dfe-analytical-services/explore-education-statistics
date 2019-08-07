@@ -31,21 +31,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var blobClient = storageAccount.CreateCloudBlobClient();
             var blobContainer = blobClient.GetContainerReference(ContainerName);
 
-            var publication = importMessage.Release.Publication.Slug;
-            var release = importMessage.Release.Slug;
+            var releaseId = importMessage.Release.Id.ToString();
 
             var dataBlob = blobContainer.GetBlockBlobReference(
-                $"{publication}/{release}/{importMessage.DataFileName}");
+                $"{releaseId}/Data/{importMessage.DataFileName}");
 
             await dataBlob.FetchAttributesAsync();
 
             var metaBlob = blobContainer.GetBlockBlobReference(
-                $"{publication}/{release}/{BlobUtils.GetMetaFileName(dataBlob)}");
+                $"{releaseId}/Data/{BlobUtils.GetMetaFileName(dataBlob)}");
 
             return new SubjectData(dataBlob, metaBlob, BlobUtils.GetName(dataBlob));
         }
         
-        public async Task<Boolean> UploadDataFileAsync(string publication, string release, IFormFile dataFile, string metaFileName,
+        public async Task<Boolean> UploadDataFileAsync(Guid releaseId, IFormFile dataFile, string metaFileName,
             string name)
         {
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
@@ -60,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             };
             await blobContainer.SetPermissionsAsync(permissions);
             
-            await UploadFileAsync(blobContainer, publication, release, dataFile, new List<KeyValuePair<string, string>>
+            await UploadFileAsync(blobContainer, releaseId.ToString(), dataFile, new List<KeyValuePair<string, string>>
             {
                 new KeyValuePair<string, string>("name", name),
                 new KeyValuePair<string, string>("metafile", metaFileName)
@@ -70,19 +69,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public void Delete(ImportMessage importMessage)
         {
-            var publication = importMessage.Release.Publication.Slug;
-            var release = importMessage.Release.Slug;
+            var releaseId = importMessage.Release.Id.ToString();
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
             var blobClient = storageAccount.CreateCloudBlobClient();
             var blobContainer = blobClient.GetContainerReference(ContainerName);
-            var blob = blobContainer.GetBlockBlobReference($"{publication}/{release}/{importMessage.DataFileName}");
+            var blob = blobContainer.GetBlockBlobReference($"{releaseId}/data/{importMessage.DataFileName}");
             blob.DeleteAsync();
         }
 
-        private static async Task UploadFileAsync(CloudBlobContainer blobContainer, string publication, string release,
+        private static async Task UploadFileAsync(CloudBlobContainer blobContainer, string releaseId,
             IFormFile file, IEnumerable<KeyValuePair<string, string>> metaValues)
         {
-            var blob = blobContainer.GetBlockBlobReference($"{publication}/{release}/{file.FileName}");
+            var blob = blobContainer.GetBlockBlobReference($"{releaseId}/Data/{file.FileName}");
             blob.Properties.ContentType = file.ContentType;
             var path = await FileUtils.UploadToTemporaryFile(file);
             await blob.UploadFromFileAsync(path);

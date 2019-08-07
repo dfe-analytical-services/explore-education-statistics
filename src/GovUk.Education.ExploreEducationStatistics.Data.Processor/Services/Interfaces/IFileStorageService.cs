@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
     {
         Task<SubjectData> GetSubjectData(ImportMessage importMessage);
 
-        Task<Boolean> UploadDataFileAsync(string publication, string release, IFormFile dataFile, string metaFileName,
+        Task<Boolean> UploadDataFileAsync(Guid releaseId, IFormFile dataFile, string metaFileName,
             string name);
 
         void Delete(ImportMessage importMessage);
