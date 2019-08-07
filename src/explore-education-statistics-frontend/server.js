@@ -130,15 +130,15 @@ async function startServer(port = process.env.PORT || 3000) {
     );
   }
 
-  server.get('/statistics/:publication/:release?', (req, res) => {
-    return app.render(req, res, '/statistics/publication', {
+  server.get('/find-statistics/:publication/:release?', (req, res) => {
+    return app.render(req, res, '/find-statistics/publication', {
       publication: req.params.publication,
       release: req.params.release,
     });
   });
 
-  server.get('/methodologies/:publication/:release?', (req, res) => {
-    return app.render(req, res, '/methodologies/methodology', {
+  server.get('/methodology/:publication/:release?', (req, res) => {
+    return app.render(req, res, '/methodology/methodology', {
       publication: req.params.publication,
       release: req.params.release,
     });
@@ -150,8 +150,8 @@ async function startServer(port = process.env.PORT || 3000) {
     });
   });
 
-  server.get('/table-tool/:publicationSlug?', (req, res) => {
-    return app.render(req, res, '/table-tool', {
+  server.get('/data-tables/:publicationSlug?', (req, res) => {
+    return app.render(req, res, '/data-tables', {
       publicationSlug: req.params.publicationSlug,
     });
   });

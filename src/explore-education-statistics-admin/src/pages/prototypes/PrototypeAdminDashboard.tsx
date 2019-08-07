@@ -1,5 +1,6 @@
 import PrototypeAdminDashboardPublications from '@admin/pages/prototypes/components/PrototypeAdminDashboardPublications';
 import AdminDashboardReadyForApproval from '@admin/pages/prototypes/components/AdminDashboardReadyForApproval';
+import AdminDashboardReadyForPublication from '@admin/pages/prototypes/components/AdminDashboardReadyForPublication';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
@@ -11,6 +12,7 @@ import PrototypePage from './components/PrototypePage';
 
 const UserType = () => {
   const userContext = React.useContext(LoginContext);
+
   return (
     <>
       {userContext.user &&
@@ -31,6 +33,15 @@ const UserType = () => {
 
 const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
   const userContext = React.useContext(LoginContext);
+  const task = location.search.includes('?status=readyApproval')
+    ? 'readyApproval'
+    : 'readyHigherReview';
+  const user =
+    userContext.user &&
+    userContext.user.permissions.includes('responsible statistician')
+      ? 'higherReviewUser'
+      : 'standardUser';
+
   return (
     <PrototypePage wide>
       <div className="govuk-grid-row">
@@ -79,18 +90,20 @@ const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
         <TabsSection
           id="task-ready-approval1"
           title={`View draft releases ${
-            location.search.includes('?status=readyApproval') ? '(1)' : '(0)'
+            location.search.includes('status=ready') ? '(1)' : '(0)'
           }`}
         >
-          <AdminDashboardReadyForApproval task="readyReview" />
+          <AdminDashboardReadyForApproval task={task} user={user} />
         </TabsSection>
         <TabsSection
           id="task-in-progress2"
           title={`View scheduled releases ${
-            location.search.includes('?status=readyApproval') ? '(1)' : '(0)'
+            location.search.includes('status=approvedPublication')
+              ? '(1)'
+              : '(0)'
           }`}
         >
-          <AdminDashboardReadyForApproval task="resolveComments" />
+          <AdminDashboardReadyForPublication task="approvedPublication" />
         </TabsSection>
       </Tabs>
 

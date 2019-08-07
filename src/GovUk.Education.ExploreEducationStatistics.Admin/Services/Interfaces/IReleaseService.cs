@@ -13,6 +13,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         List<Release> List();
 
         Release Get(Guid id);
+        
+        Task<Release> GetAsync(Guid id);
 
         Release Get(string slug);
 

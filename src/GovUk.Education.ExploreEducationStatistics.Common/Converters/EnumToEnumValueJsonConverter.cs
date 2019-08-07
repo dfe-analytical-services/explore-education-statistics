@@ -1,6 +1,6 @@
 using System;
-using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Converters
@@ -18,16 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Converters
         public override TEnum ReadJson(JsonReader reader, Type objectType, TEnum existingValue, bool hasExistingValue,
             JsonSerializer serializer)
         {
-            var value = reader.Value;
-            foreach (var val in Enum.GetValues(typeof(TEnum)).Cast<TEnum>())
-            {
-                if (val.GetEnumValue().Equals(value))
-                {
-                    return val;
-                }
-            }
-
-            throw new ArgumentException("The value '" + value + "' is not supported.");
+            return EnumUtil.GetFromString<TEnum>(reader.Value.ToString());
         }
     }
 }

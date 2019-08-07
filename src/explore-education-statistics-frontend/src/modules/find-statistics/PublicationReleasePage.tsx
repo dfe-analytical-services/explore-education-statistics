@@ -61,7 +61,7 @@ class PublicationReleasePage extends Component<Props> {
         title={data.publication.title}
         caption={data.title}
         breadcrumbs={[
-          { name: 'Find statistics and data', link: '/statistics' },
+          { name: 'Find statistics and data', link: '/find-statistics' },
         ]}
       >
         <div className={classNames('govuk-grid-row', styles.releaseIntro)}>
@@ -79,7 +79,7 @@ class PublicationReleasePage extends Component<Props> {
                     <Link
                       className="dfe-print-hidden"
                       unvisited
-                      to={`/statistics/${data.publication.slug}`}
+                      to={`/find-statistics/${data.publication.slug}`}
                     >
                       view latest release
                     </Link>
@@ -191,7 +191,7 @@ class PublicationReleasePage extends Component<Props> {
                             releaseName,
                             <li key={id} data-testid="previous-release-item">
                               <Link
-                                to={`/statistics/${data.publication.slug}/${slug}`}
+                                to={`/find-statistics/${data.publication.slug}/${slug}`}
                               >
                                 {releaseName}
                               </Link>
@@ -251,7 +251,7 @@ class PublicationReleasePage extends Component<Props> {
               <nav role="navigation" aria-labelledby="related-content">
                 <ul className="govuk-list">
                   <li>
-                    <Link to={`/methodologies/${data.publication.slug}`}>
+                    <Link to={`/methodology/${data.publication.slug}`}>
                       {`${data.publication.title}: methodology`}
                     </Link>
                   </li>
@@ -309,7 +309,7 @@ class PublicationReleasePage extends Component<Props> {
           >
             <p>
               Read our{' '}
-              <Link to={`/methodologies/${data.publication.slug}`}>
+              <Link to={`/methodology/${data.publication.slug}`}>
                 {`${data.publication.title}: methodology`}
               </Link>{' '}
               guidance.
@@ -415,8 +415,8 @@ class PublicationReleasePage extends Component<Props> {
         </p>
         <ButtonLink
           prefetch
-          as={`/table-tool/${data.publication.slug}`}
-          href={`/table-tool?publicationSlug=${data.publication.slug}`}
+          as={`/data-tables/${data.publication.slug}`}
+          href={`/data-tables?publicationSlug=${data.publication.slug}`}
         >
           Create tables
         </ButtonLink>

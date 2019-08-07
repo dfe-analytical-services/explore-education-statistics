@@ -21,6 +21,7 @@ interface Props {
   dataType?: string;
   showComments?: boolean;
   task?: string;
+  user?: string;
 }
 
 const PrototypeDashboardRelease = ({
@@ -40,6 +41,7 @@ const PrototypeDashboardRelease = ({
   dataType,
   showComments,
   task,
+  user,
 }: Props) => {
   return (
     <Details
@@ -114,12 +116,30 @@ const PrototypeDashboardRelease = ({
             <dd className="govuk-summary-list__actions" />
           </div>
         )}
+        {task === 'approvedPublication' && (
+          <>
+            <div className="govuk-summary-list__row">
+              <dt className="govuk-summary-list__key">Pre release access</dt>
+              <dd className="govuk-summary-list__value">
+                <select className="govuk-select govuk-!-width-full">
+                  <option>Please select </option>
+                  <option>Example name 1</option>
+                  <option>Example name 2</option>
+                  <option>Example name 3</option>
+                </select>
+              </dd>
+              <dd className="govuk-summary-list__actions">
+                <Link to="#">Add another</Link>
+              </dd>
+            </div>
+          </>
+        )}
         {showComments && (
           <div className="govuk-summary-list__row">
             <dt className="govuk-summary-list__key">Comments</dt>
             <dd className="govuk-summary-list__value">
               <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-                In review
+                First draft comments
               </h3>
               <Details
                 summary="Ann Evans, 17 June 2018, 17:35"
@@ -146,7 +166,7 @@ const PrototypeDashboardRelease = ({
                 </p>
               </Details>
               <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-                Final sign-off
+                HIgher review comments
               </h3>
               <Details
                 summary="Stephen Doherty, 17 June 2018, 17:35"
@@ -184,7 +204,7 @@ const PrototypeDashboardRelease = ({
       )}
       {editing && (
         <Link
-          to="/prototypes/publication-create-new-absence-config"
+          to="/prototypes/publication-create-new-absence"
           className="govuk-button"
         >
           View / edit this draft
@@ -198,8 +218,29 @@ const PrototypeDashboardRelease = ({
           View release and resolve comments
         </Link>
       )}
-      {task === 'readyReview' && (
+      {task === 'readyApproval' && (
         <Link to="/prototypes/publication-review" className="govuk-button">
+          View and edit release
+        </Link>
+      )}
+      {task === 'readyHigherReview' && user === 'standardUser' && (
+        <Link
+          to="/prototypes/publication-higher-review"
+          className="govuk-button"
+        >
+          View release
+        </Link>
+      )}
+      {task === 'approvedPublication' && (
+        <Link to="/prototypes/publication-review" className="govuk-button">
+          View release
+        </Link>
+      )}
+      {task === 'readyHigherReview' && user === 'higherReviewUser' && (
+        <Link
+          to="/prototypes/publication-higher-review"
+          className="govuk-button"
+        >
           View and review release
         </Link>
       )}

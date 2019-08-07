@@ -17,8 +17,7 @@ const PrototypeChartTest = () => {
 
   const newChartData: StackedBarProps = {
     ...chartData,
-    stacked: false,
-
+    stacked: true,
     axes: {
       ...chartData.axes,
       major: {
@@ -37,7 +36,6 @@ const PrototypeChartTest = () => {
   return (
     <PrototypePage wide>
       <ChartBuilder data={data} />
-
       <ChartRenderer type="verticalbar" {...newChartData} />
     </PrototypePage>
   );

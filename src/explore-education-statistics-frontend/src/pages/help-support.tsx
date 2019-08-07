@@ -46,12 +46,12 @@ function HelpSupportPage() {
           Statistics at DfE
         </a>{' '}
         pages GOV.UK browse our{' '}
-        <a href="/statistics">Find statistics and data</a> section.
+        <a href="/find-statistics">Find statistics and data</a> section.
       </p>
       <p>
         You can also download data files of those statistics currently published
-        via the service through our <a href="/download">Download data files</a>{' '}
-        section.
+        via the service through our{' '}
+        <a href="/download-data">Download data files</a> section.
       </p>
       <p>
         These files are currently only available in csv format but other formats
@@ -69,7 +69,7 @@ function HelpSupportPage() {
         To find out about the methodology behind the specific statistics and
         data set currently published via the service and how and why they're
         collected and published browse our{' '}
-        <a href="/methodologies">Education statistics: methodology</a> section.
+        <a href="/methodology">Education statistics: methodology</a> section.
       </p>
       <p>
         For a list of definitions and terms used across education statistics and
@@ -80,7 +80,7 @@ function HelpSupportPage() {
       <p>
         To create your own tables and explore the national and regional data we
         have available via the service use the table tool available in our{' '}
-        <a href="/table-tool">Create your own tables online</a> section.
+        <a href="/data-tables">Create your own tables online</a> section.
       </p>
       <p>
         You can use our table tool to choose the data and area of statistical
@@ -98,7 +98,7 @@ function HelpSupportPage() {
       <p>
         Sign up by selecting the 'Sign up for email alerts' link found at the
         top of the pages found under{' '}
-        <a href="/statistics">Find statistics and data</a>
+        <a href="/find-statistics">Find statistics and data</a>
       </p>
       <p>
         You'll then be sent an email alert with a link to the latest statistical
@@ -128,8 +128,8 @@ function HelpSupportPage() {
       <p>
         If you have any specific statistical or subject-related queries, contact
         the team or named statistician listed in the 'Contact us' sections of
-        the pages found under <a href="/statistics">Find statistics and data</a>
-        .
+        the pages found under{' '}
+        <a href="/find-statistics">Find statistics and data</a>.
       </p>
     </Page>
   );
