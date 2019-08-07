@@ -125,7 +125,7 @@ const PrototypeAdminDashboardPublications = () => {
                             'responsible statistician',
                           )
                             ? 'Ready for final sign-off'
-                            : 'First draft'
+                            : 'In draft'
                         }
                         review
                         lastEdited={new Date('2019-03-20 17:37')}
@@ -143,7 +143,7 @@ const PrototypeAdminDashboardPublications = () => {
                       <PrototypeDashboardRelease
                         title="Academic year,"
                         years="2018 to 2019"
-                        tag="First draft"
+                        tag="In draft"
                         editing={
                           window.location.search === '?status=editNewRelease'
                         }

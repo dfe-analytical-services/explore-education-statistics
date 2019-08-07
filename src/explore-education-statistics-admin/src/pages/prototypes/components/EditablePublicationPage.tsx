@@ -271,7 +271,7 @@ class EditablePublicationPage extends Component<Props, State> {
               <div className="govuk-grid-row">
                 <div className="govuk-grid-column-three-quarters">
                   <span className="govuk-tag">
-                    {higherReview ? 'In higher review' : 'First draft'}
+                    {higherReview ? 'Ready for sign-off' : 'In draft'}
                   </span>
 
                   <dl className="dfe-meta-content">

@@ -139,7 +139,7 @@ const PrototypeDashboardRelease = ({
             <dt className="govuk-summary-list__key">Comments</dt>
             <dd className="govuk-summary-list__value">
               <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-                First draft comments
+                Draft comments
               </h3>
               <Details
                 summary="Ann Evans, 17 June 2018, 17:35"
@@ -232,8 +232,8 @@ const PrototypeDashboardRelease = ({
         </Link>
       )}
       {task === 'approvedPublication' && (
-        <Link to="/prototypes/publication-review" className="govuk-button">
-          View release
+        <Link to="/prototypes/publication-preview" className="govuk-button">
+          Preview release
         </Link>
       )}
       {task === 'readyHigherReview' && user === 'higherReviewUser' && (

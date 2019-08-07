@@ -45,7 +45,7 @@ const UpdateStatusForm = () => {
                   className="govuk-label govuk-radios__label"
                   htmlFor="readyHigherReview"
                 >
-                  Ready for higher review
+                  Ready for sign-off
                 </label>
               </div>
             </div>

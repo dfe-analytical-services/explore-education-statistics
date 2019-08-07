@@ -12,7 +12,7 @@ const AdminDashboardReadyForApproval = ({ task, user }: Props) => {
   const userContext = React.useContext(LoginContext);
 
   const tagLabel = window.location.search.includes('status=approved')
-    ? 'Approved for publication'
+    ? 'Scheduled for publication'
     : 'In higher review';
 
   const checkStatus = window.location.search.includes('status=approved')

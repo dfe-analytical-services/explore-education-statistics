@@ -4,7 +4,7 @@ const AdminDashboardApprovedForPublication = () => {
   return (
     <>
       <div className="govuk-inset-text">
-        There are currenly no releases approved for publication
+        There are currenly no scheduled releases
       </div>
     </>
   );

@@ -141,6 +141,12 @@ function App() {
         />
         <Route
           exact
+          path="/prototypes/publication-preview"
+          component={PublicationReviewPage}
+          render={() => <PublicationReviewPage />}
+        />
+        <Route
+          exact
           path="/prototypes/publication-create-new"
           component={PublicationCreateNew}
         />
