@@ -45,13 +45,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                 {33, DataCsvFile.KS4_2018_Subject_Tables_S3_TestData}
             };
 
+        // Ignore these subjects for now until we are provided with valid data files.
+        private static readonly List<DataCsvFile> IgnoredSubjectFiles = new List<DataCsvFile>
+        {
+            DataCsvFile.level_2_3_sf,
+            DataCsvFile.KS2_2016_test_UD,
+            DataCsvFile.KS4_2018_Subject_Tables_S1_TestData,
+            DataCsvFile.clean_data_fe
+        };
+
         public static IEnumerable<Subject> GetSubjects()
         {
-            return GetThemes()
+            var subjects = GetThemes()
                 .SelectMany(theme => theme.Topics)
                 .SelectMany(topic => topic.Publications)
                 .SelectMany(publication => publication.Releases)
                 .SelectMany(release => release.Subjects);
+
+            return subjects.Where(subject => !IgnoredSubjectFiles.Contains(SubjectFiles[subject.Id]));
         }
 
         private static IEnumerable<Theme> GetThemes()

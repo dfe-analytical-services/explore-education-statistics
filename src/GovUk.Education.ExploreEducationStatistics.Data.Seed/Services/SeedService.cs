@@ -49,18 +49,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
 
             foreach (var subject in SamplePublications.GetSubjects())
             {
-                // ignore these subjects for now until we are provided with valid data files.
-                if (subject.Id == 27 || subject.Id == 29 || subject.Id == 32) continue;
-
                 var file = SamplePublications.SubjectFiles[subject.Id];
 
-                if (file != DataCsvFile.clean_data_fe)
-                {
-                    _logger.LogInformation("Seeding Subject {Subject}", subject.Name);
+                _logger.LogInformation("Seeding Subject {Subject}", subject.Name);
 
-                    StoreFiles(subject.Release, file, subject.Name);
-                    Seed(file + ".csv", subject.Release, count++);
-                }
+                StoreFiles(subject.Release, file, subject.Name);
+                Seed(file + ".csv", subject.Release, count++);
             }
 
             stopWatch.Stop();
