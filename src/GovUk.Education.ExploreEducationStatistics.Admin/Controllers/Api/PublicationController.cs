@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return NoContent();
         }
         
-        // GET api/me/publications?topicId={guid}
+        // GET api/publications/{publicationId}
         [HttpGet("api/publications/{publicationId}")]
         [AllowAnonymous] // TODO We will need to do Authorisation checks when we know what the permissions model is.
         public async Task<ActionResult<PublicationViewModel>> GetPublicationByIdAsync(
