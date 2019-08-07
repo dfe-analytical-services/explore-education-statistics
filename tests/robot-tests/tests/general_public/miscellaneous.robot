@@ -113,7 +113,7 @@ Validate Contact page
     user waits until page contains  DfE Head of Profession for Statistics
     user waits until page contains  hop.statistics@education.gov.uk
 
-    user checks url contains    %{PUBLIC_URL}/contact
+    user checks url contains    %{PUBLIC_URL}/contact-us
 
     user checks element count is x  css:[data-testid="breadcrumbs--list"] li     2
     user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(1)   Home
