@@ -55,7 +55,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
             }
 
             stopWatch.Stop();
-            _logger.LogInformation("All import messages queued. Completed with duration {duration} ", stopWatch.Elapsed.ToString());
+            _logger.LogInformation("All import messages queued. Completed with duration {duration} ",
+                stopWatch.Elapsed.ToString());
         }
 
         private void Seed(string dataFileName, Release release, int maxCount)
@@ -95,7 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
                 var cloudMessage = BuildCloudMessage(dataFileName, release);
 
                 _logger.LogInformation("Adding queue message for file \"{dataFileName}\"", dataFileName);
-                
+
                 pQueue.AddMessage(cloudMessage);
             }
         }
