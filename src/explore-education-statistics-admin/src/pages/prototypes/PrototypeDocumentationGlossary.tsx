@@ -26,7 +26,7 @@ const DocumentationGlossary = () => {
 
           <Accordion id="a-z">
             <AccordionSection heading="A">
-              <h3 id="a42-a42s">A*, A*s</h3>
+              <h3 id="a42-a42s">A*, A*s TEST</h3>
               <p>
                 The top grade in GCSEs and A levels. Use the symbol * not the
                 word ‘star’. No apostrophe in the plural.
