@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -83,7 +84,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
                     BatchSize = 1
                 });
 
-                if (count == maxCount)
+                var last = count == maxCount - 1;
+                if (last)
                 {
                     var sQueue = client.GetQueueReference("imports-pending-sequential");
                     sQueue.CreateIfNotExists();
