@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Seed.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
@@ -11,25 +12,29 @@ using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Queue;
 using Newtonsoft.Json;
+using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
 {
     public class SeedService : ISeedService
     {
         private readonly ILogger _logger;
+        private readonly IMapper _mapper;
         private readonly string _storageConnectionString;
         private readonly IFileStorageService _fileStorageService;
 
-        private ImportMessage[] messages = new ImportMessage[SamplePublications.SubjectFiles.Count - 3];
-        
+        private readonly ImportMessage[] messages = new ImportMessage[SamplePublications.SubjectFiles.Count - 3];
+
         private const bool PROCESS_SEQUENTIALLY = true;
-        
+
         public SeedService(
             ILogger<SeedService> logger,
+            IMapper mapper,
             IConfiguration config,
             IFileStorageService fileStorageService)
         {
             _logger = logger;
+            _mapper = mapper;
             _storageConnectionString = config.GetConnectionString("CoreStorage");
             _fileStorageService = fileStorageService;
         }
@@ -42,65 +47,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
             stopWatch.Start();
             var count = 0;
 
-            foreach (var theme in SamplePublications.Themes)
+            foreach (var subject in SamplePublications.GetSubjects())
             {
-                foreach (var topic in theme.Topics)
+                // ignore these subjects for now until we are provided with valid data files.
+                if (subject.Id == 27 || subject.Id == 29 || subject.Id == 32) continue;
+
+                var file = SamplePublications.SubjectFiles[subject.Id];
+
+                if (file != DataCsvFile.clean_data_fe)
                 {
-                    foreach (var publication in topic.Publications)
-                    {
-                        foreach (var release in publication.Releases)
-                        {
-                            foreach (var subject in release.Subjects)
-                            {
-                                Release r = new Release
-                                {
-                                    Id = release.Id,
-                                    Slug = release.Slug,
-                                    Title = release.Title,
-                                    ReleaseDate = release.ReleaseDate,
-                                    PublicationId = publication.Id,
-                                    Publication = new Publication
-                                    {
-                                        Id = publication.Id,
-                                        Slug = publication.Slug,
-                                        Title = publication.Title,
-                                        TopicId = topic.Id,
-                                        Topic = new Topic
-                                        {
-                                           Id = topic.Id,
-                                           Slug = topic.Slug,
-                                           Title = topic.Title,
-                                           ThemeId = theme.Id,
-                                           Theme = new Theme
-                                           {
-                                              Id = theme.Id,
-                                              Slug = theme.Slug,
-                                              Title = theme.Title
-                                           }
-                                        }
-                                    },
-                                    Subjects = new []
-                                    {
-                                        new Subject {
-                                            Id = subject.Id,
-                                            Name = subject.Name,
-                                            ReleaseId = release.Id
-                                        }
-                                    }
-                                };
+                    _logger.LogInformation("Seeding Subject {Subject}", subject.Name);
 
-                                // ignore these subjects for now until we are provided with valid data files.
-                                if (subject.Id == 27 || subject.Id == 29 || subject.Id == 32) continue;
-                                
-                                var file = SamplePublications.SubjectFiles.GetValueOrDefault(subject.Id);
-
-                                _logger.LogInformation("Seeding Subject {Subject}", subject.Name);
-
-                                StoreFiles(r, file, subject.Name);
-                                Seed(file + ".csv", r, count++);
-                            }   
-                        }
-                    } 
+                    StoreFiles(subject.Release, file, subject.Name);
+                    Seed(file + ".csv", subject.Release, count++);
                 }
             }
 
@@ -112,20 +71,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
         {
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
             var client = storageAccount.CreateCloudQueueClient();
-            
+
             var aQueue = client.GetQueueReference("imports-available");
             aQueue.CreateIfNotExists();
 
             if (PROCESS_SEQUENTIALLY)
             {
+                var importMessageRelease = _mapper.Map<Processor.Model.Release>(release);
                 messages[count] = new ImportMessage
                 {
                     DataFileName = dataFileName,
-                    Release = release,
+                    Release = importMessageRelease,
                     BatchNo = 1,
                     BatchSize = 1
                 };
-                
+
                 if (count == SamplePublications.SubjectFiles.Count - 4)
                 {
                     var sQueue = client.GetQueueReference("imports-pending-sequential");
@@ -147,11 +107,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
 
         private CloudQueueMessage BuildCloudMessage(string dataFileName, Release release)
         {
-            //var importMessageRelease = _mapper.Map<Release>(release);
+            var importMessageRelease = _mapper.Map<Processor.Model.Release>(release);
             var message = new ImportMessage
             {
                 DataFileName = dataFileName,
-                Release = release,
+                Release = importMessageRelease,
                 BatchNo = 1,
                 BatchSize = 1
             };
@@ -164,20 +124,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
             var dataFile = CreateFormFile(file.GetCsvLines(), file + ".csv", "file");
             var metaFile = CreateFormFile(file.GetMetaCsvLines(), file + ".meta.csv", "metaFile");
 
-            _fileStorageService.UploadFilesAsync(release.Publication.Slug, release.Slug, dataFile, metaFile, subjectName).Wait();
+            _fileStorageService
+                .UploadFilesAsync(release.Publication.Slug, release.Slug, dataFile, metaFile, subjectName).Wait();
         }
 
-        private IFormFile CreateFormFile(IEnumerable<string> lines, string fileName, string name)
+        private static IFormFile CreateFormFile(IEnumerable<string> lines, string fileName, string name)
         {
             var mStream = new MemoryStream();
             var writer = new StreamWriter(mStream);
-            
+
             foreach (var line in lines)
             {
                 writer.WriteLine(line);
                 writer.Flush();
             }
-            
+
             var f = new FormFile(mStream, 0, mStream.Length, name,
                 fileName)
             {
@@ -185,21 +146,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
                 ContentType = "text/csv"
             };
             return f;
-        }
-
-        class ImportMessage
-        {
-            public string DataFileName { get; set; }
-            public Release Release { get; set; }
-        
-            public int BatchSize { get; set; }
-        
-            public int BatchNo { get; set; }
-        
-            public override string ToString()
-            {
-                return $"{nameof(DataFileName)}: {DataFileName}, {nameof(Release)}: {Release}";
-            }
         }
     }
 }
