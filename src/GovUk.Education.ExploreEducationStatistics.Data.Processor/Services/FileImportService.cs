@@ -1,5 +1,6 @@
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
@@ -29,14 +30,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var subjectData = _fileStorageService.GetSubjectData(message).Result;
             var batch = subjectData.GetCsvLines().ToList();
             var metaLines = subjectData.GetMetaLines().ToList();
+            var subject = GetSubject(message, subjectData.Name);
             
-            var subject = _context.Subject
-                .Include(s => s.Release)
-                .ThenInclude(r => r.Publication)
-                .ThenInclude(p => p.Topic)
-                .ThenInclude(t => t.Theme)
-                .FirstOrDefault(s => s.Name.Equals(subjectData.Name) && s.ReleaseId == message.Release.Id);
-
             _importerService.ImportObservations(
                 batch,
                 subject,
@@ -48,18 +43,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var subjectData = _fileStorageService.GetSubjectData(message).Result;
             var batch = subjectData.GetCsvLines().ToList();
             var metaLines = subjectData.GetMetaLines().ToList();
-            
-            var subject = _context.Subject
-                .Include(s => s.Release)
-                .ThenInclude(r => r.Publication)
-                .ThenInclude(p => p.Topic)
-                .ThenInclude(t => t.Theme)
-                .FirstOrDefault(s => s.Name.Equals(subjectData.Name) && s.ReleaseId == message.Release.Id);
+            var subject = GetSubject(message, subjectData.Name);
             
             _importerService.ImportFiltersLocationsAndSchools(
                 batch,
                 _importerService.GetMeta(metaLines, subject),
                 subject.Name);
+        }
+
+        private Subject GetSubject(ImportMessage message, string subjectName)
+        {
+            return _context.Subject
+                .Include(s => s.Release)
+                .ThenInclude(r => r.Publication)
+                .ThenInclude(p => p.Topic)
+                .ThenInclude(t => t.Theme)
+                .FirstOrDefault(s => s.Name.Equals(subjectName) && s.ReleaseId == message.Release.Id);
         }
     }
 }
