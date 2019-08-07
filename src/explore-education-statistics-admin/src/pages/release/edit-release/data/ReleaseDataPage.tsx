@@ -1,19 +1,14 @@
-import PublicationContext from '@admin/pages/release/PublicationContext';
+import ManageReleaseContext, {ManageRelease} from '@admin/pages/release/ManageReleaseContext';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import React, { useContext } from 'react';
+import React, {useContext, useEffect} from 'react';
 import { RouteComponentProps } from 'react-router';
 import ReleaseDataUploadsSection from './ReleaseDataUploadsSection';
 import ReleaseFileUploadsSection from './ReleaseFileUploadsSection';
 
-interface MatchProps {
-  releaseId: string;
-}
+const ReleaseDataPage = () => {
 
-const ReleaseDataPage = ({ match }: RouteComponentProps<MatchProps>) => {
-  const { releaseId } = match.params;
-
-  const { publication } = useContext(PublicationContext);
+  const {publication, releaseId} = useContext(ManageReleaseContext) as ManageRelease;
 
   return (
     <>

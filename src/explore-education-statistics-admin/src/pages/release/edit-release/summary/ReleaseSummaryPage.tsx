@@ -1,6 +1,6 @@
 import Link from '@admin/components/Link';
 import DummyReferenceData from '@admin/pages/DummyReferenceData';
-import PublicationContext from '@admin/pages/release/PublicationContext';
+import ManageReleaseContext, {ManageRelease} from '@admin/pages/release/ManageReleaseContext';
 import { summaryEditRoute } from '@admin/routes/edit-release/routes';
 import commonService from '@admin/services/common/service';
 import {
@@ -16,13 +16,7 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 
-interface MatchProps {
-  publicationId: string;
-  releaseId: string;
-}
-
-const ReleaseSummaryPage = ({ match }: RouteComponentProps<MatchProps>) => {
-  const { publicationId, releaseId } = match.params;
+const ReleaseSummaryPage = () => {
 
   const [releaseSummaryDetails, setReleaseSummaryDetails] = useState<
     ReleaseSummaryDetails
@@ -30,7 +24,7 @@ const ReleaseSummaryPage = ({ match }: RouteComponentProps<MatchProps>) => {
 
   const [releaseTypes, setReleaseTypes] = useState<IdTitlePair[]>();
 
-  const { publication } = useContext(PublicationContext);
+  const {publication, releaseId} = useContext(ManageReleaseContext) as ManageRelease;
 
   useEffect(() => {
     const releaseSummaryPromise = service.getReleaseSummaryDetails(releaseId);
@@ -95,7 +89,7 @@ const ReleaseSummaryPage = ({ match }: RouteComponentProps<MatchProps>) => {
             term=""
             actions={
               <Link
-                to={summaryEditRoute.generateLink(publicationId, releaseId)}
+                to={summaryEditRoute.generateLink(publication.id, releaseId)}
               >
                 Edit release setup details
               </Link>
