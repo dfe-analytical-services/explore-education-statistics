@@ -23,7 +23,7 @@ import {
 
 import { Layer, LeafletMouseEvent, Path, Polyline } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import React, { Component, createRef } from 'react';
+import React from 'react';
 import { GeoJSON, LatLngBounds, Map } from 'react-leaflet';
 import styles from './MapBlock.module.scss';
 
@@ -63,14 +63,6 @@ interface LegendEntry {
   idx: number;
 }
 
-interface GroupOption {
-  id: string;
-  title: string;
-  type: 'timeperiod' | 'filter' | 'location' | null;
-  selected: string;
-  options: SelectOption[];
-}
-
 interface MapClickEvent extends LeafletMouseEvent {
   layer: Layer;
   sourceTarget: {
@@ -88,14 +80,157 @@ function getLowestLocationCode(location: DataBlockLocation) {
   );
 }
 
-class MapBlock extends Component<MapProps, MapState> {
-  private readonly mapRef = createRef<Map>();
+function getLocationsForIndicator(
+  data: DataBlockData,
+  meta: DataBlockMetadata,
+  indicator: string,
+) {
+  const allLocationIds = Array.from(
+    new Set(
+      data.result
+        .filter(r => r.measures[indicator] !== undefined)
+        .map(r => getLowestLocationCode(r.location)),
+    ),
+  );
 
-  private readonly geoJsonRef = createRef<GeoJSON>();
+  return [
+    { label: 'select...', value: '' },
+    ...allLocationIds
+      .reduce(
+        (locations: { label: string; value: string }[], next: string) => {
+          const { label, value } = (meta.locations || {})[next];
 
-  private readonly container = createRef<HTMLDivElement>();
+          return [...locations, { label, value }];
+        },
+        [],
+      )
+      .sort((a, b) => {
+        if (a.label < b.label) return -1;
+        if (a.label > b.label) return 1;
+        return 0;
+      }),
+  ];
+}
 
-  public state: MapState = {
+function getGeometryForOptions(
+  sourceData: {
+    location: DataBlockLocationMetadata;
+    selectedMeasure: number;
+    measures: Dictionary<string>;
+  }[],
+  min: number,
+  scale: number,
+): FeatureCollection<Geometry, DataBlockGeoJsonProperties> {
+  const calculateColorStyle = (value: number) =>
+    styles[
+      `rate${Math.min(Math.floor((value - min) / scale), 4).toFixed(0)}`
+      ];
+
+  return {
+    type: 'FeatureCollection',
+    features: sourceData.map(({ location, selectedMeasure, measures }) => ({
+      ...location.geoJson[0],
+      id: location.geoJson[0].properties.code,
+      properties: {
+        ...location.geoJson[0].properties,
+        measures,
+        className: calculateColorStyle(selectedMeasure),
+      },
+    })),
+  };
+}
+
+function calculateMinAndScaleForSourceData(
+  sourceData: { selectedMeasure: number }[],
+) {
+  const { min, max } = sourceData.reduce(
+    // eslint-disable-next-line no-shadow
+    ({ min, max }, { selectedMeasure }) => ({
+      min: selectedMeasure < min ? selectedMeasure : min,
+      max: selectedMeasure > max ? selectedMeasure : max,
+    }),
+    { min: Number.POSITIVE_INFINITY, max: Number.NEGATIVE_INFINITY },
+  );
+
+  if (min === max) {
+    return { min, scale: 0 };
+  }
+
+  const range = max - min;
+  const scale = range / 5.0;
+  return { min, scale };
+}
+
+function calculateSourceData(
+  data: DataBlockData,
+  meta: DataBlockMetadata,
+  displayedFilter: number,
+  selectedYear: string,
+) {
+  const resultsFilteredByYear = data.result.filter(
+    result => result.timePeriod === selectedYear,
+  );
+
+  return resultsFilteredByYear
+    .map(result => ({
+      location: (meta.locations || {})[
+        getLowestLocationCode(result.location)
+        ],
+      selectedMeasure: +result.measures[displayedFilter],
+      measures: result.measures,
+    }))
+    .filter(
+      r => r.location !== undefined && r.location.geoJson !== undefined,
+    );
+}
+
+
+function generateGeometryAndLegendForSelectedOptions(
+  data: DataBlockData,
+  meta: DataBlockMetadata,
+  selectedIndicator: string,
+  selectedYear: string,
+) {
+  const displayedFilter = +selectedIndicator;
+
+  const sourceData = calculateSourceData(
+    data,
+    meta,
+    displayedFilter,
+    selectedYear,
+  );
+
+  const { min, scale } = calculateMinAndScaleForSourceData(sourceData);
+
+  const legend: LegendEntry[] = [...Array(5)].map((_, idx) => {
+    return {
+      min: (min + idx * scale).toFixed(1),
+      max: (min + (idx + 1) * scale).toFixed(1),
+      idx,
+    };
+  });
+
+  const geometry = getGeometryForOptions(sourceData, min, scale);
+
+  return { geometry, legend };
+}
+
+
+const MapBlock = ({
+  data,
+  meta,
+  position = { lat: 53.00986, lng: -3.2524038 },
+  width,
+  height,
+  axes,
+}: MapProps) => {
+
+  const mapRef = React.createRef<Map>();
+  const geoJsonRef = React.createRef<GeoJSON>();
+  const container = React.createRef<HTMLDivElement>();
+
+
+  const [state, setState] = React.useState<MapState>({
     selected: {
       indicator: '',
       timePeriod: '',
@@ -107,13 +242,38 @@ class MapBlock extends Component<MapProps, MapState> {
     },
     geometry: undefined,
     legend: [],
-  };
+  });
 
-  private intersectionObserver!: IntersectionObserver;
+  const [ukGeometry, setUkGeometry] = React.useState<FeatureCollection>(undefined);
 
-  public async componentDidMount() {
-    const { data, meta } = this.props;
-    let { selected } = this.state;
+  let intersectionObserver!: IntersectionObserver;
+
+  function registerResizingCheck() {
+    if (container.current && container.current.parentElement) {
+      intersectionObserver = new IntersectionObserver(
+        entries => {
+          if (entries.length > 0) {
+            if (entries[0].intersectionRatio > 0) {
+              if (mapRef.current) {
+                const { current } = mapRef;
+                requestAnimationFrame(() => {
+                  current.leafletElement.invalidateSize();
+                });
+              }
+            }
+          }
+        },
+        {
+          threshold: 0.00001,
+        },
+      );
+
+      intersectionObserver.observe(container.current);
+    }
+  }
+
+  React.useEffect(() => {
+    let { selected } = state;
 
     if (data.result && data.result.length > 0) {
       const sortedMeasures = Object.values(meta.indicators).sort((a, b) =>
@@ -135,209 +295,51 @@ class MapBlock extends Component<MapProps, MapState> {
       const {
         geometry,
         legend,
-      } = MapBlock.generateGeometryAndLegendForSelectedOptions(
+      } = generateGeometryAndLegendForSelectedOptions(
         data,
         meta,
         selected.indicator,
         selected.timePeriod,
       );
 
-      const imported = await import('@common/services/UKGeoJson');
+      import('@common/services/UKGeoJson')
+        .then(imported => {
 
-      const location = MapBlock.getLocationsForIndicator(
+          setUkGeometry(imported.default);
+        });
+
+
+      const location = getLocationsForIndicator(
         data,
         meta,
         selected.indicator,
       );
 
-      this.setState({
+      setState({
         selected,
         options: {
           location,
         },
         geometry,
         legend,
-        ukGeometry: imported.default,
       });
     }
 
-    this.registerResizingCheck();
-  }
+    registerResizingCheck();
 
-  public componentWillUnmount(): void {
-    if (this.intersectionObserver) {
-      this.intersectionObserver.disconnect();
-    }
-  }
-
-  public static definition: ChartDefinition = {
-    type: 'map',
-    name: 'Geographic',
-
-    capabilities: {
-      dataSymbols: false,
-      stackable: false,
-      lineStyle: false,
-      gridLines: false,
-      canSize: true,
-    },
-
-    data: [
-      {
-        type: 'geojson',
-        title: 'Geographic',
-        entryCount: 'multiple',
-        targetAxis: 'geojson',
-      },
-    ],
-
-    axes: [
-      {
-        id: 'geojson',
-        title: 'geojson',
-        type: 'major',
-      },
-    ],
-  };
-
-  private static getLocationsForIndicator(
-    data: DataBlockData,
-    meta: DataBlockMetadata,
-    indicator: string,
-  ) {
-    const allLocationIds = Array.from(
-      new Set(
-        data.result
-          .filter(r => r.measures[indicator] !== undefined)
-          .map(r => getLowestLocationCode(r.location)),
-      ),
-    );
-
-    return [
-      { label: 'select...', value: '' },
-      ...allLocationIds
-        .reduce(
-          (locations: { label: string; value: string }[], next: string) => {
-            const { label, value } = (meta.locations || {})[next];
-
-            return [...locations, { label, value }];
-          },
-          [],
-        )
-        .sort((a, b) => {
-          if (a.label < b.label) return -1;
-          if (a.label > b.label) return 1;
-          return 0;
-        }),
-    ];
-  }
-
-  private static getGeometryForOptions(
-    sourceData: {
-      location: DataBlockLocationMetadata;
-      selectedMeasure: number;
-      measures: Dictionary<string>;
-    }[],
-    min: number,
-    scale: number,
-  ): FeatureCollection<Geometry, DataBlockGeoJsonProperties> {
-    const calculateColorStyle = (value: number) =>
-      styles[
-        `rate${Math.min(Math.floor((value - min) / scale), 4).toFixed(0)}`
-      ];
-
-    return {
-      type: 'FeatureCollection',
-      features: sourceData.map(({ location, selectedMeasure, measures }) => ({
-        ...location.geoJson[0],
-        id: location.geoJson[0].properties.code,
-        properties: {
-          ...location.geoJson[0].properties,
-          measures,
-          className: calculateColorStyle(selectedMeasure),
-        },
-      })),
+    return () => {
+      if (intersectionObserver !== undefined) {
+        intersectionObserver.disconnect();
+      }
     };
-  }
 
-  private static generateGeometryAndLegendForSelectedOptions(
-    data: DataBlockData,
-    meta: DataBlockMetadata,
-    selectedIndicator: string,
-    selectedYear: string,
-  ) {
-    const displayedFilter = +selectedIndicator;
+  }, []);
 
-    const sourceData = this.calculateSourceData(
-      data,
-      meta,
-      displayedFilter,
-      selectedYear,
-    );
 
-    const { min, scale } = this.calculateMinAndScaleForSourceData(sourceData);
-
-    const legend: LegendEntry[] = [...Array(5)].map((_, idx) => {
-      return {
-        min: (min + idx * scale).toFixed(1),
-        max: (min + (idx + 1) * scale).toFixed(1),
-        idx,
-      };
-    });
-
-    const geometry = this.getGeometryForOptions(sourceData, min, scale);
-
-    return { geometry, legend };
-  }
-
-  private static calculateMinAndScaleForSourceData(
-    sourceData: { selectedMeasure: number }[],
-  ) {
-    const { min, max } = sourceData.reduce(
-      // eslint-disable-next-line no-shadow
-      ({ min, max }, { selectedMeasure }) => ({
-        min: selectedMeasure < min ? selectedMeasure : min,
-        max: selectedMeasure > max ? selectedMeasure : max,
-      }),
-      { min: Number.POSITIVE_INFINITY, max: Number.NEGATIVE_INFINITY },
-    );
-
-    if (min === max) {
-      return { min, scale: 0 };
-    }
-
-    const range = max - min;
-    const scale = range / 5.0;
-    return { min, scale };
-  }
-
-  private static calculateSourceData(
-    data: DataBlockData,
-    meta: DataBlockMetadata,
-    displayedFilter: number,
-    selectedYear: string,
-  ) {
-    const resultsFilteredByYear = data.result.filter(
-      result => result.timePeriod === selectedYear,
-    );
-
-    return resultsFilteredByYear
-      .map(result => ({
-        location: (meta.locations || {})[
-          getLowestLocationCode(result.location)
-        ],
-        selectedMeasure: +result.measures[displayedFilter],
-        measures: result.measures,
-      }))
-      .filter(
-        r => r.location !== undefined && r.location.geoJson !== undefined,
-      );
-  }
-
-  private getFeatureElementById(
+  function getFeatureElementById(
     id: string,
   ): { element?: Element; layer?: Path; feature?: Feature } {
-    const { geometry } = this.state;
+    const { geometry } = state;
 
     if (geometry) {
       const selectedFeature = geometry.features.find(
@@ -358,12 +360,12 @@ class MapBlock extends Component<MapProps, MapState> {
     return {};
   }
 
-  private updateGeometryForOptions = () => {
-    const { data, meta } = this.props;
-    const { selected } = this.state;
+  const updateGeometryForOptions = () => {
+    const { selected } = state;
 
-    this.setState({
-      ...MapBlock.generateGeometryAndLegendForSelectedOptions(
+    setState({
+      ...state,
+      ...generateGeometryAndLegendForSelectedOptions(
         data,
         meta,
         selected.indicator,
@@ -372,47 +374,32 @@ class MapBlock extends Component<MapProps, MapState> {
     });
   };
 
-  private registerResizingCheck() {
-    if (this.container.current && this.container.current.parentElement) {
-      this.intersectionObserver = new IntersectionObserver(
-        entries => {
-          if (entries.length > 0) {
-            if (entries[0].intersectionRatio > 0) {
-              if (this.mapRef.current) {
-                const { current } = this.mapRef;
-                requestAnimationFrame(() => {
-                  current.leafletElement.invalidateSize();
-                });
-              }
-            }
-          }
-        },
-        {
-          threshold: 0.00001,
-        },
-      );
 
-      this.intersectionObserver.observe(this.container.current);
+  function updateGeojsonGeometry(
+    geometry: FeatureCollection<Geometry, DataBlockGeoJsonProperties>,
+  ) {
+    if (geoJsonRef.current) {
+      geoJsonRef.current.leafletElement.clearLayers();
+      geoJsonRef.current.leafletElement.addData(geometry);
     }
   }
 
-  private onSelectIndicator = (newSelectedIndicator: string) => {
-    const { data, meta } = this.props;
-    const { selected, options } = this.state;
+  const onSelectIndicator = (newSelectedIndicator: string) => {
+    const { selected, options } = state;
 
     const {
       geometry,
       legend,
-    } = MapBlock.generateGeometryAndLegendForSelectedOptions(
+    } = generateGeometryAndLegendForSelectedOptions(
       data,
       meta,
       newSelectedIndicator,
       selected.timePeriod,
     );
 
-    this.updateGeojsonGeometry(geometry);
+    updateGeojsonGeometry(geometry);
 
-    this.setState({
+    setState({
       selected: { ...selected, indicator: newSelectedIndicator },
 
       geometry,
@@ -420,7 +407,7 @@ class MapBlock extends Component<MapProps, MapState> {
 
       options: {
         ...options,
-        location: MapBlock.getLocationsForIndicator(
+        location: getLocationsForIndicator(
           data,
           meta,
           newSelectedIndicator,
@@ -429,22 +416,14 @@ class MapBlock extends Component<MapProps, MapState> {
     });
   };
 
-  private updateGeojsonGeometry(
-    geometry: FeatureCollection<Geometry, DataBlockGeoJsonProperties>,
-  ) {
-    if (this.geoJsonRef.current) {
-      this.geoJsonRef.current.leafletElement.clearLayers();
-      this.geoJsonRef.current.leafletElement.addData(geometry);
-    }
-  }
 
-  private selectLocationOption(locationValue: string) {
-    const { selected } = this.state;
+  function selectLocationOption(locationValue: string) {
+    const { selected } = state;
     let results: IdValue[] = [];
 
     const {
       element: currentSelectedLocationElement,
-    } = this.getFeatureElementById(selected.location);
+    } = getFeatureElementById(selected.location);
 
     if (currentSelectedLocationElement) {
       currentSelectedLocationElement.classList.remove(styles.selected);
@@ -454,15 +433,15 @@ class MapBlock extends Component<MapProps, MapState> {
       layer: selectedLayer,
       element: selectedLocationElement,
       feature: selectedFeature,
-    } = this.getFeatureElementById(locationValue);
+    } = getFeatureElementById(locationValue);
 
     if (selectedLocationElement && selectedLayer && selectedFeature) {
       selectedLocationElement.classList.add(styles.selected);
 
-      if (this.mapRef.current) {
+      if (mapRef.current) {
         const polyLine: Polyline = selectedLayer as Polyline;
 
-        this.mapRef.current.leafletElement.fitBounds(polyLine.getBounds(), {
+        mapRef.current.leafletElement.fitBounds(polyLine.getBounds(), {
           padding: [200, 200],
         });
         selectedLayer.bringToFront();
@@ -481,7 +460,8 @@ class MapBlock extends Component<MapProps, MapState> {
       }
     }
 
-    this.setState({
+    setState({
+      ...state,
       selected: {
         ...selected,
         location: locationValue,
@@ -490,15 +470,8 @@ class MapBlock extends Component<MapProps, MapState> {
     });
   }
 
-  private updateSelectedGroupOption(group: GroupOption, value: string) {
-    // eslint-disable-next-line no-param-reassign
-    group.selected = value;
-    this.updateGeometryForOptions();
-  }
-
-  private onEachFeature = (feature: MapFeature, featureLayer: Path) => {
-    const { meta } = this.props;
-    const { selected } = this.state;
+  const onEachFeature = (feature: MapFeature, featureLayer: Path) => {
+    const { selected } = state;
 
     if (feature.properties) {
       // eslint-disable-next-line no-param-reassign
@@ -531,214 +504,170 @@ class MapBlock extends Component<MapProps, MapState> {
     });
   };
 
-  private onClick = (e: MapClickEvent) => {
+  const onClick = (e: MapClickEvent) => {
     const { feature } = e.sourceTarget;
 
     if (feature.properties) {
-      this.selectLocationOption(feature.properties.code);
+      selectLocationOption(feature.properties.code);
     }
   };
 
-  public render() {
-    const {
-      position = { lat: 53.00986, lng: -3.2524038 },
-      width,
-      height,
-      meta,
-      axes,
-    } = this.props;
 
-    const { selected, options, geometry, legend, ukGeometry } = this.state;
+  const { selected, options, geometry, legend } = state;
 
-    // TODO if filters are ever wanted to be included in the Maps
-    const groupOptions: GroupOption[] = [];
 
-    /*
-    dataGroupings.map(
-      ({timePeriod}, index) => {
-        if (timePeriod) {
-          return {
-            id: `groupOption_year_${index}`,
-            title: 'Select a time period',
-            type: 'timeperiod',
-            selected: `${data.result[0].year}`,
-            options: Object.values<SelectOption>(
-              data.result.reduce(
-                (result: Dictionary<TimePeriod>, {year, timeIdentifier}) => {
-                  return {
-                    ...result,
-                    [`${year}${timeIdentifier}`]: new TimePeriod(
-                      year,
-                      timeIdentifier,
-                    ),
-                  };
-                },
-                {},
-              ),
-            )
-              .sort()
-              .reverse(),
-          };
-        }
+  return (
+    <div className="govuk-grid-row" ref={container}>
+      <div
+        className={classNames('govuk-grid-column-one-third')}
+        aria-live="assertive"
+      >
+        <form>
+          <div className="govuk-form-group govuk-!-margin-bottom-6">
+            <FormSelect
+              name="selectedIndicator"
+              id="selectedIndicator"
+              label="Select data to view"
+              value={selected.indicator}
+              onChange={e => onSelectIndicator(e.currentTarget.value)}
+              options={axes.major.dataSets.map(
+                indicator => meta.indicators[indicator.indicator],
+              )}
+              order={[]}
+            />
+          </div>
 
-        return {
-          id: `groupOption_${index}`,
-          title: '',
-          selected: '',
-          type: null,
-          options: Array<SelectOption>(),
-        };
-      },
-    );
-    */
+          <div className="govuk-form-group govuk-!-margin-bottom-6">
+            <FormSelect
+              name="selectedLocation"
+              id="selectedLocation"
+              label="Select a location"
+              value={selected.location}
+              onChange={e => selectLocationOption(e.currentTarget.value)}
+              options={options.location}
+              order={[]}
+            />
+          </div>
 
-    return (
-      <div className="govuk-grid-row" ref={this.container}>
-        <div
-          className={classNames('govuk-grid-column-one-third')}
-          aria-live="assertive"
-        >
-          <form>
-            <div className="govuk-form-group govuk-!-margin-bottom-6">
-              <FormSelect
-                name="selectedIndicator"
-                id="selectedIndicator"
-                label="Select data to view"
-                value={selected.indicator}
-                onChange={e => this.onSelectIndicator(e.currentTarget.value)}
-                options={axes.major.dataSets.map(
-                  indicator => meta.indicators[indicator.indicator],
-                )}
-                order={[]}
-              />
-            </div>
+        </form>
 
-            <div className="govuk-form-group govuk-!-margin-bottom-6">
-              <FormSelect
-                name="selectedLocation"
-                id="selectedLocation"
-                label="Select a location"
-                value={selected.location}
-                onChange={e => this.selectLocationOption(e.currentTarget.value)}
-                options={options.location}
-                order={[]}
-              />
-            </div>
-
-            {groupOptions.map(grouping => (
+        {selected.results.length > 0 ? (
+          <div>
+            {selected.results.map(result => (
               <div
-                key={grouping.id}
-                className="govuk-form-group govuk-!-margin-bottom-6"
+                key={result.id}
+                className="dfe-dash-tiles__tile govuk-!-margin-bottom-6"
               >
-                <FormSelect
-                  name="grouping"
-                  id={grouping.id}
-                  label={grouping.title}
-                  value={grouping.selected}
-                  order={[]}
-                  onChange={e =>
-                    this.updateSelectedGroupOption(
-                      grouping,
-                      e.currentTarget.value,
-                    )
-                  }
-                  options={grouping.options}
-                />
+                <h3 className="govuk-heading-m dfe-dash-tiles__heading">
+                  {meta.indicators[result.id].label}
+                </h3>
+                <p
+                  className="govuk-heading-xl govuk-!-margin-bottom-2"
+                  aria-label={meta.indicators[result.id].label}
+                >
+                  <span>
+                    {` ${result.value}${meta.indicators[result.id].unit} `}
+                  </span>
+                </p>
+                <Details
+                  summary={`What is ${meta.indicators[result.id].label}?`}
+                >
+                  Description for {meta.indicators[result.id].label}
+                </Details>
               </div>
             ))}
-          </form>
+          </div>
+        ) : (
+          ''
+        )}
 
-          {selected.results.length > 0 ? (
-            <div>
-              {selected.results.map(result => (
-                <div
-                  key={result.id}
-                  className="dfe-dash-tiles__tile govuk-!-margin-bottom-6"
-                >
-                  <h3 className="govuk-heading-m dfe-dash-tiles__heading">
-                    {meta.indicators[result.id].label}
-                  </h3>
-                  <p
-                    className="govuk-heading-xl govuk-!-margin-bottom-2"
-                    aria-label={meta.indicators[result.id].label}
-                  >
-                    <span>
-                      {` ${result.value}${meta.indicators[result.id].unit} `}
-                    </span>
-                  </p>
-                  <Details
-                    summary={`What is ${meta.indicators[result.id].label}?`}
-                  >
-                    Description for {meta.indicators[result.id].label}
-                  </Details>
-                </div>
+        {selected.indicator !== '' && (
+          <div>
+            <h3 className="govuk-heading-s">
+              Key to {meta.indicators[selected.indicator].label}
+            </h3>
+            <dl className="govuk-list">
+              {legend &&
+              legend.map(({ min, max, idx }) => (
+                <dd className={styles.legend} key={idx}>
+                  <span className={styles[`rate${idx}`]}>&nbsp;</span> {min}
+                  {meta.indicators[selected.indicator].unit}&nbsp; to {max}
+                  {meta.indicators[selected.indicator].unit}{' '}
+                </dd>
               ))}
-            </div>
-          ) : (
-            ''
-          )}
-
-          {selected.indicator !== '' && (
-            <div>
-              <h3 className="govuk-heading-s">
-                Key to {meta.indicators[selected.indicator].label}
-              </h3>
-              <dl className="govuk-list">
-                {legend &&
-                  legend.map(({ min, max, idx }) => (
-                    <dd className={styles.legend} key={idx}>
-                      <span className={styles[`rate${idx}`]}>&nbsp;</span> {min}
-                      {meta.indicators[selected.indicator].unit}&nbsp; to {max}
-                      {meta.indicators[selected.indicator].unit}{' '}
-                    </dd>
-                  ))}
-              </dl>
-            </div>
-          )}
-        </div>
-
-        <div className={classNames('govuk-grid-column-two-thirds')}>
-          <Map
-            ref={this.mapRef}
-            style={{
-              width: (width && `${width}px`) || '100%',
-              height: `${height || 600}px`,
-            }}
-            className={classNames(styles.map, 'dfe-print-break-avoid')}
-            center={position}
-            zoom={6.5}
-            // minZoom={6.5}
-            // zoomSnap={0.5}
-            // maxBounds={this.state.maxBounds}
-          >
-            {ukGeometry && <GeoJSON data={ukGeometry} className={styles.uk} />}
-
-            {geometry && (
-              <GeoJSON
-                ref={this.geoJsonRef}
-                data={geometry}
-                onEachFeature={this.onEachFeature}
-                style={(feature?: Feature) => ({
-                  className: classNames(
-                    feature &&
-                      feature.properties &&
-                      feature.properties.className,
-                    {
-                      [styles.selected]:
-                        feature && feature.id === selected.location,
-                    },
-                  ),
-                })}
-                onclick={this.onClick}
-                // style={this.styleFeature}
-                // onClick={this.handleClick}
-              />
-            )}
-          </Map>
-        </div>
+            </dl>
+          </div>
+        )}
       </div>
-    );
-  }
-}
+
+      <div className={classNames('govuk-grid-column-two-thirds')}>
+        <Map
+          ref={mapRef}
+          style={{
+            width: (width && `${width}px`) || '100%',
+            height: `${height || 600}px`,
+          }}
+          className={classNames(styles.map, 'dfe-print-break-avoid')}
+          center={position}
+          zoom={6.5}
+        >
+          {ukGeometry && <GeoJSON data={ukGeometry} className={styles.uk} />}
+
+          {geometry && (
+            <GeoJSON
+              ref={geoJsonRef}
+              data={geometry}
+              onEachFeature={onEachFeature}
+              style={(feature?: Feature) => ({
+                className: classNames(
+                  feature &&
+                  feature.properties &&
+                  feature.properties.className,
+                  {
+                    [styles.selected]:
+                    feature && feature.id === selected.location,
+                  },
+                ),
+              })}
+              onclick={onClick}
+            />
+          )}
+        </Map>
+      </div>
+    </div>
+  );
+};
+
+const definition: ChartDefinition = {
+  type: 'map',
+  name: 'Geographic',
+
+  capabilities: {
+    dataSymbols: false,
+    stackable: false,
+    lineStyle: false,
+    gridLines: false,
+    canSize: true,
+  },
+
+  data: [
+    {
+      type: 'geojson',
+      title: 'Geographic',
+      entryCount: 'multiple',
+      targetAxis: 'geojson',
+    },
+  ],
+
+  axes: [
+    {
+      id: 'geojson',
+      title: 'geojson',
+      type: 'major',
+    },
+  ],
+};
+
+MapBlock.definition = definition;
 
 export default MapBlock;
