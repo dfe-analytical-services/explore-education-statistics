@@ -62,7 +62,7 @@ const ReleaseSummaryEditPage = ({
               _: TimePeriodCoverageGroup[],
             ): EditFormValues => ({
               timePeriodCoverageCode:
-                releaseSummaryDetails.timePeriodCoverageCode,
+                releaseSummaryDetails.timePeriodCoverage.value,
               timePeriodCoverageStartYear: releaseSummaryDetails.releaseName.toString(),
               releaseTypeId: releaseSummaryDetails.typeId,
               scheduledPublishDate: dayMonthYearValuesToInputs(

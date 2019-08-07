@@ -31,7 +31,7 @@ export interface AdminDashboardRelease {
   contact: ContactDetails;
   lastEditedUser: UserDetails;
   lastEditedDateTime: string;
-  publishScheduled: DayMonthYearValues;
+  publishScheduled: Date;
   published?: string;
   nextReleaseDate: DayMonthYearValues;
 }

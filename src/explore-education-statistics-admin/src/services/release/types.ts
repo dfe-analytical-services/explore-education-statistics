@@ -2,8 +2,11 @@ import { DayMonthYearValues } from '@admin/services/common/types';
 
 export interface ReleaseSummaryDetails {
   id: string;
-  timePeriodCoverageCode: string;
-  releaseName: number;
+  timePeriodCoverage: {
+    value: string;
+    label: string;
+  };
+  releaseName: string;
   typeId: string;
   publishScheduled: string;
   nextReleaseDate: DayMonthYearValues;
@@ -14,7 +17,7 @@ export interface BaseReleaseSummaryDetailsRequest {
     value: string;
   };
   releaseName: number;
-  releaseTypeId: string;
+  typeId: string;
   publishScheduled: Date;
   nextReleaseDate: DayMonthYearValues;
 }

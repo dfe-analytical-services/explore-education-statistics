@@ -66,12 +66,11 @@ const DashboardReleaseSummary = ({ publicationId, release }: Props) => {
           {release.published && (
             <FormattedDate>{release.published}</FormattedDate>
           )}
-          {!release.published &&
-            dayMonthYearIsComplete(release.publishScheduled) && (
-              <FormattedDate>
-                {dayMonthYearToDate(release.publishScheduled)}
-              </FormattedDate>
-            )}
+          {!release.published && (
+            <FormattedDate>
+              {release.publishScheduled}
+            </FormattedDate>
+          )}
         </SummaryListItem>
         <SummaryListItem term="Next release date">
           {dayMonthYearIsComplete(release.nextReleaseDate) && (

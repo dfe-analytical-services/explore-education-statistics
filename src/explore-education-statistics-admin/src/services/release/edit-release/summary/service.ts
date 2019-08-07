@@ -18,7 +18,7 @@ const service: ReleaseSummaryService = {
   updateReleaseSummaryDetails(
     updateRequest: UpdateReleaseSummaryDetailsRequest,
   ): Promise<void> {
-    return client.post(
+    return client.put(
       `/releases/${updateRequest.releaseId}/summary`,
       updateRequest,
     );

@@ -1,20 +1,15 @@
 import Link from '@admin/components/Link';
 import DummyReferenceData from '@admin/pages/DummyReferenceData';
 import ManageReleaseContext, {ManageRelease} from '@admin/pages/release/ManageReleaseContext';
-import { summaryEditRoute } from '@admin/routes/edit-release/routes';
+import {summaryEditRoute} from '@admin/routes/edit-release/routes';
 import commonService from '@admin/services/common/service';
-import {
-  dayMonthYearIsComplete,
-  dayMonthYearToDate,
-  IdTitlePair,
-} from '@admin/services/common/types';
+import {dayMonthYearIsComplete, dayMonthYearToDate, IdTitlePair,} from '@admin/services/common/types';
 import service from '@admin/services/release/edit-release/summary/service';
-import { ReleaseSummaryDetails } from '@admin/services/release/types';
+import {ReleaseSummaryDetails} from '@admin/services/release/types';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import React, { useContext, useEffect, useState } from 'react';
-import { RouteComponentProps } from 'react-router';
+import React, {useContext, useEffect, useState} from 'react';
 
 const ReleaseSummaryPage = () => {
 
@@ -57,12 +52,12 @@ const ReleaseSummaryPage = () => {
           </SummaryListItem>
           <SummaryListItem term="Time period">
             {getSelectedTimePeriodCoverageLabel(
-              releaseSummaryDetails.timePeriodCoverageCode,
+              releaseSummaryDetails.timePeriodCoverage.value,
             )}
           </SummaryListItem>
           <SummaryListItem term="Release period">
             <time>{releaseSummaryDetails.releaseName}</time> to{' '}
-            <time>{releaseSummaryDetails.releaseName + 1}</time>
+            <time>{parseInt(releaseSummaryDetails.releaseName, 10) + 1}</time>
           </SummaryListItem>
           <SummaryListItem term="Lead statistician">
             {publication.contact && publication.contact.contactName}
