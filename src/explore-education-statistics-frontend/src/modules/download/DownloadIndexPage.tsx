@@ -46,13 +46,13 @@ class DownloadIndexPage extends Component<Props> {
             <RelatedInformation>
               <ul className="govuk-list">
                 <li>
-                  <Link to="/statistics">Find statistics and data</Link>
+                  <Link to="/find-statistics">Find statistics and data</Link>
                 </li>
                 <li>
                   <Link to="/glossary">Education statistics: glossary</Link>
                 </li>
                 <li>
-                  <Link to="/methodologies">
+                  <Link to="/methodology">
                     Education statistics: methodology
                   </Link>
                 </li>

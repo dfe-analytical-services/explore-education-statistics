@@ -12,7 +12,7 @@ function MethodologyList({ publications }: Props) {
       {publications.length > 0 ? (
         publications.map(({ title, slug }) => (
           <>
-            <Link to={`/methodologies/${slug}`}>{title}</Link>{' '}
+            <Link to={`/methodology/${slug}`}>{title}</Link>{' '}
           </>
         ))
       ) : (

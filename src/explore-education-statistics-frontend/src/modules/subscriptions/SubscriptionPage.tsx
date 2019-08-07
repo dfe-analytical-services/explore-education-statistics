@@ -86,8 +86,8 @@ class SubscriptionPage extends Component<Props> {
         title={data.title}
         caption="Notify me"
         breadcrumbs={[
-          { name: 'Find statistics and data', link: '/statistics' },
-          { name: data.title, link: `/statistics/${slug}` },
+          { name: 'Find statistics and data', link: '/find-statistics' },
+          { name: data.title, link: `/find-statistics/${slug}` },
         ]}
       >
         <div className="govuk-warning-text">
