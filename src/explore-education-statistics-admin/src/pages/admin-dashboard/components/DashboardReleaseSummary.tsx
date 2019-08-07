@@ -23,7 +23,7 @@ const getLiveLatestLabel = (isLive: boolean, isLatest: boolean) => {
   if (isLive) {
     return '(Live)';
   }
-  return undefined;
+  return '(not Live)';
 };
 
 const getTag = (approvalStatus: ReleaseApprovalStatus) => {
@@ -45,7 +45,7 @@ const DashboardReleaseSummary = ({ release }: Props) => {
       ? 'me'
       : release.lastEditedUser.name;
 
-  const releaseSummaryLabel = `${release.timePeriodCoverage.title}, ${
+  const releaseSummaryLabel = `${release.timePeriodCoverage.label}, ${
     release.releaseName
   } 
      ${getLiveLatestLabel(release.live, release.latestRelease)}`;

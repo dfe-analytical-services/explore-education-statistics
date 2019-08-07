@@ -18,6 +18,7 @@ import { DataBlockResponse } from '@common/services/dataBlockService';
 import {
   AxisConfiguration,
   DataSetConfiguration,
+  ChartDataSet,
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import React from 'react';
@@ -97,6 +98,7 @@ const ChartBuilder = ({ data }: Props) => {
     legendHeight: '42',
     height: 300,
     width: undefined,
+    title: '',
   });
   const previousAxesConfiguration = React.useRef<Dictionary<AxisConfiguration>>(
     {},
@@ -128,6 +130,29 @@ const ChartBuilder = ({ data }: Props) => {
     setDataSetAndConfiguration(newDataSets);
   };
 
+  const [chartLabels, setChartLabels] = React.useState<
+    Dictionary<DataSetConfiguration>
+  >({});
+  React.useEffect(() => {
+    setChartLabels({
+      ...dataSetAndConfiguration.reduce<Dictionary<DataSetConfiguration>>(
+        (mapped, { configuration }) => ({
+          ...mapped,
+          [configuration.value]: configuration,
+        }),
+        {},
+      ),
+      ...generateAxesMetaData(axesConfiguration, data),
+    });
+  }, [dataSetAndConfiguration, axesConfiguration, data]);
+
+  const [majorAxisDataSets, setMajorAxisDataSets] = React.useState<
+    ChartDataSet[]
+  >([]);
+  React.useEffect(() => {
+    setMajorAxisDataSets(dataSetAndConfiguration.map(dsc => dsc.dataSet));
+  }, [dataSetAndConfiguration]);
+
   // build the properties that is used to render the chart from the selections made
   const [renderedChartProps, setRenderedChartProps] = React.useState<
     ChartRendererProps
@@ -141,32 +166,17 @@ const ChartBuilder = ({ data }: Props) => {
 
         meta: data.metaData,
 
-        axes: Object.entries(axesConfiguration).reduce<
-          Dictionary<AxisConfiguration>
-        >(
-          (populatedData, [key, value]) => ({
-            ...populatedData,
-            [key]: {
-              ...value,
-              dataSets:
-                value.type === 'major'
-                  ? dataSetAndConfiguration.map(dsc => dsc.dataSet)
-                  : [],
-            },
-          }),
-          {},
-        ),
-        labels: {
-          ...dataSetAndConfiguration.reduce<Dictionary<DataSetConfiguration>>(
-            (mapped, { configuration }) => ({
-              ...mapped,
-              [configuration.value]: configuration,
-            }),
-            {},
-          ),
-
-          ...generateAxesMetaData(axesConfiguration, data),
+        axes: {
+          major: {
+            ...axesConfiguration.major,
+            dataSets: majorAxisDataSets,
+          },
+          minor: {
+            ...axesConfiguration.minor,
+            dataSets: [],
+          },
         },
+        labels: chartLabels,
         ...chartOptions,
       });
   }, [
@@ -175,6 +185,8 @@ const ChartBuilder = ({ data }: Props) => {
     dataSetAndConfiguration,
     data,
     chartOptions,
+    chartLabels,
+    majorAxisDataSets,
   ]);
 
   const previousSelectionChartType = React.useRef<ChartDefinition>();
@@ -197,6 +209,11 @@ const ChartBuilder = ({ data }: Props) => {
 
             [axisDefinition.type]: {
               referenceLines: [],
+              min: '',
+              max: '',
+              tickSpacing: '',
+              unit: '',
+              tickConfig: 'default',
 
               ...previousConfig,
 
@@ -220,6 +237,8 @@ const ChartBuilder = ({ data }: Props) => {
                   : previousConfig.showGrid,
               size:
                 previousConfig.size === undefined ? '50' : previousConfig.size,
+              sortBy: previousConfig.sortBy || 'name',
+              sortAsc: previousConfig.sortAsc || true,
             },
           };
         }, {});
@@ -267,15 +286,25 @@ const ChartBuilder = ({ data }: Props) => {
             />
           </TabsSection>
 
-          <TabsSection title="Axes">
-            <div className={styles.axesOptions}>
-              {Object.entries(axesConfiguration).map(([key, axis]) => (
+          <TabsSection title="Chart Configuration">
+            <ChartConfiguration
+              selectedChartType={selectedChartType}
+              chartOptions={chartOptions}
+              onChange={setChartOptions}
+            />
+          </TabsSection>
+
+          {Object.entries(axesConfiguration).map(([key, axis]) => (
+            <TabsSection title={axis.name} key={key}>
+              <div className={styles.axesOptions}>
                 <ChartAxisConfiguration
-                  key={key}
-                  id={axis.name}
+                  id={key}
                   configuration={axis}
                   capabilities={selectedChartType.capabilities}
+                  data={data}
                   meta={data.metaData}
+                  labels={chartLabels}
+                  dataSets={axis.type === 'major' ? majorAxisDataSets : []}
                   onConfigurationChange={updatedConfig => {
                     setAxesConfiguration({
                       ...axesConfiguration,
@@ -283,17 +312,9 @@ const ChartBuilder = ({ data }: Props) => {
                     });
                   }}
                 />
-              ))}
-            </div>
-          </TabsSection>
-
-          <TabsSection title="Chart">
-            <ChartConfiguration
-              selectedChartType={selectedChartType}
-              chartOptions={chartOptions}
-              onChange={setChartOptions}
-            />
-          </TabsSection>
+              </div>
+            </TabsSection>
+          ))}
         </Tabs>
       )}
     </div>

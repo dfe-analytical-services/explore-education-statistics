@@ -1,0 +1,39 @@
+@{
+    ViewData["Title"] = "Notify subscribers";
+    Layout = "../Shared/_Layout.cshtml";
+}
+
+<form asp-action="NotifySubscribers">
+    <fieldset class="govuk-fieldset">
+        <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
+            <h1 class="govuk-fieldset__heading">
+                Notify subscribers
+            </h1>
+        </legend>
+
+        <div class="govuk-warning-text">
+            <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+            <strong class="govuk-warning-text__text">
+                <span class="govuk-warning-text__assistive">Warning</span>
+                This will email subscribers of the selected publication.
+            </strong>
+        </div>
+
+        <div class="govuk-warning-text">
+            <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+            <strong class="govuk-warning-text__text">
+                <span class="govuk-warning-text__assistive">Warning</span>
+                Emails will only be sent to subscribers on the notify service whitelist.
+            </strong>
+        </div>
+
+        <div class="govuk-form-group">
+            <label for="publication" class="govuk-label govuk-label--s">Publication</label>
+            <select id="publication" name="PublicationId" class="govuk-select" asp-items="ViewBag.PublicationId" required="required"></select>
+        </div>
+
+        <button type="submit" class="govuk-button">
+            Send notification
+        </button>
+    </fieldset>
+</form>

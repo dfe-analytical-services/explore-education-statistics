@@ -242,7 +242,7 @@ const dashboardPublicationsByTopicId: Dictionary<
           releaseName: '2017-2018',
           timePeriodCoverage: {
             id: 'AYQ1Q4',
-            title: 'Academic year',
+            label: 'Academic year',
           },
           status: ReleaseApprovalStatus.Approved,
           latestRelease: true,

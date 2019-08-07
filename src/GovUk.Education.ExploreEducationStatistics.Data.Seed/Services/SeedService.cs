@@ -164,7 +164,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
             var dataFile = CreateFormFile(file.GetCsvLines(), file + ".csv", "file");
             var metaFile = CreateFormFile(file.GetMetaCsvLines(), file + ".meta.csv", "metaFile");
 
-            _fileStorageService.UploadFilesAsync(release.Publication.Slug, release.Slug, dataFile, metaFile, subjectName).Wait();
+            _fileStorageService.UploadDataFilesAsync(release.Id, dataFile, metaFile, subjectName).Wait();
         }
 
         private IFormFile CreateFormFile(IEnumerable<string> lines, string fileName, string name)

@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "a708b9d9-b9bd-41bf-bfd3-4137eb40abc7",
+		"_postman_id": "1d44cd5a-0e76-413b-b3fd-d6134af597c2",
 		"name": "DfE Admin API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -26,10 +26,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{admin_api_url}}/contacts",
 					"host": [
@@ -59,7 +55,7 @@
 							"    pm.expect(pm.response.json()[0].title).to.equal(\"Ad Hoc\"); ",
 							"});",
 							"",
-							"pm.test(\"Ad Hoc should be present in the results\", function () { ",
+							"pm.test(\"Official Statistics should be present in the results\", function () { ",
 							"    pm.expect(pm.response.json()[1].title).to.equal(\"Official Statistics\"); ",
 							"});"
 						],
@@ -70,10 +66,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{admin_api_url}}/meta/releasetypes",
 					"host": [
@@ -133,10 +125,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{admin_api_url}}/meta/timeidentifiers",
 					"host": [
@@ -190,10 +178,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{admin_api_url}}/me/publications?topicId=67C249DE-1CCA-446E-8CCB-DCDAC542F460",
 					"host": [
@@ -212,6 +196,499 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "POST Create new release",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "98057100-77fb-42b7-9c21-f1d4921917ab",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+							"",
+							"pm.test(\"Fields are present\", function () {",
+							"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"title\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"releaseName\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"coverageTitle\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"yearTitle\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"published\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"latestRelease\"));",
+							"});",
+							"",
+							"pm.test(\"Title should should be correct\", function () { ",
+							"    pm.expect(pm.response.json().title).to.equal(\"Academic Year 2014/15\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"PublicationId\": \"8b12776b-3d36-4475-8115-00974d7de1d0\",\n    \"ReleaseTypeId\": \"1821abb8-68b0-431b-9770-0bea65d02ff0\",\n    \"TimeIdentifier\": 62,\n    \"PublishScheduled\": \"0001-01-01T00:00:00\",\n    \"NextReleaseExpected\": {\n        \"Year\": \"2018\",\n        \"Month\": \"01\",\n        \"Day\": \"01\"\n    },\n    \"ReleaseName\": \"2014\",\n    \"TemplateReleaseId\": \"63227211-7CB3-408C-B5C2-40D3D7CB2717\"\n}"
+				},
+				"url": {
+					"raw": "{{admin_api_url}}/publications/8b12776b-3d36-4475-8115-00974d7de1d0/releases",
+					"host": [
+						"{{admin_api_url}}"
+					],
+					"path": [
+						"publications",
+						"8b12776b-3d36-4475-8115-00974d7de1d0",
+						"releases"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET Admin dashboard publications",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "aad25515-6076-4a4a-b609-61fe0a986e11",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+							"",
+							"pm.test(\"Should return some results\", function () {",
+							"    pm.expect(pm.response.json().length).to.be.above(0);    ",
+							"});",
+							"",
+							"pm.test(\"Further education outcome-based success measures should be present\", function () { ",
+							"    pm.expect(pm.response.json()[0].title).to.equal(\"Further education outcome-based success measures\"); ",
+							"});",
+							"",
+							"pm.test(\"Expect latestRelease flag if releases is more than 0\", function () {",
+							"    for(var i = 0; i < pm.response.json().length; i++) {",
+							"        if(pm.response.json()[i].releases !== null) {",
+							"            for(var j = 0; j < pm.response.json()[i].releases.length; j++) {",
+							"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].releases[${j}].latestRelease`));",
+							"            }",
+							"        }",
+							"    }",
+							"});",
+							"",
+							"pm.test(\"Expect title if methodology is more than 0\", function () {",
+							"    for(var i = 0; i < pm.response.json().length; i++) {",
+							"        if(pm.response.json()[i].methodology !== null) {",
+							"            for(var j = 0; j < pm.response.json()[i].methodology.length; j++) {",
+							"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].methodology[${j}].title`));",
+							"            }",
+							"        }",
+							"    }",
+							"});",
+							"",
+							"pm.test(\"Expect the correct fields\", function () {",
+							"    for(var i = 0; i < pm.response.json().length; i++) {",
+							"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topicId`));",
+							"            pm.expect(pm.response.to.have.jsonBody(`[${i}].nextUpdate`));",
+							"            pm.expect(pm.response.to.have.jsonBody(`[${i}].releases`));",
+							"            pm.expect(pm.response.to.have.jsonBody(`[${i}].methodology`));",
+							"            pm.expect(pm.response.to.have.jsonBody(`[${i}].contact`));",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{admin_api_url}}/me/publications?topicId=A7CE9542-20E6-401D-91F4-F832C9E58B12&themeId=2CA22E34-B87A-4281-A0EB-B80F4F8DD374",
+					"host": [
+						"{{admin_api_url}}"
+					],
+					"path": [
+						"me",
+						"publications"
+					],
+					"query": [
+						{
+							"key": "topicId",
+							"value": "A7CE9542-20E6-401D-91F4-F832C9E58B12"
+						},
+						{
+							"key": "themeId",
+							"value": "2CA22E34-B87A-4281-A0EB-B80F4F8DD374"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST Create new publication",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "256d11e0-8766-43c9-a53c-477b764c85dc",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "4b4d0e5b-d1e9-4e6a-af9e-514f3c3ad225",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+							"",
+							"pm.test(\"Fields are present\", function () {",
+							"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"title\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"nextUpdate\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"releases\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"methodology\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"topicId\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"contact\"));",
+							"});",
+							"",
+							"pm.test(\"topicId should should be correct\", function () { ",
+							"    pm.expect(pm.response.json().topicId).to.equal(\"53a1fbb7-5234-435f-892b-9baad4c82535\"); ",
+							"});",
+							"",
+							"pm.test(\"teamName should should be correct\", function () { ",
+							"    pm.expect(pm.response.json().contact.teamName).to.equal(\"Simon's Team\"); ",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"title\": \"{{$guid}}\",\n\t\"methodologyId\": \"\",\n\t\"contactId\": \"11BB7387-E85E-4571-9669-8A760DCB004F\"\n}"
+				},
+				"url": {
+					"raw": "{{admin_api_url}}/topic/53A1FBB7-5234-435F-892B-9BAAD4C82535/publications",
+					"host": [
+						"{{admin_api_url}}"
+					],
+					"path": [
+						"topic",
+						"53A1FBB7-5234-435F-892B-9BAAD4C82535",
+						"publications"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET All methodologies",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e472dd85-13ad-411e-bdcc-d5e6e875df7f",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+							"",
+							"pm.test(\"Should return some results\", function () {",
+							"    pm.expect(pm.response.json().length).to.be.above(0);    ",
+							"});",
+							"",
+							"pm.test(\"Title should be correct\", function () { ",
+							"    pm.expect(pm.response.json()[0].title).to.equal(\"Pupil exclusion statistics: methodology\"); ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{admin_api_url}}/methodologies",
+					"host": [
+						"{{admin_api_url}}"
+					],
+					"path": [
+						"methodologies"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET Methodologies for a topic",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "372a9979-fd08-4af1-bb4c-5314db6a237b",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+							"",
+							"pm.test(\"Should return some results\", function () {",
+							"    pm.expect(pm.response.json().length).to.be.above(0);    ",
+							"});",
+							"",
+							"pm.test(\"Title should be correct\", function () { ",
+							"    pm.expect(pm.response.json()[0].title).to.equal(\"Pupil exclusion statistics: methodology\"); ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{admin_api_url}}/topic/77941B7D-BBD6-4069-9107-565AF89E2DEC/methodologies",
+					"host": [
+						"{{admin_api_url}}"
+					],
+					"path": [
+						"topic",
+						"77941B7D-BBD6-4069-9107-565AF89E2DEC",
+						"methodologies"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET Release Summary",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+							"",
+							"pm.test(\"Fields are present\", function () {",
+							"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"typeId\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.value\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.label\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"publishScheduled\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"nextReleaseDate\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"releaseName\"));",
+							"});",
+							"",
+							"pm.test(\"typeId should should be correct\", function () { ",
+							"    pm.expect(pm.response.json().typeId).to.equal(\"9d333457-9132-4e55-ae78-c55cb3673d7c\"); ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{admin_api_url}}/releases/E7774A74-1F62-4B76-B9B5-84F14DAC7278/summary/",
+					"host": [
+						"{{admin_api_url}}"
+					],
+					"path": [
+						"releases",
+						"E7774A74-1F62-4B76-B9B5-84F14DAC7278",
+						"summary",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT Update release summary",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "7f8cf236-4a90-4eaf-913c-176307325907",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+							"",
+							"pm.test(\"Fields are present\", function () {",
+							"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"title\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"releaseName\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"coverageTitle\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"yearTitle\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"typeId\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage\"));",
+							"    pm.expect(pm.response.to.have.jsonBody(\"latestRelease\"));",
+							"});",
+							"",
+							"pm.test(\"releaseName should should be correct\", function () { ",
+							"    pm.expect(pm.response.json().releaseName).to.equal(\"2018\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "9182d3f6-e3df-46c4-8a0e-62c98a04e73b",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5\",\n    \"typeId\": \"9d333457-9132-4e55-ae78-c55cb3673d7c\",\n    \"timePeriodCoverage\": {\n        \"value\": \"AY\",\n        \"label\": \"Academic Year\"\n    },\n    \"publishScheduled\": null,\n    \"nextReleaseDate\": null,\n    \"releaseName\": \"2018\"\n}"
+				},
+				"url": {
+					"raw": "{{admin_api_url}}/releases/4FA4FE8E-9A15-46BB-823F-49BF8E0CDEC5/summary/",
+					"host": [
+						"{{admin_api_url}}"
+					],
+					"path": [
+						"releases",
+						"4FA4FE8E-9A15-46BB-823F-49BF8E0CDEC5",
+						"summary",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET Releases for publication",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "50f6efbc-4157-4ec4-b3f2-a7c2cb4abe9e",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+							"",
+							"pm.test(\"Should return some results\", function () {",
+							"    pm.expect(pm.response.json().length).to.be.above(0);    ",
+							"});",
+							"",
+							"pm.test(\"Expect correct fields in releases array if releases is more than 0\", function () {",
+							"    for(var i = 0; i < pm.response.json().length; i++) {",
+							"        if(pm.response.json()[i].releases !== null) {",
+							"            for(var j = 0; j < pm.response.json()[i].releases.length; j++) {",
+							"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].releases[${j}].title`));",
+							"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].releases[${j}].publicationTitle`));",
+							"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].releases[${j}].releaseName`));",
+							"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].releases[${j}].coverageTitle`));",
+							"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].releases[${j}].yearTitle`));",
+							"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].releases[${j}].typeId`));",
+							"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].releases[${j}].latestRelease`));",
+							"            }",
+							"        }",
+							"    }",
+							"});",
+							"",
+							"pm.test(\"Response should contain \\\"Pupil absence in schools in England\\\"\", function () {",
+							"   var foundTitle = false;",
+							"   for(var i = 0; i < pm.response.json().length; i++) {",
+							"        if(pm.response.json()[i].releases !== null) {",
+							"            for(var j = 0; j < pm.response.json()[i].releases.length; j++) {",
+							"                if(pm.response.json()[i].title === \"Pupil absence in schools in England\") ",
+							"                {",
+							"                    foundTitle = true;",
+							"                }",
+							"            }",
+							"        }",
+							"   }",
+							"   pm.expect(foundTitle).to.equal(true);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{admin_api_url}}/me/publications?topicId=67C249DE-1CCA-446E-8CCB-DCDAC542F460",
+					"host": [
+						"{{admin_api_url}}"
+					],
+					"path": [
+						"me",
+						"publications"
+					],
+					"query": [
+						{
+							"key": "topicId",
+							"value": "67C249DE-1CCA-446E-8CCB-DCDAC542F460"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "6464fc17-e41b-4120-9ac9-00c93234437a",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "8d33b604-23a0-45bf-9ff6-91ec28db96e4",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
 		}
 	]
 }

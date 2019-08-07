@@ -18,27 +18,14 @@ const PageFooter = ({ wide }: Props) => (
           <h2 className="govuk-visually-hidden">Support links</h2>
           <ul className="govuk-footer__inline-list">
             <li className="govuk-footer__inline-list-item">
-              <Link
-                className="govuk-footer__link"
-                to="/cookies"
-                data-testid="footer--cookies-link"
-              >
-                Cookies
-              </Link>
-            </li>
-            <li className="govuk-footer__inline-list-item">
-              <Link
-                className="govuk-footer__link"
-                to="/privacy-policy"
-                data-testid="footer--privacy-policy-link"
-              >
-                Privacy policy
-              </Link>
-            </li>
-            <li className="govuk-footer__inline-list-item">
               <Link className="govuk-footer__link" to="/prototypes">
                 Prototypes
               </Link>
+            </li>
+            <li className="govuk-footer__inline-list-item">
+              <a href="/tools" className="govuk-footer__link">
+                BAU Tools
+              </a>
             </li>
           </ul>
 

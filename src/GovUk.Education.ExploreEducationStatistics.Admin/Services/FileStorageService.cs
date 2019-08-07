@@ -1,15 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using MimeTypes;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using FileInfo = GovUk.Education.ExploreEducationStatistics.Admin.Models.FileInfo;
+using ReleaseId = System.Guid;
+using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -34,53 +40,83 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _storageConnectionString = config.GetConnectionString("CoreStorage");
         }
 
-        public async Task UploadFilesAsync(string publication, string release, IFormFile dataFile, IFormFile metaFile,
+        public async Task<Either<ValidationResult,IEnumerable<FileInfo>>> UploadDataFilesAsync(Guid releaseId, IFormFile dataFile, IFormFile metaFile,
             string name)
         {
-            var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
-
-            var blobClient = storageAccount.CreateCloudBlobClient();
-            var blobContainer = blobClient.GetContainerReference(ContainerName);
-            await blobContainer.CreateIfNotExistsAsync();
-
-            var permissions = new BlobContainerPermissions
-            {
-                PublicAccess = BlobContainerPublicAccessType.Blob
-            };
-            await blobContainer.SetPermissionsAsync(permissions);
-
-            await UploadFileAsync(blobContainer, publication, release, dataFile, new List<KeyValuePair<string, string>>
+            var blobContainer = await GetCloudBlobContainer();
+            var dataInfo = new List<KeyValuePair<string, string>>
             {
                 new KeyValuePair<string, string>("name", name),
                 new KeyValuePair<string, string>("metafile", metaFile.FileName)
-            });
-            await UploadFileAsync(blobContainer, publication, release, metaFile, new List<KeyValuePair<string, string>>
+            };
+            var metaDataInfo = new List<KeyValuePair<string, string>>
             {
                 new KeyValuePair<string, string>("datafile", dataFile.FileName)
-            });
+            };
+            
+            return await UploadFileAsync(blobContainer, releaseId, dataFile, ReleaseFileTypes.Data, dataInfo)
+                    .Map(async () =>
+                        await UploadFileAsync(blobContainer, releaseId, metaFile, ReleaseFileTypes.Data, metaDataInfo))
+                    .Map(async () => 
+                        await ListFilesAsync(releaseId, ReleaseFileTypes.Data));
         }
-
-        private static async Task UploadFileAsync(CloudBlobContainer blobContainer, string publication, string release,
-            IFormFile file, IEnumerable<KeyValuePair<string, string>> metaValues)
+        
+        public async Task<Either<ValidationResult,IEnumerable<FileInfo>>> UploadFilesAsync(Guid releaseId, IFormFile file, string name, ReleaseFileTypes type)
         {
-            var blob = blobContainer.GetBlockBlobReference($"{publication}/{release}/{file.FileName}");
-            blob.Properties.ContentType = file.ContentType;
-            var path = await FileUtils.UploadToTemporaryFile(file);
-            await blob.UploadFromFileAsync(path);
-            await AddMetaValuesAsync(blob, metaValues);
+            var blobContainer = await GetCloudBlobContainer();
+            var info = new List<KeyValuePair<string, string>> {new KeyValuePair<string, string>("name", name)};
+            return await UploadFileAsync(blobContainer, releaseId, file, type, info, true)
+                    .Map(async () => await ListFilesAsync(releaseId, type));
         }
 
-        public IEnumerable<FileInfo> ListFiles(string publication, string release)
+        private async Task<CloudBlobContainer> GetCloudBlobContainer()
         {
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
-
             var blobClient = storageAccount.CreateCloudBlobClient();
             var blobContainer = blobClient.GetContainerReference(ContainerName);
-            blobContainer.CreateIfNotExists();
+            await blobContainer.CreateIfNotExistsAsync();
+            return blobContainer;
+        }
 
-            return blobContainer.ListBlobs($"{publication}/{release}", true, BlobListingDetails.Metadata)
+        private static async Task<Either<ValidationResult, bool>> UploadFileAsync(CloudBlobContainer blobContainer, Guid releaseId,
+            IFormFile file, ReleaseFileTypes type, IEnumerable<KeyValuePair<string, string>> metaValues, bool overwrite = false)
+        {
+            var blob = blobContainer.GetBlockBlobReference(ReleasePath(releaseId, type) + $"/{file.FileName}");
+            if (blob.Exists() && !overwrite)
+            {
+                return ValidationResult("File name", "Cannot overwrite");
+            }   
+            blob.Properties.ContentType = file.ContentType;
+            var path = await UploadToTemporaryFile(file);
+            await blob.UploadFromFileAsync(path);
+            await AddMetaValuesAsync(blob, metaValues);
+            return true;
+        }
+        
+        private static async Task<string> UploadToTemporaryFile(IFormFile file)
+        {
+            var path = Path.GetTempFileName();
+            if (file.Length > 0)
+            {
+                using (var stream = new FileStream(path, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+            }
+            return path;
+        }
+
+        public async Task<IEnumerable<FileInfo>> ListFilesAsync(Guid releaseId, ReleaseFileTypes type)
+        {
+            return await ListFilesAsync(releaseId.ToString(), type);
+        }
+        
+        public async Task<IEnumerable<FileInfo>> ListFilesAsync(string releaseId, ReleaseFileTypes type)
+        {
+            var blobContainer = await GetCloudBlobContainer();
+    
+            return blobContainer.ListBlobs(ReleasePath(releaseId, type), true, BlobListingDetails.Metadata)
                 .OfType<CloudBlockBlob>()
-                .Where(IsDataFile)
                 .Select(file => new FileInfo
                 {
                     Extension = GetExtension(file),
@@ -92,12 +128,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OrderBy(info => info.Name);
         }
 
-        private static bool IsDataFile(CloudBlob blob)
+        private static string ReleasePath(string releaseId, ReleaseFileTypes type)
         {
-            // Data files are identified by a key in their metadata describing their corresponding meta file
-            return blob.Metadata.ContainsKey("metafile");
+            return $"{releaseId}/{type.GetEnumLabel()}";
         }
-        
+
+        private static string ReleasePath(ReleaseId releaseId, ReleaseFileTypes type) =>
+            ReleasePath(releaseId.ToString(), type);
+
         private static string GetExtension(CloudBlob blob)
         {
             return MimeTypeMap.GetExtension(blob.Properties.ContentType).TrimStart('.');
@@ -105,12 +143,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private static string GetName(CloudBlob blob)
         {
-            return blob.Metadata.TryGetValue("name", out var name) ? name : "Unknown file name";
+            return blob.Metadata.TryGetValue("name", out var name) ? name : "";
         }
         
         private static string GetMetaFileName(CloudBlob blob)
         {
-            return blob.Metadata.TryGetValue("metafile", out var name) ? name : "Unknown file name";
+            return blob.Metadata.TryGetValue("metafile", out var name) ? name : "";
         }
 
         private static string GetSize(CloudBlob blob)
@@ -128,9 +166,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private static async Task AddMetaValuesAsync(CloudBlob blob, IEnumerable<KeyValuePair<string, string>> values)
         {
-            foreach (var value in values)
+            foreach (var (key, value) in values)
             {
-                blob.Metadata.Add(value);
+                if (blob.Metadata.ContainsKey(key))
+                {
+                    blob.Metadata.Remove(key);
+                }
+                blob.Metadata.Add(key, value);
             }
 
             await blob.SetMetadataAsync();

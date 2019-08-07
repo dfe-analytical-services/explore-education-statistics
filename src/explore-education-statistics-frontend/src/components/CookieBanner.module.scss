@@ -1,0 +1,11 @@
+@import '~explore-education-statistics-common/src/styles/govuk-base';
+
+.container {
+  background: #d5e8f3;
+  padding: govuk-spacing(2) 0;
+  width: 100%;
+
+  > div > p {
+    margin: 0;
+  }
+}

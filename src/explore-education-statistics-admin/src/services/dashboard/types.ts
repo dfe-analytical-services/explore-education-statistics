@@ -1,6 +1,7 @@
 import {
   ContactDetails,
   DayMonthYearValues,
+  IdLabelPair,
   IdTitlePair,
   UserDetails,
 } from '@admin/services/common/types';
@@ -8,6 +9,7 @@ import {
 export enum ReleaseApprovalStatus {
   Approved,
   ReadyToReview,
+  None,
 }
 
 export interface ThemeAndTopics {
@@ -25,7 +27,7 @@ export interface AdminDashboardRelease {
   latestRelease: boolean;
   live: boolean;
   releaseName: string;
-  timePeriodCoverage: IdTitlePair;
+  timePeriodCoverage: IdLabelPair;
   contact: ContactDetails;
   lastEditedUser: UserDetails;
   lastEditedDateTime: string;

@@ -1,5 +1,6 @@
 import ProtectedRoute from '@admin/components/ProtectedRoute';
 import CreatePublicationPage from '@admin/pages/create-publication/CreatePublicationPage';
+import CreateReleasePage from '@admin/pages/release/create-release/CreateReleasePage';
 import MockSignInProcess from '@admin/pages/sign-in/mock/MockSignInProcess';
 import MockSignOutProcess from '@admin/pages/sign-in/mock/MockSignOutProcess';
 import SignedOutPage from '@admin/pages/sign-in/SignedOutPage';
@@ -22,6 +23,7 @@ import PrototypeAdminDashboard from './pages/prototypes/PrototypeAdminDashboard'
 
 import PrototypeChartTest from './pages/prototypes/PrototypeChartTest';
 import AdminDocumentationGlossary from './pages/prototypes/PrototypeDocumentationGlossary';
+import AdminDocumentationStyle from './pages/prototypes/PrototypeDocumentationStyle';
 import AdminDocumentationHome from './pages/prototypes/PrototypeDocumentationHome';
 import PublicationAssignMethodology from './pages/prototypes/PrototypePublicationPageAssignMethodology';
 import PublicationConfirmNew from './pages/prototypes/PrototypePublicationPageConfirmNew';
@@ -31,7 +33,7 @@ import PublicationCreateNew from './pages/prototypes/PrototypePublicationPageCre
 import PublicationEditPage from './pages/prototypes/PrototypePublicationPageEditAbsence';
 import PublicationEditUnresolvedComments from './pages/prototypes/PrototypePublicationPageEditAbsenceUnresolvedComments';
 import PublicationEditNew from './pages/prototypes/PrototypePublicationPageEditNew';
-import PublicationCreateNewAbsence from './pages/prototypes/PrototypePublicationPageNewAbsence';
+// import PublicationCreateNewAbsence from './pages/prototypes/PrototypePublicationPageNewAbsence';
 import PublicationCreateNewAbsenceConfig from './pages/prototypes/PrototypePublicationPageNewAbsenceConfig';
 import PublicationCreateNewAbsenceConfigEdit from './pages/prototypes/PrototypePublicationPageNewAbsenceConfigEdit';
 import PublicationCreateNewAbsenceData from './pages/prototypes/PrototypePublicationPageNewAbsenceData';
@@ -40,7 +42,7 @@ import PublicationCreateNewAbsenceScheduleEdit from './pages/prototypes/Prototyp
 import PublicationCreateNewAbsenceStatus from './pages/prototypes/PrototypePublicationPageNewAbsenceStatus';
 import PublicationCreateNewAbsenceTable from './pages/prototypes/PrototypePublicationPageNewAbsenceTable';
 import PublicationCreateNewAbsenceViewTables from './pages/prototypes/PrototypePublicationPageNewAbsenceViewTables';
-import PublicationReviewPage from './pages/prototypes/PrototypePublicationPageReviewAbsence';
+// import PublicationReviewPage from './pages/prototypes/PrototypePublicationPageReviewAbsence';
 import ReleaseCreateNew from './pages/prototypes/PrototypeReleasePageCreateNew';
 import PrototypesIndexPage from './pages/prototypes/PrototypesIndexPage';
 
@@ -74,7 +76,13 @@ function App() {
         component={CreatePublicationPage}
       />
 
-      {releaseRoutes.map(route => (
+      <ProtectedRoute
+        exact
+        path={releaseRoutes.createReleaseRoute.route}
+        component={CreateReleasePage}
+      />
+
+      {releaseRoutes.manageReleaseRoutes.map(route => (
         <ProtectedRoute
           exact
           key={route.path}
@@ -125,7 +133,7 @@ function App() {
         <Route
           exact
           path="/prototypes/publication-review"
-          component={PublicationReviewPage}
+          render={() => <PublicationEditUnresolvedComments reviewing />}
         />
         <Route
           exact
@@ -155,7 +163,7 @@ function App() {
         <Route
           exact
           path="/prototypes/publication-create-new-absence"
-          component={PublicationCreateNewAbsence}
+          render={() => <PublicationEditUnresolvedComments newBlankRelease />}
         />
         <Route
           exact
@@ -210,7 +218,7 @@ function App() {
         <Route
           exact
           path="/prototypes/documentation/style-guide"
-          component={AdminDocumentationGlossary}
+          component={AdminDocumentationStyle}
         />
       </LoginContext.Provider>
     </BrowserRouter>

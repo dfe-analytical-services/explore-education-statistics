@@ -85,25 +85,18 @@ type TimeIdentifier =
   | 'M11'
   | 'M12';
 
-export interface Country {
+export interface Location {
   code: string;
   name: string;
 }
 
-interface Region {
-  code: string;
-  name: string;
-}
+export type Country = Location;
+export type Region = Location;
 
-interface LocalAuthority {
-  code: string;
+export type LocalAuthorityDistrict = Location;
+
+export interface LocalAuthority extends Location {
   old_code: string;
-  name: string;
-}
-
-interface LocalAuthorityDistrict {
-  code: string;
-  name: string;
 }
 
 export interface DataBlockLocation {

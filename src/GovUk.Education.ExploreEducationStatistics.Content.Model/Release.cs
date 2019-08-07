@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Newtonsoft.Json;
 using static System.DateTime;
-using static System.Int32;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PartialDate;
 using static System.String;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifierCategory;

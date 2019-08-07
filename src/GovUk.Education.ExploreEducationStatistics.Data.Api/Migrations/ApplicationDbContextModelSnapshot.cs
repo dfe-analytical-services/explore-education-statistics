@@ -47,9 +47,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
                     b.Property<string>("Label");
 
+                    b.Property<string>("Name");
+
                     b.Property<long>("SubjectId");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name");
 
                     b.HasIndex("SubjectId");
 
@@ -152,12 +156,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
                     b.Property<string>("Label");
 
+                    b.Property<string>("Name");
+
                     b.Property<string>("Unit")
                         .IsRequired();
 
                     b.HasKey("Id");
 
                     b.HasIndex("IndicatorGroupId");
+
+                    b.HasIndex("Name");
 
                     b.ToTable("Indicator");
                 });

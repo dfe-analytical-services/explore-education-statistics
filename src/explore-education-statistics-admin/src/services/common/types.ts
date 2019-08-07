@@ -6,6 +6,11 @@ export interface IdTitlePair {
   title: string;
 }
 
+export interface IdLabelPair {
+  id: string;
+  label: string;
+}
+
 export interface ContactDetails {
   id: string;
   contactName: string;
@@ -96,6 +101,28 @@ export interface DayMonthYearValues {
   year?: number;
 }
 
+export interface DayMonthYearInputs {
+  day: string;
+  month: string;
+  year: string;
+}
+
+export const dayMonthYearValuesToInputs = (
+  dmy: DayMonthYearValues,
+): DayMonthYearInputs => ({
+  day: dmy.day ? dmy.day.toString() : '',
+  month: dmy.month ? dmy.month.toString() : '',
+  year: dmy.year ? dmy.year.toString() : '',
+});
+
+export const dayMonthYearInputsToValues = (
+  dmy: DayMonthYearInputs,
+): DayMonthYearValues => ({
+  day: dmy.day ? parseInt(dmy.day, 10) : undefined,
+  month: dmy.month ? parseInt(dmy.month, 10) : undefined,
+  year: dmy.year ? parseInt(dmy.year, 10) : undefined,
+});
+
 export const dateToDayMonthYear = (date?: Date) => {
   return {
     day: date && date.getDate(),
@@ -104,8 +131,18 @@ export const dateToDayMonthYear = (date?: Date) => {
   };
 };
 
+export const emptyDayMonthYear = (): DayMonthYearInputs => ({
+  day: '',
+  month: '',
+  year: '',
+});
+
 export const dayMonthYearIsComplete = (dmy?: DayMonthYearValues) => {
   return dmy && dmy.day && dmy.month && dmy.year;
+};
+
+export const dayMonthYearIsEmpty = (dmy?: DayMonthYearValues) => {
+  return !dmy || (!dmy.day && !dmy.month && !dmy.year);
 };
 
 export const dayMonthYearToDate = (dmy: DayMonthYearValues) => {
@@ -118,3 +155,6 @@ export const dayMonthYearToDate = (dmy: DayMonthYearValues) => {
   }
   return new Date(dmy.year || 0, (dmy.month || 0) - 1, dmy.day);
 };
+
+export const dayMonthYearInputsToDate = (dmy: DayMonthYearInputs): Date =>
+  dayMonthYearToDate(dayMonthYearInputsToValues(dmy));
