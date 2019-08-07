@@ -92,14 +92,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [Required] [FromQuery(Name = "name")] string name, IFormFile file)
         {
             return await CheckReleaseExistsAsync(releaseId,
-                async () =>
-                {
-                    var result =
-                        await _fileStorageService.UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Ancillary);
-                    if (!result.IsLeft) return Ok(result.Right);
-                    ValidationUtils.AddErrors(ModelState, result.Left);
-                    return ValidationProblem();
-                });
+                async () => await _fileStorageService.UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Ancillary));
+
         }
 
         // POST api/release/{releaseId}/chart-files
@@ -114,14 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [Required] [FromQuery(Name = "name")] string name, IFormFile file)
         {
             return await CheckReleaseExistsAsync(releaseId,
-                async () =>
-                {
-                    var result =
-                        await _fileStorageService.UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Chart);
-                    if (!result.IsLeft) return Ok(result.Right);
-                    ValidationUtils.AddErrors(ModelState, result.Left);
-                    return ValidationProblem();
-                });
+                async () => await _fileStorageService.UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Chart));
         }
 
         // POST api/release/{releaseId}/data-files
@@ -138,16 +125,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await CheckReleaseExistsAsync(releaseId, async () =>
             {
                 // upload the files
-                var result = await _fileStorageService.UploadDataFilesAsync(releaseId, file, metaFile, name);
-                if (result.IsLeft)
-                {
-                    ValidationUtils.AddErrors(ModelState, result.Left);
-                    return ValidationProblem();
-                }
-
-                // add message to queue to process these files
-                _importService.Import(file.FileName, releaseId);
-                return Ok(result.Right);
+                var result = await _fileStorageService.UploadDataFilesAsync(releaseId, file, metaFile, name)
+                    // add message to queue to process these files
+                    .Map(() => _importService.Import(file.FileName, releaseId));
+                return result;
             });
         }
 
@@ -203,6 +184,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             }
 
             return await andThen.Invoke();
+        }
+        
+        
+        private async Task<ActionResult> CheckReleaseExistsAsync<T>(ReleaseId releaseId, Func<Task<Either<ValidationResult,T>>> andThen)
+        {
+            var release = await _releaseService.GetAsync(releaseId);
+            if (release == null)
+            {
+                return NotFound();
+            }
+
+            var result = await andThen.Invoke();
+            if (result.IsLeft)
+            {
+                ValidationUtils.AddErrors(ModelState, result.Left);
+                return ValidationProblem();
+            }
+
+            return Ok(result.Right);
         }
     }
 }

@@ -5,7 +5,6 @@ import {
   FormRadioGroup,
   FormTextInput,
 } from '@common/components/form';
-import FormComboBox from '@common/components/form/FormComboBox';
 
 import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
 import {
@@ -39,16 +38,6 @@ interface Props {
   onConfigurationChange: (configuration: AxisConfiguration) => void;
   dataSets: ChartDataSet[];
 }
-
-const getSelectableUnits = (
-  configuration: AxisConfiguration,
-  meta: DataBlockMetadata,
-) => {
-  return configuration.dataSets
-    .map(dataSet => meta.indicators[dataSet.indicator])
-    .filter(indicator => indicator !== null)
-    .map(indicator => indicator.unit);
-};
 
 const getSortOptions = (
   labels: Dictionary<DataSetConfiguration>,
@@ -111,13 +100,13 @@ const ChartAxisConfiguration = ({
     AxisConfiguration
   >(configuration);
 
-  const [selectableUnits, setSelectableUnits] = React.useState<string[]>(() => {
-    return getSelectableUnits(configuration, meta);
-  });
-
   const [sortOptions, setSortOptions] = React.useState<SelectOption[]>(() =>
     getSortOptions(labels),
   );
+
+  React.useEffect(() => {
+    setAxisConfiguration(configuration);
+  }, [configuration]);
 
   const [limitOptions, setLimitOptions] = React.useState<SelectOption[]>(() =>
     getAxisLabels(configuration, data, meta, labels, dataSets),
@@ -161,17 +150,12 @@ const ChartAxisConfiguration = ({
 
   React.useEffect(() => {
     setAxisConfiguration(configuration);
-    setSelectableUnits(getSelectableUnits(configuration, meta));
     setSortOptions(getSortOptions(labels));
 
     setLimitOptions(getAxisLabels(configuration, data, meta, labels, dataSets));
 
     // updateAxisConfiguration({dataRange: configuration.dataRange});
   }, [configuration, data, meta, labels, dataSets]);
-
-  const [selectedUnit] = React.useState<number>(0);
-
-  const [selectedValue, setSelectedValue] = React.useState<string>();
 
   const [referenceLine, setReferenceLine] = React.useState<ReferenceLine>({
     position: '',
@@ -194,14 +178,11 @@ const ChartAxisConfiguration = ({
     <div className={styles.chartAxesConfiguration}>
       <form>
         <FormFieldset id={id} legend={axisConfiguration.title}>
-          <h2 className="govuk-heading-s">
-            {axisConfiguration.name} configuration
-          </h2>
           <FormGroup>
             <FormCheckbox
               id={`${id}_show`}
               name={`${id}_show`}
-              label="Show axis?"
+              label="Show axis labels?"
               checked={axisConfiguration.visible}
               onChange={e => {
                 updateAxisConfiguration({ visible: e.target.checked });
@@ -209,19 +190,15 @@ const ChartAxisConfiguration = ({
               value="show"
               conditional={
                 <React.Fragment>
-                  {axisConfiguration.type === 'major' && (
-                    <FormComboBox
-                      id={`${id}_unit`}
-                      inputLabel="Display Unit"
-                      onInputChange={e => setSelectedValue(e.target.value)}
-                      inputValue={selectedValue}
-                      onSelect={selected => {
-                        setSelectedValue(selectableUnits[selected]);
-                      }}
-                      options={selectableUnits}
-                      initialOption={selectedUnit}
-                    />
-                  )}
+                  <FormTextInput
+                    id={`${id}_unit`}
+                    label="Override displayed unit (leave blank to use default from metadata)"
+                    name="unit"
+                    onChange={e =>
+                      updateAxisConfiguration({ unit: e.target.value })
+                    }
+                    value={axisConfiguration.unit}
+                  />
                 </React.Fragment>
               }
             />
@@ -474,6 +451,10 @@ const ChartAxisConfiguration = ({
                   </td>
                   <td>
                     <button
+                      disabled={
+                        referenceLine.position === '' ||
+                        referenceLine.label === ''
+                      }
                       className="govuk-button govuk-!-margin-bottom-0"
                       type="button"
                       onClick={() => {

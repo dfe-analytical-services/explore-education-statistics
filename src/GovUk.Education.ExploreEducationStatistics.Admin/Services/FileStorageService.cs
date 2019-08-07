@@ -54,32 +54,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 new KeyValuePair<string, string>("datafile", dataFile.FileName)
             };
             
-            
-            var uploadDataResult = await UploadFileAsync(blobContainer, releaseId, dataFile, ReleaseFileTypes.Data, dataInfo);
-            if (uploadDataResult.IsLeft)
-            {
-                return uploadDataResult.Left;
-            }
-            
-            var uploadMetaDataResult = await UploadFileAsync(blobContainer, releaseId, metaFile, ReleaseFileTypes.Data, metaDataInfo);
-            if (uploadMetaDataResult.IsLeft)
-            {
-                return uploadMetaDataResult.Left;
-            }
-            
-            return new Either<ValidationResult,IEnumerable<FileInfo>>(await ListFilesAsync(releaseId, ReleaseFileTypes.Data));
+            return await UploadFileAsync(blobContainer, releaseId, dataFile, ReleaseFileTypes.Data, dataInfo)
+                    .Map(async () =>
+                        await UploadFileAsync(blobContainer, releaseId, metaFile, ReleaseFileTypes.Data, metaDataInfo))
+                    .Map(async () => 
+                        await ListFilesAsync(releaseId, ReleaseFileTypes.Data));
         }
         
         public async Task<Either<ValidationResult,IEnumerable<FileInfo>>> UploadFilesAsync(Guid releaseId, IFormFile file, string name, ReleaseFileTypes type)
         {
             var blobContainer = await GetCloudBlobContainer();
-            var info = new List<KeyValuePair<string, string>> {new KeyValuePair<string, string>("name", name)}; 
-            var uploadResult = await UploadFileAsync(blobContainer, releaseId, file, type, info, true);
-            if (uploadResult.IsLeft)
-            {
-                return uploadResult.Left;
-            }
-            return new Either<ValidationResult, IEnumerable<FileInfo>>(await ListFilesAsync(releaseId, type));
+            var info = new List<KeyValuePair<string, string>> {new KeyValuePair<string, string>("name", name)};
+            return await UploadFileAsync(blobContainer, releaseId, file, type, info, true)
+                    .Map(async () => await ListFilesAsync(releaseId, type));
         }
         
         private async Task<CloudBlobContainer> GetCloudBlobContainer()
