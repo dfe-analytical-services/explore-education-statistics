@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
@@ -23,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
         private readonly string _storageConnectionString;
         private readonly IFileStorageService _fileStorageService;
 
-        private readonly ImportMessage[] messages = new ImportMessage[SamplePublications.SubjectFiles.Count - 3];
+        private readonly List<ImportMessage> messages = new List<ImportMessage>();
 
         private const bool PROCESS_SEQUENTIALLY = true;
 
@@ -47,21 +48,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
             stopWatch.Start();
             var count = 0;
 
-            foreach (var subject in SamplePublications.GetSubjects())
+            var subjects = SamplePublications.GetSubjects().ToList();
+            
+            foreach (var subject in subjects)
             {
                 var file = SamplePublications.SubjectFiles[subject.Id];
 
                 _logger.LogInformation("Seeding Subject {Subject}", subject.Name);
 
                 StoreFiles(subject.Release, file, subject.Name);
-                Seed(file + ".csv", subject.Release, count++);
+                Seed(file + ".csv", subject.Release, count++, subjects.Count);
             }
 
             stopWatch.Stop();
             _logger.LogInformation("Seeding completed with duration {duration} ", stopWatch.Elapsed.ToString());
         }
 
-        private void Seed(string dataFileName, Release release, int count)
+        private void Seed(string dataFileName, Release release, int count, int maxCount)
         {
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
             var client = storageAccount.CreateCloudQueueClient();
@@ -72,15 +75,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
             if (PROCESS_SEQUENTIALLY)
             {
                 var importMessageRelease = _mapper.Map<Processor.Model.Release>(release);
-                messages[count] = new ImportMessage
+                messages.Add(new ImportMessage
                 {
                     DataFileName = dataFileName,
                     Release = importMessageRelease,
                     BatchNo = 1,
                     BatchSize = 1
-                };
+                });
 
-                if (count == SamplePublications.SubjectFiles.Count - 4)
+                if (count == maxCount)
                 {
                     var sQueue = client.GetQueueReference("imports-pending-sequential");
                     sQueue.CreateIfNotExists();
