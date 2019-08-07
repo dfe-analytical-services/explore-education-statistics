@@ -41,6 +41,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
             return NoContent();
         }
+        
+        // GET api/me/publications?topicId={guid}
+        [HttpGet("api/publications/{publicationId}")]
+        [AllowAnonymous] // TODO We will need to do Authorisation checks when we know what the permissions model is.
+        public async Task<ActionResult<PublicationViewModel>> GetPublicationByIdAsync(
+            [Required] Guid publicationId)
+        {
+            // var userId = new Guid(); // TODO get the Guid from AD
+            var result = await _publicationService.GetViewModelAsync(publicationId);
+
+            if (result != null)
+            {
+                return result;
+            }
+
+            return NoContent();
+        }
 
         // POST api/topic/{topicId}/publications
         [HttpPost("api/topic/{topicId}/publications")]

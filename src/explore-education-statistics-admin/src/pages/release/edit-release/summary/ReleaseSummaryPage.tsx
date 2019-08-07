@@ -71,7 +71,7 @@ const ReleaseSummaryPage = ({ match }: RouteComponentProps<MatchProps>) => {
             <time>{releaseSummaryDetails.releaseName + 1}</time>
           </SummaryListItem>
           <SummaryListItem term="Lead statistician">
-            {publication.contact.contactName}
+            {publication.contact && publication.contact.contactName}
           </SummaryListItem>
           <SummaryListItem term="Scheduled release">
             <FormattedDate>

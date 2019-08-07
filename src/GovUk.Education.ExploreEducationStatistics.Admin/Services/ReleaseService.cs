@@ -63,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 TimePeriodCoverage = createRelease.TimePeriodCoverage,
                 PublishScheduled = createRelease.PublishScheduled,
                 ReleaseName = createRelease.ReleaseName,
-                NextReleaseDate = createRelease.NextReleaseExpected,
+                NextReleaseDate = createRelease.NextReleaseDate,
                 Content = content
             });
             await _context.SaveChangesAsync();

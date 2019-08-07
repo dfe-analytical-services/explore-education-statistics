@@ -98,7 +98,7 @@ export interface Publication {
 export interface BasicPublicationDetails {
   id: string;
   title: string;
-  contact: ContactDetails;
+  contact?: ContactDetails;
 }
 
 export interface DayMonthYearValues {
