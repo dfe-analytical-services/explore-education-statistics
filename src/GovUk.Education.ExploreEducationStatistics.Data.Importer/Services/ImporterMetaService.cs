@@ -75,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 FilterGroupingColumn = values[3],
                 FilterHint = values[4],
                 IndicatorGrouping = values[5],
-                IndicatorUnit = EnumUtil.GetFromString<Unit>(values[6])
+                IndicatorUnit = EnumUtil.GetFromString<Unit>(values[6] ?? "")
             });
         }
 
