@@ -25,6 +25,10 @@ export default async (mock: MockAdapter) => {
     /* webpackChunkName: "mock-dashboard-data" */ '@admin/pages/DummyReferenceData'
   )).default;
 
+  const mockReleaseSummaryData = (await import(
+    /* webpackChunkName: "mock-release-summary-data" */ '@admin/services/release/edit-release/summary/mock/mock-data'
+    )).default;
+
   const getReleasesUrl = /\/publications\/(.*)\/releases/;
   const createReleaseUrl = /\/publications\/(.*)\/releases/;
 
@@ -73,8 +77,6 @@ export default async (mock: MockAdapter) => {
     if (matchingPublication) {
       const newReleaseDetails: ReleaseSummaryDetails = {
         id: generateRandomIntegerString(),
-        leadStatisticianName: 'Bob',
-        publicationTitle: matchingPublication.title,
         typeId: createRequest.releaseTypeId,
         releaseName: createRequest.releaseName,
         timePeriodCoverageCode: createRequest.timePeriodCoverage.value,
@@ -108,6 +110,8 @@ export default async (mock: MockAdapter) => {
         : [newRelease];
 
       mockData.setupByReleaseId[newReleaseDetails.id] = newReleaseDetails;
+
+      mockReleaseSummaryData.setupByReleaseId[newReleaseDetails.id] = newReleaseDetails;
 
       return [200, newReleaseDetails];
     }

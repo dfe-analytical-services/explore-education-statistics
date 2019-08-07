@@ -1,10 +1,17 @@
-import { IdTitlePair } from '@admin/services/common/types';
+import {BasicPublicationDetails, IdTitlePair} from '@admin/services/common/types';
 import { Dictionary } from '@common/types';
 
-const publicationDetailsByReleaseId: Dictionary<IdTitlePair> = {
-  'my-publication-1-release-1': {
+const publicationDetailsByPublicationId: Dictionary<BasicPublicationDetails> = {
+  'my-publication-1': {
     id: 'my-publication-1',
     title: 'Pupil absence statistics and data for schools in England',
+    contact: {
+      id: 'contact-1',
+      contactName: 'Amy Evans',
+      contactTelNo: '01234 567890',
+      teamName: 'Team 1',
+      teamEmail: 'team1@example.com',
+    }
   },
 };
 
@@ -20,7 +27,8 @@ const releaseTypes: IdTitlePair[] = [
 ];
 
 export default {
-  getPublicationDetailsForRelease: (releaseId: string) =>
-    publicationDetailsByReleaseId[releaseId],
+  publicationDetailsByPublicationId,
+  getPublicationDetails: (publicationId: string) =>
+    publicationDetailsByPublicationId[publicationId],
   getReleaseTypes: () => releaseTypes,
 };

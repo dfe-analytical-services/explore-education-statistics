@@ -1,10 +1,10 @@
+import PublicationContext from "@admin/pages/release/PublicationContext";
 import service from '@admin/services/common/service';
-import { IdTitlePair } from '@admin/services/common/types';
+import {IdTitlePair} from '@admin/services/common/types';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import React, { useEffect, useState } from 'react';
-import { RouteComponentProps } from 'react-router';
-import ReleasePageTemplate from '../components/ReleasePageTemplate';
+import React, {useContext, useEffect, useState} from 'react';
+import {RouteComponentProps} from 'react-router';
 import ReleaseDataUploadsSection from './ReleaseDataUploadsSection';
 import ReleaseFileUploadsSection from './ReleaseFileUploadsSection';
 
@@ -14,32 +14,30 @@ interface MatchProps {
 
 const ReleaseDataPage = ({ match }: RouteComponentProps<MatchProps>) => {
   const { releaseId } = match.params;
-  const [publicationDetails, setPublicationDetails] = useState<IdTitlePair>();
 
-  useEffect(() => {
-    service
-      .getPublicationDetailsForRelease(releaseId)
-      .then(setPublicationDetails);
-  }, [releaseId]);
+  const {publication} = useContext(PublicationContext);
 
   return (
     <>
-      {publicationDetails && (
-        <ReleasePageTemplate
-          publicationTitle={publicationDetails.title}
-          releaseId={releaseId}
-        >
+      {publication && (
+        <>
           <h3>Data uploads</h3>
 
           <Tabs id="dataUploadTab">
             <TabsSection id="data-upload" title="Data uploads">
-              <ReleaseDataUploadsSection releaseId={releaseId} />
+              <ReleaseDataUploadsSection
+                publicationId={publication.id}
+                releaseId={releaseId}
+              />
             </TabsSection>
             <TabsSection id="file-upload" title="File uploads">
-              <ReleaseFileUploadsSection releaseId={releaseId} />
+              <ReleaseFileUploadsSection
+                publicationId={publication.id}
+                releaseId={releaseId}
+              />
             </TabsSection>
           </Tabs>
-        </ReleasePageTemplate>
+        </>
       )}
     </>
   );

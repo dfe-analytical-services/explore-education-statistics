@@ -110,8 +110,8 @@ const ReleaseSummaryForm = <FormValues extends EditFormValues>({
                     optGroups={getTimePeriodOptions(timePeriodCoverageGroups)}
                   />
                   <FormFieldTextInput<FormValues>
-                    id={`${formId}-releaseName`}
-                    name="releaseName"
+                    id={`${formId}-timePeriodCoverageStartYear`}
+                    name="timePeriodCoverageStartYear"
                     label={
                       DummyReferenceData.findTimePeriodCoverageGroup(
                         form.values.timePeriodCoverageCode,

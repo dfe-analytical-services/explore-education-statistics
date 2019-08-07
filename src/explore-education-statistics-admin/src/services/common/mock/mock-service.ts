@@ -8,21 +8,21 @@ export default async (mock: MockAdapter) => {
   )).default;
 
   const service: CommonService = {
-    getPublicationDetailsForRelease: releaseId =>
-      Promise.resolve(mockData.getPublicationDetailsForRelease(releaseId)),
+    getBasicPublicationDetails: publicationId =>
+      Promise.resolve(mockData.getPublicationDetails(publicationId)),
     getReleaseTypes: () => Promise.resolve(mockData.getReleaseTypes()),
   };
 
-  const getPublicationDetailsForReleaseUrl = /\/release\/(.*)\/publication/;
+  const getPublicationDetailsForReleaseUrl = /\/publications\/(.*)/;
   const getReleaseTypesUrl = /\/meta\/releasetypes/;
 
-  // getPublicationDetailsForRelease
+  // getBasicPublicationDetails
   mock.onGet(getPublicationDetailsForReleaseUrl).reply(({ url }) => {
-    const [releaseId] = getCaptureGroups(
+    const [publicationId] = getCaptureGroups(
       getPublicationDetailsForReleaseUrl,
       url,
     );
-    return [200, service.getPublicationDetailsForRelease(releaseId)];
+    return [200, service.getBasicPublicationDetails(publicationId)];
   });
 
   // getReleaseTypes

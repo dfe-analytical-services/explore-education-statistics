@@ -95,6 +95,12 @@ export interface Publication {
   owner: User;
 }
 
+export interface BasicPublicationDetails {
+  id: string;
+  title: string;
+  contact: ContactDetails;
+}
+
 export interface DayMonthYearValues {
   day?: number;
   month?: number;

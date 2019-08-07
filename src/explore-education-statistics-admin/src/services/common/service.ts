@@ -1,4 +1,4 @@
-import { IdTitlePair } from '@admin/services/common/types';
+import {BasicPublicationDetails, IdTitlePair} from '@admin/services/common/types';
 import { createClient } from '@admin/services/util/service';
 import mocks from './mock/mock-service';
 
@@ -7,14 +7,14 @@ const apiClient = createClient({
 });
 
 export interface CommonService {
-  getPublicationDetailsForRelease(releaseId: string): Promise<IdTitlePair>;
+  getBasicPublicationDetails(publicationId: string): Promise<BasicPublicationDetails>;
   getReleaseTypes(): Promise<IdTitlePair[]>;
 }
 
 const service: CommonService = {
-  getPublicationDetailsForRelease(releaseId: string): Promise<IdTitlePair> {
+  getBasicPublicationDetails(publicationId: string): Promise<BasicPublicationDetails> {
     return apiClient.then(client =>
-      client.get<IdTitlePair>(`/release/${releaseId}/publication`),
+      client.get<BasicPublicationDetails>(`/publications/${publicationId}`),
     );
   },
   getReleaseTypes(): Promise<IdTitlePair[]> {

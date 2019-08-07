@@ -9,13 +9,14 @@ interface Props extends RouteComponentProps {
   releaseId: string;
   children: ReactNode;
   publicationTitle: string;
+  publicationId: string;
 }
 
 const ReleasePageTemplate = withRouter(
-  ({ releaseId, publicationTitle, children, location }: Props) => {
+  ({ releaseId, publicationId, publicationTitle, children, location }: Props) => {
     const currentRouteIndex =
       viewRoutes.findIndex(
-        route => route.generateLink(releaseId) === location.pathname,
+        route => route.generateLink(publicationId, releaseId) === location.pathname,
       ) || 0;
 
     const previousRoute =
@@ -29,12 +30,12 @@ const ReleasePageTemplate = withRouter(
     const previousSection = previousRoute
       ? {
           label: previousRoute.title,
-          linkTo: previousRoute.generateLink(releaseId),
+          linkTo: previousRoute.generateLink(publicationId, releaseId),
         }
       : undefined;
 
     const nextSection = nextRoute
-      ? { label: nextRoute.title, linkTo: nextRoute.generateLink(releaseId) }
+      ? { label: nextRoute.title, linkTo: nextRoute.generateLink(publicationId, releaseId) }
       : undefined;
 
     return (
@@ -49,7 +50,7 @@ const ReleasePageTemplate = withRouter(
               {viewRoutes.map(route => (
                 <NavLink
                   key={route.path}
-                  to={route.generateLink(releaseId)}
+                  to={route.generateLink(publicationId, releaseId)}
                   activeClassName="app-navigation--current-page"
                 >
                   {route.title}

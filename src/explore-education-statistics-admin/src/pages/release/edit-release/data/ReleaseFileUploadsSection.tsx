@@ -19,18 +19,19 @@ interface FormValues {
 }
 
 interface Props {
+  publicationId: string;
   releaseId: string;
 }
 
 const formId = 'fileUploadForm';
 
-const ReleaseFileUploadsSection = ({ releaseId }: Props) => {
+const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
   const [files, setFiles] = useState<AdhocFile[]>();
   const [deleteFileId, setDeleteFileRequest] = useState('');
 
   useEffect(() => {
     service.getReleaseAdhocFiles(releaseId).then(setFiles);
-  }, [releaseId]);
+  }, [publicationId, releaseId]);
 
   return (
     <>
@@ -116,7 +117,7 @@ const ReleaseFileUploadsSection = ({ releaseId }: Props) => {
               </Button>
 
               <div className="govuk-!-margin-top-6">
-                <Link to={dataRoute.generateLink(releaseId)}>Cancel</Link>
+                <Link to={dataRoute.generateLink(publicationId, releaseId)}>Cancel</Link>
               </div>
             </Form>
           );

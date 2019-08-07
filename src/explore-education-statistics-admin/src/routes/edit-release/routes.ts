@@ -11,7 +11,7 @@ export interface ReleaseRoute {
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   component: (props: any) => JSX.Element;
   title: string;
-  generateLink: (releaseId: string) => string;
+  generateLink: (publicationId: string, releaseId: string) => string;
 }
 
 const createReadonlyRoute = (
@@ -20,12 +20,15 @@ const createReadonlyRoute = (
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   component: (props: any) => JSX.Element,
 ): ReleaseRoute => {
-  const path = `/release/:releaseId/${section}`;
+  const path = `/publication/:publicationId/release/:releaseId/${section}`;
   return {
     path,
     component,
     title,
-    generateLink: (releaseId: string) => path.replace(':releaseId', releaseId),
+    generateLink: (publicationId: string, releaseId: string) =>
+      path.
+        replace(':publicationId', publicationId).
+        replace(':releaseId', releaseId),
   };
 };
 
@@ -35,12 +38,15 @@ const createEditRoute = (
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   component: (props: any) => JSX.Element,
 ): ReleaseRoute => {
-  const path = `/release/:releaseId/${section}/edit`;
+  const path = `/publication/:publicationId/release/:releaseId/${section}/edit`;
   return {
     path,
     component,
     title,
-    generateLink: (releaseId: string) => path.replace(':releaseId', releaseId),
+    generateLink: (publicationId: string, releaseId: string) =>
+      path.
+      replace(':publicationId', publicationId).
+      replace(':releaseId', releaseId),
   };
 };
 

@@ -1,5 +1,6 @@
 import Link from '@admin/components/Link';
 import DummyReferenceData from '@admin/pages/DummyReferenceData';
+import PublicationContext from "@admin/pages/release/PublicationContext";
 import { summaryEditRoute } from '@admin/routes/edit-release/routes';
 import {
   dayMonthYearIsComplete,
@@ -11,16 +12,17 @@ import { ReleaseSummaryDetails } from '@admin/services/release/types';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import React, { useEffect, useState } from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import { RouteComponentProps } from 'react-router';
 import ReleasePageTemplate from '../components/ReleasePageTemplate';
 
 interface MatchProps {
+  publicationId: string;
   releaseId: string;
 }
 
 const ReleaseSummaryPage = ({ match }: RouteComponentProps<MatchProps>) => {
-  const { releaseId } = match.params;
+  const { publicationId, releaseId } = match.params;
 
   const [releaseSummaryDetails, setReleaseSummaryDetails] = useState<
     ReleaseSummaryDetails
@@ -29,6 +31,8 @@ const ReleaseSummaryPage = ({ match }: RouteComponentProps<MatchProps>) => {
   const [releaseTypes, setReleaseTypes] = useState<
     IdTitlePair[]
     >();
+
+  const {publication} = useContext(PublicationContext);
 
   useEffect(() => {
     const releaseSummaryPromise = service.getReleaseSummaryDetails(releaseId);
@@ -49,56 +53,51 @@ const ReleaseSummaryPage = ({ match }: RouteComponentProps<MatchProps>) => {
 
   return (
     <>
-      {releaseSummaryDetails &&  releaseTypes && (
-        <ReleasePageTemplate
-          releaseId={releaseId}
-          publicationTitle={releaseSummaryDetails.publicationTitle}
-        >
-          <SummaryList>
-            <SummaryListItem term="Publication title">
-              {releaseSummaryDetails.publicationTitle}
-            </SummaryListItem>
-            <SummaryListItem term="Time period">
-              {getSelectedTimePeriodCoverageLabel(
-                releaseSummaryDetails.timePeriodCoverageCode,
-              )}
-            </SummaryListItem>
-            <SummaryListItem term="Release period">
-              <time>{releaseSummaryDetails.releaseName}</time> to{' '}
-              <time>{releaseSummaryDetails.releaseName + 1}</time>
-            </SummaryListItem>
-            <SummaryListItem term="Lead statistician">
-              {releaseSummaryDetails.leadStatisticianName}
-            </SummaryListItem>
-            <SummaryListItem term="Scheduled release">
+      {releaseSummaryDetails &&  releaseTypes && publication && (
+        <SummaryList>
+          <SummaryListItem term="Publication title">
+            {publication.title}
+          </SummaryListItem>
+          <SummaryListItem term="Time period">
+            {getSelectedTimePeriodCoverageLabel(
+              releaseSummaryDetails.timePeriodCoverageCode,
+            )}
+          </SummaryListItem>
+          <SummaryListItem term="Release period">
+            <time>{releaseSummaryDetails.releaseName}</time> to{' '}
+            <time>{releaseSummaryDetails.releaseName + 1}</time>
+          </SummaryListItem>
+          <SummaryListItem term="Lead statistician">
+            {publication.contact.contactName}
+          </SummaryListItem>
+          <SummaryListItem term="Scheduled release">
+            <FormattedDate>
+              {new Date(releaseSummaryDetails.publishScheduled)}
+            </FormattedDate>
+          </SummaryListItem>
+          <SummaryListItem term="Next release expected">
+            {dayMonthYearIsComplete(
+              releaseSummaryDetails.nextReleaseDate,
+            ) && (
               <FormattedDate>
-                {new Date(releaseSummaryDetails.publishScheduled)}
+                {dayMonthYearToDate(
+                  releaseSummaryDetails.nextReleaseDate,
+                )}
               </FormattedDate>
-            </SummaryListItem>
-            <SummaryListItem term="Next release expected">
-              {dayMonthYearIsComplete(
-                releaseSummaryDetails.nextReleaseDate,
-              ) && (
-                <FormattedDate>
-                  {dayMonthYearToDate(
-                    releaseSummaryDetails.nextReleaseDate,
-                  )}
-                </FormattedDate>
-              )}
-            </SummaryListItem>
-            <SummaryListItem term="Release type">
-              {getSelectedReleaseTypeTitle(releaseSummaryDetails.id, releaseTypes)}
-            </SummaryListItem>
-            <SummaryListItem
-              term=""
-              actions={
-                <Link to={summaryEditRoute.generateLink(releaseId)}>
-                  Edit release setup details
-                </Link>
-              }
-            />
-          </SummaryList>
-        </ReleasePageTemplate>
+            )}
+          </SummaryListItem>
+          <SummaryListItem term="Release type">
+            {getSelectedReleaseTypeTitle(releaseSummaryDetails.id, releaseTypes)}
+          </SummaryListItem>
+          <SummaryListItem
+            term=""
+            actions={
+              <Link to={summaryEditRoute.generateLink(publicationId, releaseId)}>
+                Edit release setup details
+              </Link>
+            }
+          />
+        </SummaryList>
       )}
     </>
   );

@@ -12,6 +12,7 @@ import { RouteComponentProps } from 'react-router';
 import ReleasePageTemplate from '../components/ReleasePageTemplate';
 
 interface MatchProps {
+  publicationId: string;
   releaseId: string;
 }
 
@@ -19,7 +20,7 @@ const ReleaseSummaryEditPage = ({
   match,
   history,
 }: RouteComponentProps<MatchProps>) => {
-  const { releaseId } = match.params;
+  const { publicationId, releaseId } = match.params;
 
   const [releaseSummaryDetails, setReleaseSummaryDetails] = useState<
     ReleaseSummaryDetails
@@ -39,18 +40,15 @@ const ReleaseSummaryEditPage = ({
 
     service
       .updateReleaseSummaryDetails(updatedReleaseDetails)
-      .then(_ => history.push(summaryRoute.generateLink(releaseId)));
+      .then(_ => history.push(summaryRoute.generateLink(publicationId, releaseId)));
   };
 
-  const cancelHandler = () => history.push(summaryRoute.generateLink(releaseId));
+  const cancelHandler = () => history.push(summaryRoute.generateLink(publicationId, releaseId));
 
   return (
     <>
       {releaseSummaryDetails && (
-        <ReleasePageTemplate
-          releaseId={releaseId}
-          publicationTitle={releaseSummaryDetails.publicationTitle}
-        >
+        <>
           <h2 className="govuk-heading-m">Edit release setup</h2>
 
           <ReleaseSummaryForm
@@ -72,7 +70,7 @@ const ReleaseSummaryEditPage = ({
             onSubmitHandler={submitHandler}
             onCancelHandler={cancelHandler}
           />
-        </ReleasePageTemplate>
+        </>
       )}
     </>
   );

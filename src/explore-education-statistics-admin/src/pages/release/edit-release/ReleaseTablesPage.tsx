@@ -1,18 +1,8 @@
 import React from 'react';
-import { RouteComponentProps } from 'react-router';
-import ReleasePageTemplate from './components/ReleasePageTemplate';
 
-interface MatchProps {
-  releaseId: string;
-}
-
-const ReleaseTablesPage = ({ match }: RouteComponentProps<MatchProps>) => {
-  const { releaseId } = match.params;
-
+const ReleaseTablesPage = () => {
   return (
-    <ReleasePageTemplate publicationTitle="TODO" releaseId={releaseId}>
-      <h2 className="govuk-heading-m">View / edit tables</h2>
-    </ReleasePageTemplate>
+    <h2 className="govuk-heading-m">View / edit tables</h2>
   );
 };
 

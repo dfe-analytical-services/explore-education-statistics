@@ -34,10 +34,11 @@ const getTag = (approvalStatus: ReleaseApprovalStatus) => {
 };
 
 interface Props {
+  publicationId: string;
   release: AdminDashboardRelease;
 }
 
-const DashboardReleaseSummary = ({ release }: Props) => {
+const DashboardReleaseSummary = ({ publicationId, release }: Props) => {
   const authentication = useContext(LoginContext);
 
   const editorName =
@@ -56,7 +57,7 @@ const DashboardReleaseSummary = ({ release }: Props) => {
       summary={releaseSummaryLabel}
       tag={getTag(release.status)}
     >
-      <ButtonLink to={summaryRoute.generateLink(release.id)}>
+      <ButtonLink to={summaryRoute.generateLink(publicationId, release.id)}>
         Edit this release
       </ButtonLink>
 

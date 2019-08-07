@@ -14,6 +14,10 @@ export default async (mock: MockAdapter) => {
     /* webpackChunkName: "dashboard-mock-data" */ '@admin/services/dashboard/mock/mock-data'
   )).default;
 
+  const publicationMockData = (await import(
+    /* webpackChunkName: "common-mock-data" */ '@admin/services/common/mock/mock-data'
+    )).default;
+
   const getMethodologiesUrl = /\/methodologies/;
   const getPublicationAndReleaseContactsUrl = /\/contacts/;
   const createPublicationUrl = /\/topic\/(.*)\/publications/;
@@ -62,6 +66,12 @@ export default async (mock: MockAdapter) => {
     ] = publicationsForTopic
       ? publicationsForTopic.concat(newPublication)
       : [newPublication];
+
+    publicationMockData.publicationDetailsByPublicationId[newPublication.id] = {
+      id: newPublication.id,
+      title: newPublication.title,
+      contact: newPublication.contact,
+    };
 
     return [200];
   });

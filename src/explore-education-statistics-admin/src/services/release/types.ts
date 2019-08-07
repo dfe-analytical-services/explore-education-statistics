@@ -2,11 +2,9 @@ import {DayMonthYearValues} from '@admin/services/common/types';
 
 export interface ReleaseSummaryDetails {
   id: string;
-  publicationTitle: string;
   timePeriodCoverageCode: string;
   releaseName: number;
   typeId: string;
-  leadStatisticianName: string;
   publishScheduled: string;
   nextReleaseDate: DayMonthYearValues;
 }
