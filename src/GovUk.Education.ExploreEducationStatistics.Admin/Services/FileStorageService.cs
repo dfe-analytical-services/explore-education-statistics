@@ -81,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
             return new Either<ValidationResult, IEnumerable<FileInfo>>(await ListFilesAsync(releaseId, type));
         }
-
+        
         private async Task<CloudBlobContainer> GetCloudBlobContainer()
         {
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
@@ -94,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private static async Task<Either<ValidationResult, bool>> UploadFileAsync(CloudBlobContainer blobContainer, Guid releaseId,
             IFormFile file, ReleaseFileTypes type, IEnumerable<KeyValuePair<string, string>> metaValues, bool overwrite = false)
         {
-            var blob = blobContainer.GetBlockBlobReference(ReleasePath(releaseId, type) + $"/{file.FileName}");
+            var blob = blobContainer.GetBlockBlobReference(ReleasePath(releaseId, type, file.FileName));
             if (blob.Exists() && !overwrite)
             {
                 return ValidationResult("File name", "Cannot overwrite");
@@ -145,9 +145,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return $"{releaseId}/{type.GetEnumLabel()}";
         }
+        
+        private static string ReleasePath(string releaseId, ReleaseFileTypes type, string fileName)
+        {
+            return ReleasePath(releaseId, type) + $"/{fileName}";
+        }
 
-        private static string ReleasePath(ReleaseId releaseId, ReleaseFileTypes type) =>
-            ReleasePath(releaseId.ToString(), type);
+        private static string ReleasePath(Guid releaseId, ReleaseFileTypes type, string fileName)
+            => ReleasePath(releaseId.ToString(), type, fileName);
 
         private static string GetExtension(CloudBlob blob)
         {
@@ -189,6 +194,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
 
             await blob.SetMetadataAsync();
+        }
+
+        public async Task<IEnumerable<FileInfo>> DeleteDataFileAsync(Guid releaseId, string fileName)
+        {
+            var blobContainer = await GetCloudBlobContainer();
+            var dataBlob = blobContainer.GetBlockBlobReference(ReleasePath(releaseId, ReleaseFileTypes.Data, fileName));
+            var metaFileName = dataBlob.Metadata["metafile"];
+            var metaDataBlob = blobContainer.GetBlockBlobReference(ReleasePath(releaseId, ReleaseFileTypes.Data, metaFileName));
+            // Delete the data and the metadata
+            await DeleteFileAsync(await GetCloudBlobContainer(), ReleasePath(releaseId, ReleaseFileTypes.Data, fileName));
+            await DeleteFileAsync(await GetCloudBlobContainer(), ReleasePath(releaseId, ReleaseFileTypes.Data, metaFileName));
+            return await ListFilesAsync(releaseId, ReleaseFileTypes.Data);
+        }
+
+        public async Task<IEnumerable<FileInfo>> DeleteFileAsync(Guid releaseId,
+            ReleaseFileTypes type, string fileName)
+        {
+            if (type == ReleaseFileTypes.Data)
+            {
+                throw new ArgumentException("Deleting data files required calling DeleteDataFilesAsync"); 
+            }
+            await DeleteFileAsync(await GetCloudBlobContainer(), ReleasePath(releaseId, type, fileName));
+            return await ListFilesAsync(releaseId, type);
+        }
+
+        private static async Task DeleteFileAsync(CloudBlobContainer blobContainer, string path)
+        {
+            var blob = blobContainer.GetBlockBlobReference(path);
+            await blob.DeleteIfExistsAsync();
         }
     }
 }

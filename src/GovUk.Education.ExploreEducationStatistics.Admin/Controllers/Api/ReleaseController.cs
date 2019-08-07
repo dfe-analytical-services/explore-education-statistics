@@ -94,7 +94,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await CheckReleaseExistsAsync(releaseId,
                 async () =>
                 {
-                    var result = await _fileStorageService.UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Ancillary);
+                    var result =
+                        await _fileStorageService.UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Ancillary);
                     if (!result.IsLeft) return Ok(result.Right);
                     ValidationUtils.AddErrors(ModelState, result.Left);
                     return ValidationProblem();
@@ -115,7 +116,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await CheckReleaseExistsAsync(releaseId,
                 async () =>
                 {
-                    var result = await _fileStorageService.UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Chart);
+                    var result =
+                        await _fileStorageService.UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Chart);
                     if (!result.IsLeft) return Ok(result.Right);
                     ValidationUtils.AddErrors(ModelState, result.Left);
                     return ValidationProblem();
@@ -142,6 +144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                     ValidationUtils.AddErrors(ModelState, result.Left);
                     return ValidationProblem();
                 }
+
                 // add message to queue to process these files
                 _importService.Import(file.FileName, releaseId);
                 return Ok(result.Right);
@@ -179,6 +182,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [Required] PublicationId publicationId)
         {
             return await _releaseService.GetReleasesForPublicationAsync(publicationId);
+        }
+
+        // DELETE api/release/{releaseId}/ancillary-files/{fileName}
+        [HttpDelete("release/{releaseId}/ancillary-files/{fileName}")]
+        [AllowAnonymous] // TODO We will need to do Authorisation checks when we know what the permissions model is.
+        public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteAncillaryFile(
+            ReleaseId releaseId, string fileName)
+        {
+            return await CheckReleaseExistsAsync(releaseId,
+                async () => Ok(await _fileStorageService.DeleteFileAsync(releaseId, ReleaseFileTypes.Ancillary, fileName)));
         }
 
         private async Task<ActionResult> CheckReleaseExistsAsync(ReleaseId releaseId, Func<Task<ActionResult>> andThen)
