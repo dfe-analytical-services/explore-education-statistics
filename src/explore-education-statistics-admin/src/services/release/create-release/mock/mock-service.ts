@@ -4,7 +4,7 @@ import {
   ReleaseApprovalStatus,
 } from '@admin/services/dashboard/types';
 import { CreateReleaseRequest } from '@admin/services/release/create-release/types';
-import { ReleaseSetupDetails } from '@admin/services/release/types';
+import { ReleaseSummaryDetails } from '@admin/services/release/types';
 import {
   generateRandomIntegerString,
   getCaptureGroups,
@@ -14,7 +14,7 @@ import { format } from 'date-fns';
 
 export default async (mock: MockAdapter) => {
   const mockData = (await import(
-    /* webpackChunkName: "mock-data" */ '@admin/services/release/edit-release/setup/mock/mock-data'
+    /* webpackChunkName: "mock-data" */ '@admin/services/release/edit-release/summary/mock/mock-data'
   )).default;
 
   const mockDashboardData = (await import(
@@ -75,7 +75,7 @@ export default async (mock: MockAdapter) => {
     );
 
     if (matchingPublication) {
-      const newReleaseDetails: ReleaseSetupDetails = {
+      const newReleaseDetails: ReleaseSummaryDetails = {
         id: generateRandomIntegerString(),
         leadStatisticianName: 'Bob',
         publicationTitle: matchingPublication.title,

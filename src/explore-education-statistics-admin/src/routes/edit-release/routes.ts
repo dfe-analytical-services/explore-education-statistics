@@ -1,5 +1,5 @@
-import ReleaseSetupEditPage from '@admin/pages/release/edit-release/setup/ReleaseSetupEditPage';
-import ReleaseSetupPage from '@admin/pages/release/edit-release/setup/ReleaseSetupPage';
+import ReleaseSummaryEditPage from '@admin/pages/release/edit-release/summary/ReleaseSummaryEditPage';
+import ReleaseSummaryPage from '@admin/pages/release/edit-release/summary/ReleaseSummaryPage';
 import ReleaseDataPage from '@admin/pages/release/edit-release/data/ReleaseDataPage';
 import ReleaseBuildTablesPage from '@admin/pages/release/edit-release/ReleaseBuildTablesPage';
 import ReleaseTablesPage from '@admin/pages/release/edit-release/ReleaseTablesPage';
@@ -47,7 +47,7 @@ const createEditRoute = (
 export const setupRoute = createReadonlyRoute(
   'setup',
   'Release setup',
-  ReleaseSetupPage,
+  ReleaseSummaryPage,
 );
 export const dataRoute = createReadonlyRoute(
   'data',
@@ -77,7 +77,7 @@ export const publishStatusRoute = createReadonlyRoute(
 export const setupEditRoute = createEditRoute(
   'setup',
   'Release setup',
-  ReleaseSetupEditPage,
+  ReleaseSummaryEditPage,
 );
 export const dataEditRoute = createEditRoute(
   'data',

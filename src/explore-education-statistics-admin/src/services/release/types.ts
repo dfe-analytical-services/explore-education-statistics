@@ -1,6 +1,6 @@
 import { DayMonthYearValues, IdTitlePair } from '@admin/services/common/types';
 
-export interface ReleaseSetupDetails {
+export interface ReleaseSummaryDetails {
   id: string;
   publicationTitle: string;
   timePeriodCoverageCode: string;
@@ -11,7 +11,7 @@ export interface ReleaseSetupDetails {
   nextReleaseExpectedDate: DayMonthYearValues;
 }
 
-export interface BaseReleaseSetupDetailsRequest {
+export interface BaseReleaseSummaryDetailsRequest {
   timePeriodCoverage: {
     value: string;
   };

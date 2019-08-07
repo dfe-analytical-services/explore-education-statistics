@@ -1,5 +1,5 @@
 import { dateToDayMonthYear } from '@admin/services/common/types';
-import { UpdateReleaseSetupDetailsRequest } from '@admin/services/release/edit-release/setup/types';
+import { UpdateReleaseSummaryDetailsRequest } from '@admin/services/release/edit-release/summary/types';
 import { getCaptureGroups } from '@admin/services/util/mock/mock-service';
 import MockAdapter from 'axios-mock-adapter';
 
@@ -12,21 +12,21 @@ export default async (mock: MockAdapter) => {
     /* webpackChunkName: "mock-dashboard-data" */ '@admin/services/common/mock/mock-data'
   )).default;
 
-  const getReleaseSetupDetailsUrl = /\/release\/(.*)\/setup/;
+  const getReleaseSummaryDetailsUrl = /\/releases\/(.*)\/summary/;
 
-  const updateReleaseSetupDetailsUrl = /\/release\/(.*)\/setup/;
+  const updateReleaseSummaryDetailsUrl = /\/releases\/(.*)\/summary/;
 
-  mock.onGet(getReleaseSetupDetailsUrl).reply(({ url }) => {
-    const [releaseId] = getCaptureGroups(getReleaseSetupDetailsUrl, url);
-    return [200, mockData.getReleaseSetupDetailsForRelease(releaseId)];
+  mock.onGet(getReleaseSummaryDetailsUrl).reply(({ url }) => {
+    const [releaseId] = getCaptureGroups(getReleaseSummaryDetailsUrl, url);
+    return [200, mockData.getReleaseSummaryDetailsForRelease(releaseId)];
   });
 
-  mock.onPost(updateReleaseSetupDetailsUrl).reply(config => {
+  mock.onPost(updateReleaseSummaryDetailsUrl).reply(config => {
     const updateRequest = JSON.parse(
       config.data,
-    ) as UpdateReleaseSetupDetailsRequest;
+    ) as UpdateReleaseSummaryDetailsRequest;
 
-    const existingRelease = mockData.getReleaseSetupDetailsForRelease(
+    const existingRelease = mockData.getReleaseSummaryDetailsForRelease(
       updateRequest.releaseId,
     );
 

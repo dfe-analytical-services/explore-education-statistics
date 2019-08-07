@@ -1,7 +1,7 @@
-import { ReleaseSetupDetails } from '@admin/services/release/types';
+import { ReleaseSummaryDetails } from '@admin/services/release/types';
 import { Dictionary } from '@common/types';
 
-const setupByReleaseId: Dictionary<ReleaseSetupDetails> = {
+const setupByReleaseId: Dictionary<ReleaseSummaryDetails> = {
   'my-publication-1-release-1': {
     id: 'my-publication-1-release-1',
     publicationTitle:
@@ -28,6 +28,6 @@ const setupByReleaseId: Dictionary<ReleaseSetupDetails> = {
 
 export default {
   setupByReleaseId,
-  getReleaseSetupDetailsForRelease: (releaseId: string) =>
+  getReleaseSummaryDetailsForRelease: (releaseId: string) =>
     setupByReleaseId[releaseId],
 };

@@ -5,8 +5,8 @@ import {
   dayMonthYearIsComplete,
   dayMonthYearToDate,
 } from '@admin/services/common/types';
-import service from '@admin/services/release/edit-release/setup/service';
-import { ReleaseSetupDetails } from '@admin/services/release/types';
+import service from '@admin/services/release/edit-release/summary/service';
+import { ReleaseSummaryDetails } from '@admin/services/release/types';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -18,15 +18,15 @@ interface MatchProps {
   releaseId: string;
 }
 
-const ReleaseSetupPage = ({ match }: RouteComponentProps<MatchProps>) => {
+const ReleaseSummaryPage = ({ match }: RouteComponentProps<MatchProps>) => {
   const { releaseId } = match.params;
 
-  const [releaseSetupDetails, setReleaseSetupDetails] = useState<
-    ReleaseSetupDetails
+  const [releaseSummaryDetails, setReleaseSummaryDetails] = useState<
+    ReleaseSummaryDetails
   >();
 
   useEffect(() => {
-    service.getReleaseSetupDetails(releaseId).then(setReleaseSetupDetails);
+    service.getReleaseSummaryDetails(releaseId).then(setReleaseSummaryDetails);
   }, [releaseId]);
 
   const getSelectedTimePeriodCoverageLabel = (timePeriodCoverageCode: string) =>
@@ -35,49 +35,54 @@ const ReleaseSetupPage = ({ match }: RouteComponentProps<MatchProps>) => {
 
   return (
     <>
-      {releaseSetupDetails && (
+      {releaseSummaryDetails && (
         <ReleasePageTemplate
           releaseId={releaseId}
-          publicationTitle={releaseSetupDetails.publicationTitle}
+          publicationTitle={releaseSummaryDetails.publicationTitle}
         >
           <SummaryList>
             <SummaryListItem term="Publication title">
-              {releaseSetupDetails.publicationTitle}
+              {releaseSummaryDetails.publicationTitle}
             </SummaryListItem>
             <SummaryListItem term="Time period">
               {getSelectedTimePeriodCoverageLabel(
-                releaseSetupDetails.timePeriodCoverageCode,
+                releaseSummaryDetails.timePeriodCoverageCode,
               )}
             </SummaryListItem>
             <SummaryListItem term="Release period">
-              <time>{releaseSetupDetails.timePeriodCoverageStartYear}</time> to{' '}
-              <time>{releaseSetupDetails.timePeriodCoverageStartYear + 1}</time>
+              <time>{releaseSummaryDetails.timePeriodCoverageStartYear}</time>{' '}
+              to{' '}
+              <time>
+                {releaseSummaryDetails.timePeriodCoverageStartYear + 1}
+              </time>
             </SummaryListItem>
             <SummaryListItem term="Lead statistician">
-              {releaseSetupDetails.leadStatisticianName}
+              {releaseSummaryDetails.leadStatisticianName}
             </SummaryListItem>
             <SummaryListItem term="Scheduled release">
               {dayMonthYearIsComplete(
-                releaseSetupDetails.scheduledPublishDate,
+                releaseSummaryDetails.scheduledPublishDate,
               ) && (
                 <FormattedDate>
-                  {dayMonthYearToDate(releaseSetupDetails.scheduledPublishDate)}
+                  {dayMonthYearToDate(
+                    releaseSummaryDetails.scheduledPublishDate,
+                  )}
                 </FormattedDate>
               )}
             </SummaryListItem>
             <SummaryListItem term="Next release expected">
               {dayMonthYearIsComplete(
-                releaseSetupDetails.nextReleaseExpectedDate,
+                releaseSummaryDetails.nextReleaseExpectedDate,
               ) && (
                 <FormattedDate>
                   {dayMonthYearToDate(
-                    releaseSetupDetails.nextReleaseExpectedDate,
+                    releaseSummaryDetails.nextReleaseExpectedDate,
                   )}
                 </FormattedDate>
               )}
             </SummaryListItem>
             <SummaryListItem term="Release type">
-              {releaseSetupDetails.releaseType.title}
+              {releaseSummaryDetails.releaseType.title}
             </SummaryListItem>
             <SummaryListItem
               term=""
@@ -94,4 +99,4 @@ const ReleaseSetupPage = ({ match }: RouteComponentProps<MatchProps>) => {
   );
 };
 
-export default ReleaseSetupPage;
+export default ReleaseSummaryPage;
