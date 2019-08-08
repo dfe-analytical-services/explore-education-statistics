@@ -9,6 +9,7 @@ using Microsoft.Azure.Storage.Blob;
 using Microsoft.Azure.Storage.DataMovement;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -42,8 +43,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var privateContainer = privateBlobClient.GetContainerReference(PrivateContainerName);
             var publicContainer = publicBlobClient.GetContainerReference(PublicContainerName);
 
-            var sourceDirectoryAddress = $"{message.PublicationSlug}/{message.ReleaseSlug}";
-            var destinationDirectoryAddress = sourceDirectoryAddress;
+
+            var sourceDirectoryAddress = AdminReleaseDirectoryPath(message.ReleaseId);
+            var destinationDirectoryAddress = PublicReleaseDirectoryPath(message.PublicationSlug, message.ReleaseSlug);
+            
             await CopyDirectoryAsync(sourceDirectoryAddress, destinationDirectoryAddress, privateContainer,
                 publicContainer, message.ReleasePublished);
         }

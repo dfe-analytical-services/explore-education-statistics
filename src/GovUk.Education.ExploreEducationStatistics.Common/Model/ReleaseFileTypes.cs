@@ -1,6 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
+namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 {
     public enum ReleaseFileTypes
     {
