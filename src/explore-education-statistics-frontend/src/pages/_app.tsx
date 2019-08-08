@@ -1,5 +1,6 @@
 import { logPageView } from '@frontend/services/googleAnalyticsService';
 import { initHotJar } from '@frontend/services/hotjarService';
+import { initApplicationInsights } from '@frontend/services/applicationInsightsService';
 import BaseApp, { Container, NextAppContext } from 'next/app';
 import Router from 'next/router';
 import React from 'react';
@@ -43,6 +44,7 @@ class App extends BaseApp<Props> {
   public componentDidMount() {
     logPageView();
     initHotJar();
+    initApplicationInsights();
 
     if (Router.router !== null) {
       Router.router.events.on('routeChangeComplete', logPageView);
