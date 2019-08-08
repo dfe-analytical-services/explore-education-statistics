@@ -103,6 +103,10 @@ user waits until element contains
   [Arguments]    ${element}    ${text}
   wait until element contains    ${element}    ${text}
 
+user waits until page contains heading
+  [Arguments]   ${text}
+  wait until page contains element   xpath://h1[text()="${text}"]
+
 user checks element contains
   [Arguments]   ${element}    ${text}
   wait until element contains  ${element}    ${text}
