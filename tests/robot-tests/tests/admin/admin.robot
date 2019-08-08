@@ -14,7 +14,7 @@ Verify admin index page loads
     user waits until page contains element    xpath://h1[text()="Sign-in"]
 
 Verify user can sign in
-    [Tags]   HappyPath     UnderConstruction
+    [Tags]   HappyPath
     user clicks link   Sign-in
 
     user waits until page contains element  xpath://div[text()="Sign in"]
@@ -31,6 +31,7 @@ Verify user can sign in
     user clicks element   css:input[value="No"]
 
     user checks url contains  %{ADMIN_URL}
+    user checks page contains element  xpath://h1[text()="User1 EESADMIN"]
     user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(1)     Home
     user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(2)     Administrator dashboard
 
