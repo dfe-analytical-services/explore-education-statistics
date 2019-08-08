@@ -292,17 +292,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             var columns = indicators.Select(tuple => tuple.Column);
             var values = CsvUtil.Values(line, headers, columns);
 
-            var todo = indicators.Zip(values, (tuple, value) => new {tuple, value}).ToList();
-
-            try
-            {
-                var dict = todo.ToDictionary(item => item.tuple.Indicator.Id, item => item.value);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
-            
             return indicators.Zip(values, (tuple, value) => new {tuple, value})
                 .ToDictionary(item => item.tuple.Indicator.Id, item => item.value);
         }
