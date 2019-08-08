@@ -7,170 +7,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DeleteData(
-                table: "Subject",
-                keyColumn: "Id",
-                keyValue: 1L);
-
-            migrationBuilder.DeleteData(
-                table: "Subject",
-                keyColumn: "Id",
-                keyValue: 2L);
-
-            migrationBuilder.DeleteData(
-                table: "Subject",
-                keyColumn: "Id",
-                keyValue: 3L);
-
-            migrationBuilder.DeleteData(
-                table: "Subject",
-                keyColumn: "Id",
-                keyValue: 4L);
-
-            migrationBuilder.DeleteData(
-                table: "Subject",
-                keyColumn: "Id",
-                keyValue: 5L);
-
-            migrationBuilder.DeleteData(
-                table: "Subject",
-                keyColumn: "Id",
-                keyValue: 6L);
-
-            migrationBuilder.DeleteData(
-                table: "Subject",
-                keyColumn: "Id",
-                keyValue: 7L);
-
-            migrationBuilder.DeleteData(
-                table: "Subject",
-                keyColumn: "Id",
-                keyValue: 8L);
-
-            migrationBuilder.DeleteData(
-                table: "Subject",
-                keyColumn: "Id",
-                keyValue: 9L);
-
-            migrationBuilder.DeleteData(
-                table: "Subject",
-                keyColumn: "Id",
-                keyValue: 10L);
-
-            migrationBuilder.DeleteData(
-                table: "Subject",
-                keyColumn: "Id",
-                keyValue: 11L);
-
-            migrationBuilder.DeleteData(
-                table: "Subject",
-                keyColumn: "Id",
-                keyValue: 12L);
-
-            migrationBuilder.DeleteData(
-                table: "Subject",
-                keyColumn: "Id",
-                keyValue: 13L);
-
-            migrationBuilder.DeleteData(
-                table: "Subject",
-                keyColumn: "Id",
-                keyValue: 14L);
-
-            migrationBuilder.DeleteData(
-                table: "Subject",
-                keyColumn: "Id",
-                keyValue: 15L);
-
-            migrationBuilder.DeleteData(
-                table: "Subject",
-                keyColumn: "Id",
-                keyValue: 16L);
-
-            migrationBuilder.DeleteData(
-                table: "Subject",
-                keyColumn: "Id",
-                keyValue: 17L);
-
-            migrationBuilder.DeleteData(
-                table: "Subject",
-                keyColumn: "Id",
-                keyValue: 18L);
-
-            migrationBuilder.DeleteData(
-                table: "Subject",
-                keyColumn: "Id",
-                keyValue: 19L);
-
-            migrationBuilder.DeleteData(
-                table: "Subject",
-                keyColumn: "Id",
-                keyValue: 20L);
-
-            migrationBuilder.DeleteData(
-                table: "Subject",
-                keyColumn: "Id",
-                keyValue: 21L);
-
-            migrationBuilder.DeleteData(
-                table: "Subject",
-                keyColumn: "Id",
-                keyValue: 22L);
-
-            migrationBuilder.DeleteData(
-                table: "Subject",
-                keyColumn: "Id",
-                keyValue: 23L);
-
-            migrationBuilder.DeleteData(
-                table: "Subject",
-                keyColumn: "Id",
-                keyValue: 24L);
-
-            migrationBuilder.DeleteData(
-                table: "Subject",
-                keyColumn: "Id",
-                keyValue: 25L);
-
-            migrationBuilder.DeleteData(
-                table: "Subject",
-                keyColumn: "Id",
-                keyValue: 26L);
-
-            migrationBuilder.DeleteData(
-                table: "Subject",
-                keyColumn: "Id",
-                keyValue: 27L);
-
-            migrationBuilder.DeleteData(
-                table: "Subject",
-                keyColumn: "Id",
-                keyValue: 28L);
-
-            migrationBuilder.DeleteData(
-                table: "Subject",
-                keyColumn: "Id",
-                keyValue: 29L);
-
-            migrationBuilder.DeleteData(
-                table: "Subject",
-                keyColumn: "Id",
-                keyValue: 30L);
-
-            migrationBuilder.DeleteData(
-                table: "Subject",
-                keyColumn: "Id",
-                keyValue: 31L);
-
-            migrationBuilder.DeleteData(
-                table: "Subject",
-                keyColumn: "Id",
-                keyValue: 32L);
-
-            migrationBuilder.DeleteData(
-                table: "Subject",
-                keyColumn: "Id",
-                keyValue: 33L);
+            // Remove all Subjects and reset the Identity
+            migrationBuilder.Sql("DELETE FROM Subject;");
+            migrationBuilder.Sql("DBCC CHECKIDENT ('[Subject]', RESEED, 0);");
 
             migrationBuilder.DeleteData(
                 table: "Release",
@@ -332,25 +171,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                 keyColumn: "Id",
                 keyValue: new Guid("eac38700-b968-4029-b8ac-0eb8e1356480"));
 
-            migrationBuilder.DeleteData(
-                table: "Theme",
-                keyColumn: "Id",
-                keyValue: new Guid("74648781-85a9-4233-8be3-fe6f137165f4"));
+            migrationBuilder.Sql("DELETE FROM Publication");
 
-            migrationBuilder.DeleteData(
-                table: "Theme",
-                keyColumn: "Id",
-                keyValue: new Guid("92c5df93-c4da-4629-ab25-51bd2920cdca"));
+            migrationBuilder.Sql("DELETE FROM Topic");
 
-            migrationBuilder.DeleteData(
-                table: "Theme",
-                keyColumn: "Id",
-                keyValue: new Guid("cc8e02fd-5599-41aa-940d-26bca68eab53"));
-
-            migrationBuilder.DeleteData(
-                table: "Theme",
-                keyColumn: "Id",
-                keyValue: new Guid("ee1855ca-d1e1-4f04-a795-cbd61d326a1f"));
+            migrationBuilder.Sql("DELETE FROM Theme");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
