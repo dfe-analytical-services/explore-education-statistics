@@ -13,5 +13,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels
         public string Summary { get; set; }
         public string LegacyPublicationUrl { get; set; }
         public List<FileInfo> DataFiles { get; set; }
+        
+        public List<FileInfo> ChartFiles { get; set; }
+        
+        public List<FileInfo> AncillaryFiles { get; set; }
     }
 }

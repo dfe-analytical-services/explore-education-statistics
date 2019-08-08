@@ -35,7 +35,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
                 cfg.CreateMap<Publication, PublicationTree>()
                     .ForMember(
                         dest => dest.DataFiles, m => m.MapFrom(publication =>
-                            ListFiles(publication.Slug, GetLatestRelease(publication).Slug, ReleaseFileTypes.Data))); // TODO qqRP
+                            ListFiles(publication.Slug, GetLatestRelease(publication).Slug, ReleaseFileTypes.Data)))
+                    .ForMember(
+                    dest => dest.AncillaryFiles, m => m.MapFrom(publication =>
+                        ListFiles(publication.Slug, GetLatestRelease(publication).Slug, ReleaseFileTypes.Ancillary)))
+                    .ForMember(
+                    dest => dest.ChartFiles, m => m.MapFrom(publication =>
+                        ListFiles(publication.Slug, GetLatestRelease(publication).Slug, ReleaseFileTypes.Chart)));
             });
 
             var mapper = config.CreateMapper();
