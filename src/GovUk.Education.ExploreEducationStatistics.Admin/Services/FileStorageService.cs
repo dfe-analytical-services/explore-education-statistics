@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using MimeTypes;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using FileInfo = GovUk.Education.ExploreEducationStatistics.Admin.Models.FileInfo;
 using ReleaseId = System.Guid;
@@ -71,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await dataBlob.FetchAttributesAsync(); 
             if (!dataBlob.Metadata.ContainsKey(MetaFileKey))
             {
-                return ValidationResult("File name", "Unable to find meta data file to delete");
+                return ValidationResult(UnableToFindMetadataFileToDelete);
             }
             var metaFileName = dataBlob.Metadata[MetaFileKey];
             // Delete the data 
@@ -95,7 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             // TODO Are there conditions in which we would not allow deletion?
             if (type == ReleaseFileTypes.Data)
             {
-                return ValidationResult("File name", "Cannot use generic functionality to delete data files");
+                return ValidationResult(CannotUseGenericFunctionToDeleteDataFile);
             }
 
             return await DeleteFileAsync(await GetCloudBlobContainer(), ReleasePath(releaseId, type, fileName))
@@ -124,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var blob = blobContainer.GetBlockBlobReference(ReleasePath(releaseId, type, file.FileName));
             if (blob.Exists() && !overwrite)
             {
-                return ValidationResult("File name", "Cannot overwrite");
+                return ValidationResult(CannotOverwriteFile);
             }
 
             blob.Properties.ContentType = file.ContentType;

@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using FileInfo = GovUk.Education.ExploreEducationStatistics.Admin.Models.FileInfo;
 
@@ -195,7 +196,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
                 .Returns(Task.FromResult(new Release {Id = releaseId}));
             fileStorageService
                 .Setup(service => service.UploadDataFilesAsync(releaseId, dataFile, metaFile, "Subject name"))
-                .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<FileInfo>>>(ValidationResult("File Name", "File Error")));
+                .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<FileInfo>>>(ValidationResult(CannotOverwriteFile)));
 
             var controller = new ReleasesController(releaseService.Object, fileStorageService.Object,
                 importService.Object);
@@ -299,7 +300,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
                 .Returns(Task.FromResult(new Release {Id = releaseId}));
             fileStorageService
                 .Setup(service => service.DeleteDataFileAsync(releaseId, "datafilename"))
-                .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<FileInfo>>>(ValidationResult("", "")));
+                .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<FileInfo>>>(ValidationResult(UnableToFindMetadataFileToDelete)));
 
             var controller = new ReleasesController(releaseService.Object, fileStorageService.Object,
                 importService.Object);
