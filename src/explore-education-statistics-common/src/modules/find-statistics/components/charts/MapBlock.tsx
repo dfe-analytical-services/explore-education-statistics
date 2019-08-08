@@ -1,6 +1,6 @@
 import Details from '@common/components/Details';
-import { FormSelect } from '@common/components/form';
-import { SelectOption } from '@common/components/form/FormSelect';
+import {FormSelect} from '@common/components/form';
+import {SelectOption} from '@common/components/form/FormSelect';
 import {
   ChartDefinition,
   ChartProps,
@@ -12,7 +12,7 @@ import {
   DataBlockLocationMetadata,
   DataBlockMetadata,
 } from '@common/services/dataBlockService';
-import { Dictionary } from '@common/types/util';
+import {Dictionary} from '@common/types/util';
 import classNames from 'classnames';
 import {
   Feature,
@@ -21,10 +21,10 @@ import {
   Geometry,
 } from 'geojson';
 
-import { Layer, LeafletMouseEvent, Path, Polyline } from 'leaflet';
+import {Layer, LeafletMouseEvent, Path, Polyline} from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import React from 'react';
-import { GeoJSON, LatLngBounds, Map } from 'react-leaflet';
+import {GeoJSON, LatLngBounds, Map} from 'react-leaflet';
 import styles from './MapBlock.module.scss';
 
 export type MapFeature = Feature<Geometry, GeoJsonProperties>;
@@ -51,11 +51,9 @@ interface MapState {
     results: IdValue[];
   };
 
-  ukGeometry?: FeatureCollection;
-
-  geometry: FeatureCollection<Geometry, DataBlockGeoJsonProperties> | undefined;
   legend: LegendEntry[];
 }
+
 
 interface LegendEntry {
   min: string;
@@ -88,27 +86,27 @@ function getLocationsForIndicator(
   const allLocationIds = Array.from(
     new Set(
       data.result
-        .filter(r => r.measures[indicator] !== undefined)
-        .map(r => getLowestLocationCode(r.location)),
+      .filter(r => r.measures[indicator] !== undefined)
+      .map(r => getLowestLocationCode(r.location)),
     ),
   );
 
   return [
-    { label: 'select...', value: '' },
+    {label: 'select...', value: ''},
     ...allLocationIds
-      .reduce(
-        (locations: { label: string; value: string }[], next: string) => {
-          const { label, value } = (meta.locations || {})[next];
+    .reduce(
+      (locations: { label: string; value: string }[], next: string) => {
+        const {label, value} = (meta.locations || {})[next];
 
-          return [...locations, { label, value }];
-        },
-        [],
-      )
-      .sort((a, b) => {
-        if (a.label < b.label) return -1;
-        if (a.label > b.label) return 1;
-        return 0;
-      }),
+        return [...locations, {label, value}];
+      },
+      [],
+    )
+    .sort((a, b) => {
+      if (a.label < b.label) return -1;
+      if (a.label > b.label) return 1;
+      return 0;
+    }),
   ];
 }
 
@@ -128,7 +126,7 @@ function getGeometryForOptions(
 
   return {
     type: 'FeatureCollection',
-    features: sourceData.map(({ location, selectedMeasure, measures }) => ({
+    features: sourceData.map(({location, selectedMeasure, measures}) => ({
       ...location.geoJson[0],
       id: location.geoJson[0].properties.code,
       properties: {
@@ -143,22 +141,22 @@ function getGeometryForOptions(
 function calculateMinAndScaleForSourceData(
   sourceData: { selectedMeasure: number }[],
 ) {
-  const { min, max } = sourceData.reduce(
+  const {min, max} = sourceData.reduce(
     // eslint-disable-next-line no-shadow
-    ({ min, max }, { selectedMeasure }) => ({
+    ({min, max}, {selectedMeasure}) => ({
       min: selectedMeasure < min ? selectedMeasure : min,
       max: selectedMeasure > max ? selectedMeasure : max,
     }),
-    { min: Number.POSITIVE_INFINITY, max: Number.NEGATIVE_INFINITY },
+    {min: Number.POSITIVE_INFINITY, max: Number.NEGATIVE_INFINITY},
   );
 
   if (min === max) {
-    return { min, scale: 0 };
+    return {min, scale: 0};
   }
 
   const range = max - min;
   const scale = range / 5.0;
-  return { min, scale };
+  return {min, scale};
 }
 
 function calculateSourceData(
@@ -172,16 +170,16 @@ function calculateSourceData(
   );
 
   return resultsFilteredByYear
-    .map(result => ({
-      location: (meta.locations || {})[
-        getLowestLocationCode(result.location)
-        ],
-      selectedMeasure: +result.measures[displayedFilter],
-      measures: result.measures,
-    }))
-    .filter(
-      r => r.location !== undefined && r.location.geoJson !== undefined,
-    );
+  .map(result => ({
+    location: (meta.locations || {})[
+      getLowestLocationCode(result.location)
+      ],
+    selectedMeasure: +result.measures[displayedFilter],
+    measures: result.measures,
+  }))
+  .filter(
+    r => r.location !== undefined && r.location.geoJson !== undefined,
+  );
 }
 
 
@@ -200,7 +198,7 @@ function generateGeometryAndLegendForSelectedOptions(
     selectedYear,
   );
 
-  const { min, scale } = calculateMinAndScaleForSourceData(sourceData);
+  const {min, scale} = calculateMinAndScaleForSourceData(sourceData);
 
   const legend: LegendEntry[] = [...Array(5)].map((_, idx) => {
     return {
@@ -212,14 +210,55 @@ function generateGeometryAndLegendForSelectedOptions(
 
   const geometry = getGeometryForOptions(sourceData, min, scale);
 
-  return { geometry, legend };
+  return {geometry, legend};
 }
 
+function registerResizingCheck(container: HTMLDivElement, callback: () => void): IntersectionObserver {
+  const intersectionObserver = new IntersectionObserver(
+    entries => {
+      if (entries.length > 0) {
+        if (entries[0].intersectionRatio > 0) {
+          callback();
+        }
+      }
+    },
+    {
+      threshold: 0.00001,
+    },
+  );
+
+  intersectionObserver.observe(container);
+  return intersectionObserver;
+}
+
+function getFeatureElementById(
+  id: string,
+  geometry?: FeatureCollection<Geometry, DataBlockGeoJsonProperties>
+): { element?: Element; layer?: Path; feature?: Feature } {
+
+  if (geometry) {
+    const selectedFeature = geometry.features.find(
+      feature => feature.id === id,
+    );
+
+    if (selectedFeature) {
+      const selectedLayer: Path = selectedFeature.properties.layer as Path;
+
+      return {
+        element: selectedLayer.getElement(),
+        layer: selectedLayer,
+        feature: selectedFeature,
+      };
+    }
+  }
+
+  return {};
+}
 
 const MapBlock = ({
   data,
   meta,
-  position = { lat: 53.00986, lng: -3.2524038 },
+  position = {lat: 53.00986, lng: -3.2524038},
   width,
   height,
   axes,
@@ -240,40 +279,18 @@ const MapBlock = ({
     options: {
       location: [],
     },
-    geometry: undefined,
     legend: [],
   });
 
-  const [ukGeometry, setUkGeometry] = React.useState<FeatureCollection>(undefined);
+  const [geometry, setGeometry] = React.useState<FeatureCollection<Geometry, DataBlockGeoJsonProperties>>();
 
-  let intersectionObserver!: IntersectionObserver;
+  const [ukGeometry, setUkGeometry] = React.useState<FeatureCollection>();
 
-  function registerResizingCheck() {
-    if (container.current && container.current.parentElement) {
-      intersectionObserver = new IntersectionObserver(
-        entries => {
-          if (entries.length > 0) {
-            if (entries[0].intersectionRatio > 0) {
-              if (mapRef.current) {
-                const { current } = mapRef;
-                requestAnimationFrame(() => {
-                  current.leafletElement.invalidateSize();
-                });
-              }
-            }
-          }
-        },
-        {
-          threshold: 0.00001,
-        },
-      );
+  const intersectionObserver = React.useRef<IntersectionObserver>();
 
-      intersectionObserver.observe(container.current);
-    }
-  }
 
   React.useEffect(() => {
-    let { selected } = state;
+    let {selected} = state;
 
     if (data.result && data.result.length > 0) {
       const sortedMeasures = Object.values(meta.indicators).sort((a, b) =>
@@ -293,7 +310,6 @@ const MapBlock = ({
       };
 
       const {
-        geometry,
         legend,
       } = generateGeometryAndLegendForSelectedOptions(
         data,
@@ -303,10 +319,10 @@ const MapBlock = ({
       );
 
       import('@common/services/UKGeoJson')
-        .then(imported => {
+      .then(imported => {
 
-          setUkGeometry(imported.default);
-        });
+        setUkGeometry(imported.default);
+      });
 
 
       const location = getLocationsForIndicator(
@@ -320,75 +336,44 @@ const MapBlock = ({
         options: {
           location,
         },
-        geometry,
         legend,
       });
     }
 
-    registerResizingCheck();
+    if (container.current) {
+      intersectionObserver.current = registerResizingCheck(container.current, () => {
+        if (mapRef.current) {
+          const {current} = mapRef;
+          requestAnimationFrame(() => {
+            current.leafletElement.invalidateSize();
+          });
+        }
+      });
+    }
 
     return () => {
-      if (intersectionObserver !== undefined) {
-        intersectionObserver.disconnect();
+      if (intersectionObserver.current !== undefined) {
+        intersectionObserver.current.disconnect();
       }
     };
 
   }, []);
 
 
-  function getFeatureElementById(
-    id: string,
-  ): { element?: Element; layer?: Path; feature?: Feature } {
-    const { geometry } = state;
-
-    if (geometry) {
-      const selectedFeature = geometry.features.find(
-        feature => feature.id === id,
-      );
-
-      if (selectedFeature) {
-        const selectedLayer: Path = selectedFeature.properties.layer as Path;
-
-        return {
-          element: selectedLayer.getElement(),
-          layer: selectedLayer,
-          feature: selectedFeature,
-        };
-      }
-    }
-
-    return {};
-  }
-
-  const updateGeometryForOptions = () => {
-    const { selected } = state;
-
-    setState({
-      ...state,
-      ...generateGeometryAndLegendForSelectedOptions(
-        data,
-        meta,
-        selected.indicator,
-        selected.timePeriod,
-      ),
-    });
-  };
-
-
-  function updateGeojsonGeometry(
-    geometry: FeatureCollection<Geometry, DataBlockGeoJsonProperties>,
-  ) {
+  const updateGeojsonGeometry = (
+    geoJson: FeatureCollection<Geometry, DataBlockGeoJsonProperties>,
+  ) => {
     if (geoJsonRef.current) {
       geoJsonRef.current.leafletElement.clearLayers();
-      geoJsonRef.current.leafletElement.addData(geometry);
+      geoJsonRef.current.leafletElement.addData(geoJson);
     }
-  }
+  };
 
   const onSelectIndicator = (newSelectedIndicator: string) => {
-    const { selected, options } = state;
+    const {selected, options} = state;
 
     const {
-      geometry,
+      geometry: newGeometry,
       legend,
     } = generateGeometryAndLegendForSelectedOptions(
       data,
@@ -397,12 +382,13 @@ const MapBlock = ({
       selected.timePeriod,
     );
 
-    updateGeojsonGeometry(geometry);
+    updateGeojsonGeometry(newGeometry);
+
+    setGeometry(newGeometry);
 
     setState({
-      selected: { ...selected, indicator: newSelectedIndicator },
+      selected: {...selected, indicator: newSelectedIndicator},
 
-      geometry,
       legend,
 
       options: {
@@ -418,12 +404,12 @@ const MapBlock = ({
 
 
   function selectLocationOption(locationValue: string) {
-    const { selected } = state;
+    const {selected} = state;
     let results: IdValue[] = [];
 
     const {
       element: currentSelectedLocationElement,
-    } = getFeatureElementById(selected.location);
+    } = getFeatureElementById(selected.location, geometry);
 
     if (currentSelectedLocationElement) {
       currentSelectedLocationElement.classList.remove(styles.selected);
@@ -433,7 +419,7 @@ const MapBlock = ({
       layer: selectedLayer,
       element: selectedLocationElement,
       feature: selectedFeature,
-    } = getFeatureElementById(locationValue);
+    } = getFeatureElementById(locationValue, geometry);
 
     if (selectedLocationElement && selectedLayer && selectedFeature) {
       selectedLocationElement.classList.add(styles.selected);
@@ -447,14 +433,14 @@ const MapBlock = ({
         selectedLayer.bringToFront();
       }
 
-      const { properties } = selectedFeature;
+      const {properties} = selectedFeature;
 
       if (properties) {
         // eslint-disable-next-line prefer-destructuring
         const measures: { [key: string]: string } = properties.measures;
 
         results = Object.entries(measures).reduce(
-          (r: IdValue[], [id, value]) => [...r, { id, value }],
+          (r: IdValue[], [id, value]) => [...r, {id, value}],
           [],
         );
       }
@@ -471,7 +457,7 @@ const MapBlock = ({
   }
 
   const onEachFeature = (feature: MapFeature, featureLayer: Path) => {
-    const { selected } = state;
+    const {selected} = state;
 
     if (feature.properties) {
       // eslint-disable-next-line no-param-reassign
@@ -481,7 +467,7 @@ const MapBlock = ({
     featureLayer.setStyle({
       className: classNames(
         feature.properties && feature.properties.className,
-        { [styles.selected]: feature.id === selected.location },
+        {[styles.selected]: feature.id === selected.location},
       ),
     });
 
@@ -505,7 +491,7 @@ const MapBlock = ({
   };
 
   const onClick = (e: MapClickEvent) => {
-    const { feature } = e.sourceTarget;
+    const {feature} = e.sourceTarget;
 
     if (feature.properties) {
       selectLocationOption(feature.properties.code);
@@ -513,7 +499,7 @@ const MapBlock = ({
   };
 
 
-  const { selected, options, geometry, legend } = state;
+  const {selected, options, legend} = state;
 
 
   return (
@@ -588,7 +574,7 @@ const MapBlock = ({
             </h3>
             <dl className="govuk-list">
               {legend &&
-              legend.map(({ min, max, idx }) => (
+              legend.map(({min, max, idx}) => (
                 <dd className={styles.legend} key={idx}>
                   <span className={styles[`rate${idx}`]}>&nbsp;</span> {min}
                   {meta.indicators[selected.indicator].unit}&nbsp; to {max}
