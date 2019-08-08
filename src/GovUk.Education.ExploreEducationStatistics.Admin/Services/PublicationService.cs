@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using UserId = System.Guid;
 using TopicId = System.Guid;
@@ -57,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             if (_context.Publications.Any(p => p.Slug == publication.Slug))
             {
-                return ValidationResult("Slug", "Slug is not unique");
+                return ValidationResult(SlugNotUnique);
             }
             
             var saved = _context.Publications.Add(new Publication

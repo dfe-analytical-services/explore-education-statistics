@@ -8,12 +8,13 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using FileInfo = GovUk.Education.ExploreEducationStatistics.Admin.Models.FileInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
@@ -195,7 +196,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
                 .Returns(Task.FromResult(new Release {Id = releaseId}));
             fileStorageService
                 .Setup(service => service.UploadDataFilesAsync(releaseId, dataFile, metaFile, "Subject name"))
-                .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<FileInfo>>>(ValidationUtils.ValidationResult("File Name", "File Error")));
+                .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<FileInfo>>>(ValidationResult(CannotOverwriteFile)));
 
             var controller = new ReleasesController(releaseService.Object, fileStorageService.Object,
                 importService.Object);
@@ -261,22 +262,57 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
             Assert.Null(actionResult.Value);
             Assert.IsAssignableFrom<NotFoundResult>(actionResult.Result);
         }
-
-        private static IFormFile MockFile(string fileName)
+        
+        [Fact]
+        public async Task DeleteDataFilesAsync_Returns_OK()
         {
-            var fileMock = new Mock<IFormFile>();
-            const string content = "test content";
-            var ms = new MemoryStream();
-            var writer = new StreamWriter(ms);
-            writer.Write(content);
-            writer.Flush();
-            ms.Position = 0;
-            fileMock.Setup(_ => _.OpenReadStream()).Returns(ms);
-            fileMock.Setup(_ => _.FileName).Returns(fileName);
-            fileMock.Setup(_ => _.Length).Returns(ms.Length);
-            return fileMock.Object;
-        }
+            var releaseId = Guid.NewGuid();
 
+            var releaseService = new Mock<IReleaseService>();
+            var fileStorageService = new Mock<IFileStorageService>();
+            var importService = new Mock<IImportService>();
+            
+            releaseService.Setup(s => s.GetAsync(It.IsAny<Guid>()))
+                .Returns(Task.FromResult(new Release {Id = releaseId}));
+            fileStorageService
+                .Setup(service => service.DeleteDataFileAsync(releaseId, "datafilename"))
+                .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<FileInfo>>>(new List<FileInfo>()));
+
+            var controller = new ReleasesController(releaseService.Object, fileStorageService.Object,
+                importService.Object);
+
+            // Call the method under test
+            var actionResult = await controller.DeleteDataFiles(releaseId, "datafilename");
+
+            Assert.IsAssignableFrom<OkObjectResult>(actionResult.Result);
+        }
+        
+        [Fact]
+        public async Task DeleteDataFilesAsync_Returns_ValidationProblem()
+        {
+            var releaseId = Guid.NewGuid();
+
+            var releaseService = new Mock<IReleaseService>();
+            var fileStorageService = new Mock<IFileStorageService>();
+            var importService = new Mock<IImportService>();
+            
+            releaseService.Setup(s => s.GetAsync(It.IsAny<Guid>()))
+                .Returns(Task.FromResult(new Release {Id = releaseId}));
+            fileStorageService
+                .Setup(service => service.DeleteDataFileAsync(releaseId, "datafilename"))
+                .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<FileInfo>>>(ValidationResult(UnableToFindMetadataFileToDelete)));
+
+            var controller = new ReleasesController(releaseService.Object, fileStorageService.Object,
+                importService.Object);
+
+            // Call the method under test
+            var actionResult = await controller.DeleteDataFiles(releaseId, "datafilename");
+
+            Assert.IsAssignableFrom<BadRequestObjectResult>(actionResult.Result);
+            Assert.IsAssignableFrom<ValidationProblemDetails>((actionResult.Result as BadRequestObjectResult)?.Value);
+        }
+        
+        
         [Fact]
         public async void Edit_Release_Summary_Returns_Ok()
         {
@@ -298,8 +334,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
             Assert.IsAssignableFrom<ReleaseViewModel>(result.Value);
             Assert.Equal(result.Value.Id, releaseId);
         }
-
-
+        
         [Fact]
         public async void Get_Release_Summary_Returns_Ok()
         {
@@ -317,8 +352,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
             Assert.IsAssignableFrom<EditReleaseSummaryViewModel>(result.Value);
             Assert.Equal(result.Value.Id, releaseId);
         }
-        
-        
+
         [Fact]
         public async void Get_Releases_For_Publication_Returns_Ok()
         {
@@ -336,7 +370,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
             Assert.IsAssignableFrom<List<ReleaseViewModel>>(result.Value);
         }            
         
-        
-        
+        private static IFormFile MockFile(string fileName)
+        {
+            var fileMock = new Mock<IFormFile>();
+            const string content = "test content";
+            var ms = new MemoryStream();
+            var writer = new StreamWriter(ms);
+            writer.Write(content);
+            writer.Flush();
+            ms.Position = 0;
+            fileMock.Setup(_ => _.OpenReadStream()).Returns(ms);
+            fileMock.Setup(_ => _.FileName).Returns(fileName);
+            fileMock.Setup(_ => _.Length).Returns(ms.Length);
+            return fileMock.Object;
+        }
     }
 }
