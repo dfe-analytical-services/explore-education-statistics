@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.Extensions.Configuration;
 using MimeTypes;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 {
@@ -33,15 +35,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
             _storageConnectionString = config.GetConnectionString("PublicStorage");
         }
 
-        public IEnumerable<FileInfo> ListFiles(string publication, string release)
+        public IEnumerable<FileInfo> ListFiles(string publication, string release, ReleaseFileTypes type)
         {
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
 
             var blobClient = storageAccount.CreateCloudBlobClient();
             var blobContainer = blobClient.GetContainerReference(ContainerName);
             blobContainer.CreateIfNotExists();
-
-            return blobContainer.ListBlobs($"{publication}/{release}", true, BlobListingDetails.Metadata)
+            
+            return blobContainer.ListBlobs(PublicReleaseDirectoryPath(publication, release, type), true, BlobListingDetails.Metadata)
                 .OfType<CloudBlockBlob>()
                 .Where(IsFileReleased)
                 .Select(file => new FileInfo

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
@@ -34,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
                 cfg.CreateMap<Publication, PublicationTree>()
                     .ForMember(
                         dest => dest.DataFiles, m => m.MapFrom(publication =>
-                            ListFiles(publication.Slug, GetLatestRelease(publication).Slug)));
+                            ListFiles(publication.Slug, GetLatestRelease(publication).Slug, ReleaseFileTypes.Data))); // TODO qqRP
             });
 
             var mapper = config.CreateMapper();
@@ -58,9 +59,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
             return _context.Releases.Include(release => release.Publication.Topic.Theme);
         }
 
-        private IEnumerable<FileInfo> ListFiles(string publication, string release)
+        private IEnumerable<FileInfo> ListFiles(string publication, string release, ReleaseFileTypes type)
         {
-            return _fileStorageService.ListFiles(publication, release);
+            return _fileStorageService.ListFiles(publication, release, type);
         }
     }
 }

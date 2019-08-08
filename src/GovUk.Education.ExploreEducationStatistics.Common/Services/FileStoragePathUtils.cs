@@ -50,10 +50,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         public static string AdminReleaseDirectoryPath(ReleaseId releaseId, ReleaseFileTypes type) =>
             AdminReleaseDirectoryPath(releaseId.ToString(), type); 
         
+        
+        /**
+         * The public file path, for a file of a particular type and name, on a release.
+         */
+        public static string PublicReleasePath(string publicationSlug, string releaseSlug, ReleaseFileTypes type, string fileName)
+        {
+            return PublicReleaseDirectoryPath(publicationSlug, releaseSlug, type) + $"{fileName}";
+        }
+        
+        /**
+         * The public directory path where files, of a particular type, on a release are stored.
+         */
+        public static string PublicReleaseDirectoryPath(string publicationSlug, string releaseSlug, ReleaseFileTypes type)
+        {
+            return PublicReleaseDirectoryPath(publicationSlug, releaseSlug) + $"{type.GetEnumLabel()}/";
+        }
+        
+        /**
+         * The top level public directory path where files on a release are stored.
+         */
         public static string PublicReleaseDirectoryPath(string publicationSlug, string releaseSlug)
         {
-            return $"{publicationSlug}/{releaseSlug}"; 
+            return $"{publicationSlug}/{releaseSlug}/"; 
         }
+        
+        
         
     }
 }
