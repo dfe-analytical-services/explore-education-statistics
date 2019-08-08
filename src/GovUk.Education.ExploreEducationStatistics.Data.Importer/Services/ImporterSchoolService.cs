@@ -1,6 +1,8 @@
+using System;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
@@ -42,10 +44,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 return schoolOut;
             }
             
-            school = _context.School
+            school = _context.School.AsNoTracking()
                      .FirstOrDefault(s => s.LaEstab == school.LaEstab) ?? _context.School.Add(school).Entity;
-      
-            GetCache().Set(cacheKey, school);
             
             return school;
         }

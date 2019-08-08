@@ -1,6 +1,7 @@
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
@@ -33,9 +34,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 return filterItem;
             }
             
-            filterItem = _context.FilterItem.FirstOrDefault(fi => fi.FilterGroupId == filterGroup.Id && fi.Label == label) 
+            filterItem = _context.FilterItem.AsNoTracking().FirstOrDefault(fi => fi.FilterGroupId == filterGroup.Id && fi.Label == label) 
                          ??_context.FilterItem.Add(new FilterItem(label, filterGroup)).Entity;
-
+            
             GetCache().Set(cacheKey, filterItem);
             
             return filterItem;
@@ -54,10 +55,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 return filterGroup;
             }
             
-            filterGroup = _context.FilterGroup
+            filterGroup = _context.FilterGroup.AsNoTracking()
                           .FirstOrDefault(fg => fg.FilterId == filter.Id && fg.Label == label) 
                           ?? _context.FilterGroup.Add(new FilterGroup(filter, label)).Entity;
-
+            
             GetCache().Set(cacheKey, filterGroup);
             
             return filterGroup;

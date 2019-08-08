@@ -73,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
             var blobClient = storageAccount.CreateCloudBlobClient();
             var blobContainer = blobClient.GetContainerReference(ContainerName);
-            var blob = blobContainer.GetBlockBlobReference($"{releaseId}/data/{importMessage.DataFileName}");
+            var blob = blobContainer.GetBlockBlobReference($"{releaseId}/Data/{importMessage.DataFileName}");
             blob.DeleteAsync();
         }
 
