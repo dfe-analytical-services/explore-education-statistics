@@ -310,6 +310,8 @@ module.exports = webpackEnv => {
                       'react-dev-utils/eslintFormatter',
                     ),
                     eslintPath: require.resolve('eslint'),
+                    failOnError: false,
+                    failOnWarning: false,
                   },
                   loader: require.resolve('eslint-loader'),
                 },
@@ -606,7 +608,7 @@ module.exports = webpackEnv => {
         safe: true,
       }),
 
-      new StylelintPlugin(),
+      process.env.ESLINT_DISABLE !== 'true' && new StylelintPlugin(),
     ].filter(Boolean),
     // Some libraries import Node modules but don't use them in the browser.
     // Tell Webpack to provide empty mocks for them so importing them works.
