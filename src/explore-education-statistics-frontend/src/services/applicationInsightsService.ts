@@ -8,7 +8,7 @@ export const initApplicationInsights = () => {
   ) {
     const appInsights = new ApplicationInsights({
       config: {
-        instrumentationKey: '19746be1-8feb-49c2-8c61-3a671628f6e3',
+        instrumentationKey: process.env.AI_INSTRUMENTATION,
         enableAutoRouteTracking: true,
         autoTrackPageVisitTime: true,
       },
