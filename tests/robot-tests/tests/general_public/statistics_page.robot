@@ -11,7 +11,7 @@ Navigate to Find Statistics page
     [Tags]  HappyPath
     environment variable should be set   PUBLIC_URL
     user goes to url   %{PUBLIC_URL}/find-statistics
-    user waits until page contains  Browse to find the statistics and data you’re looking for
+    user waits until page contains heading  Find statistics and data
 
 User uses search
     [Tags]   UnderConstruction

@@ -114,6 +114,17 @@ def user_checks_details_dropdown_contains_publication(details_heading, publicati
   except:
     raise AssertionError(f'Cannot find publication "{publication_name}" inside details component "{details_heading}"')
 
+def user_checks_details_dropdown_contains_download_link(details_heading, download_link):
+  try:
+    sl.driver.find_element_by_xpath(f'//*[@class="govuk-details__summary-text" and text()="{details_heading}"]')
+  except:
+    raise AssertionError(f'Cannot find details component "{details_heading}"')
+
+  try:
+    sl.driver.find_element_by_xpath(f'//*[@class="govuk-details__summary-text" and text()="{details_heading}"]/../..//li/a[text()="{download_link}"]')
+  except:
+    raise AssertionError(f'Cannot find link "{download_link}" in "{details_heading}"')
+
 def user_checks_key_stat_tile_contents(tile_title, tile_value, tile_context):
   try:
     elem = sl.driver.find_element_by_xpath(f'.//*[@data-testid="key-stat-tile-title" and contains(text(), "{tile_title}")]')
@@ -208,17 +219,17 @@ def user_clicks_select_all_for_category(category_label):
 def user_checks_results_table_column_heading_contains(row, column, expected):
   elem = sl.driver.find_element_by_xpath(f'//table/thead/tr[{row}]/th[{column}]')
   if expected not in elem.text:
-    raise AssertionError(f'"{expected} not found in th tag in results table thead row {row}, column {column}')
+    raise AssertionError(f'"{expected}" not found in th tag in results table thead row {row}, column {column}')
 
 def user_checks_results_table_row_heading_contains(row, column, expected):
   elem = sl.driver.find_element_by_xpath(f'//table/tbody/tr[{row}]/th[{column}]')
   if expected not in elem.text:
-    raise AssertionError(f'"{expected} not found in th tag in results table tbody row {row}, column {column}')
+    raise AssertionError(f'"{expected}" not found in th tag in results table tbody row {row}, column {column}')
 
 def user_checks_results_table_cell_contains(row, column, expected):
   elem = sl.driver.find_element_by_xpath(f'//table/tbody/tr[{row}]/td[{column}]')
   if expected not in elem.text:
-    raise AssertionError(f'"{expected} not found in td tag in results table tbody row {row}, column {column}')
+    raise AssertionError(f'"{expected}" not found in td tag in results table tbody row {row}, column {column}')
 
 def user_checks_previous_table_tool_step_contains(step, key, value):
   try:
