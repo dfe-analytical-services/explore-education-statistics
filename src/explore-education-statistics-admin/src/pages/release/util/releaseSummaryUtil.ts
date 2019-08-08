@@ -3,24 +3,22 @@ import {
   dayMonthYearInputsToValues,
 } from '@admin/services/common/types';
 import { CreateReleaseRequest } from '@admin/services/release/create-release/types';
-import { UpdateReleaseSetupDetailsRequest } from '@admin/services/release/edit-release/setup/types';
-import { BaseReleaseSetupDetailsRequest } from '@admin/services/release/types';
+import { UpdateReleaseSummaryDetailsRequest } from '@admin/services/release/edit-release/summary/types';
+import { BaseReleaseSummaryDetailsRequest } from '@admin/services/release/types';
 import { FormValues as CreateFormValues } from '../create-release/CreateReleasePage';
-import { EditFormValues } from '../setup/ReleaseSetupForm';
+import { EditFormValues } from '../summary/ReleaseSummaryForm';
 
-export const assembleBaseReleaseSetupRequestFromForm = (
+export const assembleBaseReleaseSummaryRequestFromForm = (
   values: EditFormValues,
-): BaseReleaseSetupDetailsRequest => {
+): BaseReleaseSummaryDetailsRequest => {
   return {
     timePeriodCoverage: {
       value: values.timePeriodCoverageCode,
     },
     releaseName: parseInt(values.timePeriodCoverageStartYear, 10),
     publishScheduled: dayMonthYearInputsToDate(values.scheduledPublishDate),
-    nextReleaseExpected: dayMonthYearInputsToValues(
-      values.nextReleaseExpectedDate,
-    ),
-    releaseTypeId: values.releaseTypeId,
+    nextReleaseDate: dayMonthYearInputsToValues(values.nextReleaseDate),
+    typeId: values.releaseTypeId,
   };
 };
 
@@ -30,18 +28,19 @@ export const assembleCreateReleaseRequestFromForm = (
 ): CreateReleaseRequest => {
   return {
     publicationId,
-    templateReleaseId: values.templateReleaseId,
-    ...assembleBaseReleaseSetupRequestFromForm(values),
+    templateReleaseId:
+      values.templateReleaseId !== 'new' ? values.templateReleaseId : '',
+    ...assembleBaseReleaseSummaryRequestFromForm(values),
   };
 };
 
-export const assembleUpdateReleaseSetupRequestFromForm = (
+export const assembleUpdateReleaseSummaryRequestFromForm = (
   releaseId: string,
   values: EditFormValues,
-): UpdateReleaseSetupDetailsRequest => {
+): UpdateReleaseSummaryDetailsRequest => {
   return {
     releaseId,
-    ...assembleBaseReleaseSetupRequestFromForm(values),
+    ...assembleBaseReleaseSummaryRequestFromForm(values),
   };
 };
 

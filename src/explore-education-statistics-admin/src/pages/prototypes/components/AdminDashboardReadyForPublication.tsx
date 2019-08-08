@@ -1,5 +1,4 @@
 import PrototypeDashboardRelease from '@admin/pages/prototypes/components/PrototypeDashboardRelease';
-import { LoginContext } from '@admin/components/Login';
 import React from 'react';
 
 interface Props {
@@ -9,13 +8,11 @@ interface Props {
 }
 
 const AdminDashboardReadyForApproval = ({ task, user }: Props) => {
-  const userContext = React.useContext(LoginContext);
+  const tagLabel = window.location.search.includes('status=approved')
+    ? 'Approved for publication'
+    : 'In higher review';
 
-  const tagLabel = window.location.search.includes('status=readyHigherReview')
-    ? 'In higher review'
-    : 'First draft';
-
-  const checkStatus = window.location.search.includes('status=ready')
+  const checkStatus = window.location.search.includes('status=approved')
     ? 'checkReleases'
     : 'noReleases';
 
@@ -32,33 +29,6 @@ const AdminDashboardReadyForApproval = ({ task, user }: Props) => {
       )}
       {checkStatus === 'checkReleases' && (
         <>
-          {userContext.user &&
-            userContext.user.permissions.includes('team member') && (
-              <p>Level 1: peer review</p>
-            )}
-          {userContext.user &&
-            userContext.user.permissions.includes(
-              'responsible statistician',
-            ) && <p>Level 2: higher review</p>}
-
-          {/* <p className="govuk-body">
-            {task === 'readyReview' ? (
-              'Review the following draft releases.'
-            ) : (
-              <div className="govuk-warning-text">
-                <span className="govuk-warning-text__icon" aria-hidden="true">
-                  !
-                </span>
-                <strong className="govuk-warning-text__text">
-                  <span className="govuk-warning-text__assistive">Warning</span>
-                  Resolve comments in the following draft releases
-                </strong>
-              </div>
-            )}
-            </p>*/}
-
-          <hr />
-
           <h3 className="govuk-heading-m">
             Pupil absence statistics and data for schools in England
           </h3>
@@ -71,7 +41,6 @@ const AdminDashboardReadyForApproval = ({ task, user }: Props) => {
             lastEditor={{ id: 'me', name: 'me', permissions: [] }}
             published={new Date('2019-09-20 09:30')}
             nextRelease={new Date('2020-09-20 09:30')}
-            showComments
             task={task}
             user={user}
             isNew

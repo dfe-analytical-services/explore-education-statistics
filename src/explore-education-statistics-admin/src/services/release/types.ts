@@ -1,24 +1,25 @@
-import { DayMonthYearValues, IdTitlePair } from '@admin/services/common/types';
+import { DayMonthYearValues } from '@admin/services/common/types';
 
-export interface ReleaseSetupDetails {
+export interface ReleaseSummaryDetails {
   id: string;
-  publicationTitle: string;
-  timePeriodCoverageCode: string;
-  timePeriodCoverageStartYear: number;
-  releaseType: IdTitlePair;
-  leadStatisticianName: string;
-  scheduledPublishDate: DayMonthYearValues;
-  nextReleaseExpectedDate: DayMonthYearValues;
+  timePeriodCoverage: {
+    value: string;
+    label: string;
+  };
+  releaseName: string;
+  typeId: string;
+  publishScheduled: string;
+  nextReleaseDate: DayMonthYearValues;
 }
 
-export interface BaseReleaseSetupDetailsRequest {
+export interface BaseReleaseSummaryDetailsRequest {
   timePeriodCoverage: {
     value: string;
   };
   releaseName: number;
-  releaseTypeId: string;
+  typeId: string;
   publishScheduled: Date;
-  nextReleaseExpected: DayMonthYearValues;
+  nextReleaseDate: DayMonthYearValues;
 }
 
 export default {};

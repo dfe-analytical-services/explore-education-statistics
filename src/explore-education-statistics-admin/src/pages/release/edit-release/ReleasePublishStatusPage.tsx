@@ -1,21 +1,7 @@
 import React from 'react';
-import { RouteComponentProps } from 'react-router';
-import ReleasePageTemplate from './components/ReleasePageTemplate';
 
-interface MatchProps {
-  releaseId: string;
-}
-
-const ReleasePublishStatusPage = ({
-  match,
-}: RouteComponentProps<MatchProps>) => {
-  const { releaseId } = match.params;
-
-  return (
-    <ReleasePageTemplate publicationTitle="TODO" releaseId={releaseId}>
-      <h2 className="govuk-heading-m">Set publish status</h2>
-    </ReleasePageTemplate>
-  );
+const ReleasePublishStatusPage = () => {
+  return <h2 className="govuk-heading-m">Set publish status</h2>;
 };
 
 export default ReleasePublishStatusPage;

@@ -1,12 +1,7 @@
 import publicationPollyfilla from '@admin/services/dashboard/polyfillas';
-import { polyfill } from '@admin/services/util/polyfilla';
-import { createClient } from '@admin/services/util/service';
-import mocks from './mock/mock-service';
-import { AdminDashboardPublication, ThemeAndTopics } from './types';
+import client from '@admin/services/util/service';
 
-const apiClient = createClient({
-  mockBehaviourRegistrar: mocks,
-});
+import { AdminDashboardPublication, ThemeAndTopics } from './types';
 
 export interface DashboardService {
   getMyThemesAndTopics(): Promise<ThemeAndTopics[]>;
@@ -17,22 +12,16 @@ export interface DashboardService {
 
 const service: DashboardService = {
   getMyThemesAndTopics(): Promise<ThemeAndTopics[]> {
-    return apiClient.then(client => client.get<ThemeAndTopics[]>('/me/themes'));
+    return client.get<ThemeAndTopics[]>('/me/themes');
   },
   getMyPublicationsByTopic(
     topicId: string,
   ): Promise<AdminDashboardPublication[]> {
-    return apiClient.then(client =>
-      client
-        .get<AdminDashboardPublication[]>('/me/publications', {
-          params: { topicId },
-        })
-        .then(publications =>
-          publications.map(publication =>
-            polyfill(publication, publicationPollyfilla),
-          ),
-        ),
-    );
+    return client
+      .get<AdminDashboardPublication[]>('/me/publications', {
+        params: { topicId },
+      })
+      .then(publications => publications.map(publicationPollyfilla));
   },
 };
 
