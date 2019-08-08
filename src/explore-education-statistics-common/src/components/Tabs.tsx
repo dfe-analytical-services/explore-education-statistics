@@ -69,8 +69,8 @@ const Tabs = ({ children, id, onToggle }: Props) => {
                   setSelectedTab(index);
                   if (typeof onToggle === 'function') {
                     onToggle({
-                      title: `${props.title}`,
-                      id: `${sectionId}`,
+                      title: props.title,
+                      id: sectionId,
                     });
                   }
                 }}
