@@ -72,18 +72,6 @@ const PublicationPage = ({ task }: Props) => {
               id: 'questionHigherReview',
               label: 'Ready for sign-off',
               value: 'readyHigherReview',
-              conditional: (
-                <FormGroup>
-                  <label htmlFor="questionHigherReview" className="govuk-label">
-                    Add your comment or question
-                  </label>
-                  <textarea
-                    name="questionHigherReview"
-                    id="questionHigherReview"
-                    className="govuk-textarea"
-                  />
-                </FormGroup>
-              ),
             },
           ]}
         />
