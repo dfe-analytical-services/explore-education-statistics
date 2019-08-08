@@ -47,12 +47,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 if (string.IsNullOrWhiteSpace(email))
                 {
                     email = User.Claims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn")?.Value;
-
                 }
-                
-                // TOOO - temp work around for dfe accounts to get name
-                if (email.ToLower().Contains("education.gov.uk")  )
+                else if(email.ToLower().Contains("education.gov.uk"))
                 {
+                    // TOOO - temp work around for dfe accounts to get name
                     var address = email.Split('@').First();
                     givenname = address.Split('.').First();
                     surname = address.Split('.').Last();
