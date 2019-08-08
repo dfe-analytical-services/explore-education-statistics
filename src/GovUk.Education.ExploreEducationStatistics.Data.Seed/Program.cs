@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Seed.Services;
@@ -33,6 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                 .Build();
 
             services.AddMemoryCache();
+            services.AddAutoMapper();
             services.AddSingleton(provider => configuration);
             services.AddLogging(builder => builder.AddConsole().AddConfiguration(configuration.GetSection("Logging")))
                 .AddTransient<IFileStorageService, FileStorageService>()

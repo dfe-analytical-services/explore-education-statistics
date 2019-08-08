@@ -1,4 +1,15 @@
 {
   "version": "2.0",
-  "functionTimeout": "04:00:00"
+  "functionTimeout": "04:00:00",
+  "logging": {
+    "logLevel": {
+      "default": "None",
+      "Function.ProcessUploads": "Information",
+      "Function.ProcessUploadsSequentially": "Information",
+      "Function.ImportFiles": "Information",
+      "GovUk.Education.ExploreEducationStatistics.Data.Importer": "Debug",
+      "Microsoft": "Warning",
+      "Microsoft.EntityFrameworkCore.Database.Command": "Warning"
+    }
+  }
 }

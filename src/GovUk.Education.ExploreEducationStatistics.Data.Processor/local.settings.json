@@ -10,15 +10,5 @@
   },
   "Host": {
     "CORS": "*"
-  },
-  "Logging": {
-    "Console": {
-      "LogLevel": {
-        "Default": "Information",
-        "System": "Information",
-        "Microsoft": "Warning",
-        "Microsoft.EntityFrameworkCore.Database.Command": "Warning"
-      }
-    }
   }
 }

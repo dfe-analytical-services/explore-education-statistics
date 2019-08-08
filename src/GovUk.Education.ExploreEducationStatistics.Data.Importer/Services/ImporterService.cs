@@ -112,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         
         public SubjectMeta GetMeta(List<string> metaLines, Subject subject)
         {
-            _logger.LogDebug("Importing meta lines for Publication {Publication}, {Subject}", subject.Release.Publication.Title, subject.Name);
+            _logger.LogDebug("Getting meta lines for Publication {Publication}, {Subject}", subject.Release.Publication.Title, subject.Name);
             
             return _importerMetaService.Get(metaLines, subject);
         }
@@ -136,7 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             
             var observations = GetObservations(lines, headers, subject, subjectMeta);
             
-            Console.WriteLine($"Adding {observations.Count()} observations for {subject.Name}");
+            _logger.LogInformation($"Adding {observations.Count()} observations for {subject.Name}");
 
             _context.Observation.AddRange(observations);
         }
@@ -190,7 +190,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             var mod = _importCount++;
             if (mod % 1000 == 0)
             {
-                Console.WriteLine($"{mod} lines processed during first pass for {subjectName}");
+                _logger.LogInformation($"{mod} lines processed during first pass for {subjectName}");
             }
         }
 
