@@ -110,7 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             {
                 topic = new Topic
                 {
-                    Id = message.Release.Publication.Id,
+                    Id = message.Release.Publication.Topic.Id,
                     Title = message.Release.Publication.Title,
                     Slug = message.Release.Publication.Slug,
                     Theme = CreateOrUpdateTheme(message)
