@@ -10,7 +10,16 @@ describe('MapBlock', () => {
   test('renders', async () => {
     const { container } = render(
       <MapBlock
-        {...testData.AbstractMultipleChartProps}
+        {...{
+          ...testData.AbstractMultipleChartProps,
+          axes: {
+            ...testData.AbstractMultipleChartProps.axes,
+            major: {
+              ...testData.AbstractMultipleChartProps.axes.major,
+              groupBy: "locations"
+            }
+          }
+        }}
         height={600}
         width={900}
       />,
