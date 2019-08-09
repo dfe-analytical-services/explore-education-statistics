@@ -105,8 +105,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToListAsync();
             return _mapper.Map<List<ReleaseViewModel>>(release);
         }
-        
-        
 
         private int OrderForNextReleaseOnPublication(PublicationId publicationId)
         {
