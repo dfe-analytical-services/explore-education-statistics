@@ -112,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var publication = _context.Publications.Include(p => p.Releases)
                 .Single(p => p.Id == publicationId);
-            return publication?.LatestRelease()?.Order + 1 ?? 0;
+            return publication.Releases.Select(r => r.Order).DefaultIfEmpty().Max() + 1;
         }
 
         private List<ContentSection> TemplateFromRelease(ReleaseId? releaseId)

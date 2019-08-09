@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         ReleaseName = "2018",
                         TimePeriodCoverage = TimeIdentifier.AcademicYear,
                         PublishScheduled = DateTime.Parse("2050/01/01"),
-                        ReleaseTypeId = new Guid("02e664f2-a4bc-43ee-8ff0-c87354adae72")
+                        TypeId = new Guid("02e664f2-a4bc-43ee-8ff0-c87354adae72")
                     });
 
                 Assert.Equal("Academic Year 2018/19", result.Result.Right.Title);
@@ -48,6 +48,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void CreateReleaseWithTemplate()
         {
+
+
+            var x = new List<int>().Select(c => c).DefaultIfEmpty().Max();
+            
             using (var context = InMemoryApplicationDbContext("Create"))
             {
                 context.Add(new ReleaseType {Id = new Guid("2a0217ca-c514-45da-a8b3-44c68a6737e8"), Title = "Ad Hoc",});
@@ -103,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         ReleaseName = "2018",
                         TimePeriodCoverage = TimeIdentifier.AcademicYear,
                         PublishScheduled = DateTime.Parse("2050/01/01"),
-                        ReleaseTypeId = new Guid("2a0217ca-c514-45da-a8b3-44c68a6737e8")
+                        TypeId = new Guid("2a0217ca-c514-45da-a8b3-44c68a6737e8")
                     });
 
                 // Do an in depth check of the saved release
