@@ -1,15 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Newtonsoft.Json;
 using static System.DateTime;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PartialDate;
-using static System.String;
-using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifierCategory;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.NamingUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
@@ -17,28 +14,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     {
         public Guid Id { get; set; }
 
-        public string Title => CoverageTitle + (IsNullOrEmpty(YearTitle) ? "" : " " + YearTitle);
-        
-        public string YearTitle
-        {
-            get
-            {
-                // Calendar year time identifiers we just use the year, all others we use a year range.
-                // We express this range in the format e.g. 2019/20
-                if (!IsNullOrEmpty(_releaseName) && YearRegex.Match(_releaseName).Success &&
-                    !CalendarYear.GetTimeIdentifiers().Contains(TimePeriodCoverage))
-                {
-                    var releaseStartYear = Int32.Parse(_releaseName);
-                    var releaseEndYear = (releaseStartYear % 100) + 1; // Only want the last two digits
-                    return releaseStartYear + "/" + releaseEndYear;
-                }
-                // For calendar year time identifiers we just want the year not a range. If there is no year then we
-                // just output the time period identifier
-                return IsNullOrEmpty(ReleaseName) ? "" : ReleaseName;
-            }
-        }
-        
-        public string CoverageTitle => TimePeriodCoverage.GetEnumLabel(); 
+        public string Title => ReleaseTitle(ReleaseName, TimePeriodCoverage);
+
+        public string YearTitle => ReleaseYearTitle(ReleaseName, TimePeriodCoverage);
+
+        public string CoverageTitle => ReleaseCoverageTitle(TimePeriodCoverage); 
         
         private string _releaseName;
 

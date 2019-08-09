@@ -5,6 +5,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Newtonsoft.Json;
+using static System.String;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.NamingUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 {
@@ -18,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         
         [JsonConverter(typeof(TimeIdentifierJsonConverter))]
         [Required]
-        public TimeIdentifier? TimePeriodCoverage { get; set; }
+        public TimeIdentifier TimePeriodCoverage { get; set; }
         
         public DateTime? PublishScheduled { get; set; }
         
@@ -27,5 +29,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
      
         [RegularExpression(@"^([0-9]{4})?$")]
         public string ReleaseName { get; set; }
+        
+        private string _slug;
+        public string Slug
+        {
+            get => IsNullOrEmpty(_slug) ? SlugFromTitle(ReleaseTitle(ReleaseName, TimePeriodCoverage)) : _slug;
+            set => _slug = value; 
+        }
     }
 }

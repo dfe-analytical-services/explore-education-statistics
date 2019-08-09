@@ -5,6 +5,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Newtonsoft.Json;
+using static System.String;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.NamingUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 {
@@ -28,5 +30,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         public string ReleaseName { get; set; }
 
         public Guid? TemplateReleaseId { get; set; }
+        
+        private string _slug;
+        public string Slug
+        {
+            get => IsNullOrEmpty(_slug) ? SlugFromTitle(ReleaseTitle(ReleaseName, TimePeriodCoverage)) : _slug;
+            set => _slug = value; 
+        }
     }
 }
