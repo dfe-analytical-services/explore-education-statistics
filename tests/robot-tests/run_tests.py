@@ -95,7 +95,7 @@ robotArgs += ["-v", "browser:" + args.browser]
 robotArgs += [args.tests]
 
 # Install chromedriver and add it to PATH
-path = cdi.install(file_directory='./webdriver/',
+cdi.install(file_directory='./webdriver/',
                    verbose=False,
                    chmod=True,
                    overwrite=False,
