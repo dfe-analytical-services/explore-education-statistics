@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
@@ -13,7 +12,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentif
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
-    public class TableBuilderDataService : AbstractDataService<ResultViewModel>
+    public class TableBuilderDataService : AbstractDataService<TableResultViewModel>
     {
         private readonly IFootnoteService _footnoteService;
         private readonly IResultBuilder<Observation, ObservationViewModel> _resultBuilder;
@@ -27,26 +26,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             _resultBuilder = resultBuilder;
         }
 
-        public override ResultViewModel Query(ObservationQueryContext queryContext)
+        public override TableResultViewModel Query(ObservationQueryContext queryContext)
         {
             var observations = GetObservations(queryContext).ToList();
             if (!observations.Any())
             {
-                return new ResultViewModel();
+                return new TableResultViewModel();
             }
 
-            return new ResultViewModel
+            return new TableResultViewModel
             {
                 Footnotes = GetFootnotes(observations, queryContext),
                 TimePeriodRange = GetTimePeriodRange(observations),
                 Result = observations.Select(observation =>
                     _resultBuilder.BuildResult(observation, queryContext.Indicators))
             };
-        }
-
-        public override async Task<ResultViewModel> QueryAsync(ObservationQueryContext queryContext)
-        {
-            return Query(queryContext);
         }
 
         private IEnumerable<FootnoteViewModel> GetFootnotes(IEnumerable<Observation> observations,

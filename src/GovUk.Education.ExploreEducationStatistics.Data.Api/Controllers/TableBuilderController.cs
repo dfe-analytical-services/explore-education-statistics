@@ -9,15 +9,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
     [ApiController]
     public class TableBuilderController : ControllerBase
     {
-        private readonly IDataService<ResultViewModel> _dataService;
+        private readonly IDataService<TableResultViewModel> _dataService;
 
-        public TableBuilderController(IDataService<ResultViewModel> dataService)
+        public TableBuilderController(IDataService<TableResultViewModel> dataService)
         {
             _dataService = dataService;
         }
 
         [HttpPost]
         public ActionResult<ResultViewModel> Query([FromBody] ObservationQueryContext query)
+        {
+            // TODO DFE-1277 Remove when table tool switches to new endpoint
+            var tableResultViewModel = _dataService.Query(query);
+            return new ResultViewModel
+            {
+                Footnotes = tableResultViewModel.Footnotes,
+                TimePeriodRange = tableResultViewModel.TimePeriodRange,
+                Result = tableResultViewModel.Result
+            };
+        }
+
+        [HttpPost("new")]
+        public ActionResult<TableResultViewModel> QueryNew([FromBody] ObservationQueryContext query)
         {
             return _dataService.Query(query);
         }

@@ -16,16 +16,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controller
 
         public TableBuilderControllerTests()
         {
-            var tableBuilderService = new Mock<IDataService<ResultViewModel>>();
+            var tableBuilderService = new Mock<IDataService<TableResultViewModel>>();
 
             tableBuilderService.Setup(s => s.Query(It.IsNotIn(_query))).Returns(
-                new ResultViewModel
+                new TableResultViewModel
                 {
                     Result = new List<ObservationViewModel>()
                 });
 
             tableBuilderService.Setup(s => s.Query(_query)).Returns(
-                new ResultViewModel
+                new TableResultViewModel
                 {
                     Result = new List<ObservationViewModel>
                     {

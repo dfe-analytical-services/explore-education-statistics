@@ -5,8 +5,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interface
 {
     public interface IFileStorageService
     {
-        bool FileExistsAndIsReleased(string publication, string release, string filename);
+        Task<string> DownloadTextAsync(string containerName, string blobName);
 
-        Task<FileStreamResult> StreamFile(string publication, string release, string filename);
+        Task<bool> FileExistsAndIsReleased(string containerName, string blobName);
+
+        Task<FileStreamResult> StreamFile(string containerName, string blobName, string fileName);
+
+        Task UploadFromStreamAsync(string containerName, string blobName, string contentType, string content);
     }
 }

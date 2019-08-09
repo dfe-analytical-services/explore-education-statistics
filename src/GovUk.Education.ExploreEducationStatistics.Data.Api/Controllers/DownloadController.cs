@@ -8,6 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
     [ApiController]
     public class DownloadController : ControllerBase
     {
+        private const string ContainerName = "downloads";
         private readonly IFileStorageService _fileStorageService;
 
         public DownloadController(IFileStorageService fileStorageService)
@@ -15,15 +16,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             _fileStorageService = fileStorageService;
         }
 
-        [HttpGet("{publication}/{release}/{filename}")]
-        public async Task<ActionResult> GetFile(string publication, string release, string filename)
+        [HttpGet("{publication}/{release}/{fileName}")]
+        public async Task<ActionResult> GetFile(string publication, string release, string fileName)
         {
-            if (!_fileStorageService.FileExistsAndIsReleased(publication, release, filename))
+            var blobName = $"{publication}/{release}/{fileName}";
+            if (!await _fileStorageService.FileExistsAndIsReleased(ContainerName, blobName))
             {
                 return NotFound();
             }
 
-            return await _fileStorageService.StreamFile(publication, release, filename);
+            return await _fileStorageService.StreamFile(ContainerName, blobName, fileName);
         }
     }
 }
