@@ -1,9 +1,9 @@
 import ChartBuilder from '@admin/modules/chart-builder/ChartBuilder';
 import PrototypePage from '@admin/pages/prototypes/components/PrototypePage';
 import PrototypeData from '@admin/pages/prototypes/PrototypeData';
-import ChartRenderer from '@common/modules/find-statistics/components/ChartRenderer';
+import ChartRenderer, {ChartRendererProps} from '@common/modules/find-statistics/components/ChartRenderer';
 import ChartData from '@common/modules/find-statistics/components/charts/__tests__/__data__/testBlockData';
-import { StackedBarProps } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import { StackedBarProps, ChartProps } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import { DataBlockResponse } from '@common/services/dataBlockService';
 import React from 'react';
 
@@ -30,7 +30,7 @@ const PrototypeChartTest = () => {
     },
   };
 
-  const data2 : StackedBarProps = {...{
+  const data2 : ChartProps = {...{
       ...ChartData.AbstractMultipleChartProps,
       axes: {
         ...ChartData.AbstractMultipleChartProps.axes,

@@ -3004,19 +3004,22 @@ const AbstractChartProps: ChartProps = {
     '23_1_2_____': {
       label: metaData.indicators['23'].label,
       unit: '%',
-      value: '23_1_2',
+      value: '23_1_2_____',
+      name: '23_1_2_____',
       colour: '#ff0000',
     },
     '26_1_2_____': {
       label: metaData.indicators['26'].label,
       unit: '%',
-      value: '26_1_2',
+      value: '26_1_2_____',
+      name: '26_1_2_____',
       colour: '#00ff00',
     },
     '28_1_2_____': {
       label: metaData.indicators['28'].label,
       unit: '%',
-      value: '28_1_2',
+      value: '28_1_2_____',
+      name: '28_1_2_____',
       colour: '#0000ff',
     },
   },
@@ -3073,16 +3076,19 @@ const AbstractChartProps2: ChartProps = {
       label: metaData.indicators['23'].label,
       unit: '%',
       value: '23_1_2',
+      name: '23_1_2',
     },
     '26_1_2_____': {
       label: metaData.indicators['26'].label,
       unit: '%',
       value: '26_1_2',
+      name: '26_1_2',
     },
     '28_1_2_____': {
       label: metaData.indicators['28'].label,
       unit: '%',
       value: '28_1_2',
+      name: '28_1_2',
     },
   },
 
@@ -3124,41 +3130,23 @@ const AbstractMultipleChartProps: ChartProps = {
   height: 300,
 
   labels: {
-    '23': {
+    '23_1_2_____': {
       label: metaData.indicators['23'].label,
-      name: '23',
+      name: '23_1_2_____',
       unit: '%',
-      value: '23',
+      value: '23_1_2_____',
     },
-    '26': {
+    '26_1_2_____': {
       label: metaData.indicators['26'].label,
-      name: '26',
+      name: '26_1_2_____',
       unit: '%',
-      value: '26',
+      value: '26_1_2_____',
     },
-    '28': {
+    '28_1_2_____': {
       label: metaData.indicators['28'].label,
-      name: '28',
+      name: '28_1_2_____',
       unit: '%',
-      value: '28',
-    },
-    '23_1_2': {
-      label: metaData.indicators['23'].label,
-      name: '23_1_2',
-      unit: '%',
-      value: '23_1_2',
-    },
-    '26_1_2': {
-      label: metaData.indicators['26'].label,
-      name: '26_1_2',
-      unit: '%',
-      value: '26_1_2',
-    },
-    '28_1_2': {
-      label: metaData.indicators['28'].label,
-      name: '28_1_2',
-      unit: '%',
-      value: '28_1_2',
+      value: '28_1_2_____',
     },
   },
 
@@ -3232,17 +3220,20 @@ const AbstractLargeDataChartProps: ChartProps = {
     '23_1_2_____': {
       label: metaData.indicators['23'].label,
       unit: '%',
-      value: '23_1_2',
+      value: '23_1_2_____',
+      name: '23_1_2_____',
     },
     '26_1_2_____': {
       label: metaData.indicators['26'].label,
       unit: '%',
-      value: '26_1_2',
+      value: '26_1_2_____',
+      name: '26_1_2_____',
     },
     '28_1_2_____': {
       label: metaData.indicators['28'].label,
       unit: '%',
-      value: '28_1_2',
+      value: '26_1_2_____',
+      name: '26_1_2_____',
     },
   },
 
@@ -3295,19 +3286,22 @@ const AbstractLargeDataChartProps_smaller_datasets: ChartProps = {
     '23_1_2_____': {
       label: metaData.indicators['23'].label,
       unit: '%',
-      value: '23_1_2',
+      value: '23_1_2_____',
+      name: '23_1_2_____',
       colour: '#285252',
     },
     '26_1_2_____': {
       label: metaData.indicators['26'].label,
       unit: '%',
-      value: '26_1_2',
+      value: '26_1_2_____',
+      name: '26_1_2_____',
       colour: '#572957',
     },
     '28_1_2_____': {
       label: metaData.indicators['28'].label,
       unit: '%',
-      value: '28_1_2',
+      value: '28_1_2_____',
+      name: '28_1_2_____',
       colour: '#454520',
     },
   },
@@ -3370,17 +3364,20 @@ const AbstractMissingDataChartProps: ChartProps = {
     '23_1_2_____': {
       label: metaData.indicators['23'].label,
       unit: '%',
-      value: '23_1_2',
+      value: '23_1_2_____',
+      name: '23_1_2_____',
     },
     '26_1_2_____': {
       label: metaData.indicators['26'].label,
       unit: '%',
-      value: '26_1_2',
+      value: '26_1_2_____',
+      name: '26_1_2_____',
     },
     '28_1_2_____': {
       label: metaData.indicators['28'].label,
       unit: '%',
-      value: '28_1_2',
+      value: '28_1_2_____',
+      name: '28_1_2_____',
     },
   },
 

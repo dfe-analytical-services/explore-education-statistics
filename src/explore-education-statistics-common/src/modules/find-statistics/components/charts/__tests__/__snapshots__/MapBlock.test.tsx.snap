@@ -25,17 +25,17 @@ exports[`MapBlock renders 1`] = `
             name="selectedIndicator"
           >
             <option
-              value="23"
+              value="0"
             >
               Unauthorised absence rate
             </option>
             <option
-              value="26"
+              value="1"
             >
               Overall absence rate
             </option>
             <option
-              value="28"
+              value="2"
             >
               Authorised absence rate
             </option>
@@ -79,7 +79,7 @@ exports[`MapBlock renders 1`] = `
           class="govuk-heading-s"
         >
           Key to 
-          Authorised absence rate
+          Unauthorised absence rate
         </h3>
         <dl
           class="govuk-list"
@@ -93,10 +93,10 @@ exports[`MapBlock renders 1`] = `
                
             </span>
              
-            5.0
+            3.0
             %
               to 
-            6.0
+            3.2
             %
              
           </dd>
@@ -109,10 +109,10 @@ exports[`MapBlock renders 1`] = `
                
             </span>
              
-            6.0
+            3.2
             %
               to 
-            7.0
+            3.4
             %
              
           </dd>
@@ -125,10 +125,10 @@ exports[`MapBlock renders 1`] = `
                
             </span>
              
-            7.0
+            3.4
             %
               to 
-            8.0
+            3.6
             %
              
           </dd>
@@ -141,10 +141,10 @@ exports[`MapBlock renders 1`] = `
                
             </span>
              
-            8.0
+            3.6
             %
               to 
-            9.0
+            3.8
             %
              
           </dd>
@@ -157,10 +157,10 @@ exports[`MapBlock renders 1`] = `
                
             </span>
              
-            9.0
+            3.8
             %
               to 
-            10.0
+            4.0
             %
              
           </dd>
@@ -197,18 +197,6 @@ exports[`MapBlock renders 1`] = `
             >
               <g>
                 <path
-                  class="uk leaflet-interactive"
-                  d="M-3 3L-3 -3L3 -3L3 3z"
-                  fill="#3388ff"
-                  fill-opacity="0.2"
-                  fill-rule="evenodd"
-                  stroke="#3388ff"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-opacity="1"
-                  stroke-width="3"
-                />
-                <path
                   class="rate0 leaflet-interactive"
                   d="M0 0"
                   fill="#3388ff"
@@ -223,6 +211,18 @@ exports[`MapBlock renders 1`] = `
                 <path
                   class="rate4 leaflet-interactive"
                   d="M0 0"
+                  fill="#3388ff"
+                  fill-opacity="0.2"
+                  fill-rule="evenodd"
+                  stroke="#3388ff"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-opacity="1"
+                  stroke-width="3"
+                />
+                <path
+                  class="uk leaflet-interactive"
+                  d="M-3 3L-3 -3L3 -3L3 3z"
                   fill="#3388ff"
                   fill-opacity="0.2"
                   fill-rule="evenodd"

@@ -92,6 +92,8 @@ describe('DataBlock', () => {
 
     await wait();
 
+
+
     expect(getDataBlockForSubject).toBeCalledWith(dataBlockRequest);
 
     expect(
@@ -181,7 +183,7 @@ describe('DataBlock', () => {
     expect(container.querySelectorAll('.recharts-bar')).toHaveLength(3);
   });
 
-  test('renders table', async () => {
+  test('renders table', () => {
     const getDataBlockForSubject = dataBlockService.getDataBlockForSubject.mockImplementation(
       (_: DataBlockRequest) => {
         return Promise.resolve(testData.response);
@@ -196,8 +198,6 @@ describe('DataBlock', () => {
         showTables
       />,
     );
-
-    await wait();
 
     expect(getDataBlockForSubject).toBeCalledWith(dataBlockRequest);
 
@@ -278,7 +278,7 @@ describe('DataBlock', () => {
               major: {
                 name: 'major',
                 type: 'major',
-                groupBy: 'timePeriods',
+                groupBy: 'locations',
                 dataSets: [
                   { indicator: '23', filters: ['1', '2'] },
                   { indicator: '26', filters: ['1', '2'] },

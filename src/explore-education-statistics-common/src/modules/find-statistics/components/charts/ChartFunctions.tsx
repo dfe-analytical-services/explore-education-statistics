@@ -15,9 +15,9 @@ import {
   DataSetConfiguration,
   ReferenceLine,
 } from '@common/services/publicationService';
-import { Dictionary } from '@common/types';
+import {Dictionary} from '@common/types';
 import difference from 'lodash/difference';
-import React, { ReactNode } from 'react';
+import React, {ReactNode} from 'react';
 import {
   AxisDomain,
   Label,
@@ -134,11 +134,11 @@ function calculateAxis(
     );
   }
 
-  return { size, title };
+  return {size, title};
 }
 
 export function calculateXAxis(xAxis: Axis, axisProps: XAxisProps): ReactNode {
-  const { size: height, title } = calculateAxis(xAxis, 'insideBottom');
+  const {size: height, title} = calculateAxis(xAxis, 'insideBottom');
   return (
     <XAxis {...axisProps} height={height}>
       {title}
@@ -147,7 +147,7 @@ export function calculateXAxis(xAxis: Axis, axisProps: XAxisProps): ReactNode {
 }
 
 export function calculateYAxis(yAxis: Axis, axisProps: YAxisProps): ReactNode {
-  const { size: width, title } = calculateAxis(yAxis, 'left', 270, 90);
+  const {size: width, title} = calculateAxis(yAxis, 'left', 270, 90);
   return (
     <YAxis {...axisProps} width={width}>
       {title}
@@ -200,6 +200,7 @@ function existAndCodesDoNotMatch(a?: Location, b?: Location) {
 
 function filterResultsForDataSet(ds: ChartDataSet) {
   return (result: Result) => {
+
     // fail fast with the two things that are most likely to not match
     if (ds.indicator && !Object.keys(result.measures).includes(ds.indicator))
       return false;
@@ -208,8 +209,9 @@ function filterResultsForDataSet(ds: ChartDataSet) {
       if (difference(ds.filters, result.filters).length > 0) return false;
     }
 
+
     if (ds.location) {
-      const { location } = result;
+      const {location} = result;
 
       if (existAndCodesDoNotMatch(location.country, ds.location.country))
         return false;
@@ -252,7 +254,9 @@ export function generateKeyFromDataSet(
   dataSet: ChartDataSet,
   ignoringField?: AxisGroupBy,
 ) {
-  const { indicator, filters, location, timePeriod } = {
+
+
+  const {indicator, filters, location, timePeriod} = {
     ...dataSet,
   };
 
@@ -263,22 +267,22 @@ export function generateKeyFromDataSet(
       location &&
       location.country &&
       location.country.code) ||
-      '',
+    '',
     (dontIgnoreLocations &&
       location &&
       location.region &&
       location.region.code) ||
-      '',
+    '',
     (dontIgnoreLocations &&
       location &&
       location.localAuthorityDistrict &&
       location.localAuthorityDistrict.code) ||
-      '',
+    '',
     (dontIgnoreLocations &&
       location &&
       location.localAuthority &&
       location.localAuthority.code) ||
-      '',
+    '',
   ];
 
   return [
@@ -289,6 +293,7 @@ export function generateKeyFromDataSet(
 
     (ignoringField !== 'timePeriods' && timePeriod) || '',
   ].join('_');
+
 }
 
 function generateNameForAxisConfiguration(
@@ -299,10 +304,18 @@ function generateNameForAxisConfiguration(
     case 'timePeriods':
       return result.timePeriod;
     case 'locations':
-      if (result.location.localAuthorityDistrict)
+
+      if (result.location.localAuthorityDistrict && result.location.localAuthorityDistrict.code && result.location.localAuthorityDistrict.code !== '')
         return `${result.location.localAuthorityDistrict.code}`;
-      if (result.location.localAuthority)
+
+      if (result.location.localAuthority && result.location.localAuthority.code && result.location.localAuthority.code !== '')
         return `${result.location.localAuthority.code}`;
+
+      if (result.location.region && result.location.region.code && result.location.region.code !== '')
+        return `${result.location.region.code}`;
+
+      if (result.location.country)
+        return `${result.location.country.code}`;
 
       return '';
     default:
@@ -327,7 +340,7 @@ function getChartDataForAxis(
   }
 
   const nameDictionary: Dictionary<ChartDataB> = initialNames.reduce(
-    (chartdata, n) => ({ ...chartdata, [n]: { name: n } }),
+    (chartdata, n) => ({...chartdata, [n]: {name: n}}),
     {},
   );
 
@@ -340,7 +353,7 @@ function getChartDataForAxis(
         [name]: {
           name,
           [generateKeyFromDataSet(dataSet, groupBy)]:
-            result.measures[dataSet.indicator] || 'NaN',
+          result.measures[dataSet.indicator] || 'NaN',
         },
       };
     }, nameDictionary),
@@ -349,7 +362,7 @@ function getChartDataForAxis(
 
 function reduceCombineChartData(
   newCombinedData: ChartDataB[],
-  { name, ...valueData }: { name: string },
+  {name, ...valueData}: { name: string },
 ) {
   // find and remove the existing matching (by name) entry from the list of data, or create a new one empty one
   const existingDataIndex = newCombinedData.findIndex(
@@ -358,7 +371,7 @@ function reduceCombineChartData(
   const [existingData] =
     existingDataIndex >= 0
       ? newCombinedData.splice(existingDataIndex, 1)
-      : [{ name }];
+      : [{name}];
 
   // put the new entry into the array with any existing and new values added to it
   return [
@@ -377,7 +390,7 @@ export function sortChartData(
 ) {
   if (sortBy === undefined) return chartData;
 
-  return [...chartData].sort(({ [sortBy]: sortByA }, { [sortBy]: sortByB }) => {
+  return [...chartData].sort(({[sortBy]: sortByA}, {[sortBy]: sortByB}) => {
     if (sortByA !== undefined && sortByB !== undefined) {
       return sortAsc
         ? sortByA.localeCompare(sortByB)
@@ -416,7 +429,7 @@ const FindFirstInDictionaries = (
 export function mapNameToNameLabel(
   ...metaDataObjects: (Dictionary<DataSetConfiguration> | undefined)[]
 ) {
-  return ({ name, ...otherdata }: { name: string }) => ({
+  return ({name, ...otherdata}: { name: string }) => ({
     ...otherdata,
     name:
       metaDataObjects.reduce(
@@ -453,7 +466,7 @@ export function createSortedAndMappedDataForAxis(
 
 export function getKeysForChart(chartData: ChartDataB[]) {
   return Array.from(
-    chartData.reduce((setOfKeys, { name: _, ...values }) => {
+    chartData.reduce((setOfKeys, {name: _, ...values}) => {
       return new Set([...Array.from(setOfKeys), ...Object.keys(values)]);
     }, new Set<string>()),
   );
@@ -481,12 +494,12 @@ export const conditionallyAdd = (size?: string, add?: number) => {
 };
 
 const calculateMinMaxReduce = (
-  { min, max }: { min: number; max: number },
+  {min, max}: { min: number; max: number },
   next: string,
 ) => {
   const nextValue = parseFloat(next);
   if (Number.isNaN(nextValue) && Number.isFinite(nextValue))
-    return { min, max };
+    return {min, max};
 
   return {
     min: nextValue < min ? nextValue : min,
@@ -498,7 +511,7 @@ export function calculateDataRange(chartData: ChartDataB[]) {
   // removing the 'name' variable from the object and just keeping the rest of the values
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const allValuesInData = chartData.reduce<string[]>(
-    (all, { name, ...values }) => [...all, ...Object.values(values)], // eslint-disable-line
+    (all, {name, ...values}) => [...all, ...Object.values(values)], // eslint-disable-line
     [],
   );
 
@@ -599,7 +612,7 @@ export function generateMinorAxis(
   chartData: ChartDataB[],
   axis: AxisConfiguration,
 ) {
-  const { min, max } = calculateDataRange(chartData);
+  const {min, max} = calculateDataRange(chartData);
 
   const axisMin = parseNumberOrDefault(axis.min, min);
   const axisMax = parseNumberOrDefault(axis.max, max);
@@ -612,14 +625,14 @@ export function generateMinorAxis(
     axisMax,
     axis.tickSpacing,
   );
-  return { domain, ticks };
+  return {domain, ticks};
 }
 
 export function generateMajorAxis(
   chartData: ChartDataB[],
   axis: AxisConfiguration,
 ) {
-  const majorAxisCateories = chartData.map(({ name }) => name);
+  const majorAxisCateories = chartData.map(({name}) => name);
 
   const min = parseNumberOrDefault(axis.min, 0);
   const max = parseNumberOrDefault(axis.max, majorAxisCateories.length - 1);
@@ -633,31 +646,31 @@ export function generateMajorAxis(
     max,
     axis.tickSpacing,
   );
-  return { domain, ticks };
+  return {domain, ticks};
 }
 
-export const CustomToolTip = ({ active, payload, label }: TooltipProps) => {
+export const CustomToolTip = ({active, payload, label}: TooltipProps) => {
   if (active) {
     return (
       <div className="graph-tooltip">
         <p>{label}</p>
         {payload &&
-          payload
-            .sort((a, b) => {
-              if (typeof b.value === 'number' && typeof a.value === 'number') {
-                return b.value - a.value;
-              }
+        payload
+        .sort((a, b) => {
+          if (typeof b.value === 'number' && typeof a.value === 'number') {
+            return b.value - a.value;
+          }
 
-              return 0;
-            })
-            .map((_, index) => {
-              return (
-                // eslint-disable-next-line react/no-array-index-key
-                <p key={index}>
-                  {`${payload[index].name} : ${payload[index].value}`}
-                </p>
-              );
-            })}
+          return 0;
+        })
+        .map((_, index) => {
+          return (
+            // eslint-disable-next-line react/no-array-index-key
+            <p key={index}>
+              {`${payload[index].name} : ${payload[index].value}`}
+            </p>
+          );
+        })}
       </div>
     );
   }
