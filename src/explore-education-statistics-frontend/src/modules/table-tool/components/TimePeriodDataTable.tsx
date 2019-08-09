@@ -148,31 +148,54 @@ const TimePeriodDataTable = (props: Props) => {
     });
   });
 
+  const rowLengthCheck = function isPopulated(row: string[]) {
+    return row.length > 0;
+  };
+
+  const dataAvailable = rows.some(rowLengthCheck);
+
   return (
-    <div>
-      <TableHeadersForm
-        initialValues={tableHeaders}
-        onSubmit={value => {
-          setTableHeaders(value);
+    <>
+      {dataAvailable ? (
+        <div>
+          <TableHeadersForm
+            initialValues={tableHeaders}
+            onSubmit={value => {
+              setTableHeaders(value);
 
-          if (dataTableRef.current) {
-            dataTableRef.current.scrollIntoView({
-              behavior: 'smooth',
-              block: 'start',
-            });
-          }
-        }}
-      />
+              if (dataTableRef.current) {
+                dataTableRef.current.scrollIntoView({
+                  behavior: 'smooth',
+                  block: 'start',
+                });
+              }
+            }}
+          />
 
-      <FixedMultiHeaderDataTable
-        caption={<DataTableCaption {...props} id="dataTableCaption" />}
-        columnHeaders={columnHeaders}
-        rowHeaders={rowHeaders}
-        rows={rows}
-        ref={dataTableRef}
-        footnotes={footnotes}
-      />
-    </div>
+          <FixedMultiHeaderDataTable
+            caption={<DataTableCaption {...props} id="dataTableCaption" />}
+            columnHeaders={columnHeaders}
+            rowHeaders={rowHeaders}
+            rows={rows}
+            ref={dataTableRef}
+            footnotes={footnotes}
+          />
+        </div>
+      ) : (
+        <div>
+          <div className="govuk-warning-text">
+            <span className="govuk-warning-text__icon" aria-hidden="true">
+              !
+            </span>
+            <strong className="govuk-warning-text__text">
+              <span className="govuk-warning-text__assistive">Warning</span>A
+              table could not be returned. There is no data for the options
+              selected.
+            </strong>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

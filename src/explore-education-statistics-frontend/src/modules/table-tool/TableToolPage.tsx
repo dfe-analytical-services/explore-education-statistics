@@ -299,10 +299,6 @@ class TableToolPage extends Component<Props, State> {
       this.createQuery(filters, indicators),
     );
 
-    if (result.length < 1) {
-      throw new Error('There is no data for the options selected');
-    }
-
     this.setState({
       filters,
       indicators,
