@@ -113,6 +113,7 @@ export interface ChartDefinition {
     title: string;
     type: AxisType;
     defaultDataType?: AxisGroupBy;
+    forcedDataType?: AxisGroupBy;
   }[];
 }
 
