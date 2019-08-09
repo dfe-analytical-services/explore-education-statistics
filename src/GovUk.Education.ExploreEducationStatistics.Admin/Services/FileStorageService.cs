@@ -105,7 +105,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 return ValidationResult(CannotUseGenericFunctionToDeleteDataFile);
             }
-
             return await DeleteFileAsync(await GetCloudBlobContainer(), AdminReleasePath(releaseId, type, fileName))
                 .OnSuccess(async () => await ListFilesAsync(releaseId, type));
         }
@@ -145,7 +144,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private static async Task<Either<ValidationResult, bool>> DeleteFileAsync(CloudBlobContainer blobContainer, string path)
         {
             var blob = blobContainer.GetBlockBlobReference(path);
-            return await blob.DeleteIfExistsAsync();
+            if (!blob.Exists())
+            {
+                return ValidationResult(FileNotFound);
+            }
+            await blob.DeleteAsync();
+            return true;
+
         }
 
         private async Task<CloudBlobContainer> GetCloudBlobContainer()
