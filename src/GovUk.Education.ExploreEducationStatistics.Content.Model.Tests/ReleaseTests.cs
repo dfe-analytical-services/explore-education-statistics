@@ -67,37 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
             {
             }
         }
-        
-        
-        [Fact]
-        public void Title_CalendarYear()
-        {
-            var title = new Release {ReleaseName = "2019", TimePeriodCoverage = TimeIdentifier.CalendarYear}.Title;
-            Assert.Equal("Calendar Year 2019", title);
-        }
-        
-        
-        [Fact]
-        public void Title_NonCalendarYear()
-        {
-            var title1 = new Release {ReleaseName = "2019", TimePeriodCoverage = TimeIdentifier.TaxYear}.Title;
-            Assert.Equal("Tax Year 2019/20", title1);
-            
-            var title2 = new Release {ReleaseName = "2010", TimePeriodCoverage = TimeIdentifier.TaxYear}.Title;
-            Assert.Equal("Tax Year 2010/11", title2);
-        }
-        
-        
-        [Fact]
-        public void Title_NoYear()
-        {
-            var title1 = new Release {ReleaseName = "", TimePeriodCoverage = TimeIdentifier.TaxYear}.Title;
-            Assert.Equal("Tax Year", title1);
-            
-            var title2 = new Release {ReleaseName = null, TimePeriodCoverage = TimeIdentifier.TaxYear}.Title;
-            Assert.Equal("Tax Year", title2);
-        }
-        
+
         [Fact]
         public void Acceptable_ReleaseName()
         {

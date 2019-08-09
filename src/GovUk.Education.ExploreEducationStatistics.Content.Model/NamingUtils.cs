@@ -14,13 +14,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public static string SlugFromTitle(string title)
         {
-            var removeNonAlphaNumeric =
-                new string(title.Where(c => IsLetter(c) || IsWhiteSpace(c) || IsDigit(c)).ToArray()).Trim();
-            var toLower = new string(removeNonAlphaNumeric.Select(ToLower).ToArray());
+            var replaceNonAlphaNumericWithSpace = ReplaceNonAlphaNumericWithSpaceAndTrim(title);
+            var toLower = new string(replaceNonAlphaNumericWithSpace.Select(ToLower).ToArray());
             var removeMultipleSpaces = Regex.Replace(toLower, @"\s+", " ");
             var replaceSpaces = new string(removeMultipleSpaces.Select(c => IsWhiteSpace(c) ? '-' : c).ToArray());
             return replaceSpaces;
         }
+
+        private static string ReplaceNonAlphaNumericWithSpaceAndTrim(string s)
+        {
+            return new string(s.Select(ReplaceNonAlphaNumericWithSpace).ToArray()).Trim();
+        }
+
+
+        private static Func<char, char> ReplaceNonAlphaNumericWithSpace =>
+            c => IsLetter(c) || IsWhiteSpace(c) || IsDigit(c) ? c : ' ';
 
         public static string ReleaseYearTitle(string year, TimeIdentifier coverage)
         {
@@ -28,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             if (!IsNullOrEmpty(year) && YearRegex.Match(year).Success &&
                 !TimeIdentifierCategory.CalendarYear.GetTimeIdentifiers().Contains(coverage))
             {
-                var releaseStartYear = Int32.Parse(year);
+                var releaseStartYear = int.Parse(year);
                 var releaseEndYear = (releaseStartYear % 100) + 1; // Only want the last two digits
                 return releaseStartYear + "/" + releaseEndYear;
             }
