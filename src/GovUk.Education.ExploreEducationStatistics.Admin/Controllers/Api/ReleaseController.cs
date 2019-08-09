@@ -25,13 +25,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         private readonly IReleaseService _releaseService;
         private readonly IFileStorageService _fileStorageService;
         private readonly IImportService _importService;
+        private readonly IPublicationService _publicationService;
 
         public ReleasesController(IReleaseService releaseService, IFileStorageService fileStorageService,
-            IImportService importService)
+            IImportService importService, IPublicationService publicationService)
         {
             _releaseService = releaseService;
             _fileStorageService = fileStorageService;
             _importService = importService;
+            _publicationService = publicationService;
         }
 
         // POST api/publication/{publicationId}/releases
@@ -40,8 +42,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<ReleaseViewModel>> CreateReleaseAsync(CreateReleaseViewModel release,
             PublicationId publicationId)
         {
-            release.PublicationId = publicationId;
-            return await _releaseService.CreateReleaseAsync(release);
+            return await CheckPublicationExistsAsync(publicationId, async () =>
+            {
+                release.PublicationId = publicationId;
+                return await _releaseService.CreateReleaseAsync(release);
+            });
         }
 
 
@@ -147,14 +152,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await _releaseService.GetReleaseSummaryAsync(releaseId);
         }
 
-
         [HttpPut("releases/{releaseId}/summary")]
         [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
-        public async Task<ActionResult<ReleaseViewModel>> EditReleaseSummaryAsync(EditReleaseSummaryViewModel model,
-            ReleaseId releaseId)
+        public async Task<ActionResult<ReleaseViewModel>> EditReleaseSummaryAsync(EditReleaseSummaryViewModel model, ReleaseId releaseId)
         {
-            model.Id = releaseId;
-            return await _releaseService.EditReleaseSummaryAsync(model);
+            return  await CheckReleaseExistsAsync(releaseId, async () =>
+            {
+                model.Id = releaseId;
+                return await _releaseService.EditReleaseSummaryAsync(model);
+            });
         }
 
         // GET api/publications/{publicationId}/releases
@@ -205,12 +211,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await andThen.Invoke();
         }
 
-
         private async Task<ActionResult> CheckReleaseExistsAsync<T>(ReleaseId releaseId,
             Func<Task<Either<ValidationResult, T>>> andThen)
         {
             var release = await _releaseService.GetAsync(releaseId);
             if (release == null)
+            {
+                return NotFound();
+            }
+
+            var result = await andThen.Invoke();
+            if (result.IsLeft)
+            {
+                ValidationUtils.AddErrors(ModelState, result.Left);
+                return ValidationProblem();
+            }
+
+            return Ok(result.Right);
+        }
+
+        private async Task<ActionResult> CheckPublicationExistsAsync<T>(PublicationId publicationId,
+            Func<Task<Either<ValidationResult, T>>> andThen)
+        {
+            var publication = await _publicationService.GetAsync(publicationId);
+            if (publication == null)
             {
                 return NotFound();
             }

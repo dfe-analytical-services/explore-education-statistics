@@ -1,12 +1,16 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using PublicationId = System.Guid;
 using ReleaseId = System.Guid;
 
@@ -54,23 +58,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         // TODO Authorisation will be required when users are introduced
-        public async Task<ReleaseViewModel> CreateReleaseAsync(CreateReleaseViewModel createRelease)
+        public async Task<Either<ValidationResult, ReleaseViewModel>> CreateReleaseAsync(CreateReleaseViewModel createRelease)
         {
-            var order = OrderForNextReleaseOnPublication(createRelease.PublicationId);
-            var content = TemplateFromRelease(createRelease.TemplateReleaseId);                  
-            var saved = _context.Releases.Add(new Release
+            if (_context.Releases.Any(r => r.Slug == createRelease.Slug))
             {
-                Id = PublicationId.NewGuid(),
-                Order = order,
-                PublicationId = createRelease.PublicationId,
-                Published = null,
-                TypeId = createRelease.ReleaseTypeId,
-                TimePeriodCoverage = createRelease.TimePeriodCoverage,
-                PublishScheduled = createRelease.PublishScheduled,
-                ReleaseName = createRelease.ReleaseName,
-                NextReleaseDate = createRelease.NextReleaseDate,
-                Content = content
-            });
+                return ValidationResult(SlugNotUnique);
+            }
+            var order = OrderForNextReleaseOnPublication(createRelease.PublicationId);
+            var content = TemplateFromRelease(createRelease.TemplateReleaseId);
+            var release = _mapper.Map<Release>(createRelease);
+            release.Content = content;
+            release.Order = order;
+            var saved = _context.Releases.Add(release);
             await _context.SaveChangesAsync();
             return await GetReleaseForIdAsync(saved.Entity.Id);
         }
@@ -83,8 +82,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
         
         // TODO Authorisation will be required when users are introduced
-        public async Task<ReleaseViewModel> EditReleaseSummaryAsync(EditReleaseSummaryViewModel model)
+        public async Task<Either<ValidationResult, ReleaseViewModel>> EditReleaseSummaryAsync(EditReleaseSummaryViewModel model)
         {
+            var withSameSlug = _context.Releases.Where(r => r.Slug == model.Slug);
+            if (withSameSlug.Any() && (withSameSlug.Count() > 1 || withSameSlug.First().Id != model.Id))
+            {
+                return ValidationResult(SlugNotUnique);
+            }
             var release = await _context.Releases.FirstOrDefaultAsync(r => r.Id == model.Id);
             _context.Releases.Update(release);
             _mapper.Map(model, release);
