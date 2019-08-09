@@ -68,9 +68,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ValidationResult,IEnumerable<FileInfo>>> DeleteDataFileAsync(Guid releaseId, string fileName)
         {
             // TODO what are the conditions in which we allow deletion?
+            // Validate that the data is as expected.
+            var dataFilePath = AdminReleasePath(releaseId, ReleaseFileTypes.Data, fileName);
             var blobContainer = await GetCloudBlobContainer();
-            var dataBlob = blobContainer.GetBlockBlobReference(AdminReleasePath(releaseId, ReleaseFileTypes.Data, fileName));
-            await dataBlob.FetchAttributesAsync(); 
+            var dataBlob = blobContainer.GetBlockBlobReference(dataFilePath);
+            if (!dataBlob.Exists())
+            {
+                return ValidationResult(FileNotFound);
+            }
+            dataBlob.FetchAttributes(); 
             if (!dataBlob.Metadata.ContainsKey(MetaFileKey))
             {
                 return ValidationResult(UnableToFindMetadataFileToDelete);

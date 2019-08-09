@@ -62,6 +62,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
             var next = await func();
             return new Either<Tl, T>(next);
         }
+        
+        
+        public static async Task<Either<Tl, T>> OnSuccess<Tl, Tr, T>(this Task<Either<Tl, Tr>> task, Func<Tr, Task<Either<Tl, T>>> func)
+        {
+            var firstResult = await task;
+            if (firstResult.IsLeft)
+            {
+                return new Either<Tl, T>(firstResult.Left);
+            }
+
+            var next = await func(firstResult.Right);
+            return next;
+        }
     }
     
 }
