@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -10,17 +11,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
     [ApiController]
     public class DownloadController : ControllerBase
     {
-        private readonly IDownloadService _downloadService;
+        private readonly IContentCacheService _contentCacheService;
 
-        public DownloadController(IDownloadService downloadService)
+        public DownloadController(IContentCacheService contentCacheService)
         {
-            _downloadService = downloadService;
+            _contentCacheService = contentCacheService;
         }
 
+        /// <response code="204">If the item is null</response>    
         [HttpGet("tree")]
-        public ActionResult<List<ThemeTree>> GetDownloadTree()
+        [ProducesResponseType(200)]
+        [ProducesResponseType(204)]
+        [Produces("application/json")]
+        public async Task<ActionResult<List<ThemeTree>>> GetDownloadTree()
         {
-            var tree = _downloadService.GetDownloadTree();
+            var tree = await _contentCacheService.GetDownloadTreeAsync();
 
             if (tree.Any())
             {

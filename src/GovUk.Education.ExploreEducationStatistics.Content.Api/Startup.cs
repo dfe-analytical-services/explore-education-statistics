@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Rewrite;
+using Microsoft.Azure.Storage;
+using Microsoft.Azure.Storage.Blob;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -57,12 +59,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
 
             services.AddCors();
             services.AddAutoMapper();
+            
+            
+            var cloudStorageAccount = CloudStorageAccount.Parse(Configuration.GetConnectionString("PublicStorage"));
+            services.AddSingleton<CloudBlobClient>(a => cloudStorageAccount.CreateCloudBlobClient());
+            
             services.AddTransient<IContentService, ContentService>();
             services.AddTransient<IFileStorageService, FileStorageService>();
             services.AddTransient<IReleaseService, ReleaseService>();
             services.AddTransient<IPublicationService, PublicationService>();
             services.AddTransient<IMethodologyService, MethodologyService>();
             services.AddTransient<IDownloadService, DownloadService>();
+            services.AddTransient<IContentCacheService, ContentCacheService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

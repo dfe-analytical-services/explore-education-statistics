@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -11,16 +12,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
     public class MethodologyController : ControllerBase
     {
         private readonly IMethodologyService _service;
-        public MethodologyController(IMethodologyService service)
+        
+        private readonly IContentCacheService _contentCacheService;
+
+        
+        public MethodologyController(IMethodologyService service, IContentCacheService contentCacheService)
         {
             _service = service;
+            _contentCacheService = contentCacheService;
         }
 
         // GET
+        /// <response code="204">If the item is null</response>    
         [HttpGet("tree")]
-        public ActionResult<List<ThemeTree>> GetMethodologyTree()
+        [ProducesResponseType(200)]
+        [ProducesResponseType(204)]
+        [Produces("application/json")]
+        public async Task<ActionResult<List<ThemeTree>>> GetMethodologyTree()
         {
-            var tree = _service.GetTree();
+            var tree = await _contentCacheService.GetMethodologyTreeAsync();
 
             if (tree.Any())
             {
@@ -32,6 +42,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         
         // GET api/methodology/name-of-content
         [HttpGet("{slug}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
+        [Produces("application/json")]
         public ActionResult<Methodology> Get(string slug)
         {
             var methodology = _service.Get(slug);

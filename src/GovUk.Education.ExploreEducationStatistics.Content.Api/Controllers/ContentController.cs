@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -14,22 +15,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         private readonly IPublicationService _publicationService;
         private readonly IReleaseService _releaseService;
 
+        private readonly IContentCacheService _contentCacheService;
+
         public ContentController(
             IContentService contentService,
             IPublicationService publicationService,
-            IReleaseService releaseService)
+            IReleaseService releaseService,
+            IContentCacheService contentCacheService
+            )
         {
             _contentService = contentService;
             _publicationService = publicationService;
             _releaseService = releaseService;
+
+            _contentCacheService = contentCacheService;
         }
 
         // GET api/content/tree
+        /// <response code="204">If the item is null</response>    
         [HttpGet("tree")]
-        public ActionResult<List<ThemeTree>> GetContentTree()
+        [ProducesResponseType(200)]
+        [ProducesResponseType(204)]
+        [Produces("application/json")]
+        public async Task<ActionResult<List<ThemeTree>>> GetContentTree()
         {
-            var tree = _contentService.GetContentTree();
-
+            var tree = await _contentCacheService.GetContentTreeAsync();
+        
             if (tree.Any())
             {
                 return tree;
