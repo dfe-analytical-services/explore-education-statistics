@@ -21,15 +21,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         public async Task<ActionResult> GetFile(string publication, string release, string filename)
             => await GetFile(publication, release, ReleaseFileTypes.Data, filename);
 
-        [HttpGet("{publication}/{release}/data-files/{filename}")]
+        [HttpGet("{publication}/{release}/data/{filename}")]
         public async Task<ActionResult> GetDataFile(string publication, string release, string filename)
             => await GetFile(publication, release, ReleaseFileTypes.Data, filename);
 
-        [HttpGet("{publication}/{release}/ancillary-files/{filename}")]
+        [HttpGet("{publication}/{release}/ancillary/{filename}")]
         public async Task<ActionResult> GetAncillaryFile(string publication, string release, string filename)
             => await GetFile(publication, release, ReleaseFileTypes.Ancillary, filename);
 
-        [HttpGet("{publication}/{release}/chart-files/{filename}")]
+        [HttpGet("{publication}/{release}/chart/{filename}")]
         public async Task<ActionResult> GetChartFile(string publication, string release, string filename)
             => await GetFile(publication, release, ReleaseFileTypes.Chart, filename);
 

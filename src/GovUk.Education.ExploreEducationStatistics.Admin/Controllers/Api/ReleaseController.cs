@@ -45,8 +45,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
 
-        // GET api/release/{releaseId}/data-files
-        [HttpGet("release/{releaseId}/data-files")]
+        // GET api/release/{releaseId}/data
+        [HttpGet("release/{releaseId}/data")]
         [Produces("application/json")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
@@ -57,8 +57,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 async () => Ok(await _fileStorageService.ListFilesAsync(releaseId, ReleaseFileTypes.Data)));
         }
 
-        // GET api/release/{releaseId}/ancillary-files
-        [HttpGet("release/{releaseId}/ancillary-files")]
+        // GET api/release/{releaseId}/ancillary
+        [HttpGet("release/{releaseId}/ancillary")]
         [Produces("application/json")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
@@ -69,8 +69,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 async () => Ok(await _fileStorageService.ListFilesAsync(releaseId, ReleaseFileTypes.Ancillary)));
         }
 
-        // GET api/release/{releaseId}/chart-files
-        [HttpGet("release/{releaseId}/chart-files")]
+        // GET api/release/{releaseId}/chart
+        [HttpGet("release/{releaseId}/chart")]
         [Produces("application/json")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
@@ -81,8 +81,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 async () => Ok(await _fileStorageService.ListFilesAsync(releaseId, ReleaseFileTypes.Chart)));
         }
 
-        // POST api/release/{releaseId}/ancillary-files
-        [HttpPost("release/{releaseId}/ancillary-files")]
+        // POST api/release/{releaseId}/ancillary
+        [HttpPost("release/{releaseId}/ancillary")]
         [Produces("application/json")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
@@ -97,8 +97,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                     ReleaseFileTypes.Ancillary));
         }
 
-        // POST api/release/{releaseId}/chart-files
-        [HttpPost("release/{releaseId}/chart-files")]
+        // POST api/release/{releaseId}/chart
+        [HttpPost("release/{releaseId}/chart")]
         [Produces("application/json")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
@@ -112,8 +112,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 async () => await _fileStorageService.UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Chart));
         }
 
-        // POST api/release/{releaseId}/data-files
-        [HttpPost("release/{releaseId}/data-files")]
+        // POST api/release/{releaseId}/data
+        [HttpPost("release/{releaseId}/data")]
         [Produces("application/json")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
@@ -166,7 +166,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await _releaseService.GetReleasesForPublicationAsync(publicationId);
         }
 
-        [HttpDelete("release/{releaseId}/data-files/{fileName}")]
+        [HttpDelete("release/{releaseId}/data/{fileName}")]
         [AllowAnonymous] // TODO We will need to do Authorisation checks when we know what the permissions model is.
         public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteDataFiles(ReleaseId releaseId, string fileName)
         {
@@ -174,8 +174,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 async () => await _fileStorageService.DeleteDataFileAsync(releaseId, fileName));
         }
 
-        // DELETE api/release/{releaseId}/ancillary-files/{fileName}
-        [HttpDelete("release/{releaseId}/ancillary-files/{fileName}")]
+        // DELETE api/release/{releaseId}/ancillary/{fileName}
+        [HttpDelete("release/{releaseId}/ancillary/{fileName}")]
         [AllowAnonymous] // TODO We will need to do Authorisation checks when we know what the permissions model is.
         public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteAncillaryFile(
             ReleaseId releaseId, string fileName)
@@ -184,8 +184,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 async () => await _fileStorageService.DeleteFileAsync(releaseId, ReleaseFileTypes.Ancillary, fileName));
         }
 
-        // DELETE api/release/{releaseId}/chart-files/{fileName}
-        [HttpDelete("release/{releaseId}/chart-files/{fileName}")]
+        // DELETE api/release/{releaseId}/chart/{fileName}
+        [HttpDelete("release/{releaseId}/chart/{fileName}")]
         [AllowAnonymous] // TODO We will need to do Authorisation checks when we know what the permissions model is.
         public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteChartFile(
             ReleaseId releaseId, string fileName)

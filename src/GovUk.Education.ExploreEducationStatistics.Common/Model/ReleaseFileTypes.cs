@@ -4,11 +4,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 {
     public enum ReleaseFileTypes
     {
-        [EnumLabelValue("Data")]
+        [EnumLabelValue("data")]
         Data,
-        [EnumLabelValue("Ancillary")]
+        [EnumLabelValue("ancillary")]
         Ancillary,
-        [EnumLabelValue("Chart")]
+        [EnumLabelValue("chart")]
         Chart
     }
 }

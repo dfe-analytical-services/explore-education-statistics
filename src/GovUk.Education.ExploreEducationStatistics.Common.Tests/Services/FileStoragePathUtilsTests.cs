@@ -13,18 +13,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         {
             var releaseId = Guid.NewGuid();
             Assert.Equal(releaseId + "/", AdminReleaseDirectoryPath(releaseId));
-            Assert.Equal(releaseId + "/Ancillary/", AdminReleaseDirectoryPath(releaseId, ReleaseFileTypes.Ancillary));
-            Assert.Equal(releaseId + "/Data/", AdminReleaseDirectoryPath(releaseId, ReleaseFileTypes.Data));
-            Assert.Equal(releaseId + "/Chart/", AdminReleaseDirectoryPath(releaseId, ReleaseFileTypes.Chart));
+            Assert.Equal(releaseId + "/ancillary/", AdminReleaseDirectoryPath(releaseId, ReleaseFileTypes.Ancillary));
+            Assert.Equal(releaseId + "/data/", AdminReleaseDirectoryPath(releaseId, ReleaseFileTypes.Data));
+            Assert.Equal(releaseId + "/chart/", AdminReleaseDirectoryPath(releaseId, ReleaseFileTypes.Chart));
         }
         
         [Fact]
         public void TestAdminReleasePath()
         {
             var releaseId = Guid.NewGuid();
-            Assert.Equal(releaseId + "/Ancillary/file.png", AdminReleasePath(releaseId, ReleaseFileTypes.Ancillary, "file.png"));
-            Assert.Equal(releaseId + "/Data/file.csv", AdminReleasePath(releaseId, ReleaseFileTypes.Data, "file.csv"));
-            Assert.Equal(releaseId + "/Chart/file.doc", AdminReleasePath(releaseId, ReleaseFileTypes.Chart, "file.doc"));
+            Assert.Equal(releaseId + "/ancillary/file.png", AdminReleasePath(releaseId, ReleaseFileTypes.Ancillary, "file.png"));
+            Assert.Equal(releaseId + "/data/file.csv", AdminReleasePath(releaseId, ReleaseFileTypes.Data, "file.csv"));
+            Assert.Equal(releaseId + "/chart/file.doc", AdminReleasePath(releaseId, ReleaseFileTypes.Chart, "file.doc"));
         }
         
         [Fact]
@@ -33,9 +33,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             const string releaseSlug = "releaseslug";
             const string publicationSlug = "publicationslug";
             Assert.Equal(publicationSlug + "/" + releaseSlug + "/", PublicReleaseDirectoryPath(publicationSlug, releaseSlug));
-            Assert.Equal(publicationSlug + "/" + releaseSlug + "/Ancillary/", PublicReleaseDirectoryPath(publicationSlug, releaseSlug, ReleaseFileTypes.Ancillary));
-            Assert.Equal(publicationSlug + "/" + releaseSlug + "/Data/", PublicReleaseDirectoryPath(publicationSlug, releaseSlug, ReleaseFileTypes.Data));
-            Assert.Equal(publicationSlug + "/" + releaseSlug + "/Chart/", PublicReleaseDirectoryPath(publicationSlug, releaseSlug, ReleaseFileTypes.Chart));
+            Assert.Equal(publicationSlug + "/" + releaseSlug + "/ancillary/", PublicReleaseDirectoryPath(publicationSlug, releaseSlug, ReleaseFileTypes.Ancillary));
+            Assert.Equal(publicationSlug + "/" + releaseSlug + "/data/", PublicReleaseDirectoryPath(publicationSlug, releaseSlug, ReleaseFileTypes.Data));
+            Assert.Equal(publicationSlug + "/" + releaseSlug + "/chart/", PublicReleaseDirectoryPath(publicationSlug, releaseSlug, ReleaseFileTypes.Chart));
         }
         
         [Fact]
@@ -43,9 +43,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         {
             const string releaseSlug = "releaseslug";
             const string publicationSlug = "publicationslug";
-            Assert.Equal(publicationSlug + "/" + releaseSlug + "/Ancillary/file.png", PublicReleasePath(publicationSlug, releaseSlug, ReleaseFileTypes.Ancillary, "file.png"));
-            Assert.Equal(publicationSlug+ "/" + releaseSlug +  "/Data/file.csv", PublicReleasePath(publicationSlug, releaseSlug, ReleaseFileTypes.Data, "file.csv"));
-            Assert.Equal(publicationSlug+ "/" + releaseSlug +  "/Chart/file.doc", PublicReleasePath(publicationSlug, releaseSlug, ReleaseFileTypes.Chart, "file.doc"));
+            Assert.Equal(publicationSlug + "/" + releaseSlug + "/ancillary/file.png", PublicReleasePath(publicationSlug, releaseSlug, ReleaseFileTypes.Ancillary, "file.png"));
+            Assert.Equal(publicationSlug+ "/" + releaseSlug +  "/data/file.csv", PublicReleasePath(publicationSlug, releaseSlug, ReleaseFileTypes.Data, "file.csv"));
+            Assert.Equal(publicationSlug+ "/" + releaseSlug +  "/chart/file.doc", PublicReleasePath(publicationSlug, releaseSlug, ReleaseFileTypes.Chart, "file.doc"));
         } 
         
         
