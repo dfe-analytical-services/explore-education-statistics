@@ -13,6 +13,7 @@ import DataBlockService, {
   GeographicLevel,
 } from '@common/services/dataBlockService';
 import Link from '@admin/components/Link';
+import PrototypeChartSample from '@admin/pages/prototypes/publication/components/PrototypeChartSample';
 import PrototypeData, { PrototypeTable } from '../PrototypeData';
 
 interface Props {
@@ -56,9 +57,56 @@ const PrototypeExampleTable = ({ task, table }: Props) => {
             <PrototypeTableContent table={table} task={task} />
           </div>
         </TabsSection>
-        <TabsSection id="add-chart" title="Create chart">
-          {Data && <ChartBuilder data={Data} />}
-        </TabsSection>
+        {task !== 'view' && (
+          <TabsSection id="add-chart" title="Create chart">
+            {Data && <ChartBuilder data={Data} />}
+          </TabsSection>
+        )}
+        {task === 'view' && (
+          <TabsSection id="add-chart" title="Chart">
+            <h2 className="govuk-heading-s">
+              'Absence by characteristic' from 'Pupil absence' in England
+              between 2012/13 and 2016/17
+            </h2>
+            <PrototypeChartSample
+              xAxisLabel="School Year"
+              yAxisLabel="Absence Rate"
+              chartData={[
+                {
+                  authorised: 4.2,
+                  name: '2012/13',
+                  overall: 5.3,
+                  unauthorised: 1.1,
+                },
+                {
+                  authorised: 3.5,
+                  name: '2013/14',
+                  overall: 4.5,
+                  unauthorised: 1.1,
+                },
+                {
+                  authorised: 3.5,
+                  name: '2014/15',
+                  overall: 4.6,
+                  unauthorised: 1.1,
+                },
+                {
+                  authorised: 3.4,
+                  name: '2015/16',
+                  overall: 4.6,
+                  unauthorised: 1.1,
+                },
+                {
+                  authorised: 3.4,
+                  name: '2016/17',
+                  overall: 4.7,
+                  unauthorised: 1.3,
+                },
+              ]}
+              chartDataKeys={['unauthorised', 'authorised', 'overall']}
+            />
+          </TabsSection>
+        )}
       </Tabs>
       {task === 'selectTable' && (
         <a className="govuk-button" href="#">
@@ -88,21 +136,21 @@ const PrototypeExampleTable = ({ task, table }: Props) => {
             className="govuk-button govuk-!-margin-right-3"
             href="/prototypes/publication-create-new-absence-table?status=step5#table-builder"
           >
-            Edit table
+            Edit data block
           </a>
 
           <Button variant="warning" onClick={() => toggleDeleteModal(true)}>
-            Delete table
+            Delete data block
           </Button>
 
           <ModalConfirm
             mounted={showDeleteModal}
-            title="Confirm delete table"
+            title="Confirm delete data block"
             onExit={() => toggleDeleteModal(false)}
             onConfirm={() => toggleDeleteModal(false)}
             onCancel={() => toggleDeleteModal(false)}
           >
-            <p>Are you sure you want to delete the table?</p>
+            <p>Are you sure you want to delete the data block?</p>
           </ModalConfirm>
         </>
       )}

@@ -56,8 +56,8 @@ const ContentAddComment = ({ initialComments }: Props) => {
     <>
       <div className={styles.addComment}>
         <Details
-          summary="Add comment to section"
-          className="govuk-!-margin-bottom-1"
+          summary="Add / view comments to section"
+          className="govuk-!-margin-bottom-1 govuk-body-s"
         >
           <form>
             <textarea

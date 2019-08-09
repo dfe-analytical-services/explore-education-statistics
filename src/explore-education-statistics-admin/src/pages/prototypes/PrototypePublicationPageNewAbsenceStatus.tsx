@@ -21,7 +21,7 @@ const UpdateStatusForm = () => {
                   type="radio"
                   name="status"
                   id="edit"
-                  value="editRelease"
+                  value="readyTeamApproval"
                   defaultChecked
                 />
                 <label
@@ -92,16 +92,16 @@ const PublicationDataPage = ({ location }: RouteChildrenProps) => {
       {location.search === '?status=readyTeamApproval' && (
         <>
           <div className="govuk-panel govuk-panel--confirmation">
-            <h1 className="govuk-panel__title">Release ready for review</h1>
+            <h1 className="govuk-panel__title">Release in draft</h1>
             <div className="govuk-panel__body">
-              Check the 'Comments for you to resolve' tab on your{' '}
+              You can return to 'View draft releases' tab on your{' '}
               <Link
                 className="govuk-link dfe-link--white"
                 to="/prototypes/admin-dashboard?status=readyApproval"
               >
                 dashboard
               </Link>{' '}
-              for feedback
+              to view comments and continue editing.
             </div>
           </div>
         </>
