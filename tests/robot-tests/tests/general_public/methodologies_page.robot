@@ -11,7 +11,7 @@ Navigate to /methodology page
     [Tags]  HappyPath
     environment variable should be set  PUBLIC_URL
     user goes to url   %{PUBLIC_URL}/methodology
-    user waits until page contains element   xpath://h1[text()="Methodologies"]
+    user waits until page contains heading   Methodologies
 
 Validate page contents
     [Tags]  HappyPath

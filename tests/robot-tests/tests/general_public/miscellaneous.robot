@@ -52,7 +52,7 @@ Validate homepage
 Validate Cookies page
     [Tags]  HappyPath
     user clicks link   Cookies
-    user waits until page contains element   xpath://h1[text()="Cookies on Explore education statistics"]
+    user waits until page contains heading   Cookies on Explore education statistics
     user checks url contains   %{PUBLIC_URL}/cookies
 
     user checks element count is x  css:[data-testid="breadcrumbs--list"] li     2
@@ -82,7 +82,7 @@ Enable google analytics
 Validate Cookies Details page
     [Tags]  HappyPath
     user clicks link    Find out more about cookies on Explore education statistics
-    user waits until page contains element   xpath://h1[text()="Details about cookies"]
+    user waits until page contains heading   Details about cookies
     user checks url contains   %{PUBLIC_URL}/cookies/details
 
     user checks element count is x  css:[data-testid="breadcrumbs--list"] li     3
@@ -95,7 +95,7 @@ Validate Cookies Details page
 Validate Privacy notice page
     [Tags]  HappyPath
     user clicks link   Privacy notice
-    user waits until page contains element  xpath://h1[text()="Privacy notice"]
+    user waits until page contains heading  Privacy notice
     user waits until page contains  The explore education statistics service is operated by the Department for Education
 
     user checks url contains  %{PUBLIC_URL}/privacy-notice
@@ -122,7 +122,7 @@ Validate Contact page
 Validate Help and support page
     [Tags]  HappyPath
     user clicks link    Help and support
-    user waits until page contains element  xpath:.//h1[text()="Help and support"]
+    user waits until page contains heading  Help and support
 
     user checks url contains    %{PUBLIC_URL}/help-support
 
@@ -133,7 +133,7 @@ Validate Help and support page
 Validate Sitemap page
     [Tags]  HappyPath
     user clicks link    Sitemap
-    user waits until page contains element  xpath:.//h1[text()="Sitemap"]
+    user waits until page contains heading  Sitemap
 
     user checks url contains    %{PUBLIC_URL}/sitemap
 
