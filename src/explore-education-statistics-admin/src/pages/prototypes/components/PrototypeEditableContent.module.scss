@@ -1,27 +1,33 @@
+@import '../../../styles/govuk-base';
+
 .editableButton {
   display: none;
 }
 
 .editableButtonContent {
+  font-size: 0.8rem;
   font-weight: bold;
-  left: 50%;
+  left: 0;
   position: absolute;
-  top: 50%;
-  transform: translateX(-50%) translateY(-50%);
+
+  .govuk-button {
+    font-size: 0.5rem;
+  }
 }
 
 .editableContent {
   cursor: pointer;
   margin: 0;
-  padding: 0;
+  padding: 1.5rem 0 0;
   position: relative;
 
   .editableButton {
-    background-color: rgba(240, 240, 240, 0.75);
+    border: 1px solid $govuk-border-colour;
     display: block;
     font-weight: bold;
     height: 100%;
-    padding: 0 4px;
+    margin-top: -1.5rem;
+    padding: 0;
     position: absolute;
     width: 100%;
   }
@@ -34,7 +40,7 @@
 .editableContentEditing {
   cursor: pointer;
   margin: 0;
-  padding: 0;
+  padding: 0.2rem;
   position: relative;
 
   .editableButton {
@@ -43,8 +49,8 @@
     margin: 0;
     padding: 0;
     position: absolute;
-    right: 0;
-    top: 0;
+    right: 4px;
+    top: 2px;
     z-index: 1000;
   }
 }
