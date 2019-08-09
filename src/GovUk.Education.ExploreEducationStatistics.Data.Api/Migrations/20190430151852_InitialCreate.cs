@@ -126,7 +126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                 columns: table => new
                 {
                     Id = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.SequenceHiLo),
                     SubjectId = table.Column<long>(nullable: false),
                     GeographicLevel = table.Column<string>(nullable: false),
                     LocationId = table.Column<long>(nullable: false),

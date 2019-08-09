@@ -195,7 +195,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 location.Ward.Code ==
                 (ward != null ? ward.Code : null));
 
-            return _context.Location.AsNoTracking().FirstOrDefault(predicateBuilder);
+            return _context.Location.FirstOrDefault(predicateBuilder);
         }
     }
 }

@@ -11,5 +11,11 @@
       "Microsoft": "Warning",
       "Microsoft.EntityFrameworkCore.Database.Command": "Warning"
     }
+  },
+  "extensions": {
+    "queues": {
+      "batchSize": 6,
+      "maxDequeueCount": 5
+    }
   }
 }

@@ -51,7 +51,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
             DataCsvFile.level_2_3_sf,
             DataCsvFile.KS2_2016_test_UD,
             DataCsvFile.KS4_2018_Subject_Tables_S1_TestData,
-            DataCsvFile.clean_data_fe
+            DataCsvFile.clean_data_fe,
+            DataCsvFile.SEN2_MI,
+            DataCsvFile.level_2_3_sfla,
+            DataCsvFile.KS4_2018_LA_Char_Testdata,
+            DataCsvFile.KS4_2018_Nat_Char_Testdata,
+            DataCsvFile.KS4_2018_Subject_Tables_S3_TestData
         };
 
         public static List<Subject> GetSubjects()

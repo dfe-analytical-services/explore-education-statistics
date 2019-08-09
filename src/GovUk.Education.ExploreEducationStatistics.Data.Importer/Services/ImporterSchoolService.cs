@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 return schoolOut;
             }
             
-            school = _context.School.AsNoTracking()
+            school = _context.School
                      .FirstOrDefault(s => s.LaEstab == school.LaEstab) ?? _context.School.Add(school).Entity;
             
             return school;

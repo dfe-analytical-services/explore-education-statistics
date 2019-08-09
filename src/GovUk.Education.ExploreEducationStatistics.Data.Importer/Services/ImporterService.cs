@@ -119,12 +119,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
         public void ImportFiltersLocationsAndSchools(List<string> lines, SubjectMeta subjectMeta, string subjectName)
         {
-            // Clear cache - only relevant if we are using the seeder otherwise each service instance will have own cache instance
-            ClearCaches();
             _importCount = 0;
             var headers = lines.First().Split(',').ToList();
             lines.RemoveAt(0);
-            lines.ForEach(line => CreateFiltersLocationsAndSchoolsFromCsv(line, headers, subjectMeta.Filters, subjectName));
+            lines.ToList().ForEach(line => CreateFiltersLocationsAndSchoolsFromCsv(line, headers, subjectMeta.Filters, subjectName, lines.Count));
         }
 
         public void ImportObservations(List<string> lines, Subject subject, SubjectMeta subjectMeta)
@@ -134,18 +132,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             var headers = lines.First().Split(',').ToList();
             lines.RemoveAt(0);
             
+            _logger.LogInformation($"Retrieving observations for {subject.Name}");
+
             var observations = GetObservations(lines, headers, subject, subjectMeta);
             
             _logger.LogInformation($"Adding {observations.Count()} observations for {subject.Name}");
 
             _context.Observation.AddRange(observations);
-        }
-
-        private void ClearCaches()
-        {
-            _importerFilterService.ClearCache();
-            _importerLocationService.ClearCache();
-            _importerSchoolService.ClearCache();
+            
+            _logger.LogInformation($"{observations.Count()} observations added successfully for {subject.Name}");
         }
 
         private IEnumerable<Observation> GetObservations(IEnumerable<string> lines,
@@ -162,25 +157,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             SubjectMeta subjectMeta)
         {
             var line = raw.Split(',');
-            var observation = new Observation
+            return new Observation
             {
                 FilterItems = GetFilterItems(line, headers, subjectMeta.Filters),
                 GeographicLevel = GetGeographicLevel(line, headers),
                 LocationId = GetLocationId(line, headers),
                 Measures = GetMeasures(line, headers, subjectMeta.Indicators),
-                Provider = GetProvider(line, headers,  ColumnValues[Columns.PROVIDER_COLS]),
+                Provider = GetProvider(line, headers),
                 School = GetSchool(line, headers),
                 Subject = subject,
                 TimeIdentifier = GetTimeIdentifier(line, headers),
                 Year = GetYear(line, headers)
             };
-            return observation;
         }
         
         private void CreateFiltersLocationsAndSchoolsFromCsv(string raw,
             List<string> headers,
             IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)> filtersMeta,
-            string subjectName)
+            string subjectName,
+            int numLines)
         {
             var line = raw.Split(',');
             CreateFilterItems(line, headers, filtersMeta);
@@ -190,7 +185,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             var mod = _importCount++;
             if (mod % 1000 == 0)
             {
-                _logger.LogInformation($"{mod} lines processed during first pass for {subjectName}");
+                _logger.LogInformation($"{mod} (of {numLines}) lines processed during first pass for {subjectName}");
             }
         }
 
@@ -202,13 +197,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             {
                 var filterItemLabel = CsvUtil.Value(line, headers, filterMeta.Column);
                 var filterGroupLabel = CsvUtil.Value(line, headers, filterMeta.FilterGroupingColumn);
-                var filterItem = _importerFilterService.Find(filterItemLabel, filterGroupLabel, filterMeta.Filter);
                 
                 return new ObservationFilterItem
                 {
-                    FilterItemId = filterItem.Id,
-                    FilterItem = filterItem
-                    
+                    FilterItem = _importerFilterService.Find(filterItemLabel, filterGroupLabel, filterMeta.Filter)
                 };
             }).ToList();
         }
@@ -217,7 +209,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             List<string> headers,
             IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)> filtersMeta)
         {
-
             foreach (var filterMeta in filtersMeta)
             {
                 var filterItemLabel = CsvUtil.Value(line, headers, filterMeta.Column);
@@ -253,25 +244,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         private long GetLocationId(IReadOnlyList<string> line, List<string> headers)
         {
             return _importerLocationService.Find(
-                GetCountry(line, headers, ColumnValues[Columns.COUNTRY_COLS]),
-                GetInstitution(line, headers,  ColumnValues[Columns.INSTITUTION_COLS]),
-                GetLocalAuthority(line, headers,  ColumnValues[Columns.LOCAL_AUTH_COLS]),
-                GetLocalAuthorityDistrict(line, headers,  ColumnValues[Columns.LOCAL_AUTH_DISTRICT_COLS]),
-                GetLocalEnterprisePartnership(line, headers,  ColumnValues[Columns.LOCAL_ENTERPRISE_PARTNERSHIP_COLS]),
-                GetMayoralCombinedAuthority(line, headers,  ColumnValues[Columns.MAYORAL_COMBINED_AUTHORITY_COLS]),
-                GetMultiAcademyTrust(line, headers,  ColumnValues[Columns.MULTI_ACADEMY_TRUST_COLS]),
-                GetOpportunityArea(line, headers,  ColumnValues[Columns.OPPORTUNITY_AREA_COLS]),
-                GetParliamentaryConstituency(line, headers,  ColumnValues[Columns.PARLIAMENTARY_CONSTITUENCY_COLS]),
-                GetRegion(line, headers,  ColumnValues[Columns.REGION_COLS]),
+                GetCountry(line, headers),
+                GetInstitution(line, headers),
+                GetLocalAuthority(line, headers),
+                GetLocalAuthorityDistrict(line, headers),
+                GetLocalEnterprisePartnership(line, headers),
+                GetMayoralCombinedAuthority(line, headers),
+                GetMultiAcademyTrust(line, headers),
+                GetOpportunityArea(line, headers),
+                GetParliamentaryConstituency(line, headers),
+                GetRegion(line, headers),
                 GetRscRegion(line, headers),
-                GetSponsor(line, headers,  ColumnValues[Columns.SPONSOR_COLS]),
-                GetWard(line, headers,  ColumnValues[Columns.WARD_COLS])
+                GetSponsor(line, headers),
+                GetWard(line, headers)
             ).Id;
         }
 
         private School GetSchool(IReadOnlyList<string> line, List<string> headers)
         {
-
             var school = CsvUtil.BuildType(line, headers, ColumnValues[Columns.SCHOOL_COLS], values => new School
             {
                 AcademyOpenDate = values[0],
@@ -296,79 +286,74 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 .ToDictionary(item => item.tuple.Indicator.Id, item => item.value);
         }
 
-        private static Country GetCountry(IReadOnlyList<string> line, List<string> headers, string[] cols)
+        private static Country GetCountry(IReadOnlyList<string> line, List<string> headers)
         {
-            return CsvUtil.BuildType(line, headers, cols, values =>
+            return CsvUtil.BuildType(line, headers, ColumnValues[Columns.COUNTRY_COLS], values =>
                 new Country(values[0], values[1]));
         }
 
         private static Institution GetInstitution(IReadOnlyList<string> line,
-            List<string> headers, string[] cols)
+            List<string> headers)
         {
-            return CsvUtil.BuildType(line, headers, cols, values =>
+            return CsvUtil.BuildType(line, headers, ColumnValues[Columns.INSTITUTION_COLS], values =>
                 new Institution(values[0], values[1]));
         }
 
-        private static LocalAuthority GetLocalAuthority(IReadOnlyList<string> line, List<string> headers,
-            string[] cols)
+        private static LocalAuthority GetLocalAuthority(IReadOnlyList<string> line, List<string> headers)
         {
-            return CsvUtil.BuildType(line, headers, cols, values =>
+            return CsvUtil.BuildType(line, headers, ColumnValues[Columns.LOCAL_AUTH_COLS], values =>
                 new LocalAuthority(values[0], values[1], values[2]));
         }
 
         private static LocalAuthorityDistrict GetLocalAuthorityDistrict(IReadOnlyList<string> line,
-            List<string> headers, string[] cols)
+            List<string> headers)
         {
-            return CsvUtil.BuildType(line, headers, cols, values =>
+            return CsvUtil.BuildType(line, headers, ColumnValues[Columns.LOCAL_AUTH_DISTRICT_COLS], values =>
                 new LocalAuthorityDistrict(values[0], values[1]));
         }
 
         private static LocalEnterprisePartnership GetLocalEnterprisePartnership(IReadOnlyList<string> line,
-            List<string> headers, string[] cols)
+            List<string> headers)
         {
-            return CsvUtil.BuildType(line, headers, cols, values =>
+            return CsvUtil.BuildType(line, headers, ColumnValues[Columns.LOCAL_ENTERPRISE_PARTNERSHIP_COLS], values =>
                 new LocalEnterprisePartnership(values[0], values[1]));
         }
 
         private static MayoralCombinedAuthority GetMayoralCombinedAuthority(IReadOnlyList<string> line,
-            List<string> headers, string[] cols)
+            List<string> headers)
         {
-            return CsvUtil.BuildType(line, headers, cols, values =>
+            return CsvUtil.BuildType(line, headers, ColumnValues[Columns.MAYORAL_COMBINED_AUTHORITY_COLS], values =>
                 new MayoralCombinedAuthority(values[0], values[1]));
         }
 
-        private static Mat GetMultiAcademyTrust(IReadOnlyList<string> line,
-            List<string> headers, string[] cols)
+        private static Mat GetMultiAcademyTrust(IReadOnlyList<string> line, List<string> headers)
         {
-            return CsvUtil.BuildType(line, headers, cols, values =>
+            return CsvUtil.BuildType(line, headers, ColumnValues[Columns.MULTI_ACADEMY_TRUST_COLS], values =>
                 new Mat(values[0], values[1]));
         }
 
-        private static OpportunityArea GetOpportunityArea(IReadOnlyList<string> line,
-            List<string> headers, string[] cols)
+        private static OpportunityArea GetOpportunityArea(IReadOnlyList<string> line, List<string> headers)
         {
-            return CsvUtil.BuildType(line, headers, cols, values =>
+            return CsvUtil.BuildType(line, headers, ColumnValues[Columns.OPPORTUNITY_AREA_COLS], values =>
                 new OpportunityArea(values[0], values[1]));
         }
 
         private static ParliamentaryConstituency GetParliamentaryConstituency(IReadOnlyList<string> line,
-            List<string> headers, string[] cols)
+            List<string> headers)
         {
-            return CsvUtil.BuildType(line, headers, cols, values =>
+            return CsvUtil.BuildType(line, headers, ColumnValues[Columns.PARLIAMENTARY_CONSTITUENCY_COLS], values =>
                 new ParliamentaryConstituency(values[0], values[1]));
         }
 
-        private static Provider GetProvider(IReadOnlyList<string> line,
-            List<string> headers, string[] cols)
+        private static Provider GetProvider(IReadOnlyList<string> line, List<string> headers)
         {
-            return CsvUtil.BuildType(line, headers, cols, values =>
+            return CsvUtil.BuildType(line, headers, ColumnValues[Columns.PROVIDER_COLS], values =>
                 new Provider(values[0], values[1], values[2], values[3]));
         }
 
-        private static Region GetRegion(IReadOnlyList<string> line, List<string> headers,
-            string[] cols)
+        private static Region GetRegion(IReadOnlyList<string> line, List<string> headers)
         {
-            return CsvUtil.BuildType(line, headers, cols, values =>
+            return CsvUtil.BuildType(line, headers, ColumnValues[Columns.REGION_COLS], values =>
                 new Region(values[0], values[1]));
         }
 
@@ -377,16 +362,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             return CsvUtil.BuildType(line, headers, "rsc_region_lead_name", value => new RscRegion(value));
         }
 
-        private static Sponsor GetSponsor(IReadOnlyList<string> line, List<string> headers, string[] cols)
+        private static Sponsor GetSponsor(IReadOnlyList<string> line, List<string> headers)
         {
-            return CsvUtil.BuildType(line, headers, cols, values =>
+            return CsvUtil.BuildType(line, headers, ColumnValues[Columns.SPONSOR_COLS], values =>
                 new Sponsor(values[0], values[1]));
         }
 
-        private static Ward GetWard(IReadOnlyList<string> line,
-            List<string> headers, string[] cols)
+        private static Ward GetWard(IReadOnlyList<string> line, List<string> headers)
         {
-            return CsvUtil.BuildType(line, headers, cols, values =>
+            return CsvUtil.BuildType(line, headers, ColumnValues[Columns.WARD_COLS], values =>
                 new Ward(values[0], values[1]));
         }
     }
