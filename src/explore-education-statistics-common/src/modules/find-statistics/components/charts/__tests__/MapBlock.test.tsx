@@ -16,9 +16,9 @@ describe('MapBlock', () => {
             ...testData.AbstractMultipleChartProps.axes,
             major: {
               ...testData.AbstractMultipleChartProps.axes.major,
-              groupBy: "locations"
-            }
-          }
+              groupBy: 'locations',
+            },
+          },
         }}
         height={600}
         width={900}
@@ -39,13 +39,13 @@ describe('MapBlock', () => {
             ...testData.AbstractMultipleChartProps.axes,
             major: {
               ...testData.AbstractMultipleChartProps.axes.major,
-              groupBy: "locations"
-            }
-          }
+              groupBy: 'locations',
+            },
+          },
         }}
         height={600}
         width={900}
-      />
+      />,
     );
 
     await wait();
@@ -73,13 +73,13 @@ describe('MapBlock', () => {
             ...testData.AbstractMultipleChartProps.axes,
             major: {
               ...testData.AbstractMultipleChartProps.axes.major,
-              groupBy: "locations"
-            }
-          }
+              groupBy: 'locations',
+            },
+          },
         }}
         height={600}
         width={900}
-      />
+      />,
     );
 
     await wait();
@@ -103,21 +103,21 @@ describe('MapBlock', () => {
 
   test('include all indicators from reduced selection', async () => {
     const { container } = render(
-        <MapBlock
-          {...{
-            ...testData.AbstractLargeDataChartProps_smaller_datasets,
-            axes: {
-              ...testData.AbstractLargeDataChartProps_smaller_datasets.axes,
-              major: {
-                ...testData.AbstractLargeDataChartProps_smaller_datasets.axes.major,
-                groupBy: "locations"
-              }
-            }
-          }}
-            height={600}
-            width={900}
-        />
-
+      <MapBlock
+        {...{
+          ...testData.AbstractLargeDataChartProps_smaller_datasets,
+          axes: {
+            ...testData.AbstractLargeDataChartProps_smaller_datasets.axes,
+            major: {
+              ...testData.AbstractLargeDataChartProps_smaller_datasets.axes
+                .major,
+              groupBy: 'locations',
+            },
+          },
+        }}
+        height={600}
+        width={900}
+      />,
     );
 
     await wait();

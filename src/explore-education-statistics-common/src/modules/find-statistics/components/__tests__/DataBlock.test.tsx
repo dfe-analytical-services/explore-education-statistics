@@ -92,8 +92,6 @@ describe('DataBlock', () => {
 
     await wait();
 
-
-
     expect(getDataBlockForSubject).toBeCalledWith(dataBlockRequest);
 
     expect(

@@ -197,6 +197,18 @@ exports[`MapBlock renders 1`] = `
             >
               <g>
                 <path
+                  class="uk leaflet-interactive"
+                  d="M-3 3L-3 -3L3 -3L3 3z"
+                  fill="#3388ff"
+                  fill-opacity="0.2"
+                  fill-rule="evenodd"
+                  stroke="#3388ff"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-opacity="1"
+                  stroke-width="3"
+                />
+                <path
                   class="rate0 leaflet-interactive"
                   d="M0 0"
                   fill="#3388ff"
@@ -211,18 +223,6 @@ exports[`MapBlock renders 1`] = `
                 <path
                   class="rate4 leaflet-interactive"
                   d="M0 0"
-                  fill="#3388ff"
-                  fill-opacity="0.2"
-                  fill-rule="evenodd"
-                  stroke="#3388ff"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-opacity="1"
-                  stroke-width="3"
-                />
-                <path
-                  class="uk leaflet-interactive"
-                  d="M-3 3L-3 -3L3 -3L3 3z"
                   fill="#3388ff"
                   fill-opacity="0.2"
                   fill-rule="evenodd"

@@ -108,8 +108,8 @@ exports[`DataBlock renders map instead of chart 1`] = `
             >
               <g>
                 <path
-                  class="rateNaN leaflet-interactive"
-                  d="M0 0"
+                  class="uk leaflet-interactive"
+                  d="M-3 3L-3 -3L3 -3L3 3z"
                   fill="#3388ff"
                   fill-opacity="0.2"
                   fill-rule="evenodd"
@@ -120,8 +120,8 @@ exports[`DataBlock renders map instead of chart 1`] = `
                   stroke-width="3"
                 />
                 <path
-                  class="uk leaflet-interactive"
-                  d="M-3 3L-3 -3L3 -3L3 3z"
+                  class="rateNaN leaflet-interactive"
+                  d="M0 0"
                   fill="#3388ff"
                   fill-opacity="0.2"
                   fill-rule="evenodd"
