@@ -220,7 +220,10 @@ const ChartBuilder = ({ data }: Props) => {
               // hard-coded defaults
               type: axisDefinition.type,
               name: `${axisDefinition.title} (${axisDefinition.type} axis)`,
-              groupBy: axisDefinition.forcedDataType || previousConfig.groupBy || axisDefinition.defaultDataType,
+              groupBy:
+                axisDefinition.forcedDataType ||
+                previousConfig.groupBy ||
+                axisDefinition.defaultDataType,
               dataSets:
                 axisDefinition.type === 'major'
                   ? dataSetAndConfiguration.map(dsc => dsc.dataSet)

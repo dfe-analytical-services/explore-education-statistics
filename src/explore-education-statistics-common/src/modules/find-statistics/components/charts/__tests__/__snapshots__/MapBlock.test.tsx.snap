@@ -209,9 +209,9 @@ exports[`MapBlock renders 1`] = `
                   stroke-width="3"
                 />
                 <path
-                  class="rate0 leaflet-interactive"
+                  class="leaflet-interactive"
                   d="M0 0"
-                  fill="#3388ff"
+                  fill="#3f0000"
                   fill-opacity="0.2"
                   fill-rule="evenodd"
                   stroke="#3388ff"
@@ -221,9 +221,9 @@ exports[`MapBlock renders 1`] = `
                   stroke-width="3"
                 />
                 <path
-                  class="rate4 leaflet-interactive"
+                  class="leaflet-interactive"
                   d="M0 0"
-                  fill="#3388ff"
+                  fill="#ff0000"
                   fill-opacity="0.2"
                   fill-rule="evenodd"
                   stroke="#3388ff"

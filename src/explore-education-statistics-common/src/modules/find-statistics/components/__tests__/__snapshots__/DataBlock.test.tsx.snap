@@ -35,13 +35,19 @@ exports[`DataBlock renders map instead of chart 1`] = `
           >
             <option
               value="0"
-            />
+            >
+              Label 23_1_2
+            </option>
             <option
               value="1"
-            />
+            >
+              Label 26_1_2
+            </option>
             <option
               value="2"
-            />
+            >
+              Label 28_1_2
+            </option>
           </select>
         </div>
         <div
@@ -77,6 +83,98 @@ exports[`DataBlock renders map instead of chart 1`] = `
         </div>
       </form>
       
+      <div>
+        <h3
+          class="govuk-heading-s"
+        >
+          Key to 
+          Label 23_1_2
+        </h3>
+        <dl
+          class="govuk-list"
+        >
+          <dd
+            class="legend"
+          >
+            <span
+              class="rate0"
+            >
+               
+            </span>
+             
+            -3.0
+            %
+              to 
+            -3.0
+            %
+             
+          </dd>
+          <dd
+            class="legend"
+          >
+            <span
+              class="rate1"
+            >
+               
+            </span>
+             
+            -3.0
+            %
+              to 
+            -3.0
+            %
+             
+          </dd>
+          <dd
+            class="legend"
+          >
+            <span
+              class="rate2"
+            >
+               
+            </span>
+             
+            -3.0
+            %
+              to 
+            -3.0
+            %
+             
+          </dd>
+          <dd
+            class="legend"
+          >
+            <span
+              class="rate3"
+            >
+               
+            </span>
+             
+            -3.0
+            %
+              to 
+            -3.0
+            %
+             
+          </dd>
+          <dd
+            class="legend"
+          >
+            <span
+              class="rate4"
+            >
+               
+            </span>
+             
+            -3.0
+            %
+              to 
+            -3.0
+            %
+             
+          </dd>
+        </dl>
+      </div>
     </div>
     <div
       class="govuk-grid-column-two-thirds"
@@ -120,9 +218,9 @@ exports[`DataBlock renders map instead of chart 1`] = `
                   stroke-width="3"
                 />
                 <path
-                  class="rateNaN leaflet-interactive"
+                  class="leaflet-interactive"
                   d="M0 0"
-                  fill="#3388ff"
+                  fill="#3f0000"
                   fill-opacity="0.2"
                   fill-rule="evenodd"
                   stroke="#3388ff"
