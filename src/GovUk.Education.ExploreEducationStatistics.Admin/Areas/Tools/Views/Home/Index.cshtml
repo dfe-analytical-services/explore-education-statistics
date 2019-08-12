@@ -1,25 +1,14 @@
 ﻿@{
-    ViewData["Title"] = "Education statistics publisher";
+    ViewData["Title"] = "Dashboard";
 }
 
-<h1 class="govuk-heading-l">BAU Team Tools</h1>
+<h1 class="govuk-heading-l">Administrative tools</h1>
 
-<h2 class="govuk-heading-m">Fake services</h2>
+<h2 class="govuk-heading-m">BAU Team Tools</h2>
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-one-third">
-        <h3 class="govuk-heading-s">Release actions</h3>
-        <ul class="govuk-list">
-            <li >
-                <a class="govuk-link" asp-area="Tools" asp-controller="Notifications" asp-action="NotifySubscribers">Notify subscribers</a>
-            </li>
-            <li >
-                <a class="govuk-link" asp-area="Tools" asp-controller="Publishing" asp-action="PublishReleaseData">Publish release data</a>
-            </li>
-        </ul>
-    </div>
-    <div class="govuk-grid-column-one-third">
-        <h3 class="govuk-heading-s">Fake CMS</h3>
+        <h3 class="govuk-heading-s">Taxonomy management</h3>
         <ul class="govuk-list">
             <li >
                 <a class="govuk-link" asp-area="Tools" asp-controller="Themes" asp-action="Index">Themes</a>
@@ -35,4 +24,42 @@
             </li>
         </ul>
     </div>
+    <div class="govuk-grid-column-one-third">
+        <h3 class="govuk-heading-s">Release actions</h3>
+        <ul class="govuk-list">
+            <li >
+                <a class="govuk-link" asp-area="Tools" asp-controller="Notifications" asp-action="NotifySubscribers">Notify subscribers</a>
+            </li>
+            <li >
+                <a class="govuk-link" asp-area="Tools" asp-controller="Publishing" asp-action="PublishReleaseData">Publish release data</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+
+
+<h2 class="govuk-heading-m">System administration</h2>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-third">
+        <h3 class="govuk-heading-s">Content cache</h3>
+        <ul class="govuk-list">
+            <li >
+                <a class="govuk-link" asp-area="Tools" asp-controller="ContentCache" asp-action="RebuildContentTrees">Regenerate content trees</a>
+            </li>
+            <li >
+                <a class="govuk-link" asp-area="Tools" asp-controller="ContentCache" asp-action="RebuildReleases">Regenerate releases</a>
+            </li>
+            <li >
+                <a class="govuk-link" asp-area="Tools" asp-controller="ContentCache" asp-action="RebuildMethodology">Regenerate methodology</a>
+            </li>
+        </ul>
+        
+        <ul class="govuk-list">
+            <li >
+                <a class="govuk-link" asp-area="Tools" asp-controller="ContentCache" asp-action="Clean">Clean & rebuild cache</a>
+            </li>
+        </ul>
+    </div>
+
 </div>
