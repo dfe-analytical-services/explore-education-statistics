@@ -13,7 +13,7 @@ import sortBy from 'lodash/sortBy';
 import React, { memo, useEffect, useState, forwardRef } from 'react';
 import DataTableCaption from './DataTableCaption';
 import FixedMultiHeaderDataTable from './FixedMultiHeaderDataTable';
-import TableHeadersForm, { TableHeadersFormValues } from './TableHeadersForm';
+import { TableHeadersFormValues } from './TableHeadersForm';
 
 interface Props {
   indicators: Indicator[];
@@ -174,22 +174,6 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
 
     return (
       <div>
-        {/* <TableHeadersForm
-          initialValues={tableHeaders}
-          onSubmit={value => {
-            setTableHeaders(value);
-            if(dataTableRef && dataTableRef.current) {
-
-              if (dataTableRef.current) {
-                dataTableRef.current.scrollIntoView({
-                  behavior: 'smooth',
-                  block: 'start',
-                });
-              }
-            }
-          }}
-        /> */}
-
         <FixedMultiHeaderDataTable
           caption={<DataTableCaption {...props} id="dataTableCaption" />}
           columnHeaders={columnHeaders}
