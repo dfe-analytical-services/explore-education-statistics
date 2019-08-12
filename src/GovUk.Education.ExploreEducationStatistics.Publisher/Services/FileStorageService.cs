@@ -1,6 +1,5 @@
 using System;
 using System.Globalization;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
@@ -19,7 +18,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private readonly string _privateStorageConnectionString;
         private readonly string _publicStorageConnectionString;
-        private readonly Regex _searchPatternRegex = new Regex(@"^[\w-_/]+\.(?!meta\.csv)");
 
         private const string PrivateContainerName = "releases";
         private const string PublicContainerName = "downloads";
@@ -68,8 +66,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             context.FileSkipped += FileSkippedCallback;
             context.ShouldTransferCallbackAsync += async (source, destination) =>
             {
-                var path = (source as CloudBlockBlob)?.Name;
-                return path != null && _searchPatternRegex.IsMatch(path);
+                // We do not copy the metadata file.
+                if (source is CloudBlockBlob blob)
+                {
+                    blob.FetchAttributes();
+                    return !blob.Metadata.ContainsKey(DataFileKey); // Determine if this is a metadata file
+                };
+                return true;
             };
 
             context.SetAttributesCallbackAsync += async destination =>

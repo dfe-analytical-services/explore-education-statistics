@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
             var blobContainer = blobClient.GetContainerReference(ContainerName);
             blobContainer.CreateIfNotExists();
             
-            return blobContainer.ListBlobs(PublicReleaseDirectoryPath(publication, release, type), true, BlobListingDetails.Metadata)
+            var result = blobContainer.ListBlobs(PublicReleaseDirectoryPath(publication, release, type), true, BlobListingDetails.Metadata)
                 .OfType<CloudBlockBlob>()
                 .Where(IsFileReleased)
                 .Select(file => new FileInfo
@@ -54,6 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
                     Size = GetSize(file)
                 })
                 .OrderBy(info => info.Name);
+            return result;
         }
 
         private static bool IsFileReleased(CloudBlob blob)

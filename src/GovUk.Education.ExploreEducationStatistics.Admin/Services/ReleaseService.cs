@@ -60,7 +60,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         // TODO Authorisation will be required when users are introduced
         public async Task<Either<ValidationResult, ReleaseViewModel>> CreateReleaseAsync(CreateReleaseViewModel createRelease)
         {
-            if (_context.Releases.Any(r => r.Slug == createRelease.Slug))
+            // Slug must be unique per publication to avoid file system clashes.
+            if (_context.Releases.Any(r => r.Slug == createRelease.Slug && r.PublicationId == createRelease.PublicationId))
             {
                 return ValidationResult(SlugNotUnique);
             }
@@ -84,7 +85,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         // TODO Authorisation will be required when users are introduced
         public async Task<Either<ValidationResult, ReleaseViewModel>> EditReleaseSummaryAsync(EditReleaseSummaryViewModel model)
         {
-            var withSameSlug = _context.Releases.Where(r => r.Slug == model.Slug);
+            // Slug must be unique per publication to avoid file system clashes.
+            var publication = await GetAsync(model.Id);
+            var withSameSlug = _context.Releases.Where(r => r.Slug == model.Slug && r.PublicationId == publication.Id);
             if (withSameSlug.Any() && (withSameSlug.Count() > 1 || withSameSlug.First().Id != model.Id))
             {
                 return ValidationResult(SlugNotUnique);

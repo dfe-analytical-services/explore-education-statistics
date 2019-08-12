@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage;
@@ -26,10 +27,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly string _storageConnectionString;
 
         private const string ContainerName = "releases";
-
-        private const string MetaFileKey = "metafile";
-        
-        private const string DataFileKey = "datafile";
         
         private const string NameKey = "name";
 
