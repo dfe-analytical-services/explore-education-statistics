@@ -15,8 +15,9 @@ import { SubjectMeta } from '@frontend/services/permalinkService';
 import DataTableCaption from './DataTableCaption';
 import FixedMultiHeaderDataTable from './FixedMultiHeaderDataTable';
 import { TableHeadersFormValues } from './TableHeadersForm';
+import { FullTableSubjectMeta } from './types/FullTable';
 
-interface Props extends SubjectMeta {
+interface Props extends FullTableSubjectMeta {
   results: TableData['result'];
   tableHeadersConfig?: TableHeadersFormValues;
 }

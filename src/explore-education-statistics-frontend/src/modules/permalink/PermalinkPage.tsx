@@ -34,7 +34,7 @@ class PermalinkPage extends Component<Props> {
 
   public render() {
     const { data } = this.props;
-    const { fullTable, configuration } = data;
+    const { fullTable } = data;
     return (
       <Page
         title={data.title}
@@ -66,7 +66,10 @@ class PermalinkPage extends Component<Props> {
         <TimePeriodDataTable
           {...fullTable.subjectMeta}
           results={fullTable.results}
-          tableHeadersConfig={configuration.tableHeadersConfig}
+          tableHeadersConfig={
+            fullTable.configurations &&
+            fullTable.configurations.tableHeadersConfig
+          }
         />
 
         <p className="govuk-body-s">Source: DfE prototype example statistics</p>
