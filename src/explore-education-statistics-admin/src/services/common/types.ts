@@ -1,6 +1,5 @@
 import { ReleaseApprovalStatus } from '@admin/services/dashboard/types';
 import { User } from '@admin/services/sign-in/types';
-import {Dictionary} from "@common/types";
 
 export interface IdTitlePair {
   id: string;
@@ -165,9 +164,3 @@ export const dayMonthYearToDate = (dmy: DayMonthYearValues) => {
 
 export const dayMonthYearInputsToDate = (dmy: DayMonthYearInputs): Date =>
   dayMonthYearToDate(dayMonthYearInputsToValues(dmy));
-
-export interface ServerValidationErrors {
-  errors: Dictionary<string[]>;
-  title: string;
-  status: number;
-}

@@ -11,7 +11,7 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.response.use(
   response => response,
-  error => Promise.reject(error.response)
+  error => Promise.reject(error.response),
 );
 
 const client = new Client(axiosInstance);
