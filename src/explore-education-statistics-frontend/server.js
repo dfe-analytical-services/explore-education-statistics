@@ -54,6 +54,7 @@ async function startServer(port = process.env.PORT || 3000) {
     'https://*.hotjar.com:*',
     'https://vc.hotjar.io:*',
     'wss://*.hotjar.com',
+    'https://dc.services.visualstudio.com/v2/track',
   ];
   const cspScriptSrc = [
     "'self'",
