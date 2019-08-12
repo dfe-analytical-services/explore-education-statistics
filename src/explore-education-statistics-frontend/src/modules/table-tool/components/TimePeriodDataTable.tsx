@@ -24,7 +24,7 @@ interface Props {
   locations: LocationFilter[];
   results: TableData['result'];
   footnotes?: TableData['footnotes'];
-  tableHeaderConfig?: TableHeadersFormValues;
+  tableHeadersConfig?: TableHeadersFormValues;
 }
 
 const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
@@ -36,36 +36,36 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
       indicators,
       results,
       footnotes,
-      tableHeaderConfig,
+      tableHeadersConfig,
     } = props;
 
     const [tableHeaders, setTableHeaders] = useState<TableHeadersFormValues>({
       columnGroups:
-        tableHeaderConfig && tableHeaderConfig.columnGroups
-          ? tableHeaderConfig.columnGroups
+        tableHeadersConfig && tableHeadersConfig.columnGroups
+          ? tableHeadersConfig.columnGroups
           : [],
       columns:
-        tableHeaderConfig && tableHeaderConfig.columns
-          ? tableHeaderConfig.columns
+        tableHeadersConfig && tableHeadersConfig.columns
+          ? tableHeadersConfig.columns
           : [],
       rowGroups:
-        tableHeaderConfig && tableHeaderConfig.rowGroups
-          ? tableHeaderConfig.rowGroups
+        tableHeadersConfig && tableHeadersConfig.rowGroups
+          ? tableHeadersConfig.rowGroups
           : [],
       rows:
-        tableHeaderConfig && tableHeaderConfig.rows
-          ? tableHeaderConfig.rows
+        tableHeadersConfig && tableHeadersConfig.rows
+          ? tableHeadersConfig.rows
           : [],
     });
     useEffect(() => {
       if (
-        tableHeaderConfig &&
-        tableHeaderConfig.columnGroups &&
-        tableHeaderConfig.columns &&
-        tableHeaderConfig.rowGroups &&
-        tableHeaderConfig.rows
+        tableHeadersConfig &&
+        tableHeadersConfig.columnGroups &&
+        tableHeadersConfig.columns &&
+        tableHeadersConfig.rowGroups &&
+        tableHeadersConfig.rows
       ) {
-        setTableHeaders(tableHeaderConfig);
+        setTableHeaders(tableHeadersConfig);
       }
     });
 

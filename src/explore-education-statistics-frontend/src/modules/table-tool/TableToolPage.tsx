@@ -470,7 +470,7 @@ class TableToolPage extends Component<Props, State> {
                           timePeriods={timePeriodRange}
                           results={tableData}
                           footnotes={footnotes}
-                          tableHeaderConfig={tableHeaders}
+                          tableHeadersConfig={tableHeaders}
                         />
                       </div>
 
