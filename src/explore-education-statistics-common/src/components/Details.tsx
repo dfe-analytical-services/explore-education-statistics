@@ -7,12 +7,17 @@ import React, { MouseEvent, ReactNode, useEffect, useRef } from 'react';
 let hasNativeDetails: boolean;
 let idCounter = 0;
 
+export type DetailsToggleHandler = (
+  isOpen: boolean,
+  event: MouseEvent<HTMLElement>,
+) => void;
+
 export interface DetailsProps {
   className?: string;
   tag?: string;
   children: ReactNode;
   id?: string;
-  onToggle?: (isOpen: boolean, event: MouseEvent<HTMLElement>) => void;
+  onToggle?: DetailsToggleHandler;
   open?: boolean;
   summary: string | ReactNode;
 }
@@ -74,15 +79,13 @@ const Details = ({
         tabIndex={onMounted(0)}
         onClick={event => {
           event.persist();
-
           if (onToggle) {
             onToggle(!isOpened, event);
-
             if (event.isDefaultPrevented()) {
               return;
             }
+            setOpened(isOpened);
           }
-
           setOpened(!isOpened);
         }}
         onKeyPress={event => {
