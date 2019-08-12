@@ -38,9 +38,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Observation>()
-                .Property(o => o.Id).ForSqlServerUseSequenceHiLo();
-            
             ConfigureAdditionalTypes(modelBuilder);
             ConfigureBoundaryLevel(modelBuilder);
             ConfigureIndicator(modelBuilder);

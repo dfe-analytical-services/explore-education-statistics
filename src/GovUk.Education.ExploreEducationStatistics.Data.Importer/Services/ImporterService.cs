@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using EFCore.BulkExtensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Models;
@@ -134,12 +135,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             
             _logger.LogInformation($"Retrieving observations for {subject.Name}");
 
-            var observations = GetObservations(lines, headers, subject, subjectMeta);
+            var observations = GetObservations(lines, headers, subject, subjectMeta).ToList();
             
             _logger.LogInformation($"Adding {observations.Count()} observations for {subject.Name}");
 
-            _context.Observation.AddRange(observations);
+            var subEntities = new List<ObservationFilterItem>();
             
+            using (var transaction = _context.Database.BeginTransaction())
+            {
+                _context.BulkInsert(observations,
+                    new BulkConfig {PreserveInsertOrder = true, SetOutputIdentity = true});
+                foreach (var o in observations)
+                {
+                    foreach (var item in o.FilterItems)
+                    {
+                        item.ObservationId = o.Id;
+                        item.FilterItemId = item.FilterItem.Id;
+                    }
+                    
+                    subEntities.AddRange(o.FilterItems);
+                }
+                _context.BulkInsert(subEntities);
+                transaction.Commit();
+            }
+
             _logger.LogInformation($"{observations.Count()} observations added successfully for {subject.Name}");
         }
 
@@ -157,17 +176,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             SubjectMeta subjectMeta)
         {
             var line = raw.Split(',');
+
             return new Observation
             {
                 FilterItems = GetFilterItems(line, headers, subjectMeta.Filters),
                 GeographicLevel = GetGeographicLevel(line, headers),
                 LocationId = GetLocationId(line, headers),
                 Measures = GetMeasures(line, headers, subjectMeta.Indicators),
-                Provider = GetProvider(line, headers),
-                School = GetSchool(line, headers),
+                ProviderUrn = GetProvider(line, headers)?.Urn,
+                SchoolLaEstab = GetSchool(line, headers)?.LaEstab,
                 Subject = subject,
+                SubjectId = subject.Id,
                 TimeIdentifier = GetTimeIdentifier(line, headers),
-                Year = GetYear(line, headers)
+                Year = GetYear(line, headers),
             };
         }
         

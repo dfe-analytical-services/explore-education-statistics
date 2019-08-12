@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 return filterItem;
             }
             
-            filterItem = _context.FilterItem.FirstOrDefault(fi => fi.FilterGroupId == filterGroup.Id && fi.Label == label) 
+            filterItem = _context.FilterItem.AsNoTracking().FirstOrDefault(fi => fi.FilterGroupId == filterGroup.Id && fi.Label == label) 
                          ??_context.FilterItem.Add(new FilterItem(label, filterGroup)).Entity;
             
             GetCache().Set(cacheKey, filterItem);
@@ -55,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 return filterGroup;
             }
             
-            filterGroup = _context.FilterGroup
+            filterGroup = _context.FilterGroup.AsNoTracking()
                           .FirstOrDefault(fg => fg.FilterId == filter.Id && fg.Label == label) 
                           ?? _context.FilterGroup.Add(new FilterGroup(filter, label)).Entity;
             

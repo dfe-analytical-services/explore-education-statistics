@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
@@ -17,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
     public class SplitFileService : ISplitFileService
     {
-        private const int MaxLines = 8000;
+        private const int MaxLines = 10000;
         
         private readonly IFileStorageService _fileStorageService;
 
@@ -50,8 +49,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     };
 
                     batchCount++;
-                    // pause 5 secs before putting all messages on queue to avoid contention 
-                    Thread.Sleep(5000);
                     collector.Add(iMessage);
                 }
             }
