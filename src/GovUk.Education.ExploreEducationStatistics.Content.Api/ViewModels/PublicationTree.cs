@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Models;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels
@@ -17,5 +18,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels
         public List<FileInfo> ChartFiles { get; set; }
         
         public List<FileInfo> AncillaryFiles { get; set; }
+
+        // Files to download are the actual data files and ancillary files, but currently not the chart files.
+        public List<FileInfo> DownloadFiles => DataFiles.Concat(AncillaryFiles).OrderBy(f => f.Name).ToList();
     }
 }
