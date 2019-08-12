@@ -48,10 +48,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void CreateReleaseWithTemplate()
         {
-
-
-            var x = new List<int>().Select(c => c).DefaultIfEmpty().Max();
-            
             using (var context = InMemoryApplicationDbContext("Create"))
             {
                 context.Add(new ReleaseType {Id = new Guid("2a0217ca-c514-45da-a8b3-44c68a6737e8"), Title = "Ad Hoc",});
