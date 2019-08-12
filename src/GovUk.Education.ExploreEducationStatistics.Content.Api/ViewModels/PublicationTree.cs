@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels
             {
                 var data = DataFiles ?? new List<FileInfo>();
                 var ancillary = AncillaryFiles ?? new List<FileInfo>();
-                return data.Concat(ancillary).ToList();git s
+                return data.Concat(ancillary).ToList();
             }
         }
     }
