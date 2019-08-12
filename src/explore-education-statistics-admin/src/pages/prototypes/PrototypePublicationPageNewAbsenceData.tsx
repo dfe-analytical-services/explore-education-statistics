@@ -4,6 +4,10 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import useToggle from '@common/hooks/useToggle';
 import Link from '@admin/components/Link';
+import Details from '@common/components/Details';
+import Accordion from '@common/components/Accordion';
+import AccordionSection from '@common/components/AccordionSection';
+import PrototypeFootnotes from './components/PrototypeFootnotes';
 import PrototypeAdminNavigation from './components/PrototypeAdminNavigation';
 import PrototypePage from './components/PrototypePage';
 
@@ -210,6 +214,21 @@ const PublicationDataPage = () => {
               </button>
             </div>
           </form>
+        </TabsSection>
+        <TabsSection id="footnotes" title="Footnotes">
+          <Accordion id="uploaded-data">
+            <AccordionSection heading="Geographical absence">
+              <PrototypeFootnotes />
+              <hr />
+              <PrototypeFootnotes />
+            </AccordionSection>
+            <AccordionSection heading="Local authority">
+              Test 2
+            </AccordionSection>
+            <AccordionSection heading="National characteristics">
+              <></>
+            </AccordionSection>
+          </Accordion>
         </TabsSection>
         <TabsSection id="file-upload" title="File uploads">
           <p className="govuk-body">

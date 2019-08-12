@@ -101,10 +101,11 @@ class PrototypeEditableContent extends React.Component<Props, State> {
           <div className={styles.editableButton}>
             <div className={styles.editableButtonContent}>
               <span className="govuk-button govuk-button--secondary govuk-body-s govuk-!-margin-bottom-0">
-                Edit this section {unsaved ? '- modified' : ''}
+                Edit this section
               </span>
             </div>
           </div>
+
           <div className="govuk-!-padding-1" ref={this.ref} />
         </div>
       </div>
