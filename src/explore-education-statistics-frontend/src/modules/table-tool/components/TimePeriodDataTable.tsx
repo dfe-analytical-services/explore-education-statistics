@@ -24,6 +24,7 @@ interface Props {
   locations: LocationFilter[];
   results: TableData['result'];
   footnotes?: TableData['footnotes'];
+  tableHeaderConfig?: TableHeadersFormValues;
 }
 
 const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
@@ -35,13 +36,37 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
       indicators,
       results,
       footnotes,
+      tableHeaderConfig,
     } = props;
 
     const [tableHeaders, setTableHeaders] = useState<TableHeadersFormValues>({
-      columnGroups: [],
-      columns: [],
-      rowGroups: [],
-      rows: [],
+      columnGroups:
+        tableHeaderConfig && tableHeaderConfig.columnGroups
+          ? tableHeaderConfig.columnGroups
+          : [],
+      columns:
+        tableHeaderConfig && tableHeaderConfig.columns
+          ? tableHeaderConfig.columns
+          : [],
+      rowGroups:
+        tableHeaderConfig && tableHeaderConfig.rowGroups
+          ? tableHeaderConfig.rowGroups
+          : [],
+      rows:
+        tableHeaderConfig && tableHeaderConfig.rows
+          ? tableHeaderConfig.rows
+          : [],
+    });
+    useEffect(() => {
+      if (
+        tableHeaderConfig &&
+        tableHeaderConfig.columnGroups &&
+        tableHeaderConfig.columns &&
+        tableHeaderConfig.rowGroups &&
+        tableHeaderConfig.rows
+      ) {
+        setTableHeaders(tableHeaderConfig);
+      }
     });
 
     const removeSiblinglessTotalRows = (

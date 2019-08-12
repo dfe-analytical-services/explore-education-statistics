@@ -449,9 +449,8 @@ class TableToolPage extends Component<Props, State> {
                       <div className="govuk-!-margin-bottom-4">
                         <TableHeadersForm
                           initialValues={tableHeaders}
-                          onSubmit={value => {
-                            // console.log(value);
-                            //setTableHeaders(value);
+                          onSubmit={tableHeaderConfig => {
+                            this.setState({ tableHeaders: tableHeaderConfig });
 
                             if (dataTableRef.current) {
                               dataTableRef.current.scrollIntoView({
@@ -471,6 +470,7 @@ class TableToolPage extends Component<Props, State> {
                           timePeriods={timePeriodRange}
                           results={tableData}
                           footnotes={footnotes}
+                          tableHeaderConfig={tableHeaders}
                         />
                       </div>
 
