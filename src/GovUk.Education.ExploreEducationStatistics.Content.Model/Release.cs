@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 using Newtonsoft.Json;
 using static System.DateTime;
+using static System.String;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PartialDate;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.NamingUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
@@ -14,11 +16,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     {
         public Guid Id { get; set; }
 
-        public string Title => ReleaseTitle(ReleaseName, TimePeriodCoverage);
+        public string Title => CoverageTitle + (IsNullOrEmpty(YearTitle) ? "" : " " + YearTitle);
 
-        public string YearTitle => ReleaseYearTitle(ReleaseName, TimePeriodCoverage);
+        public string YearTitle => TimePeriodLabelFormatter.FormatYear(ReleaseName, TimePeriodCoverage);
 
-        public string CoverageTitle => ReleaseCoverageTitle(TimePeriodCoverage); 
+        public string CoverageTitle => TimePeriodCoverage.GetEnumLabel();
         
         private string _releaseName;
 

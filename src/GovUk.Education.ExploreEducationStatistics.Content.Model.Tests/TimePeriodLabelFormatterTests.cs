@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Xunit;
 using Xunit.Abstractions;
 using static GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TimePeriodLabelFormatter;
@@ -118,7 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             Assert.Equal($"{AcademicOrFiscalYear} Summer Term", Format(Year, SummerTerm));
             Assert.Equal($"{AcademicOrFiscalYear} Autumn and Spring Term", Format(Year, AutumnSpringTerm));
         }
-
+        
         [Fact(Skip = "Use this to debug")]
         public void Debug()
         {

@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Newtonsoft.Json;
 using static System.String;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.NamingUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TimePeriodLabelFormatter;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 {
@@ -34,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         private string _slug;
         public string Slug
         {
-            get => IsNullOrEmpty(_slug) ? SlugFromTitle(ReleaseTitle(ReleaseName, TimePeriodCoverage)) : _slug;
+            get => IsNullOrEmpty(_slug) ? SlugFromTitle(Format(ReleaseName, TimePeriodCoverage)) : _slug;
             set => _slug = value; 
         }
     }

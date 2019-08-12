@@ -20,6 +20,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels
         public List<FileInfo> AncillaryFiles { get; set; }
 
         // Files to download are the actual data files and ancillary files, but currently not the chart files.
-        public List<FileInfo> DownloadFiles => DataFiles.Concat(AncillaryFiles).OrderBy(f => f.Name).ToList();
+        public List<FileInfo> DownloadFiles
+        {
+            get
+            {
+                var data = DataFiles ?? new List<FileInfo>();
+                var ancillary = AncillaryFiles ?? new List<FileInfo>();
+                return data.Concat(ancillary).ToList();git s
+            }
+        }
     }
 }
