@@ -25,7 +25,7 @@ import TimePeriod, {
 import mapValues from 'lodash/mapValues';
 import { NextContext } from 'next';
 import Router from 'next/router';
-import React, { Component, MouseEventHandler } from 'react';
+import React, { Component, MouseEventHandler, RefObject } from 'react';
 import DownloadCsvButton from './components/DownloadCsvButton';
 import FiltersForm, { FilterFormSubmitHandler } from './components/FiltersForm';
 import LocationFiltersForm, {
@@ -45,6 +45,10 @@ import mapOptionValues from './components/utils/mapOptionValues';
 import Wizard from './components/Wizard';
 import WizardStep from './components/WizardStep';
 import WizardStepHeading from './components/WizardStepHeading';
+import TableHeadersForm, {
+  TableHeadersFormValues,
+  returnDefaultTableHeaderConfig,
+} from './components/TableHeadersForm';
 
 export interface PublicationOptions {
   id: string;
@@ -81,6 +85,8 @@ interface State {
   timePeriodRange: TimePeriod[];
   tableData: TableData['result'];
   footnotes: TableData['footnotes'];
+  tableHeaders: TableHeadersFormValues;
+  dataTableRef: RefObject<HTMLTableElement>;
 }
 
 class TableToolPage extends Component<Props, State> {
@@ -104,6 +110,13 @@ class TableToolPage extends Component<Props, State> {
     timePeriodRange: [],
     tableData: [],
     footnotes: [],
+    tableHeaders: {
+      columnGroups: [],
+      columns: [],
+      rowGroups: [],
+      rows: [],
+    },
+    dataTableRef: React.createRef(),
   };
 
   public static async getInitialProps({ query }: NextContext) {
@@ -261,7 +274,14 @@ class TableToolPage extends Component<Props, State> {
   };
 
   private handleFiltersFormSubmit: FilterFormSubmitHandler = async values => {
-    const { startYear, startCode, endYear, endCode, subjectMeta } = this.state;
+    const {
+      startYear,
+      startCode,
+      endYear,
+      endCode,
+      subjectMeta,
+      locations,
+    } = this.state;
 
     if (!startYear || !startCode || !endYear || !endCode) {
       return;
@@ -299,14 +319,22 @@ class TableToolPage extends Component<Props, State> {
       this.createQuery(filters, indicators),
     );
 
+    const timePeriods = timePeriodRange.map(
+      timePeriod => new TimePeriod(timePeriod),
+    );
+
     this.setState({
       filters,
       indicators,
-      timePeriodRange: timePeriodRange.map(
-        timePeriod => new TimePeriod(timePeriod),
-      ),
+      timePeriodRange: timePeriods,
       tableData: result,
       footnotes,
+      tableHeaders: returnDefaultTableHeaderConfig(
+        indicators,
+        filters,
+        timePeriods,
+        Object.values(locations).flat(),
+      ),
     });
   };
 
@@ -333,6 +361,8 @@ class TableToolPage extends Component<Props, State> {
       timePeriodRange,
       tableData,
       footnotes,
+      tableHeaders,
+      dataTableRef,
     } = this.state;
 
     const locationsList = Object.values(locations).flat();
@@ -417,7 +447,22 @@ class TableToolPage extends Component<Props, State> {
                       </WizardStepHeading>
 
                       <div className="govuk-!-margin-bottom-4">
+                        <TableHeadersForm
+                          initialValues={tableHeaders}
+                          onSubmit={value => {
+                            // console.log(value);
+                            //setTableHeaders(value);
+
+                            if (dataTableRef.current) {
+                              dataTableRef.current.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start',
+                              });
+                            }
+                          }}
+                        />
                         <TimePeriodDataTable
+                          ref={dataTableRef}
                           filters={filters}
                           indicators={indicators}
                           publicationName={publication ? publication.title : ''}

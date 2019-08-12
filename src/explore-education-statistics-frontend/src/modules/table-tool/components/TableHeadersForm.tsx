@@ -1,13 +1,21 @@
+import React from 'react';
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import { Form, FormikProps } from 'formik';
+import classNames from 'classnames';
+import sortBy from 'lodash/sortBy';
 import Button from '@common/components/Button';
 import Details from '@common/components/Details';
 import { FormGroup, Formik } from '@common/components/form';
 import reorder from '@common/lib/utils/reorder';
 import Yup from '@common/lib/validation/yup';
 import { PickByType } from '@common/types';
-import classNames from 'classnames';
-import { Form, FormikProps } from 'formik';
-import React from 'react';
-import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import { Dictionary } from '@common/types/util';
+import {
+  CategoryFilter,
+  Indicator,
+  LocationFilter,
+} from '@frontend/modules/table-tool/components/types/filters';
+import TimePeriod from '@frontend/modules/table-tool/components/types/TimePeriod';
 import FormFieldSortableList from './FormFieldSortableList';
 import FormFieldSortableListGroup from './FormFieldSortableListGroup';
 import { SortableOption } from './FormSortableList';
@@ -24,6 +32,34 @@ export interface TableHeadersFormValues {
   rowGroups: SortableOption[][];
   rows: SortableOption[];
 }
+const removeSiblinglessTotalRows = (
+  categoryFilters: Dictionary<CategoryFilter[]>,
+): CategoryFilter[][] => {
+  return Object.values(categoryFilters).filter(filter => {
+    return filter.length > 1 || !filter[0].isTotal;
+  });
+};
+
+export const returnDefaultTableHeaderConfig = (
+  indicators: Indicator[],
+  filters: Dictionary<CategoryFilter[]>,
+  timePeriods: TimePeriod[],
+  locations: LocationFilter[],
+) => {
+  const sortedFilters = sortBy(
+    [...removeSiblinglessTotalRows(filters), locations],
+    [options => options.length],
+  );
+
+  const halfwayIndex = Math.floor(sortedFilters.length / 2);
+
+  return {
+    columnGroups: sortedFilters.slice(0, halfwayIndex),
+    rowGroups: sortedFilters.slice(halfwayIndex),
+    columns: timePeriods,
+    rows: indicators,
+  };
+};
 
 const TableHeadersForm = (props: Props) => {
   const { onSubmit, initialValues } = props;
