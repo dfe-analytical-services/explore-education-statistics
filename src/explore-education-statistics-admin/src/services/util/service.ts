@@ -9,6 +9,11 @@ const axiosInstance = axios.create({
   paramsSerializer: commaSeparated,
 });
 
+axiosInstance.interceptors.response.use(
+  response => response,
+  error => Promise.reject(error.response)
+);
+
 const client = new Client(axiosInstance);
 
 export default client;

@@ -1,8 +1,9 @@
+import {ServerValidationErrors} from "@admin/services/common/types";
 import ErrorSummary, {
   ErrorSummaryMessage,
 } from '@common/components/ErrorSummary';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
-import { connect, FormikContext } from 'formik';
+import {connect, FormikActions, FormikContext} from 'formik';
 import camelCase from 'lodash/camelCase';
 import get from 'lodash/get';
 import React, { ReactNode, useEffect, useState } from 'react';
@@ -11,6 +12,7 @@ interface Props {
   children: ReactNode;
   id: string;
   submitId?: string;
+  submitValidationHandler?: (errors: ServerValidationErrors, formikActions: FormikActions<any>) => void,
 }
 
 /**
@@ -35,6 +37,7 @@ const Form = ({
   id,
   submitId = `${id}-submit`,
   formik,
+  submitValidationHandler,
 }: Props & { formik: FormikContext<{}> }) => {
   const { errors, touched } = formik;
 
@@ -63,6 +66,13 @@ const Form = ({
     ? [...summaryErrors, submitError]
     : summaryErrors;
 
+  const isServerValidationError = (errorData: any) => {
+    const errorDataAsValidationError = errorData as ServerValidationErrors;
+    return errorDataAsValidationError.errors !== undefined &&
+      errorDataAsValidationError.status !== undefined  &&
+      errorDataAsValidationError.title !== undefined;
+  }
+
   return (
     <form
       id={id}
@@ -75,10 +85,14 @@ const Form = ({
           await formik.submitForm();
         } catch (error) {
           if (error) {
-            setSubmitError({
-              id: submitId,
-              message: error.message,
-            });
+            if (submitValidationHandler && isServerValidationError(error.data)) {
+              submitValidationHandler(error.data as ServerValidationErrors, formik);
+            } else {
+              setSubmitError({
+                id: submitId,
+                message: error.message,
+              });
+            }
           }
         }
       }}
