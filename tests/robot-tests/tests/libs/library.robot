@@ -103,6 +103,10 @@ user waits until element contains
   [Arguments]    ${element}    ${text}
   wait until element contains    ${element}    ${text}
 
+user waits until page contains link
+  [Arguments]    ${link_text}
+  page should contain link   ${link_text}
+
 user waits until page contains heading
   [Arguments]   ${text}
   wait until page contains element   xpath://h1[text()="${text}"]
@@ -221,3 +225,25 @@ user waits until results table appears
   user waits until page contains element   css:table thead th
   set selenium timeout          ${timeout}
   set selenium implicit wait    ${implicit_wait}
+
+user logs into microsoft online
+  [Arguments]  ${email}   ${password}
+  user waits until page contains element  xpath://div[text()="Sign in"]
+  sleep  1
+  user presses keys     ${email}
+  user waits until page contains element    css:input[value="Next"]
+  wait until element is enabled   css:input[value="Next"]
+  user clicks element   css:input[value="Next"]
+
+  user waits until page contains element  xpath://div[text()="Enter password"]
+  sleep  1
+  user presses keys     ${password}
+  user waits until page contains element    css:input[value="Sign in"]
+  wait until element is enabled   css:input[value="Sign in"]
+  user clicks element   css:input[value="Sign in"]
+
+  user waits until page contains element  xpath://div[text()="Stay signed in?"]
+  user waits until page contains element    css:input[value="No"]
+  wait until element is enabled   css:input[value="No"]
+  sleep  1
+  user clicks element   css:input[value="No"]
