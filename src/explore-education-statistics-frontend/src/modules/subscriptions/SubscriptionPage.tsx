@@ -94,7 +94,12 @@ class SubscriptionPage extends Component<Props> {
           { name: data.title, link: `/find-statistics/${slug}` },
         ]}
       >
-        {unsubscribed ? (
+        {message ? (
+          <div className="govuk-panel govuk-panel--confirmation">
+            <h2 className="govuk-panel__title">{title}</h2>
+            <div className="govuk-panel__body">{message}</div>
+          </div>
+        ) : (
           <>
             <p>Subscribe to receive updates when:</p>
             <ul className="govuk-list govuk-list--bullet">
@@ -103,11 +108,6 @@ class SubscriptionPage extends Component<Props> {
             </ul>
             <SubscriptionForm onSubmit={this.handleFormSubmit} />
           </>
-        ) : (
-          <div className="govuk-panel govuk-panel--confirmation">
-            <h2 className="govuk-panel__title">{title}</h2>
-            <div className="govuk-panel__body">{message}</div>
-          </div>
         )}
       </Page>
     );
