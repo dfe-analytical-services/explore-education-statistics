@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         public DateTime? PublishScheduled { get; set; }
         
         [PartialDateValidator]
-        public PartialDate NextReleaseExpected { get; set; }
+        public PartialDate NextReleaseDate { get; set; }
      
         [RegularExpression(@"^([0-9]{4})?$")]
         public string ReleaseName { get; set; }

@@ -50,8 +50,8 @@ const ContentSubBlockRenderer = ({
               </h2>
               <p>Use our table tool to explore this data.</p>
               <ButtonLink
-                as={`/table-tool/${publication.slug}`}
-                href={`/table-tool?publicationSlug=${publication.slug}`}
+                as={`/data-tables/${publication.slug}`}
+                href={`/data-tables?publicationSlug=${publication.slug}`}
               >
                 Explore data
               </ButtonLink>

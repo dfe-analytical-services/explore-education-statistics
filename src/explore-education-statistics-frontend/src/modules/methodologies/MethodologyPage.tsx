@@ -45,7 +45,7 @@ class MethodologyPage extends Component<Props> {
       <Page
         title={data.title}
         caption="Methodology"
-        breadcrumbs={[{ name: 'Methodologies', link: '/methodologies' }]}
+        breadcrumbs={[{ name: 'Methodologies', link: '/methodology' }]}
       >
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
@@ -91,7 +91,7 @@ class MethodologyPage extends Component<Props> {
                 </h2>
                 <ul className="govuk-list">
                   <li>
-                    <Link to={`/statistics/${data.publication.slug}`}>
+                    <Link to={`/find-statistics/${data.publication.slug}`}>
                       {data.publication.title}
                     </Link>{' '}
                   </li>

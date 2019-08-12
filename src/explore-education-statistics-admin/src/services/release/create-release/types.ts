@@ -1,6 +1,6 @@
-import { BaseReleaseSetupDetailsRequest } from '@admin/services/release/types';
+import { BaseReleaseSummaryDetailsRequest } from '@admin/services/release/types';
 
-export interface CreateReleaseRequest extends BaseReleaseSetupDetailsRequest {
+export interface CreateReleaseRequest extends BaseReleaseSummaryDetailsRequest {
   publicationId: string;
   templateReleaseId?: string;
 }

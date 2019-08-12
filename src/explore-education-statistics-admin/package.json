@@ -181,7 +181,6 @@
     "last 1 version"
   ],
   "dependencies": {
-    "axios-mock-adapter": "^1.17.0",
     "lodash": "^4.17.13",
     "whatwg-fetch": "^3.0.0"
   }

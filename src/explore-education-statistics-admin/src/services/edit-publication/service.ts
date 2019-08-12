@@ -1,11 +1,6 @@
 import { ContactDetails, IdTitlePair } from '@admin/services/common/types';
 import { CreatePublicationRequest } from '@admin/services/edit-publication/types';
-import { createClient } from '@admin/services/util/service';
-import mocks from './mock/mock-service';
-
-const apiClient = createClient({
-  mockBehaviourRegistrar: mocks,
-});
+import client from '@admin/services/util/service';
 
 export interface PublicationService {
   getMethodologies: () => Promise<IdTitlePair[]>;
@@ -15,21 +10,17 @@ export interface PublicationService {
 
 const service: PublicationService = {
   getMethodologies(): Promise<IdTitlePair[]> {
-    return apiClient.then(client =>
-      client.get<IdTitlePair[]>('/methodologies'),
-    );
+    return client.get<IdTitlePair[]>('/methodologies');
   },
   getPublicationAndReleaseContacts(): Promise<ContactDetails[]> {
-    return apiClient.then(client => client.get<ContactDetails[]>('/contacts'));
+    return client.get<ContactDetails[]>('/contacts');
   },
   createPublication(createRequest) {
-    return apiClient.then(client =>
-      client.post(`/topic/${createRequest.topicId}/publications`, {
-        title: createRequest.publicationTitle,
-        contactId: createRequest.selectedContactId,
-        methodologyId: createRequest.selectedMethodologyId,
-      }),
-    );
+    return client.post(`/topic/${createRequest.topicId}/publications`, {
+      title: createRequest.publicationTitle,
+      contactId: createRequest.selectedContactId,
+      methodologyId: createRequest.selectedMethodologyId,
+    });
   },
 };
 

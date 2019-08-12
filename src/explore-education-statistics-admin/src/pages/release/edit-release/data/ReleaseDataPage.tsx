@@ -1,46 +1,35 @@
-import service from '@admin/services/common/service';
-import { IdTitlePair } from '@admin/services/common/types';
+import ManageReleaseContext, {
+  ManageRelease,
+} from '@admin/pages/release/ManageReleaseContext';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import React, { useEffect, useState } from 'react';
-import { RouteComponentProps } from 'react-router';
-import ReleasePageTemplate from '../components/ReleasePageTemplate';
+import React, { useContext } from 'react';
 import ReleaseDataUploadsSection from './ReleaseDataUploadsSection';
 import ReleaseFileUploadsSection from './ReleaseFileUploadsSection';
 
-interface MatchProps {
-  releaseId: string;
-}
-
-const ReleaseDataPage = ({ match }: RouteComponentProps<MatchProps>) => {
-  const { releaseId } = match.params;
-  const [publicationDetails, setPublicationDetails] = useState<IdTitlePair>();
-
-  useEffect(() => {
-    service
-      .getPublicationDetailsForRelease(releaseId)
-      .then(setPublicationDetails);
-  }, [releaseId]);
+const ReleaseDataPage = () => {
+  const { publication, releaseId } = useContext(
+    ManageReleaseContext,
+  ) as ManageRelease;
 
   return (
     <>
-      {publicationDetails && (
-        <ReleasePageTemplate
-          publicationTitle={publicationDetails.title}
-          releaseId={releaseId}
-        >
-          <h3>Data uploads</h3>
+      <h3>Data uploads</h3>
 
-          <Tabs id="dataUploadTab">
-            <TabsSection id="data-upload" title="Data uploads">
-              <ReleaseDataUploadsSection releaseId={releaseId} />
-            </TabsSection>
-            <TabsSection id="file-upload" title="File uploads">
-              <ReleaseFileUploadsSection releaseId={releaseId} />
-            </TabsSection>
-          </Tabs>
-        </ReleasePageTemplate>
-      )}
+      <Tabs id="dataUploadTab">
+        <TabsSection id="data-upload" title="Data uploads">
+          <ReleaseDataUploadsSection
+            publicationId={publication.id}
+            releaseId={releaseId}
+          />
+        </TabsSection>
+        <TabsSection id="file-upload" title="File uploads">
+          <ReleaseFileUploadsSection
+            publicationId={publication.id}
+            releaseId={releaseId}
+          />
+        </TabsSection>
+      </Tabs>
     </>
   );
 };

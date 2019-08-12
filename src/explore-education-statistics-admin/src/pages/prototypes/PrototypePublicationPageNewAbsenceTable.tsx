@@ -46,15 +46,15 @@ const PublicationDataPage = () => {
         </ul>
         <div className="govuk-tabs__panel">
           <h2 className="govuk-heading-">
-            Create data blocks for this release
+            Create a data block for this release
           </h2>
 
           <p className="govuk-body">
-            Choose which data file you want to use from your uploaded files and
-            then use filters to create your data blocks.
+            Choose the data you want to use from your uploaded files and then
+            use filters to create your data block.
           </p>
 
-          <h2 className="govuk-heading-m">1. Choose data file</h2>
+          <h2 className="govuk-heading-m">1. Choose data</h2>
           {window.location.search === '?status=step1' && (
             <form method="get">
               <fieldset className="govuk-fieldset govuk-!-margin-bottom-6">
@@ -127,7 +127,7 @@ const PublicationDataPage = () => {
                 </dd>
                 <dd className="govuk-summary-list__actions">
                   <Link to="publication-create-new-absence-table?status=step1">
-                    Change file
+                    Change
                   </Link>
                 </dd>
               </div>
@@ -195,7 +195,7 @@ const PublicationDataPage = () => {
                 <dd className="govuk-summary-list__value">National</dd>
                 <dd className="govuk-summary-list__actions">
                   <Link to="publication-create-new-absence-table?status=step2">
-                    Change location
+                    Change
                   </Link>
                 </dd>
               </div>
@@ -263,16 +263,16 @@ const PublicationDataPage = () => {
             <>
               <dl className="govuk-summary-list govuk-!-margin-0 govuk-summary-list--no-border">
                 <div className="govuk-summary-list__row">
-                  <dt className="govuk-summary-list__key">Start date</dt>
+                  <dt className="govuk-summary-list__key">Start</dt>
                   <dd className="govuk-summary-list__value">2012 to 2013</dd>
                   <dd className="govuk-summary-list__actions" />
                 </div>
                 <div className="govuk-summary-list__row">
-                  <dt className="govuk-summary-list__key">End date</dt>
+                  <dt className="govuk-summary-list__key">End</dt>
                   <dd className="govuk-summary-list__value">2016 to 2017</dd>
                   <dd className="govuk-summary-list__actions">
                     <Link to="publication-create-new-absence-table?status=step3">
-                      Change time period
+                      Change
                     </Link>
                   </dd>
                 </div>
@@ -290,7 +290,7 @@ const PublicationDataPage = () => {
               <h3 className="govuk-heading-s">
                 Categories
                 <span className="govuk-hint">
-                  Select at least one option from each category
+                  Select at least one from each category
                 </span>
               </h3>
 
@@ -333,7 +333,7 @@ const PublicationDataPage = () => {
                 to="publication-create-new-absence-table?status=step5"
                 className="govuk-button govuk-!-margin-right-5"
               >
-                Create table
+                Create data block
               </Link>
               <Link
                 to="publication-create-new-absence-table?status=step3"
@@ -344,7 +344,7 @@ const PublicationDataPage = () => {
             </>
           )}
           <hr />
-          <h2 className="govuk-heading-m">5. View and save data blocks</h2>
+          <h2 className="govuk-heading-m">5. View and save data block</h2>
           {['?status=step5'].includes(window.location.search) && (
             <>
               <PrototypeAdminExampleTables task="edit" />
@@ -389,13 +389,13 @@ const PublicationDataPage = () => {
               <FormGroup>
                 <p className="govuk-body">
                   Name and save your data block before viewing it under the
-                  ‘View data blocks tab’ at the top of this page.
+                  'View data blocks' tab at the top of this page.
                 </p>
 
                 <FormTextInput
                   id="save-table"
                   name="save-table"
-                  label="Name data blocks"
+                  label="Name data block"
                   value="Absence highlights panel"
                   width={20}
                 />

@@ -10,12 +10,12 @@ Suite Teardown    user closes the browser
 Navigate to Pupil absence in schools in England methodology page
     [Tags]  HappyPath
     environment variable should be set  PUBLIC_URL
-    user goes to url   %{PUBLIC_URL}/methodologies
-    user waits until page contains element   xpath://h1[text()="Methodologies"]
+    user goes to url   %{PUBLIC_URL}/methodology
+    user waits until page contains heading   Methodologies
     user opens accordion section  Pupils and schools
     user opens details dropdown   Pupil absence
     user clicks link    Pupil absence statistics: methodology
-    user waits until page contains element   xpath://h1[text()="Pupil absence statistics: methodology"]
+    user waits until page contains heading   Pupil absence statistics: methodology
 
 Validate Published date, Last updated date
     [Tags]  HappyPath

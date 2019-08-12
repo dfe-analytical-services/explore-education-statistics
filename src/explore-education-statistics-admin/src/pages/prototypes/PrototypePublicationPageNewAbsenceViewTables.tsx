@@ -32,7 +32,7 @@ const PublicationDataPage = () => {
               to="/prototypes/publication-create-new-absence-table"
               className="govuk-tabs__tab"
             >
-              Create tables and charts
+              Create data blocks
             </Link>
           </li>
           <li className="govuk-tabs__list-item">

@@ -16,7 +16,7 @@ Get temporary email address
 Go to Absence publication page
     [Tags]  UnderConstructions
     environment variable should be set  PUBLIC_URL
-    user goes to url  %{PUBLIC_URL}/statistics/pupil-absence-in-schools-in-england
+    user goes to url  %{PUBLIC_URL}/find-statistics/pupil-absence-in-schools-in-england
     user checks element contains  css:body   Pupil absence data and statistics for schools in England
 
 Request subscription to Absence publication

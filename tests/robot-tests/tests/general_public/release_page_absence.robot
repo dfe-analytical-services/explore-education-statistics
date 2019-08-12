@@ -24,7 +24,7 @@ Navigate to Absence publication
 Validate URL
     [Documentation]  DFE-325
     [Tags]  HappyPath
-    user checks url contains  %{PUBLIC_URL}/statistics/pupil-absence-in-schools-in-england
+    user checks url contains  %{PUBLIC_URL}/find-statistics/pupil-absence-in-schools-in-england
 
 Validate Published date, Next update date, and Email alerts link
     [Tags]     HappyPath
@@ -61,13 +61,13 @@ Validate "About these statistics" -- "Last updated"
 
 Validate "Related guidance"
     [Tags]  HappyPath
-    user checks page contains link with text and url  Pupil absence in schools in England: methodology   /methodologies/pupil-absence-in-schools-in-england
+    user checks page contains link with text and url  Pupil absence in schools in England: methodology   /methodology/pupil-absence-in-schools-in-england
 
 Validate subject files file type and file unit style
     [Documentation]  DFE-958
-    [Tags]  HappyPath   NotAgainstLocal   Failing
+    [Tags]  HappyPath   NotAgainstLocal
     user opens details dropdown     Download data files
-    user checks page contains      Absence in prus (CSV, 151KB)
+    user checks page contains      Absence in prus (csv, 141 Kb)
     user closes details dropdown     Download data files
 
 Validate absence_in_prus.csv file can be downloaded

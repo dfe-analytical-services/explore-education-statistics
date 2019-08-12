@@ -32,6 +32,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return _context.Releases.FirstOrDefault(x => x.Slug == slug);
         }
+        
+        public async Task<Release> GetAsync(ReleaseId id)
+        {
+            return await _context.Releases.FirstOrDefaultAsync(x => x.Id == id);
+        }
 
         public List<Release> List()
         {
@@ -63,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 TimePeriodCoverage = createRelease.TimePeriodCoverage,
                 PublishScheduled = createRelease.PublishScheduled,
                 ReleaseName = createRelease.ReleaseName,
-                NextReleaseDate = createRelease.NextReleaseExpected,
+                NextReleaseDate = createRelease.NextReleaseDate,
                 Content = content
             });
             await _context.SaveChangesAsync();
