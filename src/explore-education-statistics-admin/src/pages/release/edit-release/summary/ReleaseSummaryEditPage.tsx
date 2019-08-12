@@ -51,10 +51,10 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
     <>
       {releaseSummaryDetails && (
         <>
-          <h2 className="govuk-heading-m">Edit release setup</h2>
+          <h2 className="govuk-heading-m">Edit release summary</h2>
 
           <ReleaseSummaryForm
-            submitButtonText="Update release status"
+            submitButtonText="Update release summary"
             initialValuesSupplier={(
               _: TimePeriodCoverageGroup[],
             ): EditFormValues => ({

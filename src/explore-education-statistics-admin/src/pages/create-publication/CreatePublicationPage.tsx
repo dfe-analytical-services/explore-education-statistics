@@ -191,7 +191,7 @@ const CreatePublicationPage = ({
                   </SummaryList>
                 )}
                 <Button type="submit" className="govuk-!-margin-top-6">
-                  Continue
+                  Create publication
                 </Button>
                 <div className="govuk-!-margin-top-6">
                   <Link to="#" onClick={cancelHandler}>
