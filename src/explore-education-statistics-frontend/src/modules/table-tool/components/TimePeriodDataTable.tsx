@@ -13,17 +13,11 @@ import TimePeriod from '@frontend/modules/table-tool/components/types/TimePeriod
 import DataTableCaption from './DataTableCaption';
 import FixedMultiHeaderDataTable from './FixedMultiHeaderDataTable';
 import { TableHeadersFormValues } from './TableHeadersForm';
+import { FullTableSubjectMeta } from './types/FullTable';
 
-interface Props {
-  indicators: Indicator[];
-  filters: Dictionary<CategoryFilter[]>;
-  timePeriods: TimePeriod[];
-  publicationName: string;
-  subjectName: string;
-  locations: LocationFilter[];
+interface Props extends FullTableSubjectMeta {
   results: TableData['result'];
-  footnotes?: TableData['footnotes'];
-  tableHeadersConfig: TableHeadersFormValues;
+  tableHeadersConfig?: TableHeadersFormValues;
 }
 
 const TimePeriodDataTable = forwardRef<HTMLElement, Props>(

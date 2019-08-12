@@ -1,10 +1,11 @@
-import { dataApi } from './api';
+import { dataApi } from '@common/services/api';
+import FullTable from '@frontend/modules/table-tool/components/types/FullTable';
 
 export interface Permalink {
   id: string;
   title: string;
   created: string;
-  data: string;
+  fullTable: FullTable;
 }
 
 export default {

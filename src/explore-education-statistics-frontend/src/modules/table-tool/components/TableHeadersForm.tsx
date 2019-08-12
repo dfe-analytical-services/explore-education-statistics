@@ -25,6 +25,35 @@ export interface TableHeadersFormValues {
   rows: SortableOption[];
 }
 
+const removeSiblinglessTotalRows = (
+  categoryFilters: Dictionary<CategoryFilter[]>,
+): CategoryFilter[][] => {
+  return Object.values(categoryFilters).filter(filter => {
+    return filter.length > 1 || !filter[0].isTotal;
+  });
+};
+
+export const returnDefaultTableHeaderConfig = (
+  indicators: Indicator[],
+  filters: Dictionary<CategoryFilter[]>,
+  timePeriods: TimePeriod[],
+  locations: LocationFilter[],
+) => {
+  const sortedFilters = sortBy(
+    [...removeSiblinglessTotalRows(filters), locations],
+    [options => options.length],
+  );
+
+  const halfwayIndex = Math.floor(sortedFilters.length / 2);
+
+  return {
+    columnGroups: sortedFilters.slice(0, halfwayIndex),
+    rowGroups: sortedFilters.slice(halfwayIndex),
+    columns: timePeriods,
+    rows: indicators,
+  };
+};
+
 const TableHeadersForm = (props: Props) => {
   const { onSubmit, initialValues } = props;
 

@@ -1,10 +1,13 @@
 import FormattedDate from '@common/components/FormattedDate';
-import permalinkService, { Permalink } from '@common/services/permalinkService';
+import permalinkService, {
+  Permalink,
+} from '@frontend/services/permalinkService';
 import ButtonLink from '@frontend/components/ButtonLink';
 import Page from '@frontend/components/Page';
 import PrintThisPage from '@frontend/components/PrintThisPage';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
+import TimePeriodDataTable from '../table-tool/components/TimePeriodDataTable';
 
 interface Props {
   permalink: string;
@@ -31,6 +34,7 @@ class PermalinkPage extends Component<Props> {
 
   public render() {
     const { data } = this.props;
+    const { fullTable } = data;
     return (
       <Page
         title={data.title}
@@ -59,100 +63,15 @@ class PermalinkPage extends Component<Props> {
           </div>
         </div>
 
-        <table className="govuk-table">
-          <caption className="govuk-heading-s">Example table</caption>
-          <thead className="govuk-table__head">
-            <tr>
-              <th className="govuk-table__header" />
-              <th
-                className="govuk-table__header govuk-table__cell--numeric"
-                scope="col"
-              >
-                2012/13
-              </th>
-              <th
-                className="govuk-table__header govuk-table__cell--numeric"
-                scope="col"
-              >
-                2013/14
-              </th>
-              <th
-                className="govuk-table__header govuk-table__cell--numeric"
-                scope="col"
-              >
-                2014/15
-              </th>
-              <th
-                className="govuk-table__header govuk-table__cell--numeric"
-                scope="col"
-              >
-                2015/16
-              </th>
-              <th
-                className="govuk-table__header govuk-table__cell--numeric"
-                scope="col"
-              >
-                2016/17
-              </th>
-            </tr>
-          </thead>
-          <tbody className="govuk-table__body">
-            <tr className="govuk-table__row ">
-              <th className="govuk-table__header">Unauthorised absence rate</th>
-              <td className="govuk-table__cell govuk-table__cell--numeric">
-                1.1
-              </td>
-              <td className="govuk-table__cell govuk-table__cell--numeric">
-                1.1
-              </td>
-              <td className="govuk-table__cell govuk-table__cell--numeric">
-                1.1
-              </td>
-              <td className="govuk-table__cell govuk-table__cell--numeric">
-                1.1
-              </td>
-              <td className="govuk-table__cell govuk-table__cell--numeric">
-                1.3
-              </td>
-            </tr>
-            <tr className="govuk-table__row ">
-              <th className="govuk-table__header">Overall absence rate</th>
-              <td className="govuk-table__cell govuk-table__cell--numeric">
-                5.3
-              </td>
-              <td className="govuk-table__cell govuk-table__cell--numeric">
-                4.5
-              </td>
-              <td className="govuk-table__cell govuk-table__cell--numeric">
-                4.6
-              </td>
-              <td className="govuk-table__cell govuk-table__cell--numeric">
-                4.6
-              </td>
-              <td className="govuk-table__cell govuk-table__cell--numeric">
-                4.7
-              </td>
-            </tr>
-            <tr className="govuk-table__row ">
-              <th className="govuk-table__header">Authorised absence rate</th>
-              <td className="govuk-table__cell govuk-table__cell--numeric">
-                4.2
-              </td>
-              <td className="govuk-table__cell govuk-table__cell--numeric">
-                3.5
-              </td>
-              <td className="govuk-table__cell govuk-table__cell--numeric">
-                3.5
-              </td>
-              <td className="govuk-table__cell govuk-table__cell--numeric">
-                3.4
-              </td>
-              <td className="govuk-table__cell govuk-table__cell--numeric">
-                3.4
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <TimePeriodDataTable
+          {...fullTable.subjectMeta}
+          results={fullTable.results}
+          tableHeadersConfig={
+            fullTable.configurations &&
+            fullTable.configurations.tableHeadersConfig
+          }
+        />
+
         <p className="govuk-body-s">Source: DfE prototype example statistics</p>
         <h2 className="govuk-heading-m govuk-!-margin-top-9">
           Create your own tables online
