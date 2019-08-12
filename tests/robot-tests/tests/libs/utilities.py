@@ -45,6 +45,32 @@ def user_checks_accordion_is_in_position(header_starts_with, position):
   if not elem.text.startswith(header_starts_with):
     raise AssertionError(f'Accordion in position {position} expected start with text "{header_starts_with}". Actual found text: "{elem.text}"')
 
+def user_verifies_accordion_is_open(section_text):
+  try:
+    sl.driver \
+      .find_element_by_xpath(f'//*[@class="govuk-accordion__section-button" and text()="{section_text}"]')
+  except NoSuchElementException:
+    raise AssertionError(f'Cannot find accordion with header {section_text}')
+
+  try:
+    sl.driver \
+      .find_element_by_xpath(f'//*[@class="govuk-accordion__section-button" and text()="{section_text}" and @aria-expanded="true"]')
+  except NoSuchElementException:
+    raise AssertionError(f'Accordion section "{section_text}" should have attribute aria-expanded="true"')
+
+def user_verifies_accordion_is_closed(section_text):
+  try:
+    sl.driver \
+      .find_element_by_xpath(f'//*[@class="govuk-accordion__section-button" and text()="{section_text}"]')
+  except NoSuchElementException:
+    raise AssertionError(f'Cannot find accordion with header {section_text}')
+
+  try:
+    sl.driver \
+      .find_element_by_xpath(f'//*[@class="govuk-accordion__section-button" and text()="{section_text}" and @aria-expanded="false"]')
+  except NoSuchElementException:
+    raise AssertionError(f'Accordion section "{section_text}" should have attribute aria-expanded="false"')
+
 def user_opens_accordion_section(exact_section_text):
   try:
     sl.driver\
