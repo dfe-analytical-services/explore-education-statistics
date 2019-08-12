@@ -72,12 +72,16 @@ class SubscriptionPage extends Component<Props> {
     const { data, slug, unsubscribed, verified } = this.props;
 
     let message;
+    let title;
 
     if (unsubscribed) {
+      title = 'Unsubscribed';
       message = 'You have successfully unsubscribed from these updates.';
     } else if (verified) {
+      title = 'Subscription verified';
       message = 'You have successfully subscribed to these updates.';
     } else if (subscribed) {
+      title = 'Subscribed';
       message = 'Thank you. Check your email to confirm your subscription.';
     }
 
@@ -90,16 +94,20 @@ class SubscriptionPage extends Component<Props> {
           { name: data.title, link: `/find-statistics/${slug}` },
         ]}
       >
-        <p>Subscribe to receive updates when:</p>
-        <ul className="govuk-list govuk-list--bullet">
-          <li>new statistics and data are released</li>
-          <li>existing statistics and data are changed or corrected</li>
-        </ul>
-
-        {message ? (
-          <p>{message}</p>
+        {unsubscribed ? (
+          <>
+            <p>Subscribe to receive updates when:</p>
+            <ul className="govuk-list govuk-list--bullet">
+              <li>new statistics and data are released</li>
+              <li>existing statistics and data are changed or corrected</li>
+            </ul>
+            <SubscriptionForm onSubmit={this.handleFormSubmit} />
+          </>
         ) : (
-          <SubscriptionForm onSubmit={this.handleFormSubmit} />
+          <div className="govuk-panel govuk-panel--confirmation">
+            <h2 className="govuk-panel__title">{title}</h2>
+            <div className="govuk-panel__body">{message}</div>
+          </div>
         )}
       </Page>
     );
