@@ -149,7 +149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
         public async Task<ActionResult<EditReleaseSummaryViewModel>> GetReleaseSummaryAsync(ReleaseId releaseId)
         {
-            return await _releaseService.GetReleaseSummaryAsync(releaseId);
+            return  Ok(await _releaseService.GetReleaseSummaryAsync(releaseId));
         }
 
         [HttpPut("releases/{releaseId}/summary")]
@@ -169,7 +169,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<List<ReleaseViewModel>>> GetReleaseForPublicationAsync(
             [Required] PublicationId publicationId)
         {
-            return await _releaseService.GetReleasesForPublicationAsync(publicationId);
+            return Ok(await _releaseService.GetReleasesForPublicationAsync(publicationId));
         }
 
         [HttpDelete("release/{releaseId}/data/{fileName}")]
