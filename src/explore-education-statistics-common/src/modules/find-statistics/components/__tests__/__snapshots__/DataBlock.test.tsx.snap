@@ -98,6 +98,7 @@ exports[`DataBlock renders map instead of chart 1`] = `
           >
             <span
               class="rate0"
+              style="background-color: rgb(63, 0, 0);"
             >
                
             </span>
@@ -105,7 +106,7 @@ exports[`DataBlock renders map instead of chart 1`] = `
             -3.0
             %
               to 
-            -3.0
+            -2.8
             %
              
           </dd>
@@ -114,14 +115,15 @@ exports[`DataBlock renders map instead of chart 1`] = `
           >
             <span
               class="rate1"
+              style="background-color: rgb(111, 0, 0);"
             >
                
             </span>
              
-            -3.0
+            -2.8
             %
               to 
-            -3.0
+            -2.5
             %
              
           </dd>
@@ -130,14 +132,15 @@ exports[`DataBlock renders map instead of chart 1`] = `
           >
             <span
               class="rate2"
+              style="background-color: rgb(159, 0, 0);"
             >
                
             </span>
              
-            -3.0
+            -2.5
             %
               to 
-            -3.0
+            -2.3
             %
              
           </dd>
@@ -146,14 +149,15 @@ exports[`DataBlock renders map instead of chart 1`] = `
           >
             <span
               class="rate3"
+              style="background-color: rgb(207, 0, 0);"
             >
                
             </span>
              
-            -3.0
+            -2.3
             %
               to 
-            -3.0
+            -2.0
             %
              
           </dd>
@@ -162,14 +166,15 @@ exports[`DataBlock renders map instead of chart 1`] = `
           >
             <span
               class="rate4"
+              style="background-color: rgb(255, 0, 0);"
             >
                
             </span>
              
-            -3.0
+            -2.0
             %
               to 
-            -3.0
+            -1.8
             %
              
           </dd>

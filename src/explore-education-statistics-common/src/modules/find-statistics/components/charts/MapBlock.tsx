@@ -32,6 +32,7 @@ type MapBlockProperties = DataBlockGeoJsonProperties & {
   color: string;
   measures: string[];
   className: string;
+  layer: Layer;
 };
 
 export type MapFeature = Feature<Geometry, MapBlockProperties>;
@@ -60,7 +61,7 @@ interface MapClickEvent extends LeafletMouseEvent {
   };
 }
 
-//<editor-fold desc="Static functions">
+// <editor-fold desc=" Static functions">
 function getLocationsForDataSet(
   data: DataBlockData,
   meta: DataBlockMetadata,
@@ -143,14 +144,10 @@ function generateGeometryAndLegendForSelectedOptions(
 
   const {min, max, range, scale} = calculateMinAndScaleForSourceData(sourceData);
 
-  console.log(min,max,range,scale);
-
   const legend: LegendEntry[] = [...Array(5)].map((_, idx) => {
     const i = idx / 4;
 
     const minValue = i;
-
-    console.log(minValue);
 
     return {
       minValue,
@@ -175,6 +172,7 @@ function registerResizingCheck(
   container: HTMLDivElement,
   callback: () => void,
 ): IntersectionObserver {
+
   const intersectionObserver = new IntersectionObserver(
     entries => {
       if (entries.length > 0) {
@@ -196,6 +194,7 @@ function getFeatureElementById(
   id: string,
   geometry?: FeatureCollection<Geometry, DataBlockGeoJsonProperties>,
 ): { element?: Element; layer?: Path; feature?: Feature } {
+
   if (geometry) {
     const selectedFeature = geometry.features.find(
       feature => feature.id === id,
@@ -233,7 +232,7 @@ function calculateColour({
   return scaled;
 }
 
-//</editor-fold>
+// </editor-fold>
 
 const MapBlock = ({
   data,
@@ -271,57 +270,21 @@ const MapBlock = ({
 
   const [chartData, setChartData] = React.useState<ChartDataB[]>([]);
 
-  React.useEffect(() => {
-
-    setDataSetOptions(axes.major.dataSets.map((dataSet, index) => {
-      const dataKey = generateKeyFromDataSet(dataSet, axes.major.groupBy);
-
-      return {...labels[dataKey], value: index};
-    }));
-
-  }, [axes.major.dataSets, axes.major.groupBy, labels]);
-
-  React.useEffect(() => {
-
-    if (geoJsonRef.current) {
-      geoJsonRef.current.leafletElement.clearLayers();
-      if (geometry) {
-        geoJsonRef.current.leafletElement.addData(geometry);
-      }
-    }
-  }, [geoJsonRef, geometry]);
-
-  React.useEffect(() => {
-    const {
-      geometry: newGeometry,
-      legend: newLegend,
-    } = generateGeometryAndLegendForSelectedOptions(
-      meta,
-      labels,
-      chartData,
-      selectedDataSetKey,
-    );
-
-    setGeometry(newGeometry);
-    setLegend(newLegend);
-  }, [chartData, meta, labels, selectedDataSetKey]);
-
-  React.useEffect(() => {
-    const generatedChartData = createDataForAxis(axes.major, data.result, meta);
-    setChartData(generatedChartData);
-
-    setMajorOptions(getLocationsForDataSet(data, meta, generatedChartData));
-  }, [data, axes, meta]);
-
+  // initialise
   React.useEffect(() => {
     import('@common/services/UKGeoJson').then(imported => {
       setUkGeometry(imported.default);
     });
+  }, [container.current]);
+
+  React.useEffect(() => {
+
 
     if (container.current) {
       intersectionObserver.current = registerResizingCheck(
         container.current,
         () => {
+
           if (mapRef.current) {
             const {current} = mapRef;
             requestAnimationFrame(() => {
@@ -339,10 +302,43 @@ const MapBlock = ({
     };
   }, [container, mapRef]);
 
-  const onSelectIndicator = (selectedDatasetIndex: number) => {
-    const selectedDataSet = axes.major.dataSets[selectedDatasetIndex];
-    const newSelectedDataSetKey = generateKeyFromDataSet(selectedDataSet);
+  // initialise on prop changes
+  React.useEffect(() => {
+    const generatedChartData = createDataForAxis(axes.major, data.result, meta);
+    setChartData(generatedChartData);
 
+    setMajorOptions(getLocationsForDataSet(data, meta, generatedChartData));
+  }, [data, axes, meta]);
+
+
+  React.useEffect(() => {
+    setDataSetOptions(axes.major.dataSets.map((dataSet, index) => {
+      const dataKey = generateKeyFromDataSet(dataSet, axes.major.groupBy);
+      return {...labels[dataKey], value: index};
+    }));
+
+  }, [axes.major.dataSets, axes.major.groupBy, labels]);
+
+
+  React.useEffect(() => {
+    if (geoJsonRef.current) {
+      geoJsonRef.current.leafletElement.clearLayers();
+
+      if (geometry) {
+        geoJsonRef.current.leafletElement.addData(geometry);
+      }
+    }
+
+  }, [geometry]);
+
+  React.useEffect(() => {
+    if (mapRef.current) {
+      mapRef.current.leafletElement.invalidateSize();
+    }
+  }, [width, height]);
+
+  // Selected data set change
+  React.useEffect(() => {
     const {
       geometry: newGeometry,
       legend: newLegend,
@@ -350,68 +346,76 @@ const MapBlock = ({
       meta,
       labels,
       chartData,
-      newSelectedDataSetKey,
+      selectedDataSetKey,
     );
 
     setGeometry(newGeometry);
-
     setLegend(newLegend);
+  }, [chartData, meta, labels, selectedDataSetKey]);
 
-    setMajorOptions(getLocationsForDataSet(data, meta, chartData));
 
+  const onSelectIndicator = (selectedDatasetIndex: number) => {
     setSelectedDataSetIndex(selectedDatasetIndex);
-    setSelectedDataSetKey(newSelectedDataSetKey);
+    setSelectedDataSetKey(generateKeyFromDataSet(axes.major.dataSets[selectedDatasetIndex]));
   };
 
-  const selectLocationOption = (locationValue: string) => {
-    let calculatedResults: IdValue[] = [];
+  const updateSelectedLocation = (newSelectedLocation: string, panTo: boolean = true) => {
 
-    const {element: currentSelectedLocationElement} = getFeatureElementById(
-      selectedLocation,
-      geometry,
-    );
+    const oldSelectedLocation = selectedLocation;
 
-    if (currentSelectedLocationElement) {
-      currentSelectedLocationElement.classList.remove(styles.selected);
+    if (oldSelectedLocation) {
+      const {element: oldSelectedLocationElement} = getFeatureElementById(
+        oldSelectedLocation,
+        geometry,
+      );
+
+      if (oldSelectedLocationElement) {
+        oldSelectedLocationElement.classList.remove(styles.selected);
+      }
     }
 
-    const {
-      layer: selectedLayer,
-      element: selectedLocationElement,
-      feature: selectedFeature,
-    } = getFeatureElementById(locationValue, geometry);
+    if (oldSelectedLocation !== newSelectedLocation) {
 
-    if (selectedLocationElement && selectedLayer && selectedFeature) {
-      selectedLocationElement.classList.add(styles.selected);
+      let calculatedResults: IdValue[] = [];
 
-      if (mapRef.current) {
-        const polyLine: Polyline = selectedLayer as Polyline;
+      const {
+        layer: selectedLayer,
+        element: selectedLocationElement,
+        feature: selectedFeature,
+      } = getFeatureElementById(newSelectedLocation, geometry);
 
-        mapRef.current.leafletElement.fitBounds(polyLine.getBounds(), {
-          padding: [200, 200],
-        });
+      if (selectedLocationElement && selectedLayer && selectedFeature) {
+        selectedLocationElement.classList.add(styles.selected);
         selectedLayer.bringToFront();
+
+        if (mapRef.current && panTo) {
+          const polyLine: Polyline = selectedLayer as Polyline;
+          mapRef.current.leafletElement.fitBounds(polyLine.getBounds());
+        }
+
+        const {properties} = selectedFeature;
+
+        if (properties) {
+          // eslint-disable-next-line prefer-destructuring
+          const measures: { [key: string]: string } = properties.measures;
+
+          calculatedResults = Object.entries(measures).reduce(
+            (r: IdValue[], [id, value]) => [...r, {id, value}],
+            [],
+          );
+
+
+        }
       }
-
-      const {properties} = selectedFeature;
-
-      if (properties) {
-        // eslint-disable-next-line prefer-destructuring
-        const measures: { [key: string]: string } = properties.measures;
-
-        calculatedResults = Object.entries(measures).reduce(
-          (r: IdValue[], [id, value]) => [...r, {id, value}],
-          [],
-        );
-      }
+      setResults(calculatedResults);
     }
 
-    setSelectedLocation(locationValue);
+    setSelectedLocation(newSelectedLocation);
 
-    setResults(calculatedResults);
   };
 
   const onEachFeature = (feature: MapFeature, featureLayer: Path) => {
+
     if (feature.properties) {
       // eslint-disable-next-line no-param-reassign
       feature.properties.layer = featureLayer;
@@ -424,6 +428,7 @@ const MapBlock = ({
       ),
     });
 
+    /*
     featureLayer.bindTooltip(() => {
       if (feature.properties) {
         const content = Object.entries(feature.properties.measures).map(
@@ -440,13 +445,15 @@ const MapBlock = ({
       }
       return '';
     });
+     */
   };
 
   const onClick = (e: MapClickEvent) => {
     const {feature} = e.sourceTarget;
 
-    if (feature.properties) {
-      selectLocationOption(feature.properties.code);
+    if (feature.properties && feature.properties.code) {
+
+      updateSelectedLocation(feature.properties.code);
     }
   };
 
@@ -485,14 +492,14 @@ const MapBlock = ({
               id="selectedLocation"
               label="Select a location"
               value={selectedLocation}
-              onChange={e => selectLocationOption(e.currentTarget.value)}
+              onChange={e => updateSelectedLocation(e.currentTarget.value)}
               options={majorOptions}
               order={[]}
             />
           </div>
         </form>
 
-        {results.length > 0 ? (
+        {results.length > 0 && (
           <div>
             {results.map(result => (
               <div
@@ -514,8 +521,6 @@ const MapBlock = ({
               </div>
             ))}
           </div>
-        ) : (
-          ''
         )}
 
         {selectedDataSetKey && labels && labels[selectedDataSetKey] && (
@@ -548,19 +553,19 @@ const MapBlock = ({
       </div>
 
       <div className={classNames('govuk-grid-column-two-thirds')}>
-        <Map
-          ref={mapRef}
-          style={{
-            width: (width && `${width}px`) || '100%',
-            height: `${height || 600}px`,
-          }}
-          className={classNames(styles.map, 'dfe-print-break-avoid')}
-          center={position}
-          zoom={6.5}
-        >
-          {ukGeometry && <GeoJSON data={ukGeometry} className={styles.uk} />}
+        {geometry && (
+          <Map
+            ref={mapRef}
+            style={{
+              width: (width && `${width}px`) || '100%',
+              height: `${height || 600}px`,
+            }}
+            className={classNames(styles.map, 'dfe-print-break-avoid')}
+            center={position}
+            zoom={6.5}
+          >
+            {ukGeometry && <GeoJSON data={ukGeometry} className={styles.uk} />}
 
-          {geometry && (
             <GeoJSON
               ref={geoJsonRef}
               data={geometry}
@@ -580,8 +585,9 @@ const MapBlock = ({
               })}
               onclick={onClick}
             />
-          )}
-        </Map>
+
+          </Map>
+        )}
       </div>
     </div>
   );

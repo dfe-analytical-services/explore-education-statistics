@@ -15,7 +15,7 @@ import {
   symbols,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 
-import { SelectOption } from '@common/components/form/FormSelect';
+import {SelectOption} from '@common/components/form/FormSelect';
 
 import styles from './graph-builder.module.scss';
 
@@ -30,7 +30,7 @@ const colourOptions: SelectOption[] = colours.map(color => {
   return {
     label: color,
     value: color,
-    style: { backgroundColor: `${color}` },
+    style: {backgroundColor: `${color}`},
   };
 });
 
@@ -46,9 +46,9 @@ const symbolOptions: SelectOption[] = [
 ];
 
 const lineStyleOptions: SelectOption[] = [
-  { label: 'Solid', value: 'solid' },
-  { label: 'Dashed', value: 'dashed' },
-  { label: 'Dotted', value: 'dotted' },
+  {label: 'Solid', value: 'solid'},
+  {label: 'Dashed', value: 'dashed'},
+  {label: 'Dotted', value: 'dotted'},
 ];
 
 const ChartDataConfiguration = ({
@@ -67,6 +67,11 @@ const ChartDataConfiguration = ({
 
   return (
     <div className={styles.chartDataConfiguration}>
+      <datalist id="chartdataconfiguration_colours">
+        {colourOptions.map(({value}) => (
+          <option key={value} value={value} />
+        ))}
+      </datalist>
       <FormFieldset id={configuration.value} legend="" legendHidden>
         <div className={styles.chartDataLabelConfiguration}>
           <div className={styles.chartDataItem}>
@@ -85,10 +90,11 @@ const ChartDataConfiguration = ({
           </div>
 
           <div className={styles.chartDataItem}>
-            <FormSelect
+            <FormTextInput
               id="colour"
               name="colour"
               label="Colour"
+              type="color"
               value={configuration.colour}
               onChange={e =>
                 updateConfig({
@@ -96,7 +102,7 @@ const ChartDataConfiguration = ({
                   colour: e.target.value,
                 })
               }
-              options={colourOptions}
+              list="chartdataconfiguration_colours"
             />
           </div>
 

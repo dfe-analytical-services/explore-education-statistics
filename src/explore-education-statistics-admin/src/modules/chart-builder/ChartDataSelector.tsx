@@ -1,7 +1,7 @@
 import ChartDataConfiguration from '@admin/modules/chart-builder/ChartDataConfiguration';
 import Button from '@common/components/Button';
-import { FormFieldset, FormGroup, FormSelect } from '@common/components/form';
-import { SelectOption } from '@common/components/form/FormSelect';
+import {FormFieldset, FormGroup, FormSelect} from '@common/components/form';
+import {SelectOption} from '@common/components/form/FormSelect';
 import {
   ChartCapabilities,
   ChartDefinition,
@@ -9,7 +9,7 @@ import {
   generateKeyFromDataSet,
   symbols,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
-import { DataBlockMetadata } from '@common/services/dataBlockService';
+import {DataBlockMetadata} from '@common/services/dataBlockService';
 import {
   ChartDataSet,
   DataSetConfiguration,
@@ -17,7 +17,7 @@ import {
 
 import React from 'react';
 import Details from '@common/components/Details';
-import { difference } from 'lodash';
+import {difference} from 'lodash';
 import styles from './graph-builder.module.scss';
 
 export interface SelectedData {
@@ -73,35 +73,33 @@ const ChartDataSelector = ({
       label: 'Select an indicator...',
       value: '',
     },
-    ...indicatorIds.map<SelectOption>(id => ({ ...metaData.indicators[id] })),
+    ...indicatorIds.map<SelectOption>(id => ({...metaData.indicators[id]})),
   ];
 
   const filterSelectOptions = filterIds
-    .map(ids => ids.map(id => metaData.filters[id]))
-    .reduce<SelectOption[]>(
-      (combinedFilters, next) => {
-        return [
-          ...combinedFilters,
-          {
-            label: next.map(id => id.label).join(', '),
-            value: next.map(id => id.value).join(','),
-          },
-        ];
-      },
-      [
+  .map(ids => ids.map(id => metaData.filters[id]))
+  .reduce<SelectOption[]>(
+    (combinedFilters, next) => {
+      return [
+        ...combinedFilters,
         {
-          label: 'Select a filter...',
-          value: '',
+          label: next.map(id => id.label).join(', '),
+          value: next.map(id => id.value).join(','),
         },
-      ],
-    );
+      ];
+    },
+    [
+      {
+        label: 'Select a filter...',
+        value: '',
+      },
+    ],
+  );
 
   const [selectedIndicator, setSelectedIndicator] = React.useState<string>('');
   const [selectedFilters, setSelectedFilters] = React.useState<string>('');
 
-  const [selectedList, setSelectedList] = React.useState<
-    ChartDataSetAndConfiguration[]
-  >([...selectedData]);
+  const [selectedList, setSelectedList] = React.useState<ChartDataSetAndConfiguration[]>([...selectedData]);
 
   const [alreadyAdded, setAlreadyAdded] = React.useState(false);
 
@@ -109,7 +107,7 @@ const ChartDataSelector = ({
     const filters = selectedFilters.split(',');
 
     const added =
-      selectedList.find(({ dataSet }) => {
+      selectedList.find(({dataSet}) => {
         return (
           dataSet.indicator === selectedIndicator &&
           difference(dataSet.filters, filters).length === 0
@@ -188,6 +186,7 @@ const ChartDataSelector = ({
                     ),
                     colour: colours[selectedList.length % colours.length],
                     symbol: symbols[selectedList.length % symbols.length],
+                    unit: metaData.indicators[dataSet.indicator].unit || '',
                   },
                 };
 
@@ -209,7 +208,7 @@ const ChartDataSelector = ({
             <React.Fragment
               key={`${
                 selected.dataSet.indicator
-              }_${selected.dataSet.filters.join(',')}`}
+                }_${selected.dataSet.filters.join(',')}`}
             >
               <div className={styles.selectedData}>
                 <div className={styles.selectedDataRow}>

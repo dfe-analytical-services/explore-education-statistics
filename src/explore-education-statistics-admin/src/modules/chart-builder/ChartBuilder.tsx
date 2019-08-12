@@ -254,7 +254,7 @@ const ChartBuilder = ({data}: Props) => {
       </div>
 
       {selectedChartType && (
-        <div className="govuk-width-container">
+        <Details summary="Chart preview" open>
           {renderedChartProps === undefined ? (
             <div
               className={classnames(styles.preview)}
@@ -270,7 +270,7 @@ const ChartBuilder = ({data}: Props) => {
           ) : (
             <ChartRenderer {...renderedChartProps} />
           )}
-        </div>
+        </Details>
       )}
 
       {selectedChartType && (
