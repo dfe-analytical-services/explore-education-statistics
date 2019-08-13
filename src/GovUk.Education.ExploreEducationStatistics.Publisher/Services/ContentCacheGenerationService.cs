@@ -10,7 +10,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
     public class ContentCacheGenerationService : IContentCacheGenerationService
     {
         private readonly IDownloadService _downloadService;
-        private readonly  CloudBlobClient _cloudBlobClient;
         private readonly CloudBlobContainer _cloudBlobContainer;
         
         private const string ContainerName = "cache";
@@ -18,9 +17,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public ContentCacheGenerationService(IDownloadService downloadService, CloudBlobClient cloudBlobClient)
         {
             _downloadService = downloadService;
-            _cloudBlobClient = cloudBlobClient;
             
-            _cloudBlobContainer = GetCloudBlobContainer();
+            _cloudBlobContainer = GetCloudBlobContainer(cloudBlobClient);
         }
 
         public async Task<bool> CleanAndRebuildFullCache()
@@ -51,9 +49,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await downloadTreeBlob.UploadTextAsync(JsonConvert.SerializeObject(downloadTree));
         }
 
-        private CloudBlobContainer GetCloudBlobContainer()
+        private CloudBlobContainer GetCloudBlobContainer(CloudBlobClient cloudBlobClient)
         {
-            var blobContainer = _cloudBlobClient.GetContainerReference(ContainerName);
+            var blobContainer = cloudBlobClient.GetContainerReference(ContainerName);
             blobContainer.CreateIfNotExists();
             return blobContainer;
         }
