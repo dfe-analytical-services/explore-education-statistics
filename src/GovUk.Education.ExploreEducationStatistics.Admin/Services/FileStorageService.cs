@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using MimeTypes;
+using static System.StringComparison;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
@@ -65,9 +66,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private static async Task<Either<ValidationResult,bool>> ValidateDataFilesForUpload(CloudBlobContainer blobContainer, Guid releaseId,
             IFormFile dataFile, IFormFile metaFile)
         {
-            if (string.Equals(dataFile.Name, metaFile.Name, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(dataFile.Name, metaFile.Name, OrdinalIgnoreCase))
             {
-                return ValidationResult()
+                return ValidationResult(DataAndMetadataFilesCannotHaveTheSameName);
             }
             if (dataFile.Length == 0 || metaFile.Length == 0)
             {
