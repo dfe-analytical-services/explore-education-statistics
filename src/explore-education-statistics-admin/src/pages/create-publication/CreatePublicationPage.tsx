@@ -1,21 +1,23 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import dashboardRoutes from '@admin/routes/dashboard/routes';
-import {ContactDetails, IdTitlePair} from '@admin/services/common/types';
+import { ContactDetails, IdTitlePair } from '@admin/services/common/types';
 import service from '@admin/services/edit-publication/service';
 import Button from '@common/components/Button';
-import {FormFieldset, Formik} from '@common/components/form';
+import { FormFieldset, Formik } from '@common/components/form';
 import Form from '@common/components/form/Form';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
-import handleServerSideValidation, {errorCodeToFieldError} from '@common/components/form/util/serverValidationHandler';
+import handleServerSideValidation, {
+  errorCodeToFieldError,
+} from '@common/components/form/util/serverValidationHandler';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
-import {FormikProps} from 'formik';
-import React, {useEffect, useState} from 'react';
-import {RouteComponentProps} from 'react-router';
+import { FormikProps } from 'formik';
+import React, { useEffect, useState } from 'react';
+import { RouteComponentProps } from 'react-router';
 
 interface MatchProps {
   topicId: string;
@@ -32,7 +34,7 @@ const serverSideValidationHandler = handleServerSideValidation(
   errorCodeToFieldError(
     'SLUG_NOT_UNIQUE',
     'publicationTitle',
-    'Choose a unique title'
+    'Choose a unique title',
   ),
 );
 
