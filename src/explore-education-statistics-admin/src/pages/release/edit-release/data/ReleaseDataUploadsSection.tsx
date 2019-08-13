@@ -1,17 +1,19 @@
 import Link from '@admin/components/Link';
 import service from '@admin/services/release/edit-release/data/service';
-import {DataFile} from '@admin/services/release/edit-release/data/types';
+import { DataFile } from '@admin/services/release/edit-release/data/types';
 import Button from '@common/components/Button';
-import {Form, FormFieldset, Formik} from '@common/components/form';
+import { Form, FormFieldset, Formik } from '@common/components/form';
 import FormFieldFileSelector from '@common/components/form/FormFieldFileSelector';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
-import handleServerSideValidation, {errorCodeToFieldError} from "@common/components/form/util/serverValidationHandler";
+import handleServerSideValidation, {
+  errorCodeToFieldError,
+} from '@common/components/form/util/serverValidationHandler';
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
-import {FormikActions, FormikProps} from 'formik';
-import React, {useEffect, useState} from 'react';
+import { FormikActions, FormikProps } from 'formik';
+import React, { useEffect, useState } from 'react';
 
 interface FormValues {
   subjectTitle: string;
@@ -34,8 +36,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
     service.getReleaseDataFiles(releaseId).then(setDataFiles);
   }, [publicationId, releaseId]);
 
-  const resetPage = async <T extends {}>({resetForm}: FormikActions<T>) => {
-
+  const resetPage = async <T extends {}>({ resetForm }: FormikActions<T>) => {
     resetForm();
 
     document
@@ -50,7 +51,11 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
   };
 
   const handleServerValidation = handleServerSideValidation(
-    errorCodeToFieldError('CANNOT_OVERWRITE_FILE', 'dataFile', 'Choose a unique data file name')
+    errorCodeToFieldError(
+      'CANNOT_OVERWRITE_FILE',
+      'dataFile',
+      'Choose a unique data file name',
+    ),
   );
 
   return (
@@ -63,12 +68,11 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
           metadataFile: null,
         }}
         onSubmit={async (values: FormValues, actions) => {
-          await service
-            .uploadDataFiles(releaseId, {
-              subjectTitle: values.subjectTitle,
-              dataFile: values.dataFile as File,
-              metadataFile: values.metadataFile as File,
-            });
+          await service.uploadDataFiles(releaseId, {
+            subjectTitle: values.subjectTitle,
+            dataFile: values.dataFile as File,
+            metadataFile: values.metadataFile as File,
+          });
 
           await resetPage(actions);
         }}
@@ -79,54 +83,55 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
         })}
         render={(form: FormikProps<FormValues>) => {
           return (
-            <Form
-              id={formId}
-              submitValidationHandler={handleServerValidation}
-            >
-              {dataFiles && dataFiles.map(dataFile => (
-                <SummaryList key={dataFile.file.id}>
-                  <SummaryListItem term="Subject title">
-                    {dataFile.title}
-                  </SummaryListItem>
-                  <SummaryListItem term="Data file">
-                    <a
-                      href={service.createDownloadDataFileLink(
-                        releaseId,
-                        dataFile.file.id,
-                      )}
-                    >
-                      {dataFile.file.fileName}
-                    </a>
-                  </SummaryListItem>
-                  <SummaryListItem term="Filesize">
-                    {dataFile.fileSize.size.toLocaleString()} {dataFile.fileSize.unit}
-                  </SummaryListItem>
-                  <SummaryListItem term="Number of rows">
-                    {dataFile.numberOfRows.toLocaleString()}
-                  </SummaryListItem>
-                  <SummaryListItem term="Metadata file">
-                    <a
-                      href={service.createDownloadDataMetadataFileLink(
-                        releaseId,
-                        dataFile.file.id,
-                      )}
-                    >
-                      {dataFile.metadataFile.fileName}
-                    </a>
-                  </SummaryListItem>
-                  <SummaryListItem
-                    term="Actions"
-                    actions={
-                      <Link
-                        to="#"
-                        onClick={_ => setDeleteFileName(dataFile.file.fileName)}
+            <Form id={formId} submitValidationHandler={handleServerValidation}>
+              {dataFiles &&
+                dataFiles.map(dataFile => (
+                  <SummaryList key={dataFile.file.id}>
+                    <SummaryListItem term="Subject title">
+                      {dataFile.title}
+                    </SummaryListItem>
+                    <SummaryListItem term="Data file">
+                      <a
+                        href={service.createDownloadDataFileLink(
+                          releaseId,
+                          dataFile.file.id,
+                        )}
                       >
-                        Delete files
-                      </Link>
-                    }
-                  />
-                </SummaryList>
-              ))}
+                        {dataFile.file.fileName}
+                      </a>
+                    </SummaryListItem>
+                    <SummaryListItem term="Filesize">
+                      {dataFile.fileSize.size.toLocaleString()}{' '}
+                      {dataFile.fileSize.unit}
+                    </SummaryListItem>
+                    <SummaryListItem term="Number of rows">
+                      {dataFile.numberOfRows.toLocaleString()}
+                    </SummaryListItem>
+                    <SummaryListItem term="Metadata file">
+                      <a
+                        href={service.createDownloadDataMetadataFileLink(
+                          releaseId,
+                          dataFile.file.id,
+                        )}
+                      >
+                        {dataFile.metadataFile.fileName}
+                      </a>
+                    </SummaryListItem>
+                    <SummaryListItem
+                      term="Actions"
+                      actions={
+                        <Link
+                          to="#"
+                          onClick={_ =>
+                            setDeleteFileName(dataFile.file.fileName)
+                          }
+                        >
+                          Delete files
+                        </Link>
+                      }
+                    />
+                  </SummaryList>
+                ))}
               <FormFieldset
                 id={`${formId}-allFieldsFieldset`}
                 legend="Add new data to release"
@@ -158,7 +163,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
               </Button>
 
               <div className="govuk-!-margin-top-6">
-                <Link to='#' onClick={() => resetPage(form)}>
+                <Link to="#" onClick={() => resetPage(form)}>
                   Cancel
                 </Link>
               </div>

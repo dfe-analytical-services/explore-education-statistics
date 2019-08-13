@@ -1,7 +1,12 @@
-import {Polyfilla} from "@admin/services/util/polyfilla";
+import { Polyfilla } from '@admin/services/util/polyfilla';
 import client from '@admin/services/util/service';
 
-import {AdhocFile, DataFile, UploadAdhocFileRequest, UploadDataFilesRequest,} from './types';
+import {
+  AdhocFile,
+  DataFile,
+  UploadAdhocFileRequest,
+  UploadDataFilesRequest,
+} from './types';
 
 export interface EditReleaseService {
   getReleaseDataFiles: (releaseId: string) => Promise<DataFile[]>;
@@ -31,26 +36,31 @@ interface GetDataFileResponse {
   size: string;
   metaFileName: string;
   rows?: number;
-};
+}
 
 const getFileNameFromPath = (path: string) =>
   path.substring(path.lastIndexOf('/') + 1);
 
-const dataFilePolyfilla: Polyfilla<GetDataFileResponse[]> =
-  (response) => response.map(file => ({
+/**
+ * A temporary step to provide a row count to the front end whilst it does not yet exist in the API.
+ */
+const dataFilePolyfilla: Polyfilla<GetDataFileResponse[]> = response =>
+  response.map(file => ({
     ...file,
     rows: 777777,
   }));
 
 const service: EditReleaseService = {
   getReleaseDataFiles(releaseId: string): Promise<DataFile[]> {
-    return client.
-      get<GetDataFileResponse[]>(`/release/${releaseId}/data`).
-      then(dataFilePolyfilla).
-      then(response => {
+    return client
+      .get<GetDataFileResponse[]>(`/release/${releaseId}/data`)
+      .then(dataFilePolyfilla)
+      .then(response => {
         const dataFiles = response.filter(file => file.metaFileName.length > 0);
         return dataFiles.map(dataFile => {
-          const associatedMetadataFile = response.find(file => file.path.endsWith(`/${dataFile.metaFileName}`));
+          const associatedMetadataFile = response.find(file =>
+            file.path.endsWith(`/${dataFile.metaFileName}`),
+          );
           return {
             title: dataFile.name,
             file: {
@@ -64,8 +74,10 @@ const service: EditReleaseService = {
             },
             metadataFile: {
               id: associatedMetadataFile ? associatedMetadataFile.path : '',
-              fileName: associatedMetadataFile ? getFileNameFromPath(associatedMetadataFile.path) : '',
-            }
+              fileName: associatedMetadataFile
+                ? getFileNameFromPath(associatedMetadataFile.path)
+                : '',
+            },
           };
         });
       });
@@ -77,7 +89,10 @@ const service: EditReleaseService = {
     const data = new FormData();
     data.append('file', request.dataFile);
     data.append('metaFile', request.metadataFile);
-    return client.post<null>(`/release/${releaseId}/data?name=${request.subjectTitle}`, data);
+    return client.post<null>(
+      `/release/${releaseId}/data?name=${request.subjectTitle}`,
+      data,
+    );
   },
   deleteDataFiles(releaseId: string, dataFileId: string): Promise<null> {
     return client.delete<null>(`/release/${releaseId}/data/${dataFileId}`);
