@@ -9,11 +9,12 @@ import Form from '@common/components/form/Form';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
-import handleServerSideValidation from '@common/components/form/util/serverValidationHandler';
+import handleServerSideValidation, {
+  errorCodeToFieldError,
+} from '@common/components/form/util/serverValidationHandler';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
-import { Dictionary } from '@common/types';
 import { FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
@@ -29,17 +30,12 @@ interface FormValues {
   selectedContactId: string;
 }
 
-const serverFieldNamesToUiFieldNames: Dictionary<string> = {
-  Slug: 'publicationTitle',
-};
-
-const serverErrorCodesToUiErrorMessages: Dictionary<string> = {
-  'Slug is not unique': 'Choose a unique title',
-};
-
 const serverSideValidationHandler = handleServerSideValidation(
-  serverFieldNamesToUiFieldNames,
-  serverErrorCodesToUiErrorMessages,
+  errorCodeToFieldError(
+    'SLUG_NOT_UNIQUE',
+    'publicationTitle',
+    'Choose a unique title',
+  ),
 );
 
 const CreatePublicationPage = ({
