@@ -1,5 +1,6 @@
-import React, { memo, forwardRef } from 'react';
 import last from 'lodash/last';
+import sortBy from 'lodash/sortBy';
+import React, { memo, useEffect, useState, forwardRef } from 'react';
 import cartesian from '@common/lib/utils/cartesian';
 import formatPretty from '@common/lib/utils/number/formatPretty';
 import { TableData } from '@common/services/tableBuilderService';
@@ -10,19 +11,81 @@ import {
   LocationFilter,
 } from '@frontend/modules/table-tool/components/types/filters';
 import TimePeriod from '@frontend/modules/table-tool/components/types/TimePeriod';
+import { SubjectMeta } from '@frontend/services/permalinkService';
 import DataTableCaption from './DataTableCaption';
 import FixedMultiHeaderDataTable from './FixedMultiHeaderDataTable';
 import { TableHeadersFormValues } from './TableHeadersForm';
-import { FullTableSubjectMeta } from './types/FullTable';
 
-interface Props extends FullTableSubjectMeta {
+interface Props extends SubjectMeta {
   results: TableData['result'];
   tableHeadersConfig?: TableHeadersFormValues;
 }
 
 const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
   (props: Props, dataTableRef) => {
-    const { results, footnotes, tableHeadersConfig } = props;
+    const {
+      filters,
+      timePeriods,
+      locations,
+      indicators,
+      results,
+      footnotes,
+      tableHeadersConfig,
+    } = props;
+
+    const [tableHeaders, setTableHeaders] = useState<TableHeadersFormValues>({
+      columnGroups:
+        tableHeadersConfig && tableHeadersConfig.columnGroups
+          ? tableHeadersConfig.columnGroups
+          : [],
+      columns:
+        tableHeadersConfig && tableHeadersConfig.columns
+          ? tableHeadersConfig.columns
+          : [],
+      rowGroups:
+        tableHeadersConfig && tableHeadersConfig.rowGroups
+          ? tableHeadersConfig.rowGroups
+          : [],
+      rows:
+        tableHeadersConfig && tableHeadersConfig.rows
+          ? tableHeadersConfig.rows
+          : [],
+    });
+    useEffect(() => {
+      if (
+        tableHeadersConfig &&
+        tableHeadersConfig.columnGroups &&
+        tableHeadersConfig.columns &&
+        tableHeadersConfig.rowGroups &&
+        tableHeadersConfig.rows
+      ) {
+        setTableHeaders(tableHeadersConfig);
+      }
+    }, [tableHeadersConfig]);
+
+    const removeSiblinglessTotalRows = (
+      categoryFilters: Dictionary<CategoryFilter[]>,
+    ): CategoryFilter[][] => {
+      return Object.values(categoryFilters).filter(filter => {
+        return filter.length > 1 || !filter[0].isTotal;
+      });
+    };
+
+    useEffect(() => {
+      const sortedFilters = sortBy(
+        [...removeSiblinglessTotalRows(filters), locations],
+        [options => options.length],
+      );
+
+      const halfwayIndex = Math.floor(sortedFilters.length / 2);
+
+      setTableHeaders({
+        columnGroups: sortedFilters.slice(0, halfwayIndex),
+        rowGroups: sortedFilters.slice(halfwayIndex),
+        columns: timePeriods,
+        rows: indicators,
+      });
+    }, [filters, timePeriods, locations, indicators]);
 
     const columnHeaders: string[][] = [
       ...tableHeadersConfig.columnGroups.map(colGroup =>
