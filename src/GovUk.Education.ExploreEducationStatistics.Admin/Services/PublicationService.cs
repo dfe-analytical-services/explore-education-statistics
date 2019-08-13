@@ -28,9 +28,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _mapper = mapper;
         }
 
-        public Publication Get(UserId id)
+        public async Task<Publication> GetAsync(PublicationId id)
         {
-            return _context.Publications.FirstOrDefault(x => x.Id == id);
+            return await _context.Publications.FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public Publication Get(string slug)

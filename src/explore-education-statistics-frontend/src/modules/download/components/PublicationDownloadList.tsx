@@ -7,7 +7,7 @@ export interface Publication {
   slug: string;
   summary: string;
   title: string;
-  dataFiles: {
+  downloadFiles: {
     extension: string;
     name: string;
     path: string;
@@ -23,11 +23,11 @@ function PublicationList({ publications }: Props) {
   return (
     <>
       {publications.length > 0 ? (
-        publications.map(({ id, title, dataFiles }) => (
+        publications.map(({ id, title, downloadFiles }) => (
           <React.Fragment key={id}>
             <h3 className="govuk-heading-s">Download files for: {title}</h3>
             <ul className="govuk-list govuk-list--bullet">
-              {dataFiles.map(({ extension, name, path, size }) => (
+              {downloadFiles.map(({ extension, name, path, size }) => (
                 <li key={path}>
                   <Link
                     to={`${baseUrl.data}/api/download/${path}`}
