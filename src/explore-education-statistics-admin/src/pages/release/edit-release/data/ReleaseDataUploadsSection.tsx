@@ -85,7 +85,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
           <Form id={formId} submitValidationHandler={handleServerValidation}>
             {dataFiles &&
               dataFiles.map(dataFile => (
-                <SummaryList key={dataFile.file.fileName}>
+                <SummaryList key={dataFile.filename}>
                   <SummaryListItem term="Subject title">
                     {dataFile.title}
                   </SummaryListItem>
@@ -93,10 +93,10 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                     <a
                       href={service.createDownloadDataFileLink(
                         releaseId,
-                        dataFile.file.fileName,
+                        dataFile.filename,
                       )}
                     >
-                      {dataFile.file.fileName}
+                      {dataFile.filename}
                     </a>
                   </SummaryListItem>
                   <SummaryListItem term="Filesize">
@@ -110,10 +110,10 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                     <a
                       href={service.createDownloadDataMetadataFileLink(
                         releaseId,
-                        dataFile.file.fileName,
+                        dataFile.filename,
                       )}
                     >
-                      {dataFile.metadataFile.fileName}
+                      {dataFile.metadataFilename}
                     </a>
                   </SummaryListItem>
                   <SummaryListItem
@@ -122,7 +122,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                       <Link
                         to="#"
                         onClick={() =>
-                          setDeleteFileName(dataFile.file.fileName)
+                          setDeleteFileName(dataFile.filename)
                         }
                       >
                         Delete files

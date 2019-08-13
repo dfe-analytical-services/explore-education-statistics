@@ -4,7 +4,7 @@ import client from '@admin/services/util/service';
 import {
   AncillaryFile,
   DataFile,
-  UploadAdhocFileRequest,
+  UploadAncillaryFileRequest,
   UploadDataFilesRequest,
 } from './types';
 
@@ -23,7 +23,7 @@ export interface EditReleaseService {
   getAncillaryFiles: (releaseId: string) => Promise<AncillaryFile[]>;
   uploadAncillaryFile: (
     releaseId: string,
-    request: UploadAdhocFileRequest,
+    request: UploadAncillaryFileRequest,
   ) => Promise<null>;
   deleteAncillaryFile: (releaseId: string, fileId: string) => Promise<null>;
   createDownloadAncillaryFileLink: (
@@ -66,20 +66,15 @@ const service: EditReleaseService = {
           );
           return {
             title: dataFile.name,
-            file: {
-              fileName: getFileNameFromPath(dataFile.path),
-            },
+            filename: getFileNameFromPath(dataFile.path),
             numberOfRows: dataFile.rows || 0,
             fileSize: {
               size: parseInt(dataFile.size.split(' ')[0], 10),
               unit: dataFile.size.split(' ')[1],
             },
-            metadataFile: {
-              id: associatedMetadataFile ? associatedMetadataFile.path : '',
-              fileName: associatedMetadataFile
-                ? getFileNameFromPath(associatedMetadataFile.path)
-                : '',
-            },
+            metadataFilename: associatedMetadataFile
+              ? getFileNameFromPath(associatedMetadataFile.path)
+              : '',
           };
         });
       });
@@ -114,10 +109,7 @@ const service: EditReleaseService = {
       .then(response =>
         response.map(file => ({
           title: file.name,
-          file: {
-            id: file.path,
-            fileName: getFileNameFromPath(file.path),
-          },
+          filename: getFileNameFromPath(file.path),
           fileSize: {
             size: parseInt(file.size.split(' ')[0], 10),
             unit: file.size.split(' ')[1],
@@ -127,7 +119,7 @@ const service: EditReleaseService = {
   },
   uploadAncillaryFile(
     releaseId: string,
-    request: UploadAdhocFileRequest,
+    request: UploadAncillaryFileRequest,
   ): Promise<null> {
     const data = new FormData();
     data.append('file', request.file);

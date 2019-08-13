@@ -69,16 +69,16 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
         return (
           <Form id={formId}>
             {files && files.map(file => (
-              <SummaryList key={file.file.fileName}>
+              <SummaryList key={file.filename}>
                 <SummaryListItem term="Name">{file.title}</SummaryListItem>
                 <SummaryListItem term="File">
                   <a
                     href={service.createDownloadDataFileLink(
                       releaseId,
-                      file.file.fileName,
+                      file.filename,
                     )}
                   >
-                    {file.file.fileName}
+                    {file.filename}
                   </a>
                 </SummaryListItem>
                 <SummaryListItem term="Filesize">
@@ -89,7 +89,7 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
                   actions={
                     <Link
                       to="#"
-                      onClick={() => setDeleteFileName(file.file.fileName)}
+                      onClick={() => setDeleteFileName(file.filename)}
                     >
                       Delete file
                     </Link>

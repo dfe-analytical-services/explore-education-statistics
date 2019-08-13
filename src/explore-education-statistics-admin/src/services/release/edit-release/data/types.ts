@@ -1,16 +1,12 @@
-interface FileDetails {
-  fileName: string;
-}
-
 export interface DataFile {
   title: string;
-  file: FileDetails;
+  filename: string;
   fileSize: {
     size: number;
     unit: string;
   };
   numberOfRows: number;
-  metadataFile: FileDetails;
+  metadataFilename: string;
 }
 
 export interface UploadDataFilesRequest {
@@ -21,14 +17,14 @@ export interface UploadDataFilesRequest {
 
 export interface AncillaryFile {
   title: string;
-  file: FileDetails;
+  filename: string;
   fileSize: {
     size: number;
     unit: string;
   };
 }
 
-export interface UploadAdhocFileRequest {
+export interface UploadAncillaryFileRequest {
   name: string;
   file: File;
 }
