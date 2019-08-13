@@ -45,6 +45,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
                     return new ValidationResult("FILE_CAN_NOT_BE_EMPTY");
                 case CannotUseGenericFunctionToAddDataFile: 
                     return new ValidationResult("CANNOT_USE_GENERIC_FUNCTION_TO_DELETE_DATA_FILE");
+                case CannotOverwriteDataFile: 
+                    return new ValidationResult("CANNOT_OVERWRITE_DATA_FILE");
+                case CannotOverwriteMetadataFile: 
+                    return new ValidationResult("CANNOT_OVERWRITE_METADATA_FILE");
+                case DataAndMetadataFilesCannotHaveTheSameName: 
+                    return new ValidationResult("DATA_AND_METADATA_CANNOT_HAVE_THE_SAME_NAME");
                 default:
                     throw new ArgumentOutOfRangeException(nameof(message), message, null);
             }
@@ -60,6 +66,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         CannotUseGenericFunctionToAddDataFile,
         UnableToFindMetadataFileToDelete,
         FileNotFound,
-        FileCannotBeEmpty
+        FileCannotBeEmpty,
+        CannotOverwriteDataFile,
+        CannotOverwriteMetadataFile,
+        DataAndMetadataFilesCannotHaveTheSameName
     }
 }

@@ -65,14 +65,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private static async Task<Either<ValidationResult,bool>> ValidateDataFilesForUpload(CloudBlobContainer blobContainer, Guid releaseId,
             IFormFile dataFile, IFormFile metaFile)
         {
+            if (string.Equals(dataFile.Name, metaFile.Name, StringComparison.OrdinalIgnoreCase))
+            {
+                return ValidationResult()
+            }
             if (dataFile.Length == 0 || metaFile.Length == 0)
             {
                 return ValidationResult(FileCannotBeEmpty);
             }
             var dataFilePath = AdminReleasePath(releaseId, ReleaseFileTypes.Data, dataFile.FileName);
             var metadataFilePath = AdminReleasePath(releaseId, ReleaseFileTypes.Data, metaFile.FileName);
-            if (blobContainer.GetBlockBlobReference(dataFilePath).Exists() ||
-                blobContainer.GetBlockBlobReference(metadataFilePath).Exists())
+            if (blobContainer.GetBlockBlobReference(dataFilePath).Exists())
+            {
+                return ValidationResult(CannotOverwriteFile);
+            }
+
+            if (blobContainer.GetBlockBlobReference(metadataFilePath).Exists())
             {
                 return ValidationResult(CannotOverwriteFile);
             }
