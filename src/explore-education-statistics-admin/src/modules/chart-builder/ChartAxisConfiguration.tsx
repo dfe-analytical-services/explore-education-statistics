@@ -360,7 +360,7 @@ const ChartAxisConfiguration = ({
               </>
             )}
 
-            {axisConfiguration.type === 'major' && capabilities.hasAxes && (
+            {axisConfiguration.type === 'major' && (
               <React.Fragment>
                 <FormFieldset id={`${id}sort_order_set`} legend="Sorting">
                   <FormSelect
