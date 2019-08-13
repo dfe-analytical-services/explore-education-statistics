@@ -23,9 +23,6 @@ export interface FullTable /* ™ */ {
   title: string;
   subjectMeta: SubjectMeta;
   results: TableData['result'];
-  configurations: {
-    tableHeadersConfig?: TableHeadersFormValues;
-  };
 }
 
 export interface Permalink {
@@ -33,6 +30,9 @@ export interface Permalink {
   title: string;
   created: string;
   fullTable: FullTable;
+  configuration: {
+    tableHeadersConfig?: TableHeadersFormValues;
+  };
 }
 
 export default {
