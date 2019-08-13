@@ -43,8 +43,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
                     return new ValidationResult("FILE_NOT_FOUND");
                 case FileCannotBeEmpty: 
                     return new ValidationResult("FILE_CAN_NOT_BE_EMPTY");
+                case DataFileCannotBeEmpty: 
+                    return new ValidationResult("DATA_FILE_CAN_NOT_BE_EMPTY");
+                case MetadataFileCannotBeEmpty: 
+                    return new ValidationResult("METADATA_FILE_CAN_NOT_BE_EMPTY");
                 case CannotUseGenericFunctionToAddDataFile: 
-                    return new ValidationResult("CANNOT_USE_GENERIC_FUNCTION_TO_DELETE_DATA_FILE");
+                    return new ValidationResult("CANNOT_USE_GENERIC_FUNCTION_TO_ADD_DATA_FILE");
                 case CannotOverwriteDataFile: 
                     return new ValidationResult("CANNOT_OVERWRITE_DATA_FILE");
                 case CannotOverwriteMetadataFile: 
@@ -67,6 +71,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         UnableToFindMetadataFileToDelete,
         FileNotFound,
         FileCannotBeEmpty,
+        DataFileCannotBeEmpty,
+        MetadataFileCannotBeEmpty,
         CannotOverwriteDataFile,
         CannotOverwriteMetadataFile,
         DataAndMetadataFilesCannotHaveTheSameName

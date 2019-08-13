@@ -52,9 +52,29 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
 
   const handleServerValidation = handleServerSideValidation(
     errorCodeToFieldError(
-      'CANNOT_OVERWRITE_FILE',
+      'CANNOT_OVERWRITE_DATA_FILE',
       'dataFile',
       'Choose a unique data file name',
+    ),
+    errorCodeToFieldError(
+      'CANNOT_OVERWRITE_METADATA_FILE',
+      'metadataFile',
+      'Choose a unique metadata file name',
+    ),
+    errorCodeToFieldError(
+      'DATA_AND_METADATA_FILES_CANNOT_HAVE_THE_SAME_NAME',
+      'dataFile',
+      'Choose a different file name for data and metadata files',
+    ),
+    errorCodeToFieldError(
+      'DATA_FILE_CAN_NOT_BE_EMPTY',
+      'dataFile',
+      'Choose a data file that is not empty',
+    ),
+    errorCodeToFieldError(
+      'METADATA_FILE_CAN_NOT_BE_EMPTY',
+      'metadataFile',
+      'Choose a metadata file that is not empty',
     ),
   );
 

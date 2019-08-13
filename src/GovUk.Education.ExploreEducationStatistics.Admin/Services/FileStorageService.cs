@@ -70,9 +70,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 return ValidationResult(DataAndMetadataFilesCannotHaveTheSameName);
             }
-            if (dataFile.Length == 0 || metaFile.Length == 0)
+            if (dataFile.Length == 0)
             {
-                return ValidationResult(FileCannotBeEmpty);
+                return ValidationResult(DataFileCannotBeEmpty);
+            }
+            if (metaFile.Length == 0)
+            {
+                return ValidationResult(MetadataFileCannotBeEmpty);
             }
             var dataFilePath = AdminReleasePath(releaseId, ReleaseFileTypes.Data, dataFile.FileName);
             var metadataFilePath = AdminReleasePath(releaseId, ReleaseFileTypes.Data, metaFile.FileName);
