@@ -1,7 +1,7 @@
 import Link from '@admin/components/Link';
 import { dataRoute } from '@admin/routes/edit-release/routes';
-import service from '@admin/services/edit-release/data/service';
-import { AdhocFile } from '@admin/services/edit-release/data/types';
+import service from '@admin/services/release/edit-release/data/service';
+import { AdhocFile } from '@admin/services/release/edit-release/data/types';
 import Button from '@common/components/Button';
 import FormFieldFileSelector from '@common/components/form/FormFieldFileSelector';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
@@ -19,18 +19,19 @@ interface FormValues {
 }
 
 interface Props {
+  publicationId: string;
   releaseId: string;
 }
 
 const formId = 'fileUploadForm';
 
-const ReleaseFileUploadsSection = ({ releaseId }: Props) => {
+const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
   const [files, setFiles] = useState<AdhocFile[]>();
   const [deleteFileId, setDeleteFileRequest] = useState('');
 
   useEffect(() => {
     service.getReleaseAdhocFiles(releaseId).then(setFiles);
-  }, [releaseId]);
+  }, [publicationId, releaseId]);
 
   return (
     <>
@@ -116,7 +117,9 @@ const ReleaseFileUploadsSection = ({ releaseId }: Props) => {
               </Button>
 
               <div className="govuk-!-margin-top-6">
-                <Link to={dataRoute.generateLink(releaseId)}>Cancel</Link>
+                <Link to={dataRoute.generateLink(publicationId, releaseId)}>
+                  Cancel
+                </Link>
               </div>
             </Form>
           );

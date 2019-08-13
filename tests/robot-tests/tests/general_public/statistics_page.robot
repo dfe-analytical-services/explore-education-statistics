@@ -9,8 +9,9 @@ Suite Teardown    user closes the browser
 *** Test Cases ***
 Navigate to Find Statistics page
     [Tags]  HappyPath
-    user goes to url   ${url}/statistics
-    user waits until page contains  Browse to find the statistics and data you’re looking for
+    environment variable should be set   PUBLIC_URL
+    user goes to url   %{PUBLIC_URL}/find-statistics
+    user waits until page contains heading  Find statistics and data
 
 User uses search
     [Tags]   UnderConstruction
@@ -34,15 +35,15 @@ Open "Pupils and schools" accordion section
 
 Validate "Pupils and schools" section
     [Tags]  HappyPath   Failing
-    user checks accordion section contains details  Pupils and schools    Admission appeals
-    user checks accordion section contains details  Pupils and schools    Exclusions
-    user checks accordion section contains details  Pupils and schools    Parental responsibility measures
-    user checks accordion section contains details  Pupils and schools    Pupil absence
-    user checks accordion section contains details  Pupils and schools    Pupil projections
-    user checks accordion section contains details  Pupils and schools    School and pupil numbers
-    user checks accordion section contains details  Pupils and schools    School applications
-    user checks accordion section contains details  Pupils and schools    School capacity
-    user checks accordion section contains details  Pupils and schools    Special educational needs (SEN)
+    user checks accordion section contains text  Pupils and schools    Admission appeals
+    user checks accordion section contains text  Pupils and schools    Exclusions
+    user checks accordion section contains text  Pupils and schools    Parental responsibility measures
+    user checks accordion section contains text  Pupils and schools    Pupil absence
+    user checks accordion section contains text  Pupils and schools    Pupil projections
+    user checks accordion section contains text  Pupils and schools    School and pupil numbers
+    user checks accordion section contains text  Pupils and schools    School applications
+    user checks accordion section contains text  Pupils and schools    School capacity
+    user checks accordion section contains text  Pupils and schools    Special educational needs (SEN)
 
 Validate "Pupil absence" details component
     [Tags]  HappyPath

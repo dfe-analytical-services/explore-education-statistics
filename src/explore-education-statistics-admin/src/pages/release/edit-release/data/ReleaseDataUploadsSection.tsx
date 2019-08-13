@@ -1,11 +1,11 @@
 import Link from '@admin/components/Link';
 import { dataRoute } from '@admin/routes/edit-release/routes';
-import service from '@admin/services/edit-release/data/service';
-import { DataFile } from '@admin/services/edit-release/data/types';
+import service from '@admin/services/release/edit-release/data/service';
+import { DataFile } from '@admin/services/release/edit-release/data/types';
 import Button from '@common/components/Button';
+import { Form, FormFieldset, Formik } from '@common/components/form';
 import FormFieldFileSelector from '@common/components/form/FormFieldFileSelector';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
-import { Form, FormFieldset, Formik } from '@common/components/form';
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -20,18 +20,19 @@ interface FormValues {
 }
 
 interface Props {
+  publicationId: string;
   releaseId: string;
 }
 
 const formId = 'dataFileUploadForm';
 
-const ReleaseDataUploadsSection = ({ releaseId }: Props) => {
+const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
   const [dataFiles, setDataFiles] = useState<DataFile[]>();
   const [deleteFileId, setDeleteFilesRequest] = useState('');
 
   useEffect(() => {
     service.getReleaseDataFiles(releaseId).then(setDataFiles);
-  }, [releaseId]);
+  }, [publicationId, releaseId]);
 
   return (
     <>
@@ -145,7 +146,9 @@ const ReleaseDataUploadsSection = ({ releaseId }: Props) => {
               </Button>
 
               <div className="govuk-!-margin-top-6">
-                <Link to={dataRoute.generateLink(releaseId)}>Cancel</Link>
+                <Link to={dataRoute.generateLink(publicationId, releaseId)}>
+                  Cancel
+                </Link>
               </div>
             </Form>
           );

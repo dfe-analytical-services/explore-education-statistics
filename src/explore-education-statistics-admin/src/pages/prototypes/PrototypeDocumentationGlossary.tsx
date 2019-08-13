@@ -16,20 +16,20 @@ const DocumentationGlossary = () => {
         <div className="govuk-grid-column-two-thirds">
           <div className="app-content__header">
             <span className="govuk-caption-xl">Style guidance</span>
-            <h1 className="govuk-heading-xl">Style guide</h1>
+            <h1 className="govuk-heading-xl">Service glossary</h1>
           </div>
           <p>
-            Browse TEST our A to Z list of style, spelling and grammar
+            Browse TEST ABC our A to Z list of style, spelling and grammar
             conventions for all content published on the explore education
             statistics service.
           </p>
 
           <Accordion id="a-z">
             <AccordionSection heading="A">
-              <h3 id="a42-a42s">A*, A*s</h3>
+              <h3 id="a42-a42s">A*, A*s TEST</h3>
               <p>
-                The top grade in GCSEs and A levels. Use the symbol * not the
-                word ‘star’. No apostrophe in the plural.
+                The top ABC grade in GCSEs and A levels. Use the symbol * not
+                the word ‘star’. No apostrophe in the plural.
               </p>
               <h3 id="a-level">A level</h3>
               <p>No hyphen. Lower case level.</p>

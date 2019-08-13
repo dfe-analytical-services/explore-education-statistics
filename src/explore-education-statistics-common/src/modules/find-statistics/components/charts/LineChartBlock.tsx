@@ -3,11 +3,11 @@ import {
   ChartDefinition,
   ChartProps,
   conditionallyAdd,
-  createDataForAxis,
-  GenerateMajorAxis,
-  GenerateMinorAxis,
+  createSortedAndMappedDataForAxis,
+  CustomToolTip,
+  generateMajorAxis,
+  generateMinorAxis,
   getKeysForChart,
-  mapNameToNameLabel,
   populateDefaultChartProps,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import { ChartSymbol } from '@common/services/publicationService';
@@ -27,41 +27,11 @@ import {
   Symbols,
   SymbolsProps,
   Tooltip,
-  TooltipProps,
   XAxis,
   YAxis,
 } from 'recharts';
 
 import './charts.scss';
-
-const CustomToolTip = ({ active, payload, label }: TooltipProps) => {
-  if (active) {
-    return (
-      <div className="graph-tooltip">
-        <p>{label}</p>
-        {payload &&
-          payload
-            .sort((a, b) => {
-              if (typeof b.value === 'number' && typeof a.value === 'number') {
-                return b.value - a.value;
-              }
-
-              return 0;
-            })
-            .map((_, index) => {
-              return (
-                // eslint-disable-next-line react/no-array-index-key
-                <p key={index}>
-                  {`${payload[index].name} : ${payload[index].value}`}
-                </p>
-              );
-            })}
-      </div>
-    );
-  }
-
-  return null;
-};
 
 const LineStyles: Dictionary<string> = {
   solid: '',
@@ -101,21 +71,23 @@ const LineChartBlock = (props: ChartProps) => {
   if (
     axes === undefined ||
     axes.major === undefined ||
+    axes.minor === undefined ||
     data === undefined ||
     meta === undefined
   )
     return <div>Unable to render chart</div>;
 
-  const chartData: ChartDataB[] = createDataForAxis(
+  const chartData: ChartDataB[] = createSortedAndMappedDataForAxis(
     axes.major,
     data.result,
     meta,
-  ).map(mapNameToNameLabel(labels, meta.timePeriods, meta.locations));
+    labels,
+  );
 
   const keysForChart = getKeysForChart(chartData);
 
-  const minorDomainTicks = GenerateMinorAxis(chartData, axes.minor);
-  const majorDomainTicks = GenerateMajorAxis(chartData, axes.major);
+  const minorDomainTicks = generateMinorAxis(chartData, axes.minor);
+  const majorDomainTicks = generateMajorAxis(chartData, axes.major);
 
   return (
     <ResponsiveContainer width={width || '100%'} height={height || 300}>
@@ -135,48 +107,38 @@ const LineChartBlock = (props: ChartProps) => {
 
         <CartesianGrid
           strokeDasharray="3 3"
-          horizontal={axes.minor && axes.minor.showGrid !== false}
+          horizontal={axes.minor.showGrid !== false}
           vertical={axes.major.showGrid !== false}
         />
 
-        {axes.major && (
-          <XAxis
-            dataKey="name"
-            hide={axes.major.visible === false}
-            label={{
-              offset: 5,
-              position: 'bottom',
-              value: '',
-            }}
-            {...majorDomainTicks}
-            scale="auto"
-            interval={
-              axes.minor && !axes.minor.visible ? 'preserveStartEnd' : undefined
-            }
-            height={conditionallyAdd(
-              axes.major && axes.major.size,
-              legend === 'bottom' ? 0 : undefined,
-            )}
-            padding={{ left: 20, right: 20 }}
-            tickMargin={10}
-          />
-        )}
+        <YAxis
+          type="number"
+          dataKey="value"
+          hide={axes.minor.visible === false}
+          unit={
+            (axes.minor.unit && axes.minor.unit !== '' && axes.minor.unit) || ''
+          }
+          scale="auto"
+          {...minorDomainTicks}
+          width={conditionallyAdd(axes.minor.size)}
+        />
 
-        {axes.minor && axes.minor.visible && (
-          <YAxis
-            label={{
-              angle: -90,
-              offset: 0,
-              position: 'left',
-              value: '',
-            }}
-            scale="auto"
-            {...minorDomainTicks}
-            interval="preserveStartEnd"
-            dataKey="value"
-            width={conditionallyAdd(axes.minor && axes.minor.size)}
-          />
-        )}
+        <XAxis
+          type="category"
+          dataKey="name"
+          hide={axes.major.visible === false}
+          unit={
+            (axes.major.unit && axes.major.unit !== '' && axes.major.unit) || ''
+          }
+          scale="auto"
+          {...majorDomainTicks}
+          padding={{ left: 20, right: 20 }}
+          height={conditionallyAdd(
+            axes.major.size,
+            legend === 'bottom' ? 0 : undefined,
+          )}
+          tickMargin={10}
+        />
 
         {keysForChart.map(name => (
           <Line
@@ -194,8 +156,7 @@ const LineChartBlock = (props: ChartProps) => {
           />
         ))}
 
-        {axes.major &&
-          axes.major.referenceLines &&
+        {axes.major.referenceLines &&
           axes.major.referenceLines.map(referenceLine => (
             <ReferenceLine
               key={`${referenceLine.position}_${referenceLine.label}`}
@@ -204,8 +165,7 @@ const LineChartBlock = (props: ChartProps) => {
             />
           ))}
 
-        {axes.minor &&
-          axes.minor.referenceLines &&
+        {axes.minor.referenceLines &&
           axes.minor.referenceLines.map(referenceLine => (
             <ReferenceLine
               key={`${referenceLine.position}_${referenceLine.label}`}

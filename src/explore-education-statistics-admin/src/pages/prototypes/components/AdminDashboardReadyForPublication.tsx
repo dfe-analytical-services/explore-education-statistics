@@ -1,5 +1,4 @@
 import PrototypeDashboardRelease from '@admin/pages/prototypes/components/PrototypeDashboardRelease';
-import { LoginContext } from '@admin/components/Login';
 import React from 'react';
 
 interface Props {
@@ -9,8 +8,6 @@ interface Props {
 }
 
 const AdminDashboardReadyForApproval = ({ task, user }: Props) => {
-  const userContext = React.useContext(LoginContext);
-
   const tagLabel = window.location.search.includes('status=approved')
     ? 'Scheduled for publication'
     : 'In higher review';

@@ -23,6 +23,7 @@ import {
   Label,
   PositionType,
   ReferenceLine as RechartsReferenceLine,
+  TooltipProps,
   XAxis,
   XAxisProps,
   YAxis,
@@ -62,6 +63,7 @@ export interface ChartProps {
   meta: DataBlockMetadata;
   labels: Dictionary<DataSetConfiguration>;
   axes: AxesConfiguration;
+  title?: string;
   height?: number;
   width?: number;
   legend?: 'none' | 'top' | 'bottom';
@@ -292,13 +294,35 @@ export function generateKeyFromDataSet(
 function generateNameForAxisConfiguration(
   result: Result,
   groupBy?: AxisGroupBy,
-) {
+): string {
   switch (groupBy) {
     case 'timePeriods':
       return result.timePeriod;
     case 'locations':
-      return `${result.location.localAuthorityDistrict &&
-        result.location.localAuthorityDistrict.code}`;
+      if (
+        result.location.localAuthorityDistrict &&
+        result.location.localAuthorityDistrict.code &&
+        result.location.localAuthorityDistrict.code !== ''
+      )
+        return `${result.location.localAuthorityDistrict.code}`;
+
+      if (
+        result.location.localAuthority &&
+        result.location.localAuthority.code &&
+        result.location.localAuthority.code !== ''
+      )
+        return `${result.location.localAuthority.code}`;
+
+      if (
+        result.location.region &&
+        result.location.region.code &&
+        result.location.region.code !== ''
+      )
+        return `${result.location.region.code}`;
+
+      if (result.location.country) return `${result.location.country.code}`;
+
+      return '';
     default:
       return '';
   }
@@ -364,6 +388,23 @@ function reduceCombineChartData(
   ];
 }
 
+export function sortChartData(
+  chartData: ChartDataB[],
+  sortBy: string | undefined,
+  sortAsc: boolean,
+) {
+  if (sortBy === undefined) return chartData;
+
+  return [...chartData].sort(({ [sortBy]: sortByA }, { [sortBy]: sortByB }) => {
+    if (sortByA !== undefined && sortByB !== undefined) {
+      return sortAsc
+        ? sortByA.localeCompare(sortByB)
+        : sortByB.localeCompare(sortByA);
+    }
+    return 0;
+  });
+}
+
 export function createDataForAxis(
   axisConfiguration: AxisConfiguration,
   results: Result[],
@@ -381,14 +422,6 @@ export function createDataForAxis(
       ).reduce(reduceCombineChartData, [...combinedChartData]);
     },
     [],
-  );
-}
-
-export function getKeysForChart(chartData: ChartDataB[]) {
-  return Array.from(
-    chartData.reduce((setOfKeys, { name: _, ...values }) => {
-      return new Set([...Array.from(setOfKeys), ...Object.keys(values)]);
-    }, new Set<string>()),
   );
 }
 
@@ -411,6 +444,39 @@ export function mapNameToNameLabel(
   });
 }
 
+export function createSortedAndMappedDataForAxis(
+  axisConfiguration: AxisConfiguration,
+  results: Result[],
+  meta: DataBlockMetadata,
+  labels: Dictionary<DataSetConfiguration>,
+): ChartDataB[] {
+  const chartData: ChartDataB[] = createDataForAxis(
+    axisConfiguration,
+    results,
+    meta,
+  ).map(mapNameToNameLabel(labels, meta.timePeriods, meta.locations));
+
+  const sorted = sortChartData(
+    chartData,
+    axisConfiguration.sortBy,
+    axisConfiguration.sortAsc !== false,
+  );
+
+  if (axisConfiguration.dataRange) {
+    return sorted.slice(...axisConfiguration.dataRange);
+  }
+
+  return sorted;
+}
+
+export function getKeysForChart(chartData: ChartDataB[]) {
+  return Array.from(
+    chartData.reduce((setOfKeys, { name: _, ...values }) => {
+      return new Set([...Array.from(setOfKeys), ...Object.keys(values)]);
+    }, new Set<string>()),
+  );
+}
+
 export function populateDefaultChartProps(
   name: string,
   config: DataSetConfiguration,
@@ -427,7 +493,7 @@ export function populateDefaultChartProps(
 
 export const conditionallyAdd = (size?: string, add?: number) => {
   if (size) {
-    return +size + (add !== undefined ? add : 0);
+    return +size + (add === undefined ? 0 : add);
   }
   return add;
 };
@@ -547,7 +613,7 @@ function calculateMajorTicks(
   return undefined;
 }
 
-export function GenerateMinorAxis(
+export function generateMinorAxis(
   chartData: ChartDataB[],
   axis: AxisConfiguration,
 ) {
@@ -567,7 +633,7 @@ export function GenerateMinorAxis(
   return { domain, ticks };
 }
 
-export function GenerateMajorAxis(
+export function generateMajorAxis(
   chartData: ChartDataB[],
   axis: AxisConfiguration,
 ) {
@@ -587,3 +653,32 @@ export function GenerateMajorAxis(
   );
   return { domain, ticks };
 }
+
+export const CustomToolTip = ({ active, payload, label }: TooltipProps) => {
+  if (active) {
+    return (
+      <div className="graph-tooltip">
+        <p>{label}</p>
+        {payload &&
+          payload
+            .sort((a, b) => {
+              if (typeof b.value === 'number' && typeof a.value === 'number') {
+                return b.value - a.value;
+              }
+
+              return 0;
+            })
+            .map((_, index) => {
+              return (
+                // eslint-disable-next-line react/no-array-index-key
+                <p key={index}>
+                  {`${payload[index].name} : ${payload[index].value}`}
+                </p>
+              );
+            })}
+      </div>
+    );
+  }
+
+  return null;
+};

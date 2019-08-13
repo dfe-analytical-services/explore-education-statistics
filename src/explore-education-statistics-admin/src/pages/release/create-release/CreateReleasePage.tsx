@@ -1,24 +1,39 @@
 import Page from '@admin/components/Page';
-import ReleaseSetupForm, {
-  FormValues,
-} from '@admin/pages/release/setup/ReleaseSetupForm';
-import { assembleCreateReleaseRequestFromForm } from '@admin/pages/release/setup/util/releaseSetupUtil';
-import { setupRoute } from '@admin/routes/edit-release/routes';
+import { TimePeriodCoverageGroup } from '@admin/pages/DummyReferenceData';
+import ReleaseSummaryForm, {
+  EditFormValues,
+} from '@admin/pages/release/summary/ReleaseSummaryForm';
+import { assembleCreateReleaseRequestFromForm } from '@admin/pages/release/util/releaseSummaryUtil';
 import dashboardRoutes from '@admin/routes/dashboard/routes';
-import service from '@admin/services/edit-release/setup/service';
-import { CreateReleaseRequest } from '@admin/services/edit-release/setup/types';
-import React from 'react';
+import { summaryRoute } from '@admin/routes/edit-release/routes';
+import { emptyDayMonthYear, IdTitlePair } from '@admin/services/common/types';
+import service from '@admin/services/release/create-release/service';
+import { CreateReleaseRequest } from '@admin/services/release/create-release/types';
+import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
+import Yup from '@common/lib/validation/yup';
+import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
+import { ObjectSchemaDefinition } from 'yup';
 
 interface MatchProps {
   publicationId: string;
 }
+
+export type FormValues = {
+  templateReleaseId: string;
+} & EditFormValues;
 
 const CreateReleasePage = ({
   match,
   history,
 }: RouteComponentProps<MatchProps>) => {
   const { publicationId } = match.params;
+
+  const [templateRelease, setTemplateRelease] = useState<IdTitlePair>();
+
+  useEffect(() => {
+    service.getTemplateRelease(publicationId).then(setTemplateRelease);
+  }, [publicationId]);
 
   const submitHandler = (values: FormValues) => {
     const createReleaseDetails: CreateReleaseRequest = assembleCreateReleaseRequestFromForm(
@@ -29,7 +44,9 @@ const CreateReleasePage = ({
     service
       .createRelease(createReleaseDetails)
       .then(createdRelease =>
-        history.push(setupRoute.generateLink(createdRelease.id)),
+        history.push(
+          summaryRoute.generateLink(publicationId, createdRelease.id),
+        ),
       );
   };
 
@@ -44,10 +61,47 @@ const CreateReleasePage = ({
         },
       ]}
     >
-      <ReleaseSetupForm
+      <ReleaseSummaryForm<FormValues>
         submitButtonText="Create new release"
+        initialValuesSupplier={(
+          timePeriodCoverageGroups: TimePeriodCoverageGroup[],
+        ): FormValues => ({
+          timePeriodCoverageCode: timePeriodCoverageGroups[0].options[0].id,
+          timePeriodCoverageStartYear: '',
+          releaseTypeId: '',
+          scheduledPublishDate: emptyDayMonthYear(),
+          nextReleaseDate: emptyDayMonthYear(),
+          templateReleaseId: '',
+        })}
+        validationRulesSupplier={(
+          baseValidationRules: ObjectSchemaDefinition<EditFormValues>,
+        ): ObjectSchemaDefinition<FormValues> => ({
+          ...baseValidationRules,
+          templateReleaseId: templateRelease
+            ? Yup.string().required('Choose a template')
+            : Yup.string(),
+        })}
         onSubmitHandler={submitHandler}
         onCancelHandler={cancelHandler}
+        additionalFields={
+          templateRelease && (
+            <FormFieldRadioGroup<FormValues>
+              id="releaseSummaryForm-templateReleaseId"
+              legend="Select template"
+              name="templateReleaseId"
+              options={[
+                {
+                  label: 'Create new template',
+                  value: 'new',
+                },
+                {
+                  label: `Copy existing template (${templateRelease.title})`,
+                  value: `${templateRelease.id}`,
+                },
+              ]}
+            />
+          )
+        }
       />
     </Page>
   );

@@ -27,11 +27,11 @@ services:
     - data-storage
   data-storage:
     container_name: ees-storage
-    build:
-      context: .
-      dockerfile: Dockerfile-Azurite
+    image: arafato/azurite
     ports:
       - "10000:10000"
+      - "10001:10001"
+      - "10002:10002"
   db:
     container_name: ees-mssql
     image: "mcr.microsoft.com/mssql/server"

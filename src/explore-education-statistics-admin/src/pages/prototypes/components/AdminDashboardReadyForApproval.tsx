@@ -41,7 +41,7 @@ const AdminDashboardReadyForApproval = ({ task, user }: Props) => {
               'responsible statistician',
             ) && <p>Level 2: higher review</p>}
 
-          {/*<p className="govuk-body">
+          {/* <p className="govuk-body">
             {task === 'readyReview' ? (
               'Review the following draft releases.'
             ) : (

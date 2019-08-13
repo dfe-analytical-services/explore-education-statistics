@@ -2,11 +2,10 @@ import {
   ChartDataB,
   ChartDefinition,
   conditionallyAdd,
-  createDataForAxis,
-  GenerateMajorAxis,
-  GenerateMinorAxis,
+  createSortedAndMappedDataForAxis,
+  generateMajorAxis,
+  generateMinorAxis,
   getKeysForChart,
-  mapNameToNameLabel,
   populateDefaultChartProps,
   StackedBarProps,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
@@ -85,16 +84,17 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
     )
       return <div>Unable to render chart</div>;
 
-    const chartData: ChartDataB[] = createDataForAxis(
+    const chartData: ChartDataB[] = createSortedAndMappedDataForAxis(
       axes.major,
       data.result,
       meta,
-    ).map(mapNameToNameLabel(labels, meta.timePeriods));
+      labels,
+    );
 
     const keysForChart = getKeysForChart(chartData);
 
-    const minorDomainTicks = GenerateMinorAxis(chartData, axes.minor);
-    const majorDomainTicks = GenerateMajorAxis(chartData, axes.major);
+    const minorDomainTicks = generateMinorAxis(chartData, axes.minor);
+    const majorDomainTicks = generateMajorAxis(chartData, axes.major);
 
     return (
       <ResponsiveContainer width={width || '100%'} height={height || 300}>
@@ -102,6 +102,7 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
           data={chartData}
           layout="vertical"
           className={classnames({ 'legend-bottom': legend === 'bottom' })}
+          stackOffset={stacked ? 'sign' : undefined}
           margin={{
             left: 30,
             top: legend === 'top' ? 10 : 0,
@@ -113,47 +114,36 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
             vertical={axes.major && axes.major.showGrid !== false}
           />
 
-          {axes.minor && (
-            <XAxis
-              type="number"
-              hide={axes.minor.visible === false}
-              label={{
-                angle: -90,
-                offset: 0,
-                position: 'left',
-                value: '',
-              }}
-              scale="auto"
-              {...minorDomainTicks}
-              height={conditionallyAdd(
-                axes.minor && axes.minor.size,
-                legend === 'bottom' ? 50 : undefined,
-              )}
-              padding={{ left: 20, right: 20 }}
-              tickMargin={10}
-            />
-          )}
+          <XAxis
+            type="number"
+            dataKey="value"
+            hide={axes.minor.visible === false}
+            unit={
+              (axes.minor.unit && axes.minor.unit !== '' && axes.minor.unit) ||
+              ''
+            }
+            scale="auto"
+            {...minorDomainTicks}
+            height={conditionallyAdd(
+              axes.minor.size,
+              legend === 'bottom' ? 50 : undefined,
+            )}
+            padding={{ left: 20, right: 20 }}
+            tickMargin={10}
+          />
 
-          {axes.major && (
-            <YAxis
-              type="category"
-              dataKey="name"
-              hide={axes.major.visible === false}
-              label={{
-                offset: 5,
-                position: 'bottom',
-                value: '',
-              }}
-              {...majorDomainTicks}
-              scale="auto"
-              width={conditionallyAdd(axes.major && axes.major.size)}
-              interval={
-                axes.minor && axes.minor.visible !== false
-                  ? 'preserveStartEnd'
-                  : undefined
-              }
-            />
-          )}
+          <YAxis
+            type="category"
+            dataKey="name"
+            hide={axes.major.visible === false}
+            unit={
+              (axes.major.unit && axes.major.unit !== '' && axes.major.unit) ||
+              ''
+            }
+            scale="auto"
+            {...majorDomainTicks}
+            width={conditionallyAdd(axes.major.size)}
+          />
 
           <Tooltip cursor={false} />
           {(legend === 'top' || legend === 'bottom') && (

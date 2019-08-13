@@ -1,6 +1,7 @@
 import {
   ContactDetails,
   DayMonthYearValues,
+  IdLabelPair,
   IdTitlePair,
   UserDetails,
 } from '@admin/services/common/types';
@@ -26,13 +27,13 @@ export interface AdminDashboardRelease {
   latestRelease: boolean;
   live: boolean;
   releaseName: string;
-  timePeriodCoverage: IdTitlePair;
+  timePeriodCoverage: IdLabelPair;
   contact: ContactDetails;
   lastEditedUser: UserDetails;
   lastEditedDateTime: string;
-  publishScheduled: DayMonthYearValues;
+  publishScheduled: Date;
   published?: string;
-  nextReleaseExpectedDate: DayMonthYearValues;
+  nextReleaseDate: DayMonthYearValues;
 }
 
 export interface AdminDashboardPublication {

@@ -36,8 +36,8 @@ class PermalinkPage extends Component<Props> {
         title={data.title}
         caption="Permanent data table"
         breadcrumbs={[
-          { name: 'Data tables', link: '/table-tool' },
-          { name: 'Permanent link', link: '/table-tool' },
+          { name: 'Data tables', link: '/data-tables' },
+          { name: 'Permanent link', link: '/data-tables' },
         ]}
       >
         <div className="govuk-grid-row">
@@ -161,7 +161,7 @@ class PermalinkPage extends Component<Props> {
           Use our tool to build tables using our range of national and regional
           data.
         </p>
-        <ButtonLink prefetch as="/table-tool/" href="/table-tool">
+        <ButtonLink prefetch as="/data-tables/" href="/data-tables">
           Create tables
         </ButtonLink>
 

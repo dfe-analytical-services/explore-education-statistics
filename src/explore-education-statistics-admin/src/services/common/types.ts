@@ -6,6 +6,11 @@ export interface IdTitlePair {
   title: string;
 }
 
+export interface IdLabelPair {
+  id: string;
+  label: string;
+}
+
 export interface ContactDetails {
   id: string;
   contactName: string;
@@ -59,7 +64,7 @@ export interface Release {
   releaseName: string;
   timePeriodCoverage: TimePeriodCoverage;
   scheduledPublishDate: DayMonthYearValues;
-  nextReleaseExpectedDate: Date;
+  nextReleaseDate: Date;
   releaseType: IdTitlePair;
   slug: string;
   status: ReleaseStatus;
@@ -88,6 +93,12 @@ export interface Publication {
   contact: ContactDetails;
   methodology: IdTitlePair;
   owner: User;
+}
+
+export interface BasicPublicationDetails {
+  id: string;
+  title: string;
+  contact?: ContactDetails;
 }
 
 export interface DayMonthYearValues {
@@ -126,8 +137,18 @@ export const dateToDayMonthYear = (date?: Date) => {
   };
 };
 
+export const emptyDayMonthYear = (): DayMonthYearInputs => ({
+  day: '',
+  month: '',
+  year: '',
+});
+
 export const dayMonthYearIsComplete = (dmy?: DayMonthYearValues) => {
   return dmy && dmy.day && dmy.month && dmy.year;
+};
+
+export const dayMonthYearIsEmpty = (dmy?: DayMonthYearValues) => {
+  return !dmy || (!dmy.day && !dmy.month && !dmy.year);
 };
 
 export const dayMonthYearToDate = (dmy: DayMonthYearValues) => {
@@ -140,3 +161,6 @@ export const dayMonthYearToDate = (dmy: DayMonthYearValues) => {
   }
   return new Date(dmy.year || 0, (dmy.month || 0) - 1, dmy.day);
 };
+
+export const dayMonthYearInputsToDate = (dmy: DayMonthYearInputs): Date =>
+  dayMonthYearToDate(dayMonthYearInputsToValues(dmy));

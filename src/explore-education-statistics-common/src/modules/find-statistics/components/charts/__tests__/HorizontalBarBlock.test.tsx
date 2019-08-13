@@ -129,11 +129,25 @@ describe('HorzontalBarBlock', () => {
   });
 
   test('can stack data', () => {
-    const { container } = render(<Chart {...props} stacked legend="none" />);
+    const { container } = render(
+      <Chart
+        {...{
+          ...props,
+          axes: {
+            ...props.axes,
+            minor: {
+              ...props.axes.minor,
+              min: '-10',
+              max: '20',
+            },
+          },
+        }}
+        stacked
+        legend="none"
+      />,
+    );
 
     // Unsure how to tell stacked data apart, other than the snapshot
-
-    expect(container).toMatchSnapshot();
 
     expect(
       Array.from(container.querySelectorAll('.recharts-rectangle')).length,
@@ -368,5 +382,60 @@ describe('HorzontalBarBlock', () => {
     const { container } = render(<Chart {...propsWithTicks} />);
 
     expectTicks(container, 'y', '2014/15', '2015/16');
+  });
+
+  test('Can sort by name', () => {
+    const propsWithTicks: ChartProps = {
+      ...props,
+      axes: {
+        minor: props.axes.minor,
+        major: {
+          ...props.axes.major,
+          sortBy: 'name',
+          sortAsc: true,
+        },
+      },
+    };
+
+    const { container } = render(<Chart {...propsWithTicks} />);
+
+    expectTicks(container, 'y', '2014/15', '2015/16');
+  });
+
+  test('Can sort by name descending', () => {
+    const propsWithTicks: ChartProps = {
+      ...props,
+      axes: {
+        minor: props.axes.minor,
+        major: {
+          ...props.axes.major,
+          sortBy: 'name',
+          sortAsc: false,
+        },
+      },
+    };
+
+    const { container } = render(<Chart {...propsWithTicks} />);
+
+    expectTicks(container, 'y', '2015/16', '2014/15');
+  });
+
+  test('Can filter a data range', () => {
+    const propsWithTicks: ChartProps = {
+      ...props,
+      axes: {
+        minor: props.axes.minor,
+        major: {
+          ...props.axes.major,
+          sortBy: 'name',
+          sortAsc: true,
+          dataRange: [0, 1],
+        },
+      },
+    };
+
+    const { container } = render(<Chart {...propsWithTicks} />);
+
+    expectTicks(container, 'y', '2014/15');
   });
 });

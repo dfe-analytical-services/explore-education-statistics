@@ -1,4 +1,4 @@
-import { IdTitlePair } from '@admin/services/common/types';
+import { IdLabelPair } from '@admin/services/common/types';
 
 export enum DateType {
   DayMonthYear,
@@ -6,10 +6,10 @@ export enum DateType {
 }
 
 export interface TimePeriodCoverageGroup {
-  title: string;
+  label: string;
   startDateLabel: string;
   startDateType: DateType;
-  options: IdTitlePair[];
+  options: IdLabelPair[];
 }
 
 const createTimePeriodGroupWithQuarterlyPermutations = (
@@ -19,53 +19,53 @@ const createTimePeriodGroupWithQuarterlyPermutations = (
   startDateType: DateType,
 ) => {
   return {
-    title: timePeriodGroup,
+    label: timePeriodGroup,
     startDateLabel,
     startDateType,
     options: [
       {
         id: code,
-        title: timePeriodGroup,
+        label: timePeriodGroup,
       },
       {
         id: `${code}Q1`,
-        title: `${timePeriodGroup} Q1`,
+        label: `${timePeriodGroup} Q1`,
       },
       {
         id: `${code}Q1Q2`,
-        title: `${timePeriodGroup} Q1 to Q2`,
+        label: `${timePeriodGroup} Q1 to Q2`,
       },
       {
         id: `${code}Q1Q3`,
-        title: `${timePeriodGroup} Q1 to Q3`,
+        label: `${timePeriodGroup} Q1 to Q3`,
       },
       {
         id: `${code}Q1Q4`,
-        title: `${timePeriodGroup} Q1 to Q4`,
+        label: `${timePeriodGroup} Q1 to Q4`,
       },
       {
         id: `${code}Q2`,
-        title: `${timePeriodGroup} Q2`,
+        label: `${timePeriodGroup} Q2`,
       },
       {
         id: `${code}Q2Q3`,
-        title: `${timePeriodGroup} Q2 to Q3`,
+        label: `${timePeriodGroup} Q2 to Q3`,
       },
       {
         id: `${code}Q2Q4`,
-        title: `${timePeriodGroup} Q2 to Q4`,
+        label: `${timePeriodGroup} Q2 to Q4`,
       },
       {
         id: `${code}Q3`,
-        title: `${timePeriodGroup} Q3`,
+        label: `${timePeriodGroup} Q3`,
       },
       {
         id: `${code}Q3Q4`,
-        title: `${timePeriodGroup} Q3 to Q4`,
+        label: `${timePeriodGroup} Q3 to Q4`,
       },
       {
         id: `${code}Q4`,
-        title: `${timePeriodGroup} Q4`,
+        label: `${timePeriodGroup} Q4`,
       },
     ],
   };
@@ -97,30 +97,30 @@ const timePeriodCoverageGroups: TimePeriodCoverageGroup[] = [
     DateType.Year,
   ),
   {
-    title: 'Term',
+    label: 'Term',
     startDateLabel: 'Year',
     startDateType: DateType.Year,
     options: [
       {
         id: 'T1',
-        title: 'Autumn term',
+        label: 'Autumn term',
       },
       {
         id: 'T1T2',
-        title: 'Autumn and spring term',
+        label: 'Autumn and spring term',
       },
       {
         id: 'T2',
-        title: 'Spring term',
+        label: 'Spring term',
       },
       {
         id: 'T3',
-        title: 'Summer term',
+        label: 'Summer term',
       },
     ],
   },
   {
-    title: 'Month',
+    label: 'Month',
     startDateLabel: 'Year',
     startDateType: DateType.Year,
     options: [
@@ -138,30 +138,19 @@ const timePeriodCoverageGroups: TimePeriodCoverageGroup[] = [
       'December',
     ].map((month, index) => ({
       id: `M${index + 1}`,
-      title: month,
+      label: month,
     })),
   },
   {
-    title: 'Other',
+    label: 'Other',
     startDateLabel: 'Year',
     startDateType: DateType.Year,
     options: [
       {
         id: 'EOM',
-        title: 'Up until 31st March',
+        label: 'Up until 31st March',
       },
     ],
-  },
-];
-
-const releaseTypeOptions: IdTitlePair[] = [
-  {
-    id: 'national-stats',
-    title: 'National statistics',
-  },
-  {
-    id: 'adhoc-stats',
-    title: 'Official / adhoc statistics',
   },
 ];
 
@@ -182,16 +171,8 @@ const findTimePeriodCoverageGroup = (code: string) => {
   );
 };
 
-const findReleaseType = (id: string) => {
-  return (
-    releaseTypeOptions.find(type => type.id === id) || releaseTypeOptions[0]
-  );
-};
-
 export default {
   timePeriodCoverageGroups,
-  releaseTypeOptions,
   findTimePeriodCoverageOption,
   findTimePeriodCoverageGroup,
-  findReleaseType,
 };
