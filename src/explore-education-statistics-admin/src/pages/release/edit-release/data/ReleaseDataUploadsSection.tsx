@@ -1,17 +1,16 @@
 import Link from '@admin/components/Link';
-import { dataRoute } from '@admin/routes/edit-release/routes';
 import service from '@admin/services/release/edit-release/data/service';
-import { DataFile } from '@admin/services/release/edit-release/data/types';
+import {DataFile} from '@admin/services/release/edit-release/data/types';
 import Button from '@common/components/Button';
-import { Form, FormFieldset, Formik } from '@common/components/form';
+import {Form, FormFieldset, Formik} from '@common/components/form';
 import FormFieldFileSelector from '@common/components/form/FormFieldFileSelector';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
-import { FormikProps } from 'formik';
-import React, { useEffect, useState } from 'react';
+import {FormikActions, FormikProps} from 'formik';
+import React, {useEffect, useState} from 'react';
 
 interface FormValues {
   subjectTitle: string;
@@ -28,11 +27,26 @@ const formId = 'dataFileUploadForm';
 
 const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
   const [dataFiles, setDataFiles] = useState<DataFile[]>();
-  const [deleteFileId, setDeleteFilesRequest] = useState('');
+  const [deleteFileName, setDeleteFileName] = useState('');
 
   useEffect(() => {
     service.getReleaseDataFiles(releaseId).then(setDataFiles);
   }, [publicationId, releaseId]);
+
+  const resetPage = async <T extends {}>({resetForm}: FormikActions<T>) => {
+
+    resetForm();
+
+    document
+      .querySelectorAll(`#${formId} input[type='file']`)
+      .forEach(input => {
+        const fileInput = input as HTMLInputElement;
+        fileInput.value = '';
+      });
+
+    const files = await service.getReleaseDataFiles(releaseId);
+    setDataFiles(files);
+  };
 
   return (
     <>
@@ -73,7 +87,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
               actions={
                 <Link
                   to="#"
-                  onClick={_ => setDeleteFilesRequest(dataFile.file.id)}
+                  onClick={_ => setDeleteFileName(dataFile.file.fileName)}
                 >
                   Delete files
                 </Link>
@@ -89,23 +103,14 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
           metadataFile: null,
         }}
         onSubmit={async (values: FormValues, actions) => {
-          service
+          await service
             .uploadDataFiles(releaseId, {
               subjectTitle: values.subjectTitle,
               dataFile: values.dataFile as File,
               metadataFile: values.metadataFile as File,
-            })
-            .then(_ => service.getReleaseDataFiles(releaseId))
-            .then(setDataFiles)
-            .then(_ => {
-              actions.resetForm();
-              document
-                .querySelectorAll(`#${formId} input[type='file']`)
-                .forEach(input => {
-                  const fileInput = input as HTMLInputElement;
-                  fileInput.value = '';
-                });
             });
+
+          await resetPage(actions);
         }}
         validationSchema={Yup.object<FormValues>({
           subjectTitle: Yup.string().required('Enter a subject title'),
@@ -146,7 +151,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
               </Button>
 
               <div className="govuk-!-margin-top-6">
-                <Link to={dataRoute.generateLink(publicationId, releaseId)}>
+                <Link to='#' onClick={() => resetPage(form)}>
                   Cancel
                 </Link>
               </div>
@@ -156,16 +161,16 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
       />
 
       <ModalConfirm
-        mounted={deleteFileId != null && deleteFileId.length > 0}
+        mounted={deleteFileName != null && deleteFileName.length > 0}
         title="Confirm deletion of selected data files"
-        onExit={() => setDeleteFilesRequest('')}
-        onCancel={() => setDeleteFilesRequest('')}
+        onExit={() => setDeleteFileName('')}
+        onCancel={() => setDeleteFileName('')}
         onConfirm={() =>
           service
-            .deleteDataFiles(releaseId, deleteFileId)
+            .deleteDataFiles(releaseId, deleteFileName)
             .then(_ => service.getReleaseDataFiles(releaseId))
             .then(setDataFiles)
-            .then(_ => setDeleteFilesRequest(''))
+            .then(_ => setDeleteFileName(''))
         }
       >
         <p>This data will no longer be available for use in this release</p>
