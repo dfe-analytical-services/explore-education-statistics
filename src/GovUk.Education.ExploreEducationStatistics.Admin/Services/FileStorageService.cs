@@ -78,12 +78,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var metadataFilePath = AdminReleasePath(releaseId, ReleaseFileTypes.Data, metaFile.FileName);
             if (blobContainer.GetBlockBlobReference(dataFilePath).Exists())
             {
-                return ValidationResult(CannotOverwriteFile);
+                return ValidationResult(CannotOverwriteDataFile);
             }
 
             if (blobContainer.GetBlockBlobReference(metadataFilePath).Exists())
             {
-                return ValidationResult(CannotOverwriteFile);
+                return ValidationResult(CannotOverwriteMetadataFile);
             }
             return true;
         }
