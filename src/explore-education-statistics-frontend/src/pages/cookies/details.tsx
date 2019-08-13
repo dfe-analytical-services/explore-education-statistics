@@ -191,6 +191,42 @@ function CookiesPage() {
           .
         </p>
       </section>
+      <section>
+        <h3>Microsoft Application Insights</h3>
+        <p>Microsoft Application Insights collect telemetry information.</p>
+
+        <table className="govuk-table">
+          <thead className="govuk-table__head">
+            <tr className="govuk-table__row">
+              <th className="govuk-table__header" scope="col">
+                Name
+              </th>
+              <th className="govuk-table__header" scope="col">
+                Purpose
+              </th>
+              <th className="govuk-table__header" scope="col">
+                Expires
+              </th>
+            </tr>
+          </thead>
+          <tbody className="govuk-table__body">
+            <tr className="govuk-table__row">
+              <td className="govuk-table__cell">ai_user</td>
+              <td className="govuk-table__cell">
+                Used to identify returning users.
+              </td>
+              <td className="govuk-table__cell">1 year</td>
+            </tr>
+            <tr className="govuk-table__row">
+              <td className="govuk-table__cell">ai_session</td>
+              <td className="govuk-table__cell">
+                Anonymous session identifer to group a user's activities
+              </td>
+              <td className="govuk-table__cell">15 minutes</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
     </Page>
   );
 }
