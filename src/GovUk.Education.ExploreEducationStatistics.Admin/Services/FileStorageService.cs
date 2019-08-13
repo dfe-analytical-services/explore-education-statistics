@@ -57,9 +57,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var dataInfo = new Dictionary<string, string> {{NameKey, name}, {MetaFileKey, metadataFile.FileName}};
             var metaDataInfo = new Dictionary<string, string> {{DataFileKey, dataFile.FileName}};
             return await ValidateDataFilesForUpload(blobContainer, releaseId, dataFile, metadataFile)
-                .OnSuccess(async () => await UploadFileAsync(blobContainer, releaseId, dataFile, ReleaseFileTypes.Data, dataInfo))
-                .OnSuccess(async () => await UploadFileAsync(blobContainer, releaseId, metadataFile, ReleaseFileTypes.Data, metaDataInfo))
-                .OnSuccess(async () => await ListFilesAsync(releaseId, ReleaseFileTypes.Data));
+                .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, dataFile, ReleaseFileTypes.Data, dataInfo))
+                .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, metadataFile, ReleaseFileTypes.Data, metaDataInfo))
+                .OnSuccess(() => ListFilesAsync(releaseId, ReleaseFileTypes.Data));
         }
 
         // We cannot rely on the normal upload validation as we want this to be an atomic operation for both files.
@@ -95,14 +95,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var blobContainer = await GetCloudBlobContainer();
             // Get the paths of the files to delete
             return await DataPathsForDeletion(blobContainer, releaseId, fileName)
-                .OnSuccess(async (path) =>
+                .OnSuccess((path) =>
                 {
                     // Delete the data file
-                    return await DeleteFileAsync(blobContainer, path.dataFilePath)
+                    return DeleteFileAsync(blobContainer, path.dataFilePath)
                         // and the metadata file
-                        .OnSuccess(async () => await DeleteFileAsync(blobContainer, path.metadataFilePath))
+                        .OnSuccess(() => DeleteFileAsync(blobContainer, path.metadataFilePath))
                         // and return the remaining files
-                        .OnSuccess(async () => await ListFilesAsync(releaseId, ReleaseFileTypes.Data));
+                        .OnSuccess(() => ListFilesAsync(releaseId, ReleaseFileTypes.Data));
                 });
         }
         
@@ -137,12 +137,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             if (type == ReleaseFileTypes.Data)
             {
-                return ValidationResult(CannotUseGenericFunctionToDeleteDataFile);
+                return ValidationResult(CannotUseGenericFunctionToAddDataFile);
             }
             var blobContainer = await GetCloudBlobContainer();
             var info = new Dictionary<string, string> {{NameKey, name}};
             return await UploadFileAsync(blobContainer, releaseId, file, type, info)
-                .OnSuccess(async () => await ListFilesAsync(releaseId, type));
+                .OnSuccess(() => ListFilesAsync(releaseId, type));
         }
 
         public async Task<Either<ValidationResult, IEnumerable<FileInfo>>> DeleteFileAsync(Guid releaseId,
@@ -155,7 +155,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
 
             return await DeleteFileAsync(await GetCloudBlobContainer(), AdminReleasePath(releaseId, type, fileName))
-                .OnSuccess(async () => await ListFilesAsync(releaseId, type));
+                .OnSuccess(() => ListFilesAsync(releaseId, type));
         }
 
         private async Task<IEnumerable<FileInfo>> ListFilesAsync(string releaseId, ReleaseFileTypes type)
