@@ -25,7 +25,7 @@ import TimePeriod, {
 import mapValues from 'lodash/mapValues';
 import { NextContext } from 'next';
 import Router from 'next/router';
-import React, { Component, MouseEventHandler, RefObject } from 'react';
+import React, { Component, MouseEventHandler, createRef } from 'react';
 import getDefaultTableHeaderConfig from '@frontend/services/tableHeadersService';
 import DownloadCsvButton from './components/DownloadCsvButton';
 import FiltersForm, { FilterFormSubmitHandler } from './components/FiltersForm';
@@ -86,7 +86,6 @@ interface State {
   tableData: TableData['result'];
   footnotes: TableData['footnotes'];
   tableHeaders: TableHeadersFormValues;
-  dataTableRef: RefObject<HTMLTableElement>;
 }
 
 class TableToolPage extends Component<Props, State> {
@@ -116,8 +115,9 @@ class TableToolPage extends Component<Props, State> {
       rowGroups: [],
       rows: [],
     },
-    dataTableRef: React.createRef(),
   };
+
+  private dataTableRef = createRef<HTMLTableElement>();
 
   public static async getInitialProps({ query }: NextContext) {
     const themeMeta = await tableBuilderService.getThemes();
@@ -362,7 +362,6 @@ class TableToolPage extends Component<Props, State> {
       tableData,
       footnotes,
       tableHeaders,
-      dataTableRef,
     } = this.state;
 
     const locationsList = Object.values(locations).flat();
@@ -452,8 +451,8 @@ class TableToolPage extends Component<Props, State> {
                           onSubmit={tableHeaderConfig => {
                             this.setState({ tableHeaders: tableHeaderConfig });
 
-                            if (dataTableRef.current) {
-                              dataTableRef.current.scrollIntoView({
+                            if (this.dataTableRef.current) {
+                              this.dataTableRef.current.scrollIntoView({
                                 behavior: 'smooth',
                                 block: 'start',
                               });
@@ -461,7 +460,7 @@ class TableToolPage extends Component<Props, State> {
                           }}
                         />
                         <TimePeriodDataTable
-                          ref={dataTableRef}
+                          ref={this.dataTableRef}
                           filters={filters}
                           indicators={indicators}
                           publicationName={publication ? publication.title : ''}
