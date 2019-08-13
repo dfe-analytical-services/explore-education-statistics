@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
@@ -10,6 +9,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interface
     {
         IEnumerable<Observation> FindObservations(ObservationQueryContext query);
 
-        IEnumerable<(TimeIdentifier TimeIdentifier, int Year)> GetTimePeriodsMeta(SubjectMetaQueryContext query);
+        IEnumerable<Observation> FindObservations(SubjectMetaQueryContext query);
     }
 }

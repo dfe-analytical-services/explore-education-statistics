@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         public override ResultWithMetaViewModel Query(ObservationQueryContext queryContext)
         {
-            var observations = GetObservations(queryContext).ToList();
+            var observations = GetObservations(queryContext).AsQueryable();
             if (!observations.Any())
             {
                 return new ResultWithMetaViewModel();

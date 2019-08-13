@@ -7,10 +7,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels
     {
         public Guid Id { get; set; }
 
+        public TableBuilderConfiguration Configuration { get; set; }
+
         public DateTime Created { get; set; }
 
-        public TableResultViewModel Result { get; set; }
-
-        public PermalinkQueryContext Query { get; set; }
+        public TableBuilderResultViewModel FullTable { get; set; }
     }
 }

@@ -10,15 +10,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
 
         public DateTime Created { get; set; }
         
-        public TableResultViewModel Result { get; set; }
+        public TableBuilderResultViewModel FullTable { get; set; }
 
         public PermalinkQueryContext Query { get; set; }
 
-        public Permalink(TableResultViewModel result, PermalinkQueryContext query)
+        public Permalink(TableBuilderResultViewModel result, PermalinkQueryContext query)
         {
             Id = Guid.NewGuid();
             Created = DateTime.UtcNow;
-            Result = result;
+            FullTable = result;
             Query = query;
         }
     }

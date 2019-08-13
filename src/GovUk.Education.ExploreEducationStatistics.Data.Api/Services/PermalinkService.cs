@@ -13,11 +13,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
     {
         private const string ContainerName = "permalinks";
 
-        private readonly IDataService<TableResultViewModel> _dataService;
+        private readonly IDataService<TableBuilderResultViewModel> _dataService;
         private readonly IFileStorageService _fileStorageService;
         private readonly IMapper _mapper;
 
-        public PermalinkService(IDataService<TableResultViewModel> dataService,
+        public PermalinkService(IDataService<TableBuilderResultViewModel> dataService,
             IFileStorageService fileStorageService,
             IMapper mapper)
         {

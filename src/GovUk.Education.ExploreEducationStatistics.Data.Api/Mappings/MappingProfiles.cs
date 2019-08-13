@@ -24,7 +24,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Mappings
 
             CreateMap<Location, LocationViewModel>();
 
-            CreateMap<Permalink, PermalinkViewModel>();
+            CreateMap<Permalink, PermalinkViewModel>()
+                .ForMember(dest => dest.Configuration,
+                    opts => opts.MapFrom(permalink => permalink.Query.Configuration));
             
             CreateMap<Publication, PublicationMetaViewModel>();
 
