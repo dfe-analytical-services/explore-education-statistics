@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public void UpdateBatchCount(string releaseId, string subjectId, int batchSize, int batchNo)
         {
-            var batch = GetBatch(releaseId, subjectId, batchSize).Result;
+            var batch = GetOrCreateBatch(releaseId, subjectId, batchSize).Result;
             var bitArray = new BitArray(batch.BatchesProcessed);
             bitArray.Set(batchNo - 1, true);
             bitArray.CopyTo(batch.BatchesProcessed, 0);
@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         
         public bool IsBatchComplete(string releaseId, string subjectId, int batchSize)
         {
-            var batch = GetBatch(releaseId, subjectId, batchSize).Result;
+            var batch = GetOrCreateBatch(releaseId, subjectId, batchSize).Result;
             var count = (from bool b in new BitArray(batch.BatchesProcessed)
                 where b
                 select b).Count();
@@ -39,12 +39,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public void UpdateCurrentBatchNumber(string releaseId, string subjectId, int batchSize, int batchNo)
         {
-            var batch = GetBatch(releaseId, subjectId, batchSize).Result;
+            var batch = GetOrCreateBatch(releaseId, subjectId, batchSize).Result;
             batch.CurrentBatchNo = batchNo;
             GetUploadsTable().Result.ExecuteAsync(TableOperation.InsertOrReplace(batch));
         }
 
-        private async Task<Batch> GetBatch(string releaseId, string subjectId, int batchSize)
+        private async Task<Batch> GetOrCreateBatch(string releaseId, string subjectId, int batchSize)
         {
             var table = GetUploadsTable().Result;
             // Need to define the extra columns to retrieve
