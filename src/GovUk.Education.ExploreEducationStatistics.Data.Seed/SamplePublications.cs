@@ -57,45 +57,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
             DataCsvFile.KS4_2018_LA_Char_Testdata,
             DataCsvFile.KS4_2018_Nat_Char_Testdata,
             DataCsvFile.KS4_2018_Subject_Tables_S3_TestData,
-            
-            
-            DataCsvFile.absence_by_geographic_level,
-            DataCsvFile.absence_for_four_year_olds,
-            DataCsvFile.absence_in_prus,
-            DataCsvFile.absence_number_missing_at_least_one_session_by_reason,
-            DataCsvFile.EYFSP_ELG_underlying_data_2013_2018,
-            DataCsvFile.EYFSP_areas_of_learning_underlying_data_2013_2018,
-            DataCsvFile.EYFSP_APS_GLD_ELG_underlying_data_2013_2018,
-            DataCsvFile.exclusions_by_reason,
-            DataCsvFile.exclusions_duration_of_fixed_exclusions,
-            DataCsvFile.exclusions_number_of_fixed_exclusions,
-            DataCsvFile.school_applications_and_offers,
-            //DataCsvFile.SEN2_AGE_NEW,
-            DataCsvFile.SEN2_AGE_STOCK,
-            DataCsvFile.SEN2_ESTAB_NEW,
-            DataCsvFile.SEN2_ESTAB_STOCK,
-            DataCsvFile.SEN2_MI,
-            DataCsvFile.skeleton_dashboard_tidy_data_NARTS,
-            DataCsvFile.skeleton_dashboard_tidy_data_annual_v4,
-            DataCsvFile.clean_data_fe,
-            DataCsvFile.level_2_3_national,
-            DataCsvFile.level_2_3_sfla,
-            DataCsvFile.KS4_2018_LA_Char_Testdata,
-            DataCsvFile.KS4_2018_Nat_Char_Testdata,
-            DataCsvFile.KS4_2018_Subject_Tables_S3_TestData,
-            
-            // New files from Cam
-            
-            DataCsvFile.absence_by_characteristic,
-            DataCsvFile.absence_by_term,
-            DataCsvFile.absence_rate_percent_bands,
-            DataCsvFile.exclusions_by_characteristic,
-            DataCsvFile.exclusions_by_geographic_level,
-            DataCsvFile.exclusions_total_days_missed_fixed_exclusions,
-            
-            DataCsvFile.level_2_3_sf,
-            DataCsvFile.KS2_2016_test_UD,
-            DataCsvFile.KS4_2018_Subject_Tables_S1_TestData
         };
 
         public static List<Subject> GetSubjects()
