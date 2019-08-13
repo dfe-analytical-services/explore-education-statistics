@@ -16,6 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddMemoryCache()
                 .AddTransient<IFileStorageService, FileStorageService>()
                 .AddTransient<IPublishingService, PublishingService>()
+                .AddTransient<IContentCacheGenerationService, ContentCacheGenerationService>()
                 .BuildServiceProvider();
         }
     }
