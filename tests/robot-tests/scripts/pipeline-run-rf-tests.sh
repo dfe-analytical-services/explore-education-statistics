@@ -1,6 +1,9 @@
 #!/bin/bash
 
-[ "$#" -eq 1 ] || { echo "1 arguments required, $# given"; exit 1; }
+# NOTE(mark): The admin password to access to Admin app is stored in the CI pipeline
+# as a secret variable, which means it cannot be accessed as a normal environment
+# variable, and instead must be passed as an argument to this script
+[ "$#" -eq 1 ] || { echo "Please provide a single argument, the admin password. Exiting..."; exit 1; }
 
 google-chrome-stable --version
 

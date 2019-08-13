@@ -62,6 +62,12 @@ parser.add_argument("--chromedriver",
                     default="74.0.3729.6",
                     metavar="{version}",
                     help="specify which version of chromedriver to use")
+"""
+NOTE(mark): The admin password to access the admin app is stored in the CI pipeline 
+            as a secret variable, which means it cannot be accessed like a normal 
+            environment variable, and instead must be passed to this script as 
+            an argument.
+"""
 parser.add_argument("--admin-pass",
                     dest="admin_pass",
                     default=None,
@@ -84,6 +90,7 @@ if args.tags:
 
 if args.env == "ci":
     robotArgs += ["--xunit", "xunit", "-v", "timeout:" + str(timeout), "-v", "implicit_wait:" + str(implicit_wait)]
+    # NOTE(mark): Ensure secrets aren't visible in CI logs/reports
     robotArgs += ["--removekeywords", "name:library.user logs into microsoft online"]
     robotArgs += ["--removekeywords", "name:operatingsystem.environment variable should be set"]
 
