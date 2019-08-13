@@ -179,30 +179,83 @@ const ChartAxisConfiguration = ({
       <form>
         <FormFieldset id={id} legend={axisConfiguration.title}>
           <FormGroup>
-            <FormCheckbox
-              id={`${id}_show`}
-              name={`${id}_show`}
-              label="Show axis labels?"
-              checked={axisConfiguration.visible}
-              onChange={e => {
-                updateAxisConfiguration({ visible: e.target.checked });
-              }}
-              value="show"
-              conditional={
-                <React.Fragment>
-                  <FormTextInput
-                    id={`${id}_unit`}
-                    label="Override displayed unit (leave blank to use default from metadata)"
-                    name="unit"
-                    onChange={e =>
-                      updateAxisConfiguration({ unit: e.target.value })
-                    }
-                    value={axisConfiguration.unit}
+            {axisConfiguration.type === 'major' &&
+              !capabilities.fixedAxisGroupBy && (
+                <>
+                  <FormSelect
+                    id={`${id}_groupBy`}
+                    label="Group data by"
+                    name={`${id}_groupBy`}
+                    value={axisConfiguration.groupBy}
+                    onChange={e => {
+                      updateAxisConfiguration({ groupBy: e.target.value });
+                    }}
+                    options={[
+                      {
+                        label: 'Time periods',
+                        value: 'timePeriods' as AxisGroupBy,
+                      },
+                      {
+                        label: 'Locations',
+                        value: 'locations' as AxisGroupBy,
+                      },
+                      {
+                        label: 'Indicators',
+                        value: 'indicators' as AxisGroupBy,
+                      },
+                      {
+                        label: 'Filters',
+                        value: 'filters' as AxisGroupBy,
+                      },
+                    ]}
                   />
-                </React.Fragment>
-              }
-            />
-            <hr />
+
+                  <hr />
+                </>
+              )}
+
+            {capabilities.hasAxes && (
+              <>
+                <FormCheckbox
+                  id={`${id}_show`}
+                  name={`${id}_show`}
+                  label="Show axis labels?"
+                  checked={axisConfiguration.visible}
+                  onChange={e => {
+                    updateAxisConfiguration({ visible: e.target.checked });
+                  }}
+                  value="show"
+                  conditional={
+                    <React.Fragment>
+                      <FormTextInput
+                        id={`${id}_unit`}
+                        label="Override displayed unit (leave blank to use default from metadata)"
+                        name="unit"
+                        onChange={e =>
+                          updateAxisConfiguration({ unit: e.target.value })
+                        }
+                        value={axisConfiguration.unit}
+                      />
+                    </React.Fragment>
+                  }
+                />
+                <hr />
+
+                <FormTextInput
+                  id={`${id}_size`}
+                  name={`${id}_size`}
+                  type="number"
+                  min="0"
+                  max="100"
+                  label="Size of axis"
+                  value={axisConfiguration.size}
+                  onChange={e =>
+                    updateAxisConfiguration({ size: e.target.value })
+                  }
+                />
+                <hr />
+              </>
+            )}
 
             {capabilities.gridLines && (
               <React.Fragment>
@@ -219,18 +272,6 @@ const ChartAxisConfiguration = ({
                 <hr />
               </React.Fragment>
             )}
-
-            <FormTextInput
-              id={`${id}_size`}
-              name={`${id}_size`}
-              type="number"
-              min="0"
-              max="100"
-              label="Size of axis"
-              value={axisConfiguration.size}
-              onChange={e => updateAxisConfiguration({ size: e.target.value })}
-            />
-            <hr />
 
             {axisConfiguration.type === 'minor' && (
               <React.Fragment>
@@ -273,53 +314,59 @@ const ChartAxisConfiguration = ({
               </React.Fragment>
             )}
 
-            <FormRadioGroup
-              id={`${id}_tick_type`}
-              name="tick_Type"
-              legend="Tick display type"
-              legendSize="s"
-              value={axisConfiguration.tickConfig}
-              onChange={e => {
-                updateAxisConfiguration({ tickConfig: e.target.value });
-              }}
-              order={[]}
-              options={[
-                {
-                  value: 'default',
-                  label: 'Automatic',
-                },
-                {
-                  label: 'Start and end only',
-                  value: 'startEnd',
-                },
-                {
-                  label: 'Custom',
-                  value: 'custom',
-                  conditional: (
-                    <FormTextInput
-                      id={`${id}_tick_spacing`}
-                      name={`${id}_tick_spacing`}
-                      type="number"
-                      width={10}
-                      label="Every nth value"
-                      value={axisConfiguration.tickSpacing}
-                      onChange={e =>
-                        updateAxisConfiguration({ tickSpacing: e.target.value })
-                      }
-                    />
-                  ),
-                },
-              ]}
-            />
-            <hr />
+            {capabilities.hasAxes && (
+              <>
+                <FormRadioGroup
+                  id={`${id}_tick_type`}
+                  name="tick_Type"
+                  legend="Tick display type"
+                  legendSize="s"
+                  value={axisConfiguration.tickConfig}
+                  onChange={e => {
+                    updateAxisConfiguration({ tickConfig: e.target.value });
+                  }}
+                  order={[]}
+                  options={[
+                    {
+                      value: 'default',
+                      label: 'Automatic',
+                    },
+                    {
+                      label: 'Start and end only',
+                      value: 'startEnd',
+                    },
+                    {
+                      label: 'Custom',
+                      value: 'custom',
+                      conditional: (
+                        <FormTextInput
+                          id={`${id}_tick_spacing`}
+                          name={`${id}_tick_spacing`}
+                          type="number"
+                          width={10}
+                          label="Every nth value"
+                          value={axisConfiguration.tickSpacing}
+                          onChange={e =>
+                            updateAxisConfiguration({
+                              tickSpacing: e.target.value,
+                            })
+                          }
+                        />
+                      ),
+                    },
+                  ]}
+                />
+                <hr />
+              </>
+            )}
 
-            {axisConfiguration.type === 'major' && (
+            {axisConfiguration.type === 'major' && capabilities.hasAxes && (
               <React.Fragment>
                 <FormFieldset id={`${id}sort_order_set`} legend="Sorting">
                   <FormSelect
                     id={`${id}_sort_by`}
                     name="sort_by"
-                    label="Sort By"
+                    label="Sort data by"
                     order={[]}
                     value={axisConfiguration.sortBy}
                     onChange={e => {

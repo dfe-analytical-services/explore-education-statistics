@@ -1,6 +1,6 @@
 import Details from '@common/components/Details';
-import {FormSelect} from '@common/components/form';
-import {SelectOption} from '@common/components/form/FormSelect';
+import { FormSelect } from '@common/components/form';
+import { SelectOption } from '@common/components/form/FormSelect';
 import {
   ChartDefinition,
   ChartProps,
@@ -16,14 +16,14 @@ import {
 } from '@common/services/dataBlockService';
 
 import classNames from 'classnames';
-import {Feature, FeatureCollection, Geometry} from 'geojson';
+import { Feature, FeatureCollection, Geometry } from 'geojson';
 
-import {Layer, LeafletMouseEvent, Path, Polyline, PathOptions} from 'leaflet';
+import { Layer, LeafletMouseEvent, Path, Polyline, PathOptions } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import React from 'react';
-import {GeoJSON, LatLngBounds, Map} from 'react-leaflet';
-import {DataSetConfiguration} from '@common/services/publicationService';
-import {Dictionary} from '@common/types';
+import { GeoJSON, LatLngBounds, Map } from 'react-leaflet';
+import { DataSetConfiguration } from '@common/services/publicationService';
+import { Dictionary } from '@common/types';
 import styles from './MapBlock.module.scss';
 
 type MapBlockProperties = DataBlockGeoJsonProperties & {
@@ -67,22 +67,22 @@ function getLocationsForDataSet(
   meta: DataBlockMetadata,
   chartData: ChartDataB[],
 ) {
-  const allLocationIds = chartData.map(({name}) => name);
+  const allLocationIds = chartData.map(({ name }) => name);
 
   return [
-    {label: 'select...', value: ''},
+    { label: 'select...', value: '' },
     ...allLocationIds
 
-    .reduce((locations: { label: string; value: string }[], next: string) => {
-      const {label, value} = (meta.locations || {})[next];
+      .reduce((locations: { label: string; value: string }[], next: string) => {
+        const { label, value } = (meta.locations || {})[next];
 
-      return [...locations, {label, value}];
-    }, [])
-    .sort((a, b) => {
-      if (a.label < b.label) return -1;
-      if (a.label > b.label) return 1;
-      return 0;
-    }),
+        return [...locations, { label, value }];
+      }, [])
+      .sort((a, b) => {
+        if (a.label < b.label) return -1;
+        if (a.label > b.label) return 1;
+        return 0;
+      }),
   ];
 }
 
@@ -95,7 +95,7 @@ function getGeometryForOptions(
 ): FeatureCollection<Geometry, DataBlockGeoJsonProperties> {
   return {
     type: 'FeatureCollection',
-    features: sourceData.map(({name, data, ...measures}) => ({
+    features: sourceData.map(({ name, data, ...measures }) => ({
       ...meta.locations[name].geoJson[0],
       id: meta.locations[name].geoJson[0].properties.code,
       properties: {
@@ -110,26 +110,26 @@ function getGeometryForOptions(
 }
 
 function calculateMinAndScaleForSourceData(sourceData: ChartDataB[]) {
-  const {min, max} = sourceData.reduce(
+  const { min, max } = sourceData.reduce(
     // eslint-disable-next-line no-shadow
-    ({min, max}, {data}) => {
+    ({ min, max }, { data }) => {
       const dataVal = Number.parseFloat(data);
       return {
         min: dataVal < min ? dataVal : min,
         max: dataVal > max ? dataVal : max,
       };
     },
-    {min: Number.POSITIVE_INFINITY, max: Number.NEGATIVE_INFINITY},
+    { min: Number.POSITIVE_INFINITY, max: Number.NEGATIVE_INFINITY },
   );
 
   if (min === max) {
-    return {min, scale: 0, range: 1};
+    return { min, scale: 0, range: 1 };
   }
 
   const range = max - min;
   const scale = 1 / range; // / 5.0;
 
-  return {min, max, range, scale};
+  return { min, max, range, scale };
 }
 
 function generateGeometryAndLegendForSelectedOptions(
@@ -139,10 +139,12 @@ function generateGeometryAndLegendForSelectedOptions(
   selectedDataSet: string,
 ) {
   const sourceData = chartData
-  .map(entry => ({...entry, data: entry[selectedDataSet]}))
-  .filter(({data}) => data !== undefined);
+    .map(entry => ({ ...entry, data: entry[selectedDataSet] }))
+    .filter(({ data }) => data !== undefined);
 
-  const {min, max, range, scale} = calculateMinAndScaleForSourceData(sourceData);
+  const { min, max, range, scale } = calculateMinAndScaleForSourceData(
+    sourceData,
+  );
 
   const legend: LegendEntry[] = [...Array(5)].map((_, idx) => {
     const i = idx / 4;
@@ -165,14 +167,13 @@ function generateGeometryAndLegendForSelectedOptions(
     scale,
   );
 
-  return {geometry, legend};
+  return { geometry, legend };
 }
 
 function registerResizingCheck(
   container: HTMLDivElement,
   callback: () => void,
 ): IntersectionObserver {
-
   const intersectionObserver = new IntersectionObserver(
     entries => {
       if (entries.length > 0) {
@@ -194,7 +195,6 @@ function getFeatureElementById(
   id: string,
   geometry?: FeatureCollection<Geometry, DataBlockGeoJsonProperties>,
 ): { element?: Element; layer?: Path; feature?: Feature } {
-
   if (geometry) {
     const selectedFeature = geometry.features.find(
       feature => feature.id === id,
@@ -214,10 +214,7 @@ function getFeatureElementById(
   return {};
 }
 
-function calculateColour({
-  scaledData = 1.0,
-  color = '#ff0000',
-}) {
+function calculateColour({ scaledData = 1.0, color = '#ff0000' }) {
   const rescale = scaledData * 0.75 + 0.25;
 
   const scaled = [
@@ -237,7 +234,7 @@ function calculateColour({
 const MapBlock = ({
   data,
   meta,
-  position = {lat: 53.00986, lng: -3.2524038},
+  position = { lat: 53.00986, lng: -3.2524038 },
   width,
   height,
   labels,
@@ -246,8 +243,11 @@ const MapBlock = ({
   const mapRef = React.createRef<Map>();
   const geoJsonRef = React.createRef<GeoJSON>();
   const container = React.createRef<HTMLDivElement>();
+  const ukRef = React.createRef<GeoJSON>();
 
-  const [geometry, setGeometry] = React.useState<FeatureCollection<Geometry, DataBlockGeoJsonProperties>>();
+  const [geometry, setGeometry] = React.useState<
+    FeatureCollection<Geometry, DataBlockGeoJsonProperties>
+  >();
 
   const [ukGeometry, setUkGeometry] = React.useState<FeatureCollection>();
 
@@ -259,7 +259,9 @@ const MapBlock = ({
 
   const [legend, setLegend] = React.useState<LegendEntry[]>([]);
 
-  const [selectedDataSetIndex, setSelectedDataSetIndex] = React.useState<number>(0);
+  const [selectedDataSetIndex, setSelectedDataSetIndex] = React.useState<
+    number
+  >(0);
   const [selectedDataSetKey, setSelectedDataSetKey] = React.useState<string>(
     generateKeyFromDataSet(axes.major.dataSets[0], axes.major.groupBy),
   );
@@ -278,15 +280,12 @@ const MapBlock = ({
   }, [container.current]);
 
   React.useEffect(() => {
-
-
     if (container.current) {
       intersectionObserver.current = registerResizingCheck(
         container.current,
         () => {
-
           if (mapRef.current) {
-            const {current} = mapRef;
+            const { current } = mapRef;
             requestAnimationFrame(() => {
               current.leafletElement.invalidateSize();
             });
@@ -310,25 +309,24 @@ const MapBlock = ({
     setMajorOptions(getLocationsForDataSet(data, meta, generatedChartData));
   }, [data, axes, meta]);
 
-
   React.useEffect(() => {
-    setDataSetOptions(axes.major.dataSets.map((dataSet, index) => {
-      const dataKey = generateKeyFromDataSet(dataSet, axes.major.groupBy);
-      return {...labels[dataKey], value: index};
-    }));
-
+    setDataSetOptions(
+      axes.major.dataSets.map((dataSet, index) => {
+        const dataKey = generateKeyFromDataSet(dataSet, axes.major.groupBy);
+        return { ...labels[dataKey], value: index };
+      }),
+    );
   }, [axes.major.dataSets, axes.major.groupBy, labels]);
-
 
   React.useEffect(() => {
     if (geoJsonRef.current) {
       geoJsonRef.current.leafletElement.clearLayers();
+      geoJsonRef.current.leafletElement.bringToFront();
 
       if (geometry) {
         geoJsonRef.current.leafletElement.addData(geometry);
       }
     }
-
   }, [geometry]);
 
   React.useEffect(() => {
@@ -353,18 +351,21 @@ const MapBlock = ({
     setLegend(newLegend);
   }, [chartData, meta, labels, selectedDataSetKey]);
 
-
   const onSelectIndicator = (selectedDatasetIndex: number) => {
     setSelectedDataSetIndex(selectedDatasetIndex);
-    setSelectedDataSetKey(generateKeyFromDataSet(axes.major.dataSets[selectedDatasetIndex]));
+    setSelectedDataSetKey(
+      generateKeyFromDataSet(axes.major.dataSets[selectedDatasetIndex]),
+    );
   };
 
-  const updateSelectedLocation = (newSelectedLocation: string, panTo: boolean = true) => {
-
+  const updateSelectedLocation = (
+    newSelectedLocation: string,
+    panTo: boolean = true,
+  ) => {
     const oldSelectedLocation = selectedLocation;
 
     if (oldSelectedLocation) {
-      const {element: oldSelectedLocationElement} = getFeatureElementById(
+      const { element: oldSelectedLocationElement } = getFeatureElementById(
         oldSelectedLocation,
         geometry,
       );
@@ -375,7 +376,6 @@ const MapBlock = ({
     }
 
     if (oldSelectedLocation !== newSelectedLocation) {
-
       let calculatedResults: IdValue[] = [];
 
       const {
@@ -393,28 +393,26 @@ const MapBlock = ({
           mapRef.current.leafletElement.fitBounds(polyLine.getBounds());
         }
 
-        const {properties} = selectedFeature;
+        const { properties } = selectedFeature;
 
         if (properties) {
           // eslint-disable-next-line prefer-destructuring
           const measures: { [key: string]: string } = properties.measures;
 
           calculatedResults = Object.entries(measures).reduce(
-            (r: IdValue[], [id, value]) => [...r, {id, value}],
+            (r: IdValue[], [id, value]) => [...r, { id, value }],
             [],
           );
-
-
         }
       }
       setResults(calculatedResults);
     }
 
     setSelectedLocation(newSelectedLocation);
-
   };
 
   const onEachFeature = (feature: MapFeature, featureLayer: Path) => {
+    console.log('onEachFeature', feature, featureLayer);
 
     if (feature.properties) {
       // eslint-disable-next-line no-param-reassign
@@ -424,12 +422,12 @@ const MapBlock = ({
     featureLayer.setStyle({
       className: classNames(
         feature.properties && feature.properties.className,
-        {[styles.selected]: feature.id === selectedLocation},
+        { [styles.selected]: feature.id === selectedLocation },
       ),
     });
 
-    /*
     featureLayer.bindTooltip(() => {
+      console.log(feature);
       if (feature.properties) {
         const content = Object.entries(feature.properties.measures).map(
           ([id, value]) => `${labels[id].label} : ${value}${labels[id].unit}`,
@@ -445,14 +443,12 @@ const MapBlock = ({
       }
       return '';
     });
-     */
   };
 
   const onClick = (e: MapClickEvent) => {
-    const {feature} = e.sourceTarget;
+    const { feature } = e.sourceTarget;
 
     if (feature.properties && feature.properties.code) {
-
       updateSelectedLocation(feature.properties.code);
     }
   };
@@ -530,30 +526,31 @@ const MapBlock = ({
             </h3>
             <dl className="govuk-list">
               {legend &&
-              legend.map(({min, max, idx, minValue}) => (
-                <dd className={styles.legend} key={idx}>
-                  <span
-                    className={styles[`rate${idx}`]}
-                    style={{
-                      backgroundColor: calculateColour({
-                        scaledData: minValue,
-                        color: labels[selectedDataSetKey].colour
-                      })
-                    }}
-                  >
-                    &nbsp;
-                  </span> {min}
-                  {labels[selectedDataSetKey].unit}&nbsp; to {max}
-                  {labels[selectedDataSetKey].unit}{' '}
-                </dd>
-              ))}
+                legend.map(({ min, max, idx, minValue }) => (
+                  <dd className={styles.legend} key={idx}>
+                    <span
+                      className={styles[`rate${idx}`]}
+                      style={{
+                        backgroundColor: calculateColour({
+                          scaledData: minValue,
+                          color: labels[selectedDataSetKey].colour,
+                        }),
+                      }}
+                    >
+                      &nbsp;
+                    </span>{' '}
+                    {min}
+                    {labels[selectedDataSetKey].unit}&nbsp; to {max}
+                    {labels[selectedDataSetKey].unit}{' '}
+                  </dd>
+                ))}
             </dl>
           </div>
         )}
       </div>
 
       <div className={classNames('govuk-grid-column-two-thirds')}>
-        {geometry && (
+        {geometry && ukGeometry && (
           <Map
             ref={mapRef}
             style={{
@@ -564,7 +561,7 @@ const MapBlock = ({
             center={position}
             zoom={6.5}
           >
-            {ukGeometry && <GeoJSON data={ukGeometry} className={styles.uk} />}
+            <GeoJSON data={ukGeometry} className={styles.uk} ref={ukRef} />
 
             <GeoJSON
               ref={geoJsonRef}
@@ -577,15 +574,14 @@ const MapBlock = ({
                   calculateColour(feature.properties),
                 className: classNames({
                   [styles.selected]:
-                  selectedDataSetIndex &&
-                  feature &&
-                  feature.id ===
-                  axes.major.dataSets[selectedDataSetIndex].location,
+                    selectedDataSetIndex &&
+                    feature &&
+                    feature.id ===
+                      axes.major.dataSets[selectedDataSetIndex].location,
                 }),
               })}
               onclick={onClick}
             />
-
           </Map>
         )}
       </div>
@@ -603,6 +599,8 @@ const definition: ChartDefinition = {
     lineStyle: false,
     gridLines: false,
     canSize: true,
+    fixedAxisGroupBy: true,
+    hasAxes: false,
   },
 
   data: [

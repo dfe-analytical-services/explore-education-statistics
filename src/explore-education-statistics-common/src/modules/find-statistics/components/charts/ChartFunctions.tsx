@@ -88,11 +88,13 @@ export interface DataSetResult {
 }
 
 export interface ChartCapabilities {
+  hasAxes: boolean;
   dataSymbols: boolean;
   stackable: boolean;
   lineStyle: boolean;
   gridLines: boolean;
   canSize: boolean;
+  fixedAxisGroupBy: boolean;
 }
 
 export interface ChartDefinition {
@@ -294,11 +296,16 @@ export function generateKeyFromDataSet(
 
 function generateNameForAxisConfiguration(
   result: Result,
+  dataSet: ChartDataSet,
   groupBy?: AxisGroupBy,
 ): string {
   switch (groupBy) {
     case 'timePeriods':
       return result.timePeriod;
+    case 'indicators':
+      return `${dataSet.indicator}`;
+    case 'filters':
+      return result.filters.join('_');
     case 'locations':
       if (
         result.location.localAuthorityDistrict &&
@@ -352,7 +359,7 @@ function getChartDataForAxis(
 
   return Object.values(
     dataForAxis.reduce<Dictionary<ChartDataB>>((r, result) => {
-      const name = generateNameForAxisConfiguration(result, groupBy);
+      const name = generateNameForAxisConfiguration(result, dataSet, groupBy);
 
       return {
         ...r,

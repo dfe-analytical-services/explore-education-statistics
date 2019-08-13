@@ -188,6 +188,8 @@ const definition: ChartDefinition = {
     lineStyle: true,
     gridLines: true,
     canSize: true,
+    fixedAxisGroupBy: false,
+    hasAxes: true,
   },
 
   data: [
