@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
                 case CannotOverwriteMetadataFile: 
                     return new ValidationResult("CANNOT_OVERWRITE_METADATA_FILE");
                 case DataAndMetadataFilesCannotHaveTheSameName: 
-                    return new ValidationResult("DATA_AND_METADATA_CANNOT_HAVE_THE_SAME_NAME");
+                    return new ValidationResult("DATA_AND_METADATA_FILES_CANNOT_HAVE_THE_SAME_NAME");
                 default:
                     throw new ArgumentOutOfRangeException(nameof(message), message, null);
             }

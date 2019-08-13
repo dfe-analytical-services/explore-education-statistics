@@ -66,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private static async Task<Either<ValidationResult,bool>> ValidateDataFilesForUpload(CloudBlobContainer blobContainer, Guid releaseId,
             IFormFile dataFile, IFormFile metaFile)
         {
-            if (string.Equals(dataFile.Name, metaFile.Name, OrdinalIgnoreCase))
+            if (string.Equals(dataFile.FileName, metaFile.FileName, OrdinalIgnoreCase))
             {
                 return ValidationResult(DataAndMetadataFilesCannotHaveTheSameName);
             }
