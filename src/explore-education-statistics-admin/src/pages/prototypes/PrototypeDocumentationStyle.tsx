@@ -28,8 +28,8 @@ const DocumentationGlossary = () => {
             <AccordionSection heading="A">
               <h3 id="a42-a42s">A*, A*s TEST</h3>
               <p>
-                The top grade in GCSEs and A levels. Use the symbol * not the
-                word ‘star’. No apostrophe in the plural.
+                The top 123 grade in GCSEs and A levels. Use the symbol * not
+                the word ‘star’. No apostrophe in the plural.
               </p>
               <h3 id="a-level">A level</h3>
               <p>No hyphen. Lower case level.</p>
