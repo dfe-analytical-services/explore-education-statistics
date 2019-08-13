@@ -38,14 +38,19 @@ class ErrorCodeToFieldErrorMapper implements ServerValidationMessageMapper {
 
   private message: string;
 
-  public constructor(errorCode: string, targetFieldName: string, message: string) {
+  public constructor(
+    errorCode: string,
+    targetFieldName: string,
+    message: string,
+  ) {
     this.errorCode = errorCode;
     this.targetFieldName = targetFieldName;
     this.message = message;
   }
 
-  public canHandleMessage: (message: ServerValidationError) => boolean = message =>
-    message.errorCode === this.errorCode;
+  public canHandleMessage: (
+    message: ServerValidationError,
+  ) => boolean = message => message.errorCode === this.errorCode;
 
   public handleMessage: (
     message: ServerValidationError,
@@ -80,7 +85,9 @@ class ErrorCodeAndFieldNameToFieldErrorMapper
     this.message = message;
   }
 
-  public canHandleMessage: (message: ServerValidationError) => boolean = message =>
+  public canHandleMessage: (
+    message: ServerValidationError,
+  ) => boolean = message =>
     message.errorCode === this.errorCode &&
     message.fieldName === this.sourceFieldName;
 
@@ -104,8 +111,9 @@ class ErrorCodeToGlobalErrorMapper implements ServerValidationMessageMapper {
     this.message = message;
   }
 
-  public canHandleMessage: (message: ServerValidationError) => boolean = message =>
-    message.errorCode === this.errorCode;
+  public canHandleMessage: (
+    message: ServerValidationError,
+  ) => boolean = message => message.errorCode === this.errorCode;
 
   public handleMessage: (
     message: ServerValidationError,
