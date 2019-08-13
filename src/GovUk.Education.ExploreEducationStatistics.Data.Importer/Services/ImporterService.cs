@@ -185,7 +185,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 Measures = GetMeasures(line, headers, subjectMeta.Indicators),
                 ProviderUrn = GetProvider(line, headers)?.Urn,
                 SchoolLaEstab = GetSchool(line, headers)?.LaEstab,
-                Subject = subject,
+                //Subject = subject,
                 SubjectId = subject.Id,
                 TimeIdentifier = GetTimeIdentifier(line, headers),
                 Year = GetYear(line, headers),
