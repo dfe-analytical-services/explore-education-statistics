@@ -2,7 +2,7 @@ import { Polyfilla } from '@admin/services/util/polyfilla';
 import client from '@admin/services/util/service';
 
 import {
-  AdhocFile,
+  AncillaryFile,
   DataFile,
   UploadAdhocFileRequest,
   UploadDataFilesRequest,
@@ -20,16 +20,19 @@ export interface EditReleaseService {
     releaseId: string,
     fileId: string,
   ) => string;
-  getReleaseAdhocFiles: (releaseId: string) => Promise<AdhocFile[]>;
-  uploadAdhocFile: (
+  getAncillaryFiles: (releaseId: string) => Promise<AncillaryFile[]>;
+  uploadAncillaryFile: (
     releaseId: string,
     request: UploadAdhocFileRequest,
   ) => Promise<null>;
-  deleteAdhocFile: (releaseId: string, fileId: string) => Promise<null>;
-  createDownloadAdhocFileLink: (releaseId: string, fileId: string) => string;
+  deleteAncillaryFile: (releaseId: string, fileId: string) => Promise<null>;
+  createDownloadAncillaryFileLink: (
+    releaseId: string,
+    fileId: string,
+  ) => string;
 }
 
-interface GetDataFileResponse {
+interface GetFileResponse {
   extension: string;
   name: string;
   path: string;
@@ -44,7 +47,7 @@ const getFileNameFromPath = (path: string) =>
 /**
  * A temporary step to provide a row count to the front end whilst it does not yet exist in the API.
  */
-const dataFilePolyfilla: Polyfilla<GetDataFileResponse[]> = response =>
+const dataFilePolyfilla: Polyfilla<GetFileResponse[]> = response =>
   response.map(file => ({
     ...file,
     rows: 777777,
@@ -53,7 +56,7 @@ const dataFilePolyfilla: Polyfilla<GetDataFileResponse[]> = response =>
 const service: EditReleaseService = {
   getReleaseDataFiles(releaseId: string): Promise<DataFile[]> {
     return client
-      .get<GetDataFileResponse[]>(`/release/${releaseId}/data`)
+      .get<GetFileResponse[]>(`/release/${releaseId}/data`)
       .then(dataFilePolyfilla)
       .then(response => {
         const dataFiles = response.filter(file => file.metaFileName.length > 0);
@@ -64,7 +67,6 @@ const service: EditReleaseService = {
           return {
             title: dataFile.name,
             file: {
-              id: dataFile.path,
               fileName: getFileNameFromPath(dataFile.path),
             },
             numberOfRows: dataFile.rows || 0,
@@ -94,35 +96,51 @@ const service: EditReleaseService = {
       data,
     );
   },
-  deleteDataFiles(releaseId: string, dataFileId: string): Promise<null> {
-    return client.delete<null>(`/release/${releaseId}/data/${dataFileId}`);
+  deleteDataFiles(releaseId: string, dataFileName: string): Promise<null> {
+    return client.delete<null>(`/release/${releaseId}/data/${dataFileName}`);
   },
-  createDownloadDataFileLink(releaseId: string, fileId: string): string {
-    return `/release/${releaseId}/datafile/${fileId}`;
+  createDownloadDataFileLink(releaseId: string, fileName: string): string {
+    return `/release/${releaseId}/data/${fileName}`;
   },
   createDownloadDataMetadataFileLink(
     releaseId: string,
-    fileId: string,
+    fileName: string,
   ): string {
-    return `/release/${releaseId}/datafile/metadata/${fileId}`;
+    return `/release/${releaseId}/data/metadata/${fileName}`;
   },
-  getReleaseAdhocFiles(releaseId: string): Promise<AdhocFile[]> {
-    return client.get<AdhocFile[]>(`/release/${releaseId}/adhoc-files`);
+  getAncillaryFiles(releaseId: string): Promise<AncillaryFile[]> {
+    return client
+      .get<GetFileResponse[]>(`/release/${releaseId}/ancillary`)
+      .then(response =>
+        response.map(file => ({
+          title: file.name,
+          file: {
+            id: file.path,
+            fileName: getFileNameFromPath(file.path),
+          },
+          fileSize: {
+            size: parseInt(file.size.split(' ')[0], 10),
+            unit: file.size.split(' ')[1],
+          },
+        })),
+      );
   },
-  uploadAdhocFile(
+  uploadAncillaryFile(
     releaseId: string,
     request: UploadAdhocFileRequest,
   ): Promise<null> {
     const data = new FormData();
-    data.append('name', request.name);
     data.append('file', request.file);
-    return client.post<null>(`/release/${releaseId}/adhoc-files/upload`, data);
+    return client.post<null>(
+      `/release/${releaseId}/ancillary?name=${request.name}`,
+      data,
+    );
   },
-  deleteAdhocFile(releaseId: string, fileId: string): Promise<null> {
-    return client.delete<null>(`/release/${releaseId}/adhoc-files/${fileId}`);
+  deleteAncillaryFile(releaseId: string, fileName: string): Promise<null> {
+    return client.delete<null>(`/release/${releaseId}/ancillary/${fileName}`);
   },
-  createDownloadAdhocFileLink(releaseId: string, fileId: string): string {
-    return `/release/${releaseId}/adhoc-file/${fileId}`;
+  createDownloadAncillaryFileLink(releaseId: string, fileName: string): string {
+    return `/release/${releaseId}/ancillary/${fileName}`;
   },
 };
 

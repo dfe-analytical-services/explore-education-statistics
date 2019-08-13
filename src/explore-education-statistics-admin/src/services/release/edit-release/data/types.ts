@@ -1,5 +1,4 @@
 interface FileDetails {
-  id: string;
   fileName: string;
 }
 
@@ -20,7 +19,7 @@ export interface UploadDataFilesRequest {
   metadataFile: File;
 }
 
-export interface AdhocFile {
+export interface AncillaryFile {
   title: string;
   file: FileDetails;
   fileSize: {

@@ -1,7 +1,7 @@
 import Link from '@admin/components/Link';
 import { dataRoute } from '@admin/routes/edit-release/routes';
 import service from '@admin/services/release/edit-release/data/service';
-import { AdhocFile } from '@admin/services/release/edit-release/data/types';
+import { AncillaryFile } from '@admin/services/release/edit-release/data/types';
 import Button from '@common/components/Button';
 import FormFieldFileSelector from '@common/components/form/FormFieldFileSelector';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
@@ -10,7 +10,7 @@ import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
-import { FormikProps } from 'formik';
+import { FormikActions, FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
 
 interface FormValues {
@@ -26,24 +26,37 @@ interface Props {
 const formId = 'fileUploadForm';
 
 const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
-  const [files, setFiles] = useState<AdhocFile[]>();
-  const [deleteFileId, setDeleteFileRequest] = useState('');
+  const [files, setFiles] = useState<AncillaryFile[]>();
+  const [deleteFileName, setDeleteFileName] = useState('');
 
   useEffect(() => {
-    service.getReleaseAdhocFiles(releaseId).then(setFiles);
+    service.getAncillaryFiles(releaseId).then(setFiles);
   }, [publicationId, releaseId]);
+
+  const resetPage = async <T extends {}>({ resetForm }: FormikActions<T>) => {
+    resetForm();
+    document
+      .querySelectorAll(`#${formId} input[type='file']`)
+      .forEach(input => {
+        const fileInput = input as HTMLInputElement;
+        fileInput.value = '';
+      });
+
+    const latestFiles = await service.getAncillaryFiles(releaseId);
+    setFiles(latestFiles);
+  };
 
   return (
     <>
       {files &&
         files.map(file => (
-          <SummaryList key={file.file.id}>
+          <SummaryList key={file.file.fileName}>
             <SummaryListItem term="Name">{file.title}</SummaryListItem>
             <SummaryListItem term="File">
               <a
                 href={service.createDownloadDataFileLink(
                   releaseId,
-                  file.file.id,
+                  file.file.fileName,
                 )}
               >
                 {file.file.fileName}
@@ -55,7 +68,10 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
             <SummaryListItem
               term="Actions"
               actions={
-                <Link to="#" onClick={_ => setDeleteFileRequest(file.file.id)}>
+                <Link
+                  to="#"
+                  onClick={() => setDeleteFileName(file.file.fileName)}
+                >
                   Delete file
                 </Link>
               }
@@ -69,22 +85,12 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
           file: null,
         }}
         onSubmit={async (values: FormValues, actions) => {
-          service
-            .uploadAdhocFile(releaseId, {
-              name: values.name,
-              file: values.file as File,
-            })
-            .then(_ => service.getReleaseAdhocFiles(releaseId))
-            .then(setFiles)
-            .then(_ => {
-              actions.resetForm();
-              document
-                .querySelectorAll(`#${formId} input[type='file']`)
-                .forEach(input => {
-                  const fileInput = input as HTMLInputElement;
-                  fileInput.value = '';
-                });
-            });
+          await service.uploadAncillaryFile(releaseId, {
+            name: values.name,
+            file: values.file as File,
+          });
+
+          resetPage(actions);
         }}
         validationSchema={Yup.object<FormValues>({
           name: Yup.string().required('Enter a name'),
@@ -121,26 +127,26 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
                   Cancel
                 </Link>
               </div>
+
+              <ModalConfirm
+                mounted={deleteFileName != null && deleteFileName.length > 0}
+                title="Confirm deletion of file"
+                onExit={() => setDeleteFileName('')}
+                onCancel={() => setDeleteFileName('')}
+                onConfirm={async () => {
+                  await service.deleteAncillaryFile(releaseId, deleteFileName);
+                  setDeleteFileName('');
+                  resetPage(form);
+                }}
+              >
+                <p>
+                  This file will no longer be available for use in this release
+                </p>
+              </ModalConfirm>
             </Form>
           );
         }}
       />
-
-      <ModalConfirm
-        mounted={deleteFileId != null && deleteFileId.length > 0}
-        title="Confirm deletion of file"
-        onExit={() => setDeleteFileRequest('')}
-        onCancel={() => setDeleteFileRequest('')}
-        onConfirm={() =>
-          service
-            .deleteAdhocFile(releaseId, deleteFileId)
-            .then(_ => service.getReleaseAdhocFiles(releaseId))
-            .then(setFiles)
-            .then(_ => setDeleteFileRequest(''))
-        }
-      >
-        <p>This file will no longer be available for use in this release</p>
-      </ModalConfirm>
     </>
   );
 };

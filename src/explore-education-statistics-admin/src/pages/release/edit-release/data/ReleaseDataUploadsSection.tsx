@@ -86,7 +86,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
             <Form id={formId} submitValidationHandler={handleServerValidation}>
               {dataFiles &&
                 dataFiles.map(dataFile => (
-                  <SummaryList key={dataFile.file.id}>
+                  <SummaryList key={dataFile.file.fileName}>
                     <SummaryListItem term="Subject title">
                       {dataFile.title}
                     </SummaryListItem>
@@ -94,7 +94,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                       <a
                         href={service.createDownloadDataFileLink(
                           releaseId,
-                          dataFile.file.id,
+                          dataFile.file.fileName,
                         )}
                       >
                         {dataFile.file.fileName}
@@ -111,7 +111,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                       <a
                         href={service.createDownloadDataMetadataFileLink(
                           releaseId,
-                          dataFile.file.id,
+                          dataFile.file.fileName,
                         )}
                       >
                         {dataFile.metadataFile.fileName}
@@ -122,7 +122,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                       actions={
                         <Link
                           to="#"
-                          onClick={_ =>
+                          onClick={() =>
                             setDeleteFileName(dataFile.file.fileName)
                           }
                         >
@@ -167,26 +167,26 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                   Cancel
                 </Link>
               </div>
+
+              <ModalConfirm
+                mounted={deleteFileName != null && deleteFileName.length > 0}
+                title="Confirm deletion of selected data files"
+                onExit={() => setDeleteFileName('')}
+                onCancel={() => setDeleteFileName('')}
+                onConfirm={async () => {
+                  await service.deleteDataFiles(releaseId, deleteFileName);
+                  setDeleteFileName('');
+                  resetPage(form);
+                }}
+              >
+                <p>
+                  This data will no longer be available for use in this release
+                </p>
+              </ModalConfirm>
             </Form>
           );
         }}
       />
-
-      <ModalConfirm
-        mounted={deleteFileName != null && deleteFileName.length > 0}
-        title="Confirm deletion of selected data files"
-        onExit={() => setDeleteFileName('')}
-        onCancel={() => setDeleteFileName('')}
-        onConfirm={() =>
-          service
-            .deleteDataFiles(releaseId, deleteFileName)
-            .then(_ => service.getReleaseDataFiles(releaseId))
-            .then(setDataFiles)
-            .then(_ => setDeleteFileName(''))
-        }
-      >
-        <p>This data will no longer be available for use in this release</p>
-      </ModalConfirm>
     </>
   );
 };
