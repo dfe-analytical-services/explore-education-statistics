@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void CreateReleaseNoTemplate()
         {
-            using (var context = InMemoryApplicationDbContext("Create"))
+            using (var context = InMemoryApplicationDbContext("CreateReleaseNoTemplate"))
             {
                 context.Add(new ReleaseType {Id = new Guid("484e6b5c-4a0f-47fd-914e-ac4dac5bdd1c"), Title = "Ad Hoc",});
                 context.Add(new Publication
@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 context.SaveChanges();
             }
 
-            using (var context = InMemoryApplicationDbContext("Create"))
+            using (var context = InMemoryApplicationDbContext("CreateReleaseNoTemplate"))
             {
                 var result = new ReleaseService(context, MapperForProfile<MappingProfiles>()).CreateReleaseAsync(
                     new CreateReleaseViewModel
@@ -34,13 +34,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         ReleaseName = "2018",
                         TimePeriodCoverage = TimeIdentifier.AcademicYear,
                         PublishScheduled = DateTime.Parse("2050/01/01"),
-                        ReleaseTypeId = new Guid("02e664f2-a4bc-43ee-8ff0-c87354adae72")
+                        TypeId = new Guid("02e664f2-a4bc-43ee-8ff0-c87354adae72")
                     });
 
-                Assert.Equal("Academic Year 2018/19", result.Result.Title);
-                Assert.Null(result.Result.Published);
-                Assert.False(result.Result.LatestRelease); // Most recent - but not published yet.
-                Assert.Equal(TimeIdentifier.AcademicYear, result.Result.TimePeriodCoverage);
+                Assert.Equal("Academic Year 2018/19", result.Result.Right.Title);
+                Assert.Null(result.Result.Right.Published);
+                Assert.False(result.Result.Right.LatestRelease); // Most recent - but not published yet.
+                Assert.Equal(TimeIdentifier.AcademicYear, result.Result.Right.TimePeriodCoverage);
             }
         }
 
@@ -103,11 +103,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         ReleaseName = "2018",
                         TimePeriodCoverage = TimeIdentifier.AcademicYear,
                         PublishScheduled = DateTime.Parse("2050/01/01"),
-                        ReleaseTypeId = new Guid("2a0217ca-c514-45da-a8b3-44c68a6737e8")
+                        TypeId = new Guid("2a0217ca-c514-45da-a8b3-44c68a6737e8")
                     });
 
                 // Do an in depth check of the saved release
-                var release = context.Releases.Single(r => r.Id == result.Result.Id);
+                var release = context.Releases.Single(r => r.Id == result.Result.Right.Id);
                 Assert.Equal(2, release.Content.Count);
                 Assert.Equal("Template caption index 0", release.Content[0].Caption);
                 Assert.Equal("Template heading index 0", release.Content[0].Heading);
@@ -232,11 +232,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             TimePeriodCoverage = timePeriodCoverageEdited
                         });
 
-                Assert.Equal(publishScheduledEdited, edited.PublishScheduled);
-                Assert.Equal(nextReleaseDateEdited, edited.NextReleaseDate);
-                Assert.Equal(typeEditedId, edited.TypeId);
-                Assert.Equal(releaseNameEdited, edited.ReleaseName);
-                Assert.Equal(timePeriodCoverageEdited, edited.TimePeriodCoverage);
+                Assert.Equal(publishScheduledEdited, edited.Right.PublishScheduled);
+                Assert.Equal(nextReleaseDateEdited, edited.Right.NextReleaseDate);
+                Assert.Equal(typeEditedId, edited.Right.TypeId);
+                Assert.Equal(releaseNameEdited, edited.Right.ReleaseName);
+                Assert.Equal(timePeriodCoverageEdited, edited.Right.TimePeriodCoverage);
             }
         }
 

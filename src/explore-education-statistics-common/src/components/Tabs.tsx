@@ -68,7 +68,10 @@ const Tabs = ({ children, id, onToggle }: Props) => {
                   event.preventDefault();
                   setSelectedTab(index);
                   if (typeof onToggle === 'function') {
-                    onToggle({ id: sectionId, title: props.title });
+                    onToggle({
+                      title: props.title,
+                      id: sectionId,
+                    });
                   }
                 }}
                 onKeyDown={event => {
@@ -82,7 +85,10 @@ const Tabs = ({ children, id, onToggle }: Props) => {
                       setSelectedTab(nextTabIndex);
                       tabElements[nextTabIndex].focus();
                       if (typeof onToggle === 'function') {
-                        onToggle({ id: sectionId, title: props.title });
+                        onToggle({
+                          title: `${props.title}`,
+                          id: `${sectionId}`,
+                        });
                       }
                       break;
                     }
@@ -95,7 +101,10 @@ const Tabs = ({ children, id, onToggle }: Props) => {
                       setSelectedTab(nextTabIndex);
                       tabElements[nextTabIndex].focus();
                       if (typeof onToggle === 'function') {
-                        onToggle({ id: sectionId, title: props.title });
+                        onToggle({
+                          title: `${props.title}`,
+                          id: `${sectionId}`,
+                        });
                       }
                       break;
                     }

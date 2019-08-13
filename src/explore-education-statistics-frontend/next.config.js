@@ -142,14 +142,17 @@ const nextConfig = {
       const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
       const StylelintPlugin = require('stylelint-webpack-plugin');
 
-      config.plugins.push(
-        new CaseSensitivePathsPlugin(),
-        new StylelintPlugin({
-          // Next doesn't play nicely with emitted errors
-          // so we'll just display warnings instead
-          emitErrors: false,
-        }),
-      );
+      config.plugins.push(new CaseSensitivePathsPlugin());
+
+      if (envConfig.ESLINT_DISABLE !== 'true') {
+        config.plugins.push(
+          new StylelintPlugin({
+            // Next doesn't play nicely with emitted errors
+            // so we'll just display warnings instead
+            emitErrors: false,
+          }),
+        );
+      }
     }
 
     const originalEntry = config.entry;

@@ -36,16 +36,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return blob.DownloadTextAsync();
         }
         
-        public async Task<bool> FileExistsAndIsReleased(string containerName, string blobName)
+        public bool FileExistsAndIsReleased(string containerName, string blobName)
         {
-            var blobContainer = await GetCloudBlobContainer(containerName);
+            var blobContainer = GetCloudBlobContainer(containerName);
             var blob = blobContainer.GetBlockBlobReference(blobName);
             return blob.Exists() && IsFileReleased(blob);
         }
 
         public async Task<FileStreamResult> StreamFile(string containerName, string blobName, string fileName)
         {
-            var blobContainer = await GetCloudBlobContainer(containerName);
+            var blobContainer = GetCloudBlobContainer(containerName);
             var blob = blobContainer.GetBlockBlobReference(blobName);
 
             if (!blob.Exists())
@@ -65,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         public async Task UploadFromStreamAsync(string containerName, string blobName, string contentType, string content)
         {
-            var blobContainer = await GetCloudBlobContainer(containerName);
+            var blobContainer = GetCloudBlobContainer(containerName);
             var blob = blobContainer.GetBlockBlobReference(blobName);
             blob.Properties.ContentType = contentType;
             
@@ -95,12 +95,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return DateTime.ParseExact(dateTime, "o", CultureInfo.InvariantCulture, DateTimeStyles.None);
         }
         
-        private async Task<CloudBlobContainer> GetCloudBlobContainer(string containerName)
+        private CloudBlobContainer GetCloudBlobContainer(string containerName)
         {
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
             var blobClient = storageAccount.CreateCloudBlobClient();
             var blobContainer = blobClient.GetContainerReference(containerName);
-            await blobContainer.CreateIfNotExistsAsync();
+            blobContainer.CreateIfNotExists();
             return blobContainer;
         }
     }

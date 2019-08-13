@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage;
@@ -14,6 +14,7 @@ using Microsoft.WindowsAzure.Storage.Blob;
 using MimeTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using FileInfo = GovUk.Education.ExploreEducationStatistics.Admin.Models.FileInfo;
 using ReleaseId = System.Guid;
 using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
@@ -25,10 +26,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly string _storageConnectionString;
 
         private const string ContainerName = "releases";
-
-        private const string MetaFileKey = "metafile";
-        
-        private const string DataFileKey = "datafile";
         
         private const string NameKey = "name";
 
@@ -67,18 +64,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ValidationResult,IEnumerable<FileInfo>>> DeleteDataFileAsync(Guid releaseId, string fileName)
         {
             // TODO what are the conditions in which we allow deletion?
+            // Validate that the data is as expected.
+            var dataFilePath = AdminReleasePath(releaseId, ReleaseFileTypes.Data, fileName);
             var blobContainer = await GetCloudBlobContainer();
-            var dataBlob = blobContainer.GetBlockBlobReference(ReleasePath(releaseId, ReleaseFileTypes.Data, fileName));
-            await dataBlob.FetchAttributesAsync(); 
+            var dataBlob = blobContainer.GetBlockBlobReference(dataFilePath);
+            if (!dataBlob.Exists())
+            {
+                return ValidationResult(FileNotFound);
+            }
+            dataBlob.FetchAttributes(); 
             if (!dataBlob.Metadata.ContainsKey(MetaFileKey))
             {
                 return ValidationResult(UnableToFindMetadataFileToDelete);
             }
             var metaFileName = dataBlob.Metadata[MetaFileKey];
             // Delete the data 
-            return await DeleteFileAsync(blobContainer, ReleasePath(releaseId, ReleaseFileTypes.Data, fileName))
+            return await DeleteFileAsync(blobContainer, AdminReleasePath(releaseId, ReleaseFileTypes.Data, fileName))
                 // and the metadata
-                .OnSuccess(async () => await DeleteFileAsync(blobContainer, ReleasePath(releaseId, ReleaseFileTypes.Data, metaFileName)))
+                .OnSuccess(async () => await DeleteFileAsync(blobContainer, AdminReleasePath(releaseId, ReleaseFileTypes.Data, metaFileName)))
                 // and return the remaining files
                 .OnSuccess(async () => await ListFilesAsync(releaseId, ReleaseFileTypes.Data));
         }
@@ -98,8 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 return ValidationResult(CannotUseGenericFunctionToDeleteDataFile);
             }
-
-            return await DeleteFileAsync(await GetCloudBlobContainer(), ReleasePath(releaseId, type, fileName))
+            return await DeleteFileAsync(await GetCloudBlobContainer(), AdminReleasePath(releaseId, type, fileName))
                 .OnSuccess(async () => await ListFilesAsync(releaseId, type));
         }
 
@@ -107,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var blobContainer = await GetCloudBlobContainer();
 
-            return blobContainer.ListBlobs(ReleasePath(releaseId, type), true, BlobListingDetails.Metadata)
+            return blobContainer.ListBlobs(AdminReleaseDirectoryPath(releaseId, type), true, BlobListingDetails.Metadata)
                 .OfType<CloudBlockBlob>()
                 .Select(file => new FileInfo
                 {
@@ -122,7 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private static async Task<Either<ValidationResult, bool>> UploadFileAsync(CloudBlobContainer blobContainer, Guid releaseId, IFormFile file, ReleaseFileTypes type, IDictionary<string, string> metaValues, bool overwrite = false)
         {
-            var blob = blobContainer.GetBlockBlobReference(ReleasePath(releaseId, type, file.FileName));
+            var blob = blobContainer.GetBlockBlobReference(AdminReleasePath(releaseId, type, file.FileName));
             if (blob.Exists() && !overwrite)
             {
                 return ValidationResult(CannotOverwriteFile);
@@ -138,7 +140,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private static async Task<Either<ValidationResult, bool>> DeleteFileAsync(CloudBlobContainer blobContainer, string path)
         {
             var blob = blobContainer.GetBlockBlobReference(path);
-            return await blob.DeleteIfExistsAsync();
+            if (!blob.Exists())
+            {
+                return ValidationResult(FileNotFound);
+            }
+            await blob.DeleteAsync();
+            return true;
+
         }
 
         private async Task<CloudBlobContainer> GetCloudBlobContainer()
@@ -163,20 +171,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return path;
         }
-
-        private static string ReleasePath(string releaseId, ReleaseFileTypes type)
-        {
-            return $"{releaseId}/{type.GetEnumLabel()}";
-        }
-
-        private static string ReleasePath(string releaseId, ReleaseFileTypes type, string fileName)
-        {
-            return ReleasePath(releaseId, type) + $"/{fileName}";
-        }
-
-        private static string ReleasePath(Guid releaseId, ReleaseFileTypes type, string fileName)
-            => ReleasePath(releaseId.ToString(), type, fileName);
-
+        
         private static string GetExtension(CloudBlob blob)
         {
             return MimeTypeMap.GetExtension(blob.Properties.ContentType).TrimStart('.');
