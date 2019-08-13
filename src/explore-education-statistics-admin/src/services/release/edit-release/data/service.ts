@@ -1,11 +1,7 @@
+import {Polyfilla} from "@admin/services/util/polyfilla";
 import client from '@admin/services/util/service';
 
-import {
-  AdhocFile,
-  DataFile,
-  UploadAdhocFileRequest,
-  UploadDataFilesRequest,
-} from './types';
+import {AdhocFile, DataFile, UploadAdhocFileRequest, UploadDataFilesRequest,} from './types';
 
 export interface EditReleaseService {
   getReleaseDataFiles: (releaseId: string) => Promise<DataFile[]>;
@@ -28,21 +24,29 @@ export interface EditReleaseService {
   createDownloadAdhocFileLink: (releaseId: string, fileId: string) => string;
 }
 
-type ListDataFilesResponse = [{
+interface GetDataFileResponse {
   extension: string;
   name: string;
   path: string;
   size: string;
   metaFileName: string;
-}];
+  rows?: number;
+};
 
 const getFileNameFromPath = (path: string) =>
   path.substring(path.lastIndexOf('/') + 1);
 
+const dataFilePolyfilla: Polyfilla<GetDataFileResponse[]> =
+  (response) => response.map(file => ({
+    ...file,
+    rows: 777777,
+  }));
+
 const service: EditReleaseService = {
   getReleaseDataFiles(releaseId: string): Promise<DataFile[]> {
     return client.
-      get<ListDataFilesResponse>(`/release/${releaseId}/data`).
+      get<GetDataFileResponse[]>(`/release/${releaseId}/data`).
+      then(dataFilePolyfilla).
       then(response => {
         const dataFiles = response.filter(file => file.metaFileName.length > 0);
         return dataFiles.map(dataFile => {
@@ -53,7 +57,7 @@ const service: EditReleaseService = {
               id: dataFile.path,
               fileName: getFileNameFromPath(dataFile.path),
             },
-            numberOfRows: 777777,
+            numberOfRows: dataFile.rows || 0,
             fileSize: {
               size: parseInt(dataFile.size.split(' ')[0], 10),
               unit: dataFile.size.split(' ')[1],
