@@ -47,7 +47,7 @@ import WizardStep from './components/WizardStep';
 import WizardStepHeading from './components/WizardStepHeading';
 import TableHeadersForm, {
   TableHeadersFormValues,
-  returnDefaultTableHeaderConfig,
+  getDefaultTableHeaderConfig,
 } from './components/TableHeadersForm';
 
 export interface PublicationOptions {
@@ -329,7 +329,7 @@ class TableToolPage extends Component<Props, State> {
       timePeriodRange: timePeriods,
       tableData: result,
       footnotes,
-      tableHeaders: returnDefaultTableHeaderConfig(
+      tableHeaders: getDefaultTableHeaderConfig(
         indicators,
         filters,
         timePeriods,

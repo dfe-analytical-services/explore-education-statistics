@@ -40,7 +40,7 @@ const removeSiblinglessTotalRows = (
   });
 };
 
-export const returnDefaultTableHeaderConfig = (
+export const getDefaultTableHeaderConfig = (
   indicators: Indicator[],
   filters: Dictionary<CategoryFilter[]>,
   timePeriods: TimePeriod[],

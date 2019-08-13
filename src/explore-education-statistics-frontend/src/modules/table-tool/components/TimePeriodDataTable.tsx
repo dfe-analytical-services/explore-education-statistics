@@ -57,6 +57,14 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
           ? tableHeadersConfig.rows
           : [],
     });
+    const removeSiblinglessTotalRows = (
+      categoryFilters: Dictionary<CategoryFilter[]>,
+    ): CategoryFilter[][] => {
+      return Object.values(categoryFilters).filter(filter => {
+        return filter.length > 1 || !filter[0].isTotal;
+      });
+    };
+
     useEffect(() => {
       if (
         tableHeadersConfig &&
@@ -67,15 +75,7 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
       ) {
         setTableHeaders(tableHeadersConfig);
       }
-    });
-
-    const removeSiblinglessTotalRows = (
-      categoryFilters: Dictionary<CategoryFilter[]>,
-    ): CategoryFilter[][] => {
-      return Object.values(categoryFilters).filter(filter => {
-        return filter.length > 1 || !filter[0].isTotal;
-      });
-    };
+    }, [tableHeadersConfig]);
 
     useEffect(() => {
       const sortedFilters = sortBy(
@@ -173,16 +173,14 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
     });
 
     return (
-      <div>
-        <FixedMultiHeaderDataTable
-          caption={<DataTableCaption {...props} id="dataTableCaption" />}
-          columnHeaders={columnHeaders}
-          rowHeaders={rowHeaders}
-          rows={rows}
-          ref={dataTableRef}
-          footnotes={footnotes}
-        />
-      </div>
+      <FixedMultiHeaderDataTable
+        caption={<DataTableCaption {...props} id="dataTableCaption" />}
+        columnHeaders={columnHeaders}
+        rowHeaders={rowHeaders}
+        rows={rows}
+        ref={dataTableRef}
+        footnotes={footnotes}
+      />
     );
   },
 );
