@@ -1,9 +1,9 @@
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 {
@@ -41,13 +41,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             string filename)
         {
             if (!_fileStorageService.FileExistsAndIsReleased(ContainerName,
-                FileStoragePathUtils.PublicReleasePath(publication, release, type, filename)))
+                PublicReleasePath(publication, release, type, filename)))
             {
                 return NotFound();
             }
 
             return await _fileStorageService.StreamFile(ContainerName,
-                FileStoragePathUtils.PublicReleasePath(publication, release, type, filename), filename);
+                PublicReleasePath(publication, release, type, filename), filename);
         }
     }
 }
