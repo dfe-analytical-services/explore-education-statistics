@@ -26,6 +26,7 @@ import mapValues from 'lodash/mapValues';
 import { NextContext } from 'next';
 import Router from 'next/router';
 import React, { Component, MouseEventHandler, RefObject } from 'react';
+import getDefaultTableHeaderConfig from '@frontend/services/tableHeadersService';
 import DownloadCsvButton from './components/DownloadCsvButton';
 import FiltersForm, { FilterFormSubmitHandler } from './components/FiltersForm';
 import LocationFiltersForm, {
@@ -47,7 +48,6 @@ import WizardStep from './components/WizardStep';
 import WizardStepHeading from './components/WizardStepHeading';
 import TableHeadersForm, {
   TableHeadersFormValues,
-  getDefaultTableHeaderConfig,
 } from './components/TableHeadersForm';
 
 export interface PublicationOptions {
