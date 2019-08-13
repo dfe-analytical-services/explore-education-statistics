@@ -6,7 +6,9 @@ import {
   ChartProps,
   createDataForAxis,
   generateKeyFromDataSet,
-  ChartDataB, createSortedAndMappedDataForAxis, createSortedDataForAxis,
+  ChartDataB,
+  createSortedAndMappedDataForAxis,
+  createSortedDataForAxis,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 
 import {
@@ -67,19 +69,19 @@ function getLocationsForDataSet(
   meta: DataBlockMetadata,
   chartData: ChartDataB[],
 ) {
-
   const allLocationIds = chartData.map(({ __name }) => __name);
 
   return [
     { label: 'select...', value: '' },
-    ...allLocationIds
-
-      .reduce((locations: { label: string; value: string }[], next: string) => {
+    ...allLocationIds.reduce(
+      (locations: { label: string; value: string }[], next: string) => {
         const { label, value } = (meta.locations || {})[next];
 
         return [...locations, { label, value }];
-      }, [])
-      /*
+      },
+      [],
+    ),
+    /*
       .sort((a, b) => {
         if (a.label < b.label) return -1;
         if (a.label > b.label) return 1;
@@ -145,9 +147,7 @@ function generateGeometryAndLegendForSelectedOptions(
     .map(entry => ({ ...entry, data: entry[selectedDataSet] }))
     .filter(({ data }) => data !== undefined);
 
-  const { min, range, scale } = calculateMinAndScaleForSourceData(
-    sourceData,
-  );
+  const { min, range, scale } = calculateMinAndScaleForSourceData(sourceData);
 
   const legend: LegendEntry[] = [...Array(5)].map((_, idx) => {
     const i = idx / 4;
@@ -243,7 +243,9 @@ const MapBlock = ({
   const container = React.createRef<HTMLDivElement>();
   const ukRef = React.createRef<GeoJSON>();
 
-  const [geometry, setGeometry] = React.useState<FeatureCollection<Geometry, DataBlockGeoJsonProperties>>();
+  const [geometry, setGeometry] = React.useState<
+    FeatureCollection<Geometry, DataBlockGeoJsonProperties>
+  >();
 
   const [ukGeometry, setUkGeometry] = React.useState<FeatureCollection>();
 
@@ -255,7 +257,9 @@ const MapBlock = ({
 
   const [legend, setLegend] = React.useState<LegendEntry[]>([]);
 
-  const [selectedDataSetIndex, setSelectedDataSetIndex] = React.useState<number>(0);
+  const [selectedDataSetIndex, setSelectedDataSetIndex] = React.useState<
+    number
+  >(0);
   const [selectedDataSetKey, setSelectedDataSetKey] = React.useState<string>(
     generateKeyFromDataSet(axes.major.dataSets[0], axes.major.groupBy),
   );
@@ -297,7 +301,13 @@ const MapBlock = ({
 
   // initialise on prop changes
   React.useEffect(() => {
-    const generatedChartData = createSortedAndMappedDataForAxis(axes.major, data.result, meta, labels);
+    const generatedChartData = createSortedAndMappedDataForAxis(
+      axes.major,
+      data.result,
+      meta,
+      labels,
+      true,
+    );
 
     setChartData(generatedChartData);
 
@@ -408,7 +418,6 @@ const MapBlock = ({
   };
 
   const onEachFeature = (feature: MapFeature, featureLayer: Path) => {
-
     if (feature.properties) {
       // eslint-disable-next-line no-param-reassign
       feature.properties.layer = featureLayer;
@@ -422,9 +431,7 @@ const MapBlock = ({
     });
 
     featureLayer.bindTooltip(() => {
-
       if (feature.properties) {
-
         const content = Object.entries(feature.properties.measures).map(
           ([id, value]) => `${labels[id].label} : ${value}${labels[id].unit}`,
         );
@@ -522,24 +529,24 @@ const MapBlock = ({
             </h3>
             <dl className="govuk-list">
               {legend &&
-              legend.map(({ min, max, idx, minValue }) => (
-                <dd className={styles.legend} key={idx}>
-                  <span
-                    className={styles[`rate${idx}`]}
-                    style={{
-                      backgroundColor: calculateColour({
-                        scaledData: minValue,
-                        color: labels[selectedDataSetKey].colour,
-                      }),
-                    }}
-                  >
-                    &nbsp;
-                  </span>{' '}
-                  {min}
-                  {labels[selectedDataSetKey].unit}&nbsp; to {max}
-                  {labels[selectedDataSetKey].unit}{' '}
-                </dd>
-              ))}
+                legend.map(({ min, max, idx, minValue }) => (
+                  <dd className={styles.legend} key={idx}>
+                    <span
+                      className={styles[`rate${idx}`]}
+                      style={{
+                        backgroundColor: calculateColour({
+                          scaledData: minValue,
+                          color: labels[selectedDataSetKey].colour,
+                        }),
+                      }}
+                    >
+                      &nbsp;
+                    </span>{' '}
+                    {min}
+                    {labels[selectedDataSetKey].unit}&nbsp; to {max}
+                    {labels[selectedDataSetKey].unit}{' '}
+                  </dd>
+                ))}
             </dl>
           </div>
         )}
@@ -570,10 +577,10 @@ const MapBlock = ({
                   calculateColour(feature.properties),
                 className: classNames({
                   [styles.selected]:
-                  selectedDataSetIndex &&
-                  feature &&
-                  feature.id ===
-                  axes.major.dataSets[selectedDataSetIndex].location,
+                    selectedDataSetIndex &&
+                    feature &&
+                    feature.id ===
+                      axes.major.dataSets[selectedDataSetIndex].location,
                 }),
               })}
               onclick={onClick}

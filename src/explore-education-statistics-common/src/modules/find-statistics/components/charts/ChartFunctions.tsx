@@ -103,7 +103,6 @@ export interface ChartDefinition {
 
   height?: number;
 
-
   capabilities: ChartCapabilities;
 
   data: {
@@ -269,22 +268,22 @@ export function generateKeyFromDataSet(
       location &&
       location.country &&
       location.country.code) ||
-    '',
+      '',
     (dontIgnoreLocations &&
       location &&
       location.region &&
       location.region.code) ||
-    '',
+      '',
     (dontIgnoreLocations &&
       location &&
       location.localAuthorityDistrict &&
       location.localAuthorityDistrict.code) ||
-    '',
+      '',
     (dontIgnoreLocations &&
       location &&
       location.localAuthority &&
       location.localAuthority.code) ||
-    '',
+      '',
   ];
 
   return [
@@ -369,7 +368,7 @@ function getChartDataForAxis(
         [name]: {
           name,
           [generateKeyFromDataSet(dataSet, groupBy)]:
-          result.measures[dataSet.indicator] || 'NaN',
+            result.measures[dataSet.indicator] || 'NaN',
         },
       };
     }, nameDictionary),
@@ -443,10 +442,11 @@ const FindFirstInDictionaries = (
   result || (meta && meta[name] && meta[name].label);
 
 export function mapNameToNameLabel(
+  keepOriginalValue: boolean = false,
   ...metaDataObjects: (Dictionary<DataSetConfiguration> | undefined)[]
 ) {
   return ({ name, ...otherdata }: { name: string }) => ({
-    __name: name,
+    ...(keepOriginalValue ? { __name: name } : {}),
     name:
       metaDataObjects.reduce(
         FindFirstInDictionaries(metaDataObjects, name),
@@ -460,7 +460,7 @@ export function createSortedDataForAxis(
   axisConfiguration: AxisConfiguration,
   results: Result[],
   meta: DataBlockMetadata,
-  mapFunction: (data : ChartDataB) => ChartDataB = data=>data
+  mapFunction: (data: ChartDataB) => ChartDataB = data => data,
 ): ChartDataB[] {
   const chartData: ChartDataB[] = createDataForAxis(
     axisConfiguration,
@@ -486,16 +486,19 @@ export function createSortedAndMappedDataForAxis(
   results: Result[],
   meta: DataBlockMetadata,
   labels: Dictionary<DataSetConfiguration>,
+  keepOriginalValue: boolean = false,
 ): ChartDataB[] {
-
   return createSortedDataForAxis(
     axisConfiguration,
     results,
     meta,
-    mapNameToNameLabel(labels, meta.timePeriods, meta.locations)
+    mapNameToNameLabel(
+      keepOriginalValue,
+      labels,
+      meta.timePeriods,
+      meta.locations,
+    ),
   );
-
-
 }
 
 export function getKeysForChart(chartData: ChartDataB[]) {
@@ -689,22 +692,22 @@ export const CustomToolTip = ({ active, payload, label }: TooltipProps) => {
       <div className="graph-tooltip">
         <p>{label}</p>
         {payload &&
-        payload
-          .sort((a, b) => {
-            if (typeof b.value === 'number' && typeof a.value === 'number') {
-              return b.value - a.value;
-            }
+          payload
+            .sort((a, b) => {
+              if (typeof b.value === 'number' && typeof a.value === 'number') {
+                return b.value - a.value;
+              }
 
-            return 0;
-          })
-          .map((_, index) => {
-            return (
-              // eslint-disable-next-line react/no-array-index-key
-              <p key={index}>
-                {`${payload[index].name} : ${payload[index].value}`}
-              </p>
-            );
-          })}
+              return 0;
+            })
+            .map((_, index) => {
+              return (
+                // eslint-disable-next-line react/no-array-index-key
+                <p key={index}>
+                  {`${payload[index].name} : ${payload[index].value}`}
+                </p>
+              );
+            })}
       </div>
     );
   }

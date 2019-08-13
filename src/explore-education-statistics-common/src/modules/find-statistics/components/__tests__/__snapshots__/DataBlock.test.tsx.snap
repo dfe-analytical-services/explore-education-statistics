@@ -82,7 +82,6 @@ exports[`DataBlock renders map instead of chart 1`] = `
           </select>
         </div>
       </form>
-      
       <div>
         <h3
           class="govuk-heading-s"

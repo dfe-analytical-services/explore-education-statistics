@@ -73,7 +73,6 @@ exports[`MapBlock renders 1`] = `
           </select>
         </div>
       </form>
-      
       <div>
         <h3
           class="govuk-heading-s"

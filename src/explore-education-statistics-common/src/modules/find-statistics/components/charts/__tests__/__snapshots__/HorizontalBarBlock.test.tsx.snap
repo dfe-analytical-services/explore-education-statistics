@@ -19,7 +19,7 @@ exports[`HorzontalBarBlock renders basic chart correctly 1`] = `
       >
         <defs>
           <clippath
-            id="recharts4-clip"
+            id="recharts5-clip"
           >
             <rect
               height="260"
@@ -111,8 +111,8 @@ exports[`HorzontalBarBlock renders basic chart correctly 1`] = `
               stroke-dasharray="3 3"
               width="810"
               x="90"
-              x1="346.9230769230769"
-              x2="346.9230769230769"
+              x1="319.8612487611497"
+              x2="319.8612487611497"
               y="10"
               y1="10"
               y2="270"
@@ -124,8 +124,8 @@ exports[`HorzontalBarBlock renders basic chart correctly 1`] = `
               stroke-dasharray="3 3"
               width="810"
               x="90"
-              x1="583.8461538461538"
-              x2="583.8461538461538"
+              x1="529.7224975222994"
+              x2="529.7224975222994"
               y="10"
               y1="10"
               y2="270"
@@ -234,8 +234,8 @@ exports[`HorzontalBarBlock renders basic chart correctly 1`] = `
                 stroke="#666"
                 width="810"
                 x="90"
-                x1="346.9230769230769"
-                x2="346.9230769230769"
+                x1="319.8612487611497"
+                x2="319.8612487611497"
                 y="270"
                 y1="276"
                 y2="270"
@@ -247,14 +247,14 @@ exports[`HorzontalBarBlock renders basic chart correctly 1`] = `
                 stroke="none"
                 text-anchor="middle"
                 width="810"
-                x="346.9230769230769"
+                x="319.8612487611497"
                 y="286"
               >
                 <tspan
                   dy="0.71em"
-                  x="346.9230769230769"
+                  x="319.8612487611497"
                 >
-                  1
+                  547
                 </tspan>
               </text>
             </g>
@@ -268,8 +268,8 @@ exports[`HorzontalBarBlock renders basic chart correctly 1`] = `
                 stroke="#666"
                 width="810"
                 x="90"
-                x1="583.8461538461538"
-                x2="583.8461538461538"
+                x1="529.7224975222994"
+                x2="529.7224975222994"
                 y="270"
                 y1="276"
                 y2="270"
@@ -281,14 +281,14 @@ exports[`HorzontalBarBlock renders basic chart correctly 1`] = `
                 stroke="none"
                 text-anchor="middle"
                 width="810"
-                x="583.8461538461538"
+                x="529.7224975222994"
                 y="286"
               >
                 <tspan
                   dy="0.71em"
-                  x="583.8461538461538"
+                  x="529.7224975222994"
                 >
-                  5
+                  1097
                 </tspan>
               </text>
             </g>
@@ -322,7 +322,7 @@ exports[`HorzontalBarBlock renders basic chart correctly 1`] = `
                   dy="0.71em"
                   x="880"
                 >
-                  10
+                  2015
                 </tspan>
               </text>
             </g>
@@ -425,17 +425,31 @@ exports[`HorzontalBarBlock renders basic chart correctly 1`] = `
           >
             <g
               class="recharts-layer recharts-bar-rectangle"
+            />
+            <g
+              class="recharts-layer recharts-bar-rectangle"
+            />
+          </g>
+        </g>
+        <g
+          class="recharts-layer recharts-bar"
+        >
+          <g
+            class="recharts-layer recharts-bar-rectangles"
+          >
+            <g
+              class="recharts-layer recharts-bar-rectangle"
             >
               <path
                 class="recharts-rectangle"
-                d="M 287.69230769230774,23 h 177.69230769230768 v 32 h -177.69230769230768 Z"
+                d="M 111.14469772051537,50 h 1.144697720515353 v 23 h -1.144697720515353 Z"
                 fill="#ff0000"
-                height="32"
+                height="23"
                 radius="0"
                 stroke="#ff0000"
-                width="177.69230769230768"
-                x="287.69230769230774"
-                y="23"
+                width="1.144697720515353"
+                x="111.14469772051537"
+                y="50"
               />
             </g>
             <g
@@ -443,14 +457,14 @@ exports[`HorzontalBarBlock renders basic chart correctly 1`] = `
             >
               <path
                 class="recharts-rectangle"
-                d="M 287.69230769230774,153 h -177.69230769230774 v 32 h 177.69230769230774 Z"
+                d="M 111.14469772051537,180 h -1.1446977205153672 v 23 h 1.1446977205153672 Z"
                 fill="#ff0000"
-                height="32"
+                height="23"
                 radius="0"
                 stroke="#ff0000"
-                width="-177.69230769230774"
-                x="287.69230769230774"
-                y="153"
+                width="-1.1446977205153672"
+                x="111.14469772051537"
+                y="180"
               />
             </g>
           </g>
@@ -466,14 +480,14 @@ exports[`HorzontalBarBlock renders basic chart correctly 1`] = `
             >
               <path
                 class="recharts-rectangle"
-                d="M 287.69230769230774,59 h 592.3076923076923 v 32 h -592.3076923076923 Z"
+                d="M 111.14469772051537,77 h 3.8156590683845337 v 23 h -3.8156590683845337 Z"
                 fill="#00ff00"
-                height="32"
+                height="23"
                 radius="0"
                 stroke="#00ff00"
-                width="592.3076923076923"
-                x="287.69230769230774"
-                y="59"
+                width="3.8156590683845337"
+                x="111.14469772051537"
+                y="77"
               />
             </g>
             <g
@@ -481,14 +495,14 @@ exports[`HorzontalBarBlock renders basic chart correctly 1`] = `
             >
               <path
                 class="recharts-rectangle"
-                d="M 287.69230769230774,189 h 236.9230769230768 v 32 h -236.9230769230768 Z"
+                d="M 111.14469772051537,207 h 1.5262636273538135 v 23 h -1.5262636273538135 Z"
                 fill="#00ff00"
-                height="32"
+                height="23"
                 radius="0"
                 stroke="#00ff00"
-                width="236.9230769230768"
-                x="287.69230769230774"
-                y="189"
+                width="1.5262636273538135"
+                x="111.14469772051537"
+                y="207"
               />
             </g>
           </g>
@@ -504,14 +518,14 @@ exports[`HorzontalBarBlock renders basic chart correctly 1`] = `
             >
               <path
                 class="recharts-rectangle"
-                d="M 287.69230769230774,95 h 296.1538461538461 v 32 h -296.1538461538461 Z"
+                d="M 111.14469772051537,104 h 1.9078295341922598 v 23 h -1.9078295341922598 Z"
                 fill="#0000ff"
-                height="32"
+                height="23"
                 radius="0"
                 stroke="#0000ff"
-                width="296.1538461538461"
-                x="287.69230769230774"
-                y="95"
+                width="1.9078295341922598"
+                x="111.14469772051537"
+                y="104"
               />
             </g>
             <g
@@ -519,14 +533,14 @@ exports[`HorzontalBarBlock renders basic chart correctly 1`] = `
             >
               <path
                 class="recharts-rectangle"
-                d="M 287.69230769230774,225 h 59.23076923076917 v 32 h -59.23076923076917 Z"
+                d="M 111.14469772051537,234 h 0.38156590683844627 v 23 h -0.38156590683844627 Z"
                 fill="#0000ff"
-                height="32"
+                height="23"
                 radius="0"
                 stroke="#0000ff"
-                width="59.23076923076917"
-                x="287.69230769230774"
-                y="225"
+                width="0.38156590683844627"
+                x="111.14469772051537"
+                y="234"
               />
             </g>
           </g>
@@ -555,6 +569,30 @@ exports[`HorzontalBarBlock renders basic chart correctly 1`] = `
               <path
                 class="recharts-legend-icon"
                 d="M0,4h32v24h-32z"
+                stroke="none"
+              />
+            </svg>
+            <span
+              class="recharts-legend-item-text"
+            >
+              __name
+            </span>
+          </li>
+          <li
+            class="recharts-legend-item legend-item-1"
+            style="display: inline-block; margin-right: 10px;"
+          >
+            <svg
+              class="recharts-surface"
+              height="14"
+              style="display: inline-block; vertical-align: middle; margin-right: 4px;"
+              version="1.1"
+              viewBox="0 0 32 32"
+              width="14"
+            >
+              <path
+                class="recharts-legend-icon"
+                d="M0,4h32v24h-32z"
                 fill="#ff0000"
                 stroke="none"
               />
@@ -566,7 +604,7 @@ exports[`HorzontalBarBlock renders basic chart correctly 1`] = `
             </span>
           </li>
           <li
-            class="recharts-legend-item legend-item-1"
+            class="recharts-legend-item legend-item-2"
             style="display: inline-block; margin-right: 10px;"
           >
             <svg
@@ -591,7 +629,7 @@ exports[`HorzontalBarBlock renders basic chart correctly 1`] = `
             </span>
           </li>
           <li
-            class="recharts-legend-item legend-item-2"
+            class="recharts-legend-item legend-item-3"
             style="display: inline-block; margin-right: 10px;"
           >
             <svg
