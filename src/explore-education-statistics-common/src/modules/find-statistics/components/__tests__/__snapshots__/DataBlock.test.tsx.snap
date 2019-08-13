@@ -34,20 +34,14 @@ exports[`DataBlock renders map instead of chart 1`] = `
             name="selectedIndicator"
           >
             <option
-              value="23"
-            >
-              Unauthorised absence rate
-            </option>
+              value="0"
+            />
             <option
-              value="26"
-            >
-              Overall absence rate
-            </option>
+              value="1"
+            />
             <option
-              value="28"
-            >
-              Authorised absence rate
-            </option>
+              value="2"
+            />
           </select>
         </div>
         <div
@@ -74,102 +68,15 @@ exports[`DataBlock renders map instead of chart 1`] = `
             >
               England
             </option>
+            <option
+              value="S92000001"
+            >
+              Scotland
+            </option>
           </select>
         </div>
       </form>
       
-      <div>
-        <h3
-          class="govuk-heading-s"
-        >
-          Key to 
-          Authorised absence rate
-        </h3>
-        <dl
-          class="govuk-list"
-        >
-          <dd
-            class="legend"
-          >
-            <span
-              class="rate0"
-            >
-               
-            </span>
-             
-            5.0
-            %
-              to 
-            5.0
-            %
-             
-          </dd>
-          <dd
-            class="legend"
-          >
-            <span
-              class="rate1"
-            >
-               
-            </span>
-             
-            5.0
-            %
-              to 
-            5.0
-            %
-             
-          </dd>
-          <dd
-            class="legend"
-          >
-            <span
-              class="rate2"
-            >
-               
-            </span>
-             
-            5.0
-            %
-              to 
-            5.0
-            %
-             
-          </dd>
-          <dd
-            class="legend"
-          >
-            <span
-              class="rate3"
-            >
-               
-            </span>
-             
-            5.0
-            %
-              to 
-            5.0
-            %
-             
-          </dd>
-          <dd
-            class="legend"
-          >
-            <span
-              class="rate4"
-            >
-               
-            </span>
-             
-            5.0
-            %
-              to 
-            5.0
-            %
-             
-          </dd>
-        </dl>
-      </div>
     </div>
     <div
       class="govuk-grid-column-two-thirds"

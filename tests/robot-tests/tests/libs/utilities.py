@@ -31,7 +31,8 @@ def user_should_be_at_top_of_page():
 
 def user_checks_page_contains_accordion(accordion_heading):
   try:
-    sl.driver.find_element_by_xpath(f'//*[@class="govuk-accordion__section-button" and text()="{accordion_heading}"]')
+    sl.wait_until_page_contains_element(f'xpath://*[@class="govuk-accordion__section-button" and text()="{accordion_heading}"]')
+    # sl.driver.find_element_by_xpath(f'//*[@class="govuk-accordion__section-button" and text()="{accordion_heading}"]')
   except:
     raise AssertionError(f"Accordion with heading '{accordion_heading} not found!'")
 
@@ -42,8 +43,34 @@ def user_checks_accordion_is_in_position(header_starts_with, position):
   except:
     raise AssertionError(f"There are less than {position} accordion sections!")
 
-  if not elem.text.startswith(header_starts_with):
+  if not elem.text.strip().startswith(header_starts_with):
     raise AssertionError(f'Accordion in position {position} expected start with text "{header_starts_with}". Actual found text: "{elem.text}"')
+
+def user_verifies_accordion_is_open(section_text):
+  try:
+    sl.driver \
+      .find_element_by_xpath(f'//*[@class="govuk-accordion__section-button" and text()="{section_text}"]')
+  except NoSuchElementException:
+    raise AssertionError(f'Cannot find accordion with header {section_text}')
+
+  try:
+    sl.driver \
+      .find_element_by_xpath(f'//*[@class="govuk-accordion__section-button" and text()="{section_text}" and @aria-expanded="true"]')
+  except NoSuchElementException:
+    raise AssertionError(f'Accordion section "{section_text}" should have attribute aria-expanded="true"')
+
+def user_verifies_accordion_is_closed(section_text):
+  try:
+    sl.driver \
+      .find_element_by_xpath(f'//*[@class="govuk-accordion__section-button" and text()="{section_text}"]')
+  except NoSuchElementException:
+    raise AssertionError(f'Cannot find accordion with header {section_text}')
+
+  try:
+    sl.driver \
+      .find_element_by_xpath(f'//*[@class="govuk-accordion__section-button" and text()="{section_text}" and @aria-expanded="false"]')
+  except NoSuchElementException:
+    raise AssertionError(f'Accordion section "{section_text}" should have attribute aria-expanded="false"')
 
 def user_opens_accordion_section(exact_section_text):
   try:
@@ -73,7 +100,7 @@ def user_closes_accordion_section(exact_section_text):
   except NoSuchElementException:
     raise AssertionError(f'Accordion "{exact_section_text}" not collapsed!')
 
-def user_checks_accordion_section_contains_details(accordion_section, details_component):
+def user_checks_accordion_section_contains_text(accordion_section, details_component):
   try:
     sl.driver.find_element_by_xpath(f'//*[@class="govuk-accordion__section-button" and text()="{accordion_section}"]')
   except:
@@ -113,6 +140,17 @@ def user_checks_details_dropdown_contains_publication(details_heading, publicati
     sl.driver.find_element_by_xpath(f'//*[@class="govuk-details__summary-text" and text()="{details_heading}"]/../..//strong[text()="{publication_name}"]')
   except:
     raise AssertionError(f'Cannot find publication "{publication_name}" inside details component "{details_heading}"')
+
+def user_checks_details_dropdown_contains_download_link(details_heading, download_link):
+  try:
+    sl.driver.find_element_by_xpath(f'//*[@class="govuk-details__summary-text" and text()="{details_heading}"]')
+  except:
+    raise AssertionError(f'Cannot find details component "{details_heading}"')
+
+  try:
+    sl.driver.find_element_by_xpath(f'//*[@class="govuk-details__summary-text" and text()="{details_heading}"]/../..//li/a[text()="{download_link}"]')
+  except:
+    raise AssertionError(f'Cannot find link "{download_link}" in "{details_heading}"')
 
 def user_checks_key_stat_tile_contents(tile_title, tile_value, tile_context):
   try:
@@ -208,17 +246,17 @@ def user_clicks_select_all_for_category(category_label):
 def user_checks_results_table_column_heading_contains(row, column, expected):
   elem = sl.driver.find_element_by_xpath(f'//table/thead/tr[{row}]/th[{column}]')
   if expected not in elem.text:
-    raise AssertionError(f'"{expected} not found in th tag in results table thead row {row}, column {column}')
+    raise AssertionError(f'"{expected}" not found in th tag in results table thead row {row}, column {column}')
 
 def user_checks_results_table_row_heading_contains(row, column, expected):
   elem = sl.driver.find_element_by_xpath(f'//table/tbody/tr[{row}]/th[{column}]')
   if expected not in elem.text:
-    raise AssertionError(f'"{expected} not found in th tag in results table tbody row {row}, column {column}')
+    raise AssertionError(f'"{expected}" not found in th tag in results table tbody row {row}, column {column}')
 
 def user_checks_results_table_cell_contains(row, column, expected):
   elem = sl.driver.find_element_by_xpath(f'//table/tbody/tr[{row}]/td[{column}]')
   if expected not in elem.text:
-    raise AssertionError(f'"{expected} not found in td tag in results table tbody row {row}, column {column}')
+    raise AssertionError(f'"{expected}" not found in td tag in results table tbody row {row}, column {column}')
 
 def user_checks_previous_table_tool_step_contains(step, key, value):
   try:

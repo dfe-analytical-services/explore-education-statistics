@@ -14,7 +14,7 @@ Verify Public Page Loads
     user checks element contains  css:body   Explore education statistics
 
 Verify can accept cookie banner
-    [Tags]  HappyPath
+    [Tags]  HappyPath   NotAgainstLocal
     user checks page contains  GOV.UK uses cookies to make the site simpler.
 
     cookie should not exist   ees_banner_seen
@@ -52,7 +52,7 @@ Validate homepage
 Validate Cookies page
     [Tags]  HappyPath
     user clicks link   Cookies
-    user waits until page contains element   xpath://h1[text()="Cookies on Explore education statistics"]
+    user waits until page contains heading   Cookies on Explore education statistics
     user checks url contains   %{PUBLIC_URL}/cookies
 
     user checks element count is x  css:[data-testid="breadcrumbs--list"] li     2
@@ -60,7 +60,7 @@ Validate Cookies page
     user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(2)   Cookies
 
 Disable google analytics
-    [Tags]  HappyPath
+    [Tags]  HappyPath   NotAgainstLocal
     user clicks element   css:#googleAnalytics-off
     user clicks element   xpath://button[text()="Save changes"]
     user waits until page contains   Your cookie settings were saved
@@ -69,7 +69,7 @@ Disable google analytics
     cookie should have value  ees_disable_google_analytics   true
 
 Enable google analytics
-    [Tags]  HappyPath
+    [Tags]  HappyPath    NotAgainstLocal
     user reloads page
 
     user clicks element   css:#googleAnalytics-on
@@ -82,7 +82,7 @@ Enable google analytics
 Validate Cookies Details page
     [Tags]  HappyPath
     user clicks link    Find out more about cookies on Explore education statistics
-    user waits until page contains element   xpath://h1[text()="Details about cookies"]
+    user waits until page contains heading   Details about cookies
     user checks url contains   %{PUBLIC_URL}/cookies/details
 
     user checks element count is x  css:[data-testid="breadcrumbs--list"] li     3
@@ -95,7 +95,7 @@ Validate Cookies Details page
 Validate Privacy notice page
     [Tags]  HappyPath
     user clicks link   Privacy notice
-    user waits until page contains element  xpath://h1[text()="Privacy notice"]
+    user waits until page contains heading  Privacy notice
     user waits until page contains  The explore education statistics service is operated by the Department for Education
 
     user checks url contains  %{PUBLIC_URL}/privacy-notice
@@ -122,7 +122,7 @@ Validate Contact page
 Validate Help and support page
     [Tags]  HappyPath
     user clicks link    Help and support
-    user waits until page contains element  xpath:.//h1[text()="Help and support"]
+    user waits until page contains heading  Help and support
 
     user checks url contains    %{PUBLIC_URL}/help-support
 
@@ -133,7 +133,7 @@ Validate Help and support page
 Validate Sitemap page
     [Tags]  HappyPath
     user clicks link    Sitemap
-    user waits until page contains element  xpath:.//h1[text()="Sitemap"]
+    user waits until page contains heading  Sitemap
 
     user checks url contains    %{PUBLIC_URL}/sitemap
 

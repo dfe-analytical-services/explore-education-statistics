@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.3-servicing-35854")
+                .HasAnnotation("ProductVersion", "2.2.6-servicing-10079")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -954,7 +954,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
 
                     b.Property<string>("Summary");
 
-                    b.Property<int>("TimePeriodCoverage");
+                    b.Property<string>("TimePeriodCoverage")
+                        .IsRequired()
+                        .HasMaxLength(6);
 
                     b.Property<Guid?>("TypeId");
 
@@ -980,7 +982,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                             Summary = @"Read national statistical summaries, view charts and tables and download data files.
 
 Find out how and why these statistics are collected and published - [Pupil absence statistics: methodology](../methodology/pupil-absence-in-schools-in-england).",
-                            TimePeriodCoverage = 0,
+                            TimePeriodCoverage = "AY",
                             TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c")
                         },
                         new
@@ -994,7 +996,7 @@ Find out how and why these statistics are collected and published - [Pupil absen
                             ReleaseName = "2015",
                             Slug = "2015-16",
                             Summary = "Read national statistical summaries and definitions, view charts and tables and download data files across a range of pupil absence subject areas.",
-                            TimePeriodCoverage = 0,
+                            TimePeriodCoverage = "AY",
                             TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c")
                         },
                         new
@@ -1010,7 +1012,7 @@ Find out how and why these statistics are collected and published - [Pupil absen
                             Summary = @"Read national statistical summaries, view charts and tables and download data files.
 
 Find out how and why these statistics are collected and published - [Permanent and fixed-period exclusion statistics: methodology](../methodology/permanent-and-fixed-period-exclusions-in-england)",
-                            TimePeriodCoverage = 0,
+                            TimePeriodCoverage = "AY",
                             TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c")
                         },
                         new
@@ -1026,7 +1028,7 @@ Find out how and why these statistics are collected and published - [Permanent a
                             Summary = @"Read national statistical summaries, view charts and tables and download data files.
 
 Find out how and why these statistics are collected and published - [Secondary and primary school applications and offers: methodology](../methodology/secondary-and-primary-schools-applications-and-offers)",
-                            TimePeriodCoverage = 0,
+                            TimePeriodCoverage = "AY",
                             TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c")
                         });
                 });

@@ -35,5 +35,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels
         public DataBlock KeyStatistics { get; set; }
         
         public List<FileInfo> DataFiles { get; set; }
+        
+        public List<FileInfo> AncillaryFiles { get; set; }
+        
+        public List<FileInfo> ChartFiles { get; set; }
     }
 }

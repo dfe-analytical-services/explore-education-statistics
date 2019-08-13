@@ -1,13 +1,14 @@
 import { Publication, Release } from '@common/services/publicationService';
 import React from 'react';
-import ContentSubBlockRenderer from './ContentSubBlockRenderer';
+import ContentSubBlockRenderer, {
+  SectionToggleHandler,
+} from './ContentSubBlockRenderer';
 
 export interface ContentBlockProps {
   content: Release['content'][0]['content'];
   id: string;
   publication: Publication;
-
-  onToggle?: (section: { id: string; title: string }) => void;
+  onToggle?: SectionToggleHandler;
 }
 
 const ContentBlock = ({

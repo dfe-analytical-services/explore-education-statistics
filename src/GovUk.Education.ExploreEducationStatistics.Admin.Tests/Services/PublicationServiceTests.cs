@@ -10,6 +10,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using Assert = Xunit.Assert;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
@@ -112,8 +114,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     });
 
                 Assert.True(result.IsLeft); // Second time should be validation failure
-                CollectionAssert.AreEquivalent(new List<string> {"Slug"},
-                    new List<string>(result.Left.MemberNames));
+                Assert.Equal(ValidationResult(SlugNotUnique).ErrorMessage,
+                    result.Left.ErrorMessage);
             }
         }
         

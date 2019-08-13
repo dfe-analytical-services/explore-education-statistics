@@ -65,9 +65,9 @@ Validate "Related guidance"
 
 Validate subject files file type and file unit style
     [Documentation]  DFE-958
-    [Tags]  HappyPath   NotAgainstLocal   Failing
+    [Tags]  HappyPath   NotAgainstLocal
     user opens details dropdown     Download data files
-    user checks page contains      Absence in prus (CSV, 151KB)
+    user checks page contains      Absence in prus (csv, 141 Kb)
     user closes details dropdown     Download data files
 
 Validate absence_in_prus.csv file can be downloaded

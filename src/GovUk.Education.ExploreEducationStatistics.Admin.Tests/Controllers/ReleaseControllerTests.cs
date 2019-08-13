@@ -6,14 +6,16 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using FileInfo = GovUk.Education.ExploreEducationStatistics.Admin.Models.FileInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
@@ -23,67 +25,57 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
         [Fact]
         public async void Create_Release_Returns_Ok()
         {
-            var releaseService = new Mock<IReleaseService>();
-            var fileStorageService = new Mock<IFileStorageService>();
-            var importService = new Mock<IImportService>();
-
-
-            releaseService.Setup(s => s.CreateReleaseAsync(It.IsAny<CreateReleaseViewModel>()))
-                .Returns(Task.FromResult(new ReleaseViewModel()));
-            var controller =
-                new ReleasesController(releaseService.Object, fileStorageService.Object, importService.Object);
-            releaseService.Setup(s => s.CreateReleaseAsync(It.IsAny<CreateReleaseViewModel>()))
-                .Returns(Task.FromResult(new ReleaseViewModel()));
+            var publicationId = Guid.NewGuid();
+            var mocks = Mocks();
+            mocks.PublicationService.Setup(s => s.GetAsync(It.Is<Guid>(id => id == publicationId)))
+                .Returns(Task.FromResult(new Publication()));
+            mocks.ReleaseService.Setup(s => s.CreateReleaseAsync(It.IsAny<CreateReleaseViewModel>()))
+                .Returns(Task.FromResult(new Either<ValidationResult, ReleaseViewModel>(new ReleaseViewModel())));
+            var controller = ReleasesControllerWithMocks(mocks);
+            
+            // Call the method under test
+            var result = await controller.CreateReleaseAsync(new CreateReleaseViewModel(), publicationId);
+            AssertOkResult<ReleaseViewModel>(result);
         }
-        
+
+
         [Fact]
         public async Task AddAncillaryFilesAsync_UploadsTheFiles_Returns_Ok()
         {
             var releaseId = Guid.NewGuid();
-            var releaseService = new Mock<IReleaseService>();
-            var fileStorageService = new Mock<IFileStorageService>();
-            var importService = new Mock<IImportService>();
-
+            var mocks = Mocks();
             var ancillaryFile = MockFile("ancillaryFile.doc");
-
-            releaseService.Setup(s => s.GetAsync(It.IsAny<Guid>()))
+            mocks.ReleaseService.Setup(s => s.GetAsync(It.IsAny<Guid>()))
                 .Returns(Task.FromResult(new Release {Id = releaseId}));
-            fileStorageService
-                .Setup(service => service.UploadFilesAsync(releaseId, ancillaryFile,"File name", ReleaseFileTypes.Ancillary))
-                .Returns(Task.FromResult<Either<ValidationResult,IEnumerable<FileInfo>>>(new List<FileInfo>()));
-
-            var controller = new ReleasesController(releaseService.Object, fileStorageService.Object,
-                importService.Object);
+            mocks.FileStorageService
+                .Setup(service =>
+                    service.UploadFilesAsync(releaseId, ancillaryFile, "File name", ReleaseFileTypes.Ancillary))
+                .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<FileInfo>>>(new List<FileInfo>()));
+            var controller = ReleasesControllerWithMocks(mocks);
 
             // Call the method under test
             var actionResult = await controller.AddAncillaryFilesAsync(releaseId, "File name", ancillaryFile);
-
-            Assert.IsAssignableFrom<ActionResult<IEnumerable<FileInfo>>>(actionResult);
+            var unboxed = AssertOkResult(actionResult);
+            Assert.NotNull(unboxed);
         }
 
         [Fact]
         public async Task AddAncillaryFilesAsync_UploadsTheFiles_Returns_NotFound()
         {
-            var releaseService = new Mock<IReleaseService>();
-            var fileStorageService = new Mock<IFileStorageService>();
-            var importService = new Mock<IImportService>();
-
+            var mocks = Mocks();
             var ancillaryFile = MockFile("ancillaryFile.doc");
-
-            var controller = new ReleasesController(releaseService.Object, fileStorageService.Object,
-                importService.Object);
-
+            var controller = ReleasesControllerWithMocks(mocks);
+            
             // Call the method under test
-            var actionResult = await controller.AddAncillaryFilesAsync(Guid.NewGuid(),  "File name", ancillaryFile );
-
-            Assert.IsAssignableFrom<NotFoundResult>(actionResult.Result);
+            var actionResult = await controller.AddAncillaryFilesAsync(Guid.NewGuid(), "File name", ancillaryFile);
+            AssertNotFound(actionResult);
         }
 
         [Fact]
         public async Task GetAncillaryFilesAsync_Returns_A_List_Of_Files()
         {
             var releaseId = Guid.NewGuid();
-            IEnumerable<FileInfo> testFiles = new []
+            IEnumerable<FileInfo> testFiles = new[]
             {
                 new FileInfo
                 {
@@ -100,118 +92,89 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
                     Size = "1 Kb"
                 }
             };
-
-            var releaseService = new Mock<IReleaseService>();
-            var fileStorageService = new Mock<IFileStorageService>();
-            var importService = new Mock<IImportService>();
-
-
-            releaseService.Setup(s => s.GetAsync(It.IsAny<Guid>()))
+            var mocks = Mocks();
+            mocks.ReleaseService.Setup(s => s.GetAsync(It.IsAny<Guid>()))
                 .Returns(Task.FromResult(new Release {Id = releaseId}));
-            fileStorageService.Setup(s => s.ListFilesAsync(releaseId, ReleaseFileTypes.Ancillary)).Returns(Task.FromResult(testFiles));
-
-
-            var controller = new ReleasesController(releaseService.Object, fileStorageService.Object,
-                importService.Object);
+            mocks.FileStorageService.Setup(s => s.ListFilesAsync(releaseId, ReleaseFileTypes.Ancillary))
+                .Returns(Task.FromResult(testFiles));
+            var controller = ReleasesControllerWithMocks(mocks);
+            
             // Call the method under test
-            var actionResult = await controller.GetAncillaryFilesAsync(releaseId);
-
-            Assert.IsAssignableFrom<OkObjectResult>(actionResult.Result);
+            var result = await controller.GetAncillaryFilesAsync(releaseId);
+            var unboxed = AssertOkResult<IEnumerable<FileInfo>>(result);
+            Assert.NotNull(unboxed);
         }
 
         [Fact]
         public async Task GetAncillaryFilesAsync_Returns_NotFound()
         {
-            var releaseService = new Mock<IReleaseService>();
-            var fileStorageService = new Mock<IFileStorageService>();
-            var importService = new Mock<IImportService>();
-            var controller = new ReleasesController(releaseService.Object, fileStorageService.Object,
-                importService.Object);
-
+            var mocks = Mocks();
+            var controller = ReleasesControllerWithMocks(mocks);
+            
             // Call the method under test 
-            var actionResult = await controller.GetAncillaryFilesAsync(Guid.NewGuid());
-
-            Assert.Null(actionResult.Value);
-            Assert.IsAssignableFrom<NotFoundResult>(actionResult.Result);
+            var result = await controller.GetAncillaryFilesAsync(Guid.NewGuid());
+            AssertNotFound(result);
         }
-        
+
         [Fact]
         public async Task AddDataFilesAsync_UploadsTheFiles_Returns_Ok()
         {
             var releaseId = Guid.NewGuid();
-
-            var releaseService = new Mock<IReleaseService>();
-            var fileStorageService = new Mock<IFileStorageService>();
-            var importService = new Mock<IImportService>();
-
+            var mocks = Mocks();
             var dataFile = MockFile("datafile.csv");
             var metaFile = MockFile("metafile.csv");
-            
-            releaseService.Setup(s => s.GetAsync(It.IsAny<Guid>()))
+
+            mocks.ReleaseService.Setup(s => s.GetAsync(It.IsAny<Guid>()))
                 .Returns(Task.FromResult(new Release {Id = releaseId}));
-            fileStorageService
+            mocks.FileStorageService
                 .Setup(service => service.UploadDataFilesAsync(releaseId, dataFile, metaFile, "Subject name"))
                 .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<FileInfo>>>(new List<FileInfo>()));
-
-            var controller = new ReleasesController(releaseService.Object, fileStorageService.Object,
-                importService.Object);
-
-            var actionResult = await controller.AddDataFilesAsync(releaseId, "Subject name", dataFile, metaFile);
-
-            Assert.IsAssignableFrom<ActionResult<IEnumerable<FileInfo>>>(actionResult);
+            
+            // Call the method under test
+            var controller = ReleasesControllerWithMocks(mocks);
+            var result = await controller.AddDataFilesAsync(releaseId, "Subject name", dataFile, metaFile);
+            var unboxed = AssertOkResult(result);
+            Assert.NotNull(unboxed);
         }
 
         [Fact]
         public async Task AddDataFilesAsync_UploadsTheFiles_Returns_NotFound()
         {
-            var releaseService = new Mock<IReleaseService>();
-            var fileStorageService = new Mock<IFileStorageService>();
-            var importService = new Mock<IImportService>();
-
+            var mocks = Mocks();
             var dataFile = MockFile("datafile.csv");
             var metaFile = MockFile("metafile.csv");
-
-            var controller = new ReleasesController(releaseService.Object, fileStorageService.Object,
-                importService.Object);
-
-            var actionResult = await controller.AddDataFilesAsync(Guid.NewGuid(), "Subject name", dataFile, metaFile);
-
-            Assert.IsAssignableFrom<NotFoundResult>(actionResult.Result);
+            var controller = ReleasesControllerWithMocks(mocks);
+            
+            // Call the method under test
+            var result = await controller.AddDataFilesAsync(Guid.NewGuid(), "Subject name", dataFile, metaFile);
+            AssertNotFound(result);
         }
-        
+
         [Fact]
         public async Task AddDataFilesAsync_UploadsTheFiles_Returns_ValidationProblem()
         {
             var releaseId = Guid.NewGuid();
-
-            var releaseService = new Mock<IReleaseService>();
-            var fileStorageService = new Mock<IFileStorageService>();
-            var importService = new Mock<IImportService>();
-
+            var mocks = Mocks();
             var dataFile = MockFile("datafile.csv");
             var metaFile = MockFile("metafile.csv");
-            
-            releaseService.Setup(s => s.GetAsync(It.IsAny<Guid>()))
+            mocks.ReleaseService.Setup(s => s.GetAsync(It.IsAny<Guid>()))
                 .Returns(Task.FromResult(new Release {Id = releaseId}));
-            fileStorageService
+            mocks.FileStorageService
                 .Setup(service => service.UploadDataFilesAsync(releaseId, dataFile, metaFile, "Subject name"))
-                .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<FileInfo>>>(ValidationUtils.ValidationResult("File Name", "File Error")));
-
-            var controller = new ReleasesController(releaseService.Object, fileStorageService.Object,
-                importService.Object);
+                .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<FileInfo>>>(
+                    ValidationResult(CannotOverwriteFile)));
+            var controller = ReleasesControllerWithMocks(mocks);
 
             // Call the method under test
-            var actionResult = await controller.AddDataFilesAsync(releaseId, "Subject name", dataFile, metaFile);
-
-            Assert.IsAssignableFrom<BadRequestObjectResult>(actionResult.Result);
-            Assert.IsAssignableFrom<ValidationProblemDetails>((actionResult.Result as BadRequestObjectResult)?.Value);
+            var result = await controller.AddDataFilesAsync(releaseId, "Subject name", dataFile, metaFile);
+            AssertValidationProblem(result, CannotOverwriteFile);
         }
 
         [Fact]
         public async Task GetDataFilesAsync_Returns_A_List_Of_Files()
         {
             var releaseId = Guid.NewGuid();
-            IEnumerable<FileInfo> testFiles = new []
+            IEnumerable<FileInfo> testFiles = new[]
             {
                 new FileInfo
                 {
@@ -229,37 +192,119 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
                 }
             };
 
-            var releaseService = new Mock<IReleaseService>();
-            var fileStorageService = new Mock<IFileStorageService>();
-            var importService = new Mock<IImportService>();
-
-
-            releaseService.Setup(s => s.GetAsync(It.IsAny<Guid>()))
+            var mocks = Mocks();
+            mocks.ReleaseService.Setup(s => s.GetAsync(It.IsAny<Guid>()))
                 .Returns(Task.FromResult(new Release {Id = releaseId}));
-            fileStorageService.Setup(s => s.ListFilesAsync(releaseId, ReleaseFileTypes.Data)).Returns(Task.FromResult(testFiles));
+            mocks.FileStorageService.Setup(s => s.ListFilesAsync(releaseId, ReleaseFileTypes.Data))
+                .Returns(Task.FromResult(testFiles));
+            var controller = ReleasesControllerWithMocks(mocks);
 
-
-            var controller = new ReleasesController(releaseService.Object, fileStorageService.Object,
-                importService.Object);
-
-            var actionResult = await controller.GetDataFilesAsync(releaseId);
-
-            Assert.IsAssignableFrom<OkObjectResult>(actionResult.Result);
+            // Call the method under test
+            var result = await controller.GetDataFilesAsync(releaseId);
+            var unboxed = AssertOkResult(result);
+            Assert.Contains(unboxed, f => f.Name == "Release a file 1");
+            Assert.Contains(unboxed, f => f.Name == "Release a file 2");
         }
 
         [Fact]
         public async Task GetDataFilesAsync_Returns_NotFound()
         {
-            var releaseService = new Mock<IReleaseService>();
-            var fileStorageService = new Mock<IFileStorageService>();
-            var importService = new Mock<IImportService>();
-            var controller = new ReleasesController(releaseService.Object, fileStorageService.Object,
-                importService.Object);
+            var mocks = Mocks();
+            var controller = ReleasesControllerWithMocks(mocks);
+            
+            // Call the method under test
+            var result = await controller.GetDataFilesAsync(Guid.NewGuid());
+            AssertNotFound(result);
+            
+        }
 
-            var actionResult = await controller.GetDataFilesAsync(Guid.NewGuid());
+        [Fact]
+        public async Task DeleteDataFilesAsync_Returns_OK()
+        {
+            var releaseId = Guid.NewGuid();
+            var mocks = Mocks();
+            mocks.ReleaseService.Setup(s => s.GetAsync(It.IsAny<Guid>()))
+                .Returns(Task.FromResult(new Release {Id = releaseId}));
+            mocks.FileStorageService
+                .Setup(service => service.DeleteDataFileAsync(releaseId, "datafilename"))
+                .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<FileInfo>>>(new List<FileInfo>()));
+            var controller = ReleasesControllerWithMocks(mocks);
 
-            Assert.Null(actionResult.Value);
-            Assert.IsAssignableFrom<NotFoundResult>(actionResult.Result);
+            // Call the method under test
+            var result = await controller.DeleteDataFiles(releaseId, "datafilename");
+            var unboxed = AssertOkResult(result);
+            Assert.NotNull(unboxed);
+        }
+
+        [Fact]
+        public async Task DeleteDataFilesAsync_Returns_ValidationProblem()
+        {
+            var releaseId = Guid.NewGuid();
+            var mocks = Mocks();
+            mocks.ReleaseService.Setup(s => s.GetAsync(It.IsAny<Guid>()))
+                .Returns(Task.FromResult(new Release {Id = releaseId}));
+            mocks.FileStorageService
+                .Setup(service => service.DeleteDataFileAsync(releaseId, "datafilename"))
+                .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<FileInfo>>>(
+                    ValidationResult(UnableToFindMetadataFileToDelete)));
+            var controller = ReleasesControllerWithMocks(mocks);
+
+            // Call the method under test
+            var result = await controller.DeleteDataFiles(releaseId, "datafilename");
+            AssertValidationProblem(result, UnableToFindMetadataFileToDelete);
+        }
+
+
+        [Fact]
+        public async void Edit_Release_Summary_Returns_Ok()
+        {
+            var mocks = Mocks();
+            var releaseId = new Guid("95bf7743-fe6f-4b85-a28f-49f6f6b8735a");
+            mocks.ReleaseService
+                .Setup(s => s.EditReleaseSummaryAsync(It.IsAny<EditReleaseSummaryViewModel>()))
+                .Returns<EditReleaseSummaryViewModel>(e => Task.FromResult(
+                    new Either<ValidationResult, ReleaseViewModel>(new ReleaseViewModel {Id = e.Id})));
+            mocks.ReleaseService
+                .Setup(s => s.GetAsync(releaseId))
+                .Returns(Task.FromResult(new Release()));
+            var controller = ReleasesControllerWithMocks(mocks);
+
+            // Method under test
+            var result = await controller.EditReleaseSummaryAsync(new EditReleaseSummaryViewModel(), releaseId);
+            var unboxed = AssertOkResult(result);
+            Assert.Equal(releaseId, unboxed.Id);
+        }
+
+        [Fact]
+        public async void Get_Release_Summary_Returns_Ok()
+        {
+            var mocks = Mocks();
+            var releaseId = new Guid("95bf7743-fe6f-4b85-a28f-49f6f6b8735a");
+            mocks.ReleaseService
+                .Setup(s => s.GetReleaseSummaryAsync(It.IsAny<Guid>()))
+                .Returns<Guid>(id => Task.FromResult(new EditReleaseSummaryViewModel {Id = id}));
+            var controller = ReleasesControllerWithMocks(mocks);
+
+            // Method under test
+            var result = await controller.GetReleaseSummaryAsync(releaseId);
+            var unboxed = AssertOkResult(result);
+            Assert.Equal(unboxed.Id, releaseId);
+        }
+
+        [Fact]
+        public async void Get_Releases_For_Publication_Returns_Ok()
+        {
+            var mocks = Mocks();
+            var releaseId = new Guid("fc570a6c-d230-40ae-a5e5-febab330fb12");
+            mocks.ReleaseService
+                .Setup(s => s.GetReleasesForPublicationAsync(It.Is<Guid>(id => id == releaseId)))
+                .Returns<Guid>(x => Task.FromResult(new List<ReleaseViewModel>()));
+            var controller = ReleasesControllerWithMocks(mocks);
+
+            // Method under test
+            var result = await controller.GetReleaseForPublicationAsync(releaseId);
+            var unboxed = AssertOkResult(result);
+            Assert.NotNull(unboxed);
         }
 
         private static IFormFile MockFile(string fileName)
@@ -277,66 +322,52 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
             return fileMock.Object;
         }
 
-        [Fact]
-        public async void Edit_Release_Summary_Returns_Ok()
+        private static T AssertOkResult<T>(ActionResult<T> result) where T : class
         {
-            var releaseService = new Mock<IReleaseService>();
-            var fileStorageService = new Mock<IFileStorageService>();
-            var importService = new Mock<IImportService>();
-            var releaseId = new Guid("95bf7743-fe6f-4b85-a28f-49f6f6b8735a");
-
-            releaseService
-                .Setup(s => s.EditReleaseSummaryAsync(It.IsAny<EditReleaseSummaryViewModel>()))
-                .Returns<EditReleaseSummaryViewModel>(e => Task.FromResult(new ReleaseViewModel
-                {
-                    Id = e.Id
-                }));
-            var controller = new ReleasesController(releaseService.Object, fileStorageService.Object, importService.Object);
-
-            // Method under test
-            var result = await controller.EditReleaseSummaryAsync(new EditReleaseSummaryViewModel(), releaseId);
-            Assert.IsAssignableFrom<ReleaseViewModel>(result.Value);
-            Assert.Equal(result.Value.Id, releaseId);
-        }
-
-
-        [Fact]
-        public async void Get_Release_Summary_Returns_Ok()
-        {
-            var releaseService = new Mock<IReleaseService>();
-            var fileStorageService = new Mock<IFileStorageService>();
-            var importService = new Mock<IImportService>();
-            var releaseId = new Guid("95bf7743-fe6f-4b85-a28f-49f6f6b8735a");
-            releaseService
-                .Setup(s => s.GetReleaseSummaryAsync(It.IsAny<Guid>()))
-                .Returns<Guid>(id => Task.FromResult(new EditReleaseSummaryViewModel{Id = id}));
-            var controller = new ReleasesController(releaseService.Object, fileStorageService.Object, importService.Object);
-
-            // Method under test
-            var result = await controller.GetReleaseSummaryAsync(releaseId);
-            Assert.IsAssignableFrom<EditReleaseSummaryViewModel>(result.Value);
-            Assert.Equal(result.Value.Id, releaseId);
+            Assert.IsAssignableFrom<ActionResult<T>>(result);
+            Assert.IsAssignableFrom<OkObjectResult>(result.Result);
+            var okObjectResult = result.Result as OkObjectResult;
+            Assert.IsAssignableFrom<T>(okObjectResult?.Value);
+            return okObjectResult?.Value as T;
         }
         
-        
-        [Fact]
-        public async void Get_Releases_For_Publication_Returns_Ok()
+        private static void AssertNotFound<T>(ActionResult<T> result) where T : class
         {
-            var releaseService = new Mock<IReleaseService>();
-            var fileStorageService = new Mock<IFileStorageService>();
-            var importService = new Mock<IImportService>();
-            var releaseId = new Guid("fc570a6c-d230-40ae-a5e5-febab330fb12");
-            releaseService
-                .Setup(s => s.GetReleasesForPublicationAsync(It.Is<Guid>(id => id == releaseId)))
-                .Returns<Guid>(x => Task.FromResult(new List<ReleaseViewModel>()));
-            var controller = new ReleasesController(releaseService.Object, fileStorageService.Object, importService.Object);
+            Assert.IsAssignableFrom<ActionResult<T>>(result);
+            Assert.IsAssignableFrom<NotFoundResult>(result.Result);
+            Assert.Null(result.Value);
+        }
+        
+        private static ValidationProblemDetails AssertValidationProblem<T>(ActionResult<T> result) where T : class
+        {
+            Assert.IsAssignableFrom<BadRequestObjectResult>(result.Result);
+            var badRequestObjectResult = result.Result as BadRequestObjectResult;
+            Assert.IsAssignableFrom<ValidationProblemDetails>(badRequestObjectResult?.Value);
+            var validationProblemDetails = badRequestObjectResult.Value as ValidationProblemDetails;
+            return validationProblemDetails;
+        }
+        
+        private static ValidationProblemDetails AssertValidationProblem<T>(ActionResult<T> result, ValidationErrorMessages message) where T : class
+        {
+            var validationProblem = AssertValidationProblem(result);
+            Assert.True(validationProblem.Errors.ContainsKey(string.Empty));
+            Assert.Contains(ValidationResult(message).ErrorMessage, validationProblem.Errors[string.Empty]);
+            return validationProblem;
+        }
+        
+        private static (Mock<IReleaseService> ReleaseService, Mock<IFileStorageService> FileStorageService,
+            Mock<IImportService> ImportService, Mock<IPublicationService> PublicationService) Mocks()
+        {
+            return (new Mock<IReleaseService>(), new Mock<IFileStorageService>(), new Mock<IImportService>(),
+                new Mock<IPublicationService>());
+        }
 
-            // Method under test
-            var result = await controller.GetReleaseForPublicationAsync(releaseId);
-            Assert.IsAssignableFrom<List<ReleaseViewModel>>(result.Value);
-        }            
-        
-        
-        
+        private static ReleasesController ReleasesControllerWithMocks(
+            (Mock<IReleaseService> ReleaseService, Mock<IFileStorageService> FileStorageService, Mock<IImportService>
+                ImportService, Mock<IPublicationService> PublicationService) mocks)
+        {
+            return new ReleasesController(mocks.ReleaseService.Object, mocks.FileStorageService.Object,
+                mocks.ImportService.Object, mocks.PublicationService.Object);
+        }
     }
 }

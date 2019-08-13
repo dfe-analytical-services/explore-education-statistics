@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -24,13 +25,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         private readonly IReleaseService _releaseService;
         private readonly IFileStorageService _fileStorageService;
         private readonly IImportService _importService;
+        private readonly IPublicationService _publicationService;
 
         public ReleasesController(IReleaseService releaseService, IFileStorageService fileStorageService,
-            IImportService importService)
+            IImportService importService, IPublicationService publicationService)
         {
             _releaseService = releaseService;
             _fileStorageService = fileStorageService;
             _importService = importService;
+            _publicationService = publicationService;
         }
 
         // POST api/publication/{publicationId}/releases
@@ -39,13 +42,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<ReleaseViewModel>> CreateReleaseAsync(CreateReleaseViewModel release,
             PublicationId publicationId)
         {
-            release.PublicationId = publicationId;
-            return await _releaseService.CreateReleaseAsync(release);
+            return await CheckPublicationExistsAsync(publicationId, async () =>
+            {
+                release.PublicationId = publicationId;
+                return await _releaseService.CreateReleaseAsync(release);
+            });
         }
 
 
-        // GET api/release/{releaseId}/data-files
-        [HttpGet("release/{releaseId}/data-files")]
+        // GET api/release/{releaseId}/data
+        [HttpGet("release/{releaseId}/data")]
         [Produces("application/json")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
@@ -56,8 +62,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 async () => Ok(await _fileStorageService.ListFilesAsync(releaseId, ReleaseFileTypes.Data)));
         }
 
-        // GET api/release/{releaseId}/ancillary-files
-        [HttpGet("release/{releaseId}/ancillary-files")]
+        // GET api/release/{releaseId}/ancillary
+        [HttpGet("release/{releaseId}/ancillary")]
         [Produces("application/json")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
@@ -68,8 +74,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 async () => Ok(await _fileStorageService.ListFilesAsync(releaseId, ReleaseFileTypes.Ancillary)));
         }
 
-        // GET api/release/{releaseId}/chart-files
-        [HttpGet("release/{releaseId}/chart-files")]
+        // GET api/release/{releaseId}/chart
+        [HttpGet("release/{releaseId}/chart")]
         [Produces("application/json")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
@@ -80,8 +86,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 async () => Ok(await _fileStorageService.ListFilesAsync(releaseId, ReleaseFileTypes.Chart)));
         }
 
-        // POST api/release/{releaseId}/ancillary-files
-        [HttpPost("release/{releaseId}/ancillary-files")]
+        // POST api/release/{releaseId}/ancillary
+        [HttpPost("release/{releaseId}/ancillary")]
         [Produces("application/json")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
@@ -92,11 +98,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [Required] [FromQuery(Name = "name")] string name, IFormFile file)
         {
             return await CheckReleaseExistsAsync(releaseId,
-                async () => await _fileStorageService.UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Ancillary));
+                async () => await _fileStorageService.UploadFilesAsync(releaseId, file, name,
+                    ReleaseFileTypes.Ancillary));
         }
 
-        // POST api/release/{releaseId}/chart-files
-        [HttpPost("release/{releaseId}/chart-files")]
+        // POST api/release/{releaseId}/chart
+        [HttpPost("release/{releaseId}/chart")]
         [Produces("application/json")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
@@ -110,8 +117,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 async () => await _fileStorageService.UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Chart));
         }
 
-        // POST api/release/{releaseId}/data-files
-        [HttpPost("release/{releaseId}/data-files")]
+        // POST api/release/{releaseId}/data
+        [HttpPost("release/{releaseId}/data")]
         [Produces("application/json")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
@@ -125,7 +132,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             {
                 // upload the files
                 var result = await _fileStorageService.UploadDataFilesAsync(releaseId, file, metaFile, name)
-                    .Map(() => _importService.Import(file.FileName, releaseId));
+                    // add message to queue to process these files
+                    .OnSuccess(() => _importService.Import(file.FileName, releaseId));
                 return result;
             });
         }
@@ -141,17 +149,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
         public async Task<ActionResult<EditReleaseSummaryViewModel>> GetReleaseSummaryAsync(ReleaseId releaseId)
         {
-            return await _releaseService.GetReleaseSummaryAsync(releaseId);
+            return  Ok(await _releaseService.GetReleaseSummaryAsync(releaseId));
         }
-
 
         [HttpPut("releases/{releaseId}/summary")]
         [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
-        public async Task<ActionResult<ReleaseViewModel>> EditReleaseSummaryAsync(EditReleaseSummaryViewModel model,
-            ReleaseId releaseId)
+        public async Task<ActionResult<ReleaseViewModel>> EditReleaseSummaryAsync(EditReleaseSummaryViewModel model, ReleaseId releaseId)
         {
-            model.Id = releaseId;
-            return await _releaseService.EditReleaseSummaryAsync(model);
+            return  await CheckReleaseExistsAsync(releaseId, async () =>
+            {
+                model.Id = releaseId;
+                return await _releaseService.EditReleaseSummaryAsync(model);
+            });
         }
 
         // GET api/publications/{publicationId}/releases
@@ -160,7 +169,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<List<ReleaseViewModel>>> GetReleaseForPublicationAsync(
             [Required] PublicationId publicationId)
         {
-            return await _releaseService.GetReleasesForPublicationAsync(publicationId);
+            return Ok(await _releaseService.GetReleasesForPublicationAsync(publicationId));
+        }
+
+        [HttpDelete("release/{releaseId}/data/{fileName}")]
+        [AllowAnonymous] // TODO We will need to do Authorisation checks when we know what the permissions model is.
+        public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteDataFiles(ReleaseId releaseId, string fileName)
+        {
+            return await CheckReleaseExistsAsync(releaseId,
+                async () => await _fileStorageService.DeleteDataFileAsync(releaseId, fileName));
+        }
+
+        // DELETE api/release/{releaseId}/ancillary/{fileName}
+        [HttpDelete("release/{releaseId}/ancillary/{fileName}")]
+        [AllowAnonymous] // TODO We will need to do Authorisation checks when we know what the permissions model is.
+        public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteAncillaryFile(
+            ReleaseId releaseId, string fileName)
+        {
+            return await CheckReleaseExistsAsync(releaseId,
+                async () => await _fileStorageService.DeleteFileAsync(releaseId, ReleaseFileTypes.Ancillary, fileName));
+        }
+
+        // DELETE api/release/{releaseId}/chart/{fileName}
+        [HttpDelete("release/{releaseId}/chart/{fileName}")]
+        [AllowAnonymous] // TODO We will need to do Authorisation checks when we know what the permissions model is.
+        public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteChartFile(
+            ReleaseId releaseId, string fileName)
+        {
+            return await CheckReleaseExistsAsync(releaseId,
+                async () => await _fileStorageService.DeleteFileAsync(releaseId, ReleaseFileTypes.Chart, fileName));
         }
 
         private async Task<ActionResult> CheckReleaseExistsAsync(ReleaseId releaseId, Func<Task<ActionResult>> andThen)
@@ -173,12 +210,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
             return await andThen.Invoke();
         }
-        
-        
-        private async Task<ActionResult> CheckReleaseExistsAsync<T>(ReleaseId releaseId, Func<Task<Either<ValidationResult,T>>> andThen)
+
+        private async Task<ActionResult> CheckReleaseExistsAsync<T>(ReleaseId releaseId,
+            Func<Task<Either<ValidationResult, T>>> andThen)
         {
             var release = await _releaseService.GetAsync(releaseId);
             if (release == null)
+            {
+                return NotFound();
+            }
+
+            var result = await andThen.Invoke();
+            if (result.IsLeft)
+            {
+                ValidationUtils.AddErrors(ModelState, result.Left);
+                return ValidationProblem();
+            }
+
+            return Ok(result.Right);
+        }
+
+        private async Task<ActionResult> CheckPublicationExistsAsync<T>(PublicationId publicationId,
+            Func<Task<Either<ValidationResult, T>>> andThen)
+        {
+            var publication = await _publicationService.GetAsync(publicationId);
+            if (publication == null)
             {
                 return NotFound();
             }

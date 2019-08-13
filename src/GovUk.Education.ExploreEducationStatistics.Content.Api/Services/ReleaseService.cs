@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
@@ -92,16 +93,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
                 }));
                 
                 var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
-                releaseViewModel.DataFiles = ListFiles(release);
+                releaseViewModel.DataFiles = ListFiles(release, ReleaseFileTypes.Data);
+                releaseViewModel.ChartFiles = ListFiles(release, ReleaseFileTypes.Chart);
+                releaseViewModel.AncillaryFiles = ListFiles(release, ReleaseFileTypes.Ancillary);
+                
                 return releaseViewModel;
             }
 
             return null;
         }
 
-        private List<FileInfo> ListFiles(Release release)
+        private List<FileInfo> ListFiles(Release release, ReleaseFileTypes type)
         {
-            return _fileStorageService.ListFiles(release.Publication.Slug, release.Slug).ToList();
+            return _fileStorageService.ListFiles(release.Publication.Slug, release.Slug, type).ToList();
         }
     }
 }
