@@ -8,6 +8,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
 
         bool IsBatchComplete(ImportMessage importMessage, string subjectId);
 
-        void UpdateCurrentBatchNumber(ImportMessage importMessage);
+        void UpdateCurrentBatchNumber(ImportMessage importMessage, string subjectId);
     }
 }

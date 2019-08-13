@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             var batch = GetBatch(importMessage, subjectId).Result;
             var bitArray = new BitArray(batch.BatchesProcessed);
-            bitArray.Set(importMessage.BatchNo, true);
+            bitArray.Set(importMessage.BatchNo - 1, true);
             bitArray.CopyTo(batch.BatchesProcessed, 0);
             GetUploadsTable().Result.ExecuteAsync(TableOperation.InsertOrReplace(batch));
         }
@@ -31,26 +31,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         public bool IsBatchComplete(ImportMessage importMessage, string subjectId)
         {
             var batch = GetBatch(importMessage, subjectId).Result;
-            var numProcessed = (from bool p in batch.BatchesProcessed
-                where p
-                select p).Count();
-            return numProcessed == batch.BatchSize;
+            var count = (from bool b in new BitArray(batch.BatchesProcessed)
+                where b
+                select b).Count();
+            
+            return count == batch.BatchSize;
         }
 
-        public void UpdateCurrentBatchNumber(ImportMessage importMessage)
+        public void UpdateCurrentBatchNumber(ImportMessage importMessage, string subjectId)
         {
-            throw new System.NotImplementedException();
+            var batch = GetBatch(importMessage, subjectId).Result;
+            batch.CurrentBatchNo = importMessage.BatchNo;
+            GetUploadsTable().Result.ExecuteAsync(TableOperation.InsertOrReplace(batch));
         }
 
         private async Task<Batch> GetBatch(ImportMessage importMessage, string subjectId)
         {
             var table = GetUploadsTable().Result;
             // Need to define the extra columns to retrieve
-            var columns = new List<string>(){ "BatchSize", "BatchesProcessed" };
+            var columns = new List<string>(){ "BatchSize", "BatchesProcessed", "CurrentBatchNo"};
             Batch batch;
 
             var result = await table.ExecuteAsync(TableOperation.Retrieve<Batch>(importMessage.Release.Id.ToString(), subjectId, columns));
-            if (result == null)
+            if (result.Result == null)
             {
                 batch = new Batch(importMessage.Release.Id.ToString(), subjectId, importMessage.BatchSize);
             }

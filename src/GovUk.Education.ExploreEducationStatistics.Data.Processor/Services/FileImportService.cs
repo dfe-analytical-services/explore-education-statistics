@@ -35,10 +35,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         public void ImportObservations(ImportMessage message)
         {
             var subjectData = _fileStorageService.GetSubjectData(message).Result;
-            var batch = subjectData.GetCsvLines().ToList();
-            var metaLines = subjectData.GetMetaLines().ToList();
             var subject = GetSubject(message, subjectData.Name);
             
+            _batchService.UpdateCurrentBatchNumber(message, subject.Id.ToString());
+            
+            var batch = subjectData.GetCsvLines().ToList();
+            var metaLines = subjectData.GetMetaLines().ToList();
+
             _importerService.ImportObservations(
                 batch,
                 subject,
