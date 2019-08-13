@@ -21,13 +21,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controller
             tableBuilderService.Setup(s => s.Query(It.IsNotIn(_query))).Returns(
                 new TableBuilderResultViewModel
                 {
-                    Result = new List<ObservationViewModel>()
+                    Results = new List<ObservationViewModel>()
                 });
 
             tableBuilderService.Setup(s => s.Query(_query)).Returns(
                 new TableBuilderResultViewModel
                 {
-                    Result = new List<ObservationViewModel>
+                    Results = new List<ObservationViewModel>
                     {
                         new ObservationViewModel()
                     }
@@ -41,8 +41,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controller
         [Fact]
         public void Query_Post()
         {
-            var result = _controller.Query(_query);
-            Assert.IsAssignableFrom<ResultViewModel>(result.Value);
+            var result = _controller.QueryNew(_query);
+            Assert.IsAssignableFrom<TableBuilderResultViewModel>(result.Value);
         }
     }
 }

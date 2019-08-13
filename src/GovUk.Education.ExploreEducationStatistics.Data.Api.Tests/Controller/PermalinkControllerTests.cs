@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controller
                 new PermalinkViewModel
                 {
                     Id = _validId,
-                    Result = new TableBuilderResultViewModel()
+                    FullTable = new TableBuilderResultViewModel()
                 }
             );
             
@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controller
                 new PermalinkViewModel
                 {
                     Id = Guid.NewGuid(),
-                    Result = new TableBuilderResultViewModel()
+                    FullTable = new TableBuilderResultViewModel()
                 }
             );
             
