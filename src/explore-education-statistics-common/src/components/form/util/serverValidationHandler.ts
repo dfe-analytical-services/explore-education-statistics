@@ -155,6 +155,8 @@ class ServerValidationHandler {
             setFieldError,
             setGlobalError,
           );
+        } else {
+          setGlobalError('An unexpected error occurred.');
         }
       });
     });
@@ -215,13 +217,14 @@ const handleServerSideValidation = <T extends {}>(
   ...messageMappers: ServerValidationMessageMapper[]
 ) => (
   errors: ServerValidationErrors,
-  { setFieldError, setError }: FormikActions<T>,
+  setFieldError: FieldErrorSetter,
+  setGlobalError: GlobalErrorSetter,
 ) => {
   const serverValidationHandler = new ServerValidationHandler(messageMappers);
   serverValidationHandler.handleServerValidationErrors(
     errors,
     setFieldError,
-    (errorMessage: string) => setError(errorMessage),
+    setGlobalError,
   );
 };
 

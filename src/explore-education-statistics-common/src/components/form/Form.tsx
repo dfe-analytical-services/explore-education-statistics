@@ -1,7 +1,11 @@
 import ErrorSummary, {
   ErrorSummaryMessage,
 } from '@common/components/ErrorSummary';
-import { ServerValidationErrors } from '@common/components/form/util/serverValidationHandler';
+import {
+  FieldErrorSetter,
+  GlobalErrorSetter,
+  ServerValidationErrors
+} from '@common/components/form/util/serverValidationHandler';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import { connect, FormikActions, FormikContext } from 'formik';
 import camelCase from 'lodash/camelCase';
@@ -14,7 +18,8 @@ interface Props {
   submitId?: string;
   submitValidationHandler?: <T extends {}>(
     errors: ServerValidationErrors,
-    formikActions: FormikActions<T>,
+    setFieldError: FieldErrorSetter,
+    setGlobalError: GlobalErrorSetter,
   ) => void;
 }
 
@@ -96,7 +101,11 @@ const Form = ({
             ) {
               submitValidationHandler(
                 error.data as ServerValidationErrors,
-                formik,
+                formik.setFieldError,
+                (message) => setSubmitError({
+                  id: submitId,
+                  message: message,
+                }),
               );
             } else {
               setSubmitError({
