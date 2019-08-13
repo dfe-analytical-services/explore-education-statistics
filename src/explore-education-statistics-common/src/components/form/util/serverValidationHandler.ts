@@ -1,5 +1,4 @@
-import { Dictionary } from '@common/types';
-import { FormikActions } from 'formik';
+import {Dictionary} from '@common/types';
 
 export interface ServerValidationErrors {
   errors: Dictionary<string[]>;

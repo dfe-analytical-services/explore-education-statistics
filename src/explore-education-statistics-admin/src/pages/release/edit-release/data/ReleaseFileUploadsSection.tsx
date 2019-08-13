@@ -68,35 +68,36 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
       render={(form: FormikProps<FormValues>) => {
         return (
           <Form id={formId}>
-            {files && files.map(file => (
-              <SummaryList key={file.filename}>
-                <SummaryListItem term="Name">{file.title}</SummaryListItem>
-                <SummaryListItem term="File">
-                  <a
-                    href={service.createDownloadDataFileLink(
-                      releaseId,
-                      file.filename,
-                    )}
-                  >
-                    {file.filename}
-                  </a>
-                </SummaryListItem>
-                <SummaryListItem term="Filesize">
-                  {file.fileSize.size.toLocaleString()} {file.fileSize.unit}
-                </SummaryListItem>
-                <SummaryListItem
-                  term="Actions"
-                  actions={
-                    <Link
-                      to="#"
-                      onClick={() => setDeleteFileName(file.filename)}
+            {files &&
+              files.map(file => (
+                <SummaryList key={file.filename}>
+                  <SummaryListItem term="Name">{file.title}</SummaryListItem>
+                  <SummaryListItem term="File">
+                    <a
+                      href={service.createDownloadDataFileLink(
+                        releaseId,
+                        file.filename,
+                      )}
                     >
-                      Delete file
-                    </Link>
-                  }
-                />
-              </SummaryList>
-            ))}
+                      {file.filename}
+                    </a>
+                  </SummaryListItem>
+                  <SummaryListItem term="Filesize">
+                    {file.fileSize.size.toLocaleString()} {file.fileSize.unit}
+                  </SummaryListItem>
+                  <SummaryListItem
+                    term="Actions"
+                    actions={
+                      <Link
+                        to="#"
+                        onClick={() => setDeleteFileName(file.filename)}
+                      >
+                        Delete file
+                      </Link>
+                    }
+                  />
+                </SummaryList>
+              ))}
             <FormFieldset
               id={`${formId}-allFieldsFieldset`}
               legend="Upload file"

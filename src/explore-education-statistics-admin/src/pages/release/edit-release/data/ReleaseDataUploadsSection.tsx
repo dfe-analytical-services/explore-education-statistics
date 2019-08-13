@@ -141,9 +141,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                     actions={
                       <Link
                         to="#"
-                        onClick={() =>
-                          setDeleteFileName(dataFile.filename)
-                        }
+                        onClick={() => setDeleteFileName(dataFile.filename)}
                       >
                         Delete files
                       </Link>

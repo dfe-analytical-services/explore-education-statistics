@@ -1,16 +1,14 @@
-import ErrorSummary, {
-  ErrorSummaryMessage,
-} from '@common/components/ErrorSummary';
+import ErrorSummary, {ErrorSummaryMessage,} from '@common/components/ErrorSummary';
 import {
   FieldErrorSetter,
   GlobalErrorSetter,
-  ServerValidationErrors
+  ServerValidationErrors,
 } from '@common/components/form/util/serverValidationHandler';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
-import { connect, FormikActions, FormikContext } from 'formik';
+import {connect, FormikContext} from 'formik';
 import camelCase from 'lodash/camelCase';
 import get from 'lodash/get';
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, {ReactNode, useEffect, useState} from 'react';
 
 interface Props {
   children: ReactNode;
@@ -102,10 +100,11 @@ const Form = ({
               submitValidationHandler(
                 error.data as ServerValidationErrors,
                 formik.setFieldError,
-                (message) => setSubmitError({
-                  id: submitId,
-                  message: message,
-                }),
+                message =>
+                  setSubmitError({
+                    id: submitId,
+                    message,
+                  }),
               );
             } else {
               setSubmitError({
