@@ -41,6 +41,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
                     return new ValidationResult("UNABLE_TO_FIND_METADATA_FILE_TO_DELETE");
                 case FileNotFound:
                     return new ValidationResult("FILE_NOT_FOUND");
+                case FileCannotBeEmpty: 
+                    return new ValidationResult("FILE_CAN_NOT_BE_EMPTY");
+                case CannotUseGenericFunctionToAddDataFile: 
+                    return new ValidationResult("CANNOT_USE_GENERIC_FUNCTION_TO_DELETE_DATA_FILE");
                 default:
                     throw new ArgumentOutOfRangeException(nameof(message), message, null);
             }
@@ -53,7 +57,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         SlugNotUnique,
         PartialDateNotValid,
         CannotUseGenericFunctionToDeleteDataFile,
+        CannotUseGenericFunctionToAddDataFile,
         UnableToFindMetadataFileToDelete,
-        FileNotFound
+        FileNotFound,
+        FileCannotBeEmpty
     }
 }

@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
         public static implicit operator Either<Tl, Tr>(Tl left) => new Either<Tl, Tr>(left);
         
         public static implicit operator Either<Tl, Tr>(Tr right) => new Either<Tl, Tr>(right);
-        
+
     }
 
     public static class EitherTaskExtensions 
@@ -61,6 +61,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
 
             var next = await func();
             return new Either<Tl, T>(next);
+        }
+        
+        public static async Task<Either<Tl, T>> OnSuccess<Tl, Tr, T>(this Task<Either<Tl, Tr>> task, Func<Tr, Task<Either<Tl, T>>> func)
+        {
+            var firstResult = await task;
+            if (firstResult.IsLeft)
+            {
+                return new Either<Tl, T>(firstResult.Left);
+            }
+
+            var next = await func(firstResult.Right);
+            return next;
         }
     }
     
