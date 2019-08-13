@@ -4,4 +4,8 @@
         <TargetFramework>netcoreapp2.2</TargetFramework>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common\GovUk.Education.ExploreEducationStatistics.Common.csproj" />
+    </ItemGroup>
+
 </Project>
