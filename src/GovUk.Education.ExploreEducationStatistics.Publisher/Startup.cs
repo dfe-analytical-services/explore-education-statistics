@@ -1,11 +1,15 @@
 ﻿using System;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Services;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using FileStorageService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.FileStorageService;
+using IFileStorageService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IFileStorageService;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 
@@ -22,6 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddTransient<IFileStorageService, FileStorageService>()
                 .AddTransient<IPublishingService, PublishingService>()
                 .AddTransient<IContentCacheGenerationService, ContentCacheGenerationService>()
+                .AddTransient<IDownloadService, DownloadService>()
                 .BuildServiceProvider();
         }
         
