@@ -1,6 +1,5 @@
 variables:
   BuildConfiguration: 'Release'
-  CI: true
 
 trigger: [ 'master' ]
 pr: none
