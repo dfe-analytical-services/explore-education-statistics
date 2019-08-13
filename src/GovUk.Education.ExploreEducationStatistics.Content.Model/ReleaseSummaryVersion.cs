@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -12,14 +11,13 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.PartialDat
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
-    public class Release
+    public class ReleaseSummaryVersion : IVersion
     {
-        public Guid Id { get; set; }
 
-        public ReleaseSummary ReleaseSummary { get; set; }
+        public Guid ReleaseSummaryId;
         
-        public Guid ReleaseSummaryId { get; set; }
-
+        public ReleaseSummary ReleaseSummary;
+        
         public string Title => CoverageTitle + (IsNullOrEmpty(YearTitle) ? "" : " " + YearTitle);
 
         public string YearTitle => TimePeriodLabelFormatter.FormatYear(ReleaseName, TimePeriodCoverage);
@@ -59,26 +57,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public string Slug { get; set; }
 
         public string Summary { get; set; }
-
-        public Guid PublicationId { get; set; }
-
-        public Publication Publication { get; set; }
-
-        public List<Update> Updates { get; set; }
-
-        public List<ContentSection> Content { get; set; }
-
-        public DataBlock KeyStatistics { get; set; }
-
-        public Guid? TypeId { get; set; }
-
+        
         public ReleaseType Type { get; set; }
 
         [JsonConverter(typeof(TimeIdentifierJsonConverter))]
         public TimeIdentifier TimePeriodCoverage { get; set; }
-
-        public int Order { get; set; }
-
+        
         private PartialDate _nextReleaseDate;
 
         public PartialDate NextReleaseDate
@@ -96,5 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
                 }
             }
         }
+
+        public DateTime Created { get; set; }
     }
 }

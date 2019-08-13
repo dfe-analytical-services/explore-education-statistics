@@ -57,22 +57,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _mapper.Map<ReleaseViewModel>(release);
         }
 
-        // TODO Authorisation will be required when users are introduced
-        public async Task<Either<ValidationResult, ReleaseViewModel>> CreateReleaseAsync(CreateReleaseViewModel createRelease)
+        private async Task<Either<ValidationResult, bool>> ValidateReleaseSlugUniqueToPublication(string slug, PublicationId publicationId, ReleaseId? releaseId = null)
         {
-            // Slug must be unique per publication to avoid file system clashes.
-            if (_context.Releases.Any(r => r.Slug == createRelease.Slug && r.PublicationId == createRelease.PublicationId))
+            // TODO remove once information has been moved from Release to ReleaseSummaryVersion
+            if (_context.Releases.Any(r => r.Slug == slug && r.PublicationId == publicationId))
             {
                 return ValidationResult(SlugNotUnique);
             }
-            var order = OrderForNextReleaseOnPublication(createRelease.PublicationId);
-            var content = TemplateFromRelease(createRelease.TemplateReleaseId);
-            var release = _mapper.Map<Release>(createRelease);
-            release.Content = content;
-            release.Order = order;
-            var saved = _context.Releases.Add(release);
-            await _context.SaveChangesAsync();
-            return await GetReleaseForIdAsync(saved.Entity.Id);
+
+            var slugInUse = _context.Releases
+                .Where(r => r.PublicationId == publicationId)
+                .Include(r => r.ReleaseSummary)
+                .ThenInclude(rs => rs.Versions)
+                .Select(r => r.ReleaseSummary)
+                .Any(rs => rs.ReleaseId != releaseId && rs.Current.Slug == slug);
+            if (slugInUse)
+            {
+                return ValidationResult(SlugNotUnique);
+            }
+
+            return true;
+
+
+        }
+
+        // TODO Authorisation will be required when users are introduced
+        public async Task<Either<ValidationResult, ReleaseViewModel>> CreateReleaseAsync(CreateReleaseViewModel createRelease)
+        {
+            return await ValidateReleaseSlugUniqueToPublication(createRelease.PublicationId).OnSuccess(async () =>
+            {
+                var order = OrderForNextReleaseOnPublication(createRelease.PublicationId);
+                var content = TemplateFromRelease(createRelease.TemplateReleaseId);
+                var release = _mapper.Map<Release>(createRelease);
+                release.Content = content;
+                release.Order = order;
+                var saved = _context.Releases.Add(release);
+                await _context.SaveChangesAsync();
+                return await GetReleaseForIdAsync(saved.Entity.Id);
+            });
         }
         
         // TODO Authorisation will be required when users are introduced
