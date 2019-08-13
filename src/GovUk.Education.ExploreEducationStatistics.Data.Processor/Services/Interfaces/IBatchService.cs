@@ -1,13 +1,11 @@
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
-
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces
 {
     public interface IBatchService
     {
-        void UpdateBatchCount(ImportMessage importMessage, string subjectId);
+        void UpdateBatchCount(string releaseId, string subjectId, int batchSize, int batchNo);
 
-        bool IsBatchComplete(ImportMessage importMessage, string subjectId);
+        bool IsBatchComplete(string releaseId, string subjectId, int batchSize);
 
-        void UpdateCurrentBatchNumber(ImportMessage importMessage, string subjectId);
+        void UpdateCurrentBatchNumber(string releaseId, string subjectId, int batchSize, int batchNo);
     }
 }

@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var subjectData = _fileStorageService.GetSubjectData(message).Result;
             var subject = GetSubject(message, subjectData.Name);
             
-            _batchService.UpdateCurrentBatchNumber(message, subject.Id.ToString());
+            _batchService.UpdateCurrentBatchNumber(message.Release.Id.ToString(), subject.Id.ToString(), message.BatchSize, message.BatchNo);
             
             var batch = subjectData.GetCsvLines().ToList();
             var metaLines = subjectData.GetMetaLines().ToList();
@@ -56,9 +56,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 _fileStorageService.Delete(message);
             }
             
-            _batchService.UpdateBatchCount(message, subject.Id.ToString());
+            _batchService.UpdateBatchCount(message.Release.Id.ToString(), subject.Id.ToString(), message.BatchSize, message.BatchNo);
 
-            if (_batchService.IsBatchComplete(message, subject.Id.ToString()))
+            if (_batchService.IsBatchComplete(message.Release.Id.ToString(), subject.Id.ToString(), message.BatchSize))
             {
                 _logger.LogInformation($"All batches imported for {message.DataFileName}");  
             }

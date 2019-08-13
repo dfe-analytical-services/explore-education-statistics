@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.Azure.Cosmos.Table;
@@ -19,18 +18,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _tblStorageService = tblStorageService;
         }
 
-        public void UpdateBatchCount(ImportMessage importMessage, string subjectId)
+        public void UpdateBatchCount(string releaseId, string subjectId, int batchSize, int batchNo)
         {
-            var batch = GetBatch(importMessage, subjectId).Result;
+            var batch = GetBatch(releaseId, subjectId, batchSize).Result;
             var bitArray = new BitArray(batch.BatchesProcessed);
-            bitArray.Set(importMessage.BatchNo - 1, true);
+            bitArray.Set(batchNo - 1, true);
             bitArray.CopyTo(batch.BatchesProcessed, 0);
             GetUploadsTable().Result.ExecuteAsync(TableOperation.InsertOrReplace(batch));
         }
         
-        public bool IsBatchComplete(ImportMessage importMessage, string subjectId)
+        public bool IsBatchComplete(string releaseId, string subjectId, int batchSize)
         {
-            var batch = GetBatch(importMessage, subjectId).Result;
+            var batch = GetBatch(releaseId, subjectId, batchSize).Result;
             var count = (from bool b in new BitArray(batch.BatchesProcessed)
                 where b
                 select b).Count();
@@ -38,24 +37,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return count == batch.BatchSize;
         }
 
-        public void UpdateCurrentBatchNumber(ImportMessage importMessage, string subjectId)
+        public void UpdateCurrentBatchNumber(string releaseId, string subjectId, int batchSize, int batchNo)
         {
-            var batch = GetBatch(importMessage, subjectId).Result;
-            batch.CurrentBatchNo = importMessage.BatchNo;
+            var batch = GetBatch(releaseId, subjectId, batchSize).Result;
+            batch.CurrentBatchNo = batchNo;
             GetUploadsTable().Result.ExecuteAsync(TableOperation.InsertOrReplace(batch));
         }
 
-        private async Task<Batch> GetBatch(ImportMessage importMessage, string subjectId)
+        private async Task<Batch> GetBatch(string releaseId, string subjectId, int batchSize)
         {
             var table = GetUploadsTable().Result;
             // Need to define the extra columns to retrieve
             var columns = new List<string>(){ "BatchSize", "BatchesProcessed", "CurrentBatchNo"};
             Batch batch;
 
-            var result = await table.ExecuteAsync(TableOperation.Retrieve<Batch>(importMessage.Release.Id.ToString(), subjectId, columns));
+            var result = await table.ExecuteAsync(TableOperation.Retrieve<Batch>(releaseId, subjectId, columns));
             if (result.Result == null)
             {
-                batch = new Batch(importMessage.Release.Id.ToString(), subjectId, importMessage.BatchSize);
+                batch = new Batch(releaseId, subjectId, batchSize);
             }
             else
             {
