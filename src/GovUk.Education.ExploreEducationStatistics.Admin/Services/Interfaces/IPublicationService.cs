@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     {
         List<Publication> List();
 
-        Publication Get(Guid id);
+        Task<Publication> GetAsync(Guid id);
 
         Publication Get(string slug);
 

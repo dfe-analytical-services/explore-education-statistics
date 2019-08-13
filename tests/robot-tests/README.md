@@ -20,7 +20,7 @@ Then install pipenv
 pip install pipenv
 ```
 
-NOTE: If the above command doesn't work (or any of the subsequent commands in this README) then you can use `python -m` as below:
+NOTE: If the above command doesn't work (or any of the subsequent commands in this README) then you can prefix `python -m ` to the command as below:
 ```
 python -m pip install pipenv
 ```
@@ -29,10 +29,13 @@ Then in the robot-tests directory run
 ```
 pipenv install
 ```
+OR
+```
+python -m pipenv install
+```
 
-If you intend to run the tests from your local machine, you will also need to create .env files for the relevant environments: ".env.dev", ".env.dev02", and ".env.dev03". Each .env file contains the URLs for that environment's public app and admin app. You can copy and rename the .env.example file in the robot-tests directory, replacing `publicAppUrl` and `adminAppUrl` with the actual URLs for that environment.
+If you intend to run the tests from your local machine, you will also need to create .env files for the relevant environments: ".env.dev", ".env.test", and ".env.dev03". You can copy and rename the .env.example file in the robot-tests directory, replacing the variable values with those for that file's specific environment. The tests rely on these environment variables being set.
 
-When running these tests as part of the CI pipeline, they rely on `publicAppUrl` and `adminAppUrl` being set as part of the pipeline.
 
 # How do I run the tests?
 
@@ -40,7 +43,7 @@ When running these tests as part of the CI pipeline, they rely on `publicAppUrl`
 pipenv run python run_tests.py
 ```
 
-Further instructions on how to use the test runner script
+Further instructions available options
 ```
 pipenv run python run_tests.py -h
 ```
@@ -53,20 +56,28 @@ This section details what the various directories in robot-tests contain.
 This directory holds scripts used by run\_tests.py and the CI pipeline.
 
 ### test-results
-This directory holds the output of a test run, including the test report and log.
+This directory holds the output of a test run, including the test report and log. Screenshots are preserved across runs, but other files are overwritten.
 
 ### tests
-This holds the actual robot framework/selenium tests. The tests are themselves organised into different folders. The `libs` folder holds python and robot framework libraries used by the tests themselves.
+This holds the actual robot framework/selenium tests. The tests are themselves organised into different folders. The `libs` doesn't contain tests, but libraries used by the tests.
 
 ### webdriver
-This holds chromedriver, used by selenium to interact with the browser. If chromedriver isn't present in this directory, it is automatically downloaded when the tests are run. You can explicitly download the chromedriver version of your choice with "--chromedriver <version>". Alternatively, you can place the chromedriver of your choice into the webdriver directory.
+This holds chromedriver, used by selenium to interact with the browser. If chromedriver isn't present in this directory, it is automatically downloaded when the tests are run. You can explicitly download the chromedriver version of your choice with "--chromedriver <version>". Alternatively, you can manually place the chromedriver of your choice into the webdriver directory.
 
-The run_tests.py defaults to using the chromedriver existing in the webdriver directory. If you wish the run script to download a different version, you'll first have to delete the preexisting chromedriver.
+The run_tests.py only downloads chromedriver if it doesn't already exist. If you wish the run script to download a different version, you'll first have to delete chromedriver from the webdriver directory.
+
+If you need to change the chromedriver version used by the CI pipeline, it can be done in `scripts/pipeline-run-rf-tests.sh`. You can check [this repository](https://github.com/microsoft/azure-pipelines-image-generation/tree/master/images) for the version of chrome used on the Azure agent you're using. At the time of writing, the robot tests use the [Ubuntu 1604 image](https://github.com/microsoft/azure-pipelines-image-generation/blob/master/images/linux/Ubuntu1604-README.md)
+
 
 # Guidelines for people writing UI tests
 
 ### IDE
 If searching for an IDE to add/edit these tests, consider using IntelliJ with "IntelliBot @ SeleniumLibrary Patched" and "Robot Framework Support" plugins. This should give you autocompletion and allow you to click through to keywords defined in both .robot and .py files. For this to work, you'll need to change the Project Structure to use "No SDK".
+
+IntelliJ also allows you use to External Tools to right click on a file and run that file exclusively with these settings:
+- Program: /home/${USER}/.local/bin/pipenv   (Or wherever pipenv is located)
+- Arguments: run ./run_tests.py --visual -i robot -f "$FilePath$" -e dev
+- Working directory: $ProjectFileDir$   (which should represent the robot-tests directory. You may have to do something like "$ProjectFileDir$/../tests/robot-tests")
 
 ### Parallelism / Pabot
 It is essential that the test suites can run in parallel. This might not be the case if one test suite relies on test data that another changes. AND this might cause the tests, when run in parallel, to fail in unpredictable ways, making it difficult to determine what test data is the failure-making culprit.

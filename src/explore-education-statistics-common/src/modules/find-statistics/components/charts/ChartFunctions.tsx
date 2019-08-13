@@ -299,10 +299,28 @@ function generateNameForAxisConfiguration(
     case 'timePeriods':
       return result.timePeriod;
     case 'locations':
-      if (result.location.localAuthorityDistrict)
+      if (
+        result.location.localAuthorityDistrict &&
+        result.location.localAuthorityDistrict.code &&
+        result.location.localAuthorityDistrict.code !== ''
+      )
         return `${result.location.localAuthorityDistrict.code}`;
-      if (result.location.localAuthority)
+
+      if (
+        result.location.localAuthority &&
+        result.location.localAuthority.code &&
+        result.location.localAuthority.code !== ''
+      )
         return `${result.location.localAuthority.code}`;
+
+      if (
+        result.location.region &&
+        result.location.region.code &&
+        result.location.region.code !== ''
+      )
+        return `${result.location.region.code}`;
+
+      if (result.location.country) return `${result.location.country.code}`;
 
       return '';
     default:
