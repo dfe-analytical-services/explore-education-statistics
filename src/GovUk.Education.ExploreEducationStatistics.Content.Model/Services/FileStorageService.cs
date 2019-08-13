@@ -4,15 +4,14 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Models;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.Extensions.Configuration;
 using MimeTypes;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services
 {
     public class FileStorageService : IFileStorageService
     {
@@ -43,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
             var blobContainer = blobClient.GetContainerReference(ContainerName);
             blobContainer.CreateIfNotExists();
             
-            var result = blobContainer.ListBlobs(PublicReleaseDirectoryPath(publication, release, type), true, BlobListingDetails.Metadata)
+            var result = blobContainer.ListBlobs(FileStoragePathUtils.PublicReleaseDirectoryPath(publication, release, type), true, BlobListingDetails.Metadata)
                 .OfType<CloudBlockBlob>()
                 .Where(IsFileReleased)
                 .Select(file => new FileInfo

@@ -6,12 +6,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
     public class ContentCacheGenerationService : IContentCacheGenerationService
     {
-        private readonly ApplicationDbContext _context;
-
         public ContentCacheGenerationService(ApplicationDbContext context
         )
         {
-            _context = context;
         }
 
         public async Task<bool> CleanAndRebuildFullCache()

@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Models;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces
 {
     public interface IFileStorageService
     {

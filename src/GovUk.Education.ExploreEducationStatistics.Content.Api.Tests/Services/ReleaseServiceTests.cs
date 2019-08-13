@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces
 using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;

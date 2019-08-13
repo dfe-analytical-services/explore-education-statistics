@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using FileInfo = GovUk.Education.ExploreEducationStatistics.Admin.Models.FileInfo;
 using ReleaseId = System.Guid;
 using PublicationId = System.Guid;
 

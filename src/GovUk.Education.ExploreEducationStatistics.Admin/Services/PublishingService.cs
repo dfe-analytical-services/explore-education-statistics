@@ -7,8 +7,8 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Queue;
+using Microsoft.Azure.Storage;
+using Microsoft.Azure.Storage.Queue;
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services

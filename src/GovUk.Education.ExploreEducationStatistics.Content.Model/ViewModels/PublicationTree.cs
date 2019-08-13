@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Models;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels
 {
     public class PublicationTree
 

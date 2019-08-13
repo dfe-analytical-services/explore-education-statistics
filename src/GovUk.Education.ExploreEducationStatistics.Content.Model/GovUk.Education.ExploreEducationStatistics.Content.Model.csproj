@@ -5,11 +5,27 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Microsoft.Azure.Storage.Common" Version="11.0.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.3" />
         <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Model\GovUk.Education.ExploreEducationStatistics.Data.Model.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="AutoMapper, Version=8.1.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005">
+        <HintPath>..\..\..\..\..\.nuget\packages\automapper\8.1.0\lib\netstandard2.0\AutoMapper.dll</HintPath>
+      </Reference>
+      <Reference Include="Microsoft.Azure.Storage.Blob, Version=10.0.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+        <HintPath>..\..\..\..\..\.nuget\packages\microsoft.azure.storage.blob\10.0.3\lib\netstandard2.0\Microsoft.Azure.Storage.Blob.dll</HintPath>
+      </Reference>
+      <Reference Include="Microsoft.Azure.Storage.Common, Version=10.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+        <HintPath>..\..\..\..\..\.nuget\packages\microsoft.azure.storage.common\10.0.1\lib\netstandard2.0\Microsoft.Azure.Storage.Common.dll</HintPath>
+      </Reference>
+      <Reference Include="MimeTypeMap, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\..\..\..\..\.nuget\packages\mediatypemap\2.1.0\lib\net40\MimeTypeMap.dll</HintPath>
+      </Reference>
     </ItemGroup>
 </Project>

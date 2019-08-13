@@ -1,4 +1,4 @@
-namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Models
+namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 {
     public class FileInfo
     {
