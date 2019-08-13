@@ -193,7 +193,7 @@ function CookiesPage() {
       </section>
       <section>
         <h3>Microsoft Application Insights</h3>
-        <p>Microsoft Application Insights collect telemetry information.</p>
+        <p>Microsoft Application Insights collects telemetry information.</p>
 
         <table className="govuk-table">
           <thead className="govuk-table__head">
