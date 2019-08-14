@@ -69,6 +69,29 @@ const TimePeriodDataTable = (props: Props) => {
     });
   }, [filters, timePeriods, locations, indicators]);
 
+  const noDataErrorComponent = () => {
+    return (
+      <>
+        <div>
+          <div className="govuk-warning-text">
+            <span className="govuk-warning-text__icon" aria-hidden="true">
+              !
+            </span>
+            <strong className="govuk-warning-text__text">
+              <span className="govuk-warning-text__assistive">Warning</span>A
+              table could not be returned. There is no data for the options
+              selected.
+            </strong>
+          </div>
+        </div>
+      </>
+    );
+  };
+
+  if (results.length === 0 || timePeriods.length === 0) {
+    return noDataErrorComponent();
+  }
+
   const columnHeaders: string[][] = [
     ...tableHeaders.columnGroups.map(colGroup =>
       colGroup.map(group => group.label),
@@ -148,53 +171,32 @@ const TimePeriodDataTable = (props: Props) => {
     });
   });
 
-  const rowLengthCheck = function isPopulated(row: string[]) {
-    return row.length > 0;
-  };
-
-  const dataAvailable = rows.some(rowLengthCheck);
-
   return (
     <>
-      {dataAvailable ? (
-        <div>
-          <TableHeadersForm
-            initialValues={tableHeaders}
-            onSubmit={value => {
-              setTableHeaders(value);
+      <div>
+        <TableHeadersForm
+          initialValues={tableHeaders}
+          onSubmit={value => {
+            setTableHeaders(value);
 
-              if (dataTableRef.current) {
-                dataTableRef.current.scrollIntoView({
-                  behavior: 'smooth',
-                  block: 'start',
-                });
-              }
-            }}
-          />
+            if (dataTableRef.current) {
+              dataTableRef.current.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+              });
+            }
+          }}
+        />
 
-          <FixedMultiHeaderDataTable
-            caption={<DataTableCaption {...props} id="dataTableCaption" />}
-            columnHeaders={columnHeaders}
-            rowHeaders={rowHeaders}
-            rows={rows}
-            ref={dataTableRef}
-            footnotes={footnotes}
-          />
-        </div>
-      ) : (
-        <div>
-          <div className="govuk-warning-text">
-            <span className="govuk-warning-text__icon" aria-hidden="true">
-              !
-            </span>
-            <strong className="govuk-warning-text__text">
-              <span className="govuk-warning-text__assistive">Warning</span>A
-              table could not be returned. There is no data for the options
-              selected.
-            </strong>
-          </div>
-        </div>
-      )}
+        <FixedMultiHeaderDataTable
+          caption={<DataTableCaption {...props} id="dataTableCaption" />}
+          columnHeaders={columnHeaders}
+          rowHeaders={rowHeaders}
+          rows={rows}
+          ref={dataTableRef}
+          footnotes={footnotes}
+        />
+      </div>
     </>
   );
 };
