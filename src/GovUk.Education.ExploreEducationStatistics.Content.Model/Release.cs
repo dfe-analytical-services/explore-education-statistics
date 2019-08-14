@@ -18,8 +18,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public ReleaseSummary ReleaseSummary { get; set; }
         
-        public Guid ReleaseSummaryId { get; set; }
-
         public string Title => CoverageTitle + (IsNullOrEmpty(YearTitle) ? "" : " " + YearTitle);
 
         public string YearTitle => TimePeriodLabelFormatter.FormatYear(ReleaseName, TimePeriodCoverage);

@@ -8,6 +8,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public Guid ReleaseId { get; set; }
         
-        public Guid Release { get; set; }
+        public Release Release { get; set; }
     }
 }
