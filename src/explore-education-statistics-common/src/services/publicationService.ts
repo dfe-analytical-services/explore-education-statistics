@@ -57,7 +57,7 @@ export interface Axis {
   size?: number;
 }
 
-export type ChartType = 'line' | 'verticalbar' | 'horizontalbar' | 'map';
+export type ChartType = 'line' | 'verticalbar' | 'horizontalbar' | 'map' | "infographic";
 
 export interface ChartDataSet {
   indicator: string;

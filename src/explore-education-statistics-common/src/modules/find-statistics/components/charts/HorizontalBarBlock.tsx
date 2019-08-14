@@ -1,6 +1,6 @@
 import {
   ChartDataB,
-  ChartDefinition,
+  ChartDefinition, ChartProps,
   conditionallyAdd,
   createSortedAndMappedDataForAxis,
   generateMajorAxis,
@@ -26,7 +26,9 @@ import {
 
 import './charts.scss';
 
-export default class HorizontalBarBlock extends Component<StackedBarProps> {
+export type HorizontalBarProps = StackedBarProps;
+
+export default class HorizontalBarBlock extends Component<HorizontalBarProps> {
   public static definition: ChartDefinition = {
     type: 'horizontalbar',
     name: 'Horizontal bar',
