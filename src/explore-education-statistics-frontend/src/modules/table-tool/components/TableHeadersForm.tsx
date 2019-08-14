@@ -1,13 +1,13 @@
+import React from 'react';
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import { Form, FormikProps } from 'formik';
+import classNames from 'classnames';
 import Button from '@common/components/Button';
 import Details from '@common/components/Details';
 import { FormGroup, Formik } from '@common/components/form';
 import reorder from '@common/lib/utils/reorder';
 import Yup from '@common/lib/validation/yup';
 import { PickByType } from '@common/types';
-import classNames from 'classnames';
-import { Form, FormikProps } from 'formik';
-import React from 'react';
-import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import FormFieldSortableList from './FormFieldSortableList';
 import FormFieldSortableListGroup from './FormFieldSortableListGroup';
 import { SortableOption } from './FormSortableList';

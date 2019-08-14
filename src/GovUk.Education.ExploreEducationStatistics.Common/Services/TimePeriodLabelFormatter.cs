@@ -1,13 +1,18 @@
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using static System.Int32;
+using static System.String;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
     public class TimePeriodLabelFormatter
     {
+        
+        private static readonly Regex YearRegex = new Regex(@"^([0-9]{4})?$");
         private YearFormatOption YearFormat { get; }
         private TimeIdentifierFormatOption TimeIdentifierFormat { get; }
 
@@ -58,48 +63,76 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             TimeIdentifierFormat = timeIdentifierFormat;
         }
 
+        
         public static string Format(int year, TimeIdentifier timeIdentifier)
+        {
+            return Format(year.ToString(), timeIdentifier);
+        }
+        
+        public static string Format(string year, TimeIdentifier timeIdentifier)
+        {
+            return FormatterFor(timeIdentifier).FormatInternal(year, timeIdentifier); 
+        }
+        
+        public static string FormatLabel(TimeIdentifier timeIdentifier)
+        {
+            return FormatterFor(timeIdentifier).FormatLabelInternal(timeIdentifier);
+        }
+        
+        public static string FormatYear(string year, TimeIdentifier timeIdentifier)
+        {
+            return FormatterFor(timeIdentifier).FormatYearInternal(year);
+        }
+        
+        private string FormatInternal(string year, TimeIdentifier timeIdentifier)
+        {
+            var formattedLabel = FormatLabelInternal(timeIdentifier);
+            var formattedYear = FormatYearInternal(year);
+            return IsNullOrEmpty(formattedLabel) ? formattedYear : $"{formattedYear} {formattedLabel}";
+        }
+
+        private string FormatYearInternal(string year)
+        {
+            if (!IsNullOrEmpty(year) && YearRegex.Match(year).Success)
+            {
+                switch (YearFormat)
+                {
+                    case YearFormatOption.Default:
+                        return year;
+                    case YearFormatOption.AcademicOrFiscal:
+                        return $"{Parse(year)}/{(Parse(year) % 100) + 1}"; // Only want the last two digits
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+            return IsNullOrEmpty(year) ? "" : year;
+        }
+        
+        public static TimePeriodLabelFormatter FormatterFor(TimeIdentifier timeIdentifier)
         {
             var labelValueAttribute = timeIdentifier.GetEnumAttribute<TimeIdentifierMetaAttribute>();
             var formatter = Formatters[labelValueAttribute.Format];
-            return formatter.Format(year, labelValueAttribute.Label, labelValueAttribute.ShortLabel);
+            return formatter;
         }
 
-        private string Format(int year, string label, string shortLabel)
+        private string FormatLabelInternal(TimeIdentifier timeIdentifier)
         {
-            var formattedYear = FormatYear(year);
-            var formattedLabel = FormatLabel(label, shortLabel);
-            return string.IsNullOrEmpty(formattedLabel) ? formattedYear : $"{formattedYear} {formattedLabel}";
-        }
-
-        private string FormatLabel(string label, string shortLabel)
-        {
+            var labelValueAttribute = timeIdentifier.GetEnumAttribute<TimeIdentifierMetaAttribute>();
+            var label = labelValueAttribute.Label;
+            var shortLabel = labelValueAttribute.ShortLabel;
             switch (TimeIdentifierFormat)
             {
                 case TimeIdentifierFormatOption.Default:
                     return label;
                 case TimeIdentifierFormatOption.None:
-                    return string.Empty;
+                    return Empty;
                 case TimeIdentifierFormatOption.Short:
                     return shortLabel;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
-
-        private string FormatYear(int year)
-        {
-            switch (YearFormat)
-            {
-                case YearFormatOption.Default:
-                    return year.ToString();
-                case YearFormatOption.AcademicOrFiscal:
-                    return $"{year}/{(year + 1).ToString().Substring(2)}";
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-
+        
         private enum YearFormatOption
         {
             Default,

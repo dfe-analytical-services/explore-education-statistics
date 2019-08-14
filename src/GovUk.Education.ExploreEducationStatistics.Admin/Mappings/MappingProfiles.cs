@@ -24,6 +24,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m => m.MapFrom(r => r.Publication.Title));;
             
             CreateMap<EditReleaseSummaryViewModel, Release>();
+
+            CreateMap<CreateReleaseViewModel, Release>();
         }
     }
 }

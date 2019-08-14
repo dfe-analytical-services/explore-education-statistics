@@ -59,7 +59,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 PublicationSlug = release.Publication.Slug,
                 ReleasePublished = release.Published ?? DateTime.UtcNow,
-                ReleaseSlug = release.Slug
+                ReleaseSlug = release.Slug,
+                ReleaseId = release.Id
             };
 
             return new CloudQueueMessage(JsonConvert.SerializeObject(message));
