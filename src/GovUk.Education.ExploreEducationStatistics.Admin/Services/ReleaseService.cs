@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -84,11 +85,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         // TODO Authorisation will be required when users are introduced
         public async Task<Either<ValidationResult, ReleaseViewModel>> CreateReleaseAsync(CreateReleaseViewModel createRelease)
         {
-            return await ValidateReleaseSlugUniqueToPublication(createRelease.PublicationId).OnSuccess(async () =>
+            return await ValidateReleaseSlugUniqueToPublication(createRelease.Slug, createRelease.PublicationId)
+                .OnSuccess(async () =>
             {
                 var order = OrderForNextReleaseOnPublication(createRelease.PublicationId);
                 var content = TemplateFromRelease(createRelease.TemplateReleaseId);
+                // TODO remove once information has been moved from Release to ReleaseSummaryVersion                 
                 var release = _mapper.Map<Release>(createRelease);
+                // TODO this should remain information has been moved from Release to ReleaseSummaryVersion
+                release.ReleaseSummary = new ReleaseSummary
+                {
+                    Versions = new List<ReleaseSummaryVersion>()
+                    {
+                        new ReleaseSummaryVersion
+                        {
+                            Slug = createRelease.Slug,
+                            TypeId = createRelease.TypeId.Value,
+                            Created = DateTime.Now,
+                            ReleaseName = createRelease.ReleaseName,
+                            PublishScheduled = createRelease.PublishScheduled,
+                            NextReleaseDate = createRelease.NextReleaseDate,
+                            TimePeriodCoverage = createRelease.TimePeriodCoverage
+                        }
+                    }
+                };
+                
                 release.Content = content;
                 release.Order = order;
                 var saved = _context.Releases.Add(release);

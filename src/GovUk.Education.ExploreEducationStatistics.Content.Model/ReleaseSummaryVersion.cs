@@ -59,6 +59,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public string Summary { get; set; }
         
         public ReleaseType Type { get; set; }
+        
+        public Guid TypeId { get; set; }
 
         [JsonConverter(typeof(TimeIdentifierJsonConverter))]
         public TimeIdentifier TimePeriodCoverage { get; set; }
