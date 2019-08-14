@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta.TableBuilder;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
@@ -83,8 +84,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private IEnumerable<TableBuilderResultFilterItemMetaViewModel> GetFilters(IQueryable<Observation> observations)
         {
             var filterItems = _filterItemService.GetFilterItemsIncludingFilters(observations).ToList();
-            var filterItemsGroupedByFilter = filterItems.GroupBy(item => item.FilterGroup.Filter);
-            var totalsByFilter = filterItemsGroupedByFilter.ToDictionary(items => items.Key.Id, 
+            var filterItemsGroupedByFilter = filterItems.GroupBy(item => item.FilterGroup.Filter.Id);
+            var totalsByFilter = filterItemsGroupedByFilter.ToDictionary(items => items.Key, 
                 items => _filterItemService.GetTotal(items)?.Id);
             return filterItems.Select(item =>
             {
