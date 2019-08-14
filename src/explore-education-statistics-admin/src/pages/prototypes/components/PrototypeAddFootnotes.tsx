@@ -20,6 +20,14 @@ const PrototypeAddFootnotes = () => {
           >
             Add another footnote
           </button>
+
+          <button
+            className="govuk-button govuk-button--secondary govuk-!-margin-right-3"
+            type="submit"
+            onClick={() => setAddNewFootnote(false)}
+          >
+            Delete this footnote
+          </button>
           <hr />
         </>
       )}
@@ -32,6 +40,13 @@ const PrototypeAddFootnotes = () => {
             onClick={() => setAddNewFootnote(true)}
           >
             Add another footnote
+          </button>
+          <button
+            className="govuk-button govuk-button--secondary govuk-!-margin-right-3"
+            type="submit"
+            onClick={() => setAddNewFootnote(false)}
+          >
+            Delete this footnote
           </button>
           <hr />
         </>
