@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
 
         [FunctionName("ProcessUploads")]
         public void ProcessUploads(
-            [QueueTrigger("imports-pending", Connection = "")]
+            [QueueTrigger("imports-pending")]
             ImportMessage message,
             ILogger logger,
             [Queue("imports-available")] ICollector<ImportMessage> collector
@@ -66,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
         
         [FunctionName("ProcessUploadsSequentially")]
         public void ProcessUploadsSequentially(
-            [QueueTrigger("imports-pending-sequential", Connection = "")]
+            [QueueTrigger("imports-pending-sequential")]
             ImportMessage[] messages,
             ILogger logger,
             [Queue("imports-available")] ICollector<ImportMessage> collector
@@ -103,9 +103,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             logger.LogInformation($"{GetType().Name} function COMPLETE");
         }
         
-        [FunctionName("ImportFiles")]
-        public void ImportFiles(
-            [QueueTrigger("imports-available", Connection = "")]
+        [FunctionName("ImportObservations")]
+        public void ImportObservations(
+            [QueueTrigger("imports-available")]
             ImportMessage message,
             ILogger logger)
         {
@@ -115,14 +115,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                     $"{GetType().Name} function STARTED for : Batch: {message.BatchNo} of {message.BatchSize} with Datafile: {message.DataFileName}");
                 
                 _fileImportService.ImportObservations(message);
-                
-                // If the batch size is > 1 i.e. The file was split into batches
-                // then delete each split batch processed
-                
-                if (message.BatchSize > 1)
-                {
-                    _fileStorageService.Delete(message);
-                }
             }
             catch (Exception e)
             {

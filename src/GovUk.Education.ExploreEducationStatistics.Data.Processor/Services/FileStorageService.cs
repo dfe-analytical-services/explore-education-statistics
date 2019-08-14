@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 
@@ -15,30 +14,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
     public class FileStorageService : IFileStorageService
     {
-        private readonly string _storageConnectionString;
+        private readonly CloudBlobContainer _blobContainer;
 
         private const string ContainerName = "releases";
 
-        public FileStorageService(IConfiguration config)
+        public FileStorageService(string connectionString)
         {
-            _storageConnectionString = config.GetConnectionString("CoreStorage");
+            _blobContainer = GetOrCreateBlobContainer(connectionString).Result;
         }
 
         public async Task<SubjectData> GetSubjectData(ImportMessage importMessage)
         {
-            var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
-
-            var blobClient = storageAccount.CreateCloudBlobClient();
-            var blobContainer = blobClient.GetContainerReference(ContainerName);
-
             var releaseId = importMessage.Release.Id.ToString();
 
-            var dataBlob = blobContainer.GetBlockBlobReference(
+            var dataBlob = _blobContainer.GetBlockBlobReference(
                 $"{releaseId}/Data/{importMessage.DataFileName}");
 
             await dataBlob.FetchAttributesAsync();
 
-            var metaBlob = blobContainer.GetBlockBlobReference(
+            var metaBlob = _blobContainer.GetBlockBlobReference(
                 $"{releaseId}/Data/{BlobUtils.GetMetaFileName(dataBlob)}");
 
             return new SubjectData(dataBlob, metaBlob, BlobUtils.GetName(dataBlob));
@@ -47,19 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         public async Task<Boolean> UploadDataFileAsync(Guid releaseId, IFormFile dataFile, string metaFileName,
             string name)
         {
-            var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
-
-            var blobClient = storageAccount.CreateCloudBlobClient();
-            var blobContainer = blobClient.GetContainerReference(ContainerName);
-            await blobContainer.CreateIfNotExistsAsync();
-
-            var permissions = new BlobContainerPermissions
-            {
-                PublicAccess = BlobContainerPublicAccessType.Blob
-            };
-            await blobContainer.SetPermissionsAsync(permissions);
-            
-            await UploadFileAsync(blobContainer, releaseId.ToString(), dataFile, new List<KeyValuePair<string, string>>
+            await UploadFileAsync(releaseId.ToString(), dataFile, new List<KeyValuePair<string, string>>
             {
                 new KeyValuePair<string, string>("name", name),
                 new KeyValuePair<string, string>("metafile", metaFileName)
@@ -70,17 +52,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         public void Delete(ImportMessage importMessage)
         {
             var releaseId = importMessage.Release.Id.ToString();
-            var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
-            var blobClient = storageAccount.CreateCloudBlobClient();
-            var blobContainer = blobClient.GetContainerReference(ContainerName);
-            var blob = blobContainer.GetBlockBlobReference($"{releaseId}/Data/{importMessage.DataFileName}");
+            var blob = _blobContainer.GetBlockBlobReference($"{releaseId}/Data/{importMessage.DataFileName}");
             blob.DeleteAsync();
         }
 
-        private static async Task UploadFileAsync(CloudBlobContainer blobContainer, string releaseId,
+        private async Task UploadFileAsync(string releaseId,
             IFormFile file, IEnumerable<KeyValuePair<string, string>> metaValues)
         {
-            var blob = blobContainer.GetBlockBlobReference($"{releaseId}/Data/{file.FileName}");
+            var blob = _blobContainer.GetBlockBlobReference($"{releaseId}/Data/{file.FileName}");
             blob.Properties.ContentType = file.ContentType;
             var path = await FileUtils.UploadToTemporaryFile(file);
             await blob.UploadFromFileAsync(path);
@@ -95,6 +74,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
 
             await blob.SetMetadataAsync();
+        }
+
+        private async Task<CloudBlobContainer> GetOrCreateBlobContainer(string storageConnectionString)
+        {
+            var storageAccount = CloudStorageAccount.Parse(storageConnectionString);
+            var blobClient = storageAccount.CreateCloudBlobClient();
+            var blobContainer = blobClient.GetContainerReference(ContainerName);
+            await blobContainer.CreateIfNotExistsAsync();
+            var permissions = new BlobContainerPermissions
+            {
+                PublicAccess = BlobContainerPublicAccessType.Blob
+            };
+            await blobContainer.SetPermissionsAsync(permissions);
+            return blobContainer;
         }
     }
 }

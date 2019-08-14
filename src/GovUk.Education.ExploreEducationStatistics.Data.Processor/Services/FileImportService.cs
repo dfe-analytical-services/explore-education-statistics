@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
@@ -14,28 +15,53 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private readonly ApplicationDbContext _context;
         private readonly IFileStorageService _fileStorageService;
         private readonly IImporterService _importerService;
+        private readonly IBatchService _batchService;
+        private readonly ILogger<IFileImportService> _logger;
 
         public FileImportService(
             ApplicationDbContext context,
             IFileStorageService fileStorageService,
-            IImporterService importerService)
+            IImporterService importerService,
+            IBatchService batchService,
+            ILogger<IFileImportService> logger)
         {
             _context = context;
             _fileStorageService = fileStorageService;
             _importerService = importerService;
+            _batchService = batchService;
+            _logger = logger;
         }
 
         public void ImportObservations(ImportMessage message)
         {
             var subjectData = _fileStorageService.GetSubjectData(message).Result;
-            var batch = subjectData.GetCsvLines().ToList();
-            var metaLines = subjectData.GetMetaLines().ToList();
             var subject = GetSubject(message, subjectData.Name);
             
+            _batchService.UpdateCurrentBatchNumber(message.Release.Id.ToString(), subject.Id.ToString(), message.BatchSize, message.BatchNo);
+            
+            var batch = subjectData.GetCsvLines().ToList();
+            var metaLines = subjectData.GetMetaLines().ToList();
+
             _importerService.ImportObservations(
                 batch,
                 subject,
                 _importerService.GetMeta(metaLines, subject));
+            
+                            
+            // If the batch size is > 1 i.e. The file was split into batches
+            // then delete each split batch processed
+                
+            if (message.BatchSize > 1)
+            {
+                _fileStorageService.Delete(message);
+            }
+            
+            _batchService.UpdateBatchCount(message.Release.Id.ToString(), subject.Id.ToString(), message.BatchSize, message.BatchNo);
+
+            if (_batchService.IsBatchComplete(message.Release.Id.ToString(), subject.Id.ToString(), message.BatchSize))
+            {
+                _logger.LogInformation($"All batches imported for {message.DataFileName}");  
+            }
         }
         
         public void ImportFiltersLocationsAndSchools(ImportMessage message)

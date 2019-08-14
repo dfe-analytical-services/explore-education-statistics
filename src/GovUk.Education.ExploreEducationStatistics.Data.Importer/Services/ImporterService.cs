@@ -129,7 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         public void ImportObservations(List<string> lines, Subject subject, SubjectMeta subjectMeta)
         {
             _logger.LogDebug("Importing batch for Publication {Publication}, {Subject}", subject.Release.Publication.Title, subject.Name);
-
+            
             var headers = lines.First().Split(',').ToList();
             lines.RemoveAt(0);
             
@@ -167,10 +167,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             Subject subject,
             SubjectMeta subjectMeta)
         {
-            return lines.Select(line => ObservationsFromCsv(line, headers, subject, subjectMeta));
+            return lines.Select(line => ObservationFromCsv(line, headers, subject, subjectMeta));
         }
 
-        private Observation ObservationsFromCsv(string raw,
+        private Observation ObservationFromCsv(string raw,
             List<string> headers,
             Subject subject,
             SubjectMeta subjectMeta)
@@ -185,7 +185,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 Measures = GetMeasures(line, headers, subjectMeta.Indicators),
                 ProviderUrn = GetProvider(line, headers)?.Urn,
                 SchoolLaEstab = GetSchool(line, headers)?.LaEstab,
-                Subject = subject,
                 SubjectId = subject.Id,
                 TimeIdentifier = GetTimeIdentifier(line, headers),
                 Year = GetYear(line, headers),
