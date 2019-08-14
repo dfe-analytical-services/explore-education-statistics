@@ -715,12 +715,12 @@
 						{
 							"key": "file",
 							"type": "file",
-							"src": "/home/mark/projects/explore-education-statistics/tests/newman/files/my_file.csv"
+							"src": "{{files_dir}}/my_file.csv"
 						},
 						{
 							"key": "metaFile",
 							"type": "file",
-							"src": "/home/mark/projects/explore-education-statistics/tests/newman/files/my_metafile.csv"
+							"src": "{{files_dir}/my_metafile.csv"
 						}
 					]
 				},
@@ -853,7 +853,7 @@
 						{
 							"key": "file",
 							"type": "file",
-							"src": "/home/mark/projects/explore-education-statistics/tests/newman/files/ancillary.doc"
+							"src": "{{files_dir}}/ancillary.doc"
 						}
 					]
 				},
@@ -989,7 +989,7 @@
 						{
 							"key": "file",
 							"type": "file",
-							"src": "/home/mark/projects/explore-education-statistics/tests/newman/files/chart.png"
+							"src": "{{files_dir}}/chart.png"
 						}
 					]
 				},
