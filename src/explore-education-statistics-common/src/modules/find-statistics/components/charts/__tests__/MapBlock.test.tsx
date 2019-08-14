@@ -10,7 +10,16 @@ describe('MapBlock', () => {
   test('renders', async () => {
     const { container } = render(
       <MapBlock
-        {...testData.AbstractMultipleChartProps}
+        {...{
+          ...testData.AbstractMultipleChartProps,
+          axes: {
+            ...testData.AbstractMultipleChartProps.axes,
+            major: {
+              ...testData.AbstractMultipleChartProps.axes.major,
+              groupBy: 'locations',
+            },
+          },
+        }}
         height={600}
         width={900}
       />,
@@ -24,7 +33,16 @@ describe('MapBlock', () => {
   test('includes all locations in select', async () => {
     const { container } = render(
       <MapBlock
-        {...testData.AbstractMultipleChartProps}
+        {...{
+          ...testData.AbstractMultipleChartProps,
+          axes: {
+            ...testData.AbstractMultipleChartProps.axes,
+            major: {
+              ...testData.AbstractMultipleChartProps.axes.major,
+              groupBy: 'locations',
+            },
+          },
+        }}
         height={600}
         width={900}
       />,
@@ -49,7 +67,16 @@ describe('MapBlock', () => {
   test('includes all indicators in select', async () => {
     const { container } = render(
       <MapBlock
-        {...testData.AbstractMultipleChartProps}
+        {...{
+          ...testData.AbstractMultipleChartProps,
+          axes: {
+            ...testData.AbstractMultipleChartProps.axes,
+            major: {
+              ...testData.AbstractMultipleChartProps.axes.major,
+              groupBy: 'locations',
+            },
+          },
+        }}
         height={600}
         width={900}
       />,
@@ -62,13 +89,13 @@ describe('MapBlock', () => {
     expect(select).toBeVisible();
 
     if (select) {
-      expect(select.querySelector('option[value="28"]')).toHaveTextContent(
+      expect(select.querySelector('option[value="2"]')).toHaveTextContent(
         'Authorised absence rate',
       );
-      expect(select.querySelector('option[value="26"]')).toHaveTextContent(
+      expect(select.querySelector('option[value="1"]')).toHaveTextContent(
         'Overall absence rate',
       );
-      expect(select.querySelector('option[value="23"]')).toHaveTextContent(
+      expect(select.querySelector('option[value="0"]')).toHaveTextContent(
         'Unauthorised absence rate',
       );
     }
@@ -77,7 +104,17 @@ describe('MapBlock', () => {
   test('include all indicators from reduced selection', async () => {
     const { container } = render(
       <MapBlock
-        {...testData.AbstractLargeDataChartProps_smaller_datasets}
+        {...{
+          ...testData.AbstractLargeDataChartProps_smaller_datasets,
+          axes: {
+            ...testData.AbstractLargeDataChartProps_smaller_datasets.axes,
+            major: {
+              ...testData.AbstractLargeDataChartProps_smaller_datasets.axes
+                .major,
+              groupBy: 'locations',
+            },
+          },
+        }}
         height={600}
         width={900}
       />,
@@ -90,10 +127,10 @@ describe('MapBlock', () => {
     expect(select).toBeVisible();
 
     if (select) {
-      expect(select.querySelector('option[value="26"]')).toHaveTextContent(
+      expect(select.querySelector('option[value="1"]')).toHaveTextContent(
         'Overall absence rate',
       );
-      expect(select.querySelector('option[value="23"]')).toHaveTextContent(
+      expect(select.querySelector('option[value="0"]')).toHaveTextContent(
         'Unauthorised absence rate',
       );
     }

@@ -1,3 +1,5 @@
+import React, { memo, forwardRef } from 'react';
+import last from 'lodash/last';
 import cartesian from '@common/lib/utils/cartesian';
 import formatPretty from '@common/lib/utils/number/formatPretty';
 import { TableData } from '@common/services/tableBuilderService';
@@ -8,12 +10,9 @@ import {
   LocationFilter,
 } from '@frontend/modules/table-tool/components/types/filters';
 import TimePeriod from '@frontend/modules/table-tool/components/types/TimePeriod';
-import last from 'lodash/last';
-import sortBy from 'lodash/sortBy';
-import React, { memo, useEffect, useRef, useState } from 'react';
 import DataTableCaption from './DataTableCaption';
 import FixedMultiHeaderDataTable from './FixedMultiHeaderDataTable';
-import TableHeadersForm, { TableHeadersFormValues } from './TableHeadersForm';
+import { TableHeadersFormValues } from './TableHeadersForm';
 
 interface Props {
   indicators: Indicator[];
@@ -24,181 +23,127 @@ interface Props {
   locations: LocationFilter[];
   results: TableData['result'];
   footnotes?: TableData['footnotes'];
+  tableHeadersConfig: TableHeadersFormValues;
 }
 
-const TimePeriodDataTable = (props: Props) => {
-  const {
-    filters,
-    timePeriods,
-    locations,
-    indicators,
-    results,
-    footnotes,
-  } = props;
-
-  const dataTableRef = useRef<HTMLTableElement>(null);
-
-  const [tableHeaders, setTableHeaders] = useState<TableHeadersFormValues>({
-    columnGroups: [],
-    columns: [],
-    rowGroups: [],
-    rows: [],
-  });
-
-  const removeSiblinglessTotalRows = (
-    categoryFilters: Dictionary<CategoryFilter[]>,
-  ): CategoryFilter[][] => {
-    return Object.values(categoryFilters).filter(filter => {
-      return filter.length > 1 || !filter[0].isTotal;
-    });
-  };
-
-  useEffect(() => {
-    const sortedFilters = sortBy(
-      [...removeSiblinglessTotalRows(filters), locations],
-      [options => options.length],
-    );
-
-    const halfwayIndex = Math.floor(sortedFilters.length / 2);
-
-    setTableHeaders({
-      columnGroups: sortedFilters.slice(0, halfwayIndex),
-      rowGroups: sortedFilters.slice(halfwayIndex),
-      columns: timePeriods,
-      rows: indicators,
-    });
-  }, [filters, timePeriods, locations, indicators]);
-
-  const noDataErrorComponent = () => {
-    return (
-      <>
-        <div>
-          <div className="govuk-warning-text">
-            <span className="govuk-warning-text__icon" aria-hidden="true">
-              !
-            </span>
-            <strong className="govuk-warning-text__text">
-              <span className="govuk-warning-text__assistive">Warning</span>A
-              table could not be returned. There is no data for the options
-              selected.
-            </strong>
+const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
+  (props: Props, dataTableRef) => {
+    const { results, footnotes, tableHeadersConfig } = props;
+    const noDataErrorComponent = () => {
+      return (
+        <>
+          <div>
+            <div className="govuk-warning-text">
+              <span className="govuk-warning-text__icon" aria-hidden="true">
+                !
+              </span>
+              <strong className="govuk-warning-text__text">
+                <span className="govuk-warning-text__assistive">Warning</span>A
+                table could not be returned. There is no data for the options
+                selected.
+              </strong>
+            </div>
           </div>
-        </div>
-      </>
-    );
-  };
-
-  if (results.length === 0 || timePeriods.length === 0) {
-    return noDataErrorComponent();
-  }
-
-  const columnHeaders: string[][] = [
-    ...tableHeaders.columnGroups.map(colGroup =>
-      colGroup.map(group => group.label),
-    ),
-    tableHeaders.columns.map(column => column.label),
-  ];
-
-  const rowHeaders: string[][] = [
-    ...tableHeaders.rowGroups.map(rowGroup =>
-      rowGroup.map(group => group.label),
-    ),
-    tableHeaders.rows.map(row => row.label),
-  ];
-
-  const rowHeadersCartesian = cartesian(
-    ...tableHeaders.rowGroups,
-    tableHeaders.rows,
-  );
-
-  const columnHeadersCartesian = cartesian(
-    ...tableHeaders.columnGroups,
-    tableHeaders.columns,
-  );
-
-  const rows = rowHeadersCartesian.map(rowFilterCombination => {
-    const rowCol1 = last(rowFilterCombination);
-
-    return columnHeadersCartesian.map(columnFilterCombination => {
-      const rowCol2 = last(columnFilterCombination);
-
-      // User could choose to flip rows and columns
-      const indicator = (rowCol1 instanceof Indicator
-        ? rowCol1
-        : rowCol2) as Indicator;
-      const timePeriod = (rowCol2 instanceof TimePeriod
-        ? rowCol2
-        : rowCol1) as TimePeriod;
-
-      const filterCombination = [
-        ...rowFilterCombination,
-        ...columnFilterCombination,
-      ];
-
-      const categoryFilters = filterCombination.filter(
-        filter => filter instanceof CategoryFilter,
+        </>
       );
+    };
 
-      const locationFilters = filterCombination.filter(
-        filter => filter instanceof LocationFilter,
-      ) as LocationFilter[];
+    if (results.length === 0) {
+      return noDataErrorComponent();
+    }
 
-      const matchingResult = results.find(result => {
-        return (
-          categoryFilters.every(filter =>
-            result.filters.includes(filter.value),
-          ) &&
-          result.timePeriod === timePeriod.value &&
-          locationFilters.every(
-            filter =>
-              result.location[filter.level] &&
-              result.location[filter.level].code === filter.value,
-          )
+    const columnHeaders: string[][] = [
+      ...tableHeadersConfig.columnGroups.map(colGroup =>
+        colGroup.map(group => group.label),
+      ),
+      tableHeadersConfig.columns.map(column => column.label),
+    ];
+
+    const rowHeaders: string[][] = [
+      ...tableHeadersConfig.rowGroups.map(rowGroup =>
+        rowGroup.map(group => group.label),
+      ),
+      tableHeadersConfig.rows.map(row => row.label),
+    ];
+
+    const rowHeadersCartesian = cartesian(
+      ...tableHeadersConfig.rowGroups,
+      tableHeadersConfig.rows,
+    );
+
+    const columnHeadersCartesian = cartesian(
+      ...tableHeadersConfig.columnGroups,
+      tableHeadersConfig.columns,
+    );
+
+    const rows = rowHeadersCartesian.map(rowFilterCombination => {
+      const rowCol1 = last(rowFilterCombination);
+
+      return columnHeadersCartesian.map(columnFilterCombination => {
+        const rowCol2 = last(columnFilterCombination);
+
+        // User could choose to flip rows and columns
+        const indicator = (rowCol1 instanceof Indicator
+          ? rowCol1
+          : rowCol2) as Indicator;
+        const timePeriod = (rowCol2 instanceof TimePeriod
+          ? rowCol2
+          : rowCol1) as TimePeriod;
+
+        const filterCombination = [
+          ...rowFilterCombination,
+          ...columnFilterCombination,
+        ];
+
+        const categoryFilters = filterCombination.filter(
+          filter => filter instanceof CategoryFilter,
         );
+
+        const locationFilters = filterCombination.filter(
+          filter => filter instanceof LocationFilter,
+        ) as LocationFilter[];
+
+        const matchingResult = results.find(result => {
+          return (
+            categoryFilters.every(filter =>
+              result.filters.includes(filter.value),
+            ) &&
+            result.timePeriod === timePeriod.value &&
+            locationFilters.every(
+              filter =>
+                result.location[filter.level] &&
+                result.location[filter.level].code === filter.value,
+            )
+          );
+        });
+
+        if (!matchingResult) {
+          return 'n/a';
+        }
+
+        const value = matchingResult.measures[indicator.value];
+
+        if (Number.isNaN(Number(value))) {
+          return value;
+        }
+
+        return `${formatPretty(value)}${indicator.unit}`;
       });
-
-      if (!matchingResult) {
-        return 'n/a';
-      }
-
-      const value = matchingResult.measures[indicator.value];
-
-      if (Number.isNaN(Number(value))) {
-        return value;
-      }
-
-      return `${formatPretty(value)}${indicator.unit}`;
     });
-  });
 
-  return (
-    <>
-      <div>
-        <TableHeadersForm
-          initialValues={tableHeaders}
-          onSubmit={value => {
-            setTableHeaders(value);
+    return (
+      <FixedMultiHeaderDataTable
+        caption={<DataTableCaption {...props} id="dataTableCaption" />}
+        columnHeaders={columnHeaders}
+        rowHeaders={rowHeaders}
+        rows={rows}
+        ref={dataTableRef}
+        footnotes={footnotes}
+      />
+    );
+  },
+);
 
-            if (dataTableRef.current) {
-              dataTableRef.current.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start',
-              });
-            }
-          }}
-        />
-
-        <FixedMultiHeaderDataTable
-          caption={<DataTableCaption {...props} id="dataTableCaption" />}
-          columnHeaders={columnHeaders}
-          rowHeaders={rowHeaders}
-          rows={rows}
-          ref={dataTableRef}
-          footnotes={footnotes}
-        />
-      </div>
-    </>
-  );
-};
+TimePeriodDataTable.displayName = 'TimePeriodDataTable';
 
 export default memo(TimePeriodDataTable);

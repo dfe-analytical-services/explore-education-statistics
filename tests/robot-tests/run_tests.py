@@ -77,11 +77,9 @@ if args.tags:
 
 if args.env == "ci":
     robotArgs += ["--xunit", "xunit", "-v", "timeout:" + str(timeout), "-v", "implicit_wait:" + str(implicit_wait)]
-elif args.env == 'local':
-    os.environ['PUBLIC_URL'] = "http://localhost:3000"
-    os.environ['ADMIN_URL'] = "http://localhost:3001"
-    robotArgs += ['--exclude', 'NotAgainstLocal']
 else:
+    if args.env == 'local':
+        robotArgs += ['--exclude', 'NotAgainstLocal']
     load_dotenv(os.path.join(os.path.dirname(__file__), '.env.' + args.env))
 
 if os.getenv('PUBLIC_URL') is None or os.getenv('ADMIN_URL') is None:
@@ -97,7 +95,7 @@ robotArgs += ["-v", "browser:" + args.browser]
 robotArgs += [args.tests]
 
 # Install chromedriver and add it to PATH
-path = cdi.install(file_directory='./webdriver/',
+cdi.install(file_directory='./webdriver/',
                    verbose=False,
                    chmod=True,
                    overwrite=False,

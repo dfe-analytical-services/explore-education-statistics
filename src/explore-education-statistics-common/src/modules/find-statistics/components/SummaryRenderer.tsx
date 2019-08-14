@@ -1,5 +1,5 @@
-import Details from '@common/components/Details';
-import React from 'react';
+import Details, { DetailsToggleHandler } from '@common/components/Details';
+import React, { MouseEvent } from 'react';
 import ReactMarkdown from 'react-markdown';
 import {
   DataBlockData,
@@ -15,6 +15,7 @@ export interface SummaryRendererProps {
   dataKeys: string[];
   dataSummary: string[];
   description: { type: string; body: string };
+  onToggle?: DetailsToggleHandler;
 }
 
 function getLatestMeasures(result: Result[]) {
@@ -34,6 +35,7 @@ export default function SummaryRenderer({
   data,
   dataKeys,
   dataSummary,
+  onToggle,
 }: SummaryRendererProps) {
   let measures: { [key: string]: string } = {};
 
@@ -74,7 +76,10 @@ export default function SummaryRenderer({
                   <p className="govuk-body-s">{dataSummary[index]}</p>
                 )}
               </div>
-              <Details summary={`Define '${meta.indicators[key].label}'`}>
+              <Details
+                onToggle={onToggle}
+                summary={`Define '${meta.indicators[key].label}'`}
+              >
                 <p>
                   This service is not yet available
                   {/*

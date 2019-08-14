@@ -1,6 +1,6 @@
 using System;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
 {
@@ -67,37 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
             {
             }
         }
-        
-        
-        [Fact]
-        public void Title_CalendarYear()
-        {
-            var title = new Release {ReleaseName = "2019", TimePeriodCoverage = TimeIdentifier.CalendarYear}.Title;
-            Assert.Equal("Calendar Year 2019", title);
-        }
-        
-        
-        [Fact]
-        public void Title_NonCalendarYear()
-        {
-            var title1 = new Release {ReleaseName = "2019", TimePeriodCoverage = TimeIdentifier.TaxYear}.Title;
-            Assert.Equal("Tax Year 2019/20", title1);
-            
-            var title2 = new Release {ReleaseName = "2010", TimePeriodCoverage = TimeIdentifier.TaxYear}.Title;
-            Assert.Equal("Tax Year 2010/11", title2);
-        }
-        
-        
-        [Fact]
-        public void Title_NoYear()
-        {
-            var title1 = new Release {ReleaseName = "", TimePeriodCoverage = TimeIdentifier.TaxYear}.Title;
-            Assert.Equal("Tax Year", title1);
-            
-            var title2 = new Release {ReleaseName = null, TimePeriodCoverage = TimeIdentifier.TaxYear}.Title;
-            Assert.Equal("Tax Year", title2);
-        }
-        
+
         [Fact]
         public void Acceptable_ReleaseName()
         {
@@ -142,6 +112,56 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
             new Release {ReleaseName = "2011"};
             new Release {ReleaseName = "3000"};
             // None should throw
+        }
+        
+        
+        
+        [Fact]
+        public void Title_CalendarYear()
+        {
+            var title = new Release {ReleaseName = "2019", TimePeriodCoverage = CalendarYear}.Title;
+            Assert.Equal("Calendar Year 2019", title);
+        }
+        
+        [Fact]
+        public void Title_NonCalendarYear()
+        {
+            var title1 = new Release { ReleaseName = "2019", TimePeriodCoverage = TaxYear}.Title;
+            Assert.Equal("Tax Year 2019/20", title1);
+            
+            var title2 = new Release {ReleaseName = "2010", TimePeriodCoverage = TaxYear}.Title;
+            Assert.Equal("Tax Year 2010/11", title2);
+        }
+
+        [Fact]
+        public void Title_NoYear()
+        {
+            var title1 = new Release {ReleaseName = "", TimePeriodCoverage = TaxYear}.Title;
+            Assert.Equal("Tax Year", title1);
+            
+            var title2 = new Release {ReleaseName = null, TimePeriodCoverage = TaxYear}.Title;
+            Assert.Equal("Tax Year", title2);
+        }
+        
+        [Fact]
+        public void CoverageTitle()
+        {
+            var coverageTitle = new Release {TimePeriodCoverage = TaxYear}.CoverageTitle;
+            Assert.Equal("Tax Year", coverageTitle);
+        }
+        
+        [Fact]
+        public void ReleaseYearTitle_CalendarYear()
+        {
+            var yearTitle = new Release {ReleaseName = "2019", TimePeriodCoverage = CalendarYear}.YearTitle;
+            Assert.Equal("2019", yearTitle );
+        }
+        
+        [Fact]
+        public void ReleaseYearTitle_NonCalendarYear()
+        {
+            var yearTitle = new Release {ReleaseName = "2019", TimePeriodCoverage = TaxYear}.YearTitle;
+            Assert.Equal("2019/20", yearTitle);
         }
     }
 }

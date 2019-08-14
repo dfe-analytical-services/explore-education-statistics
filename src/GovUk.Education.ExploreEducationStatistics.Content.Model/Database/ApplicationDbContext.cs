@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Converters;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
@@ -189,7 +190,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(
                     p => p.ToString(),
                     p => new Uri(p));
-
+            
+            modelBuilder.Entity<Release>()
+                .Property(r => r.TimePeriodCoverage)
+                .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>())
+                .HasMaxLength(6);
+            
             modelBuilder.Entity<Release>()
                 .Property(b => b.Content)
                 .HasConversion(

@@ -21,9 +21,9 @@ Validate Pupils and schools contains correct details components
     user checks page contains accordion   Pupils and schools
     user opens accordion section   Pupils and schools
 
-    user checks accordion section contains details  Pupils and schools   Pupil absence
-    user checks accordion section contains details  Pupils and schools   School applications
-    user checks accordion section contains details  Pupils and schools   Exclusions
+    user checks accordion section contains text  Pupils and schools   Pupil absence
+    user checks accordion section contains text  Pupils and schools   School applications
+    user checks accordion section contains text  Pupils and schools   Exclusions
 
 Validate Pupil absence data downloads are available
     [Tags]  HappyPath   NotAgainstLocal

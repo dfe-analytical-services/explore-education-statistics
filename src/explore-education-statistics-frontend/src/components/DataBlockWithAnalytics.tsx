@@ -8,6 +8,13 @@ const DataBlockWithAnalytics = (props: DataBlockProps) => {
   return (
     <DataBlock
       {...props}
+      onSummaryDetailsToggle={(isOpened, event) => {
+        logEvent(
+          'Summary Define Dropdowns',
+          `${event.currentTarget.innerText} dropdown opened`,
+          window.location.pathname,
+        );
+      }}
       onToggle={(section: { id: string; title: string }) => {
         logEvent(
           'Publication Release Data Tabs',

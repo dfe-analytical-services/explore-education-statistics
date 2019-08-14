@@ -12,6 +12,7 @@ Navigate to Pupil absence in schools in England methodology page
     environment variable should be set  PUBLIC_URL
     user goes to url   %{PUBLIC_URL}/methodology
     user waits until page contains heading   Methodologies
+
     user opens accordion section  Pupils and schools
     user opens details dropdown   Pupil absence
     user clicks link    Pupil absence statistics: methodology
