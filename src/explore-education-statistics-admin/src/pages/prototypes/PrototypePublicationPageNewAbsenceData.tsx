@@ -7,6 +7,7 @@ import Link from '@admin/components/Link';
 import Details from '@common/components/Details';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
+import PrototypeAddFootnotes from './components/PrototypeAddFootnotes';
 import PrototypeFootnotes from './components/PrototypeFootnotes';
 import PrototypeAdminNavigation from './components/PrototypeAdminNavigation';
 import PrototypePage from './components/PrototypePage';
@@ -218,15 +219,15 @@ const PublicationDataPage = () => {
         <TabsSection id="footnotes" title="Footnotes">
           <Accordion id="uploaded-data">
             <AccordionSection heading="Geographical absence">
-              <PrototypeFootnotes />
-              <hr />
-              <PrototypeFootnotes />
+              <PrototypeAddFootnotes />
             </AccordionSection>
             <AccordionSection heading="Local authority">
-              Test 2
+              <PrototypeAddFootnotes />
             </AccordionSection>
             <AccordionSection heading="National characteristics">
-              <></>
+              <button className="govuk-button" type="button">
+                Add footnote
+              </button>
             </AccordionSection>
           </Accordion>
         </TabsSection>
