@@ -99,6 +99,7 @@ const ChartBuilder = ({data}: Props) => {
     height: 300,
     width: undefined,
     title: '',
+    fileId: undefined
   });
   const previousAxesConfiguration = React.useRef<Dictionary<AxisConfiguration>>(
     {},
@@ -273,22 +274,24 @@ const ChartBuilder = ({data}: Props) => {
 
       {selectedChartType && (
         <Tabs id="ChartTabs">
-          <TabsSection title="Data">
-            <p>Add data from the existing dataset to the chart</p>
-            <ChartDataSelector
-              onDataAdded={onDataAdded}
-              onDataRemoved={onDataRemoved}
-              onDataChanged={(newData: ChartDataSetAndConfiguration[]) => {
-                setDataSetAndConfiguration([...newData]);
-              }}
-              metaData={data.metaData}
-              indicatorIds={indicatorIds}
-              filterIds={filterIdCombinations}
-              selectedData={dataSetAndConfiguration}
-              chartType={selectedChartType}
-              capabilities={selectedChartType.capabilities}
-            />
-          </TabsSection>
+          {selectedChartType.data.length > 0 && (
+            <TabsSection title="Data">
+              <p>Add data from the existing dataset to the chart</p>
+              <ChartDataSelector
+                onDataAdded={onDataAdded}
+                onDataRemoved={onDataRemoved}
+                onDataChanged={(newData: ChartDataSetAndConfiguration[]) => {
+                  setDataSetAndConfiguration([...newData]);
+                }}
+                metaData={data.metaData}
+                indicatorIds={indicatorIds}
+                filterIds={filterIdCombinations}
+                selectedData={dataSetAndConfiguration}
+                chartType={selectedChartType}
+                capabilities={selectedChartType.capabilities}
+              />
+            </TabsSection>
+          )}
 
           <TabsSection title="Chart Configuration">
             <ChartConfiguration
