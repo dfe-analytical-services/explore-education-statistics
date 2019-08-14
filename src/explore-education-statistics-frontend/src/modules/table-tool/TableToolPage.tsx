@@ -26,7 +26,7 @@ import mapValues from 'lodash/mapValues';
 import { NextContext } from 'next';
 import Router from 'next/router';
 import React, { Component, MouseEventHandler, createRef } from 'react';
-import getDefaultTableHeaderConfig from '@frontend/services/tableHeadersService';
+import getDefaultTableHeaderConfig from '@frontend/modules/table-tool/utils/tableHeaders';
 import DownloadCsvButton from './components/DownloadCsvButton';
 import FiltersForm, { FilterFormSubmitHandler } from './components/FiltersForm';
 import LocationFiltersForm, {
