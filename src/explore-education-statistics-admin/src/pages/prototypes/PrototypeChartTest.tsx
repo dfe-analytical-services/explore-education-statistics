@@ -3,8 +3,6 @@ import ChartData from '@common/modules/find-statistics/components/charts/__tests
 import { DataBlockResponse } from '@common/services/dataBlockService';
 import React from 'react';
 import ChartBuilder from '@admin/modules/chart-builder/ChartBuilder';
-import ChartRenderer from '@common/modules/find-statistics/components/ChartRenderer';
-import { StackedBarProps } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 
 const PrototypeChartTest = () => {
   const chartData = ChartData.AbstractLargeDataChartProps_smaller_datasets;
@@ -14,14 +12,14 @@ const PrototypeChartTest = () => {
     metaData: chartData.meta,
   };
 
-  const newChartData: StackedBarProps = {
-    ...ChartData.AbstractChartProps,
-  };
+  /* const newChartData: StackedBarProps = {
+     ...ChartData.AbstractChartProps,
+   };*/
 
   return (
     <PrototypePage wide>
-      {/*<ChartBuilder data={newChartBuilderData} />*/}
-      <ChartRenderer type="line" {...newChartData} />
+      <ChartBuilder data={newChartBuilderData} />
+      {/* <ChartRenderer type="line" {...newChartData} /> */}
     </PrototypePage>
   );
 };

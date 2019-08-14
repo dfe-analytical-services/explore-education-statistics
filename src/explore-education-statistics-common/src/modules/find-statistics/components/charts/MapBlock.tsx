@@ -2,13 +2,11 @@ import Details from '@common/components/Details';
 import { FormSelect } from '@common/components/form';
 import { SelectOption } from '@common/components/form/FormSelect';
 import {
+  ChartDataB,
   ChartDefinition,
   ChartProps,
-  createDataForAxis,
-  generateKeyFromDataSet,
-  ChartDataB,
   createSortedAndMappedDataForAxis,
-  createSortedDataForAxis,
+  generateKeyFromDataSet,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 
 import {
@@ -20,7 +18,7 @@ import {
 import classNames from 'classnames';
 import { Feature, FeatureCollection, Geometry } from 'geojson';
 
-import { Layer, LeafletMouseEvent, Path, Polyline, PathOptions } from 'leaflet';
+import { Layer, LeafletMouseEvent, Path, PathOptions, Polyline } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import React from 'react';
 import { GeoJSON, LatLngBounds, Map } from 'react-leaflet';
