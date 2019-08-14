@@ -1,10 +1,9 @@
+import ReleaseDataPage from '@admin/pages/release/edit-release/data/ReleaseDataPage';
+import ReleaseContentPage from '@admin/pages/release/edit-release/ReleaseContentPage';
+import ReleaseDataBlocksPage from '@admin/pages/release/edit-release/ReleaseDataBlocksPage';
+import ReleasePublishStatusPage from '@admin/pages/release/edit-release/ReleaseStatusPage';
 import ReleaseSummaryEditPage from '@admin/pages/release/edit-release/summary/ReleaseSummaryEditPage';
 import ReleaseSummaryPage from '@admin/pages/release/edit-release/summary/ReleaseSummaryPage';
-import ReleaseDataPage from '@admin/pages/release/edit-release/data/ReleaseDataPage';
-import ReleaseBuildTablesPage from '@admin/pages/release/edit-release/ReleaseBuildTablesPage';
-import ReleaseTablesPage from '@admin/pages/release/edit-release/ReleaseTablesPage';
-import ReleaseContentPage from '@admin/pages/release/edit-release/ReleaseContentPage';
-import ReleasePublishStatusPage from '@admin/pages/release/edit-release/ReleasePublishStatusPage';
 
 export interface ReleaseRoute {
   path: string;
@@ -57,27 +56,22 @@ export const summaryRoute = createReadonlyRoute(
 );
 export const dataRoute = createReadonlyRoute(
   'data',
-  'Add / edit data',
+  'Manage data',
   ReleaseDataPage,
 );
-export const buildTablesRoute = createReadonlyRoute(
-  'build-tables',
-  'Build tables',
-  ReleaseBuildTablesPage,
-);
-export const tablesRoute = createReadonlyRoute(
-  'tables',
-  'View / edit tables',
-  ReleaseTablesPage,
+export const dataBlocksRoute = createReadonlyRoute(
+  'data-blocks',
+  'Manage data blocks',
+  ReleaseDataBlocksPage,
 );
 export const contentRoute = createReadonlyRoute(
   'content',
-  'Add / edit content',
+  'Manage content',
   ReleaseContentPage,
 );
 export const publishStatusRoute = createReadonlyRoute(
-  'publish-status',
-  'Set publish status',
+  'status',
+  'Update release status',
   ReleasePublishStatusPage,
 );
 export const summaryEditRoute = createEditRoute(
@@ -85,48 +79,17 @@ export const summaryEditRoute = createEditRoute(
   'Release summary',
   ReleaseSummaryEditPage,
 );
-export const dataEditRoute = createEditRoute(
-  'data',
-  'Add / edit data',
-  ReleaseDataPage,
-);
-export const buildTablesEditRoute = createEditRoute(
-  'build-tables',
-  'Build tables',
-  ReleaseBuildTablesPage,
-);
-export const tablesEditRoute = createEditRoute(
-  'tables',
-  'View / edit tables',
-  ReleaseTablesPage,
-);
-export const contentEditRoute = createEditRoute(
-  'content',
-  'Add / edit content',
-  ReleaseContentPage,
-);
-export const publishStatusEditRoute = createEditRoute(
-  'publish-status',
-  'Set publish status',
-  ReleasePublishStatusPage,
-);
 
 export const viewRoutes = [
   summaryRoute,
   dataRoute,
-  buildTablesRoute,
-  tablesRoute,
+  dataBlocksRoute,
   contentRoute,
   publishStatusRoute,
 ];
 
 export const editRoutes = [
   summaryEditRoute,
-  dataEditRoute,
-  buildTablesEditRoute,
-  tablesEditRoute,
-  contentEditRoute,
-  publishStatusEditRoute,
 ];
 
 export default {
