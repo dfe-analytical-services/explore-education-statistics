@@ -5,7 +5,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Models
 {
     public class Batch : TableEntity
     {
-        public byte[]BatchesProcessed  { get; set; }        
+        public byte[]BatchesProcessed  { get; set; }
         public int BatchSize { get; set; }
         public int CurrentBatchNo { get; set; }
 
