@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         }
 
         public IEnumerable<Footnote> GetFootnotes(long subjectId,
-            IEnumerable<Observation> observations,
+            IQueryable<Observation> observations,
             IEnumerable<long> indicators)
         {
             var filterItems = observations.SelectMany(observation => observation.FilterItems)

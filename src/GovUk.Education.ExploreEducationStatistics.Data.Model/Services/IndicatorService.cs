@@ -25,11 +25,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .Select(t => t.indicator);
         }
 
-        public IEnumerable<Indicator> GetIndicators(long subjectId, IEnumerable<long> indicatorIds)
+        public IEnumerable<Indicator> GetIndicators(long subjectId, IEnumerable<long> indicatorIds = null)
         {
-            if (indicatorIds == null)
+            if (indicatorIds == null || !indicatorIds.Any())
             {
-                return new List<Indicator>();
+                return GetIndicators(subjectId);
             }
 
             return DbSet()
