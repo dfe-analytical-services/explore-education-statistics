@@ -14,9 +14,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     public class ReleaseSummaryVersion : IVersion
     {
 
-        public Guid ReleaseSummaryId;
-        
-        public ReleaseSummary ReleaseSummary;
+        public Guid Id { get; set; }
+
+        public Guid ReleaseSummaryId { get; set; }
+
+        public ReleaseSummary ReleaseSummary { get; set; }
         
         public string Title => CoverageTitle + (IsNullOrEmpty(YearTitle) ? "" : " " + YearTitle);
 

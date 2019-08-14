@@ -216,7 +216,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     v => JsonConvert.DeserializeObject<DataBlock>(v));
 
             modelBuilder.Entity<ReleaseSummary>();
-            modelBuilder.Entity<ReleaseSummaryVersion>();
+            modelBuilder.Entity<ReleaseSummaryVersion>()
+                .Property(b => b.NextReleaseDate)
+                .HasConversion(
+                    v => JsonConvert.SerializeObject(v),
+                    v => JsonConvert.DeserializeObject<PartialDate>(v));
             
             modelBuilder.Entity<ReleaseType>().HasData(
                 new ReleaseType
