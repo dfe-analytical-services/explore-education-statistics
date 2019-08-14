@@ -1,4 +1,4 @@
-import {Dictionary} from '@common/types';
+import { Dictionary } from '@common/types';
 
 export interface ServerValidationErrors {
   errors: Dictionary<string[]>;

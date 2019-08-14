@@ -1,15 +1,18 @@
 import Link from '@admin/components/Link';
-import {LoginContext} from '@admin/components/Login';
+import { LoginContext } from '@admin/components/Login';
 import Page from '@admin/components/Page';
-import {IdTitlePair} from '@admin/services/common/types';
+import { IdTitlePair } from '@admin/services/common/types';
 import dashboardService from '@admin/services/dashboard/service';
-import {AdminDashboardPublication, ThemeAndTopics,} from '@admin/services/dashboard/types';
+import {
+  AdminDashboardPublication,
+  ThemeAndTopics,
+} from '@admin/services/dashboard/types';
 import loginService from '@admin/services/sign-in/service';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import orderBy from 'lodash/orderBy';
-import React, {useContext, useEffect, useState} from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import AdminDashboardPublicationsTab from './components/AdminDashboardPublicationsTab';
 
 const themeToThemeWithIdTitleAndTopics = (theme: ThemeAndTopics) => ({
@@ -38,9 +41,7 @@ const AdminDashboardPage = () => {
     AdminDashboardPublication[]
   >();
 
-  const [themes, setThemes] = useState<
-    ThemeAndTopicsIdsAndTitles[]
-  >();
+  const [themes, setThemes] = useState<ThemeAndTopicsIdsAndTitles[]>();
 
   const [selectedThemeAndTopic, setSelectedThemeAndTopic] = useState<{
     theme: ThemeAndTopicsIdsAndTitles;
@@ -48,9 +49,11 @@ const AdminDashboardPage = () => {
   }>();
 
   useEffect(() => {
-    dashboardService.getMyThemesAndTopics().
-      then(themeList =>
-        setThemes(themeList.map(themeToThemeWithIdTitleAndTopics)))
+    dashboardService
+      .getMyThemesAndTopics()
+      .then(themeList =>
+        setThemes(themeList.map(themeToThemeWithIdTitleAndTopics)),
+      );
   }, []);
 
   useEffect(() => {
@@ -61,10 +64,12 @@ const AdminDashboardPage = () => {
       });
     }
   }, [themes]);
-  
+
   useEffect(() => {
     if (selectedThemeAndTopic) {
-      dashboardService.getMyPublicationsByTopic(selectedThemeAndTopic.topic.id).then(setMyPublications);
+      dashboardService
+        .getMyPublicationsByTopic(selectedThemeAndTopic.topic.id)
+        .then(setMyPublications);
     }
   }, [selectedThemeAndTopic]);
 
@@ -102,7 +107,10 @@ const AdminDashboardPage = () => {
               onThemeChange={themeId =>
                 setSelectedThemeAndTopic({
                   theme: findThemeById(themeId, themes),
-                  topic: orderBy(findThemeById(themeId, themes).topics, topic => topic.title)[0],
+                  topic: orderBy(
+                    findThemeById(themeId, themes).topics,
+                    topic => topic.title,
+                  )[0],
                 })
               }
               onTopicChange={topicId =>

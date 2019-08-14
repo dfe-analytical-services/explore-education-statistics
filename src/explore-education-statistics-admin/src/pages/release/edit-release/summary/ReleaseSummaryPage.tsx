@@ -1,10 +1,12 @@
 import Link from '@admin/components/Link';
-import ManageReleaseContext, {ManageRelease,} from '@admin/pages/release/ManageReleaseContext';
+import ManageReleaseContext, {
+  ManageRelease,
+} from '@admin/pages/release/ManageReleaseContext';
 import {
   getSelectedReleaseTypeTitle,
-  getSelectedTimePeriodCoverageLabel
-} from "@admin/pages/release/util/releaseSummaryUtil";
-import {summaryEditRoute} from '@admin/routes/edit-release/routes';
+  getSelectedTimePeriodCoverageLabel,
+} from '@admin/pages/release/util/releaseSummaryUtil';
+import { summaryEditRoute } from '@admin/routes/edit-release/routes';
 import commonService from '@admin/services/common/service';
 import {
   dayMonthYearIsComplete,
@@ -13,11 +15,11 @@ import {
   TimePeriodCoverageGroup,
 } from '@admin/services/common/types';
 import service from '@admin/services/release/edit-release/summary/service';
-import {ReleaseSummaryDetails} from '@admin/services/release/types';
+import { ReleaseSummaryDetails } from '@admin/services/release/types';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import React, {useContext, useEffect, useState} from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 interface ReleaseSummaryModel {
   releaseSummaryDetails: ReleaseSummaryDetails;
@@ -26,9 +28,7 @@ interface ReleaseSummaryModel {
 }
 
 const ReleaseSummaryPage = () => {
-  const [model, setModel] = useState<
-    ReleaseSummaryModel
-  >();
+  const [model, setModel] = useState<ReleaseSummaryModel>();
 
   const { publication, releaseId } = useContext(
     ManageReleaseContext,
@@ -38,15 +38,16 @@ const ReleaseSummaryPage = () => {
     Promise.all([
       service.getReleaseSummaryDetails(releaseId),
       commonService.getReleaseTypes(),
-      commonService.getTimePeriodCoverageGroups()]
-    ).
-    then(([releaseSummaryResult, releaseTypesResult, timePeriodGroupsResult]) => {
-      setModel({
-        releaseSummaryDetails: releaseSummaryResult,
-        timePeriodCoverageGroups: timePeriodGroupsResult,
-        releaseTypes: releaseTypesResult,
-      });
-    });
+      commonService.getTimePeriodCoverageGroups(),
+    ]).then(
+      ([releaseSummaryResult, releaseTypesResult, timePeriodGroupsResult]) => {
+        setModel({
+          releaseSummaryDetails: releaseSummaryResult,
+          timePeriodCoverageGroups: timePeriodGroupsResult,
+          releaseTypes: releaseTypesResult,
+        });
+      },
+    );
   }, [releaseId]);
 
   return (
@@ -64,7 +65,9 @@ const ReleaseSummaryPage = () => {
           </SummaryListItem>
           <SummaryListItem term="Release period">
             <time>{model.releaseSummaryDetails.releaseName}</time> to{' '}
-            <time>{parseInt(model.releaseSummaryDetails.releaseName, 10) + 1}</time>
+            <time>
+              {parseInt(model.releaseSummaryDetails.releaseName, 10) + 1}
+            </time>
           </SummaryListItem>
           <SummaryListItem term="Lead statistician">
             {publication.contact && publication.contact.contactName}
@@ -75,9 +78,13 @@ const ReleaseSummaryPage = () => {
             </FormattedDate>
           </SummaryListItem>
           <SummaryListItem term="Next release expected">
-            {dayMonthYearIsComplete(model.releaseSummaryDetails.nextReleaseDate) && (
+            {dayMonthYearIsComplete(
+              model.releaseSummaryDetails.nextReleaseDate,
+            ) && (
               <FormattedDate>
-                {dayMonthYearToDate(model.releaseSummaryDetails.nextReleaseDate)}
+                {dayMonthYearToDate(
+                  model.releaseSummaryDetails.nextReleaseDate,
+                )}
               </FormattedDate>
             )}
           </SummaryListItem>

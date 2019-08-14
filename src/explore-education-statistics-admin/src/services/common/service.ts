@@ -1,4 +1,8 @@
-import {BasicPublicationDetails, IdTitlePair, TimePeriodCoverageGroup,} from '@admin/services/common/types';
+import {
+  BasicPublicationDetails,
+  IdTitlePair,
+  TimePeriodCoverageGroup,
+} from '@admin/services/common/types';
 import client from '@admin/services/util/service';
 
 export interface CommonService {

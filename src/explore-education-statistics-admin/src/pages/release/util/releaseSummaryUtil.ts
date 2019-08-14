@@ -1,6 +1,8 @@
 import {
   dayMonthYearInputsToDate,
-  dayMonthYearInputsToValues, IdTitlePair, TimePeriodCoverageGroup,
+  dayMonthYearInputsToValues,
+  IdTitlePair,
+  TimePeriodCoverageGroup,
 } from '@admin/services/common/types';
 import { CreateReleaseRequest } from '@admin/services/release/create-release/types';
 import { UpdateReleaseSummaryDetailsRequest } from '@admin/services/release/edit-release/summary/types';
@@ -44,22 +46,34 @@ export const assembleUpdateReleaseSummaryRequestFromForm = (
   };
 };
 
-export const findTimePeriodCoverageGroup = (code: string, timePeriodCoverageGroups: TimePeriodCoverageGroup[]) => {
+export const findTimePeriodCoverageGroup = (
+  code: string,
+  timePeriodCoverageGroups: TimePeriodCoverageGroup[],
+) => {
   return (
     timePeriodCoverageGroups.find(group =>
-      group.timeIdentifiers.map(option => option.identifier.value).some(id => id === code),
+      group.timeIdentifiers
+        .map(option => option.identifier.value)
+        .some(id => id === code),
     ) || timePeriodCoverageGroups[0]
   );
 };
 
-export const findTimePeriodCoverageOption = (code: string, timePeriodCoverageGroups: TimePeriodCoverageGroup[]) =>
+export const findTimePeriodCoverageOption = (
+  code: string,
+  timePeriodCoverageGroups: TimePeriodCoverageGroup[],
+) =>
   timePeriodCoverageGroups
     .flatMap(group => group.timeIdentifiers)
     .find(option => option.identifier.value === code) ||
   timePeriodCoverageGroups[0].timeIdentifiers[0];
 
-export const getSelectedTimePeriodCoverageLabel = (timePeriodCoverageCode: string, timePeriodCoverageGroups: TimePeriodCoverageGroup[]) =>
-  findTimePeriodCoverageOption(timePeriodCoverageCode, timePeriodCoverageGroups).identifier.label;
+export const getSelectedTimePeriodCoverageLabel = (
+  timePeriodCoverageCode: string,
+  timePeriodCoverageGroups: TimePeriodCoverageGroup[],
+) =>
+  findTimePeriodCoverageOption(timePeriodCoverageCode, timePeriodCoverageGroups)
+    .identifier.label;
 
 export const getSelectedReleaseTypeTitle = (
   releaseTypeId: string,

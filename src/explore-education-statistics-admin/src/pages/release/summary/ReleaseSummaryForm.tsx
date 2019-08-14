@@ -1,23 +1,27 @@
 import Link from '@admin/components/Link';
-import {findTimePeriodCoverageGroup} from "@admin/pages/release/util/releaseSummaryUtil";
+import { findTimePeriodCoverageGroup } from '@admin/pages/release/util/releaseSummaryUtil';
 import service from '@admin/services/common/service';
-import {DayMonthYearInputs, IdTitlePair, TimePeriodCoverageGroup} from '@admin/services/common/types';
+import {
+  DayMonthYearInputs,
+  IdTitlePair,
+  TimePeriodCoverageGroup,
+} from '@admin/services/common/types';
 import {
   validateMandatoryDayMonthYearField,
   validateOptionalPartialDayMonthYearField,
 } from '@admin/validation/validation';
 import Button from '@common/components/Button';
-import {Form, FormFieldset, Formik} from '@common/components/form';
+import { Form, FormFieldset, Formik } from '@common/components/form';
 import FormFieldDayMonthYear from '@common/components/form/FormFieldDayMonthYear';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
-import {SelectOption} from '@common/components/form/FormSelect';
+import { SelectOption } from '@common/components/form/FormSelect';
 import Yup from '@common/lib/validation/yup';
-import {Dictionary} from '@common/types';
-import {FormikProps} from 'formik';
-import React, {useEffect, useState} from 'react';
-import {ObjectSchemaDefinition} from 'yup';
+import { Dictionary } from '@common/types';
+import { FormikProps } from 'formik';
+import React, { useEffect, useState } from 'react';
+import { ObjectSchemaDefinition } from 'yup';
 
 export interface EditFormValues {
   timePeriodCoverageCode: string;
@@ -53,19 +57,18 @@ const ReleaseSummaryForm = <FormValues extends EditFormValues>({
   onCancelHandler,
   additionalFields,
 }: Props<FormValues>) => {
-
-  const [model, setModel] = useState<
-    ReleaseSummaryFormModel
-  >();
+  const [model, setModel] = useState<ReleaseSummaryFormModel>();
 
   useEffect(() => {
-    Promise.all([service.getReleaseTypes(), service.getTimePeriodCoverageGroups()]).
-      then(([releaseTypesResult, timePeriodGroupsResult]) => {
-        setModel({
-          releaseTypes: releaseTypesResult,
-          timePeriodCoverageGroups: timePeriodGroupsResult,
-        });
+    Promise.all([
+      service.getReleaseTypes(),
+      service.getTimePeriodCoverageGroups(),
+    ]).then(([releaseTypesResult, timePeriodGroupsResult]) => {
+      setModel({
+        releaseTypes: releaseTypesResult,
+        timePeriodCoverageGroups: timePeriodGroupsResult,
       });
+    });
   }, []);
 
   const getTimePeriodOptions = (
@@ -74,7 +77,8 @@ const ReleaseSummaryForm = <FormValues extends EditFormValues>({
     const optGroups: Dictionary<SelectOption[]> = {};
     timePeriodGroups.forEach(group => {
       optGroups[group.category.label] = group.timeIdentifiers.map(
-        ({identifier}) => identifier);
+        ({ identifier }) => identifier,
+      );
     });
     return optGroups;
   };
@@ -112,13 +116,18 @@ const ReleaseSummaryForm = <FormValues extends EditFormValues>({
                     id={`${formId}-timePeriodCoverage`}
                     label="Type"
                     name="timePeriodCoverageCode"
-                    optGroups={getTimePeriodOptions(model.timePeriodCoverageGroups)}
+                    optGroups={getTimePeriodOptions(
+                      model.timePeriodCoverageGroups,
+                    )}
                   />
                   <FormFieldTextInput<FormValues>
                     id={`${formId}-timePeriodCoverageStartYear`}
                     name="timePeriodCoverageStartYear"
                     label={
-                      findTimePeriodCoverageGroup(form.values.timePeriodCoverageCode, model.timePeriodCoverageGroups).category.label
+                      findTimePeriodCoverageGroup(
+                        form.values.timePeriodCoverageCode,
+                        model.timePeriodCoverageGroups,
+                      ).category.label
                     }
                     width={4}
                     type="number"

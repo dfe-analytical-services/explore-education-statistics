@@ -1,22 +1,24 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import dashboardRoutes from '@admin/routes/dashboard/routes';
-import {ContactDetails, IdTitlePair} from '@admin/services/common/types';
+import { ContactDetails, IdTitlePair } from '@admin/services/common/types';
 import service from '@admin/services/edit-publication/service';
 import Button from '@common/components/Button';
-import {FormFieldset, Formik} from '@common/components/form';
+import { FormFieldset, Formik } from '@common/components/form';
 import Form from '@common/components/form/Form';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
-import handleServerSideValidation, {errorCodeToFieldError,} from '@common/components/form/util/serverValidationHandler';
+import handleServerSideValidation, {
+  errorCodeToFieldError,
+} from '@common/components/form/util/serverValidationHandler';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
-import {FormikProps} from 'formik';
+import { FormikProps } from 'formik';
 import orderBy from 'lodash/orderBy';
-import React, {useEffect, useState} from 'react';
-import {RouteComponentProps} from 'react-router';
+import React, { useEffect, useState } from 'react';
+import { RouteComponentProps } from 'react-router';
 
 interface MatchProps {
   topicId: string;
@@ -53,15 +55,13 @@ const CreatePublicationPage = ({
   useEffect(() => {
     Promise.all([
       service.getMethodologies(),
-      service.getPublicationAndReleaseContacts()
-    ]).then(
-      ([methodologies, contacts]) => {
-        setModel({
-          methodologies,
-          contacts,
-        });
-      },
-    );
+      service.getPublicationAndReleaseContacts(),
+    ]).then(([methodologies, contacts]) => {
+      setModel({
+        methodologies,
+        contacts,
+      });
+    });
   }, []);
 
   const submitFormHandler = async (values: FormValues) => {
@@ -101,9 +101,15 @@ const CreatePublicationPage = ({
           enableReinitialize
           initialValues={{
             publicationTitle: '',
-            selectedContactId: orderBy(model.contacts, contact => contact.contactName)[0].id,
+            selectedContactId: orderBy(
+              model.contacts,
+              contact => contact.contactName,
+            )[0].id,
             methodologyChoice: undefined,
-            selectedMethodologyId: orderBy(model.methodologies, methodology => methodology.title)[0].id,
+            selectedMethodologyId: orderBy(
+              model.methodologies,
+              methodology => methodology.title,
+            )[0].id,
           }}
           validationSchema={Yup.object<FormValues>({
             publicationTitle: Yup.string().required(

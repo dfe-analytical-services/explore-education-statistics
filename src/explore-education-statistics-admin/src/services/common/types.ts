@@ -29,7 +29,7 @@ export interface UserDetails {
 export interface TimePeriodCoverageGroup {
   category: {
     label: string;
-  },
+  };
   timeIdentifiers: {
     identifier: ValueLabelPair;
   }[];
