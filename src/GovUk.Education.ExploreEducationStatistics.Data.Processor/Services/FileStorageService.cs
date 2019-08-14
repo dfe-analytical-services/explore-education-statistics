@@ -28,12 +28,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var releaseId = importMessage.Release.Id.ToString();
 
             var dataBlob = _blobContainer.GetBlockBlobReference(
-                $"{releaseId}/Data/{importMessage.DataFileName}");
+                $"{releaseId}/data/{importMessage.DataFileName}");
 
             await dataBlob.FetchAttributesAsync();
 
             var metaBlob = _blobContainer.GetBlockBlobReference(
-                $"{releaseId}/Data/{BlobUtils.GetMetaFileName(dataBlob)}");
+                $"{releaseId}/data/{BlobUtils.GetMetaFileName(dataBlob)}");
 
             return new SubjectData(dataBlob, metaBlob, BlobUtils.GetName(dataBlob));
         }
@@ -52,14 +52,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         public void Delete(ImportMessage importMessage)
         {
             var releaseId = importMessage.Release.Id.ToString();
-            var blob = _blobContainer.GetBlockBlobReference($"{releaseId}/Data/{importMessage.DataFileName}");
+            var blob = _blobContainer.GetBlockBlobReference($"{releaseId}/data/{importMessage.DataFileName}");
             blob.DeleteAsync();
         }
 
         private async Task UploadFileAsync(string releaseId,
             IFormFile file, IEnumerable<KeyValuePair<string, string>> metaValues)
         {
-            var blob = _blobContainer.GetBlockBlobReference($"{releaseId}/Data/{file.FileName}");
+            var blob = _blobContainer.GetBlockBlobReference($"{releaseId}/data/{file.FileName}");
             blob.Properties.ContentType = file.ContentType;
             var path = await FileUtils.UploadToTemporaryFile(file);
             await blob.UploadFromFileAsync(path);

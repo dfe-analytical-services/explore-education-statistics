@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
@@ -114,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 logger.LogInformation(
                     $"{GetType().Name} function STARTED for : Batch: {message.BatchNo} of {message.BatchSize} with Datafile: {message.DataFileName}");
                 
-                _fileImportService.ImportObservations(message);
+                _fileImportService.ImportObservations(message).Wait();
             }
             catch (Exception e)
             {

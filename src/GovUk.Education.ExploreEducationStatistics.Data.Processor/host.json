@@ -6,8 +6,9 @@
       "default": "None",
       "Function.ProcessUploads": "Information",
       "Function.ProcessUploadsSequentially": "Information",
-      "Function.ImportFiles": "Information",
+      "Function.ImportObservations": "Information",
       "GovUk.Education.ExploreEducationStatistics.Data.Importer": "Debug",
+      "GovUk.Education.ExploreEducationStatistics.Data.Processor": "Information",
       "Microsoft": "Warning",
       "Microsoft.EntityFrameworkCore.Database.Command": "Warning"
     }

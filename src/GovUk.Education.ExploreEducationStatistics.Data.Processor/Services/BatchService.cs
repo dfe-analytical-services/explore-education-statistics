@@ -18,18 +18,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _tblStorageService = tblStorageService;
         }
 
-        public void UpdateBatchCount(string releaseId, string subjectId, int batchSize, int batchNo)
+        public async Task UpdateBatchCount(string releaseId, string subjectId, int batchSize, int batchNo)
         {
             var batch = GetOrCreateBatch(releaseId, subjectId, batchSize).Result;
             var bitArray = new BitArray(batch.BatchesProcessed);
             bitArray.Set(batchNo - 1, true);
             bitArray.CopyTo(batch.BatchesProcessed, 0);
-            GetUploadsTable().Result.ExecuteAsync(TableOperation.InsertOrReplace(batch));
+            var table = await GetUploadsTable();
+            await table.ExecuteAsync(TableOperation.InsertOrReplace(batch));
         }
         
-        public bool IsBatchComplete(string releaseId, string subjectId, int batchSize)
+        public async Task<bool> IsBatchComplete(string releaseId, string subjectId, int batchSize)
         {
-            var batch = GetOrCreateBatch(releaseId, subjectId, batchSize).Result;
+            var batch = await GetOrCreateBatch(releaseId, subjectId, batchSize);
             var count = (from bool b in new BitArray(batch.BatchesProcessed)
                 where b
                 select b).Count();
@@ -37,11 +38,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return count == batch.BatchSize;
         }
 
-        public void UpdateCurrentBatchNumber(string releaseId, string subjectId, int batchSize, int batchNo)
+        public async Task UpdateCurrentBatchNumber(string releaseId, string subjectId, int batchSize, int batchNo)
         {
-            var batch = GetOrCreateBatch(releaseId, subjectId, batchSize).Result;
+            var batch = await GetOrCreateBatch(releaseId, subjectId, batchSize);
             batch.CurrentBatchNo = batchNo;
-            GetUploadsTable().Result.ExecuteAsync(TableOperation.InsertOrReplace(batch));
+            var table = await GetUploadsTable();
+            await table.ExecuteAsync(TableOperation.InsertOrReplace(batch));
         }
 
         private async Task<Batch> GetOrCreateBatch(string releaseId, string subjectId, int batchSize)

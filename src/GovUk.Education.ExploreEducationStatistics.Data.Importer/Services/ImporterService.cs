@@ -23,23 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
         private int _importCount;
         
-        public ImporterService(
-            ImporterFilterService importerFilterService,
-            ImporterLocationService importerLocationService,
-            IImporterMetaService importerMetaService,
-            ImporterSchoolService importerSchoolService,
-            ApplicationDbContext context,
-            ILogger<ImporterService> logger)
-        {
-            _importerFilterService = importerFilterService;
-            _importerLocationService = importerLocationService;
-            _importerMetaService = importerMetaService;
-            _context = context;
-            _logger = logger;
-            _importerSchoolService = importerSchoolService;
-        }
-        
-        private enum Columns
+                private enum Columns
         {
             SCHOOL_COLS,
             COUNTRY_COLS,
@@ -103,6 +87,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                     Columns.WARD_COLS, new[]{"ward_code", "ward_name"}
                 }
             };
+        
+        public ImporterService(
+            ImporterFilterService importerFilterService,
+            ImporterLocationService importerLocationService,
+            IImporterMetaService importerMetaService,
+            ImporterSchoolService importerSchoolService,
+            ApplicationDbContext context,
+            ILogger<ImporterService> logger)
+        {
+            _importerFilterService = importerFilterService;
+            _importerLocationService = importerLocationService;
+            _importerMetaService = importerMetaService;
+            _context = context;
+            _logger = logger;
+            _importerSchoolService = importerSchoolService;
+        }
 
         public SubjectMeta ImportMeta(List<string> metaLines, Subject subject)
         {
@@ -159,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 transaction.Commit();
             }
 
-            _logger.LogInformation($"{observations.Count()} observations added successfully for {subject.Name}");
+            _logger.LogDebug($"{observations.Count()} observations added successfully for {subject.Name}");
         }
 
         private IEnumerable<Observation> GetObservations(IEnumerable<string> lines,
@@ -169,14 +169,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         {
             return lines.Select(line => ObservationFromCsv(line, headers, subject, subjectMeta));
         }
-
+        
         private Observation ObservationFromCsv(string raw,
             List<string> headers,
             Subject subject,
             SubjectMeta subjectMeta)
         {
             var line = raw.Split(',');
-
+            
             return new Observation
             {
                 FilterItems = GetFilterItems(line, headers, subjectMeta.Filters),
