@@ -95,6 +95,7 @@ export interface ChartCapabilities {
   gridLines: boolean;
   canSize: boolean;
   fixedAxisGroupBy: boolean;
+  hasReferenceLines: boolean;
 }
 
 export interface ChartDefinition {

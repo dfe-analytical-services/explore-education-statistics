@@ -190,6 +190,7 @@ const definition: ChartDefinition = {
     canSize: true,
     fixedAxisGroupBy: false,
     hasAxes: true,
+    hasReferenceLines: true,
   },
 
   data: [

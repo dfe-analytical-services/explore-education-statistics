@@ -413,113 +413,115 @@ const ChartAxisConfiguration = ({
               </React.Fragment>
             )}
 
-            <table className="govuk-table">
-              <caption className="govuk-caption-m">Reference lines</caption>
-              <thead>
-                <tr>
-                  <th>Position</th>
-                  <th>Label</th>
-                  <th />
-                </tr>
-              </thead>
-              <tbody>
-                {axisConfiguration.referenceLines &&
-                  axisConfiguration.referenceLines.map((rl, idx) => (
-                    <tr key={`${rl.label}_${rl.position}`}>
-                      <td>{rl.position}</td>
-                      <td>{rl.label}</td>
-                      <td>
-                        <button
-                          className="govuk-button govuk-button--secondary govuk-!-margin-0"
-                          type="button"
-                          onClick={() => {
-                            const newReferenceLines = [
-                              ...(axisConfiguration.referenceLines || []),
-                            ];
-                            newReferenceLines.splice(idx, 1);
-                            updateAxisConfiguration({
-                              referenceLines: newReferenceLines,
+            {capabilities.hasReferenceLines && (
+              <table className="govuk-table">
+                <caption className="govuk-caption-m">Reference lines</caption>
+                <thead>
+                  <tr>
+                    <th>Position</th>
+                    <th>Label</th>
+                    <th />
+                  </tr>
+                </thead>
+                <tbody>
+                  {axisConfiguration.referenceLines &&
+                    axisConfiguration.referenceLines.map((rl, idx) => (
+                      <tr key={`${rl.label}_${rl.position}`}>
+                        <td>{rl.position}</td>
+                        <td>{rl.label}</td>
+                        <td>
+                          <button
+                            className="govuk-button govuk-button--secondary govuk-!-margin-0"
+                            type="button"
+                            onClick={() => {
+                              const newReferenceLines = [
+                                ...(axisConfiguration.referenceLines || []),
+                              ];
+                              newReferenceLines.splice(idx, 1);
+                              updateAxisConfiguration({
+                                referenceLines: newReferenceLines,
+                              });
+                            }}
+                          >
+                            Remove
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  <tr>
+                    <td>
+                      {axisConfiguration.type === 'minor' && (
+                        <FormTextInput
+                          name=""
+                          id=""
+                          label=""
+                          type="text"
+                          value={`${referenceLine.position}`}
+                          onChange={e => {
+                            setReferenceLine({
+                              ...referenceLine,
+                              position: e.target.value,
                             });
                           }}
-                        >
-                          Remove
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                <tr>
-                  <td>
-                    {axisConfiguration.type === 'minor' && (
+                        />
+                      )}
+                      {axisConfiguration.type === 'major' && (
+                        <FormSelect
+                          name=""
+                          id=""
+                          label=""
+                          value={referenceLine.position}
+                          order={[]}
+                          onChange={e => {
+                            setReferenceLine({
+                              ...referenceLine,
+                              position: e.target.value,
+                            });
+                          }}
+                          options={referenceOptions}
+                        />
+                      )}
+                    </td>
+                    <td>
                       <FormTextInput
                         name=""
                         id=""
                         label=""
                         type="text"
-                        value={`${referenceLine.position}`}
+                        value={referenceLine.label}
                         onChange={e => {
                           setReferenceLine({
                             ...referenceLine,
-                            position: e.target.value,
+                            label: e.target.value,
                           });
                         }}
                       />
-                    )}
-                    {axisConfiguration.type === 'major' && (
-                      <FormSelect
-                        name=""
-                        id=""
-                        label=""
-                        value={referenceLine.position}
-                        order={[]}
-                        onChange={e => {
-                          setReferenceLine({
-                            ...referenceLine,
-                            position: e.target.value,
+                    </td>
+                    <td>
+                      <button
+                        disabled={
+                          referenceLine.position === '' ||
+                          referenceLine.label === ''
+                        }
+                        className="govuk-button govuk-!-margin-bottom-0"
+                        type="button"
+                        onClick={() => {
+                          updateAxisConfiguration({
+                            referenceLines: [
+                              ...(axisConfiguration.referenceLines || []),
+                              referenceLine,
+                            ],
                           });
+                          setReferenceLine({ label: '', position: '' });
                         }}
-                        options={referenceOptions}
-                      />
-                    )}
-                  </td>
-                  <td>
-                    <FormTextInput
-                      name=""
-                      id=""
-                      label=""
-                      type="text"
-                      value={referenceLine.label}
-                      onChange={e => {
-                        setReferenceLine({
-                          ...referenceLine,
-                          label: e.target.value,
-                        });
-                      }}
-                    />
-                  </td>
-                  <td>
-                    <button
-                      disabled={
-                        referenceLine.position === '' ||
-                        referenceLine.label === ''
-                      }
-                      className="govuk-button govuk-!-margin-bottom-0"
-                      type="button"
-                      onClick={() => {
-                        updateAxisConfiguration({
-                          referenceLines: [
-                            ...(axisConfiguration.referenceLines || []),
-                            referenceLine,
-                          ],
-                        });
-                        setReferenceLine({ label: '', position: '' });
-                      }}
-                    >
-                      Add
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                      >
+                        Add
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            )}
           </FormGroup>
         </FormFieldset>
       </form>

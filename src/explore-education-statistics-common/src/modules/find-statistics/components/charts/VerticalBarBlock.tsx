@@ -39,6 +39,7 @@ export default class VerticalBarBlock extends Component<StackedBarProps> {
       canSize: true,
       fixedAxisGroupBy: false,
       hasAxes: true,
+      hasReferenceLines: true,
     },
 
     data: [

@@ -604,6 +604,7 @@ const definition: ChartDefinition = {
     canSize: true,
     fixedAxisGroupBy: true,
     hasAxes: false,
+    hasReferenceLines: false,
   },
 
   data: [
