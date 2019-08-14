@@ -28,7 +28,7 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
     service.getReleaseSummaryDetails(releaseId).then(release => {
       setReleaseSummaryDetails(release);
     });
-  }, [releaseId]);
+  }, []);
 
   const submitHandler = (values: EditFormValues) => {
     const updatedReleaseDetails = assembleUpdateReleaseSummaryRequestFromForm(

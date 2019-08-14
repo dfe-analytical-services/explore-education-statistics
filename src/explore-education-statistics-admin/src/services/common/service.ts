@@ -1,7 +1,4 @@
-import {
-  BasicPublicationDetails,
-  IdTitlePair,
-} from '@admin/services/common/types';
+import {BasicPublicationDetails, IdTitlePair, TimePeriodCoverageGroup,} from '@admin/services/common/types';
 import client from '@admin/services/util/service';
 
 export interface CommonService {
@@ -9,6 +6,7 @@ export interface CommonService {
     publicationId: string,
   ): Promise<BasicPublicationDetails>;
   getReleaseTypes(): Promise<IdTitlePair[]>;
+  getTimePeriodCoverageGroups(): Promise<TimePeriodCoverageGroup[]>;
 }
 
 const service: CommonService = {
@@ -21,6 +19,9 @@ const service: CommonService = {
   },
   getReleaseTypes(): Promise<IdTitlePair[]> {
     return client.get<IdTitlePair[]>('/meta/releasetypes');
+  },
+  getTimePeriodCoverageGroups(): Promise<TimePeriodCoverageGroup[]> {
+    return client.get<TimePeriodCoverageGroup[]>('/meta/timeidentifiers');
   },
 };
 

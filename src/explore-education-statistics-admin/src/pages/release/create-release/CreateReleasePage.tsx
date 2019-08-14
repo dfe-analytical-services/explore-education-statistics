@@ -1,12 +1,11 @@
 import Page from '@admin/components/Page';
-import { TimePeriodCoverageGroup } from '@admin/pages/DummyReferenceData';
 import ReleaseSummaryForm, {
   EditFormValues,
 } from '@admin/pages/release/summary/ReleaseSummaryForm';
 import { assembleCreateReleaseRequestFromForm } from '@admin/pages/release/util/releaseSummaryUtil';
 import dashboardRoutes from '@admin/routes/dashboard/routes';
 import { summaryRoute } from '@admin/routes/edit-release/routes';
-import { emptyDayMonthYear, IdTitlePair } from '@admin/services/common/types';
+import {emptyDayMonthYear, IdTitlePair, TimePeriodCoverageGroup} from '@admin/services/common/types';
 import service from '@admin/services/release/create-release/service';
 import { CreateReleaseRequest } from '@admin/services/release/create-release/types';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
@@ -33,7 +32,7 @@ const CreateReleasePage = ({
 
   useEffect(() => {
     service.getTemplateRelease(publicationId).then(setTemplateRelease);
-  }, [publicationId]);
+  }, []);
 
   const submitHandler = (values: FormValues) => {
     const createReleaseDetails: CreateReleaseRequest = assembleCreateReleaseRequestFromForm(
@@ -66,7 +65,7 @@ const CreateReleasePage = ({
         initialValuesSupplier={(
           timePeriodCoverageGroups: TimePeriodCoverageGroup[],
         ): FormValues => ({
-          timePeriodCoverageCode: timePeriodCoverageGroups[0].options[0].id,
+          timePeriodCoverageCode: timePeriodCoverageGroups[0].timeIdentifiers[0].identifier.value,
           timePeriodCoverageStartYear: '',
           releaseTypeId: '',
           scheduledPublishDate: emptyDayMonthYear(),
