@@ -10,17 +10,16 @@ import {
 import { TableHeadersFormValues } from '@frontend/modules/table-tool/components/TableHeadersForm';
 
 export interface SubjectMeta {
-  indicators: Indicator[];
-  filters: Dictionary<CategoryFilter[]>;
   publicationName: string;
   subjectName: string;
   locations: LocationFilter[];
-
+  timePeriodRange: TimePeriod[];
+  filters: Dictionary<CategoryFilter[]>;
+  indicators: Indicator[];
   footnotes: {
     id: number;
     label: string;
   }[];
-  timePeriodRange: TimePeriod[];
 }
 
 export interface FullTable /* ™ */ {
