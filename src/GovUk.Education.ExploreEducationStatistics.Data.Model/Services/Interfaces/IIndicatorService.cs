@@ -4,8 +4,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
 {
     public interface IIndicatorService : IRepository<Indicator, long>
     {
-        IEnumerable<Indicator> GetIndicators(long subjectId);
-        
-        IEnumerable<Indicator> GetIndicators(long subjectId, IEnumerable<long> indicatorIds);
+        IEnumerable<Indicator> GetIndicators(long subjectId, IEnumerable<long> indicatorIds = null);
     }
 }

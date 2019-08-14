@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
@@ -17,16 +15,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         }
 
         public Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> GetObservationalUnits(
-            Expression<Func<Observation, bool>> observationPredicate)
+            IQueryable<Observation> observations)
         {
-            var locations = GetLocations(observationPredicate);
-            return GetObservationalUnits(locations);
-        }
-
-        public Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> GetObservationalUnits(
-            IEnumerable<Observation> observations)
-        {
-            var locations = GetLocations(observations.AsQueryable());
+            var locations = GetLocations(observations);
             return GetObservationalUnits(locations);
         }
 
@@ -74,15 +65,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-        }
-
-        private Dictionary<GeographicLevel, IEnumerable<Location>> GetLocations(
-            Expression<Func<Observation, bool>> observationPredicate)
-        {
-            var queryable = _context.Observation
-                .AsNoTracking()
-                .Where(observationPredicate);
-            return GetLocations(queryable);
         }
 
         private Dictionary<GeographicLevel, IEnumerable<Location>> GetLocations(IQueryable<Observation> observations)
