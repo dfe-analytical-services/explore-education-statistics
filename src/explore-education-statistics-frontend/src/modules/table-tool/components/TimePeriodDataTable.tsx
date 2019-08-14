@@ -4,6 +4,7 @@ import cartesian from '@common/lib/utils/cartesian';
 import formatPretty from '@common/lib/utils/number/formatPretty';
 import { TableData } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types/util';
+import WarningMessage from '@common/components/WarningMessage';
 import {
   CategoryFilter,
   Indicator,
@@ -32,20 +33,10 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
 
     if (results.length === 0) {
       return (
-        <>
-          <div>
-            <div className="govuk-warning-text">
-              <span className="govuk-warning-text__icon" aria-hidden="true">
-                !
-              </span>
-              <strong className="govuk-warning-text__text">
-                <span className="govuk-warning-text__assistive">Warning</span>A
-                table could not be returned. There is no data for the options
-                selected.
-              </strong>
-            </div>
-          </div>
-        </>
+        <WarningMessage icon="!">
+          A table could not be returned. There is no data for the options
+          selected.
+        </WarningMessage>
       );
     }
 
