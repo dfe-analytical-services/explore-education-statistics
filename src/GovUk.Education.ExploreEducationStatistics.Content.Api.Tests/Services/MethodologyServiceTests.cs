@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Services;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services

@@ -6,6 +6,8 @@ using GovUk.Education.ExploreEducationStatistics.Publisher;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
+using Microsoft.Azure.Storage;
+using Microsoft.Azure.Storage.Blob;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using FileStorageService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.FileStorageService;
@@ -19,14 +21,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
     {
         public override void Configure(IFunctionsHostBuilder builder)
         {
+            var contentDatabaseConnection = GetSqlAzureConnectionString("ContentDb");
+            
             builder.Services
                 .AddMemoryCache()
                 .AddDbContext<ApplicationDbContext>(options =>
-                    options.UseSqlServer(GetSqlAzureConnectionString("ContentDb")))
+                    options.UseSqlServer(contentDatabaseConnection))
                 .AddTransient<IFileStorageService, FileStorageService>()
                 .AddTransient<IPublishingService, PublishingService>()
                 .AddTransient<IContentCacheGenerationService, ContentCacheGenerationService>()
+                .AddTransient<IContentService, ContentService>()
                 .AddTransient<IDownloadService, DownloadService>()
+                .AddTransient<IMethodologyService, MethodologyService>()
                 .BuildServiceProvider();
         }
         

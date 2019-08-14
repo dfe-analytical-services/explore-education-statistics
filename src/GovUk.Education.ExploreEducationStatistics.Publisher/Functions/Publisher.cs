@@ -8,12 +8,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     public class Publisher
     {
         private readonly IPublishingService _publishingService;
-        private readonly IContentCacheGenerationService _contentCacheGenerationService;
 
-        public Publisher(IPublishingService publishingService, IContentCacheGenerationService contentCacheGenerationService)
+        public Publisher(IPublishingService publishingService)
         {
             _publishingService = publishingService;
-            _contentCacheGenerationService = contentCacheGenerationService;
         }
 
         [FunctionName("Publisher")]
