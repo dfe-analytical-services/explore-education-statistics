@@ -4,6 +4,7 @@ using System.Linq;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
@@ -82,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 {
                     Hint = "",
                     Legend = pair.Key.GetEnumLabel(),
-                    Options = _mapper.Map<IEnumerable<LabelValueViewModel>>(pair.Value)
+                    Options = _mapper.Map<IEnumerable<LabelValue>>(pair.Value)
                 });
         }
 
@@ -114,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                                 new TableBuilderFilterItemMetaViewModel
                                 {
                                     Label = itemsGroupedByFilterGroup.Key.Label,
-                                    Options = itemsGroupedByFilterGroup.Select(item => new LabelValueViewModel
+                                    Options = itemsGroupedByFilterGroup.Select(item => new LabelValue
                                     {
                                         Label = item.Label,
                                         Value = item.Id.ToString()

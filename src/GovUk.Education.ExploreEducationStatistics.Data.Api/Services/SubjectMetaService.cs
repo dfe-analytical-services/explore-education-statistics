@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
@@ -51,11 +52,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             };
         }
 
-        private Dictionary<string, LabelValueViewModel> GetFilters(IQueryable<Observation> observations)
+        private Dictionary<string, LabelValue> GetFilters(IQueryable<Observation> observations)
         {
             return _filterItemService.GetFilterItems(observations).ToDictionary(
                 item => item.Id.ToString(),
-                item => new LabelValueViewModel
+                item => new LabelValue
                 {
                     Label = item.Label,
                     Value = item.Id.ToString()
@@ -70,13 +71,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 indicator => _mapper.Map<IndicatorMetaViewModel>(indicator));
         }
 
-        private Dictionary<string, ObservationalUnitGeoJsonMetaViewModel> GetObservationalUnits(
+        private Dictionary<string, ObservationalUnitGeoJsonMeta> GetObservationalUnits(
             IQueryable<Observation> observations, long? boundaryLevelId = null)
         {
             var observationalUnits = _locationService.GetObservationalUnits(observations);
 
             var observationalUnitMetaViewModels = observationalUnits.SelectMany(pair =>
-                pair.Value.Select(observationalUnit => new ObservationalUnitGeoJsonMetaViewModel
+                pair.Value.Select(observationalUnit => new ObservationalUnitGeoJsonMeta
                 {
                     GeoJson = GetGeoJsonForObservationalUnit(boundaryLevelId ??
                                                              GetBoundaryLevel(pair.Key).Id, observationalUnit),

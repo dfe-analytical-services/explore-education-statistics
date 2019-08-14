@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
@@ -63,10 +64,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             };
         }
 
-        private IEnumerable<LabelValueViewModel> GetObservationalUnits(IQueryable<Observation> observations)
+        private IEnumerable<LabelValue> GetObservationalUnits(IQueryable<Observation> observations)
         {
             var observationalUnits = _locationService.GetObservationalUnits(observations);
-            return observationalUnits.SelectMany(pair => pair.Value.Select(observationalUnit => new LabelValueViewModel
+            return observationalUnits.SelectMany(pair => pair.Value.Select(observationalUnit => new LabelValue
                 {
                     Label = observationalUnit.Name,
                     Value = observationalUnit.Code
@@ -79,9 +80,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 _indicatorService.GetIndicators(query.SubjectId, query.Indicators));
         }
 
-        private IEnumerable<LabelValueViewModel> GetFilters(IQueryable<Observation> observations)
+        private IEnumerable<LabelValue> GetFilters(IQueryable<Observation> observations)
         {
-            return _filterItemService.GetFilterItems(observations).Select(item => new LabelValueViewModel
+            return _filterItemService.GetFilterItems(observations).Select(item => new LabelValue
                 {
                     Label = item.Label,
                     Value = item.Id.ToString()
