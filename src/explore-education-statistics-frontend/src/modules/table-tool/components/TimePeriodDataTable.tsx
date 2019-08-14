@@ -29,7 +29,8 @@ interface Props {
 const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
   (props: Props, dataTableRef) => {
     const { results, footnotes, tableHeadersConfig } = props;
-    const noDataErrorComponent = () => {
+
+    if (results.length === 0) {
       return (
         <>
           <div>
@@ -46,10 +47,6 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
           </div>
         </>
       );
-    };
-
-    if (results.length === 0) {
-      return noDataErrorComponent();
     }
 
     const columnHeaders: string[][] = [
