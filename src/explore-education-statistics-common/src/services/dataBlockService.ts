@@ -220,6 +220,7 @@ export interface DataBlockMetadata {
   filters: Dictionary<LabelValueMetadata>;
   timePeriods: Dictionary<LabelValueMetadata>;
   locations: Dictionary<DataBlockLocationMetadata>;
+  locationsOptions?: LabelValueMetadata[]
 }
 
 interface DataBlockTimePeriod {
@@ -258,15 +259,27 @@ export interface DataBlockResponse {
   subjectId: number;
   releaseDate: Date;
   geographicLevel: GeographicLevel;
+  geographicId?: string;
 
   result: Result[];
 }
 
 const DataBlockService = {
-  async getDataBlockForSubject(request: DataBlockRequest) {
+  async getDataBlockForSubject(request: DataBlockRequest) : Promise<DataBlockResponse> {
     const response: DataBlockResponse = await dataApi.post('/Data', request);
 
-    return response;
+    // hack for now
+    return {
+      ...response,
+      metaData: {
+        ...response.metaData,
+        locationsOptions: [
+          { label: "Geographic from 2014" , value: "2014" }
+        ]
+      }
+    };
+
+    //return response;
   },
 };
 

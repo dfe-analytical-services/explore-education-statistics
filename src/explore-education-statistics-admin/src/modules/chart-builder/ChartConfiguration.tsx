@@ -1,17 +1,19 @@
 import styles from '@admin/modules/chart-builder/graph-builder.module.scss';
 import React from 'react';
-import { ChartDefinition } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import {ChartDefinition} from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import {
   FormCheckbox,
   FormGroup,
   FormSelect,
   FormTextInput,
 } from '@common/components/form';
+import {DataBlockMetadata} from '@common/services/dataBlockService';
 
 interface Props {
   selectedChartType: ChartDefinition;
   chartOptions: ChartOptions;
   onChange: (chartOptions: ChartOptions) => void;
+  meta: DataBlockMetadata;
 }
 
 export interface ChartOptions {
@@ -21,14 +23,15 @@ export interface ChartOptions {
   height?: number;
   width?: number;
   title?: string;
+  geographicId?: string;
 }
 
-const ChartConfiguration = (props: Props) => {
-  const {
-    chartOptions: initialChartOptions,
-    selectedChartType,
-    onChange,
-  } = props;
+const ChartConfiguration = ({
+  chartOptions: initialChartOptions,
+  selectedChartType,
+  onChange,
+  meta,
+}: Props) => {
 
   const [chartOptions, setChartOptions] = React.useState<ChartOptions>(
     initialChartOptions,
@@ -85,9 +88,9 @@ const ChartConfiguration = (props: Props) => {
           value={chartOptions.legend}
           label="Legend Position"
           options={[
-            { label: 'Top', value: 'top' },
-            { label: 'Bottom', value: 'bottom' },
-            { label: 'None', value: 'none' },
+            {label: 'Top', value: 'top'},
+            {label: 'Bottom', value: 'bottom'},
+            {label: 'None', value: 'none'},
           ]}
           order={[]}
           onChange={e => {
@@ -144,6 +147,30 @@ const ChartConfiguration = (props: Props) => {
                 width: parseInt(e.target.value, 10) || undefined,
               });
             }}
+          />
+        </FormGroup>
+      )}
+
+      {selectedChartType.type === 'map' && meta.locationsOptions && meta.locationsOptions.length > 0 && (
+        <FormGroup className={styles.formGroup}>
+          <FormSelect
+            id="geographicId"
+            label="Select a version of geographical data to use"
+            name="geographicId"
+            order={[]}
+            options={
+              [
+                {label: "Latest", value: ''},
+                ...meta.locationsOptions
+              ]
+            }
+            onChange={e => {
+              updateChartOptions({
+                ...chartOptions,
+                geographicId: e.target.value
+              });
+            }}
+            value={chartOptions.geographicId}
           />
         </FormGroup>
       )}

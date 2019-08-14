@@ -73813,7 +73813,13 @@
         "label": "2016/17",
         "year": 2016
       }
-    }
+    },
+    "locationsOptions": [
+      {
+        "label": "2014",
+        "value": "2014"
+      }
+    ]
   },
   "timePeriodRange": [],
   "result": [
