@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "1d44cd5a-0e76-413b-b3fd-d6134af597c2",
+		"_postman_id": "226b89d3-7ffd-49a3-a46f-71ad07dc0968",
 		"name": "DfE Admin API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -26,6 +26,10 @@
 			"request": {
 				"method": "GET",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "{{admin_api_url}}/contacts",
 					"host": [
@@ -66,6 +70,10 @@
 			"request": {
 				"method": "GET",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "{{admin_api_url}}/meta/releasetypes",
 					"host": [
@@ -125,6 +133,10 @@
 			"request": {
 				"method": "GET",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "{{admin_api_url}}/meta/timeidentifiers",
 					"host": [
@@ -178,6 +190,10 @@
 			"request": {
 				"method": "GET",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "{{admin_api_url}}/me/publications?topicId=67C249DE-1CCA-446E-8CCB-DCDAC542F460",
 					"host": [
@@ -239,16 +255,16 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"PublicationId\": \"8b12776b-3d36-4475-8115-00974d7de1d0\",\n    \"ReleaseTypeId\": \"1821abb8-68b0-431b-9770-0bea65d02ff0\",\n    \"TimeIdentifier\": 62,\n    \"PublishScheduled\": \"0001-01-01T00:00:00\",\n    \"NextReleaseExpected\": {\n        \"Year\": \"2018\",\n        \"Month\": \"01\",\n        \"Day\": \"01\"\n    },\n    \"ReleaseName\": \"2014\",\n    \"TemplateReleaseId\": \"63227211-7CB3-408C-B5C2-40D3D7CB2717\"\n}"
+					"raw": "{\n    \"PublicationId\": \"8b12776b-3d36-4475-8115-00974d7de1d0\",\n    \"ReleaseTypeId\": \"1821abb8-68b0-431b-9770-0bea65d02ff0\",\n    \"TypeId\": \"1821ABB8-68B0-431B-9770-0BEA65D02FF0\",\n    \"TimeIdentifier\": 62,\n    \"PublishScheduled\": \"0001-01-01T00:00:00\",\n    \"NextReleaseExpected\": {\n        \"Year\": \"2018\",\n        \"Month\": \"01\",\n        \"Day\": \"01\"\n    },\n    \"ReleaseName\": \"2014\",\n    \"TemplateReleaseId\": \"63227211-7CB3-408C-B5C2-40D3D7CB2717\"\n}"
 				},
 				"url": {
-					"raw": "{{admin_api_url}}/publications/8b12776b-3d36-4475-8115-00974d7de1d0/releases",
+					"raw": "{{admin_api_url}}/publications/C52BDD2A-B38E-46F9-88AB-19968E328C46/releases",
 					"host": [
 						"{{admin_api_url}}"
 					],
 					"path": [
 						"publications",
-						"8b12776b-3d36-4475-8115-00974d7de1d0",
+						"C52BDD2A-B38E-46F9-88AB-19968E328C46",
 						"releases"
 					]
 				}
@@ -310,6 +326,10 @@
 			"request": {
 				"method": "GET",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "{{admin_api_url}}/me/publications?topicId=A7CE9542-20E6-401D-91F4-F832C9E58B12&themeId=2CA22E34-B87A-4281-A0EB-B80F4F8DD374",
 					"host": [
@@ -429,6 +449,10 @@
 			"request": {
 				"method": "GET",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "{{admin_api_url}}/methodologies",
 					"host": [
@@ -466,6 +490,10 @@
 			"request": {
 				"method": "GET",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "{{admin_api_url}}/topic/77941B7D-BBD6-4069-9107-565AF89E2DEC/methodologies",
 					"host": [
@@ -512,6 +540,10 @@
 			"request": {
 				"method": "GET",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "{{admin_api_url}}/releases/E7774A74-1F62-4B76-B9B5-84F14DAC7278/summary/",
 					"host": [
@@ -649,6 +681,10 @@
 			"request": {
 				"method": "GET",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "{{admin_api_url}}/me/publications?topicId=67C249DE-1CCA-446E-8CCB-DCDAC542F460",
 					"host": [
@@ -663,6 +699,417 @@
 							"key": "topicId",
 							"value": "67C249DE-1CCA-446E-8CCB-DCDAC542F460"
 						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST Upload data file",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+							"",
+							"pm.test(\"Should return some results\", function () {",
+							"    pm.expect(pm.response.json().length).to.equal(2);    ",
+							"});",
+							"",
+							"pm.test(\"Name should be correct\", function () { ",
+							"    pm.expect(pm.response.json()[1].name).to.equal(\"testName\"); ",
+							"});",
+							"",
+							"pm.test(\"Extension should be csv\", function () { ",
+							"    pm.expect(pm.response.json()[0].extension).to.equal(\"csv\"); ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": ""
+						},
+						{
+							"key": "metaFile",
+							"type": "file",
+							"src": ""
+						}
+					]
+				},
+				"url": {
+					"raw": "{{admin_api_url}}/release/85d43d6f-ec91-452d-aba2-03303ab4363a/data?name=testName",
+					"host": [
+						"{{admin_api_url}}"
+					],
+					"path": [
+						"release",
+						"85d43d6f-ec91-452d-aba2-03303ab4363a",
+						"data"
+					],
+					"query": [
+						{
+							"key": "name",
+							"value": "testName"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET Data files",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "313f3538-ad70-44ec-aed5-3d9286545bf0",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+							"",
+							"pm.test(\"Should return some results\", function () {",
+							"    pm.expect(pm.response.json().length).to.equal(2);    ",
+							"});",
+							"",
+							"pm.test(\"Name should be correct\", function () { ",
+							"    pm.expect(pm.response.json()[1].name).to.equal(\"testName\"); ",
+							"});",
+							"",
+							"pm.test(\"Extension should be csv\", function () { ",
+							"    pm.expect(pm.response.json()[0].extension).to.equal(\"csv\"); ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{admin_api_url}}/release/85d43d6f-ec91-452d-aba2-03303ab4363a/data",
+					"host": [
+						"{{admin_api_url}}"
+					],
+					"path": [
+						"release",
+						"85d43d6f-ec91-452d-aba2-03303ab4363a",
+						"data"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE Data file",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://localhost:5001/api/release/85d43d6f-ec91-452d-aba2-03303ab4363a/data/my_file.csv",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"release",
+						"85d43d6f-ec91-452d-aba2-03303ab4363a",
+						"data",
+						"my_file.csv"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST Upload ancillary file",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "4d2d835f-99c3-4df4-adfd-af5b6c678672",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+							"",
+							"pm.test(\"Should return some results\", function () {",
+							"    pm.expect(pm.response.json().length).to.equal(2);    ",
+							"});",
+							"",
+							"pm.test(\"Name should be correct\", function () { ",
+							"    pm.expect(pm.response.json()[1].name).to.equal(\"test\"); ",
+							"});",
+							"",
+							"pm.test(\"Extension should be csv\", function () { ",
+							"    pm.expect(pm.response.json()[0].extension).to.equal(\"doc\"); ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": ""
+						}
+					]
+				},
+				"url": {
+					"raw": "{{admin_api_url}}/release/85d43d6f-ec91-452d-aba2-03303ab4363a/ancillary?name=test",
+					"host": [
+						"{{admin_api_url}}"
+					],
+					"path": [
+						"release",
+						"85d43d6f-ec91-452d-aba2-03303ab4363a",
+						"ancillary"
+					],
+					"query": [
+						{
+							"key": "name",
+							"value": "test"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET ancillary files",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "06d9ef58-8beb-4ec6-aac6-18ddc1a3c9e4",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+							"",
+							"pm.test(\"Should return some results\", function () {",
+							"    pm.expect(pm.response.json().length).to.equal(2);    ",
+							"});",
+							"",
+							"pm.test(\"Name should be correct\", function () { ",
+							"    pm.expect(pm.response.json()[1].name).to.equal(\"test\"); ",
+							"});",
+							"",
+							"pm.test(\"Extension should be csv\", function () { ",
+							"    pm.expect(pm.response.json()[0].extension).to.equal(\"doc\"); ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{admin_api_url}}/release/85d43d6f-ec91-452d-aba2-03303ab4363a/ancillary?name=test",
+					"host": [
+						"{{admin_api_url}}"
+					],
+					"path": [
+						"release",
+						"85d43d6f-ec91-452d-aba2-03303ab4363a",
+						"ancillary"
+					],
+					"query": [
+						{
+							"key": "name",
+							"value": "test"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE Ancillary file",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{admin_api_url}}/release/85d43d6f-ec91-452d-aba2-03303ab4363a/ancillary/ancillary.doc",
+					"host": [
+						"{{admin_api_url}}"
+					],
+					"path": [
+						"release",
+						"85d43d6f-ec91-452d-aba2-03303ab4363a",
+						"ancillary",
+						"ancillary.doc"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST Upload chart file",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c3aa6c3a-7405-4b53-9fce-ab1d75b4e2da",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+							"",
+							"pm.test(\"Should return some results\", function () {",
+							"    pm.expect(pm.response.json().length).to.equal(1);    ",
+							"});",
+							"",
+							"pm.test(\"Name should be correct\", function () { ",
+							"    pm.expect(pm.response.json()[0].name).to.equal(\"test\"); ",
+							"});",
+							"",
+							"pm.test(\"Extension should be csv\", function () { ",
+							"    pm.expect(pm.response.json()[0].extension).to.equal(\"png\"); ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": ""
+						}
+					]
+				},
+				"url": {
+					"raw": "{{admin_api_url}}/release/85d43d6f-ec91-452d-aba2-03303ab4363a/chart?name=test",
+					"host": [
+						"{{admin_api_url}}"
+					],
+					"path": [
+						"release",
+						"85d43d6f-ec91-452d-aba2-03303ab4363a",
+						"chart"
+					],
+					"query": [
+						{
+							"key": "name",
+							"value": "test"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET chart files",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "0e8a7e3f-244d-43aa-a936-4238169dcd82",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+							"",
+							"pm.test(\"Should return some results\", function () {",
+							"    pm.expect(pm.response.json().length).to.equal(1);    ",
+							"});",
+							"",
+							"pm.test(\"Name should be correct\", function () { ",
+							"    pm.expect(pm.response.json()[0].name).to.equal(\"test\"); ",
+							"});",
+							"",
+							"pm.test(\"Extension should be csv\", function () { ",
+							"    pm.expect(pm.response.json()[0].extension).to.equal(\"png\"); ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{admin_api_url}}/release/85d43d6f-ec91-452d-aba2-03303ab4363a/chart",
+					"host": [
+						"{{admin_api_url}}"
+					],
+					"path": [
+						"release",
+						"85d43d6f-ec91-452d-aba2-03303ab4363a",
+						"chart"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE Chart file",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{admin_api_url}}/release/85d43d6f-ec91-452d-aba2-03303ab4363a/chart/chart.png",
+					"host": [
+						"{{admin_api_url}}"
+					],
+					"path": [
+						"release",
+						"85d43d6f-ec91-452d-aba2-03303ab4363a",
+						"chart",
+						"chart.png"
 					]
 				}
 			},
