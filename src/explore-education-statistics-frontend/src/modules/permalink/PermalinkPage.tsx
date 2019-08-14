@@ -8,6 +8,7 @@ import PrintThisPage from '@frontend/components/PrintThisPage';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
 import TimePeriodDataTable from '../table-tool/components/TimePeriodDataTable';
+import getDefaultTableHeaderConfig from '../table-tool/utils/tableHeaders';
 
 interface Props {
   permalink: string;
@@ -35,6 +36,21 @@ class PermalinkPage extends Component<Props> {
   public render() {
     const { data } = this.props;
     const { fullTable, configuration } = data;
+    const {
+      indicators,
+      filters,
+      locations,
+      timePeriodRange,
+    } = fullTable.subjectMeta;
+    const tableHeadersConfig =
+      configuration.tableHeadersConfig ||
+      getDefaultTableHeaderConfig(
+        indicators,
+        filters,
+        timePeriodRange,
+        locations,
+      );
+
     return (
       <Page
         title={data.title}
@@ -66,7 +82,7 @@ class PermalinkPage extends Component<Props> {
         <TimePeriodDataTable
           {...fullTable.subjectMeta}
           results={fullTable.results}
-          tableHeadersConfig={configuration.tableHeadersConfig}
+          tableHeadersConfig={tableHeadersConfig}
         />
 
         <p className="govuk-body-s">Source: DfE prototype example statistics</p>
