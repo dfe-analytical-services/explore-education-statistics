@@ -51,6 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                     .ConfigureWarnings(builder => builder.Ignore(RelationalEventId.ValueConversionSqlLiteralWarning))
             );
 
+            // ReSharper disable once CommentTypo
             // Adds Brotli and Gzip compressing
             services.AddResponseCompression();
 
@@ -62,10 +63,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
 
             services.AddTransient<IResultBuilder<Observation, ObservationViewModel>, ResultBuilder>();
             services.AddTransient<IBoundaryLevelService, BoundaryLevelService>();
-            services.AddTransient<IDataService<ResultViewModel>, TableBuilderDataService>();
+            services.AddTransient<IDataService<TableBuilderResultViewModel>, TableBuilderDataService>();
             services.AddTransient<IDataService<ResultWithMetaViewModel>, DataService>();
             services.AddTransient<IPublicationMetaService, PublicationMetaService>();
             services.AddTransient<ISubjectMetaService, SubjectMetaService>();
+            services.AddTransient<ITableBuilderResultSubjectMetaService, TableBuilderResultSubjectMetaService>();
             services.AddTransient<ITableBuilderSubjectMetaService, TableBuilderSubjectMetaService>();
             services.AddTransient<IFileStorageService, FileStorageService>();
             services.AddTransient<IFilterGroupService, FilterGroupService>();
@@ -80,6 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<IReleaseService, ReleaseService>();
             services.AddTransient<ISchoolService, SchoolService>();
             services.AddTransient<ISubjectService, SubjectService>();
+            services.AddTransient<ITimePeriodService, TimePeriodService>();
             services.AddTransient<IPermalinkService, PermalinkService>();
             services.AddTransient<ITableStorageService, TableStorageService>(s => new TableStorageService(Configuration.GetConnectionString("PublicStorage")));
 
@@ -106,6 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                 app.UseHsts();
             }
 
+            // ReSharper disable once CommentTypo
             // Adds Brotli and Gzip compressing
             app.UseResponseCompression();
 

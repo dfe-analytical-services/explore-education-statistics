@@ -1,7 +1,9 @@
+using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 {
@@ -9,6 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
     [ApiController]
     public class DownloadController : ControllerBase
     {
+        private const string ContainerName = "downloads";
         private readonly IFileStorageService _fileStorageService;
 
         public DownloadController(IFileStorageService fileStorageService)
@@ -16,7 +19,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             _fileStorageService = fileStorageService;
         }
 
-        // TODO This endpoint is deprecated and needs to be removed when all file release file types are supported by the front end not just data.
+        [Obsolete(
+            "TODO This endpoint is deprecated and needs to be removed when all file release file types are supported by the front end not just data.")]
         [HttpGet("{publication}/{release}/{filename}")]
         public async Task<ActionResult> GetFile(string publication, string release, string filename)
             => await GetFile(publication, release, ReleaseFileTypes.Data, filename);
@@ -36,12 +40,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         private async Task<ActionResult> GetFile(string publication, string release, ReleaseFileTypes type,
             string filename)
         {
-            if (!_fileStorageService.FileExistsAndIsReleased(publication, release, type, filename))
+            if (!_fileStorageService.FileExistsAndIsReleased(ContainerName,
+                PublicReleasePath(publication, release, type, filename)))
             {
                 return NotFound();
             }
 
-            return await _fileStorageService.StreamFile(publication, release, type, filename);
+            return await _fileStorageService.StreamFile(ContainerName,
+                PublicReleasePath(publication, release, type, filename), filename);
         }
     }
 }
