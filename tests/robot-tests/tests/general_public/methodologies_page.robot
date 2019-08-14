@@ -7,11 +7,11 @@ Suite Setup       user opens the browser
 Suite Teardown    user closes the browser
 
 *** Test Cases ***
-Navigate to /methodologies page
+Navigate to /methodology page
     [Tags]  HappyPath
     environment variable should be set  PUBLIC_URL
-    user goes to url   %{PUBLIC_URL}/methodologies
-    user waits until page contains element   xpath://h1[text()="Methodologies"]
+    user goes to url   %{PUBLIC_URL}/methodology
+    user waits until page contains heading   Methodologies
 
 Validate page contents
     [Tags]  HappyPath
@@ -21,13 +21,13 @@ Validate page contents
     user opens accordion section    Pupils and schools
 
     user opens details dropdown     Exclusions
-    user checks page contains link with text and url  Pupil exclusion statistics: methodology   /methodologies/permanent-and-fixed-period-exclusions-in-england
+    user checks page contains link with text and url  Pupil exclusion statistics: methodology   /methodology/permanent-and-fixed-period-exclusions-in-england
 
     user opens details dropdown     Pupil absence
-    user checks page contains link with text and url  Pupil absence statistics: methodology   /methodologies/pupil-absence-in-schools-in-england
+    user checks page contains link with text and url  Pupil absence statistics: methodology   /methodology/pupil-absence-in-schools-in-england
 
     user opens details dropdown     School applications
-    user checks page contains link with text and url  Secondary and primary school applications and offers: methodology   /methodologies/secondary-and-primary-schools-applications-and-offers
+    user checks page contains link with text and url  Secondary and primary school applications and offers: methodology   /methodology/secondary-and-primary-schools-applications-and-offers
 
 Validate Related information section links exist
     [Tags]  HappyPath

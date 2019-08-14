@@ -12,14 +12,14 @@ function DownloadIndexPage() {
       title="Pupils and schools"
       breadcrumbs={[
         {
-          link: '/download',
+          link: '/download-data',
           name: 'Download data',
         },
       ]}
     >
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <Link className="govuk-body" to="/download">
+          <Link className="govuk-body" to="/download-data">
             {' '}
             Change theme
           </Link>

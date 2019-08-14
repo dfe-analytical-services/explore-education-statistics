@@ -6,6 +6,7 @@ interface Props {
   children?: ReactNode;
   term: string;
   detailsNoMargin?: boolean;
+  smallKey?: boolean;
 }
 
 const SummaryListItem = ({
@@ -13,10 +14,18 @@ const SummaryListItem = ({
   children,
   term,
   detailsNoMargin,
+  smallKey = false,
 }: Props) => {
   return (
     <div className="govuk-summary-list__row">
-      <dt className="govuk-summary-list__key">{term}</dt>
+      <dt
+        className={classNames('govuk-summary-list__key', {
+          'dfe-details-no-margin': detailsNoMargin,
+          'dfe-summary-list__key--small': smallKey,
+        })}
+      >
+        {term}
+      </dt>
       {children && (
         <dd
           className={classNames('govuk-summary-list__value', {

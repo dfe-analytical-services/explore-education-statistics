@@ -2,8 +2,8 @@ import HorizontalBarBlock from '@common/modules/find-statistics/components/chart
 import LineChartBlock from '@common/modules/find-statistics/components/charts/LineChartBlock';
 import VerticalBarBlock from '@common/modules/find-statistics/components/charts/VerticalBarBlock';
 import { ChartType } from '@common/services/publicationService';
-import dynamic from 'next-server/dynamic';
 import React from 'react';
+import dynamic from 'next-server/dynamic';
 import { ChartProps, StackedBarProps } from './charts/ChartFunctions';
 
 const DynamicMapBlock = dynamic(

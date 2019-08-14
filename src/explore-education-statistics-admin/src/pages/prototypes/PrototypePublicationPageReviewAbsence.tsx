@@ -16,79 +16,13 @@ const PublicationPage = () => {
       ? 'level2'
       : 'level1';
 
-  const Level1ReviewForm = () => {
-    return (
-      <div>
-        <FormRadioGroup
-          legend="Update release status"
-          id="review-release"
-          name="review-release"
-          value={status}
-          onChange={e => {
-            setStatus(e.target.value);
-          }}
-          options={[
-            {
-              id: 'first-draft',
-              label: 'First draft',
-              value: 'first-draft',
-            },
-
-            {
-              id: 'approve-release',
-              label: 'Final sign-off',
-              value: 'approve-release',
-              conditional: (
-                <FormGroup>
-                  <label htmlFor="approved-comments" className="govuk-label">
-                    Add any extra comments
-                  </label>
-                  <textarea
-                    name="approved-comments"
-                    id="approved-comments"
-                    className="govuk-textarea"
-                  />
-                </FormGroup>
-              ),
-            },
-
-            {
-              id: 'question',
-              label: 'In review',
-              value: 'question',
-              conditional: (
-                <FormGroup>
-                  <label htmlFor="question" className="govuk-label">
-                    Add your comment or question
-                  </label>
-                  <textarea
-                    name="question"
-                    id="question"
-                    className="govuk-textarea"
-                  />
-                </FormGroup>
-              ),
-            },
-          ]}
-        />
-
-        <Link
-          to="/prototypes/admin-dashboard?status=readyApproval"
-          className="govuk-button"
-        >
-          Update
-        </Link>
-      </div>
-    );
-  };
-
   const Level2ReviewForm = () => {
     return (
-      <div>
+      <form action="/prototypes/admin-dashboard">
         <FormRadioGroup
           legend="Final sign-off release status"
-          id="higher-review-release"
-          name="rhigher-eview-release"
+          id="status"
+          name="status"
           value={status}
           onChange={e => {
             setStatus(e.target.value);
@@ -97,7 +31,7 @@ const PublicationPage = () => {
             {
               id: 'approve-release-higher-review',
               label: 'Approve for publication',
-              value: 'approve-release-higher-review',
+              value: 'approvedPublication',
               conditional: (
                 <FormGroup>
                   <label htmlFor="approved-comments" className="govuk-label">
@@ -116,7 +50,7 @@ const PublicationPage = () => {
               id: 'question',
               label:
                 'In higher review - add comments and questions for author / team lead',
-              value: 'question',
+              value: 'readyHigherReview',
               conditional: (
                 <FormGroup>
                   <label htmlFor="question" className="govuk-label">
@@ -132,16 +66,13 @@ const PublicationPage = () => {
             },
           ]}
         />
-        <Link
-          to="/prototypes/admin-dashboard?status=readyApproval&amp;level=2"
-          className="govuk-button"
-        >
+        <button type="submit" className="govuk-button">
           Update
-        </Link>
+        </button>
         <div>
           <Link to="#">Print this page</Link>
         </div>
-      </div>
+      </form>
     );
   };
 
@@ -156,17 +87,28 @@ const PublicationPage = () => {
         { text: 'Review release', link: '#' },
       ]}
     >
-      {reviewType === 'level1' && <Level1ReviewForm />}
-      {reviewType === 'level2' && <Level2ReviewForm />}
-
-      <hr />
-      <div className="govuk-width-container dfe-align--comments">
-        <EditablePublicationPage
-          editing
-          reviewing
-          data={PrototypePublicationService.getNewPublication()}
-        />
-      </div>
+      {reviewType === 'level1' && (
+        <>
+          <div className="govuk-width-container">
+            <EditablePublicationPage
+              higherReview
+              data={PrototypePublicationService.getNewPublication()}
+            />
+          </div>
+        </>
+      )}
+      {reviewType === 'level2' && (
+        <>
+          <Level2ReviewForm />
+          <div className="govuk-width-container dfe-align--comments">
+            <EditablePublicationPage
+              higherReview
+              reviewing
+              data={PrototypePublicationService.getNewPublication()}
+            />
+          </div>
+        </>
+      )}
     </PrototypePage>
   );
 };

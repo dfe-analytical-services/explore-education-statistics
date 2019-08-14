@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using UserId = System.Guid;
 using TopicId = System.Guid;
@@ -27,9 +28,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _mapper = mapper;
         }
 
-        public Publication Get(UserId id)
+        public async Task<Publication> GetAsync(PublicationId id)
         {
-            return _context.Publications.FirstOrDefault(x => x.Id == id);
+            return await _context.Publications.FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public Publication Get(string slug)
@@ -57,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             if (_context.Publications.Any(p => p.Slug == publication.Slug))
             {
-                return ValidationResult("Slug", "Slug is not unique");
+                return ValidationResult(SlugNotUnique);
             }
             
             var saved = _context.Publications.Add(new Publication

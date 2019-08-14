@@ -146,7 +146,9 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
               </div>
 
               <div className="govuk-summary-list__row">
-                <dt className="govuk-summary-list__key">Contact</dt>
+                <dt className="govuk-summary-list__key">
+                  Publication and release contact
+                </dt>
                 <dd className="govuk-summary-list__value">Alex Miller</dd>
               </div>
 

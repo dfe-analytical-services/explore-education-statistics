@@ -4,12 +4,16 @@ import ButtonLink from '@frontend/components/ButtonLink';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 
+export type SectionToggleHandler = (section: {
+  id: string;
+  title: string;
+}) => void;
+
 interface Props {
   block: ContentBlock;
   id: string;
   publication: Publication;
-
-  onToggle?: (section: { id: string; title: string }) => void;
+  onToggle?: SectionToggleHandler;
 }
 
 const ContentSubBlockRenderer = ({
@@ -50,8 +54,8 @@ const ContentSubBlockRenderer = ({
               </h2>
               <p>Use our table tool to explore this data.</p>
               <ButtonLink
-                as={`/table-tool/${publication.slug}`}
-                href={`/table-tool?publicationSlug=${publication.slug}`}
+                as={`/data-tables/${publication.slug}`}
+                href={`/data-tables?publicationSlug=${publication.slug}`}
               >
                 Explore data
               </ButtonLink>

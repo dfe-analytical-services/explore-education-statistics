@@ -34,35 +34,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
         public static implicit operator Either<Tl, Tr>(Tl left) => new Either<Tl, Tr>(left);
         
         public static implicit operator Either<Tl, Tr>(Tr right) => new Either<Tl, Tr>(right);
-        
+
     }
 
     public static class EitherTaskExtensions 
     {
-        public static async Task<Either<Tl, T>> Map<Tl, Tr, T>(this Task<Either<Tl, Tr>> task, Func<Tr, Task<Either<Tl, T>>> func)
-        {
-            var firstResult = await task;
-            if (firstResult.IsLeft)
-            {
-                return new Either<Tl, T>(firstResult.Left);
-            }
-
-            return await func(firstResult.Right);
-        }
-        
-        public static async Task<Either<Tl, T>> Map<Tl, Tr, T>(this Task<Either<Tl, Tr>> task, Func<Tr, Task<T>> func)
-        {
-            var firstResult = await task;
-            if (firstResult.IsLeft)
-            {
-                return new Either<Tl, T>(firstResult.Left);
-            }
-
-            var next = await func(firstResult.Right);
-            return new Either<Tl, T>(next);
-        }
-        
-        public static async Task<Either<Tl, Tr>> Map<Tl, Tr>(this Task<Either<Tl, Tr>> task, Action func)
+        public static async Task<Either<Tl, Tr>> OnSuccess<Tl, Tr>(this Task<Either<Tl, Tr>> task, Action func)
         {
             var firstResult = await task;
             if (firstResult.IsLeft)
@@ -74,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
             return firstResult;
         }
         
-        public static async Task<Either<Tl, T>> Map<Tl, Tr, T>(this Task<Either<Tl, Tr>> task, Func<Task<T>> func)
+        public static async Task<Either<Tl, T>> OnSuccess<Tl, Tr, T>(this Task<Either<Tl, Tr>> task, Func<Task<T>> func)
         {
             var firstResult = await task;
             if (firstResult.IsLeft)
@@ -84,6 +61,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
 
             var next = await func();
             return new Either<Tl, T>(next);
+        }
+        
+        public static async Task<Either<Tl, T>> OnSuccess<Tl, Tr, T>(this Task<Either<Tl, Tr>> task, Func<Tr, Task<Either<Tl, T>>> func)
+        {
+            var firstResult = await task;
+            if (firstResult.IsLeft)
+            {
+                return new Either<Tl, T>(firstResult.Left);
+            }
+
+            var next = await func(firstResult.Right);
+            return next;
         }
     }
     
