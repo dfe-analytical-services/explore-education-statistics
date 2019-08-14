@@ -4,13 +4,19 @@ using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Microsoft.EntityFrameworkCore.Internal;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
     public static class TimePeriodUtil
     {
+        public static IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriodRange(
+            (int Year, TimeIdentifier TimeIdentifier) start,
+            (int Year, TimeIdentifier TimeIdentifier) end)
+        {
+            return Range(start.Year, start.TimeIdentifier, end.Year, end.TimeIdentifier);
+        }
+
         public static IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> Range(TimePeriodQuery timePeriodQuery)
         {
             return Range(timePeriodQuery.StartYear,

@@ -9,6 +9,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interface
     {
         Task<PermalinkViewModel> GetAsync(Guid id);
 
-        Task<PermalinkViewModel> CreateAsync(ObservationQueryContext tableQuery);
+        Task<PermalinkViewModel> CreateAsync(PermalinkQueryContext query);
     }
 }

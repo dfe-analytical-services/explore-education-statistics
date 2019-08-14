@@ -1,5 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta
@@ -11,5 +12,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta
 
         public string Label { get; set; }
         public int Year { get; set; }
+
+        public TimePeriodMetaViewModel(int year, TimeIdentifier code)
+        {
+            Code = code;
+            Label = TimePeriodLabelFormatter.Format(year, code);
+            Year = year;
+        }
     }
 }
