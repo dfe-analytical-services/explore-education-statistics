@@ -17,15 +17,15 @@ import FixedMultiHeaderDataTable from './FixedMultiHeaderDataTable';
 import { TableHeadersFormValues } from './TableHeadersForm';
 
 interface Props extends SubjectMeta {
-  results: TableData['result'];
-  tableHeadersConfig?: TableHeadersFormValues;
+  results: TableData['results'];
+  tableHeadersConfig: TableHeadersFormValues;
 }
 
 const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
   (props: Props, dataTableRef) => {
     const {
       filters,
-      timePeriods,
+      timePeriodRange,
       locations,
       indicators,
       results,
@@ -82,10 +82,10 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
       setTableHeaders({
         columnGroups: sortedFilters.slice(0, halfwayIndex),
         rowGroups: sortedFilters.slice(halfwayIndex),
-        columns: timePeriods,
+        columns: timePeriodRange,
         rows: indicators,
       });
-    }, [filters, timePeriods, locations, indicators]);
+    }, [filters, timePeriodRange, locations, indicators]);
 
     const columnHeaders: string[][] = [
       ...tableHeadersConfig.columnGroups.map(colGroup =>

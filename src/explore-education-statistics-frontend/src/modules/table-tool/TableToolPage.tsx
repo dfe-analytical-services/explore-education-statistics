@@ -311,15 +311,17 @@ class TableToolPage extends Component<Props, State> {
       indicator => new Indicator(indicatorsByValue[indicator]),
     );
 
+    console.log(filters, indicators);
     const {
-      footnotes,
-      timePeriodRange,
-      result,
+      subjectMeta: responseSubjectMeta,
+      results,
     } = await tableBuilderService.getTableData(
       this.createQuery(filters, indicators),
     );
+    console.log(filters, responseSubjectMeta.filters);
+    console.log(indicators, responseSubjectMeta.indicators);
 
-    const timePeriods = timePeriodRange.map(
+    const timePeriods = responseSubjectMeta.timePeriodRange.map(
       timePeriod => new TimePeriod(timePeriod),
     );
 
@@ -327,8 +329,8 @@ class TableToolPage extends Component<Props, State> {
       filters,
       indicators,
       timePeriodRange: timePeriods,
-      tableData: result,
-      footnotes,
+      tableData: results,
+      footnotes: responseSubjectMeta.footnotes,
       tableHeaders: getDefaultTableHeaderConfig(
         indicators,
         filters,
@@ -466,7 +468,7 @@ class TableToolPage extends Component<Props, State> {
                           publicationName={publication ? publication.title : ''}
                           subjectName={subjectName}
                           locations={locationsList}
-                          timePeriods={timePeriodRange}
+                          timePeriodRange={timePeriodRange}
                           results={tableData}
                           footnotes={footnotes}
                           tableHeadersConfig={tableHeaders}
