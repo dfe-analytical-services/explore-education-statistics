@@ -53,6 +53,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var table = await GetUploadsTable();
             await table.ExecuteAsync(TableOperation.InsertOrReplace(batch));
         }
+        
+        public async Task FailBatch(string releaseId, string subjectId, string errorMessage)
+        {
+            var batch = await GetOrCreateBatch(releaseId, subjectId, 0);
+            batch.Status = (int)ImportStatus.FAILED;
+            var table = await GetUploadsTable();
+            await table.ExecuteAsync(TableOperation.InsertOrReplace(batch));
+        }
 
         private async Task<Batch> GetOrCreateBatch(string releaseId, string subjectId, int batchSize)
         {

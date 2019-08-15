@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Data.Importer.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
@@ -58,6 +59,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 var subjectData = ProcessSubject(message);
                 
                 SplitFile(message, collector, subjectData);
+            }
+            catch (ImporterException ex)
+            {
+                _batchService.FailBatch(message.Release.Id.ToString(), ex._subjectId.ToString(), ex.Message);
             }
             catch (Exception e)
             {
@@ -117,8 +122,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             {
                 logger.LogInformation(
                     $"{GetType().Name} function STARTED for : Batch: {message.BatchNo} of {message.BatchSize} with Datafile: {message.DataFileName}");
-                
+
                 _fileImportService.ImportObservations(message).Wait();
+            }
+            catch (ImporterException ex)
+            {
+                _batchService.FailBatch(message.Release.Id.ToString(), ex._subjectId.ToString(), ex.Message);
             }
             catch (Exception e)
             {
@@ -139,6 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             _context.SaveChanges();
             
             var batches = SplitFileService.GetNumBatches(subjectData.GetCsvLines().Count());
+            
             _batchService.UpdateStatus(message.Release.Id.ToString(), subject.Id.ToString(), batches, ImportStatus.RUNNING);
 
             _importerService.ImportMeta(subjectData.GetMetaLines().ToList(), subject);

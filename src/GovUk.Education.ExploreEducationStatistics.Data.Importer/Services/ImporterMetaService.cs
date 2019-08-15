@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Importer.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -12,16 +13,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
     public class ImporterMetaService : IImporterMetaService
     {
         private readonly ApplicationDbContext _context;
+        private static IValidatorService _validatorService;
 
-        public ImporterMetaService(ApplicationDbContext context)
+        public ImporterMetaService(
+            ApplicationDbContext context,
+            IValidatorService validatorService)
         {
             _context = context;
+            _validatorService = validatorService;
         }
 
         public SubjectMeta Import(IEnumerable<string> lines, Subject subject)
         {
+            _validatorService.ValidateMetaHeader(subject.Id, lines.First());
+            
             var headers = GetHeaders(lines);
-            var metaRows = GetMetaRows(lines, headers);
+            var metaRows = GetMetaRows(subject.Id, lines, headers, true);
 
             return new SubjectMeta
             {
@@ -33,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         public SubjectMeta Get(IEnumerable<string> lines, Subject subject)
         {
             var headers = GetHeaders(lines);
-            var metaRows = GetMetaRows(lines, headers);
+            var metaRows = GetMetaRows(subject.Id, lines, headers, false);
 
             return new SubjectMeta
             {
@@ -47,11 +54,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             return lines.First().Split(',').ToList();
         }
 
-        private static IEnumerable<MetaRow> GetMetaRows(IEnumerable<string> lines, List<string> headers)
+        private static IEnumerable<MetaRow> GetMetaRows(
+            long subjectId,
+            IEnumerable<string> lines,
+            List<string> headers,
+            bool validate)
         {
             return lines
                 .Skip(1)
-                .Select(line => GetMetaRow(line, headers));
+                .Select((line, index) =>
+                {
+                    if (validate) _validatorService.ValidateMetaRow(subjectId, line, index);
+                    return GetMetaRow(line, headers);
+                });
         }
 
         private static MetaRow GetMetaRow(string line, List<string> headers)

@@ -4,6 +4,7 @@ using System.Linq;
 using EFCore.BulkExtensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Importer.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -239,28 +240,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             List<string> headers,
             IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)> filtersMeta)
         {
-            List<ObservationFilterItem> list = new List<ObservationFilterItem>();
-            foreach (var (filter, column, filterGroupingColumn) in filtersMeta)
+            return filtersMeta.Select(filterMeta =>
             {
-                var filterItemLabel = CsvUtil.Value(line, headers, column);
-                var filterGroupLabel = CsvUtil.Value(line, headers, filterGroupingColumn);
-
-                list.Add(new ObservationFilterItem
+                var filterItemLabel = CsvUtil.Value(line, headers, filterMeta.Column);
+                var filterGroupLabel = CsvUtil.Value(line, headers, filterMeta.FilterGroupingColumn);
+                
+                return new ObservationFilterItem
                 {
-                    FilterItem = _importerFilterService.Find(filterItemLabel, filterGroupLabel, filter)
-                });
-            }
-            return list;
-//            return filtersMeta.Select(filterMeta =>
-//            {
-//                var filterItemLabel = CsvUtil.Value(line, headers, filterMeta.Column);
-//                var filterGroupLabel = CsvUtil.Value(line, headers, filterMeta.FilterGroupingColumn);
-//                
-//                return new ObservationFilterItem
-//                {
-//                    FilterItem = _importerFilterService.Find(filterItemLabel, filterGroupLabel, filterMeta.Filter)
-//                };
-//            }).ToList();
+                    FilterItem = _importerFilterService.Find(filterItemLabel, filterGroupLabel, filterMeta.Filter)
+                };
+            }).ToList();
         }
 
         private ICollection<ObservationFilterItem> CreateObservationFilterItems(IEnumerable<FilterItem> filterItems)
@@ -282,7 +271,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 }
             }
 
-            throw new ArgumentException("Unexpected value: " + timeIdentifier);
+            throw new InvalidTimeIdentifierException(timeIdentifier);
         }
 
         private static int GetYear(IReadOnlyList<string> line, List<string> headers)
