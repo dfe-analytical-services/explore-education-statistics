@@ -17,10 +17,9 @@ const PrototypeChartTest = () => {
      ...ChartData.AbstractChartProps,
    };*/
 
-  const onChartSave = (props : ChartRendererProps) => {
-
-    console.log("Saved " , props);
-
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const onChartSave = (props: ChartRendererProps) => {
+    // console.log('Saved ', props);
   };
 
   return (
