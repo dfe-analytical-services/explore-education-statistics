@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .FirstOrDefaultAsync();
             return _mapper.Map<ReleaseViewModel>(release);
         }
-
+        
         // TODO Authorisation will be required when users are introduced
         public async Task<Either<ValidationResult, ReleaseViewModel>> CreateReleaseAsync(
             CreateReleaseViewModel createRelease)
@@ -75,44 +75,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return await GetReleaseForIdAsync(saved.Entity.Id);
                 });
         }
-        
-        // DFE-1163 release summary information into version tables.
-        // TODO Authorisation will be required when users are introduced
-        public async Task<Either<ValidationResult, ReleaseViewModel>> CreateReleaseAsync2(
-            CreateReleaseViewModel createRelease)
-        {
-            return await ValidateReleaseSlugUniqueToPublication2(createRelease.Slug, createRelease.PublicationId)
-                .OnSuccess(async () =>
-                {
-                    var order = OrderForNextReleaseOnPublication(createRelease.PublicationId);
-                    var content = TemplateFromRelease(createRelease.TemplateReleaseId);
-                    // DFE-1163 release summary information into version tables.
-                    var saved = _context.Releases.Add(new Release
-                    {
-                        ReleaseSummary = new ReleaseSummary
-                        {
-                            Versions = new List<ReleaseSummaryVersion>()
-                            {
-                                new ReleaseSummaryVersion
-                                {
-                                    Slug = createRelease.Slug,
-                                    TypeId = createRelease.TypeId.Value,
-                                    Created = DateTime.Now,
-                                    ReleaseName = createRelease.ReleaseName,
-                                    PublishScheduled = createRelease.PublishScheduled,
-                                    NextReleaseDate = createRelease.NextReleaseDate,
-                                    TimePeriodCoverage = createRelease.TimePeriodCoverage
-                                }
-                            }
-                        },
-                        Content = content,
-                        Order = order,
-                    });
-
-                    await _context.SaveChangesAsync();
-                    return await GetReleaseForIdAsync(saved.Entity.Id); // TODO new version
-                });
-        }
 
         // TODO Authorisation will be required when users are introduced
         public async Task<EditReleaseSummaryViewModel> GetReleaseSummaryAsync(ReleaseId releaseId)
@@ -125,19 +87,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ValidationResult, ReleaseViewModel>> EditReleaseSummaryAsync(
             EditReleaseSummaryViewModel model)
         {
-            // Slug must be unique per publication to avoid file system clashes.
             var publication = await GetAsync(model.Id);
-            var withSameSlug = _context.Releases.Where(r => r.Slug == model.Slug && r.PublicationId == publication.Id);
-            if (withSameSlug.Any() && (withSameSlug.Count() > 1 || withSameSlug.First().Id != model.Id))
-            {
-                return ValidationResult(SlugNotUnique);
-            }
-
-            var release = await _context.Releases.FirstOrDefaultAsync(r => r.Id == model.Id);
-            _context.Releases.Update(release);
-            _mapper.Map(model, release);
-            await _context.SaveChangesAsync();
-            return await GetReleaseForIdAsync(model.Id);
+            return await ValidateReleaseSlugUniqueToPublication(model.Slug, publication.Id, model.Id)
+                .OnSuccess(async () =>
+                {
+                    var release = await _context.Releases.FirstOrDefaultAsync(r => r.Id == model.Id);
+                    _context.Releases.Update(release);
+                    _mapper.Map(model, release);
+                    await _context.SaveChangesAsync();
+                    return await GetReleaseForIdAsync(model.Id);
+                });
         }
 
         // TODO Authorisation will be required when users are introduced
@@ -153,27 +112,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private async Task<Either<ValidationResult, bool>> ValidateReleaseSlugUniqueToPublication(string slug,
             PublicationId publicationId, ReleaseId? releaseId = null)
         {
-            if (_context.Releases.Any(r => r.Slug == slug && r.PublicationId == publicationId))
+            if (_context.Releases.Any(r => r.Slug == slug && r.PublicationId == publicationId && r.Id != releaseId))
             {
                 return ValidationResult(SlugNotUnique);
             }
-            return true;
-        }
-        
-        private async Task<Either<ValidationResult, bool>> ValidateReleaseSlugUniqueToPublication2(string slug,
-            PublicationId publicationId, ReleaseId? releaseId = null)
-        {
-            var slugInUse = _context.Releases
-                .Where(r => r.PublicationId == publicationId)
-                .Include(r => r.ReleaseSummary)
-                .ThenInclude(rs => rs.Versions)
-                .Select(r => r.ReleaseSummary)
-                .Any(rs => rs.ReleaseId != releaseId && rs.Current.Slug == slug);
-            if (slugInUse)
-            {
-                return ValidationResult(SlugNotUnique);
-            }
-            
+
             return true;
         }
 
