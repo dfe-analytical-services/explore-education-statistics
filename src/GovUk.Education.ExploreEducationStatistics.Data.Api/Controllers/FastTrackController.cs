@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(Guid fastTrackId)
         {
-            var viewModel = await _fastTrackService.GetAsync(fastTrackId);    
+            var viewModel = await _fastTrackService.GetAsync(fastTrackId);
 
             if (viewModel == null)
             {
