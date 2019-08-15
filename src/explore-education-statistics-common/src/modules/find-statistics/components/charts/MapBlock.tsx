@@ -14,6 +14,8 @@ import {
   DataBlockGeoJsonProperties,
   DataBlockMetadata,
 } from '@common/services/dataBlockService';
+import { DataSetConfiguration } from '@common/services/publicationService';
+import { Dictionary } from '@common/types';
 
 import classNames from 'classnames';
 import { Feature, FeatureCollection, Geometry } from 'geojson';
@@ -22,8 +24,6 @@ import { Layer, LeafletMouseEvent, Path, PathOptions, Polyline } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import React from 'react';
 import { GeoJSON, LatLngBounds, Map } from 'react-leaflet';
-import { DataSetConfiguration } from '@common/services/publicationService';
-import { Dictionary } from '@common/types';
 import styles from './MapBlock.module.scss';
 
 type MapBlockProperties = DataBlockGeoJsonProperties & {
@@ -225,6 +225,23 @@ function calculateColour({ scaledData = 1.0, color = '#ff0000' }) {
   ].join('');
 }
 
+// this is the most annoying painful way of having to make this work!!!
+// using a reference to the callback to make the onEachFeature callback work
+// otherwise it ends up creating a closure that has no access to updated properties?
+// calling the referenced callback and rebuilding it when the data it uses changes
+function useCallbackRef<T extends (...args: never[]) => unknown>(
+  callback: () => T,
+  deps: unknown[] | undefined,
+) {
+  const ref = React.useRef<T>();
+
+  React.useEffect(() => {
+    ref.current = callback();
+  }, deps); // eslint-disable-line
+
+  return ref;
+}
+
 // </editor-fold>
 
 const MapBlock = ({
@@ -295,76 +312,67 @@ const MapBlock = ({
 
   // initialise on prop changes
   React.useEffect(() => {
-
     const generatedChartData = createSortedAndMappedDataForAxis(
       axes.major,
       data.result,
       meta,
       labels,
       true,
-    ).filter(({ __name: id }) => meta.locations[id] && meta.locations[id].geoJson);
-
+    ).filter(
+      ({ __name: id }) => meta.locations[id] && meta.locations[id].geoJson,
+    );
 
     setChartData(generatedChartData);
 
     setMajorOptions(getLocationsForDataSet(data, meta, generatedChartData));
-  }, [data.result, axes.major, meta, labels]);
+  }, [data, axes.major, meta, labels]);
 
   React.useEffect(() => {
-
     setDataSetOptions(
       axes.major.dataSets.map((dataSet, index) => {
         const dataKey = generateKeyFromDataSet(dataSet, axes.major.groupBy);
         return { ...labels[dataKey], value: index };
       }),
     );
-
-
   }, [axes.major.dataSets, axes.major.groupBy, labels]);
 
-
-  const tooltipCallback = React.useCallback((feature: MapFeature) => {
-    if (feature.properties) {
-      const content = Object.entries(feature.properties.measures).map(
-        ([id, value]) => ({
-          ...(labels[id] || { label: '', unit: '' }),
-          value,
-
-        }),
-      ).map(({ label, value, unit }) => (
-          `${label} : ${value}${unit}`
-        ),
-      );
-
-      if (feature.id) {
-        content.unshift(
-          `<strong>${(meta.locations || {})[feature.id].label}</strong>`,
-        );
+  const onEachFeatureCallback = useCallbackRef(
+    () => (feature: MapFeature, featureLayer: Layer) => {
+      if (feature.properties) {
+        // eslint-disable-next-line no-param-reassign
+        feature.properties.layer = featureLayer;
       }
 
-      return content.join('<br />');
-    }
-    return '';
-  }, [labels, meta.locations]);
+      const featurePath: Path = featureLayer as Path;
+      featurePath.setStyle({
+        className: classNames(
+          feature.properties && feature.properties.className,
+          { [styles.selected]: feature.id === selectedLocation },
+        ),
+      });
 
+      featureLayer.bindTooltip(() => {
+        if (feature.properties) {
+          const content = Object.entries(feature.properties.measures)
+            .map(([id, value]) => ({
+              ...(labels[id] || { label: '', unit: '' }),
+              value,
+            }))
+            .map(({ label, value, unit }) => `${label} : ${value}${unit}`);
 
+          if (feature.id) {
+            content.unshift(
+              `<strong>${(meta.locations || {})[feature.id].label}</strong>`,
+            );
+          }
 
-  const onEachFeature = React.useCallback((feature: MapFeature, featureLayer: Layer) => {
-    if (feature.properties) {
-      // eslint-disable-next-line no-param-reassign
-      feature.properties.layer = featureLayer;
-    }
-
-    const featurePath: Path = featureLayer as Path;
-    featurePath.setStyle({
-      className: classNames(
-        feature.properties && feature.properties.className,
-        { [styles.selected]: feature.id === selectedLocation },
-      ),
-    });
-
-    featureLayer.bindTooltip(() => tooltipCallback(feature));
-  }, [labels, selectedLocation, tooltipCallback]);
+          return content.join('<br />');
+        }
+        return '';
+      });
+    },
+    [labels, meta.locations, selectedLocation],
+  );
 
   React.useEffect(() => {
     if (geoJsonRef.current) {
@@ -372,12 +380,9 @@ const MapBlock = ({
 
       if (geometry) {
         geoJsonRef.current.leafletElement.addData(geometry);
-        // @ts-ignore
-        geoJsonRef.current.leafletElement.on("eachFeature", onEachFeature);
       }
     }
-
-  }, [geometry, geoJsonRef, geoJsonRef.current, tooltipCallback]);
+  }, [geoJsonRef, geometry]);
 
   React.useEffect(() => {
     if (mapRef.current) {
@@ -462,13 +467,6 @@ const MapBlock = ({
     setSelectedLocation(newSelectedLocation);
   };
 
-  // some sort of closure is happening?
-  const getLabels = () => labels;
-
-
-
-
-
   const onClick = (e: MapClickEvent) => {
     const { feature } = e.sourceTarget;
 
@@ -550,24 +548,26 @@ const MapBlock = ({
             </h3>
             <dl className="govuk-list">
               {legend &&
-              legend.map(({ min, max, idx, minValue }) => (
-                <dd className={styles.legend} key={idx}>
-                  <span
-                    className={styles[`rate${idx}`]}
-                    style={{
-                      backgroundColor: calculateColour({
-                        scaledData: minValue,
-                        color: labels[selectedDataSetKey].colour,
-                      }),
-                    }}
-                  >
-                    &nbsp;
-                  </span>{' '}
-                  {min}
-                  {labels[selectedDataSetKey].unit}&nbsp; to {max}
-                  {labels[selectedDataSetKey].unit}{' '}
-                </dd>
-              ))}
+              legend.map(({ min, max, idx, minValue }) =>
+                (
+                  <dd className={styles.legend} key={idx}>
+                    <span
+                      className={styles[`rate${idx}`]}
+                      style={{
+                        backgroundColor: calculateColour({
+                          scaledData: minValue,
+                          color: labels[selectedDataSetKey].colour,
+                        }),
+                      }}
+                    >
+                      &nbsp;
+                    </span>{' '}
+                    {min}
+                    {labels[selectedDataSetKey].unit}&nbsp; to {max}
+                    {labels[selectedDataSetKey].unit}{' '}
+                  </dd>
+                ),
+              )}
             </dl>
           </div>
         )}
@@ -590,7 +590,10 @@ const MapBlock = ({
             <GeoJSON
               ref={geoJsonRef}
               data={geometry}
-              /*onEachFeature={onEachFeature}*/
+              onEachFeature={(feature, layer) =>
+                onEachFeatureCallback.current &&
+                onEachFeatureCallback.current(feature, layer)
+              }
               style={(feature?: MapFeature): PathOptions => ({
                 fillColor:
                   feature &&

@@ -10,35 +10,28 @@ import DataBlockService, {
 import React from 'react';
 
 const PrototypeChartTest = () => {
-
   const request: DataBlockRequest = {
-    'geographicLevel': GeographicLevel.LocalAuthority,
-    'subjectId': 12,
-    'indicators': [
-      '160',
-      '158',
-      '156',
-    ],
-    'filters': [
-      '423',
-    ],
-    'timePeriod': {
-      'startYear': '2009',
-      'startCode': 'AY',
-      'endYear': '2016',
-      'endCode': 'AY',
+    geographicLevel: GeographicLevel.LocalAuthority,
+    subjectId: 12,
+    indicators: ['160', '158', '156'],
+    filters: ['423'],
+    timePeriod: {
+      startYear: '2009',
+      startCode: 'AY',
+      endYear: '2016',
+      endCode: 'AY',
     },
   };
 
-  const [chartBuilderData, setChartBuilderData] = React.useState<DataBlockResponse>();
+  const [chartBuilderData, setChartBuilderData] = React.useState<
+    DataBlockResponse
+  >();
 
   React.useEffect(() => {
-    DataBlockService.getDataBlockForSubject(request)
-      .then(response => {
-        setChartBuilderData(response);
-      });
+    DataBlockService.getDataBlockForSubject(request).then(response => {
+      setChartBuilderData(response);
+    });
   }, []);
-
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onChartSave = (props: ChartRendererProps) => {
