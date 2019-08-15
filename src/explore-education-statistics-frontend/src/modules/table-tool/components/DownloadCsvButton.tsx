@@ -23,7 +23,7 @@ interface Props {
   filters: Dictionary<CategoryFilter[]>;
   timePeriods: TimePeriod[];
   locations: LocationFilter[];
-  results: TableData['result'];
+  results: TableData['results'];
 }
 
 const DownloadCsvButton = ({

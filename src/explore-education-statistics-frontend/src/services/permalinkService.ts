@@ -1,20 +1,28 @@
 import { dataApi } from '@common/services/api';
 import { Dictionary } from '@common/types';
-import { TableData } from '@common/services/tableBuilderService';
+import {
+  TableData,
+  GroupedFilterOptions,
+} from '@common/services/tableBuilderService';
 import TimePeriod from '@common/services/types/TimePeriod';
 import {
-  CategoryFilter,
   Indicator,
   LocationFilter,
 } from '@frontend/modules/table-tool/components/types/filters';
 import { TableHeadersFormValues } from '@frontend/modules/table-tool/components/TableHeadersForm';
 
-export interface SubjectMeta {
+export interface FullTableMeta {
   publicationName: string;
+  subjectId: string;
   subjectName: string;
   locations: LocationFilter[];
   timePeriodRange: TimePeriod[];
-  filters: Dictionary<CategoryFilter[]>;
+  filters: Dictionary<{
+    legend: string;
+    hint?: string;
+    options: GroupedFilterOptions;
+    totalValue?: string;
+  }>;
   indicators: Indicator[];
   footnotes: {
     id: number;
@@ -24,7 +32,7 @@ export interface SubjectMeta {
 
 export interface FullTable /* ™ */ {
   title?: string;
-  subjectMeta: SubjectMeta;
+  subjectMeta: FullTableMeta;
   results: TableData['results'];
 }
 

@@ -1,5 +1,5 @@
 import { Dictionary, PartialRecord } from '@common/types';
-import { SubjectMeta, FullTable } from '@frontend/services/permalinkService';
+import { FullTableMeta, FullTable } from '@frontend/services/permalinkService';
 import { dataApi } from './api';
 
 export interface FilterOption {
@@ -89,7 +89,7 @@ export type LocationLevelKeys =
   | 'ward';
 
 export interface TableData {
-  subjectMeta: SubjectMeta;
+  subjectMeta: FullTableMeta;
   results: {
     timePeriod: string;
     measures: Dictionary<string>;
