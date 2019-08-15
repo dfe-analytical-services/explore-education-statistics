@@ -48,17 +48,15 @@ const CustomToolTip = (props: TooltipProps) => {
     return (
       <div className={styles.tooltip}>
         <p>{label}</p>
-        {
-          payload
-            .sort((a, b) => {
-              return (b.value as number) - (a.value as number);
-            })
-            .map((_, index) => (
-              <p key={index}>
-                {`${payload[index].name} : ${payload[index].value}`}
-              </p>
-            ))
-        }
+        {payload
+          .sort((a, b) => {
+            return (b.value as number) - (a.value as number);
+          })
+          .map((_, index) => (
+            <p key={index}>
+              {`${payload[index].name} : ${payload[index].value}`}
+            </p>
+          ))}
       </div>
     );
   }

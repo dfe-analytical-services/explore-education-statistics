@@ -145,11 +145,13 @@ function generateGeometryAndLegendForSelectedOptions(
     .map(entry => ({ ...entry, data: entry[selectedDataSet] }))
     .filter(({ data }) => data !== undefined);
 
-  const { min, max, range, scale } = calculateMinAndScaleForSourceData(sourceData);
+  const { min, max, range, scale } = calculateMinAndScaleForSourceData(
+    sourceData,
+  );
 
-  let fixedScale = Math.log10((max-min) / 5);
+  let fixedScale = Math.log10((max - min) / 5);
 
-  if (fixedScale <0) {
+  if (fixedScale < 0 && Number.isFinite(fixedScale)) {
     fixedScale = -Math.floor(fixedScale);
   } else {
     fixedScale = 0;
@@ -266,7 +268,9 @@ const MapBlock = ({
   const container = React.createRef<HTMLDivElement>();
   const ukRef = React.createRef<GeoJSON>();
 
-  const [geometry, setGeometry] = React.useState<FeatureCollection<Geometry, DataBlockGeoJsonProperties>>();
+  const [geometry, setGeometry] = React.useState<
+    FeatureCollection<Geometry, DataBlockGeoJsonProperties>
+  >();
 
   const [ukGeometry, setUkGeometry] = React.useState<FeatureCollection>();
 
@@ -278,7 +282,9 @@ const MapBlock = ({
 
   const [legend, setLegend] = React.useState<LegendEntry[]>([]);
 
-  const [selectedDataSetIndex, setSelectedDataSetIndex] = React.useState<number>(0);
+  const [selectedDataSetIndex, setSelectedDataSetIndex] = React.useState<
+    number
+  >(0);
   const [selectedDataSetKey, setSelectedDataSetKey] = React.useState<string>(
     generateKeyFromDataSet(axes.major.dataSets[0], axes.major.groupBy),
   );
@@ -556,8 +562,7 @@ const MapBlock = ({
             </h3>
             <dl className="govuk-list">
               {legend &&
-              legend.map(({ min, max, idx, minValue }) =>
-                (
+                legend.map(({ min, max, idx, minValue }) => (
                   <dd className={styles.legend} key={idx}>
                     <span
                       className={styles[`rate${idx}`]}
@@ -574,8 +579,7 @@ const MapBlock = ({
                     {labels[selectedDataSetKey].unit}&nbsp; to {max}
                     {labels[selectedDataSetKey].unit}{' '}
                   </dd>
-                ),
-              )}
+                ))}
             </dl>
           </div>
         )}
@@ -609,10 +613,10 @@ const MapBlock = ({
                   calculateColour(feature.properties),
                 className: classNames({
                   [styles.selected]:
-                  selectedDataSetIndex &&
-                  feature &&
-                  feature.id ===
-                  axes.major.dataSets[selectedDataSetIndex].location,
+                    selectedDataSetIndex &&
+                    feature &&
+                    feature.id ===
+                      axes.major.dataSets[selectedDataSetIndex].location,
                 }),
               })}
               onclick={onClick}
