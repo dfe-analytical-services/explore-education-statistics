@@ -8,5 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Inte
         List<ThemeTree> GetTree();
 
         Methodology Get(string slug);
+
+        IEnumerable<Methodology> Get();
     }
 }

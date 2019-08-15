@@ -33,7 +33,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await UpdateTrees();
 
             // TODO: Generate methodologies
-
+            await UpdateMethodologies();
+            
             // TODO: Generate releases
             // TODO: Work out how to identify latest release in the most efficient way
 
@@ -45,23 +46,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private async Task UpdateTrees()
         {
             await UpdateDownloadTree();
-
-            await UpdateMethodologyTree();
-
             await UpdateContentTree();
+            // await UpdateMethodologyTree();
+        }
+
+        private async Task UpdateMethodologies()
+        {
+            var methologies = _methodologyService.Get();
+
+            foreach (var methodology in methologies)
+            {
+                var blob = _cloudBlobContainer.GetBlockBlobReference($"methodology/methodologies/{methodology.Id}.json");
+                await blob.UploadTextAsync(JsonConvert.SerializeObject(methodology));
+            }
         }
 
         private async Task UpdateContentTree()
         {
             var contentTree = _contentService.GetContentTree();
 
-            if (contentTree == null)
+            if (contentTree != null)
+            {
+                var contentTreeBlob = _cloudBlobContainer.GetBlockBlobReference($"content/tree.json");
+                await contentTreeBlob.UploadTextAsync(JsonConvert.SerializeObject(contentTree));
+            }
+            else
             {
                 throw new Exception("Content tree could not be retrieved");
             }
-
-            var downloadTreeBlob = _cloudBlobContainer.GetBlockBlobReference($"content/tree.json");
-            await downloadTreeBlob.UploadTextAsync(JsonConvert.SerializeObject(contentTree));
         }
 
         private async Task UpdateDownloadTree()
@@ -70,24 +82,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             if (downloadTree != null)
             {
+                var downloadTreeBlob = _cloudBlobContainer.GetBlockBlobReference($"download/tree.json");
+                await downloadTreeBlob.UploadTextAsync(JsonConvert.SerializeObject(downloadTree));
+            }
+            else
+            {
                 throw new Exception("Download tree could not be retrieved");
             }
-
-            var downloadTreeBlob = _cloudBlobContainer.GetBlockBlobReference($"download/tree.json");
-            await downloadTreeBlob.UploadTextAsync(JsonConvert.SerializeObject(downloadTree));
         }
 
         private async Task UpdateMethodologyTree()
         {
             var methodologyTree = _methodologyService.GetTree();
-            
+
             if (methodologyTree != null)
+            {
+                var methodologyTreeBlob = _cloudBlobContainer.GetBlockBlobReference($"methodology/tree.json");
+                await methodologyTreeBlob.UploadTextAsync(JsonConvert.SerializeObject(methodologyTree));
+            }
+            else
             {
                 throw new Exception("Methodology tree could not be retrieved");
             }
-
-            var downloadTreeBlob = _cloudBlobContainer.GetBlockBlobReference($"methodology/tree.json");
-            await downloadTreeBlob.UploadTextAsync(JsonConvert.SerializeObject(methodologyTree));
         }
 
         private static CloudBlobContainer GetCloudBlobContainer(string connectionString)
