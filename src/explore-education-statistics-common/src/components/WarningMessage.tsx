@@ -2,10 +2,10 @@ import React, { ReactNode } from 'react';
 
 interface Props {
   children: ReactNode;
-  icon: string;
+  icon?: string;
 }
 
-const WarningMessage = ({ icon, children }: Props) => {
+const WarningMessage = ({ icon = '!', children }: Props) => {
   return (
     <div className="govuk-warning-text">
       <span className="govuk-warning-text__icon" aria-hidden="true">
