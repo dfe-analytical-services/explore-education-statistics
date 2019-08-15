@@ -3,6 +3,7 @@ import ChartData from '@common/modules/find-statistics/components/charts/__tests
 import { DataBlockResponse } from '@common/services/dataBlockService';
 import React from 'react';
 import ChartBuilder from '@admin/modules/chart-builder/ChartBuilder';
+import { ChartRendererProps } from '@common/modules/find-statistics/components/ChartRenderer';
 
 const PrototypeChartTest = () => {
   const chartData = ChartData.AbstractLargeDataChartProps_smaller_datasets;
@@ -16,9 +17,15 @@ const PrototypeChartTest = () => {
      ...ChartData.AbstractChartProps,
    };*/
 
+  const onChartSave = (props : ChartRendererProps) => {
+
+    console.log("Saved " , props);
+
+  };
+
   return (
     <PrototypePage wide>
-      <ChartBuilder data={newChartBuilderData} />
+      <ChartBuilder data={newChartBuilderData} onChartSave={onChartSave} />
       {/* <ChartRenderer type="line" {...newChartData} /> */}
     </PrototypePage>
   );
