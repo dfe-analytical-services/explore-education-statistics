@@ -2,26 +2,26 @@ import last from 'lodash/last';
 import React, { memo, forwardRef } from 'react';
 import cartesian from '@common/lib/utils/cartesian';
 import formatPretty from '@common/lib/utils/number/formatPretty';
-import { TableData } from '@common/services/tableBuilderService';
 import {
   CategoryFilter,
   Indicator,
   LocationFilter,
 } from '@frontend/modules/table-tool/components/types/filters';
 import TimePeriod from '@frontend/modules/table-tool/components/types/TimePeriod';
-import { SubjectMeta } from '@frontend/services/permalinkService';
+import { FullTable } from '@frontend/services/permalinkService';
 import DataTableCaption from './DataTableCaption';
 import FixedMultiHeaderDataTable from './FixedMultiHeaderDataTable';
 import { TableHeadersFormValues } from './TableHeadersForm';
 
-interface Props extends SubjectMeta {
-  results: TableData['results'];
+interface Props {
+  fullTable: FullTable;
   tableHeadersConfig: TableHeadersFormValues;
 }
 
 const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
   (props: Props, dataTableRef) => {
-    const { results, footnotes, tableHeadersConfig } = props;
+    const { fullTable, tableHeadersConfig } = props;
+    const { subjectMeta, results } = fullTable;
 
     const columnHeaders: string[][] = [
       ...tableHeadersConfig.columnGroups.map(colGroup =>
@@ -104,12 +104,12 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
 
     return (
       <FixedMultiHeaderDataTable
-        caption={<DataTableCaption {...props} id="dataTableCaption" />}
+        caption={<DataTableCaption {...subjectMeta} id="dataTableCaption" />}
         columnHeaders={columnHeaders}
         rowHeaders={rowHeaders}
         rows={rows}
         ref={dataTableRef}
-        footnotes={footnotes}
+        footnotes={subjectMeta.footnotes}
       />
     );
   },

@@ -23,7 +23,7 @@ export interface SubjectMeta {
 }
 
 export interface FullTable /* ™ */ {
-  title: string;
+  title?: string;
   subjectMeta: SubjectMeta;
   results: TableData['results'];
 }

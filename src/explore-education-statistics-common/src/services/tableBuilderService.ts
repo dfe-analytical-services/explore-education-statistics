@@ -1,5 +1,5 @@
 import { Dictionary, PartialRecord } from '@common/types';
-import { SubjectMeta } from '@frontend/services/permalinkService';
+import { SubjectMeta, FullTable } from '@frontend/services/permalinkService';
 import { dataApi } from './api';
 
 export interface FilterOption {
@@ -144,7 +144,7 @@ export default {
   ): Promise<PublicationSubjectMeta> {
     return dataApi.post('/meta/subject', query);
   },
-  getTableData(query: TableDataQuery): Promise<TableData> {
+  getTableData(query: TableDataQuery): Promise<FullTable> {
     return dataApi.post('/tablebuilder/new', query);
   },
   getTablePermalink(query: TableDataQuery): Promise<TablePermalink> {

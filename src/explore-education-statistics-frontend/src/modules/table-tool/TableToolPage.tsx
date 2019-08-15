@@ -5,7 +5,6 @@ import tableBuilderService, {
   IndicatorOption,
   PublicationSubject,
   PublicationSubjectMeta,
-  TableData,
   TableDataQuery,
   ThemeMeta,
 } from '@common/services/tableBuilderService';
@@ -27,6 +26,7 @@ import { NextContext } from 'next';
 import Router from 'next/router';
 import React, { Component, MouseEventHandler, createRef } from 'react';
 import getDefaultTableHeaderConfig from '@frontend/modules/table-tool/utils/tableHeaders';
+import { FullTable } from '@frontend/services/permalinkService';
 import DownloadCsvButton from './components/DownloadCsvButton';
 import FiltersForm, { FilterFormSubmitHandler } from './components/FiltersForm';
 import LocationFiltersForm, {
@@ -70,6 +70,7 @@ interface Props {
 }
 
 interface State {
+  createdTable?: FullTable;
   startYear?: number;
   startCode?: string;
   endYear?: number;
@@ -80,11 +81,8 @@ interface State {
   publication?: PublicationOptions['topics'][0]['publications'][0];
   subjects: PublicationSubject[];
   subjectId: string;
-  subjectName: string;
   subjectMeta: PublicationSubjectMeta;
-  timePeriodRange: TimePeriod[];
-  tableData: TableData['result'];
-  footnotes: TableData['footnotes'];
+  // timePeriodRange: TimePeriod[];
   tableHeaders: TableHeadersFormValues;
 }
 
@@ -93,7 +91,6 @@ class TableToolPage extends Component<Props, State> {
     filters: {},
     locations: {},
     indicators: [],
-    subjectName: '',
     subjectId: '',
     subjectMeta: {
       timePeriod: {
@@ -106,9 +103,7 @@ class TableToolPage extends Component<Props, State> {
       filters: {},
     },
     subjects: [],
-    timePeriodRange: [],
-    tableData: [],
-    footnotes: [],
+    // timePeriodRange: [],
     tableHeaders: {
       columnGroups: [],
       columns: [],
@@ -152,16 +147,12 @@ class TableToolPage extends Component<Props, State> {
 
     this.setState({
       publication,
-      footnotes: [],
       subjects,
-      subjectName: '',
-      tableData: [],
     });
   };
 
   private handlePublicationSubjectFormSubmit: PublicationSubjectFormSubmitHandler = async ({
     subjectId,
-    subjectName,
   }) => {
     const subjectMeta = await tableBuilderService.getPublicationSubjectMeta(
       subjectId,
@@ -169,7 +160,6 @@ class TableToolPage extends Component<Props, State> {
 
     this.setState({
       subjectMeta,
-      subjectName,
       subjectId,
     });
   };
@@ -311,30 +301,20 @@ class TableToolPage extends Component<Props, State> {
       indicator => new Indicator(indicatorsByValue[indicator]),
     );
 
-    console.log(filters, indicators);
-    const {
-      subjectMeta: responseSubjectMeta,
-      results,
-    } = await tableBuilderService.getTableData(
+    const createdTable = await tableBuilderService.getTableData(
       this.createQuery(filters, indicators),
-    );
-    console.log(filters, responseSubjectMeta.filters);
-    console.log(indicators, responseSubjectMeta.indicators);
-
-    const timePeriods = responseSubjectMeta.timePeriodRange.map(
-      timePeriod => new TimePeriod(timePeriod),
     );
 
     this.setState({
+      createdTable,
       filters,
       indicators,
-      timePeriodRange: timePeriods,
-      tableData: results,
-      footnotes: responseSubjectMeta.footnotes,
       tableHeaders: getDefaultTableHeaderConfig(
         indicators,
         filters,
-        timePeriods,
+        createdTable.subjectMeta.timePeriodRange.map(
+          timePeriod => new TimePeriod(timePeriod),
+        ),
         Object.values(locations).flat(),
       ),
     });
@@ -353,20 +333,12 @@ class TableToolPage extends Component<Props, State> {
   public render() {
     const { themeMeta, publicationId } = this.props;
     const {
-      filters,
-      indicators,
-      locations,
+      createdTable,
       publication,
-      subjectName,
       subjectMeta,
       subjects,
-      timePeriodRange,
-      tableData,
-      footnotes,
       tableHeaders,
     } = this.state;
-
-    const locationsList = Object.values(locations).flat();
 
     return (
       <Page title="Create your own tables online" caption="Table Tool" wide>
@@ -461,21 +433,16 @@ class TableToolPage extends Component<Props, State> {
                             }
                           }}
                         />
-                        <TimePeriodDataTable
-                          ref={this.dataTableRef}
-                          filters={filters}
-                          indicators={indicators}
-                          publicationName={publication ? publication.title : ''}
-                          subjectName={subjectName}
-                          locations={locationsList}
-                          timePeriodRange={timePeriodRange}
-                          results={tableData}
-                          footnotes={footnotes}
-                          tableHeadersConfig={tableHeaders}
-                        />
+                        {createdTable ? (
+                          <TimePeriodDataTable
+                            ref={this.dataTableRef}
+                            fullTable={createdTable}
+                            tableHeadersConfig={tableHeaders}
+                          />
+                        ) : null}
                       </div>
 
-                      {publication && (
+                      {publication && createdTable && (
                         <>
                           <h3>Additional options</h3>
 
@@ -497,11 +464,13 @@ class TableToolPage extends Component<Props, State> {
                               <DownloadCsvButton
                                 publicationSlug={publication.slug}
                                 meta={subjectMeta}
-                                filters={filters}
-                                indicators={indicators}
-                                locations={locationsList}
-                                timePeriods={timePeriodRange}
-                                results={tableData}
+                                filters={createdTable.subjectMeta.filters}
+                                indicators={createdTable.subjectMeta.indicators}
+                                locations={createdTable.subjectMeta.locations}
+                                timePeriods={
+                                  createdTable.subjectMeta.timePeriodRange
+                                }
+                                results={createdTable.results}
                               />
                             </li>
 
