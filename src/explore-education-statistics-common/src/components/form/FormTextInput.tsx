@@ -24,6 +24,7 @@ export interface FormTextInputProps {
   defaultValue?: string;
   min?: string;
   max?: string;
+  list?: string;
 }
 
 const FormTextInput = ({
