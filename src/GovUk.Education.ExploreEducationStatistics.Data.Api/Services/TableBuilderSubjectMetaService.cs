@@ -14,9 +14,9 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
-    public class TableBuilderSubjectMetaService : ITableBuilderSubjectMetaService
+    public class TableBuilderSubjectMetaService : AbstractTableBuilderSubjectMetaService,
+        ITableBuilderSubjectMetaService
     {
-        private readonly IFilterItemService _filterItemService;
         private readonly IIndicatorGroupService _indicatorGroupService;
         private readonly ILocationService _locationService;
         private readonly IMapper _mapper;
@@ -24,16 +24,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private readonly ISubjectService _subjectService;
         private readonly ITimePeriodService _timePeriodService;
 
-        public TableBuilderSubjectMetaService(
-            IFilterItemService filterItemService,
+        public TableBuilderSubjectMetaService(IFilterItemService filterItemService,
             IIndicatorGroupService indicatorGroupService,
             ILocationService locationService,
             IMapper mapper,
             IObservationService observationService,
             ISubjectService subjectService,
-            ITimePeriodService timePeriodService)
+            ITimePeriodService timePeriodService) : base(filterItemService)
         {
-            _filterItemService = filterItemService;
             _indicatorGroupService = indicatorGroupService;
             _locationService = locationService;
             _mapper = mapper;
@@ -97,37 +95,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                     Options = _mapper.Map<IEnumerable<IndicatorMetaViewModel>>(group.Indicators)
                 }
             );
-        }
-
-        private Dictionary<string, TableBuilderFilterMetaViewModel> GetFilters(IQueryable<Observation> observations)
-        {
-            return _filterItemService.GetFilterItemsIncludingFilters(observations)
-                .GroupBy(item => item.FilterGroup.Filter)
-                .ToDictionary(
-                    itemsGroupedByFilter => itemsGroupedByFilter.Key.Label.PascalCase(),
-                    itemsGroupedByFilter => new TableBuilderFilterMetaViewModel
-                    {
-                        Hint = itemsGroupedByFilter.Key.Hint,
-                        Legend = itemsGroupedByFilter.Key.Label,
-                        Options = itemsGroupedByFilter.GroupBy(item => item.FilterGroup).ToDictionary(
-                            itemsGroupedByFilterGroup => itemsGroupedByFilterGroup.Key.Label.PascalCase(),
-                            itemsGroupedByFilterGroup =>
-                                new TableBuilderFilterItemsMetaViewModel
-                                {
-                                    Label = itemsGroupedByFilterGroup.Key.Label,
-                                    Options = itemsGroupedByFilterGroup.Select(item => new LabelValue
-                                    {
-                                        Label = item.Label,
-                                        Value = item.Id.ToString()
-                                    })
-                                }),
-                        TotalValue = GetTotalValue(itemsGroupedByFilter)
-                    });
-        }
-
-        private string GetTotalValue(IEnumerable<FilterItem> filterItems)
-        {
-            return _filterItemService.GetTotal(filterItems)?.Id.ToString() ?? string.Empty;
         }
     }
 }
