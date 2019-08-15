@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Importer.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
@@ -132,7 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             
             var headers = lines.First().Split(',').ToList();
             lines.RemoveAt(0);
-            
+
             _logger.LogInformation($"Retrieving observations for {subject.Name}");
 
             var observations = GetObservations(lines, headers, subject, subjectMeta).ToList();
@@ -165,21 +166,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         private IEnumerable<Observation> GetObservations(IEnumerable<string> lines,
             List<string> headers,
             Subject subject,
-            SubjectMeta subjectMeta)
+            SubjectMeta subjectMeta
+            )
         {
-            return lines.Select(line => ObservationFromCsv(line, headers, subject, subjectMeta));
+            // Retrieve all the observations created in the first pass for this subject
+            var filterItems = GetFilterItems(subject.Id);
+            return lines.Select(line => ObservationFromCsv(line, headers, subject, subjectMeta, filterItems));
         }
         
         private Observation ObservationFromCsv(string raw,
             List<string> headers,
             Subject subject,
-            SubjectMeta subjectMeta)
+            SubjectMeta subjectMeta,
+            IEnumerable<FilterItem> filterItems)
         {
             var line = raw.Split(',');
             
             return new Observation
             {
-                FilterItems = GetFilterItems(line, headers, subjectMeta.Filters),
+                //FilterItems = CreateObservationFilterItems(filterItems),
+                FilterItems = GetFilterItemsOld(line, headers, subjectMeta.Filters),
                 GeographicLevel = GetGeographicLevel(line, headers),
                 LocationId = GetLocationId(line, headers),
                 Measures = GetMeasures(line, headers, subjectMeta.Indicators),
@@ -209,22 +215,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             }
         }
 
-        private ICollection<ObservationFilterItem> GetFilterItems(IReadOnlyList<string> line,
-            List<string> headers,
-            IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)> filtersMeta)
-        {
-            return filtersMeta.Select(filterMeta =>
-            {
-                var filterItemLabel = CsvUtil.Value(line, headers, filterMeta.Column);
-                var filterGroupLabel = CsvUtil.Value(line, headers, filterMeta.FilterGroupingColumn);
-                
-                return new ObservationFilterItem
-                {
-                    FilterItem = _importerFilterService.Find(filterItemLabel, filterGroupLabel, filterMeta.Filter)
-                };
-            }).ToList();
-        }
-        
         private void CreateFilterItems(IReadOnlyList<string> line,
             List<string> headers,
             IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)> filtersMeta)
@@ -235,6 +225,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 var filterGroupLabel = CsvUtil.Value(line, headers, filterMeta.FilterGroupingColumn);
                 _importerFilterService.Find(filterItemLabel, filterGroupLabel, filterMeta.Filter); 
             }
+        }
+        
+        private IEnumerable<FilterItem> GetFilterItems(long subjectId)
+        {
+            return _context.FilterItem
+                .Include(fi => fi.FilterGroup)
+                .ThenInclude(fg => fg.Filter)
+                .AsNoTracking().Where(fi => fi.FilterGroup.Filter.SubjectId == subjectId);
+        }
+        
+        private ICollection<ObservationFilterItem> GetFilterItemsOld(IReadOnlyList<string> line,
+            List<string> headers,
+            IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)> filtersMeta)
+        {
+            List<ObservationFilterItem> list = new List<ObservationFilterItem>();
+            foreach (var (filter, column, filterGroupingColumn) in filtersMeta)
+            {
+                var filterItemLabel = CsvUtil.Value(line, headers, column);
+                var filterGroupLabel = CsvUtil.Value(line, headers, filterGroupingColumn);
+
+                list.Add(new ObservationFilterItem
+                {
+                    FilterItem = _importerFilterService.Find(filterItemLabel, filterGroupLabel, filter)
+                });
+            }
+            return list;
+//            return filtersMeta.Select(filterMeta =>
+//            {
+//                var filterItemLabel = CsvUtil.Value(line, headers, filterMeta.Column);
+//                var filterGroupLabel = CsvUtil.Value(line, headers, filterMeta.FilterGroupingColumn);
+//                
+//                return new ObservationFilterItem
+//                {
+//                    FilterItem = _importerFilterService.Find(filterItemLabel, filterGroupLabel, filterMeta.Filter)
+//                };
+//            }).ToList();
+        }
+
+        private ICollection<ObservationFilterItem> CreateObservationFilterItems(IEnumerable<FilterItem> filterItems)
+        {
+            return filterItems.Select(fi => new ObservationFilterItem
+            {
+                FilterItem = fi
+            }).ToList();
         }
 
         private static TimeIdentifier GetTimeIdentifier(IReadOnlyList<string> line, List<string> headers)

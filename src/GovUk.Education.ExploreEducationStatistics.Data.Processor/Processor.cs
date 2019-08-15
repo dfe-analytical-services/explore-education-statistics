@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
@@ -21,6 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
         private readonly IFileStorageService _fileStorageService;
         private readonly ISplitFileService _splitFileService;
         private readonly IImporterService _importerService;
+        private readonly IBatchService _batchService;
         private readonly ApplicationDbContext _context;
         
         public Processor(
@@ -29,6 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             IFileStorageService fileStorageService,
             ISplitFileService splitFileService,
             IImporterService importerService,
+            IBatchService batchService,
             ApplicationDbContext context
         )
         {
@@ -37,6 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             _fileStorageService = fileStorageService;
             _splitFileService = splitFileService;
             _importerService = importerService;
+            _batchService = batchService;
             _context = context;
         }
 
@@ -131,10 +134,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
         private SubjectData ProcessSubject(ImportMessage message)
         {
             var subjectData = _fileStorageService.GetSubjectData(message).Result;
-                
             var subject =_releaseProcessorService.CreateOrUpdateRelease(subjectData, message);
-                
+            
             _context.SaveChanges();
+            
+            var batches = SplitFileService.GetNumBatches(subjectData.GetCsvLines().Count());
+            _batchService.UpdateStatus(message.Release.Id.ToString(), subject.Id.ToString(), batches, ImportStatus.RUNNING);
 
             _importerService.ImportMeta(subjectData.GetMetaLines().ToList(), subject);
                 

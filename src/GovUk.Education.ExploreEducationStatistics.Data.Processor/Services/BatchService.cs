@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
@@ -9,6 +10,13 @@ using Microsoft.Azure.Cosmos.Table;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
+    public enum ImportStatus
+    {
+        RUNNING = 1,
+        FAILED = 2,
+        COMPLETE = 3
+    };
+    
     public class BatchService : IBatchService
     {
         private readonly ITableStorageService _tblStorageService;
@@ -38,10 +46,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return count == batch.BatchSize;
         }
 
-        public async Task UpdateCurrentBatchNumber(string releaseId, string subjectId, int batchSize, int batchNo)
+        public async Task UpdateStatus(string releaseId, string subjectId, int batchSize, ImportStatus status)
         {
             var batch = await GetOrCreateBatch(releaseId, subjectId, batchSize);
-            batch.CurrentBatchNo = batchNo;
+            batch.Status = (int)status;
             var table = await GetUploadsTable();
             await table.ExecuteAsync(TableOperation.InsertOrReplace(batch));
         }

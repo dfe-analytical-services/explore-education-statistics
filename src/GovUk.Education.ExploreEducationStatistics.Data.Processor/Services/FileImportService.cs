@@ -38,9 +38,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             var subjectData = _fileStorageService.GetSubjectData(message).Result;
             var subject = GetSubject(message, subjectData.Name);
-            
-            await _batchService.UpdateCurrentBatchNumber(message.Release.Id.ToString(), subject.Id.ToString(), message.BatchSize, message.BatchNo);
-            
             var batch = subjectData.GetCsvLines().ToList();
             var metaLines = subjectData.GetMetaLines().ToList();
 
@@ -65,7 +62,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             
             if (batchComplete)
             {
-                _logger.LogInformation($"All batches imported for {message.DataFileName}");  
+                _logger.LogInformation($"All batches imported for {message.DataFileName}"); 
+                await _batchService.UpdateStatus(message.Release.Id.ToString(), subject.Id.ToString(), message.BatchSize, ImportStatus.COMPLETE);
             }
         }
         

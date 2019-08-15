@@ -8,6 +8,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
 
         Task<bool> IsBatchComplete(string releaseId, string subjectId, int batchSize);
 
-        Task UpdateCurrentBatchNumber(string releaseId, string subjectId, int batchSize, int batchNo);
+        Task UpdateStatus(string releaseId, string subjectId, int batchSize, ImportStatus status);
     }
 }

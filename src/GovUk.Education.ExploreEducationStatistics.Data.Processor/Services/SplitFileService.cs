@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
     public class SplitFileService : ISplitFileService
     {
-        private const int MaxLines = 10000;
+        public const int MaxLinesPerBatch = 10000;
         
         private readonly IFileStorageService _fileStorageService;
 
@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var batchCount = 1;
             var lines = subjectData.GetCsvLines();
 
-            if (lines.Count() > MaxLines + 1)
+            if (lines.Count() > MaxLinesPerBatch + 1)
             {
                 List<IFormFile> files = SplitFile(message, lines);
 
@@ -63,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             var files = new List<IFormFile>();    
             var header = csvLines.First();
-            var batches = csvLines.Skip(1).Batch(MaxLines);
+            var batches = csvLines.Skip(1).Batch(MaxLinesPerBatch);
             var index = 1;
             
             foreach (var batch in batches)
@@ -92,6 +92,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 index++;
             }
             return files;
+        }
+        public static int GetNumBatches(int rows) {
+            return (int)Math.Ceiling((double)rows / (double)MaxLinesPerBatch);
         }
     }
 }

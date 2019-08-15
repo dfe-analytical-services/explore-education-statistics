@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Models
     {
         public byte[]BatchesProcessed  { get; set; }
         public int BatchSize { get; set; }
-        public int CurrentBatchNo { get; set; }
+        public int Status { get; set; }
 
         public Batch(string releaseId, string subjectId, int batchSize)
         {
