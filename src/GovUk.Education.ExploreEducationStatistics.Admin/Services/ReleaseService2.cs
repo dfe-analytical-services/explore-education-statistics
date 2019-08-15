@@ -53,9 +53,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     m => m.MapFrom(r => r.ReleaseSummary.NextReleaseDate))
                 .ForMember(dest => dest.TimePeriodCoverage,
                     m => m.MapFrom(r => r.ReleaseSummary.TimePeriodCoverage));
-
-            cfg.CreateMap<ReleaseSummaryVersion, CreateReleaseViewModel>();
-            cfg.CreateMap<ReleaseSummaryVersion, EditReleaseSummaryViewModel>();
+            
+            cfg.CreateMap<CreateReleaseViewModel, ReleaseSummaryVersion>();
+            cfg.CreateMap<EditReleaseSummaryViewModel, ReleaseSummaryVersion>();
             cfg.CreateMap<EditReleaseSummaryViewModel, Release>();
         }).CreateMapper();
 
@@ -91,9 +91,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var content = await TemplateFromRelease(createRelease.TemplateReleaseId);
                     var releaseSummary = _mapper.Map<ReleaseSummaryVersion>(createRelease);
                     releaseSummary.Created = DateTime.Now;
-                    // DFE-1163 release summary information into version tables.
                     var saved = _context.Releases.Add(new Release
                     {
+                        PublicationId = createRelease.PublicationId,
                         ReleaseSummary = new ReleaseSummary
                         {
                             Versions = new List<ReleaseSummaryVersion>()
@@ -104,7 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         Content = content,
                         Order = order,
                     });
-
+                    
                     await _context.SaveChangesAsync();
                     return await GetReleaseForIdAsync(saved.Entity.Id);
                 });

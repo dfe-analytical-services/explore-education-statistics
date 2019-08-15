@@ -6,7 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     {
         List<T> Versions { get; set; }
 
-        T Lastest { get; }
+        T Latest { get; }
 
         T Current { get; }
 
