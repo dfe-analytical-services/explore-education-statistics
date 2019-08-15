@@ -7,13 +7,49 @@ const PrototypeFootnotes = () => {
   const [valueIndicator, setValueIndicator] = useState('');
   const [valueFilter, setValueFilter] = useState('');
   const [valueFootnote, setValueFootnote] = useState('');
-  const [addIndicatorBlock, setIndicatorBlock] = useState(true);
-  const [addFilterBlock, setFilterBlock] = useState(true);
+  const [addIndicatorBlock, setIndicatorBlock] = useState(false);
+  const [addFilterBlock, setFilterBlock] = useState(false);
   const [editFootnoteBlock, setEditFootnoteBlock] = useState(false);
 
   return (
     <>
       <div className="govuk-grid-row">
+        <div className="govuk-grid-column-one-third">
+          <div className="govuk-form-group govuk-!-margin-bottom-2">
+            <div className="govuk-checkboxes govuk-checkboxes--small">
+              <div className="govuk-checkboxes__item">
+                <input
+                  className="govuk-checkboxes__input"
+                  type="checkbox"
+                  id="selectSubject"
+                  name="selectSubject"
+                  value="selectSubject"
+                  onChange={event => {
+                    setValueIndicator(event.target.value);
+                    setEditFootnoteBlock(false);
+
+                    if (addIndicatorBlock) {
+                      setIndicatorBlock(false);
+                    } else {
+                      setIndicatorBlock(true);
+                    }
+                    if (addFilterBlock) {
+                      setFilterBlock(false);
+                    } else {
+                      setFilterBlock(true);
+                    }
+                  }}
+                />
+                <label
+                  className="govuk-label govuk-checkboxes__label"
+                  htmlFor="selectSubject"
+                >
+                  Select this subject
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
         <div className="govuk-grid-column-one-third">
           <div className="govuk-form-group govuk-!-margin-bottom-2">
             <div className="govuk-checkboxes govuk-checkboxes--small">
@@ -109,51 +145,6 @@ const PrototypeFootnotes = () => {
                 </div>
               </Details>
             </>
-          )}
-        </div>
-        <div className="govuk-grid-column-one-third">
-          <h3 className="govuk-heading-s">Footnote</h3>
-          {!editFootnoteBlock && (
-            <>
-              <textarea
-                className="govuk-textarea govuk-!-margin-bottom-3"
-                name="footnote-1"
-                rows={5}
-                value={valueFootnote}
-                onChange={event => {
-                  setValueFootnote(event.target.value);
-                }}
-              >
-                test
-              </textarea>
-              <button
-                className="govuk-button"
-                type="submit"
-                onClick={() => setEditFootnoteBlock(true)}
-              >
-                Save
-              </button>
-            </>
-          )}
-          {editFootnoteBlock && (
-            <div>
-              <div>
-                <p>{valueFootnote}</p>
-              </div>
-              <button
-                className="govuk-button govuk-!-margin-right-3"
-                type="submit"
-                onClick={() => setEditFootnoteBlock(false)}
-              >
-                Edit
-              </button>
-              <button
-                className="govuk-button govuk-button--secondary"
-                type="submit"
-              >
-                Delete footnote
-              </button>
-            </div>
           )}
         </div>
       </div>

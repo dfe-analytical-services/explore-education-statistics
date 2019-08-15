@@ -217,19 +217,7 @@ const PublicationDataPage = () => {
           </form>
         </TabsSection>
         <TabsSection id="footnotes" title="Footnotes">
-          <Accordion id="uploaded-data">
-            <AccordionSection heading="Geographical absence">
-              <PrototypeAddFootnotes />
-            </AccordionSection>
-            <AccordionSection heading="Local authority">
-              <PrototypeAddFootnotes />
-            </AccordionSection>
-            <AccordionSection heading="National characteristics">
-              <button className="govuk-button" type="button">
-                Add footnote
-              </button>
-            </AccordionSection>
-          </Accordion>
+          <PrototypeAddFootnotes />
         </TabsSection>
         <TabsSection id="file-upload" title="File uploads">
           <p className="govuk-body">
