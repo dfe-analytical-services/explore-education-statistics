@@ -126,7 +126,7 @@ function calculateMinAndScaleForSourceData(sourceData: ChartDataB[]) {
   );
 
   if (min === max) {
-    return { min, scale: 0, range: 1 };
+    return { min, max: min, scale: 0, range: 1 };
   }
 
   const range = max - min;
@@ -145,15 +145,23 @@ function generateGeometryAndLegendForSelectedOptions(
     .map(entry => ({ ...entry, data: entry[selectedDataSet] }))
     .filter(({ data }) => data !== undefined);
 
-  const { min, range, scale } = calculateMinAndScaleForSourceData(sourceData);
+  const { min, max, range, scale } = calculateMinAndScaleForSourceData(sourceData);
+
+  let fixedScale = Math.log10((max-min) / 5);
+
+  if (fixedScale <0) {
+    fixedScale = -Math.floor(fixedScale);
+  } else {
+    fixedScale = 0;
+  }
 
   const legend: LegendEntry[] = [...Array(5)].map((_, idx) => {
     const i = idx / 4;
 
     return {
       minValue: i,
-      min: (min + i * range).toFixed(1),
-      max: (min + (i + 0.25) * range).toFixed(1),
+      min: (min + i * range).toFixed(fixedScale),
+      max: (min + (i + 0.25) * range).toFixed(fixedScale),
       idx,
     };
   });

@@ -1,7 +1,6 @@
 import ChartBuilder from '@admin/modules/chart-builder/ChartBuilder';
 import PrototypePage from '@admin/pages/prototypes/components/PrototypePage';
 import { ChartRendererProps } from '@common/modules/find-statistics/components/ChartRenderer';
-import ChartData from '@common/modules/find-statistics/components/charts/__tests__/__data__/testBlockData';
 import DataBlockService, {
   DataBlockRequest,
   DataBlockResponse,
@@ -31,7 +30,7 @@ const PrototypeChartTest = () => {
     DataBlockService.getDataBlockForSubject(request).then(response => {
       setChartBuilderData(response);
     });
-  }, []);
+  }, []); // eslint-disable-line
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onChartSave = (props: ChartRendererProps) => {
