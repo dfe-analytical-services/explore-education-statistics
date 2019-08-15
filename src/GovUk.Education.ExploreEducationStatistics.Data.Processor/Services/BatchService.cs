@@ -2,11 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.Azure.Cosmos.Table;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
@@ -54,10 +54,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             await table.ExecuteAsync(TableOperation.InsertOrReplace(batch));
         }
         
-        public async Task FailBatch(string releaseId, string subjectId, string errorMessage)
+        public async Task FailBatch(string releaseId, string subjectId, List<string> errors)
         {
             var batch = await GetOrCreateBatch(releaseId, subjectId, 0);
             batch.Status = (int)ImportStatus.FAILED;
+            batch.Errors = JsonConvert.SerializeObject(errors);
             var table = await GetUploadsTable();
             await table.ExecuteAsync(TableOperation.InsertOrReplace(batch));
         }
@@ -66,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             var table = GetUploadsTable().Result;
             // Need to define the extra columns to retrieve
-            var columns = new List<string>(){ "BatchSize", "BatchesProcessed", "CurrentBatchNo"};
+            var columns = new List<string>(){ "BatchSize", "BatchesProcessed", "Status", "Errors"};
             Batch batch;
 
             var result = await table.ExecuteAsync(TableOperation.Retrieve<Batch>(releaseId, subjectId, columns));

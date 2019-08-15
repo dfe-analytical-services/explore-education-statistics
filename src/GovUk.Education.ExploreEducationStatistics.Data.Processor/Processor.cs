@@ -62,7 +62,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             }
             catch (ImporterException ex)
             {
-                _batchService.FailBatch(message.Release.Id.ToString(), ex._subjectId.ToString(), ex.Message);
+                _batchService.FailBatch(message.Release.Id.ToString(), ex._subjectId.ToString(),
+                    new List<String> {ex.Message});
             }
             catch (Exception e)
             {
@@ -95,8 +96,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 }
                 catch (Exception e)
                 {
+                    // If it's known exception then handle it
+                    if (e is ImporterException ex)
+                    {
+                        _batchService.FailBatch(message.Release.Id.ToString(), ex._subjectId.ToString(), new List<String>{ex.Message});
+                    }
                     logger.LogError(
                         $"Seeding FAILED for : Datafile: {message.DataFileName} : {e.InnerException.Message} : will not retry...");
+                    // As this is the seeder continue with the next one
+                    continue;
                 }
 
                 logger.LogInformation($"First pass COMPLETE for : Datafile: {message.DataFileName}");
@@ -125,12 +133,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
 
                 _fileImportService.ImportObservations(message).Wait();
             }
-            catch (ImporterException ex)
-            {
-                _batchService.FailBatch(message.Release.Id.ToString(), ex._subjectId.ToString(), ex.Message);
-            }
             catch (Exception e)
             {
+                // If it's known exception then handle it
+                if (e is ImporterException ex)
+                {
+                    _batchService.FailBatch(message.Release.Id.ToString(), ex._subjectId.ToString(), new List<String>{ex.Message});
+                }
                 logger.LogError(
                     $"{GetType().Name} function FAILED: : Batch: {message.BatchNo} of {message.BatchSize} with Datafile: {message.DataFileName} : {e.InnerException.Message} : retrying...");
                 throw;
@@ -145,7 +154,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             var subjectData = _fileStorageService.GetSubjectData(message).Result;
             var subject =_releaseProcessorService.CreateOrUpdateRelease(subjectData, message);
             
-            _context.SaveChanges();
+            SaveChanges();
             
             var batches = SplitFileService.GetNumBatches(subjectData.GetCsvLines().Count());
             
@@ -153,11 +162,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
 
             _importerService.ImportMeta(subjectData.GetMetaLines().ToList(), subject);
                 
-            _context.SaveChanges();
+            SaveChanges();
                 
             _fileImportService.ImportFiltersLocationsAndSchools(message);
 
-            _context.SaveChanges();
+            SaveChanges();
 
             return subjectData;
         }
@@ -165,6 +174,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
         private void SplitFile(ImportMessage message, ICollector<ImportMessage> collector, SubjectData subjectData)
         {
             _splitFileService.SplitDataFile(collector, message, subjectData);
+        }
+
+        private void SaveChanges()
+        {
+            _context.SaveChanges();
         }
     }
 }

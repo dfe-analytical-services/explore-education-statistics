@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces
@@ -10,6 +11,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
 
         Task UpdateStatus(string releaseId, string subjectId, int batchSize, ImportStatus status);
 
-        Task FailBatch(string releaseId, string subjectId, string errorMessage);
+        Task FailBatch(string releaseId, string subjectId, List<string> errors);
     }
 }
