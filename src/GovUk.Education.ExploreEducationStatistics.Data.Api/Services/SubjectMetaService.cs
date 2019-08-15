@@ -48,6 +48,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 Filters = GetFilters(observations),
                 Indicators = GetIndicators(query),
                 Locations = GetObservationalUnits(observations, query.BoundaryLevel),
+                // TODO DFE-1300 Remove GeographicLevel.Country
+                BoundaryLevels = GetBoundaryLevelOptions(query.BoundaryLevel, GeographicLevel.Country),
                 TimePeriods = GetTimePeriods(observations)
             };
         }
@@ -93,6 +95,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private BoundaryLevel GetBoundaryLevel(GeographicLevel geographicLevel)
         {
             return _boundaryLevelService.FindLatestByGeographicLevel(geographicLevel);
+        }
+
+        private IEnumerable<IdLabelViewModel> GetBoundaryLevelOptions(long? boundaryLevelId, GeographicLevel geographicLevel)
+        {
+            var boundaryLevels = boundaryLevelId.HasValue ? 
+                _boundaryLevelService.FindRelatedByBoundaryLevel(boundaryLevelId.Value) : 
+                _boundaryLevelService.FindByGeographicLevel(geographicLevel);
+            return boundaryLevels.Select(level => _mapper.Map<IdLabelViewModel>(level));
         }
 
         private Dictionary<string, TimePeriodMetaViewModel> GetTimePeriods(IQueryable<Observation> observations)
