@@ -241,9 +241,7 @@ const MapBlock = ({
   const container = React.createRef<HTMLDivElement>();
   const ukRef = React.createRef<GeoJSON>();
 
-  const [geometry, setGeometry] = React.useState<
-    FeatureCollection<Geometry, DataBlockGeoJsonProperties>
-  >();
+  const [geometry, setGeometry] = React.useState<FeatureCollection<Geometry, DataBlockGeoJsonProperties>>();
 
   const [ukGeometry, setUkGeometry] = React.useState<FeatureCollection>();
 
@@ -255,9 +253,7 @@ const MapBlock = ({
 
   const [legend, setLegend] = React.useState<LegendEntry[]>([]);
 
-  const [selectedDataSetIndex, setSelectedDataSetIndex] = React.useState<
-    number
-  >(0);
+  const [selectedDataSetIndex, setSelectedDataSetIndex] = React.useState<number>(0);
   const [selectedDataSetKey, setSelectedDataSetKey] = React.useState<string>(
     generateKeyFromDataSet(axes.major.dataSets[0], axes.major.groupBy),
   );
@@ -299,27 +295,76 @@ const MapBlock = ({
 
   // initialise on prop changes
   React.useEffect(() => {
+
     const generatedChartData = createSortedAndMappedDataForAxis(
       axes.major,
       data.result,
       meta,
       labels,
       true,
-    );
+    ).filter(({ __name: id }) => meta.locations[id] && meta.locations[id].geoJson);
+
 
     setChartData(generatedChartData);
 
     setMajorOptions(getLocationsForDataSet(data, meta, generatedChartData));
-  }, [data, axes, meta, labels]);
+  }, [data.result, axes.major, meta, labels]);
 
   React.useEffect(() => {
+
     setDataSetOptions(
       axes.major.dataSets.map((dataSet, index) => {
         const dataKey = generateKeyFromDataSet(dataSet, axes.major.groupBy);
         return { ...labels[dataKey], value: index };
       }),
     );
+
+
   }, [axes.major.dataSets, axes.major.groupBy, labels]);
+
+
+  const tooltipCallback = React.useCallback((feature: MapFeature) => {
+    if (feature.properties) {
+      const content = Object.entries(feature.properties.measures).map(
+        ([id, value]) => ({
+          ...(labels[id] || { label: '', unit: '' }),
+          value,
+
+        }),
+      ).map(({ label, value, unit }) => (
+          `${label} : ${value}${unit}`
+        ),
+      );
+
+      if (feature.id) {
+        content.unshift(
+          `<strong>${(meta.locations || {})[feature.id].label}</strong>`,
+        );
+      }
+
+      return content.join('<br />');
+    }
+    return '';
+  }, [labels, meta.locations]);
+
+
+
+  const onEachFeature = React.useCallback((feature: MapFeature, featureLayer: Layer) => {
+    if (feature.properties) {
+      // eslint-disable-next-line no-param-reassign
+      feature.properties.layer = featureLayer;
+    }
+
+    const featurePath: Path = featureLayer as Path;
+    featurePath.setStyle({
+      className: classNames(
+        feature.properties && feature.properties.className,
+        { [styles.selected]: feature.id === selectedLocation },
+      ),
+    });
+
+    featureLayer.bindTooltip(() => tooltipCallback(feature));
+  }, [labels, selectedLocation, tooltipCallback]);
 
   React.useEffect(() => {
     if (geoJsonRef.current) {
@@ -327,10 +372,12 @@ const MapBlock = ({
 
       if (geometry) {
         geoJsonRef.current.leafletElement.addData(geometry);
+        // @ts-ignore
+        geoJsonRef.current.leafletElement.on("eachFeature", onEachFeature);
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [geometry]);
+
+  }, [geometry, geoJsonRef, geoJsonRef.current, tooltipCallback]);
 
   React.useEffect(() => {
     if (mapRef.current) {
@@ -415,36 +462,12 @@ const MapBlock = ({
     setSelectedLocation(newSelectedLocation);
   };
 
-  const onEachFeature = (feature: MapFeature, featureLayer: Path) => {
-    if (feature.properties) {
-      // eslint-disable-next-line no-param-reassign
-      feature.properties.layer = featureLayer;
-    }
+  // some sort of closure is happening?
+  const getLabels = () => labels;
 
-    featureLayer.setStyle({
-      className: classNames(
-        feature.properties && feature.properties.className,
-        { [styles.selected]: feature.id === selectedLocation },
-      ),
-    });
 
-    featureLayer.bindTooltip(() => {
-      if (feature.properties) {
-        const content = Object.entries(feature.properties.measures).map(
-          ([id, value]) => `${labels[id].label} : ${value}${labels[id].unit}`,
-        );
 
-        if (feature.id) {
-          content.unshift(
-            `<strong>${(meta.locations || {})[feature.id].label}</strong>`,
-          );
-        }
 
-        return content.join('<br />');
-      }
-      return '';
-    });
-  };
 
   const onClick = (e: MapClickEvent) => {
     const { feature } = e.sourceTarget;
@@ -527,24 +550,24 @@ const MapBlock = ({
             </h3>
             <dl className="govuk-list">
               {legend &&
-                legend.map(({ min, max, idx, minValue }) => (
-                  <dd className={styles.legend} key={idx}>
-                    <span
-                      className={styles[`rate${idx}`]}
-                      style={{
-                        backgroundColor: calculateColour({
-                          scaledData: minValue,
-                          color: labels[selectedDataSetKey].colour,
-                        }),
-                      }}
-                    >
-                      &nbsp;
-                    </span>{' '}
-                    {min}
-                    {labels[selectedDataSetKey].unit}&nbsp; to {max}
-                    {labels[selectedDataSetKey].unit}{' '}
-                  </dd>
-                ))}
+              legend.map(({ min, max, idx, minValue }) => (
+                <dd className={styles.legend} key={idx}>
+                  <span
+                    className={styles[`rate${idx}`]}
+                    style={{
+                      backgroundColor: calculateColour({
+                        scaledData: minValue,
+                        color: labels[selectedDataSetKey].colour,
+                      }),
+                    }}
+                  >
+                    &nbsp;
+                  </span>{' '}
+                  {min}
+                  {labels[selectedDataSetKey].unit}&nbsp; to {max}
+                  {labels[selectedDataSetKey].unit}{' '}
+                </dd>
+              ))}
             </dl>
           </div>
         )}
@@ -567,7 +590,7 @@ const MapBlock = ({
             <GeoJSON
               ref={geoJsonRef}
               data={geometry}
-              onEachFeature={onEachFeature}
+              /*onEachFeature={onEachFeature}*/
               style={(feature?: MapFeature): PathOptions => ({
                 fillColor:
                   feature &&
@@ -575,10 +598,10 @@ const MapBlock = ({
                   calculateColour(feature.properties),
                 className: classNames({
                   [styles.selected]:
-                    selectedDataSetIndex &&
-                    feature &&
-                    feature.id ===
-                      axes.major.dataSets[selectedDataSetIndex].location,
+                  selectedDataSetIndex &&
+                  feature &&
+                  feature.id ===
+                  axes.major.dataSets[selectedDataSetIndex].location,
                 }),
               })}
               onclick={onClick}
