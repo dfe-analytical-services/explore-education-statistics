@@ -112,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                         Options = itemsGroupedByFilter.GroupBy(item => item.FilterGroup).ToDictionary(
                             itemsGroupedByFilterGroup => itemsGroupedByFilterGroup.Key.Label.PascalCase(),
                             itemsGroupedByFilterGroup =>
-                                new TableBuilderFilterItemMetaViewModel
+                                new TableBuilderFilterItemsMetaViewModel
                                 {
                                     Label = itemsGroupedByFilterGroup.Key.Label,
                                     Options = itemsGroupedByFilterGroup.Select(item => new LabelValue
@@ -125,33 +125,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                     });
         }
 
-        private static string GetTotalValue(IEnumerable<FilterItem> filterItems)
+        private string GetTotalValue(IEnumerable<FilterItem> filterItems)
         {
-            return GetTotalGroup(filterItems)?.FirstOrDefault(IsFilterItemTotal)?.Id.ToString() ?? string.Empty;
-        }
-
-        private static IEnumerable<FilterItem> GetTotalGroup(IEnumerable<FilterItem> filterItems)
-        {
-            var itemsGroupedByFilterGroup = filterItems.GroupBy(item => item.FilterGroup).ToList();
-            //Return the group if there is only one, otherwise the 'Total' group if it exists
-            return itemsGroupedByFilterGroup.Count == 1
-                ? itemsGroupedByFilterGroup.First()
-                : itemsGroupedByFilterGroup.FirstOrDefault(items => IsFilterGroupTotal(items.Key));
-        }
-
-        private static bool IsFilterItemTotal(FilterItem item)
-        {
-            return IsEqualToIgnoreCase(item.Label, "Total");
-        }
-
-        private static bool IsFilterGroupTotal(FilterGroup group)
-        {
-            return IsEqualToIgnoreCase(group.Label, "Total");
-        }
-
-        private static bool IsEqualToIgnoreCase(string value, string compareTo)
-        {
-            return value.Equals(compareTo, StringComparison.InvariantCultureIgnoreCase);
+            return _filterItemService.GetTotal(filterItems)?.Id.ToString() ?? string.Empty;
         }
     }
 }

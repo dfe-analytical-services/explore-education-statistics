@@ -68,10 +68,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         {
             var observationalUnits = _locationService.GetObservationalUnits(observations);
             return observationalUnits.SelectMany(pair => pair.Value.Select(observationalUnit => new LabelValue
-                {
-                    Label = observationalUnit.Name,
-                    Value = observationalUnit.Code
-                }));
+            {
+                Label = observationalUnit.Name,
+                Value = observationalUnit.Code
+            }));
         }
 
         private IEnumerable<IndicatorMetaViewModel> GetIndicators(SubjectMetaQueryContext query)
@@ -80,13 +80,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 _indicatorService.GetIndicators(query.SubjectId, query.Indicators));
         }
 
-        private IEnumerable<LabelValue> GetFilters(IQueryable<Observation> observations)
+        private IEnumerable<TableBuilderResultFilterItemMetaViewModel> GetFilters(IQueryable<Observation> observations)
         {
-            return _filterItemService.GetFilterItems(observations).Select(item => new LabelValue
+            var filterItems = _filterItemService.GetFilterItemsIncludingFilters(observations).ToList();
+            var filterItemsGroupedByFilter = filterItems.GroupBy(item => item.FilterGroup.Filter.Id);
+            var totalsByFilter = filterItemsGroupedByFilter.ToDictionary(items => items.Key, 
+                items => _filterItemService.GetTotal(items)?.Id);
+            return filterItems.Select(item =>
+            {
+                var isTotal = totalsByFilter[item.FilterGroup.Filter.Id] == item.Id;
+                return new TableBuilderResultFilterItemMetaViewModel
                 {
+                    IsTotal = isTotal,
                     Label = item.Label,
                     Value = item.Id.ToString()
-                });
+                };
+            });
         }
 
         private IEnumerable<FootnoteViewModel> GetFootnotes(IQueryable<Observation> observations,
