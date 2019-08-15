@@ -14,9 +14,9 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
-    public class TableBuilderResultSubjectMetaService : ITableBuilderResultSubjectMetaService
+    public class TableBuilderResultSubjectMetaService : AbstractTableBuilderSubjectMetaService,
+        ITableBuilderResultSubjectMetaService
     {
-        private readonly IFilterItemService _filterItemService;
         private readonly IFootnoteService _footnoteService;
         private readonly IIndicatorService _indicatorService;
         private readonly ILocationService _locationService;
@@ -24,16 +24,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private readonly ISubjectService _subjectService;
         private readonly ITimePeriodService _timePeriodService;
 
-        public TableBuilderResultSubjectMetaService(
+        public TableBuilderResultSubjectMetaService(IFilterItemService filterItemService,
             IFootnoteService footnoteService,
-            IFilterItemService filterItemService,
             IIndicatorService indicatorService,
             ILocationService locationService,
             IMapper mapper,
             ISubjectService subjectService,
-            ITimePeriodService timePeriodService)
+            ITimePeriodService timePeriodService) : base(filterItemService)
         {
-            _filterItemService = filterItemService;
             _footnoteService = footnoteService;
             _indicatorService = indicatorService;
             _locationService = locationService;
@@ -78,24 +76,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         {
             return _mapper.Map<IEnumerable<IndicatorMetaViewModel>>(
                 _indicatorService.GetIndicators(query.SubjectId, query.Indicators));
-        }
-
-        private IEnumerable<TableBuilderResultFilterItemMetaViewModel> GetFilters(IQueryable<Observation> observations)
-        {
-            var filterItems = _filterItemService.GetFilterItemsIncludingFilters(observations).ToList();
-            var filterItemsGroupedByFilter = filterItems.GroupBy(item => item.FilterGroup.Filter.Id);
-            var totalsByFilter = filterItemsGroupedByFilter.ToDictionary(items => items.Key, 
-                items => _filterItemService.GetTotal(items)?.Id);
-            return filterItems.Select(item =>
-            {
-                var isTotal = totalsByFilter[item.FilterGroup.Filter.Id] == item.Id;
-                return new TableBuilderResultFilterItemMetaViewModel
-                {
-                    IsTotal = isTotal,
-                    Label = item.Label,
-                    Value = item.Id.ToString()
-                };
-            });
         }
 
         private IEnumerable<FootnoteViewModel> GetFootnotes(IQueryable<Observation> observations,
