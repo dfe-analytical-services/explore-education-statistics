@@ -9,9 +9,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     {
         public List<T> Versions { get; set; }
 
-        [NotMapped] private List<T> Ordered => Versions?.OrderBy(t => t.Created).ToList() ?? new List<T>();
+        [NotMapped] public List<T> Ordered => Versions?.OrderBy(t => t.Created).ToList() ?? new List<T>();
 
         [NotMapped] public T Latest => Ordered.LastOrDefault();
+        
+        [NotMapped] public T First => Ordered.FirstOrDefault();
 
         [NotMapped] public T Current => ForDate(DateTime.Now);
         
