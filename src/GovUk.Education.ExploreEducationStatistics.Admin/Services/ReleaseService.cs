@@ -160,8 +160,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Include(r => r.Publication.Releases) // Back refs required to work out latest
                 .Include(r => r.Publication.Contact)
                 .Include(r => r.Type)
-                .Include(r => r.ReleaseSummary)
-                .Include(r => r.ReleaseSummary.Versions);
+                .Include(r => r.ReleaseSummary.Versions)
+                .Include(r => r.ReleaseSummary.Versions)
+                .ThenInclude(v => v.Type);
         }
     }
 }

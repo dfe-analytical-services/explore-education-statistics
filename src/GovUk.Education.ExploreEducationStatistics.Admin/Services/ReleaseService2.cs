@@ -33,8 +33,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     m => m.MapFrom(r => r.Published))
                 .ForMember(dest => dest.Title,
                     m => m.MapFrom(r => r.ReleaseSummary.Title))
-                .ForMember(dest => dest.Type,
-                    m => m.MapFrom(r => r.ReleaseSummary.Type))
                 .ForMember(dest => dest.CoverageTitle,
                     m => m.MapFrom(r => r.ReleaseSummary.CoverageTitle))
                 .ForMember(dest => dest.LatestRelease,
@@ -47,6 +45,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     m => m.MapFrom(r => r.ReleaseSummary.ReleaseName))
                 .ForMember(dest => dest.TypeId,
                     m => m.MapFrom(r => r.ReleaseSummary.TypeId))
+                .ForMember(dest => dest.Type,
+                    m => m.MapFrom(r => r.ReleaseSummary.Type))
                 .ForMember(dest => dest.YearTitle,
                     m => m.MapFrom(r => r.ReleaseSummary.YearTitle))
                 .ForMember(dest => dest.NextReleaseDate,
