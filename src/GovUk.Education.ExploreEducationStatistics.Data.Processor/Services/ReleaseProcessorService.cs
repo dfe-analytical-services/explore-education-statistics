@@ -1,12 +1,12 @@
 using System.Linq;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Publication = GovUk.Education.ExploreEducationStatistics.Data.Model.Publication;
 using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
 using Theme = GovUk.Education.ExploreEducationStatistics.Data.Model.Theme;
@@ -14,41 +14,45 @@ using Topic = GovUk.Education.ExploreEducationStatistics.Data.Model.Topic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
-    public class ImportService : IImportService
+    public class ReleaseProcessorService : IReleaseProcessorService
     {
+        private readonly ILogger<IReleaseProcessorService> _logger;
         private readonly ApplicationDbContext _context;
-        private readonly IFileStorageService _fileStorageService;
-        private readonly IImporterService _importerService;
         private readonly IMapper _mapper;
-
-        public ImportService(
+        
+        public ReleaseProcessorService(
+            ILogger<IReleaseProcessorService> logger,
             ApplicationDbContext context,
-            IFileStorageService fileStorageService,
-            IImporterService importerService,
             IMapper mapper)
         {
+            _logger = logger;
             _context = context;
-            _fileStorageService = fileStorageService;
-            _importerService = importerService;
             _mapper = mapper;
         }
 
-        public void Import(ImportMessage message)
+        public Subject CreateOrUpdateRelease(SubjectData subjectData, ImportMessage message)
         {
-            var subjectData = _fileStorageService.GetSubjectData(message).Result;
             var release = CreateOrUpdateRelease(message);
-            var subject = CreateSubject(subjectData.Name, release);
-            _context.SaveChanges();
-
-            _importerService.Import(subjectData.GetCsvLines(), subjectData.GetMetaLines(), subject);
+            return RemoveAndCreateSubject(subjectData.Name, release);
         }
 
-        private Subject CreateSubject(string name, Release release)
+        private Subject RemoveAndCreateSubject(string name, Release release)
         {
-            var subject = _context.Subject.Add(new Subject(name, release)).Entity;
+            var subject = _context.Subject
+                .FirstOrDefault(s => s.Name.Equals(name) && s.ReleaseId == release.Id);
+            
+            // If the subject exists then this must be a reload of the same release/subject so delete & re-create.
+
+            if (subject != null)
+            {
+                _context.Subject.Remove(subject);
+            }
+
+            subject = _context.Subject.Add(new Subject(name, release)).Entity;
+
             return subject;
         }
-
+        
         private Release CreateOrUpdateRelease(ImportMessage message)
         {
             var release = _context.Release
@@ -62,6 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 release = new Release
                 {
                     Id = message.Release.Id,
+                    ReleaseDate = message.Release.ReleaseDate,
                     Title = message.Release.Title,
                     Slug = message.Release.Slug,
                     Publication = CreateOrUpdatePublication(message)
@@ -95,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             publication = _mapper.Map(message.Release.Publication, publication);
             return _context.Publication.Update(publication).Entity;
         }
-
+        
         private Topic CreateOrUpdateTopic(ImportMessage message)
         {
             var topic = _context.Topic
@@ -106,9 +111,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             {
                 topic = new Topic
                 {
-                    Id = message.Release.Publication.Id,
-                    Title = message.Release.Publication.Title,
-                    Slug = message.Release.Publication.Slug,
+                    Id = message.Release.Publication.Topic.Id,
+                    Title = message.Release.Publication.Topic.Title,
+                    Slug = message.Release.Publication.Topic.Slug,
                     Theme = CreateOrUpdateTheme(message)
                 };
                 return _context.Topic.Add(topic).Entity;
