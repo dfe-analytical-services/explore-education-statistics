@@ -6,33 +6,26 @@ import ChartDataSelector, {
 import Details from '@common/components/Details';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import ChartRenderer, {
-  ChartRendererProps,
-} from '@common/modules/find-statistics/components/ChartRenderer';
+import ChartRenderer, {ChartRendererProps,} from '@common/modules/find-statistics/components/ChartRenderer';
 import {ChartDefinition} from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import HorizontalBarBlock from '@common/modules/find-statistics/components/charts/HorizontalBarBlock';
 import LineChartBlock from '@common/modules/find-statistics/components/charts/LineChartBlock';
 import MapBlock from '@common/modules/find-statistics/components/charts/MapBlock';
 import VerticalBarBlock from '@common/modules/find-statistics/components/charts/VerticalBarBlock';
 import {DataBlockResponse} from '@common/services/dataBlockService';
-import {
-  AxisConfiguration,
-  DataSetConfiguration,
-  ChartDataSet,
-} from '@common/services/publicationService';
+import {AxisConfiguration, ChartDataSet, DataSetConfiguration,} from '@common/services/publicationService';
 import {Dictionary} from '@common/types';
 import React from 'react';
-import ChartConfiguration, {
-  ChartOptions,
-} from '@admin/modules/chart-builder/ChartConfiguration';
+import ChartConfiguration, {ChartOptions,} from '@admin/modules/chart-builder/ChartConfiguration';
 import classnames from 'classnames';
+import Infographic from '@common/modules/find-statistics/components/charts/Infographic';
 import ChartAxisConfiguration from './ChartAxisConfiguration';
 import ChartTypeSelector from './ChartTypeSelector';
 import styles from './graph-builder.module.scss';
-import Infographic from '@common/modules/find-statistics/components/charts/Infographic';
 
 interface Props {
   data: DataBlockResponse;
+  onChartSave?: (props: ChartRendererProps) => void;
 }
 
 function getReduceMetaDataForAxis(data: DataBlockResponse) {
@@ -76,8 +69,10 @@ const chartTypes: ChartDefinition[] = [
   MapBlock.definition,
 ];
 
-const ChartBuilder = ({data}: Props) => {
-  const [selectedChartType, setSelectedChartType] = React.useState<ChartDefinition | undefined>();
+const ChartBuilder = ({ data, onChartSave }: Props) => {
+  const [selectedChartType, setSelectedChartType] = React.useState<
+    ChartDefinition | undefined
+  >();
 
   const indicatorIds = Object.keys(data.metaData.indicators);
 
@@ -323,6 +318,22 @@ const ChartBuilder = ({data}: Props) => {
             </TabsSection>
           ))}
         </Tabs>
+      )}
+
+      {selectedChartType && renderedChartProps && (
+        <>
+          <button
+            type="button"
+            className="govuk-button"
+            onClick={() => {
+              if (onChartSave) {
+                onChartSave(renderedChartProps);
+              }
+            }}
+          >
+            Save chart options
+          </button>
+        </>
       )}
     </div>
   );

@@ -6,8 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 {
-
-    
     [Route("api/[controller]")]
     [ApiController]
     public class PermalinkController : ControllerBase
@@ -33,10 +31,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] ObservationQueryContext tableQuery)
+        public async Task<IActionResult> Create([FromBody] PermalinkQueryContext query)
         {
-            var permalink = await _permalinkService.CreateAsync(tableQuery);
-
+            var permalink = await _permalinkService.CreateAsync(query);
             return Ok(permalink);
         }
     }
