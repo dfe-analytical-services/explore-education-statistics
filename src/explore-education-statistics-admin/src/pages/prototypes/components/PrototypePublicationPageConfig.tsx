@@ -126,6 +126,30 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                 <dd className="govuk-summary-list__value">07954 765423</dd>
               </div>
             </dl>
+
+            <h2 className="govuk-heading-m govuk-!-margin-top-9">
+              Production team
+            </h2>
+            <dl className="govuk-summary-list govuk-width-container govuk-!-margin-bottom-9">
+              <div className="govuk-summary-list__row">
+                <dt className="govuk-summary-list__key">Team lead</dt>
+                <dd className="govuk-summary-list__value">
+                  <a href="mailto: example@email.co.uk">John Smith</a>
+                </dd>
+              </div>
+              <div className="govuk-summary-list__row">
+                <dt className="govuk-summary-list__key">Primary analyst</dt>
+                <dd className="govuk-summary-list__value">
+                  <a href="mailto: example@email.co.uk">Ann Evans</a>
+                </dd>
+              </div>
+              <div className="govuk-summary-list__row">
+                <dt className="govuk-summary-list__key">Primary analyst</dt>
+                <dd className="govuk-summary-list__value">
+                  <a href="mailto: example@email.co.uk">Alex Miller</a>
+                </dd>
+              </div>
+            </dl>
           </>
         )}
         {sectionId === 'confirmPublication' && (

@@ -48,12 +48,37 @@ const PrototypePublicationSummary = () => {
           </dt>
           <dd className="govuk-summary-list__value">Alex Miller</dd>
         </div>
+
         <div className="govuk-summary-list__row">
           <dt className="govuk-summary-list__key">Template</dt>
           <dd className="govuk-summary-list__value">
             Copied existing template (2017/18)
           </dd>
         </div>
+
+        <h2 className="govuk-heading-m govuk-!-margin-top-6">
+          Production team
+        </h2>
+
+        <div className="govuk-summary-list__row">
+          <dt className="govuk-summary-list__key">Team lead</dt>
+          <dd className="govuk-summary-list__value">
+            <a href="mailto: example@email.co.uk">John Smith</a>
+          </dd>
+        </div>
+        <div className="govuk-summary-list__row">
+          <dt className="govuk-summary-list__key">Primary analyst</dt>
+          <dd className="govuk-summary-list__value">
+            <a href="mailto: example@email.co.uk">Ann Evans</a>
+          </dd>
+        </div>
+        <div className="govuk-summary-list__row">
+          <dt className="govuk-summary-list__key">Primary analyst</dt>
+          <dd className="govuk-summary-list__value">
+            <a href="mailto: example@email.co.uk">Alex Miller</a>
+          </dd>
+        </div>
+
         <div className="govuk-summary-list__row">
           <dt className="govuk-summary-list__key" />
           <dd className="govuk-summary-list__actions">
