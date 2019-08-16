@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ForMember(dest => dest.Contact,
                     m => m.MapFrom(r => r.Publication.Contact))
                 .ForMember(dest => dest.Published,
-                    m => m.MapFrom(r => r.ReleaseSummary.Published))
+                    m => m.MapFrom(r => r.Published))
                 .ForMember(dest => dest.Title,
                     m => m.MapFrom(r => r.ReleaseSummary.Title))
                 .ForMember(dest => dest.Type,
@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             
             cfg.CreateMap<CreateReleaseViewModel, ReleaseSummaryVersion>();
             cfg.CreateMap<EditReleaseSummaryViewModel, ReleaseSummaryVersion>();
-            cfg.CreateMap<EditReleaseSummaryViewModel, Release>();
+            cfg.CreateMap<ReleaseSummary, EditReleaseSummaryViewModel>();
         }).CreateMapper();
 
 
@@ -117,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Where(r => r.Id == releaseId)
                 .HydrateReleaseForReleaseViewModel()
                 .FirstOrDefaultAsync();
-            return _mapper.Map<EditReleaseSummaryViewModel>(release);
+            return _mapper.Map<EditReleaseSummaryViewModel>(release.ReleaseSummary);
         }
 
         // TODO Authorisation will be required when users are introduced
@@ -135,7 +135,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var currentSummary = release.ReleaseSummary.Current;
                     var newSummary = _mapper.Map<ReleaseSummaryVersion>(model);
                     newSummary.Created = DateTime.Now;
-                    newSummary.Published = currentSummary.Published;
                     newSummary.Summary = currentSummary.Summary;
                     release.ReleaseSummary.Versions.Add(newSummary);
                     _context.Update(release);
@@ -149,9 +148,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var release = await _context.Releases
                 .Where(r => r.Publication.Id == publicationId)
                 .HydrateReleaseForReleaseViewModel()
-                .Select(r => new ReleaseViewModel
-                {
-                })
                 .ToListAsync();
 
             return _mapper.Map<List<ReleaseViewModel>>(release);
@@ -160,12 +156,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private async Task<Either<ValidationResult, bool>> ValidateReleaseSlugUniqueToPublication(string slug,
             PublicationId publicationId, ReleaseId? releaseId = null)
         {
+
             var slugMatches = _context.Releases
-                .Where(r => r.PublicationId == publicationId)
-                .Include(r => r.ReleaseSummary)
-                .ThenInclude(rs => rs.Versions)
+                .Where(r => r.PublicationId == publicationId && r.ReleaseSummary.ReleaseId != releaseId)
                 .Select(r => r.ReleaseSummary)
-                .Any(rs => rs.ReleaseId != releaseId && rs.Current.Slug == slug);
+                .Include(rs => rs.Versions)
+                .ToList() // Required as the following operation are not expressible in sql as they query computed fields
+                .Any(rs => rs.Current.Slug == slug);
             if (slugMatches)
             {
                 return ValidationResult(SlugNotUnique);

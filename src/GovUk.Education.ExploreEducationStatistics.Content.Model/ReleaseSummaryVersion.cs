@@ -44,17 +44,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             }
         }
 
-        /**
-         * The last date the release was published - this should be set when the PublishScheduled date is reached and
-         * the release is published.
-         */
-        public DateTime? Published { get; set; }
-
         // The date that the release is scheduled to be published - when this time is reached then the release should
         // be published and the Published date set.
         public DateTime? PublishScheduled { get; set; }
-
-        [NotMapped] public bool Live => Published.HasValue && (Compare(UtcNow, Published.Value) > 0);
 
         public string Slug { get; set; }
 

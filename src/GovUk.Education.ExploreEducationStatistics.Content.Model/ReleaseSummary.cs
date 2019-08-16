@@ -20,10 +20,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         [NotMapped] public string ReleaseName => Current?.ReleaseName;
 
-        [NotMapped] public DateTime? Published => Current?.Published;
-
-        [NotMapped] public bool? Live => Current?.Live;
-
         [NotMapped] public DateTime? PublishScheduled => Current?.PublishScheduled;
 
         [NotMapped] public string Slug => Current?.Slug;

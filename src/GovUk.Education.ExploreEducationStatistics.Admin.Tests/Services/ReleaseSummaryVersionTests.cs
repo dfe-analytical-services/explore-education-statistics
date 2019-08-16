@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.EqualityUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -15,23 +16,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void CreateReleaseNoTemplate2()
         {
-            using (var context = InMemoryApplicationDbContext("CreateReleaseNoTemplate2"))
-            {
-                context.Add(new ReleaseType {Id = new Guid("484e6b5c-4a0f-47fd-914e-ac4dac5bdd1c"), Title = "Ad Hoc",});
-                context.Add(new Publication {Id = new Guid("24fcd99c-0508-4437-91c4-90c777414ab9"), Title = "Publication"});
-                context.SaveChanges();
-            }
+            var (releaseTypeId, publicationId) = CreatePublicationAndReleaseType("CreateReleaseNoTemplate2");
 
             using (var context = InMemoryApplicationDbContext("CreateReleaseNoTemplate2"))
             {
                 var result = new ReleaseService2(context).CreateReleaseAsync(
                     new CreateReleaseViewModel
                     {
-                        PublicationId = new Guid("24fcd99c-0508-4437-91c4-90c777414ab9"),
+                        PublicationId = publicationId,
                         ReleaseName = "2018",
                         TimePeriodCoverage = TimeIdentifier.AcademicYear,
                         PublishScheduled = DateTime.Parse("2050/01/01"),
-                        TypeId = new Guid("02e664f2-a4bc-43ee-8ff0-c87354adae72")
+                        TypeId = releaseTypeId
                     });
 
                 Assert.Equal("Academic Year 2018/19", result.Result.Right.Title);
@@ -118,156 +114,93 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
-
-        [Fact]
-        public async void LatestReleaseCorrectlyReported2()
-        {
-            var latestReleaseId = new Guid("274d4621-7d21-431b-80de-77b62a4374d2");
-            var notLatestReleaseId = new Guid("49b73c2f-141a-4dc7-a2d4-69316aef8bbc");
-            using (var context = InMemoryApplicationDbContext("LatestReleaseCorrectlyReported2"))
-            {
-                context.Add(new Publication
-                {
-                    Id = new Guid("24fcd99c-0508-4437-91c4-90c777414ab9"),
-                    Title = "Publication",
-                    Releases = new List<Release>
-                    {
-                        new Release
-                        {
-                            Id = notLatestReleaseId,
-                            Order = 0,
-                            Published = DateTime.Now.AddDays(-2) // Is published but not the latest by order
-                        },
-                        new Release
-                        {
-                            Id = latestReleaseId,
-                            Order = 1,
-                            Published = DateTime.Now.AddDays(-1) // Is published and the the latest by order
-                        }
-                    }
-                });
-
-                context.SaveChanges();
-            }
-
-            // Note that we use different contexts for each method call - this is to avoid misleadingly optimistic
-            // loading of the entity graph as we go.
-            using (var context = InMemoryApplicationDbContext("LatestReleaseCorrectlyReported2"))
-            {
-                // Method under test
-                var notLatest =
-                    await new ReleaseService2(context).GetReleaseForIdAsync(
-                        notLatestReleaseId);
-                Assert.False(notLatest.LatestRelease);
-            }
-
-            using (var context = InMemoryApplicationDbContext("LatestReleaseCorrectlyReported"))
-            {
-                // Method under test
-                var notLatest =
-                    await new ReleaseService2(context).GetReleaseForIdAsync(
-                        notLatestReleaseId);
-                Assert.False(notLatest.LatestRelease);
-            }
-        }
-
-
         [Fact]
         public async void EditReleaseSummary2()
         {
-            using (var context = InMemoryApplicationDbContext("EditReleaseSummary2"))
-            {
-                context.Add(new ReleaseType {Id = new Guid("484e6b5c-4a0f-47fd-914e-ac4dac5bdd1c"), Title = "Ad Hoc",});
-                context.Add(new Publication {Id = new Guid("24fcd99c-0508-4437-91c4-90c777414ab9"), Title = "Publication"});
-                context.SaveChanges();
-            }
+            var (releaseTypeId, publicationId) = CreatePublicationAndReleaseType("EditReleaseSummary2");
 
             Guid releaseId;
             using (var context = InMemoryApplicationDbContext("EditReleaseSummary2"))
             {
-                // Save the release that will later be edited
-                var created = await new ReleaseService2(context).CreateReleaseAsync(
+                // Save the release that will later be edited - use the services. 
+                var result = await new ReleaseService2(context).CreateReleaseAsync(
                     new CreateReleaseViewModel
                     {
-                        PublicationId = new Guid("24fcd99c-0508-4437-91c4-90c777414ab9"),
+                        PublicationId = publicationId,
                         ReleaseName = "2018",
                         TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                        PublishScheduled = DateTime.Parse("2050/01/01"),
-                        TypeId = new Guid("02e664f2-a4bc-43ee-8ff0-c87354adae72"),
-                        NextReleaseDate = new PartialDate {Day = "01", Month = "01", Year = "2014"}
+                        PublishScheduled = DateTime.Parse("2018/06/01"),
+                        TypeId = releaseTypeId,
+                        NextReleaseDate = new PartialDate {Day = "01", Month = "01", Year = "2019"}
                     });
 
-                Assert.Equal("Academic Year 2018/19", created.Right.Title);
-                Assert.Null(created.Right.Published);
-                Assert.False(created.Right.LatestRelease); // Most recent - but not published yet.
-                Assert.Equal(TimeIdentifier.AcademicYear, created.Right.TimePeriodCoverage);
-                releaseId = created.Right.Id;
+                Assert.True(!result.IsLeft);
+                var created = result.Right;
+                Assert.Null(created.Published);
+                Assert.Equal(created.PublishScheduled, DateTime.Parse("2018/06/01"));
+                Assert.Equal("2018", created.ReleaseName);    
+                Assert.Equal("2019", created.NextReleaseDate.Year);    
+                Assert.Equal(TimeIdentifier.AcademicYear, created.TimePeriodCoverage);
+                releaseId = created.Id;
             }
 
             using (var context = InMemoryApplicationDbContext("EditReleaseSummary2"))
             {
-                var edited = await new ReleaseService2(context).EditReleaseSummaryAsync(
+                // Call the method under test
+                var result = await new ReleaseService2(context).EditReleaseSummaryAsync(
                     new EditReleaseSummaryViewModel
                     {
                         Id = releaseId,
                         ReleaseName = "2019",
                         TimePeriodCoverage = TimeIdentifier.August,
-                        PublishScheduled = DateTime.Parse("2051/01/01"),
-                        TypeId = new Guid("02e664f2-a4bc-43ee-8ff0-c87354adae72"),
-                        NextReleaseDate = new PartialDate {Day = "01", Month = "01", Year = "2015"}
+                        PublishScheduled = DateTime.Parse("2019/06/01"),
+                        TypeId = releaseTypeId,
+                        NextReleaseDate = new PartialDate {Day = "01", Month = "01", Year = "2020"}
                     });
-                Assert.Equal("August 2019", edited.Right.Title);
-                Assert.Null(edited.Right.Published);
-                Assert.False(edited.Right.LatestRelease); // Most recent - but not published yet.
-                Assert.Equal(TimeIdentifier.August, edited.Right.TimePeriodCoverage);
+                Assert.True(!result.IsLeft);
+                var edited = result.Right;
+                Assert.Null(edited.Published);
+                Assert.Equal(edited.PublishScheduled, DateTime.Parse("2019/06/01"));
+                Assert.Equal("2019", edited.ReleaseName);    
+                Assert.Equal("2020", edited.NextReleaseDate.Year);    
+                Assert.Equal(TimeIdentifier.August, edited.TimePeriodCoverage);
             }
         }
 
 
         [Fact]
-        public async void GetEditReleaseSummaryAsync2()
+        public async void GetReleaseSummaryAsync2()
         {
-            var releaseId = new Guid("5cf345d4-7f7b-425c-8267-de785cfc040b");
-            var addHocReleaseTypeId = new Guid("19b024dc-339c-4e2c-b2ca-b55e5c509ad2");
-            var publishScheduled = DateTime.Now.AddDays(1);
-            var nextReleaseDate = new PartialDate {Day = "1", Month = "1", Year = "2040"};
-            const string releaseName = "2035";
-            const TimeIdentifier timePeriodCoverage = TimeIdentifier.January;
-            using (var context = InMemoryApplicationDbContext("GetEditReleaseSummaryAsync2"))
-            {
-                context.AddRange(new List<ReleaseType>
-                {
-                    new ReleaseType
-                    {
-                        Id = addHocReleaseTypeId,
-                        Title = "Ad Hoc"
-                    },
-                });
-                context.Add(
-                    new Release
-                    {
-                        Id = releaseId,
-                        TypeId = addHocReleaseTypeId,
-                        TimePeriodCoverage = TimeIdentifier.January,
-                        PublishScheduled = publishScheduled,
-                        NextReleaseDate = nextReleaseDate,
-                        ReleaseName = releaseName
-                    });
-                context.SaveChanges();
-            }
+            var (releaseTypeId, publicationId) = CreatePublicationAndReleaseType("GetReleaseSummaryAsync2");
 
-            using (var context = InMemoryApplicationDbContext("GetEditReleaseSummaryAsync2"))
+            Guid releaseId;
+            using (var context = InMemoryApplicationDbContext("GetReleaseSummaryAsync2"))
+            {
+                // Save the release that will retrieved later - use the services.
+                var result = await new ReleaseService2(context).CreateReleaseAsync(
+                    new CreateReleaseViewModel
+                    {
+                        PublicationId = publicationId,
+                        ReleaseName = "2018",
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        PublishScheduled = DateTime.Parse("2018/06/01"),
+                        TypeId = releaseTypeId,
+                        NextReleaseDate = new PartialDate {Day = "01", Month = "01", Year = "2019"}
+                    });
+
+                Assert.True(!result.IsLeft);
+                releaseId = result.Right.Id;
+            }
+            
+            using (var context = InMemoryApplicationDbContext("GetReleaseSummaryAsync2"))
             {
                 // Method under test 
-                var summary = await new ReleaseService2(context)
-                    .GetReleaseSummaryAsync(releaseId);
-
-
-                Assert.Equal(publishScheduled, summary.PublishScheduled);
-                Assert.Equal(nextReleaseDate, summary.NextReleaseDate);
-                Assert.Equal(addHocReleaseTypeId, summary.TypeId);
-                Assert.Equal(releaseName, summary.ReleaseName);
-                Assert.Equal(timePeriodCoverage, summary.TimePeriodCoverage);
+                var summary = await new ReleaseService2(context).GetReleaseSummaryAsync(releaseId);
+                Assert.Equal(DateTime.Parse("2018/06/01"), summary.PublishScheduled);
+                Assert.Equal(new PartialDate {Day = "01", Month = "01", Year = "2019"}, summary.NextReleaseDate, PartialDateEqualityComparer());
+                Assert.Equal(releaseTypeId, summary.TypeId);
+                Assert.Equal("2018", summary.ReleaseName);
+                Assert.Equal(TimeIdentifier.AcademicYear, summary.TimePeriodCoverage);
             }
         }
 
@@ -275,64 +208,74 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async void GetReleasesForPublicationAsync()
         {
-            var addHocReleaseTypeId = new Guid("19b024dc-339c-4e2c-b2ca-b55e5c509ad2");
-            var publicationId = new Guid("94af186f-5dbe-4f46-8a8e-f5480ed9f4fc");
-            var publishScheduledForFirstRelease = DateTime.Now.AddDays(1);
-            var publishScheduledForSecondRelease = DateTime.Now.AddDays(2);
-            var firstReleaseId = new Guid("8781ebf8-790c-484b-8a34-19ea501c9c74");
-            var secondReleaseId = new Guid("cace48cf-9f08-4471-815c-b3703aade096");
-
-            using (var context = InMemoryApplicationDbContext("GetReleasesForPublicationAsync"))
-            {
-                context.AddRange(new List<ReleaseType>
-                {
-                    new ReleaseType
-                    {
-                        Id = addHocReleaseTypeId,
-                        Title = "Ad Hoc"
-                    },
-                });
-                context.Add(new Publication
-                {
-                    Id = publicationId,
-                    Releases = new List<Release>
-                    {
-                        new Release
-                        {
-                            Id = firstReleaseId,
-                            TypeId = addHocReleaseTypeId,
-                            TimePeriodCoverage = TimeIdentifier.February,
-                            PublishScheduled = publishScheduledForFirstRelease,
-                            NextReleaseDate = new PartialDate {Day = "01", Month = "01", Year = "2040"},
-                            ReleaseName = "2035",
-                        },
-                        new Release
-                        {
-                            Id = secondReleaseId,
-                            TypeId = addHocReleaseTypeId,
-                            TimePeriodCoverage = TimeIdentifier.January,
-                            PublishScheduled = publishScheduledForSecondRelease,
-                            NextReleaseDate = new PartialDate {Day = "01", Month = "01", Year = "2041"},
-                            ReleaseName = "2036"
-                        }
-                    }
-                });
-                context.SaveChanges();
-            }
+            var (releaseTypeId, publicationId) = CreatePublicationAndReleaseType("GetReleasesForPublicationAsync2");
+            
+            Guid firstReleaseId;
+            Guid secondReleaseId;
 
             using (var context = InMemoryApplicationDbContext("GetReleasesForPublicationAsync2"))
             {
+                // Add first release that will retrieved later - use the services.
+                var result = await new ReleaseService2(context).CreateReleaseAsync(
+                    new CreateReleaseViewModel
+                    {
+                        PublicationId = publicationId,
+                        ReleaseName = "2018",
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        PublishScheduled = DateTime.Parse("2018/06/01"),
+                        TypeId = releaseTypeId,
+                        NextReleaseDate = new PartialDate {Day = "01", Month = "01", Year = "2019"}
+                    });
+                Assert.True(!result.IsLeft);
+                firstReleaseId = result.Right.Id;
+
+            }
+            
+            using (var context = InMemoryApplicationDbContext("GetReleasesForPublicationAsync2"))
+            {
+                // Add first release that will retrieved later - use the services.
+                var result = await new ReleaseService2(context).CreateReleaseAsync(
+                    new CreateReleaseViewModel
+                    {
+                        PublicationId = publicationId,
+                        ReleaseName = "2019",
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        PublishScheduled = DateTime.Parse("2019/06/01"),
+                        TypeId = releaseTypeId,
+                        NextReleaseDate = new PartialDate {Day = "01", Month = "01", Year = "2019"}
+                    });
+                Assert.True(!result.IsLeft);
+                secondReleaseId = result.Right.Id;
+            }
+            
+            using (var context = InMemoryApplicationDbContext("GetReleasesForPublicationAsync2"))
+            {
                 // Method under test 
-                var summary = await new ReleaseService2(context)
+                var releasesForPublication = await new ReleaseService2(context)
                     .GetReleasesForPublicationAsync(publicationId);
-                Assert.Equal(2, summary.Count);
-                Assert.True(summary.Exists(r => r.Id == firstReleaseId && r.TypeId == addHocReleaseTypeId));
-                Assert.True(summary.Exists(r =>
-                    r.Id == firstReleaseId && r.TimePeriodCoverage == TimeIdentifier.February));
-                Assert.True(summary.Exists(r =>
-                    r.Id == firstReleaseId && r.PublishScheduled == publishScheduledForFirstRelease));
-                Assert.True(summary.Exists(r => r.Id == firstReleaseId && r.ReleaseName == "2035"));
+                Assert.Equal(2, releasesForPublication .Count);
+                Assert.True(releasesForPublication .Exists(r => r.Id == firstReleaseId && r.TypeId == releaseTypeId));
+                Assert.True(releasesForPublication .Exists(r =>
+                    r.Id == firstReleaseId && r.TimePeriodCoverage == TimeIdentifier.AcademicYear));
+                Assert.True(releasesForPublication .Exists(r =>
+                    r.Id == firstReleaseId && r.PublishScheduled == DateTime.Parse("2018/06/01")));
+                Assert.True(releasesForPublication .Exists(r => r.Id == firstReleaseId && r.ReleaseName == "2018"));
+            }
+        }
+        
+        private static (Guid releaseTypeId, Guid publicationId) CreatePublicationAndReleaseType(string contextName)
+        {
+            using (var context = InMemoryApplicationDbContext(contextName))
+            {
+                var releaseTypeId = Guid.NewGuid();
+                var publicationId = Guid.NewGuid();
+                context.Add(new ReleaseType {Id = releaseTypeId, Title = "Ad Hoc",});
+                context.Add(new Publication {Id = publicationId, Title = "Publication"});
+                context.SaveChanges();
+                return (releaseTypeId, publicationId);
             }
         }
     }
+    
+    
 }
