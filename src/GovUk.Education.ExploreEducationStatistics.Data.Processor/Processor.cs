@@ -62,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             }
             catch (ImporterException ex)
             {
-                _batchService.FailBatch(message.Release.Id.ToString(), ex._subjectId.ToString(),
+                _batchService.FailBatch(message.Release.Id.ToString(), ex.SubjectId.ToString(),
                     new List<String> {ex.Message});
             }
             catch (Exception e)
@@ -99,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                     // If it's known exception then handle it
                     if (e is ImporterException ex)
                     {
-                        _batchService.FailBatch(message.Release.Id.ToString(), ex._subjectId.ToString(), new List<String>{ex.Message});
+                        _batchService.FailBatch(message.Release.Id.ToString(), ex.SubjectId.ToString(), new List<String>{ex.Message});
                     }
                     logger.LogError(
                         $"Seeding FAILED for : Datafile: {message.DataFileName} : {e.InnerException.Message} : will not retry...");
@@ -138,7 +138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 // If it's known exception then handle it
                 if (e is ImporterException ex)
                 {
-                    _batchService.FailBatch(message.Release.Id.ToString(), ex._subjectId.ToString(), new List<String>{ex.Message});
+                    _batchService.FailBatch(message.Release.Id.ToString(), ex.SubjectId.ToString(), new List<String>{ex.Message});
                 }
                 logger.LogError(
                     $"{GetType().Name} function FAILED: : Batch: {message.BatchNo} of {message.BatchSize} with Datafile: {message.DataFileName} : {e.InnerException.Message} : retrying...");
