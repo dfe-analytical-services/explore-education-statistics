@@ -166,7 +166,7 @@ const PrototypeDashboardRelease = ({
                 </p>
               </Details>
               <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-                HIgher review comments
+                Higher review comments
               </h3>
               <Details
                 summary="Stephen Doherty, 17 June 2018, 17:35"
@@ -196,6 +196,19 @@ const PrototypeDashboardRelease = ({
           </dd>
           <dd className="govuk-summary-list__actions" />
         </div>
+        {(task === 'readyApproval' || task === 'readyHigherReview') && (
+          <div className="govuk-summary-list__row">
+            <dt className="govuk-summary-list__key">Internal release notes</dt>
+            <dd className="govuk-summary-list__value">
+              <p>
+                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vitae
+                nulla sequi, tenetur accusamus deleniti unde corrupti deserunt!
+                Quos sequi aspernatur libero maxime, quo aperiam voluptatibus
+                quia numquam asperiores, deserunt nihil.
+              </p>
+            </dd>
+          </div>
+        )}
       </dl>
       {!editing && !review && (
         <Link to="/prototypes/publication-edit" className="govuk-button">

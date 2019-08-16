@@ -115,23 +115,6 @@ const PrototypeExampleTable = ({ task, table }: Props) => {
       )}
       {task === 'view' && (
         <>
-          <FormGroup>
-            <FormTextInput
-              id="permalink"
-              name="permalink"
-              label="Permalink"
-              hint="Copy this link to view a standalone version of this table. Use this link to refer to your table within your release.
-              "
-              defaultValue="http://dfe-url.gov.uk/example-permalink"
-              width={20}
-              onClick={e =>
-                e.currentTarget.setSelectionRange(
-                  0,
-                  e.currentTarget.value.length,
-                )
-              }
-            />
-          </FormGroup>
           <a
             className="govuk-button govuk-!-margin-right-3"
             href="/prototypes/publication-create-new-absence-table?status=step5#table-builder"

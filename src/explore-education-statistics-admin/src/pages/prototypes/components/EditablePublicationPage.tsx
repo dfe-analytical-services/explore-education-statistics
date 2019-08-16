@@ -420,22 +420,41 @@ class EditablePublicationPage extends Component<Props, State> {
                     <strong>19 April 2019</strong>
                   </dd>
                   <dd>
-                    <Details summary="See all 2 updates">
+                    <Details summary="See updates">
                       <div data-testid="publication-page--update-element">
-                        <h3 className="govuk-heading-s">19 April 2017</h3>
-                        <p>
-                          Underlying data file updated to include absence data
-                          by pupil residency and school location, andupdated
-                          metadata document.
-                        </p>
-                      </div>
-                      <div data-testid="publication-page--update-element">
-                        <h3 className="govuk-heading-s">22 March 2017</h3>
+                        <h3 className="govuk-heading-s">20 September 2019</h3>
                         <p>First published.</p>
                       </div>
                     </Details>
                   </dd>
                 </dl>
+
+                {editing && (
+                  <>
+                    <FormFieldset id="test" legend="">
+                      <FormGroup>
+                        <label
+                          htmlFor="releaseUpdateNote"
+                          className="govuk-label"
+                        >
+                          Add release note
+                        </label>
+                        <textarea
+                          className="govuk-textarea govuk-!-margin-bottom-3"
+                          id="releaseUpdateNote"
+                          name="releaseUpdateNote"
+                          rows={3}
+                          value=""
+                        >
+                          test
+                        </textarea>
+                      </FormGroup>
+                      <button type="submit" className="govuk-button">
+                        Add note
+                      </button>
+                    </FormFieldset>
+                  </>
+                )}
 
                 <nav role="navigation" aria-labelledby="related-content">
                   <h2
@@ -645,22 +664,26 @@ class EditablePublicationPage extends Component<Props, State> {
               </address>
             </AccordionSection>
           </Accordion>
-          <h2 className="govuk-heading-m govuk-!-margin-top-9">
-            Exploring the data
-          </h2>
-          <p>
-            The statistics can be viewed as reports, or you can customise and
-            download as excel or .csv files . The data can also be accessed via
-            an API. <a href="#">What is an API?</a>
-          </p>
-          <Link to="/prototypes/table-tool" className="govuk-button">
-            Create charts and tables
-          </Link>
-          <div className="govuk-!-margin-top-9">
-            <a href="#print" className="govuk-link">
-              Print this page
-            </a>
-          </div>
+          {!editing && (
+            <>
+              <h2 className="govuk-heading-m govuk-!-margin-top-9">
+                Exploring the data
+              </h2>
+              <p>
+                The statistics can be viewed as reports, or you can customise
+                and download as excel or .csv files . The data can also be
+                accessed via an API. <a href="#">What is an API?</a>
+              </p>
+              <Link to="/prototypes/table-tool" className="govuk-button">
+                Create charts and tables
+              </Link>
+              <div className="govuk-!-margin-top-9">
+                <a href="#print" className="govuk-link">
+                  Print this page
+                </a>
+              </div>
+            </>
+          )}
         </div>
       </>
     );

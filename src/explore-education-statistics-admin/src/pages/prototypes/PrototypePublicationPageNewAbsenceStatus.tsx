@@ -55,7 +55,7 @@ const UpdateStatusForm = () => {
               htmlFor="release-notes"
               className="govuk-label govuk-label--s"
             >
-              Release notes
+              Internal release notes
             </label>
             <textarea
               id="release-notes"
@@ -77,7 +77,7 @@ const PublicationDataPage = ({ location }: RouteChildrenProps) => {
       wide
       breadcrumbs={[
         {
-          link: '/prototypes/admin-dashboard?status=editNewRelease',
+          link: '/prototypes/admin-dashboard?status=readyApproval',
           text: 'Administrator dashboard',
         },
         { text: 'Create new release', link: '#' },
