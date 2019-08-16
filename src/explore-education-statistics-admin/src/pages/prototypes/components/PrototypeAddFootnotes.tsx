@@ -21,21 +21,11 @@ const PrototypeAddFootnotes = () => {
           {!editFootnoteBlock && (
             <>
               <p>Select either one or multiple subject areas from below</p>
-              <Accordion id="uploaded-data">
-                <AccordionSection heading="Geographical absence">
-                  <PrototypeFootnotes />
-                </AccordionSection>
-                <AccordionSection heading="Local authority">
-                  <PrototypeFootnotes />
-                </AccordionSection>
-                <AccordionSection heading="National characteristics">
-                  <PrototypeFootnotes />
-                  <button className="govuk-button" type="button">
-                    Add footnote
-                  </button>
-                </AccordionSection>
-              </Accordion>
-              <h3 className="govuk-heading-s">Footnote</h3>
+              <PrototypeFootnotes subject="Geographical absence" />
+              <PrototypeFootnotes subject="Local authority" />
+              <PrototypeFootnotes subject="National characteristics" />
+
+              <h3 className="govuk-heading-s govuk-!-margin-top-6">Footnote</h3>
 
               <textarea
                 className="govuk-textarea govuk-!-margin-bottom-3"
@@ -162,20 +152,9 @@ const PrototypeAddFootnotes = () => {
       {addAnotherFootnote && (
         <>
           <p>Select either one or multiple subject areas from below</p>
-          <Accordion id="uploaded-data">
-            <AccordionSection heading="Geographical absence">
-              <PrototypeFootnotes />
-            </AccordionSection>
-            <AccordionSection heading="Local authority">
-              <PrototypeFootnotes />
-            </AccordionSection>
-            <AccordionSection heading="National characteristics">
-              <PrototypeFootnotes />
-              <button className="govuk-button" type="button">
-                Add footnote
-              </button>
-            </AccordionSection>
-          </Accordion>
+          <PrototypeFootnotes subject="Geographical absence" />
+          <PrototypeFootnotes subject="Local authority" />
+          <PrototypeFootnotes subject="National characteristics" />
           <h3 className="govuk-heading-s">Footnote</h3>
 
           <textarea

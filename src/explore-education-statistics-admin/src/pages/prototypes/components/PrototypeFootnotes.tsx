@@ -3,7 +3,11 @@ import React, { useState } from 'react';
 import Link from '@admin/components/Link';
 import Details from '@common/components/Details';
 
-const PrototypeFootnotes = () => {
+interface Props {
+  subject?: string;
+}
+
+const PrototypeFootnotes = ({ subject }: Props) => {
   const [valueIndicator, setValueIndicator] = useState('');
   const [valueFilter, setValueFilter] = useState('');
   const [valueFootnote, setValueFootnote] = useState('');
@@ -44,7 +48,7 @@ const PrototypeFootnotes = () => {
                   className="govuk-label govuk-checkboxes__label"
                   htmlFor="selectSubject"
                 >
-                  Select this subject
+                  {subject}
                 </label>
               </div>
             </div>
@@ -80,16 +84,17 @@ const PrototypeFootnotes = () => {
               </div>
             </div>
           </div>
-
           {addIndicatorBlock && (
-            <Details summary="Indicator" tag="3 selected">
-              <div className="dfe-filter-overflow">
-                <img
-                  src="/static/images/prototype/indicator-filters.png"
-                  alt=""
-                />
-              </div>
-            </Details>
+            <>
+              <Details summary="Indicator" tag="3 selected">
+                <div className="dfe-filter-overflow">
+                  <img
+                    src="/static/images/prototype/indicator-filters.png"
+                    alt=""
+                  />
+                </div>
+              </Details>
+            </>
           )}
         </div>
         <div className="govuk-grid-column-one-third">
@@ -148,6 +153,7 @@ const PrototypeFootnotes = () => {
           )}
         </div>
       </div>
+      <hr className="govuk-!-margin-0 govuk-!-margin-bottom-2" />
     </>
   );
 };
