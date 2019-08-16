@@ -8,19 +8,21 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.EqualityUtils;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class ReleaseService2Tests
     {
         [Fact]
-        public void CreateReleaseNoTemplate2()
+        public async void CreateReleaseNoTemplate2()
         {
             var (releaseTypeId, publicationId) = CreatePublicationAndReleaseType("CreateReleaseNoTemplate2");
 
             using (var context = InMemoryApplicationDbContext("CreateReleaseNoTemplate2"))
             {
-                var result = new ReleaseService2(context).CreateReleaseAsync(
+                var result = await new ReleaseService2(context).CreateReleaseAsync(
                     new CreateReleaseViewModel
                     {
                         PublicationId = publicationId,
@@ -30,10 +32,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         TypeId = releaseTypeId
                     });
 
-                Assert.Equal("Academic Year 2018/19", result.Result.Right.Title);
-                Assert.Null(result.Result.Right.Published);
-                Assert.False(result.Result.Right.LatestRelease); // Most recent - but not published yet.
-                Assert.Equal(TimeIdentifier.AcademicYear, result.Result.Right.TimePeriodCoverage);
+                Assert.Equal("Academic Year 2018/19", result.Right.Title);
+                Assert.Null(result.Right.Published);
+                Assert.False(result.Right.LatestRelease); // Most recent - but not published yet.
+                Assert.Equal(TimeIdentifier.AcademicYear, result.Right.TimePeriodCoverage);
+            }
+        }
+
+        
+        [Fact]
+        public async void CreateReleaseWithSlugThatAlreadyExistsCausesValidationFailure()
+        {
+            var (releaseTypeId, publicationId) = CreatePublicationAndReleaseType("CreateReleaseWithSlugThatAlreadyExistsCausesValidationFailure");
+
+            using (var context = InMemoryApplicationDbContext("CreateReleaseWithSlugThatAlreadyExistsCausesValidationFailure"))
+            {
+                // Add the first release - use the services.
+                await new ReleaseService2(context).CreateReleaseAsync(
+                    new CreateReleaseViewModel
+                    {
+                        PublicationId = publicationId,
+                        ReleaseName = "2018",
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        TypeId = releaseTypeId
+                    });
+            }
+            
+            using (var context = InMemoryApplicationDbContext("CreateReleaseWithSlugThatAlreadyExistsCausesValidationFailure"))
+            {
+                // Add the first release - use the services.
+                var result = await new ReleaseService2(context).CreateReleaseAsync(
+                    new CreateReleaseViewModel
+                    {
+                        PublicationId = publicationId,
+                        ReleaseName = "2018",
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        TypeId = releaseTypeId
+                    });
+                Assert.True(result.IsLeft);
+                Assert.Equal(ValidationResult(SlugNotUnique).ErrorMessage , result.Left.ErrorMessage);
             }
         }
 
