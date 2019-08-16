@@ -102,10 +102,10 @@ exports[`DataBlock renders map instead of chart 1`] = `
                
             </span>
              
-            -3.0
+            -3
             %
               to 
-            -2.8
+            -3
             %
              
           </dd>
@@ -119,10 +119,10 @@ exports[`DataBlock renders map instead of chart 1`] = `
                
             </span>
              
-            -2.8
+            -3
             %
               to 
-            -2.5
+            -3
             %
              
           </dd>
@@ -136,10 +136,10 @@ exports[`DataBlock renders map instead of chart 1`] = `
                
             </span>
              
-            -2.5
+            -3
             %
               to 
-            -2.3
+            -2
             %
              
           </dd>
@@ -153,10 +153,10 @@ exports[`DataBlock renders map instead of chart 1`] = `
                
             </span>
              
-            -2.3
+            -2
             %
               to 
-            -2.0
+            -2
             %
              
           </dd>
@@ -170,10 +170,10 @@ exports[`DataBlock renders map instead of chart 1`] = `
                
             </span>
              
-            -2.0
+            -2
             %
               to 
-            -1.8
+            -2
             %
              
           </dd>

@@ -1,21 +1,36 @@
-import PrototypePage from '@admin/pages/prototypes/components/PrototypePage';
-import ChartData from '@common/modules/find-statistics/components/charts/__tests__/__data__/testBlockData';
-import { DataBlockResponse } from '@common/services/dataBlockService';
-import React from 'react';
 import ChartBuilder from '@admin/modules/chart-builder/ChartBuilder';
+import PrototypePage from '@admin/pages/prototypes/components/PrototypePage';
 import { ChartRendererProps } from '@common/modules/find-statistics/components/ChartRenderer';
+import DataBlockService, {
+  DataBlockRequest,
+  DataBlockResponse,
+  GeographicLevel,
+} from '@common/services/dataBlockService';
+import React from 'react';
 
 const PrototypeChartTest = () => {
-  const chartData = ChartData.AbstractLargeDataChartProps_smaller_datasets;
-
-  const newChartBuilderData: DataBlockResponse = {
-    ...chartData.data,
-    metaData: chartData.meta,
+  const request: DataBlockRequest = {
+    geographicLevel: GeographicLevel.LocalAuthority,
+    subjectId: 12,
+    indicators: ['160', '158', '156'],
+    filters: ['423'],
+    timePeriod: {
+      startYear: '2009',
+      startCode: 'AY',
+      endYear: '2016',
+      endCode: 'AY',
+    },
   };
 
-  /* const newChartData: StackedBarProps = {
-     ...ChartData.AbstractChartProps,
-   };*/
+  const [chartBuilderData, setChartBuilderData] = React.useState<
+    DataBlockResponse
+  >();
+
+  React.useEffect(() => {
+    DataBlockService.getDataBlockForSubject(request).then(response => {
+      setChartBuilderData(response);
+    });
+  }, []); // eslint-disable-line
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onChartSave = (props: ChartRendererProps) => {
@@ -24,8 +39,9 @@ const PrototypeChartTest = () => {
 
   return (
     <PrototypePage wide>
-      <ChartBuilder data={newChartBuilderData} onChartSave={onChartSave} />
-      {/* <ChartRenderer type="line" {...newChartData} /> */}
+      {chartBuilderData && (
+        <ChartBuilder data={chartBuilderData} onChartSave={onChartSave} />
+      )}
     </PrototypePage>
   );
 };

@@ -14,6 +14,8 @@ import {
   DataBlockGeoJsonProperties,
   DataBlockMetadata,
 } from '@common/services/dataBlockService';
+import { DataSetConfiguration } from '@common/services/publicationService';
+import { Dictionary } from '@common/types';
 
 import classNames from 'classnames';
 import { Feature, FeatureCollection, Geometry } from 'geojson';
@@ -22,8 +24,6 @@ import { Layer, LeafletMouseEvent, Path, PathOptions, Polyline } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import React from 'react';
 import { GeoJSON, LatLngBounds, Map } from 'react-leaflet';
-import { DataSetConfiguration } from '@common/services/publicationService';
-import { Dictionary } from '@common/types';
 import styles from './MapBlock.module.scss';
 
 type MapBlockProperties = DataBlockGeoJsonProperties & {
@@ -126,7 +126,7 @@ function calculateMinAndScaleForSourceData(sourceData: ChartDataB[]) {
   );
 
   if (min === max) {
-    return { min, scale: 0, range: 1 };
+    return { min, max: min, scale: 0, range: 1 };
   }
 
   const range = max - min;
@@ -145,15 +145,25 @@ function generateGeometryAndLegendForSelectedOptions(
     .map(entry => ({ ...entry, data: entry[selectedDataSet] }))
     .filter(({ data }) => data !== undefined);
 
-  const { min, range, scale } = calculateMinAndScaleForSourceData(sourceData);
+  const { min, max, range, scale } = calculateMinAndScaleForSourceData(
+    sourceData,
+  );
+
+  let fixedScale = Math.log10((max - min) / 5);
+
+  if (fixedScale < 0 && Number.isFinite(fixedScale)) {
+    fixedScale = -Math.floor(fixedScale);
+  } else {
+    fixedScale = 0;
+  }
 
   const legend: LegendEntry[] = [...Array(5)].map((_, idx) => {
     const i = idx / 4;
 
     return {
       minValue: i,
-      min: (min + i * range).toFixed(1),
-      max: (min + (i + 0.25) * range).toFixed(1),
+      min: (min + i * range).toFixed(fixedScale),
+      max: (min + (i + 0.25) * range).toFixed(fixedScale),
       idx,
     };
   });
@@ -223,6 +233,23 @@ function calculateColour({ scaledData = 1.0, color = '#ff0000' }) {
       )}`.substr(-2),
     ),
   ].join('');
+}
+
+// this is the most annoying painful way of having to make this work!!!
+// using a reference to the callback to make the onEachFeature callback work
+// otherwise it ends up creating a closure that has no access to updated properties?
+// calling the referenced callback and rebuilding it when the data it uses changes
+function useCallbackRef<T extends (...args: never[]) => unknown>(
+  callback: () => T,
+  deps: unknown[] | undefined,
+) {
+  const ref = React.useRef<T>();
+
+  React.useEffect(() => {
+    ref.current = callback();
+  }, deps); // eslint-disable-line
+
+  return ref;
 }
 
 // </editor-fold>
@@ -305,12 +332,14 @@ const MapBlock = ({
       meta,
       labels,
       true,
+    ).filter(
+      ({ __name: id }) => meta.locations[id] && meta.locations[id].geoJson,
     );
 
     setChartData(generatedChartData);
 
     setMajorOptions(getLocationsForDataSet(data, meta, generatedChartData));
-  }, [data, axes, meta, labels]);
+  }, [data, axes.major, meta, labels]);
 
   React.useEffect(() => {
     setDataSetOptions(
@@ -321,6 +350,44 @@ const MapBlock = ({
     );
   }, [axes.major.dataSets, axes.major.groupBy, labels]);
 
+  const onEachFeatureCallback = useCallbackRef(
+    () => (feature: MapFeature, featureLayer: Layer) => {
+      if (feature.properties) {
+        // eslint-disable-next-line no-param-reassign
+        feature.properties.layer = featureLayer;
+      }
+
+      const featurePath: Path = featureLayer as Path;
+      featurePath.setStyle({
+        className: classNames(
+          feature.properties && feature.properties.className,
+          { [styles.selected]: feature.id === selectedLocation },
+        ),
+      });
+
+      featureLayer.bindTooltip(() => {
+        if (feature.properties) {
+          const content = Object.entries(feature.properties.measures)
+            .map(([id, value]) => ({
+              ...(labels[id] || { label: '', unit: '' }),
+              value,
+            }))
+            .map(({ label, value, unit }) => `${label} : ${value}${unit}`);
+
+          if (feature.id) {
+            content.unshift(
+              `<strong>${(meta.locations || {})[feature.id].label}</strong>`,
+            );
+          }
+
+          return content.join('<br />');
+        }
+        return '';
+      });
+    },
+    [labels, meta.locations, selectedLocation],
+  );
+
   React.useEffect(() => {
     if (geoJsonRef.current) {
       geoJsonRef.current.leafletElement.clearLayers();
@@ -329,8 +396,7 @@ const MapBlock = ({
         geoJsonRef.current.leafletElement.addData(geometry);
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [geometry]);
+  }, [geoJsonRef, geometry]);
 
   React.useEffect(() => {
     if (mapRef.current) {
@@ -413,37 +479,6 @@ const MapBlock = ({
     }
 
     setSelectedLocation(newSelectedLocation);
-  };
-
-  const onEachFeature = (feature: MapFeature, featureLayer: Path) => {
-    if (feature.properties) {
-      // eslint-disable-next-line no-param-reassign
-      feature.properties.layer = featureLayer;
-    }
-
-    featureLayer.setStyle({
-      className: classNames(
-        feature.properties && feature.properties.className,
-        { [styles.selected]: feature.id === selectedLocation },
-      ),
-    });
-
-    featureLayer.bindTooltip(() => {
-      if (feature.properties) {
-        const content = Object.entries(feature.properties.measures).map(
-          ([id, value]) => `${labels[id].label} : ${value}${labels[id].unit}`,
-        );
-
-        if (feature.id) {
-          content.unshift(
-            `<strong>${(meta.locations || {})[feature.id].label}</strong>`,
-          );
-        }
-
-        return content.join('<br />');
-      }
-      return '';
-    });
   };
 
   const onClick = (e: MapClickEvent) => {
@@ -567,7 +602,10 @@ const MapBlock = ({
             <GeoJSON
               ref={geoJsonRef}
               data={geometry}
-              onEachFeature={onEachFeature}
+              onEachFeature={(feature, layer) =>
+                onEachFeatureCallback.current &&
+                onEachFeatureCallback.current(feature, layer)
+              }
               style={(feature?: MapFeature): PathOptions => ({
                 fillColor:
                   feature &&
