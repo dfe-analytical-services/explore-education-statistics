@@ -1,37 +1,37 @@
 version: "3"
 services:
-#  data-api:
-#    container_name: ees-data
-#    build:
-#      context: .
-#      dockerfile: Dockerfile-Data-Api
-#    ports:
-#    - "5000:5000"
-#    - "5001:5001"
-#    environment:
-#      ASPNETCORE_ENVIRONMENT: Development
-#    depends_on:
-#    - db
-#    - data-storage
-#  content-api:
-#    container_name: ees-content
-#    build: 
-#      context: .
-#      dockerfile: Dockerfile-Content-Api
-#    ports:
-#    - "5010:5010"
-#    - "5011:5011"
-#    environment:
-#      ASPNETCORE_ENVIRONMENT: Development
-#    depends_on:
-#    - data-storage
-#  data-storage:
-#    container_name: ees-storage
-#    image: arafato/azurite
-#    ports:
-#      - "10000:10000"
-#      - "10001:10001"
-#      - "10002:10002"
+  data-api:
+    container_name: ees-data
+    build:
+      context: .
+      dockerfile: Dockerfile-Data-Api
+    ports:
+      - "5000:5000"
+      - "5001:5001"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    depends_on:
+      - db
+      - data-storage
+  content-api:
+    container_name: ees-content
+    build:
+      context: .
+      dockerfile: Dockerfile-Content-Api
+    ports:
+      - "5010:5010"
+      - "5011:5011"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    depends_on:
+      - data-storage
+  data-storage:
+    container_name: ees-storage
+    image: arafato/azurite
+    ports:
+      - "10000:10000"
+      - "10001:10001"
+      - "10002:10002"
   db:
     container_name: ees-mssql
     image: "mcr.microsoft.com/mssql/server"
@@ -45,7 +45,7 @@ services:
       ACCEPT_EULA: "Y"
     command:
       - /bin/bash
-      - -c 
+      - -c
       - |
         # Launch MSSQL and send to background
         /opt/mssql/bin/sqlservr &
