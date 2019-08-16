@@ -15,6 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Models
             RowKey = subjectId;
             this.BatchSize = batchSize;
             this.BatchesProcessed = new byte[32];
+            this.Errors = "";
         }
 
         public Batch()

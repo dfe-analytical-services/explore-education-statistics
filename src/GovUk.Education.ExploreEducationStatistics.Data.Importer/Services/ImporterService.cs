@@ -109,14 +109,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         public SubjectMeta ImportMeta(List<string> metaLines, Subject subject)
         {
             _logger.LogDebug("Importing meta lines for Publication {Publication}, {Subject}", subject.Release.Publication.Title, subject.Name);
-            
             return _importerMetaService.Import(metaLines, subject);
         }
         
         public SubjectMeta GetMeta(List<string> metaLines, Subject subject)
         {
             _logger.LogDebug("Getting meta lines for Publication {Publication}, {Subject}", subject.Release.Publication.Title, subject.Name);
-            
             return _importerMetaService.Get(metaLines, subject);
         }
 

@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
     public class SplitFileService : ISplitFileService
     {
-        public const int MaxLinesPerBatch = 10000;
+        private const int MaxLinesPerBatch = 800;
         
         private readonly IFileStorageService _fileStorageService;
 

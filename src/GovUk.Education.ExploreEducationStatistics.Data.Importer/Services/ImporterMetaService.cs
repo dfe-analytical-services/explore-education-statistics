@@ -10,6 +10,16 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 {
+    public enum MetaColumns {
+        col_name,
+        col_type,
+        label,
+        filter_grouping_column,
+        filter_hint,
+        indicator_grouping,
+        indicator_unit
+    }
+
     public class ImporterMetaService : IImporterMetaService
     {
         private readonly ApplicationDbContext _context;
@@ -64,25 +74,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 .Skip(1)
                 .Select((line, index) =>
                 {
-                    if (validate) _validatorService.ValidateMetaRow(subjectId, line, index);
+                    if (validate) _validatorService.ValidateMetaRow(subjectId, line, index, headers.Count);
                     return GetMetaRow(line, headers);
                 });
         }
 
         private static MetaRow GetMetaRow(string line, List<string> headers)
         {
-            var columns = new[]
-            {
-                "col_name",
-                "col_type",
-                "label",
-                "filter_grouping_column",
-                "filter_hint",
-                "indicator_grouping",
-                "indicator_unit"
-            };
-
-            return CsvUtil.BuildType(line.Split(','), headers, columns, values => new MetaRow
+            return CsvUtil.BuildType(line.Split(','), 
+                headers, Enum.GetNames(typeof(MetaColumns)), values => new MetaRow
             {
                 ColumnName = values[0],
                 ColumnType = (ColumnType) Enum.Parse(typeof(ColumnType), values[1]),

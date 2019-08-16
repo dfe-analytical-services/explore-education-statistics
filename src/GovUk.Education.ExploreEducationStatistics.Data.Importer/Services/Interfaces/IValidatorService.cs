@@ -4,6 +4,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Inte
     {
         void ValidateMetaHeader(long subjectId, string header);
 
-        void ValidateMetaRow(long subjectId, string row, int rowNumber);
+        void ValidateMetaRow(long subjectId, string row, int rowNumber, int numExpectedColumns);
     }
 }
