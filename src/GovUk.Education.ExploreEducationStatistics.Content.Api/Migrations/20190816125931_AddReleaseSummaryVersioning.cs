@@ -32,7 +32,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                     Id = table.Column<Guid>(nullable: false),
                     ReleaseSummaryId = table.Column<Guid>(nullable: false),
                     ReleaseName = table.Column<string>(nullable: true),
-                    Published = table.Column<DateTime>(nullable: true),
                     PublishScheduled = table.Column<DateTime>(nullable: true),
                     Slug = table.Column<string>(nullable: true),
                     Summary = table.Column<string>(nullable: true),

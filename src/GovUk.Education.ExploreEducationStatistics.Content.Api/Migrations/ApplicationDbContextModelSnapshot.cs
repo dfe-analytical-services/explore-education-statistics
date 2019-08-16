@@ -1059,8 +1059,6 @@ Find out how and why these statistics are collected and published - [Secondary a
 
                     b.Property<DateTime?>("PublishScheduled");
 
-                    b.Property<DateTime?>("Published");
-
                     b.Property<string>("ReleaseName");
 
                     b.Property<Guid>("ReleaseSummaryId");
