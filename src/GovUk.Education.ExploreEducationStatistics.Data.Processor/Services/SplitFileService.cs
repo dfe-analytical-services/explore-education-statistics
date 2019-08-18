@@ -16,8 +16,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
     public class SplitFileService : ISplitFileService
     {
-        private const int MaxLinesPerBatch = 800;
-        
         private readonly IFileStorageService _fileStorageService;
 
         public SplitFileService(IFileStorageService fileStorageService)
@@ -25,14 +23,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _fileStorageService = fileStorageService;
         }
 
-        public void SplitDataFile(ICollector<ImportMessage> collector, ImportMessage message, SubjectData subjectData)
+        public void SplitDataFile(
+            ICollector<ImportMessage> collector,
+            ImportMessage message,
+            SubjectData subjectData,
+            BatchSettings batchSettings)
         {
             var batchCount = 1;
             var lines = subjectData.GetCsvLines();
 
-            if (lines.Count() > MaxLinesPerBatch + 1)
+            if (lines.Count() > batchSettings.BatchSize + 1)
             {
-                List<IFormFile> files = SplitFile(message, lines);
+                List<IFormFile> files = SplitFile(message, lines, batchSettings.BatchSize);
 
                 // Upload the split data files & send message to process to imports-available queue
                 foreach (var f in files)
@@ -59,11 +61,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
         }
         
-        private static List<IFormFile> SplitFile(ImportMessage message, IEnumerable<string> csvLines)
+        private static List<IFormFile> SplitFile(
+            ImportMessage message,
+            IEnumerable<string> csvLines,
+            int batchSize)
         {
             var files = new List<IFormFile>();    
             var header = csvLines.First();
-            var batches = csvLines.Skip(1).Batch(MaxLinesPerBatch);
+            var batches = csvLines.Skip(1).Batch(batchSize);
             var index = 1;
             
             foreach (var batch in batches)
@@ -93,8 +98,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
             return files;
         }
-        public static int GetNumBatches(int rows) {
-            return (int)Math.Ceiling((double)rows / (double)MaxLinesPerBatch);
+        public static int GetNumBatches(int rows, int batchSize) {
+            return (int)Math.Ceiling(rows / (double)batchSize);
         }
     }
 }

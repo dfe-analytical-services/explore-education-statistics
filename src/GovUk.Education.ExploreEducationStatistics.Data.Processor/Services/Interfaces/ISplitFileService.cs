@@ -6,6 +6,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
 {
     public interface ISplitFileService
     {
-        void SplitDataFile(ICollector<ImportMessage> collector, ImportMessage message, SubjectData subjectData);
+        void SplitDataFile(
+            ICollector<ImportMessage> collector,
+            ImportMessage message,
+            SubjectData subjectData,
+            BatchSettings batchSettings);
     }
 }
