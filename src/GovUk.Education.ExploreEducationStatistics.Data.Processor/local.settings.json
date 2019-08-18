@@ -12,6 +12,6 @@
     "CORS": "*"
   },
   "BatchSettings": {
-    "BatchSize": 800
+    "BatchSize": 1000
   }
 }
