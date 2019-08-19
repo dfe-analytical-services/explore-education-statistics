@@ -55,17 +55,20 @@ export function parseCondensedTimePeriodRange(
 
 export interface AxesConfiguration {
   major: AxisConfiguration;
-  minor: AxisConfiguration;
+  minor?: AxisConfiguration;
 }
 
-export interface ChartProps {
+export interface AbstractChartProps {
   data: DataBlockData;
   meta: DataBlockMetadata;
-  labels: Dictionary<DataSetConfiguration>;
-  axes: AxesConfiguration;
   title?: string;
   height?: number;
   width?: number;
+}
+
+export interface ChartProps extends AbstractChartProps {
+  labels: Dictionary<DataSetConfiguration>;
+  axes: AxesConfiguration;
   legend?: 'none' | 'top' | 'bottom';
   legendHeight?: string;
 }

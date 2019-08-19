@@ -14,9 +14,9 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
-    public class TableBuilderResultSubjectMetaService : ITableBuilderResultSubjectMetaService
+    public class TableBuilderResultSubjectMetaService : AbstractTableBuilderSubjectMetaService,
+        ITableBuilderResultSubjectMetaService
     {
-        private readonly IFilterItemService _filterItemService;
         private readonly IFootnoteService _footnoteService;
         private readonly IIndicatorService _indicatorService;
         private readonly ILocationService _locationService;
@@ -24,16 +24,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private readonly ISubjectService _subjectService;
         private readonly ITimePeriodService _timePeriodService;
 
-        public TableBuilderResultSubjectMetaService(
+        public TableBuilderResultSubjectMetaService(IFilterItemService filterItemService,
             IFootnoteService footnoteService,
-            IFilterItemService filterItemService,
             IIndicatorService indicatorService,
             ILocationService locationService,
             IMapper mapper,
             ISubjectService subjectService,
-            ITimePeriodService timePeriodService)
+            ITimePeriodService timePeriodService) : base(filterItemService)
         {
-            _filterItemService = filterItemService;
             _footnoteService = footnoteService;
             _indicatorService = indicatorService;
             _locationService = locationService;
@@ -68,25 +66,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         {
             var observationalUnits = _locationService.GetObservationalUnits(observations);
             return observationalUnits.SelectMany(pair => pair.Value.Select(observationalUnit => new LabelValue
-                {
-                    Label = observationalUnit.Name,
-                    Value = observationalUnit.Code
-                }));
+            {
+                Label = observationalUnit.Name,
+                Value = observationalUnit.Code
+            }));
         }
 
         private IEnumerable<IndicatorMetaViewModel> GetIndicators(SubjectMetaQueryContext query)
         {
             return _mapper.Map<IEnumerable<IndicatorMetaViewModel>>(
                 _indicatorService.GetIndicators(query.SubjectId, query.Indicators));
-        }
-
-        private IEnumerable<LabelValue> GetFilters(IQueryable<Observation> observations)
-        {
-            return _filterItemService.GetFilterItems(observations).Select(item => new LabelValue
-                {
-                    Label = item.Label,
-                    Value = item.Id.ToString()
-                });
         }
 
         private IEnumerable<FootnoteViewModel> GetFootnotes(IQueryable<Observation> observations,

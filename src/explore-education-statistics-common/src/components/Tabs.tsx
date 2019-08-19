@@ -41,6 +41,9 @@ const Tabs = ({ children, id, onToggle }: Props) => {
     isComponentType(child, TabsSection),
   ) as ReactComponentElement<typeof TabsSection>[];
 
+  if (selectedTabIndex >= sections.length)
+    setSelectedTabIndex(sections.length - 1);
+
   return (
     <div className="govuk-tabs">
       <ul className="govuk-tabs__list" role="tablist">

@@ -11,6 +11,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta
 
         public Dictionary<string, ObservationalUnitGeoJsonMeta> Locations { get; set; }
         
+        public IEnumerable<IdLabelViewModel> BoundaryLevels { get; set; }
+        
         public Dictionary<string, TimePeriodMetaViewModel> TimePeriods { get; set; }
     }
 }

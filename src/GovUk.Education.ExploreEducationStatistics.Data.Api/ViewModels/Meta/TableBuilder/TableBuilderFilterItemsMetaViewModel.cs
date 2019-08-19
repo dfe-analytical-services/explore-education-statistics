@@ -3,7 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta.TableBuilder
 {
-    public class TableBuilderFilterItemMetaViewModel : LabelOptionsMetaValueModel<IEnumerable<LabelValue>>
+    public class TableBuilderFilterItemsMetaViewModel : LabelOptionsMetaValueModel<IEnumerable<LabelValue>>
     {
     }
 }
