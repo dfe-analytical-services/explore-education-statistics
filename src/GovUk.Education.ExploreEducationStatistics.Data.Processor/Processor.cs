@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
@@ -49,26 +50,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             [QueueTrigger("imports-pending")]
             ImportMessage message,
             ILogger logger,
+            ExecutionContext context,
             [Queue("imports-available")] ICollector<ImportMessage> collector
             )
         {
             logger.LogInformation($"{GetType().Name} function STARTED for : Datafile: {message.DataFileName}");
-
+            
+            var batchSettings = GetBatchSettings(LoadAppSettings(context));
+            
             try
             {
-                var subjectData = ProcessSubject(message);
-                
-                SplitFile(message, collector, subjectData);
-            }
-            catch (ImporterException ex)
-            {
-                _batchService.FailBatch(message.Release.Id.ToString(), ex.SubjectId.ToString(),
-                    new List<String> {ex.Message});
+                var subjectData = ProcessSubject(message, batchSettings.BatchSize);
+                SplitFile(message, collector, subjectData, batchSettings);
             }
             catch (Exception e)
             {
-                logger.LogError($"{GetType().Name} function FAILED for : Datafile: {message.DataFileName} : {e.InnerException.Message} : retrying...");
-                throw;
+                // TODO - We need the subject ID to properly log an unknown error
+                logger.LogError($"{GetType().Name} function FAILED for : Datafile: {message.DataFileName} : {e.Message} : will retry unknown exceptions 3 times...");
+
+                // If it's known exception then log it but don't throw
+                if (e is ImporterException ex)
+                {
+                    _batchService.FailBatch(message.Release.Id.ToString(), ex.SubjectId.ToString(),
+                        new List<String> {ex.Message});
+                }
+                else
+                {
+                    throw;
+                }
             }
 
             logger.LogInformation($"{GetType().Name} function COMPLETE for : Datafile: {message.DataFileName}");
@@ -79,11 +88,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             [QueueTrigger("imports-pending-sequential")]
             ImportMessage[] messages,
             ILogger logger,
+            ExecutionContext context,
             [Queue("imports-available")] ICollector<ImportMessage> collector
         )
         {
             logger.LogInformation($"{GetType().Name} function STARTED");
-
+            
+            var batchSettings = GetBatchSettings(LoadAppSettings(context));
             var successes = new List<ImportMessage>();
             
             foreach (var message in messages)
@@ -91,19 +102,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 try
                 {
                     logger.LogInformation($"Re-seeding for : Datafile: {message.DataFileName}");
-                    ProcessSubject(message);
+                    ProcessSubject(message, batchSettings.BatchSize);
                     successes.Add(message);
                 }
                 catch (Exception e)
                 {
-                    // If it's known exception then handle it
+                    // If it's known exception then log it
                     if (e is ImporterException ex)
                     {
-                        _batchService.FailBatch(message.Release.Id.ToString(), ex.SubjectId.ToString(), new List<String>{ex.Message});
+                        _batchService.FailBatch(message.Release.Id.ToString(), ex.SubjectId.ToString(), new List<String>{ex.Message}).Wait();
                     }
                     logger.LogError(
-                        $"Seeding FAILED for : Datafile: {message.DataFileName} : {e.InnerException.Message} : will not retry...");
-                    // As this is the seeder continue with the next one
+                        $"Seeding FAILED for : Datafile: {message.DataFileName} : {e.Message} : will not retry...");
+                    // As this is the seeder continue with the next one - don't throw!
                     continue;
                 }
 
@@ -114,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             foreach (var message in successes)
             {
                 var subjectData = _fileStorageService.GetSubjectData(message).Result;
-                SplitFile(message, collector, subjectData); 
+                SplitFile(message, collector, subjectData, batchSettings); 
             }
 
             logger.LogInformation($"{GetType().Name} function COMPLETE");
@@ -126,39 +137,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             ImportMessage message,
             ILogger logger)
         {
-            try
-            {
-                logger.LogInformation(
+            logger.LogInformation(
                     $"{GetType().Name} function STARTED for : Batch: {message.BatchNo} of {message.BatchSize} with Datafile: {message.DataFileName}");
-
-                _fileImportService.ImportObservations(message).Wait();
-            }
-            catch (Exception e)
-            {
-                // If it's known exception then handle it
-                if (e is ImporterException ex)
-                {
-                    _batchService.FailBatch(message.Release.Id.ToString(), ex.SubjectId.ToString(), new List<String>{ex.Message});
-                }
-                logger.LogError(
-                    $"{GetType().Name} function FAILED: : Batch: {message.BatchNo} of {message.BatchSize} with Datafile: {message.DataFileName} : {e.InnerException.Message} : retrying...");
-                throw;
-            }
+                
+            _fileImportService.ImportObservations(message).Wait();
 
             logger.LogInformation(
                 $"{GetType().Name} function COMPLETE for : Batch: {message.BatchNo}  of {message.BatchSize} with Datafile: {message.DataFileName}");
         }
 
-        private SubjectData ProcessSubject(ImportMessage message)
+        private SubjectData ProcessSubject(ImportMessage message, int batchSize)
         {
             var subjectData = _fileStorageService.GetSubjectData(message).Result;
             var subject =_releaseProcessorService.CreateOrUpdateRelease(subjectData, message);
             
             SaveChanges();
             
-            var batches = SplitFileService.GetNumBatches(subjectData.GetCsvLines().Count());
+            var numBatches = SplitFileService.GetNumBatches(subjectData.GetCsvLines().Count(), batchSize);
             
-            _batchService.UpdateStatus(message.Release.Id.ToString(), subject.Id.ToString(), batches, ImportStatus.RUNNING);
+            _batchService.UpdateStatus(message.Release.Id.ToString(), subject.Id.ToString(), numBatches, ImportStatus.RUNNING_PHASE_1).Wait();
 
             _importerService.ImportMeta(subjectData.GetMetaLines().ToList(), subject);
                 
@@ -171,14 +168,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             return subjectData;
         }
 
-        private void SplitFile(ImportMessage message, ICollector<ImportMessage> collector, SubjectData subjectData)
+        private void SplitFile(
+            ImportMessage message,
+            ICollector<ImportMessage> collector,
+            SubjectData subjectData,
+            BatchSettings batchSettings)
         {
-            _splitFileService.SplitDataFile(collector, message, subjectData);
+            _splitFileService.SplitDataFile(collector, message, subjectData, batchSettings);
         }
 
         private void SaveChanges()
         {
             _context.SaveChanges();
+        }
+        
+        private static IConfigurationRoot LoadAppSettings(ExecutionContext context)
+        {
+            return new ConfigurationBuilder()
+                .SetBasePath(context.FunctionAppDirectory)
+                .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
+                .AddEnvironmentVariables()
+                .Build();
+        }
+
+        private static BatchSettings GetBatchSettings(IConfigurationRoot config)
+        {
+            var batchSettings = new BatchSettings {BatchSize = config.GetValue<int>("BatchSize")};
+            return batchSettings;
         }
     }
 }
