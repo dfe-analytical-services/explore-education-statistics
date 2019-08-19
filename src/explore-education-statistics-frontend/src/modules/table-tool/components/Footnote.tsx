@@ -1,9 +1,9 @@
 import React from 'react';
-import { TableData } from '@common/services/tableBuilderService';
+import { FullTableMeta } from '@frontend/services/permalinkService';
 import Details from '@common/components/Details';
 
 export interface FootnoteProps {
-  content: TableData['footnotes'];
+  content: FullTableMeta['footnotes'];
 }
 
 const Footnote = ({ content }: FootnoteProps) => {

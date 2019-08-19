@@ -18,9 +18,7 @@ import {
   Indicator,
   LocationFilter,
 } from '@frontend/modules/table-tool/components/types/filters';
-import TimePeriod, {
-  parseYearCodeTuple,
-} from '@frontend/modules/table-tool/components/types/TimePeriod';
+import { parseYearCodeTuple } from '@frontend/modules/table-tool/components/types/TimePeriod';
 import mapValues from 'lodash/mapValues';
 import { NextContext } from 'next';
 import Router from 'next/router';
@@ -82,7 +80,6 @@ interface State {
   subjects: PublicationSubject[];
   subjectId: string;
   subjectMeta: PublicationSubjectMeta;
-  // timePeriodRange: TimePeriod[];
   tableHeaders: TableHeadersFormValues;
 }
 
@@ -103,7 +100,6 @@ class TableToolPage extends Component<Props, State> {
       filters: {},
     },
     subjects: [],
-    // timePeriodRange: [],
     tableHeaders: {
       columnGroups: [],
       columns: [],
@@ -116,7 +112,6 @@ class TableToolPage extends Component<Props, State> {
 
   public static async getInitialProps({ query }: NextContext) {
     const themeMeta = await tableBuilderService.getThemes();
-
     const publication = themeMeta
       .flatMap(option => option.topics)
       .flatMap(option => option.publications)
@@ -264,14 +259,7 @@ class TableToolPage extends Component<Props, State> {
   };
 
   private handleFiltersFormSubmit: FilterFormSubmitHandler = async values => {
-    const {
-      startYear,
-      startCode,
-      endYear,
-      endCode,
-      subjectMeta,
-      locations,
-    } = this.state;
+    const { startYear, startCode, endYear, endCode, subjectMeta } = this.state;
 
     if (!startYear || !startCode || !endYear || !endCode) {
       return;
@@ -309,14 +297,7 @@ class TableToolPage extends Component<Props, State> {
       createdTable,
       filters,
       indicators,
-      tableHeaders: getDefaultTableHeaderConfig(
-        indicators,
-        filters,
-        createdTable.subjectMeta.timePeriodRange.map(
-          timePeriod => new TimePeriod(timePeriod),
-        ),
-        Object.values(locations).flat(),
-      ),
+      tableHeaders: getDefaultTableHeaderConfig(createdTable.subjectMeta),
     });
   };
 

@@ -57,6 +57,7 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
         const indicator = (rowCol1 instanceof Indicator
           ? rowCol1
           : rowCol2) as Indicator;
+
         const timePeriod = (rowCol2 instanceof TimePeriod
           ? rowCol2
           : rowCol1) as TimePeriod;

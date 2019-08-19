@@ -1,8 +1,8 @@
 import React, { forwardRef, ReactNode, Ref, useRef } from 'react';
-import { TableData } from '@common/services/tableBuilderService';
 import Footnote from '@frontend/modules/table-tool/components/Footnote';
-import styles from './FixedMultiHeaderDataTable.module.scss';
+import { FullTableMeta } from '@frontend/services/permalinkService';
 import MultiHeaderTable from './MultiHeaderTable';
+import styles from './FixedMultiHeaderDataTable.module.scss';
 
 interface Props {
   caption: ReactNode;
@@ -11,7 +11,7 @@ interface Props {
   columnHeaders: string[][];
   rowHeaders: string[][];
   rows: string[][];
-  footnotes?: TableData['footnotes'];
+  footnotes?: FullTableMeta['footnotes'];
 }
 
 const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
