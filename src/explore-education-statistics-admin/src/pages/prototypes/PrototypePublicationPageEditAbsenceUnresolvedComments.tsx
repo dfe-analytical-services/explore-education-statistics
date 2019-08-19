@@ -60,7 +60,7 @@ const PublicationPage = ({ reviewing, newBlankRelease }: Props) => {
             </span>
             <strong className="govuk-warning-text__text">
               <span className="govuk-warning-text__assistive">Warning</span>
-              There are {allUnresolved.length} comments
+              There are {allUnresolved.length} unresolved comments
             </strong>
           </div>
         )}
@@ -97,7 +97,7 @@ const PublicationPage = ({ reviewing, newBlankRelease }: Props) => {
                 />
               )}
               <label className="govuk-label govuk-radios__label" htmlFor="edit">
-                Edit content
+                Edit content, add and view comments
               </label>
             </div>
             <div className="govuk-radios__item">
@@ -136,7 +136,11 @@ const PublicationPage = ({ reviewing, newBlankRelease }: Props) => {
       </div>
 
       <hr />
-      <div className="govuk-width-container  dfe-align--comments">
+      <div
+        className={`govuk-width-container ${
+          editing ? 'dfe-align--comments' : 'dfe-hide-comments'
+        }`}
+      >
         <EditablePublicationPage editing={editing} reviewing data={data} />
       </div>
     </PrototypePage>

@@ -2,6 +2,7 @@ import { LoginContext } from '@admin/components/Login';
 import { User } from '@admin/services/sign-in/types';
 import { ExtendedComment } from '@admin/services/publicationService';
 import Details from '@common/components/Details';
+import classNames from 'classnames';
 import React from 'react';
 import styles from './PrototypeEditableContentAddComment.module.scss';
 
@@ -54,7 +55,7 @@ const ContentAddComment = ({ initialComments }: Props) => {
 
   return (
     <>
-      <div className={styles.addComment}>
+      <div className={classNames('dfe-comment-block', [styles.addComment])}>
         <Details
           summary="Add / view comments to section"
           className="govuk-!-margin-bottom-1 govuk-body-s"
