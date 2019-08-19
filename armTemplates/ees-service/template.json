@@ -186,7 +186,7 @@
     "publicStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publicStorageAccountName'))]",
     "publisherAppName": "[concat(parameters('subscription'), '-fa-', parameters('environment'), '-publisher')]",
     "publisherPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-publisher')]",
-    "publisherAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-publisher')]",
+    "publisherAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-publisher')]"
   },
   "resources": [
     {
