@@ -3,6 +3,9 @@ import React from 'react';
 import Link from '@admin/components/Link';
 import { format } from 'date-fns';
 import Details from '@common/components/Details';
+import { LoginContext } from '@admin/components/Login';
+import useToggle from '@common/hooks/useToggle';
+import ModalConfirm from '@common/components/ModalConfirm';
 
 interface Props {
   title?: string;
@@ -43,6 +46,9 @@ const PrototypeDashboardRelease = ({
   task,
   user,
 }: Props) => {
+  const userContext = React.useContext(LoginContext);
+  const [showDeleteReleaseModal, toggleDeleteReleaseModal] = useToggle(false);
+
   return (
     <Details
       className="govuk-!-margin-bottom-0"
@@ -210,53 +216,78 @@ const PrototypeDashboardRelease = ({
           </div>
         )}
       </dl>
-      {!editing && !review && (
-        <Link to="/prototypes/publication-edit" className="govuk-button">
-          Edit this release
-        </Link>
-      )}
-      {editing && (
-        <Link
-          to="/prototypes/publication-create-new-absence"
-          className="govuk-button"
-        >
-          View / edit this draft
-        </Link>
-      )}
-      {task === 'resolveComments' && (
-        <Link
-          to="/prototypes/publication-unresolved-comments"
-          className="govuk-button"
-        >
-          View release and resolve comments
-        </Link>
-      )}
-      {task === 'readyApproval' && (
-        <Link to="/prototypes/publication-review" className="govuk-button">
-          View and edit release
-        </Link>
-      )}
-      {task === 'readyHigherReview' && user === 'standardUser' && (
-        <Link
-          to="/prototypes/publication-higher-review"
-          className="govuk-button"
-        >
-          View release
-        </Link>
-      )}
-      {task === 'approvedPublication' && (
-        <Link to="/prototypes/publication-preview" className="govuk-button">
-          Preview release
-        </Link>
-      )}
-      {task === 'readyHigherReview' && user === 'higherReviewUser' && (
-        <Link
-          to="/prototypes/publication-higher-review"
-          className="govuk-button"
-        >
-          View and review release
-        </Link>
-      )}
+      <div className="govuk-grid-row">
+        <div className="govuk-grid-column-one-half">
+          {!editing && !review && (
+            <Link to="/prototypes/publication-edit" className="govuk-button">
+              Edit this release
+            </Link>
+          )}
+          {editing && (
+            <Link
+              to="/prototypes/publication-create-new-absence"
+              className="govuk-button"
+            >
+              View / edit this draft
+            </Link>
+          )}
+          {task === 'resolveComments' && (
+            <Link
+              to="/prototypes/publication-unresolved-comments"
+              className="govuk-button"
+            >
+              View release and resolve comments
+            </Link>
+          )}
+          {task === 'readyApproval' && (
+            <Link to="/prototypes/publication-review" className="govuk-button">
+              View and edit release
+            </Link>
+          )}
+          {task === 'readyHigherReview' && user === 'standardUser' && (
+            <Link
+              to="/prototypes/publication-higher-review"
+              className="govuk-button"
+            >
+              View release
+            </Link>
+          )}
+          {task === 'approvedPublication' && (
+            <Link to="/prototypes/publication-preview" className="govuk-button">
+              Preview release
+            </Link>
+          )}
+          {task === 'readyHigherReview' && user === 'higherReviewUser' && (
+            <Link
+              to="/prototypes/publication-higher-review"
+              className="govuk-button"
+            >
+              View and review release
+            </Link>
+          )}
+        </div>
+        <div className="govuk-grid-column-one-half dfe-align--right">
+          {userContext.user && userContext.user.permissions.includes('bau') && (
+            <a
+              href="#"
+              className="govuk-button govuk-button--warning govuk-!-margin-left-6"
+              onClick={() => toggleDeleteReleaseModal(true)}
+            >
+              Remove this release
+            </a>
+          )}
+        </div>
+      </div>
+
+      <ModalConfirm
+        mounted={showDeleteReleaseModal}
+        title="Confirm removal of this release"
+        onExit={() => toggleDeleteReleaseModal(false)}
+        onConfirm={() => toggleDeleteReleaseModal(false)}
+        onCancel={() => toggleDeleteReleaseModal(false)}
+      >
+        <p>This releases will be removed from public view </p>
+      </ModalConfirm>
     </Details>
   );
 };

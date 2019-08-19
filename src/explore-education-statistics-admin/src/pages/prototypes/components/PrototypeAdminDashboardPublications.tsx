@@ -4,15 +4,21 @@ import AccordionSection from '@common/components/AccordionSection';
 import { FormGroup, FormSelect } from '@common/components/form';
 import { LoginContext } from '@admin/components/Login';
 import React from 'react';
+import useToggle from '@common/hooks/useToggle';
+import ModalConfirm from '@common/components/ModalConfirm';
 import Link from '@admin/components/Link';
 
 const PrototypeAdminDashboardPublications = () => {
   const userContext = React.useContext(LoginContext);
+  const [showDeletePublicationModal, toggleDeletePublicationModal] = useToggle(
+    false,
+  );
 
   return (
     <>
       {userContext.user &&
-        userContext.user.permissions.includes('team lead') && (
+        (userContext.user.permissions.includes('team lead') ||
+          userContext.user.permissions.includes('bau')) && (
           <p className="govuk-body">
             View existing and create new publications and releases.
           </p>
@@ -35,57 +41,62 @@ const PrototypeAdminDashboardPublications = () => {
           explore.statistics@education.gov.uk
         </a>
       </p>
-      {userContext.user && userContext.user.permissions.includes('team lead') && (
-        <>
-          <form>
-            <div className="govuk-grid-row">
-              <div className="govuk-grid-column-one-half">
-                <FormGroup>
-                  <FormSelect
-                    id="select-theme"
-                    label="Select theme"
-                    name="select-theme"
-                    options={[
-                      { label: 'Pupils and schools', value: 'pupils-schools' },
-                      {
-                        label: 'School and college outcomes and performance',
-                        value: 'school-college-performance',
-                      },
-                    ]}
-                  />
-                </FormGroup>
+      {userContext.user &&
+        (userContext.user.permissions.includes('team lead') ||
+          userContext.user.permissions.includes('bau')) && (
+          <>
+            <form>
+              <div className="govuk-grid-row">
+                <div className="govuk-grid-column-one-half">
+                  <FormGroup>
+                    <FormSelect
+                      id="select-theme"
+                      label="Select theme"
+                      name="select-theme"
+                      options={[
+                        {
+                          label: 'Pupils and schools',
+                          value: 'pupils-schools',
+                        },
+                        {
+                          label: 'School and college outcomes and performance',
+                          value: 'school-college-performance',
+                        },
+                      ]}
+                    />
+                  </FormGroup>
+                </div>
+                <div className="govuk-grid-column-one-half">
+                  <FormGroup>
+                    <FormSelect
+                      id="select-theme"
+                      label="Select topic"
+                      name="select-topic"
+                      value="pupil-absence"
+                      options={[
+                        {
+                          label: 'Admission appeals',
+                          value: 'admission-appeals',
+                        },
+                        { label: 'Exclusions', value: 'exclusions' },
+                        { label: 'Pupil absence', value: 'pupil-absence' },
+                        {
+                          label: 'Parental responsibility measures',
+                          value: 'parental-repsonsibilty',
+                        },
+                        {
+                          label: 'Pupil projections',
+                          value: 'pupil-projections',
+                        },
+                        { label: 'View all topics', value: 'view-all-topics' },
+                      ]}
+                    />
+                  </FormGroup>
+                </div>
               </div>
-              <div className="govuk-grid-column-one-half">
-                <FormGroup>
-                  <FormSelect
-                    id="select-theme"
-                    label="Select topic"
-                    name="select-topic"
-                    value="pupil-absence"
-                    options={[
-                      {
-                        label: 'Admission appeals',
-                        value: 'admission-appeals',
-                      },
-                      { label: 'Exclusions', value: 'exclusions' },
-                      { label: 'Pupil absence', value: 'pupil-absence' },
-                      {
-                        label: 'Parental responsibility measures',
-                        value: 'parental-repsonsibilty',
-                      },
-                      {
-                        label: 'Pupil projections',
-                        value: 'pupil-projections',
-                      },
-                      { label: 'View all topics', value: 'view-all-topics' },
-                    ]}
-                  />
-                </FormGroup>
-              </div>
-            </div>
-          </form>
-        </>
-      )}
+            </form>
+          </>
+        )}
       <hr />
       <h2 className="govuk-heading-l">Pupils and schools</h2>
       <h3 className="govuk-heading-m govuk-!-margin-bottom-0">
@@ -204,18 +215,33 @@ const PrototypeAdminDashboardPublications = () => {
               </dd>
             </div>
           </dl>
-          <Link
-            to="/prototypes/release-create-new"
-            className="govuk-button govuk-!-margin-right-6"
-          >
-            Create new release
-          </Link>
-          <Link
-            to="/prototypes/publication-assign-methodology"
-            className="govuk-button govuk-button--secondary"
-          >
-            Manage methodology
-          </Link>
+          <div className="govuk-grid-row">
+            <div className="govuk-grid-column-one-half">
+              <Link
+                to="/prototypes/release-create-new"
+                className="govuk-button govuk-!-margin-right-6"
+              >
+                Create new release
+              </Link>
+              <Link
+                to="/prototypes/publication-assign-methodology"
+                className="govuk-button govuk-button--secondary govuk-!-margin-right-6"
+              >
+                Manage methodology
+              </Link>
+            </div>
+            {userContext.user && userContext.user.permissions.includes('bau') && (
+              <div className="govuk-grid-column-one-half dfe-align--right">
+                <a
+                  href="#"
+                  className="govuk-button govuk-button--warning"
+                  onClick={() => toggleDeletePublicationModal(true)}
+                >
+                  Remove this publication
+                </a>
+              </div>
+            )}
+          </div>
         </AccordionSection>
         <AccordionSection
           heading=" Pupil absence statistics and data for schools in England: autumn term"
@@ -393,6 +419,17 @@ const PrototypeAdminDashboardPublications = () => {
           Create new publication
         </Link>
       )}
+      <ModalConfirm
+        mounted={showDeletePublicationModal}
+        title="Confirm removal of this publication"
+        onExit={() => toggleDeletePublicationModal(false)}
+        onConfirm={() => toggleDeletePublicationModal(false)}
+        onCancel={() => toggleDeletePublicationModal(false)}
+      >
+        <p>
+          This publication and related releases will be removed from public view{' '}
+        </p>
+      </ModalConfirm>
     </>
   );
 };
