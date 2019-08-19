@@ -1067,7 +1067,9 @@ Find out how and why these statistics are collected and published - [Secondary a
 
                     b.Property<string>("Summary");
 
-                    b.Property<int>("TimePeriodCoverage");
+                    b.Property<string>("TimePeriodCoverage")
+                        .IsRequired()
+                        .HasMaxLength(6);
 
                     b.Property<Guid>("TypeId");
 

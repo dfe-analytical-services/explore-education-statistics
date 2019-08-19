@@ -205,6 +205,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<List<ContentSection>>(v));
+            
             modelBuilder.Entity<Release>()
                 .Property(b => b.NextReleaseDate)
                 .HasConversion(
@@ -231,6 +232,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<PartialDate>(v));
+            
+            modelBuilder.Entity<ReleaseSummaryVersion>()
+                .Property(r => r.TimePeriodCoverage)
+                .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>())
+                .HasMaxLength(6);
             
             modelBuilder.Entity<ReleaseType>().HasData(
                 new ReleaseType

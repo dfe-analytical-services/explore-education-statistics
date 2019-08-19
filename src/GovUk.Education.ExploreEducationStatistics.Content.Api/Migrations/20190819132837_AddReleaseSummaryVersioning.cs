@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                     Slug = table.Column<string>(nullable: true),
                     Summary = table.Column<string>(nullable: true),
                     TypeId = table.Column<Guid>(nullable: false),
-                    TimePeriodCoverage = table.Column<int>(nullable: false),
+                    TimePeriodCoverage = table.Column<string>(maxLength: 6, nullable: false),
                     NextReleaseDate = table.Column<string>(nullable: true),
                     Created = table.Column<DateTime>(nullable: false)
                 },
