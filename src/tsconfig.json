@@ -26,6 +26,7 @@
       "@common/*": ["./explore-education-statistics-common/src/*"],
       "@common-test/*": ["./explore-education-statistics-common/test/*"],
       "@frontend/*": ["./explore-education-statistics-frontend/src/*"]
-    }
+    },
+    "sourceMap": true
   }
 }

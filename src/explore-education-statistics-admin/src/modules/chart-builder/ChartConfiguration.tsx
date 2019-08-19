@@ -1,13 +1,13 @@
 import styles from '@admin/modules/chart-builder/graph-builder.module.scss';
 import React from 'react';
-import { ChartDefinition } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import {ChartDefinition} from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import {
   FormCheckbox,
   FormGroup,
   FormSelect,
   FormTextInput,
 } from '@common/components/form';
-import { DataBlockMetadata } from '@common/services/dataBlockService';
+import {DataBlockMetadata} from '@common/services/dataBlockService';
 
 interface Props {
   selectedChartType: ChartDefinition;
@@ -110,9 +110,9 @@ const ChartConfiguration = ({
             value={chartOptions.legend}
             label="Legend Position"
             options={[
-              { label: 'Top', value: 'top' },
-              { label: 'Bottom', value: 'bottom' },
-              { label: 'None', value: 'none' },
+              {label: 'Top', value: 'top'},
+              {label: 'Bottom', value: 'bottom'},
+              {label: 'None', value: 'none'},
             ]}
             order={[]}
             onChange={e => {
@@ -174,28 +174,36 @@ const ChartConfiguration = ({
         )}
 
         {selectedChartType.type === 'map' &&
-          meta.locationsOptions &&
-          meta.locationsOptions.length > 0 && (
-            <FormGroup className={styles.formGroup}>
-              <FormSelect
-                id="geographicId"
-                label="Select a version of geographical data to use"
-                name="geographicId"
-                order={[]}
-                options={[
-                  { label: 'Latest', value: '' },
-                  ...meta.locationsOptions,
-                ]}
-                onChange={e => {
-                  updateChartOptions({
-                    ...chartOptions,
-                    geographicId: e.target.value,
-                  });
-                }}
-                value={chartOptions.geographicId}
-              />
-            </FormGroup>
-          )}
+        meta.boundaryLevels && (
+          <>
+            {meta.boundaryLevels.length === 1 && (
+              <div>
+                Using <em>{meta.boundaryLevels[0].label}</em>
+              </div>
+            )}
+            {meta.boundaryLevels.length > 1 && (
+              <FormGroup className={styles.formGroup}>
+                <FormSelect
+                  id="geographicId"
+                  label="Select a version of geographical data to use"
+                  name="geographicId"
+                  order={[]}
+                  options={[
+                    {label: 'Latest', value: ''},
+                    ...meta.boundaryLevels.map(({id, label}) => ({value: id, label})),
+                  ]}
+                  onChange={e => {
+                    updateChartOptions({
+                      ...chartOptions,
+                      geographicId: e.target.value,
+                    });
+                  }}
+                  value={chartOptions.geographicId}
+                />
+              </FormGroup>
+            )}
+          </>
+        )}
       </div>
     </>
   );

@@ -1,6 +1,6 @@
-import { dataApi } from '@common/services/api';
-import { Dictionary } from '@common/types/util';
-import { Feature, Geometry } from 'geojson';
+import {dataApi} from '@common/services/api';
+import {Dictionary} from '@common/types/util';
+import {Feature, Geometry} from 'geojson';
 
 export enum GeographicLevel {
   Establishment = 'Establishment',
@@ -215,12 +215,16 @@ export interface DataBlockLocationMetadata {
 
 // ------------------------------------------
 
+export interface BoundaryLevel {
+  id : number;
+  label: string;
+}
 export interface DataBlockMetadata {
   indicators: Dictionary<LabelValueUnitMetadata>;
   filters: Dictionary<LabelValueMetadata>;
   timePeriods: Dictionary<LabelValueMetadata>;
   locations: Dictionary<DataBlockLocationMetadata>;
-  locationsOptions?: LabelValueMetadata[]
+  boundaryLevels?: BoundaryLevel[]
 }
 
 interface DataBlockTimePeriod {
@@ -235,6 +239,7 @@ export interface DataBlockRequest {
   timePeriod: DataBlockTimePeriod;
   filters: string[];
   geographicLevel: GeographicLevel;
+  boundaryLevel?: number,
   indicators: string[];
 
   country?: string[];
@@ -251,6 +256,10 @@ export interface DataBlockRequest {
   ward?: string[];
 }
 
+export interface DataBlockRerequest {
+  boundaryLevel?: number;
+}
+
 export interface DataBlockResponse {
   metaData: DataBlockMetadata;
 
@@ -259,7 +268,6 @@ export interface DataBlockResponse {
   subjectId: number;
   releaseDate: Date;
   geographicLevel: GeographicLevel;
-  geographicId?: string;
 
   result: Result[];
 }
@@ -268,18 +276,7 @@ const DataBlockService = {
   async getDataBlockForSubject(request: DataBlockRequest) : Promise<DataBlockResponse> {
     const response: DataBlockResponse = await dataApi.post('/Data', request);
 
-    // hack for now
-    return {
-      ...response,
-      metaData: {
-        ...response.metaData,
-        locationsOptions: [
-          { label: "Geographic from 2014" , value: "2014" }
-        ]
-      }
-    };
-
-    //return response;
+    return response;
   },
 };
 

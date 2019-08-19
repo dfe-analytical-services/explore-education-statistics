@@ -1,13 +1,13 @@
 import HorizontalBarBlock from '@common/modules/find-statistics/components/charts/HorizontalBarBlock';
 import LineChartBlock from '@common/modules/find-statistics/components/charts/LineChartBlock';
 import VerticalBarBlock from '@common/modules/find-statistics/components/charts/VerticalBarBlock';
-import { ChartType } from '@common/services/publicationService';
+import {ChartType} from '@common/services/publicationService';
 import React from 'react';
 import dynamic from 'next-server/dynamic';
 import Infographic, {
   InfographicChartProps,
 } from '@common/modules/find-statistics/components/charts/Infographic';
-import { ChartProps, StackedBarProps } from './charts/ChartFunctions';
+import {ChartProps, StackedBarProps} from './charts/ChartFunctions';
 
 const DynamicMapBlock = dynamic(
   () => import('@common/modules/find-statistics/components/charts/MapBlock'),
@@ -20,10 +20,10 @@ export interface ChartRendererProps
   extends ChartProps,
     StackedBarProps,
     InfographicChartProps {
-  type: ChartType;
+  type: ChartType | 'unknown';
 }
 
-function ChartTypeRenderer({ type, ...chartProps }: ChartRendererProps) {
+function ChartTypeRenderer({type, ...chartProps}: ChartRendererProps) {
   switch (type.toLowerCase()) {
     case 'line':
       return <LineChartBlock {...chartProps} />;
@@ -42,7 +42,7 @@ function ChartTypeRenderer({ type, ...chartProps }: ChartRendererProps) {
 }
 
 function ChartRenderer(props: ChartRendererProps) {
-  const { data, meta, title } = props;
+  const {data, meta, title} = props;
 
   // TODO : Temporary sort on the results to get them in date order
   data.result.sort((a, b) => a.timePeriod.localeCompare(b.timePeriod));

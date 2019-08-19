@@ -379,7 +379,7 @@ const ChartAxisConfiguration = ({
                     name="sort_asc"
                     label="Sort Ascending"
                     value="asc"
-                    checked={axisConfiguration.sortAsc}
+                    defaultChecked={axisConfiguration.sortAsc}
                     onChange={e => {
                       updateAxisConfiguration({ sortAsc: e.target.checked });
                     }}

@@ -96,6 +96,7 @@ function getGeometryForOptions(
   min: number,
   scale: number,
 ): FeatureCollection<Geometry, DataBlockGeoJsonProperties> {
+
   return {
     type: 'FeatureCollection',
     features: sourceData.map(({ __name: id, name: _, data, ...measures }) => ({
@@ -293,7 +294,7 @@ const MapBlock = ({
 
   const [results, setResults] = React.useState<IdValue[]>([]);
 
-  const [chartData, setChartData] = React.useState<ChartDataB[]>([]);
+  const [chartData, setChartData] = React.useState<ChartDataB[]>();
 
   // initialise
   React.useEffect(() => {
@@ -302,6 +303,7 @@ const MapBlock = ({
     });
   }, [container]);
 
+  // resize handler
   React.useEffect(() => {
     if (container.current) {
       intersectionObserver.current = registerResizingCheck(
@@ -326,6 +328,7 @@ const MapBlock = ({
 
   // initialise on prop changes
   React.useEffect(() => {
+
     const generatedChartData = createSortedAndMappedDataForAxis(
       axes.major,
       data.result,
@@ -341,6 +344,7 @@ const MapBlock = ({
     setMajorOptions(getLocationsForDataSet(data, meta, generatedChartData));
   }, [data, axes.major, meta, labels]);
 
+  // update settings for the data sets
   React.useEffect(() => {
     setDataSetOptions(
       axes.major.dataSets.map((dataSet, index) => {
@@ -350,6 +354,53 @@ const MapBlock = ({
     );
   }, [axes.major.dataSets, axes.major.groupBy, labels]);
 
+
+  // reset the GeoJson layer if the geometry is changed, updating the component doesn't do it once it's rendered
+  React.useEffect(() => {
+    if (geoJsonRef.current) {
+      geoJsonRef.current.leafletElement.clearLayers();
+
+      if (geometry) {
+        geoJsonRef.current.leafletElement.addData(geometry);
+      }
+    }
+  }, [geoJsonRef, geometry]);
+
+  // force a refresh of the leaflet element if width or height are changed
+  React.useEffect(() => {
+    if (mapRef.current) {
+      mapRef.current.leafletElement.invalidateSize();
+    }
+  }, [width, height, mapRef]);
+
+  // Rebuild the geometry if the selection has changed
+  React.useEffect(() => {
+
+    if (chartData) {
+      const {
+        geometry: newGeometry,
+        legend: newLegend,
+      } = generateGeometryAndLegendForSelectedOptions(
+        meta,
+        labels,
+        chartData,
+        selectedDataSetKey,
+      );
+
+      setGeometry(newGeometry);
+      setLegend(newLegend);
+    }
+  }, [chartData, meta, labels, selectedDataSetKey]);
+
+  // Generate the selected indicator key when the user selects an option
+  const onSelectIndicator = (selectedDatasetIndex: number) => {
+    setSelectedDataSetIndex(selectedDatasetIndex);
+    setSelectedDataSetKey(
+      generateKeyFromDataSet(axes.major.dataSets[selectedDatasetIndex]),
+    );
+  };
+
+  // callbacks for the Leaflet element
   const onEachFeatureCallback = useCallbackRef(
     () => (feature: MapFeature, featureLayer: Layer) => {
       if (feature.properties) {
@@ -368,11 +419,11 @@ const MapBlock = ({
       featureLayer.bindTooltip(() => {
         if (feature.properties) {
           const content = Object.entries(feature.properties.measures)
-            .map(([id, value]) => ({
-              ...(labels[id] || { label: '', unit: '' }),
-              value,
-            }))
-            .map(({ label, value, unit }) => `${label} : ${value}${unit}`);
+          .map(([id, value]) => ({
+            ...(labels[id] || { label: '', unit: '' }),
+            value,
+          }))
+          .map(({ label, value, unit }) => `${label} : ${value}${unit}`);
 
           if (feature.id) {
             content.unshift(
@@ -387,45 +438,6 @@ const MapBlock = ({
     },
     [labels, meta.locations, selectedLocation],
   );
-
-  React.useEffect(() => {
-    if (geoJsonRef.current) {
-      geoJsonRef.current.leafletElement.clearLayers();
-
-      if (geometry) {
-        geoJsonRef.current.leafletElement.addData(geometry);
-      }
-    }
-  }, [geoJsonRef, geometry]);
-
-  React.useEffect(() => {
-    if (mapRef.current) {
-      mapRef.current.leafletElement.invalidateSize();
-    }
-  }, [width, height, mapRef]);
-
-  // Selected data set change
-  React.useEffect(() => {
-    const {
-      geometry: newGeometry,
-      legend: newLegend,
-    } = generateGeometryAndLegendForSelectedOptions(
-      meta,
-      labels,
-      chartData,
-      selectedDataSetKey,
-    );
-
-    setGeometry(newGeometry);
-    setLegend(newLegend);
-  }, [chartData, meta, labels, selectedDataSetKey]);
-
-  const onSelectIndicator = (selectedDatasetIndex: number) => {
-    setSelectedDataSetIndex(selectedDatasetIndex);
-    setSelectedDataSetKey(
-      generateKeyFromDataSet(axes.major.dataSets[selectedDatasetIndex]),
-    );
-  };
 
   const updateSelectedLocation = (
     newSelectedLocation: string,
@@ -492,8 +504,7 @@ const MapBlock = ({
   if (
     data === undefined ||
     axes.major === undefined ||
-    axes.major.dataSets === undefined ||
-    axes.minor === undefined
+    axes.major.dataSets === undefined
   )
     return <div>An error occurred</div>;
 

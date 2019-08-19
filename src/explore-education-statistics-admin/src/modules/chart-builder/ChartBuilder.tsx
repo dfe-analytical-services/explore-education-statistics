@@ -18,14 +18,14 @@ import HorizontalBarBlock from '@common/modules/find-statistics/components/chart
 import LineChartBlock from '@common/modules/find-statistics/components/charts/LineChartBlock';
 import MapBlock from '@common/modules/find-statistics/components/charts/MapBlock';
 import VerticalBarBlock from '@common/modules/find-statistics/components/charts/VerticalBarBlock';
-import { DataBlockResponse } from '@common/services/dataBlockService';
+import {DataBlockResponse, DataBlockRerequest} from '@common/services/dataBlockService';
 import {
   AxisConfiguration,
   ChartDataSet,
   DataSetConfiguration,
   Chart,
 } from '@common/services/publicationService';
-import { Dictionary } from '@common/types';
+import {Dictionary} from '@common/types';
 import React from 'react';
 import ChartConfiguration, {
   ChartOptions,
@@ -40,6 +40,8 @@ interface Props {
   data: DataBlockResponse;
   initialConfiguration?: Chart;
   onChartSave?: (props: ChartRendererProps) => void;
+
+  onRequiresDataUpdate?: (parameters: DataBlockRerequest) => void
 }
 
 function getReduceMetaDataForAxis(data: DataBlockResponse) {
@@ -83,29 +85,33 @@ const chartTypes: ChartDefinition[] = [
   MapBlock.definition,
 ];
 
+// need a constant reference as there are dependencies on this not changing if it isn't set
 const ChartBuilder = ({
   data,
   onChartSave,
-  initialConfiguration = {},
+  initialConfiguration,
+  onRequiresDataUpdate
 }: Props) => {
-  const [selectedChartType, setSelectedChartType] = React.useState<
-    ChartDefinition | undefined
-  >();
+  const [selectedChartType, setSelectedChartType] = React.useState<ChartDefinition | undefined>();
 
-  const indicatorIds = Object.keys(data.metaData.indicators);
-
-  const filterIdCombinations: string[][] = Object.values(
-    data.result.reduce((filterSet, result) => {
-      const filterIds = Array.from(result.filters);
-
-      return {
-        ...filterSet,
-        [filterIds.join('_')]: filterIds,
-      };
-    }, {}),
+  const [indicatorIds] = React.useState<string[]>(
+    Object.keys(data.metaData.indicators)
   );
 
-  const [chartOptions, setChartOptions] = React.useState<ChartOptions>({
+  const [filterIdCombinations] = React.useState<string[][]>(
+    Object.values(
+      data.result.reduce((filterSet, result) => {
+        const filterIds = Array.from(result.filters);
+
+        return {
+          ...filterSet,
+          [filterIds.join('_')]: filterIds,
+        };
+      }, {}),
+    )
+  );
+
+  const [chartOptions, realSetChartOptions] = React.useState<ChartOptions>({
     stacked: false,
     legend: 'top',
     legendHeight: '42',
@@ -114,17 +120,28 @@ const ChartBuilder = ({
     ...initialConfiguration,
   });
 
+  const previousChartOptions = React.useRef<ChartOptions>();
+
+  const setChartOptions = (_chartOptions: ChartOptions) => {
+    if (previousChartOptions.current && onRequiresDataUpdate) {
+      if (previousChartOptions.current.geographicId !== _chartOptions.geographicId) {
+
+        const boundaryLevel = _chartOptions.geographicId ? Number.parseInt(_chartOptions.geographicId, 10) : undefined;
+
+        onRequiresDataUpdate({boundaryLevel});
+      }
+    }
+    previousChartOptions.current = _chartOptions;
+    realSetChartOptions(_chartOptions);
+  };
+
   const previousAxesConfiguration = React.useRef<Dictionary<AxisConfiguration>>(
     {},
   );
 
-  const [axesConfiguration, realSetAxesConfiguration] = React.useState<
-    Dictionary<AxisConfiguration>
-  >({});
+  const [axesConfiguration, realSetAxesConfiguration] = React.useState<Dictionary<AxisConfiguration>>({});
 
-  const [dataSetAndConfiguration, setDataSetAndConfiguration] = React.useState<
-    ChartDataSetAndConfiguration[]
-  >([]);
+  const [dataSetAndConfiguration, setDataSetAndConfiguration] = React.useState<ChartDataSetAndConfiguration[]>([]);
 
   const setAxesConfiguration = (config: Dictionary<AxisConfiguration>) => {
     previousAxesConfiguration.current = config;
@@ -144,41 +161,36 @@ const ChartBuilder = ({
     setDataSetAndConfiguration(newDataSets);
   };
 
-  const [chartLabels, setChartLabels] = React.useState<
-    Dictionary<DataSetConfiguration>
-  >({});
+  const [chartLabels, setChartLabels] = React.useState<Dictionary<DataSetConfiguration>>({});
   React.useEffect(() => {
-    if (axesConfiguration) {
-      setChartLabels({
-        ...dataSetAndConfiguration.reduce<Dictionary<DataSetConfiguration>>(
-          (mapped, { configuration }) => ({
-            ...mapped,
-            [configuration.value]: configuration,
-          }),
-          {},
-        ),
-        ...generateAxesMetaData(axesConfiguration, data),
-      });
-    }
+
+    setChartLabels({
+      ...dataSetAndConfiguration.reduce<Dictionary<DataSetConfiguration>>(
+        (mapped, {configuration}) => ({
+          ...mapped,
+          [configuration.value]: configuration,
+        }),
+        {},
+      ),
+      ...generateAxesMetaData(axesConfiguration, data)
+    });
+
   }, [dataSetAndConfiguration, axesConfiguration, data]);
 
-  const [majorAxisDataSets, setMajorAxisDataSets] = React.useState<
-    ChartDataSet[]
-  >([]);
+  const [majorAxisDataSets, setMajorAxisDataSets] = React.useState<ChartDataSet[]>([]);
   React.useEffect(() => {
     setMajorAxisDataSets(dataSetAndConfiguration.map(dsc => dsc.dataSet));
   }, [dataSetAndConfiguration]);
 
   // build the properties that is used to render the chart from the selections made
-  const [renderedChartProps, setRenderedChartProps] = React.useState<
-    ChartRendererProps
-  >();
+  const [renderedChartProps, setRenderedChartProps] = React.useState<ChartRendererProps>();
   React.useEffect(() => {
     if (
       selectedChartType &&
       majorAxisDataSets.length > 0 &&
-      axesConfiguration
+      axesConfiguration.major
     ) {
+
       setRenderedChartProps({
         type: selectedChartType.type,
 
@@ -219,9 +231,7 @@ const ChartBuilder = ({
       previousSelectionChartType.current = selectedChartType;
 
       if (selectedChartType) {
-        const newAxesConfiguration = selectedChartType.axes.reduce<
-          Dictionary<AxisConfiguration>
-        >((axesConfigurationDictionary, axisDefinition) => {
+        const newAxesConfiguration = selectedChartType.axes.reduce<Dictionary<AxisConfiguration>>((axesConfigurationDictionary, axisDefinition) => {
           const previousConfig =
             (previousAxesConfiguration.current &&
               previousAxesConfiguration.current[axisDefinition.type]) ||
@@ -275,10 +285,13 @@ const ChartBuilder = ({
   }, [selectedChartType, dataSetAndConfiguration]);
 
   React.useEffect(() => {
+
+    const initial = initialConfiguration || {};
+
     setSelectedChartType(
       () =>
-        initialConfiguration &&
-        chartTypes.find(({ type }) => type === initialConfiguration.type),
+        initial &&
+        chartTypes.find(({type}) => type === initial.type),
     );
 
     setChartOptions({
@@ -287,31 +300,29 @@ const ChartBuilder = ({
       legendHeight: '42',
       height: 300,
       title: '',
-      ...initialConfiguration,
+      ...initial,
     });
 
-    if (initialConfiguration.labels) {
-      setChartLabels(initialConfiguration.labels);
+    if (initial.labels) {
+      setChartLabels(initial.labels);
     }
 
-    if (initialConfiguration.axes && initialConfiguration.labels) {
-      setAxesConfiguration((initialConfiguration.axes as unknown) as Dictionary<
-        AxisConfiguration
-      >);
+    if (initial.axes && initial.labels) {
+      setAxesConfiguration((initial.axes as unknown) as Dictionary<AxisConfiguration>);
 
       if (
-        initialConfiguration.axes.major &&
-        initialConfiguration.axes.major.dataSets &&
-        initialConfiguration.labels
+        initial.axes.major &&
+        initial.axes.major.dataSets &&
+        initial.labels
       ) {
-        const dataSetAndConfig = initialConfiguration.axes.major.dataSets
-          .map(dataSet => {
-            const key = generateKeyFromDataSet(dataSet);
-            const configuration =
-              initialConfiguration.labels && initialConfiguration.labels[key];
-            return { dataSet, configuration };
-          })
-          .filter(dsc => dsc.configuration !== undefined);
+        const dataSetAndConfig = initial.axes.major.dataSets
+        .map(dataSet => {
+          const key = generateKeyFromDataSet(dataSet);
+          const configuration =
+            initial.labels && initial.labels[key];
+          return {dataSet, configuration};
+        })
+        .filter(dsc => dsc.configuration !== undefined);
 
         // @ts-ignore ... because Typescript is a pain
         setDataSetAndConfiguration(dataSetAndConfig);
