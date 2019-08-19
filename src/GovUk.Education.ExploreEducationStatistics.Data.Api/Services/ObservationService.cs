@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -11,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -101,19 +101,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 result.AddRange(DbSet()
                     .AsNoTracking()
                     .Where(observation => batch.Contains(observation.Id))
-                    .Include(observation => observation.Subject)
-                    .ThenInclude(subject => subject.Release)
                     .Include(observation => observation.Location)
                     .Include(observation => observation.FilterItems)
-                    .ThenInclude(item => item.FilterItem.FilterGroup));
+                    .ThenInclude(item => item.FilterItem.FilterGroup.Filter));
             }
 
+            // Nullify all of the Observational Unit fields which are empty
+            // Do this here on the set of distinct Locations rather than when building each ObservationViewModel
+            // (since a Location may be referenced by more than one Observation) 
             result.Select(observation => observation.Location)
                 .Distinct()
                 .ToList()
                 .ForEach(location => location.ReplaceEmptyOwnedTypeValuesWithNull());
 
             return result;
+        }
+
+        public IEnumerable<Observation> FindObservations(SubjectMetaQueryContext query)
+        {
+            return DbSet().AsNoTracking().Where(ObservationPredicateBuilder.Build(query));
         }
 
         private static SqlParameter CreateTimePeriodListType(string parameterName,
@@ -131,18 +137,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             }
 
             return TimePeriodUtil.Range(query.TimePeriod);
-        }
-
-        public IEnumerable<(TimeIdentifier TimeIdentifier, int Year)> GetTimePeriodsMeta(SubjectMetaQueryContext query)
-        {
-            var timePeriods = DbSet().AsNoTracking().Where(query.ObservationPredicate())
-                .Select(o => new {o.TimeIdentifier, o.Year})
-                .OrderBy(tuple => tuple.Year)
-                .ThenBy(tuple => tuple.TimeIdentifier)
-                .Distinct();
-
-            return from timePeriod in timePeriods.AsEnumerable()
-                select (timePeriod.TimeIdentifier, timePeriod.Year);
         }
     }
 }

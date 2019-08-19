@@ -1,120 +1,42 @@
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
-using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
-    public class TableBuilderDataService : AbstractDataService<ResultViewModel>
+    public class TableBuilderDataService : AbstractDataService<TableBuilderResultViewModel>
     {
-        private readonly IFootnoteService _footnoteService;
+        private readonly ITableBuilderResultSubjectMetaService _resultSubjectMetaService;
         private readonly IResultBuilder<Observation, ObservationViewModel> _resultBuilder;
 
-        public TableBuilderDataService(IFootnoteService footnoteService,
-            IObservationService observationService,
+        public TableBuilderDataService(IObservationService observationService,
+            ITableBuilderResultSubjectMetaService resultSubjectMetaService,
             ISubjectService subjectService,
             IResultBuilder<Observation, ObservationViewModel> resultBuilder) : base(observationService, subjectService)
         {
-            _footnoteService = footnoteService;
             _resultBuilder = resultBuilder;
+            _resultSubjectMetaService = resultSubjectMetaService;
         }
 
-        public override ResultViewModel Query(ObservationQueryContext queryContext)
+        public override TableBuilderResultViewModel Query(ObservationQueryContext queryContext)
         {
-            var observations = GetObservations(queryContext).ToList();
+            var observations = GetObservations(queryContext).AsQueryable();
             if (!observations.Any())
             {
-                return new ResultViewModel();
+                return new TableBuilderResultViewModel();
             }
 
-            return new ResultViewModel
+            var subjectMetaViewModel =
+                _resultSubjectMetaService.GetSubjectMeta(queryContext.ToSubjectMetaQueryContext(), observations);
+
+            return new TableBuilderResultViewModel
             {
-                Footnotes = GetFootnotes(observations, queryContext),
-                TimePeriodRange = GetTimePeriodRange(observations),
-                Result = observations.Select(observation =>
+                SubjectMeta = subjectMetaViewModel,
+                Results = observations.Select(observation =>
                     _resultBuilder.BuildResult(observation, queryContext.Indicators))
-            };
-        }
-
-        public override async Task<ResultViewModel> QueryAsync(ObservationQueryContext queryContext)
-        {
-            return Query(queryContext);
-        }
-
-        private IEnumerable<FootnoteViewModel> GetFootnotes(IEnumerable<Observation> observations,
-            ObservationQueryContext queryContext)
-        {
-            return _footnoteService.GetFootnotes(queryContext.SubjectId, observations, queryContext.Indicators)
-                .Select(footnote => new FootnoteViewModel
-                {
-                    Id = footnote.Id,
-                    Label = footnote.Content
-                });
-        }
-
-        private static IEnumerable<TimePeriodMetaViewModel> GetTimePeriodRange(
-            IEnumerable<Observation> observations)
-        {
-            var timePeriods = GetDistinctObservationTimePeriods(observations);
-
-            var start = timePeriods.First();
-            var end = timePeriods.Last();
-
-            if (start.TimeIdentifier.IsNumberOfTerms() || end.TimeIdentifier.IsNumberOfTerms())
-            {
-                return MergeTimePeriodsWithHalfTermRange(timePeriods, start.Year, end.Year)
-                    .Select(BuildTimePeriodViewModel);
-            }
-
-            return GetTimePeriodRange(start, end).Select(BuildTimePeriodViewModel);
-        }
-
-        private static IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriodRange(
-            (int Year, TimeIdentifier TimeIdentifier) start,
-            (int Year, TimeIdentifier TimeIdentifier) end)
-        {
-            return TimePeriodUtil.Range(start.Year, start.TimeIdentifier, end.Year, end.TimeIdentifier);
-        }
-
-        private static IEnumerable<(int Year, TimeIdentifier TimeIdentifier)>
-            MergeTimePeriodsWithHalfTermRange(
-                List<(int Year, TimeIdentifier TimeIdentifier)> timePeriods, int startYear, int endYear)
-        {
-            // Generate a year range based only on Six Half Terms
-            var range = TimePeriodUtil.Range(startYear, SixHalfTerms, endYear, SixHalfTerms);
-
-            // Merge it with the distinct time periods to replace any years which should be Five Half Terms
-            var rangeMap = range.ToDictionary(tuple => tuple.Year, tuple => tuple);
-            timePeriods.ForEach(tuple => { rangeMap[tuple.Year] = (tuple.Year, tuple.TimeIdentifier); });
-
-            return rangeMap.Values;
-        }
-
-        private static List<(int Year, TimeIdentifier TimeIdentifier)> GetDistinctObservationTimePeriods(
-            IEnumerable<Observation> observations)
-        {
-            return observations.Select(o => (o.Year, o.TimeIdentifier))
-                .Distinct()
-                .OrderBy(tuple => tuple.Year)
-                .ThenBy(tuple => tuple.TimeIdentifier)
-                .ToList();
-        }
-
-        private static TimePeriodMetaViewModel BuildTimePeriodViewModel((int Year, TimeIdentifier TimeIdentifier) tuple)
-        {
-            return new TimePeriodMetaViewModel
-            {
-                Code = tuple.TimeIdentifier,
-                Label = TimePeriodLabelFormatter.Format(tuple.Year, tuple.TimeIdentifier),
-                Year = tuple.Year
             };
         }
     }

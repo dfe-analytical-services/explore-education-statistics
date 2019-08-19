@@ -12,15 +12,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public Publication Publication { get; set; }
         public Guid PublicationId { get; set; }
         public IEnumerable<Subject> Subjects { get; set; }
-
-        public Release()
-        {
-        }
-
-        public Release(DateTime releaseDate, Guid publicationId)
-        {
-            ReleaseDate = releaseDate;
-            PublicationId = publicationId;
-        }
     }
 }

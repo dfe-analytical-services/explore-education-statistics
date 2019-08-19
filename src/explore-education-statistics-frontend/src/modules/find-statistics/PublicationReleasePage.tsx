@@ -127,7 +127,7 @@ class PublicationReleasePage extends Component<Props> {
             </div>
 
             <ReactMarkdown className="govuk-body" source={data.summary} />
-            {data.dataFiles && (
+            {data.downloadFiles && (
               <Details
                 summary="Download data files"
                 onToggle={(open: boolean) =>
@@ -140,7 +140,7 @@ class PublicationReleasePage extends Component<Props> {
                 }
               >
                 <ul className="govuk-list govuk-list--bullet">
-                  {data.dataFiles.map(({ extension, name, path, size }) => (
+                  {data.downloadFiles.map(({ extension, name, path, size }) => (
                     <li key={path}>
                       <Link
                         to={`${baseUrl.data}/api/download/${path}`}
