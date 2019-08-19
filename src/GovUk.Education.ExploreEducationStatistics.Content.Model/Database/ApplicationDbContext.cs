@@ -216,15 +216,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<DataBlock>(v));
-//            modelBuilder.Entity<Release>().HasOne(r => r.ReleaseSummary)
-//                .WithOne(rs => rs.Release)
-//                .HasForeignKey<ReleaseSummary>(rs => rs.ReleaseId);
-
-//            modelBuilder.Entity<ReleaseSummary>()
-//                .HasMany(rs => rs.Versions)
-//                .WithOne(rsv => rsv.ReleaseSummary)
-//                .HasForeignKey(rsv => rsv.ReleaseSummaryId);
-
+            
             modelBuilder.Entity<ReleaseSummary>()
                 .HasOne(rs => rs.Release).WithOne(r => r.ReleaseSummary)
                 .HasForeignKey<ReleaseSummary>(rs => rs.ReleaseId);
