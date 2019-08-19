@@ -57,7 +57,12 @@ export interface Axis {
   size?: number;
 }
 
-export type ChartType = 'line' | 'verticalbar' | 'horizontalbar' | 'map' | "infographic";
+export type ChartType =
+  | 'line'
+  | 'verticalbar'
+  | 'horizontalbar'
+  | 'map'
+  | 'infographic';
 
 export interface ChartDataSet {
   indicator: string;
@@ -130,14 +135,20 @@ export interface AxisConfiguration {
 }
 
 export interface Chart {
-  type: ChartType;
-  labels: Dictionary<DataSetConfiguration>;
-  axes: AxesConfiguration;
+  type?: ChartType;
+
+  title?: string;
+  height?: number;
+  width?: number;
+
+  labels?: Dictionary<DataSetConfiguration>;
+  axes?: AxesConfiguration;
+
+  legend?: 'none' | 'top' | 'bottom';
+  legendHeight?: string;
 
   stacked?: boolean;
-  width?: number;
-  height?: number;
-  showLegend?: boolean;
+  fileId?: string;
 }
 
 export interface Table {

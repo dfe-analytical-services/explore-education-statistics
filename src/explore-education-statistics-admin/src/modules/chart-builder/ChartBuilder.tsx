@@ -6,17 +6,30 @@ import ChartDataSelector, {
 import Details from '@common/components/Details';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import ChartRenderer, {ChartRendererProps,} from '@common/modules/find-statistics/components/ChartRenderer';
-import {ChartDefinition} from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import ChartRenderer, {
+  ChartRendererProps,
+} from '@common/modules/find-statistics/components/ChartRenderer';
+import {
+  ChartDefinition,
+  AxesConfiguration,
+  generateKeyFromDataSet,
+} from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import HorizontalBarBlock from '@common/modules/find-statistics/components/charts/HorizontalBarBlock';
 import LineChartBlock from '@common/modules/find-statistics/components/charts/LineChartBlock';
 import MapBlock from '@common/modules/find-statistics/components/charts/MapBlock';
 import VerticalBarBlock from '@common/modules/find-statistics/components/charts/VerticalBarBlock';
-import {DataBlockResponse} from '@common/services/dataBlockService';
-import {AxisConfiguration, ChartDataSet, DataSetConfiguration,} from '@common/services/publicationService';
-import {Dictionary} from '@common/types';
+import { DataBlockResponse } from '@common/services/dataBlockService';
+import {
+  AxisConfiguration,
+  ChartDataSet,
+  DataSetConfiguration,
+  Chart,
+} from '@common/services/publicationService';
+import { Dictionary } from '@common/types';
 import React from 'react';
-import ChartConfiguration, {ChartOptions,} from '@admin/modules/chart-builder/ChartConfiguration';
+import ChartConfiguration, {
+  ChartOptions,
+} from '@admin/modules/chart-builder/ChartConfiguration';
 import classnames from 'classnames';
 import Infographic from '@common/modules/find-statistics/components/charts/Infographic';
 import ChartAxisConfiguration from './ChartAxisConfiguration';
@@ -25,6 +38,7 @@ import styles from './graph-builder.module.scss';
 
 interface Props {
   data: DataBlockResponse;
+  initialConfiguration?: Chart;
   onChartSave?: (props: ChartRendererProps) => void;
 }
 
@@ -69,7 +83,11 @@ const chartTypes: ChartDefinition[] = [
   MapBlock.definition,
 ];
 
-const ChartBuilder = ({ data, onChartSave }: Props) => {
+const ChartBuilder = ({
+  data,
+  onChartSave,
+  initialConfiguration = {},
+}: Props) => {
   const [selectedChartType, setSelectedChartType] = React.useState<
     ChartDefinition | undefined
   >();
@@ -92,17 +110,21 @@ const ChartBuilder = ({ data, onChartSave }: Props) => {
     legend: 'top',
     legendHeight: '42',
     height: 300,
-    width: undefined,
     title: '',
-    fileId: undefined
+    ...initialConfiguration,
   });
+
   const previousAxesConfiguration = React.useRef<Dictionary<AxisConfiguration>>(
     {},
   );
 
-  const [axesConfiguration, realSetAxesConfiguration] = React.useState<Dictionary<AxisConfiguration>>({});
+  const [axesConfiguration, realSetAxesConfiguration] = React.useState<
+    Dictionary<AxisConfiguration>
+  >({});
 
-  const [dataSetAndConfiguration, setDataSetAndConfiguration] = React.useState<ChartDataSetAndConfiguration[]>([]);
+  const [dataSetAndConfiguration, setDataSetAndConfiguration] = React.useState<
+    ChartDataSetAndConfiguration[]
+  >([]);
 
   const setAxesConfiguration = (config: Dictionary<AxisConfiguration>) => {
     previousAxesConfiguration.current = config;
@@ -122,29 +144,41 @@ const ChartBuilder = ({ data, onChartSave }: Props) => {
     setDataSetAndConfiguration(newDataSets);
   };
 
-  const [chartLabels, setChartLabels] = React.useState<Dictionary<DataSetConfiguration>>({});
+  const [chartLabels, setChartLabels] = React.useState<
+    Dictionary<DataSetConfiguration>
+  >({});
   React.useEffect(() => {
-    setChartLabels({
-      ...dataSetAndConfiguration.reduce<Dictionary<DataSetConfiguration>>(
-        (mapped, {configuration}) => ({
-          ...mapped,
-          [configuration.value]: configuration,
-        }),
-        {},
-      ),
-      ...generateAxesMetaData(axesConfiguration, data),
-    });
+    if (axesConfiguration) {
+      setChartLabels({
+        ...dataSetAndConfiguration.reduce<Dictionary<DataSetConfiguration>>(
+          (mapped, { configuration }) => ({
+            ...mapped,
+            [configuration.value]: configuration,
+          }),
+          {},
+        ),
+        ...generateAxesMetaData(axesConfiguration, data),
+      });
+    }
   }, [dataSetAndConfiguration, axesConfiguration, data]);
 
-  const [majorAxisDataSets, setMajorAxisDataSets] = React.useState<ChartDataSet[]>([]);
+  const [majorAxisDataSets, setMajorAxisDataSets] = React.useState<
+    ChartDataSet[]
+  >([]);
   React.useEffect(() => {
     setMajorAxisDataSets(dataSetAndConfiguration.map(dsc => dsc.dataSet));
   }, [dataSetAndConfiguration]);
 
   // build the properties that is used to render the chart from the selections made
-  const [renderedChartProps, setRenderedChartProps] = React.useState<ChartRendererProps>();
+  const [renderedChartProps, setRenderedChartProps] = React.useState<
+    ChartRendererProps
+  >();
   React.useEffect(() => {
-    if (selectedChartType && majorAxisDataSets.length > 0) {
+    if (
+      selectedChartType &&
+      majorAxisDataSets.length > 0 &&
+      axesConfiguration
+    ) {
       setRenderedChartProps({
         type: selectedChartType.type,
 
@@ -185,7 +219,9 @@ const ChartBuilder = ({ data, onChartSave }: Props) => {
       previousSelectionChartType.current = selectedChartType;
 
       if (selectedChartType) {
-        const newAxesConfiguration = selectedChartType.axes.reduce<Dictionary<AxisConfiguration>>((axesConfigurationDictionary, axisDefinition) => {
+        const newAxesConfiguration = selectedChartType.axes.reduce<
+          Dictionary<AxisConfiguration>
+        >((axesConfigurationDictionary, axisDefinition) => {
           const previousConfig =
             (previousAxesConfiguration.current &&
               previousAxesConfiguration.current[axisDefinition.type]) ||
@@ -238,6 +274,51 @@ const ChartBuilder = ({ data, onChartSave }: Props) => {
     }
   }, [selectedChartType, dataSetAndConfiguration]);
 
+  React.useEffect(() => {
+    setSelectedChartType(
+      () =>
+        initialConfiguration &&
+        chartTypes.find(({ type }) => type === initialConfiguration.type),
+    );
+
+    setChartOptions({
+      stacked: false,
+      legend: 'top',
+      legendHeight: '42',
+      height: 300,
+      title: '',
+      ...initialConfiguration,
+    });
+
+    if (initialConfiguration.labels) {
+      setChartLabels(initialConfiguration.labels);
+    }
+
+    if (initialConfiguration.axes && initialConfiguration.labels) {
+      setAxesConfiguration((initialConfiguration.axes as unknown) as Dictionary<
+        AxisConfiguration
+      >);
+
+      if (
+        initialConfiguration.axes.major &&
+        initialConfiguration.axes.major.dataSets &&
+        initialConfiguration.labels
+      ) {
+        const dataSetAndConfig = initialConfiguration.axes.major.dataSets
+          .map(dataSet => {
+            const key = generateKeyFromDataSet(dataSet);
+            const configuration =
+              initialConfiguration.labels && initialConfiguration.labels[key];
+            return { dataSet, configuration };
+          })
+          .filter(dsc => dsc.configuration !== undefined);
+
+        // @ts-ignore ... because Typescript is a pain
+        setDataSetAndConfiguration(dataSetAndConfig);
+      }
+    }
+  }, [initialConfiguration]);
+
   return (
     <div className={styles.editor}>
       <ChartTypeSelector
@@ -246,7 +327,12 @@ const ChartBuilder = ({ data, onChartSave }: Props) => {
         selectedChartType={selectedChartType}
       />
       <div className="govuk-!-margin-top-6 govuk-body-s dfe-align--right">
-        <a href="#" onClick={() => setSelectedChartType(Infographic.definition)}>Choose an infographic as alternative</a>
+        <a
+          href="#"
+          onClick={() => setSelectedChartType(Infographic.definition)}
+        >
+          Choose an infographic as alternative
+        </a>
       </div>
 
       {selectedChartType && (

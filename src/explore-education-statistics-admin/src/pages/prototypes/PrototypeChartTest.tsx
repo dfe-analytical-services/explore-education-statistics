@@ -7,6 +7,7 @@ import DataBlockService, {
   GeographicLevel,
 } from '@common/services/dataBlockService';
 import React from 'react';
+import { ChartType } from '@common/services/publicationService';
 
 const PrototypeChartTest = () => {
   const request: DataBlockRequest = {
@@ -40,7 +41,37 @@ const PrototypeChartTest = () => {
   return (
     <PrototypePage wide>
       {chartBuilderData && (
-        <ChartBuilder data={chartBuilderData} onChartSave={onChartSave} />
+        <ChartBuilder
+          data={chartBuilderData}
+          onChartSave={onChartSave}
+          initialConfiguration={{
+            type: 'map' as ChartType,
+
+            height: 600,
+
+            labels: {
+              '160_423_____': {
+                label: 'A Label',
+                name: '160_423_____',
+                value: 'name',
+              },
+            },
+
+            axes: {
+              major: {
+                type: 'major',
+                name: 'major',
+                groupBy: 'locations',
+                dataSets: [
+                  {
+                    indicator: '160',
+                    filters: ['423'],
+                  },
+                ],
+              },
+            },
+          }}
+        />
       )}
     </PrototypePage>
   );

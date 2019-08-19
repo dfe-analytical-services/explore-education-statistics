@@ -55,7 +55,7 @@ export function parseCondensedTimePeriodRange(
 
 export interface AxesConfiguration {
   major: AxisConfiguration;
-  minor: AxisConfiguration;
+  minor?: AxisConfiguration;
 }
 
 export interface AbstractChartProps {

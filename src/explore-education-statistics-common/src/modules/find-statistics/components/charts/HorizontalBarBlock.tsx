@@ -1,6 +1,7 @@
 import {
   ChartDataB,
-  ChartDefinition, ChartProps,
+  ChartDefinition,
+  ChartProps,
   conditionallyAdd,
   createSortedAndMappedDataForAxis,
   generateMajorAxis,
