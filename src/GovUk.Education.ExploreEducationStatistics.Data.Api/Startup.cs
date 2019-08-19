@@ -95,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            UpdateDatabase(app);
+            // UpdateDatabase(app);
 
             if (env.IsDevelopment())
             {
