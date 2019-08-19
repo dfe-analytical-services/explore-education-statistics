@@ -1,4 +1,4 @@
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
+namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
 {
     public class TableBuilderConfiguration
     {

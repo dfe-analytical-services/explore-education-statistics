@@ -82,8 +82,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                 name: "IX_SubjectFootnote_FootnoteId",
                 table: "SubjectFootnote",
                 column: "FootnoteId");
-            
-            ExecuteFile(migrationBuilder, _migrationsPath + "20190719135058_FootnoteData.sql");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

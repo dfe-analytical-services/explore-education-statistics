@@ -2,7 +2,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Newtonsoft.Json;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
+namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
 {
     public class TimePeriodQuery
     {

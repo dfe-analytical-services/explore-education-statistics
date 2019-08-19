@@ -1,5 +1,5 @@
 using System;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels
 {
@@ -7,10 +7,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels
     {
         public Guid Id { get; set; }
 
-        public TableBuilderConfiguration Configuration { get; set; }
-
         public DateTime Created { get; set; }
 
         public TableBuilderResultViewModel FullTable { get; set; }
+        
+        public TableBuilderQueryContext Query { get; set; }
     }
 }
