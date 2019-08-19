@@ -1,1018 +1,1151 @@
 {
 	"info": {
-		"_postman_id": "a73f8d3c-fa15-473f-b680-5bc595b01b50",
+		"_postman_id": "0268a5a9-9355-4b15-b428-f2684cbe71d7",
 		"name": "DfE Admin API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "GET contacts",
-			"event": [
+			"name": "Contacts",
+			"item": [
 				{
-					"listen": "test",
-					"script": {
-						"id": "2db4ed0b-6eeb-40b6-914f-f1692eb248fb",
-						"exec": [
-							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-							"",
-							"pm.test(\"Team name should be correct\", function () { ",
-							"    pm.expect(pm.response.json()[0].teamName).to.equal(\"Simon's Team\"); ",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{admin_api_url}}/contacts",
-					"host": [
-						"{{admin_api_url}}"
-					],
-					"path": [
-						"contacts"
-					]
-				},
-				"description": "Returns all contacts"
-			},
-			"response": []
-		},
-		{
-			"name": "GET Release Types",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "7a6fd139-bc0d-4c80-96f1-4b6439171c35",
-						"exec": [
-							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-							"",
-							"pm.test(\"Should return 2 results\", function () { pm.expect(pm.response.json().length).to.equal(2); });",
-							"",
-							"pm.test(\"Ad Hoc should be present in the results\", function () { ",
-							"    pm.expect(pm.response.json()[0].title).to.equal(\"Ad Hoc\"); ",
-							"});",
-							"",
-							"pm.test(\"Official Statistics should be present in the results\", function () { ",
-							"    pm.expect(pm.response.json()[1].title).to.equal(\"Official Statistics\"); ",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{admin_api_url}}/meta/releasetypes",
-					"host": [
-						"{{admin_api_url}}"
-					],
-					"path": [
-						"meta",
-						"releasetypes"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "GET Time Identifers",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "fd44e1ec-7bf1-419d-9a9e-1317325d0595",
-						"exec": [
-							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-							"",
-							"",
-							"pm.test(\"Exect the correct fields\", function () {",
-							"    for(var i = 0; i < pm.response.json().length; i++) {",
-							"            pm.expect(pm.response.to.have.jsonBody(`[${i}].category`));",
-							"            pm.expect(pm.response.to.have.jsonBody(`[${i}].timeIdentifiers`));",
-							"            pm.expect(pm.response.to.have.jsonBody(`[${i}].timeIdentifiers[0].identifier`));",
-							"            pm.expect(pm.response.to.have.jsonBody(`[${i}].timeIdentifiers[0].identifier.value`));",
-							"            pm.expect(pm.response.to.have.jsonBody(`[${i}].timeIdentifiers[0].identifier.label`));",
-							"    }",
-							"});",
-							"",
-							"pm.test(\"Expect Academic year to be returned\", function () {",
-							"    for(var i = 0; i < pm.response.json().length; i++) {",
-							"            pm.expect(pm.response.json()[0].category.label).to.equal(\"Academic year\");",
-							"    }",
-							"});",
-							"",
-							"pm.test(\"Expect Academic Year Q1 to be returned\", function () {",
-							"    for(var i = 0; i < pm.response.json().length; i++) {",
-							"            pm.expect(pm.response.json()[0].timeIdentifiers[1].identifier.label).to.equal(\"Academic Year Q1\");",
-							"    }",
-							"});",
-							"",
-							"pm.test(\"Expect correct number of identifiers\", function () {",
-							"    for(var i = 0; i < pm.response.json().length; i++) {",
-							"            pm.expect(pm.response.json()[0].timeIdentifiers.length).to.equal(13);",
-							"    }",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{admin_api_url}}/meta/timeidentifiers",
-					"host": [
-						"{{admin_api_url}}"
-					],
-					"path": [
-						"meta",
-						"timeidentifiers"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "GET LatestRelease flag",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "7cbd4f1c-cf5e-4b8a-b7ec-c2e479396b3a",
-						"exec": [
-							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-							"",
-							"pm.test(\"Should return some results\", function () {",
-							"    pm.expect(pm.response.json().length).to.be.above(0);    ",
-							"});",
-							"",
-							"pm.test(\"Response should contain \\\"Pupil absence in schools in England: autumn term\\\"\", function () {",
-							"   var foundTitle = false;",
-							"   for(var i = 0; i < pm.response.json().length; i++) {",
-							"       if(pm.response.json()[i].title === \"Pupil absence in schools in England: autumn term\") foundTitle = true;",
-							"   }",
-							"   pm.expect(foundTitle).to.equal(true);",
-							"});",
-							"",
-							"",
-							"pm.test(\"Expect latestRelease flag if releases is more than 0\", function () {",
-							"    for(var i = 0; i < pm.response.json().length; i++) {",
-							"        if(pm.response.json()[i].releases !== null) {",
-							"            for(var j = 0; j < pm.response.json()[i].releases.length; j++) {",
-							"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].releases[${j}].latestRelease`));",
-							"            }",
-							"        }",
-							"    }",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{admin_api_url}}/me/publications?topicId=67C249DE-1CCA-446E-8CCB-DCDAC542F460",
-					"host": [
-						"{{admin_api_url}}"
-					],
-					"path": [
-						"me",
-						"publications"
-					],
-					"query": [
+					"name": "Contacts",
+					"event": [
 						{
-							"key": "topicId",
-							"value": "67C249DE-1CCA-446E-8CCB-DCDAC542F460"
+							"listen": "test",
+							"script": {
+								"id": "2db4ed0b-6eeb-40b6-914f-f1692eb248fb",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Fields are present\", function () {",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0].id\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0].teamName\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0].teamEmail\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0].contactName\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0].contactTelNo\"));",
+									"});",
+									"",
+									"pm.test(\"Team name should be correct\", function () { ",
+									"    pm.expect(pm.response.json()[0].teamName).to.equal(\"Simon's Team\"); ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
 						}
-					]
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{admin_api_url}}/contacts",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"contacts"
+							]
+						},
+						"description": "Returns all contacts"
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "POST Create new release",
-			"event": [
+			"name": "Meta",
+			"item": [
 				{
-					"listen": "test",
-					"script": {
-						"id": "98057100-77fb-42b7-9c21-f1d4921917ab",
-						"exec": [
-							"/*",
-							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-							"",
-							"pm.test(\"Fields are present\", function () {",
-							"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
-							"    pm.expect(pm.response.to.have.jsonBody(\"title\"));",
-							"    pm.expect(pm.response.to.have.jsonBody(\"releaseName\"));",
-							"    pm.expect(pm.response.to.have.jsonBody(\"coverageTitle\"));",
-							"    pm.expect(pm.response.to.have.jsonBody(\"yearTitle\"));",
-							"    pm.expect(pm.response.to.have.jsonBody(\"published\"));",
-							"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage\"));",
-							"    pm.expect(pm.response.to.have.jsonBody(\"latestRelease\"));",
-							"});",
-							"",
-							"pm.test(\"Title should should be correct\", function () { ",
-							"    pm.expect(pm.response.json().title).to.equal(\"Academic Year 2014/15\");",
-							"});",
-							"*/"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"name": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"PublicationId\": \"8b12776b-3d36-4475-8115-00974d7de1d0\",\n    \"ReleaseTypeId\": \"1821abb8-68b0-431b-9770-0bea65d02ff0\",\n    \"TypeId\": \"1821ABB8-68B0-431B-9770-0BEA65D02FF0\",\n    \"TimeIdentifier\": 62,\n    \"PublishScheduled\": \"0001-01-01T00:00:00\",\n    \"NextReleaseExpected\": {\n        \"Year\": \"2018\",\n        \"Month\": \"01\",\n        \"Day\": \"01\"\n    },\n    \"ReleaseName\": \"2014\",\n    \"TemplateReleaseId\": \"63227211-7CB3-408C-B5C2-40D3D7CB2717\"\n}"
-				},
-				"url": {
-					"raw": "{{admin_api_url}}/publications/C52BDD2A-B38E-46F9-88AB-19968E328C46/releases",
-					"host": [
-						"{{admin_api_url}}"
-					],
-					"path": [
-						"publications",
-						"C52BDD2A-B38E-46F9-88AB-19968E328C46",
-						"releases"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "GET Admin dashboard publications",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "aad25515-6076-4a4a-b609-61fe0a986e11",
-						"exec": [
-							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-							"",
-							"pm.test(\"Should return some results\", function () {",
-							"    pm.expect(pm.response.json().length).to.be.above(0);    ",
-							"});",
-							"",
-							"pm.test(\"Further education outcome-based success measures should be present\", function () { ",
-							"    pm.expect(pm.response.json()[0].title).to.equal(\"Further education outcome-based success measures\"); ",
-							"});",
-							"",
-							"pm.test(\"Expect latestRelease flag if releases is more than 0\", function () {",
-							"    for(var i = 0; i < pm.response.json().length; i++) {",
-							"        if(pm.response.json()[i].releases !== null) {",
-							"            for(var j = 0; j < pm.response.json()[i].releases.length; j++) {",
-							"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].releases[${j}].latestRelease`));",
-							"            }",
-							"        }",
-							"    }",
-							"});",
-							"",
-							"pm.test(\"Expect title if methodology is more than 0\", function () {",
-							"    for(var i = 0; i < pm.response.json().length; i++) {",
-							"        if(pm.response.json()[i].methodology !== null) {",
-							"            for(var j = 0; j < pm.response.json()[i].methodology.length; j++) {",
-							"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].methodology[${j}].title`));",
-							"            }",
-							"        }",
-							"    }",
-							"});",
-							"",
-							"pm.test(\"Expect the correct fields\", function () {",
-							"    for(var i = 0; i < pm.response.json().length; i++) {",
-							"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topicId`));",
-							"            pm.expect(pm.response.to.have.jsonBody(`[${i}].nextUpdate`));",
-							"            pm.expect(pm.response.to.have.jsonBody(`[${i}].releases`));",
-							"            pm.expect(pm.response.to.have.jsonBody(`[${i}].methodology`));",
-							"            pm.expect(pm.response.to.have.jsonBody(`[${i}].contact`));",
-							"    }",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{admin_api_url}}/me/publications?topicId=A7CE9542-20E6-401D-91F4-F832C9E58B12&themeId=2CA22E34-B87A-4281-A0EB-B80F4F8DD374",
-					"host": [
-						"{{admin_api_url}}"
-					],
-					"path": [
-						"me",
-						"publications"
-					],
-					"query": [
+					"name": "Time identifers",
+					"event": [
 						{
-							"key": "topicId",
-							"value": "A7CE9542-20E6-401D-91F4-F832C9E58B12"
+							"listen": "test",
+							"script": {
+								"id": "fd44e1ec-7bf1-419d-9a9e-1317325d0595",
+								"exec": [
+									"var respJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Expect the correct fields\", function () {",
+									"    for(var i = 0; i < respJson.length; i++) {",
+									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].category`));",
+									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].category.value`));",
+									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].category.label`));",
+									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].timeIdentifiers`));",
+									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].timeIdentifiers[0].identifier`));",
+									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].timeIdentifiers[0].identifier.value`));",
+									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].timeIdentifiers[0].identifier.label`));",
+									"    }",
+									"});",
+									"",
+									"pm.test(\"Expect AcademicYear results to be correct\", function () {",
+									"    for(var i = 0; i < respJson.length; i++) {",
+									"        if(respJson[i].category.value === \"AcademicYear\") {",
+									"            pm.expect(respJson[i].category.label).to.equal(\"Academic year\");",
+									"            pm.expect(respJson[i].timeIdentifiers.length).to.equal(13);",
+									"            break;",
+									"        }",
+									"    }",
+									"});",
+									"",
+									"pm.test(\"Expect Month results to be correct\", function () {",
+									"    for(var i = 0; i < respJson.length; i++) {",
+									"        if(respJson[i].category.value === \"Month\") {",
+									"            pm.expect(respJson[i].category.label).to.equal(\"Month\");",
+									"            pm.expect(respJson[i].timeIdentifiers.length).to.equal(12);",
+									"            break;",
+									"        }",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{admin_api_url}}/meta/timeidentifiers",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"meta",
+								"timeidentifiers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Release types",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7a6fd139-bc0d-4c80-96f1-4b6439171c35",
+								"exec": [
+									"var respJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Should return 2 results\", function () { pm.expect(respJson.length).to.equal(2); });",
+									"",
+									"pm.test(\"Results should be correct\", function () {",
+									"    var foundAdHoc = false;",
+									"    var foundOfficialStatistics = false;",
+									"    for(var i = 0; i < respJson.length; i++) {",
+									"        if(respJson[i].title === \"Ad Hoc\") { foundAdHoc = true; }",
+									"        if(respJson[i].title === \"Official Statistics\") { foundOfficialStatistics = true; }",
+									"    }",
+									"    pm.expect(foundAdHoc).to.equal(true);",
+									"    pm.expect(foundOfficialStatistics).to.equal(true);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{admin_api_url}}/meta/releasetypes",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"meta",
+								"releasetypes"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Methodologies",
+			"item": [
+				{
+					"name": "Methodologies",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e472dd85-13ad-411e-bdcc-d5e6e875df7f",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Should return some results\", function () {",
+									"    pm.expect(pm.response.json().length).to.be.above(0);    ",
+									"});",
+									"",
+									"pm.test(\"Title should be correct\", function () { ",
+									"    pm.expect(pm.response.json()[0].title).to.equal(\"Pupil exclusion statistics: methodology\"); ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{admin_api_url}}/methodologies",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"methodologies"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Methodologies for a topic",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "372a9979-fd08-4af1-bb4c-5314db6a237b",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Should return some results\", function () {",
+									"    pm.expect(pm.response.json().length).to.be.above(0);    ",
+									"});",
+									"",
+									"pm.test(\"Title should be correct\", function () { ",
+									"    pm.expect(pm.response.json()[0].title).to.equal(\"Pupil exclusion statistics: methodology\"); ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{admin_api_url}}/topic/77941B7D-BBD6-4069-9107-565AF89E2DEC/methodologies",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"topic",
+								"77941B7D-BBD6-4069-9107-565AF89E2DEC",
+								"methodologies"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Theme",
+			"item": [
+				{
+					"name": "Get my themes",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "2db4ed0b-6eeb-40b6-914f-f1692eb248fb",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"/*",
+									"pm.test(\"Fields are present\", function () {",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0].id\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0].teamName\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0].teamEmail\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0].contactName\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0].contactTelNo\"));",
+									"});",
+									"",
+									"pm.test(\"Team name should be correct\", function () { ",
+									"    pm.expect(pm.response.json()[0].teamName).to.equal(\"Simon's Team\"); ",
+									"});",
+									"*/"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{admin_api_url}}/me/themes",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"me",
+								"themes"
+							]
+						},
+						"description": "Returns all contacts"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Publication",
+			"item": [
+				{
+					"name": "Get my publications by topic",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7cbd4f1c-cf5e-4b8a-b7ec-c2e479396b3a",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Should return some results\", function () {",
+									"    pm.expect(pm.response.json().length).to.be.above(0);    ",
+									"});",
+									"",
+									"pm.test(\"Response should contain \\\"Pupil absence in schools in England: autumn term\\\"\", function () {",
+									"   var foundTitle = false;",
+									"   for(var i = 0; i < pm.response.json().length; i++) {",
+									"       if(pm.response.json()[i].title === \"Pupil absence in schools in England: autumn term\") foundTitle = true;",
+									"   }",
+									"   pm.expect(foundTitle).to.equal(true);",
+									"});",
+									"",
+									"",
+									"pm.test(\"Expect latestRelease flag if releases is more than 0\", function () {",
+									"    for(var i = 0; i < pm.response.json().length; i++) {",
+									"        if(pm.response.json()[i].releases !== null) {",
+									"            for(var j = 0; j < pm.response.json()[i].releases.length; j++) {",
+									"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].releases[${j}].latestRelease`));",
+									"            }",
+									"        }",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
 						},
 						{
-							"key": "themeId",
-							"value": "2CA22E34-B87A-4281-A0EB-B80F4F8DD374"
+							"listen": "prerequest",
+							"script": {
+								"id": "5c3f3658-a145-40af-9a97-5f9f0e1f241c",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
 						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "POST Create new publication",
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"id": "256d11e0-8766-43c9-a53c-477b764c85dc",
-						"exec": [
-							""
-						],
-						"type": "text/javascript"
-					}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{admin_api_url}}/me/publications?topicId=67C249DE-1CCA-446E-8CCB-DCDAC542F460",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"me",
+								"publications"
+							],
+							"query": [
+								{
+									"key": "topicId",
+									"value": "67C249DE-1CCA-446E-8CCB-DCDAC542F460"
+								}
+							]
+						}
+					},
+					"response": []
 				},
 				{
-					"listen": "test",
-					"script": {
-						"id": "4b4d0e5b-d1e9-4e6a-af9e-514f3c3ad225",
-						"exec": [
-							"// NOTE(mark): Changed title to not be unique so new publication isn't created each test run.",
-							"/*",
-							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-							"",
-							"pm.test(\"Fields are present\", function () {",
-							"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
-							"    pm.expect(pm.response.to.have.jsonBody(\"title\"));",
-							"    pm.expect(pm.response.to.have.jsonBody(\"nextUpdate\"));",
-							"    pm.expect(pm.response.to.have.jsonBody(\"releases\"));",
-							"    pm.expect(pm.response.to.have.jsonBody(\"methodology\"));",
-							"    pm.expect(pm.response.to.have.jsonBody(\"topicId\"));",
-							"    pm.expect(pm.response.to.have.jsonBody(\"contact\"));",
-							"});",
-							"",
-							"pm.test(\"topicId should should be correct\", function () { ",
-							"    pm.expect(pm.response.json().topicId).to.equal(\"53a1fbb7-5234-435f-892b-9baad4c82535\"); ",
-							"});",
-							"",
-							"pm.test(\"teamName should should be correct\", function () { ",
-							"    pm.expect(pm.response.json().contact.teamName).to.equal(\"Simon's Team\"); ",
-							"});",
-							"*/"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"name": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"title\": \"b84e5120-7ee2-4d4e-ac0c-b6e6a42ee22c\",\n\t\"methodologyId\": \"\",\n\t\"contactId\": \"11BB7387-E85E-4571-9669-8A760DCB004F\"\n}"
-				},
-				"url": {
-					"raw": "{{admin_api_url}}/topic/53A1FBB7-5234-435F-892B-9BAAD4C82535/publications",
-					"host": [
-						"{{admin_api_url}}"
-					],
-					"path": [
-						"topic",
-						"53A1FBB7-5234-435F-892B-9BAAD4C82535",
-						"publications"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "GET All methodologies",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "e472dd85-13ad-411e-bdcc-d5e6e875df7f",
-						"exec": [
-							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-							"",
-							"pm.test(\"Should return some results\", function () {",
-							"    pm.expect(pm.response.json().length).to.be.above(0);    ",
-							"});",
-							"",
-							"pm.test(\"Title should be correct\", function () { ",
-							"    pm.expect(pm.response.json()[0].title).to.equal(\"Pupil exclusion statistics: methodology\"); ",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{admin_api_url}}/methodologies",
-					"host": [
-						"{{admin_api_url}}"
-					],
-					"path": [
-						"methodologies"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "GET Methodologies for a topic",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "372a9979-fd08-4af1-bb4c-5314db6a237b",
-						"exec": [
-							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-							"",
-							"pm.test(\"Should return some results\", function () {",
-							"    pm.expect(pm.response.json().length).to.be.above(0);    ",
-							"});",
-							"",
-							"pm.test(\"Title should be correct\", function () { ",
-							"    pm.expect(pm.response.json()[0].title).to.equal(\"Pupil exclusion statistics: methodology\"); ",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{admin_api_url}}/topic/77941B7D-BBD6-4069-9107-565AF89E2DEC/methodologies",
-					"host": [
-						"{{admin_api_url}}"
-					],
-					"path": [
-						"topic",
-						"77941B7D-BBD6-4069-9107-565AF89E2DEC",
-						"methodologies"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "GET Release Summary",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
-						"exec": [
-							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-							"",
-							"pm.test(\"Fields are present\", function () {",
-							"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
-							"    pm.expect(pm.response.to.have.jsonBody(\"typeId\"));",
-							"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage\"));",
-							"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.value\"));",
-							"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.label\"));",
-							"    pm.expect(pm.response.to.have.jsonBody(\"publishScheduled\"));",
-							"    pm.expect(pm.response.to.have.jsonBody(\"nextReleaseDate\"));",
-							"    pm.expect(pm.response.to.have.jsonBody(\"releaseName\"));",
-							"});",
-							"",
-							"pm.test(\"typeId should should be correct\", function () { ",
-							"    pm.expect(pm.response.json().typeId).to.equal(\"9d333457-9132-4e55-ae78-c55cb3673d7c\"); ",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{admin_api_url}}/releases/E7774A74-1F62-4B76-B9B5-84F14DAC7278/summary/",
-					"host": [
-						"{{admin_api_url}}"
-					],
-					"path": [
-						"releases",
-						"E7774A74-1F62-4B76-B9B5-84F14DAC7278",
-						"summary",
-						""
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "GET Releases for publication",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "50f6efbc-4157-4ec4-b3f2-a7c2cb4abe9e",
-						"exec": [
-							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-							"",
-							"pm.test(\"Should return some results\", function () {",
-							"    pm.expect(pm.response.json().length).to.be.above(0);    ",
-							"});",
-							"",
-							"pm.test(\"Expect correct fields in releases array if releases is more than 0\", function () {",
-							"    for(var i = 0; i < pm.response.json().length; i++) {",
-							"        if(pm.response.json()[i].releases !== null) {",
-							"            for(var j = 0; j < pm.response.json()[i].releases.length; j++) {",
-							"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].releases[${j}].title`));",
-							"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].releases[${j}].publicationTitle`));",
-							"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].releases[${j}].releaseName`));",
-							"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].releases[${j}].coverageTitle`));",
-							"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].releases[${j}].yearTitle`));",
-							"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].releases[${j}].typeId`));",
-							"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].releases[${j}].latestRelease`));",
-							"            }",
-							"        }",
-							"    }",
-							"});",
-							"",
-							"pm.test(\"Response should contain \\\"Pupil absence in schools in England\\\"\", function () {",
-							"   var foundTitle = false;",
-							"   for(var i = 0; i < pm.response.json().length; i++) {",
-							"        if(pm.response.json()[i].releases !== null) {",
-							"            for(var j = 0; j < pm.response.json()[i].releases.length; j++) {",
-							"                if(pm.response.json()[i].title === \"Pupil absence in schools in England\") ",
-							"                {",
-							"                    foundTitle = true;",
-							"                }",
-							"            }",
-							"        }",
-							"   }",
-							"   pm.expect(foundTitle).to.equal(true);",
-							"});",
-							"",
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{admin_api_url}}/me/publications?topicId=67C249DE-1CCA-446E-8CCB-DCDAC542F460",
-					"host": [
-						"{{admin_api_url}}"
-					],
-					"path": [
-						"me",
-						"publications"
-					],
-					"query": [
+					"name": "Admin dashboard publications",
+					"event": [
 						{
-							"key": "topicId",
-							"value": "67C249DE-1CCA-446E-8CCB-DCDAC542F460"
+							"listen": "test",
+							"script": {
+								"id": "aad25515-6076-4a4a-b609-61fe0a986e11",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Should return some results\", function () {",
+									"    pm.expect(pm.response.json().length).to.be.above(0);    ",
+									"});",
+									"",
+									"pm.test(\"Further education outcome-based success measures should be present\", function () { ",
+									"    pm.expect(pm.response.json()[0].title).to.equal(\"Further education outcome-based success measures\"); ",
+									"});",
+									"",
+									"pm.test(\"Expect latestRelease flag if releases is more than 0\", function () {",
+									"    for(var i = 0; i < pm.response.json().length; i++) {",
+									"        if(pm.response.json()[i].releases !== null) {",
+									"            for(var j = 0; j < pm.response.json()[i].releases.length; j++) {",
+									"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].releases[${j}].latestRelease`));",
+									"            }",
+									"        }",
+									"    }",
+									"});",
+									"",
+									"pm.test(\"Expect title if methodology is more than 0\", function () {",
+									"    for(var i = 0; i < pm.response.json().length; i++) {",
+									"        if(pm.response.json()[i].methodology !== null) {",
+									"            for(var j = 0; j < pm.response.json()[i].methodology.length; j++) {",
+									"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].methodology[${j}].title`));",
+									"            }",
+									"        }",
+									"    }",
+									"});",
+									"",
+									"pm.test(\"Expect the correct fields\", function () {",
+									"    for(var i = 0; i < pm.response.json().length; i++) {",
+									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topicId`));",
+									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].nextUpdate`));",
+									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].releases`));",
+									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].methodology`));",
+									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].contact`));",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
 						}
-					]
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{admin_api_url}}/me/publications?topicId=A7CE9542-20E6-401D-91F4-F832C9E58B12&themeId=2CA22E34-B87A-4281-A0EB-B80F4F8DD374",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"me",
+								"publications"
+							],
+							"query": [
+								{
+									"key": "topicId",
+									"value": "A7CE9542-20E6-401D-91F4-F832C9E58B12"
+								},
+								{
+									"key": "themeId",
+									"value": "2CA22E34-B87A-4281-A0EB-B80F4F8DD374"
+								}
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "POST Upload data file",
-			"event": [
+			"name": "Release",
+			"item": [
 				{
-					"listen": "test",
-					"script": {
-						"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
-						"exec": [
-							"/*",
-							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-							"",
-							"pm.test(\"Should return some results\", function () {",
-							"    pm.expect(pm.response.json().length).to.equal(2);    ",
-							"});",
-							"",
-							"pm.test(\"Name should be correct\", function () { ",
-							"    pm.expect(pm.response.json()[1].name).to.equal(\"testName\"); ",
-							"});",
-							"",
-							"pm.test(\"Extension should be csv\", function () { ",
-							"    pm.expect(pm.response.json()[0].extension).to.equal(\"csv\"); ",
-							"});",
-							"*/"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"name": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "formdata",
-					"formdata": [
+					"name": "Releases for publication",
+					"event": [
 						{
-							"key": "file",
-							"type": "file",
-							"src": "{{files_dir}}/my_file.csv"
+							"listen": "test",
+							"script": {
+								"id": "50f6efbc-4157-4ec4-b3f2-a7c2cb4abe9e",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Should return some results\", function () {",
+									"    pm.expect(pm.response.json().length).to.be.above(0);    ",
+									"});",
+									"",
+									"pm.test(\"Expect correct fields in releases array if releases is more than 0\", function () {",
+									"    for(var i = 0; i < pm.response.json().length; i++) {",
+									"        if(pm.response.json()[i].releases !== null) {",
+									"            for(var j = 0; j < pm.response.json()[i].releases.length; j++) {",
+									"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].releases[${j}].title`));",
+									"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].releases[${j}].publicationTitle`));",
+									"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].releases[${j}].releaseName`));",
+									"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].releases[${j}].coverageTitle`));",
+									"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].releases[${j}].yearTitle`));",
+									"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].releases[${j}].typeId`));",
+									"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].releases[${j}].latestRelease`));",
+									"            }",
+									"        }",
+									"    }",
+									"});",
+									"",
+									"pm.test(\"Response should contain \\\"Pupil absence in schools in England\\\"\", function () {",
+									"   var foundTitle = false;",
+									"   for(var i = 0; i < pm.response.json().length; i++) {",
+									"        if(pm.response.json()[i].releases !== null) {",
+									"            for(var j = 0; j < pm.response.json()[i].releases.length; j++) {",
+									"                if(pm.response.json()[i].title === \"Pupil absence in schools in England\") ",
+									"                {",
+									"                    foundTitle = true;",
+									"                }",
+									"            }",
+									"        }",
+									"   }",
+									"   pm.expect(foundTitle).to.equal(true);",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
 						},
 						{
-							"key": "metaFile",
-							"type": "file",
-							"src": "{{files_dir}/my_metafile.csv"
+							"listen": "prerequest",
+							"script": {
+								"id": "152c86f6-6905-4366-a08e-4b8a54d6c2ec",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
 						}
-					]
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{admin_api_url}}/me/publications?topicId=67C249DE-1CCA-446E-8CCB-DCDAC542F460",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"me",
+								"publications"
+							],
+							"query": [
+								{
+									"key": "topicId",
+									"value": "67C249DE-1CCA-446E-8CCB-DCDAC542F460"
+								}
+							]
+						}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "{{admin_api_url}}/release/85d43d6f-ec91-452d-aba2-03303ab4363a/data?name=testName",
-					"host": [
-						"{{admin_api_url}}"
-					],
-					"path": [
-						"release",
-						"85d43d6f-ec91-452d-aba2-03303ab4363a",
-						"data"
-					],
-					"query": [
-						{
-							"key": "name",
-							"value": "testName"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "GET Data files",
-			"event": [
 				{
-					"listen": "test",
-					"script": {
-						"id": "313f3538-ad70-44ec-aed5-3d9286545bf0",
-						"exec": [
-							"/*",
-							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-							"",
-							"pm.test(\"Should return some results\", function () {",
-							"    pm.expect(pm.response.json().length).to.equal(2);    ",
-							"});",
-							"",
-							"pm.test(\"Name should be correct\", function () { ",
-							"    pm.expect(pm.response.json()[1].name).to.equal(\"testName\"); ",
-							"});",
-							"",
-							"pm.test(\"Extension should be csv\", function () { ",
-							"    pm.expect(pm.response.json()[0].extension).to.equal(\"csv\"); ",
-							"});",
-							"*/"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{admin_api_url}}/release/85d43d6f-ec91-452d-aba2-03303ab4363a/data",
-					"host": [
-						"{{admin_api_url}}"
+					"name": "Release summary",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Fields are present\", function () {",
+									"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"typeId\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.value\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.label\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"publishScheduled\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"nextReleaseDate\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"releaseName\"));",
+									"});",
+									"",
+									"pm.test(\"typeId should should be correct\", function () { ",
+									"    pm.expect(pm.response.json().typeId).to.equal(\"9d333457-9132-4e55-ae78-c55cb3673d7c\"); ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "dbde4b62-47dd-4c3d-93dc-5e01ec3f8231",
+								"exec": [
+									"postman.setNextRequest(null);"
+								],
+								"type": "text/javascript"
+							}
+						}
 					],
-					"path": [
-						"release",
-						"85d43d6f-ec91-452d-aba2-03303ab4363a",
-						"data"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "DELETE Data file",
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{admin_api_url}}/releases/E7774A74-1F62-4B76-B9B5-84F14DAC7278/summary/",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"releases",
+								"E7774A74-1F62-4B76-B9B5-84F14DAC7278",
+								"summary",
+								""
+							]
+						}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "https://localhost:5001/api/release/85d43d6f-ec91-452d-aba2-03303ab4363a/data/my_file.csv",
-					"protocol": "https",
-					"host": [
-						"localhost"
-					],
-					"port": "5001",
-					"path": [
-						"api",
-						"release",
-						"85d43d6f-ec91-452d-aba2-03303ab4363a",
-						"data",
-						"my_file.csv"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "POST Upload ancillary file",
-			"event": [
 				{
-					"listen": "test",
-					"script": {
-						"id": "4d2d835f-99c3-4df4-adfd-af5b6c678672",
-						"exec": [
-							"/*",
-							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-							"",
-							"pm.test(\"Should return some results\", function () {",
-							"    pm.expect(pm.response.json().length).to.equal(2);    ",
-							"});",
-							"",
-							"pm.test(\"Name should be correct\", function () { ",
-							"    pm.expect(pm.response.json()[1].name).to.equal(\"test\"); ",
-							"});",
-							"",
-							"pm.test(\"Extension should be csv\", function () { ",
-							"    pm.expect(pm.response.json()[0].extension).to.equal(\"doc\"); ",
-							"});",
-							"*/"
+					"name": "Create new publication",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "256d11e0-8766-43c9-a53c-477b764c85dc",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "4b4d0e5b-d1e9-4e6a-af9e-514f3c3ad225",
+								"exec": [
+									"// NOTE(mark): Changed title to not be unique so new publication isn't created each test run.",
+									"/*",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Fields are present\", function () {",
+									"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"title\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"nextUpdate\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"releases\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"methodology\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"topicId\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"contact\"));",
+									"});",
+									"",
+									"pm.test(\"topicId should should be correct\", function () { ",
+									"    pm.expect(pm.response.json().topicId).to.equal(\"53a1fbb7-5234-435f-892b-9baad4c82535\"); ",
+									"});",
+									"",
+									"pm.test(\"teamName should should be correct\", function () { ",
+									"    pm.expect(pm.response.json().contact.teamName).to.equal(\"Simon's Team\"); ",
+									"});",
+									"*/"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
 						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "formdata",
-					"formdata": [
-						{
-							"key": "file",
-							"type": "file",
-							"src": "{{files_dir}}/ancillary.doc"
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"title\": \"b84e5120-7ee2-4d4e-ac0c-b6e6a42ee22c\",\n\t\"methodologyId\": \"\",\n\t\"contactId\": \"11BB7387-E85E-4571-9669-8A760DCB004F\"\n}"
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/topic/53A1FBB7-5234-435F-892B-9BAAD4C82535/publications",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"topic",
+								"53A1FBB7-5234-435F-892B-9BAAD4C82535",
+								"publications"
+							]
 						}
-					]
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "{{admin_api_url}}/release/85d43d6f-ec91-452d-aba2-03303ab4363a/ancillary?name=test",
-					"host": [
-						"{{admin_api_url}}"
-					],
-					"path": [
-						"release",
-						"85d43d6f-ec91-452d-aba2-03303ab4363a",
-						"ancillary"
-					],
-					"query": [
-						{
-							"key": "name",
-							"value": "test"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "GET ancillary files",
-			"event": [
 				{
-					"listen": "test",
-					"script": {
-						"id": "06d9ef58-8beb-4ec6-aac6-18ddc1a3c9e4",
-						"exec": [
-							"/*",
-							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-							"",
-							"pm.test(\"Should return some results\", function () {",
-							"    pm.expect(pm.response.json().length).to.equal(2);    ",
-							"});",
-							"",
-							"pm.test(\"Name should be correct\", function () { ",
-							"    pm.expect(pm.response.json()[1].name).to.equal(\"test\"); ",
-							"});",
-							"",
-							"pm.test(\"Extension should be csv\", function () { ",
-							"    pm.expect(pm.response.json()[0].extension).to.equal(\"doc\"); ",
-							"});",
-							"*/"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{admin_api_url}}/release/85d43d6f-ec91-452d-aba2-03303ab4363a/ancillary?name=test",
-					"host": [
-						"{{admin_api_url}}"
-					],
-					"path": [
-						"release",
-						"85d43d6f-ec91-452d-aba2-03303ab4363a",
-						"ancillary"
-					],
-					"query": [
+					"name": "Create new release",
+					"event": [
 						{
-							"key": "name",
-							"value": "test"
+							"listen": "test",
+							"script": {
+								"id": "98057100-77fb-42b7-9c21-f1d4921917ab",
+								"exec": [
+									"/*",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Fields are present\", function () {",
+									"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"title\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"releaseName\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"coverageTitle\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"yearTitle\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"published\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"latestRelease\"));",
+									"});",
+									"",
+									"pm.test(\"Title should should be correct\", function () { ",
+									"    pm.expect(pm.response.json().title).to.equal(\"Academic Year 2014/15\");",
+									"});",
+									"*/"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "53582e6e-2f99-4426-bbac-814e65969e32",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
 						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "DELETE Ancillary file",
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
-				"url": {
-					"raw": "{{admin_api_url}}/release/85d43d6f-ec91-452d-aba2-03303ab4363a/ancillary/ancillary.doc",
-					"host": [
-						"{{admin_api_url}}"
 					],
-					"path": [
-						"release",
-						"85d43d6f-ec91-452d-aba2-03303ab4363a",
-						"ancillary",
-						"ancillary.doc"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "POST Upload chart file",
-			"event": [
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"PublicationId\": \"8b12776b-3d36-4475-8115-00974d7de1d0\",\n    \"ReleaseTypeId\": \"1821abb8-68b0-431b-9770-0bea65d02ff0\",\n    \"TypeId\": \"1821ABB8-68B0-431B-9770-0BEA65D02FF0\",\n    \"TimeIdentifier\": 62,\n    \"PublishScheduled\": \"0001-01-01T00:00:00\",\n    \"NextReleaseExpected\": {\n        \"Year\": \"2018\",\n        \"Month\": \"01\",\n        \"Day\": \"01\"\n    },\n    \"ReleaseName\": \"2014\",\n    \"TemplateReleaseId\": \"63227211-7CB3-408C-B5C2-40D3D7CB2717\"\n}"
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/publications/C52BDD2A-B38E-46F9-88AB-19968E328C46/releases",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"publications",
+								"C52BDD2A-B38E-46F9-88AB-19968E328C46",
+								"releases"
+							]
+						}
+					},
+					"response": []
+				},
 				{
-					"listen": "test",
-					"script": {
-						"id": "c3aa6c3a-7405-4b53-9fce-ab1d75b4e2da",
-						"exec": [
-							"/*",
-							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-							"",
-							"pm.test(\"Should return some results\", function () {",
-							"    pm.expect(pm.response.json().length).to.equal(1);    ",
-							"});",
-							"",
-							"pm.test(\"Name should be correct\", function () { ",
-							"    pm.expect(pm.response.json()[0].name).to.equal(\"test\"); ",
-							"});",
-							"",
-							"pm.test(\"Extension should be csv\", function () { ",
-							"    pm.expect(pm.response.json()[0].extension).to.equal(\"png\"); ",
-							"});",
-							"*/"
+					"name": "Upload data file",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"exec": [
+									"/*",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Should return some results\", function () {",
+									"    pm.expect(pm.response.json().length).to.equal(2);    ",
+									"});",
+									"",
+									"pm.test(\"Name should be correct\", function () { ",
+									"    pm.expect(pm.response.json()[1].name).to.equal(\"testName\"); ",
+									"});",
+									"",
+									"pm.test(\"Extension should be csv\", function () { ",
+									"    pm.expect(pm.response.json()[0].extension).to.equal(\"csv\"); ",
+									"});",
+									"*/"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
 						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "formdata",
-					"formdata": [
-						{
-							"key": "file",
-							"type": "file",
-							"src": "{{files_dir}}/chart.png"
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/my_file.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}/my_metafile.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/85d43d6f-ec91-452d-aba2-03303ab4363a/data?name=testName",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"85d43d6f-ec91-452d-aba2-03303ab4363a",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "testName"
+								}
+							]
 						}
-					]
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "{{admin_api_url}}/release/85d43d6f-ec91-452d-aba2-03303ab4363a/chart?name=test",
-					"host": [
-						"{{admin_api_url}}"
-					],
-					"path": [
-						"release",
-						"85d43d6f-ec91-452d-aba2-03303ab4363a",
-						"chart"
-					],
-					"query": [
-						{
-							"key": "name",
-							"value": "test"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "GET chart files",
-			"event": [
 				{
-					"listen": "test",
-					"script": {
-						"id": "0e8a7e3f-244d-43aa-a936-4238169dcd82",
-						"exec": [
-							"/*",
-							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-							"",
-							"pm.test(\"Should return some results\", function () {",
-							"    pm.expect(pm.response.json().length).to.equal(1);    ",
-							"});",
-							"",
-							"pm.test(\"Name should be correct\", function () { ",
-							"    pm.expect(pm.response.json()[0].name).to.equal(\"test\"); ",
-							"});",
-							"",
-							"pm.test(\"Extension should be csv\", function () { ",
-							"    pm.expect(pm.response.json()[0].extension).to.equal(\"png\"); ",
-							"});",
-							"*/"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{admin_api_url}}/release/85d43d6f-ec91-452d-aba2-03303ab4363a/chart",
-					"host": [
-						"{{admin_api_url}}"
+					"name": "Get data files",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "313f3538-ad70-44ec-aed5-3d9286545bf0",
+								"exec": [
+									"/*",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Should return some results\", function () {",
+									"    pm.expect(pm.response.json().length).to.equal(2);    ",
+									"});",
+									"",
+									"pm.test(\"Name should be correct\", function () { ",
+									"    pm.expect(pm.response.json()[1].name).to.equal(\"testName\"); ",
+									"});",
+									"",
+									"pm.test(\"Extension should be csv\", function () { ",
+									"    pm.expect(pm.response.json()[0].extension).to.equal(\"csv\"); ",
+									"});",
+									"*/"
+								],
+								"type": "text/javascript"
+							}
+						}
 					],
-					"path": [
-						"release",
-						"85d43d6f-ec91-452d-aba2-03303ab4363a",
-						"chart"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "DELETE Chart file",
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{admin_api_url}}/release/85d43d6f-ec91-452d-aba2-03303ab4363a/data",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"85d43d6f-ec91-452d-aba2-03303ab4363a",
+								"data"
+							]
+						}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "{{admin_api_url}}/release/85d43d6f-ec91-452d-aba2-03303ab4363a/chart/chart.png",
-					"host": [
-						"{{admin_api_url}}"
+				{
+					"name": "Delete data file",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://localhost:5001/api/release/85d43d6f-ec91-452d-aba2-03303ab4363a/data/my_file.csv",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "5001",
+							"path": [
+								"api",
+								"release",
+								"85d43d6f-ec91-452d-aba2-03303ab4363a",
+								"data",
+								"my_file.csv"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload ancillary file",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "4d2d835f-99c3-4df4-adfd-af5b6c678672",
+								"exec": [
+									"/*",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Should return some results\", function () {",
+									"    pm.expect(pm.response.json().length).to.equal(2);    ",
+									"});",
+									"",
+									"pm.test(\"Name should be correct\", function () { ",
+									"    pm.expect(pm.response.json()[1].name).to.equal(\"test\"); ",
+									"});",
+									"",
+									"pm.test(\"Extension should be csv\", function () { ",
+									"    pm.expect(pm.response.json()[0].extension).to.equal(\"doc\"); ",
+									"});",
+									"*/"
+								],
+								"type": "text/javascript"
+							}
+						}
 					],
-					"path": [
-						"release",
-						"85d43d6f-ec91-452d-aba2-03303ab4363a",
-						"chart",
-						"chart.png"
-					]
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/ancillary.doc"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/85d43d6f-ec91-452d-aba2-03303ab4363a/ancillary?name=test",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"85d43d6f-ec91-452d-aba2-03303ab4363a",
+								"ancillary"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "test"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get ancillary files",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "06d9ef58-8beb-4ec6-aac6-18ddc1a3c9e4",
+								"exec": [
+									"/*",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Should return some results\", function () {",
+									"    pm.expect(pm.response.json().length).to.equal(2);    ",
+									"});",
+									"",
+									"pm.test(\"Name should be correct\", function () { ",
+									"    pm.expect(pm.response.json()[1].name).to.equal(\"test\"); ",
+									"});",
+									"",
+									"pm.test(\"Extension should be csv\", function () { ",
+									"    pm.expect(pm.response.json()[0].extension).to.equal(\"doc\"); ",
+									"});",
+									"*/"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{admin_api_url}}/release/85d43d6f-ec91-452d-aba2-03303ab4363a/ancillary?name=test",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"85d43d6f-ec91-452d-aba2-03303ab4363a",
+								"ancillary"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "test"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete ancillary file",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/85d43d6f-ec91-452d-aba2-03303ab4363a/ancillary/ancillary.doc",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"85d43d6f-ec91-452d-aba2-03303ab4363a",
+								"ancillary",
+								"ancillary.doc"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload chart file",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c3aa6c3a-7405-4b53-9fce-ab1d75b4e2da",
+								"exec": [
+									"/*",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Should return some results\", function () {",
+									"    pm.expect(pm.response.json().length).to.equal(1);    ",
+									"});",
+									"",
+									"pm.test(\"Name should be correct\", function () { ",
+									"    pm.expect(pm.response.json()[0].name).to.equal(\"test\"); ",
+									"});",
+									"",
+									"pm.test(\"Extension should be csv\", function () { ",
+									"    pm.expect(pm.response.json()[0].extension).to.equal(\"png\"); ",
+									"});",
+									"*/"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/chart.png"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/85d43d6f-ec91-452d-aba2-03303ab4363a/chart?name=test",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"85d43d6f-ec91-452d-aba2-03303ab4363a",
+								"chart"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "test"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get chart files",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "0e8a7e3f-244d-43aa-a936-4238169dcd82",
+								"exec": [
+									"/*",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Should return some results\", function () {",
+									"    pm.expect(pm.response.json().length).to.equal(1);    ",
+									"});",
+									"",
+									"pm.test(\"Name should be correct\", function () { ",
+									"    pm.expect(pm.response.json()[0].name).to.equal(\"test\"); ",
+									"});",
+									"",
+									"pm.test(\"Extension should be csv\", function () { ",
+									"    pm.expect(pm.response.json()[0].extension).to.equal(\"png\"); ",
+									"});",
+									"*/"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{admin_api_url}}/release/85d43d6f-ec91-452d-aba2-03303ab4363a/chart",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"85d43d6f-ec91-452d-aba2-03303ab4363a",
+								"chart"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete chart file",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/85d43d6f-ec91-452d-aba2-03303ab4363a/chart/chart.png",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"85d43d6f-ec91-452d-aba2-03303ab4363a",
+								"chart",
+								"chart.png"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		}
 	],
 	"event": [
