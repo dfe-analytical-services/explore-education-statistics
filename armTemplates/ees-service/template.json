@@ -95,6 +95,12 @@
     "envNumber": {
       "type": "string",
       "defaultValue": ""
+    },
+    "BatchSettings": {
+      "type": "object",
+      "defaultValue": {
+        "BatchSize": 1000
+      }
     }
   },
   "variables": {
@@ -906,6 +912,9 @@
       "properties": {
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('importerPlanName'))]",
         "httpsOnly": true,
+        "BatchSettings":{
+          "BatchSize": "[parameters('BatchSettings').BatchSize]"
+        },
         "siteConfig": {
           "http20Enabled": true,
           "phpVersion": "off",
