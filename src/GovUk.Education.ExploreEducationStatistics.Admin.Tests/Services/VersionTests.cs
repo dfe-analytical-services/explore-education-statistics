@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Assert.NotNull(versioned.Ordered);
             Assert.Empty(versioned.Ordered);
         }
-        
+
         [Fact]
         public void VersionOrderingAllFuture()
         {
@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Assert.Equal("+20days", versioned.Latest.Name);
             Assert.Equal("+20days", versioned.First.Name);
         }
-        
+
         [Fact]
         public void VersionOrdering()
         {
@@ -47,11 +47,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new Version
                     {
                         Created = DateTime.Now.AddDays(-10), // 10 days ago.
-                        Name = "-10days" 
+                        Name = "-10days"
                     },
                     new Version
                     {
-                        Created = DateTime.Now.AddDays(-20),  // 20 days ago.
+                        Created = DateTime.Now.AddDays(-20), // 20 days ago.
                         Name = "-20days"
                     },
                     new Version
@@ -69,10 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Assert.Equal("-20days", versioned.Ordered[0].Name);
             Assert.Equal("-20days", versioned.Ordered[0].Name);
         }
-        
     }
-    
-    
 
     public class Version : IVersion
     {
@@ -83,7 +80,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
     public class Versioned : AbstractVersioned<Version>
     {
-        
     }
-    
 }

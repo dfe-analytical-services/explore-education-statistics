@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Documents.SystemFunctions;
 using ReleaseId = System.Guid;
 using PublicationId = System.Guid;
 
@@ -80,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             Func<Task<Either<ValidationResult, T>>> andThen)
         {
             var release = await _releaseService2.GetAsync(releaseId);
-            if (release == null)
+            if (release.IsNull())
             {
                 return NotFound();
             }

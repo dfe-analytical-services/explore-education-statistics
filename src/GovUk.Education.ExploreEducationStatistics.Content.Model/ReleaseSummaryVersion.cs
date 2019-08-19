@@ -13,7 +13,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
     public class ReleaseSummaryVersion : IVersion
     {
-
         public Guid Id { get; set; }
 
         public Guid ReleaseSummaryId { get; set; }

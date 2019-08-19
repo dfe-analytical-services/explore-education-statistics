@@ -59,7 +59,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             cfg.CreateMap<ReleaseSummary, EditReleaseSummaryViewModel>();
         }).CreateMapper();
 
-
         public ReleaseService2(ApplicationDbContext context)
         {
             _context = context;
@@ -156,7 +155,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private async Task<Either<ValidationResult, bool>> ValidateReleaseSlugUniqueToPublication(string slug,
             PublicationId publicationId, ReleaseId? releaseId = null)
         {
-
             var slugMatches = _context.Releases
                 .Where(r => r.PublicationId == publicationId && r.ReleaseSummary.ReleaseId != releaseId)
                 .Select(r => r.ReleaseSummary)
