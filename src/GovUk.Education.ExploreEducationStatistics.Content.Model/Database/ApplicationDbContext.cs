@@ -170,7 +170,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public DbSet<Publication> Publications { get; set; }
         public DbSet<Release> Releases { get; set; }
         
-        public DbSet<ReleaseSummary> ReleaseSummary { get; set; }
+        public DbSet<ReleaseSummary> ReleaseSummaries { get; set; }
         
         public DbSet<ReleaseSummaryVersion> ReleaseSummaryVersions { get; set; }
         public DbSet<ReleaseType> ReleaseTypes { get; set; }

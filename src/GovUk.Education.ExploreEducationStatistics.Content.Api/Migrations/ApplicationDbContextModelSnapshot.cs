@@ -1045,7 +1045,7 @@ Find out how and why these statistics are collected and published - [Secondary a
                     b.HasIndex("ReleaseId")
                         .IsUnique();
 
-                    b.ToTable("ReleaseSummary");
+                    b.ToTable("ReleaseSummaries");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseSummaryVersion", b =>

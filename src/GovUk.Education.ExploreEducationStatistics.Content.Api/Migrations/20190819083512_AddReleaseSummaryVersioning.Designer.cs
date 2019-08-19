@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190816125931_AddReleaseSummaryVersioning")]
+    [Migration("20190819083512_AddReleaseSummaryVersioning")]
     partial class AddReleaseSummaryVersioning
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1047,7 +1047,7 @@ Find out how and why these statistics are collected and published - [Secondary a
                     b.HasIndex("ReleaseId")
                         .IsUnique();
 
-                    b.ToTable("ReleaseSummary");
+                    b.ToTable("ReleaseSummaries");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseSummaryVersion", b =>

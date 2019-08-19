@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "ReleaseSummary",
+                name: "ReleaseSummaries",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
@@ -16,9 +16,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ReleaseSummary", x => x.Id);
+                    table.PrimaryKey("PK_ReleaseSummaries", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ReleaseSummary_Releases_ReleaseId",
+                        name: "FK_ReleaseSummaries_Releases_ReleaseId",
                         column: x => x.ReleaseId,
                         principalTable: "Releases",
                         principalColumn: "Id",
@@ -44,9 +44,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                 {
                     table.PrimaryKey("PK_ReleaseSummaryVersions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ReleaseSummaryVersions_ReleaseSummary_ReleaseSummaryId",
+                        name: "FK_ReleaseSummaryVersions_ReleaseSummaries_ReleaseSummaryId",
                         column: x => x.ReleaseSummaryId,
-                        principalTable: "ReleaseSummary",
+                        principalTable: "ReleaseSummaries",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -58,8 +58,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ReleaseSummary_ReleaseId",
-                table: "ReleaseSummary",
+                name: "IX_ReleaseSummaries_ReleaseId",
+                table: "ReleaseSummaries",
                 column: "ReleaseId",
                 unique: true);
 
@@ -80,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                 name: "ReleaseSummaryVersions");
 
             migrationBuilder.DropTable(
-                name: "ReleaseSummary");
+                name: "ReleaseSummaries");
         }
     }
 }
