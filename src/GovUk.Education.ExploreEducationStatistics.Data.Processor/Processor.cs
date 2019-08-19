@@ -193,8 +193,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
 
         private static BatchSettings GetBatchSettings(IConfigurationRoot config)
         {
-            var batchSettings = new BatchSettings();
-            config.Bind("BatchSettings", batchSettings);
+            var batchSettings = new BatchSettings {BatchSize = config.GetValue<int>("BatchSize")};
             return batchSettings;
         }
     }

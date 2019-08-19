@@ -95,12 +95,6 @@
     "envNumber": {
       "type": "string",
       "defaultValue": ""
-    },
-    "BatchSettings": {
-      "type": "object",
-      "defaultValue": {
-        "BatchSize": 1000
-      }
     }
   },
   "variables": {
@@ -912,9 +906,6 @@
       "properties": {
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('importerPlanName'))]",
         "httpsOnly": true,
-        "BatchSettings":{
-          "BatchSize": "[parameters('BatchSettings').BatchSize]"
-        },
         "siteConfig": {
           "http20Enabled": true,
           "phpVersion": "off",
@@ -955,6 +946,10 @@
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
               "value": "[reference(resourceId('microsoft.insights/components/', variables('importerAppInsights')), '2015-05-01').InstrumentationKey]"
+            },
+            {
+              "name": "BatchSize",
+              "value": "1000"
             }
           ],
           "connectionStrings": [
