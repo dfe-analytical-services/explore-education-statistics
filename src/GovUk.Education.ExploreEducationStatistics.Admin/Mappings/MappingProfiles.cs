@@ -15,17 +15,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 opts => opts.MapFrom(release => release.ReleaseName));
             
             CreateMap<Release, ReleaseViewModel>()
-                .ForMember(
-                    dest => dest.LatestRelease,
-                    m => m.MapFrom(r => r.Publication.LatestRelease().Id == r.Id))
-                .ForMember(dest => dest.Contact, 
+                .ForMember(dest => dest.Contact,
                     m => m.MapFrom(r => r.Publication.Contact))
-                .ForMember(dest => dest.PublicationTitle, 
-                    m => m.MapFrom(r => r.Publication.Title));;
+                .ForMember(dest => dest.Published,
+                    m => m.MapFrom(r => r.Published))
+                .ForMember(dest => dest.Title,
+                    m => m.MapFrom(r => r.ReleaseSummary.Title))
+                .ForMember(dest => dest.CoverageTitle,
+                    m => m.MapFrom(r => r.ReleaseSummary.CoverageTitle))
+                .ForMember(dest => dest.LatestRelease,
+                    m => m.MapFrom(r => r.Publication.LatestRelease().Id == r.Id))
+                .ForMember(dest => dest.PublicationTitle,
+                    m => m.MapFrom(r => r.Publication.Title))
+                .ForMember(dest => dest.PublishScheduled,
+                    m => m.MapFrom(r => r.ReleaseSummary.PublishScheduled))
+                .ForMember(dest => dest.ReleaseName,
+                    m => m.MapFrom(r => r.ReleaseSummary.ReleaseName))
+                .ForMember(dest => dest.TypeId,
+                    m => m.MapFrom(r => r.ReleaseSummary.TypeId))
+                .ForMember(dest => dest.Type,
+                    m => m.MapFrom(r => r.ReleaseSummary.Type))
+                .ForMember(dest => dest.YearTitle,
+                    m => m.MapFrom(r => r.ReleaseSummary.YearTitle))
+                .ForMember(dest => dest.NextReleaseDate,
+                    m => m.MapFrom(r => r.ReleaseSummary.NextReleaseDate))
+                .ForMember(dest => dest.TimePeriodCoverage,
+                    m => m.MapFrom(r => r.ReleaseSummary.TimePeriodCoverage));
             
-            CreateMap<EditReleaseSummaryViewModel, Release>();
-
-            CreateMap<CreateReleaseViewModel, Release>();
+            CreateMap<CreateReleaseViewModel, ReleaseSummaryVersion>();
+            CreateMap<EditReleaseSummaryViewModel, ReleaseSummaryVersion>();
+            CreateMap<ReleaseSummary, EditReleaseSummaryViewModel>();
         }
     }
 }

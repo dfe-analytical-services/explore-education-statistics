@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -8,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.EqualityUtils;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 
@@ -22,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             using (var context = InMemoryApplicationDbContext("CreateReleaseNoTemplate2"))
             {
-                var result = await new ReleaseService2(context).CreateReleaseAsync(
+                var result = await new ReleaseService(context, MapperForProfile<MappingProfiles>()).CreateReleaseAsync(
                     new CreateReleaseViewModel
                     {
                         PublicationId = publicationId,
@@ -48,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var context = InMemoryApplicationDbContext("CreateReleaseWithSlugThatAlreadyExistsCausesValidationFailure"))
             {
                 // Add the first release - use the services.
-                await new ReleaseService2(context).CreateReleaseAsync(
+                await new ReleaseService(context, MapperForProfile<MappingProfiles>()).CreateReleaseAsync(
                     new CreateReleaseViewModel
                     {
                         PublicationId = publicationId,
@@ -61,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var context = InMemoryApplicationDbContext("CreateReleaseWithSlugThatAlreadyExistsCausesValidationFailure"))
             {
                 // Add the first release - use the services.
-                var result = await new ReleaseService2(context).CreateReleaseAsync(
+                var result = await new ReleaseService(context, MapperForProfile<MappingProfiles>()).CreateReleaseAsync(
                     new CreateReleaseViewModel
                     {
                         PublicationId = publicationId,
@@ -125,7 +127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var context = InMemoryApplicationDbContext("CreateReleaseWithTemplate2"))
             {
                 // Service method under test
-                var result = new ReleaseService2(context).CreateReleaseAsync(
+                var result = new ReleaseService(context, MapperForProfile<MappingProfiles>()).CreateReleaseAsync(
                     new CreateReleaseViewModel
                     {
                         PublicationId = new Guid("403d3c5d-a8cd-4d54-a029-0c74c86c55b2"),
@@ -160,7 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var context = InMemoryApplicationDbContext("EditReleaseSummary2"))
             {
                 // Save the release that will later be edited - use the services. 
-                var result = await new ReleaseService2(context).CreateReleaseAsync(
+                var result = await new ReleaseService(context, MapperForProfile<MappingProfiles>()).CreateReleaseAsync(
                     new CreateReleaseViewModel
                     {
                         PublicationId = publicationId,
@@ -184,7 +186,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var context = InMemoryApplicationDbContext("EditReleaseSummary2"))
             {
                 // Call the method under test
-                var result = await new ReleaseService2(context).EditReleaseSummaryAsync(
+                var result = await new ReleaseService(context, MapperForProfile<MappingProfiles>()).EditReleaseSummaryAsync(
                     new EditReleaseSummaryViewModel
                     {
                         Id = releaseId,
@@ -214,7 +216,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var context = InMemoryApplicationDbContext("GetReleaseSummaryAsync2"))
             {
                 // Save the release that will retrieved later - use the services.
-                var result = await new ReleaseService2(context).CreateReleaseAsync(
+                var result = await new ReleaseService(context, MapperForProfile<MappingProfiles>()).CreateReleaseAsync(
                     new CreateReleaseViewModel
                     {
                         PublicationId = publicationId,
@@ -232,7 +234,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var context = InMemoryApplicationDbContext("GetReleaseSummaryAsync2"))
             {
                 // Method under test 
-                var summary = await new ReleaseService2(context).GetReleaseSummaryAsync(releaseId);
+                var summary = await new ReleaseService(context, MapperForProfile<MappingProfiles>()).GetReleaseSummaryAsync(releaseId);
                 Assert.Equal(DateTime.Parse("2018/06/01"), summary.PublishScheduled);
                 Assert.Equal(new PartialDate {Day = "01", Month = "01", Year = "2019"}, summary.NextReleaseDate, PartialDateEqualityComparer());
                 Assert.Equal(releaseTypeId, summary.TypeId);
@@ -253,7 +255,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var context = InMemoryApplicationDbContext("GetReleasesForPublicationAsync2"))
             {
                 // Add first release that will retrieved later - use the services.
-                var result = await new ReleaseService2(context).CreateReleaseAsync(
+                var result = await new ReleaseService(context, MapperForProfile<MappingProfiles>()).CreateReleaseAsync(
                     new CreateReleaseViewModel
                     {
                         PublicationId = publicationId,
@@ -271,7 +273,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var context = InMemoryApplicationDbContext("GetReleasesForPublicationAsync2"))
             {
                 // Add first release that will retrieved later - use the services.
-                var result = await new ReleaseService2(context).CreateReleaseAsync(
+                var result = await new ReleaseService(context, MapperForProfile<MappingProfiles>()).CreateReleaseAsync(
                     new CreateReleaseViewModel
                     {
                         PublicationId = publicationId,
@@ -288,7 +290,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using (var context = InMemoryApplicationDbContext("GetReleasesForPublicationAsync2"))
             {
                 // Method under test 
-                var releasesForPublication = await new ReleaseService2(context)
+                var releasesForPublication = await new ReleaseService(context, MapperForProfile<MappingProfiles>())
                     .GetReleasesForPublicationAsync(publicationId);
                 Assert.Equal(2, releasesForPublication .Count);
                 Assert.True(releasesForPublication .Exists(r => r.Id == firstReleaseId && r.TypeId == releaseTypeId));

@@ -21,33 +21,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
-
+         
         public ReleaseService(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
         }
-
-        public Release Get(PublicationId id)
-        {
-            return _context.Releases.FirstOrDefault(x => x.Id == id);
-        }
-
-        public Release Get(string slug)
-        {
-            return _context.Releases.FirstOrDefault(x => x.Slug == slug);
-        }
-
+        
         public async Task<Release> GetAsync(ReleaseId id)
         {
             return await _context.Releases.FirstOrDefaultAsync(x => x.Id == id);
         }
-
-        public List<Release> List()
-        {
-            return _context.Releases.ToList();
-        }
-
+        
         // TODO Authorisation will be required when users are introduced
         public async Task<ReleaseViewModel> GetReleaseForIdAsync(ReleaseId id)
         {
@@ -57,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .FirstOrDefaultAsync();
             return _mapper.Map<ReleaseViewModel>(release);
         }
-        
+
         // TODO Authorisation will be required when users are introduced
         public async Task<Either<ValidationResult, ReleaseViewModel>> CreateReleaseAsync(
             CreateReleaseViewModel createRelease)
@@ -66,21 +51,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async () =>
                 {
                     var order = OrderForNextReleaseOnPublication(createRelease.PublicationId);
-                    var content = TemplateFromRelease(createRelease.TemplateReleaseId);
-                    var release = _mapper.Map<Release>(createRelease);
-                    release.Content = content;
-                    release.Order = order;
-                    var saved = _context.Releases.Add(release);
+                    var content = await TemplateFromRelease(createRelease.TemplateReleaseId);
+                    var releaseSummary = _mapper.Map<ReleaseSummaryVersion>(createRelease);
+                    releaseSummary.Created = DateTime.Now;
+                    var saved = _context.Releases.Add(new Release
+                    {
+                        PublicationId = createRelease.PublicationId,
+                        ReleaseSummary = new ReleaseSummary
+                        {
+                            Versions = new List<ReleaseSummaryVersion>()
+                            {
+                                releaseSummary
+                            }
+                        },
+                        Content = content,
+                        Order = order,
+                    });
+                    
                     await _context.SaveChangesAsync();
                     return await GetReleaseForIdAsync(saved.Entity.Id);
                 });
         }
 
         // TODO Authorisation will be required when users are introduced
-        public async Task<EditReleaseSummaryViewModel> GetReleaseSummaryAsync(ReleaseId releaseId)
+        public async Task<EditReleaseSummaryViewModel> GetReleaseSummaryAsync(Guid releaseId)
         {
-            var release = await _context.Releases.FirstOrDefaultAsync(r => r.Id == releaseId);
-            return _mapper.Map<EditReleaseSummaryViewModel>(release);
+            var release = await _context.Releases
+                .Where(r => r.Id == releaseId)
+                .HydrateReleaseForReleaseViewModel()
+                .FirstOrDefaultAsync();
+            return _mapper.Map<EditReleaseSummaryViewModel>(release.ReleaseSummary);
         }
 
         // TODO Authorisation will be required when users are introduced
@@ -91,28 +91,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await ValidateReleaseSlugUniqueToPublication(model.Slug, publication.Id, model.Id)
                 .OnSuccess(async () =>
                 {
-                    var release = await _context.Releases.FirstOrDefaultAsync(r => r.Id == model.Id);
-                    _context.Releases.Update(release);
-                    _mapper.Map(model, release);
-                    await _context.SaveChangesAsync();
+                    var release = await _context.Releases
+                        .Where(r => r.Id == model.Id)
+                        .HydrateReleaseForReleaseViewModel()
+                        .FirstOrDefaultAsync();
+                    var currentSummary = release.ReleaseSummary.Current;
+                    var newSummary = _mapper.Map<ReleaseSummaryVersion>(model);
+                    newSummary.Created = DateTime.Now;
+                    newSummary.Summary = currentSummary.Summary;
+                    release.ReleaseSummary.Versions.Add(newSummary);
+                    _context.Update(release);
                     return await GetReleaseForIdAsync(model.Id);
                 });
         }
 
         // TODO Authorisation will be required when users are introduced
-        public async Task<List<ReleaseViewModel>> GetReleasesForPublicationAsync(PublicationId publicationId)
+        public async Task<List<ReleaseViewModel>> GetReleasesForPublicationAsync(Guid publicationId)
         {
             var release = await _context.Releases
                 .Where(r => r.Publication.Id == publicationId)
                 .HydrateReleaseForReleaseViewModel()
                 .ToListAsync();
+
             return _mapper.Map<List<ReleaseViewModel>>(release);
         }
 
         private async Task<Either<ValidationResult, bool>> ValidateReleaseSlugUniqueToPublication(string slug,
             PublicationId publicationId, ReleaseId? releaseId = null)
         {
-            if (_context.Releases.Any(r => r.Slug == slug && r.PublicationId == publicationId && r.Id != releaseId))
+            var slugMatches = _context.Releases
+                .Where(r => r.PublicationId == publicationId && r.ReleaseSummary.ReleaseId != releaseId)
+                .Select(r => r.ReleaseSummary)
+                .Include(rs => rs.Versions)
+                .ToList() // Required as the following operation are not expressible in sql as they query computed fields
+                .Any(rs => rs.Current.Slug == slug);
+            if (slugMatches)
             {
                 return ValidationResult(SlugNotUnique);
             }
@@ -127,11 +140,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return publication.Releases.Select(r => r.Order).DefaultIfEmpty().Max() + 1;
         }
 
-        private List<ContentSection> TemplateFromRelease(ReleaseId? releaseId)
+        private async Task<List<ContentSection>> TemplateFromRelease(ReleaseId? releaseId)
         {
             if (releaseId.HasValue)
             {
-                var templateContent = Get(releaseId.Value).Content;
+                var templateContent = (await GetAsync(releaseId.Value)).Content;
                 if (templateContent != null)
                 {
                     return templateContent.Select(c => new ContentSection
@@ -145,6 +158,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
 
             return new List<ContentSection>();
+        }
+        
+        public Release Get(PublicationId id)
+        {
+            return _context.Releases.FirstOrDefault(x => x.Id == id);
+        }
+
+        public Release Get(string slug)
+        {
+            return _context.Releases.FirstOrDefault(x => x.Slug == slug);
+        }
+        
+        public List<Release> List()
+        {
+            return _context.Releases.ToList();
         }
     }
 
