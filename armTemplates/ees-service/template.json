@@ -95,6 +95,65 @@
     "envNumber": {
       "type": "string",
       "defaultValue": ""
+    },
+    "departmentName": {
+      "type": "string",
+      "metadata": {
+        "description": "Tag Value - Enter the Department name tag value e.g. Data Directorate"
+      }
+    },
+    "environmentName": {
+      "type": "string",
+      "defaultValue": "Unknown",
+      "metadata": {
+        "description": "Tag Value - The name of the phase of the development lifecycle environment that the component will be used in e.g. Development / Test / Integration / Production"
+      }
+    },
+    "subscriptionName": {
+      "type": "string",
+      "metadata": {
+        "description": "Tag Value - Enter the full name of the Azure subscription where this resource is located e.g. s101-datahub-development / s101-datahub-test / s101-datahub-production"
+      }
+    },
+    "solutionName": {
+      "type": "string",
+      "metadata": {
+        "description": "Tag Value - Enter the solution name that the component is a part of e.g. EDAP, LDS, EES"
+      }
+    },
+    "costCentre": {
+      "type": "string",
+      "defaultValue": "Unknown",
+      "metadata": {
+        "description": "Tag Value - Enter the cost centre identifying value provided by the Service Owner. Otherwise populate with Unknown."
+      }
+    },
+    "serviceOwnerName": {
+      "type": "string",
+      "metadata": {
+        "description": "Tag Value - Enter the name of the Service or Application Owner in the SURNAME, Firstname format e.g. SINCLAIR, Paul / SHELBY, Laura"
+      }
+    },
+    "dateProvisioned": {
+      "type": "string",
+      "defaultValue": "[utcNow('u')]",
+      "metadata": {
+        "description": "Tag Value - Enter the date that the component was created using the YYYYMMDD format e.g. 20190417. Use of the utcNow function will automatically populate this entry at creation time. Note: This only works when forced as a default value."
+      }
+    },
+    "deploymentRepo": {
+      "type": "string",
+      "defaultValue": "N/A",
+      "metadata": {
+        "description": "Tag Value - Enter the name of the repo that the deployment script for the component name be found. If the component is deployed manually, the value should be N/A"
+      }
+    },
+    "deploymentScript": {
+      "type": "string",
+      "defaultValue": "N/A",
+      "metadata": {
+        "description": "Tag Value - Enter the name of the main script (not the parameters file) used to deploy the component. If the component is deployed manually, the value should be N/A"
+      }
     }
   },
   "variables": {
@@ -127,7 +186,7 @@
     "publicStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publicStorageAccountName'))]",
     "publisherAppName": "[concat(parameters('subscription'), '-fa-', parameters('environment'), '-publisher')]",
     "publisherPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-publisher')]",
-    "publisherAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-publisher')]"
+    "publisherAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-publisher')]",
   },
   "resources": [
     {
@@ -136,7 +195,15 @@
       "apiVersion": "2016-08-01",
       "location": "[resourceGroup().location]",
       "tags": {
-        "[concat('hidden-related:', '/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('dataPlanName'))]": "empty"
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "resources": [
         {
@@ -213,7 +280,15 @@
       "location": "[resourceGroup().location]",
       "comments": "This specifies the web app slots.",
       "tags": {
-        "displayName": "WebAppSlots"
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "properties": {
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('dataPlanName'))]"
@@ -245,7 +320,15 @@
       "apiVersion": "2014-04-01",
       "location": "[parameters('appInsightsLocation')]",
       "tags": {
-        "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('dataAppName'))]": "Resource"
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "properties": {
         "applicationId": "[variables('dataAppName')]",
@@ -258,7 +341,15 @@
       "apiVersion": "2016-08-01",
       "location": "[resourceGroup().location]",
       "tags": {
-        "[concat('hidden-related:', '/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('contentPlanName'))]": "empty"
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "resources": [
         {
@@ -331,7 +422,15 @@
       "location": "[resourceGroup().location]",
       "comments": "This specifies the web app slots.",
       "tags": {
-        "displayName": "WebAppSlots"
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "properties": {
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('contentPlanName'))]"
@@ -363,7 +462,15 @@
       "apiVersion": "2014-04-01",
       "location": "[parameters('appInsightsLocation')]",
       "tags": {
-        "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('contentAppName'))]": "Resource"
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "properties": {
         "applicationId": "[variables('contentAppName')]",
@@ -376,7 +483,15 @@
       "apiVersion": "2016-08-01",
       "location": "[resourceGroup().location]",
       "tags": {
-        "[concat('hidden-related:', '/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('adminPlanName'))]": "empty"
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "resources": [
         {
@@ -455,7 +570,15 @@
       "location": "[resourceGroup().location]",
       "comments": "This specifies the web app slots.",
       "tags": {
-        "displayName": "WebAppSlots"
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "properties": {
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('adminPlanName'))]"
@@ -487,7 +610,15 @@
       "apiVersion": "2014-04-01",
       "location": "[parameters('appInsightsLocation')]",
       "tags": {
-        "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('adminAppName'))]": "Resource"
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "properties": {
         "applicationId": "[variables('adminAppName')]",
@@ -500,7 +631,15 @@
       "apiVersion": "2016-08-01",
       "location": "[resourceGroup().location]",
       "tags": {
-        "[concat('hidden-related:', '/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('publicPlanName'))]": "empty"
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "properties": {
         "name": "[variables('publicAppName')]",
@@ -584,7 +723,15 @@
       "apiVersion": "2014-04-01",
       "location": "[parameters('appInsightsLocation')]",
       "tags": {
-        "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('publicAppName'))]": "Resource"
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "properties": {
         "applicationId": "[variables('publicAppName')]",
@@ -611,7 +758,15 @@
       "type": "Microsoft.Sql/servers",
       "location": "[resourceGroup().location]",
       "tags": {
-        "displayName": "SqlServer"
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "apiVersion": "2014-04-01",
       "properties": {
@@ -625,7 +780,15 @@
           "type": "databases",
           "location": "[resourceGroup().location]",
           "tags": {
-            "displayName": "Database"
+            "Department": "[parameters('departmentName')]",
+            "Solution": "[parameters('solutionName')]",
+            "Environment": "[parameters('environmentName')]",
+            "Subscription": "[parameters('subscriptionName')]",
+            "CostCentre": "[parameters('costCentre')]",
+            "ServiceOwner": "[parameters('serviceOwnerName')]",
+            "DateProvisioned": "[parameters('dateProvisioned')]",
+            "DeploymentRepo": "[parameters('deploymentRepo')]",
+            "DeploymentScript": "[parameters('deploymentScript')]"
           },
           "apiVersion": "2015-01-01",
           "dependsOn": [
@@ -643,7 +806,15 @@
           "type": "databases",
           "location": "[resourceGroup().location]",
           "tags": {
-            "displayName": "Database"
+            "Department": "[parameters('departmentName')]",
+            "Solution": "[parameters('solutionName')]",
+            "Environment": "[parameters('environmentName')]",
+            "Subscription": "[parameters('subscriptionName')]",
+            "CostCentre": "[parameters('costCentre')]",
+            "ServiceOwner": "[parameters('serviceOwnerName')]",
+            "DateProvisioned": "[parameters('dateProvisioned')]",
+            "DeploymentRepo": "[parameters('deploymentRepo')]",
+            "DeploymentScript": "[parameters('deploymentScript')]"
           },
           "apiVersion": "2015-01-01",
           "dependsOn": [
@@ -676,7 +847,15 @@
       "type": "Microsoft.Sql/servers",
       "location": "[resourceGroup().location]",
       "tags": {
-        "displayName": "SqlServer"
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "apiVersion": "2014-04-01",
       "properties": {
@@ -690,7 +869,15 @@
           "type": "databases",
           "location": "[resourceGroup().location]",
           "tags": {
-            "displayName": "Database"
+            "Department": "[parameters('departmentName')]",
+            "Solution": "[parameters('solutionName')]",
+            "Environment": "[parameters('environmentName')]",
+            "Subscription": "[parameters('subscriptionName')]",
+            "CostCentre": "[parameters('costCentre')]",
+            "ServiceOwner": "[parameters('serviceOwnerName')]",
+            "DateProvisioned": "[parameters('dateProvisioned')]",
+            "DeploymentRepo": "[parameters('deploymentRepo')]",
+            "DeploymentScript": "[parameters('deploymentScript')]"
           },
           "apiVersion": "2015-01-01",
           "dependsOn": [
@@ -756,7 +943,15 @@
       "kind": "web",
       "location": "[resourceGroup().location]",
       "tags": {
-        "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('notificationsAppName'))]": "Resource"
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "properties": {
         "Application_Type": "web",
@@ -874,7 +1069,15 @@
       "kind": "web",
       "location": "[resourceGroup().location]",
       "tags": {
-        "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('importerAppName'))]": "Resource"
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "properties": {
         "Application_Type": "web",
@@ -973,7 +1176,15 @@
       "kind": "web",
       "location": "[resourceGroup().location]",
       "tags": {
-        "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('publisherAppName'))]": "Resource"
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "properties": {
         "Application_Type": "web",
