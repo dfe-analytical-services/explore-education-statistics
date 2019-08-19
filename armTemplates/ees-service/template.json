@@ -149,9 +149,9 @@
       "type": "string",
       "defaultValue": "Unknown",
       "metadata": {
-          "description": "Tag Value - Enter the name of the user who created these resources in the SURNAME, Firstname format e.g. RULER, Paul"
+        "description": "Tag Value - Enter the name of the user who created these resources in the SURNAME, Firstname format e.g. RULER, Paul"
       }
-  },
+    },
     "deploymentRepo": {
       "type": "string",
       "defaultValue": "N/A",
@@ -208,6 +208,7 @@
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Unknown",
         "Environment": "[parameters('environmentName')]",
         "Subscription": "[parameters('subscriptionName')]",
         "CostCentre": "[parameters('costCentre')]",
@@ -294,6 +295,7 @@
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Unknown",
         "Environment": "[parameters('environmentName')]",
         "Subscription": "[parameters('subscriptionName')]",
         "CostCentre": "[parameters('costCentre')]",
@@ -335,6 +337,7 @@
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Unknown",
         "Environment": "[parameters('environmentName')]",
         "Subscription": "[parameters('subscriptionName')]",
         "CostCentre": "[parameters('costCentre')]",
@@ -357,6 +360,7 @@
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Unknown",
         "Environment": "[parameters('environmentName')]",
         "Subscription": "[parameters('subscriptionName')]",
         "CostCentre": "[parameters('costCentre')]",
@@ -439,6 +443,7 @@
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Unknown",
         "Environment": "[parameters('environmentName')]",
         "Subscription": "[parameters('subscriptionName')]",
         "CostCentre": "[parameters('costCentre')]",
@@ -480,6 +485,7 @@
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Unknown",
         "Environment": "[parameters('environmentName')]",
         "Subscription": "[parameters('subscriptionName')]",
         "CostCentre": "[parameters('costCentre')]",
@@ -502,6 +508,7 @@
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Unknown",
         "Environment": "[parameters('environmentName')]",
         "Subscription": "[parameters('subscriptionName')]",
         "CostCentre": "[parameters('costCentre')]",
@@ -590,6 +597,7 @@
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Unknown",
         "Environment": "[parameters('environmentName')]",
         "Subscription": "[parameters('subscriptionName')]",
         "CostCentre": "[parameters('costCentre')]",
@@ -631,6 +639,7 @@
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Unknown",
         "Environment": "[parameters('environmentName')]",
         "Subscription": "[parameters('subscriptionName')]",
         "CostCentre": "[parameters('costCentre')]",
@@ -653,6 +662,7 @@
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Unknown",
         "Environment": "[parameters('environmentName')]",
         "Subscription": "[parameters('subscriptionName')]",
         "CostCentre": "[parameters('costCentre')]",
@@ -746,6 +756,7 @@
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Unknown",
         "Environment": "[parameters('environmentName')]",
         "Subscription": "[parameters('subscriptionName')]",
         "CostCentre": "[parameters('costCentre')]",
@@ -782,6 +793,7 @@
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Unknown",
         "Environment": "[parameters('environmentName')]",
         "Subscription": "[parameters('subscriptionName')]",
         "CostCentre": "[parameters('costCentre')]",
@@ -805,6 +817,7 @@
           "tags": {
             "Department": "[parameters('departmentName')]",
             "Solution": "[parameters('solutionName')]",
+            "ServiceType": "Unknown",
             "Environment": "[parameters('environmentName')]",
             "Subscription": "[parameters('subscriptionName')]",
             "CostCentre": "[parameters('costCentre')]",
@@ -832,6 +845,7 @@
           "tags": {
             "Department": "[parameters('departmentName')]",
             "Solution": "[parameters('solutionName')]",
+            "ServiceType": "Unknown",
             "Environment": "[parameters('environmentName')]",
             "Subscription": "[parameters('subscriptionName')]",
             "CostCentre": "[parameters('costCentre')]",
@@ -874,6 +888,7 @@
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Unknown",
         "Environment": "[parameters('environmentName')]",
         "Subscription": "[parameters('subscriptionName')]",
         "CostCentre": "[parameters('costCentre')]",
@@ -897,6 +912,7 @@
           "tags": {
             "Department": "[parameters('departmentName')]",
             "Solution": "[parameters('solutionName')]",
+            "ServiceType": "Unknown",
             "Environment": "[parameters('environmentName')]",
             "Subscription": "[parameters('subscriptionName')]",
             "CostCentre": "[parameters('costCentre')]",
@@ -972,6 +988,7 @@
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Unknown",
         "Environment": "[parameters('environmentName')]",
         "Subscription": "[parameters('subscriptionName')]",
         "CostCentre": "[parameters('costCentre')]",
@@ -1099,6 +1116,7 @@
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Unknown",
         "Environment": "[parameters('environmentName')]",
         "Subscription": "[parameters('subscriptionName')]",
         "CostCentre": "[parameters('costCentre')]",
@@ -1207,6 +1225,7 @@
       "tags": {
         "Department": "[parameters('departmentName')]",
         "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Unknown",
         "Environment": "[parameters('environmentName')]",
         "Subscription": "[parameters('subscriptionName')]",
         "CostCentre": "[parameters('costCentre')]",
@@ -1226,6 +1245,19 @@
       "apiVersion": "2015-04-01",
       "name": "[variables('publisherPlanName')]",
       "location": "[resourceGroup().location]",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Unknown",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
       "properties": {
         "name": "[variables('publisherPlanName')]",
         "computeMode": "Dynamic",
@@ -1244,6 +1276,19 @@
         "[resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName'))]",
         "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]"
       ],
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Unknown",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
       "properties": {
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('publisherPlanName'))]",
         "httpsOnly": true,
