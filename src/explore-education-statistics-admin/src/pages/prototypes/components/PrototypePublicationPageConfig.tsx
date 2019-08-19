@@ -132,6 +132,14 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
             </h2>
             <dl className="govuk-summary-list govuk-width-container govuk-!-margin-bottom-9">
               <div className="govuk-summary-list__row">
+                <dt className="govuk-summary-list__key">
+                  Responsible statistician
+                </dt>
+                <dd className="govuk-summary-list__value">
+                  <a href="mailto: example@email.co.uk">Stephen Doherty</a>
+                </dd>
+              </div>
+              <div className="govuk-summary-list__row">
                 <dt className="govuk-summary-list__key">Team lead</dt>
                 <dd className="govuk-summary-list__value">
                   <a href="mailto: example@email.co.uk">John Smith</a>

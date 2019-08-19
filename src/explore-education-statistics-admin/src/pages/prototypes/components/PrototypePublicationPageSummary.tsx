@@ -56,10 +56,15 @@ const PrototypePublicationSummary = () => {
           </dd>
         </div>
 
-        <h2 className="govuk-heading-m govuk-!-margin-top-6">
+        <h2 className="govuk-heading-m govuk-!-margin-top-9">
           Production team
         </h2>
-
+        <div className="govuk-summary-list__row">
+          <dt className="govuk-summary-list__key">Responsible statistician</dt>
+          <dd className="govuk-summary-list__value">
+            <a href="mailto: example@email.co.uk">Stephen Doherty</a>
+          </dd>
+        </div>
         <div className="govuk-summary-list__row">
           <dt className="govuk-summary-list__key">Team lead</dt>
           <dd className="govuk-summary-list__value">
@@ -67,7 +72,7 @@ const PrototypePublicationSummary = () => {
           </dd>
         </div>
         <div className="govuk-summary-list__row">
-          <dt className="govuk-summary-list__key">Primary analyst</dt>
+          <dt className="govuk-summary-list__key">Primary analyst (Author)</dt>
           <dd className="govuk-summary-list__value">
             <a href="mailto: example@email.co.uk">Ann Evans</a>
           </dd>
