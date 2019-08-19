@@ -4,7 +4,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
 {
     public interface IBoundaryLevelService : IRepository<BoundaryLevel, long>
     {
-        IEnumerable<BoundaryLevel> FindByGeographicLevel(GeographicLevel geographicLevel);
+        IEnumerable<BoundaryLevel> FindByGeographicLevels(IEnumerable<GeographicLevel> geographicLevels);
         BoundaryLevel FindLatestByGeographicLevel(GeographicLevel geographicLevel);
         IEnumerable<BoundaryLevel> FindRelatedByBoundaryLevel(long boundaryLevelId);
     }
