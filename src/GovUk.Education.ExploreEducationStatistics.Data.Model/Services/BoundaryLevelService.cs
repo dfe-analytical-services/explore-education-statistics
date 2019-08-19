@@ -14,9 +14,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         {
         }
 
-        public IEnumerable<BoundaryLevel> FindByGeographicLevel(GeographicLevel geographicLevel)
+        private IEnumerable<BoundaryLevel> FindByGeographicLevel(GeographicLevel geographicLevel)
         {
             return FindMany(level => level.Level.Equals(geographicLevel))
+                .OrderByDescending(level => level.Published);
+        }
+
+        public IEnumerable<BoundaryLevel> FindByGeographicLevels(IEnumerable<GeographicLevel> geographicLevels)
+        {
+            return FindMany(level => geographicLevels.Contains(level.Level))
                 .OrderByDescending(level => level.Published);
         }
 
