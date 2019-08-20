@@ -17,14 +17,17 @@ import HorizontalBarBlock from '@common/modules/find-statistics/components/chart
 import LineChartBlock from '@common/modules/find-statistics/components/charts/LineChartBlock';
 import MapBlock from '@common/modules/find-statistics/components/charts/MapBlock';
 import VerticalBarBlock from '@common/modules/find-statistics/components/charts/VerticalBarBlock';
-import {DataBlockResponse, DataBlockRerequest} from '@common/services/dataBlockService';
+import {
+  DataBlockResponse,
+  DataBlockRerequest,
+} from '@common/services/dataBlockService';
 import {
   AxisConfiguration,
   ChartDataSet,
   DataSetConfiguration,
   Chart,
 } from '@common/services/publicationService';
-import {Dictionary} from '@common/types';
+import { Dictionary } from '@common/types';
 import React from 'react';
 import ChartConfiguration, {
   ChartOptions,
@@ -40,7 +43,7 @@ interface Props {
   initialConfiguration?: Chart;
   onChartSave?: (props: ChartRendererProps) => void;
 
-  onRequiresDataUpdate?: (parameters: DataBlockRerequest) => void
+  onRequiresDataUpdate?: (parameters: DataBlockRerequest) => void;
 }
 
 function getReduceMetaDataForAxis(data: DataBlockResponse) {
@@ -89,12 +92,14 @@ const ChartBuilder = ({
   data,
   onChartSave,
   initialConfiguration,
-  onRequiresDataUpdate
+  onRequiresDataUpdate,
 }: Props) => {
-  const [selectedChartType, setSelectedChartType] = React.useState<ChartDefinition | undefined>();
+  const [selectedChartType, setSelectedChartType] = React.useState<
+    ChartDefinition | undefined
+  >();
 
   const [indicatorIds] = React.useState<string[]>(
-    Object.keys(data.metaData.indicators)
+    Object.keys(data.metaData.indicators),
   );
 
   const [filterIdCombinations] = React.useState<string[][]>(
@@ -107,7 +112,7 @@ const ChartBuilder = ({
           [filterIds.join('_')]: filterIds,
         };
       }, {}),
-    )
+    ),
   );
 
   const [chartOptions, setChartOptions] = React.useState<ChartOptions>({
@@ -115,17 +120,20 @@ const ChartBuilder = ({
     legend: 'top',
     legendHeight: '42',
     height: 300,
-    title: ''
+    title: '',
   });
-
 
   const previousAxesConfiguration = React.useRef<Dictionary<AxisConfiguration>>(
     {},
   );
 
-  const [axesConfiguration, realSetAxesConfiguration] = React.useState<Dictionary<AxisConfiguration>>({});
+  const [axesConfiguration, realSetAxesConfiguration] = React.useState<
+    Dictionary<AxisConfiguration>
+  >({});
 
-  const [dataSetAndConfiguration, setDataSetAndConfiguration] = React.useState<ChartDataSetAndConfiguration[]>([]);
+  const [dataSetAndConfiguration, setDataSetAndConfiguration] = React.useState<
+    ChartDataSetAndConfiguration[]
+  >([]);
 
   const setAxesConfiguration = (config: Dictionary<AxisConfiguration>) => {
     previousAxesConfiguration.current = config;
@@ -145,38 +153,40 @@ const ChartBuilder = ({
     setDataSetAndConfiguration(newDataSets);
   };
 
-  const [chartLabels, setChartLabels] = React.useState<Dictionary<DataSetConfiguration>>({});
+  const [chartLabels, setChartLabels] = React.useState<
+    Dictionary<DataSetConfiguration>
+  >({});
   React.useEffect(() => {
-
     setChartLabels({
       ...dataSetAndConfiguration.reduce<Dictionary<DataSetConfiguration>>(
-        (mapped, {configuration}) => ({
+        (mapped, { configuration }) => ({
           ...mapped,
           [configuration.value]: configuration,
         }),
         {},
       ),
-      ...generateAxesMetaData(axesConfiguration, data)
+      ...generateAxesMetaData(axesConfiguration, data),
     });
-
   }, [dataSetAndConfiguration, axesConfiguration, data]);
 
-  const [majorAxisDataSets, setMajorAxisDataSets] = React.useState<ChartDataSet[]>([]);
+  const [majorAxisDataSets, setMajorAxisDataSets] = React.useState<
+    ChartDataSet[]
+  >([]);
   React.useEffect(() => {
     setMajorAxisDataSets(dataSetAndConfiguration.map(dsc => dsc.dataSet));
   }, [dataSetAndConfiguration]);
 
   // build the properties that is used to render the chart from the selections made
-  const [renderedChartProps, setRenderedChartProps] = React.useState<ChartRendererProps>();
+  const [renderedChartProps, setRenderedChartProps] = React.useState<
+    ChartRendererProps
+  >();
   React.useEffect(() => {
     if (
       selectedChartType &&
       majorAxisDataSets.length > 0 &&
       axesConfiguration.major
     ) {
-
       setRenderedChartProps({
-
         type: selectedChartType.type,
 
         data,
@@ -196,7 +206,6 @@ const ChartBuilder = ({
         labels: chartLabels,
 
         ...chartOptions,
-
       });
     } else {
       setRenderedChartProps(undefined);
@@ -218,7 +227,9 @@ const ChartBuilder = ({
       previousSelectionChartType.current = selectedChartType;
 
       if (selectedChartType) {
-        const newAxesConfiguration = selectedChartType.axes.reduce<Dictionary<AxisConfiguration>>((axesConfigurationDictionary, axisDefinition) => {
+        const newAxesConfiguration = selectedChartType.axes.reduce<
+          Dictionary<AxisConfiguration>
+        >((axesConfigurationDictionary, axisDefinition) => {
           const previousConfig =
             (previousAxesConfiguration.current &&
               previousAxesConfiguration.current[axisDefinition.type]) ||
@@ -283,59 +294,59 @@ const ChartBuilder = ({
       fileId,
       geographicId,
       labels,
-      axes
+      axes,
     }: Chart = {
       stacked: false,
       legend: 'top',
       legendHeight: '42',
       height: 300,
       title: '',
-    }
+    },
   ) => {
     return {
       type,
-      options: {stacked, legend, legendHeight, height, width, title, fileId, geographicId},
+      options: {
+        stacked,
+        legend,
+        legendHeight,
+        height,
+        width,
+        title,
+        fileId,
+        geographicId,
+      },
       axes,
-      labels
+      labels,
     };
   };
 
   // initial chart options set up
   React.useEffect(() => {
-
     const initial = extractInitialChartOptions(initialConfiguration);
 
-    console.log(initial);
-
-
     setSelectedChartType(
-      () =>
-        initial &&
-        chartTypes.find(({type}) => type === initial.type),
+      () => initial && chartTypes.find(({ type }) => type === initial.type),
     );
 
-    setChartOptions({...initial.options});
+    setChartOptions({ ...initial.options });
 
     if (initial.labels) {
       setChartLabels(initial.labels);
     }
 
     if (initial.axes && initial.labels) {
-      setAxesConfiguration((initial.axes as unknown) as Dictionary<AxisConfiguration>);
+      setAxesConfiguration((initial.axes as unknown) as Dictionary<
+        AxisConfiguration
+      >);
 
-      if (
-        initial.axes.major &&
-        initial.axes.major.dataSets &&
-        initial.labels
-      ) {
+      if (initial.axes.major && initial.axes.major.dataSets && initial.labels) {
         const dataSetAndConfig = initial.axes.major.dataSets
-        .map(dataSet => {
-          const key = generateKeyFromDataSet(dataSet);
-          const configuration =
-            initial.labels && initial.labels[key];
-          return {dataSet, configuration};
-        })
-        .filter(dsc => dsc.configuration !== undefined);
+          .map(dataSet => {
+            const key = generateKeyFromDataSet(dataSet);
+            const configuration = initial.labels && initial.labels[key];
+            return { dataSet, configuration };
+          })
+          .filter(dsc => dsc.configuration !== undefined);
 
         // @ts-ignore ... because Typescript is a pain
         setDataSetAndConfiguration(dataSetAndConfig);
@@ -404,7 +415,12 @@ const ChartBuilder = ({
               chartOptions={chartOptions}
               onChange={setChartOptions}
               onBoundaryLevelChange={boundaryLevel =>
-                onRequiresDataUpdate && onRequiresDataUpdate({boundaryLevel: boundaryLevel ? Number.parseInt(boundaryLevel, 10) : undefined})
+                onRequiresDataUpdate &&
+                onRequiresDataUpdate({
+                  boundaryLevel: boundaryLevel
+                    ? Number.parseInt(boundaryLevel, 10)
+                    : undefined,
+                })
               }
               meta={data.metaData}
             />

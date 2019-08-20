@@ -1,13 +1,13 @@
 import styles from '@admin/modules/chart-builder/graph-builder.module.scss';
 import React from 'react';
-import {ChartDefinition} from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import { ChartDefinition } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import {
   FormCheckbox,
   FormGroup,
   FormSelect,
   FormTextInput,
 } from '@common/components/form';
-import {DataBlockMetadata} from '@common/services/dataBlockService';
+import { DataBlockMetadata } from '@common/services/dataBlockService';
 
 interface Props {
   selectedChartType: ChartDefinition;
@@ -15,7 +15,7 @@ interface Props {
   onChange: (chartOptions: ChartOptions) => void;
   meta: DataBlockMetadata;
 
-  onBoundaryLevelChange?: (boundaryLevel: string) => void
+  onBoundaryLevelChange?: (boundaryLevel: string) => void;
 }
 
 export interface ChartOptions {
@@ -34,7 +34,7 @@ const ChartConfiguration = ({
   selectedChartType,
   onChange,
   meta,
-  onBoundaryLevelChange
+  onBoundaryLevelChange,
 }: Props) => {
   const [chartOptions, setChartOptions] = React.useState<ChartOptions>(
     initialChartOptions,
@@ -113,9 +113,9 @@ const ChartConfiguration = ({
             value={chartOptions.legend}
             label="Legend Position"
             options={[
-              {label: 'Top', value: 'top'},
-              {label: 'Bottom', value: 'bottom'},
-              {label: 'None', value: 'none'},
+              { label: 'Top', value: 'top' },
+              { label: 'Bottom', value: 'bottom' },
+              { label: 'None', value: 'none' },
             ]}
             order={[]}
             onChange={e => {
@@ -176,8 +176,7 @@ const ChartConfiguration = ({
           </FormGroup>
         )}
 
-        {selectedChartType.type === 'map' &&
-        meta.boundaryLevels && (
+        {selectedChartType.type === 'map' && meta.boundaryLevels && (
           <>
             {meta.boundaryLevels.length === 1 && (
               <div>
@@ -192,12 +191,15 @@ const ChartConfiguration = ({
                   name="geographicId"
                   order={[]}
                   options={[
-                    {label: 'Latest', value: ''},
-                    ...meta.boundaryLevels.map(({id, label}) => ({value: id, label})),
+                    { label: 'Latest', value: '' },
+                    ...meta.boundaryLevels.map(({ id, label }) => ({
+                      value: id,
+                      label,
+                    })),
                   ]}
                   onChange={e => {
                     if (onBoundaryLevelChange) {
-                    onBoundaryLevelChange(e.target.value);
+                      onBoundaryLevelChange(e.target.value);
                     }
 
                     updateChartOptions({

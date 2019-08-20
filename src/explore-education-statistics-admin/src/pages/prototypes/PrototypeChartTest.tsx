@@ -1,24 +1,21 @@
 import ChartBuilder from '@admin/modules/chart-builder/ChartBuilder';
 import PrototypePage from '@admin/pages/prototypes/components/PrototypePage';
-import {ChartRendererProps} from '@common/modules/find-statistics/components/ChartRenderer';
+import { ChartRendererProps } from '@common/modules/find-statistics/components/ChartRenderer';
 import DataBlockService, {
   DataBlockRequest,
   DataBlockResponse,
-  GeographicLevel,
   DataBlockRerequest,
 } from '@common/services/dataBlockService';
 import React from 'react';
-import {ChartType, Chart} from '@common/services/publicationService';
-import {FormSelect} from '@common/components/form';
-import {SelectOption} from '@common/components/form/FormSelect';
+import { ChartType, Chart } from '@common/services/publicationService';
+import { FormSelect } from '@common/components/form';
+import { SelectOption } from '@common/components/form/FormSelect';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 
-
-const options: ({ json: string, initialOptions?: Chart } & SelectOption)[] = [
-
+const options: ({ json: string; initialOptions?: Chart } & SelectOption)[] = [
   {
-    label: "Regional Absence",
-    value: "0",
+    label: 'Regional Absence',
+    value: '0',
     json: `
 {
   "subjectId": "1",
@@ -53,8 +50,8 @@ const options: ({ json: string, initialOptions?: Chart } & SelectOption)[] = [
           label: 'Total unauthorised absence rate',
           name: '23_1_2_____',
           value: 'erm',
-          colour: "#00ffff",
-          unit: ""
+          colour: '#00ffff',
+          unit: '',
         },
       },
 
@@ -66,17 +63,17 @@ const options: ({ json: string, initialOptions?: Chart } & SelectOption)[] = [
           dataSets: [
             {
               indicator: '23',
-              filters: ['1', '2']
+              filters: ['1', '2'],
             },
           ],
         },
       },
-    }
+    },
   },
 
   {
-    label: "Local Authority District",
-    value: "1",
+    label: 'Local Authority District',
+    value: '1',
     json: `
 {
   "geographicLevel": "Local_Authority_District",
@@ -104,7 +101,7 @@ const options: ({ json: string, initialOptions?: Chart } & SelectOption)[] = [
     initialOptions: {
       type: 'map' as ChartType,
 
-      title: "Authorised absences for Local Authority Districts of England",
+      title: 'Authorised absences for Local Authority Districts of England',
 
       height: 600,
 
@@ -113,22 +110,22 @@ const options: ({ json: string, initialOptions?: Chart } & SelectOption)[] = [
           label: 'Total FSM eligible, authorised absences',
           name: '6_2_3_43_____',
           value: '6_2_3_43_____',
-          colour: "#00ffff",
-          unit: ""
+          colour: '#00ffff',
+          unit: '',
         },
         '6_2_3_44_____': {
           label: 'Total not FSM eligible, authorised absences',
           name: '6_2_3_44_____',
           value: '6_2_3_44_____',
-          colour: "#00ffff",
-          unit: ""
+          colour: '#00ffff',
+          unit: '',
         },
         '6_2_3_45_____': {
           label: 'Total FSM unclassified, authorised absences',
           name: '6_2_3_45_____',
           value: '6_2_3_45_____',
-          colour: "#00ffff",
-          unit: ""
+          colour: '#00ffff',
+          unit: '',
         },
       },
 
@@ -153,26 +150,29 @@ const options: ({ json: string, initialOptions?: Chart } & SelectOption)[] = [
           ],
         },
       },
-    }
-
-  }
-
+    },
+  },
 ];
 
-
 const PrototypeChartTest = () => {
+  const [selected, setSelected] = React.useState('0');
 
-  const [selected, setSelected] = React.useState("0");
+  const [request, setRequest] = React.useState<DataBlockRequest>(
+    JSON.parse(options[0].json),
+  );
 
-  const [request, setRequest] = React.useState<DataBlockRequest>(JSON.parse(options[0].json));
+  const [chartBuilderData, setChartBuilderData] = React.useState<
+    DataBlockResponse
+  >();
 
-  const [chartBuilderData, setChartBuilderData] = React.useState<DataBlockResponse>();
-
-  const [requestConfiguration, setRequestConfiguration] = React.useState<Chart | undefined>(options[0].initialOptions);
-  const [initialConfiguration, setInitialConfiguration] = React.useState<Chart | undefined>();
+  const [requestConfiguration, setRequestConfiguration] = React.useState<
+    Chart | undefined
+  >(options[0].initialOptions);
+  const [initialConfiguration, setInitialConfiguration] = React.useState<
+    Chart | undefined
+  >();
 
   React.useEffect(() => {
-
     // destroy the existing setup before the response completes
     setChartBuilderData(undefined);
     setInitialConfiguration(undefined);
@@ -183,23 +183,20 @@ const PrototypeChartTest = () => {
     });
   }, [request, requestConfiguration]);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line
   const onChartSave = (props: ChartRendererProps) => {
     // console.log('Saved ', props);
   };
 
   const reRequestdata = (reRequest: DataBlockRerequest) => {
-
     setRequest({
       ...request,
-      ...reRequest
+      ...reRequest,
     });
-
   };
 
   return (
     <PrototypePage wide>
-
       <FormSelect
         id="requests"
         name="requests"
@@ -207,13 +204,12 @@ const PrototypeChartTest = () => {
         options={options}
         value={selected}
         order={[]}
-        onChange={(e) => {
+        onChange={e => {
           const newSelectedValue = +e.target.value;
           setSelected(e.target.value);
           setRequest(JSON.parse(options[newSelectedValue].json));
           setRequestConfiguration(options[newSelectedValue].initialOptions);
         }}
-
       />
 
       {chartBuilderData ? (

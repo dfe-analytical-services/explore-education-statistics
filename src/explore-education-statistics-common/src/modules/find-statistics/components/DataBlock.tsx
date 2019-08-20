@@ -18,13 +18,12 @@ import DataBlockService, {
   DataBlockResponse,
 } from '@common/services/dataBlockService';
 import {
-  AxisConfiguration,
   Chart,
   DataQuery,
   Summary,
   Table,
 } from '@common/services/publicationService';
-import React, {Component, MouseEvent, ReactNode} from 'react';
+import React, { Component, MouseEvent, ReactNode } from 'react';
 import DownloadDetails from './DownloadDetails';
 
 export interface DataBlockProps {
@@ -70,9 +69,9 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
   private query?: DataQuery = undefined;
 
   public async componentDidMount() {
-    const {dataBlockRequest} = this.props;
+    const { dataBlockRequest } = this.props;
 
-    this.setState({isLoading: true});
+    this.setState({ isLoading: true });
 
     if (dataBlockRequest) {
       const result = await DataBlockService.getDataBlockForSubject(
@@ -81,7 +80,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
 
       this.parseDataResponse(result);
     } else {
-      const {dataBlockResponse} = this.props;
+      const { dataBlockResponse } = this.props;
       if (dataBlockResponse) {
         this.parseDataResponse(dataBlockResponse);
       }
@@ -93,12 +92,12 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
   }
 
   private parseDataResponse(response: DataBlockResponse): void {
-    const newState: DataBlockState = {isLoading: false};
+    const newState: DataBlockState = { isLoading: false };
 
     const data: DataBlockData = response;
     const meta = response.metaData;
 
-    const {charts, summary, tables} = this.props;
+    const { charts, summary, tables } = this.props;
 
     if (response.result.length > 0) {
       if (tables) {
@@ -114,7 +113,6 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
 
     if (charts) {
       newState.charts = charts.map<ChartRendererProps>(chart => {
-
         // There is a presumption that the configuration from the API is valid.
         // The data coming from the API is required to be optional for the ChartRenderer
         // But the data for the charts is required. The charts have validation that
@@ -127,7 +125,6 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
         };
 
         return rendererProps;
-
       });
     }
 
@@ -151,7 +148,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
       onSummaryDetailsToggle,
       id,
     } = this.props;
-    const {charts, summary, tables, isLoading} = this.state;
+    const { charts, summary, tables, isLoading } = this.state;
     return (
       <>
         {heading && <h3>{heading}</h3>}

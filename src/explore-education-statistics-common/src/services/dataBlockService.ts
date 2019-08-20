@@ -1,6 +1,6 @@
-import {dataApi} from '@common/services/api';
-import {Dictionary} from '@common/types/util';
-import {Feature, Geometry} from 'geojson';
+import { dataApi } from '@common/services/api';
+import { Dictionary } from '@common/types/util';
+import { Feature, Geometry } from 'geojson';
 
 export enum GeographicLevel {
   Establishment = 'Establishment',
@@ -216,7 +216,7 @@ export interface DataBlockLocationMetadata {
 // ------------------------------------------
 
 export interface BoundaryLevel {
-  id : number;
+  id: number;
   label: string;
 }
 export interface DataBlockMetadata {
@@ -224,7 +224,7 @@ export interface DataBlockMetadata {
   filters: Dictionary<LabelValueMetadata>;
   timePeriods: Dictionary<LabelValueMetadata>;
   locations: Dictionary<DataBlockLocationMetadata>;
-  boundaryLevels?: BoundaryLevel[]
+  boundaryLevels?: BoundaryLevel[];
 }
 
 interface DataBlockTimePeriod {
@@ -239,7 +239,7 @@ export interface DataBlockRequest {
   timePeriod: DataBlockTimePeriod;
   filters: string[];
   geographicLevel: GeographicLevel;
-  boundaryLevel?: number,
+  boundaryLevel?: number;
   indicators: string[];
 
   country?: string[];
@@ -273,7 +273,9 @@ export interface DataBlockResponse {
 }
 
 const DataBlockService = {
-  async getDataBlockForSubject(request: DataBlockRequest) : Promise<DataBlockResponse> {
+  async getDataBlockForSubject(
+    request: DataBlockRequest,
+  ): Promise<DataBlockResponse> {
     const response: DataBlockResponse = await dataApi.post('/Data', request);
 
     return response;

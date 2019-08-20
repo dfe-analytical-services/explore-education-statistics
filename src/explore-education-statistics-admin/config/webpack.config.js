@@ -338,11 +338,13 @@ module.exports = webpackEnv => {
             {
               test: /\.(js|mjs|jsx|ts|tsx)$/,
               include: [
-                  paths.appSrc,
-                path.resolve( // added the common directory to be built and include source maps
-                    paths.appPath,
-                    '../explore-education-statistics-common/src',
-                )],
+                paths.appSrc,
+                path.resolve(
+                  // added the common directory to be built and include source maps
+                  paths.appPath,
+                  '../explore-education-statistics-common/src',
+                ),
+              ],
               loader: require.resolve('babel-loader'),
               options: {
                 customize: require.resolve(
@@ -367,7 +369,7 @@ module.exports = webpackEnv => {
                 cacheDirectory: true,
                 cacheCompression: isEnvProduction,
                 compact: isEnvProduction,
-                sourceMaps: true
+                sourceMaps: true,
               },
             },
             // Process any JS outside of the app with Babel.

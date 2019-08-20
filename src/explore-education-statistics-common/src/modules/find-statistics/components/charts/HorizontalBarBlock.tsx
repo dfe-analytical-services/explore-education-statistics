@@ -1,7 +1,6 @@
 import {
   ChartDataB,
   ChartDefinition,
-  ChartProps,
   conditionallyAdd,
   createSortedAndMappedDataForAxis,
   generateMajorAxis,
@@ -85,6 +84,7 @@ export default class HorizontalBarBlock extends Component<HorizontalBarProps> {
     if (
       axes === undefined ||
       axes.major === undefined ||
+      axes.minor === undefined ||
       data === undefined ||
       meta === undefined
     )

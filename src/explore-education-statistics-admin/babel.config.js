@@ -13,5 +13,5 @@ module.exports = {
   ],
   plugins: ['@babel/plugin-proposal-class-properties'],
   inputSourceMap: true,
-  sourceMaps: true
+  sourceMaps: true,
 };
