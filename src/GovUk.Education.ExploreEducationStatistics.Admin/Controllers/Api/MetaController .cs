@@ -21,7 +21,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         // GET api/meta/timeidentifiers
         [HttpGet("timeidentifiers")]
-        [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
         public ActionResult<List<TimeIdentifierCategoryModel>> GetTimeIdentifiersByCategory()
         {
             return _metaService.GetTimeIdentifiersByCategory();
@@ -29,13 +28,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         
         // GET api/meta/releasetypes
         [HttpGet("releasetypes")]
-        [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
         public ActionResult<List<ReleaseType>> GetReleaseTypes()
         {
             return _metaService.GetReleaseTypes();
         }
-
-
-        
     }
 }
