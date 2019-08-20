@@ -33,7 +33,7 @@
     },
     "skuAdmin": {
       "type": "string",
-      "defaultValue": "S1 Standard"
+      "defaultValue": "S3 Standard"
     },
     "sqlAdministratorLogin": {
       "type": "string",
@@ -1302,6 +1302,7 @@
         "siteConfig": {
           "http20Enabled": true,
           "phpVersion": "off",
+          "AlwaysOn": true,
           "cors": {
             "allowedOrigins": [
               "*"
@@ -1348,6 +1349,7 @@
           "connectionStrings": [
             {
               "name": "CoreStorage",
+              "type": "Common",
               "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('coreStorageAccountName'), ';AccountKey=', listKeys(variables('coreStorageAccountId'),'2015-05-01-preview').key1)]"
             },
             {
