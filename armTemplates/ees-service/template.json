@@ -33,7 +33,7 @@
     },
     "skuAdmin": {
       "type": "string",
-      "defaultValue": "S1 Standard"
+      "defaultValue": "P2V2"
     },
     "sqlAdministratorLogin": {
       "type": "string",
@@ -664,9 +664,9 @@
       },
       "properties": {
         "name": "[variables('adminPlanName')]",
-        "workerSizeId": "1",
+        "workerSizeId": "0",
         "reserved": false,
-        "numberOfWorkers": "3",
+        "numberOfWorkers": "1",
         "hostingEnvironment": ""
       }
     },
