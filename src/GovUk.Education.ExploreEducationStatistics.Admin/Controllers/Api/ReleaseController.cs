@@ -37,7 +37,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
         
         [HttpGet("release/{releaseId}/chart/{filename}")]
-        [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
         public async Task<ActionResult> GetChartFile(ReleaseId releaseId, string filename)
         {
             return await CheckReleaseExistsStreamAsync(releaseId,
@@ -45,7 +44,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
         
         [HttpGet("release/{releaseId}/data/{filename}")]
-        [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
         public async Task<ActionResult> GetDataFile(ReleaseId releaseId, string filename)
         {
             return await CheckReleaseExistsStreamAsync(releaseId,
@@ -53,7 +51,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
         
         [HttpGet("release/{releaseId}/ancillary/{filename}")]
-        [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
         public async Task<ActionResult> GetAncillaryFile(ReleaseId releaseId, string filename)
         {
             return await CheckReleaseExistsStreamAsync(releaseId,
@@ -62,7 +59,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         
         // POST api/publication/{publicationId}/releases
         [HttpPost("publications/{publicationId}/releases")]
-        [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
         public async Task<ActionResult<ReleaseViewModel>> CreateReleaseAsync(CreateReleaseViewModel release,
             PublicationId publicationId)
         {
@@ -79,7 +75,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [Produces("application/json")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
-        [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
         public async Task<ActionResult<IEnumerable<FileInfo>>> GetDataFilesAsync(ReleaseId releaseId)
         {
             return await CheckReleaseExistsAsync(releaseId,
@@ -91,7 +86,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [Produces("application/json")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
-        [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
         public async Task<ActionResult<IEnumerable<FileInfo>>> GetAncillaryFilesAsync(ReleaseId releaseId)
         {
             return await CheckReleaseExistsAsync(releaseId,
@@ -103,7 +97,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [Produces("application/json")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
-        [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
         public async Task<ActionResult<IEnumerable<FileInfo>>> GetChartFilesAsync(ReleaseId releaseId)
         {
             return await CheckReleaseExistsAsync(releaseId,
@@ -117,7 +110,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [ProducesResponseType(404)]
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
         public async Task<ActionResult<IEnumerable<FileInfo>>> AddAncillaryFilesAsync(ReleaseId releaseId,
             [Required] [FromQuery(Name = "name")] string name, IFormFile file)
         {
@@ -133,7 +125,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [ProducesResponseType(404)]
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
         public async Task<ActionResult<IEnumerable<FileInfo>>> AddChartFilesAsync(ReleaseId releaseId,
             [Required] [FromQuery(Name = "name")] string name, IFormFile file)
         {
@@ -148,7 +139,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [ProducesResponseType(404)]
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
         public async Task<ActionResult<IEnumerable<FileInfo>>> AddDataFilesAsync(ReleaseId releaseId,
             [Required] [FromQuery(Name = "name")] string name, IFormFile file, IFormFile metaFile)
         {
@@ -163,21 +153,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("releases/{releaseId}")]
-        [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
         public async Task<ReleaseViewModel> GetReleaseAsync(ReleaseId releaseId)
         {
             return await _releaseService.GetReleaseForIdAsync(releaseId);
         }
 
         [HttpGet("releases/{releaseId}/summary")]
-        [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
         public async Task<ActionResult<EditReleaseSummaryViewModel>> GetReleaseSummaryAsync(ReleaseId releaseId)
         {
             return Ok(await _releaseService.GetReleaseSummaryAsync(releaseId));
         }
 
         [HttpPut("releases/{releaseId}/summary")]
-        [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
         public async Task<ActionResult<ReleaseViewModel>> EditReleaseSummaryAsync(EditReleaseSummaryViewModel model,
             ReleaseId releaseId)
         {
@@ -190,7 +177,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         // GET api/publications/{publicationId}/releases
         [HttpGet("publications/{publicationId}/releases")]
-        [AllowAnonymous] // TODO We will need to do Authorisation checks when we know what the permissions model is.
         public async Task<ActionResult<List<ReleaseViewModel>>> GetReleaseForPublicationAsync(
             [Required] PublicationId publicationId)
         {
@@ -198,7 +184,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpDelete("release/{releaseId}/data/{fileName}")]
-        [AllowAnonymous] // TODO We will need to do Authorisation checks when we know what the permissions model is.
         public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteDataFiles(ReleaseId releaseId, string fileName)
         {
             return await CheckReleaseExistsAsync(releaseId,
@@ -207,7 +192,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         // DELETE api/release/{releaseId}/ancillary/{fileName}
         [HttpDelete("release/{releaseId}/ancillary/{fileName}")]
-        [AllowAnonymous] // TODO We will need to do Authorisation checks when we know what the permissions model is.
         public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteAncillaryFile(
             ReleaseId releaseId, string fileName)
         {
@@ -217,7 +201,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         // DELETE api/release/{releaseId}/chart/{fileName}
         [HttpDelete("release/{releaseId}/chart/{fileName}")]
-        [AllowAnonymous] // TODO We will need to do Authorisation checks when we know what the permissions model is.
         public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteChartFile(
             ReleaseId releaseId, string fileName)
         {
