@@ -9,6 +9,7 @@ import { NextContext } from 'next';
 import React, { Component } from 'react';
 import TimePeriodDataTable from '../table-tool/components/TimePeriodDataTable';
 import getDefaultTableHeaderConfig from '../table-tool/utils/tableHeaders';
+import DownloadCsvButton from '../table-tool/components/DownloadCsvButton';
 
 interface Props {
   permalink: string;
@@ -35,21 +36,7 @@ class PermalinkPage extends Component<Props> {
 
   public render() {
     const { data } = this.props;
-    const { fullTable, configuration } = data;
-    const {
-      indicators,
-      filters,
-      locations,
-      timePeriodRange,
-    } = fullTable.subjectMeta;
-    const tableHeadersConfig =
-      configuration.tableHeadersConfig ||
-      getDefaultTableHeaderConfig(
-        indicators,
-        filters,
-        timePeriodRange,
-        locations,
-      );
+    const { fullTable } = data;
 
     return (
       <Page
@@ -80,10 +67,12 @@ class PermalinkPage extends Component<Props> {
         </div>
 
         <TimePeriodDataTable
-          {...fullTable.subjectMeta}
-          results={fullTable.results}
-          tableHeadersConfig={tableHeadersConfig}
+          fullTable={fullTable}
+          tableHeadersConfig={getDefaultTableHeaderConfig(
+            fullTable.subjectMeta,
+          )}
         />
+        <DownloadCsvButton publicationSlug="testy-boi" fullTable={fullTable} />
 
         <p className="govuk-body-s">Source: DfE prototype example statistics</p>
         <h2 className="govuk-heading-m govuk-!-margin-top-9">

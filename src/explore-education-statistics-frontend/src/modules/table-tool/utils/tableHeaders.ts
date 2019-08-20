@@ -16,7 +16,7 @@ const removeSiblinglessTotalRows = (
   });
 };
 
-const transformTableMetaFiltersToCategoryFilters = (
+export const transformTableMetaFiltersToCategoryFilters = (
   filters: FullTableMeta['filters'],
 ): Dictionary<CategoryFilter[]> => {
   return mapValuesWithKeys(filters, (filterKey, filterValue) =>

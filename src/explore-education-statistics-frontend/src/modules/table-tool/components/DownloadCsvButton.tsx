@@ -1,13 +1,7 @@
 import ButtonText from '@common/components/ButtonText';
 import cartesian from '@common/lib/utils/cartesian';
 import {
-  PublicationSubjectMeta,
-  TableData,
-} from '@common/services/tableBuilderService';
-import { Dictionary } from '@common/types';
-import {
   CategoryFilter,
-  Indicator,
   LocationFilter,
   Filter,
 } from '@frontend/modules/table-tool/components/types/filters';
@@ -15,29 +9,28 @@ import TimePeriod from '@frontend/modules/table-tool/components/types/TimePeriod
 import { saveAs } from 'file-saver';
 import Papa from 'papaparse';
 import React from 'react';
+import { FullTable } from '@frontend/services/permalinkService';
+import { transformTableMetaFiltersToCategoryFilters } from '../utils/tableHeaders';
 
 interface Props {
   publicationSlug: string;
-  meta: PublicationSubjectMeta;
-  indicators: Indicator[];
-  filters: Dictionary<CategoryFilter[]>;
-  timePeriods: TimePeriod[];
-  locations: LocationFilter[];
-  results: TableData['results'];
+  fullTable: FullTable;
 }
 
-const DownloadCsvButton = ({
-  publicationSlug,
-  meta,
-  indicators,
-  filters,
-  timePeriods,
-  locations,
-  results,
-}: Props) => {
+const DownloadCsvButton = ({ publicationSlug, fullTable }: Props) => {
+  const { subjectMeta, results } = fullTable;
+  const {
+    indicators,
+    filters: metaFilters,
+    timePeriodRange: timePeriods,
+    locations,
+  } = subjectMeta;
+
+  const filters = transformTableMetaFiltersToCategoryFilters(metaFilters);
+
   const getCsvData = (): string[][] => {
-    const filterColumns = Object.entries(filters).map(
-      ([key]) => meta.filters[key].legend,
+    const filterColumns = Object.entries(metaFilters).map(
+      ([key]) => metaFilters[key].legend,
     );
 
     const indicatorColumns = indicators.map(indicator => {
@@ -65,22 +58,22 @@ const DownloadCsvButton = ({
         ...CategoryFilter[]
       ];
 
+      console.log(location, timePeriod, ...filterOptions);
+
       const indicatorCells = indicators.map(indicator => {
         const matchingResult = results.find(result => {
           return Boolean(
             filterOptions.every(filter =>
               result.filters.includes(filter.value),
             ) &&
-              result.timePeriod === timePeriod.value &&
+              result.timePeriod === new TimePeriod(timePeriod).value &&
               result.location[location.level] &&
               result.location[location.level].code === location.value,
           );
         });
-
         if (!matchingResult) {
           return 'n/a';
         }
-
         return matchingResult.measures[indicator.value];
       });
 

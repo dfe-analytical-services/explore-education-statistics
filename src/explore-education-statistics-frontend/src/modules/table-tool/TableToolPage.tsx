@@ -444,14 +444,7 @@ class TableToolPage extends Component<Props, State> {
                             <li>
                               <DownloadCsvButton
                                 publicationSlug={publication.slug}
-                                meta={subjectMeta}
-                                filters={createdTable.subjectMeta.filters}
-                                indicators={createdTable.subjectMeta.indicators}
-                                locations={createdTable.subjectMeta.locations}
-                                timePeriods={
-                                  createdTable.subjectMeta.timePeriodRange
-                                }
-                                results={createdTable.results}
+                                fullTable={createdTable}
                               />
                             </li>
 
