@@ -302,11 +302,14 @@ class TableToolPage extends Component<Props, State> {
   };
 
   private handlePermalinkClick: MouseEventHandler = async () => {
-    const { filters, indicators } = this.state;
+    const { filters, indicators, tableHeaders } = this.state;
 
-    const { url } = await tableBuilderService.getTablePermalink(
-      this.createQuery(filters, indicators),
-    );
+    const { url } = await tableBuilderService.getTablePermalink({
+      ...this.createQuery(filters, indicators),
+      configurations: {
+        tableHeadersConfig: tableHeaders,
+      },
+    });
 
     Router.push(url);
   };

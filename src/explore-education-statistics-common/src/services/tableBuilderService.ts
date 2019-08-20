@@ -1,5 +1,9 @@
 import { Dictionary, PartialRecord } from '@common/types';
-import { FullTableMeta, FullTable } from '@frontend/services/permalinkService';
+import {
+  FullTableMeta,
+  FullTable,
+  PermalinkCreate,
+} from '@frontend/services/permalinkService';
 import { dataApi } from './api';
 
 export interface FilterOption {
@@ -147,7 +151,7 @@ export default {
   getTableData(query: TableDataQuery): Promise<FullTable> {
     return dataApi.post('/tablebuilder/new', query);
   },
-  getTablePermalink(query: TableDataQuery): Promise<TablePermalink> {
+  getTablePermalink(query: PermalinkCreate): Promise<TablePermalink> {
     return dataApi.post('/permalink', query);
   },
 };

@@ -3,6 +3,7 @@ import { Dictionary } from '@common/types';
 import {
   TableData,
   GroupedFilterOptions,
+  TableDataQuery,
 } from '@common/services/tableBuilderService';
 import TimePeriod from '@common/services/types/TimePeriod';
 import {
@@ -28,6 +29,12 @@ export interface FullTableMeta {
     id: number;
     label: string;
   }[];
+}
+
+export interface PermalinkCreate extends TableDataQuery {
+  configurations: {
+    tableHeadersConfig: TableHeadersFormValues;
+  };
 }
 
 export interface FullTable /* ™ */ {
