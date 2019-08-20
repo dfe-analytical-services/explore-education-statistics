@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Tools.Controllers
 {
     [Area("Tools")]
+    [Authorize]
     [ApiExplorerSettings(IgnoreApi=true)]
     public class TopicsController : Controller
     {
