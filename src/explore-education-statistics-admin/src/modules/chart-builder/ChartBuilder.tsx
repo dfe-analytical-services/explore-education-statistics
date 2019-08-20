@@ -11,7 +11,6 @@ import ChartRenderer, {
 } from '@common/modules/find-statistics/components/ChartRenderer';
 import {
   ChartDefinition,
-  AxesConfiguration,
   generateKeyFromDataSet,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import HorizontalBarBlock from '@common/modules/find-statistics/components/charts/HorizontalBarBlock';
@@ -111,29 +110,14 @@ const ChartBuilder = ({
     )
   );
 
-  const [chartOptions, realSetChartOptions] = React.useState<ChartOptions>({
+  const [chartOptions, setChartOptions] = React.useState<ChartOptions>({
     stacked: false,
     legend: 'top',
     legendHeight: '42',
     height: 300,
-    title: '',
-    ...initialConfiguration,
+    title: ''
   });
 
-  const previousChartOptions = React.useRef<ChartOptions>();
-
-  const setChartOptions = (_chartOptions: ChartOptions) => {
-    if (previousChartOptions.current && onRequiresDataUpdate) {
-      if (previousChartOptions.current.geographicId !== _chartOptions.geographicId) {
-
-        const boundaryLevel = _chartOptions.geographicId ? Number.parseInt(_chartOptions.geographicId, 10) : undefined;
-
-        onRequiresDataUpdate({boundaryLevel});
-      }
-    }
-    previousChartOptions.current = _chartOptions;
-    realSetChartOptions(_chartOptions);
-  };
 
   const previousAxesConfiguration = React.useRef<Dictionary<AxisConfiguration>>(
     {},
@@ -192,6 +176,7 @@ const ChartBuilder = ({
     ) {
 
       setRenderedChartProps({
+
         type: selectedChartType.type,
 
         data,
@@ -209,7 +194,9 @@ const ChartBuilder = ({
           },
         },
         labels: chartLabels,
+
         ...chartOptions,
+
       });
     } else {
       setRenderedChartProps(undefined);
@@ -284,9 +271,42 @@ const ChartBuilder = ({
     }
   }, [selectedChartType, dataSetAndConfiguration]);
 
+  const extractInitialChartOptions = (
+    {
+      type,
+      stacked = false,
+      legend = 'top',
+      legendHeight = '42',
+      height = 300,
+      width,
+      title = '',
+      fileId,
+      geographicId,
+      labels,
+      axes
+    }: Chart = {
+      stacked: false,
+      legend: 'top',
+      legendHeight: '42',
+      height: 300,
+      title: '',
+    }
+  ) => {
+    return {
+      type,
+      options: {stacked, legend, legendHeight, height, width, title, fileId, geographicId},
+      axes,
+      labels
+    };
+  };
+
+  // initial chart options set up
   React.useEffect(() => {
 
-    const initial = initialConfiguration || {};
+    const initial = extractInitialChartOptions(initialConfiguration);
+
+    console.log(initial);
+
 
     setSelectedChartType(
       () =>
@@ -294,14 +314,7 @@ const ChartBuilder = ({
         chartTypes.find(({type}) => type === initial.type),
     );
 
-    setChartOptions({
-      stacked: false,
-      legend: 'top',
-      legendHeight: '42',
-      height: 300,
-      title: '',
-      ...initial,
-    });
+    setChartOptions({...initial.options});
 
     if (initial.labels) {
       setChartLabels(initial.labels);
@@ -390,6 +403,9 @@ const ChartBuilder = ({
               selectedChartType={selectedChartType}
               chartOptions={chartOptions}
               onChange={setChartOptions}
+              onBoundaryLevelChange={boundaryLevel =>
+                onRequiresDataUpdate && onRequiresDataUpdate({boundaryLevel: boundaryLevel ? Number.parseInt(boundaryLevel, 10) : undefined})
+              }
               meta={data.metaData}
             />
           </TabsSection>

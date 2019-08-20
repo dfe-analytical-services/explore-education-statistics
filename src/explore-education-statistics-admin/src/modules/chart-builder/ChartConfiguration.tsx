@@ -14,6 +14,8 @@ interface Props {
   chartOptions: ChartOptions;
   onChange: (chartOptions: ChartOptions) => void;
   meta: DataBlockMetadata;
+
+  onBoundaryLevelChange?: (boundaryLevel: string) => void
 }
 
 export interface ChartOptions {
@@ -32,6 +34,7 @@ const ChartConfiguration = ({
   selectedChartType,
   onChange,
   meta,
+  onBoundaryLevelChange
 }: Props) => {
   const [chartOptions, setChartOptions] = React.useState<ChartOptions>(
     initialChartOptions,
@@ -193,6 +196,10 @@ const ChartConfiguration = ({
                     ...meta.boundaryLevels.map(({id, label}) => ({value: id, label})),
                   ]}
                   onChange={e => {
+                    if (onBoundaryLevelChange) {
+                    onBoundaryLevelChange(e.target.value);
+                    }
+
                     updateChartOptions({
                       ...chartOptions,
                       geographicId: e.target.value,

@@ -149,6 +149,7 @@ export interface Chart {
 
   stacked?: boolean;
   fileId?: string;
+  geographicId?: string;
 }
 
 export interface Table {
