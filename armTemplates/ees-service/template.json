@@ -664,7 +664,7 @@
       },
       "properties": {
         "name": "[variables('adminPlanName')]",
-        "workerSizeId": "2",
+        "workerSizeId": "1",
         "reserved": false,
         "numberOfWorkers": "3",
         "hostingEnvironment": ""
