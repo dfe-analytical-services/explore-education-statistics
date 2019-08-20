@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta.Ta
 
         public IEnumerable<IndicatorMetaViewModel> Indicators { get; set; }
 
-        public IEnumerable<LabelValue> Locations { get; set; }
+        public IEnumerable<ObservationalUnitMetaViewModel> Locations { get; set; }
 
         public string PublicationName { get; set; }
 
