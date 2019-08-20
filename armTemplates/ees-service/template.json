@@ -32,8 +32,8 @@
       "defaultValue": "S1 Standard"
     },
     "skuAdmin": {
-      "type": "string",
-      "defaultValue": "P2V2"
+      "Tier": "PremiumV2",
+      "Name": "P3V2"
     },
     "sqlAdministratorLogin": {
       "type": "string",
