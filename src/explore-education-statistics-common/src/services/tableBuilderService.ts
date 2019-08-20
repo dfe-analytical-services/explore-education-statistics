@@ -149,7 +149,7 @@ export default {
     return dataApi.post('/meta/subject', query);
   },
   getTableData(query: TableDataQuery): Promise<FullTable> {
-    return dataApi.post('/tablebuilder/new', query);
+    return dataApi.post('/tablebuilder', query);
   },
   getTablePermalink(query: PermalinkCreate): Promise<TablePermalink> {
     return dataApi.post('/permalink', query);
