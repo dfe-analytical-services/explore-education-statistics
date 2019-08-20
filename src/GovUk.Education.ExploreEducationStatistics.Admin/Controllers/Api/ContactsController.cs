@@ -20,7 +20,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         // GET api/contacts
         [HttpGet]
-        [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
         public ActionResult<List<Contact>> GetContacts()
         {
             return _contactService.GetContacts();
