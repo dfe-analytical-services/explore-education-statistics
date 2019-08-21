@@ -72,7 +72,10 @@ class PermalinkPage extends Component<Props> {
             fullTable.subjectMeta,
           )}
         />
-        <DownloadCsvButton publicationSlug="testy-boi" fullTable={fullTable} />
+        <DownloadCsvButton
+          publicationSlug={`permalink-${data.created}-${data.title}`}
+          fullTable={fullTable}
+        />
 
         <p className="govuk-body-s">Source: DfE prototype example statistics</p>
         <h2 className="govuk-heading-m govuk-!-margin-top-9">

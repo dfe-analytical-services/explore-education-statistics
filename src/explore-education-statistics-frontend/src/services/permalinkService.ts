@@ -31,16 +31,14 @@ export interface FullTableMeta {
   }[];
 }
 
-export interface PermalinkCreate extends TableDataQuery {
+interface PermalinkCreate extends TableDataQuery {
   configurations: {
     tableHeadersConfig: TableHeadersFormValues;
   };
 }
 
-export interface FullTable /* ™ */ {
+export interface FullTable extends TableData {
   title?: string;
-  subjectMeta: FullTableMeta;
-  results: TableData['results'];
 }
 
 export interface Permalink {
@@ -56,5 +54,15 @@ export interface Permalink {
 export default {
   getPermalink(publicationSlug: string): Promise<Permalink> {
     return dataApi.get(`Permalink/${publicationSlug}`);
+  },
+  createTablePermalink(
+    query: PermalinkCreate,
+  ): Promise<{
+    id: string;
+    title: string;
+    created: string;
+    url: string;
+  }> {
+    return dataApi.post('/permalink', query);
   },
 };

@@ -58,8 +58,6 @@ const DownloadCsvButton = ({ publicationSlug, fullTable }: Props) => {
         ...CategoryFilter[]
       ];
 
-      console.log(location, timePeriod, ...filterOptions);
-
       const indicatorCells = indicators.map(indicator => {
         const matchingResult = results.find(result => {
           return Boolean(

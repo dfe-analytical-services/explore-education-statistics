@@ -24,7 +24,9 @@ import { NextContext } from 'next';
 import Router from 'next/router';
 import React, { Component, MouseEventHandler, createRef } from 'react';
 import getDefaultTableHeaderConfig from '@frontend/modules/table-tool/utils/tableHeaders';
-import { FullTable } from '@frontend/services/permalinkService';
+import permalinkService, {
+  FullTable,
+} from '@frontend/services/permalinkService';
 import DownloadCsvButton from './components/DownloadCsvButton';
 import FiltersForm, { FilterFormSubmitHandler } from './components/FiltersForm';
 import LocationFiltersForm, {
@@ -304,7 +306,7 @@ class TableToolPage extends Component<Props, State> {
   private handlePermalinkClick: MouseEventHandler = async () => {
     const { filters, indicators, tableHeaders } = this.state;
 
-    const { url } = await tableBuilderService.getTablePermalink({
+    const { url } = await permalinkService.createTablePermalink({
       ...this.createQuery(filters, indicators),
       configurations: {
         tableHeadersConfig: tableHeaders,

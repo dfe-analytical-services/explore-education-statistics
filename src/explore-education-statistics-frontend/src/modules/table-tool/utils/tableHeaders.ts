@@ -21,8 +21,7 @@ export const transformTableMetaFiltersToCategoryFilters = (
 ): Dictionary<CategoryFilter[]> => {
   return mapValuesWithKeys(filters, (filterKey, filterValue) =>
     Object.values(filterValue.options)
-      .map(options => options.options)
-      .flat()
+      .flatMap(options => options.options)
       .map(
         filter =>
           new CategoryFilter(filter, filter.value === filterValue.totalValue),

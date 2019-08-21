@@ -1,10 +1,6 @@
 import { Dictionary, PartialRecord } from '@common/types';
-import {
-  FullTableMeta,
-  FullTable,
-  PermalinkCreate,
-} from '@frontend/services/permalinkService';
-import { dataApi } from 'explore-education-statistics-common/src/services/api';
+import { FullTableMeta, FullTable } from '@frontend/services/permalinkService';
+import { dataApi } from '@common/services/api';
 
 export interface FilterOption {
   label: string;
@@ -105,13 +101,6 @@ export interface TableData {
   }[];
 }
 
-export interface TablePermalink {
-  id: string;
-  title: string;
-  created: string;
-  url: string;
-}
-
 interface TimePeriodQuery {
   startYear: number;
   startCode: string;
@@ -150,8 +139,5 @@ export default {
   },
   getTableData(query: TableDataQuery): Promise<FullTable> {
     return dataApi.post('/tablebuilder', query);
-  },
-  getTablePermalink(query: PermalinkCreate): Promise<TablePermalink> {
-    return dataApi.post('/permalink', query);
   },
 };
