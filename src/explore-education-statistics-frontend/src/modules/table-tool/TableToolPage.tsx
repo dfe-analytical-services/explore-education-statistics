@@ -7,7 +7,7 @@ import tableBuilderService, {
   PublicationSubjectMeta,
   TableDataQuery,
   ThemeMeta,
-} from '@common/services/tableBuilderService';
+} from '@frontend/services/tableBuilderService';
 import { Dictionary } from '@common/types/util';
 import ButtonText from '@common/components/ButtonText';
 import Link from '@frontend/components/Link';

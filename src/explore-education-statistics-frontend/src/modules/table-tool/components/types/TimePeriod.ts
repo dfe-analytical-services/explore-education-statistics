@@ -1,4 +1,4 @@
-import { TimePeriodOption } from '@common/services/tableBuilderService';
+import { TimePeriodOption } from '@frontend/services/tableBuilderService';
 import { TimePeriodCode } from '@common/services/types/TimePeriod';
 import { Filter } from './filters';
 

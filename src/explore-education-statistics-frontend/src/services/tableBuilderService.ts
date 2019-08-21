@@ -4,7 +4,7 @@ import {
   FullTable,
   PermalinkCreate,
 } from '@frontend/services/permalinkService';
-import { dataApi } from './api';
+import { dataApi } from 'explore-education-statistics-common/src/services/api';
 
 export interface FilterOption {
   label: string;

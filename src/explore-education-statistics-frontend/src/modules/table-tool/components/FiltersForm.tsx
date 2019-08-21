@@ -7,7 +7,7 @@ import {
 } from '@common/components/form';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import Yup from '@common/lib/validation/yup';
-import { PublicationSubjectMeta } from '@common/services/tableBuilderService';
+import { PublicationSubjectMeta } from '@frontend/services/tableBuilderService';
 import useResetFormOnPreviousStep from '@frontend/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
 import { FormikProps } from 'formik';
 import camelCase from 'lodash/camelCase';

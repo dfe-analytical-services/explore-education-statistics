@@ -4,7 +4,7 @@ import {
   TableData,
   GroupedFilterOptions,
   TableDataQuery,
-} from '@common/services/tableBuilderService';
+} from '@frontend/services/tableBuilderService';
 import TimePeriod from '@common/services/types/TimePeriod';
 import {
   Indicator,
