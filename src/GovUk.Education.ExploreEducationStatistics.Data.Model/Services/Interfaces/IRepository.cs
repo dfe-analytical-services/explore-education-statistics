@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
@@ -11,15 +12,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
 
         int Count(Expression<Func<TEntity, bool>> expression);
 
-        IEnumerable<TEntity> All(List<Expression<Func<TEntity, object>>> include = null);
+        IQueryable<TEntity> All(List<Expression<Func<TEntity, object>>> include = null);
 
         TEntity Find(TKey id);
 
-        IEnumerable<TEntity> Find(TKey[] ids);
+        IQueryable<TEntity> Find(TKey[] ids);
 
         TEntity Find(TKey id, List<Expression<Func<TEntity, object>>> include);
         
-        IEnumerable<TEntity> FindMany(Expression<Func<TEntity, bool>> expression,
+        IQueryable<TEntity> FindMany(Expression<Func<TEntity, bool>> expression,
             List<Expression<Func<TEntity, object>>> include = null);
 
         int Max(Expression<Func<TEntity, int>> expression);

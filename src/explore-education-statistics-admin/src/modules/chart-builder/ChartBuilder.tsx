@@ -25,12 +25,14 @@ import React from 'react';
 import ChartConfiguration, {
   ChartOptions,
 } from '@admin/modules/chart-builder/ChartConfiguration';
+import classnames from 'classnames';
 import ChartAxisConfiguration from './ChartAxisConfiguration';
 import ChartTypeSelector from './ChartTypeSelector';
 import styles from './graph-builder.module.scss';
 
 interface Props {
   data: DataBlockResponse;
+  onChartSave?: (props: ChartRendererProps) => void;
 }
 
 function getReduceMetaDataForAxis(data: DataBlockResponse) {
@@ -74,7 +76,7 @@ const chartTypes: ChartDefinition[] = [
   MapBlock.definition,
 ];
 
-const ChartBuilder = ({ data }: Props) => {
+const ChartBuilder = ({ data, onChartSave }: Props) => {
   const [selectedChartType, setSelectedChartType] = React.useState<
     ChartDefinition | undefined
   >();
@@ -158,7 +160,7 @@ const ChartBuilder = ({ data }: Props) => {
     ChartRendererProps
   >();
   React.useEffect(() => {
-    if (selectedChartType)
+    if (selectedChartType && majorAxisDataSets.length > 0) {
       setRenderedChartProps({
         type: selectedChartType.type,
 
@@ -179,6 +181,9 @@ const ChartBuilder = ({ data }: Props) => {
         labels: chartLabels,
         ...chartOptions,
       });
+    } else {
+      setRenderedChartProps(undefined);
+    }
   }, [
     selectedChartType,
     axesConfiguration,
@@ -220,7 +225,10 @@ const ChartBuilder = ({ data }: Props) => {
               // hard-coded defaults
               type: axisDefinition.type,
               name: `${axisDefinition.title} (${axisDefinition.type} axis)`,
-              groupBy: previousConfig.groupBy || axisDefinition.defaultDataType,
+              groupBy:
+                axisDefinition.forcedDataType ||
+                previousConfig.groupBy ||
+                axisDefinition.defaultDataType,
               dataSets:
                 axisDefinition.type === 'major'
                   ? dataSetAndConfiguration.map(dsc => dsc.dataSet)
@@ -259,11 +267,21 @@ const ChartBuilder = ({ data }: Props) => {
         <a href="#">Choose an infographic as alternative</a>
       </div>
 
-      {renderedChartProps && (
+      {selectedChartType && (
         <Details summary="Chart preview" open>
-          <div className="govuk-width-container">
+          {renderedChartProps === undefined ? (
+            <div
+              className={classnames(styles.preview)}
+              style={{
+                width: chartOptions.width && `${chartOptions.width}px`,
+                height: chartOptions.height && `${chartOptions.height}px`,
+              }}
+            >
+              <span>Add data to view a preview of the chart</span>
+            </div>
+          ) : (
             <ChartRenderer {...renderedChartProps} />
-          </div>
+          )}
         </Details>
       )}
 
@@ -316,6 +334,22 @@ const ChartBuilder = ({ data }: Props) => {
             </TabsSection>
           ))}
         </Tabs>
+      )}
+
+      {selectedChartType && renderedChartProps && (
+        <>
+          <button
+            type="button"
+            className="govuk-button"
+            onClick={() => {
+              if (onChartSave) {
+                onChartSave(renderedChartProps);
+              }
+            }}
+          >
+            Save chart options
+          </button>
+        </>
       )}
     </div>
   );

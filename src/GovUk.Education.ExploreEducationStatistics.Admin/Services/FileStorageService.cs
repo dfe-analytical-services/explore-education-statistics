@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
@@ -279,5 +280,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             await blob.SetMetadataAsync();
         }
+        
+        
+        public async Task<Either<ValidationResult, FileStreamResult>> StreamFile(Guid releaseId, ReleaseFileTypes type, string fileName)
+        {
+            var blobContainer = await GetCloudBlobContainer();
+            var blob = blobContainer.GetBlockBlobReference(AdminReleasePath(releaseId, type, fileName));
+
+            if (!blob.Exists())
+            {
+                return ValidationResult(FileNotFound);
+            }
+
+            var stream = new MemoryStream();
+
+            await blob.DownloadToStreamAsync(stream);
+            stream.Seek(0, SeekOrigin.Begin);
+            return new FileStreamResult(stream, blob.Properties.ContentType)
+            {
+                FileDownloadName = fileName
+            };
+        }
+
     }
 }

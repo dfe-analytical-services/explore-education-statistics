@@ -6,7 +6,8 @@
       "@admin/*": ["../explore-education-statistics-admin/src/*"],
       "@common/*": ["../explore-education-statistics-common/src/*"],
       "@common-test/*": ["../explore-education-statistics-common/test/*"]
-    }
+    },
+    "sourceMap": true
   },
   "include": [
     "src",

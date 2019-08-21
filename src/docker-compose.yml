@@ -6,25 +6,25 @@ services:
       context: .
       dockerfile: Dockerfile-Data-Api
     ports:
-    - "5000:5000"
-    - "5001:5001"
+      - "5000:5000"
+      - "5001:5001"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
     depends_on:
-    - db
-    - data-storage
+      - db
+      - data-storage
   content-api:
     container_name: ees-content
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile-Content-Api
     ports:
-    - "5010:5010"
-    - "5011:5011"
+      - "5010:5010"
+      - "5011:5011"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
     depends_on:
-    - data-storage
+      - data-storage
   data-storage:
     container_name: ees-storage
     image: arafato/azurite
@@ -45,7 +45,7 @@ services:
       ACCEPT_EULA: "Y"
     command:
       - /bin/bash
-      - -c 
+      - -c
       - |
         # Launch MSSQL and send to background
         /opt/mssql/bin/sqlservr &
