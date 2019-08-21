@@ -9,7 +9,7 @@ interface Props {
 
 const AdminDashboardReadyForApproval = ({ task, user }: Props) => {
   const tagLabel = window.location.search.includes('status=approved')
-    ? 'Scheduled for publication'
+    ? 'Approved for release'
     : 'In higher review';
 
   const checkStatus = window.location.search.includes('status=approved')

@@ -89,7 +89,7 @@ const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
         </TabsSection> */}
         <TabsSection
           id="task-ready-approval1"
-          title={`View releases in progress ${
+          title={`View draft releases ${
             location.search.includes('status=ready') ? '(1)' : '(0)'
           }`}
         >

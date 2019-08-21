@@ -34,7 +34,7 @@ const PublicationPage = ({ task }: Props) => {
           options={[
             {
               id: 'approve-release-higher-review',
-              label: 'Schedule for release',
+              label: 'Approved for release',
               value: 'approvedPublication',
               conditional: (
                 <FormGroup>

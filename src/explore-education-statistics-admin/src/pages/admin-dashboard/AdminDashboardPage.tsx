@@ -117,7 +117,7 @@ const AdminDashboardPage = () => {
             />
           )}
         </TabsSection>
-        <TabsSection id="draft-releases" title="View releases in progress (0)">
+        <TabsSection id="draft-releases" title="View draft releases (0)">
           <div className="govuk-inset-text">
             There are currently no releases ready for you to review
           </div>

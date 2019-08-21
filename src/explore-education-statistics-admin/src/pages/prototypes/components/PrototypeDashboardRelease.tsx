@@ -172,7 +172,7 @@ const PrototypeDashboardRelease = ({
                 </p>
               </Details>
               <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-                Higher review comments
+                Responsible statistician comments
               </h3>
               <Details
                 summary="Stephen Doherty, 17 June 2018, 17:35"

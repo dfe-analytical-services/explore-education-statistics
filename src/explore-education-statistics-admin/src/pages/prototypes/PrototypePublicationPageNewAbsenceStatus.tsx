@@ -56,6 +56,10 @@ const UpdateStatusForm = () => {
               className="govuk-label govuk-label--s"
             >
               Internal release notes
+              <span className="govuk-hint">
+                This will be shown on the view draft release summary to help and
+                update members of the publication team about your release.
+              </span>
             </label>
             <textarea
               id="release-notes"
@@ -113,14 +117,16 @@ const PublicationDataPage = ({ location }: RouteChildrenProps) => {
               Release ready for final sign-off
             </h1>
             <div className="govuk-panel__body">
-              Check the 'Comments for you to resolve' tab on your{' '}
+              The release has been passed on to the responsible statistican. You
+              can still view the release under the 'View draft releases' tab on
+              your{' '}
               <Link
                 className="dfe-link--white"
                 to="/prototypes/admin-dashboard?status=readyHigherReview"
               >
                 dashboard
               </Link>{' '}
-              for feedback
+              .
             </div>
           </div>
         </>

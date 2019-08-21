@@ -40,18 +40,18 @@ const PublicationDataPage = () => {
               to="/prototypes/publication-create-new-absence-view-table"
               className="govuk-tabs__tab  govuk-tabs__tab--selected"
             >
-              View data blocks
+              View saved tables and charts
             </Link>
           </li>
         </ul>
         <div className="govuk-tabs__panel">
           <FormFieldset
             id="tableFieldset"
-            legend="View and edit data blocks configured for this release"
+            legend="View and edit saved tables and charts for this release"
           >
             <FormSelect
               id="tables"
-              label="Select a data block to view"
+              label="Select saved tables and charts"
               name="tables"
               options={Object.values(Data.tables)}
               order={[]}

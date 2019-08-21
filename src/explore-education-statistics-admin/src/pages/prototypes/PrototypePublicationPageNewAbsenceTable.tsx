@@ -40,7 +40,7 @@ const PublicationDataPage = () => {
               to="/prototypes/publication-create-new-absence-view-table"
               className="govuk-tabs__tab"
             >
-              View data blocks
+              View saved tables and charts
             </Link>
           </li>
         </ul>
@@ -374,7 +374,7 @@ const PublicationDataPage = () => {
                 </FormGroup>
                 <FormGroup>
                   <label htmlFor="footnotes" className="govuk-label">
-                    Footnotes
+                    Release footnotes
                   </label>
                   <textarea
                     name="footnotes"

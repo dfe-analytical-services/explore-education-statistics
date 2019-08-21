@@ -304,7 +304,7 @@ const PublicationDataPage = () => {
                   className="govuk-label govuk-label--s"
                   htmlFor="file-upload-1"
                 >
-                  Upload data
+                  Upload file
                 </label>
                 <input
                   className="govuk-file-upload"
