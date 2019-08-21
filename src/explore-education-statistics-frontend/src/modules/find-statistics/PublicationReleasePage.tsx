@@ -368,7 +368,7 @@ class PublicationReleasePage extends Component<Props> {
             </h4>
             <p className="govuk-!-margin-top-0">
               Email <br />
-              <a href="mailto:schools.statistics@education.gov.uk">
+              <a href={`mailto:${data.publication.contact.teamEmail}`}>
                 {data.publication.contact.teamEmail}
               </a>
             </p>
