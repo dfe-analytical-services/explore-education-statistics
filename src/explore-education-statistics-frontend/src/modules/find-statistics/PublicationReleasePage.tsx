@@ -360,8 +360,8 @@ class PublicationReleasePage extends Component<Props> {
           </AccordionSection>
           <AccordionSection heading="Contact us" headingTag="h3">
             <p>
-              If you have a specific enquiry about {data.publication.topic.theme.title} statistics and
-              data:
+              If you have a specific enquiry about{' '}
+              {data.publication.topic.theme.title} statistics and data:
             </p>
             <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
               {data.publication.contact.teamName}
@@ -373,7 +373,8 @@ class PublicationReleasePage extends Component<Props> {
               </a>
             </p>
             <p>
-              Telephone: {data.publication.contact.contactName} <br /> {data.publication.contact.contactTelNo}
+              Telephone: {data.publication.contact.contactName} <br />{' '}
+              {data.publication.contact.contactTelNo}
             </p>
             <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
               Press office
