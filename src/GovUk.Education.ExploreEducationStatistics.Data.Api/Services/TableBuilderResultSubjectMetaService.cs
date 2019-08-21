@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
@@ -61,14 +62,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             };
         }
 
-        private IEnumerable<LabelValue> GetObservationalUnits(IQueryable<Observation> observations)
+        private IEnumerable<ObservationalUnitMetaViewModel> GetObservationalUnits(IQueryable<Observation> observations)
         {
             var observationalUnits = _locationService.GetObservationalUnits(observations);
-            return observationalUnits.SelectMany(pair => pair.Value.Select(observationalUnit => new LabelValue
-            {
-                Label = observationalUnit.Name,
-                Value = observationalUnit.Code
-            }));
+            return observationalUnits.SelectMany(pair => pair.Value.Select(observationalUnit =>
+                new ObservationalUnitMetaViewModel
+                {
+                    Label = observationalUnit.Name,
+                    Level = pair.Key.ToString().CamelCase(),
+                    Value = observationalUnit.Code
+                }));
         }
 
         private IEnumerable<IndicatorMetaViewModel> GetIndicators(SubjectMetaQueryContext query)
