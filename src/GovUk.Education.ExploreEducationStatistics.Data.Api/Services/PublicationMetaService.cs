@@ -47,6 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                     {
                         release => release.Publication.Topic.Theme
                     })
+                .AsEnumerable()
                 .GroupBy(release => release.Publication.Topic.Theme)
                 .Select(grouping => grouping.Key)
             );
