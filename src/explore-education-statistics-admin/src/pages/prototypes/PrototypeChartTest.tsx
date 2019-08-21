@@ -72,7 +72,7 @@ const options: ({ json: string; initialOptions?: Chart } & SelectOption)[] = [
   },
 
   {
-    label: 'Local Authority District',
+    label: 'Absences, FSM eligibility, Local Authority Districts',
     value: '1',
     json: `
 {
@@ -101,27 +101,27 @@ const options: ({ json: string; initialOptions?: Chart } & SelectOption)[] = [
     initialOptions: {
       type: 'map' as ChartType,
 
-      title: 'Authorised absences for Local Authority Districts of England',
+      title: 'Total authorised absences, based on FSM eligibility, for Local Authority Districts of England',
 
       height: 600,
 
       labels: {
         '6_2_3_43_____': {
-          label: 'Total FSM eligible, authorised absences',
+          label: 'FSM eligible',
           name: '6_2_3_43_____',
           value: '6_2_3_43_____',
           colour: '#00ffff',
           unit: '',
         },
         '6_2_3_44_____': {
-          label: 'Total not FSM eligible, authorised absences',
+          label: 'Not FSM eligible',
           name: '6_2_3_44_____',
           value: '6_2_3_44_____',
           colour: '#00ffff',
           unit: '',
         },
         '6_2_3_45_____': {
-          label: 'Total FSM unclassified, authorised absences',
+          label: 'FSM unclassified',
           name: '6_2_3_45_____',
           value: '6_2_3_45_____',
           colour: '#00ffff',
@@ -154,11 +154,13 @@ const options: ({ json: string; initialOptions?: Chart } & SelectOption)[] = [
   },
 ];
 
+const initialState = 1;
+
 const PrototypeChartTest = () => {
-  const [selected, setSelected] = React.useState('0');
+  const [selected, setSelected] = React.useState(`${initialState}`);
 
   const [request, setRequest] = React.useState<DataBlockRequest>(
-    JSON.parse(options[0].json),
+    JSON.parse(options[initialState].json),
   );
 
   const [chartBuilderData, setChartBuilderData] = React.useState<
@@ -167,7 +169,7 @@ const PrototypeChartTest = () => {
 
   const [requestConfiguration, setRequestConfiguration] = React.useState<
     Chart | undefined
-  >(options[0].initialOptions);
+  >(options[initialState].initialOptions);
   const [initialConfiguration, setInitialConfiguration] = React.useState<
     Chart | undefined
   >();

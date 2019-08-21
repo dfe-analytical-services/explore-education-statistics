@@ -276,7 +276,7 @@ function generateDataOptions(
 ) {
   return dataSets.map((dataSet, index) => {
     const dataKey = generateKeyFromDataSet(dataSet, groupBy);
-    return { ...labels[dataKey], value: index };
+    return { ...labels[dataKey], value: dataKey };
   });
 }
 
@@ -296,9 +296,7 @@ const MapBlock = ({
   const container = React.createRef<HTMLDivElement>();
   const ukRef = React.createRef<GeoJSON>();
 
-  const [geometry, setGeometry] = React.useState<
-    FeatureCollection<Geometry, DataBlockGeoJsonProperties>
-  >();
+  const [geometry, setGeometry] = React.useState<FeatureCollection<Geometry, DataBlockGeoJsonProperties>>();
 
   const [ukGeometry, setUkGeometry] = React.useState<FeatureCollection>();
 
@@ -310,9 +308,6 @@ const MapBlock = ({
 
   const [legend, setLegend] = React.useState<LegendEntry[]>([]);
 
-  const [selectedDataSetIndex, setSelectedDataSetIndex] = React.useState<
-    number
-  >(0);
   const [selectedDataSetKey, setSelectedDataSetKey] = React.useState<string>(
     generateKeyFromDataSet(axes.major.dataSets[0], axes.major.groupBy),
   );
@@ -368,6 +363,12 @@ const MapBlock = ({
     setChartData(generatedChartData);
 
     setMajorOptions(getLocationsForDataSet(data, meta, generatedChartData));
+
+    if (labels[selectedDataSetKey] === undefined) {
+      const newKey = generateKeyFromDataSet(axes.major.dataSets[0], axes.major.groupBy);
+      setSelectedDataSetKey(newKey);
+    }
+
   }, [data, axes.major, meta, labels]);
 
   // update settings for the data sets
@@ -386,6 +387,7 @@ const MapBlock = ({
 
   // Rebuild the geometry if the selection has changed
   React.useEffect(() => {
+
     if (chartData) {
       const {
         geometry: newGeometry,
@@ -403,14 +405,6 @@ const MapBlock = ({
       }
     }
   }, [chartData, meta, labels, selectedDataSetKey]);
-
-  // Generate the selected indicator key when the user selects an option
-  const onSelectIndicator = (selectedDatasetIndex: number) => {
-    setSelectedDataSetIndex(selectedDatasetIndex);
-    setSelectedDataSetKey(
-      generateKeyFromDataSet(axes.major.dataSets[selectedDatasetIndex]),
-    );
-  };
 
   // callbacks for the Leaflet element
   const onEachFeatureCallback = useCallbackRef(
@@ -451,70 +445,64 @@ const MapBlock = ({
     [labels, meta.locations, selectedLocation],
   );
 
-  const updateSelectedLocation = React.useCallback(
-    (newSelectedLocation: string, panTo: boolean = true) => {
-      const oldSelectedLocation = selectedLocation;
+  const updateSelectedLocation = (newSelectedLocation: string, panTo: boolean = true) => {
+    const oldSelectedLocation = selectedLocation;
 
-      if (oldSelectedLocation) {
-        const { element: oldSelectedLocationElement } = getFeatureElementById(
-          oldSelectedLocation,
-          geometry,
-        );
+    if (oldSelectedLocation) {
+      const { element: oldSelectedLocationElement } = getFeatureElementById(
+        oldSelectedLocation,
+        geometry,
+      );
 
-        if (oldSelectedLocationElement) {
-          oldSelectedLocationElement.classList.remove(styles.selected);
+      if (oldSelectedLocationElement) {
+        oldSelectedLocationElement.classList.remove(styles.selected);
+      }
+    }
+
+    if (oldSelectedLocation !== newSelectedLocation) {
+      let calculatedResults: IdValue[] = [];
+
+      const {
+        layer: selectedLayer,
+        element: selectedLocationElement,
+        feature: selectedFeature,
+      } = getFeatureElementById(newSelectedLocation, geometry);
+
+      if (selectedLocationElement && selectedLayer && selectedFeature) {
+        selectedLayer.bringToFront();
+        selectedLocationElement.classList.add(styles.selected);
+
+        if (mapRef.current && panTo) {
+          const polyLine: Polyline = selectedLayer as Polyline;
+          mapRef.current.leafletElement.fitBounds(polyLine.getBounds());
+        }
+
+        const { properties } = selectedFeature;
+
+        if (properties) {
+          // eslint-disable-next-line prefer-destructuring
+          const measures: { [key: string]: string } = properties.measures;
+
+          calculatedResults = Object.entries(measures).reduce(
+            (r: IdValue[], [id, value]) => [...r, { id, value }],
+            [],
+          );
         }
       }
 
-      if (oldSelectedLocation !== newSelectedLocation) {
-        let calculatedResults: IdValue[] = [];
+      setResults(calculatedResults);
+    }
 
-        const {
-          layer: selectedLayer,
-          element: selectedLocationElement,
-          feature: selectedFeature,
-        } = getFeatureElementById(newSelectedLocation, geometry);
+    setSelectedLocation(newSelectedLocation);
+  };
 
-        if (selectedLocationElement && selectedLayer && selectedFeature) {
-          selectedLayer.bringToFront();
-          selectedLocationElement.classList.add(styles.selected);
+  const onClick = (e: MapClickEvent) => {
+    const { feature } = e.sourceTarget;
 
-          if (mapRef.current && panTo) {
-            const polyLine: Polyline = selectedLayer as Polyline;
-            mapRef.current.leafletElement.fitBounds(polyLine.getBounds());
-          }
-
-          const { properties } = selectedFeature;
-
-          if (properties) {
-            // eslint-disable-next-line prefer-destructuring
-            const measures: { [key: string]: string } = properties.measures;
-
-            calculatedResults = Object.entries(measures).reduce(
-              (r: IdValue[], [id, value]) => [...r, { id, value }],
-              [],
-            );
-          }
-        }
-
-        setResults(calculatedResults);
-      }
-
-      setSelectedLocation(newSelectedLocation);
-    },
-    [geometry, mapRef, selectedLocation],
-  );
-
-  const onClick = React.useCallback(
-    (e: MapClickEvent) => {
-      const { feature } = e.sourceTarget;
-
-      if (feature.properties && feature.properties.code) {
-        updateSelectedLocation(feature.properties.code);
-      }
-    },
-    [updateSelectedLocation],
-  );
+    if (feature.properties && feature.properties.code) {
+      updateSelectedLocation(feature.properties.code);
+    }
+  };
 
   // reset the GeoJson layer if the geometry is changed, updating the component doesn't do it once it's rendered
   React.useEffect(() => {
@@ -548,9 +536,9 @@ const MapBlock = ({
               name="selectedIndicator"
               id="selectedIndicator"
               label="Select data to view"
-              value={selectedDataSetIndex}
+              value={selectedDataSetKey}
               onChange={e =>
-                onSelectIndicator(Number.parseInt(e.currentTarget.value, 10))
+                setSelectedDataSetKey(e.currentTarget.value)
               }
               options={dataSetOptions}
               order={[]}
@@ -601,24 +589,24 @@ const MapBlock = ({
             </h3>
             <dl className="govuk-list">
               {legend &&
-                legend.map(({ min, max, idx, minValue }) => (
-                  <dd className={styles.legend} key={idx}>
-                    <span
-                      className={styles[`rate${idx}`]}
-                      style={{
-                        backgroundColor: calculateColour({
-                          scaledData: minValue,
-                          color: labels[selectedDataSetKey].colour,
-                        }),
-                      }}
-                    >
-                      &nbsp;
-                    </span>{' '}
-                    {min}
-                    {labels[selectedDataSetKey].unit}&nbsp; to {max}
-                    {labels[selectedDataSetKey].unit}{' '}
-                  </dd>
-                ))}
+              legend.map(({ min, max, idx, minValue }) => (
+                <dd className={styles.legend} key={idx}>
+                  <span
+                    className={styles[`rate${idx}`]}
+                    style={{
+                      backgroundColor: calculateColour({
+                        scaledData: minValue,
+                        color: labels[selectedDataSetKey].colour,
+                      }),
+                    }}
+                  >
+                    &nbsp;
+                  </span>{' '}
+                  {min}
+                  {labels[selectedDataSetKey].unit}&nbsp; to {max}
+                  {labels[selectedDataSetKey].unit}{' '}
+                </dd>
+              ))}
             </dl>
           </div>
         )}
@@ -651,11 +639,8 @@ const MapBlock = ({
                   feature.properties &&
                   calculateColour(feature.properties),
                 className: classNames({
-                  [styles.selected]:
-                    selectedDataSetIndex &&
-                    feature &&
-                    feature.id ===
-                      axes.major.dataSets[selectedDataSetIndex].location,
+                  [styles.selected]: feature && feature.id === selectedLocation,
+
                 }),
               })}
               onclick={onClick}
