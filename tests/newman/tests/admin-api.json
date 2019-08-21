@@ -36,7 +36,13 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Cookie",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}; Domain={{azure_ad_cookie_domain}}",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "{{admin_api_url}}/contacts",
 							"host": [
