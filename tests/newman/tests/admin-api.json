@@ -177,14 +177,22 @@
 							"script": {
 								"id": "e472dd85-13ad-411e-bdcc-d5e6e875df7f",
 								"exec": [
+									"var respJson = pm.response.json();",
+									"",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 									"",
 									"pm.test(\"Should return some results\", function () {",
-									"    pm.expect(pm.response.json().length).to.be.above(0);    ",
+									"    pm.expect(pm.response.json().length).to.be.above(2);    ",
 									"});",
 									"",
-									"pm.test(\"Title should be correct\", function () { ",
-									"    pm.expect(pm.response.json()[0].title).to.equal(\"Pupil exclusion statistics: methodology\"); ",
+									"pm.test(\"Title for Exclusion methodology should be correct\", function () {",
+									"    var foundExclusion = false;",
+									"    for(var i = 0; i < respJson.length; i++) {",
+									"        if(respJson[i].id === \"c8c911e3-39c1-452b-801f-25bb79d1deb7\") {",
+									"            foundExclusion = true;",
+									"                pm.expect(respJson[i].title).to.equal(\"Pupil exclusion statistics: methodology\"); ",
+									"        }",
+									"    }",
 									"});"
 								],
 								"type": "text/javascript"
@@ -207,7 +215,7 @@
 					"response": []
 				},
 				{
-					"name": "Methodologies for a topic",
+					"name": "Methodologies for topic - Exclusions",
 					"event": [
 						{
 							"listen": "test",
@@ -220,8 +228,9 @@
 									"    pm.expect(pm.response.json().length).to.be.above(0);    ",
 									"});",
 									"",
-									"pm.test(\"Title should be correct\", function () { ",
-									"    pm.expect(pm.response.json()[0].title).to.equal(\"Pupil exclusion statistics: methodology\"); ",
+									"pm.test(\"Result should be correct\", function () { ",
+									"    pm.expect(pm.response.json()[0].id).to.equal(\"c8c911e3-39c1-452b-801f-25bb79d1deb7\");",
+									"    pm.expect(pm.response.json()[0].title).to.equal(\"Pupil exclusion statistics: methodology\");",
 									"});"
 								],
 								"type": "text/javascript"
@@ -258,21 +267,42 @@
 							"script": {
 								"id": "2db4ed0b-6eeb-40b6-914f-f1692eb248fb",
 								"exec": [
-									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"var respJson = pm.response.json();",
 									"",
-									"/*",
-									"pm.test(\"Fields are present\", function () {",
+									"pm.test(\"Status code is 200\", function () { ",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Number of themes should be correct\", function () {",
+									"    pm.expect(respJson.length).to.equal(9);",
+									"});",
+									"",
+									"pm.test(\"First result should have correct fields\", function () {",
 									"    pm.expect(pm.response.to.have.jsonBody(\"[0].id\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[0].teamName\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[0].teamEmail\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[0].contactName\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[0].contactTelNo\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0].slug\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0].title\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0].summary\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0].topics\"));",
 									"});",
 									"",
-									"pm.test(\"Team name should be correct\", function () { ",
-									"    pm.expect(pm.response.json()[0].teamName).to.equal(\"Simon's Team\"); ",
-									"});",
-									"*/"
+									"pm.test(\"Number of topics and fields of first topic under Pupils and schools should be correct\", function () {",
+									"    var foundPupilsAndSchools = false;",
+									"    for(var i = 0; i < respJson.length; i++) {",
+									"        if(respJson[i].title === \"Pupils and schools\") {",
+									"            foundPupilsAndSchools = true;",
+									"            pm.expect(respJson[i].topics.length).to.equal(9);",
+									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].id`));",
+									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].title`));",
+									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].slug`));",
+									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].description`));",
+									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].themeId`));",
+									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].theme`));",
+									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].summary`));",
+									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].publications`));",
+									"        }",
+									"    }",
+									"    pm.expect(foundPupilsAndSchools).to.equal(true);",
+									"});"
 								],
 								"type": "text/javascript"
 							}
@@ -301,34 +331,119 @@
 			"name": "Publication",
 			"item": [
 				{
-					"name": "Get my publications by topic",
+					"name": "Get publication - Pupil absence in schools in England",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "50f6efbc-4157-4ec4-b3f2-a7c2cb4abe9e",
+								"exec": [
+									"var respJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Expect correct fields\", function () {",
+									"    pm.expect(pm.response.to.have.jsonBody(`id`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`title`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`nextUpdate`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`methodology`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`topicId`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`contact`));",
+									"});",
+									"",
+									"pm.test(\"Response id and title should be correct\", function () {",
+									"    pm.expect(respJson.id).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\");",
+									"    pm.expect(respJson.title).to.equal(\"Pupil absence in schools in England\"); ",
+									"});",
+									"",
+									"pm.test(\"Should be two releases\", function () {",
+									"    pm.expect(respJson.releases.length).to.equal(2); ",
+									"});",
+									"",
+									"pm.test(\"Methodology title should be correct\", function () {",
+									"    pm.expect(respJson.methodology.title).to.equal(\"Pupil absence statistics: methodology\"); ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "152c86f6-6905-4366-a08e-4b8a54d6c2ec",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{admin_api_url}}/publications/cbbd299f-8297-44bc-92ac-558bcf51f8ad",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"publications",
+								"cbbd299f-8297-44bc-92ac-558bcf51f8ad"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get user's topic - Pupil absence",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"id": "7cbd4f1c-cf5e-4b8a-b7ec-c2e479396b3a",
 								"exec": [
+									"var respJson = pm.response.json();",
+									"",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 									"",
 									"pm.test(\"Should return some results\", function () {",
-									"    pm.expect(pm.response.json().length).to.be.above(0);    ",
+									"    pm.expect(respJson.length).to.be.above(0);    ",
 									"});",
 									"",
 									"pm.test(\"Response should contain \\\"Pupil absence in schools in England: autumn term\\\"\", function () {",
 									"   var foundTitle = false;",
-									"   for(var i = 0; i < pm.response.json().length; i++) {",
-									"       if(pm.response.json()[i].title === \"Pupil absence in schools in England: autumn term\") foundTitle = true;",
+									"   for(var i = 0; i < respJson.length; i++) {",
+									"       if(respJson[i].title === \"Pupil absence in schools in England: autumn term\") foundTitle = true;",
 									"   }",
 									"   pm.expect(foundTitle).to.equal(true);",
 									"});",
 									"",
+									"pm.test(\"Expect latestRelease flag on releases\", function () {",
+									"    for(var i = 0; i < respJson.length; i++) {",
+									"        for(var j = 0; j < respJson[i].releases.length; j++) {",
+									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].releases[${j}].latestRelease`));",
+									"        }",
+									"    }",
+									"});",
 									"",
-									"pm.test(\"Expect latestRelease flag if releases is more than 0\", function () {",
-									"    for(var i = 0; i < pm.response.json().length; i++) {",
-									"        if(pm.response.json()[i].releases !== null) {",
-									"            for(var j = 0; j < pm.response.json()[i].releases.length; j++) {",
-									"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].releases[${j}].latestRelease`));",
-									"            }",
+									"pm.test(\"Expect non-null methodology to have correct fields\", function () {",
+									"    for(var i = 0; i < respJson.length; i++) {",
+									"        if(respJson[i].methodology !== null) {",
+									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].methodology.id`));",
+									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].methodology.title`));",
+									"        }",
+									"    }",
+									"});",
+									"",
+									"pm.test(\"Expect non-null contacts to have correct fields\", function () {",
+									"    for(var i = 0; i < respJson.length; i++) {",
+									"        if(respJson[i].contact !== null) {",
+									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].contact.id`));",
+									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].contact.teamName`));",
+									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].contact.teamEmail`));",
+									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].contact.contactName`));",
+									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].contact.contactTelNo`));            ",
 									"        }",
 									"    }",
 									"});"
@@ -370,50 +485,51 @@
 					"response": []
 				},
 				{
-					"name": "Admin dashboard publications",
+					"name": "Get user's topic - School applications",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"id": "aad25515-6076-4a4a-b609-61fe0a986e11",
 								"exec": [
+									"var respJson = pm.response.json();",
+									"",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 									"",
 									"pm.test(\"Should return some results\", function () {",
-									"    pm.expect(pm.response.json().length).to.be.above(0);    ",
+									"    pm.expect(respJson.length).to.be.above(0);    ",
 									"});",
 									"",
-									"pm.test(\"Further education outcome-based success measures should be present\", function () { ",
-									"    pm.expect(pm.response.json()[0].title).to.equal(\"Further education outcome-based success measures\"); ",
+									"pm.test(\"Expect the correct fields\", function () {",
+									"    for(var i = 0; i < respJson.length; i++) {",
+									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topicId`));",
+									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].nextUpdate`));",
+									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].releases`));",
+									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].methodology`));",
+									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].contact`));",
+									"    }",
+									"});",
+									"",
+									"pm.test(\"First result's title should be correct\", function () { ",
+									"    pm.expect(respJson[0].title).to.equal(\"Secondary and primary schools applications and offers\"); ",
 									"});",
 									"",
 									"pm.test(\"Expect latestRelease flag if releases is more than 0\", function () {",
-									"    for(var i = 0; i < pm.response.json().length; i++) {",
-									"        if(pm.response.json()[i].releases !== null) {",
-									"            for(var j = 0; j < pm.response.json()[i].releases.length; j++) {",
+									"    for(var i = 0; i < respJson.length; i++) {",
+									"        if(respJson[i].releases !== null) {",
+									"            for(var j = 0; j < respJson[i].releases.length; j++) {",
 									"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].releases[${j}].latestRelease`));",
 									"            }",
 									"        }",
 									"    }",
 									"});",
 									"",
-									"pm.test(\"Expect title if methodology is more than 0\", function () {",
-									"    for(var i = 0; i < pm.response.json().length; i++) {",
-									"        if(pm.response.json()[i].methodology !== null) {",
-									"            for(var j = 0; j < pm.response.json()[i].methodology.length; j++) {",
-									"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].methodology[${j}].title`));",
-									"            }",
+									"pm.test(\"Expect non-null methodology to have correct fields\", function () {",
+									"    for(var i = 0; i < respJson.length; i++) {",
+									"        if(respJson[i].methodology !== null) {",
+									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].methodology.id`));",
+									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].methodology.title`));",
 									"        }",
-									"    }",
-									"});",
-									"",
-									"pm.test(\"Expect the correct fields\", function () {",
-									"    for(var i = 0; i < pm.response.json().length; i++) {",
-									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topicId`));",
-									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].nextUpdate`));",
-									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].releases`));",
-									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].methodology`));",
-									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].contact`));",
 									"    }",
 									"});"
 								],
@@ -425,7 +541,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{admin_api_url}}/me/publications?topicId=A7CE9542-20E6-401D-91F4-F832C9E58B12&themeId=2CA22E34-B87A-4281-A0EB-B80F4F8DD374",
+							"raw": "{{admin_api_url}}/me/publications?topicId=1a9636e4-29d5-4c90-8c07-f41db8dd019c",
 							"host": [
 								"{{admin_api_url}}"
 							],
@@ -436,11 +552,12 @@
 							"query": [
 								{
 									"key": "topicId",
-									"value": "A7CE9542-20E6-401D-91F4-F832C9E58B12"
+									"value": "1a9636e4-29d5-4c90-8c07-f41db8dd019c"
 								},
 								{
-									"key": "themeId",
-									"value": "2CA22E34-B87A-4281-A0EB-B80F4F8DD374"
+									"key": "",
+									"value": "",
+									"disabled": true
 								}
 							]
 						}
@@ -453,90 +570,7 @@
 			"name": "Release",
 			"item": [
 				{
-					"name": "Releases for publication",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "50f6efbc-4157-4ec4-b3f2-a7c2cb4abe9e",
-								"exec": [
-									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-									"",
-									"pm.test(\"Should return some results\", function () {",
-									"    pm.expect(pm.response.json().length).to.be.above(0);    ",
-									"});",
-									"",
-									"pm.test(\"Expect correct fields in releases array if releases is more than 0\", function () {",
-									"    for(var i = 0; i < pm.response.json().length; i++) {",
-									"        if(pm.response.json()[i].releases !== null) {",
-									"            for(var j = 0; j < pm.response.json()[i].releases.length; j++) {",
-									"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].releases[${j}].title`));",
-									"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].releases[${j}].publicationTitle`));",
-									"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].releases[${j}].releaseName`));",
-									"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].releases[${j}].coverageTitle`));",
-									"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].releases[${j}].yearTitle`));",
-									"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].releases[${j}].typeId`));",
-									"                 pm.expect(pm.response.to.have.jsonBody(`[${i}].releases[${j}].latestRelease`));",
-									"            }",
-									"        }",
-									"    }",
-									"});",
-									"",
-									"pm.test(\"Response should contain \\\"Pupil absence in schools in England\\\"\", function () {",
-									"   var foundTitle = false;",
-									"   for(var i = 0; i < pm.response.json().length; i++) {",
-									"        if(pm.response.json()[i].releases !== null) {",
-									"            for(var j = 0; j < pm.response.json()[i].releases.length; j++) {",
-									"                if(pm.response.json()[i].title === \"Pupil absence in schools in England\") ",
-									"                {",
-									"                    foundTitle = true;",
-									"                }",
-									"            }",
-									"        }",
-									"   }",
-									"   pm.expect(foundTitle).to.equal(true);",
-									"});",
-									"",
-									""
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "152c86f6-6905-4366-a08e-4b8a54d6c2ec",
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{admin_api_url}}/me/publications?topicId=67C249DE-1CCA-446E-8CCB-DCDAC542F460",
-							"host": [
-								"{{admin_api_url}}"
-							],
-							"path": [
-								"me",
-								"publications"
-							],
-							"query": [
-								{
-									"key": "topicId",
-									"value": "67C249DE-1CCA-446E-8CCB-DCDAC542F460"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Release summary",
+					"name": "Release summary - Exclusions 2016",
 					"event": [
 						{
 							"listen": "test",
