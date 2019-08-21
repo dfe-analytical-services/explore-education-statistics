@@ -21,7 +21,7 @@ const PrototypeAddFootnotes = () => {
           {!editFootnoteBlock && (
             <>
               <p>Select either one or multiple subject areas from below</p>
-              <PrototypeFootnotes subject="Geographical absence" />
+              <PrototypeFootnotes subject="Geographical absence" titleRow />
               <PrototypeFootnotes subject="Local authority" />
               <PrototypeFootnotes subject="National characteristics" />
 

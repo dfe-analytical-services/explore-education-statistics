@@ -5,9 +5,10 @@ import Details from '@common/components/Details';
 
 interface Props {
   subject?: string;
+  titleRow?: boolean;
 }
 
-const PrototypeFootnotes = ({ subject }: Props) => {
+const PrototypeFootnotes = ({ subject, titleRow }: Props) => {
   const [valueIndicator, setValueIndicator] = useState('');
   const [valueFilter, setValueFilter] = useState('');
   const [valueFootnote, setValueFootnote] = useState('');
@@ -17,6 +18,16 @@ const PrototypeFootnotes = ({ subject }: Props) => {
 
   return (
     <>
+      {titleRow && (
+        <>
+          <div className="govuk-grid-row govuk-heading-s govuk-!-margin-bottom-0">
+            <div className="govuk-grid-column-one-third">Subject</div>
+            <div className="govuk-grid-column-one-third">Indicator</div>
+            <div className="govuk-grid-column-one-third">Filter</div>
+          </div>
+          <hr className="govuk-!-margin-top-1 govuk-!-margin-bottom-2" />
+        </>
+      )}
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-one-third">
           <div className="govuk-form-group govuk-!-margin-bottom-2">
@@ -28,20 +39,10 @@ const PrototypeFootnotes = ({ subject }: Props) => {
                   id="selectSubject"
                   name="selectSubject"
                   value="selectSubject"
+                  defaultChecked
                   onChange={event => {
                     setValueIndicator(event.target.value);
                     setEditFootnoteBlock(false);
-
-                    if (addIndicatorBlock) {
-                      setIndicatorBlock(false);
-                    } else {
-                      setIndicatorBlock(true);
-                    }
-                    if (addFilterBlock) {
-                      setFilterBlock(false);
-                    } else {
-                      setFilterBlock(true);
-                    }
                   }}
                 />
                 <label
@@ -55,38 +56,48 @@ const PrototypeFootnotes = ({ subject }: Props) => {
           </div>
         </div>
         <div className="govuk-grid-column-one-third">
-          <div className="govuk-form-group govuk-!-margin-bottom-2">
-            <div className="govuk-checkboxes govuk-checkboxes--small">
-              <div className="govuk-checkboxes__item">
-                <input
-                  className="govuk-checkboxes__input"
-                  type="checkbox"
-                  id="selectAllIndicators"
-                  name="selectAllIndicators"
-                  value="selectAllIndicators"
-                  onChange={event => {
-                    setValueIndicator(event.target.value);
-                    setEditFootnoteBlock(false);
+          {!addIndicatorBlock && (
+            <div className="govuk-form-group govuk-!-margin-bottom-2">
+              <div className="govuk-checkboxes govuk-checkboxes--small">
+                <div className="govuk-checkboxes__item">
+                  <input
+                    className="govuk-checkboxes__input"
+                    type="checkbox"
+                    id="selectAllIndicators"
+                    name="selectAllIndicators"
+                    value="selectAllIndicators"
+                    defaultChecked
+                    onChange={event => {
+                      setValueIndicator(event.target.value);
+                      setEditFootnoteBlock(false);
 
-                    if (addIndicatorBlock) {
-                      setIndicatorBlock(false);
-                    } else {
-                      setIndicatorBlock(true);
-                    }
-                  }}
-                />
-                <label
-                  className="govuk-label govuk-checkboxes__label"
-                  htmlFor="selectAllIndicators"
-                >
-                  Select all indicators
-                </label>
+                      if (addIndicatorBlock) {
+                        setIndicatorBlock(false);
+                      } else {
+                        setIndicatorBlock(true);
+                      }
+                    }}
+                  />
+                  <label
+                    className="govuk-label govuk-checkboxes__label"
+                    htmlFor="selectAllIndicators"
+                  >
+                    Select all indicators
+                  </label>
+                </div>
               </div>
             </div>
-          </div>
+          )}
           {addIndicatorBlock && (
             <>
-              <Details summary="Indicator" tag="3 selected">
+              <span className="govuk-hint govuk-!-margin-top-2">
+                Select at least one indicator
+              </span>
+              <Details
+                summary="Indicator"
+                className="govuk-!-margin-bottom-1"
+                tag="3 selected"
+              >
                 <div className="dfe-filter-overflow">
                   <img
                     src="/static/images/prototype/indicator-filters.png"
@@ -94,41 +105,76 @@ const PrototypeFootnotes = ({ subject }: Props) => {
                   />
                 </div>
               </Details>
+              <div className="govuk-form-group govuk-!-margin-bottom-2">
+                <div className="govuk-checkboxes govuk-checkboxes--small">
+                  <div className="govuk-checkboxes__item">
+                    <input
+                      className="govuk-checkboxes__input"
+                      type="checkbox"
+                      id="selectAllIndicators"
+                      name="selectAllIndicators"
+                      value="selectAllIndicators"
+                      onChange={event => {
+                        setValueIndicator(event.target.value);
+                        setEditFootnoteBlock(false);
+
+                        if (addIndicatorBlock) {
+                          setIndicatorBlock(false);
+                        } else {
+                          setIndicatorBlock(true);
+                        }
+                      }}
+                    />
+                    <label
+                      className="govuk-label govuk-checkboxes__label"
+                      htmlFor="selectAllIndicators"
+                    >
+                      Select all indicators
+                    </label>
+                  </div>
+                </div>
+              </div>
             </>
           )}
         </div>
         <div className="govuk-grid-column-one-third">
-          <div className="govuk-form-group govuk-!-margin-bottom-2">
-            <div className="govuk-checkboxes govuk-checkboxes--small">
-              <div className="govuk-checkboxes__item">
-                <input
-                  className="govuk-checkboxes__input"
-                  type="checkbox"
-                  id="selectAllFilters"
-                  name="selectAllFilters"
-                  value="selectAllFilters"
-                  onChange={event => {
-                    setValueIndicator(event.target.value);
-                    setEditFootnoteBlock(false);
+          {!addFilterBlock && (
+            <div className="govuk-form-group govuk-!-margin-bottom-2">
+              <div className="govuk-checkboxes govuk-checkboxes--small">
+                <div className="govuk-checkboxes__item">
+                  <input
+                    className="govuk-checkboxes__input"
+                    type="checkbox"
+                    id="selectAllFilters"
+                    name="selectAllFilters"
+                    value="selectAllFilters"
+                    defaultChecked
+                    onChange={event => {
+                      setValueIndicator(event.target.value);
+                      setEditFootnoteBlock(false);
 
-                    if (addFilterBlock) {
-                      setFilterBlock(false);
-                    } else {
-                      setFilterBlock(true);
-                    }
-                  }}
-                />
-                <label
-                  className="govuk-label govuk-checkboxes__label"
-                  htmlFor="selectAllFilters"
-                >
-                  Select all filters
-                </label>
+                      if (addFilterBlock) {
+                        setFilterBlock(false);
+                      } else {
+                        setFilterBlock(true);
+                      }
+                    }}
+                  />
+                  <label
+                    className="govuk-label govuk-checkboxes__label"
+                    htmlFor="selectAllFilters"
+                  >
+                    Select all filters
+                  </label>
+                </div>
               </div>
             </div>
-          </div>
+          )}
           {addFilterBlock && (
             <>
+              <span className="govuk-hint govuk-!-margin-top-2">
+                Select at least one filter
+              </span>
               <Details
                 summary="Characteristic"
                 tag="1 selected"
@@ -149,6 +195,35 @@ const PrototypeFootnotes = ({ subject }: Props) => {
                   />
                 </div>
               </Details>
+              <div className="govuk-form-group govuk-!-margin-bottom-2">
+                <div className="govuk-checkboxes govuk-checkboxes--small">
+                  <div className="govuk-checkboxes__item">
+                    <input
+                      className="govuk-checkboxes__input"
+                      type="checkbox"
+                      id="selectAllFilters"
+                      name="selectAllFilters"
+                      value="selectAllFilters"
+                      onChange={event => {
+                        setValueIndicator(event.target.value);
+                        setEditFootnoteBlock(false);
+
+                        if (addFilterBlock) {
+                          setFilterBlock(false);
+                        } else {
+                          setFilterBlock(true);
+                        }
+                      }}
+                    />
+                    <label
+                      className="govuk-label govuk-checkboxes__label"
+                      htmlFor="selectAllFilters"
+                    >
+                      Select all filters
+                    </label>
+                  </div>
+                </div>
+              </div>
             </>
           )}
         </div>
