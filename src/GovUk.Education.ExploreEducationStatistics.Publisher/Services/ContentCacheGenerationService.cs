@@ -110,6 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             foreach (var methodology in methodologies)
             {
+                // TODO: model might be incorrect so will need to validate
                 // TODO: Save the filename as slug rather than ID
                 var blob = _cloudBlobContainer.GetBlockBlobReference($"methodology/methodologies/{methodology}.json");
                 await blob.UploadTextAsync(JsonConvert.SerializeObject(methodology));
@@ -141,6 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 {
                     var release = _releaseService.GetRelease(r.Slug);
                     
+                    // TODO: ideally this would live alongside the latest relase above but current api implementation only takes the release slug
                     var releaseBlob = _cloudBlobContainer.GetBlockBlobReference($"content/releases/{release.Slug}.json");
                     await releaseBlob.UploadTextAsync(JsonConvert.SerializeObject(release));
                 }
