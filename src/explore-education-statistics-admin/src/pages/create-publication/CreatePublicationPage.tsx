@@ -16,6 +16,7 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
 import { FormikProps } from 'formik';
+import orderBy from 'lodash/orderBy';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 
@@ -38,24 +39,29 @@ const serverSideValidationHandler = handleServerSideValidation(
   ),
 );
 
+interface CreatePublicationModel {
+  methodologies: IdTitlePair[];
+  contacts: ContactDetails[];
+}
+
 const CreatePublicationPage = ({
   match,
   history,
 }: RouteComponentProps<MatchProps>) => {
   const { topicId } = match.params;
 
-  const [methodologies, setMethodologies] = useState<IdTitlePair[]>();
-  const [contacts, setContacts] = useState<ContactDetails[]>();
+  const [model, setModel] = useState<CreatePublicationModel>();
 
   useEffect(() => {
-    const methodologyPromise = service.getMethodologies();
-    const contactsPromise = service.getPublicationAndReleaseContacts();
-    Promise.all([methodologyPromise, contactsPromise]).then(
-      ([methodologiesResult, contactsResult]) => {
-        setMethodologies(methodologiesResult);
-        setContacts(contactsResult);
-      },
-    );
+    Promise.all([
+      service.getMethodologies(),
+      service.getPublicationAndReleaseContacts(),
+    ]).then(([methodologies, contacts]) => {
+      setModel({
+        methodologies,
+        contacts,
+      });
+    });
   }, []);
 
   const submitFormHandler = async (values: FormValues) => {
@@ -90,14 +96,20 @@ const CreatePublicationPage = ({
       ]}
     >
       <h1 className="govuk-heading-l">Create new publication</h1>
-      {contacts && methodologies && (
+      {model && (
         <Formik<FormValues>
           enableReinitialize
           initialValues={{
             publicationTitle: '',
-            selectedContactId: contacts[0].id,
+            selectedContactId: orderBy(
+              model.contacts,
+              contact => contact.contactName,
+            )[0].id,
             methodologyChoice: undefined,
-            selectedMethodologyId: methodologies[0].id,
+            selectedMethodologyId: orderBy(
+              model.methodologies,
+              methodology => methodology.title,
+            )[0].id,
           }}
           validationSchema={Yup.object<FormValues>({
             publicationTitle: Yup.string().required(
@@ -145,7 +157,7 @@ const CreatePublicationPage = ({
                     id={`${formId}-selectedMethodologyId`}
                     name="selectedMethodologyId"
                     label="Select methodology"
-                    options={methodologies.map(methodology => ({
+                    options={model.methodologies.map(methodology => ({
                       label: methodology.title,
                       value: methodology.id,
                     }))}
@@ -160,7 +172,7 @@ const CreatePublicationPage = ({
                     id={`${formId}-selectedContactId`}
                     label="Publication and release contact"
                     name="selectedContactId"
-                    options={contacts.map(contact => ({
+                    options={model.contacts.map(contact => ({
                       label: contact.contactName,
                       value: contact.id,
                     }))}
@@ -172,7 +184,7 @@ const CreatePublicationPage = ({
                       {
                         getSelectedContact(
                           form.values.selectedContactId,
-                          contacts,
+                          model.contacts,
                         ).teamEmail
                       }
                     </SummaryListItem>
@@ -180,7 +192,7 @@ const CreatePublicationPage = ({
                       {
                         getSelectedContact(
                           form.values.selectedContactId,
-                          contacts,
+                          model.contacts,
                         ).contactTelNo
                       }
                     </SummaryListItem>
