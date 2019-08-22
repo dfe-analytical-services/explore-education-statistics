@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels;
@@ -13,14 +12,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
     [Route("api/[controller]")]
     public class MethodologyController : ControllerBase
     {
-        private readonly IMethodologyService _service;
-        
         private readonly IContentCacheService _contentCacheService;
 
         
-        public MethodologyController(IMethodologyService service, IContentCacheService contentCacheService)
+        public MethodologyController(IContentCacheService contentCacheService)
         {
-            _service = service;
             _contentCacheService = contentCacheService;
         }
 
@@ -47,9 +43,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
         [Produces("application/json")]
-        public ActionResult<Methodology> Get(string slug)
+        public async Task<ActionResult<Methodology>> Get(string slug)
         {
-            var methodology = _service.Get(slug);
+            var methodology = await _contentCacheService.GetMethodologyAsync(slug);
 
             if (methodology != null)
             {

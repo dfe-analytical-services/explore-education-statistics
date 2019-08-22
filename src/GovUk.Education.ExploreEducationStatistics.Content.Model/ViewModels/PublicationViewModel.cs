@@ -1,6 +1,6 @@
 using System;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels
 {
     public class PublicationViewModel
     {

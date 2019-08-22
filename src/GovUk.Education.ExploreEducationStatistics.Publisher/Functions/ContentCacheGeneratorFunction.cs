@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         {
             logger.LogInformation($"{GetType().Name} function triggered: {message}");
 
-            // TODO: switch actions based on message content
+            // TODO: switch actions based on message content, for now full rebuild
             await _contentCacheGenerationService.CleanAndRebuildFullCache();
 
             logger.LogInformation($"{GetType().Name} function completed");

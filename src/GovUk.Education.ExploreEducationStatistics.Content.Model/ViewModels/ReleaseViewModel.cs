@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels
 {
     public class ReleaseViewModel
     {
