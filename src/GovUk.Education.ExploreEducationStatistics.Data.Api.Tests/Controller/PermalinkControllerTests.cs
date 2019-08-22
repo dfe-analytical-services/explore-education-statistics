@@ -1,8 +1,8 @@
 using System;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controller
         private readonly PermalinkController _controller;
 
         private readonly Guid _validId = Guid.NewGuid();
-        private readonly PermalinkQueryContext _query = new PermalinkQueryContext();
+        private readonly TableBuilderQueryContext _query = new TableBuilderQueryContext();
 
         public PermalinkControllerTests()
         {

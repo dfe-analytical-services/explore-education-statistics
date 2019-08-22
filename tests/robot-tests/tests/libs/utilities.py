@@ -34,7 +34,7 @@ def user_checks_page_contains_accordion(accordion_heading):
     sl.wait_until_page_contains_element(f'xpath://*[@class="govuk-accordion__section-button" and text()="{accordion_heading}"]')
     # sl.driver.find_element_by_xpath(f'//*[@class="govuk-accordion__section-button" and text()="{accordion_heading}"]')
   except:
-    raise AssertionError(f"Accordion with heading '{accordion_heading} not found!'")
+    raise AssertionError(f"Accordion with heading '{accordion_heading}' not found!'")
 
 def user_checks_accordion_is_in_position(header_starts_with, position):
   try:

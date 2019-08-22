@@ -67,6 +67,11 @@ const ChartDataConfiguration = ({
 
   return (
     <div className={styles.chartDataConfiguration}>
+      <datalist id="chartdataconfiguration_colours">
+        {colourOptions.map(({ value }) => (
+          <option key={value} value={value} />
+        ))}
+      </datalist>
       <FormFieldset id={configuration.value} legend="" legendHidden>
         <div className={styles.chartDataLabelConfiguration}>
           <div className={styles.chartDataItem}>
@@ -85,10 +90,11 @@ const ChartDataConfiguration = ({
           </div>
 
           <div className={styles.chartDataItem}>
-            <FormSelect
+            <FormTextInput
               id="colour"
               name="colour"
               label="Colour"
+              type="color"
               value={configuration.colour}
               onChange={e =>
                 updateConfig({
@@ -96,7 +102,7 @@ const ChartDataConfiguration = ({
                   colour: e.target.value,
                 })
               }
-              options={colourOptions}
+              list="chartdataconfiguration_colours"
             />
           </div>
 

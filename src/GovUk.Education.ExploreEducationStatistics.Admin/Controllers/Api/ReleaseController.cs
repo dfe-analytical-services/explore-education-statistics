@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using FileInfo = GovUk.Education.ExploreEducationStatistics.Admin.Models.FileInfo;
 using ReleaseId = System.Guid;
 using PublicationId = System.Guid;
 
@@ -35,7 +36,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _importService = importService;
             _publicationService = publicationService;
         }
-
+        
+        [HttpGet("release/{releaseId}/chart/{filename}")]
+        [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
+        public async Task<ActionResult> GetChartFile(ReleaseId releaseId, string filename)
+        {
+            return await CheckReleaseExistsStreamAsync(releaseId,
+                () => _fileStorageService.StreamFile(releaseId, ReleaseFileTypes.Chart, filename));
+        }
+        
+        [HttpGet("release/{releaseId}/data/{filename}")]
+        [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
+        public async Task<ActionResult> GetDataFile(ReleaseId releaseId, string filename)
+        {
+            return await CheckReleaseExistsStreamAsync(releaseId,
+                () => _fileStorageService.StreamFile(releaseId, ReleaseFileTypes.Data, filename));
+        }
+        
+        [HttpGet("release/{releaseId}/ancillary/{filename}")]
+        [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
+        public async Task<ActionResult> GetAncillaryFile(ReleaseId releaseId, string filename)
+        {
+            return await CheckReleaseExistsStreamAsync(releaseId,
+                () => _fileStorageService.StreamFile(releaseId, ReleaseFileTypes.Ancillary, filename));
+        }
+        
         // POST api/publication/{publicationId}/releases
         [HttpPost("publications/{publicationId}/releases")]
         [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
@@ -131,9 +156,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await CheckReleaseExistsAsync(releaseId, () =>
             {
                 // upload the files
-                var result = _fileStorageService.UploadDataFilesAsync(releaseId, file, metaFile, name)
+                var result = _fileStorageService.UploadDataFilesAsync(releaseId, file, metaFile, name);
                     // add message to queue to process these files
-                    .OnSuccess(() => _importService.Import(file.FileName, releaseId));
+                    // TODO: Disabled adding message to queue
+                    //.OnSuccess(() => _importService.Import(file.FileName, releaseId));
                 return result;
             });
         }
@@ -241,6 +267,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
             return Ok(result.Right);
         }
+        
+        private async Task<ActionResult> CheckReleaseExistsStreamAsync(ReleaseId releaseId,
+            Func<Task<Either<ValidationResult, FileStreamResult>>> andThen)
+        {
+            var release = await _releaseService.GetAsync(releaseId);
+            if (release == null)
+            {
+                return NotFound();
+            }
+
+            var result = await andThen.Invoke();
+            if (result.IsLeft)
+            {
+                ValidationUtils.AddErrors(ModelState, result.Left);
+                return ValidationProblem();
+            }
+
+            return result.Right;
+        }
+        
 
         private async Task<ActionResult> CheckPublicationExistsAsync<T>(PublicationId publicationId,
             Func<Task<Either<ValidationResult, T>>> andThen)
@@ -257,7 +303,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 ValidationUtils.AddErrors(ModelState, result.Left);
                 return ValidationProblem();
             }
-
+            
             return Ok(result.Right);
         }
     }

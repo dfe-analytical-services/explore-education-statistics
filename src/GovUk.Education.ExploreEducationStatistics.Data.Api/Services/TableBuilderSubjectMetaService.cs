@@ -4,19 +4,18 @@ using System.Linq;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta.TableBuilder;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
-    public class TableBuilderSubjectMetaService : ITableBuilderSubjectMetaService
+    public class TableBuilderSubjectMetaService : AbstractTableBuilderSubjectMetaService,
+        ITableBuilderSubjectMetaService
     {
-        private readonly IFilterItemService _filterItemService;
         private readonly IIndicatorGroupService _indicatorGroupService;
         private readonly ILocationService _locationService;
         private readonly IMapper _mapper;
@@ -24,16 +23,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private readonly ISubjectService _subjectService;
         private readonly ITimePeriodService _timePeriodService;
 
-        public TableBuilderSubjectMetaService(
-            IFilterItemService filterItemService,
+        public TableBuilderSubjectMetaService(IFilterItemService filterItemService,
             IIndicatorGroupService indicatorGroupService,
             ILocationService locationService,
             IMapper mapper,
             IObservationService observationService,
             ISubjectService subjectService,
-            ITimePeriodService timePeriodService)
+            ITimePeriodService timePeriodService) : base(filterItemService)
         {
-            _filterItemService = filterItemService;
             _indicatorGroupService = indicatorGroupService;
             _locationService = locationService;
             _mapper = mapper;
@@ -97,61 +94,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                     Options = _mapper.Map<IEnumerable<IndicatorMetaViewModel>>(group.Indicators)
                 }
             );
-        }
-
-        private Dictionary<string, TableBuilderFilterMetaViewModel> GetFilters(IQueryable<Observation> observations)
-        {
-            return _filterItemService.GetFilterItemsIncludingFilters(observations)
-                .GroupBy(item => item.FilterGroup.Filter)
-                .ToDictionary(
-                    itemsGroupedByFilter => itemsGroupedByFilter.Key.Label.PascalCase(),
-                    itemsGroupedByFilter => new TableBuilderFilterMetaViewModel
-                    {
-                        Hint = itemsGroupedByFilter.Key.Hint,
-                        Legend = itemsGroupedByFilter.Key.Label,
-                        Options = itemsGroupedByFilter.GroupBy(item => item.FilterGroup).ToDictionary(
-                            itemsGroupedByFilterGroup => itemsGroupedByFilterGroup.Key.Label.PascalCase(),
-                            itemsGroupedByFilterGroup =>
-                                new TableBuilderFilterItemMetaViewModel
-                                {
-                                    Label = itemsGroupedByFilterGroup.Key.Label,
-                                    Options = itemsGroupedByFilterGroup.Select(item => new LabelValue
-                                    {
-                                        Label = item.Label,
-                                        Value = item.Id.ToString()
-                                    })
-                                }),
-                        TotalValue = GetTotalValue(itemsGroupedByFilter)
-                    });
-        }
-
-        private static string GetTotalValue(IEnumerable<FilterItem> filterItems)
-        {
-            return GetTotalGroup(filterItems)?.FirstOrDefault(IsFilterItemTotal)?.Id.ToString() ?? string.Empty;
-        }
-
-        private static IEnumerable<FilterItem> GetTotalGroup(IEnumerable<FilterItem> filterItems)
-        {
-            var itemsGroupedByFilterGroup = filterItems.GroupBy(item => item.FilterGroup).ToList();
-            //Return the group if there is only one, otherwise the 'Total' group if it exists
-            return itemsGroupedByFilterGroup.Count == 1
-                ? itemsGroupedByFilterGroup.First()
-                : itemsGroupedByFilterGroup.FirstOrDefault(items => IsFilterGroupTotal(items.Key));
-        }
-
-        private static bool IsFilterItemTotal(FilterItem item)
-        {
-            return IsEqualToIgnoreCase(item.Label, "Total");
-        }
-
-        private static bool IsFilterGroupTotal(FilterGroup group)
-        {
-            return IsEqualToIgnoreCase(group.Label, "Total");
-        }
-
-        private static bool IsEqualToIgnoreCase(string value, string compareTo)
-        {
-            return value.Equals(compareTo, StringComparison.InvariantCultureIgnoreCase);
         }
     }
 }

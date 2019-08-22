@@ -223,6 +223,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     Id = new Guid("1821abb8-68b0-431b-9770-0bea65d02ff0"),
                     Title = "Ad Hoc"
+                },
+                new ReleaseType
+                {
+                    Id = new Guid("8becd272-1100-4e33-8a7d-1c0c4e3b42b8"),
+                    Title = "National Statistics"
                 });
 
             modelBuilder.Entity<Theme>().HasData(

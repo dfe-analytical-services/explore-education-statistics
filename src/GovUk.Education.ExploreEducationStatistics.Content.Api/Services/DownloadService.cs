@@ -50,8 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
                 .GroupBy(release => release.Publication.Topic.Theme)
                 .Select(grouping => grouping.Key);
 
-            var x = mapper.Map<IEnumerable<ThemeTree>>(themes);
-            return x;
+            return mapper.Map<IEnumerable<ThemeTree>>(themes);
         }
 
         private static Release GetLatestRelease(Publication publication)
