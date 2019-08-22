@@ -9,7 +9,7 @@ export interface ReleaseSummaryDetails {
   releaseName: string;
   typeId: string;
   publishScheduled: string;
-  nextReleaseDate: DayMonthYearValues;
+  nextReleaseDate?: DayMonthYearValues;
   status: 'Draft' | 'HigherLevelReview' | 'Live';
 }
 
