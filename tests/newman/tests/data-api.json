@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "04e407f6-583d-41f6-8e16-d39a7b277af6",
+		"_postman_id": "96b52e07-693c-4618-8081-cefc109859e6",
 		"name": "DfE Data API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -5197,7 +5197,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+												"id": "7be51e96-5401-48dc-986c-42c7ee78d7e5",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -5223,8 +5223,23 @@
 													"});",
 													"",
 													"pm.test(\"Number of metaData locations should be correct and to have associated geoJson data\", function () {",
-													"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(1);",
-													"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E06000001.geoJson\"));",
+													"    pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(1);",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E06000001.geoJson\"));",
+													"});",
+													"",
+													"pm.test(\"Number of boundaryLevels should be correct\", function () {",
+													"    var foundId8 = false;",
+													"    var foundId3 = false;",
+													"    for(var i = 0; i < respJson.metaData.boundaryLevels.length; i++) {",
+													"        if(respJson.metaData.boundaryLevels[i].id === 8) {",
+													"            foundId8 = true;",
+													"            pm.expect(respJson.metaData.boundaryLevels[i].label).to.equal(\"Local Authority Districts (April 2019) Boundaries UK BUC\");",
+													"        }",
+													"        if(respJson.metaData.boundaryLevels[i].id === 3) {",
+													"            foundId3 = true;",
+													"            pm.expect(respJson.metaData.boundaryLevels[i].label).to.equal(\"Local Authority Districts December 2017 Ultra Generalised Clipped Boundaries in United Kingdom WGS84\");",
+													"        }",
+													"    }",
 													"});",
 													"",
 													"pm.test(\"All results should have LA District name Hartlepool\", function () {",
@@ -5298,7 +5313,6 @@
 													"",
 													"pm.test(\"Number of metaData locations should be correct and not have associated geoJson data\", function () {",
 													"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(1);",
-													"   // boundaryLevel 1 only includes geoJson for countries",
 													"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E06000001\"));",
 													"   pm.expect(pm.response.to.not.have.jsonBody(\"metaData.locations.E06000001.geoJson\"));",
 													"});",
@@ -5448,7 +5462,6 @@
 													"",
 													"pm.test(\"Number of metaData locations should be correct and to have associated geoJson data\", function () {",
 													"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(1);",
-													"   // boundaryLevel 6 should only have geoJson data for regions",
 													"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E06000001\"));",
 													"   pm.expect(pm.response.to.not.have.jsonBody(\"metaData.locations.E06000001.geoJson\"));",
 													"});",
@@ -6105,9 +6118,19 @@
 					"name": "Permalink - Absence by characteristic - invalid permalinkId",
 					"event": [
 						{
+							"listen": "prerequest",
+							"script": {
+								"id": "022c9044-3a78-41f6-9476-916e5c92e4b6",
+								"exec": [
+									"postman.setNextRequest('Download - Absence by term');"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
 							"listen": "test",
 							"script": {
-								"id": "4305c315-122a-4d29-ace3-0af70e73d69a",
+								"id": "c80a67f6-be1b-4a79-89b6-f21275308965",
 								"exec": [
 									"// DFE-1330",
 									"/*",
@@ -6145,6 +6168,29 @@
 							"path": [
 								"permalink",
 								"5948f25b-25ae-488a-bf54-e8913e89de18"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Fasttrack",
+			"item": [
+				{
+					"name": "Fasttrack - Absence by characteristic - get fasttrack",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{data_api_url}}/fasttrack/a8f78ed9-3ec4-4816-ba1a-fd4d9167a82f",
+							"host": [
+								"{{data_api_url}}"
+							],
+							"path": [
+								"fasttrack",
+								"a8f78ed9-3ec4-4816-ba1a-fd4d9167a82f"
 							]
 						}
 					},
