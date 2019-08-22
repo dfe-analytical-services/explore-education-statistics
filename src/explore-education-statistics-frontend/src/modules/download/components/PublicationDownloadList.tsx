@@ -19,6 +19,23 @@ interface Props {
   publications: Publication[];
 }
 
+function getPublicationDate(path: string) {
+  const twoYearDateFormat = /.*\/([0-9]{4})-([0-9]{2})\/.*/;
+  const singleYearDateFormat = /.*\/([0-9]{4})\/.*/;
+
+  const twoYearDate = twoYearDateFormat.exec(path);
+  const singleYearDate = singleYearDateFormat.exec(path);
+
+  if (twoYearDate) {
+    return `, ${twoYearDate[1]}/${twoYearDate[2]}`;
+  }
+
+  if (singleYearDate) {
+    return `, ${singleYearDate[1]}`;
+  }
+  return '';
+}
+
 function PublicationList({ publications }: Props) {
   return (
     <>
@@ -34,7 +51,7 @@ function PublicationList({ publications }: Props) {
                     className="govuk-link"
                     data-testid={`download-stats-${path}`}
                   >
-                    {name}
+                    {`${name}${getPublicationDate(path)}`}
                   </Link>
                   {` (${extension}, ${size})`}
                 </li>

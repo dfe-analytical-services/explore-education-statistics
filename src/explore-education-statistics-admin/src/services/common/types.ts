@@ -1,6 +1,3 @@
-import { ReleaseApprovalStatus } from '@admin/services/dashboard/types';
-import { User } from '@admin/services/sign-in/types';
-
 export interface IdTitlePair {
   id: string;
   title: string;
@@ -8,6 +5,11 @@ export interface IdTitlePair {
 
 export interface IdLabelPair {
   id: string;
+  label: string;
+}
+
+export interface ValueLabelPair {
+  value: string;
   label: string;
 }
 
@@ -24,75 +26,13 @@ export interface UserDetails {
   name: string;
 }
 
-export interface Topic {
-  id: string;
-  title: string;
-  theme: IdTitlePair;
-}
-
-export interface TimePeriodCoverage {
-  label: string;
-  code: string;
-  startDate: Date;
-}
-
-export interface ReleaseStatus {
-  approvalStatus: ReleaseApprovalStatus;
-  isNew: boolean;
-  isLive: boolean;
-  isLatest: boolean;
-  lastEdited: Date;
-  lastEditor: User;
-  published: Date;
-  nextRelease: Date;
-}
-
-export interface ReleaseDataType {
-  id: string;
-  title: string;
-}
-
-export interface Comment {
-  id: string;
-  author: User;
-  datetime: Date;
-  content: string;
-}
-
-export interface Release {
-  id: string;
-  releaseName: string;
-  timePeriodCoverage: TimePeriodCoverage;
-  scheduledPublishDate: DayMonthYearValues;
-  nextReleaseDate: Date;
-  releaseType: IdTitlePair;
-  slug: string;
-  status: ReleaseStatus;
-  lead: ContactDetails;
-  dataType: ReleaseDataType;
-  comments: Comment[];
-}
-
-export interface LegacyRelease {
-  id: string;
-  description: string;
-  url: string;
-}
-
-export interface Publication {
-  id: string;
-  slug: string;
-  title: string;
-  description: string;
-  dataSource: string;
-  summary: string;
-  nextUpdate: string;
-  releases: Release[];
-  legacyReleases: LegacyRelease[];
-  topic: Topic;
-  contact: ContactDetails;
-  methodology: IdTitlePair;
-  owner: User;
+export interface TimePeriodCoverageGroup {
+  category: {
+    label: string;
+  };
+  timeIdentifiers: {
+    identifier: ValueLabelPair;
+  }[];
 }
 
 export interface BasicPublicationDetails {

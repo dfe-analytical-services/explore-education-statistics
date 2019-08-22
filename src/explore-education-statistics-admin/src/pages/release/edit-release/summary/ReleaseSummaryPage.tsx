@@ -1,14 +1,18 @@
 import Link from '@admin/components/Link';
-import DummyReferenceData from '@admin/pages/DummyReferenceData';
 import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
+import {
+  getSelectedReleaseType,
+  getSelectedTimePeriodCoverageLabel,
+} from '@admin/pages/release/util/releaseSummaryUtil';
 import { summaryEditRoute } from '@admin/routes/edit-release/routes';
 import commonService from '@admin/services/common/service';
 import {
   dayMonthYearIsComplete,
   dayMonthYearToDate,
   IdTitlePair,
+  TimePeriodCoverageGroup,
 } from '@admin/services/common/types';
 import service from '@admin/services/release/edit-release/summary/service';
 import { ReleaseSummaryDetails } from '@admin/services/release/types';
@@ -17,75 +21,78 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import React, { useContext, useEffect, useState } from 'react';
 
-const ReleaseSummaryPage = () => {
-  const [releaseSummaryDetails, setReleaseSummaryDetails] = useState<
-    ReleaseSummaryDetails
-  >();
+interface ReleaseSummaryModel {
+  releaseSummaryDetails: ReleaseSummaryDetails;
+  timePeriodCoverageGroups: TimePeriodCoverageGroup[];
+  releaseTypes: IdTitlePair[];
+}
 
-  const [releaseTypes, setReleaseTypes] = useState<IdTitlePair[]>();
+const ReleaseSummaryPage = () => {
+  const [model, setModel] = useState<ReleaseSummaryModel>();
 
   const { publication, releaseId } = useContext(
     ManageReleaseContext,
   ) as ManageRelease;
 
   useEffect(() => {
-    const releaseSummaryPromise = service.getReleaseSummaryDetails(releaseId);
-    const releaseTypesPromise = commonService.getReleaseTypes();
-    Promise.all([releaseSummaryPromise, releaseTypesPromise]).then(
-      ([releaseSummaryResult, releaseTypesResult]) => {
-        setReleaseSummaryDetails(releaseSummaryResult);
-        setReleaseTypes(releaseTypesResult);
+    Promise.all([
+      service.getReleaseSummaryDetails(releaseId),
+      commonService.getReleaseTypes(),
+      commonService.getTimePeriodCoverageGroups(),
+    ]).then(
+      ([releaseSummaryResult, releaseTypesResult, timePeriodGroupsResult]) => {
+        setModel({
+          releaseSummaryDetails: releaseSummaryResult,
+          timePeriodCoverageGroups: timePeriodGroupsResult,
+          releaseTypes: releaseTypesResult,
+        });
       },
     );
   }, [releaseId]);
-
-  const getSelectedTimePeriodCoverageLabel = (timePeriodCoverageCode: string) =>
-    DummyReferenceData.findTimePeriodCoverageOption(timePeriodCoverageCode)
-      .label;
-
-  const getSelectedReleaseType = (
-    releaseTypeId: string,
-    availableReleaseTypes: IdTitlePair[],
-  ) =>
-    availableReleaseTypes.find(type => type.id === releaseTypeId) ||
-    availableReleaseTypes[0];
 
   return (
     <>
       <h2 className="govuk-heading-m">Release summary</h2>
       <p>These details will be shown to users to help identify this release.</p>
-      {releaseSummaryDetails && releaseTypes && (
+      {model && (
         <SummaryList>
           <SummaryListItem term="Publication title">
             {publication.title}
           </SummaryListItem>
           <SummaryListItem term="Time period">
             {getSelectedTimePeriodCoverageLabel(
-              releaseSummaryDetails.timePeriodCoverage.value,
+              model.releaseSummaryDetails.timePeriodCoverage.value,
+              model.timePeriodCoverageGroups,
             )}
           </SummaryListItem>
           <SummaryListItem term="Release period">
-            <time>{releaseSummaryDetails.releaseName}</time> to{' '}
-            <time>{parseInt(releaseSummaryDetails.releaseName, 10) + 1}</time>
+            <time>{model.releaseSummaryDetails.releaseName}</time> to{' '}
+            <time>
+              {parseInt(model.releaseSummaryDetails.releaseName, 10) + 1}
+            </time>
           </SummaryListItem>
           <SummaryListItem term="Lead statistician">
             {publication.contact && publication.contact.contactName}
           </SummaryListItem>
           <SummaryListItem term="Scheduled release">
             <FormattedDate>
-              {new Date(releaseSummaryDetails.publishScheduled)}
+              {new Date(model.releaseSummaryDetails.publishScheduled)}
             </FormattedDate>
           </SummaryListItem>
           <SummaryListItem term="Next release expected">
-            {dayMonthYearIsComplete(releaseSummaryDetails.nextReleaseDate) && (
+            {dayMonthYearIsComplete(
+              model.releaseSummaryDetails.nextReleaseDate,
+            ) && (
               <FormattedDate>
-                {dayMonthYearToDate(releaseSummaryDetails.nextReleaseDate)}
+                {dayMonthYearToDate(
+                  model.releaseSummaryDetails.nextReleaseDate,
+                )}
               </FormattedDate>
             )}
           </SummaryListItem>
           <SummaryListItem term="Release type">
             {
-              getSelectedReleaseType(releaseSummaryDetails.typeId, releaseTypes)
+              getSelectedReleaseType(model.releaseSummaryDetails.typeId, model.releaseTypes)
                 .title
             }
           </SummaryListItem>
