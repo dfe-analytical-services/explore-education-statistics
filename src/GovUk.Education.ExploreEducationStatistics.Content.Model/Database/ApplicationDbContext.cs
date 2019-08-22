@@ -505,7 +505,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new Topic
                 {
                     Id = new Guid("e50ba9fd-9f19-458c-aceb-4422f0c7d1ba"),
-                    Title = "School and pupils numbers",
+                    Title = "School and pupil numbers",
                     Summary = "",
                     ThemeId = new Guid("ee1855ca-d1e1-4f04-a795-cbd61d326a1f"),
                     Slug = "school-and-pupil-numbers"
@@ -624,6 +624,70 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     TeamEmail = "teamshakes@gmail.com",
                     ContactName = "Simon Shakespeare",
                     ContactTelNo = "0114 262 1619"
+                },
+                new Contact
+                {
+                    Id = new Guid("58117de4-5951-48e4-8537-9f74967a6233"),
+                    TeamName = "Test Team",
+                    TeamEmail = "explore.statistics@education.gov.uk",
+                    ContactName = "Laura Selby",
+                    ContactTelNo = "07384237142"
+                },
+                new Contact
+                {
+                    Id = new Guid("72f846d7-1580-484e-b299-3ce13070f297"),
+                    TeamName = "Another Test Team",
+                    TeamEmail = "explore.statistics@education.gov.uk",
+                    ContactName = "John Shale",
+                    ContactTelNo = "07919937921"
+                },
+                new Contact
+                {
+                    Id = new Guid("32d61132-e4c0-442c-88f4-f879971eb699"),
+                    TeamName = "Explore Education Statistics",
+                    TeamEmail = "explore.statistics@education.gov.uk",
+                    ContactName = "Cameron Race",
+                    ContactTelNo = "07780991976"
+                },
+                new Contact
+                {
+                    Id = new Guid("d246c696-4b3a-4aeb-842c-c1318ee334e8"),
+                    TeamName = "School absence and exclusions team",
+                    TeamEmail = "schools.statistics@education.gov.uk",
+                    ContactName = "Mark Pearson",
+                    ContactTelNo = "01142742585"
+                },
+                new Contact
+                {
+                    Id = new Guid("74f5aade-6d24-4a0b-be23-2ab4b4b2d191"),
+                    TeamName = "School preference statistics team",
+                    TeamEmail = "school.preference@education.gov.uk",
+                    ContactName = "Helen Bray",
+                    ContactTelNo = "02077838553"
+                },
+                new Contact
+                {
+                    Id = new Guid("0b63e6c7-5a9d-4c48-b30f-f0729e0644c0"),
+                    TeamName = "Special educational needs statistics team",
+                    TeamEmail = "sen.statistics@education.gov.uk",
+                    ContactName = "Sean Gibson",
+                    ContactTelNo = "01325340987"
+                },
+                new Contact
+                {
+                    Id = new Guid("0d2ead36-3ebc-482f-a9c9-e17d746a0dd9"),
+                    TeamName = "Looked-after children statistics team",
+                    TeamEmail = "cla.stats@education.gov.uk",
+                    ContactName = "Justin Ushie",
+                    ContactTelNo = "01325340817"
+                },
+                new Contact
+                {
+                    Id = new Guid("18c9a473-465d-4b8a-b2cf-b24fd3b9c094"),
+                    TeamName = "Attainment statistics team",
+                    TeamEmail = "Attainment.STATISTICS@education.gov.uk",
+                    ContactName = "Raffaele Sasso",
+                    ContactTelNo = "07469413581"
                 }
             );
 
@@ -1017,7 +1081,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     NextUpdate = new DateTime(2019, 3, 22),
                     DataSource =
                         "[Pupil absence statistics: guide](https://www.gov.uk/government/publications/absence-statistics-guide#)",
-                    ContactId = new Guid("11bb7387-e85e-4571-9669-8a760dcb004f")
+                    ContactId = new Guid("d246c696-4b3a-4aeb-842c-c1318ee334e8")
                 },
                 new Publication
                 {
@@ -1378,8 +1442,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Published = new DateTime(2018, 3, 22),
                     Slug = "2016-17",
                     Summary =
-                        "Read national statistical summaries, view charts and tables and download data files.\n\n" +
-                        "Find out how and why these statistics are collected and published - [Pupil absence statistics: methodology](../methodology/pupil-absence-in-schools-in-england).",
+                        "Read national statistical summaries, view charts and tables and download data files.",
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
                     KeyStatistics = new DataBlock
@@ -2010,8 +2073,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Published = new DateTime(2018, 7, 19),
                     Slug = "2016-17",
                     Summary =
-                        "Read national statistical summaries, view charts and tables and download data files.\n\n" +
-                        "Find out how and why these statistics are collected and published - [Permanent and fixed-period exclusion statistics: methodology](../methodology/permanent-and-fixed-period-exclusions-in-england)",
+                        "Read national statistical summaries, view charts and tables and download data files.",
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
                     KeyStatistics = new DataBlock
@@ -2507,8 +2569,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Published = new DateTime(2018, 6, 14),
                     Slug = "2018",
                     Summary =
-                        "Read national statistical summaries, view charts and tables and download data files.\n\n" +
-                        "Find out how and why these statistics are collected and published - [Secondary and primary school applications and offers: methodology](../methodology/secondary-and-primary-schools-applications-and-offers)",
+                        "Read national statistical summaries, view charts and tables and download data files.",
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
                     KeyStatistics = new DataBlock
@@ -3394,7 +3455,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new ContentSection
                         {
-                            Heading = "1 Overview of exclusion statistics",
+                            Heading = "1. Overview of exclusion statistics",
                             Caption = "",
                             Order = 1,
                             Content = new List<IContentBlock>
