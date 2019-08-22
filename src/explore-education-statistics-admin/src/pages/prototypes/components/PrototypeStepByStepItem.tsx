@@ -23,7 +23,10 @@ const StepByStepItem = ({ children, stepHeading, stepNumber, open }: Props) => {
             <a
               href="#"
               className={styles.toggleLink}
-              onClick={() => setViewStep(true)}
+              onClick={event => {
+                event.preventDefault();
+                setViewStep(true);
+              }}
             >
               <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
                 {stepHeading}
@@ -37,7 +40,10 @@ const StepByStepItem = ({ children, stepHeading, stepNumber, open }: Props) => {
             <a
               href="#"
               className={styles.toggleLink}
-              onClick={() => setViewStep(false)}
+              onClick={event => {
+                event.preventDefault();
+                setViewStep(false);
+              }}
             >
               <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
                 {stepHeading}
