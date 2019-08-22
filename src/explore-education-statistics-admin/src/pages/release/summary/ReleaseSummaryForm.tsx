@@ -20,8 +20,8 @@ import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { SelectOption } from '@common/components/form/FormSelect';
 import handleServerSideValidation, {
   errorCodeAndFieldNameToFieldError,
-  errorCodeToFieldError
-} from "@common/components/form/util/serverValidationHandler";
+  errorCodeToFieldError,
+} from '@common/components/form/util/serverValidationHandler';
 import Yup from '@common/lib/validation/yup';
 import { Dictionary } from '@common/types';
 import { FormikProps } from 'formik';
@@ -65,7 +65,7 @@ const serverSideValidationHandler = handleServerSideValidation(
     'NextReleaseDate',
     'nextReleaseDate',
     'Enter a valid date',
-  )
+  ),
 );
 
 const ReleaseSummaryForm = <FormValues extends EditFormValues>({
