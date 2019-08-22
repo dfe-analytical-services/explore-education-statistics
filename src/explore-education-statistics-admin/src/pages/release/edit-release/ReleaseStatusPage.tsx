@@ -4,7 +4,7 @@ import dashboardRoutes from "@admin/routes/dashboard/routes";
 import service from '@admin/services/release/edit-release/status/service';
 import Button from "@common/components/Button";
 import {Form, FormFieldRadioGroup, Formik} from "@common/components/form";
-import FormFieldTextInput from "@common/components/form/FormFieldTextInput";
+import FormFieldTextArea from "@common/components/form/FormFieldTextArea";
 import Yup from "@common/lib/validation/yup";
 import {FormikProps} from "formik";
 import React, {useContext, useEffect, useState} from 'react';
@@ -68,10 +68,12 @@ const ReleaseStatusPage = ({history}: RouteComponentProps) => {
                     },
                   ]}
                 />
-                <FormFieldTextInput
+                <FormFieldTextArea
                   name='releaseNotes'
                   id={`${formId}-releaseNotes`}
                   label='Release notes'
+                  rows={2}
+                  additionalClass='govuk-!-width-one-half'
                 />
                 <Button type="submit" className="govuk-!-margin-top-6">
                   Update

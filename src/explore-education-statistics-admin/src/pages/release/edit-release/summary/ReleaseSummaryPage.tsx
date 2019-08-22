@@ -43,12 +43,12 @@ const ReleaseSummaryPage = () => {
     DummyReferenceData.findTimePeriodCoverageOption(timePeriodCoverageCode)
       .label;
 
-  const getSelectedReleaseTypeTitle = (
+  const getSelectedReleaseType = (
     releaseTypeId: string,
     availableReleaseTypes: IdTitlePair[],
   ) =>
-    availableReleaseTypes.find(type => type.title === releaseTypeId) ||
-    availableReleaseTypes[0].title;
+    availableReleaseTypes.find(type => type.id === releaseTypeId) ||
+    availableReleaseTypes[0];
 
   return (
     <>
@@ -84,10 +84,10 @@ const ReleaseSummaryPage = () => {
             )}
           </SummaryListItem>
           <SummaryListItem term="Release type">
-            {getSelectedReleaseTypeTitle(
-              releaseSummaryDetails.id,
+            {getSelectedReleaseType(
+              releaseSummaryDetails.typeId,
               releaseTypes,
-            )}
+            ).title}
           </SummaryListItem>
           <SummaryListItem
             term=""

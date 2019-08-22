@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190821222013_ReleaseStatus")]
+    [Migration("20190822084439_AddReleaseStatus")]
     partial class AddReleaseStatus
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -954,7 +954,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
 
                     b.Property<string>("Slug");
 
-                    b.Property<int>("Status");
+                    b.Property<string>("Status")
+                        .IsRequired();
 
                     b.Property<string>("Summary");
 
@@ -983,7 +984,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                             Published = new DateTime(2018, 3, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ReleaseName = "2016",
                             Slug = "2016-17",
-                            Status = 0,
+                            Status = "Draft",
                             Summary = @"Read national statistical summaries, view charts and tables and download data files.
 
 Find out how and why these statistics are collected and published - [Pupil absence statistics: methodology](../methodology/pupil-absence-in-schools-in-england).",
@@ -1000,7 +1001,7 @@ Find out how and why these statistics are collected and published - [Pupil absen
                             Published = new DateTime(2016, 3, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ReleaseName = "2015",
                             Slug = "2015-16",
-                            Status = 0,
+                            Status = "Draft",
                             Summary = "Read national statistical summaries and definitions, view charts and tables and download data files across a range of pupil absence subject areas.",
                             TimePeriodCoverage = "AY",
                             TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c")
@@ -1015,7 +1016,7 @@ Find out how and why these statistics are collected and published - [Pupil absen
                             Published = new DateTime(2018, 7, 19, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ReleaseName = "2016",
                             Slug = "2016-17",
-                            Status = 0,
+                            Status = "Draft",
                             Summary = @"Read national statistical summaries, view charts and tables and download data files.
 
 Find out how and why these statistics are collected and published - [Permanent and fixed-period exclusion statistics: methodology](../methodology/permanent-and-fixed-period-exclusions-in-england)",
@@ -1032,7 +1033,7 @@ Find out how and why these statistics are collected and published - [Permanent a
                             Published = new DateTime(2018, 6, 14, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ReleaseName = "2018",
                             Slug = "2018",
-                            Status = 0,
+                            Status = "Draft",
                             Summary = @"Read national statistical summaries, view charts and tables and download data files.
 
 Find out how and why these statistics are collected and published - [Secondary and primary school applications and offers: methodology](../methodology/secondary-and-primary-schools-applications-and-offers)",
@@ -1063,6 +1064,11 @@ Find out how and why these statistics are collected and published - [Secondary a
                         {
                             Id = new Guid("1821abb8-68b0-431b-9770-0bea65d02ff0"),
                             Title = "Ad Hoc"
+                        },
+                        new
+                        {
+                            Id = new Guid("8becd272-1100-4e33-8a7d-1c0c4e3b42b8"),
+                            Title = "National Statistics"
                         });
                 });
 

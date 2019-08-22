@@ -5,6 +5,7 @@ using System.Text;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Converters;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Newtonsoft.Json;
 
 // ReSharper disable StringLiteralTypo
@@ -212,6 +213,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<DataBlock>(v));
+            
+            modelBuilder.Entity<Release>()
+                .Property(b => b.Status)
+                .HasConversion(new EnumToStringConverter<ReleaseStatus>());
 
             modelBuilder.Entity<ReleaseType>().HasData(
                 new ReleaseType
