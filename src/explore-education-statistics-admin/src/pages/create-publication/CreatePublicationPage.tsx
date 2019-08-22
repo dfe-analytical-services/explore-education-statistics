@@ -1,9 +1,22 @@
+import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
-import CreatePublicationForm from '@admin/pages/create-publication/CreatePublicationForm';
-import CreatePublicationSummary from '@admin/pages/create-publication/CreatePublicationSummary';
 import dashboardRoutes from '@admin/routes/dashboard/routes';
 import { ContactDetails, IdTitlePair } from '@admin/services/common/types';
 import service from '@admin/services/edit-publication/service';
+import Button from '@common/components/Button';
+import { FormFieldset, Formik } from '@common/components/form';
+import Form from '@common/components/form/Form';
+import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
+import FormFieldSelect from '@common/components/form/FormFieldSelect';
+import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
+import handleServerSideValidation, {
+  errorCodeToFieldError,
+} from '@common/components/form/util/serverValidationHandler';
+import SummaryList from '@common/components/SummaryList';
+import SummaryListItem from '@common/components/SummaryListItem';
+import Yup from '@common/lib/validation/yup';
+import { FormikProps } from 'formik';
+import orderBy from 'lodash/orderBy';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 
@@ -18,49 +31,60 @@ interface FormValues {
   selectedContactId: string;
 }
 
+const serverSideValidationHandler = handleServerSideValidation(
+  errorCodeToFieldError(
+    'SLUG_NOT_UNIQUE',
+    'publicationTitle',
+    'Choose a unique title',
+  ),
+);
+
+interface CreatePublicationModel {
+  methodologies: IdTitlePair[];
+  contacts: ContactDetails[];
+}
+
 const CreatePublicationPage = ({
   match,
   history,
 }: RouteComponentProps<MatchProps>) => {
   const { topicId } = match.params;
 
-  const [methodologies, setMethodologies] = useState<IdTitlePair[]>();
-  const [contacts, setContacts] = useState<ContactDetails[]>();
-  const [confirmationView, setConfirmationView] = useState(false);
-  const [currentValues, setCurrentValues] = useState<FormValues>();
+  const [model, setModel] = useState<CreatePublicationModel>();
 
   useEffect(() => {
-    const methodologyPromise = service.getMethodologies();
-    const contactsPromise = service.getPublicationAndReleaseContacts();
-    Promise.all([methodologyPromise, contactsPromise]).then(
-      ([methodologiesResult, contactsResult]) => {
-        setMethodologies(methodologiesResult);
-        setContacts(contactsResult);
-      },
-    );
+    Promise.all([
+      service.getMethodologies(),
+      service.getPublicationAndReleaseContacts(),
+    ]).then(([methodologies, contacts]) => {
+      setModel({
+        methodologies,
+        contacts,
+      });
+    });
   }, []);
 
-  const submitFormHandler = (values: FormValues) => {
-    setCurrentValues(values);
-    setConfirmationView(true);
-  };
+  const submitFormHandler = async (values: FormValues) => {
+    await service.createPublication({
+      topicId,
+      ...values,
+    });
 
-  const editHandler = () => {
-    setConfirmationView(false);
-  };
-
-  const confirmHandler = (values: FormValues) => {
-    service
-      .createPublication({
-        topicId,
-        ...values,
-      })
-      .then(() => history.push(dashboardRoutes.adminDashboard));
+    history.push(dashboardRoutes.adminDashboard);
   };
 
   const cancelHandler = () => {
     history.push(dashboardRoutes.adminDashboard);
   };
+
+  const getSelectedContact = (
+    contactId: string,
+    availableContacts: ContactDetails[],
+  ) =>
+    availableContacts.find(contact => contact.id === contactId) ||
+    availableContacts[0];
+
+  const formId = 'createPublicationForm';
 
   return (
     <Page
@@ -72,26 +96,121 @@ const CreatePublicationPage = ({
       ]}
     >
       <h1 className="govuk-heading-l">Create new publication</h1>
-      {contacts &&
-        methodologies &&
-        (confirmationView && currentValues ? (
-          <CreatePublicationSummary
-            contacts={contacts}
-            methodologies={methodologies}
-            values={currentValues}
-            onEditHandler={editHandler}
-            onConfirmHandler={confirmHandler}
-            onCancelHandler={cancelHandler}
-          />
-        ) : (
-          <CreatePublicationForm
-            contacts={contacts}
-            methodologies={methodologies}
-            currentValues={currentValues}
-            onSubmitHandler={submitFormHandler}
-            onCancelHandler={cancelHandler}
-          />
-        ))}
+      {model && (
+        <Formik<FormValues>
+          enableReinitialize
+          initialValues={{
+            publicationTitle: '',
+            selectedContactId: orderBy(
+              model.contacts,
+              contact => contact.contactName,
+            )[0].id,
+            methodologyChoice: undefined,
+            selectedMethodologyId: orderBy(
+              model.methodologies,
+              methodology => methodology.title,
+            )[0].id,
+          }}
+          validationSchema={Yup.object<FormValues>({
+            publicationTitle: Yup.string().required(
+              'Enter a publication title',
+            ),
+            selectedContactId: Yup.string().required(
+              'Choose a publication and release contact',
+            ),
+            methodologyChoice: Yup.mixed().required('Choose a methodology'),
+            selectedMethodologyId: Yup.string().when('methodologyChoice', {
+              is: 'existing',
+              then: Yup.string().required('Choose a methodology'),
+              otherwise: Yup.string(),
+            }),
+          })}
+          onSubmit={submitFormHandler}
+          render={(form: FormikProps<FormValues>) => {
+            return (
+              <Form
+                id={formId}
+                submitValidationHandler={serverSideValidationHandler}
+              >
+                <FormFieldTextInput
+                  id={`${formId}-publicationTitle`}
+                  label="Enter publication title"
+                  name="publicationTitle"
+                />
+                <FormFieldRadioGroup
+                  id={`${formId}-methodologyChoice`}
+                  legend="Choose a methodology for this publication"
+                  name="methodologyChoice"
+                  options={[
+                    {
+                      value: 'existing',
+                      label: 'Add existing methodology',
+                    },
+                    {
+                      value: 'new',
+                      label: 'Create new methodology',
+                    },
+                  ]}
+                />
+                {form.values.methodologyChoice === 'existing' && (
+                  <FormFieldSelect
+                    id={`${formId}-selectedMethodologyId`}
+                    name="selectedMethodologyId"
+                    label="Select methodology"
+                    options={model.methodologies.map(methodology => ({
+                      label: methodology.title,
+                      value: methodology.id,
+                    }))}
+                  />
+                )}
+                <FormFieldset
+                  id={`${formId}-selectedContactIdFieldset`}
+                  legend="Choose the contact for this publication"
+                  hint="They will be the main point of contact for data and methodology enquiries for this publication and its releases."
+                >
+                  <FormFieldSelect
+                    id={`${formId}-selectedContactId`}
+                    label="Publication and release contact"
+                    name="selectedContactId"
+                    options={model.contacts.map(contact => ({
+                      label: contact.contactName,
+                      value: contact.id,
+                    }))}
+                  />
+                </FormFieldset>
+                {form.values.selectedContactId && (
+                  <SummaryList>
+                    <SummaryListItem term="Email">
+                      {
+                        getSelectedContact(
+                          form.values.selectedContactId,
+                          model.contacts,
+                        ).teamEmail
+                      }
+                    </SummaryListItem>
+                    <SummaryListItem term="Telephone">
+                      {
+                        getSelectedContact(
+                          form.values.selectedContactId,
+                          model.contacts,
+                        ).contactTelNo
+                      }
+                    </SummaryListItem>
+                  </SummaryList>
+                )}
+                <Button type="submit" className="govuk-!-margin-top-6">
+                  Create publication
+                </Button>
+                <div className="govuk-!-margin-top-6">
+                  <Link to="#" onClick={cancelHandler}>
+                    Cancel publication
+                  </Link>
+                </div>
+              </Form>
+            );
+          }}
+        />
+      )}
     </Page>
   );
 };

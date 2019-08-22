@@ -1,4 +1,22 @@
 {
   "version": "2.0",
-  "functionTimeout": "04:00:00"
+  "functionTimeout": "04:00:00",
+  "logging": {
+    "logLevel": {
+      "default": "None",
+      "Function.ProcessUploads": "Information",
+      "Function.ProcessUploadsSequentially": "Information",
+      "Function.ImportObservations": "Information",
+      "GovUk.Education.ExploreEducationStatistics.Data.Importer": "Debug",
+      "GovUk.Education.ExploreEducationStatistics.Data.Processor": "Information",
+      "Microsoft": "Warning",
+      "Microsoft.EntityFrameworkCore.Database.Command": "Warning"
+    }
+  },
+  "extensions": {
+    "queues": {
+      "batchSize": 6,
+      "maxDequeueCount": 3
+    }
+  }
 }

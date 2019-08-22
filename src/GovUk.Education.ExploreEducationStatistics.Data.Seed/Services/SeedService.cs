@@ -1,27 +1,42 @@
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using System.IO;
+using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Seed.Extensions;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Internal;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Queue;
+using Newtonsoft.Json;
+using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
 {
     public class SeedService : ISeedService
     {
         private readonly ILogger _logger;
-        private readonly ApplicationDbContext _context;
-        private readonly IImporterService _importerService;
+        private readonly IMapper _mapper;
+        private readonly string _storageConnectionString;
+        private readonly IFileStorageService _fileStorageService;
 
-        public SeedService(ILogger<SeedService> logger,
-            ApplicationDbContext context,
-            IImporterService importerService)
+        private readonly List<ImportMessage> messages = new List<ImportMessage>();
+
+        private const bool PROCESS_SEQUENTIALLY = true;
+
+        public SeedService(
+            ILogger<SeedService> logger,
+            IMapper mapper,
+            IConfiguration config,
+            IFileStorageService fileStorageService)
         {
             _logger = logger;
-            _context = context;
-            _importerService = importerService;
+            _mapper = mapper;
+            _storageConnectionString = config.GetConnectionString("CoreStorage");
+            _fileStorageService = fileStorageService;
         }
 
         public void Seed()
@@ -31,45 +46,103 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
             var stopWatch = new Stopwatch();
             stopWatch.Start();
 
-            try
+            var subjects = SamplePublications.GetSubjects();
+            foreach (var subject in subjects)
             {
-                _context.ChangeTracker.AutoDetectChangesEnabled = false;
-
-                foreach (var theme in SamplePublications.Themes)
-                {
-                    _logger.LogInformation("Updating Theme {Theme}", theme.Title);
-                    var updated = _context.Theme.Update(theme).Entity;
-                    _context.SaveChanges();
-
-                    var subjects = updated.Topics
-                        .SelectMany(topic => topic.Publications)
-                        .SelectMany(publication => publication.Releases)
-                        .SelectMany(release => release.Subjects);
-
-                    Seed(subjects);
-                }
-            }
-            finally
-            {
-                _context.ChangeTracker.AutoDetectChangesEnabled = true;
+                _logger.LogInformation($"Processing subject {subject.Id}");
+                var file = SamplePublications.SubjectFiles[subject.Id];
+                StoreFiles(subject.Release, file, subject.Name);
+                Seed(file + ".csv", subject.Release, subjects.Count);
             }
 
             stopWatch.Stop();
-            _logger.LogInformation("Seeding completed with duration {duration} ", stopWatch.Elapsed.ToString());
+            _logger.LogInformation("All import messages queued. Completed with duration {duration} ",
+                stopWatch.Elapsed.ToString());
         }
 
-        private void Seed(IEnumerable<Subject> subjects)
+        private void Seed(string dataFileName, Release release, int maxCount)
         {
-            foreach (var subject in subjects)
+            var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
+            var client = storageAccount.CreateCloudQueueClient();
+
+            var aQueue = client.GetQueueReference("imports-available");
+            aQueue.CreateIfNotExists();
+
+            if (PROCESS_SEQUENTIALLY)
             {
-                var file = SamplePublications.SubjectFiles.GetValueOrDefault(subject.Id);
-                _logger.LogInformation("Seeding Subject {Subject}", subject.Name);
+                var importMessageRelease = _mapper.Map<Processor.Model.Release>(release);
+                messages.Add(new ImportMessage
+                {
+                    DataFileName = dataFileName,
+                    Release = importMessageRelease,
+                    BatchNo = 1,
+                    BatchSize = 1
+                });
 
-                var lines = file.GetCsvLines();
-                var metaLines = file.GetMetaCsvLines();
-
-                _importerService.Import(lines, metaLines, subject);
+                var last = messages.Count == maxCount;
+                if (last)
+                {
+                    var sQueue = client.GetQueueReference("imports-pending-sequential");
+                    sQueue.CreateIfNotExists();
+                    _logger.LogInformation("Adding {count} queue messages", messages.Count);
+                    sQueue.AddMessage(new CloudQueueMessage(JsonConvert.SerializeObject(messages)));
+                }
             }
+            else
+            {
+                var pQueue = client.GetQueueReference("imports-pending");
+
+                pQueue.CreateIfNotExists();
+
+                var cloudMessage = BuildCloudMessage(dataFileName, release);
+
+                _logger.LogInformation("Adding queue message for file \"{dataFileName}\"", dataFileName);
+
+                pQueue.AddMessage(cloudMessage);
+            }
+        }
+
+        private CloudQueueMessage BuildCloudMessage(string dataFileName, Release release)
+        {
+            var importMessageRelease = _mapper.Map<Processor.Model.Release>(release);
+            var message = new ImportMessage
+            {
+                DataFileName = dataFileName,
+                Release = importMessageRelease,
+                BatchNo = 1,
+                BatchSize = 1
+            };
+
+            return new CloudQueueMessage(JsonConvert.SerializeObject(message));
+        }
+
+        private void StoreFiles(Release release, DataCsvFile file, string subjectName)
+        {
+            var dataFile = CreateFormFile(file.GetCsvLines(), file + ".csv", "file");
+            var metaFile = CreateFormFile(file.GetMetaCsvLines(), file + ".meta.csv", "metaFile");
+
+            _logger.LogInformation("Uploading files for \"{subjectName}\"", subjectName);
+            var result = _fileStorageService.UploadDataFilesAsync(release.Id, dataFile, metaFile, subjectName).Result;
+        }
+
+        private static IFormFile CreateFormFile(IEnumerable<string> lines, string fileName, string name)
+        {
+            var mStream = new MemoryStream();
+            var writer = new StreamWriter(mStream);
+
+            foreach (var line in lines)
+            {
+                writer.WriteLine(line);
+                writer.Flush();
+            }
+
+            var f = new FormFile(mStream, 0, mStream.Length, name,
+                fileName)
+            {
+                Headers = new HeaderDictionary(),
+                ContentType = "text/csv"
+            };
+            return f;
         }
     }
 }

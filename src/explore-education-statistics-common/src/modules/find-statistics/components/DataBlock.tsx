@@ -41,6 +41,9 @@ export interface DataBlockProps {
   additionalTabContent?: ReactNode;
 
   onToggle?: (section: { id: string; title: string }) => void;
+
+  dataBlockResponse?: DataBlockResponse;
+
   onSummaryDetailsToggle?: (
     isOpened: boolean,
     event: MouseEvent<HTMLElement>,
@@ -77,7 +80,10 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
 
       this.parseDataResponse(result);
     } else {
-      // this.parseDataResponse(data, meta);
+      const { dataBlockResponse } = this.props;
+      if (dataBlockResponse) {
+        this.parseDataResponse(dataBlockResponse);
+      }
     }
   }
 

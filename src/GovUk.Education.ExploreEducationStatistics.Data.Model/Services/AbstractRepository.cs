@@ -40,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             return DbSet().Count(expression);
         }
 
-        public IEnumerable<TEntity> All(List<Expression<Func<TEntity, object>>> include = null)
+        public IQueryable<TEntity> All(List<Expression<Func<TEntity, object>>> include = null)
         {
             var queryable = DbSet().AsQueryable();
             include?.ForEach(i => queryable = queryable.Include(i));
@@ -61,12 +61,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             return DbSet().Find(id);
         }
 
-        public IEnumerable<TEntity> Find(TKey[] ids)
+        public IQueryable<TEntity> Find(TKey[] ids)
         {
             return DbSet().FindAll(_context, ids.Cast<object>().ToArray());
         }
 
-        public IEnumerable<TEntity> FindMany(Expression<Func<TEntity, bool>> expression,
+        public IQueryable<TEntity> FindMany(Expression<Func<TEntity, bool>> expression,
             List<Expression<Func<TEntity, object>>> include = null)
         {
             var queryable = DbSet().Where(expression);
@@ -87,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .Select(expression)
                 .FirstOrDefault();
         }
-        
+
         protected static SqlParameter CreateIdListType(string parameterName, IEnumerable<long> values)
         {
             return CreateListType(parameterName, values.AsIdListTable(), "dbo.IdListIntegerType");
@@ -97,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         {
             return CreateListType(parameterName, values.AsIdListTable(), "dbo.IdListVarcharType");
         }
-        
+
         protected static SqlParameter CreateListType(string parameterName, object value, string typeName)
         {
             return new SqlParameter(parameterName, value)

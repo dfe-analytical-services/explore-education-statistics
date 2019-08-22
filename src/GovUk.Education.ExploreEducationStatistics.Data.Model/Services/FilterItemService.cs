@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -16,18 +15,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         {
         }
 
-        public IEnumerable<FilterItem> GetFilterItems(Expression<Func<Observation, bool>> observationPredicate)
+        public IEnumerable<FilterItem> GetFilterItems(IQueryable<Observation> observations)
         {
-            var filterItemIds = (from ofi in _context.Set<ObservationFilterItem>()
-                join
-                    o in _context.Observation.Where(observationPredicate) 
-                    on ofi.ObservationId equals o.Id
-                select ofi.FilterItemId).Distinct().ToList();
+            return observations.SelectMany(observation => observation.FilterItems)
+                .Select(item => item.FilterItem).Distinct();
+        }
 
-            return DbSet()
-                .AsNoTracking()
-                .Where(item => filterItemIds.Contains(item.Id))
+        public IEnumerable<FilterItem> GetFilterItemsIncludingFilters(IQueryable<Observation> observations)
+        {
+            return observations.SelectMany(observation => observation.FilterItems)
+                .Select(item => item.FilterItem)
+                .Distinct()
                 .Include(item => item.FilterGroup.Filter);
+        }
+
+        public FilterItem GetTotal(IEnumerable<FilterItem> filterItems)
+        {
+            return GetTotalGroup(filterItems)?.FirstOrDefault(IsFilterItemTotal);
+        }
+
+        private static IEnumerable<FilterItem> GetTotalGroup(IEnumerable<FilterItem> filterItems)
+        {
+            var itemsGroupedByFilterGroup = filterItems.GroupBy(item => item.FilterGroup).ToList();
+            //Return the group if there is only one, otherwise the 'Total' group if it exists
+            return itemsGroupedByFilterGroup.Count == 1
+                ? itemsGroupedByFilterGroup.First()
+                : itemsGroupedByFilterGroup.FirstOrDefault(items => IsFilterGroupTotal(items.Key));
+        }
+
+        private static bool IsFilterItemTotal(FilterItem item)
+        {
+            return IsEqualToIgnoreCase(item.Label, "Total");
+        }
+
+        private static bool IsFilterGroupTotal(FilterGroup group)
+        {
+            return IsEqualToIgnoreCase(group.Label, "Total");
+        }
+
+        private static bool IsEqualToIgnoreCase(string value, string compareTo)
+        {
+            return value.Equals(compareTo, StringComparison.InvariantCultureIgnoreCase);
         }
     }
 }
