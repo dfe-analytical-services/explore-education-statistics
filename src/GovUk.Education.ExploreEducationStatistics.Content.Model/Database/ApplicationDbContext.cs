@@ -1081,7 +1081,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     NextUpdate = new DateTime(2019, 3, 22),
                     DataSource =
                         "[Pupil absence statistics: guide](https://www.gov.uk/government/publications/absence-statistics-guide#)",
-                    ContactId = new Guid("11bb7387-e85e-4571-9669-8a760dcb004f")
+                    ContactId = new Guid("d246c696-4b3a-4aeb-842c-c1318ee334e8")
                 },
                 new Publication
                 {
