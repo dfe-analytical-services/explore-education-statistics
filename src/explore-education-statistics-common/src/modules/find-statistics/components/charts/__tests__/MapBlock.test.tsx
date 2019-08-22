@@ -89,15 +89,15 @@ describe('MapBlock', () => {
     expect(select).toBeVisible();
 
     if (select) {
-      expect(select.querySelector('option[value="2"]')).toHaveTextContent(
-        'Authorised absence rate',
-      );
-      expect(select.querySelector('option[value="1"]')).toHaveTextContent(
-        'Overall absence rate',
-      );
-      expect(select.querySelector('option[value="0"]')).toHaveTextContent(
-        'Unauthorised absence rate',
-      );
+      expect(
+        select.querySelector('option[value="28_1_2_____"]'),
+      ).toHaveTextContent('Authorised absence rate');
+      expect(
+        select.querySelector('option[value="26_1_2_____"]'),
+      ).toHaveTextContent('Overall absence rate');
+      expect(
+        select.querySelector('option[value="23_1_2_____"]'),
+      ).toHaveTextContent('Unauthorised absence rate');
     }
   });
 
@@ -127,12 +127,12 @@ describe('MapBlock', () => {
     expect(select).toBeVisible();
 
     if (select) {
-      expect(select.querySelector('option[value="1"]')).toHaveTextContent(
-        'Overall absence rate',
-      );
-      expect(select.querySelector('option[value="0"]')).toHaveTextContent(
-        'Unauthorised absence rate',
-      );
+      expect(
+        select.querySelector('option[value="26_1_2_____"]'),
+      ).toHaveTextContent('Overall absence rate');
+      expect(
+        select.querySelector('option[value="23_1_2_____"]'),
+      ).toHaveTextContent('Unauthorised absence rate');
     }
   });
 });

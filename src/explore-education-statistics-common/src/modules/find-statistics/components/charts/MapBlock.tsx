@@ -274,7 +274,7 @@ function generateDataOptions(
   labels: Dictionary<DataSetConfiguration>,
   groupBy?: AxisGroupBy,
 ) {
-  return dataSets.map((dataSet, index) => {
+  return dataSets.map(dataSet => {
     const dataKey = generateKeyFromDataSet(dataSet, groupBy);
     return { ...labels[dataKey], value: dataKey };
   });
@@ -296,7 +296,9 @@ const MapBlock = ({
   const container = React.createRef<HTMLDivElement>();
   const ukRef = React.createRef<GeoJSON>();
 
-  const [geometry, setGeometry] = React.useState<FeatureCollection<Geometry, DataBlockGeoJsonProperties>>();
+  const [geometry, setGeometry] = React.useState<
+    FeatureCollection<Geometry, DataBlockGeoJsonProperties>
+  >();
 
   const [ukGeometry, setUkGeometry] = React.useState<FeatureCollection>();
 
@@ -308,9 +310,7 @@ const MapBlock = ({
 
   const [legend, setLegend] = React.useState<LegendEntry[]>([]);
 
-  const [selectedDataSetKey, setSelectedDataSetKey] = React.useState<string>(
-    generateKeyFromDataSet(axes.major.dataSets[0], axes.major.groupBy),
-  );
+  const [selectedDataSetKey, setSelectedDataSetKey] = React.useState<string>();
 
   const [selectedLocation, setSelectedLocation] = React.useState<string>('');
 
@@ -323,10 +323,10 @@ const MapBlock = ({
     import('@common/services/UKGeoJson').then(imported => {
       setUkGeometry(imported.default);
     });
-  }, [container]);
+  }, []);
 
   // resize handler
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     if (container.current) {
       intersectionObserver.current = registerResizingCheck(
         container.current,
@@ -363,13 +363,18 @@ const MapBlock = ({
     setChartData(generatedChartData);
 
     setMajorOptions(getLocationsForDataSet(data, meta, generatedChartData));
-
-    if (labels[selectedDataSetKey] === undefined) {
-      const newKey = generateKeyFromDataSet(axes.major.dataSets[0], axes.major.groupBy);
-      setSelectedDataSetKey(newKey);
-    }
-
   }, [data, axes.major, meta, labels]);
+
+  React.useEffect(() => {
+    if (
+      selectedDataSetKey === undefined ||
+      labels[selectedDataSetKey] === undefined
+    ) {
+      setSelectedDataSetKey(
+        generateKeyFromDataSet(axes.major.dataSets[0], axes.major.groupBy),
+      );
+    }
+  }, [axes.major.dataSets, axes.major.groupBy, labels, selectedDataSetKey]);
 
   // update settings for the data sets
   React.useEffect(() => {
@@ -383,12 +388,12 @@ const MapBlock = ({
     if (mapRef.current) {
       mapRef.current.leafletElement.invalidateSize();
     }
-  }, [width, height, mapRef]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [width, height]);
 
   // Rebuild the geometry if the selection has changed
   React.useEffect(() => {
-
-    if (chartData) {
+    if (chartData && selectedDataSetKey && labels[selectedDataSetKey]) {
       const {
         geometry: newGeometry,
         legend: newLegend,
@@ -445,7 +450,10 @@ const MapBlock = ({
     [labels, meta.locations, selectedLocation],
   );
 
-  const updateSelectedLocation = (newSelectedLocation: string, panTo: boolean = true) => {
+  const updateSelectedLocation = (
+    newSelectedLocation: string,
+    panTo: boolean = true,
+  ) => {
     const oldSelectedLocation = selectedLocation;
 
     if (oldSelectedLocation) {
@@ -537,9 +545,7 @@ const MapBlock = ({
               id="selectedIndicator"
               label="Select data to view"
               value={selectedDataSetKey}
-              onChange={e =>
-                setSelectedDataSetKey(e.currentTarget.value)
-              }
+              onChange={e => setSelectedDataSetKey(e.currentTarget.value)}
               options={dataSetOptions}
               order={[]}
             />
@@ -589,24 +595,24 @@ const MapBlock = ({
             </h3>
             <dl className="govuk-list">
               {legend &&
-              legend.map(({ min, max, idx, minValue }) => (
-                <dd className={styles.legend} key={idx}>
-                  <span
-                    className={styles[`rate${idx}`]}
-                    style={{
-                      backgroundColor: calculateColour({
-                        scaledData: minValue,
-                        color: labels[selectedDataSetKey].colour,
-                      }),
-                    }}
-                  >
-                    &nbsp;
-                  </span>{' '}
-                  {min}
-                  {labels[selectedDataSetKey].unit}&nbsp; to {max}
-                  {labels[selectedDataSetKey].unit}{' '}
-                </dd>
-              ))}
+                legend.map(({ min, max, idx, minValue }) => (
+                  <dd className={styles.legend} key={idx}>
+                    <span
+                      className={styles[`rate${idx}`]}
+                      style={{
+                        backgroundColor: calculateColour({
+                          scaledData: minValue,
+                          color: labels[selectedDataSetKey].colour,
+                        }),
+                      }}
+                    >
+                      &nbsp;
+                    </span>{' '}
+                    {min}
+                    {labels[selectedDataSetKey].unit}&nbsp; to {max}
+                    {labels[selectedDataSetKey].unit}{' '}
+                  </dd>
+                ))}
             </dl>
           </div>
         )}
@@ -640,7 +646,6 @@ const MapBlock = ({
                   calculateColour(feature.properties),
                 className: classNames({
                   [styles.selected]: feature && feature.id === selectedLocation,
-
                 }),
               })}
               onclick={onClick}

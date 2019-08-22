@@ -101,7 +101,8 @@ const options: ({ json: string; initialOptions?: Chart } & SelectOption)[] = [
     initialOptions: {
       type: 'map' as ChartType,
 
-      title: 'Total authorised absences, based on FSM eligibility, for Local Authority Districts of England',
+      title:
+        'Total authorised absences, based on FSM eligibility, for Local Authority Districts of England',
 
       height: 600,
 
