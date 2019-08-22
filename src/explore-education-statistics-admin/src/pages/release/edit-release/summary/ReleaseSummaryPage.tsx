@@ -84,10 +84,10 @@ const ReleaseSummaryPage = () => {
             )}
           </SummaryListItem>
           <SummaryListItem term="Release type">
-            {getSelectedReleaseType(
-              releaseSummaryDetails.typeId,
-              releaseTypes,
-            ).title}
+            {
+              getSelectedReleaseType(releaseSummaryDetails.typeId, releaseTypes)
+                .title
+            }
           </SummaryListItem>
           <SummaryListItem
             term=""

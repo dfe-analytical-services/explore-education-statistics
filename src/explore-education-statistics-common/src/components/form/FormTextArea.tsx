@@ -6,7 +6,6 @@ import React, {
   ReactNode,
 } from 'react';
 import ErrorMessage from '../ErrorMessage';
-import createDescribedBy from './util/createDescribedBy';
 
 export interface FormTextAreaProps {
   error?: ReactNode | string;
@@ -34,10 +33,7 @@ const FormTextArea = ({
 }: FormTextAreaProps) => {
   return (
     <>
-      <label
-        className='govuk-label'
-        htmlFor={id}
-      >
+      <label className="govuk-label" htmlFor={id}>
         {label}
       </label>
       {hint && (

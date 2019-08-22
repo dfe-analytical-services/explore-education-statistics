@@ -1,6 +1,6 @@
-import {IdTitlePair} from '@admin/services/common/types';
-import {CreateReleaseRequest} from '@admin/services/release/create-release/types';
-import {ReleaseSummaryDetails} from '@admin/services/release/types';
+import { IdTitlePair } from '@admin/services/common/types';
+import { CreateReleaseRequest } from '@admin/services/release/create-release/types';
+import { ReleaseSummaryDetails } from '@admin/services/release/types';
 import client from '@admin/services/util/service';
 
 export interface ReleaseSummaryService {

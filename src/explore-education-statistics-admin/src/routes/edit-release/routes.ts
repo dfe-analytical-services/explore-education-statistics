@@ -88,9 +88,7 @@ export const viewRoutes = [
   publishStatusRoute,
 ];
 
-export const editRoutes = [
-  summaryEditRoute,
-];
+export const editRoutes = [summaryEditRoute];
 
 export default {
   manageReleaseRoutes: [...viewRoutes, ...editRoutes],
