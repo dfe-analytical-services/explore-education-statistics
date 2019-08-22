@@ -74,6 +74,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public TimeIdentifier TimePeriodCoverage { get; set; }
 
         public int Order { get; set; }
+        
+        public ReleaseStatus Status { get; set; }
 
         private PartialDate _nextReleaseDate;
 

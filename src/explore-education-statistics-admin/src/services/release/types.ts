@@ -10,6 +10,7 @@ export interface ReleaseSummaryDetails {
   typeId: string;
   publishScheduled: string;
   nextReleaseDate: DayMonthYearValues;
+  status: 'Draft' | 'HigherLevelReview' | 'Live';
 }
 
 export interface BaseReleaseSummaryDetailsRequest {

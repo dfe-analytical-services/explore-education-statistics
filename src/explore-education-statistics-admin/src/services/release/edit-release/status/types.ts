@@ -1,5 +1,5 @@
 export interface UpdateReleaseStatusRequest {
-  releaseStatusId: string;
+  releaseStatus: string;
   releaseNotes: string;
 }
 

@@ -5,13 +5,14 @@ using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using static System.String;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.NamingUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TimePeriodLabelFormatter;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 {
-    public class EditReleaseSummaryViewModel
+    public class ReleaseSummaryViewModel
     {
         
         public Guid Id { get; set; }
@@ -37,5 +38,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
             get => IsNullOrEmpty(_slug) ? SlugFromTitle(Format(ReleaseName, TimePeriodCoverage)) : _slug;
             set => _slug = value; 
         }
+        
+        [JsonConverter(typeof(StringEnumConverter))]
+        public ReleaseStatus Status { get; set; }
     }
 }

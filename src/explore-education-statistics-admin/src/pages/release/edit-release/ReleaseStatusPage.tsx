@@ -8,15 +8,15 @@ import FormFieldTextInput from "@common/components/form/FormFieldTextInput";
 import Yup from "@common/lib/validation/yup";
 import {FormikProps} from "formik";
 import React, {useContext, useEffect, useState} from 'react';
-import {RouteComponentProps, withRouter} from "react-router";
+import {RouteComponentProps} from "react-router";
 
 interface FormValues {
-  releaseStatusId: string;
+  releaseStatus: string;
   releaseNotes: string;
 }
 
 const ReleaseStatusPage = ({history}: RouteComponentProps) => {
-  const [releaseStatusId, setReleaseStatusId] = useState('');
+  const [releaseStatus, setReleaseStatus] = useState('');
 
   const { releaseId } = useContext(
     ManageReleaseContext,
@@ -24,7 +24,7 @@ const ReleaseStatusPage = ({history}: RouteComponentProps) => {
 
   useEffect(
     () => {
-      service.getReleaseStatus(releaseId).then(setReleaseStatusId);
+      service.getReleaseStatus(releaseId).then(setReleaseStatus);
     }, [releaseId]
   );
 
@@ -35,11 +35,11 @@ const ReleaseStatusPage = ({history}: RouteComponentProps) => {
       <h2 className="govuk-heading-m">Update release status</h2>
       <p>Select and update the release status.</p>
 
-      {releaseStatusId && (
+      {releaseStatus && (
         <Formik<FormValues>
           enableReinitialize
           initialValues={{
-            releaseStatusId,
+            releaseStatus,
             releaseNotes: '',
           }}
           onSubmit={async (values: FormValues, actions) => {
@@ -47,7 +47,7 @@ const ReleaseStatusPage = ({history}: RouteComponentProps) => {
             history.push(dashboardRoutes.adminDashboard);
           }}
           validationSchema={Yup.object<FormValues>({
-            releaseStatusId: Yup.string().required('Choose a status'),
+            releaseStatus: Yup.string().required('Choose a status'),
             releaseNotes: Yup.string().required('Provide some release notes')
           })}
           render={(form: FormikProps<FormValues>) => {
@@ -55,16 +55,16 @@ const ReleaseStatusPage = ({history}: RouteComponentProps) => {
               <Form id={formId}>
                 <FormFieldRadioGroup<FormValues>
                   legend='Status'
-                  name='releaseStatusId'
-                  id={`${formId}-releaseStatusId`}
+                  name='releaseStatus'
+                  id={`${formId}-releaseStatus`}
                   options={[
                     {
                       label: 'In draft',
-                      value: 'draft',
+                      value: 'Draft',
                     },
                     {
                       label: 'Ready for higher review',
-                      value: 'higher-review',
+                      value: 'HigherLevelReview',
                     },
                   ]}
                 />

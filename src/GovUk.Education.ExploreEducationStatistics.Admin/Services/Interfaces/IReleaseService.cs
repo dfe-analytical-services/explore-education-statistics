@@ -24,10 +24,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<ReleaseViewModel> GetReleaseForIdAsync(ReleaseId id);
         
-        Task<EditReleaseSummaryViewModel> GetReleaseSummaryAsync(ReleaseId releaseId);
+        Task<ReleaseSummaryViewModel> GetReleaseSummaryAsync(ReleaseId releaseId);
         
-        Task<Either<ValidationResult, ReleaseViewModel>> EditReleaseSummaryAsync(EditReleaseSummaryViewModel model);
+        Task<Either<ValidationResult, ReleaseViewModel>> EditReleaseSummaryAsync(ReleaseSummaryViewModel model);
 
         Task<List<ReleaseViewModel>> GetReleasesForPublicationAsync(PublicationId publicationId);
+
+        Task<Either<ValidationResult, ReleaseSummaryViewModel>> UpdateReleaseStatusAsync(ReleaseId releaseId, ReleaseStatus status, string releaseNotes);
     }
 }

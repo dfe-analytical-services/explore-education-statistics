@@ -21,9 +21,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(dest => dest.Contact, 
                     m => m.MapFrom(r => r.Publication.Contact))
                 .ForMember(dest => dest.PublicationTitle, 
-                    m => m.MapFrom(r => r.Publication.Title));;
+                    m => m.MapFrom(r => r.Publication.Title));
             
-            CreateMap<EditReleaseSummaryViewModel, Release>();
+            CreateMap<ReleaseSummaryViewModel, Release>();
 
             CreateMap<CreateReleaseViewModel, Release>();
         }
