@@ -170,30 +170,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         {
             // Retrieve all the observations created in the first pass for this subject
             var filterItems = GetFilterItems(subject.Id);
-            return lines.Select(line => ObservationFromCsv(line, headers, subject, subjectMeta, filterItems));
+            return lines.Select(
+                (line, index) => 
+                ObservationFromCsv(line, headers, subject, subjectMeta, filterItems, index));
         }
         
         private Observation ObservationFromCsv(string raw,
             List<string> headers,
             Subject subject,
             SubjectMeta subjectMeta,
-            IEnumerable<FilterItem> filterItems)
+            IEnumerable<FilterItem> filterItems,
+            int row)
         {
-            var line = raw.Split(',');
-            
-            return new Observation
+            try
             {
-                //FilterItems = CreateObservationFilterItems(filterItems),
-                FilterItems = GetFilterItemsOld(line, headers, subjectMeta.Filters),
-                GeographicLevel = GetGeographicLevel(line, headers),
-                LocationId = GetLocationId(line, headers),
-                Measures = GetMeasures(line, headers, subjectMeta.Indicators),
-                ProviderUrn = GetProvider(line, headers)?.Urn,
-                SchoolLaEstab = GetSchool(line, headers)?.LaEstab,
-                SubjectId = subject.Id,
-                TimeIdentifier = GetTimeIdentifier(line, headers),
-                Year = GetYear(line, headers),
-            };
+                var line = raw.Split(',');
+            
+                return new Observation
+                {
+                    //FilterItems = CreateObservationFilterItems(filterItems),
+                    FilterItems = GetFilterItemsOld(line, headers, subjectMeta.Filters),
+                    GeographicLevel = GetGeographicLevel(line, headers),
+                    LocationId = GetLocationId(line, headers),
+                    Measures = GetMeasures(line, headers, subjectMeta.Indicators),
+                    ProviderUrn = GetProvider(line, headers)?.Urn,
+                    SchoolLaEstab = GetSchool(line, headers)?.LaEstab,
+                    SubjectId = subject.Id,
+                    TimeIdentifier = GetTimeIdentifier(line, headers),
+                    Year = GetYear(line, headers),
+                };
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw new InvalidObservationException(subject.Id, row, e.Message);
+            }
         }
         
         private void CreateFiltersLocationsAndSchoolsFromCsv(string raw,
