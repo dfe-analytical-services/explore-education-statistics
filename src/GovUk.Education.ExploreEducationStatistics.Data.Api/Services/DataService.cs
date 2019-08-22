@@ -1,9 +1,8 @@
 using System.Linq;
-using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
@@ -24,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         public override ResultWithMetaViewModel Query(ObservationQueryContext queryContext)
         {
-            var observations = GetObservations(queryContext).ToList();
+            var observations = GetObservations(queryContext).AsQueryable();
             if (!observations.Any())
             {
                 return new ResultWithMetaViewModel();
@@ -36,11 +35,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                     _resultBuilder.BuildResult(observation, queryContext.Indicators)),
                 MetaData = _subjectMetaService.GetSubjectMeta(queryContext.ToSubjectMetaQueryContext(), observations)
             };
-        }
-        
-        public override async Task<ResultWithMetaViewModel> QueryAsync(ObservationQueryContext queryContext)
-        {
-            return Query(queryContext);
         }
     }
 }

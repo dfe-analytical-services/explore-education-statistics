@@ -87,14 +87,17 @@ function GlossaryIndexPage() {
             subsidiary registrations (at their additional schools).
           </p>
           <p>
-            See also <a href="dual-registered-pupils">Dual registered pupils</a>
+            See also{' '}
+            <a href="/glossary#dual-registered-pupils">
+              Dual registered pupils
+            </a>
             .
           </p>
           <h3 id="dual-registered-pupils">Dual registered pupils</h3>
           <p>Pupils who are enrolled at more than 1 school.</p>
           <p>
             See also{' '}
-            <a href="dual-main-registered-pupils">
+            <a href="/glossary#dual-main-registered-pupils">
               dual main registered pupils
             </a>
             .

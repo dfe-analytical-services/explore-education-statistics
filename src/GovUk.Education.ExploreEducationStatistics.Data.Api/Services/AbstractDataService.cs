@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
@@ -21,9 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         }
 
         public abstract TResult Query(ObservationQueryContext queryContext);
-        
-        public abstract Task<TResult> QueryAsync(ObservationQueryContext queryContext);
-        
+
         protected IEnumerable<Observation> GetObservations(ObservationQueryContext queryContext)
         {
             if (!_subjectService.IsSubjectForLatestRelease(queryContext.SubjectId))

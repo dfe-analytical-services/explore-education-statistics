@@ -1,5 +1,5 @@
 import Details, { DetailsToggleHandler } from '@common/components/Details';
-import React, { MouseEvent } from 'react';
+import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import {
   DataBlockData,
@@ -101,11 +101,7 @@ export default function SummaryRenderer({
           );
         })}
       </div>
-      {description.body !== '' ? (
-        <ReactMarkdown source={description.body} />
-      ) : (
-        ''
-      )}
+      {description.body !== '' && <ReactMarkdown source={description.body} />}
     </>
   );
 }
