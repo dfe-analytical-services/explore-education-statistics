@@ -24,6 +24,7 @@ import PrototypeChartTest from './pages/prototypes/PrototypeChartTest';
 import AdminDocumentationGlossary from './pages/prototypes/PrototypeDocumentationGlossary';
 import AdminDocumentationStyle from './pages/prototypes/PrototypeDocumentationStyle';
 import AdminDocumentationHome from './pages/prototypes/PrototypeDocumentationHome';
+import AdminDocumentationCreateNewRelease from './pages/prototypes/PrototypeDocumentationCreateNewRelease';
 import PublicationAssignMethodology from './pages/prototypes/PrototypePublicationPageAssignMethodology';
 import PublicationConfirmNew from './pages/prototypes/PrototypePublicationPageConfirmNew';
 
@@ -209,6 +210,11 @@ function App() {
           exact
           path="/prototypes/documentation/style-guide"
           component={AdminDocumentationStyle}
+        />
+        <Route
+          exact
+          path="/prototypes/documentation/create-new-release"
+          component={AdminDocumentationCreateNewRelease}
         />
       </LoginContext.Provider>
     </BrowserRouter>

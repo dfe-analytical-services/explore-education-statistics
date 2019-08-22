@@ -45,3 +45,5 @@ tags
 *.tmp
 
 lerna-debug.log
+
+admin-start.sh

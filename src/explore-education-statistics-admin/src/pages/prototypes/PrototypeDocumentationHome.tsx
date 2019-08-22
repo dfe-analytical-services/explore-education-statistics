@@ -4,7 +4,12 @@ import PrototypePage from './components/PrototypePage';
 
 const BrowseReleasesPage = () => {
   return (
-    <PrototypePage wide breadcrumbs={[{ text: 'Documentation' }]}>
+    <PrototypePage
+      wide
+      breadcrumbs={[
+        { text: 'Documentation', link: '/prototypes/documentation' },
+      ]}
+    >
       <h1>Documentation</h1>
 
       <h3 className="govuk-heading-m govuk-!-margin-top-9">Style guide</h3>
@@ -39,10 +44,13 @@ const BrowseReleasesPage = () => {
       <div className="govuk-grid-row govuk-!-margin-bottom-9">
         <div className="govuk-grid-column-one-third">
           <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
-            <Link to="#">Training link 1</Link>
+            <Link to="/prototypes/documentation/create-new-release">
+              Creating a new release
+            </Link>
           </h4>
           <p className="govuk-caption-m govuk-!-margin-top-1">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.{' '}
+            How to create a new release - including uploading data and files and
+            creating data blocks (ie tables and charts) and content.{' '}
           </p>
         </div>
         <div className="govuk-grid-column-one-third">
