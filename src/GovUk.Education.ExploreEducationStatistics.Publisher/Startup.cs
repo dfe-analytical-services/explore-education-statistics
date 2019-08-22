@@ -31,6 +31,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddTransient<IPublishingService, PublishingService>()
                 .AddTransient<IContentCacheGenerationService, ContentCacheGenerationService>()
                 .AddTransient<IContentService, ContentService>()
+                .AddTransient<IReleaseService, ReleaseService>()
+                .AddTransient<IPublicationService, PublicationService>()
                 .AddTransient<IDownloadService, DownloadService>()
                 .AddTransient<IMethodologyService, MethodologyService>()
                 .BuildServiceProvider();
