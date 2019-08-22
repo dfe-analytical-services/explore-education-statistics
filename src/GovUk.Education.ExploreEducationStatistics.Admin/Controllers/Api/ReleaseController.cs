@@ -155,9 +155,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await CheckReleaseExistsAsync(releaseId, () =>
             {
                 // upload the files
-                var result = _fileStorageService.UploadDataFilesAsync(releaseId, file, metaFile, name)
+                var result = _fileStorageService.UploadDataFilesAsync(releaseId, file, metaFile, name);
                     // add message to queue to process these files
-                    .OnSuccess(() => _importService.Import(file.FileName, releaseId));
+                    // TODO: Disabled adding message to queue
+                    //.OnSuccess(() => _importService.Import(file.FileName, releaseId));
                 return result;
             });
         }
