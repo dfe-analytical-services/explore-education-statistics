@@ -42,11 +42,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             // TODO: Generate methodologies
             await UpdateMethodologies();
             
-            // TODO: Generate releases
-            // TODO: Work out how to identify latest release in the most efficient way
-
-            // TODO: Generate publications?
-
+            // TODO: Generate publications and releases
+            await UpdatePublicationsAndReleases();
+            
             return true;
         }
 
