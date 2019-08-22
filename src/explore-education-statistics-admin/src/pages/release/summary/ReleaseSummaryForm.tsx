@@ -11,12 +11,17 @@ import {
   validateOptionalPartialDayMonthYearField,
 } from '@admin/validation/validation';
 import Button from '@common/components/Button';
-import { Form, FormFieldset, Formik } from '@common/components/form';
+import { FormFieldset, Formik } from '@common/components/form';
+import Form from '@common/components/form/Form';
 import FormFieldDayMonthYear from '@common/components/form/FormFieldDayMonthYear';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { SelectOption } from '@common/components/form/FormSelect';
+import handleServerSideValidation, {
+  errorCodeAndFieldNameToFieldError,
+  errorCodeToFieldError
+} from "@common/components/form/util/serverValidationHandler";
 import Yup from '@common/lib/validation/yup';
 import { Dictionary } from '@common/types';
 import { FormikProps } from 'formik';
@@ -48,6 +53,20 @@ interface ReleaseSummaryFormModel {
   timePeriodCoverageGroups: TimePeriodCoverageGroup[];
   releaseTypes: IdTitlePair[];
 }
+
+const serverSideValidationHandler = handleServerSideValidation(
+  errorCodeToFieldError(
+    'SLUG_NOT_UNIQUE',
+    'timePeriodCoverageStartYear',
+    'Choose a unique combination of time period and start year',
+  ),
+  errorCodeAndFieldNameToFieldError(
+    'PARTIAL_DATE_NOT_VALID',
+    'NextReleaseDate',
+    'nextReleaseDate',
+    'Enter a valid date',
+  )
+);
 
 const ReleaseSummaryForm = <FormValues extends EditFormValues>({
   submitButtonText,
@@ -107,7 +126,10 @@ const ReleaseSummaryForm = <FormValues extends EditFormValues>({
           onSubmit={onSubmitHandler}
           render={(form: FormikProps<FormValues>) => {
             return (
-              <Form id={formId}>
+              <Form
+                id={formId}
+                submitValidationHandler={serverSideValidationHandler}
+              >
                 <FormFieldset
                   id={`${formId}-timePeriodCoverageFieldset`}
                   legend="Select time period coverage"

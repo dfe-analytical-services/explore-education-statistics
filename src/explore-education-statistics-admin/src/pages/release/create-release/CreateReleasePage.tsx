@@ -38,19 +38,14 @@ const CreateReleasePage = ({
     service.getTemplateRelease(publicationId).then(setTemplateRelease);
   }, [publicationId]);
 
-  const submitHandler = (values: FormValues) => {
+  const submitHandler = async (values: FormValues) => {
     const createReleaseDetails: CreateReleaseRequest = assembleCreateReleaseRequestFromForm(
       publicationId,
       values,
     );
 
-    service
-      .createRelease(createReleaseDetails)
-      .then(createdRelease =>
-        history.push(
-          summaryRoute.generateLink(publicationId, createdRelease.id),
-        ),
-      );
+    const createdRelease = await service.createRelease(createReleaseDetails);
+    history.push(summaryRoute.generateLink(publicationId, createdRelease.id));
   };
 
   const cancelHandler = () => history.push(dashboardRoutes.adminDashboard);
