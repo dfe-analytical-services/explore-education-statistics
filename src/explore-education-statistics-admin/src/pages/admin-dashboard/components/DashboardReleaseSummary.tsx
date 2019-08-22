@@ -92,7 +92,7 @@ const DashboardReleaseSummary = ({ publicationId, release }: Props) => {
           <a href="#">{editorName}</a>
         </SummaryListItem>
         {release.internalReleaseNote && (
-          <SummaryListItem term="Internal release note">
+          <SummaryListItem term="Internal release note" breakNewLines>
             {release.internalReleaseNote}
           </SummaryListItem>
         )}

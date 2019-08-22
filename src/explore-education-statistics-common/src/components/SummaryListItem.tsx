@@ -7,6 +7,7 @@ interface Props {
   term: string;
   detailsNoMargin?: boolean;
   smallKey?: boolean;
+  breakNewLines?: boolean;
 }
 
 const SummaryListItem = ({
@@ -15,6 +16,7 @@ const SummaryListItem = ({
   term,
   detailsNoMargin,
   smallKey = false,
+  breakNewLines = false,
 }: Props) => {
   return (
     <div className="govuk-summary-list__row">
@@ -30,6 +32,7 @@ const SummaryListItem = ({
         <dd
           className={classNames('govuk-summary-list__value', {
             'dfe-details-no-margin': detailsNoMargin,
+            'dfe-summary-list__value--break-new-lines': breakNewLines,
           })}
         >
           {children}
