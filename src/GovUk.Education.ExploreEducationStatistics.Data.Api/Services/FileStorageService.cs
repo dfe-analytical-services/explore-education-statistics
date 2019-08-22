@@ -22,10 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         public Task<string> DownloadTextAsync(string containerName, string blobName)
         {
-            var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
-
-            var blobClient = storageAccount.CreateCloudBlobClient();
-            var blobContainer = blobClient.GetContainerReference(containerName);
+            var blobContainer = GetCloudBlobContainer(containerName);
             var blob = blobContainer.GetBlockBlobReference(blobName);
 
             if (!blob.Exists())

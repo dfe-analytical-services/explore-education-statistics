@@ -36,13 +36,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
             var client = storageAccount.CreateCloudQueueClient();
-            var queue = client.GetQueueReference("imports-pending");
-            queue.CreateIfNotExists();
-
+            var pQueue = client.GetQueueReference("imports-pending");
+            var aQueue = client.GetQueueReference("imports-available");
+            
+            pQueue.CreateIfNotExists();
+            aQueue.CreateIfNotExists();
+            
             var message = BuildMessage(dataFileName, releaseId);
-            queue.AddMessage(message);
+            pQueue.AddMessage(message);
 
-            _logger.LogTrace($"Sent import message for data file: {dataFileName}, releaseId: {releaseId}");
+            _logger.LogInformation($"Sent import message for data file: {dataFileName}, releaseId: {releaseId}");
         }
 
         private CloudQueueMessage BuildMessage(string dataFileName, Guid releaseId)
@@ -58,7 +61,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var message = new ImportMessage
             {
                 DataFileName = dataFileName,
-                Release = importMessageRelease
+                Release = importMessageRelease,
+                BatchNo = 1,
+                BatchSize = 1
             };
 
             return new CloudQueueMessage(JsonConvert.SerializeObject(message));

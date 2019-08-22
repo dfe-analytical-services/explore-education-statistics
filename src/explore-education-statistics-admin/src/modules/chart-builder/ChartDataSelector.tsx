@@ -188,6 +188,7 @@ const ChartDataSelector = ({
                     ),
                     colour: colours[selectedList.length % colours.length],
                     symbol: symbols[selectedList.length % symbols.length],
+                    unit: metaData.indicators[dataSet.indicator].unit || '',
                   },
                 };
 

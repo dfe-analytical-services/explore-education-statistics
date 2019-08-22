@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Http;
 using FileInfo = GovUk.Education.ExploreEducationStatistics.Admin.Models.FileInfo;
+using Microsoft.AspNetCore.Mvc;
 using ReleaseId = System.Guid;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
@@ -18,5 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ValidationResult, IEnumerable<FileInfo>>> DeleteFileAsync(ReleaseId releaseId, ReleaseFileTypes type, string fileName);
         
         Task<Either<ValidationResult, IEnumerable<FileInfo>>> DeleteDataFileAsync(ReleaseId releaseId, string fileName);
+
+        Task<Either<ValidationResult, FileStreamResult>> StreamFile(ReleaseId releaseId, ReleaseFileTypes type, string fileName);
     }
 }
