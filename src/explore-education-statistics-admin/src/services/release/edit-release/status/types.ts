@@ -1,6 +1,6 @@
 export interface UpdateReleaseStatusRequest {
   releaseStatus: string;
-  releaseNotes: string;
+  internalReleaseNote: string;
 }
 
 export default {};

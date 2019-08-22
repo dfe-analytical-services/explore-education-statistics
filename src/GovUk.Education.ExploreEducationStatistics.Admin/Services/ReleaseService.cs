@@ -136,12 +136,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
         
         // TODO Authorisation will be required when users are introduced
-        // TODO what do we need to do with the release notes?
         public async Task<Either<ValidationResult, ReleaseSummaryViewModel>> UpdateReleaseStatusAsync(
-            ReleaseId releaseId, ReleaseStatus status, string releaseNotes)
+            ReleaseId releaseId, ReleaseStatus status, string internalReleaseNote)
         {
             var release = await GetAsync(releaseId);
             release.Status = status;
+            release.InternalReleaseNote = internalReleaseNote;
             _context.Releases.Update(release);
             await _context.SaveChangesAsync();
             return await GetReleaseSummaryAsync(releaseId);

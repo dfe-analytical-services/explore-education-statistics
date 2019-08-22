@@ -34,6 +34,7 @@ export interface AdminDashboardRelease {
   publishScheduled: Date;
   published?: string;
   nextReleaseDate: DayMonthYearValues;
+  internalReleaseNote?: string;
 }
 
 export interface AdminDashboardPublication {

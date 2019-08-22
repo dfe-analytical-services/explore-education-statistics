@@ -51,7 +51,6 @@ const FormTextArea = ({
         className={classNames('govuk-textarea', {
           [additionalClass || '']: additionalClass,
         })}
-
         id={id}
       />
     </>

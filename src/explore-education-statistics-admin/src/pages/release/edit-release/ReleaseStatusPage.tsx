@@ -12,7 +12,7 @@ import {RouteComponentProps} from "react-router";
 
 interface FormValues {
   releaseStatus: string;
-  releaseNotes: string;
+  internalReleaseNote: string;
 }
 
 const ReleaseStatusPage = ({history}: RouteComponentProps) => {
@@ -40,15 +40,15 @@ const ReleaseStatusPage = ({history}: RouteComponentProps) => {
           enableReinitialize
           initialValues={{
             releaseStatus,
-            releaseNotes: '',
+            internalReleaseNote: '',
           }}
-          onSubmit={async (values: FormValues, actions) => {
+          onSubmit={async (values: FormValues) => {
             await service.updateReleaseStatus(releaseId, values);
             history.push(dashboardRoutes.adminDashboard);
           }}
           validationSchema={Yup.object<FormValues>({
             releaseStatus: Yup.string().required('Choose a status'),
-            releaseNotes: Yup.string().required('Provide some release notes')
+            internalReleaseNote: Yup.string().required('Provide an internal release note')
           })}
           render={(form: FormikProps<FormValues>) => {
             return (
@@ -69,9 +69,9 @@ const ReleaseStatusPage = ({history}: RouteComponentProps) => {
                   ]}
                 />
                 <FormFieldTextArea
-                  name='releaseNotes'
-                  id={`${formId}-releaseNotes`}
-                  label='Release notes'
+                  name='internalReleaseNote'
+                  id={`${formId}-internalReleaseNote`}
+                  label='Internal release note'
                   rows={2}
                   additionalClass='govuk-!-width-one-half'
                 />

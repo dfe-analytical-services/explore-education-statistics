@@ -76,6 +76,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public int Order { get; set; }
         
         public ReleaseStatus Status { get; set; }
+        
+        public string InternalReleaseNote { get; set; }
 
         private PartialDate _nextReleaseDate;
 

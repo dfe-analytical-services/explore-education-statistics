@@ -41,5 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         
         [JsonConverter(typeof(StringEnumConverter))]
         public ReleaseStatus Status { get; set; }
+
+        public string InternalReleaseNote { get; set; }
     }
 }

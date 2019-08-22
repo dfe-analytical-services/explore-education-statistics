@@ -91,6 +91,11 @@ const DashboardReleaseSummary = ({ publicationId, release }: Props) => {
           {format(new Date(release.lastEditedDateTime), 'HH:mm')} by{' '}
           <a href="#">{editorName}</a>
         </SummaryListItem>
+        {release.internalReleaseNote && (
+          <SummaryListItem term="Internal release note">
+            {release.internalReleaseNote}
+          </SummaryListItem>
+        )}
       </SummaryList>
     </Details>
   );
