@@ -84,6 +84,7 @@ export default class VerticalBarBlock extends Component<VerticalBarProps> {
     if (
       axes === undefined ||
       axes.major === undefined ||
+      axes.minor === undefined ||
       data === undefined ||
       meta === undefined
     )

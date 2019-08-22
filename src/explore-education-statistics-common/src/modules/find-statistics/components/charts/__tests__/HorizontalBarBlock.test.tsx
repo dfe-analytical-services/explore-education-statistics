@@ -18,6 +18,7 @@ const props = {
   ...testData.AbstractChartProps,
   width: 900,
 };
+
 const { axes } = props;
 
 describe('HorzontalBarBlock', () => {
@@ -80,6 +81,7 @@ describe('HorzontalBarBlock', () => {
         {...props}
         axes={{
           ...axes,
+          // @ts-ignore
           minor: {
             ...axes.minor,
             visible: false,
@@ -99,6 +101,7 @@ describe('HorzontalBarBlock', () => {
         {...props}
         axes={{
           ...axes,
+          // @ts-ignore
           minor: {
             ...axes.minor,
             visible: false,
@@ -130,6 +133,7 @@ describe('HorzontalBarBlock', () => {
 
   test('can stack data', () => {
     const { container } = render(
+      // @ts-ignore
       <Chart
         {...{
           ...props,
@@ -182,6 +186,7 @@ describe('HorzontalBarBlock', () => {
   });
   test('can render minor axis reference line', () => {
     const { container } = render(
+      // @ts-ignore
       <Chart
         {...{
           ...props,
@@ -268,6 +273,7 @@ describe('HorzontalBarBlock', () => {
       ...props,
       axes: {
         major: props.axes.major,
+        // @ts-ignore
         minor: {
           ...props.axes.minor,
           tickConfig: 'default',
@@ -285,6 +291,7 @@ describe('HorzontalBarBlock', () => {
       ...props,
       axes: {
         major: props.axes.major,
+        // @ts-ignore
         minor: {
           ...props.axes.minor,
           tickConfig: 'startEnd',
@@ -302,6 +309,7 @@ describe('HorzontalBarBlock', () => {
       ...props,
       axes: {
         major: props.axes.major,
+        // @ts-ignore
         minor: {
           ...props.axes.minor,
           tickConfig: 'custom',
