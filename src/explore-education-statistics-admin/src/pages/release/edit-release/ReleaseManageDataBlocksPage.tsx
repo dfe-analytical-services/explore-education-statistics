@@ -13,11 +13,23 @@ import DataBlockService, {
 import { Chart } from '@common/services/publicationService';
 import { ChartRendererProps } from '@common/modules/find-statistics/components/ChartRenderer';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import DataBlocksService from '@admin/services/release/edit-release/datablocks/service';
+import { DataBlock } from 'src/services/release/edit-release/datablocks/types';
+import FormSelect from '@common/components/form/FormSelect';
 
 const ReleaseManageDataBlocksPage = () => {
   const { publication, releaseId } = useContext(
     ManageReleaseContext,
   ) as ManageRelease;
+
+  const [selectedDataBlock, setSelectedDataBlock] = React.useState<string>('');
+  const [dataBlocks, setDataBlocks] = React.useState<DataBlock[]>([]);
+
+  React.useEffect(() => {
+    DataBlocksService.getDataBlocks(releaseId).then(blocks => {
+      setDataBlocks(blocks);
+    });
+  }, [releaseId]);
 
   const [chartBuilderData, setChartBuilderData] = React.useState<
     DataBlockResponse
@@ -64,6 +76,26 @@ const ReleaseManageDataBlocksPage = () => {
       <Tabs id="manageDataBlocks">
         <TabsSection title="Create data blocks">something</TabsSection>
         <TabsSection title="View datablocks">
+          <FormSelect
+            id="selectDataBlock"
+            name="selectDataBlock"
+            label="Select data block"
+            onChange={e => {
+              setRequest(dataBlocks[+e.target.value].dataBlockRequest);
+              setSelectedDataBlock(e.target.value);
+            }}
+            options={[
+              {
+                label: 'select',
+                value: '',
+              },
+              ...dataBlocks.map((dataBlock, index) => ({
+                label: `${index} ${dataBlock.heading}`,
+                value: `${index}`,
+              })),
+            ]}
+          />
+
           <Tabs id="editDataBlockSections">
             <TabsSection title="table">Table</TabsSection>
             <TabsSection title="Create Chart">
