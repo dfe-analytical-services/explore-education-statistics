@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics
 {
-    [Route("api/[controller]")]
+    [Route("api/data/[controller]")]
     [ApiController]
+    [Authorize]
     public class MetaController : ControllerBase
     {
         private readonly IPublicationMetaService _publicationMetaService;

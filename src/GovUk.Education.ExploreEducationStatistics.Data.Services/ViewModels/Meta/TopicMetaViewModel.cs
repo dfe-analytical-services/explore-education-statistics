@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta
+namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta
 {
     public class TopicMetaViewModel
     {
