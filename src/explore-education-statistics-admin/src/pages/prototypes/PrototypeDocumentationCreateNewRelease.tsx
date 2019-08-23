@@ -6,7 +6,7 @@ import PrototypePage from './components/PrototypePage';
 import StepNav from './components/PrototypeStepByStep';
 import StepNavItem from './components/PrototypeStepByStepItem';
 
-const DocumentationGlossary = ({ location }: RouteChildrenProps) => {
+const DocumentationCreateNewRelease = ({ location }: RouteChildrenProps) => {
   const query = new URLSearchParams(window.location.search);
   const step = Number(query.get('step'));
 
@@ -168,4 +168,4 @@ const DocumentationGlossary = ({ location }: RouteChildrenProps) => {
   );
 };
 
-export default DocumentationGlossary;
+export default DocumentationCreateNewRelease;

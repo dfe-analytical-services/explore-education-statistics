@@ -25,6 +25,7 @@ import AdminDocumentationGlossary from './pages/prototypes/PrototypeDocumentatio
 import AdminDocumentationStyle from './pages/prototypes/PrototypeDocumentationStyle';
 import AdminDocumentationHome from './pages/prototypes/PrototypeDocumentationHome';
 import AdminDocumentationCreateNewRelease from './pages/prototypes/PrototypeDocumentationCreateNewRelease';
+import AdminDocumentationCreateNewPublication from './pages/prototypes/PrototypeDocumentationCreateNewPublication';
 import PublicationAssignMethodology from './pages/prototypes/PrototypePublicationPageAssignMethodology';
 import PublicationConfirmNew from './pages/prototypes/PrototypePublicationPageConfirmNew';
 
@@ -215,6 +216,11 @@ function App() {
           exact
           path="/prototypes/documentation/create-new-release"
           component={AdminDocumentationCreateNewRelease}
+        />
+        <Route
+          exact
+          path="/prototypes/documentation/create-new-publication"
+          component={AdminDocumentationCreateNewPublication}
         />
       </LoginContext.Provider>
     </BrowserRouter>
