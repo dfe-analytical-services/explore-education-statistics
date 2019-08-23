@@ -62,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             FilterItemName.Characteristic__Total, 1
                         },
                         {
-                            FilterItemName.School_Type__Total, 2
+                            FilterItemName.School_Type__Total, 58
                         }
                     }
                 },
@@ -70,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     12, new Dictionary<FilterItemName, int>
                     {
                         {
-                            FilterItemName.School_Type__Total, 423
+                            FilterItemName.School_Type__Total, 457
                         }
                     }
                 },
@@ -78,10 +78,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     17, new Dictionary<FilterItemName, int>
                     {
                         {
-                            FilterItemName.Year_of_admission__Primary_Total, 539
+                            FilterItemName.Year_of_admission__Primary_Total, 571
                         },
                         {
-                            FilterItemName.Year_of_admission__Secondary_Total, 540
+                            FilterItemName.Year_of_admission__Secondary_Total, 573
                         }
                     }
                 }
@@ -108,25 +108,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     12, new Dictionary<IndicatorName, int>
                     {
                         {
-                            IndicatorName.Number_of_schools, 153
+                            IndicatorName.Number_of_schools, 176
                         },
                         {
-                            IndicatorName.Number_of_pupils, 154
+                            IndicatorName.Number_of_pupils, 177
                         },
                         {
-                            IndicatorName.Number_of_permanent_exclusions, 155
+                            IndicatorName.Number_of_permanent_exclusions, 178
                         },
                         {
-                            IndicatorName.Permanent_exclusion_rate, 156
+                            IndicatorName.Permanent_exclusion_rate, 179
                         },
                         {
-                            IndicatorName.Number_of_fixed_period_exclusions, 157
+                            IndicatorName.Number_of_fixed_period_exclusions, 180
                         },
                         {
-                            IndicatorName.Fixed_period_exclusion_rate, 158
+                            IndicatorName.Fixed_period_exclusion_rate, 181
                         },
                         {
-                            IndicatorName.Percentage_of_pupils_with_fixed_period_exclusions, 160
+                            IndicatorName.Percentage_of_pupils_with_fixed_period_exclusions, 183
                         }
                     }
                 },
@@ -134,31 +134,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     17, new Dictionary<IndicatorName, int>
                     {
                         {
-                            IndicatorName.Number_of_applications_received, 189
+                            IndicatorName.Number_of_applications_received, 212
                         },
                         {
-                            IndicatorName.Number_of_first_preferences_offered, 193
+                            IndicatorName.Number_of_first_preferences_offered, 215
                         },
                         {
-                            IndicatorName.Number_of_second_preferences_offered, 194
+                            IndicatorName.Number_of_second_preferences_offered, 217
                         },
                         {
-                            IndicatorName.Number_of_third_preferences_offered, 195
+                            IndicatorName.Number_of_third_preferences_offered, 218
                         },
                         {
-                            IndicatorName.Number_that_received_one_of_their_first_three_preferences, 196
+                            IndicatorName.Number_that_received_one_of_their_first_three_preferences, 219
                         },
                         {
-                            IndicatorName.Number_that_received_an_offer_for_a_preferred_school, 197
+                            IndicatorName.Number_that_received_an_offer_for_a_preferred_school, 220
                         },
                         {
-                            IndicatorName.Number_that_received_an_offer_for_a_non_preferred_school, 198
+                            IndicatorName.Number_that_received_an_offer_for_a_non_preferred_school, 221
                         },
                         {
-                            IndicatorName.Number_that_did_not_receive_an_offer, 199
+                            IndicatorName.Number_that_did_not_receive_an_offer, 222
                         },
                         {
-                            IndicatorName.Number_that_received_an_offer_for_a_school_within_their_LA, 200
+                            IndicatorName.Number_that_received_an_offer_for_a_school_within_their_LA, 223
                         }
                     }
                 }
