@@ -80,6 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             
             services.AddTransient<IDataService<ResultWithMetaViewModel>, DataService>();
             services.AddTransient<IObservationService, ObservationService>();
+            services.AddTransient<IPublicationMetaService, PublicationMetaService>();
             services.AddTransient<IResultBuilder<Observation, ObservationViewModel>, ResultBuilder>();
             services.AddTransient<ISubjectMetaService, SubjectMetaService>();
             services.AddTransient<ITimePeriodService, TimePeriodService>();
