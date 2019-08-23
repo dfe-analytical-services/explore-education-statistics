@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -22,7 +21,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
         private readonly IMapper _mapper;
         private readonly string _storageConnectionString;
         private readonly IFileStorageService _fileStorageService;
-
         private readonly List<ImportMessage> messages = new List<ImportMessage>();
 
         private const bool PROCESS_SEQUENTIALLY = true;
@@ -42,10 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
         public void Seed()
         {
             _logger.LogInformation("Seeding");
-
-            var stopWatch = new Stopwatch();
-            stopWatch.Start();
-
+            
             var subjects = SamplePublications.GetSubjects();
             foreach (var subject in subjects)
             {
@@ -55,9 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
                 Seed(file + ".csv", subject.Release, subjects.Count);
             }
 
-            stopWatch.Stop();
-            _logger.LogInformation("All import messages queued. Completed with duration {duration} ",
-                stopWatch.Elapsed.ToString());
+            _logger.LogInformation("All import messages queued");
         }
 
         private void Seed(string dataFileName, Release release, int maxCount)
@@ -84,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
                 {
                     var sQueue = client.GetQueueReference("imports-pending-sequential");
                     sQueue.CreateIfNotExists();
-                    _logger.LogInformation("Adding {count} queue messages", messages.Count);
+                    _logger.LogInformation($"Adding 1 message to queue for sequential processing of all files");
                     sQueue.AddMessage(new CloudQueueMessage(JsonConvert.SerializeObject(messages)));
                 }
             }
@@ -96,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
 
                 var cloudMessage = BuildCloudMessage(dataFileName, release);
 
-                _logger.LogInformation("Adding queue message for file \"{dataFileName}\"", dataFileName);
+                _logger.LogInformation($"Adding queue message for file {dataFileName}");
 
                 pQueue.AddMessage(cloudMessage);
             }
@@ -122,7 +115,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
             var metaFile = CreateFormFile(file.GetMetaCsvLines(), file + ".meta.csv", "metaFile");
 
             _logger.LogInformation("Uploading files for \"{subjectName}\"", subjectName);
-            var result = _fileStorageService.UploadDataFilesAsync(release.Id, dataFile, metaFile, subjectName).Result;
+            var result = _fileStorageService.UploadDataFilesAsync(release.Id, dataFile, metaFile, subjectName, true).Result;
+            if (result.IsLeft)
+            {
+                _logger.LogInformation($"Could not upload data files: {result.Left.ErrorMessage}");
+            }
         }
 
         private static IFormFile CreateFormFile(IEnumerable<string> lines, string fileName, string name)

@@ -52,20 +52,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ValidationResult, IEnumerable<FileInfo>>> UploadDataFilesAsync(Guid releaseId,
-            IFormFile dataFile, IFormFile metadataFile, string name)
+            IFormFile dataFile, IFormFile metadataFile, string name, bool overwrite)
         {
             var blobContainer = await GetCloudBlobContainer();
             var dataInfo = new Dictionary<string, string> {{NameKey, name}, {MetaFileKey, metadataFile.FileName}};
             var metaDataInfo = new Dictionary<string, string> {{DataFileKey, dataFile.FileName}};
-            return await ValidateDataFilesForUpload(blobContainer, releaseId, dataFile, metadataFile)
-                .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, dataFile, ReleaseFileTypes.Data, dataInfo))
-                .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, metadataFile, ReleaseFileTypes.Data, metaDataInfo))
+            return await ValidateDataFilesForUpload(blobContainer, releaseId, dataFile, metadataFile, overwrite)
+                .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, dataFile, ReleaseFileTypes.Data, dataInfo, overwrite))
+                .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, metadataFile, ReleaseFileTypes.Data, metaDataInfo, overwrite))
                 .OnSuccess(() => ListFilesAsync(releaseId, ReleaseFileTypes.Data));
         }
 
         // We cannot rely on the normal upload validation as we want this to be an atomic operation for both files.
         private static async Task<Either<ValidationResult,bool>> ValidateDataFilesForUpload(CloudBlobContainer blobContainer, Guid releaseId,
-            IFormFile dataFile, IFormFile metaFile)
+            IFormFile dataFile, IFormFile metaFile, bool overwrite)
         {
             if (string.Equals(dataFile.FileName, metaFile.FileName, OrdinalIgnoreCase))
             {
@@ -81,12 +81,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
             var dataFilePath = AdminReleasePath(releaseId, ReleaseFileTypes.Data, dataFile.FileName);
             var metadataFilePath = AdminReleasePath(releaseId, ReleaseFileTypes.Data, metaFile.FileName);
-            if (blobContainer.GetBlockBlobReference(dataFilePath).Exists())
+            if (!overwrite && blobContainer.GetBlockBlobReference(dataFilePath).Exists())
             {
                 return ValidationResult(CannotOverwriteDataFile);
             }
 
-            if (blobContainer.GetBlockBlobReference(metadataFilePath).Exists())
+            if (!overwrite && blobContainer.GetBlockBlobReference(metadataFilePath).Exists())
             {
                 return ValidationResult(CannotOverwriteMetadataFile);
             }
@@ -138,7 +138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ValidationResult, IEnumerable<FileInfo>>> UploadFilesAsync(Guid releaseId,
-            IFormFile file, string name, ReleaseFileTypes type)
+            IFormFile file, string name, ReleaseFileTypes type, bool overwrite)
         {
             if (type == ReleaseFileTypes.Data)
             {
@@ -146,7 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
             var blobContainer = await GetCloudBlobContainer();
             var info = new Dictionary<string, string> {{NameKey, name}};
-            return await UploadFileAsync(blobContainer, releaseId, file, type, info)
+            return await UploadFileAsync(blobContainer, releaseId, file, type, info, overwrite)
                 .OnSuccess(() => ListFilesAsync(releaseId, type));
         }
 
@@ -182,10 +182,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         private static async Task<Either<ValidationResult, bool>> UploadFileAsync(CloudBlobContainer blobContainer,
-            Guid releaseId, IFormFile file, ReleaseFileTypes type, IDictionary<string, string> metaValues)
+            Guid releaseId, IFormFile file, ReleaseFileTypes type, IDictionary<string, string> metaValues, bool overwrite)
         {
             var blob = blobContainer.GetBlockBlobReference(AdminReleasePath(releaseId, type, file.FileName));
-            if (blob.Exists())
+            if (!overwrite && blob.Exists())
             {
                 return ValidationResult(CannotOverwriteFile);
             }
