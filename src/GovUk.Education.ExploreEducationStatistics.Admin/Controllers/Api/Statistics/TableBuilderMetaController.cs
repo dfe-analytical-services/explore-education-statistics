@@ -2,12 +2,14 @@ using System;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta.TableBuilder;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics
 {
-    [Route("api/meta")]
+    [Route("api/data/[controller]")]
     [ApiController]
+    [Authorize]
     public class TableBuilderMetaController : ControllerBase
     {
         private readonly ITableBuilderSubjectMetaService _subjectMetaService;

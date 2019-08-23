@@ -83,6 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IResultBuilder<Observation, ObservationViewModel>, ResultBuilder>();
             services.AddTransient<ISubjectMetaService, SubjectMetaService>();
             services.AddTransient<ITimePeriodService, TimePeriodService>();
+            services.AddTransient<ITableBuilderSubjectMetaService, TableBuilderSubjectMetaService>();
 
             services.AddSwaggerGen(c =>
             {

@@ -1,7 +1,7 @@
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Extensions
+namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Extensions
 {
     public class StringExtensionTests
     {

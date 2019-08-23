@@ -6,7 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
+namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Extensions
 {
     public class TimeIdentifierExtensionsTests
     {

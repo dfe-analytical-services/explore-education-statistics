@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Extensions
+namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions
 {
     public static class StringExtensions
     {

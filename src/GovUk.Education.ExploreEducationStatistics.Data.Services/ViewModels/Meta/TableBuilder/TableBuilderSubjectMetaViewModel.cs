@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta.TableBuilder
+namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta.TableBuilder
 {
     public class TableBuilderSubjectMetaViewModel
     {
