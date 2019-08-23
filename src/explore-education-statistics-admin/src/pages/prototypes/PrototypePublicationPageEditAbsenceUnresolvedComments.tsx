@@ -3,6 +3,7 @@ import EditablePublicationPage from '@admin/pages/prototypes/components/Editable
 import PrototypePublicationService from '@admin/pages/prototypes/components/PrototypePublicationService';
 import { ExtendedComment } from '@admin/services/publicationService';
 import React from 'react';
+import Link from '@admin/components/Link';
 import PrototypeAdminNavigation from './components/PrototypeAdminNavigation';
 import PrototypePage from './components/PrototypePage';
 
@@ -142,6 +143,26 @@ const PublicationPage = ({ reviewing, newBlankRelease }: Props) => {
         }`}
       >
         <EditablePublicationPage editing={editing} reviewing data={data} />
+      </div>
+      <hr />
+      <div className="govuk-grid-row govuk-!-margin-top-9">
+        <div className="govuk-grid-column-one-half ">
+          <Link to="/prototypes/publication-create-new-absence-table">
+            <span className="govuk-heading-m govuk-!-margin-bottom-0">
+              Previous step
+            </span>
+            Manage data blocks
+          </Link>
+        </div>
+
+        <div className="govuk-grid-column-one-half dfe-align--right">
+          <Link to="/prototypes/publication-create-new-absence-status">
+            <span className="govuk-heading-m govuk-!-margin-bottom-0">
+              Next step
+            </span>
+            Update release status
+          </Link>
+        </div>
       </div>
     </PrototypePage>
   );

@@ -140,7 +140,7 @@ const PrototypePublicationConfig = ({ sectionId }: Props) => {
                 </dd>
               </div>
               <div className="govuk-summary-list__row">
-                <dt className="govuk-summary-list__key">Team lead</dt>
+                <dt className="govuk-summary-list__key">Team leader</dt>
                 <dd className="govuk-summary-list__value">
                   <a href="mailto: example@email.co.uk">John Smith</a>
                 </dd>
