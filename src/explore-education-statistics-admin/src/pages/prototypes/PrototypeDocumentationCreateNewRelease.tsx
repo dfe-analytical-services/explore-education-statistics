@@ -1,11 +1,15 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import React from 'react';
+import { RouteChildrenProps } from 'react-router';
 import PrototypePage from './components/PrototypePage';
 import StepNav from './components/PrototypeStepByStep';
 import StepNavItem from './components/PrototypeStepByStepItem';
 
-const DocumentationGlossary = () => {
+const DocumentationGlossary = ({ location }: RouteChildrenProps) => {
+  const query = new URLSearchParams(window.location.search);
+  const step = Number(query.get('step'));
+
   return (
     <PrototypePage
       wide
@@ -47,7 +51,11 @@ const DocumentationGlossary = () => {
             </li>
           </ul>
           <StepNav>
-            <StepNavItem stepNumber={1} stepHeading="Choose a publication">
+            <StepNavItem
+              stepNumber={1}
+              stepHeading="Choose a publication"
+              open={step === 1}
+            >
               <p>
                 Anyone can create a new release under their assigned list of
                 publications.
@@ -72,7 +80,11 @@ const DocumentationGlossary = () => {
                 alt=""
               />
             </StepNavItem>
-            <StepNavItem stepNumber={2} stepHeading="Create a new release">
+            <StepNavItem
+              stepNumber={2}
+              stepHeading="Create a new release"
+              open={step === 2}
+            >
               <p>
                 Once you’ve created a new release you’ll become its ‘Primary
                 analyst / Author’ and (along with members of your ‘Production
@@ -106,7 +118,6 @@ const DocumentationGlossary = () => {
                 If you can't find the publication where you want to create your
                 release contact:{' '}
               </p>
-
               <h3>Explore education statistics team </h3>
               <p>
                 Email <br />
@@ -115,19 +126,39 @@ const DocumentationGlossary = () => {
                 </a>
               </p>
             </StepNavItem>
-            <StepNavItem stepNumber={3} stepHeading="Release summary">
+            <StepNavItem
+              stepNumber={3}
+              stepHeading="Release summary"
+              open={step === 3}
+            >
               <p>Write standard html here</p>
             </StepNavItem>
-            <StepNavItem stepNumber={4} stepHeading="Manage data">
+            <StepNavItem
+              stepNumber={4}
+              stepHeading="Manage data"
+              open={step === 4}
+            >
               <p>Write standard html here</p>
             </StepNavItem>
-            <StepNavItem stepNumber={5} stepHeading="Manage data blocks">
+            <StepNavItem
+              stepNumber={5}
+              stepHeading="Manage data blocks"
+              open={step === 5}
+            >
               <p>Write standard html here</p>
             </StepNavItem>
-            <StepNavItem stepNumber={6} stepHeading="Manage content">
+            <StepNavItem
+              stepNumber={6}
+              stepHeading="Manage content"
+              open={step === 6}
+            >
               <p>Write standard html here</p>
             </StepNavItem>
-            <StepNavItem stepNumber={7} stepHeading="Update release status">
+            <StepNavItem
+              stepNumber={7}
+              stepHeading="Update release status"
+              open={step === 7}
+            >
               <p>Write standard html here</p>
             </StepNavItem>
           </StepNav>
