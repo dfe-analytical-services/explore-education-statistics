@@ -33,7 +33,7 @@
     },
     "skuAdmin": {
       "type": "string",
-      "defaultValue": "S1 Standard"
+      "defaultValue": "S3 Standard"
     },
     "sqlAdministratorLogin": {
       "type": "string",
@@ -270,7 +270,7 @@
             {
               "name": "StatisticsDb",
               "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'statistics', ';User Id=', parameters('sqlAdministratorLogin'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]"
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'public-statistics', ';User Id=', parameters('sqlAdministratorLogin'), '@', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]"
             },
             {
               "name": "PublicStorage",
@@ -1302,6 +1302,7 @@
         "siteConfig": {
           "http20Enabled": true,
           "phpVersion": "off",
+          "AlwaysOn": true,
           "cors": {
             "allowedOrigins": [
               "*"
@@ -1348,6 +1349,7 @@
           "connectionStrings": [
             {
               "name": "CoreStorage",
+              "type": "Custom",
               "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('coreStorageAccountName'), ';AccountKey=', listKeys(variables('coreStorageAccountId'),'2015-05-01-preview').key1)]"
             },
             {
@@ -1480,10 +1482,12 @@
           "connectionStrings": [
             {
               "name": "CoreStorage",
+              "type": "Custom",
               "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('coreStorageAccountName'), ';AccountKey=', listKeys(variables('coreStorageAccountId'),'2015-05-01-preview').key1)]"
             },
             {
               "name": "PublicStorage",
+              "type": "Custom",
               "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publicStorageAccountName'), ';AccountKey=', listKeys(variables('publicStorageAccountId'),'2015-05-01-preview').key1)]"
             }
           ]
