@@ -44,7 +44,7 @@ const BrowseReleasesPage = () => {
       <div className="govuk-grid-row govuk-!-margin-bottom-9">
         <div className="govuk-grid-column-one-third">
           <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
-            <Link to="/prototypes/documentation/create-new-release">
+            <Link to="/prototypes/documentation/create-new-publication">
               Creating a new publication
             </Link>
           </h4>
