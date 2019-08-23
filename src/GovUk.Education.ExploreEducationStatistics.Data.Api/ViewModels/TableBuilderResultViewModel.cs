@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta.TableBuilder;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels
 {

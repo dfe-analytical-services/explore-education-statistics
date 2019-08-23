@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         {
             var releaseId = _releaseService.GetLatestRelease(publicationId);
 
-            var subjectMetaViewModels = _mapper.Map<IEnumerable<IdLabelViewModel>>(
+            var subjectMetaViewModels = _mapper.Map<IEnumerable<IdLabel>>(
                 _subjectService.FindMany(subject => subject.Release.Id == releaseId));
 
             return new PublicationSubjectsMetaViewModel

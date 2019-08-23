@@ -4,6 +4,8 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Mappings
 {
@@ -32,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Mappings
 
             CreateMap<Publication, PublicationMetaViewModel>();
 
-            CreateMap<Subject, IdLabelViewModel>()
+            CreateMap<Subject, IdLabel>()
                 .ForMember(dest => dest.Label, opts => opts.MapFrom(subject => subject.Name));
 
             CreateMap<Theme, ThemeMetaViewModel>();

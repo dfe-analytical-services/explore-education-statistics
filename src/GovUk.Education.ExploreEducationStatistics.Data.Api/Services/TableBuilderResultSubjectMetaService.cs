@@ -5,12 +5,14 @@ using System.Linq.Expressions;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta.TableBuilder;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
+using Footnote = GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Footnote;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
@@ -80,11 +82,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 _indicatorService.GetIndicators(query.SubjectId, query.Indicators));
         }
 
-        private IEnumerable<FootnoteViewModel> GetFootnotes(IQueryable<Observation> observations,
+        private IEnumerable<Footnote> GetFootnotes(IQueryable<Observation> observations,
             SubjectMetaQueryContext queryContext)
         {
             return _footnoteService.GetFootnotes(queryContext.SubjectId, observations, queryContext.Indicators)
-                .Select(footnote => new FootnoteViewModel
+                .Select(footnote => new Footnote
                 {
                     Id = footnote.Id,
                     Label = footnote.Content

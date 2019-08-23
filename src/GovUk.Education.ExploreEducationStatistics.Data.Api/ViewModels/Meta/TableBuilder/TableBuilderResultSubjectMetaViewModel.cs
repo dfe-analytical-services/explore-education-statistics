@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta.TableBuilder
 {
@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta.Ta
     {
         public Dictionary<string, TableBuilderFilterMetaViewModel> Filters { get; set; }
 
-        public IEnumerable<FootnoteViewModel> Footnotes { get; set; }
+        public IEnumerable<Footnote> Footnotes { get; set; }
 
         public IEnumerable<IndicatorMetaViewModel> Indicators { get; set; }
 
