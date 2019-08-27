@@ -18,6 +18,7 @@ const props = {
   ...testData.AbstractChartProps,
   width: 900,
 };
+
 const { axes } = props;
 
 describe('HorzontalBarBlock', () => {
