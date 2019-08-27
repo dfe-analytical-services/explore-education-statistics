@@ -367,7 +367,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
                 ImportService, Mock<IPublicationService> PublicationService) mocks)
         {
             return new ReleasesController(mocks.ReleaseService.Object, mocks.FileStorageService.Object,
-                mocks.ImportService.Object, mocks.PublicationService.Object);
+                mocks.ImportService.Object, mocks.PublicationService.Object,null);
         }
     }
 }

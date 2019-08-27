@@ -3,6 +3,7 @@ import EditablePublicationPage from '@admin/pages/prototypes/components/Editable
 import PrototypePublicationService from '@admin/pages/prototypes/components/PrototypePublicationService';
 import { ExtendedComment } from '@admin/services/publicationService';
 import React from 'react';
+import Link from '@admin/components/Link';
 import PrototypeAdminNavigation from './components/PrototypeAdminNavigation';
 import PrototypePage from './components/PrototypePage';
 
@@ -60,7 +61,7 @@ const PublicationPage = ({ reviewing, newBlankRelease }: Props) => {
             </span>
             <strong className="govuk-warning-text__text">
               <span className="govuk-warning-text__assistive">Warning</span>
-              There are {allUnresolved.length} comments
+              There are {allUnresolved.length} unresolved comments
             </strong>
           </div>
         )}
@@ -97,7 +98,7 @@ const PublicationPage = ({ reviewing, newBlankRelease }: Props) => {
                 />
               )}
               <label className="govuk-label govuk-radios__label" htmlFor="edit">
-                Edit content
+                Add / view comments and edit content
               </label>
             </div>
             <div className="govuk-radios__item">
@@ -136,8 +137,32 @@ const PublicationPage = ({ reviewing, newBlankRelease }: Props) => {
       </div>
 
       <hr />
-      <div className="govuk-width-container  dfe-align--comments">
+      <div
+        className={`govuk-width-container ${
+          editing ? 'dfe-align--comments' : 'dfe-hide-comments'
+        }`}
+      >
         <EditablePublicationPage editing={editing} reviewing data={data} />
+      </div>
+      <hr />
+      <div className="govuk-grid-row govuk-!-margin-top-9">
+        <div className="govuk-grid-column-one-half ">
+          <Link to="/prototypes/publication-create-new-absence-table">
+            <span className="govuk-heading-m govuk-!-margin-bottom-0">
+              Previous step
+            </span>
+            Manage data blocks
+          </Link>
+        </div>
+
+        <div className="govuk-grid-column-one-half dfe-align--right">
+          <Link to="/prototypes/publication-create-new-absence-status">
+            <span className="govuk-heading-m govuk-!-margin-bottom-0">
+              Next step
+            </span>
+            Update release status
+          </Link>
+        </div>
       </div>
     </PrototypePage>
   );

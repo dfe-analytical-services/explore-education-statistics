@@ -59,8 +59,19 @@ const PrototypeBrowseReleasesPage = ({ location }: RouteChildrenProps) => {
           <RelatedInformation heading="Help and guidance">
             <ul className="govuk-list">
               <li>
-                <Link to="/prototypes/methodology-home">
-                  Administrators guide{' '}
+                <Link
+                  to="/prototypes/documentation/create-new-publication"
+                  target="blank"
+                >
+                  Creating a new publication{' '}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/prototypes/documentation/create-new-release"
+                  target="blank"
+                >
+                  Creating a new release{' '}
                 </Link>
               </li>
             </ul>
