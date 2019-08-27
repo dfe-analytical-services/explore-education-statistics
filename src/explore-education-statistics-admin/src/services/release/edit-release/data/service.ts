@@ -1,13 +1,7 @@
-import { Polyfilla } from '@admin/services/util/polyfilla';
+import {Polyfilla} from '@admin/services/util/polyfilla';
 import client, {baseURL} from '@admin/services/util/service';
-import {baseUrl} from "@common/services/api";
 
-import {
-  AncillaryFile,
-  DataFile,
-  UploadAncillaryFileRequest,
-  UploadDataFilesRequest,
-} from './types';
+import {AncillaryFile, DataFile, UploadAncillaryFileRequest, UploadDataFilesRequest,} from './types';
 
 export interface EditReleaseService {
   getReleaseDataFiles: (releaseId: string) => Promise<DataFile[]>;
