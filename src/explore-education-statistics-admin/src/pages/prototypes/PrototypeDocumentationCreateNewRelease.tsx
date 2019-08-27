@@ -5,7 +5,7 @@ import { RouteChildrenProps } from 'react-router';
 import PrototypePage from './components/PrototypePage';
 import StepNav from './components/PrototypeStepByStep';
 import StepNavItem from './components/PrototypeStepByStepItem';
-import imageChoosePublication from './images/guidance/horizontal-bar.png';
+import imageChoosePublication from './images/guidance/guidance-choose-publication.png';
 
 const DocumentationCreateNewRelease = ({ location }: RouteChildrenProps) => {
   const query = new URLSearchParams(window.location.search);
@@ -67,19 +67,13 @@ const DocumentationCreateNewRelease = ({ location }: RouteChildrenProps) => {
                 administration dashboard, select the publication where you want
                 to create your release.
               </p>
-              <img
-                src={imageChoosePublication}
-                alt="Choose a publication TEST2"
-              />
+              <img src={imageChoosePublication} alt="Choose a publication" />
               <p>
                 2. If you have access to a long list of publications, use the
                 ‘Select theme’ and ‘Select topic’ dropdowns to find a
                 publication.
               </p>
-              <img
-                src="/static/images/guidance/guidance-select-theme.png"
-                alt=""
-              />
+              <img src="/static/images/chart-types/line-chart.png" alt="" />
             </StepNavItem>
             <StepNavItem
               stepNumber={2}
