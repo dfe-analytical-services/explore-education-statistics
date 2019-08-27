@@ -91,7 +91,7 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
                   <SummaryListItem term="Name">{file.title}</SummaryListItem>
                   <SummaryListItem term="File">
                     <a
-                      href={service.createDownloadDataFileLink(
+                      href={service.createDownloadAncillaryFileLink(
                         releaseId,
                         file.filename,
                       )}
