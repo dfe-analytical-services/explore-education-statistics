@@ -158,7 +158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var releaseService = new Mock<IReleaseService>();
 
             releaseService.Setup(s => s.GetRelease("publication-a")).Returns(
-                new Release
+                new ReleaseViewModel()
                 {
                     Slug = "publication-a"
                 });
@@ -180,7 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var publicationService = new Mock<IPublicationService>();
             var releaseService = new Mock<IReleaseService>();
 
-            releaseService.Setup(s => s.GetRelease("publication-a")).Returns((Release) null);
+            releaseService.Setup(s => s.GetRelease("publication-a")).Returns((ReleaseViewModel) null);
 
             var controller =
                 new ContentController(contentService.Object, publicationService.Object, releaseService.Object);
