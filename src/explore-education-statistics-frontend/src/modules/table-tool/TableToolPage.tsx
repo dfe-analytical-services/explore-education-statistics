@@ -473,14 +473,13 @@ class TableToolPage extends Component<Props, State> {
                               ) : (
                                 <>
                                   <ButtonText
-                                    disabled={!!permalinkId}
                                     onClick={this.handlePermalinkClick}
                                   >
                                     Create permanent link
                                   </ButtonText>
-                                  {permalinkLoading && (
+                                  {/* permalinkLoading && (
                                     <LoadingSpinner size={20} />
-                                  )}
+                                  ) */}
                                 </>
                               )}
                             </li>
