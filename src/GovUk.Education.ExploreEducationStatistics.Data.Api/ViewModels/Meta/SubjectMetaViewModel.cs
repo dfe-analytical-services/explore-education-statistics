@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta
 {
@@ -10,6 +10,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta
         public Dictionary<string, IndicatorMetaViewModel> Indicators { get; set; }
 
         public Dictionary<string, ObservationalUnitGeoJsonMeta> Locations { get; set; }
+        
+        public IEnumerable<IdLabelViewModel> BoundaryLevels { get; set; }
         
         public Dictionary<string, TimePeriodMetaViewModel> TimePeriods { get; set; }
     }

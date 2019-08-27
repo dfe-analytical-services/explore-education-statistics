@@ -1,6 +1,11 @@
 import Link from '@admin/components/Link';
+import { findTimePeriodCoverageGroup } from '@admin/pages/release/util/releaseSummaryUtil';
 import service from '@admin/services/common/service';
-import { DayMonthYearInputs, IdTitlePair } from '@admin/services/common/types';
+import {
+  DayMonthYearInputs,
+  IdTitlePair,
+  TimePeriodCoverageGroup,
+} from '@admin/services/common/types';
 import {
   validateMandatoryDayMonthYearField,
   validateOptionalPartialDayMonthYearField,
@@ -17,9 +22,6 @@ import { Dictionary } from '@common/types';
 import { FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
 import { ObjectSchemaDefinition } from 'yup';
-import DummyReferenceData, {
-  TimePeriodCoverageGroup,
-} from '../../DummyReferenceData';
 
 export interface EditFormValues {
   timePeriodCoverageCode: string;
@@ -42,6 +44,11 @@ interface Props<FormValues extends EditFormValues> {
   additionalFields?: React.ReactNode;
 }
 
+interface ReleaseSummaryFormModel {
+  timePeriodCoverageGroups: TimePeriodCoverageGroup[];
+  releaseTypes: IdTitlePair[];
+}
+
 const ReleaseSummaryForm = <FormValues extends EditFormValues>({
   submitButtonText,
   initialValuesSupplier,
@@ -50,15 +57,18 @@ const ReleaseSummaryForm = <FormValues extends EditFormValues>({
   onCancelHandler,
   additionalFields,
 }: Props<FormValues>) => {
-  const [timePeriodCoverageGroups, setTimePeriodCoverageGroups] = useState<
-    TimePeriodCoverageGroup[]
-  >();
-
-  const [releaseTypes, setReleaseTypes] = useState<IdTitlePair[]>();
+  const [model, setModel] = useState<ReleaseSummaryFormModel>();
 
   useEffect(() => {
-    setTimePeriodCoverageGroups(DummyReferenceData.timePeriodCoverageGroups);
-    service.getReleaseTypes().then(setReleaseTypes);
+    Promise.all([
+      service.getReleaseTypes(),
+      service.getTimePeriodCoverageGroups(),
+    ]).then(([releaseTypesResult, timePeriodGroupsResult]) => {
+      setModel({
+        releaseTypes: releaseTypesResult,
+        timePeriodCoverageGroups: timePeriodGroupsResult,
+      });
+    });
   }, []);
 
   const getTimePeriodOptions = (
@@ -66,10 +76,9 @@ const ReleaseSummaryForm = <FormValues extends EditFormValues>({
   ) => {
     const optGroups: Dictionary<SelectOption[]> = {};
     timePeriodGroups.forEach(group => {
-      optGroups[group.label] = group.options.map(option => ({
-        label: `${option.label} - ${option.id}`,
-        value: option.id,
-      }));
+      optGroups[group.category.label] = group.timeIdentifiers.map(
+        ({ identifier }) => identifier,
+      );
     });
     return optGroups;
   };
@@ -86,10 +95,10 @@ const ReleaseSummaryForm = <FormValues extends EditFormValues>({
 
   return (
     <>
-      {timePeriodCoverageGroups && releaseTypes && (
+      {model && (
         <Formik<FormValues>
           enableReinitialize
-          initialValues={initialValuesSupplier(timePeriodCoverageGroups)}
+          initialValues={initialValuesSupplier(model.timePeriodCoverageGroups)}
           validationSchema={Yup.object<FormValues>(
             validationRulesSupplier
               ? validationRulesSupplier(baseValidationRules)
@@ -107,15 +116,18 @@ const ReleaseSummaryForm = <FormValues extends EditFormValues>({
                     id={`${formId}-timePeriodCoverage`}
                     label="Type"
                     name="timePeriodCoverageCode"
-                    optGroups={getTimePeriodOptions(timePeriodCoverageGroups)}
+                    optGroups={getTimePeriodOptions(
+                      model.timePeriodCoverageGroups,
+                    )}
                   />
                   <FormFieldTextInput<FormValues>
                     id={`${formId}-timePeriodCoverageStartYear`}
                     name="timePeriodCoverageStartYear"
                     label={
-                      DummyReferenceData.findTimePeriodCoverageGroup(
+                      findTimePeriodCoverageGroup(
                         form.values.timePeriodCoverageCode,
-                      ).startDateLabel
+                        model.timePeriodCoverageGroups,
+                      ).category.label
                     }
                     width={4}
                     type="number"
@@ -142,7 +154,7 @@ const ReleaseSummaryForm = <FormValues extends EditFormValues>({
                   id={`${formId}-releaseTypeId`}
                   legend="Release Type"
                   name="releaseTypeId"
-                  options={releaseTypes.map(type => ({
+                  options={model.releaseTypes.map(type => ({
                     label: type.title,
                     value: `${type.id}`,
                   }))}

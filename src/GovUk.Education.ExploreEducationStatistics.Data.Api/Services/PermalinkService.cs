@@ -2,9 +2,9 @@ using System;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return _mapper.Map<PermalinkViewModel>(permalink);
         }
 
-        public async Task<PermalinkViewModel> CreateAsync(PermalinkQueryContext query)
+        public async Task<PermalinkViewModel> CreateAsync(TableBuilderQueryContext query)
         {
             var result = _dataService.Query(query);
             var permalink = new Permalink(result, query);

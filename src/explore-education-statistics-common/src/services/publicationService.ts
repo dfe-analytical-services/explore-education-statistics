@@ -196,6 +196,12 @@ export interface AbstractRelease<ContentBlockType> {
     path: string;
     size: string;
   }[];
+  downloadFiles: {
+    extension: string;
+    name: string;
+    path: string;
+    size: string;
+  }[];
 }
 
 export type Release = AbstractRelease<ContentBlock>;

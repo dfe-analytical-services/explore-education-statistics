@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -7,15 +6,12 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 {
-    public class ImporterLocationService
+    public class ImporterLocationService : BaseImporterService
     {
-        private readonly IMemoryCache _cache;
         private readonly ApplicationDbContext _context;
 
-        public ImporterLocationService(IMemoryCache cache,
-            ApplicationDbContext context)
+        public ImporterLocationService(ImporterMemoryCache cache, ApplicationDbContext context) : base(cache)
         {
-            _cache = cache;
             _context = context;
         }
 
@@ -37,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 localEnterprisePartnership, mayoralCombinedAuthority, multiAcademyTrust, opportunityArea,
                 parliamentaryConstituency, region, rscRegion, sponsor, ward);
 
-            if (_cache.TryGetValue(cacheKey, out Location location))
+            if (GetCache().TryGetValue(cacheKey, out Location location))
             {
                 return location;
             }
@@ -45,8 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             location = LookupOrCreate(country, institution, localAuthority, localAuthorityDistrict,
                 localEnterprisePartnership, mayoralCombinedAuthority, multiAcademyTrust, opportunityArea,
                 parliamentaryConstituency, region, rscRegion, sponsor, ward);
-            _cache.Set(cacheKey, location,
-                new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(5)));
+            GetCache().Set(cacheKey, location);
 
             return location;
         }
@@ -129,7 +124,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                     Ward = ward ?? Ward.Empty()
                 });
 
-                _context.SaveChanges();
                 return entityEntry.Entity;
             }
 

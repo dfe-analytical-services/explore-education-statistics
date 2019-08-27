@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "a987d317-8b66-4fa6-adac-ad3e331dec3f",
+		"_postman_id": "e7265748-effa-45b5-9924-1c3b6ce2dca2",
 		"name": "Dfe Content API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -243,28 +243,40 @@
 							"script": {
 								"id": "b9b07de4-ff73-4b70-a7be-1d0e4c74315d",
 								"exec": [
+									"var respJson = pm.response.json();",
+									"",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 									"",
 									"pm.test(\"Should return some results\", function () {",
 									"    pm.expect(pm.response.json().length).to.be.above(0);    ",
 									"});",
 									"",
-									"pm.test(\"Should be more than eight themes\", function () { pm.expect(pm.response.json().length).to.be.above(8); });",
-									"",
 									"pm.test(\"Response should contain \\\"Pupils and schools\\\"\", function () {",
-									"   var foundPupilsAndSchools = false;",
-									"   for(var i = 0; i < pm.response.json().length; i++) {",
-									"       if(pm.response.json()[i].title === \"Pupils and schools\") foundPupilsAndSchools = true;",
-									"   }",
-									"   pm.expect(foundPupilsAndSchools).to.equal(true);",
+									"    var foundPupilsAndSchools = false;",
+									"    for(var i = 0; i < respJson.length; i++) {",
+									"        if(respJson[i].title === \"Pupils and schools\") { ",
+									"            foundPupilsAndSchools = true;",
+									"        }",
+									"    }",
+									"    pm.expect(foundPupilsAndSchools).to.equal(true);",
 									"});",
 									"",
-									"pm.test(\"Response should contain \\\"Further education\\\"\", function () {",
-									"   var foundFurtherEducation = false;",
-									"   for(var i = 0; i < pm.response.json().length; i++) {",
-									"       if(pm.response.json()[i].title === \"Further education\") foundFurtherEducation = true;",
-									"   }",
-									"   pm.expect(foundFurtherEducation).to.equal(true);",
+									"pm.test(\"Pupil absence in schools in England should have correct number of dataFiles\", function() {",
+									"    for(var i = 0; respJson.length; i++) {",
+									"        if(respJson[i].title === \"Pupils and schools\") {",
+									"            for(var j = 0; respJson[i].topics.length; j++) {",
+									"                if(respJson[i].topics[j].title === \"Pupil absence\") {",
+									"                    for(var k = 0; respJson[i].topics[j].publications.length; k++) {",
+									"                        if(respJson[i].topics[j].publications[k].title === \"Pupil absence in schools in England\") {",
+									"                            pm.expect(respJson[i].topics[j].publications[k].dataFiles.length).to.equal(8);",
+									"                            pm.expect(respJson[i].topics[j].publications[k].downloadFiles.length).to.equal(8);",
+									"                            return;",
+									"                        }",
+									"                    }",
+									"                }",
+									"            }",
+									"        }",
+									"    }",
 									"});"
 								],
 								"type": "text/javascript"
@@ -275,12 +287,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{content_api_url}}/content/tree",
+							"raw": "{{content_api_url}}/download/tree",
 							"host": [
 								"{{content_api_url}}"
 							],
 							"path": [
-								"content",
+								"download",
 								"tree"
 							]
 						}

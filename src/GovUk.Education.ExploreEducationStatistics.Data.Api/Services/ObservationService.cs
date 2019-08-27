@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -118,7 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         public IEnumerable<Observation> FindObservations(SubjectMetaQueryContext query)
         {
-            return DbSet().AsNoTracking().Where(query.ObservationPredicate());
+            return DbSet().AsNoTracking().Where(ObservationPredicateBuilder.Build(query));
         }
 
         private static SqlParameter CreateTimePeriodListType(string parameterName,

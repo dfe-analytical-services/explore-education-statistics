@@ -14,6 +14,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Mappings
     {
         public MappingProfiles()
         {
+            CreateMap<FastTrack, FastTrackViewModel>();
+
             CreateMap<IObservationalUnit, LabelValue>()
                 .ForMember(dest => dest.Label, opts => { opts.MapFrom(unit => unit.Name); })
                 .ForMember(dest => dest.Value, opts => { opts.MapFrom(unit => unit.Code); });
@@ -27,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Mappings
             CreateMap<Permalink, PermalinkViewModel>()
                 .ForMember(dest => dest.Configuration,
                     opts => opts.MapFrom(permalink => permalink.Query.Configuration));
-            
+
             CreateMap<Publication, PublicationMetaViewModel>();
 
             CreateMap<Subject, IdLabelViewModel>()

@@ -2,11 +2,10 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Newtonsoft.Json;
 
@@ -43,11 +42,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             SubjectMetaQueryContext query,
             IQueryable<Observation> observations)
         {
+            var observationalUnits = GetObservationalUnits(observations);
             return new SubjectMetaViewModel
             {
                 Filters = GetFilters(observations),
                 Indicators = GetIndicators(query),
-                Locations = GetObservationalUnits(observations, query.BoundaryLevel),
+                Locations = GetGeoJsonObservationalUnits(observationalUnits, query.BoundaryLevel),
+                BoundaryLevels = GetBoundaryLevelOptions(query.BoundaryLevel, observationalUnits.Keys),
                 TimePeriods = GetTimePeriods(observations)
             };
         }
@@ -71,17 +72,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 indicator => _mapper.Map<IndicatorMetaViewModel>(indicator));
         }
 
-        private Dictionary<string, ObservationalUnitGeoJsonMeta> GetObservationalUnits(
-            IQueryable<Observation> observations, long? boundaryLevelId = null)
+        private Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> GetObservationalUnits(
+            IQueryable<Observation> observations)
         {
-            var observationalUnits = _locationService.GetObservationalUnits(observations);
+            return _locationService.GetObservationalUnits(observations);
+        }
 
+        private Dictionary<string, ObservationalUnitGeoJsonMeta> GetGeoJsonObservationalUnits(
+            Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> observationalUnits,
+            long? boundaryLevelId = null)
+        {
             var observationalUnitMetaViewModels = observationalUnits.SelectMany(pair =>
                 pair.Value.Select(observationalUnit => new ObservationalUnitGeoJsonMeta
                 {
                     GeoJson = GetGeoJsonForObservationalUnit(boundaryLevelId ??
                                                              GetBoundaryLevel(pair.Key).Id, observationalUnit),
                     Label = observationalUnit.Name,
+                    Level = pair.Key,
                     Value = observationalUnit.Code
                 }));
 
@@ -93,6 +100,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private BoundaryLevel GetBoundaryLevel(GeographicLevel geographicLevel)
         {
             return _boundaryLevelService.FindLatestByGeographicLevel(geographicLevel);
+        }
+
+        private IEnumerable<IdLabelViewModel> GetBoundaryLevelOptions(long? boundaryLevelId, IEnumerable<GeographicLevel> geographicLevels)
+        {
+            var boundaryLevels = boundaryLevelId.HasValue
+                ? _boundaryLevelService.FindRelatedByBoundaryLevel(boundaryLevelId.Value)
+                : _boundaryLevelService.FindByGeographicLevels(geographicLevels);
+            return boundaryLevels.Select(level => _mapper.Map<IdLabelViewModel>(level));
         }
 
         private Dictionary<string, TimePeriodMetaViewModel> GetTimePeriods(IQueryable<Observation> observations)

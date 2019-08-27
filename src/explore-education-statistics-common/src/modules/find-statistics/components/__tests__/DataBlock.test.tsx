@@ -252,23 +252,26 @@ describe('DataBlock', () => {
           {
             type: 'map',
             labels: {
-              '23_1_2': {
-                name: '23_1_2',
+              '23_1_2_____': {
+                name: '23_1_2_____',
                 label: 'Label 23_1_2',
                 value: '23_1_2',
                 unit: '%',
+                colour: '#ff0000',
               },
-              '26_1_2': {
-                name: '26_1_2',
+              '26_1_2_____': {
+                name: '26_1_2_____',
                 label: 'Label 26_1_2',
                 value: '26_1_2',
                 unit: '%',
+                colour: '#00ff00',
               },
-              '28_1_2': {
-                name: '28_1_2',
+              '28_1_2_____': {
+                name: '28_1_2_____',
                 label: 'Label 28_1_2',
                 value: '28_1_2',
                 unit: '%',
+                colour: '#0000ff',
               },
             },
 
