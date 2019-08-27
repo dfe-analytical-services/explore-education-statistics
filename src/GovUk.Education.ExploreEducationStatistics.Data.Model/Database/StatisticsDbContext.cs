@@ -6,9 +6,9 @@ using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 {
-    public class ApplicationDbContext : DbContext
+    public class StatisticsDbContext : DbContext
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+        public StatisticsDbContext(DbContextOptions<StatisticsDbContext> options) : base(options)
         {
             Database.SetCommandTimeout(int.MaxValue);
         }

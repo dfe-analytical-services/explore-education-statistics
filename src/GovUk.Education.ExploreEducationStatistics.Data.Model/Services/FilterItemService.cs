@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
     public class FilterItemService : AbstractRepository<FilterItem, long>, IFilterItemService
     {
-        public FilterItemService(ApplicationDbContext context,
+        public FilterItemService(StatisticsDbContext context,
             ILogger<FilterItemService> logger) : base(context, logger)
         {
         }

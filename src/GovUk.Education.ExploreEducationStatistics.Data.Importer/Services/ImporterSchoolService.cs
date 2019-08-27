@@ -8,9 +8,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 {
     public class ImporterSchoolService : BaseImporterService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly StatisticsDbContext _context;
 
-        public ImporterSchoolService(ImporterMemoryCache cache, ApplicationDbContext context) : base(cache)
+        public ImporterSchoolService(ImporterMemoryCache cache, StatisticsDbContext context) : base(cache)
         {
             _context = context;
         }
