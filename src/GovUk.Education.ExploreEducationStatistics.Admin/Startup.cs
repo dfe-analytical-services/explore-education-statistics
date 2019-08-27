@@ -73,6 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IContactService, ContactService>();
             services.AddTransient<IReleaseService, ReleaseService>();
             services.AddTransient<IMethodologyService, MethodologyService>();
+            services.AddTransient<IDataBlockService, DataBlockService>();
 
             services.AddSwaggerGen(c =>
             {

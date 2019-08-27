@@ -25,17 +25,17 @@ exports[`MapBlock renders 1`] = `
             name="selectedIndicator"
           >
             <option
-              value="0"
+              value="23_1_2_____"
             >
               Unauthorised absence rate
             </option>
             <option
-              value="1"
+              value="26_1_2_____"
             >
               Overall absence rate
             </option>
             <option
-              value="2"
+              value="28_1_2_____"
             >
               Authorised absence rate
             </option>

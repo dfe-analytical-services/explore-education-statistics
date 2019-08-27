@@ -68,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 
         // GET api/content/release/5
         [HttpGet("release/{id}")]
-        public ActionResult<Release> GetRelease(string id)
+        public ActionResult<ReleaseViewModel> GetRelease(string id)
         {
             var release = _releaseService.GetRelease(id);
 
