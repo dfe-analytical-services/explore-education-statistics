@@ -69,7 +69,7 @@ const KeyIndicator = ({
                 name={`trend-1-${indicatorOrder}`}
               />
             </div>
-            <Details summary="Guidance text">
+            <Details summary="Guidance text" open>
               <label htmlFor={`help-title-${indicatorOrder}`}>
                 Guidance title
               </label>
@@ -87,9 +87,7 @@ const KeyIndicator = ({
                 id={`help-text-1${indicatorOrder}`}
                 className="govuk-!-margin-bottom-2 govuk-body-s govuk-textarea govuk-!-width-full"
                 rows={5}
-                placeholder={`
-                  ${guidanceText}
-                  is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.`}
+                placeholder={`${guidanceText} is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.`}
               />
             </Details>
             <button

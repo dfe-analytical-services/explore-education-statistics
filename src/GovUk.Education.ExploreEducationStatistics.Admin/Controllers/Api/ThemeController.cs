@@ -22,7 +22,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         // GET api/me/themes/
         [HttpGet("api/me/themes")]
-        [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
         public ActionResult<List<Theme>> GetMyThemes()
         {
             var userId = new Guid(); // TODO get the Guid from AD

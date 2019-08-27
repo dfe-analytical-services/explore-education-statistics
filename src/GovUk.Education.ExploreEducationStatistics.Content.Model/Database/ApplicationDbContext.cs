@@ -1130,7 +1130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new Publication
                 {
                     Id = new Guid("a91d9e05-be82-474c-85ae-4913158406d0"),
-                    Title = "School and pupils and their characteristics",
+                    Title = "Schools, pupils and their characteristics",
                     Summary = "",
                     TopicId = new Guid("e50ba9fd-9f19-458c-aceb-4422f0c7d1ba"),
                     Slug = "school-pupils-and-their-characteristics",
