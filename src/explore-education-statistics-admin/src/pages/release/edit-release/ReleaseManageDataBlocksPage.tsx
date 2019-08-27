@@ -1,27 +1,26 @@
-import React, { useContext } from 'react';
-import Tabs from '@common/components/Tabs';
-import TabsSection from '@common/components/TabsSection';
 import ChartBuilder from '@admin/modules/chart-builder/ChartBuilder';
 import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
+import DataBlocksService from '@admin/services/release/edit-release/datablocks/service';
+import { DataBlock } from '@admin/services/release/edit-release/datablocks/types';
+import FormSelect from '@common/components/form/FormSelect';
+import LoadingSpinner from '@common/components/LoadingSpinner';
+import Tabs from '@common/components/Tabs';
+import TabsSection from '@common/components/TabsSection';
+import { ChartRendererProps } from '@common/modules/find-statistics/components/ChartRenderer';
 import DataBlockService, {
   DataBlockRequest,
   DataBlockRerequest,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
 import { Chart } from '@common/services/publicationService';
-import { ChartRendererProps } from '@common/modules/find-statistics/components/ChartRenderer';
-import LoadingSpinner from '@common/components/LoadingSpinner';
-import DataBlocksService from '@admin/services/release/edit-release/datablocks/service';
-import { DataBlock } from 'src/services/release/edit-release/datablocks/types';
-import FormSelect from '@common/components/form/FormSelect';
+import React, { useContext } from 'react';
 
 const ReleaseManageDataBlocksPage = () => {
-  const { publication, releaseId } = useContext(
-    ManageReleaseContext,
-  ) as ManageRelease;
+  const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedDataBlock, setSelectedDataBlock] = React.useState<string>('');
   const [dataBlocks, setDataBlocks] = React.useState<DataBlock[]>([]);
 
@@ -37,6 +36,7 @@ const ReleaseManageDataBlocksPage = () => {
 
   const [request, setRequest] = React.useState<DataBlockRequest>();
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [requestConfiguration, setRequestConfiguration] = React.useState<
     Chart | undefined
   >();
