@@ -1068,7 +1068,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Summary = "",
                     TopicId = new Guid("77941b7d-bbd6-4069-9107-565af89e2dec"),
                     Slug = "permanent-and-fixed-period-exclusions-in-england",
-                    NextUpdate = new DateTime(2019, 7, 19)
+                    NextUpdate = new DateTime(2019, 7, 19),
+                    ContactId = new Guid("d246c696-4b3a-4aeb-842c-c1318ee334e8")
                 },
                 new Publication
                 {
@@ -1146,6 +1147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     TopicId = new Guid("1a9636e4-29d5-4c90-8c07-f41db8dd019c"),
                     Slug = "secondary-and-primary-schools-applications-and-offers",
                     NextUpdate = new DateTime(2019, 6, 14),
+                    ContactId = new Guid("d246c696-4b3a-4aeb-842c-c1318ee334e8")
                 },
                 new Publication
                 {
