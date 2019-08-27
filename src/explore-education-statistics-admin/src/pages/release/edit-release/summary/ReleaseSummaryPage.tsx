@@ -92,8 +92,10 @@ const ReleaseSummaryPage = () => {
           </SummaryListItem>
           <SummaryListItem term="Release type">
             {
-              getSelectedReleaseType(model.releaseSummaryDetails.typeId, model.releaseTypes)
-                .title
+              getSelectedReleaseType(
+                model.releaseSummaryDetails.typeId,
+                model.releaseTypes,
+              ).title
             }
           </SummaryListItem>
           <SummaryListItem
