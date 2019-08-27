@@ -188,8 +188,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             
                 return new Observation
                 {
-                    //FilterItems = CreateObservationFilterItems(filterItems),
-                    FilterItems = GetFilterItemsOld(line, headers, subjectMeta.Filters),
+                    FilterItems = GetFilterItems(line, headers, subjectMeta.Filters),
                     GeographicLevel = GetGeographicLevel(line, headers),
                     LocationId = GetLocationId(line, headers),
                     Measures = GetMeasures(line, headers, subjectMeta.Indicators),
@@ -245,7 +244,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 .AsNoTracking().Where(fi => fi.FilterGroup.Filter.SubjectId == subjectId);
         }
         
-        private ICollection<ObservationFilterItem> GetFilterItemsOld(IReadOnlyList<string> line,
+        private ICollection<ObservationFilterItem> GetFilterItems(IReadOnlyList<string> line,
             List<string> headers,
             IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)> filtersMeta)
         {
@@ -258,14 +257,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 {
                     FilterItem = _importerFilterService.Find(filterItemLabel, filterGroupLabel, filterMeta.Filter)
                 };
-            }).ToList();
-        }
-
-        private ICollection<ObservationFilterItem> CreateObservationFilterItems(IEnumerable<FilterItem> filterItems)
-        {
-            return filterItems.Select(fi => new ObservationFilterItem
-            {
-                FilterItem = fi
             }).ToList();
         }
 

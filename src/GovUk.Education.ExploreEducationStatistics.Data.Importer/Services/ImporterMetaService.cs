@@ -39,11 +39,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             
             var headers = GetHeaders(lines);
             var metaRows = GetMetaRows(subject.Id, lines, headers, true);
-
+            var filters = ImportFilters(metaRows, subject).ToList();
+            var indicators = ImportIndicators(metaRows, subject).ToList();
+            
             return new SubjectMeta
             {
-                Filters = ImportFilters(metaRows, subject),
-                Indicators = ImportIndicators(metaRows, subject)
+                Filters = filters,
+                Indicators = indicators
             };
         }
 
@@ -51,11 +53,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         {
             var headers = GetHeaders(lines);
             var metaRows = GetMetaRows(subject.Id, lines, headers, false);
-
+            var filters = GetFilters(metaRows, subject).ToList();
+            var indicators = GetIndicators(metaRows, subject).ToList();
+            
             return new SubjectMeta
             {
-                Filters = GetFilters(metaRows, subject),
-                Indicators = GetIndicators(metaRows, subject)
+                Filters = filters,
+                Indicators = indicators
             };
         }
 

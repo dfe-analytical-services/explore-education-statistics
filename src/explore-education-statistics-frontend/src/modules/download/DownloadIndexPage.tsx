@@ -37,8 +37,8 @@ class DownloadIndexPage extends Component<Props> {
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
             <p className="govuk-body-l">
-              Find the data files behind our range of national and regional
-              statistics for your own analysis.
+              Find the latest data files behind our range of national and
+              regional statistics for your own analysis.
             </p>
             <PageSearchFormWithAnalytics />
           </div>

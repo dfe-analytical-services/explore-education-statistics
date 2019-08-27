@@ -19,7 +19,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query
 
             if (query.TimePeriod != null)
             {
-                // Don't use the observation.GetTimePeriod() extension in the expression here as it can't be translated
+                // Don't use the observation.GetTimePeriod() extension in the expression here
+                // or string interpolation as it can't be translated
                 predicate = predicate.And(observation => GetTimePeriodRange(query.TimePeriod)
                     .Contains(observation.Year + "_" + observation.TimeIdentifier));
             }

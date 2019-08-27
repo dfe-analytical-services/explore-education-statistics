@@ -67,7 +67,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                 .SelectMany(publication => publication.Releases)
                 .SelectMany(release => release.Subjects);
 
-            return subjects.Where(subject => !IgnoredSubjectFiles.Contains(SubjectFiles[subject.Id])).ToList();
+            return subjects.Where(subject => !IgnoredSubjectFiles.Contains(
+                SubjectFiles[subject.Id])).OrderBy(subject => subject.Id).ToList();
         }
 
         private static IEnumerable<Theme> GetThemes()
