@@ -3711,7 +3711,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "2c8281ce-e56c-4542-9cb2-b90dcac8f445",
+												"id": "0ed51781-5027-4730-b0da-604beb3c6157",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -3719,13 +3719,14 @@
 													"    pm.response.to.have.status(200);",
 													"});",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.results.length).to.equal(17838); });",
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.results.length).to.equal(4427); });",
 													"",
-													"pm.test(\"geographicLevel should be same as request\", function () {",
-													"    for(var i = 0; i < respJson.results.length; i++) {",
-													"        pm.expect(respJson.results[i].geographicLevel).to.equal(\"School\");",
-													"    }",
-													"});"
+													"// NOTE(mark): Slow!",
+													"// pm.test(\"geographicLevel should be same as request\", function () {",
+													"//     for(var i = 0; i < respJson.results.length; i++) {",
+													"//         pm.expect(respJson.results[i].geographicLevel).to.equal(\"School\");",
+													"//     }",
+													"// });"
 												],
 												"type": "text/javascript"
 											}
