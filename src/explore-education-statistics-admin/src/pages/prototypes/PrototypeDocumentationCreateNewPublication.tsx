@@ -5,7 +5,8 @@ import { RouteChildrenProps } from 'react-router';
 import PrototypePage from './components/PrototypePage';
 import StepNav from './components/PrototypeStepByStep';
 import StepNavItem from './components/PrototypeStepByStepItem';
-import imageChoosePublication from './images/guidance/guidance-choose-pub.jpg';
+import imageChoosePublication from './images/guidance/guidance-choose-publication.png';
+import imageChoosePublicationTest from './images/guidance/test.png';
 
 const DocumentationCreateNewRelease = ({ location }: RouteChildrenProps) => {
   const query = new URLSearchParams(window.location.search);
@@ -37,6 +38,7 @@ const DocumentationCreateNewRelease = ({ location }: RouteChildrenProps) => {
             <StepNavItem stepNumber={1} stepHeading="Step 1" open={step === 1}>
               <p>Write standard html here</p>
               <img src={imageChoosePublication} alt="Choose a publication" />
+              <img src={imageChoosePublicationTest} alt="This is a test" />
             </StepNavItem>
             <StepNavItem stepNumber={2} stepHeading="Step 2" open={step === 2}>
               <p>Write standard html here</p>
