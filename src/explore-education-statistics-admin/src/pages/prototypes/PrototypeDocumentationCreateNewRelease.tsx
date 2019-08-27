@@ -73,7 +73,10 @@ const DocumentationCreateNewRelease = ({ location }: RouteChildrenProps) => {
                 ‘Select theme’ and ‘Select topic’ dropdowns to find a
                 publication.
               </p>
-              <img src="/static/images/chart-types/line-chart.png" alt="" />
+              <img
+                src="/static/images/prototype/indicator-filters.png"
+                alt="Test 2"
+              />
             </StepNavItem>
             <StepNavItem
               stepNumber={2}
