@@ -32,7 +32,7 @@ export interface FullTableMeta {
 }
 
 interface PermalinkCreate extends TableDataQuery {
-  configurations: {
+  configuration: {
     tableHeadersConfig: TableHeadersFormValues;
   };
 }

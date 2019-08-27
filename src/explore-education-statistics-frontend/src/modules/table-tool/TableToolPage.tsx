@@ -78,6 +78,7 @@ interface State {
   locations: Dictionary<LocationFilter[]>;
   filters: Dictionary<CategoryFilter[]>;
   indicators: Indicator[];
+  permalinkId: string;
   publication?: PublicationOptions['topics'][0]['publications'][0];
   subjects: PublicationSubject[];
   subjectId: string;
@@ -88,8 +89,9 @@ interface State {
 class TableToolPage extends Component<Props, State> {
   public state: State = {
     filters: {},
-    locations: {},
     indicators: [],
+    locations: {},
+    permalinkId: '',
     subjectId: '',
     subjectMeta: {
       timePeriod: {
@@ -299,6 +301,7 @@ class TableToolPage extends Component<Props, State> {
       createdTable,
       filters,
       indicators,
+      permalinkId: '',
       tableHeaders: getDefaultTableHeaderConfig(createdTable.subjectMeta),
     });
   };
@@ -306,14 +309,18 @@ class TableToolPage extends Component<Props, State> {
   private handlePermalinkClick: MouseEventHandler = async () => {
     const { filters, indicators, tableHeaders } = this.state;
 
-    const { url } = await permalinkService.createTablePermalink({
+    const { id: permalinkId } = await permalinkService.createTablePermalink({
       ...this.createQuery(filters, indicators),
-      configurations: {
+      configuration: {
         tableHeadersConfig: tableHeaders,
       },
     });
 
-    Router.push(url);
+    this.setState({
+      permalinkId,
+    });
+
+    // Router.push(`${window.location.pathname}/permalink/${permalinkId}`);
   };
 
   public render() {
@@ -321,6 +328,7 @@ class TableToolPage extends Component<Props, State> {
     const {
       createdTable,
       publication,
+      permalinkId,
       subjectMeta,
       subjects,
       tableHeaders,
@@ -409,7 +417,10 @@ class TableToolPage extends Component<Props, State> {
                         <TableHeadersForm
                           initialValues={tableHeaders}
                           onSubmit={tableHeaderConfig => {
-                            this.setState({ tableHeaders: tableHeaderConfig });
+                            this.setState({
+                              tableHeaders: tableHeaderConfig,
+                              permalinkId: '',
+                            });
 
                             if (this.dataTableRef.current) {
                               this.dataTableRef.current.scrollIntoView({
@@ -442,9 +453,24 @@ class TableToolPage extends Component<Props, State> {
                               </Link>
                             </li>
                             <li>
-                              <ButtonText onClick={this.handlePermalinkClick}>
+                              <ButtonText
+                                disabled={!!permalinkId}
+                                onClick={this.handlePermalinkClick}
+                              >
                                 Create permanent link
                               </ButtonText>
+                              {permalinkId ? (
+                                <ButtonText
+                                  onClick={() => {
+                                    window.open(
+                                      `${window.location.pathname}/permalink/${permalinkId}`,
+                                      'blank_',
+                                    );
+                                  }}
+                                >
+                                  {`${window.location.href}/permalink/${permalinkId}`}
+                                </ButtonText>
+                              ) : null}
                             </li>
                             <li>
                               <DownloadCsvButton
