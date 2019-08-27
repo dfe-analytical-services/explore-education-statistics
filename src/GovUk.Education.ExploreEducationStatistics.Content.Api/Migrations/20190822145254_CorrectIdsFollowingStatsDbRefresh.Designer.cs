@@ -4,18 +4,20 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190822145254_CorrectIdsFollowingStatsDbRefresh")]
+    partial class CorrectIdsFollowingStatsDbRefresh
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.6-servicing-10079")
+                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -683,7 +685,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9"),
-                            ContactId = new Guid("d246c696-4b3a-4aeb-842c-c1318ee334e8"),
                             MethodologyId = new Guid("c8c911e3-39c1-452b-801f-25bb79d1deb7"),
                             NextUpdate = new DateTime(2019, 7, 19, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Slug = "permanent-and-fixed-period-exclusions-in-england",
@@ -751,7 +752,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         new
                         {
                             Id = new Guid("66c8e9db-8bf2-4b0b-b094-cfab25c20b05"),
-                            ContactId = new Guid("d246c696-4b3a-4aeb-842c-c1318ee334e8"),
                             MethodologyId = new Guid("8ab41234-cc9d-4b3d-a42c-c9fce7762719"),
                             NextUpdate = new DateTime(2019, 6, 14, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Slug = "secondary-and-primary-schools-applications-and-offers",
