@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controller
         [Fact]
         public void Query_Post()
         {
-            var result = _controller.QueryNew(_query);
+            var result = _controller.Query(_query);
             Assert.IsAssignableFrom<TableBuilderResultViewModel>(result.Value);
         }
     }

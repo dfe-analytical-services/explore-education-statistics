@@ -49,6 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
             var subjects = SamplePublications.GetSubjects();
             foreach (var subject in subjects)
             {
+                _logger.LogInformation($"Processing subject {subject.Id}");
                 var file = SamplePublications.SubjectFiles[subject.Id];
                 StoreFiles(subject.Release, file, subject.Name);
                 Seed(file + ".csv", subject.Release, subjects.Count);

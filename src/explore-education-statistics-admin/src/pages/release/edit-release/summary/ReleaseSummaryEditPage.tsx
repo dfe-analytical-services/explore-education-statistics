@@ -30,17 +30,14 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
     });
   }, [releaseId]);
 
-  const submitHandler = (values: EditFormValues) => {
+  const submitHandler = async (values: EditFormValues) => {
     const updatedReleaseDetails = assembleUpdateReleaseSummaryRequestFromForm(
       releaseId,
       values,
     );
 
-    service
-      .updateReleaseSummaryDetails(updatedReleaseDetails)
-      .then(() =>
-        history.push(summaryRoute.generateLink(publication.id, releaseId)),
-      );
+    await service.updateReleaseSummaryDetails(updatedReleaseDetails);
+    history.push(summaryRoute.generateLink(publication.id, releaseId));
   };
 
   const cancelHandler = () =>
