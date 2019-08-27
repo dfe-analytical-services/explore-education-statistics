@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
             _mapper = mapper;
         }
 
-        public Release GetRelease(string id)
+        public ReleaseViewModel GetRelease(string id)
         {
             var release = Guid.TryParse(id, out var newGuid)
                 ? _context.Releases.Include(x => x.Publication).ThenInclude(x => x.LegacyReleases)
@@ -49,8 +49,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
                     Updates = r.Updates
                 }));
             }
-
-            return release;
+            
+            var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
+            releaseViewModel.LatestRelease =  IsLatestRelease(release.PublicationId, releaseViewModel.Id);
+            
+            return releaseViewModel;
         }
 
         public ReleaseViewModel GetLatestRelease(string id)
@@ -104,6 +107,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
             return null;
         }
 
+        // TODO: This logic is flawed but will provide an accurate result with the current seed data
+        private bool IsLatestRelease(Guid publicationId, Guid releaseId)
+        {
+            return (_context.Releases
+                        .Where(x=> x.PublicationId == publicationId)
+                        .OrderBy(x => x.Published)
+                        .Last().Id == releaseId);
+        }
+        
         private List<FileInfo> ListFiles(Release release, ReleaseFileTypes type)
         {
             return _fileStorageService.ListFiles(release.Publication.Slug, release.Slug, type).ToList();
