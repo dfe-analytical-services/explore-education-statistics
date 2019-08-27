@@ -14,6 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controller
     {
         private readonly PermalinkController _controller;
 
+        private readonly Guid _createdId = Guid.NewGuid();
         private readonly Guid _validId = Guid.NewGuid();
         private readonly TableBuilderQueryContext _query = new TableBuilderQueryContext();
 
@@ -32,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controller
             permalinkService.Setup(s => s.CreateAsync(_query)).ReturnsAsync(
                 new PermalinkViewModel
                 {
-                    Id = Guid.NewGuid(),
+                    Id = _createdId,
                     FullTable = new TableBuilderResultViewModel()
                 }
             );
@@ -68,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controller
             Assert.IsAssignableFrom<PermalinkViewModel>(result.Value);
             var link = result.Value as PermalinkViewModel;
 
-            Assert.NotNull(link.Id);
+            Assert.Equal(_createdId, link.Id);
         }
     }
 }
