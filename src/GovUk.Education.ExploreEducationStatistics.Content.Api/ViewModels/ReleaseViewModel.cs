@@ -21,6 +21,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels
 
         public DateTime? Published { get; set; }
 
+        public bool LatestRelease { get; set; }
+
         public string Slug { get; set; }
 
         public string Summary { get; set; }
