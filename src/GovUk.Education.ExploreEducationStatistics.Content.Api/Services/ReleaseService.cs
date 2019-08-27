@@ -96,6 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
                 releaseViewModel.DataFiles = ListFiles(release, ReleaseFileTypes.Data);
                 releaseViewModel.ChartFiles = ListFiles(release, ReleaseFileTypes.Chart);
                 releaseViewModel.AncillaryFiles = ListFiles(release, ReleaseFileTypes.Ancillary);
+                releaseViewModel.LatestRelease = true;
                 
                 return releaseViewModel;
             }
