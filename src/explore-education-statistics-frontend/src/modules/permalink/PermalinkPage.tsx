@@ -36,7 +36,7 @@ class PermalinkPage extends Component<Props> {
 
   public render() {
     const { data } = this.props;
-    const { fullTable, configuration } = data;
+    const { fullTable /* , configuration */ } = data;
 
     return (
       <Page
@@ -69,9 +69,11 @@ class PermalinkPage extends Component<Props> {
         <TimePeriodDataTable
           fullTable={fullTable}
           tableHeadersConfig={
-            configuration.tableHeadersConfig
+            /* configuration.tableHeadersConfig
               ? configuration.tableHeadersConfig
-              : getDefaultTableHeaderConfig(fullTable.subjectMeta)
+              :  */ getDefaultTableHeaderConfig(
+              fullTable.subjectMeta,
+            )
           }
         />
         <DownloadCsvButton
