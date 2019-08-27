@@ -79,12 +79,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IMethodologyService, MethodologyService>();
             
             services.AddTransient<IDataService<ResultWithMetaViewModel>, DataService>();
+            services.AddTransient<IDataService<TableBuilderResultViewModel>, TableBuilderDataService>();
             services.AddTransient<IObservationService, ObservationService>();
             services.AddTransient<IPublicationMetaService, PublicationMetaService>();
             services.AddTransient<IResultBuilder<Observation, ObservationViewModel>, ResultBuilder>();
             services.AddTransient<ISubjectMetaService, SubjectMetaService>();
             services.AddTransient<ITimePeriodService, TimePeriodService>();
             services.AddTransient<ITableBuilderSubjectMetaService, TableBuilderSubjectMetaService>();
+            services.AddTransient<ITableBuilderResultSubjectMetaService, TableBuilderResultSubjectMetaService>();
 
             services.AddSwaggerGen(c =>
             {
