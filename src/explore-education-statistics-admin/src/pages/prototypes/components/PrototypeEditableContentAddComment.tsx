@@ -2,6 +2,7 @@ import { LoginContext } from '@admin/components/Login';
 import { User } from '@admin/services/sign-in/types';
 import { ExtendedComment } from '@admin/services/publicationService';
 import Details from '@common/components/Details';
+import classNames from 'classnames';
 import React from 'react';
 import styles from './PrototypeEditableContentAddComment.module.scss';
 
@@ -45,12 +46,19 @@ const ContentAddComment = ({ initialComments }: Props) => {
     setComments([...comments]);
   };
 
+  const resolveComment = (index: number) => {
+    comments[index].state = 'resolved';
+    comments[index].resolvedOn = new Date();
+    comments[index].resolvedBy = context.user && context.user.name;
+    setComments([...comments]);
+  };
+
   return (
     <>
-      <div className={styles.addComment}>
+      <div className={classNames('dfe-comment-block', [styles.addComment])}>
         <Details
-          summary="Add comment to section"
-          className="govuk-!-margin-bottom-1"
+          summary="Add / view comments to section"
+          className="govuk-!-margin-bottom-1 govuk-body-s"
         >
           <form>
             <textarea
@@ -71,25 +79,51 @@ const ContentAddComment = ({ initialComments }: Props) => {
             </button>
           </form>
           <hr />
-          {comments.map(({ name, comment, time }, index) => (
-            <div key={key()}>
-              <h2 className="govuk-body-xs govuk-!-margin-0">
-                <strong>{`${name} ${time.toLocaleDateString()}`}</strong>
-              </h2>
-              <p className="govuk-body-xs govuk-!-margin-bottom-1">{comment}</p>
-              {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
-              <a
-                className="govuk-body-xs"
-                role="button"
-                tabIndex={0}
-                onClick={() => removeComment(index)}
-                style={{ cursor: 'pointer' }}
-              >
-                Remove
-              </a>
-              <hr />
-            </div>
-          ))}
+          <div className={styles.commentsContainer}>
+            {comments.map(
+              (
+                { name, time, comment, state, resolvedOn, resolvedBy },
+                index,
+              ) => (
+                <div key={key()}>
+                  <h2 className="govuk-body-xs govuk-!-margin-0">
+                    <strong>{`${name} ${time.toLocaleDateString()}`}</strong>
+                  </h2>
+                  <p className="govuk-body-xs govuk-!-margin-bottom-1">
+                    {comment}
+                  </p>
+                  {state === 'open' && (
+                    <button
+                      type="button"
+                      className="govuk-body-xs govuk-!-margin-right-3"
+                      onClick={() => resolveComment(index)}
+                    >
+                      Resolve
+                    </button>
+                  )}
+                  {state === 'resolved' && (
+                    <p className="govuk-body-xs govuk-!-margin-bottom-1 ">
+                      <em>
+                        Resolved {resolvedOn && resolvedOn.toLocaleDateString()}{' '}
+                        by {resolvedBy}
+                      </em>
+                    </p>
+                  )}
+                  {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
+                  <a
+                    className="govuk-body-xs"
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => removeComment(index)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    Remove
+                  </a>
+                  <hr />
+                </div>
+              ),
+            )}
+          </div>
         </Details>
       </div>
     </>

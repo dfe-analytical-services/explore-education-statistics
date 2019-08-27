@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
@@ -8,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -27,16 +29,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         private readonly IFileStorageService _fileStorageService;
         private readonly IImportService _importService;
         private readonly IPublicationService _publicationService;
+        private readonly IDataBlockService _dataBlockService;
 
         public ReleasesController(IReleaseService releaseService, IFileStorageService fileStorageService,
-            IImportService importService, IPublicationService publicationService)
+            IImportService importService, IPublicationService publicationService, IDataBlockService dataBlockService)
         {
             _releaseService = releaseService;
             _fileStorageService = fileStorageService;
             _importService = importService;
             _publicationService = publicationService;
+            _dataBlockService = dataBlockService;
         }
-        
+
         [HttpGet("release/{releaseId}/chart/{filename}")]
         [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
         public async Task<ActionResult> GetChartFile(ReleaseId releaseId, string filename)
@@ -44,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await CheckReleaseExistsStreamAsync(releaseId,
                 () => _fileStorageService.StreamFile(releaseId, ReleaseFileTypes.Chart, filename));
         }
-        
+
         [HttpGet("release/{releaseId}/data/{filename}")]
         [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
         public async Task<ActionResult> GetDataFile(ReleaseId releaseId, string filename)
@@ -52,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await CheckReleaseExistsStreamAsync(releaseId,
                 () => _fileStorageService.StreamFile(releaseId, ReleaseFileTypes.Data, filename));
         }
-        
+
         [HttpGet("release/{releaseId}/ancillary/{filename}")]
         [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
         public async Task<ActionResult> GetAncillaryFile(ReleaseId releaseId, string filename)
@@ -60,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await CheckReleaseExistsStreamAsync(releaseId,
                 () => _fileStorageService.StreamFile(releaseId, ReleaseFileTypes.Ancillary, filename));
         }
-        
+
         // POST api/publication/{publicationId}/releases
         [HttpPost("publications/{publicationId}/releases")]
         [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
@@ -157,9 +161,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             {
                 // upload the files
                 var result = _fileStorageService.UploadDataFilesAsync(releaseId, file, metaFile, name);
-                    // add message to queue to process these files
-                    // TODO: Disabled adding message to queue
-                    //.OnSuccess(() => _importService.Import(file.FileName, releaseId));
+                // add message to queue to process these files
+                // TODO: Disabled adding message to queue
+                //.OnSuccess(() => _importService.Import(file.FileName, releaseId));
                 return result;
             });
         }
@@ -226,7 +230,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await CheckReleaseExistsAsync(releaseId,
                 () => _fileStorageService.DeleteFileAsync(releaseId, ReleaseFileTypes.Chart, fileName));
         }
-        
+
         [HttpPut("releases/{releaseId}/status")]
         [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
         public async Task<ActionResult<ReleaseSummaryViewModel>> UpdateReleaseStatusAsync(
@@ -236,6 +240,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 releaseId, 
                 () => _releaseService.UpdateReleaseStatusAsync(releaseId, updateRequest.ReleaseStatus, updateRequest.InternalReleaseNote)
             );
+        }
+
+        [HttpGet("release/{releaseId}/datablocks/")]
+        [AllowAnonymous]
+        public async Task<ActionResult<List<DataBlockViewModel>>> GetDataBlocks(ReleaseId releaseId)
+        {
+            return await CheckReleaseExistsAsync(releaseId,  async () => Ok(await _dataBlockService.ListAsync(releaseId)));
         }
 
         private async Task<ActionResult> CheckReleaseExistsAsync(ReleaseId releaseId, Func<Task<ActionResult>> andThen)
@@ -267,7 +278,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
             return Ok(result.Right);
         }
-        
+
         private async Task<ActionResult> CheckReleaseExistsStreamAsync(ReleaseId releaseId,
             Func<Task<Either<ValidationResult, FileStreamResult>>> andThen)
         {
@@ -286,7 +297,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
             return result.Right;
         }
-        
+
 
         private async Task<ActionResult> CheckPublicationExistsAsync<T>(PublicationId publicationId,
             Func<Task<Either<ValidationResult, T>>> andThen)
@@ -303,7 +314,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 ValidationUtils.AddErrors(ModelState, result.Left);
                 return ValidationProblem();
             }
-            
+
             return Ok(result.Right);
         }
     }

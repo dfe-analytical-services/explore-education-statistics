@@ -17,7 +17,7 @@ const PublicationDataPage = () => {
       wide
       breadcrumbs={[
         {
-          link: '/prototypes/admin-dashboard?status=editNewRelease',
+          link: '/prototypes/admin-dashboard?status=readyApproval',
           text: 'Administrator dashboard',
         },
         { text: 'Create new release', link: '#' },
@@ -40,7 +40,7 @@ const PublicationDataPage = () => {
               to="/prototypes/publication-create-new-absence-view-table"
               className="govuk-tabs__tab"
             >
-              View data blocks
+              View saved tables and charts
             </Link>
           </li>
         </ul>
@@ -350,7 +350,7 @@ const PublicationDataPage = () => {
               <PrototypeAdminExampleTables task="edit" />
               <Link
                 to="/prototypes/publication-create-new-absence-table?status=step5#add-chart"
-                className="govuk-button govuk-button--secondary"
+                className="govuk-button govuk-button"
               >
                 Create chart
               </Link>
@@ -374,7 +374,7 @@ const PublicationDataPage = () => {
                 </FormGroup>
                 <FormGroup>
                   <label htmlFor="footnotes" className="govuk-label">
-                    Footnotes
+                    Release footnotes
                   </label>
                   <textarea
                     name="footnotes"

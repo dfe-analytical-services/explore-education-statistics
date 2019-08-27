@@ -6,7 +6,11 @@ import PrototypePublicationService from '@admin/pages/prototypes/components/Prot
 import EditablePublicationPage from '@admin/pages/prototypes/components/EditablePublicationPage';
 import PrototypePage from './components/PrototypePage';
 
-const PublicationPage = () => {
+interface Props {
+  task?: string;
+}
+
+const PublicationPage = ({ task }: Props) => {
   const [status, setStatus] = React.useState('');
   const userContext = React.useContext(LoginContext);
 
@@ -20,7 +24,7 @@ const PublicationPage = () => {
     return (
       <form action="/prototypes/admin-dashboard">
         <FormRadioGroup
-          legend="Final sign-off release status"
+          legend="Update release status"
           id="status"
           name="status"
           value={status}
@@ -30,7 +34,7 @@ const PublicationPage = () => {
           options={[
             {
               id: 'approve-release-higher-review',
-              label: 'Approve for publication',
+              label: 'Approved for release',
               value: 'approvedPublication',
               conditional: (
                 <FormGroup>
@@ -48,9 +52,8 @@ const PublicationPage = () => {
 
             {
               id: 'question',
-              label:
-                'In higher review - add comments and questions for author / team lead',
-              value: 'readyHigherReview',
+              label: 'In draft',
+              value: 'inDraft',
               conditional: (
                 <FormGroup>
                   <label htmlFor="question" className="govuk-label">
@@ -63,6 +66,12 @@ const PublicationPage = () => {
                   />
                 </FormGroup>
               ),
+            },
+
+            {
+              id: 'questionHigherReview',
+              label: 'Ready for sign-off',
+              value: 'readyHigherReview',
             },
           ]}
         />
@@ -97,7 +106,7 @@ const PublicationPage = () => {
           </div>
         </>
       )}
-      {reviewType === 'level2' && (
+      {reviewType === 'level2' && task !== 'previewRelease' && (
         <>
           <Level2ReviewForm />
           <div className="govuk-width-container dfe-align--comments">
