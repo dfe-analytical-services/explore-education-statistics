@@ -69,7 +69,7 @@ const DocumentationCreateNewRelease = ({ location }: RouteChildrenProps) => {
               </p>
               <img
                 src={imageChoosePublication}
-                alt="Choose a publication TEST"
+                alt="Choose a publication TEST2"
               />
               <p>
                 2. If you have access to a long list of publications, use the
