@@ -215,11 +215,16 @@ export interface DataBlockLocationMetadata {
 
 // ------------------------------------------
 
+export interface BoundaryLevel {
+  id: number;
+  label: string;
+}
 export interface DataBlockMetadata {
   indicators: Dictionary<LabelValueUnitMetadata>;
   filters: Dictionary<LabelValueMetadata>;
   timePeriods: Dictionary<LabelValueMetadata>;
   locations: Dictionary<DataBlockLocationMetadata>;
+  boundaryLevels?: BoundaryLevel[];
 }
 
 interface DataBlockTimePeriod {
@@ -234,6 +239,7 @@ export interface DataBlockRequest {
   timePeriod: DataBlockTimePeriod;
   filters: string[];
   geographicLevel: GeographicLevel;
+  boundaryLevel?: number;
   indicators: string[];
 
   country?: string[];
@@ -250,6 +256,10 @@ export interface DataBlockRequest {
   ward?: string[];
 }
 
+export interface DataBlockRerequest {
+  boundaryLevel?: number;
+}
+
 export interface DataBlockResponse {
   metaData: DataBlockMetadata;
 
@@ -263,7 +273,9 @@ export interface DataBlockResponse {
 }
 
 const DataBlockService = {
-  async getDataBlockForSubject(request: DataBlockRequest) {
+  async getDataBlockForSubject(
+    request: DataBlockRequest,
+  ): Promise<DataBlockResponse> {
     const response: DataBlockResponse = await dataApi.post('/Data', request);
 
     return response;
