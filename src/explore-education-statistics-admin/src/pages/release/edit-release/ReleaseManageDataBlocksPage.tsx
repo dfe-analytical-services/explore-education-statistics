@@ -30,19 +30,13 @@ const ReleaseManageDataBlocksPage = () => {
     });
   }, [releaseId]);
 
-  const [chartBuilderData, setChartBuilderData] = React.useState<
-    DataBlockResponse
-  >();
+  const [chartBuilderData, setChartBuilderData] = React.useState<DataBlockResponse>();
 
   const [request, setRequest] = React.useState<DataBlockRequest>();
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [requestConfiguration, setRequestConfiguration] = React.useState<
-    Chart | undefined
-  >();
-  const [initialConfiguration, setInitialConfiguration] = React.useState<
-    Chart | undefined
-  >();
+  const [requestConfiguration, setRequestConfiguration] = React.useState<Chart | undefined>();
+  const [initialConfiguration, setInitialConfiguration] = React.useState<Chart | undefined>();
 
   React.useEffect(() => {
     // destroy the existing setup before the response completes
@@ -51,7 +45,10 @@ const ReleaseManageDataBlocksPage = () => {
 
     if (request) {
       DataBlockService.getDataBlockForSubject(request).then(response => {
-        setChartBuilderData(response);
+        setChartBuilderData({
+          ...response,
+          releaseId,
+        });
         setInitialConfiguration(requestConfiguration);
       });
     }
@@ -84,6 +81,7 @@ const ReleaseManageDataBlocksPage = () => {
               setRequest(dataBlocks[+e.target.value].dataBlockRequest);
               setSelectedDataBlock(e.target.value);
             }}
+            order={[]}
             options={[
               {
                 label: 'select',
@@ -96,21 +94,26 @@ const ReleaseManageDataBlocksPage = () => {
             ]}
           />
 
-          <Tabs id="editDataBlockSections">
-            <TabsSection title="table">Table</TabsSection>
-            <TabsSection title="Create Chart">
-              {chartBuilderData ? (
-                <ChartBuilder
-                  data={chartBuilderData}
-                  onChartSave={onChartSave}
-                  initialConfiguration={initialConfiguration}
-                  onRequiresDataUpdate={reRequestdata}
-                />
-              ) : (
-                <LoadingSpinner />
-              )}
-            </TabsSection>
-          </Tabs>
+          {selectedDataBlock && (
+            <>
+              <hr />
+              <Tabs id="editDataBlockSections">
+                <TabsSection title="table">Table</TabsSection>
+                <TabsSection title="Create Chart">
+                  {chartBuilderData ? (
+                    <ChartBuilder
+                      data={chartBuilderData}
+                      onChartSave={onChartSave}
+                      initialConfiguration={initialConfiguration}
+                      onRequiresDataUpdate={reRequestdata}
+                    />
+                  ) : (
+                    <LoadingSpinner />
+                  )}
+                </TabsSection>
+              </Tabs>
+            </>
+          )}
         </TabsSection>
       </Tabs>
     </>

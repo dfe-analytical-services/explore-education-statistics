@@ -57,7 +57,7 @@ const PrototypeExampleTable = ({ task, table }: Props) => {
           </div>
         </TabsSection>
         <TabsSection id="add-chart" title="Create chart">
-          {Data && <ChartBuilder data={Data} />}
+          {Data && <ChartBuilder data={Data}  />}
         </TabsSection>
       </Tabs>
       {task === 'selectTable' && (

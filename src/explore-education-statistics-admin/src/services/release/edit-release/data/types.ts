@@ -28,3 +28,17 @@ export interface UploadAncillaryFileRequest {
   name: string;
   file: File;
 }
+
+export interface ChartFile {
+  title: string;
+  filename: string;
+  fileSize: {
+    size: number;
+    unit: string;
+  };
+}
+
+export interface UploadChartFileRequest {
+  name: string;
+  file: File;
+}
