@@ -45,19 +45,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controller
         [Fact]
         public async void DebugReport()
         {
-            var result = _controller.GetReport();
+            var result = await _controller.GetReport();
 
-            Assert.IsType<Task<ActionResult<DebugReport>>>(result);
+            Assert.NotNull(result);
 
-            var actionResult = await result;
+            var debugReport = result.Value;
 
-            Assert.Equal(100, actionResult.Value.FilterCount);
-            Assert.Equal(200, actionResult.Value.IndicatorCount);
-            Assert.Equal(300, actionResult.Value.LocationCount);
-            Assert.Equal(400, actionResult.Value.ObservationCount);
-            Assert.Equal(500, actionResult.Value.ReleaseCount);
-            Assert.Equal(600, actionResult.Value.SchoolCount);
-            Assert.Equal(700, actionResult.Value.SubjectCount);
+            Assert.Equal(100, debugReport.FilterCount);
+            Assert.Equal(200, debugReport.IndicatorCount);
+            Assert.Equal(300, debugReport.LocationCount);
+            Assert.Equal(400, debugReport.ObservationCount);
+            Assert.Equal(500, debugReport.ReleaseCount);
+            Assert.Equal(600, debugReport.SchoolCount);
+            Assert.Equal(700, debugReport.SubjectCount);
         }
     }
 }
