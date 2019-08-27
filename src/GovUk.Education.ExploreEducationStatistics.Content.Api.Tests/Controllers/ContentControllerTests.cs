@@ -169,7 +169,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var result = controller.GetRelease("publication-a");
 
             Assert.IsAssignableFrom<ReleaseViewModel>(result.Value);
-            Assert.Equal("Academic Year", result.Value.Title);
             Assert.Equal("publication-a", result.Value.Slug);
         }
 
