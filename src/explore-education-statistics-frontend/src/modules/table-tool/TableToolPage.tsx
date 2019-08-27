@@ -10,6 +10,7 @@ import tableBuilderService, {
 } from '@frontend/services/tableBuilderService';
 import { Dictionary } from '@common/types/util';
 import ButtonText from '@common/components/ButtonText';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PreviousStepModalConfirm from '@frontend/modules/table-tool/components/PreviousStepModalConfirm';
@@ -79,6 +80,7 @@ interface State {
   filters: Dictionary<CategoryFilter[]>;
   indicators: Indicator[];
   permalinkId: string;
+  permalinkLoading: boolean;
   publication?: PublicationOptions['topics'][0]['publications'][0];
   subjects: PublicationSubject[];
   subjectId: string;
@@ -92,6 +94,7 @@ class TableToolPage extends Component<Props, State> {
     indicators: [],
     locations: {},
     permalinkId: '',
+    permalinkLoading: false,
     subjectId: '',
     subjectMeta: {
       timePeriod: {
@@ -308,6 +311,7 @@ class TableToolPage extends Component<Props, State> {
 
   private handlePermalinkClick: MouseEventHandler = async () => {
     const { filters, indicators, tableHeaders } = this.state;
+    this.setState({ permalinkLoading: true });
 
     const { id: permalinkId } = await permalinkService.createTablePermalink({
       ...this.createQuery(filters, indicators),
@@ -318,6 +322,7 @@ class TableToolPage extends Component<Props, State> {
 
     this.setState({
       permalinkId,
+      permalinkLoading: false,
     });
 
     // Router.push(`${window.location.pathname}/permalink/${permalinkId}`);
@@ -329,6 +334,7 @@ class TableToolPage extends Component<Props, State> {
       createdTable,
       publication,
       permalinkId,
+      permalinkLoading,
       subjectMeta,
       subjects,
       tableHeaders,
@@ -453,12 +459,6 @@ class TableToolPage extends Component<Props, State> {
                               </Link>
                             </li>
                             <li>
-                              <ButtonText
-                                disabled={!!permalinkId}
-                                onClick={this.handlePermalinkClick}
-                              >
-                                Create permanent link
-                              </ButtonText>
                               {permalinkId ? (
                                 <ButtonText
                                   onClick={() => {
@@ -468,9 +468,21 @@ class TableToolPage extends Component<Props, State> {
                                     );
                                   }}
                                 >
-                                  {`${window.location.href}/permalink/${permalinkId}`}
+                                  View permanent link
                                 </ButtonText>
-                              ) : null}
+                              ) : (
+                                <>
+                                  <ButtonText
+                                    disabled={!!permalinkId}
+                                    onClick={this.handlePermalinkClick}
+                                  >
+                                    Create permanent link
+                                  </ButtonText>
+                                  {permalinkLoading && (
+                                    <LoadingSpinner size={20} />
+                                  )}
+                                </>
+                              )}
                             </li>
                             <li>
                               <DownloadCsvButton
