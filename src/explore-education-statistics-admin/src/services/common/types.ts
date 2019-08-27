@@ -91,7 +91,10 @@ export const dayMonthYearIsEmpty = (dmy?: DayMonthYearValues) => {
   return !dmy || (!dmy.day && !dmy.month && !dmy.year);
 };
 
-export const dayMonthYearToDate = (dmy: DayMonthYearValues) => {
+export const dayMonthYearToDate = (dmy?: DayMonthYearValues) => {
+  if (!dmy) {
+    throw Error(`Couldn't convert undefined DayMonthYearValues to Date`);
+  }
   if (!dayMonthYearIsComplete(dmy)) {
     throw Error(
       `Couldn't convert DayMonthYearValues ${JSON.stringify(
