@@ -53,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
-            services.AddAutoMapper();
+            services.AddAutoMapper(typeof(Startup).Assembly);
             services.AddMvc(options =>
                 {
                     var policy = new AuthorizationPolicyBuilder()
