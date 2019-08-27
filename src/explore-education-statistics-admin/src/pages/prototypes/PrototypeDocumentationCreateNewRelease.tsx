@@ -74,8 +74,8 @@ const DocumentationCreateNewRelease = ({ location }: RouteChildrenProps) => {
                 publication.
               </p>
               <img
-                src="/static/images/prototype/indicator-filters.png"
-                alt="Test 2"
+                src="/static/images/guidance/guidance-select-theme.png"
+                alt=""
               />
             </StepNavItem>
             <StepNavItem
