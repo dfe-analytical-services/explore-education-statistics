@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics
 {
-    [Route("api/data/[controller]")]
+    [Route("api/data/meta")]
     [ApiController]
     [Authorize]
     public class TableBuilderMetaController : ControllerBase
