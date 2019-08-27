@@ -2,7 +2,7 @@ import { Form, FormFieldRadioGroup, Formik } from '@common/components/form';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
-import { PublicationSubject } from '@common/services/tableBuilderService';
+import { PublicationSubject } from '@frontend/services/tableBuilderService';
 import useResetFormOnPreviousStep from '@frontend/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
 import { FormikProps } from 'formik';
 import React, { useRef, useState } from 'react';

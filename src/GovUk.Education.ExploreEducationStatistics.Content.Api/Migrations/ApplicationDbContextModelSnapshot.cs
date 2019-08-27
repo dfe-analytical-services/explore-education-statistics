@@ -745,7 +745,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                             LegacyPublicationUrl = "https://www.gov.uk/government/collections/statistics-school-and-pupil-numbers",
                             Slug = "school-pupils-and-their-characteristics",
                             Summary = "",
-                            Title = "School and pupils and their characteristics",
+                            Title = "Schools, pupils and their characteristics",
                             TopicId = new Guid("e50ba9fd-9f19-458c-aceb-4422f0c7d1ba")
                         },
                         new

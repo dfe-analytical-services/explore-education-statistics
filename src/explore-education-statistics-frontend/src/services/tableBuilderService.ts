@@ -1,5 +1,6 @@
 import { Dictionary, PartialRecord } from '@common/types';
-import { dataApi } from './api';
+import { FullTableMeta, FullTable } from '@frontend/services/permalinkService';
+import { dataApi } from '@common/services/api';
 
 export interface FilterOption {
   label: string;
@@ -88,16 +89,8 @@ export type LocationLevelKeys =
   | 'ward';
 
 export interface TableData {
-  footnotes: {
-    id: number;
-    label: string;
-  }[];
-  timePeriodRange: {
-    code: string;
-    label: string;
-    year: number;
-  }[];
-  result: {
+  subjectMeta: FullTableMeta;
+  results: {
     timePeriod: string;
     measures: Dictionary<string>;
     filters: string[];
@@ -106,13 +99,6 @@ export interface TableData {
       name: string;
     }>;
   }[];
-}
-
-export interface TablePermalink {
-  id: string;
-  title: string;
-  created: string;
-  url: string;
 }
 
 interface TimePeriodQuery {
@@ -151,10 +137,7 @@ export default {
   ): Promise<PublicationSubjectMeta> {
     return dataApi.post('/meta/subject', query);
   },
-  getTableData(query: TableDataQuery): Promise<TableData> {
+  getTableData(query: TableDataQuery): Promise<FullTable> {
     return dataApi.post('/tablebuilder', query);
-  },
-  getTablePermalink(query: TableDataQuery): Promise<TablePermalink> {
-    return dataApi.post('/permalink', query);
   },
 };
