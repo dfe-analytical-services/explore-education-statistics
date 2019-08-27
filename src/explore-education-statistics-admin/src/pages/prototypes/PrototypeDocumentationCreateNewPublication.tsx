@@ -5,8 +5,10 @@ import { RouteChildrenProps } from 'react-router';
 import PrototypePage from './components/PrototypePage';
 import StepNav from './components/PrototypeStepByStep';
 import StepNavItem from './components/PrototypeStepByStepItem';
-import imageChoosePublication from './images/guidance/guidance-choose-publication.png';
-import imageChoosePublicationTest from './images/guidance/test.png';
+import imageTest1 from './images/guidance/guidance-choose-publication.jpg';
+import imageTest2 from './images/guidance/guidance-create-release-button.jpg';
+import imageTest3 from './images/guidance/guidance-create-release-navigation.jpg';
+import imageTest4 from './images/guidance/guidance-select-theme.jpg';
 
 const DocumentationCreateNewRelease = ({ location }: RouteChildrenProps) => {
   const query = new URLSearchParams(window.location.search);
@@ -37,17 +39,19 @@ const DocumentationCreateNewRelease = ({ location }: RouteChildrenProps) => {
           <StepNav>
             <StepNavItem stepNumber={1} stepHeading="Step 1" open={step === 1}>
               <p>Write standard html here</p>
-              <img src={imageChoosePublication} alt="Choose a publication" />
-              <img src={imageChoosePublicationTest} alt="This is a test" />
+              <img src={imageTest1} alt="TEST 1" />
             </StepNavItem>
             <StepNavItem stepNumber={2} stepHeading="Step 2" open={step === 2}>
               <p>Write standard html here</p>
+              <img src={imageTest2} alt="TEST 2" />
             </StepNavItem>
             <StepNavItem stepNumber={3} stepHeading="Step 3" open={step === 3}>
               <p>Write standard html here</p>
+              <img src={imageTest3} alt="TEST 3" />
             </StepNavItem>
             <StepNavItem stepNumber={4} stepHeading="Step 4" open={step === 4}>
               <p>Write standard html here</p>
+              <img src={imageTest4} alt="TEST 4" />
             </StepNavItem>
           </StepNav>
         </div>
