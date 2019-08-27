@@ -98,6 +98,10 @@ h1.govuk-panel__title {
   width: 15%;
 }
 
+.dfe-summary-list__value--break-new-lines {
+  white-space: pre-line;
+}
+
 .dfe-toggle-edit {
   background: $govuk-brand-colour;
   padding: 10px;
