@@ -1,11 +1,12 @@
 import sortBy from 'lodash/sortBy';
 import { Dictionary } from '@common/types/util';
+import mapValuesWithKeys from '@common/lib/utils/mapValuesWithKeys';
 import {
   CategoryFilter,
   Indicator,
-  LocationFilter,
 } from '@frontend/modules/table-tool/components/types/filters';
-import TimePeriod from '@frontend/modules/table-tool/components/types/TimePeriod';
+import { FullTableMeta } from '@frontend/services/permalinkService';
+import TimePeriod from '../components/types/TimePeriod';
 
 const removeSiblinglessTotalRows = (
   categoryFilters: Dictionary<CategoryFilter[]>,
@@ -15,14 +16,29 @@ const removeSiblinglessTotalRows = (
   });
 };
 
-const getDefaultTableHeaderConfig = (
-  indicators: Indicator[],
-  filters: Dictionary<CategoryFilter[]>,
-  timePeriods: TimePeriod[],
-  locations: LocationFilter[],
-) => {
+export const transformTableMetaFiltersToCategoryFilters = (
+  filters: FullTableMeta['filters'],
+): Dictionary<CategoryFilter[]> => {
+  return mapValuesWithKeys(filters, (filterKey, filterValue) =>
+    Object.values(filterValue.options)
+      .flatMap(options => options.options)
+      .map(
+        filter =>
+          new CategoryFilter(filter, filter.value === filterValue.totalValue),
+      ),
+  );
+};
+
+const getDefaultTableHeaderConfig = (fullTableMeta: FullTableMeta) => {
+  const { indicators, filters, locations, timePeriodRange } = fullTableMeta;
+
   const sortedFilters = sortBy(
-    [...removeSiblinglessTotalRows(filters), locations],
+    [
+      ...removeSiblinglessTotalRows(
+        transformTableMetaFiltersToCategoryFilters(filters),
+      ),
+      locations,
+    ],
     [options => options.length],
   );
 
@@ -31,8 +47,8 @@ const getDefaultTableHeaderConfig = (
   return {
     columnGroups: sortedFilters.slice(0, halfwayIndex),
     rowGroups: sortedFilters.slice(halfwayIndex),
-    columns: timePeriods,
-    rows: indicators,
+    columns: timePeriodRange.map(timePeriod => new TimePeriod(timePeriod)),
+    rows: indicators.map(indicator => new Indicator(indicator)),
   };
 };
 
