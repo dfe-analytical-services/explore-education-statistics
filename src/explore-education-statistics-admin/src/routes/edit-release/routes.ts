@@ -5,6 +5,7 @@ import ReleaseBuildTablesPage from '@admin/pages/release/edit-release/ReleaseBui
 import ReleaseTablesPage from '@admin/pages/release/edit-release/ReleaseTablesPage';
 import ReleaseContentPage from '@admin/pages/release/edit-release/ReleaseContentPage';
 import ReleasePublishStatusPage from '@admin/pages/release/edit-release/ReleasePublishStatusPage';
+import ReleaseManageDataBlocksPage from '@admin/pages/release/edit-release/ReleaseManageDataBlocksPage';
 
 export interface ReleaseRoute {
   path: string;
@@ -60,6 +61,11 @@ export const dataRoute = createReadonlyRoute(
   'Add / edit data',
   ReleaseDataPage,
 );
+export const manageDataBlocksRoute = createReadonlyRoute(
+  'manage-datablocks',
+  'Manage data blocks',
+  ReleaseManageDataBlocksPage,
+);
 export const buildTablesRoute = createReadonlyRoute(
   'build-tables',
   'Build tables',
@@ -95,6 +101,11 @@ export const buildTablesEditRoute = createEditRoute(
   'Build tables',
   ReleaseBuildTablesPage,
 );
+export const manageDataBlocksEditRoute = createEditRoute(
+  'manage-datablocks',
+  'Manage data blocks',
+  ReleaseManageDataBlocksPage,
+);
 export const tablesEditRoute = createEditRoute(
   'tables',
   'View / edit tables',
@@ -114,6 +125,7 @@ export const publishStatusEditRoute = createEditRoute(
 export const viewRoutes = [
   summaryRoute,
   dataRoute,
+  manageDataBlocksRoute,
   buildTablesRoute,
   tablesRoute,
   contentRoute,
@@ -123,6 +135,7 @@ export const viewRoutes = [
 export const editRoutes = [
   summaryEditRoute,
   dataEditRoute,
+  manageDataBlocksEditRoute,
   buildTablesEditRoute,
   tablesEditRoute,
   contentEditRoute,
