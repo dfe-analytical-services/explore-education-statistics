@@ -24,6 +24,7 @@ import PrototypeChartTest from './pages/prototypes/PrototypeChartTest';
 import AdminDocumentationGlossary from './pages/prototypes/PrototypeDocumentationGlossary';
 import AdminDocumentationStyle from './pages/prototypes/PrototypeDocumentationStyle';
 import AdminDocumentationHome from './pages/prototypes/PrototypeDocumentationHome';
+import AdminDocumentationUsingDashboard from './pages/prototypes/PrototypeDocumentationUsingDashboard';
 import AdminDocumentationCreateNewRelease from './pages/prototypes/PrototypeDocumentationCreateNewRelease';
 import AdminDocumentationCreateNewPublication from './pages/prototypes/PrototypeDocumentationCreateNewPublication';
 import PublicationAssignMethodology from './pages/prototypes/PrototypePublicationPageAssignMethodology';
@@ -211,6 +212,11 @@ function App() {
           exact
           path="/prototypes/documentation/style-guide"
           component={AdminDocumentationStyle}
+        />
+        <Route
+          exact
+          path="/prototypes/documentation/using-dashboard"
+          component={AdminDocumentationUsingDashboard}
         />
         <Route
           exact

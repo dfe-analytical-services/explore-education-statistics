@@ -1,16 +1,18 @@
+import Link from '@admin/components/Link';
+import { LoginContext } from '@admin/components/Login';
+import Page from '@admin/components/Page';
+import { IdTitlePair } from '@admin/services/common/types';
+import dashboardService from '@admin/services/dashboard/service';
 import {
   AdminDashboardPublication,
   ThemeAndTopics,
 } from '@admin/services/dashboard/types';
-import React, { useContext, useEffect, useState } from 'react';
+import loginService from '@admin/services/sign-in/service';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import { LoginContext } from '@admin/components/Login';
-import { IdTitlePair } from '@admin/services/common/types';
-import dashboardService from '@admin/services/dashboard/service';
-import Link from '@admin/components/Link';
-import Page from '@admin/components/Page';
+import orderBy from 'lodash/orderBy';
+import React, { useContext, useEffect, useState } from 'react';
 import AdminDashboardPublicationsTab from './components/AdminDashboardPublicationsTab';
 
 const themeToThemeWithIdTitleAndTopics = (theme: ThemeAndTopics) => ({
@@ -37,7 +39,7 @@ interface ThemeAndTopicsIdsAndTitles extends IdTitlePair {
 const AdminDashboardPage = () => {
   const [myPublications, setMyPublications] = useState<
     AdminDashboardPublication[]
-  >([]);
+  >();
 
   const [themes, setThemes] = useState<ThemeAndTopicsIdsAndTitles[]>();
 
@@ -46,30 +48,30 @@ const AdminDashboardPage = () => {
     topic: IdTitlePair;
   }>();
 
-  const authentication = useContext(LoginContext);
+  useEffect(() => {
+    dashboardService
+      .getMyThemesAndTopics()
+      .then(themeList =>
+        setThemes(themeList.map(themeToThemeWithIdTitleAndTopics)),
+      );
+  }, []);
 
   useEffect(() => {
-    if (!themes) {
-      dashboardService.getMyThemesAndTopics().then(themeList => {
-        const themesAsIdTitlePairs = themeList.map(
-          themeToThemeWithIdTitleAndTopics,
-        );
-
-        setThemes(themesAsIdTitlePairs);
-
-        setSelectedThemeAndTopic({
-          theme: themesAsIdTitlePairs[0],
-          topic: themesAsIdTitlePairs[0].topics[0],
-        });
+    if (themes) {
+      setSelectedThemeAndTopic({
+        theme: themes[0],
+        topic: orderBy(themes[0].topics, topic => topic.title)[0],
       });
     }
+  }, [themes]);
 
+  useEffect(() => {
     if (selectedThemeAndTopic) {
       dashboardService
         .getMyPublicationsByTopic(selectedThemeAndTopic.topic.id)
         .then(setMyPublications);
     }
-  }, [authentication, selectedThemeAndTopic, themes]);
+  }, [selectedThemeAndTopic]);
 
   return (
     <Page wide breadcrumbs={[{ name: 'Administrator dashboard' }]}>
@@ -94,7 +96,7 @@ const AdminDashboardPage = () => {
           id="my-publications"
           title="Manage publications and releases"
         >
-          {themes && selectedThemeAndTopic && (
+          {themes && selectedThemeAndTopic && myPublications && (
             <AdminDashboardPublicationsTab
               publications={myPublications}
               noResultsMessage="You have not yet created any publications"
@@ -105,7 +107,10 @@ const AdminDashboardPage = () => {
               onThemeChange={themeId =>
                 setSelectedThemeAndTopic({
                   theme: findThemeById(themeId, themes),
-                  topic: findThemeById(themeId, themes).topics[0],
+                  topic: orderBy(
+                    findThemeById(themeId, themes).topics,
+                    topic => topic.title,
+                  )[0],
                 })
               }
               onTopicChange={topicId =>
@@ -146,7 +151,7 @@ const UserGreeting = () => {
         {user ? user.name : ''}{' '}
         <span className="govuk-body-s">
           Not you?{' '}
-          <a className="govuk-link" href="{loginService.getSignOutLink()}">
+          <a className="govuk-link" href={loginService.getSignOutLink()}>
             Sign out
           </a>
         </span>

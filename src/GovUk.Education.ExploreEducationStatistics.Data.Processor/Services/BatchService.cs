@@ -48,7 +48,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var count = (from bool b in new BitArray(batch.BatchesProcessed)
                 where b
                 select b).Count();
+            
+            _logger.LogInformation($"batchSize={batch.BatchSize} count={count}");
+
             var complete = count == batch.BatchSize;
+            
             if (complete)
             {
                 await UpdateStatus(releaseId, subjectId, 

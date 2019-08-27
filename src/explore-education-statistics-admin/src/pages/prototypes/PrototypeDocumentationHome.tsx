@@ -44,12 +44,24 @@ const BrowseReleasesPage = () => {
       <div className="govuk-grid-row govuk-!-margin-bottom-9">
         <div className="govuk-grid-column-one-third">
           <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
+            <Link to="/prototypes/documentation/using-dashboard">
+              Using your administration dashboard
+            </Link>
+          </h4>
+          <p className="govuk-caption-m govuk-!-margin-top-1">
+            How to use your administration dashboard to manage publications,
+            releases and methodology.{' '}
+          </p>
+        </div>
+        <div className="govuk-grid-column-one-third">
+          <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
             <Link to="/prototypes/documentation/create-new-publication">
               Creating a new publication
             </Link>
           </h4>
           <p className="govuk-caption-m govuk-!-margin-top-1">
-            How to create a new publication{' '}
+            How to create a new publication - including adding a methodology and
+            contact details.{' '}
           </p>
         </div>
         <div className="govuk-grid-column-one-third">
@@ -61,14 +73,6 @@ const BrowseReleasesPage = () => {
           <p className="govuk-caption-m govuk-!-margin-top-1">
             How to create a new release - including uploading data and files and
             creating data blocks (ie tables and charts) and content.{' '}
-          </p>
-        </div>
-        <div className="govuk-grid-column-one-third">
-          <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
-            <Link to="#">Training link 3</Link>
-          </h4>
-          <p className="govuk-caption-m govuk-!-margin-top-1">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.{' '}
           </p>
         </div>
       </div>
