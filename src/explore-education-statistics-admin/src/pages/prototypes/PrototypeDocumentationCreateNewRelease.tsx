@@ -5,7 +5,10 @@ import { RouteChildrenProps } from 'react-router';
 import PrototypePage from './components/PrototypePage';
 import StepNav from './components/PrototypeStepByStep';
 import StepNavItem from './components/PrototypeStepByStepItem';
-import imageChoosePublication from './images/guidance/guidance-choose-publication.png';
+import imageChoosePublication from './images/guidance/guidance-choose-publication.jpg';
+import imageCreateReleaseButton from './images/guidance/guidance-create-release-button.jpg';
+import imageCreateReleaseNavigation from './images/guidance/guidance-create-release-navigation.jpg';
+import imageSelectTheme from './images/guidance/guidance-select-theme.jpg';
 
 const DocumentationCreateNewRelease = ({ location }: RouteChildrenProps) => {
   const query = new URLSearchParams(window.location.search);
@@ -73,10 +76,7 @@ const DocumentationCreateNewRelease = ({ location }: RouteChildrenProps) => {
                 ‘Select theme’ and ‘Select topic’ dropdowns to find a
                 publication.
               </p>
-              <img
-                src="/static/images/guidance/guidance-select-theme.png"
-                alt=""
-              />
+              <img src={imageSelectTheme} alt="" />
             </StepNavItem>
             <StepNavItem
               stepNumber={2}
@@ -94,10 +94,7 @@ const DocumentationCreateNewRelease = ({ location }: RouteChildrenProps) => {
                 Under the publication you’ve chosen, select the green 'Create
                 new release' button.
               </p>
-              <img
-                src="/static/images/guidance/guidance-create-release-button.png"
-                alt=""
-              />
+              <img src={imageCreateReleaseButton} alt="" />
               <h3>Don't</h3>
               <p>
                 Don’t worry if you haven't got all the data, files and content
@@ -107,10 +104,7 @@ const DocumentationCreateNewRelease = ({ location }: RouteChildrenProps) => {
                 You can come back and add these later using the various tabs at
                 the top of the page.
               </p>
-              <img
-                src="/static/images/guidance/guidance-create-release-navigation.png"
-                alt=""
-              />
+              <img src={imageCreateReleaseNavigation} alt="" />
               <h3>Help and support</h3>
               <p>
                 If you can't find the publication where you want to create your
