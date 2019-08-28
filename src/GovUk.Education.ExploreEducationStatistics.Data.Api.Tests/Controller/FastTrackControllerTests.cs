@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -46,9 +47,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controller
         [Fact]
         public async void Get_FastTrack_NotFound()
         {
-            var result = _controller.Get(Guid.NewGuid());
+            var result = await _controller.Get(Guid.NewGuid());
 
-            Assert.IsAssignableFrom<NotFoundResult>(result.Result);
+            Assert.NotNull(result);
+            
+            Assert.IsAssignableFrom<NotFoundResult>(result);
         }
     }
 }

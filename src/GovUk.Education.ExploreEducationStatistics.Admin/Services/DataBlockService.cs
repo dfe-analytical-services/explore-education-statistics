@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 dataBlockList.Add(new DataBlockViewModel
                     {
                         Id = new Guid("17774a74-1f62-4b76-b9b5-84f14dac7278"),
-                        Heading = "",
+                        Heading = "Local Authority, Total, Number of schools, Number of Pupils, Number of Permanent Exclusions",
                         DataBlockRequest = new DataBlockRequest
                         {
                             SubjectId = 12,
