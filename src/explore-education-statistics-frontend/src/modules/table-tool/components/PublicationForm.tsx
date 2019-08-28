@@ -29,6 +29,7 @@ interface Props {
   onSubmit: PublicationFormSubmitHandler;
   options: ThemeMeta[];
   publicationId?: string;
+  publicationTitle?: string;
 }
 
 const PublicationForm = (props: Props & InjectedWizardProps) => {
@@ -38,6 +39,7 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
     isActive,
     goToNextStep,
     publicationId = '',
+    publicationTitle,
   } = props;
   const [publicationName, setPublicationName] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -183,7 +185,7 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
                 {stepHeading}
                 <SummaryList noBorder>
                   <SummaryListItem term="Publication">
-                    {publicationName}
+                    {publicationName || publicationTitle}
                   </SummaryListItem>
                 </SummaryList>
               </>
