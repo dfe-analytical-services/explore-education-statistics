@@ -448,6 +448,35 @@ class TableToolPage extends Component<Props, State> {
 
                       {publication && createdTable && (
                         <>
+                          <h3>Share your table</h3>
+                          <ul className="govuk-list">
+                            <li>
+                              {permalinkId ? (
+                                <>
+                                  <div>Generated permanent link:</div>
+                                  <LinkContainer
+                                    url={`${window.location.href}/permalink/${permalinkId}`}
+                                  />
+                                </>
+                              ) : (
+                                <>
+                                  <ButtonText
+                                    disabled={permalinkLoading}
+                                    onClick={this.handlePermalinkClick}
+                                  >
+                                    {permalinkLoading
+                                      ? `Generating`
+                                      : `Generate`}{' '}
+                                    permanent link
+                                    {permalinkLoading && (
+                                      <LoadingSpinner inline size={19} />
+                                    )}
+                                  </ButtonText>
+                                </>
+                              )}
+                            </li>
+                          </ul>
+
                           <h3>Additional options</h3>
 
                           <ul className="govuk-list">
@@ -479,41 +508,6 @@ class TableToolPage extends Component<Props, State> {
                             </li>
                             <li>
                               <a href="#contact">Contact</a>
-                            </li>
-                          </ul>
-                        </>
-                      )}
-                      {publication && createdTable && (
-                        <>
-                          <h3>Share your table</h3>
-                          <ul className="govuk-list">
-                            <li>
-                              {permalinkId ? (
-                                <>
-                                  <div>Generated Permalink:</div>
-                                  <LinkContainer
-                                    url={`${window.location.href}/permalink/${permalinkId}`}
-                                  />
-                                </>
-                              ) : (
-                                <>
-                                  <ButtonText
-                                    disabled={permalinkLoading}
-                                    onClick={this.handlePermalinkClick}
-                                  >
-                                    {permalinkLoading
-                                      ? `Generating`
-                                      : `Generate`}{' '}
-                                    permanent link
-                                  </ButtonText>
-                                  {permalinkLoading && (
-                                    <LoadingSpinner
-                                      text="Generating permanent link"
-                                      size={20}
-                                    />
-                                  )}
-                                </>
-                              )}
                             </li>
                           </ul>
                         </>
