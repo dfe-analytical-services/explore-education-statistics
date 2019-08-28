@@ -75,7 +75,7 @@ class PublicationReleasePage extends Component<Props> {
                   </strong>
                 ) : (
                   <p>
-                    This publication holds data from{' '}
+                    This publication release contains data from{' '}
                     <span className="govuk-!-font-weight-bold">
                       {data.yearTitle}
                     </span>
@@ -87,7 +87,6 @@ class PublicationReleasePage extends Component<Props> {
                     >
                       view latest release here
                     </Link>
-                    .
                   </p>
                 )}
                 <dl className="dfe-meta-content govuk-!-margin-top-3 govuk-!-margin-bottom-1">
