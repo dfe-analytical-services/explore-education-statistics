@@ -1,9 +1,9 @@
 import ReleaseDataPage from '@admin/pages/release/edit-release/data/ReleaseDataPage';
 import ReleaseContentPage from '@admin/pages/release/edit-release/ReleaseContentPage';
-import ReleaseDataBlocksPage from '@admin/pages/release/edit-release/ReleaseDataBlocksPage';
 import ReleasePublishStatusPage from '@admin/pages/release/edit-release/ReleaseStatusPage';
 import ReleaseSummaryEditPage from '@admin/pages/release/edit-release/summary/ReleaseSummaryEditPage';
 import ReleaseSummaryPage from '@admin/pages/release/edit-release/summary/ReleaseSummaryPage';
+import ReleaseManageDataBlocksPage from '@admin/pages/release/edit-release/ReleaseManageDataBlocksPage';
 
 export interface ReleaseRoute {
   path: string;
@@ -59,10 +59,10 @@ export const dataRoute = createReadonlyRoute(
   'Manage data',
   ReleaseDataPage,
 );
-export const dataBlocksRoute = createReadonlyRoute(
-  'data-blocks',
+export const manageDataBlocksRoute = createReadonlyRoute(
+  'manage-datablocks',
   'Manage data blocks',
-  ReleaseDataBlocksPage,
+  ReleaseManageDataBlocksPage,
 );
 export const contentRoute = createReadonlyRoute(
   'content',
@@ -83,7 +83,7 @@ export const summaryEditRoute = createEditRoute(
 export const viewRoutes = [
   summaryRoute,
   dataRoute,
-  dataBlocksRoute,
+  manageDataBlocksRoute,
   contentRoute,
   publishStatusRoute,
 ];

@@ -1102,6 +1102,129 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                         });
                 });
 
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseSummary", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<Guid>("ReleaseId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReleaseId")
+                        .IsUnique();
+
+                    b.ToTable("ReleaseSummaries");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("1bf7c51f-4d12-4697-8868-455760a887a7"),
+                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5")
+                        },
+                        new
+                        {
+                            Id = new Guid("51eb730b-d76c-4a0c-aaf2-cf7aa96f133a"),
+                            ReleaseId = new Guid("f75bc75e-ae58-4bc4-9b14-305ad5e4ff7d")
+                        },
+                        new
+                        {
+                            Id = new Guid("06c45b1e-533d-4c95-900b-62beb4620f59"),
+                            ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278")
+                        },
+                        new
+                        {
+                            Id = new Guid("c6e08ed3-d93a-410a-9e7e-600f2cf25725"),
+                            ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717")
+                        });
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseSummaryVersion", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("Created");
+
+                    b.Property<string>("NextReleaseDate");
+
+                    b.Property<DateTime?>("PublishScheduled");
+
+                    b.Property<string>("ReleaseName");
+
+                    b.Property<Guid>("ReleaseSummaryId");
+
+                    b.Property<string>("Slug");
+
+                    b.Property<string>("Summary");
+
+                    b.Property<string>("TimePeriodCoverage")
+                        .IsRequired()
+                        .HasMaxLength(6);
+
+                    b.Property<Guid>("TypeId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReleaseSummaryId");
+
+                    b.HasIndex("TypeId");
+
+                    b.ToTable("ReleaseSummaryVersions");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("420ca58e-278b-456b-9031-fe74a6966159"),
+                            Created = new DateTime(2018, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ReleaseName = "2016",
+                            ReleaseSummaryId = new Guid("1bf7c51f-4d12-4697-8868-455760a887a7"),
+                            Slug = "2016-17",
+                            Summary = @"Read national statistical summaries, view charts and tables and download data files.
+
+Find out how and why these statistics are collected and published - [Pupil absence statistics: methodology](../methodology/pupil-absence-in-schools-in-england).",
+                            TimePeriodCoverage = "AY",
+                            TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c")
+                        },
+                        new
+                        {
+                            Id = new Guid("fe5e8cac-a574-4e83-861b-7b5f927d7d34"),
+                            Created = new DateTime(2016, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ReleaseName = "2015",
+                            ReleaseSummaryId = new Guid("51eb730b-d76c-4a0c-aaf2-cf7aa96f133a"),
+                            Slug = "2015-16",
+                            Summary = "Read national statistical summaries and definitions, view charts and tables and download data files across a range of pupil absence subject areas.",
+                            TimePeriodCoverage = "AY",
+                            TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c")
+                        },
+                        new
+                        {
+                            Id = new Guid("04adfe47-9057-4abd-a0e8-5a6ac56e1560"),
+                            Created = new DateTime(2018, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ReleaseName = "2016",
+                            ReleaseSummaryId = new Guid("06c45b1e-533d-4c95-900b-62beb4620f59"),
+                            Slug = "2016-17",
+                            Summary = @"Read national statistical summaries, view charts and tables and download data files.
+
+Find out how and why these statistics are collected and published - [Permanent and fixed-period exclusion statistics: methodology](../methodology/permanent-and-fixed-period-exclusions-in-england)",
+                            TimePeriodCoverage = "AY",
+                            TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c")
+                        },
+                        new
+                        {
+                            Id = new Guid("c6e08ed3-d93a-410a-9e7e-600f2cf25725"),
+                            Created = new DateTime(2018, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ReleaseName = "2018",
+                            ReleaseSummaryId = new Guid("c6e08ed3-d93a-410a-9e7e-600f2cf25725"),
+                            Slug = "2018",
+                            Summary = @"Read national statistical summaries, view charts and tables and download data files.
+
+Find out how and why these statistics are collected and published - [Secondary and primary school applications and offers: methodology](../methodology/secondary-and-primary-schools-applications-and-offers)",
+                            TimePeriodCoverage = "AY",
+                            TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c")
+                        });
+                });
+
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseType", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1683,6 +1806,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseType", "Type")
                         .WithMany()
                         .HasForeignKey("TypeId");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseSummary", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", "Release")
+                        .WithOne("ReleaseSummary")
+                        .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseSummary", "ReleaseId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseSummaryVersion", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseSummary", "ReleaseSummary")
+                        .WithMany("Versions")
+                        .HasForeignKey("ReleaseSummaryId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseType", "Type")
+                        .WithMany()
+                        .HasForeignKey("TypeId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Topic", b =>
