@@ -6,7 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
     public class SchoolService : AbstractRepository<School, long>, ISchoolService
     {
-        public SchoolService(ApplicationDbContext context, ILogger<SchoolService> logger)
+        public SchoolService(StatisticsDbContext context, ILogger<SchoolService> logger)
             : base(context, logger)
         {
         }
