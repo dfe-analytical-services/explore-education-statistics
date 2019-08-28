@@ -1,32 +1,24 @@
 import ReleaseSummary from "@admin/pages/admin-dashboard/components/ReleaseSummary";
 import {AdminDashboardRelease} from '@admin/services/dashboard/types';
 import {Dictionary} from "@common/types";
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 
 interface Props {
-  getReleasesFn: () => Promise<AdminDashboardRelease[]>;
   noReleasesMessage: string;
+  releases: AdminDashboardRelease[];
 }
 
-const ReleasesByStatusTab = ({getReleasesFn, noReleasesMessage}: Props) => {
+const ReleasesByStatusTab = ({releases, noReleasesMessage}: Props) => {
 
-  const [releasesByPublication, setReleasesByPublication] = useState<
-    Dictionary<AdminDashboardRelease[]>
-  >();
+  const releasesByPublication: Dictionary<AdminDashboardRelease[]> = {};
 
-  useEffect(() => {
-    getReleasesFn().then(releases => {
-      const byPublication: Dictionary<AdminDashboardRelease[]> = {};
-      releases.forEach(release => {
-        if (byPublication[release.publicationTitle]) {
-          byPublication[release.publicationTitle].push(release);
-        } else {
-          byPublication[release.publicationTitle] = [release];
-        }
-      });
-      setReleasesByPublication(byPublication);
-    });
-  }, []);
+  releases.forEach(release => {
+    if (releasesByPublication[release.publicationTitle]) {
+      releasesByPublication[release.publicationTitle].push(release);
+    } else {
+      releasesByPublication[release.publicationTitle] = [release];
+    }
+  });
 
   return (
     <>
