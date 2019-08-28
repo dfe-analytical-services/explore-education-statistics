@@ -242,7 +242,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
 
         [Fact]
-        public async void GetEditReleaseSummaryAsync()
+        public async void GetReleaseSummaryAsync()
         {
             var releaseId = new Guid("5cf345d4-7f7b-425c-8267-de785cfc040b");
             var addHocReleaseTypeId = new Guid("19b024dc-339c-4e2c-b2ca-b55e5c509ad2");
@@ -250,7 +250,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var nextReleaseDate = new PartialDate {Day = "1", Month = "1", Year = "2040"};
             const string releaseName = "2035";
             const TimeIdentifier timePeriodCoverage = TimeIdentifier.January;
-            using (var context = InMemoryApplicationDbContext("GetEditReleaseSummaryAsync"))
+            using (var context = InMemoryApplicationDbContext("GetReleaseSummaryAsync"))
             {
                 context.AddRange(new List<ReleaseType>
                 {
@@ -273,7 +273,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 context.SaveChanges();
             }
 
-            using (var context = InMemoryApplicationDbContext("GetEditReleaseSummaryAsync"))
+            using (var context = InMemoryApplicationDbContext("GetReleaseSummaryAsync"))
             {
                 // Method under test 
                 var summary = await new ReleaseService(context, MapperForProfile<MappingProfiles>())
