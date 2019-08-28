@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -23,7 +25,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(dest => dest.PublicationTitle, 
                     m => m.MapFrom(r => r.Publication.Title))
                 .ForMember(dest => dest.PublicationId, 
-                    m => m.MapFrom(r => r.Publication.Id));
+                    m => m.MapFrom(r => r.Publication.Id))
+                .ForMember(dest => dest.DraftComments, 
+                    m => m.MapFrom(_ => new List<ReleaseViewModel.Comment>()
+                    {
+                        new ReleaseViewModel.Comment() { Message = "Message 1\nSome multiline content\nSpanning several lines", AuthorName = "TODO User", CreatedDate = DateTime.Now.AddMonths(-2)},
+                        new ReleaseViewModel.Comment() { Message = "Message 2", AuthorName = "TODO User 2", CreatedDate = DateTime.Now.AddMonths(-3)},
+                        new ReleaseViewModel.Comment() { Message = "Message 3", AuthorName = "TODO User 3", CreatedDate = DateTime.Now.AddMonths(-4)},
+                    }))
+                .ForMember(dest => dest.HigherReviewComments, 
+                    m => m.MapFrom(_ => new List<ReleaseViewModel.Comment>()
+                    {
+                        new ReleaseViewModel.Comment() { Message = "Message 4", AuthorName = "TODO Responsible Statistician 4", CreatedDate = DateTime.Now.AddDays(-2)},
+                    }));
+
             
             CreateMap<ReleaseSummaryViewModel, Release>();
 

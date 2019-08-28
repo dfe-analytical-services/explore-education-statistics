@@ -4,7 +4,7 @@ import {
   dayMonthYearToDate,
 } from '@admin/services/common/types';
 import {
-  AdminDashboardRelease,
+  AdminDashboardRelease, Comment,
   ReleaseStatus,
 } from '@admin/services/dashboard/types';
 import FormattedDate from '@common/components/FormattedDate';
@@ -91,6 +91,12 @@ const ReleaseSummary = ({ publicationId, release }: Props) => {
             </span>
           )}
         </SummaryListItem>
+        {(release.draftComments || release.higherReviewComments) && (
+          <SummaryListItem term="Comments">
+            <Comments heading='Draft comments' comments={release.draftComments} />
+            <Comments heading='Responsible statistician comments' comments={release.higherReviewComments} />
+          </SummaryListItem>
+        )}
         <SummaryListItem term="Last edited" detailsNoMargin>
           <FormattedDate>{release.lastEditedDateTime}</FormattedDate>
           {' at '}
@@ -98,12 +104,41 @@ const ReleaseSummary = ({ publicationId, release }: Props) => {
           <a href="#">{editorName}</a>
         </SummaryListItem>
         {release.internalReleaseNote && (
-          <SummaryListItem term="Internal release note" breakNewLines>
-            {release.internalReleaseNote}
+          <SummaryListItem term="Internal release note">
+            <span className="dfe-multiline-content">
+              {release.internalReleaseNote}
+            </span>
           </SummaryListItem>
         )}
       </SummaryList>
     </Details>
+  );
+};
+
+interface CommentsProps {
+  heading: string;
+  comments: Comment[];
+}
+
+const Comments = ({heading, comments}: CommentsProps) => {
+
+  return comments && (
+    <>
+      <h3 className='govuk-heading-s govuk-!-margin-bottom-0'>{heading}</h3>
+      {comments.map((comment, index) => (
+
+        /* eslint-disable react/no-array-index-key */
+        <Details
+          key={index}
+          summary={`${comment.authorName}, ${format(new Date(comment.createdDate), 'dd MMMM yyyy, HH:mm')}`}
+          className={index < comments.length - 1 ? 'govuk-!-margin-bottom-0' : undefined}
+        >
+          <span className="dfe-multiline-content">
+            {comment.message}
+          </span>
+        </Details>
+      ))}
+    </>
   );
 };
 

@@ -17,6 +17,12 @@ export interface ThemeAndTopics {
   }[];
 }
 
+export interface Comment {
+  message: string;
+  authorName: string;
+  createdDate: string;
+}
+
 export interface AdminDashboardRelease {
   id: string;
   status: ReleaseStatus;
@@ -33,6 +39,8 @@ export interface AdminDashboardRelease {
   published?: string;
   nextReleaseDate: DayMonthYearValues;
   internalReleaseNote?: string;
+  draftComments: Comment[];
+  higherReviewComments: Comment[];
 }
 
 export interface AdminDashboardPublication {
