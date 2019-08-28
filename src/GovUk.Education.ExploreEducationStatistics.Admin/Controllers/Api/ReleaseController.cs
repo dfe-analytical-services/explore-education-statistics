@@ -200,7 +200,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
         
         // GET api/publications/{publicationId}/releases
-        [HttpGet("publications/{publicationId}/releases/draft")]
+        [HttpGet("releases/draft")]
         [AllowAnonymous] // TODO We will need to do Authorisation checks when we know what the permissions model is.
         public async Task<ActionResult<List<ReleaseViewModel>>> GetDraftReleasesAsync()
         {
