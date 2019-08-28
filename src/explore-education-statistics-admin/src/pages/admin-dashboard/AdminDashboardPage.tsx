@@ -18,6 +18,8 @@ interface Model {
 
 const AdminDashboardPage = () => {
 
+  const { user } = useContext(LoginContext);
+
   const [model, setModel] = useState<Model>();
 
   useEffect(() => {
@@ -41,7 +43,16 @@ const AdminDashboardPage = () => {
         <Page wide breadcrumbs={[{ name: 'Administrator dashboard' }]}>
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-two-thirds">
-              <UserGreeting />
+              <span className="govuk-caption-xl">Welcome</span>
+              <h1 className="govuk-heading-xl">
+                {user ? user.name : ''}{' '}
+                <span className="govuk-body-s">
+                  Not you?{' '}
+                  <a className="govuk-link" href={loginService.getSignOutLink()}>
+                    Sign out
+                  </a>
+                </span>
+              </h1>
             </div>
             <div className="govuk-grid-column-one-third">
               <RelatedInformation heading="Help and guidance">
@@ -60,9 +71,7 @@ const AdminDashboardPage = () => {
               id="my-publications"
               title="Manage publications and releases"
             >
-              {(
-                <MyPublicationsTab />
-              )}
+              <MyPublicationsTab />
             </TabsSection>
             <TabsSection
               id="draft-releases"
@@ -87,26 +96,6 @@ const AdminDashboardPage = () => {
       )}
     </>
   )
-};
-
-const UserGreeting = () => {
-  const { user } = useContext(LoginContext);
-
-  return (
-    <>
-      <span className="govuk-caption-xl">Welcome</span>
-
-      <h1 className="govuk-heading-xl">
-        {user ? user.name : ''}{' '}
-        <span className="govuk-body-s">
-          Not you?{' '}
-          <a className="govuk-link" href={loginService.getSignOutLink()}>
-            Sign out
-          </a>
-        </span>
-      </h1>
-    </>
-  );
 };
 
 export default AdminDashboardPage;
