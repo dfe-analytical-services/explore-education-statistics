@@ -2,7 +2,7 @@ import { Form, FormFieldset, Formik } from '@common/components/form';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
-import { PublicationSubjectMeta } from '@common/services/tableBuilderService';
+import { PublicationSubjectMeta } from '@frontend/services/tableBuilderService';
 import { Dictionary } from '@common/types/util';
 import useResetFormOnPreviousStep from '@frontend/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
 import { FormikProps } from 'formik';

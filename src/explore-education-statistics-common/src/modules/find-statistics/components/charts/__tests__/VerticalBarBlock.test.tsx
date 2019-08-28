@@ -82,6 +82,7 @@ describe('VerticalBarBlock', () => {
         {...props}
         axes={{
           ...axes,
+          // @ts-ignore
           minor: {
             ...axes.minor,
             visible: false,
@@ -101,6 +102,7 @@ describe('VerticalBarBlock', () => {
         {...props}
         axes={{
           ...axes,
+          // @ts-ignore
           minor: {
             ...axes.minor,
             visible: false,
@@ -132,6 +134,7 @@ describe('VerticalBarBlock', () => {
 
   test('can stack data', () => {
     const { container } = render(
+      // @ts-ignore
       <Chart
         {...{
           ...props,
@@ -184,6 +187,7 @@ describe('VerticalBarBlock', () => {
   });
   test('can render minor axis reference line', () => {
     const { container } = render(
+      // @ts-ignore
       <Chart
         {...{
           ...props,
@@ -270,6 +274,7 @@ describe('VerticalBarBlock', () => {
       ...props,
       axes: {
         major: props.axes.major,
+        // @ts-ignore
         minor: {
           ...props.axes.minor,
           tickConfig: 'default',
@@ -287,6 +292,7 @@ describe('VerticalBarBlock', () => {
       ...props,
       axes: {
         major: props.axes.major,
+        // @ts-ignore
         minor: {
           ...props.axes.minor,
           tickConfig: 'startEnd',
@@ -304,6 +310,7 @@ describe('VerticalBarBlock', () => {
       ...props,
       axes: {
         major: props.axes.major,
+        // @ts-ignore
         minor: {
           ...props.axes.minor,
           tickConfig: 'custom',

@@ -23,14 +23,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         // GET api/topic/{topicId}/methodologies
         [HttpGet("api/topic/{topicId}/methodologies")]
-        [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
         public async Task<ActionResult<List<MethodologyViewModel>>> GetTopicMethodologiesAsync([Required]TopicId topicId)
         {
             return await _methodologyService.GetTopicMethodologiesAsync(topicId);
         }
         
         [HttpGet("api/methodologies")]
-        [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
         public async Task<ActionResult<List<MethodologyViewModel>>> GetMethodologiesAsync()
         {
             return await _methodologyService.ListAsync();

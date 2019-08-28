@@ -1,7 +1,7 @@
 import {
   FilterOption,
   IndicatorOption,
-} from '@common/services/tableBuilderService';
+} from '@frontend/services/tableBuilderService';
 import camelCase from 'lodash/camelCase';
 
 export abstract class Filter {
