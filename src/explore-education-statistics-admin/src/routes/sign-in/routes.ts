@@ -1,4 +1,4 @@
-import {baseURL} from "@admin/services/util/service";
+import { baseURL } from '@admin/services/util/service';
 
 export default {
   signIn: '/sign-in',
