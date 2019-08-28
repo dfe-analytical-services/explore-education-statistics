@@ -64,10 +64,6 @@ const ReleaseSummary = ({ publicationId, release }: Props) => {
       summary={releaseSummaryLabel}
       tag={getStatusLabel(release.status)}
     >
-      <ButtonLink to={summaryRoute.generateLink(publicationId, release.id)}>
-        Edit this release
-      </ButtonLink>
-
       <SummaryList additionalClassName="govuk-!-margin-bottom-3">
         <SummaryListItem term="Publish date">
           <FormattedDate>
@@ -118,6 +114,16 @@ const ReleaseSummary = ({ publicationId, release }: Props) => {
           </SummaryListItem>
         )}
       </SummaryList>
+
+      <div className="govuk-grid-row">
+        <div className="govuk-grid-column-one-half">
+          <ButtonLink to={summaryRoute.generateLink(publicationId, release.id)}>
+            View and edit release
+          </ButtonLink>
+        </div>
+        <div className="govuk-grid-column-one-half dfe-align--right" />
+      </div>
+
     </Details>
   );
 };
