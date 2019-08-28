@@ -35,7 +35,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Converters
                     contentBlock = new MapChart();
                     break;
             }
-            serializer.Populate(jsonObject.CreateReader(), contentBlock);
+
+            if (contentBlock != null)
+            {
+                serializer.Populate(jsonObject.CreateReader(), contentBlock);
+            }
+
             return contentBlock;
         }
  

@@ -35,6 +35,12 @@
   margin-right: 0;
 }
 
+.dfe-hide-comments {
+  .dfe-comment-block {
+    display: none;
+  }
+}
+
 // stylelint-disable-next-line selector-no-qualifying-type
 h1.govuk-panel__title {
   color: govuk-colour('white');

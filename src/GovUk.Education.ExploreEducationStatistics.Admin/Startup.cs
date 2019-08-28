@@ -15,6 +15,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
@@ -72,7 +76,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IMetaService, MetaService>();
             services.AddTransient<IContactService, ContactService>();
             services.AddTransient<IReleaseService, ReleaseService>();
+            services.AddTransient<IReleaseService2, ReleaseService2>();
             services.AddTransient<IMethodologyService, MethodologyService>();
+            services.AddTransient<IDataBlockService, DataBlockService>();
+            
+            services.AddTransient<IDataService<ResultWithMetaViewModel>, DataService>();
+            services.AddTransient<IDataService<TableBuilderResultViewModel>, TableBuilderDataService>();
+            services.AddTransient<IObservationService, ObservationService>();
+            services.AddTransient<IPublicationMetaService, PublicationMetaService>();
+            services.AddTransient<IResultBuilder<Observation, ObservationViewModel>, ResultBuilder>();
+            services.AddTransient<ISubjectMetaService, SubjectMetaService>();
+            services.AddTransient<ITimePeriodService, TimePeriodService>();
+            services.AddTransient<ITableBuilderSubjectMetaService, TableBuilderSubjectMetaService>();
+            services.AddTransient<ITableBuilderResultSubjectMetaService, TableBuilderResultSubjectMetaService>();
 
             services.AddSwaggerGen(c =>
             {

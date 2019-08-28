@@ -26,7 +26,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         // GET api/me/publications?topicId={guid}
         [HttpGet("api/me/publications")]
-        [AllowAnonymous] // TODO We will need to do Authorisation checks when we know what the permissions model is.
         public async Task<ActionResult<List<PublicationViewModel>>> GetPublicationsAsync(
             [Required] [FromQuery(Name = "topicId")]
             Guid topicId)
@@ -44,7 +43,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         
         // GET api/publications/{publicationId}
         [HttpGet("api/publications/{publicationId}")]
-        [AllowAnonymous] // TODO We will need to do Authorisation checks when we know what the permissions model is.
         public async Task<ActionResult<PublicationViewModel>> GetPublicationByIdAsync(
             [Required] Guid publicationId)
         {
@@ -61,7 +59,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         // POST api/topic/{topicId}/publications
         [HttpPost("api/topic/{topicId}/publications")]
-        [AllowAnonymous] // TODO We will need to do Authorisation checks when we know what the permissions model is.
         public async Task<ActionResult<PublicationViewModel>> CreatePublicationAsync(CreatePublicationViewModel publication, Guid topicId)
         {
             publication.TopicId = topicId;

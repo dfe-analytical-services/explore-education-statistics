@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         
         public string YearTitle { get; set; }
 
-        public Guid TypeId { get; set; }
+        public Guid? TypeId { get; set; }
 
         public PartialDate NextReleaseDate { get; set; }
 
@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         public DateTime? Published { get; set; }
 
         [JsonConverter(typeof(TimeIdentifierJsonConverter))]
-        public TimeIdentifier TimePeriodCoverage { get; set; }
+        public TimeIdentifier? TimePeriodCoverage { get; set; }
 
         public bool LatestRelease { get; set; }
         

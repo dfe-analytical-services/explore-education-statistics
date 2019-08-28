@@ -26,7 +26,9 @@ import {
 
 import './charts.scss';
 
-export default class VerticalBarBlock extends Component<StackedBarProps> {
+export type VerticalBarProps = StackedBarProps;
+
+export default class VerticalBarBlock extends Component<VerticalBarProps> {
   public static definition: ChartDefinition = {
     type: 'verticalbar',
     name: 'Vertical bar',
@@ -82,6 +84,7 @@ export default class VerticalBarBlock extends Component<StackedBarProps> {
     if (
       axes === undefined ||
       axes.major === undefined ||
+      axes.minor === undefined ||
       data === undefined ||
       meta === undefined
     )

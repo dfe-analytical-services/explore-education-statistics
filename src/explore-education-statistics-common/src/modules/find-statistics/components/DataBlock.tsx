@@ -105,19 +105,27 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
           {
             data,
             meta,
-            ...tables[0],
+            ...tables[0], /// at present only one chart
           },
         ];
       }
     }
 
     if (charts) {
-      newState.charts = charts.map(chart => ({
-        ...chart,
+      newState.charts = charts.map<ChartRendererProps>(chart => {
+        // There is a presumption that the configuration from the API is valid.
+        // The data coming from the API is required to be optional for the ChartRenderer
+        // But the data for the charts is required. The charts have validation that
+        // prevent them from attempting to render.
+        // @ts-ignore
+        const rendererProps: ChartRendererProps = {
+          data,
+          meta,
+          ...chart,
+        };
 
-        data,
-        meta,
-      }));
+        return rendererProps;
+      });
     }
 
     if (summary) {
