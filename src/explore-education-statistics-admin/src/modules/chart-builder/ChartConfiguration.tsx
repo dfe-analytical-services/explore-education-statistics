@@ -7,13 +7,20 @@ import {
   FormSelect,
   FormTextInput,
 } from '@common/components/form';
-import { DataBlockMetadata } from '@common/services/dataBlockService';
+import {
+  DataBlockMetadata,
+  DataBlockResponse,
+} from '@common/services/dataBlockService';
+import service from '@admin/services/release/edit-release/data/service';
+import { SelectOption } from '@common/components/form/FormSelect';
+import Button from '@common/components/Button';
 
 interface Props {
   selectedChartType: ChartDefinition;
   chartOptions: ChartOptions;
   onChange: (chartOptions: ChartOptions) => void;
   meta: DataBlockMetadata;
+  data: DataBlockResponse;
 
   onBoundaryLevelChange?: (boundaryLevel: string) => void;
 }
@@ -29,11 +36,117 @@ export interface ChartOptions {
   geographicId?: string;
 }
 
+interface InfographicSelectionProps {
+  releaseId: string;
+  fileId: string;
+  onChange: (fileId: string) => void;
+}
+
+const InfographicSelection = ({
+  releaseId,
+  fileId,
+  onChange,
+}: InfographicSelectionProps) => {
+  const [options, setOptions] = React.useState<SelectOption[]>();
+  const [selectedOption, setSelectedOption] = React.useState<string>('');
+
+  const [fileName, setFileName] = React.useState<string>('');
+  const [file, setFile] = React.useState<File>();
+
+  const updateOptions = (id: string) => {
+    service.getChartFiles(id).then(files => {
+      setOptions([
+        {
+          label: 'Upload a new file...',
+          value: '',
+        },
+        ...files.map(({ title, filename }) => ({
+          label: title,
+          value: filename,
+        })),
+      ]);
+    });
+  };
+
+  const uploadFile = () => {
+    if (file && fileName !== '') {
+      service
+        .uploadChartFile(releaseId, {
+          file,
+          name: fileName,
+        })
+        .then(() => updateOptions(releaseId))
+        .then(() => {
+          setSelectedOption(file.name);
+          setFileName('');
+          setFile(undefined);
+        });
+    }
+  };
+
+  React.useEffect(() => {
+    updateOptions(releaseId);
+  }, [releaseId]);
+
+  return (
+    <>
+      <FormGroup>
+        <FormSelect
+          id="infographic-fileid"
+          name="infographic-fileid"
+          label="Select the file to show"
+          order={[]}
+          value={selectedOption}
+          onChange={e => {
+            setSelectedOption(e.target.value);
+            onChange(e.target.value);
+          }}
+          options={options}
+        />
+
+        {selectedOption === '' && (
+          <FormGroup>
+            <FormTextInput
+              id="chart-file-name"
+              name="chart-file-name"
+              label="Name of Infographic file"
+              value={fileName}
+              width={10}
+              onChange={e => setFileName(e.target.value)}
+            />
+            <FormTextInput
+              id="chart-file"
+              label="Select file to upload"
+              name="chart-file"
+              type="file"
+              width={5}
+              onChange={e => {
+                if (e.target.files && e.target.files.length > 0)
+                  setFile(e.target.files[0]);
+              }}
+            />
+
+            <Button
+              type="button"
+              disabled={fileName === '' || file === undefined}
+              onClick={() => uploadFile()}
+            >
+              Upload
+            </Button>
+          </FormGroup>
+        )}
+      </FormGroup>
+      <hr />
+    </>
+  );
+};
+
 const ChartConfiguration = ({
   chartOptions: initialChartOptions,
   selectedChartType,
   onChange,
   meta,
+  data,
   onBoundaryLevelChange,
 }: Props) => {
   const [chartOptions, setChartOptions] = React.useState<ChartOptions>(
@@ -55,23 +168,16 @@ const ChartConfiguration = ({
     <>
       {selectedChartType.type === 'infographic' && (
         <>
-          <FormGroup>
-            <FormTextInput
-              id="infographic-fileid"
-              name="infographic-fileid"
-              label="Select the file to show"
-              value={chartOptions.fileId}
-              width={5}
-              onChange={e => {
-                updateChartOptions({
-                  ...chartOptions,
-                  fileId: e.target.value,
-                });
-              }}
-            />
-          </FormGroup>
-
-          <hr />
+          <InfographicSelection
+            releaseId={data.releaseId}
+            fileId={chartOptions.fileId || ''}
+            onChange={fileId => {
+              updateChartOptions({
+                ...chartOptions,
+                fileId,
+              });
+            }}
+          />
         </>
       )}
       <div className={styles.axesOptions}>
