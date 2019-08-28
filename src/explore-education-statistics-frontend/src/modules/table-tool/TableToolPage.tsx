@@ -10,6 +10,7 @@ import tableBuilderService, {
 } from '@frontend/services/tableBuilderService';
 import { Dictionary } from '@common/types/util';
 import ButtonText from '@common/components/ButtonText';
+import LinkContainer from '@common/components/LinkContainer';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
@@ -459,31 +460,6 @@ class TableToolPage extends Component<Props, State> {
                               </Link>
                             </li>
                             <li>
-                              {permalinkId ? (
-                                <ButtonText
-                                  onClick={() => {
-                                    window.open(
-                                      `${window.location.pathname}/permalink/${permalinkId}`,
-                                      'blank_',
-                                    );
-                                  }}
-                                >
-                                  View permanent link
-                                </ButtonText>
-                              ) : (
-                                <>
-                                  <ButtonText
-                                    onClick={this.handlePermalinkClick}
-                                  >
-                                    Create permanent link
-                                  </ButtonText>
-                                  {/* permalinkLoading && (
-                                    <LoadingSpinner size={20} />
-                                  ) */}
-                                </>
-                              )}
-                            </li>
-                            <li>
                               <DownloadCsvButton
                                 publicationSlug={publication.slug}
                                 fullTable={createdTable}
@@ -503,6 +479,41 @@ class TableToolPage extends Component<Props, State> {
                             </li>
                             <li>
                               <a href="#contact">Contact</a>
+                            </li>
+                          </ul>
+                        </>
+                      )}
+                      {publication && createdTable && (
+                        <>
+                          <h3>Share your table</h3>
+                          <ul className="govuk-list">
+                            <li>
+                              {permalinkId ? (
+                                <>
+                                  <div>Generated Permalink:</div>
+                                  <LinkContainer
+                                    url={`${window.location.href}/permalink/${permalinkId}`}
+                                  />
+                                </>
+                              ) : (
+                                <>
+                                  <ButtonText
+                                    disabled={permalinkLoading}
+                                    onClick={this.handlePermalinkClick}
+                                  >
+                                    {permalinkLoading
+                                      ? `Generating`
+                                      : `Generate`}{' '}
+                                    permanent link
+                                  </ButtonText>
+                                  {permalinkLoading && (
+                                    <LoadingSpinner
+                                      text="Generating permanent link"
+                                      size={20}
+                                    />
+                                  )}
+                                </>
+                              )}
                             </li>
                           </ul>
                         </>

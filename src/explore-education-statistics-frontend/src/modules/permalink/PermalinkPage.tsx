@@ -7,8 +7,8 @@ import Page from '@frontend/components/Page';
 import PrintThisPage from '@frontend/components/PrintThisPage';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
-import TimePeriodDataTable from '../table-tool/components/TimePeriodDataTable';
 import getDefaultTableHeaderConfig from '../table-tool/utils/tableHeaders';
+import TimePeriodDataTable from '../table-tool/components/TimePeriodDataTable';
 import DownloadCsvButton from '../table-tool/components/DownloadCsvButton';
 
 interface Props {
@@ -36,11 +36,11 @@ class PermalinkPage extends Component<Props> {
 
   public render() {
     const { data } = this.props;
-    const { fullTable /* , configuration */ } = data;
+    const { fullTable, configuration } = data;
 
     return (
       <Page
-        title={data.title}
+        title="Saved Table"
         caption="Permanent data table"
         breadcrumbs={[
           { name: 'Data tables', link: '/data-tables' },
@@ -69,11 +69,9 @@ class PermalinkPage extends Component<Props> {
         <TimePeriodDataTable
           fullTable={fullTable}
           tableHeadersConfig={
-            /* configuration.tableHeadersConfig
+            configuration.tableHeadersConfig
               ? configuration.tableHeadersConfig
-              :  */ getDefaultTableHeaderConfig(
-              fullTable.subjectMeta,
-            )
+              : getDefaultTableHeaderConfig(fullTable.subjectMeta)
           }
         />
         <DownloadCsvButton
