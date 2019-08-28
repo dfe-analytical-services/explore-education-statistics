@@ -2998,6 +2998,70 @@
 									"response": []
 								},
 								{
+									"name": "Tablebuilder - Absence by characteristic - 3 LAs",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "a2f93f15-3577-4c87-ae52-685637abbb01",
+												"exec": [
+													"var respJson = pm.response.json();",
+													"",
+													"pm.test(\"Expect corret number of results\", function () {",
+													"    pm.expect(respJson.results.length).to.equal(9); ",
+													"});",
+													"",
+													"pm.test(\"Verify all possible timePeriods appear\", function () {",
+													"    var found2013 = false;",
+													"    var found2014 = false;",
+													"    var found2015 = false;",
+													"    for(var i = 0; i < respJson.results.length; i++) {",
+													"        if(!found2013 && respJson.results[i].timePeriod === \"2013_AY\") {",
+													"            found2013 = true;",
+													"        }",
+													"        if(!found2014 && respJson.results[i].timePeriod === \"2014_AY\") {",
+													"            found2014 = true;",
+													"        }",
+													"        if(!found2015 && respJson.results[i].timePeriod === \"2015_AY\") {",
+													"            found2015 = true;",
+													"        }",
+													"        pm.expect(found2013).to.equal(true, \"No results from 2013\");",
+													"        pm.expect(found2014).to.equal(true, \"No results from 2014\");",
+													"        pm.expect(found2015).to.equal(true, \"No results from 2015\");",
+													"    } ",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"localAuthority\": [\n        \"E09000002\",\n        \"E09000003\",\n        \"E08000016\"\n    ],\n    \"subjectId\": \"1\",\n    \"indicators\": [\n        \"28\",\n        \"26\",\n        \"23\"\n    ],\n    \"filters\": [\n        {{FILT_Char__Total}},\n        {{FILT_SchoolType__Total}},\n        {{FILT_YearBreakdown__SixHalfTerms}}\n    ],\n    \"timePeriod\": {\n        \"startYear\": 2013,\n        \"startCode\": \"AY\",\n        \"endYear\": 2015,\n        \"endCode\": \"AY\"\n    }\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/tablebuilder",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"tablebuilder"
+											]
+										}
+									},
+									"response": []
+								},
+								{
 									"name": "Tablebuilder - Absence by characteristic - Wandsworth",
 									"event": [
 										{
@@ -3206,13 +3270,15 @@
 											"pm.globals.set(\"FILT_Char__Total\", \"1\");",
 											"pm.globals.set(\"FILT_Char__GenderMale\", \"53\");",
 											"pm.globals.set(\"FILT_Char__GenderFemale\", \"52\");",
+											"pm.globals.set(\"FILT_SchoolType__Total\", \"58\");",
 											"pm.globals.set(\"FILT_SchoolType__StateFundedPrimary\", \"57\");",
 											"pm.globals.set(\"FILT_SchoolType__StateFundedSecondary\", \"56\");",
 											"pm.globals.set(\"FILT_SchoolType__Special\", \"55\");",
 											"pm.globals.set(\"FILT_Char__FSMEligible\", \"18\");",
 											"pm.globals.set(\"FILT_Char__FSMNotEligible\", \"10\");",
 											"pm.globals.set(\"FILT_Char__FSMUnclassified\", \"8\");",
-											"pm.globals.set(\"FILT_Char__EthMinor_Irish\", \"50\");"
+											"pm.globals.set(\"FILT_Char__EthMinor_Irish\", \"50\");",
+											"pm.globals.set(\"FILT_YearBreakdown__SixHalfTerms\", \"54\");"
 										]
 									}
 								},
@@ -3787,6 +3853,26 @@
 													"    for(var i = 0; i < respJson.results.length; i++) {",
 													"        pm.expect(respJson.results[i].geographicLevel).to.equal(\"School\");",
 													"    }",
+													"});",
+													"",
+													"pm.test(\"Verify all possible timePeriods appear\", function () {",
+													"    var found2013 = false;",
+													"    var found2014 = false;",
+													"    var found2015 = false;",
+													"    for(var i = 0; i < respJson.results.length; i++) {",
+													"        if(!found2013 && respJson.results[i].timePeriod === \"2013_AY\") {",
+													"            found2013 = true;",
+													"        }",
+													"        if(!found2014 && respJson.results[i].timePeriod === \"2014_AY\") {",
+													"            found2014 = true;",
+													"        }",
+													"        if(!found2015 && respJson.results[i].timePeriod === \"2015_AY\") {",
+													"            found2015 = true;",
+													"        }",
+													"        pm.expect(found2013).to.equal(true, \"No results from 2013\");",
+													"        pm.expect(found2014).to.equal(true, \"No results from 2014\");",
+													"        pm.expect(found2015).to.equal(true, \"No results from 2015\");",
+													"    } ",
 													"});"
 												],
 												"type": "text/javascript"
@@ -3805,7 +3891,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\t\"subjectId\": 2,\n\t\"geographicLevel\": \"School\",\n\t\"region\": [ \"E13000001\" ],\n\t\"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n\t\"filters\" : [\n\t\t{{FILT_SchoolType__Total}}, {{FILT_SchoolType__StateFundedPrimary}}\n\t],\n\t\"indicators\": [\n\t\t42, 61, 57, 59, 66, 111212\n\t]\n}"
+											"raw": "{\n    \"localAuthority\": [\n        \"E09000002\",\n        \"E09000003\",\n        \"E08000016\"\n    ],\n    \"subjectId\": \"1\",\n    \"indicators\": [\n        \"28\",\n        \"26\",\n        \"23\"\n    ],\n    \"filters\": [\n        \"1\",\n        \"54\",\n        \"58\"\n    ],\n    \"timePeriod\": {\n        \"startYear\": 2013,\n        \"startCode\": \"AY\",\n        \"endYear\": 2015,\n        \"endCode\": \"AY\"\n    }\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
