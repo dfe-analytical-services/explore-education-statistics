@@ -15,6 +15,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Mappings
     {
         public MappingProfiles()
         {
+            CreateMap<BoundaryLevel, IdLabel>();
+            
             CreateMap<FastTrack, FastTrackViewModel>();
 
             CreateMap<IObservationalUnit, LabelValue>()
