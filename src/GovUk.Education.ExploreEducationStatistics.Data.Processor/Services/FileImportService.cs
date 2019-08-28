@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             try
             {
-                _batchService.UpdateStatus(message.Release.Id.ToString(), subject.Id.ToString(), ImportStatus.RUNNING_PHASE_2);
+                _batchService.UpdateStatus(message.Release.Id.ToString(), ImportStatus.RUNNING_PHASE_2, message.DataFileName);
 
                 var batch = subjectData.GetCsvLines().ToList();
                 var metaLines = subjectData.GetMetaLines().ToList();
@@ -64,15 +64,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 }
                 
                 _batchService.UpdateBatchCount(
-                    message.Release.Id.ToString(), subject.Id.ToString(), message.BatchSize, message.BatchNo).Wait();
+                    message.Release.Id.ToString(), message.BatchSize, message.BatchNo, message.DataFileName).Wait();
             }
             catch (Exception e)
             {
                 _batchService.LogErrors(
                     message.Release.Id.ToString(),
-                    subject.Id.ToString(),
                     new List<String>{e.Message},
-                    message.BatchNo).Wait();
+                    message.BatchNo,
+                    message.DataFileName).Wait();
                 
                 _logger.LogError(
                     $"{GetType().Name} function FAILED: : Batch: " +
@@ -99,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _importerService.ImportFiltersLocationsAndSchools(
                 batch,
                 _importerService.GetMeta(metaLines, subject),
-                subject.Name);
+                subject);
         }
 
         private Subject GetSubject(ImportMessage message, string subjectName)

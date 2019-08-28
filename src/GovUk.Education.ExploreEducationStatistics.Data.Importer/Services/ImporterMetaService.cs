@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
-using GovUk.Education.ExploreEducationStatistics.Data.Importer.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -23,22 +22,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
     public class ImporterMetaService : IImporterMetaService
     {
         private readonly ApplicationDbContext _context;
-        private static IValidatorService _validatorService;
 
         public ImporterMetaService(
-            ApplicationDbContext context,
-            IValidatorService validatorService)
+            ApplicationDbContext context)
         {
             _context = context;
-            _validatorService = validatorService;
         }
 
         public SubjectMeta Import(IEnumerable<string> lines, Subject subject)
         {
-            _validatorService.ValidateMetaHeader(subject.Id, lines.First());
-            
             var headers = GetHeaders(lines);
-            var metaRows = GetMetaRows(subject.Id, lines, headers, true);
+            var metaRows = GetMetaRows(lines, headers);
             var filters = ImportFilters(metaRows, subject).ToList();
             var indicators = ImportIndicators(metaRows, subject).ToList();
             
@@ -52,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         public SubjectMeta Get(IEnumerable<string> lines, Subject subject)
         {
             var headers = GetHeaders(lines);
-            var metaRows = GetMetaRows(subject.Id, lines, headers, false);
+            var metaRows = GetMetaRows(lines, headers);
             var filters = GetFilters(metaRows, subject).ToList();
             var indicators = GetIndicators(metaRows, subject).ToList();
             
@@ -69,18 +63,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         }
 
         private static IEnumerable<MetaRow> GetMetaRows(
-            long subjectId,
             IEnumerable<string> lines,
-            List<string> headers,
-            bool validate)
+            List<string> headers)
         {
             return lines
                 .Skip(1)
-                .Select((line, index) =>
-                {
-                    if (validate) _validatorService.ValidateMetaRow(subjectId, line, index, headers.Count);
-                    return GetMetaRow(line, headers);
-                });
+                .Select((line, index) => GetMetaRow(line, headers));
         }
 
         private static MetaRow GetMetaRow(string line, List<string> headers)

@@ -9,10 +9,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Models
         public int Status { get; set; }
         public string Errors { get; set; }
 
-        public Batch(string releaseId, string subjectId, int batchSize)
+        public Batch(string releaseId, string dataFileName, int batchSize)
         {
             PartitionKey = releaseId;
-            RowKey = subjectId;
+            RowKey = dataFileName;
             this.BatchSize = batchSize;
             this.BatchesProcessed = new byte[64];
             this.Errors = "";
