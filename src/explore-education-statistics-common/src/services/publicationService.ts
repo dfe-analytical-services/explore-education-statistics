@@ -189,6 +189,7 @@ export interface AbstractRelease<ContentBlockType> {
   summary: string;
   publicationId: string;
   publication: Publication;
+  latestRelease: boolean;
   updates: {
     id: string;
     releaseId: string;

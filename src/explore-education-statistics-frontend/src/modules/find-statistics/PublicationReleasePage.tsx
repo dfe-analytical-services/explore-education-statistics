@@ -68,21 +68,26 @@ class PublicationReleasePage extends Component<Props> {
           <div className="govuk-grid-column-two-thirds">
             <div className="govuk-grid-row">
               <div className="govuk-grid-column-three-quarters">
-                {!release ? (
+                {!data.latestRelease ? (
                   <strong className="govuk-tag govuk-!-margin-right-6">
                     {' '}
                     This is the latest data{' '}
                   </strong>
                 ) : (
                   <p>
-                    This is data from {release},{' '}
+                    This publication holds data from{' '}
+                    <span className="govuk-!-font-weight-bold">
+                      {data.yearTitle}
+                    </span>
+                    ,{' '}
                     <Link
                       className="dfe-print-hidden"
                       unvisited
                       to={`/find-statistics/${data.publication.slug}`}
                     >
-                      view latest release
+                      view latest release here
                     </Link>
+                    .
                   </p>
                 )}
                 <dl className="dfe-meta-content govuk-!-margin-top-3 govuk-!-margin-bottom-1">
