@@ -1,16 +1,12 @@
 import styles from '@admin/modules/chart-builder/graph-builder.module.scss';
 import service from '@admin/services/release/edit-release/data/service';
-import { UploadChartFileRequest } from '@admin/services/release/edit-release/data/types';
 import {
   FormCheckbox,
   FormGroup,
   FormSelect,
   FormTextInput,
 } from '@common/components/form';
-import {
-  SelectChangeEventHandler,
-  SelectOption,
-} from '@common/components/form/FormSelect';
+import { SelectOption } from '@common/components/form/FormSelect';
 import { ChartDefinition } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import {
   DataBlockMetadata,
@@ -81,7 +77,6 @@ const InfographicChartOptions = ({
   const doUpload = () => {
     if (uploadFile) {
       setUploading(true);
-
       service
         .uploadChartFile(releaseId, {
           name: uploadName,
@@ -157,7 +152,6 @@ const InfographicChartOptions = ({
     </FormGroup>
   );
 };
-
 const ChartConfiguration = ({
   chartOptions: initialChartOptions,
   selectedChartType,
@@ -173,14 +167,12 @@ const ChartConfiguration = ({
     setChartOptions(options);
     if (onChange) onChange(options);
   };
-
   const [chartWidth, setChartWidth] = React.useState(
     `${initialChartOptions.width || ''}`,
   );
   const [chartHeight, setChartHeight] = React.useState(
     `${initialChartOptions.height || ''}`,
   );
-
   return (
     <>
       {selectedChartType.type === 'infographic' && (
