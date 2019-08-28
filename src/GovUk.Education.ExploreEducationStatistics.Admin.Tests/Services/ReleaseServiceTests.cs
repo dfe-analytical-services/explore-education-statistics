@@ -222,7 +222,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Method under test 
                 var edited = await new ReleaseService(context, MapperForProfile<MappingProfiles>())
                     .EditReleaseSummaryAsync(
-                        new EditReleaseSummaryViewModel
+                        new ReleaseSummaryViewModel
                         {
                             Id = releaseId,
                             PublishScheduled = publishScheduledEdited,

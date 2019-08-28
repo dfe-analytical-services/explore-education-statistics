@@ -77,15 +77,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         // TODO Authorisation will be required when users are introduced
-        public async Task<EditReleaseSummaryViewModel> GetReleaseSummaryAsync(ReleaseId releaseId)
+        public async Task<ReleaseSummaryViewModel> GetReleaseSummaryAsync(ReleaseId releaseId)
         {
             var release = await _context.Releases.FirstOrDefaultAsync(r => r.Id == releaseId);
-            return _mapper.Map<EditReleaseSummaryViewModel>(release);
+            return _mapper.Map<ReleaseSummaryViewModel>(release);
         }
 
         // TODO Authorisation will be required when users are introduced
         public async Task<Either<ValidationResult, ReleaseViewModel>> EditReleaseSummaryAsync(
-            EditReleaseSummaryViewModel model)
+            ReleaseSummaryViewModel model)
         {
             var publication = await GetAsync(model.Id);
             return await ValidateReleaseSlugUniqueToPublication(model.Slug, publication.Id, model.Id)
@@ -146,6 +146,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return new List<ContentSection>();
         }
+
+        // TODO Authorisation will be required when users are introduced
+        public async Task<Either<ValidationResult, ReleaseSummaryViewModel>> UpdateReleaseStatusAsync(
+            ReleaseId releaseId, ReleaseStatus status, string internalReleaseNote)
+        {
+            var release = await GetAsync(releaseId);
+            release.Status = status;
+            release.InternalReleaseNote = internalReleaseNote;
+            _context.Releases.Update(release);
+            await _context.SaveChangesAsync();
+            return await GetReleaseSummaryAsync(releaseId);
+        }
     }
 
     public static class ReleaseLinqExtensions
@@ -160,7 +172,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Include(r => r.Publication.Releases) // Back refs required to work out latest
                 .Include(r => r.Publication.Contact)
                 .Include(r => r.Type)
-                .Include(r => r.ReleaseSummary.Versions)
                 .Include(r => r.ReleaseSummary.Versions)
                 .ThenInclude(v => v.Type);
         }
