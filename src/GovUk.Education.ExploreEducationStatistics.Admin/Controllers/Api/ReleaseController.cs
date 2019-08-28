@@ -191,7 +191,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         
         // GET api/releases/draft
         [HttpGet("releases/draft")]
-        [AllowAnonymous] // TODO We will need to do Authorisation checks when we know what the permissions model is.
         public async Task<ActionResult<List<ReleaseViewModel>>> GetDraftReleasesAsync()
         {
             return Ok(await _releaseService.GetReleasesForReleaseStatusesAsync(ReleaseStatus.Draft, ReleaseStatus.HigherLevelReview));
@@ -199,7 +198,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         
         // GET api/releases/scheduled
         [HttpGet("releases/scheduled")]
-        [AllowAnonymous] // TODO We will need to do Authorisation checks when we know what the permissions model is.
         public async Task<ActionResult<List<ReleaseViewModel>>> GetScheduledReleasesAsync()
         {
             return Ok(await _releaseService.GetReleasesForReleaseStatusesAsync(ReleaseStatus.Approved));

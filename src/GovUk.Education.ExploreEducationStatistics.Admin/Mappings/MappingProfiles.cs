@@ -26,6 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m => m.MapFrom(r => r.Publication.Title))
                 .ForMember(dest => dest.PublicationId, 
                     m => m.MapFrom(r => r.Publication.Id))
+                // TODO return real Comments as soon as commenting on Releases has been implemented
                 .ForMember(dest => dest.DraftComments, 
                     m => m.MapFrom(_ => new List<ReleaseViewModel.Comment>()
                     {
