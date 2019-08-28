@@ -6,11 +6,7 @@ import {
   UserDetails,
 } from '@admin/services/common/types';
 
-export enum ReleaseApprovalStatus {
-  Approved,
-  ReadyToReview,
-  None,
-}
+export type ReleaseStatus = 'Draft' | 'HigherLevelReview' | 'Approved';
 
 export interface ThemeAndTopics {
   title: string;
@@ -23,7 +19,7 @@ export interface ThemeAndTopics {
 
 export interface AdminDashboardRelease {
   id: string;
-  status: ReleaseApprovalStatus;
+  status: ReleaseStatus;
   latestRelease: boolean;
   live: boolean;
   releaseName: string;

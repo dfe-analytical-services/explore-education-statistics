@@ -4,6 +4,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     {
         Draft,
         HigherLevelReview,
-        Live,
+        Approved,
     }
 }

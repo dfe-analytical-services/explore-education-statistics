@@ -1,4 +1,5 @@
 import { DayMonthYearValues } from '@admin/services/common/types';
+import {ReleaseStatus} from "@admin/services/dashboard/types";
 
 export interface ReleaseSummaryDetails {
   id: string;
@@ -10,7 +11,7 @@ export interface ReleaseSummaryDetails {
   typeId: string;
   publishScheduled: string;
   nextReleaseDate?: DayMonthYearValues;
-  status: 'Draft' | 'HigherLevelReview' | 'Live';
+  status: ReleaseStatus;
 }
 
 export interface BaseReleaseSummaryDetailsRequest {

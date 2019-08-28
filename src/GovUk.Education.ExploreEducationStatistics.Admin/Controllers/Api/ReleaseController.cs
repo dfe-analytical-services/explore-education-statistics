@@ -212,7 +212,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [AllowAnonymous] // TODO We will need to do Authorisation checks when we know what the permissions model is.
         public async Task<ActionResult<List<ReleaseViewModel>>> GetScheduledReleasesAsync()
         {
-            return Ok(await _releaseService.GetReleasesForReleaseStatusesAsync(ReleaseStatus.Live));
+            return Ok(await _releaseService.GetReleasesForReleaseStatusesAsync(ReleaseStatus.Approved));
         }
 
         [HttpDelete("release/{releaseId}/data/{fileName}")]

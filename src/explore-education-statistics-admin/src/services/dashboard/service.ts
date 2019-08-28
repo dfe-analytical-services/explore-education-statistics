@@ -31,7 +31,7 @@ const service: DashboardService = {
   },
   getScheduledReleases(): Promise<AdminDashboardRelease[]> {
     return client.get<AdminDashboardRelease[]>('/releases/scheduled').
-    then(releases => releases.map(releasePolyfilla));
+      then(releases => releases.map(releasePolyfilla));
   }
 };
 

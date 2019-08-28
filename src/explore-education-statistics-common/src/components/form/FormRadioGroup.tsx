@@ -69,6 +69,10 @@ class FormRadioGroup extends PureComponent<FormRadioGroupProps> {
       value,
     } = this.props;
 
+    const orderedOptions = orderDirection && orderDirection.length === 0
+      ? options
+      : orderBy(options, order, orderDirection);
+
     return (
       <FormFieldset {...this.props}>
         <div
@@ -78,7 +82,7 @@ class FormRadioGroup extends PureComponent<FormRadioGroupProps> {
           })}
           ref={this.ref}
         >
-          {orderBy(options, order, orderDirection).map(option => (
+          {orderedOptions.map(option => (
             <FormRadio
               {...option}
               id={option.id ? option.id : `${id}-${kebabCase(option.value)}`}

@@ -1,5 +1,7 @@
+import {ReleaseStatus} from "@admin/services/dashboard/types";
+
 export interface UpdateReleaseStatusRequest {
-  releaseStatus: string;
+  releaseStatus: ReleaseStatus;
   internalReleaseNote: string;
 }
 

@@ -5,7 +5,7 @@ import {
 } from '@admin/services/common/types';
 import {
   AdminDashboardRelease,
-  ReleaseApprovalStatus,
+  ReleaseStatus,
 } from '@admin/services/dashboard/types';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
@@ -26,11 +26,13 @@ const getLiveLatestLabel = (isLive: boolean, isLatest: boolean) => {
   return '(not Live)';
 };
 
-const getTag = (approvalStatus: ReleaseApprovalStatus) => {
-  if (ReleaseApprovalStatus.ReadyToReview === approvalStatus) {
-    return 'Ready to review';
+const getStatusLabel = (approvalStatus: ReleaseStatus) => {
+  switch (approvalStatus) {
+    case 'Draft': return 'Draft';
+    case 'HigherLevelReview': return 'In Review';
+    case 'Approved': return 'Approved for Publication';
+    default: return undefined;
   }
-  return undefined;
 };
 
 interface Props {
@@ -55,7 +57,7 @@ const ReleaseSummary = ({ publicationId, release }: Props) => {
     <Details
       className="govuk-!-margin-bottom-0"
       summary={releaseSummaryLabel}
-      tag={getTag(release.status)}
+      tag={getStatusLabel(release.status)}
     >
       <ButtonLink to={summaryRoute.generateLink(publicationId, release.id)}>
         Edit this release
