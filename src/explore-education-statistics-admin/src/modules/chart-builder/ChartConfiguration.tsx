@@ -1,6 +1,6 @@
 import styles from '@admin/modules/chart-builder/graph-builder.module.scss';
-import React from 'react';
-import { ChartDefinition } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import service from '@admin/services/release/edit-release/data/service';
+import { UploadChartFileRequest } from '@admin/services/release/edit-release/data/types';
 import {
   FormCheckbox,
   FormGroup,
@@ -8,19 +8,23 @@ import {
   FormTextInput,
 } from '@common/components/form';
 import {
+  SelectChangeEventHandler,
+  SelectOption,
+} from '@common/components/form/FormSelect';
+import { ChartDefinition } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import {
   DataBlockMetadata,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
-import service from '@admin/services/release/edit-release/data/service';
-import { SelectOption } from '@common/components/form/FormSelect';
+import React from 'react';
 import Button from '@common/components/Button';
 
 interface Props {
   selectedChartType: ChartDefinition;
   chartOptions: ChartOptions;
   onChange: (chartOptions: ChartOptions) => void;
-  meta: DataBlockMetadata;
   data: DataBlockResponse;
+  meta: DataBlockMetadata;
 
   onBoundaryLevelChange?: (boundaryLevel: string) => void;
 }
@@ -36,31 +40,37 @@ export interface ChartOptions {
   geographicId?: string;
 }
 
-interface InfographicSelectionProps {
+interface InfographicChartOptionsProps {
   releaseId: string;
-  fileId: string;
+  fileId?: string;
   onChange: (fileId: string) => void;
 }
 
-const InfographicSelection = ({
+const InfographicChartOptions = ({
   releaseId,
   fileId,
   onChange,
-}: InfographicSelectionProps) => {
-  const [options, setOptions] = React.useState<SelectOption[]>();
-  const [selectedOption, setSelectedOption] = React.useState<string>('');
+}: InfographicChartOptionsProps) => {
+  const [chartFileOptions, setChartFileOptions] = React.useState<
+    SelectOption[]
+  >([]);
 
-  const [fileName, setFileName] = React.useState<string>('');
-  const [file, setFile] = React.useState<File>();
+  const [currentFileId, setCurrentFileId] = React.useState(fileId);
 
-  const updateOptions = (id: string) => {
-    service.getChartFiles(id).then(files => {
-      setOptions([
+  const [uploadName, setUploadName] = React.useState<string>('');
+
+  const [uploadFile, setUploadFile] = React.useState<File>();
+
+  const [uploading, setUploading] = React.useState<boolean>(false);
+
+  const loadChartFilesAsync = () => {
+    service.getChartFiles(releaseId).then(chartFiles => {
+      setChartFileOptions([
         {
-          label: 'Upload a new file...',
+          label: 'Upload a new file',
           value: '',
         },
-        ...files.map(({ title, filename }) => ({
+        ...chartFiles.map(({ title, filename }) => ({
           label: title,
           value: filename,
         })),
@@ -68,76 +78,83 @@ const InfographicSelection = ({
     });
   };
 
-  const uploadFile = () => {
-    if (file && fileName !== '') {
+  const doUpload = () => {
+    if (uploadFile) {
+      setUploading(true);
+
       service
         .uploadChartFile(releaseId, {
-          file,
-          name: fileName,
+          name: uploadName,
+          file: uploadFile,
         })
-        .then(() => updateOptions(releaseId))
+        .then(() => loadChartFilesAsync())
         .then(() => {
-          setSelectedOption(file.name);
-          setFileName('');
-          setFile(undefined);
+          onChange(uploadFile.name);
+          setCurrentFileId(uploadFile.name);
+          setUploadName('');
+          setUploadFile(undefined);
+        })
+        .finally(() => {
+          setUploading(false);
         });
     }
   };
 
   React.useEffect(() => {
-    updateOptions(releaseId);
+    loadChartFilesAsync();
   }, [releaseId]);
 
   return (
-    <>
-      <FormGroup>
-        <FormSelect
-          id="infographic-fileid"
-          name="infographic-fileid"
-          label="Select the file to show"
-          order={[]}
-          value={selectedOption}
-          onChange={e => {
-            setSelectedOption(e.target.value);
-            onChange(e.target.value);
-          }}
-          options={options}
-        />
+    <FormGroup>
+      <FormSelect
+        id="infographic-fileid"
+        name="infographic-fileid"
+        label="Select the file to show"
+        order={[]}
+        options={chartFileOptions}
+        value={fileId}
+        onChange={e => {
+          setCurrentFileId(e.target.value);
+          return onChange(e.target.value);
+        }}
+      />
+      {currentFileId === '' && (
+        <FormGroup>
+          <FormTextInput
+            id="upload-name"
+            name="upload-name"
+            label="Select a name to give the file"
+            defaultValue={uploadName}
+            onChange={e => setUploadName(e.target.value)}
+            width={10}
+          />
 
-        {selectedOption === '' && (
-          <FormGroup>
-            <FormTextInput
-              id="chart-file-name"
-              name="chart-file-name"
-              label="Name of Infographic file"
-              value={fileName}
-              width={10}
-              onChange={e => setFileName(e.target.value)}
-            />
-            <FormTextInput
-              id="chart-file"
-              label="Select file to upload"
-              name="chart-file"
-              type="file"
-              width={5}
-              onChange={e => {
-                if (e.target.files && e.target.files.length > 0)
-                  setFile(e.target.files[0]);
-              }}
-            />
+          <FormTextInput
+            id="upload-chart"
+            name="upload-chrt"
+            label="Select a file to upload"
+            type="file"
+            onChange={e => {
+              if (e.target.files && e.target.files.length > 0) {
+                setUploadFile(e.target.files[0]);
+              } else {
+                setUploadFile(undefined);
+              }
+            }}
+          />
 
-            <Button
-              type="button"
-              disabled={fileName === '' || file === undefined}
-              onClick={() => uploadFile()}
-            >
-              Upload
-            </Button>
-          </FormGroup>
-        )}
-      </FormGroup>
-      <hr />
-    </>
+          <Button
+            type="button"
+            disabled={
+              uploadName.length === 0 || uploadFile === undefined || uploading
+            }
+            onClick={() => doUpload()}
+          >
+            Upload
+          </Button>
+        </FormGroup>
+      )}
+    </FormGroup>
   );
 };
 
@@ -168,7 +185,7 @@ const ChartConfiguration = ({
     <>
       {selectedChartType.type === 'infographic' && (
         <>
-          <InfographicSelection
+          <InfographicChartOptions
             releaseId={data.releaseId}
             fileId={chartOptions.fileId || ''}
             onChange={fileId => {
@@ -178,6 +195,7 @@ const ChartConfiguration = ({
               });
             }}
           />
+          <hr />
         </>
       )}
       <div className={styles.axesOptions}>
