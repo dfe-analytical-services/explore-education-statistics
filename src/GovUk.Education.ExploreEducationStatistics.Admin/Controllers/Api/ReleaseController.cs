@@ -199,12 +199,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return Ok(await _releaseService.GetReleasesForPublicationAsync(publicationId));
         }
         
-        // GET api/publications/{publicationId}/releases
+        // GET api/releases/draft
         [HttpGet("releases/draft")]
         [AllowAnonymous] // TODO We will need to do Authorisation checks when we know what the permissions model is.
         public async Task<ActionResult<List<ReleaseViewModel>>> GetDraftReleasesAsync()
         {
             return Ok(await _releaseService.GetReleasesForReleaseStatusesAsync(ReleaseStatus.Draft, ReleaseStatus.HigherLevelReview));
+        }
+        
+        // GET api/releases/scheduled
+        [HttpGet("releases/scheduled")]
+        [AllowAnonymous] // TODO We will need to do Authorisation checks when we know what the permissions model is.
+        public async Task<ActionResult<List<ReleaseViewModel>>> GetScheduledReleasesAsync()
+        {
+            return Ok(await _releaseService.GetReleasesForReleaseStatusesAsync(ReleaseStatus.Live));
         }
 
         [HttpDelete("release/{releaseId}/data/{fileName}")]

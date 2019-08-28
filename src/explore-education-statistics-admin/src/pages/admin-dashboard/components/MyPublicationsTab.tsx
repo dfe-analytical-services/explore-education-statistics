@@ -8,7 +8,7 @@ import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import { IdTitlePair } from '@admin/services/common/types';
 import Link from '@admin/components/Link';
-import AdminDashboardPublicationSummary from './AdminDashboardPublicationSummary';
+import PublicationSummary from './PublicationSummary';
 
 interface ThemeAndTopicsIdsAndTitles extends IdTitlePair {
   topics: IdTitlePair[];
@@ -31,7 +31,7 @@ const findThemeById = (
 const findTopicById = (topicId: string, theme: ThemeAndTopicsIdsAndTitles) =>
   theme.topics.find(topic => topic.id === topicId) || theme.topics[0];
 
-const AdminDashboardPublicationsTab = () => {
+const MyPublicationsTab = () => {
 
   const [myPublications, setMyPublications] = useState<
     AdminDashboardPublication[]
@@ -143,7 +143,7 @@ const AdminDashboardPublicationsTab = () => {
                   heading={publication.title}
                   headingTag="h3"
                 >
-                  <AdminDashboardPublicationSummary publication={publication} />
+                  <PublicationSummary publication={publication} />
                 </AccordionSection>
               ))}
             </Accordion>
@@ -163,4 +163,4 @@ const AdminDashboardPublicationsTab = () => {
   );
 };
 
-export default AdminDashboardPublicationsTab;
+export default MyPublicationsTab;

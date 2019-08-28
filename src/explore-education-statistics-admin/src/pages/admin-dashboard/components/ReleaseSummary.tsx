@@ -38,7 +38,7 @@ interface Props {
   release: AdminDashboardRelease;
 }
 
-const DashboardReleaseSummary = ({ publicationId, release }: Props) => {
+const ReleaseSummary = ({ publicationId, release }: Props) => {
   const authentication = useContext(LoginContext);
 
   const editorName =
@@ -101,4 +101,4 @@ const DashboardReleaseSummary = ({ publicationId, release }: Props) => {
   );
 };
 
-export default DashboardReleaseSummary;
+export default ReleaseSummary;

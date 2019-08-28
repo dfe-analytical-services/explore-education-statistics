@@ -1,12 +1,14 @@
 import Link from '@admin/components/Link';
 import {LoginContext} from '@admin/components/Login';
 import Page from '@admin/components/Page';
+import ReleasesTab from "@admin/pages/admin-dashboard/components/ReleasesByStatusTab";
+import dashboardService from "@admin/services/dashboard/service";
 import loginService from '@admin/services/sign-in/service';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import React, {useContext, useEffect, useState} from 'react';
-import AdminDashboardPublicationsTab from './components/AdminDashboardPublicationsTab';
+import MyPublicationsTab from './components/MyPublicationsTab';
 
 const AdminDashboardPage = () => {
 
@@ -17,7 +19,7 @@ const AdminDashboardPage = () => {
   useEffect(() => {
     setDraftReleaseCount(1);
     setScheduledReleaseCount(2);
-  });
+  }, []);
 
   return (
     <Page wide breadcrumbs={[{ name: 'Administrator dashboard' }]}>
@@ -43,21 +45,26 @@ const AdminDashboardPage = () => {
           title="Manage publications and releases"
         >
           {(
-            <AdminDashboardPublicationsTab />
+            <MyPublicationsTab />
           )}
         </TabsSection>
-        <TabsSection id="draft-releases" title={`View draft releases (${draftReleaseCount})`}>
-          <div className="govuk-inset-text">
-            There are currently no releases ready for you to review
-          </div>
+        <TabsSection
+          id="draft-releases"
+          title={`View draft releases (${draftReleaseCount})`}
+        >
+          <ReleasesTab
+            getReleasesFn={dashboardService.getDraftReleases}
+            noReleasesMessage='There are currently no draft releases'
+          />
         </TabsSection>
         <TabsSection
           id="scheduled-releases"
           title={`View scheduled releases (${scheduledReleaseCount})`}
         >
-          <div className="govuk-inset-text">
-            There are currently no unresolved comments
-          </div>
+          <ReleasesTab
+            getReleasesFn={dashboardService.getScheduledReleases}
+            noReleasesMessage='There are currently no scheduled releases'
+          />
         </TabsSection>
       </Tabs>
     </Page>

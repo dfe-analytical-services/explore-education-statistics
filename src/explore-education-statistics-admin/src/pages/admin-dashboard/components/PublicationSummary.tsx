@@ -1,6 +1,6 @@
 import ButtonLink from '@admin/components/ButtonLink';
 import Link from '@admin/components/Link';
-import DashboardReleaseSummary from '@admin/pages/admin-dashboard/components/DashboardReleaseSummary';
+import ReleaseSummary from '@admin/pages/admin-dashboard/components/ReleaseSummary';
 import releaseRoutes from '@admin/routes/edit-release/routes';
 import { AdminDashboardPublication } from '@admin/services/dashboard/types';
 import SummaryList from '@common/components/SummaryList';
@@ -11,7 +11,7 @@ export interface Props {
   publication: AdminDashboardPublication;
 }
 
-const AdminDashboardPublicationSummary = ({ publication }: Props) => {
+const PublicationSummary = ({ publication }: Props) => {
   return (
     <>
       <SummaryList>
@@ -29,7 +29,7 @@ const AdminDashboardPublicationSummary = ({ publication }: Props) => {
           <ul className="govuk-list dfe-admin">
             {publication.releases.map(release => (
               <li key={release.id}>
-                <DashboardReleaseSummary
+                <ReleaseSummary
                   publicationId={publication.id}
                   release={release}
                 />
@@ -66,4 +66,4 @@ const AdminDashboardPublicationSummary = ({ publication }: Props) => {
   );
 };
 
-export default AdminDashboardPublicationSummary;
+export default PublicationSummary;

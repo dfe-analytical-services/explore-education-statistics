@@ -15,6 +15,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 
         public string Title { get; set; }
 
+        public Guid PublicationId { get; set; }
+
         public string PublicationTitle { get; set; }
         public string ReleaseName { get; set; }
         

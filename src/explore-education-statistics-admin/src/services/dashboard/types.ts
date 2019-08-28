@@ -27,6 +27,8 @@ export interface AdminDashboardRelease {
   latestRelease: boolean;
   live: boolean;
   releaseName: string;
+  publicationId: string;
+  publicationTitle: string;
   timePeriodCoverage: IdLabelPair;
   contact: ContactDetails;
   lastEditedUser: UserDetails;
