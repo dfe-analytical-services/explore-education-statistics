@@ -457,6 +457,17 @@ class TableToolPage extends Component<Props, State> {
                                   <LinkContainer
                                     url={`${window.location.href}/permalink/${permalinkId}`}
                                   />
+                                  <div>
+                                    <a
+                                      className="govuk-link"
+                                      href={`${window.location.href}/permalink/${permalinkId}`}
+                                      title="View created table permalink"
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                    >
+                                      View permanent link
+                                    </a>
+                                  </div>
                                 </>
                               ) : (
                                 <>
