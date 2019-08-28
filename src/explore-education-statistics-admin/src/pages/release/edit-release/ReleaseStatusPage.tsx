@@ -3,7 +3,7 @@ import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
 import dashboardRoutes from '@admin/routes/dashboard/routes';
-import {ReleaseStatus} from "@admin/services/dashboard/types";
+import { ReleaseStatus } from '@admin/services/dashboard/types';
 import service from '@admin/services/release/edit-release/status/service';
 import Button from '@common/components/Button';
 import { Form, FormFieldRadioGroup, Formik } from '@common/components/form';

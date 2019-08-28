@@ -1,6 +1,6 @@
-import ReleaseSummary from "@admin/pages/admin-dashboard/components/ReleaseSummary";
-import {AdminDashboardRelease} from '@admin/services/dashboard/types';
-import {Dictionary} from "@common/types";
+import ReleaseSummary from '@admin/pages/admin-dashboard/components/ReleaseSummary';
+import { AdminDashboardRelease } from '@admin/services/dashboard/types';
+import { Dictionary } from '@common/types';
 import React from 'react';
 
 interface Props {
@@ -8,8 +8,7 @@ interface Props {
   releases: AdminDashboardRelease[];
 }
 
-const ReleasesByStatusTab = ({releases, noReleasesMessage}: Props) => {
-
+const ReleasesByStatusTab = ({ releases, noReleasesMessage }: Props) => {
   const releasesByPublication: Dictionary<AdminDashboardRelease[]> = {};
 
   releases.forEach(release => {
@@ -28,22 +27,21 @@ const ReleasesByStatusTab = ({releases, noReleasesMessage}: Props) => {
             <React.Fragment key={publication}>
               <hr />
               <h3>{publication}</h3>
-              {
-                releasesByPublication[publication].map(release => (
-                  <ReleaseSummary
-                    key={release.id}
-                    publicationId={release.publicationId}
-                    release={release}
-                  />
-                ))
-              }
+              {releasesByPublication[publication].map(release => (
+                <ReleaseSummary
+                  key={release.id}
+                  publicationId={release.publicationId}
+                  release={release}
+                />
+              ))}
             </React.Fragment>
           ))}
         </>
       )}
-      {releasesByPublication && Object.keys(releasesByPublication).length === 0 && (
-        <div>{noReleasesMessage}</div>
-      )}
+      {releasesByPublication &&
+        Object.keys(releasesByPublication).length === 0 && (
+          <div>{noReleasesMessage}</div>
+        )}
     </>
   );
 };

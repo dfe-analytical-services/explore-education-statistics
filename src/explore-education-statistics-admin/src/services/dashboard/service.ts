@@ -1,7 +1,14 @@
-import {publicationPolyfilla, releasePolyfilla} from '@admin/services/dashboard/polyfillas';
+import {
+  publicationPolyfilla,
+  releasePolyfilla,
+} from '@admin/services/dashboard/polyfillas';
 import client from '@admin/services/util/service';
 
-import {AdminDashboardPublication, AdminDashboardRelease, ThemeAndTopics} from './types';
+import {
+  AdminDashboardPublication,
+  AdminDashboardRelease,
+  ThemeAndTopics,
+} from './types';
 
 export interface DashboardService {
   getMyThemesAndTopics(): Promise<ThemeAndTopics[]>;
@@ -26,13 +33,15 @@ const service: DashboardService = {
       .then(publications => publications.map(publicationPolyfilla));
   },
   getDraftReleases(): Promise<AdminDashboardRelease[]> {
-    return client.get<AdminDashboardRelease[]>('/releases/draft').
-      then(releases => releases.map(releasePolyfilla));
+    return client
+      .get<AdminDashboardRelease[]>('/releases/draft')
+      .then(releases => releases.map(releasePolyfilla));
   },
   getScheduledReleases(): Promise<AdminDashboardRelease[]> {
-    return client.get<AdminDashboardRelease[]>('/releases/scheduled').
-      then(releases => releases.map(releasePolyfilla));
-  }
+    return client
+      .get<AdminDashboardRelease[]>('/releases/scheduled')
+      .then(releases => releases.map(releasePolyfilla));
+  },
 };
 
 export default service;

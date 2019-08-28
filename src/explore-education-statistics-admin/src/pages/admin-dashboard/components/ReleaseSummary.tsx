@@ -28,10 +28,14 @@ const getLiveLatestLabel = (isLive: boolean, isLatest: boolean) => {
 
 const getStatusLabel = (approvalStatus: ReleaseStatus) => {
   switch (approvalStatus) {
-    case 'Draft': return 'Draft';
-    case 'HigherLevelReview': return 'In Review';
-    case 'Approved': return 'Approved for Publication';
-    default: return undefined;
+    case 'Draft':
+      return 'Draft';
+    case 'HigherLevelReview':
+      return 'In Review';
+    case 'Approved':
+      return 'Approved for Publication';
+    default:
+      return undefined;
   }
 };
 

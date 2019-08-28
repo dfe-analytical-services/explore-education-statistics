@@ -1,4 +1,4 @@
-import {ReleaseStatus} from "@admin/services/dashboard/types";
+import { ReleaseStatus } from '@admin/services/dashboard/types';
 import { UpdateReleaseStatusRequest } from '@admin/services/release/edit-release/status/types';
 import releaseSummaryService from '@admin/services/release/edit-release/summary/service';
 import client from '@admin/services/util/service';

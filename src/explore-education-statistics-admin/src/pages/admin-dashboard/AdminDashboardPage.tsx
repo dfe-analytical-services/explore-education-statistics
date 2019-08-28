@@ -1,14 +1,14 @@
 import Link from '@admin/components/Link';
-import {LoginContext} from '@admin/components/Login';
+import { LoginContext } from '@admin/components/Login';
 import Page from '@admin/components/Page';
-import ReleasesTab from "@admin/pages/admin-dashboard/components/ReleasesByStatusTab";
-import dashboardService from "@admin/services/dashboard/service";
-import {AdminDashboardRelease} from "@admin/services/dashboard/types";
+import ReleasesTab from '@admin/pages/admin-dashboard/components/ReleasesByStatusTab';
+import dashboardService from '@admin/services/dashboard/service';
+import { AdminDashboardRelease } from '@admin/services/dashboard/types';
 import loginService from '@admin/services/sign-in/service';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import React, {useContext, useEffect, useState} from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import MyPublicationsTab from './components/MyPublicationsTab';
 
 interface Model {
@@ -17,7 +17,6 @@ interface Model {
 }
 
 const AdminDashboardPage = () => {
-
   const { user } = useContext(LoginContext);
 
   const [model, setModel] = useState<Model>();
@@ -25,21 +24,18 @@ const AdminDashboardPage = () => {
   useEffect(() => {
     Promise.all([
       dashboardService.getDraftReleases(),
-      dashboardService.getScheduledReleases()
-    ]).
-    then(([draft, scheduled]) => {
+      dashboardService.getScheduledReleases(),
+    ]).then(([draft, scheduled]) => {
       setModel({
         draftReleases: draft,
         scheduledReleases: scheduled,
-      })
+      });
     });
   }, []);
-
 
   return (
     <>
       {model && (
-
         <Page wide breadcrumbs={[{ name: 'Administrator dashboard' }]}>
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-two-thirds">
@@ -48,7 +44,10 @@ const AdminDashboardPage = () => {
                 {user ? user.name : ''}{' '}
                 <span className="govuk-body-s">
                   Not you?{' '}
-                  <a className="govuk-link" href={loginService.getSignOutLink()}>
+                  <a
+                    className="govuk-link"
+                    href={loginService.getSignOutLink()}
+                  >
                     Sign out
                   </a>
                 </span>
@@ -79,7 +78,7 @@ const AdminDashboardPage = () => {
             >
               <ReleasesTab
                 releases={model.draftReleases}
-                noReleasesMessage='There are currently no draft releases'
+                noReleasesMessage="There are currently no draft releases"
               />
             </TabsSection>
             <TabsSection
@@ -88,14 +87,14 @@ const AdminDashboardPage = () => {
             >
               <ReleasesTab
                 releases={model.scheduledReleases}
-                noReleasesMessage='There are currently no scheduled releases'
+                noReleasesMessage="There are currently no scheduled releases"
               />
             </TabsSection>
           </Tabs>
         </Page>
       )}
     </>
-  )
+  );
 };
 
 export default AdminDashboardPage;

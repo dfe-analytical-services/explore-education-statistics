@@ -69,9 +69,10 @@ class FormRadioGroup extends PureComponent<FormRadioGroupProps> {
       value,
     } = this.props;
 
-    const orderedOptions = orderDirection && orderDirection.length === 0
-      ? options
-      : orderBy(options, order, orderDirection);
+    const orderedOptions =
+      orderDirection && orderDirection.length === 0
+        ? options
+        : orderBy(options, order, orderDirection);
 
     return (
       <FormFieldset {...this.props}>

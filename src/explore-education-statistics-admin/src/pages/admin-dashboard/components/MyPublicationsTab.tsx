@@ -1,9 +1,12 @@
 import publicationRoutes from '@admin/routes/edit-publication/routes';
-import dashboardService from "@admin/services/dashboard/service";
-import {AdminDashboardPublication, ThemeAndTopics} from '@admin/services/dashboard/types';
+import dashboardService from '@admin/services/dashboard/service';
+import {
+  AdminDashboardPublication,
+  ThemeAndTopics,
+} from '@admin/services/dashboard/types';
 import FormSelect from '@common/components/form/FormSelect';
-import orderBy from "lodash/orderBy";
-import React, {useEffect, useState} from 'react';
+import orderBy from 'lodash/orderBy';
+import React, { useEffect, useState } from 'react';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import { IdTitlePair } from '@admin/services/common/types';
@@ -32,10 +35,9 @@ const findTopicById = (topicId: string, theme: ThemeAndTopicsIdsAndTitles) =>
   theme.topics.find(topic => topic.id === topicId) || theme.topics[0];
 
 const MyPublicationsTab = () => {
-
   const [myPublications, setMyPublications] = useState<
     AdminDashboardPublication[]
-    >();
+  >();
 
   const [themes, setThemes] = useState<ThemeAndTopicsIdsAndTitles[]>();
 
@@ -44,7 +46,10 @@ const MyPublicationsTab = () => {
     topic: IdTitlePair;
   }>();
 
-  const onThemeChange = (themeId: string, availableThemes: ThemeAndTopicsIdsAndTitles[]) =>
+  const onThemeChange = (
+    themeId: string,
+    availableThemes: ThemeAndTopicsIdsAndTitles[],
+  ) =>
     setSelectedThemeAndTopic({
       theme: findThemeById(themeId, availableThemes),
       topic: orderBy(
@@ -53,7 +58,10 @@ const MyPublicationsTab = () => {
       )[0],
     });
 
-  const onTopicChange = (topicId: string, selectedTheme: ThemeAndTopicsIdsAndTitles) =>
+  const onTopicChange = (
+    topicId: string,
+    selectedTheme: ThemeAndTopicsIdsAndTitles,
+  ) =>
     setSelectedThemeAndTopic({
       theme: selectedTheme,
       topic: findTopicById(topicId, selectedTheme),
@@ -127,7 +135,10 @@ const MyPublicationsTab = () => {
                 }))}
                 value={selectedThemeAndTopic.topic.id}
                 onChange={event => {
-                  onTopicChange(event.target.value, selectedThemeAndTopic.theme);
+                  onTopicChange(
+                    event.target.value,
+                    selectedThemeAndTopic.theme,
+                  );
                 }}
               />
             </div>
@@ -149,10 +160,14 @@ const MyPublicationsTab = () => {
             </Accordion>
           )}
           {myPublications.length === 0 && (
-            <div className="govuk-inset-text">You have not yet created any publications</div>
+            <div className="govuk-inset-text">
+              You have not yet created any publications
+            </div>
           )}
           <Link
-            to={publicationRoutes.createPublication.generateLink(selectedThemeAndTopic.topic.id)}
+            to={publicationRoutes.createPublication.generateLink(
+              selectedThemeAndTopic.topic.id,
+            )}
             className="govuk-button"
           >
             Create new publication
