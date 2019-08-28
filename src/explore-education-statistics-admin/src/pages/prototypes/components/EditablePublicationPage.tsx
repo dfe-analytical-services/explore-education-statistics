@@ -577,7 +577,7 @@ class EditablePublicationPage extends Component<Props, State> {
               resolveComments,
             )}
           <h2 className="govuk-heading-m govuk-!-margin-top-9">
-            Extra information
+            Help and support
           </h2>
           <Accordion id="extra-information-sections">
             <AccordionSection
