@@ -42,6 +42,21 @@ interface InfographicChartOptionsProps {
   onChange: (fileId: string) => void;
 }
 
+const loadChartFilesAndMapToSelectOptionAsync = (releaseId: string): Promise<SelectOption[]> => {
+  return service.getChartFiles(releaseId).then(chartFiles => {
+    return [
+      {
+        label: 'Upload a new file',
+        value: '',
+      },
+      ...chartFiles.map(({ title, filename }) => ({
+        label: title,
+        value: filename,
+      })),
+    ];
+  });
+};
+
 const InfographicChartOptions = ({
   releaseId,
   fileId,
@@ -57,21 +72,6 @@ const InfographicChartOptions = ({
 
   const [uploading, setUploading] = React.useState<boolean>(false);
 
-  const loadChartFilesAsync = () => {
-    service.getChartFiles(releaseId).then(chartFiles => {
-      setChartFileOptions([
-        {
-          label: 'Upload a new file',
-          value: '',
-        },
-        ...chartFiles.map(({ title, filename }) => ({
-          label: title,
-          value: filename,
-        })),
-      ]);
-    });
-  };
-
   const doUpload = () => {
     if (uploadFile) {
       setUploading(true);
@@ -80,7 +80,10 @@ const InfographicChartOptions = ({
           name: uploadName,
           file: uploadFile,
         })
-        .then(() => loadChartFilesAsync())
+        .then(() =>
+          loadChartFilesAndMapToSelectOptionAsync(releaseId)
+            .then(setChartFileOptions),
+        )
         .then(() => {
           onChange(uploadFile.name);
           setCurrentFileId(uploadFile.name);
@@ -94,7 +97,8 @@ const InfographicChartOptions = ({
   };
 
   React.useEffect(() => {
-    loadChartFilesAsync();
+    loadChartFilesAndMapToSelectOptionAsync(releaseId)
+      .then(setChartFileOptions);
   }, [releaseId]);
 
   return (
