@@ -7,7 +7,7 @@ import tableBuilderService, {
   PublicationSubjectMeta,
   TableDataQuery,
   ThemeMeta,
-} from '@frontend/services/tableBuilderService';
+} from '@common/modules/full-table/services/tableBuilderService';
 import { Dictionary } from '@common/types/util';
 import ButtonText from '@common/components/ButtonText';
 import LinkContainer from '@common/components/LinkContainer';
@@ -19,15 +19,15 @@ import {
   CategoryFilter,
   Indicator,
   LocationFilter,
-} from '@frontend/modules/table-tool/components/types/filters';
-import parseYearCodeTuple from '@frontend/modules/table-tool/components/types/TimePeriod';
+} from '@common/modules/full-table/types/filters';
+import parseYearCodeTuple from '@common/modules/full-table/utils/TimePeriod';
 import mapValues from 'lodash/mapValues';
 import { NextContext } from 'next';
 import React, { Component, MouseEventHandler, createRef } from 'react';
-import getDefaultTableHeaderConfig from '@frontend/modules/table-tool/utils/tableHeaders';
+import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
 import permalinkService, {
   FullTable,
-} from '@frontend/services/permalinkService';
+} from '@common/modules/full-table/services/permalinkService';
 import DownloadCsvButton from './components/DownloadCsvButton';
 import FiltersForm, { FilterFormSubmitHandler } from './components/FiltersForm';
 import LocationFiltersForm, {

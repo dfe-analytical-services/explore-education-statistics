@@ -2,7 +2,7 @@ import commaList from '@common/lib/utils/string/commaList';
 import {
   LocationFilter,
   TimePeriodFilter,
-} from '@frontend/modules/table-tool/components/types/filters';
+} from '@common/modules/full-table/types/filters';
 import React from 'react';
 
 interface Props {

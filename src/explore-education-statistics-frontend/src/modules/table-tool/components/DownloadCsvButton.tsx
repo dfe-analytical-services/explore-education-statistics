@@ -5,12 +5,12 @@ import {
   LocationFilter,
   TimePeriodFilter,
   Filter,
-} from '@frontend/modules/table-tool/components/types/filters';
+} from '@common/modules/full-table/types/filters';
 import { saveAs } from 'file-saver';
 import Papa from 'papaparse';
 import React from 'react';
-import { FullTable } from '@frontend/services/permalinkService';
-import { transformTableMetaFiltersToCategoryFilters } from '../utils/tableHeaders';
+import { FullTable } from '@common/modules/full-table/services/permalinkService';
+import { transformTableMetaFiltersToCategoryFilters } from '@common/modules/full-table/utils/tableHeaders';
 
 interface Props {
   publicationSlug: string;

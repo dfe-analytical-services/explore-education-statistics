@@ -5,8 +5,8 @@ import {
   CategoryFilter,
   Indicator,
   TimePeriodFilter,
-} from '@frontend/modules/table-tool/components/types/filters';
-import { FullTableMeta } from '@frontend/services/permalinkService';
+} from '@common/modules/full-table/types/filters';
+import { FullTableMeta } from '@common/modules/full-table/services/permalinkService';
 
 const removeSiblinglessTotalRows = (
   categoryFilters: Dictionary<CategoryFilter[]>,

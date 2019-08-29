@@ -7,8 +7,8 @@ import {
   Indicator,
   LocationFilter,
   TimePeriodFilter,
-} from '@frontend/modules/table-tool/components/types/filters';
-import { FullTable } from '@frontend/services/permalinkService';
+} from '@common/modules/full-table/types/filters';
+import { FullTable } from '@common/modules/full-table/services/permalinkService';
 import DataTableCaption from './DataTableCaption';
 import FixedMultiHeaderDataTable from './FixedMultiHeaderDataTable';
 import { TableHeadersFormValues } from './TableHeadersForm';

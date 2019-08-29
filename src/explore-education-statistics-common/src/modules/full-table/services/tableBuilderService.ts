@@ -1,5 +1,8 @@
 import { Dictionary, PartialRecord } from '@common/types';
-import { FullTableMeta, FullTable } from '@frontend/services/permalinkService';
+import {
+  FullTableMeta,
+  FullTable,
+} from '@common/modules/full-table/services/permalinkService';
 import { dataApi } from '@common/services/api';
 
 export interface FilterOption {

@@ -2,7 +2,7 @@ import {
   FilterOption,
   IndicatorOption,
   TimePeriodOption,
-} from '@frontend/services/tableBuilderService';
+} from '@common/modules/full-table/services/tableBuilderService';
 import camelCase from 'lodash/camelCase';
 
 export abstract class Filter {

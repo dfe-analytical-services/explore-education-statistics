@@ -5,15 +5,14 @@ import {
   GroupedFilterOptions,
   TableDataQuery,
   FilterOption,
-} from '@frontend/services/tableBuilderService';
+} from '@common/modules/full-table/services/tableBuilderService';
 import {
   Indicator,
   LocationFilter,
   CategoryFilter,
   TimePeriodFilter,
-} from '@frontend/modules/table-tool/components/types/filters';
-import { TableHeadersFormValues } from '@frontend/modules/table-tool/components/TableHeadersForm';
-import { transformTableMetaFiltersToCategoryFilters } from '@frontend/modules/table-tool/utils/tableHeaders';
+} from '@common/modules/full-table/types/filters';
+import { transformTableMetaFiltersToCategoryFilters } from '@common/modules/full-table/utils/tableHeaders';
 
 export interface FullTableMeta {
   publicationName: string;
@@ -36,7 +35,7 @@ export interface FullTableMeta {
 
 interface PermalinkCreate extends TableDataQuery {
   configuration: {
-    tableHeadersConfig: TableHeadersFormValues;
+    tableHeadersConfig: UnmappedTableHeadersConfig;
   };
 }
 
@@ -50,8 +49,20 @@ export interface Permalink {
   created: string;
   fullTable: FullTable;
   configuration: {
-    tableHeadersConfig: TableHeadersFormValues;
+    tableHeadersConfig: UnmappedTableHeadersConfig;
   };
+}
+
+interface UnmappedTableHeadersConfig {
+  columnGroups: SortableOption[][];
+  columns: SortableOption[];
+  rowGroups: SortableOption[][];
+  rows: SortableOption[];
+}
+
+interface SortableOption {
+  label: string;
+  value: string;
 }
 
 const reverseMapTableHeadersConfig = (
