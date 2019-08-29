@@ -64,7 +64,7 @@ const DownloadCsvButton = ({ publicationSlug, fullTable }: Props) => {
             filterOptions.every(filter =>
               result.filters.includes(filter.value),
             ) &&
-              result.timePeriod === new TimePeriod(timePeriod).value &&
+              result.timePeriod === timePeriod.value &&
               result.location[location.level] &&
               result.location[location.level].code === location.value,
           );

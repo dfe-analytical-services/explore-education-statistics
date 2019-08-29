@@ -296,9 +296,11 @@ class TableToolPage extends Component<Props, State> {
       indicator => new Indicator(indicatorsByValue[indicator]),
     );
 
-    const createdTable = await tableBuilderService.getTableData(
+    const unmappedCreatedTable = await tableBuilderService.getTableData(
       this.createQuery(filters, indicators),
     );
+
+    const createdTable = permalinkService.mapFullTable(unmappedCreatedTable);
 
     this.setState({
       createdTable,

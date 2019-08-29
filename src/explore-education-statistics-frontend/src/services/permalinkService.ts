@@ -164,25 +164,29 @@ const reverseMapTableHeadersConfig = (
   };
 };
 
-const mapPermalink = (unmappedPermalink: any) => {
-  const mappedFullTable = {
-    ...unmappedPermalink.fullTable,
+const mapFullTable = (unmappedFullTable: any) => {
+  return {
+    ...unmappedFullTable,
     subjectMeta: {
-      ...unmappedPermalink.fullTable.subjectMeta,
-      indicators: unmappedPermalink.fullTable.subjectMeta.indicators.map(
+      ...unmappedFullTable.subjectMeta,
+      indicators: unmappedFullTable.subjectMeta.indicators.map(
         (indicator: { label: string; unit: string; value: string }) =>
           new Indicator(indicator),
       ),
-      locations: unmappedPermalink.fullTable.subjectMeta.locations.map(
+      locations: unmappedFullTable.subjectMeta.locations.map(
         (location: { label: string; level: string; value: string }) =>
           new LocationFilter(location, location.level),
       ),
-      timePeriodRange: unmappedPermalink.fullTable.subjectMeta.timePeriodRange.map(
+      timePeriodRange: unmappedFullTable.subjectMeta.timePeriodRange.map(
         (timePeriod: { code: string; label: string; year: number }) =>
           new TimePeriod(timePeriod),
       ),
     },
   };
+};
+
+const mapPermalink = (unmappedPermalink: any) => {
+  const mappedFullTable = mapFullTable(unmappedPermalink.fullTable);
 
   return {
     ...unmappedPermalink,
@@ -203,5 +207,6 @@ export default {
   getPermalink(publicationSlug: string): Promise<Permalink> {
     return dataApi.get(`Permalink/${publicationSlug}`);
   },
+  mapFullTable,
   mapPermalink,
 };
