@@ -62,8 +62,8 @@ const ManageReleasePageContainer = ({
         <Page wide breadcrumbs={[{ name: 'Edit release' }]}>
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-two-thirds">
-              <h1 className="govuk-heading-l">
-                <span className="govuk-caption-l">Edit release</span>
+              <h1 className="govuk-heading-xl">
+                <span className="govuk-caption-xl">Edit release</span>
                 {publication.title}
               </h1>
             </div>
