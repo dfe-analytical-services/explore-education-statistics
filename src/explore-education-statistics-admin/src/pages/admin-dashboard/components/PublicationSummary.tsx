@@ -1,7 +1,7 @@
 import ButtonLink from '@admin/components/ButtonLink';
 import Link from '@admin/components/Link';
 import ReleaseSummary from '@admin/pages/admin-dashboard/components/ReleaseSummary';
-import releaseRoutes, {summaryRoute} from '@admin/routes/edit-release/routes';
+import releaseRoutes, { summaryRoute } from '@admin/routes/edit-release/routes';
 import { AdminDashboardPublication } from '@admin/services/dashboard/types';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -30,10 +30,11 @@ const PublicationSummary = ({ publication }: Props) => {
             {publication.releases.map(release => (
               <li key={release.id}>
                 <ReleaseSummary
-                  publicationId={publication.id}
                   release={release}
                   actions={
-                    <ButtonLink to={summaryRoute.generateLink(publication.id, release.id)}>
+                    <ButtonLink
+                      to={summaryRoute.generateLink(publication.id, release.id)}
+                    >
                       View and edit release
                     </ButtonLink>
                   }

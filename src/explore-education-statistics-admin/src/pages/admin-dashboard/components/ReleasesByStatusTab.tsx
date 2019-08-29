@@ -32,7 +32,6 @@ const ReleasesByStatusTab = ({ releases, noReleasesMessage, actions, afterCommen
               {releasesByPublication[publication].map(release => (
                 <ReleaseSummary
                   key={release.id}
-                  publicationId={release.publicationId}
                   release={release}
                   actions={actions(release)}
                   afterCommentsSection={afterCommentsSection && afterCommentsSection(release)}

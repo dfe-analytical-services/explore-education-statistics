@@ -32,13 +32,12 @@ const getStatusLabel = (approvalStatus: ReleaseStatus) => {
 };
 
 interface Props {
-  publicationId: string;
   release: AdminDashboardRelease;
   actions: ReactNode;
   afterCommentsSection?: ReactNode;
 }
 
-const ReleaseSummary = ({ publicationId, release, actions, afterCommentsSection }: Props) => {
+const ReleaseSummary = ({ release, actions, afterCommentsSection }: Props) => {
   const authentication = useContext(LoginContext);
 
   const editorName =
