@@ -1,20 +1,19 @@
-import ButtonLink from '@admin/components/ButtonLink';
+import { LoginContext } from '@admin/components/Login';
 import {
   dayMonthYearIsComplete,
   dayMonthYearToDate,
 } from '@admin/services/common/types';
 import {
   AdminDashboardRelease,
-  ReleaseApprovalStatus,
+  Comment,
+  ReleaseStatus,
 } from '@admin/services/dashboard/types';
+import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import React, { useContext } from 'react';
 import { format } from 'date-fns';
-import Details from '@common/components/Details';
-import { LoginContext } from '@admin/components/Login';
-import { summaryRoute } from '@admin/routes/edit-release/routes';
+import React, { ReactNode, useContext } from 'react';
 
 const getLiveLatestLabel = (isLive: boolean, isLatest: boolean) => {
   if (isLive && isLatest) {
@@ -26,19 +25,25 @@ const getLiveLatestLabel = (isLive: boolean, isLatest: boolean) => {
   return '(not Live)';
 };
 
-const getTag = (approvalStatus: ReleaseApprovalStatus) => {
-  if (ReleaseApprovalStatus.ReadyToReview === approvalStatus) {
-    return 'Ready to review';
+const getStatusLabel = (approvalStatus: ReleaseStatus) => {
+  switch (approvalStatus) {
+    case 'Draft':
+      return 'Draft';
+    case 'HigherLevelReview':
+      return 'In Review';
+    case 'Approved':
+      return 'Approved for Publication';
+    default:
+      return undefined;
   }
-  return undefined;
 };
 
 interface Props {
-  publicationId: string;
   release: AdminDashboardRelease;
+  actions: ReactNode;
 }
 
-const DashboardReleaseSummary = ({ publicationId, release }: Props) => {
+const ReleaseSummary = ({ release, actions }: Props) => {
   const authentication = useContext(LoginContext);
 
   const editorName =
@@ -55,12 +60,8 @@ const DashboardReleaseSummary = ({ publicationId, release }: Props) => {
     <Details
       className="govuk-!-margin-bottom-0"
       summary={releaseSummaryLabel}
-      tag={getTag(release.status)}
+      tag={getStatusLabel(release.status)}
     >
-      <ButtonLink to={summaryRoute.generateLink(publicationId, release.id)}>
-        Edit this release
-      </ButtonLink>
-
       <SummaryList additionalClassName="govuk-!-margin-bottom-3">
         <SummaryListItem term="Publish date">
           <FormattedDate>
@@ -85,6 +86,18 @@ const DashboardReleaseSummary = ({ publicationId, release }: Props) => {
             </span>
           )}
         </SummaryListItem>
+        {(release.draftComments || release.higherReviewComments) && (
+          <SummaryListItem term="Comments">
+            <Comments
+              heading="Draft comments"
+              comments={release.draftComments}
+            />
+            <Comments
+              heading="Responsible statistician comments"
+              comments={release.higherReviewComments}
+            />
+          </SummaryListItem>
+        )}
         <SummaryListItem term="Last edited" detailsNoMargin>
           <FormattedDate>{release.lastEditedDateTime}</FormattedDate>
           {' at '}
@@ -92,13 +105,52 @@ const DashboardReleaseSummary = ({ publicationId, release }: Props) => {
           <a href="#">{editorName}</a>
         </SummaryListItem>
         {release.internalReleaseNote && (
-          <SummaryListItem term="Internal release note" breakNewLines>
-            {release.internalReleaseNote}
+          <SummaryListItem term="Internal release note">
+            <span className="dfe-multiline-content">
+              {release.internalReleaseNote}
+            </span>
           </SummaryListItem>
         )}
       </SummaryList>
+
+      <div className="govuk-grid-row">
+        <div className="govuk-grid-column-one-half">{actions}</div>
+        <div className="govuk-grid-column-one-half dfe-align--right" />
+      </div>
     </Details>
   );
 };
 
-export default DashboardReleaseSummary;
+interface CommentsProps {
+  heading: string;
+  comments: Comment[];
+}
+
+const Comments = ({ heading, comments }: CommentsProps) => {
+  return (
+    comments && (
+      <>
+        <h3 className="govuk-heading-s govuk-!-margin-bottom-0">{heading}</h3>
+        {comments.map((comment, index) => (
+          /* eslint-disable react/no-array-index-key */
+          <Details
+            key={index}
+            summary={`${comment.authorName}, ${format(
+              new Date(comment.createdDate),
+              'dd MMMM yyyy, HH:mm',
+            )}`}
+            className={
+              index < comments.length - 1
+                ? 'govuk-!-margin-bottom-0'
+                : undefined
+            }
+          >
+            <span className="dfe-multiline-content">{comment.message}</span>
+          </Details>
+        ))}
+      </>
+    )
+  );
+};
+
+export default ReleaseSummary;

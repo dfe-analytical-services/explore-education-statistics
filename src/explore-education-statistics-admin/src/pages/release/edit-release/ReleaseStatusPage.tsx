@@ -3,6 +3,7 @@ import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
 import dashboardRoutes from '@admin/routes/dashboard/routes';
+import { ReleaseStatus } from '@admin/services/dashboard/types';
 import service from '@admin/services/release/edit-release/status/service';
 import Button from '@common/components/Button';
 import { Form, FormFieldRadioGroup, Formik } from '@common/components/form';
@@ -13,12 +14,12 @@ import React, { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 
 interface FormValues {
-  releaseStatus: string;
+  releaseStatus: ReleaseStatus;
   internalReleaseNote: string;
 }
 
 const ReleaseStatusPage = ({ history }: RouteComponentProps) => {
-  const [releaseStatus, setReleaseStatus] = useState('');
+  const [releaseStatus, setReleaseStatus] = useState<ReleaseStatus>();
 
   const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
 
@@ -45,7 +46,7 @@ const ReleaseStatusPage = ({ history }: RouteComponentProps) => {
             history.push(dashboardRoutes.adminDashboard);
           }}
           validationSchema={Yup.object<FormValues>({
-            releaseStatus: Yup.string().required('Choose a status'),
+            releaseStatus: Yup.mixed().required('Choose a status'),
             internalReleaseNote: Yup.string().required(
               'Provide an internal release note',
             ),
@@ -66,7 +67,12 @@ const ReleaseStatusPage = ({ history }: RouteComponentProps) => {
                       label: 'Ready for higher review',
                       value: 'HigherLevelReview',
                     },
+                    {
+                      label: 'Approved for publication',
+                      value: 'Approved',
+                    },
                   ]}
+                  orderDirection={[]}
                 />
                 <FormFieldTextArea
                   name="internalReleaseNote"
