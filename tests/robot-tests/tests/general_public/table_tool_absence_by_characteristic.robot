@@ -76,57 +76,57 @@ Validate results table row headings
     [Tags]  HappyPath
     user checks results table row heading contains  1    1    England
 
-    user checks results table row heading contains  1    2    Gender female
-    user checks results table row heading contains  1    3    Authorised absence rate
+    user checks results table row heading contains  1    2    Gender male
+    user checks results table row heading contains  1    3    Unauthorised absence rate
     user checks results table row heading contains  2    1    Overall absence rate
-    user checks results table row heading contains  3    1    Unauthorised absence rate
+    user checks results table row heading contains  3    1    Authorised absence rate
 
-    user checks results table row heading contains  4    1    Gender male
-    user checks results table row heading contains  4    2    Authorised absence rate
+    user checks results table row heading contains  4    1    Gender female
+    user checks results table row heading contains  4    2    Unauthorised absence rate
     user checks results table row heading contains  5    1    Overall absence rate
-    user checks results table row heading contains  6    1    Unauthorised absence rate
-
-Validate Gender female Authorised absence rate row
-    [Tags]  HappyPath
-    user checks results table cell contains  1    1     4.2%
-    user checks results table cell contains  1    2     3.5%
-    user checks results table cell contains  1    3     3.5%
-    user checks results table cell contains  1    4     3.4%
-
-Validate Gender female Unauthorised absence rate row
-    [Tags]  HappyPath
-    user checks results table cell contains  2    1     5.3%
-    user checks results table cell contains  2    2     4.5%
-    user checks results table cell contains  2    3     4.6%
-    user checks results table cell contains  2    4     4.5%
-
-Validate Gender female Overall absence rate row
-    [Tags]  HappyPath
-    user checks results table cell contains  3    1     1.1%
-    user checks results table cell contains  3    2     1.1%
-    user checks results table cell contains  3    3     1.1%
-    user checks results table cell contains  3    4     1.1%
-
-Validate Gender male Authorised absence rate row
-    [Tags]  HappyPath
-    user checks results table cell contains  4    1     4.2%
-    user checks results table cell contains  4    2     3.4%
-    user checks results table cell contains  4    3     3.6%
-    user checks results table cell contains  4    4     3.5%
+    user checks results table row heading contains  6    1    Authorised absence rate
 
 Validate Gender male Unauthorised absence rate row
     [Tags]  HappyPath
-    user checks results table cell contains  5    1     5.2%
-    user checks results table cell contains  5    2     4.5%
-    user checks results table cell contains  5    3     4.6%
-    user checks results table cell contains  5    4     4.6%
+    user checks results table cell contains  1    1     1.1%
+    user checks results table cell contains  1    2     1.1%
+    user checks results table cell contains  1    3     1.1%
+    user checks results table cell contains  1    4     1.1%
 
 Validate Gender male Overall absence rate row
     [Tags]  HappyPath
-    user checks results table cell contains  6    1     1.1%
-    user checks results table cell contains  6    2     1.1%
-    user checks results table cell contains  6    3     1.1%
-    user checks results table cell contains  6    4     1.1%
+    user checks results table cell contains  2    1     5.2%
+    user checks results table cell contains  2    2     4.5%
+    user checks results table cell contains  2    3     4.6%
+    user checks results table cell contains  2    4     4.6%
+
+Validate Gender male Authorised absence rate row
+    [Tags]  HappyPath
+    user checks results table cell contains  3    1     4.2%
+    user checks results table cell contains  3    2     3.4%
+    user checks results table cell contains  3    3     3.6%
+    user checks results table cell contains  3    4     3.5%
+
+Validate Gender female Unauthorised absence rate row
+    [Tags]  HappyPath
+    user checks results table cell contains  4    1     1.1%
+    user checks results table cell contains  4    2     1.1%
+    user checks results table cell contains  4    3     1.1%
+    user checks results table cell contains  4    4     1.1%
+
+Validate Gender female Overall absence rate row
+    [Tags]  HappyPath
+    user checks results table cell contains  5    1     5.3%
+    user checks results table cell contains  5    2     4.5%
+    user checks results table cell contains  5    3     4.6%
+    user checks results table cell contains  5    4     4.5%
+
+Validate Gender female Authorised absence rate row
+    [Tags]  HappyPath
+    user checks results table cell contains  6    1     4.2%
+    user checks results table cell contains  6    2     3.5%
+    user checks results table cell contains  6    3     3.5%
+    user checks results table cell contains  6    4     3.4%
 
 Reorder results
     [Tags]  HappyPath   Failing
@@ -142,8 +142,6 @@ Reorder results
     user reorders table headers  xpath://strong[text()="Authorised absence rate"]   xpath://strong[text()="Unauthorised absence rate"]
     user reorders table headers  xpath://strong[text()="2012/13"]   xpath://strong[text()="2015/16"]
     
-    sleep    10
-
     user clicks element     xpath://button[text()="Re-order table"]
 
 Validate results table column headings after reordering

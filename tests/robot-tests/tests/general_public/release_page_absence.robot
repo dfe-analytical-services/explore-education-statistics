@@ -67,7 +67,7 @@ Validate subject files file type and file unit style
     [Documentation]  DFE-958
     [Tags]  HappyPath   NotAgainstLocal
     user opens details dropdown     Download data files
-    user checks page contains      Absence in prus (csv, 141 Kb)
+    user checks page contains      Absence in PRUs (csv, 141 Kb)
     user closes details dropdown     Download data files
 
 Validate absence_in_prus.csv file can be downloaded
@@ -75,7 +75,7 @@ Validate absence_in_prus.csv file can be downloaded
     [Tags]  HappyPath    NotAgainstLocal
     user opens details dropdown     Download data files
 
-    download file  link:Absence in prus     absence_in_prus.csv
+    download file  link:Absence in PRUs     absence_in_prus.csv
     downloaded file should have first line  absence_in_prus.csv   time_identifier,time_period,geographic_level,country_code,country_name,region_code,region_name,old_la_code,new_la_code,la_name,school_type,num_schools,enrolments,sess_possible,sess_overall,sess_authorised,sess_unauthorised,sess_overall_percent,sess_authorised_percent,sess_unauthorised_percent,enrolments_pa10_exact,enrolments_pa10_exact_percent,sess_auth_illness,sess_auth_appointments,sess_auth_religious,sess_auth_study,sess_auth_traveller,sess_auth_holiday,sess_auth_ext_holiday,sess_auth_excluded,sess_auth_other,sess_auth_totalreasons,sess_unauth_holiday,sess_unauth_late,sess_unauth_other,sess_unauth_noyet,sess_unauth_totalreasons,sess_overall_totalreasons
 
     user closes details dropdown     Download data files
