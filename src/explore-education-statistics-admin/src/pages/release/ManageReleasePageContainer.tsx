@@ -86,8 +86,8 @@ const ManageReleasePageContainer = ({
 
           <nav className="app-navigation govuk-!-margin-top-6 govuk-!-margin-bottom-9">
             <ul className="app-navigation__list govuk-!-margin-bottom-0">
-              <li>
-                {viewRoutes.map(route => (
+              {viewRoutes.map(route => (
+                <li key={route.path}>
                   <NavLink
                     key={route.path}
                     to={route.generateLink(publicationId, releaseId)}
@@ -95,8 +95,8 @@ const ManageReleasePageContainer = ({
                   >
                     {route.title}
                   </NavLink>
-                ))}
-              </li>
+                </li>
+              ))}
             </ul>
           </nav>
 
