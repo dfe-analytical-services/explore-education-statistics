@@ -193,6 +193,7 @@ const definition: ChartDefinition = {
     fixedAxisGroupBy: false,
     hasAxes: true,
     hasReferenceLines: true,
+    hasLegend: true,
   },
 
   data: [
