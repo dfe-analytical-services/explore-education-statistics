@@ -49,6 +49,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<Methodology, MethodologyViewModel>();
 
             CreateMap<Publication, PublicationViewModel>();
+
+            CreateMap<DataBlock, DataBlockViewModel>();
         }
     }
 }

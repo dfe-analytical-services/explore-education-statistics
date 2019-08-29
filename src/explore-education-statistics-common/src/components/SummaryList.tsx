@@ -1,7 +1,5 @@
-import SummaryListItem from '@common/components/SummaryListItem';
-import isComponentType from '@common/lib/type-guards/components/isComponentType';
 import classNames from 'classnames';
-import React, { Children, ReactNode } from 'react';
+import React, {ReactNode} from 'react';
 
 interface Props {
   children: ReactNode;
@@ -17,9 +15,7 @@ const SummaryList = ({ children, noBorder, additionalClassName }: Props) => {
         [additionalClassName || '']: additionalClassName,
       })}
     >
-      {Children.toArray(children).filter(child =>
-        isComponentType(child, SummaryListItem),
-      )}
+      {children}
     </dl>
   );
 };

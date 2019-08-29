@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ILogger<PreReleaseService> _logger;
         
         // TODO remove when we have Users to link to a Release for its Pre Release Contacts
-        private readonly Dictionary<Guid, List<UserDetailsViewModel>> _preReleaseContactsByRelease;
+        private static readonly Dictionary<Guid, List<UserDetailsViewModel>> _preReleaseContactsByRelease = new Dictionary<Guid, List<UserDetailsViewModel>>();
         private readonly List<UserDetailsViewModel> _availablePreReleaseContacts;
             
         public PreReleaseService(ApplicationDbContext context, IMapper mapper, IReleaseService releaseService, ILogger<PreReleaseService> logger)
@@ -45,7 +45,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     Name = "TODO Pre Release User 3",
                 },
             };
-            _preReleaseContactsByRelease = new Dictionary<Guid, List<UserDetailsViewModel>>();
         }
 
         public async Task<List<UserDetailsViewModel>> GetAvailablePreReleaseContactsAsync()
