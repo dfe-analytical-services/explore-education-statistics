@@ -42,6 +42,7 @@ export default class HorizontalBarBlock extends Component<HorizontalBarProps> {
       fixedAxisGroupBy: false,
       hasAxes: true,
       hasReferenceLines: true,
+      hasLegend: true,
     },
 
     data: [

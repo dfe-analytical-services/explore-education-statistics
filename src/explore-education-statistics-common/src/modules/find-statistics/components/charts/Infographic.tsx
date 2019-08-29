@@ -46,6 +46,7 @@ const definition: ChartDefinition = {
     fixedAxisGroupBy: true,
     hasAxes: false,
     hasReferenceLines: false,
+    hasLegend: false,
   },
 
   data: [],

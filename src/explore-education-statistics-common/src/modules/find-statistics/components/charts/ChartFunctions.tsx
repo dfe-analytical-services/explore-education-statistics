@@ -99,6 +99,7 @@ export interface ChartCapabilities {
   canSize: boolean;
   fixedAxisGroupBy: boolean;
   hasReferenceLines: boolean;
+  hasLegend: boolean;
 }
 
 export interface ChartDefinition {

@@ -42,6 +42,7 @@ export default class VerticalBarBlock extends Component<VerticalBarProps> {
       fixedAxisGroupBy: false,
       hasAxes: true,
       hasReferenceLines: true,
+      hasLegend: true,
     },
 
     data: [
