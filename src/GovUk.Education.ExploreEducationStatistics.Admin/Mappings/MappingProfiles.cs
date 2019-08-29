@@ -19,20 +19,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(
                     dest => dest.LatestRelease,
                     m => m.MapFrom(r => r.Publication.LatestRelease().Id == r.Id))
-                .ForMember(dest => dest.Contact, 
+                .ForMember(dest => dest.Contact,
                     m => m.MapFrom(r => r.Publication.Contact))
-                .ForMember(dest => dest.PublicationTitle, 
+                .ForMember(dest => dest.PublicationTitle,
                     m => m.MapFrom(r => r.Publication.Title));
 
+            CreateMap<Release, ReleaseSummaryViewModel>();
             CreateMap<ReleaseSummaryViewModel, Release>();
-            
+
             CreateMap<CreateReleaseViewModel, Release>();
 
             CreateMap<Methodology, MethodologyViewModel>();
-            
+
             CreateMap<Publication, PublicationViewModel>();
-            
-            CreateMap<List<MethodologyViewModel>, List<Methodology>>();
         }
     }
 }
