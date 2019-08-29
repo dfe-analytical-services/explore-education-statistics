@@ -7,12 +7,14 @@ interface Props {
   noReleasesMessage: string;
   releases: AdminDashboardRelease[];
   actions: (release: AdminDashboardRelease) => ReactNode;
+  children?: (release: AdminDashboardRelease) => ReactNode;
 }
 
 const ReleasesByStatusTab = ({
   releases,
   noReleasesMessage,
   actions,
+  children,
 }: Props) => {
   const releasesByPublication: Dictionary<AdminDashboardRelease[]> = {};
 
@@ -37,7 +39,9 @@ const ReleasesByStatusTab = ({
                   key={release.id}
                   release={release}
                   actions={actions(release)}
-                />
+                >
+                  {children && children(release)}
+                </ReleaseSummary>
               ))}
             </React.Fragment>
           ))}

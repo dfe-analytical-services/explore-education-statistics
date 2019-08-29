@@ -41,9 +41,10 @@ const getStatusLabel = (approvalStatus: ReleaseStatus) => {
 interface Props {
   release: AdminDashboardRelease;
   actions: ReactNode;
+  children?: ReactNode;
 }
 
-const ReleaseSummary = ({ release, actions }: Props) => {
+const ReleaseSummary = ({ release, actions, children }: Props) => {
   const authentication = useContext(LoginContext);
 
   const editorName =
@@ -98,6 +99,7 @@ const ReleaseSummary = ({ release, actions }: Props) => {
             />
           </SummaryListItem>
         )}
+        {children}
         <SummaryListItem term="Last edited" detailsNoMargin>
           <FormattedDate>{release.lastEditedDateTime}</FormattedDate>
           {' at '}
