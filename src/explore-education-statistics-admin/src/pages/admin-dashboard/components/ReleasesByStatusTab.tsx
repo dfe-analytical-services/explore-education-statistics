@@ -7,9 +7,10 @@ interface Props {
   noReleasesMessage: string;
   releases: AdminDashboardRelease[];
   actions: (release: AdminDashboardRelease) => ReactNode;
+  afterCommentsSection?: (release: AdminDashboardRelease) => ReactNode;
 }
 
-const ReleasesByStatusTab = ({ releases, noReleasesMessage, actions }: Props) => {
+const ReleasesByStatusTab = ({ releases, noReleasesMessage, actions, afterCommentsSection }: Props) => {
   const releasesByPublication: Dictionary<AdminDashboardRelease[]> = {};
 
   releases.forEach(release => {
@@ -34,6 +35,7 @@ const ReleasesByStatusTab = ({ releases, noReleasesMessage, actions }: Props) =>
                   publicationId={release.publicationId}
                   release={release}
                   actions={actions(release)}
+                  afterCommentsSection={afterCommentsSection && afterCommentsSection(release)}
                 />
               ))}
             </React.Fragment>

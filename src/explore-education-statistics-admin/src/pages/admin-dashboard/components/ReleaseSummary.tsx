@@ -35,9 +35,10 @@ interface Props {
   publicationId: string;
   release: AdminDashboardRelease;
   actions: ReactNode;
+  afterCommentsSection?: ReactNode;
 }
 
-const ReleaseSummary = ({ publicationId, release, actions }: Props) => {
+const ReleaseSummary = ({ publicationId, release, actions, afterCommentsSection }: Props) => {
   const authentication = useContext(LoginContext);
 
   const editorName =
@@ -92,6 +93,7 @@ const ReleaseSummary = ({ publicationId, release, actions }: Props) => {
             />
           </SummaryListItem>
         )}
+        {afterCommentsSection}
         <SummaryListItem term="Last edited" detailsNoMargin>
           <FormattedDate>{release.lastEditedDateTime}</FormattedDate>
           {' at '}

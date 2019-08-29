@@ -8,6 +8,7 @@ import dashboardService from '@admin/services/dashboard/service';
 import { AdminDashboardRelease } from '@admin/services/dashboard/types';
 import loginService from '@admin/services/sign-in/service';
 import RelatedInformation from '@common/components/RelatedInformation';
+import SummaryListItem from "@common/components/SummaryListItem";
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import React, { useContext, useEffect, useState } from 'react';
@@ -99,6 +100,11 @@ const AdminDashboardPage = () => {
                   <ButtonLink to={summaryRoute.generateLink(release.publicationId, release.id)}>
                     Preview release
                   </ButtonLink>
+                )}
+                afterCommentsSection={release => (
+                  <SummaryListItem term="Pre release access">
+                    hello
+                  </SummaryListItem>
                 )}
               />
             </TabsSection>
