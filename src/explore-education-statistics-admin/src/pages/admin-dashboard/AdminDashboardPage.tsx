@@ -1,20 +1,20 @@
-import ButtonLink from "@admin/components/ButtonLink";
+import ButtonLink from '@admin/components/ButtonLink';
 import Link from '@admin/components/Link';
-import {LoginContext} from '@admin/components/Login';
+import { LoginContext } from '@admin/components/Login';
 import Page from '@admin/components/Page';
 import ReleasesTab from '@admin/pages/admin-dashboard/components/ReleasesByStatusTab';
-import {summaryRoute} from "@admin/routes/edit-release/routes";
-import {UserDetails} from "@admin/services/common/types";
+import { summaryRoute } from '@admin/routes/edit-release/routes';
+import { UserDetails } from '@admin/services/common/types';
 import dashboardService from '@admin/services/dashboard/service';
-import {AdminDashboardRelease} from '@admin/services/dashboard/types';
+import { AdminDashboardRelease } from '@admin/services/dashboard/types';
 import loginService from '@admin/services/sign-in/service';
-import FormSelect from "@common/components/form/FormSelect";
+import FormSelect from '@common/components/form/FormSelect';
 import RelatedInformation from '@common/components/RelatedInformation';
-import SummaryListItem from "@common/components/SummaryListItem";
+import SummaryListItem from '@common/components/SummaryListItem';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import {Dictionary} from "@common/types";
-import React, {useContext, useEffect, useState} from 'react';
+import { Dictionary } from '@common/types';
+import React, { useContext, useEffect, useState } from 'react';
 import MyPublicationsTab from './components/MyPublicationsTab';
 
 interface Model {
@@ -34,30 +34,34 @@ const AdminDashboardPage = () => {
       dashboardService.getDraftReleases(),
       dashboardService.getScheduledReleases(),
       dashboardService.getAvailablePreReleaseContacts(),
-    ]).then(([draftReleases, scheduledReleases, availablePreReleaseContacts]) => {
+    ]).then(
+      ([draftReleases, scheduledReleases, availablePreReleaseContacts]) => {
+        const contactResultsByRelease = scheduledReleases.map(release =>
+          dashboardService
+            .getPreReleaseContactsForRelease(release.id)
+            .then(contacts => ({
+              releaseId: release.id,
+              contacts,
+            })),
+        );
 
-      const contactResultsByRelease =
-        scheduledReleases.map(release =>
-          dashboardService.getPreReleaseContactsForRelease(release.id).
-          then(contacts => ({
-            releaseId: release.id,
-            contacts,
-          })));
-
-      Promise.all(contactResultsByRelease).then(contactResults => {
-        const preReleaseContactsByScheduledRelease: Dictionary<UserDetails[]> = {};
-        contactResults.forEach(result => {
-          const {releaseId, contacts} = result;
-          preReleaseContactsByScheduledRelease[releaseId] = contacts;
-        })
-        setModel({
-          draftReleases,
-          scheduledReleases,
-          availablePreReleaseContacts,
-          preReleaseContactsByScheduledRelease,
+        Promise.all(contactResultsByRelease).then(contactResults => {
+          const preReleaseContactsByScheduledRelease: Dictionary<
+            UserDetails[]
+          > = {};
+          contactResults.forEach(result => {
+            const { releaseId, contacts } = result;
+            preReleaseContactsByScheduledRelease[releaseId] = contacts;
+          });
+          setModel({
+            draftReleases,
+            scheduledReleases,
+            availablePreReleaseContacts,
+            preReleaseContactsByScheduledRelease,
+          });
         });
-      });
-    });
+      },
+    );
   }, []);
 
   return (
@@ -107,7 +111,12 @@ const AdminDashboardPage = () => {
                 releases={model.draftReleases}
                 noReleasesMessage="There are currently no draft releases"
                 actions={release => (
-                  <ButtonLink to={summaryRoute.generateLink(release.publicationId, release.id)}>
+                  <ButtonLink
+                    to={summaryRoute.generateLink(
+                      release.publicationId,
+                      release.id,
+                    )}
+                  >
                     View and edit release
                   </ButtonLink>
                 )}
@@ -121,23 +130,28 @@ const AdminDashboardPage = () => {
                 releases={model.scheduledReleases}
                 noReleasesMessage="There are currently no scheduled releases"
                 actions={release => (
-                  <ButtonLink to={summaryRoute.generateLink(release.publicationId, release.id)}>
+                  <ButtonLink
+                    to={summaryRoute.generateLink(
+                      release.publicationId,
+                      release.id,
+                    )}
+                  >
                     Preview release
                   </ButtonLink>
                 )}
                 afterCommentsSection={release => (
                   <SummaryListItem
-                    term="Pre release access"
-                    actions={(
-                      <Link to='' onClick={() => {}}>
+                    term="Select pre release access"
+                    actions={
+                      <Link to="" onClick={() => {}}>
                         Add another
                       </Link>
-                    )}
+                    }
                   >
                     <FormSelect
-                      id='preReleaseAccessContact'
-                      name='preReleaseAccessContact'
-                      label=''
+                      id="preReleaseAccessContact"
+                      name="preReleaseAccessContact"
+                      label=""
                       options={[
                         {
                           label: 'Please select',
@@ -149,10 +163,12 @@ const AdminDashboardPage = () => {
                         })),
                       ]}
                       order={[]}
-                      className='govuk-!-width-full'
+                      className="govuk-!-width-full"
                       onChange={async event => {
-                        await dashboardService.addPreReleaseContactToRelease(release.id, event.target.value);
-
+                        await dashboardService.addPreReleaseContactToRelease(
+                          release.id,
+                          event.target.value,
+                        );
                       }}
                     />
                   </SummaryListItem>
