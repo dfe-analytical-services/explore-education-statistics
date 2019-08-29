@@ -1,46 +1,58 @@
 import { dataApi } from '@common/services/api';
-import { Dictionary } from '@common/types';
 import {
-  TableData,
-  GroupedFilterOptions,
   TableDataQuery,
-  FilterOption,
+  IndicatorOption,
+  TimePeriodOption,
+  GroupedFilterOptions,
 } from '@common/modules/full-table/services/tableBuilderService';
-import {
-  Indicator,
-  LocationFilter,
-  CategoryFilter,
-  TimePeriodFilter,
-} from '@common/modules/full-table/types/filters';
-import { transformTableMetaFiltersToCategoryFilters } from '@common/modules/full-table/utils/tableHeaders';
+import { Dictionary } from '@common/types';
+import { FullTable } from '../types/fullTable';
+import { TableHeadersConfig } from '../utils/tableHeaders';
 
-export interface FullTableMeta {
+export interface SortableOption {
+  label: string;
+  value: string;
+}
+
+export interface UnmappedTableHeadersConfig {
+  columnGroups: SortableOption[][];
+  columns: SortableOption[];
+  rowGroups: SortableOption[][];
+  rows: SortableOption[];
+}
+
+interface UnmappedFullTableSubjectMeta {
   publicationName: string;
   subjectId: string;
   subjectName: string;
-  locations: LocationFilter[];
-  timePeriodRange: TimePeriodFilter[];
+  locations: { label: string; value: string; level: string }[];
+  timePeriodRange: TimePeriodOption[];
   filters: Dictionary<{
     legend: string;
     hint?: string;
     options: GroupedFilterOptions;
     totalValue?: string;
   }>;
-  indicators: Indicator[];
+  indicators: IndicatorOption[];
   footnotes: {
     id: number;
     label: string;
   }[];
 }
 
-interface PermalinkCreate extends TableDataQuery {
+export interface UnmappedFullTable {
+  results: FullTable['results'];
+  subjectMeta: UnmappedFullTableSubjectMeta;
+}
+
+export interface UnmappedPermalink {
+  id: string;
+  title: string;
+  created: string;
+  fullTable: UnmappedFullTable;
   configuration: {
     tableHeadersConfig: UnmappedTableHeadersConfig;
   };
-}
-
-export interface FullTable extends TableData {
-  title?: string;
 }
 
 export interface Permalink {
@@ -49,27 +61,21 @@ export interface Permalink {
   created: string;
   fullTable: FullTable;
   configuration: {
+    tableHeadersConfig: TableHeadersConfig;
+  };
+}
+
+interface PermalinkCreate extends TableDataQuery {
+  configuration: {
     tableHeadersConfig: UnmappedTableHeadersConfig;
   };
 }
 
-interface UnmappedTableHeadersConfig {
-  columnGroups: SortableOption[][];
-  columns: SortableOption[];
-  rowGroups: SortableOption[][];
-  rows: SortableOption[];
-}
-
-interface SortableOption {
-  label: string;
-  value: string;
-}
-
 export default {
-  createTablePermalink(query: PermalinkCreate): Promise<Permalink> {
+  createTablePermalink(query: PermalinkCreate): Promise<UnmappedPermalink> {
     return dataApi.post('/permalink', query);
   },
-  getPermalink(publicationSlug: string): Promise<Permalink> {
+  getPermalink(publicationSlug: string): Promise<UnmappedPermalink> {
     return dataApi.get(`Permalink/${publicationSlug}`);
   },
 };

@@ -5,8 +5,16 @@ import {
   CategoryFilter,
   Indicator,
   TimePeriodFilter,
+  LocationFilter,
 } from '@common/modules/full-table/types/filters';
-import { FullTableMeta } from '@common/modules/full-table/services/permalinkService';
+import { FullTableMeta } from '../types/fullTable';
+
+export interface TableHeadersConfig {
+  columns: (Indicator | TimePeriodFilter)[];
+  columnGroups: (LocationFilter | CategoryFilter)[][];
+  rows: (Indicator | TimePeriodFilter)[];
+  rowGroups: (LocationFilter | CategoryFilter)[][];
+}
 
 const removeSiblinglessTotalRows = (
   categoryFilters: Dictionary<CategoryFilter[]>,

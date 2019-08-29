@@ -4,33 +4,31 @@ import {
   LocationFilter,
   TimePeriodFilter,
 } from '../types/filters';
-import { FullTableMeta } from '../services/permalinkService';
-import { FilterOption } from '../services/tableBuilderService';
-import { transformTableMetaFiltersToCategoryFilters } from './tableHeaders';
+import {
+  UnmappedTableHeadersConfig,
+  UnmappedFullTable,
+  UnmappedPermalink,
+  Permalink,
+} from '../services/permalinkService';
+import {
+  transformTableMetaFiltersToCategoryFilters,
+  TableHeadersConfig,
+} from './tableHeaders';
+import { FullTableMeta, FullTable } from '../types/fullTable';
 
 const reverseMapTableHeadersConfig = (
-  {
-    columns,
-    rows,
-    columnGroups,
-    rowGroups,
-  }: {
-    columns: FilterOption[];
-    columnGroups: FilterOption[][];
-    rows: FilterOption[];
-    rowGroups: FilterOption[][];
-  },
+  { columns, rows, columnGroups, rowGroups }: UnmappedTableHeadersConfig,
   fullTableSubjectMeta: FullTableMeta,
-) => {
+): TableHeadersConfig => {
   /**
    * config filters only contain `values`.
    * This function remaps the config from the filters in the subjectMeta
    */
-  let mappedRows = [];
-  let mappedColumns = [];
+  let mappedRows: (TimePeriodFilter | Indicator)[] = [];
+  let mappedColumns: (TimePeriodFilter | Indicator)[] = [];
 
-  const mappedRowGroups: (LocationFilter | CategoryFilter | any)[][] = [];
-  const mappedColumnGroups: (LocationFilter | CategoryFilter | any)[][] = [];
+  const mappedRowGroups: (LocationFilter | CategoryFilter)[][] = [];
+  const mappedColumnGroups: (LocationFilter | CategoryFilter)[][] = [];
 
   const initialValue = columns[0].value;
   // rows/columns can only be TimePeriods / Indicators
@@ -39,23 +37,23 @@ const reverseMapTableHeadersConfig = (
     mappedColumns = columns.map(({ value }) => {
       return fullTableSubjectMeta.timePeriodRange.find(
         timePeriod => `${timePeriod.year}_${timePeriod.code}` === value,
-      );
+      ) as TimePeriodFilter;
     });
     mappedRows = rows.map(({ value }) => {
       return fullTableSubjectMeta.indicators.find(
         indicator => indicator.value === value,
-      );
+      ) as Indicator;
     });
   } else {
     mappedRows = rows.map(({ value }) => {
       return fullTableSubjectMeta.timePeriodRange.find(
         timePeriod => `${timePeriod.year}_${timePeriod.code}` === value,
-      );
+      ) as TimePeriodFilter;
     });
     mappedColumns = columns.map(({ value }) => {
       return fullTableSubjectMeta.indicators.find(
         indicator => indicator.value === value,
-      );
+      ) as Indicator;
     });
   }
 
@@ -80,11 +78,13 @@ const reverseMapTableHeadersConfig = (
       }
     }
 
-    mappedRowGroups[index] = rowGroup.map(({ value }) =>
-      locationAndFilterGroups[currentIndex].find(
-        element => element.value === value,
-      ),
+    mappedRowGroups[index] = rowGroup.map(
+      ({ value }) =>
+        locationAndFilterGroups[currentIndex].find(
+          element => element.value === value,
+        ) as LocationFilter | CategoryFilter,
     );
+
     locationAndFilterGroups.splice(currentIndex, 1);
   });
 
@@ -101,10 +101,11 @@ const reverseMapTableHeadersConfig = (
       }
     }
 
-    mappedColumnGroups[index] = columnGroup.map(({ value }) =>
-      locationAndFilterGroups[currentIndex].find(
-        element => element.value === value,
-      ),
+    mappedColumnGroups[index] = columnGroup.map(
+      ({ value }) =>
+        locationAndFilterGroups[currentIndex].find(
+          element => element.value === value,
+        ) as LocationFilter | CategoryFilter,
     );
     locationAndFilterGroups.splice(currentIndex, 1);
   });
@@ -117,28 +118,29 @@ const reverseMapTableHeadersConfig = (
   };
 };
 
-export const mapFullTable = (unmappedFullTable: any) => {
+export const mapFullTable = (
+  unmappedFullTable: UnmappedFullTable,
+): FullTable => {
   return {
     ...unmappedFullTable,
     subjectMeta: {
       ...unmappedFullTable.subjectMeta,
       indicators: unmappedFullTable.subjectMeta.indicators.map(
-        (indicator: { label: string; unit: string; value: string }) =>
-          new Indicator(indicator),
+        indicator => new Indicator(indicator),
       ),
       locations: unmappedFullTable.subjectMeta.locations.map(
-        (location: { label: string; level: string; value: string }) =>
-          new LocationFilter(location, location.level),
+        location => new LocationFilter(location, location.level),
       ),
       timePeriodRange: unmappedFullTable.subjectMeta.timePeriodRange.map(
-        (timePeriod: { code: string; label: string; year: number }) =>
-          new TimePeriodFilter(timePeriod),
+        timePeriod => new TimePeriodFilter(timePeriod),
       ),
     },
   };
 };
 
-export const mapPermalink = (unmappedPermalink: any) => {
+export const mapPermalink = (
+  unmappedPermalink: UnmappedPermalink,
+): Permalink => {
   const mappedFullTable = mapFullTable(unmappedPermalink.fullTable);
 
   return {
