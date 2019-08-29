@@ -56,8 +56,6 @@ class PublicationReleasePage extends Component<Props> {
     const releaseCount =
       data.publication.releases.length + data.publication.legacyReleases.length;
 
-    console.log(data.publication.releases);
-
     return (
       <Page
         title={data.publication.title}
@@ -83,7 +81,7 @@ class PublicationReleasePage extends Component<Props> {
                   >
                     View latest data:{' '}
                     <span className="govuk-!-font-weight-bold">
-                      {data.publication.releases.slice(-1)[0].yearTitle}
+                      {data.publication.releases.slice(-1)[0].title}
                     </span>
                   </Link>
                 )}
