@@ -1,9 +1,4 @@
-import classNames from 'classnames';
 import React, { useState } from 'react';
-import Link from '@admin/components/Link';
-import Details from '@common/components/Details';
-import Accordion from '@common/components/Accordion';
-import AccordionSection from '@common/components/AccordionSection';
 import PrototypeFootnotes from './PrototypeFootnotes';
 
 const PrototypeAddFootnotes = () => {

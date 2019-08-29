@@ -1,7 +1,6 @@
-import classNames from 'classnames';
-import React, { useState } from 'react';
-import Link from '@admin/components/Link';
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import Details from '@common/components/Details';
+import React, { useState } from 'react';
 
 interface Props {
   subject?: string;
