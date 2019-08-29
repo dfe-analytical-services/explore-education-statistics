@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -13,19 +14,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
         {
             CreateMap<Release, Data.Processor.Model.Release>().ForMember(dest => dest.Title,
                 opts => opts.MapFrom(release => release.ReleaseName));
-            
+
             CreateMap<Release, ReleaseViewModel>()
                 .ForMember(
                     dest => dest.LatestRelease,
                     m => m.MapFrom(r => r.Publication.LatestRelease().Id == r.Id))
-                .ForMember(dest => dest.Contact, 
+                .ForMember(dest => dest.Contact,
                     m => m.MapFrom(r => r.Publication.Contact))
-                .ForMember(dest => dest.PublicationTitle, 
+                .ForMember(dest => dest.PublicationTitle,
                     m => m.MapFrom(r => r.Publication.Title));
-            
+
+            CreateMap<Release, ReleaseSummaryViewModel>();
             CreateMap<ReleaseSummaryViewModel, Release>();
 
             CreateMap<CreateReleaseViewModel, Release>();
+
+            CreateMap<Methodology, MethodologyViewModel>();
+
+            CreateMap<Publication, PublicationViewModel>();
         }
     }
 }

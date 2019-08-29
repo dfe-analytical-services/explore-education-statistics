@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
         {
             builder.Services
                 .AddAutoMapper()
-                .AddDbContext<ApplicationDbContext>(options =>
+                .AddDbContext<StatisticsDbContext>(options =>
                     options.UseSqlServer(GetConnectionString("StatisticsDb", $"{ConnectionTypeValues[ConnectionTypes.AZURE_SQL]}"),
                         providerOptions => providerOptions.EnableRetryOnFailure()))
                 .AddTransient<IFileStorageService, FileStorageService>(s => new FileStorageService(GetConnectionString("CoreStorage", $"{ConnectionTypeValues[ConnectionTypes.AZURE_STORAGE]}")))
