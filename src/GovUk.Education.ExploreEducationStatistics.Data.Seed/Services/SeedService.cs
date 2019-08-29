@@ -122,7 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
             var metaFile = CreateFormFile(file.GetMetaCsvLines(), file + ".meta.csv", "metaFile");
 
             _logger.LogInformation("Uploading files for \"{subjectName}\"", subjectName);
-            var result = _fileStorageService.UploadDataFilesAsync(release.Id, dataFile, metaFile, subjectName).Result;
+            var result = _fileStorageService.UploadDataFilesAsync(release.Id, dataFile, metaFile, subjectName, true).Result;
         }
 
         private static IFormFile CreateFormFile(IEnumerable<string> lines, string fileName, string name)
