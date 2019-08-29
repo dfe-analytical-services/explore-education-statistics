@@ -42,7 +42,9 @@ interface InfographicChartOptionsProps {
   onChange: (fileId: string) => void;
 }
 
-const loadChartFilesAndMapToSelectOptionAsync = (releaseId: string): Promise<SelectOption[]> => {
+const loadChartFilesAndMapToSelectOptionAsync = (
+  releaseId: string,
+): Promise<SelectOption[]> => {
   return service.getChartFiles(releaseId).then(chartFiles => {
     return [
       {
@@ -62,7 +64,9 @@ const InfographicChartOptions = ({
   fileId,
   onChange,
 }: InfographicChartOptionsProps) => {
-  const [chartFileOptions, setChartFileOptions] = React.useState<SelectOption[]>([]);
+  const [chartFileOptions, setChartFileOptions] = React.useState<
+    SelectOption[]
+  >([]);
 
   const [currentFileId, setCurrentFileId] = React.useState(fileId);
 
@@ -81,8 +85,9 @@ const InfographicChartOptions = ({
           file: uploadFile,
         })
         .then(() =>
-          loadChartFilesAndMapToSelectOptionAsync(releaseId)
-            .then(setChartFileOptions),
+          loadChartFilesAndMapToSelectOptionAsync(releaseId).then(
+            setChartFileOptions,
+          ),
         )
         .then(() => {
           onChange(uploadFile.name);
@@ -97,8 +102,9 @@ const InfographicChartOptions = ({
   };
 
   React.useEffect(() => {
-    loadChartFilesAndMapToSelectOptionAsync(releaseId)
-      .then(setChartFileOptions);
+    loadChartFilesAndMapToSelectOptionAsync(releaseId).then(
+      setChartFileOptions,
+    );
   }, [releaseId]);
 
   return (
