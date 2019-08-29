@@ -57,6 +57,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
             DataCsvFile.KS4_2018_LA_Char_Testdata,
             DataCsvFile.KS4_2018_Nat_Char_Testdata,
             DataCsvFile.KS4_2018_Subject_Tables_S3_TestData,
+            
+            // New excluded files which need fixing subsequent to the prev feed
+            DataCsvFile.exclusions_by_characteristic,
+            DataCsvFile.skeleton_dashboard_tidy_data_NARTS
         };
 
         public static List<Subject> GetSubjects()

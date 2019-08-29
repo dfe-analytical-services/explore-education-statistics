@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Data.Importer.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
@@ -61,30 +59,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             
             var batchSettings = GetBatchSettings(LoadAppSettings(context));
             
-            try
-            {
-                var subjectData = ProcessSubject(message);
-                SplitFile(message, collector, subjectData, batchSettings);
-            }
-            catch (Exception e)
-            {
-                // TODO - We need the subject ID to properly log an unknown error
-                logger.LogError($"{GetType().Name} function FAILED for : Datafile: " +
-                                $"{message.DataFileName} : {e.Message} : will retry unknown exceptions 3 times...");
-
-                // If it's known exception then log it but don't throw
-                if (e is ImporterException ex)
+            if (IsDataFileValid(message, batchSettings.BatchSize, logger)) {
+                
+                try
                 {
-                    _batchService.FailBatch(message.Release.Id.ToString(),
-                        new List<String> {ex.Message},
-                        message.DataFileName);
+                    var subjectData = ProcessSubject(message);
+                    _splitFileService.SplitDataFile(collector, message, subjectData, batchSettings);
                 }
-                else
+                catch (Exception e)
                 {
+                    logger.LogError($"{GetType().Name} function FAILED for : Datafile: " +
+                                    $"{message.DataFileName} : {e.Message} : will retry unknown exceptions 3 times...");
                     throw;
                 }
             }
-
+            else
+            {
+                logger.LogError(
+                    $"Import FAILED for {message.DataFileName}...check log"); 
+            }
+            
             logger.LogInformation($"{GetType().Name} function COMPLETE for : Datafile: {message.DataFileName}");
         }
         
@@ -100,29 +94,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             logger.LogInformation($"{GetType().Name} function STARTED");
             
             var batchSettings = GetBatchSettings(LoadAppSettings(context));
-            var successes = new List<ImportMessage>();
 
             // Log all initial validation messages
-            var valid = true;
+            var allValid = true;
             foreach (var message in messages)
             {
-                logger.LogInformation($"Validating Datafile: {message.DataFileName}");
-                if (!IsDataFileValid(message, batchSettings.BatchSize))
+                if (!IsDataFileValid(message, batchSettings.BatchSize, logger))
                 {
-                    logger.LogInformation($"Datafile: {message.DataFileName} has errors");
-                    valid = false;
+                    allValid = false;
                 }
             }
 
-            if (valid)
+            if (allValid)
             {
                 foreach (var message in messages)
                 {
                     logger.LogInformation($"Re-seeding for : Datafile: {message.DataFileName}");
                     ProcessSubject(message);
                     var subjectData = _fileStorageService.GetSubjectData(message).Result;
-                    SplitFile(message, collector, subjectData, batchSettings);
-                    successes.Add(message);
+                    _splitFileService.SplitDataFile(collector, message, subjectData, batchSettings);
                     logger.LogInformation($"First pass COMPLETE for : Datafile: {message.DataFileName}");
                 }
             }
@@ -168,8 +158,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             return subjectData;
         }
 
-        private bool IsDataFileValid(ImportMessage message, int batchSize)
+        private bool IsDataFileValid(ImportMessage message, int batchSize, ILogger logger)
         {
+            logger.LogInformation($"Validating Datafile: {message.DataFileName}");
+
             var subjectData = _fileStorageService.GetSubjectData(message).Result;
             var numBatches = SplitFileService.GetNumBatches(subjectData.GetCsvLines().Count(), batchSize);
             
@@ -178,16 +170,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 numBatches, ImportStatus.RUNNING_PHASE_1,
                 message.DataFileName).Wait();
             
-            return _validatorService.IsDataValid(message, subjectData);
-        }
+            var valid = _validatorService.IsDataValid(message, subjectData);
 
-        private void SplitFile(
-            ImportMessage message,
-            ICollector<ImportMessage> collector,
-            SubjectData subjectData,
-            BatchSettings batchSettings)
-        {
-            _splitFileService.SplitDataFile(collector, message, subjectData, batchSettings);
+            if (!valid)
+            {
+                logger.LogInformation($"Datafile: {message.DataFileName} has errors");
+            }
+
+            return valid;
         }
 
         private void SaveChanges()
@@ -206,8 +196,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
 
         private static BatchSettings GetBatchSettings(IConfigurationRoot config)
         {
-            var batchSettings = new BatchSettings {BatchSize = config.GetValue<int>("BatchSize")};
-            return batchSettings;
+            return new BatchSettings {BatchSize = config.GetValue<int>("BatchSize")};
         }
     }
 }

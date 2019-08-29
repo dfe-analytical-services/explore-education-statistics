@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Common.Database;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Data.Importer.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
@@ -9,6 +12,33 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfa
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
+    public enum ValidationErrorMessages
+    {
+        [EnumLabelValue("Meta header contains quotes")]
+        MetaHeaderContainsQuotes,
+        
+        [EnumLabelValue("Metafile has unexpected columns")]
+        MetaFileHasUnexpectedColumns,
+        
+        [EnumLabelValue("Metafile contains quotes")]
+        MetaFileContainsQuotes,
+        
+        [EnumLabelValue("Metafile has invalid number of columns")]
+        MetaFileHasInvalidNumberOfColumns,
+        
+        [EnumLabelValue("Datafile contains quotes")]
+        DataFileContainsQuotes,
+        
+        [EnumLabelValue("Datafile has invalid number of columns")]
+        DataFileHasInvalidNumberOfColumns,
+        
+        [EnumLabelValue("Datafile has invalid geographic level")]
+        DataFileHasInvalidGeographicLevel,
+        
+        [EnumLabelValue("Datafile has invalid time identifier")]
+        DataFileHasInvalidTimeIdentifier
+    }
+    
     public class ValidatorService : IValidatorService
     {
         private readonly IBatchService _batchService;
@@ -42,14 +72,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             if (RowContainsQuotes(header))
             {
-                errors.Add("Meta header contains quotes");
+                errors.Add(ValidationErrorMessages.MetaHeaderContainsQuotes.GetEnumLabel());
             }
             
             // Check for unexpected column names
             Array.ForEach<string>( Enum.GetNames(typeof(MetaColumns)), (string col) => {
                 if (!header.Contains(col))
                 { 
-                    errors.Add("Meta file has unexpected columns");
+                    errors.Add(ValidationErrorMessages.MetaFileHasUnexpectedColumns.GetEnumLabel());
                 }
             } );
         }
@@ -72,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             foreach (var line in lines.Skip(1))
             {
-                ValidateObservationRow(line, idx++, headers.Count, message, errors);
+                ValidateObservationRow(line, idx++, headers, message, errors);
             }
         }
 
@@ -80,25 +110,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             if (RowContainsQuotes(row))
             {
-                errors.Add($"Meta file contains quotes at row {rowNumber}");
+                errors.Add($"error at row {rowNumber}: " + ValidationErrorMessages.MetaFileContainsQuotes.GetEnumLabel());
             }
 
             if (HasUnexpectedNumberOfColumns(row, numExpectedColumns))
             {
-                errors.Add($"Meta file has invalid number of columns at row {rowNumber}");
+                errors.Add($"error at row {rowNumber}: " + ValidationErrorMessages.MetaFileHasInvalidNumberOfColumns.GetEnumLabel());
             }
         }
         
-        private void ValidateObservationRow(string row, int rowNumber, int numExpectedColumns, ImportMessage message, List<string> errors)
+        private void ValidateObservationRow(string row, int rowNumber, List<string> headers, ImportMessage message, List<string> errors)
         {
             if (RowContainsQuotes(row))
             {
-                errors.Add($"Datafile file contains quotes at row {rowNumber}");
+                errors.Add($"error at row {rowNumber}: " + ValidationErrorMessages.DataFileContainsQuotes.GetEnumLabel());
             }
 
-            if (HasUnexpectedNumberOfColumns(row, numExpectedColumns))
+            if (HasUnexpectedNumberOfColumns(row, headers.Count))
             {
-                errors.Add( $"Data file has invalid number of columns at row {rowNumber}");
+                errors.Add( $"error at row {rowNumber}: " + ValidationErrorMessages.DataFileHasInvalidNumberOfColumns.GetEnumLabel());
+            }
+
+            try
+            {
+                var line = row.Split(',');
+                ImporterService.GetGeographicLevel(line, headers);
+                ImporterService.GetTimeIdentifier(line, headers);
+            }
+            catch (InvalidGeographicLevelException e)
+            {
+                errors.Add( $"error at row {rowNumber}: " + ValidationErrorMessages.DataFileHasInvalidGeographicLevel.GetEnumLabel());
+            }
+            catch (InvalidTimeIdentifierException e)
+            {
+                errors.Add( $"error at row {rowNumber}: " + ValidationErrorMessages.DataFileHasInvalidTimeIdentifier.GetEnumLabel());
             }
         }
 

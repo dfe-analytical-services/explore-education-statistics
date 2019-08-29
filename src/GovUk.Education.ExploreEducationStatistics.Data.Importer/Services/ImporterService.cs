@@ -166,6 +166,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
             _logger.LogDebug($"{observations.Count()} observations added successfully for {subject.Name}");
         }
+        
+        public static GeographicLevel GetGeographicLevel(IReadOnlyList<string> line, List<string> headers)
+        {
+            return GeographicLevels.EnumFromStringForImport(CsvUtil.Value(line, headers, "geographic_level"));
+        }
+        
+        public static TimeIdentifier GetTimeIdentifier(IReadOnlyList<string> line, List<string> headers)
+        {
+            var timeIdentifier = CsvUtil.Value(line, headers, "time_identifier").ToLower();
+            foreach (var value in Enum.GetValues(typeof(TimeIdentifier)).Cast<TimeIdentifier>())
+            {
+                if (value.GetEnumLabel().Equals(timeIdentifier, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return value;
+                }
+            }
+
+            throw new InvalidTimeIdentifierException(timeIdentifier);
+        }
 
         private IEnumerable<Observation> GetObservations(IEnumerable<string> lines,
             List<string> headers,
@@ -252,28 +271,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             }).ToList();
         }
 
-        private static TimeIdentifier GetTimeIdentifier(IReadOnlyList<string> line, List<string> headers)
-        {
-            var timeIdentifier = CsvUtil.Value(line, headers, "time_identifier").ToLower();
-            foreach (var value in Enum.GetValues(typeof(TimeIdentifier)).Cast<TimeIdentifier>())
-            {
-                if (value.GetEnumLabel().Equals(timeIdentifier, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    return value;
-                }
-            }
-
-            throw new InvalidTimeIdentifierException(timeIdentifier);
-        }
-
         private static int GetYear(IReadOnlyList<string> line, List<string> headers)
         {
             return int.Parse(CsvUtil.Value(line, headers, "time_period").Substring(0, 4));
-        }
-
-        private static GeographicLevel GetGeographicLevel(IReadOnlyList<string> line, List<string> headers)
-        {
-            return GeographicLevels.EnumFromStringForImport(CsvUtil.Value(line, headers, "geographic_level"));
         }
 
         private long GetLocationId(IReadOnlyList<string> line, List<string> headers)

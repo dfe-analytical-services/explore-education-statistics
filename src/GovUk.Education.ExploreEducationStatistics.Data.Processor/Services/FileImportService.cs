@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Data.Importer.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -79,12 +78,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     $"{message.BatchNo} of {message.BatchSize} with Datafile: " +
                     $"{message.DataFileName} : {e.Message} : will retry unknown exceptions 3 times...");
                 
-                // If it's a unknown exception then might be an sql deadlock so
-                // log error but allow retry upto 3 times
-                if (e is ImporterException ex)
-                {
-                    return;
-                }
                 throw e;
             }
         }
