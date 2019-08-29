@@ -53,15 +53,6 @@ const PageFooter = ({ wide }: Props) => (
                 Help and support
               </Link>
             </li>
-            <li className="govuk-footer__inline-list-item">
-              <Link
-                className="govuk-footer__link"
-                to="/sitemap"
-                data-testid="footer--sitemap-link"
-              >
-                Sitemap
-              </Link>
-            </li>
           </ul>
 
           <svg
