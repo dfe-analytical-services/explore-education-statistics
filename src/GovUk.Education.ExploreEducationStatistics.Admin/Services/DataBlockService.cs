@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using Microsoft.EntityFrameworkCore.Query.ExpressionVisitors.Internal;
 using DataBlockId = System.Guid;
 using ReleaseId = System.Guid;
 
@@ -32,14 +33,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             CreateDataBlockViewModel createDataBlock)
         {
             var release = await _releaseService.GetAsync(releaseId);
-            var id = new DataBlockId();
+            var id = DataBlockId.NewGuid();
 
             var dataBlock = _mapper.Map<DataBlock>(createDataBlock);
             // TODO DFE-1341 update the Content with the data block
 
             _context.Releases.Update(release);
             await _context.SaveChangesAsync();
-            return await GetAsync(releaseId, id);
+            
+            // TODO DFE-1341 Remove me once the data block has been inserted
+            return new DataBlockViewModel
+            {
+                Id = id
+            };
+            
+            //return await GetAsync(releaseId, id);
         }
 
         public async Task<DataBlockViewModel> GetAsync(ReleaseId releaseId, DataBlockId id)
