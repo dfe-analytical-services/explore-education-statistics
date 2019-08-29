@@ -1,20 +1,12 @@
-import { LoginContext } from '@admin/components/Login';
-import {
-  dayMonthYearIsComplete,
-  dayMonthYearToDate,
-} from '@admin/services/common/types';
-import {
-  AdminDashboardRelease,
-  Comment,
-  ReleaseStatus,
-} from '@admin/services/dashboard/types';
+import {LoginContext} from '@admin/components/Login';
+import {dayMonthYearIsComplete, dayMonthYearToDate,} from '@admin/services/common/types';
+import {AdminDashboardRelease, Comment, ReleaseStatus,} from '@admin/services/dashboard/types';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import { format } from 'date-fns';
-import React, { ReactNode, useContext } from 'react';
-import Link from '@admin/components/Link';
+import {format} from 'date-fns';
+import React, {ReactNode, useContext} from 'react';
 
 const getLiveLatestLabel = (isLive: boolean, isLatest: boolean) => {
   if (isLive && isLatest) {
@@ -42,10 +34,10 @@ const getStatusLabel = (approvalStatus: ReleaseStatus) => {
 interface Props {
   release: AdminDashboardRelease;
   actions: ReactNode;
-  afterCommentsSection?: ReactNode;
+  children?: ReactNode;
 }
 
-const ReleaseSummary = ({ release, actions, afterCommentsSection }: Props) => {
+const ReleaseSummary = ({ release, actions, children }: Props) => {
   const authentication = useContext(LoginContext);
 
   const editorName =
@@ -100,27 +92,7 @@ const ReleaseSummary = ({ release, actions, afterCommentsSection }: Props) => {
             />
           </SummaryListItem>
         )}
-        {afterCommentsSection}
-        <SummaryListItem
-          term="Pre release access"
-          actions={
-            <Link to="" onClick={() => {}}>
-              Remove
-            </Link>
-          }
-        >
-          Pre release user 1
-        </SummaryListItem>
-        <SummaryListItem
-          term=""
-          actions={
-            <Link to="" onClick={() => {}}>
-              Remove
-            </Link>
-          }
-        >
-          Pre release user 2
-        </SummaryListItem>
+        {children}
         <SummaryListItem term="Last edited" detailsNoMargin>
           <FormattedDate>{release.lastEditedDateTime}</FormattedDate>
           {' at '}

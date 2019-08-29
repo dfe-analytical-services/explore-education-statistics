@@ -1,5 +1,6 @@
 import ReleaseSummary from '@admin/pages/admin-dashboard/components/ReleaseSummary';
 import { AdminDashboardRelease } from '@admin/services/dashboard/types';
+import SummaryListItem from "@common/components/SummaryListItem";
 import { Dictionary } from '@common/types';
 import React, {ReactNode} from 'react';
 
@@ -7,10 +8,10 @@ interface Props {
   noReleasesMessage: string;
   releases: AdminDashboardRelease[];
   actions: (release: AdminDashboardRelease) => ReactNode;
-  afterCommentsSection?: (release: AdminDashboardRelease) => ReactNode;
+  children?: (release: AdminDashboardRelease) => ReactNode;
 }
 
-const ReleasesByStatusTab = ({ releases, noReleasesMessage, actions, afterCommentsSection }: Props) => {
+const ReleasesByStatusTab = ({ releases, noReleasesMessage, actions, children }: Props) => {
   const releasesByPublication: Dictionary<AdminDashboardRelease[]> = {};
 
   releases.forEach(release => {
@@ -34,8 +35,9 @@ const ReleasesByStatusTab = ({ releases, noReleasesMessage, actions, afterCommen
                   key={release.id}
                   release={release}
                   actions={actions(release)}
-                  afterCommentsSection={afterCommentsSection && afterCommentsSection(release)}
-                />
+                >
+                  {children && children(release)}
+                </ReleaseSummary>
               ))}
             </React.Fragment>
           ))}
