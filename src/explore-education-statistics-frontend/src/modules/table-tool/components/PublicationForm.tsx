@@ -39,9 +39,9 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
     isActive,
     goToNextStep,
     publicationId = '',
-    publicationTitle,
+    publicationTitle = '',
   } = props;
-  const [publicationName, setPublicationName] = useState('');
+
   const [searchTerm, setSearchTerm] = useState('');
 
   const formId = 'publicationForm';
@@ -152,9 +152,6 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
                                     id={`${formId}-publicationId-${camelCase(
                                       topic.title,
                                     )}`}
-                                    onChange={(event, option) => {
-                                      setPublicationName(option.label);
-                                    }}
                                     options={topic.publications
                                       .filter(
                                         publication =>
@@ -185,7 +182,7 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
                 {stepHeading}
                 <SummaryList noBorder>
                   <SummaryListItem term="Publication">
-                    {publicationName || publicationTitle}
+                    {publicationTitle}
                   </SummaryListItem>
                 </SummaryList>
               </>
