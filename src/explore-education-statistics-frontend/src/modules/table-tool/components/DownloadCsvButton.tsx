@@ -3,9 +3,9 @@ import cartesian from '@common/lib/utils/cartesian';
 import {
   CategoryFilter,
   LocationFilter,
+  TimePeriodFilter,
   Filter,
 } from '@frontend/modules/table-tool/components/types/filters';
-import TimePeriod from '@frontend/modules/table-tool/components/types/TimePeriod';
 import { saveAs } from 'file-saver';
 import Papa from 'papaparse';
 import React from 'react';
@@ -54,7 +54,7 @@ const DownloadCsvButton = ({ publicationSlug, fullTable }: Props) => {
       // prettier-ignore
       const [location, timePeriod, ...filterOptions] = row as [
         LocationFilter,
-        TimePeriod,
+        TimePeriodFilter,
         ...CategoryFilter[]
       ];
 

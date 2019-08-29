@@ -10,9 +10,9 @@ import {
   Indicator,
   LocationFilter,
   CategoryFilter,
+  TimePeriodFilter,
 } from '@frontend/modules/table-tool/components/types/filters';
 import { TableHeadersFormValues } from '@frontend/modules/table-tool/components/TableHeadersForm';
-import TimePeriod from '@frontend/modules/table-tool/components/types/TimePeriod';
 import { transformTableMetaFiltersToCategoryFilters } from '@frontend/modules/table-tool/utils/tableHeaders';
 
 export interface FullTableMeta {
@@ -20,7 +20,7 @@ export interface FullTableMeta {
   subjectId: string;
   subjectName: string;
   locations: LocationFilter[];
-  timePeriodRange: TimePeriod[];
+  timePeriodRange: TimePeriodFilter[];
   filters: Dictionary<{
     legend: string;
     hint?: string;
@@ -178,7 +178,7 @@ const mapFullTable = (unmappedFullTable: any) => {
       ),
       timePeriodRange: unmappedFullTable.subjectMeta.timePeriodRange.map(
         (timePeriod: { code: string; label: string; year: number }) =>
-          new TimePeriod(timePeriod),
+          new TimePeriodFilter(timePeriod),
       ),
     },
   };

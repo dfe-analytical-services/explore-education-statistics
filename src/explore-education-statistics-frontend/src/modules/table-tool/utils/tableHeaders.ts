@@ -4,9 +4,9 @@ import mapValuesWithKeys from '@common/lib/utils/mapValuesWithKeys';
 import {
   CategoryFilter,
   Indicator,
+  TimePeriodFilter,
 } from '@frontend/modules/table-tool/components/types/filters';
 import { FullTableMeta } from '@frontend/services/permalinkService';
-import TimePeriod from '../components/types/TimePeriod';
 
 const removeSiblinglessTotalRows = (
   categoryFilters: Dictionary<CategoryFilter[]>,
@@ -47,7 +47,9 @@ const getDefaultTableHeaderConfig = (fullTableMeta: FullTableMeta) => {
   return {
     columnGroups: sortedFilters.slice(0, halfwayIndex),
     rowGroups: sortedFilters.slice(halfwayIndex),
-    columns: timePeriodRange.map(timePeriod => new TimePeriod(timePeriod)),
+    columns: timePeriodRange.map(
+      timePeriod => new TimePeriodFilter(timePeriod),
+    ),
     rows: indicators.map(indicator => new Indicator(indicator)),
   };
 };

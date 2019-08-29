@@ -6,8 +6,8 @@ import {
   CategoryFilter,
   Indicator,
   LocationFilter,
+  TimePeriodFilter,
 } from '@frontend/modules/table-tool/components/types/filters';
-import TimePeriod from '@frontend/modules/table-tool/components/types/TimePeriod';
 import { FullTable } from '@frontend/services/permalinkService';
 import DataTableCaption from './DataTableCaption';
 import FixedMultiHeaderDataTable from './FixedMultiHeaderDataTable';
@@ -58,9 +58,9 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
           ? rowCol1
           : rowCol2) as Indicator;
 
-        const timePeriod = (rowCol2 instanceof TimePeriod
+        const timePeriod = (rowCol2 instanceof TimePeriodFilter
           ? rowCol2
-          : rowCol1) as TimePeriod;
+          : rowCol1) as TimePeriodFilter;
 
         const filterCombination = [
           ...rowFilterCombination,

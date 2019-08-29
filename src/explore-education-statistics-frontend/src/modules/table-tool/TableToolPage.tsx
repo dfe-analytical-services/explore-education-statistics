@@ -20,7 +20,7 @@ import {
   Indicator,
   LocationFilter,
 } from '@frontend/modules/table-tool/components/types/filters';
-import { parseYearCodeTuple } from '@frontend/modules/table-tool/components/types/TimePeriod';
+import parseYearCodeTuple from '@frontend/modules/table-tool/components/types/TimePeriod';
 import mapValues from 'lodash/mapValues';
 import { NextContext } from 'next';
 import React, { Component, MouseEventHandler, createRef } from 'react';
