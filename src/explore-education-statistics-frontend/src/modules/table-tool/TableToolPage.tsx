@@ -369,6 +369,7 @@ class TableToolPage extends Component<Props, State> {
                     <PublicationForm
                       {...stepProps}
                       publicationId={publicationId}
+                      publicationTitle={publication ? publication.title : ''}
                       options={themeMeta}
                       onSubmit={this.handlePublicationFormSubmit}
                     />
