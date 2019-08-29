@@ -1,7 +1,7 @@
 import ReleaseSummary from '@admin/pages/admin-dashboard/components/ReleaseSummary';
-import {AdminDashboardRelease} from '@admin/services/dashboard/types';
-import {Dictionary} from '@common/types';
-import React, {ReactNode} from 'react';
+import { AdminDashboardRelease } from '@admin/services/dashboard/types';
+import { Dictionary } from '@common/types';
+import React, { ReactNode } from 'react';
 
 interface Props {
   noReleasesMessage: string;

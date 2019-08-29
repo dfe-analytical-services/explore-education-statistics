@@ -223,7 +223,7 @@ const AdminDashboardPage = () => {
                         >
                           {existingContact.name}
                         </SummaryListItem>
-                      )
+                      ),
                     )}
                   </>
                 )}
