@@ -66,17 +66,9 @@ const reverseMapTableHeadersConfig = (
   ];
 
   rowGroups.forEach((rowGroup, index) => {
-    let currentIndex = 0;
-    for (let i = 0; i < locationAndFilterGroups.length; i += 1) {
-      if (
-        locationAndFilterGroups[i].find(
-          element => element.value === rowGroup[0].value,
-        )
-      ) {
-        currentIndex = i;
-        break;
-      }
-    }
+    const currentIndex = locationAndFilterGroups.findIndex(group =>
+      group.find(element => element.value === rowGroup[0].value),
+    );
 
     mappedRowGroups[index] = rowGroup.map(
       ({ value }) =>
