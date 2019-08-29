@@ -2,6 +2,7 @@ import FormattedDate from '@common/components/FormattedDate';
 import permalinkService, {
   Permalink,
 } from '@common/modules/full-table/services/permalinkService';
+import { mapPermalink } from '@common/modules/full-table/utils/mapPermalinks';
 import ButtonLink from '@frontend/components/ButtonLink';
 import Page from '@frontend/components/Page';
 import PrintThisPage from '@frontend/components/PrintThisPage';
@@ -36,7 +37,7 @@ class PermalinkPage extends Component<Props> {
 
   public render() {
     const { data } = this.props;
-    const { fullTable, configuration } = permalinkService.mapPermalink(data);
+    const { fullTable, configuration } = mapPermalink(data);
 
     return (
       <Page

@@ -28,6 +28,7 @@ import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableH
 import permalinkService, {
   FullTable,
 } from '@common/modules/full-table/services/permalinkService';
+import { mapFullTable } from '@common/modules/full-table/utils/mapPermalinks';
 import DownloadCsvButton from './components/DownloadCsvButton';
 import FiltersForm, { FilterFormSubmitHandler } from './components/FiltersForm';
 import LocationFiltersForm, {
@@ -300,7 +301,7 @@ class TableToolPage extends Component<Props, State> {
       this.createQuery(filters, indicators),
     );
 
-    const createdTable = permalinkService.mapFullTable(unmappedCreatedTable);
+    const createdTable = mapFullTable(unmappedCreatedTable);
 
     this.setState({
       createdTable,
