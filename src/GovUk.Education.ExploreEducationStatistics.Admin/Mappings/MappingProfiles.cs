@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
@@ -40,10 +39,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                         new ReleaseViewModel.Comment() { Message = "Message 4", AuthorName = "TODO Responsible Statistician 4", CreatedDate = DateTime.Now.AddDays(-2)},
                     }));
 
-            
+            CreateMap<Release, ReleaseSummaryViewModel>();
+
             CreateMap<ReleaseSummaryViewModel, Release>();
 
             CreateMap<CreateReleaseViewModel, Release>();
+
+            CreateMap<Methodology, MethodologyViewModel>();
+
+            CreateMap<Publication, PublicationViewModel>();
         }
     }
 }
