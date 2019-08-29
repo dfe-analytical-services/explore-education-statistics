@@ -1,6 +1,5 @@
 import classNames from 'classnames';
 import React, { ReactNode, useState } from 'react';
-import { RouteComponentProps } from 'react-router';
 import styles from './PrototypeStepByStep.module.scss';
 
 interface Props {

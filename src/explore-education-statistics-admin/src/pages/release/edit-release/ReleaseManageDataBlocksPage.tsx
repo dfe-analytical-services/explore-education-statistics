@@ -58,6 +58,7 @@ const ReleaseManageDataBlocksPage = () => {
         setInitialConfiguration(requestConfiguration);
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [request, requestConfiguration]);
 
   // eslint-disable-next-line

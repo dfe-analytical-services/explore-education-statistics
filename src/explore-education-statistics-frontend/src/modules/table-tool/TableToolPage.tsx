@@ -1,16 +1,7 @@
+import ButtonText from '@common/components/ButtonText';
 import { ConfirmContextProvider } from '@common/context/ConfirmContext';
 import mapValuesWithKeys from '@common/lib/utils/mapValuesWithKeys';
-import tableBuilderService, {
-  FilterOption,
-  IndicatorOption,
-  PublicationSubject,
-  PublicationSubjectMeta,
-  TableDataQuery,
-  ThemeMeta,
-} from '@frontend/services/tableBuilderService';
 import { Dictionary } from '@common/types/util';
-import ButtonText from '@common/components/ButtonText';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PreviousStepModalConfirm from '@frontend/modules/table-tool/components/PreviousStepModalConfirm';
@@ -20,14 +11,21 @@ import {
   LocationFilter,
 } from '@frontend/modules/table-tool/components/types/filters';
 import { parseYearCodeTuple } from '@frontend/modules/table-tool/components/types/TimePeriod';
-import mapValues from 'lodash/mapValues';
-import { NextContext } from 'next';
-import Router from 'next/router';
-import React, { Component, MouseEventHandler, createRef } from 'react';
 import getDefaultTableHeaderConfig from '@frontend/modules/table-tool/utils/tableHeaders';
 import permalinkService, {
   FullTable,
 } from '@frontend/services/permalinkService';
+import tableBuilderService, {
+  FilterOption,
+  IndicatorOption,
+  PublicationSubject,
+  PublicationSubjectMeta,
+  TableDataQuery,
+  ThemeMeta,
+} from '@frontend/services/tableBuilderService';
+import mapValues from 'lodash/mapValues';
+import { NextContext } from 'next';
+import React, { Component, createRef, MouseEventHandler } from 'react';
 import DownloadCsvButton from './components/DownloadCsvButton';
 import FiltersForm, { FilterFormSubmitHandler } from './components/FiltersForm';
 import LocationFiltersForm, {
@@ -39,6 +37,9 @@ import PublicationForm, {
 import PublicationSubjectForm, {
   PublicationSubjectFormSubmitHandler,
 } from './components/PublicationSubjectForm';
+import TableHeadersForm, {
+  TableHeadersFormValues,
+} from './components/TableHeadersForm';
 import TimePeriodDataTable from './components/TimePeriodDataTable';
 import TimePeriodForm, {
   TimePeriodFormSubmitHandler,
@@ -47,9 +48,6 @@ import mapOptionValues from './components/utils/mapOptionValues';
 import Wizard from './components/Wizard';
 import WizardStep from './components/WizardStep';
 import WizardStepHeading from './components/WizardStepHeading';
-import TableHeadersForm, {
-  TableHeadersFormValues,
-} from './components/TableHeadersForm';
 
 export interface PublicationOptions {
   id: string;
