@@ -152,7 +152,9 @@ const AdminDashboardPage = () => {
                             label: 'Please select',
                             value: '',
                           },
-                          ...model.availablePreReleaseContacts.map(contact => ({
+                          ...model.availablePreReleaseContacts.
+                            filter(contact => !model.preReleaseContactsByScheduledRelease[release.id].find(c => c.id === contact.id)).
+                            map(contact => ({
                             label: contact.name,
                             value: contact.id,
                           })),
@@ -176,7 +178,19 @@ const AdminDashboardPage = () => {
                         key={existingContact.id}
                         term="Pre release access"
                         actions={
-                          <Link to="" onClick={() => {}}>
+                          <Link
+                            to=""
+                            onClick={async _ => {
+                              const updatedContacts = await dashboardService.removePreReleaseContactFromRelease(release.id, existingContact.id);
+                              setModel({
+                                ...model,
+                                preReleaseContactsByScheduledRelease: {
+                                  ...model.preReleaseContactsByScheduledRelease,
+                                  [release.id]: updatedContacts,
+                                }
+                              })
+                            }}
+                          >
                             Remove
                           </Link>
                         }
