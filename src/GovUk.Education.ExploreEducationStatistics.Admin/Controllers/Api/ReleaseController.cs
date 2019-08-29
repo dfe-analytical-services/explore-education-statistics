@@ -221,18 +221,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             );
         }
 
+        [HttpPost("release/{releaseId}/datablocks")]
+        [AllowAnonymous]
+        public async Task<ActionResult<DataBlockViewModel>> CreateDataBlockAsync(CreateDataBlockViewModel dataBlock,
+            ReleaseId releaseId)
+        {
+            return await CheckReleaseExistsAsync(releaseId, () => _dataBlockService.CreateAsync(releaseId, dataBlock));
+        }
+        
         [HttpGet("release/{releaseId}/datablocks/")]
         [AllowAnonymous]
-        public async Task<ActionResult<List<DataBlockViewModel>>> GetDataBlocks(ReleaseId releaseId)
+        public async Task<ActionResult<List<DataBlockViewModel>>> GetDataBlocksAsync(ReleaseId releaseId)
         {
             return await CheckReleaseExistsAsync(releaseId,  async () => Ok(await _dataBlockService.ListAsync(releaseId)));
         }
         
         [HttpGet("release/{releaseId}/datablock/{id}")]
         [AllowAnonymous]
-        public async Task<ActionResult<DataBlockViewModel>> GetDataBlock(ReleaseId releaseId, DataBlockId id)
+        public async Task<ActionResult<DataBlockViewModel>> GetDataBlockAsync(ReleaseId releaseId, DataBlockId id)
         {
-            return await CheckReleaseExistsAsync(releaseId,  async () => Ok(await _dataBlockService.Get(releaseId, id)));
+            return await CheckReleaseExistsAsync(releaseId,  async () => 
+                Ok(await _dataBlockService.GetAsync(releaseId, id)));
         }
 
         private async Task<ActionResult> CheckReleaseExistsAsync(ReleaseId releaseId, Func<Task<ActionResult>> andThen)

@@ -33,6 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<Publication, PublicationViewModel>();
 
             CreateMap<DataBlock, DataBlockViewModel>();
+            CreateMap<CreateDataBlockViewModel, DataBlock>();
         }
     }
 }
