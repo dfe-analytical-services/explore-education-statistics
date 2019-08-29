@@ -47,9 +47,7 @@ const InfographicChartOptions = ({
   fileId,
   onChange,
 }: InfographicChartOptionsProps) => {
-  const [chartFileOptions, setChartFileOptions] = React.useState<
-    SelectOption[]
-  >([]);
+  const [chartFileOptions, setChartFileOptions] = React.useState<SelectOption[]>([]);
 
   const [currentFileId, setCurrentFileId] = React.useState(fileId);
 
@@ -222,42 +220,44 @@ const ChartConfiguration = ({
             />
           )}
         </FormGroup>
-        <FormGroup className={styles.formGroup}>
-          <FormSelect
-            id="legend-position"
-            name="legend-position"
-            value={chartOptions.legend}
-            label="Legend Position"
-            options={[
-              { label: 'Top', value: 'top' },
-              { label: 'Bottom', value: 'bottom' },
-              { label: 'None', value: 'none' },
-            ]}
-            order={[]}
-            onChange={e => {
-              updateChartOptions({
-                ...chartOptions,
-                // @ts-ignore
-                legend: e.target.value,
-              });
-            }}
-          />
-          {chartOptions.legend !== 'none' && (
-            <FormTextInput
-              id="legend-height"
-              name="legend-height"
-              label="Legend Height (blank for automatic)"
-              value={chartOptions.legendHeight}
-              width={5}
+        {selectedChartType.capabilities.hasLegend && (
+          <FormGroup className={styles.formGroup}>
+            <FormSelect
+              id="legend-position"
+              name="legend-position"
+              value={chartOptions.legend}
+              label="Legend Position"
+              options={[
+                { label: 'Top', value: 'top' },
+                { label: 'Bottom', value: 'bottom' },
+                { label: 'None', value: 'none' },
+              ]}
+              order={[]}
               onChange={e => {
                 updateChartOptions({
                   ...chartOptions,
-                  legendHeight: e.target.value,
+                  // @ts-ignore
+                  legend: e.target.value,
                 });
               }}
             />
-          )}
-        </FormGroup>
+            {chartOptions.legend !== 'none' && (
+              <FormTextInput
+                id="legend-height"
+                name="legend-height"
+                label="Legend Height (blank for automatic)"
+                value={chartOptions.legendHeight}
+                width={5}
+                onChange={e => {
+                  updateChartOptions({
+                    ...chartOptions,
+                    legendHeight: e.target.value,
+                  });
+                }}
+              />
+            )}
+          </FormGroup>
+        )}
 
         {selectedChartType.capabilities.canSize && (
           <FormGroup className={styles.formGroup}>
