@@ -186,7 +186,7 @@ const options: ({ json: string; initialOptions?: Chart } & SelectOption)[] = [
   },
 ];
 
-const initialState = 2;
+const initialState = 0;
 
 const PrototypeChartTest = () => {
   const [selected, setSelected] = React.useState(`${initialState}`);

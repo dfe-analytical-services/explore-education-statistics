@@ -1,18 +1,25 @@
 import styles from '@admin/modules/chart-builder/graph-builder.module.scss';
-import React from 'react';
-import { ChartDefinition } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import service from '@admin/services/release/edit-release/data/service';
 import {
   FormCheckbox,
   FormGroup,
   FormSelect,
   FormTextInput,
 } from '@common/components/form';
-import { DataBlockMetadata } from '@common/services/dataBlockService';
+import { SelectOption } from '@common/components/form/FormSelect';
+import { ChartDefinition } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import {
+  DataBlockMetadata,
+  DataBlockResponse,
+} from '@common/services/dataBlockService';
+import React from 'react';
+import Button from '@common/components/Button';
 
 interface Props {
   selectedChartType: ChartDefinition;
   chartOptions: ChartOptions;
   onChange: (chartOptions: ChartOptions) => void;
+  data: DataBlockResponse;
   meta: DataBlockMetadata;
 
   onBoundaryLevelChange?: (boundaryLevel: string) => void;
@@ -29,11 +36,128 @@ export interface ChartOptions {
   geographicId?: string;
 }
 
+interface InfographicChartOptionsProps {
+  releaseId: string;
+  fileId?: string;
+  onChange: (fileId: string) => void;
+}
+
+const InfographicChartOptions = ({
+  releaseId,
+  fileId,
+  onChange,
+}: InfographicChartOptionsProps) => {
+  const [chartFileOptions, setChartFileOptions] = React.useState<
+    SelectOption[]
+  >([]);
+
+  const [currentFileId, setCurrentFileId] = React.useState(fileId);
+
+  const [uploadName, setUploadName] = React.useState<string>('');
+
+  const [uploadFile, setUploadFile] = React.useState<File>();
+
+  const [uploading, setUploading] = React.useState<boolean>(false);
+
+  const loadChartFilesAsync = () => {
+    service.getChartFiles(releaseId).then(chartFiles => {
+      setChartFileOptions([
+        {
+          label: 'Upload a new file',
+          value: '',
+        },
+        ...chartFiles.map(({ title, filename }) => ({
+          label: title,
+          value: filename,
+        })),
+      ]);
+    });
+  };
+
+  const doUpload = () => {
+    if (uploadFile) {
+      setUploading(true);
+      service
+        .uploadChartFile(releaseId, {
+          name: uploadName,
+          file: uploadFile,
+        })
+        .then(() => loadChartFilesAsync())
+        .then(() => {
+          onChange(uploadFile.name);
+          setCurrentFileId(uploadFile.name);
+          setUploadName('');
+          setUploadFile(undefined);
+        })
+        .finally(() => {
+          setUploading(false);
+        });
+    }
+  };
+
+  React.useEffect(() => {
+    loadChartFilesAsync();
+  }, [releaseId]);
+
+  return (
+    <FormGroup>
+      <FormSelect
+        id="infographic-fileid"
+        name="infographic-fileid"
+        label="Select the file to show"
+        order={[]}
+        options={chartFileOptions}
+        value={fileId}
+        onChange={e => {
+          setCurrentFileId(e.target.value);
+          return onChange(e.target.value);
+        }}
+      />
+      {currentFileId === '' && (
+        <FormGroup>
+          <FormTextInput
+            id="upload-name"
+            name="upload-name"
+            label="Select a name to give the file"
+            defaultValue={uploadName}
+            onChange={e => setUploadName(e.target.value)}
+            width={10}
+          />
+
+          <FormTextInput
+            id="upload-chart"
+            name="upload-chrt"
+            label="Select a file to upload"
+            type="file"
+            onChange={e => {
+              if (e.target.files && e.target.files.length > 0) {
+                setUploadFile(e.target.files[0]);
+              } else {
+                setUploadFile(undefined);
+              }
+            }}
+          />
+
+          <Button
+            type="button"
+            disabled={
+              uploadName.length === 0 || uploadFile === undefined || uploading
+            }
+            onClick={() => doUpload()}
+          >
+            Upload
+          </Button>
+        </FormGroup>
+      )}
+    </FormGroup>
+  );
+};
 const ChartConfiguration = ({
   chartOptions: initialChartOptions,
   selectedChartType,
   onChange,
   meta,
+  data,
   onBoundaryLevelChange,
 }: Props) => {
   const [chartOptions, setChartOptions] = React.useState<ChartOptions>(
@@ -43,34 +167,26 @@ const ChartConfiguration = ({
     setChartOptions(options);
     if (onChange) onChange(options);
   };
-
   const [chartWidth, setChartWidth] = React.useState(
     `${initialChartOptions.width || ''}`,
   );
   const [chartHeight, setChartHeight] = React.useState(
     `${initialChartOptions.height || ''}`,
   );
-
   return (
     <>
       {selectedChartType.type === 'infographic' && (
         <>
-          <FormGroup>
-            <FormTextInput
-              id="infographic-fileid"
-              name="infographic-fileid"
-              label="Select the file to show"
-              value={chartOptions.fileId}
-              width={5}
-              onChange={e => {
-                updateChartOptions({
-                  ...chartOptions,
-                  fileId: e.target.value,
-                });
-              }}
-            />
-          </FormGroup>
-
+          <InfographicChartOptions
+            releaseId={data.releaseId}
+            fileId={chartOptions.fileId || ''}
+            onChange={fileId => {
+              updateChartOptions({
+                ...chartOptions,
+                fileId,
+              });
+            }}
+          />
           <hr />
         </>
       )}

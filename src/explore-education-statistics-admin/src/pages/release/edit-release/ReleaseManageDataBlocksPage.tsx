@@ -51,7 +51,10 @@ const ReleaseManageDataBlocksPage = () => {
 
     if (request) {
       DataBlockService.getDataBlockForSubject(request).then(response => {
-        setChartBuilderData(response);
+        setChartBuilderData({
+          ...response,
+          releaseId,
+        });
         setInitialConfiguration(requestConfiguration);
       });
     }
@@ -84,6 +87,7 @@ const ReleaseManageDataBlocksPage = () => {
               setRequest(dataBlocks[+e.target.value].dataBlockRequest);
               setSelectedDataBlock(e.target.value);
             }}
+            order={[]}
             options={[
               {
                 label: 'select',
@@ -96,21 +100,26 @@ const ReleaseManageDataBlocksPage = () => {
             ]}
           />
 
-          <Tabs id="editDataBlockSections">
-            <TabsSection title="table">Table</TabsSection>
-            <TabsSection title="Create Chart">
-              {chartBuilderData ? (
-                <ChartBuilder
-                  data={chartBuilderData}
-                  onChartSave={onChartSave}
-                  initialConfiguration={initialConfiguration}
-                  onRequiresDataUpdate={reRequestdata}
-                />
-              ) : (
-                <LoadingSpinner />
-              )}
-            </TabsSection>
-          </Tabs>
+          {selectedDataBlock && (
+            <>
+              <hr />
+              <Tabs id="editDataBlockSections">
+                <TabsSection title="table">Table</TabsSection>
+                <TabsSection title="Create Chart">
+                  {chartBuilderData ? (
+                    <ChartBuilder
+                      data={chartBuilderData}
+                      onChartSave={onChartSave}
+                      initialConfiguration={initialConfiguration}
+                      onRequiresDataUpdate={reRequestdata}
+                    />
+                  ) : (
+                    <LoadingSpinner />
+                  )}
+                </TabsSection>
+              </Tabs>
+            </>
+          )}
         </TabsSection>
       </Tabs>
     </>
