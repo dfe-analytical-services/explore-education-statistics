@@ -9,6 +9,7 @@ import {
   UnmappedFullTable,
   UnmappedPermalink,
   Permalink,
+  SortableOption,
 } from '../services/permalinkService';
 import {
   transformTableMetaFiltersToCategoryFilters,
@@ -26,9 +27,6 @@ const reverseMapTableHeadersConfig = (
    */
   let mappedRows: (TimePeriodFilter | Indicator)[] = [];
   let mappedColumns: (TimePeriodFilter | Indicator)[] = [];
-
-  const mappedRowGroups: (LocationFilter | CategoryFilter)[][] = [];
-  const mappedColumnGroups: (LocationFilter | CategoryFilter)[][] = [];
 
   const initialValue = columns[0].value;
   // rows/columns can only be TimePeriods / Indicators
@@ -65,46 +63,27 @@ const reverseMapTableHeadersConfig = (
     fullTableSubjectMeta.locations,
   ];
 
-  rowGroups.forEach((rowGroup, index) => {
-    const currentIndex = locationAndFilterGroups.findIndex(group =>
-      group.find(element => element.value === rowGroup[0].value),
-    );
+  const mapGroupGroups = (
+    groupGroups: SortableOption[][],
+  ): (LocationFilter | CategoryFilter)[][] =>
+    groupGroups.map(rowGroup => {
+      const currentIndex = locationAndFilterGroups.findIndex(group =>
+        group.find(element => element.value === rowGroup[0].value),
+      );
 
-    mappedRowGroups[index] = rowGroup.map(
-      ({ value }) =>
-        locationAndFilterGroups[currentIndex].find(
-          element => element.value === value,
-        ) as LocationFilter | CategoryFilter,
-    );
-  });
-
-  columnGroups.forEach((columnGroup, index) => {
-    let currentIndex = 0;
-    for (let i = 0; i < locationAndFilterGroups.length; i += 1) {
-      if (
-        locationAndFilterGroups[i].find(
-          element => element.value === columnGroup[0].value,
-        )
-      ) {
-        currentIndex = i;
-        break;
-      }
-    }
-
-    mappedColumnGroups[index] = columnGroup.map(
-      ({ value }) =>
-        locationAndFilterGroups[currentIndex].find(
-          element => element.value === value,
-        ) as LocationFilter | CategoryFilter,
-    );
-    locationAndFilterGroups.splice(currentIndex, 1);
-  });
+      return rowGroup.map(
+        ({ value }) =>
+          locationAndFilterGroups[currentIndex].find(
+            element => element.value === value,
+          ) as LocationFilter | CategoryFilter,
+      );
+    });
 
   return {
     columns: mappedColumns,
-    columnGroups: mappedColumnGroups,
+    columnGroups: mapGroupGroups(columnGroups),
     rows: mappedRows,
-    rowGroups: mappedRowGroups,
+    rowGroups: mapGroupGroups(rowGroups),
   };
 };
 
