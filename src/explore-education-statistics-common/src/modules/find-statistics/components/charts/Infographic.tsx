@@ -6,10 +6,29 @@ import * as React from 'react';
 
 export interface InfographicChartProps extends AbstractChartProps {
   fileId?: string;
+
+  chartFileDownloadService?: (releaseId: string, fileName: string) => string;
 }
 
-const Infographic = ({ fileId }: InfographicChartProps) => {
-  return <div>Infographic ${fileId}</div>;
+const Infographic = ({
+  data,
+  fileId,
+  chartFileDownloadService,
+  width,
+  height,
+}: InfographicChartProps) => {
+  const [file, setFile] = React.useState<string>();
+
+  React.useEffect(() => {
+    if (fileId && chartFileDownloadService) {
+      setFile(chartFileDownloadService(data.releaseId, fileId));
+    }
+  }, [chartFileDownloadService, data.releaseId, fileId]);
+
+  if (fileId === undefined || fileId === '')
+    return <div>Infographic not configured</div>;
+
+  return <img alt="infographic" src={file} width={width} height={height} />;
 };
 
 const definition: ChartDefinition = {
