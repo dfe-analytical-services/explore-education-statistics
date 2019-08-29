@@ -16,11 +16,6 @@ const publicationPollyfilla: Polyfilla<AdminDashboardPublication> = (
         name: 'TODO editor user',
       },
       lastEditedDateTime: '1971-01-01 00:00',
-      nextReleaseDate: {
-        day: 2,
-        month: 2,
-        year: 1971,
-      },
       contact: publication.contact,
     };
     return patchedRelease;

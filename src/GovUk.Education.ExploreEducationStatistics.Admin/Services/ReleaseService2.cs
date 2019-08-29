@@ -55,8 +55,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     m => m.MapFrom(r => r.ReleaseSummary.TimePeriodCoverage));
             
             cfg.CreateMap<CreateReleaseViewModel, ReleaseSummaryVersion>();
-            cfg.CreateMap<EditReleaseSummaryViewModel, ReleaseSummaryVersion>();
-            cfg.CreateMap<ReleaseSummary, EditReleaseSummaryViewModel>();
+            cfg.CreateMap<ReleaseSummaryViewModel, ReleaseSummaryVersion>();
+            cfg.CreateMap<ReleaseSummary, ReleaseSummaryViewModel>();
         }).CreateMapper();
 
         public ReleaseService2(ApplicationDbContext context)
@@ -110,18 +110,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         // TODO Authorisation will be required when users are introduced
-        public async Task<EditReleaseSummaryViewModel> GetReleaseSummaryAsync(Guid releaseId)
+        public async Task<ReleaseSummaryViewModel> GetReleaseSummaryAsync(Guid releaseId)
         {
             var release = await _context.Releases
                 .Where(r => r.Id == releaseId)
                 .HydrateReleaseForReleaseViewModel()
                 .FirstOrDefaultAsync();
-            return _mapper.Map<EditReleaseSummaryViewModel>(release.ReleaseSummary);
+            return _mapper.Map<ReleaseSummaryViewModel>(release.ReleaseSummary);
         }
 
         // TODO Authorisation will be required when users are introduced
         public async Task<Either<ValidationResult, ReleaseViewModel>> EditReleaseSummaryAsync(
-            EditReleaseSummaryViewModel model)
+            ReleaseSummaryViewModel model)
         {
             var publication = await GetAsync(model.Id);
             return await ValidateReleaseSlugUniqueToPublication(model.Slug, publication.Id, model.Id)

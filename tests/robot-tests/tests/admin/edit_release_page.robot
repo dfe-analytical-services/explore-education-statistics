@@ -58,6 +58,7 @@ Validate release summary tab has correct details
     
 
 User clicks Edit release setup details         
+    [Tags]  HappyPath   UnderConstruction
     user clicks element  xpath://a[text()="Edit release setup details"]
     user waits until page contains element   xpath://h2[text()="Edit release setup"]
     get element attribute  css:#releaseSummaryForm-timePeriodCoverageStartYear  2014

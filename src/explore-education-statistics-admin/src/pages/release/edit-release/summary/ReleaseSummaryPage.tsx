@@ -3,7 +3,7 @@ import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
 import {
-  getSelectedReleaseTypeTitle,
+  getSelectedReleaseType,
   getSelectedTimePeriodCoverageLabel,
 } from '@admin/pages/release/util/releaseSummaryUtil';
 import { summaryEditRoute } from '@admin/routes/edit-release/routes';
@@ -52,6 +52,8 @@ const ReleaseSummaryPage = () => {
 
   return (
     <>
+      <h2 className="govuk-heading-m">Release summary</h2>
+      <p>These details will be shown to users to help identify this release.</p>
       {model && (
         <SummaryList>
           <SummaryListItem term="Publication title">
@@ -89,10 +91,12 @@ const ReleaseSummaryPage = () => {
             )}
           </SummaryListItem>
           <SummaryListItem term="Release type">
-            {getSelectedReleaseTypeTitle(
-              model.releaseSummaryDetails.id,
-              model.releaseTypes,
-            )}
+            {
+              getSelectedReleaseType(
+                model.releaseSummaryDetails.typeId,
+                model.releaseTypes,
+              ).title
+            }
           </SummaryListItem>
           <SummaryListItem
             term=""

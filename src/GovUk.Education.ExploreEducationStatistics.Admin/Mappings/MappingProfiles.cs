@@ -24,16 +24,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(dest => dest.PublicationTitle,
                     m => m.MapFrom(r => r.Publication.Title));
 
-            CreateMap<EditReleaseSummaryViewModel, Release>();
-            CreateMap<Release, EditReleaseSummaryViewModel>();
-            
+            CreateMap<Release, ReleaseSummaryViewModel>();
+            CreateMap<ReleaseSummaryViewModel, Release>();
+
             CreateMap<CreateReleaseViewModel, Release>();
 
             CreateMap<Methodology, MethodologyViewModel>();
-            
+
             CreateMap<Publication, PublicationViewModel>();
-            
-            CreateMap<List<MethodologyViewModel>, List<Methodology>>();
         }
     }
 }

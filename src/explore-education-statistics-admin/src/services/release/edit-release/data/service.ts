@@ -1,5 +1,5 @@
 import { Polyfilla } from '@admin/services/util/polyfilla';
-import client from '@admin/services/util/service';
+import client, { baseURL } from '@admin/services/util/service';
 
 import {
   AncillaryFile,
@@ -105,13 +105,13 @@ const service: EditReleaseService = {
     return client.delete<null>(`/release/${releaseId}/data/${dataFileName}`);
   },
   createDownloadDataFileLink(releaseId: string, fileName: string): string {
-    return `/release/${releaseId}/data/${fileName}`;
+    return `${baseURL}release/${releaseId}/data/${fileName}`;
   },
   createDownloadDataMetadataFileLink(
     releaseId: string,
     fileName: string,
   ): string {
-    return `/release/${releaseId}/data/metadata/${fileName}`;
+    return `${baseURL}release/${releaseId}/data/${fileName}`;
   },
   getAncillaryFiles(releaseId: string): Promise<AncillaryFile[]> {
     return client
@@ -142,7 +142,7 @@ const service: EditReleaseService = {
     return client.delete<null>(`/release/${releaseId}/ancillary/${fileName}`);
   },
   createDownloadAncillaryFileLink(releaseId: string, fileName: string): string {
-    return `/release/${releaseId}/ancillary/${fileName}`;
+    return `${baseURL}release/${releaseId}/ancillary/${fileName}`;
   },
 
   async getChartFiles(releaseId: string) {

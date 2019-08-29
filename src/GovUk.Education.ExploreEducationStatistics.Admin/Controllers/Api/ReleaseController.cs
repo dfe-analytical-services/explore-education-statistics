@@ -165,13 +165,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("releases/{releaseId}/summary")]
-        public async Task<ActionResult<EditReleaseSummaryViewModel>> GetReleaseSummaryAsync(ReleaseId releaseId)
+        public async Task<ActionResult<ReleaseSummaryViewModel>> GetReleaseSummaryAsync(ReleaseId releaseId)
         {
             return Ok(await _releaseService.GetReleaseSummaryAsync(releaseId));
         }
 
         [HttpPut("releases/{releaseId}/summary")]
-        public async Task<ActionResult<ReleaseViewModel>> EditReleaseSummaryAsync(EditReleaseSummaryViewModel model,
+        public async Task<ActionResult<ReleaseViewModel>> UpdateReleaseSummaryAsync(ReleaseSummaryViewModel model,
             ReleaseId releaseId)
         {
             return await CheckReleaseExistsAsync(releaseId, () =>
@@ -212,6 +212,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             return await CheckReleaseExistsAsync(releaseId,
                 () => _fileStorageService.DeleteFileAsync(releaseId, ReleaseFileTypes.Chart, fileName));
+        }
+
+        [HttpPut("releases/{releaseId}/status")]
+        public async Task<ActionResult<ReleaseSummaryViewModel>> UpdateReleaseStatusAsync(
+            UpdateReleaseStatusRequest updateRequest, ReleaseId releaseId)
+        {
+            return await CheckReleaseExistsAsync(
+                releaseId, 
+                () => _releaseService.UpdateReleaseStatusAsync(releaseId, updateRequest.ReleaseStatus, updateRequest.InternalReleaseNote)
+            );
         }
 
         [HttpGet("release/{releaseId}/datablocks/")]
