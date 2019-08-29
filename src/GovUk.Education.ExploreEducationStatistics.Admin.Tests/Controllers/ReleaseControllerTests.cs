@@ -261,8 +261,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
             var mocks = Mocks();
             var releaseId = new Guid("95bf7743-fe6f-4b85-a28f-49f6f6b8735a");
             mocks.ReleaseService
-                .Setup(s => s.EditReleaseSummaryAsync(It.IsAny<EditReleaseSummaryViewModel>()))
-                .Returns<EditReleaseSummaryViewModel>(e => Task.FromResult(
+                .Setup(s => s.EditReleaseSummaryAsync(It.IsAny<ReleaseSummaryViewModel>()))
+                .Returns<ReleaseSummaryViewModel>(e => Task.FromResult(
                     new Either<ValidationResult, ReleaseViewModel>(new ReleaseViewModel {Id = e.Id})));
             mocks.ReleaseService
                 .Setup(s => s.GetAsync(releaseId))
@@ -270,7 +270,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Method under test
-            var result = await controller.EditReleaseSummaryAsync(new EditReleaseSummaryViewModel(), releaseId);
+            var result = await controller.UpdateReleaseSummaryAsync(new ReleaseSummaryViewModel(), releaseId);
             var unboxed = AssertOkResult(result);
             Assert.Equal(releaseId, unboxed.Id);
         }
@@ -282,7 +282,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
             var releaseId = new Guid("95bf7743-fe6f-4b85-a28f-49f6f6b8735a");
             mocks.ReleaseService
                 .Setup(s => s.GetReleaseSummaryAsync(It.IsAny<Guid>()))
-                .Returns<Guid>(id => Task.FromResult(new EditReleaseSummaryViewModel {Id = id}));
+                .Returns<Guid>(id => Task.FromResult(new ReleaseSummaryViewModel {Id = id}));
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Method under test

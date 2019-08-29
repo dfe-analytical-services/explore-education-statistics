@@ -75,11 +75,11 @@ export const getSelectedTimePeriodCoverageLabel = (
   findTimePeriodCoverageOption(timePeriodCoverageCode, timePeriodCoverageGroups)
     .identifier.label;
 
-export const getSelectedReleaseTypeTitle = (
+export const getSelectedReleaseType = (
   releaseTypeId: string,
   availableReleaseTypes: IdTitlePair[],
 ) =>
-  availableReleaseTypes.find(type => type.title === releaseTypeId) ||
-  availableReleaseTypes[0].title;
+  availableReleaseTypes.find(type => type.id === releaseTypeId) ||
+  availableReleaseTypes[0];
 
 export default {};
