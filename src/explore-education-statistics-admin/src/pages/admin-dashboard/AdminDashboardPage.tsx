@@ -88,8 +88,19 @@ const AdminDashboardPage = () => {
               <RelatedInformation heading="Help and guidance">
                 <ul className="govuk-list">
                   <li>
-                    <Link to="/prototypes/methodology-home">
-                      Administrators' guide{' '}
+                    <Link
+                      to="/prototypes/documentation/using-dashboard"
+                      target="_blank"
+                    >
+                      Using your administration dashboard{' '}
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/prototypes/documentation/create-new-release"
+                      target="_blank"
+                    >
+                      Creating a new release{' '}
                     </Link>
                   </li>
                 </ul>

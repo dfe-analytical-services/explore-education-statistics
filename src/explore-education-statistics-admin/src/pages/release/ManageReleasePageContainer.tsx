@@ -1,3 +1,4 @@
+import Link from '@admin/components/Link';
 import NavLink from '@admin/components/NavLink';
 import Page from '@admin/components/Page';
 import PreviousNextLinks from '@admin/components/PreviousNextLinks';
@@ -7,6 +8,7 @@ import service from '@admin/services/common/service';
 import { BasicPublicationDetails } from '@admin/services/common/types';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
+import RelatedInformation from '@common/components/RelatedInformation';
 import ManageReleaseContext from './ManageReleaseContext';
 
 interface MatchProps {
@@ -58,11 +60,31 @@ const ManageReleasePageContainer = ({
     <>
       {publication && (
         <Page wide breadcrumbs={[{ name: 'Edit release' }]}>
-          <h1 className="govuk-heading-l">
-            {publication.title}
-            <span className="govuk-caption-l">Edit release</span>
-          </h1>
-          <nav className="app-navigation govuk-!-margin-bottom-9">
+          <div className="govuk-grid-row">
+            <div className="govuk-grid-column-two-thirds">
+              <h1 className="govuk-heading-l">
+                <span className="govuk-caption-l">Edit release</span>
+                {publication.title}
+              </h1>
+            </div>
+
+            <div className="govuk-grid-column-one-third">
+              <RelatedInformation heading="Help and guidance">
+                <ul className="govuk-list">
+                  <li>
+                    <Link
+                      to="/prototypes/documentation/create-new-release"
+                      target="_blank"
+                    >
+                      Creating a new release{' '}
+                    </Link>
+                  </li>
+                </ul>
+              </RelatedInformation>
+            </div>
+          </div>
+
+          <nav className="app-navigation govuk-!-margin-top-6 govuk-!-margin-bottom-9">
             <ul className="app-navigation__list govuk-!-margin-bottom-0">
               <li>
                 {viewRoutes.map(route => (
