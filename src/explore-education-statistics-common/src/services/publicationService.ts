@@ -19,6 +19,7 @@ export interface Publication {
     id: string;
     releaseName: string;
     slug: string;
+    yearTitle: string;
   }[];
   legacyReleases: {
     id: string;
