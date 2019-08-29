@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IDataBlockService
     {
-        Task<DataBlockViewModel> Get(DataBlockId id);
+        Task<DataBlockViewModel> Get(ReleaseId releaseId, DataBlockId id);
 
         Task<List<DataBlockViewModel>> ListAsync(ReleaseId releaseId);
     }

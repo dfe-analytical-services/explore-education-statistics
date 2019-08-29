@@ -1,9 +1,12 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using Microsoft.EntityFrameworkCore;
 using DataBlockId = System.Guid;
 using ReleaseId = System.Guid;
 
@@ -11,65 +14,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class DataBlockService : IDataBlockService
     {
-        public Task<DataBlockViewModel> Get(DataBlockId id)
-        {
-            if (id.ToString() == "17774a74-1f62-4b76-b9b5-84f14dac7278")
-            {
-                return Task.FromResult(new DataBlockViewModel
-                {
-                    Id = new DataBlockId("17774a74-1f62-4b76-b9b5-84f14dac7278"),
-                    Heading =
-                        "Local Authority, Total, Number of schools, Number of Pupils, Number of Permanent Exclusions",
-                    DataBlockRequest = new DataBlockRequest
-                    {
-                        SubjectId = 12,
-                        GeographicLevel = "Local_Authority",
-                        Indicators = new List<string> {"153", "154", "155"},
-                        Filters = new List<string> {"423"},
-                        TimePeriod = new TimePeriod
-                        {
-                            StartYear = "2014",
-                            StartCode = TimeIdentifier.AcademicYear,
-                            EndYear = "2016",
-                            EndCode = TimeIdentifier.AcademicYear
-                        }
-                    }
-                });
-            }
+        private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-            return null;
+        public DataBlockService(ApplicationDbContext context, IMapper mapper)
+        {
+            _context = context;
+            _mapper = mapper;
         }
 
-        public Task<List<DataBlockViewModel>> ListAsync(ReleaseId releaseId)
+        public async Task<DataBlockViewModel> Get(ReleaseId releaseId, DataBlockId id)
         {
-            var dataBlockList = new List<DataBlockViewModel>();
+            var release = await _context.Releases.FirstAsync(r => r.Id.Equals(releaseId));
+            var dataBlock = GetDataBlocks(release).FirstOrDefault(block => block.Id.Equals(id));
+            return _mapper.Map<DataBlockViewModel>(dataBlock);
+        }
 
-            if (releaseId.ToString() == "e7774a74-1f62-4b76-b9b5-84f14dac7278")
-            {
-                dataBlockList.Add(new DataBlockViewModel
-                    {
-                        Id = new DataBlockId("17774a74-1f62-4b76-b9b5-84f14dac7278"),
-                        Heading =
-                            "Local Authority, Total, Number of schools, Number of Pupils, Number of Permanent Exclusions",
-                        DataBlockRequest = new DataBlockRequest
-                        {
-                            SubjectId = 12,
-                            GeographicLevel = "Local_Authority",
-                            Indicators = new List<string> {"153", "154", "155"},
-                            Filters = new List<string> {"423"},
-                            TimePeriod = new TimePeriod
-                            {
-                                StartYear = "2014",
-                                StartCode = TimeIdentifier.AcademicYear,
-                                EndYear = "2016",
-                                EndCode = TimeIdentifier.AcademicYear
-                            }
-                        }
-                    }
-                );
-            }
+        public async Task<List<DataBlockViewModel>> ListAsync(ReleaseId releaseId)
+        {
+            var release = await _context.Releases.FirstAsync(r => r.Id.Equals(releaseId));
+            return _mapper.Map<List<DataBlockViewModel>>(GetDataBlocks(release));
+        }
 
-            return Task.FromResult(dataBlockList);
+        private static IEnumerable<DataBlock> GetDataBlocks(Release release)
+        {
+            return release.Content.SelectMany(section => section.Content).OfType<DataBlock>();
         }
     }
 }

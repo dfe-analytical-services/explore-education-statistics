@@ -356,18 +356,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
         }
         
         private static (Mock<IReleaseService> ReleaseService, Mock<IFileStorageService> FileStorageService,
-            Mock<IImportService> ImportService, Mock<IPublicationService> PublicationService) Mocks()
+            Mock<IPublicationService> PublicationService) Mocks()
         {
-            return (new Mock<IReleaseService>(), new Mock<IFileStorageService>(), new Mock<IImportService>(),
-                new Mock<IPublicationService>());
+            return (new Mock<IReleaseService>(), new Mock<IFileStorageService>(), new Mock<IPublicationService>());
         }
 
         private static ReleasesController ReleasesControllerWithMocks(
-            (Mock<IReleaseService> ReleaseService, Mock<IFileStorageService> FileStorageService, Mock<IImportService>
-                ImportService, Mock<IPublicationService> PublicationService) mocks)
+            (Mock<IReleaseService> ReleaseService, Mock<IFileStorageService> FileStorageService, 
+                Mock<IPublicationService> PublicationService) mocks)
         {
-            return new ReleasesController(mocks.ReleaseService.Object, mocks.FileStorageService.Object,
-                mocks.ImportService.Object, mocks.PublicationService.Object,null);
+            return new ReleasesController(mocks.ReleaseService.Object, mocks.FileStorageService.Object, 
+                mocks.PublicationService.Object,null);
         }
     }
 }
