@@ -336,15 +336,20 @@ jobs:
       vmImage: 'ubuntu-16.04'
     steps:
       - task: PublishPipelineArtifact@0
-        displayName: 'Publish Pipeline Artifact'
+        displayName: 'Publish Robot tests'
         inputs:
           artifactName: 'robot-tests'
           targetPath: 'tests/robot-tests'
       - task: PublishPipelineArtifact@0
-        displayName: 'Publish Pipeline Artifact'
+        displayName: 'Publish Newman tests'
         inputs:
           artifactName: 'newman-tests'
           targetPath: 'tests/newman'
+      - task: PublishPipelineArtifact@0
+        displayName: 'Publish AzureADCookie script'
+        inputs:
+          artifactName: 'azure-ad-cookie-script'
+          targetPath: 'useful-scripts/azure-ad-cookie'
       - task: 'PublishPipelineArtifact@0'
         displayName: 'Publish ARM templates'
         inputs:
