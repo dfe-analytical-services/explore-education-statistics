@@ -80,8 +80,7 @@ const reverseMapTableHeadersConfig = (
 
   const initialValue = columns[0].value;
   // rows/columns can only be TimePeriods / Indicators
-  // eslint-disable-next-line no-restricted-globals
-  if (isNaN(Number(initialValue))) {
+  if (Number.isNaN(Number(initialValue))) {
     // if NaN then timePeriod
     mappedColumns = columns.map(({ value }) => {
       return fullTableSubjectMeta.timePeriodRange.find(
