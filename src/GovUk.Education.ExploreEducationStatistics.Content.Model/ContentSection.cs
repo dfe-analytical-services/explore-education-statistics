@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Converters;
@@ -52,6 +53,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     {
         public override string Type => "DataBlock";
 
+        public Guid Id { get; set; }
+        
         public string Heading { get; set; }
         
         public DataBlockRequest DataBlockRequest { get; set; }
@@ -61,7 +64,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public Summary Summary { get; set; }
         
         public List<Table> Tables { get; set; }
-
     }
 
     public class Summary

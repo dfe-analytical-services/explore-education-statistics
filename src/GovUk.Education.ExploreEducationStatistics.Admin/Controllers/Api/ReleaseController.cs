@@ -1,21 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using FileInfo = GovUk.Education.ExploreEducationStatistics.Admin.Models.FileInfo;
-using ReleaseId = System.Guid;
+using DataBlockId = System.Guid;
 using PublicationId = System.Guid;
+using ReleaseId = System.Guid;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
@@ -27,16 +24,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     {
         private readonly IReleaseService _releaseService;
         private readonly IFileStorageService _fileStorageService;
-        private readonly IImportService _importService;
         private readonly IPublicationService _publicationService;
         private readonly IDataBlockService _dataBlockService;
 
-        public ReleasesController(IReleaseService releaseService, IFileStorageService fileStorageService,
-            IImportService importService, IPublicationService publicationService, IDataBlockService dataBlockService)
+        public ReleasesController(IReleaseService releaseService,
+            IFileStorageService fileStorageService,
+            IPublicationService publicationService,
+            IDataBlockService dataBlockService)
         {
             _releaseService = releaseService;
             _fileStorageService = fileStorageService;
-            _importService = importService;
             _publicationService = publicationService;
             _dataBlockService = dataBlockService;
         }
@@ -243,6 +240,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<List<DataBlockViewModel>>> GetDataBlocks(ReleaseId releaseId)
         {
             return await CheckReleaseExistsAsync(releaseId,  async () => Ok(await _dataBlockService.ListAsync(releaseId)));
+        }
+        
+        [HttpGet("release/{releaseId}/datablock/{id}")]
+        [AllowAnonymous]
+        public async Task<ActionResult<DataBlockViewModel>> GetDataBlock(ReleaseId releaseId, DataBlockId id)
+        {
+            return await CheckReleaseExistsAsync(releaseId,  async () => Ok(await _dataBlockService.Get(releaseId, id)));
         }
 
         private async Task<ActionResult> CheckReleaseExistsAsync(ReleaseId releaseId, Func<Task<ActionResult>> andThen)
