@@ -22,7 +22,7 @@ const reverseMapTableHeadersConfig = (
 ): TableHeadersConfig => {
   /**
    * config filters only contain `values`.
-   * This function remaps the config from the filters in the subjectMeta
+   * This function remaps the config filters into full filters, using the subjectMeta
    */
   let mappedRows: (TimePeriodFilter | Indicator)[] = [];
   let mappedColumns: (TimePeriodFilter | Indicator)[] = [];
@@ -84,8 +84,6 @@ const reverseMapTableHeadersConfig = (
           element => element.value === value,
         ) as LocationFilter | CategoryFilter,
     );
-
-    locationAndFilterGroups.splice(currentIndex, 1);
   });
 
   columnGroups.forEach((columnGroup, index) => {
