@@ -23,7 +23,6 @@ import {
 import { parseYearCodeTuple } from '@frontend/modules/table-tool/components/types/TimePeriod';
 import mapValues from 'lodash/mapValues';
 import { NextContext } from 'next';
-import Router from 'next/router';
 import React, { Component, MouseEventHandler, createRef } from 'react';
 import getDefaultTableHeaderConfig from '@frontend/modules/table-tool/utils/tableHeaders';
 import permalinkService, {
@@ -471,18 +470,19 @@ class TableToolPage extends Component<Props, State> {
                                 </>
                               ) : (
                                 <>
-                                  <ButtonText
-                                    disabled={permalinkLoading}
-                                    onClick={this.handlePermalinkClick}
-                                  >
-                                    {permalinkLoading
-                                      ? `Generating`
-                                      : `Generate`}{' '}
-                                    permanent link
-                                    {permalinkLoading && (
+                                  {permalinkLoading ? (
+                                    <>
+                                      Generating permanent link
                                       <LoadingSpinner inline size={19} />
-                                    )}
-                                  </ButtonText>
+                                    </>
+                                  ) : (
+                                    <ButtonText
+                                      disabled={permalinkLoading}
+                                      onClick={this.handlePermalinkClick}
+                                    >
+                                      Generate permanent link
+                                    </ButtonText>
+                                  )}
                                 </>
                               )}
                             </li>

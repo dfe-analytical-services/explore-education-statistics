@@ -36,11 +36,11 @@ class PermalinkPage extends Component<Props> {
 
   public render() {
     const { data } = this.props;
-    const { fullTable, configuration } = data;
+    const { fullTable, configuration } = permalinkService.mapPermalink(data);
 
     return (
       <Page
-        title="Saved Table"
+        title={`'${fullTable.subjectMeta.subjectName}' from '${fullTable.subjectMeta.publicationName}'`}
         caption="Permanent data table"
         breadcrumbs={[
           { name: 'Data tables', link: '/data-tables' },
@@ -65,7 +65,6 @@ class PermalinkPage extends Component<Props> {
             </RelatedAside> */}
           </div>
         </div>
-
         <TimePeriodDataTable
           fullTable={fullTable}
           tableHeadersConfig={
@@ -78,7 +77,6 @@ class PermalinkPage extends Component<Props> {
           publicationSlug={`permalink-${data.created}-${data.title}`}
           fullTable={fullTable}
         />
-
         <p className="govuk-body-s">Source: DfE prototype example statistics</p>
         <h2 className="govuk-heading-m govuk-!-margin-top-9">
           Create your own tables online
@@ -90,7 +88,6 @@ class PermalinkPage extends Component<Props> {
         <ButtonLink prefetch as="/data-tables/" href="/data-tables">
           Create tables
         </ButtonLink>
-
         <PrintThisPage
           analytics={{
             category: 'Page print',

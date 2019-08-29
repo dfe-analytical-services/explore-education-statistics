@@ -4,13 +4,16 @@ import {
   TableData,
   GroupedFilterOptions,
   TableDataQuery,
+  FilterOption,
 } from '@frontend/services/tableBuilderService';
-import TimePeriod from '@common/services/types/TimePeriod';
 import {
   Indicator,
   LocationFilter,
+  CategoryFilter,
 } from '@frontend/modules/table-tool/components/types/filters';
 import { TableHeadersFormValues } from '@frontend/modules/table-tool/components/TableHeadersForm';
+import TimePeriod from '@frontend/modules/table-tool/components/types/TimePeriod';
+import { transformTableMetaFiltersToCategoryFilters } from '@frontend/modules/table-tool/utils/tableHeaders';
 
 export interface FullTableMeta {
   publicationName: string;
@@ -47,22 +50,158 @@ export interface Permalink {
   created: string;
   fullTable: FullTable;
   configuration: {
-    tableHeadersConfig?: TableHeadersFormValues;
+    tableHeadersConfig: TableHeadersFormValues;
   };
 }
 
+const reverseMapTableHeadersConfig = (
+  {
+    columns,
+    rows,
+    columnGroups,
+    rowGroups,
+  }: {
+    columns: FilterOption[];
+    columnGroups: FilterOption[][];
+    rows: FilterOption[];
+    rowGroups: FilterOption[][];
+  },
+  fullTableSubjectMeta: FullTableMeta,
+) => {
+  /**
+   * config filters only contain `values`.
+   * This function remaps the config from the filters in the subjectMeta
+   */
+  let mappedRows = [];
+  let mappedColumns = [];
+
+  const mappedRowGroups: (LocationFilter | CategoryFilter | any)[][] = [];
+  const mappedColumnGroups: (LocationFilter | CategoryFilter | any)[][] = [];
+
+  const initialValue = columns[0].value;
+  // rows/columns can only be TimePeriods / Indicators
+  // eslint-disable-next-line no-restricted-globals
+  if (isNaN(Number(initialValue))) {
+    // if NaN then timePeriod
+    mappedColumns = columns.map(({ value }) => {
+      return fullTableSubjectMeta.timePeriodRange.find(
+        timePeriod => `${timePeriod.year}_${timePeriod.code}` === value,
+      );
+    });
+    mappedRows = rows.map(({ value }) => {
+      return fullTableSubjectMeta.indicators.find(
+        indicator => indicator.value === value,
+      );
+    });
+  } else {
+    mappedRows = rows.map(({ value }) => {
+      return fullTableSubjectMeta.timePeriodRange.find(
+        timePeriod => `${timePeriod.year}_${timePeriod.code}` === value,
+      );
+    });
+    mappedColumns = columns.map(({ value }) => {
+      return fullTableSubjectMeta.indicators.find(
+        indicator => indicator.value === value,
+      );
+    });
+  }
+
+  // rowGroups/columnGroups can only be filters and locations
+  const locationAndFilterGroups: (LocationFilter | CategoryFilter)[][] = [
+    ...Object.values(
+      transformTableMetaFiltersToCategoryFilters(fullTableSubjectMeta.filters),
+    ),
+    fullTableSubjectMeta.locations,
+  ];
+
+  rowGroups.forEach((rowGroup, index) => {
+    let currentIndex = 0;
+    for (let i = 0; i < locationAndFilterGroups.length; i += 1) {
+      if (
+        locationAndFilterGroups[i].find(
+          element => element.value === rowGroup[0].value,
+        )
+      ) {
+        currentIndex = i;
+        break;
+      }
+    }
+
+    mappedRowGroups[index] = rowGroup.map(({ value }) =>
+      locationAndFilterGroups[currentIndex].find(
+        element => element.value === value,
+      ),
+    );
+    locationAndFilterGroups.splice(currentIndex, 1);
+  });
+
+  columnGroups.forEach((columnGroup, index) => {
+    let currentIndex = 0;
+    for (let i = 0; i < locationAndFilterGroups.length; i += 1) {
+      if (
+        locationAndFilterGroups[i].find(
+          element => element.value === columnGroup[0].value,
+        )
+      ) {
+        currentIndex = i;
+        break;
+      }
+    }
+
+    mappedColumnGroups[index] = columnGroup.map(({ value }) =>
+      locationAndFilterGroups[currentIndex].find(
+        element => element.value === value,
+      ),
+    );
+    locationAndFilterGroups.splice(currentIndex, 1);
+  });
+
+  return {
+    columns: mappedColumns,
+    columnGroups: mappedColumnGroups,
+    rows: mappedRows,
+    rowGroups: mappedRowGroups,
+  };
+};
+
+const mapPermalink = (unmappedPermalink: any) => {
+  const mappedFullTable = {
+    ...unmappedPermalink.fullTable,
+    subjectMeta: {
+      ...unmappedPermalink.fullTable.subjectMeta,
+      indicators: unmappedPermalink.fullTable.subjectMeta.indicators.map(
+        (indicator: { label: string; unit: string; value: string }) =>
+          new Indicator(indicator),
+      ),
+      locations: unmappedPermalink.fullTable.subjectMeta.locations.map(
+        (location: { label: string; level: string; value: string }) =>
+          new LocationFilter(location, location.level),
+      ),
+      timePeriodRange: unmappedPermalink.fullTable.subjectMeta.timePeriodRange.map(
+        (timePeriod: { code: string; label: string; year: number }) =>
+          new TimePeriod(timePeriod),
+      ),
+    },
+  };
+
+  return {
+    ...unmappedPermalink,
+    fullTable: mappedFullTable,
+    configuration: {
+      tableHeadersConfig: reverseMapTableHeadersConfig(
+        unmappedPermalink.configuration.tableHeadersConfig,
+        mappedFullTable.subjectMeta,
+      ),
+    },
+  };
+};
+
 export default {
+  createTablePermalink(query: PermalinkCreate): Promise<Permalink> {
+    return dataApi.post('/permalink', query);
+  },
   getPermalink(publicationSlug: string): Promise<Permalink> {
     return dataApi.get(`Permalink/${publicationSlug}`);
   },
-  createTablePermalink(
-    query: PermalinkCreate,
-  ): Promise<{
-    id: string;
-    title: string;
-    created: string;
-    url: string;
-  }> {
-    return dataApi.post('/permalink', query);
-  },
+  mapPermalink,
 };
