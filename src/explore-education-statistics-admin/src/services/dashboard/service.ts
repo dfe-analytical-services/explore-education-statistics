@@ -1,3 +1,4 @@
+import {UserDetails} from "@admin/services/common/types";
 import {
   publicationPolyfilla,
   releasePolyfilla,
@@ -17,6 +18,7 @@ export interface DashboardService {
   ): Promise<AdminDashboardPublication[]>;
   getDraftReleases(): Promise<AdminDashboardRelease[]>;
   getScheduledReleases(): Promise<AdminDashboardRelease[]>;
+  getPreReleaseContacts(): Promise<UserDetails[]>;
 }
 
 const service: DashboardService = {
@@ -41,6 +43,10 @@ const service: DashboardService = {
     return client
       .get<AdminDashboardRelease[]>('/releases/scheduled')
       .then(releases => releases.map(releasePolyfilla));
+  },
+  getPreReleaseContacts(): Promise<UserDetails[]> {
+    return client
+      .get<UserDetails[]>('/prerelease/contacts');
   },
 };
 

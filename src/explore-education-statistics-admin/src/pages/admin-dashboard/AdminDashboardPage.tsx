@@ -1,22 +1,25 @@
 import ButtonLink from "@admin/components/ButtonLink";
 import Link from '@admin/components/Link';
-import { LoginContext } from '@admin/components/Login';
+import {LoginContext} from '@admin/components/Login';
 import Page from '@admin/components/Page';
 import ReleasesTab from '@admin/pages/admin-dashboard/components/ReleasesByStatusTab';
 import {summaryRoute} from "@admin/routes/edit-release/routes";
+import {UserDetails} from "@admin/services/common/types";
 import dashboardService from '@admin/services/dashboard/service';
-import { AdminDashboardRelease } from '@admin/services/dashboard/types';
+import {AdminDashboardRelease} from '@admin/services/dashboard/types';
 import loginService from '@admin/services/sign-in/service';
+import FormSelect from "@common/components/form/FormSelect";
 import RelatedInformation from '@common/components/RelatedInformation';
 import SummaryListItem from "@common/components/SummaryListItem";
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import React, { useContext, useEffect, useState } from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import MyPublicationsTab from './components/MyPublicationsTab';
 
 interface Model {
   draftReleases: AdminDashboardRelease[];
   scheduledReleases: AdminDashboardRelease[];
+  preReleaseContacts: UserDetails[];
 }
 
 const AdminDashboardPage = () => {
@@ -28,10 +31,12 @@ const AdminDashboardPage = () => {
     Promise.all([
       dashboardService.getDraftReleases(),
       dashboardService.getScheduledReleases(),
-    ]).then(([draft, scheduled]) => {
+      dashboardService.getPreReleaseContacts(),
+    ]).then(([draftReleases, scheduledReleases, preReleaseContacts]) => {
       setModel({
-        draftReleases: draft,
-        scheduledReleases: scheduled,
+        draftReleases,
+        scheduledReleases,
+        preReleaseContacts,
       });
     });
   }, []);
@@ -101,9 +106,33 @@ const AdminDashboardPage = () => {
                     Preview release
                   </ButtonLink>
                 )}
-                afterCommentsSection={release => (
-                  <SummaryListItem term="Pre release access">
-                    hello
+                afterCommentsSection={_ => (
+                  <SummaryListItem
+                    term="Pre release access"
+                    actions={(
+                      <Link to='' onClick={() => {}}>
+                        Add another
+                      </Link>
+                    )}
+                  >
+                    <FormSelect
+                      id='preReleaseAccessContact'
+                      name='preReleaseAccessContact'
+                      label=''
+                      options={[
+                        {
+                          label: 'Please select',
+                          value: '',
+                        },
+                        ...model.preReleaseContacts.map(contact => ({
+                          label: contact.name,
+                          value: contact.id,
+                        })),
+                      ]}
+                      order={[]}
+                      className='govuk-!-width-full'
+                      onChange={() => {}}
+                    />
                   </SummaryListItem>
                 )}
               />
