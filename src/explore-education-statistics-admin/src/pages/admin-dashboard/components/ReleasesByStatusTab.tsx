@@ -1,7 +1,7 @@
 import ReleaseSummary from '@admin/pages/admin-dashboard/components/ReleaseSummary';
 import { AdminDashboardRelease } from '@admin/services/dashboard/types';
 import { Dictionary } from '@common/types';
-import React, {ReactNode} from 'react';
+import React, { ReactNode } from 'react';
 
 interface Props {
   noReleasesMessage: string;
@@ -9,7 +9,11 @@ interface Props {
   actions: (release: AdminDashboardRelease) => ReactNode;
 }
 
-const ReleasesByStatusTab = ({ releases, noReleasesMessage, actions }: Props) => {
+const ReleasesByStatusTab = ({
+  releases,
+  noReleasesMessage,
+  actions,
+}: Props) => {
   const releasesByPublication: Dictionary<AdminDashboardRelease[]> = {};
 
   releases.forEach(release => {
@@ -31,7 +35,6 @@ const ReleasesByStatusTab = ({ releases, noReleasesMessage, actions }: Props) =>
               {releasesByPublication[publication].map(release => (
                 <ReleaseSummary
                   key={release.id}
-                  publicationId={release.publicationId}
                   release={release}
                   actions={actions(release)}
                 />

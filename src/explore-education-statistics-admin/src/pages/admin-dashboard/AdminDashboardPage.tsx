@@ -1,9 +1,9 @@
-import ButtonLink from "@admin/components/ButtonLink";
+import ButtonLink from '@admin/components/ButtonLink';
 import Link from '@admin/components/Link';
 import { LoginContext } from '@admin/components/Login';
 import Page from '@admin/components/Page';
 import ReleasesTab from '@admin/pages/admin-dashboard/components/ReleasesByStatusTab';
-import {summaryRoute} from "@admin/routes/edit-release/routes";
+import { summaryRoute } from '@admin/routes/edit-release/routes';
 import dashboardService from '@admin/services/dashboard/service';
 import { AdminDashboardRelease } from '@admin/services/dashboard/types';
 import loginService from '@admin/services/sign-in/service';
@@ -82,7 +82,12 @@ const AdminDashboardPage = () => {
                 releases={model.draftReleases}
                 noReleasesMessage="There are currently no draft releases"
                 actions={release => (
-                  <ButtonLink to={summaryRoute.generateLink(release.publicationId, release.id)}>
+                  <ButtonLink
+                    to={summaryRoute.generateLink(
+                      release.publicationId,
+                      release.id,
+                    )}
+                  >
                     View and edit release
                   </ButtonLink>
                 )}
@@ -96,7 +101,12 @@ const AdminDashboardPage = () => {
                 releases={model.scheduledReleases}
                 noReleasesMessage="There are currently no scheduled releases"
                 actions={release => (
-                  <ButtonLink to={summaryRoute.generateLink(release.publicationId, release.id)}>
+                  <ButtonLink
+                    to={summaryRoute.generateLink(
+                      release.publicationId,
+                      release.id,
+                    )}
+                  >
                     Preview release
                   </ButtonLink>
                 )}

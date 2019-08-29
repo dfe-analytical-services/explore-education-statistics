@@ -1,12 +1,19 @@
-import {LoginContext} from '@admin/components/Login';
-import {dayMonthYearIsComplete, dayMonthYearToDate,} from '@admin/services/common/types';
-import {AdminDashboardRelease, Comment, ReleaseStatus,} from '@admin/services/dashboard/types';
+import { LoginContext } from '@admin/components/Login';
+import {
+  dayMonthYearIsComplete,
+  dayMonthYearToDate,
+} from '@admin/services/common/types';
+import {
+  AdminDashboardRelease,
+  Comment,
+  ReleaseStatus,
+} from '@admin/services/dashboard/types';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import {format} from 'date-fns';
-import React, {ReactNode, useContext} from 'react';
+import { format } from 'date-fns';
+import React, { ReactNode, useContext } from 'react';
 
 const getLiveLatestLabel = (isLive: boolean, isLatest: boolean) => {
   if (isLive && isLatest) {
@@ -32,12 +39,11 @@ const getStatusLabel = (approvalStatus: ReleaseStatus) => {
 };
 
 interface Props {
-  publicationId: string;
   release: AdminDashboardRelease;
   actions: ReactNode;
 }
 
-const ReleaseSummary = ({ publicationId, release, actions }: Props) => {
+const ReleaseSummary = ({ release, actions }: Props) => {
   const authentication = useContext(LoginContext);
 
   const editorName =
@@ -108,12 +114,9 @@ const ReleaseSummary = ({ publicationId, release, actions }: Props) => {
       </SummaryList>
 
       <div className="govuk-grid-row">
-        <div className="govuk-grid-column-one-half">
-          {actions}
-        </div>
+        <div className="govuk-grid-column-one-half">{actions}</div>
         <div className="govuk-grid-column-one-half dfe-align--right" />
       </div>
-
     </Details>
   );
 };
