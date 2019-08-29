@@ -18,7 +18,10 @@ export interface DashboardService {
   ): Promise<AdminDashboardPublication[]>;
   getDraftReleases(): Promise<AdminDashboardRelease[]>;
   getScheduledReleases(): Promise<AdminDashboardRelease[]>;
-  getPreReleaseContacts(): Promise<UserDetails[]>;
+  getAvailablePreReleaseContacts(): Promise<UserDetails[]>;
+  getPreReleaseContactsForRelease(releaseId: string): Promise<UserDetails[]>;
+  addPreReleaseContactToRelease(releaseId: string, preReleaseContactId: string): Promise<UserDetails[]>;
+  removePreReleaseContactFromRelease(releaseId: string, preReleaseContactId: string): Promise<UserDetails[]>;
 }
 
 const service: DashboardService = {
@@ -44,9 +47,21 @@ const service: DashboardService = {
       .get<AdminDashboardRelease[]>('/releases/scheduled')
       .then(releases => releases.map(releasePolyfilla));
   },
-  getPreReleaseContacts(): Promise<UserDetails[]> {
+  getAvailablePreReleaseContacts(): Promise<UserDetails[]> {
     return client
       .get<UserDetails[]>('/prerelease/contacts');
+  },
+  getPreReleaseContactsForRelease(releaseId): Promise<UserDetails[]> {
+    return client
+      .get<UserDetails[]>(`/release/${releaseId}/prerelease-contacts`);
+  },
+  addPreReleaseContactToRelease(releaseId, preReleaseContactId: string): Promise<UserDetails[]> {
+    return client
+      .post<UserDetails[]>(`/release/${releaseId}/prerelease-contact/${preReleaseContactId}`);
+  },
+  removePreReleaseContactFromRelease(releaseId, preReleaseContactId: string): Promise<UserDetails[]> {
+    return client
+      .delete<UserDetails[]>(`/release/${releaseId}/prerelease-contact/${preReleaseContactId}`);
   },
 };
 

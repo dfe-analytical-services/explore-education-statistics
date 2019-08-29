@@ -13,13 +13,15 @@ import RelatedInformation from '@common/components/RelatedInformation';
 import SummaryListItem from "@common/components/SummaryListItem";
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
+import {Dictionary} from "@common/types";
 import React, {useContext, useEffect, useState} from 'react';
 import MyPublicationsTab from './components/MyPublicationsTab';
 
 interface Model {
   draftReleases: AdminDashboardRelease[];
   scheduledReleases: AdminDashboardRelease[];
-  preReleaseContacts: UserDetails[];
+  availablePreReleaseContacts: UserDetails[];
+  preReleaseContactsByScheduledRelease: Dictionary<UserDetails[]>;
 }
 
 const AdminDashboardPage = () => {
@@ -31,12 +33,29 @@ const AdminDashboardPage = () => {
     Promise.all([
       dashboardService.getDraftReleases(),
       dashboardService.getScheduledReleases(),
-      dashboardService.getPreReleaseContacts(),
-    ]).then(([draftReleases, scheduledReleases, preReleaseContacts]) => {
-      setModel({
-        draftReleases,
-        scheduledReleases,
-        preReleaseContacts,
+      dashboardService.getAvailablePreReleaseContacts(),
+    ]).then(([draftReleases, scheduledReleases, availablePreReleaseContacts]) => {
+
+      const contactResultsByRelease =
+        scheduledReleases.map(release =>
+          dashboardService.getPreReleaseContactsForRelease(release.id).
+          then(contacts => ({
+            releaseId: release.id,
+            contacts,
+          })));
+
+      Promise.all(contactResultsByRelease).then(contactResults => {
+        const preReleaseContactsByScheduledRelease: Dictionary<UserDetails[]> = {};
+        contactResults.forEach(result => {
+          const {releaseId, contacts} = result;
+          preReleaseContactsByScheduledRelease[releaseId] = contacts;
+        })
+        setModel({
+          draftReleases,
+          scheduledReleases,
+          availablePreReleaseContacts,
+          preReleaseContactsByScheduledRelease,
+        });
       });
     });
   }, []);
@@ -106,7 +125,7 @@ const AdminDashboardPage = () => {
                     Preview release
                   </ButtonLink>
                 )}
-                afterCommentsSection={_ => (
+                afterCommentsSection={release => (
                   <SummaryListItem
                     term="Pre release access"
                     actions={(
@@ -124,14 +143,17 @@ const AdminDashboardPage = () => {
                           label: 'Please select',
                           value: '',
                         },
-                        ...model.preReleaseContacts.map(contact => ({
+                        ...model.availablePreReleaseContacts.map(contact => ({
                           label: contact.name,
                           value: contact.id,
                         })),
                       ]}
                       order={[]}
                       className='govuk-!-width-full'
-                      onChange={() => {}}
+                      onChange={async event => {
+                        await dashboardService.addPreReleaseContactToRelease(release.id, event.target.value);
+
+                      }}
                     />
                   </SummaryListItem>
                 )}

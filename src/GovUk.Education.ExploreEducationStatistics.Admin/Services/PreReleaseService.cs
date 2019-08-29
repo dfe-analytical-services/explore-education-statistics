@@ -1,28 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class PreReleaseService : IPreReleaseService
     {
-        /*
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
-
-        public PreReleaseService(ApplicationDbContext context, IMapper mapper)
+        private readonly IReleaseService _releaseService;
+        private readonly ILogger<PreReleaseService> _logger;
+        
+        // TODO remove when we have Users to link to a Release for its Pre Release Contacts
+        private readonly Dictionary<Guid, List<UserDetailsViewModel>> _preReleaseContactsByRelease;
+        private readonly List<UserDetailsViewModel> _availablePreReleaseContacts;
+            
+        public PreReleaseService(ApplicationDbContext context, IMapper mapper, IReleaseService releaseService, ILogger<PreReleaseService> logger)
         {
             _context = context;
             _mapper = mapper;
-        }
-        */
-
-        public async Task<List<UserDetailsViewModel>> GetPreReleaseContactsAsync()
-        {
-            // TODO return a list of candidate Users once we have a concept of Users in the database
-            return await Task.FromResult(new List<UserDetailsViewModel>()
+            _releaseService = releaseService;
+            _logger = logger;
+            _availablePreReleaseContacts = new List<UserDetailsViewModel>()
             {
                 new UserDetailsViewModel()
                 {
@@ -39,7 +44,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     Id = new Guid("513e2657-d1a8-4d30-afb3-8d382cc4ddee"),
                     Name = "TODO Pre Release User 3",
                 },
-            });
+            };
+            _preReleaseContactsByRelease = new Dictionary<Guid, List<UserDetailsViewModel>>();
+        }
+
+        public async Task<List<UserDetailsViewModel>> GetAvailablePreReleaseContactsAsync()
+        {
+            // TODO return a list of candidate Users once we have a concept of Users in the database
+            return await Task.FromResult(_availablePreReleaseContacts);
+        }
+        
+        // TODO revisit when we have the concept of Users int the database
+        public async Task<List<UserDetailsViewModel>> GetPreReleaseContactsForReleaseAsync(Guid releaseId)
+        {
+            return await Task.FromResult(_preReleaseContactsByRelease.GetValueOrDefault(releaseId, new List<UserDetailsViewModel>()));
+        }
+        
+        // TODO revisit when we have the concept of Users int the database
+        public async Task<List<UserDetailsViewModel>> AddPreReleaseContactToReleaseAsync(Guid releaseId, Guid userId)
+        {
+            _logger.Log(LogLevel.Debug, "Pre Release User " + userId + " added to Release " + releaseId);
+            
+            var chosenUser = _availablePreReleaseContacts.Find(contact => contact.Id.Equals(userId));
+            
+            if (_preReleaseContactsByRelease.ContainsKey(releaseId)) {
+                _preReleaseContactsByRelease[releaseId].Add(chosenUser);
+                
+            } else {
+                _preReleaseContactsByRelease.Add(releaseId, new List<UserDetailsViewModel>() { chosenUser });
+            }
+            return await Task.FromResult(_preReleaseContactsByRelease[releaseId]);
+        }
+        
+        // TODO revisit when we have the concept of Users int the database
+        public async Task<List<UserDetailsViewModel>> RemovePreReleaseContactFromReleaseAsync(Guid releaseId, Guid userId)
+        {
+            _logger.Log(LogLevel.Debug, "Pre Release User " + userId + " removed from Release " + releaseId);
+            
+            var chosenUser = _availablePreReleaseContacts.Find(contact => contact.Id.Equals(userId));
+            
+            if (_preReleaseContactsByRelease.ContainsKey(releaseId)) {
+                _preReleaseContactsByRelease[releaseId].Remove(chosenUser);
+            }
+
+            return await Task.FromResult(_preReleaseContactsByRelease[releaseId]);
         }
     }
 }
