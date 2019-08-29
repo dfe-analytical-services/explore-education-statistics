@@ -1,20 +1,20 @@
-import ButtonLink from "@admin/components/ButtonLink";
+import ButtonLink from '@admin/components/ButtonLink';
 import Link from '@admin/components/Link';
-import {LoginContext} from '@admin/components/Login';
+import { LoginContext } from '@admin/components/Login';
 import Page from '@admin/components/Page';
 import ReleasesTab from '@admin/pages/admin-dashboard/components/ReleasesByStatusTab';
-import {summaryRoute} from "@admin/routes/edit-release/routes";
-import {UserDetails} from "@admin/services/common/types";
+import { summaryRoute } from '@admin/routes/edit-release/routes';
+import { UserDetails } from '@admin/services/common/types';
 import dashboardService from '@admin/services/dashboard/service';
-import {AdminDashboardRelease} from '@admin/services/dashboard/types';
+import { AdminDashboardRelease } from '@admin/services/dashboard/types';
 import loginService from '@admin/services/sign-in/service';
-import FormSelect from "@common/components/form/FormSelect";
+import FormSelect from '@common/components/form/FormSelect';
 import RelatedInformation from '@common/components/RelatedInformation';
-import SummaryListItem from "@common/components/SummaryListItem";
+import SummaryListItem from '@common/components/SummaryListItem';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import {Dictionary} from "@common/types";
-import React, {useContext, useEffect, useState} from 'react';
+import { Dictionary } from '@common/types';
+import React, { useContext, useEffect, useState } from 'react';
 import MyPublicationsTab from './components/MyPublicationsTab';
 
 interface Model {
@@ -34,30 +34,34 @@ const AdminDashboardPage = () => {
       dashboardService.getDraftReleases(),
       dashboardService.getScheduledReleases(),
       dashboardService.getAvailablePreReleaseContacts(),
-    ]).then(([draftReleases, scheduledReleases, availablePreReleaseContacts]) => {
+    ]).then(
+      ([draftReleases, scheduledReleases, availablePreReleaseContacts]) => {
+        const contactResultsByRelease = scheduledReleases.map(release =>
+          dashboardService
+            .getPreReleaseContactsForRelease(release.id)
+            .then(contacts => ({
+              releaseId: release.id,
+              contacts,
+            })),
+        );
 
-      const contactResultsByRelease =
-        scheduledReleases.map(release =>
-          dashboardService.getPreReleaseContactsForRelease(release.id).
-          then(contacts => ({
-            releaseId: release.id,
-            contacts,
-          })));
-
-      Promise.all(contactResultsByRelease).then(contactResults => {
-        const preReleaseContactsByScheduledRelease: Dictionary<UserDetails[]> = {};
-        contactResults.forEach(result => {
-          const {releaseId, contacts} = result;
-          preReleaseContactsByScheduledRelease[releaseId] = contacts;
+        Promise.all(contactResultsByRelease).then(contactResults => {
+          const preReleaseContactsByScheduledRelease: Dictionary<
+            UserDetails[]
+          > = {};
+          contactResults.forEach(result => {
+            const { releaseId, contacts } = result;
+            preReleaseContactsByScheduledRelease[releaseId] = contacts;
+          });
+          setModel({
+            draftReleases,
+            scheduledReleases,
+            availablePreReleaseContacts,
+            preReleaseContactsByScheduledRelease,
+          });
         });
-        setModel({
-          draftReleases,
-          scheduledReleases,
-          availablePreReleaseContacts,
-          preReleaseContactsByScheduledRelease,
-        });
-      });
-    });
+      },
+    );
   }, []);
 
   return (
@@ -118,7 +122,12 @@ const AdminDashboardPage = () => {
                 releases={model.draftReleases}
                 noReleasesMessage="There are currently no draft releases"
                 actions={release => (
-                  <ButtonLink to={summaryRoute.generateLink(release.publicationId, release.id)}>
+                  <ButtonLink
+                    to={summaryRoute.generateLink(
+                      release.publicationId,
+                      release.id,
+                    )}
+                  >
                     View and edit release
                   </ButtonLink>
                 )}
@@ -132,7 +141,12 @@ const AdminDashboardPage = () => {
                 releases={model.scheduledReleases}
                 noReleasesMessage="There are currently no scheduled releases"
                 actions={release => (
-                  <ButtonLink to={summaryRoute.generateLink(release.publicationId, release.id)}>
+                  <ButtonLink
+                    to={summaryRoute.generateLink(
+                      release.publicationId,
+                      release.id,
+                    )}
+                  >
                     Preview release
                   </ButtonLink>
                 )}
@@ -140,50 +154,77 @@ const AdminDashboardPage = () => {
                 {release => (
                   <>
                     <SummaryListItem
-                      key='select'
+                      key="select"
                       term="Select pre release access"
                     >
                       <FormSelect
-                        id='preReleaseAccessContact'
-                        name='preReleaseAccessContact'
-                        label=''
+                        id="preReleaseAccessContact"
+                        name="preReleaseAccessContact"
+                        label=""
                         options={[
                           {
                             label: 'Please select',
                             value: '',
                           },
-                          ...model.availablePreReleaseContacts.map(contact => ({
-                            label: contact.name,
-                            value: contact.id,
-                          })),
+                          ...model.availablePreReleaseContacts
+                            .filter(
+                              contact =>
+                                !model.preReleaseContactsByScheduledRelease[
+                                  release.id
+                                ].find(c => c.id === contact.id),
+                            )
+                            .map(contact => ({
+                              label: contact.name,
+                              value: contact.id,
+                            })),
                         ]}
                         order={[]}
-                        className='govuk-!-width-full'
+                        className="govuk-!-width-full"
                         onChange={async event => {
-                          const updatedContacts = await dashboardService.addPreReleaseContactToRelease(release.id, event.target.value);
+                          const updatedContacts = await dashboardService.addPreReleaseContactToRelease(
+                            release.id,
+                            event.target.value,
+                          );
                           setModel({
                             ...model,
                             preReleaseContactsByScheduledRelease: {
                               ...model.preReleaseContactsByScheduledRelease,
                               [release.id]: updatedContacts,
-                            }
-                          })
+                            },
+                          });
                         }}
                       />
                     </SummaryListItem>
-                    {model.preReleaseContactsByScheduledRelease[release.id].map(existingContact => (
-                      <SummaryListItem
-                        key={existingContact.id}
-                        term="Pre release access"
-                        actions={
-                          <Link to="" onClick={() => {}}>
-                            Remove
-                          </Link>
-                        }
-                      >
-                        {existingContact.name}
-                      </SummaryListItem>
-                    ))}
+                    {model.preReleaseContactsByScheduledRelease[release.id].map(
+                      existingContact => (
+                        <SummaryListItem
+                          key={existingContact.id}
+                          term="Pre release access"
+                          actions={
+                            <Link
+                              to=""
+                              onClick={async _ => {
+                                const updatedContacts = await dashboardService.removePreReleaseContactFromRelease(
+                                  release.id,
+                                  existingContact.id,
+                                );
+                                setModel({
+                                  ...model,
+                                  preReleaseContactsByScheduledRelease: {
+                                    ...model.preReleaseContactsByScheduledRelease,
+                                    [release.id]: updatedContacts,
+                                  },
+                                });
+                              }}
+                            >
+                              Remove
+                            </Link>
+                          }
+                        >
+                          {existingContact.name}
+                        </SummaryListItem>
+                      ),
+                    )}
                   </>
                 )}
               </ReleasesTab>

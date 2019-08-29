@@ -32,7 +32,7 @@ def wait_until_page_contains_xpath(context, selector):
             pass
         if elem is not None:
             return
-    raise Exception(f"Timeout! Couldn't find element with xpath selector '{selector}''")
+    raise Exception(f"Timeout! Couldn't find element with xpath selector '{selector}'")
     
 driver = webdriver.Chrome(executable_path=os.getcwd() + os.sep + "chromedriver")
 driver.get(args.url)
