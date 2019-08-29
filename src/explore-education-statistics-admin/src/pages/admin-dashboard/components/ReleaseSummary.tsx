@@ -1,12 +1,20 @@
-import {LoginContext} from '@admin/components/Login';
-import {dayMonthYearIsComplete, dayMonthYearToDate,} from '@admin/services/common/types';
-import {AdminDashboardRelease, Comment, ReleaseStatus,} from '@admin/services/dashboard/types';
+import { LoginContext } from '@admin/components/Login';
+import {
+  dayMonthYearIsComplete,
+  dayMonthYearToDate,
+} from '@admin/services/common/types';
+import {
+  AdminDashboardRelease,
+  Comment,
+  ReleaseStatus,
+} from '@admin/services/dashboard/types';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import {format} from 'date-fns';
-import React, {ReactNode, useContext} from 'react';
+import { format } from 'date-fns';
+import React, { ReactNode, useContext } from 'react';
+import Link from '@admin/components/Link';
 
 const getLiveLatestLabel = (isLive: boolean, isLatest: boolean) => {
   if (isLive && isLatest) {
@@ -93,6 +101,26 @@ const ReleaseSummary = ({ release, actions, afterCommentsSection }: Props) => {
           </SummaryListItem>
         )}
         {afterCommentsSection}
+        <SummaryListItem
+          term="Pre release access"
+          actions={
+            <Link to="" onClick={() => {}}>
+              Remove
+            </Link>
+          }
+        >
+          Pre release user 1
+        </SummaryListItem>
+        <SummaryListItem
+          term=""
+          actions={
+            <Link to="" onClick={() => {}}>
+              Remove
+            </Link>
+          }
+        >
+          Pre release user 2
+        </SummaryListItem>
         <SummaryListItem term="Last edited" detailsNoMargin>
           <FormattedDate>{release.lastEditedDateTime}</FormattedDate>
           {' at '}
@@ -109,12 +137,9 @@ const ReleaseSummary = ({ release, actions, afterCommentsSection }: Props) => {
       </SummaryList>
 
       <div className="govuk-grid-row">
-        <div className="govuk-grid-column-one-half">
-          {actions}
-        </div>
+        <div className="govuk-grid-column-one-half">{actions}</div>
         <div className="govuk-grid-column-one-half dfe-align--right" />
       </div>
-
     </Details>
   );
 };
