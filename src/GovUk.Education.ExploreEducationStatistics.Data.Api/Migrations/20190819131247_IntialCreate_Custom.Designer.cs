@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 {
-    [DbContext(typeof(ApplicationDbContext))]
+    [DbContext(typeof(StatisticsDbContext))]
     [Migration("20190819131247_IntialCreate_Custom")]
     partial class IntialCreate_Custom
     {
