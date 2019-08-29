@@ -18,14 +18,14 @@ import LineChartBlock from '@common/modules/find-statistics/components/charts/Li
 import MapBlock from '@common/modules/find-statistics/components/charts/MapBlock';
 import VerticalBarBlock from '@common/modules/find-statistics/components/charts/VerticalBarBlock';
 import {
-  DataBlockResponse,
   DataBlockRerequest,
+  DataBlockResponse,
 } from '@common/services/dataBlockService';
 import {
   AxisConfiguration,
+  Chart,
   ChartDataSet,
   DataSetConfiguration,
-  Chart,
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import React from 'react';
@@ -34,6 +34,7 @@ import ChartConfiguration, {
 } from '@admin/modules/chart-builder/ChartConfiguration';
 import classnames from 'classnames';
 import Infographic from '@common/modules/find-statistics/components/charts/Infographic';
+import service from '@admin/services/release/edit-release/data/service';
 import ChartAxisConfiguration from './ChartAxisConfiguration';
 import ChartTypeSelector from './ChartTypeSelector';
 import styles from './graph-builder.module.scss';
@@ -183,8 +184,10 @@ const ChartBuilder = ({
   React.useEffect(() => {
     if (
       selectedChartType &&
-      majorAxisDataSets.length > 0 &&
-      axesConfiguration.major
+      (selectedChartType.axes.length === 0 ||
+        (selectedChartType.axes.length > 0 &&
+          majorAxisDataSets.length > 0 &&
+          axesConfiguration.major))
     ) {
       setRenderedChartProps({
         type: selectedChartType.type,
@@ -204,6 +207,7 @@ const ChartBuilder = ({
           },
         },
         labels: chartLabels,
+        chartFileDownloadService: service.createDownloadChartFileLink,
 
         ...chartOptions,
       });
@@ -364,7 +368,10 @@ const ChartBuilder = ({
       <div className="govuk-!-margin-top-6 govuk-body-s dfe-align--right">
         <a
           href="#"
-          onClick={() => setSelectedChartType(Infographic.definition)}
+          onClick={e => {
+            e.preventDefault();
+            setSelectedChartType(Infographic.definition);
+          }}
         >
           Choose an infographic as alternative
         </a>
@@ -380,7 +387,13 @@ const ChartBuilder = ({
                 height: chartOptions.height && `${chartOptions.height}px`,
               }}
             >
-              <span>Add data to view a preview of the chart</span>
+              {selectedChartType.axes.length > 0 ? (
+                <span>Add data to view a preview of the chart</span>
+              ) : (
+                <span>
+                  Configure the {selectedChartType.name} to view a preview
+                </span>
+              )}
             </div>
           ) : (
             <ChartRenderer {...renderedChartProps} />
@@ -423,6 +436,7 @@ const ChartBuilder = ({
                 })
               }
               meta={data.metaData}
+              data={data}
             />
           </TabsSection>
 

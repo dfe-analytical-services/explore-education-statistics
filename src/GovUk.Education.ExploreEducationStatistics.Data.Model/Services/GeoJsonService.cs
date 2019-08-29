@@ -6,9 +6,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
     public class GeoJsonService : IGeoJsonService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly StatisticsDbContext _context;
 
-        public GeoJsonService(ApplicationDbContext context)
+        public GeoJsonService(StatisticsDbContext context)
         {
             _context = context;
         }

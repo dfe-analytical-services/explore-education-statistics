@@ -1,6 +1,14 @@
 ﻿using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.AzureAD.UI;
 using Microsoft.AspNetCore.Authorization;
@@ -10,16 +18,15 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Services;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
+using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Swagger;
+using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
+using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
@@ -47,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
-            services.AddAutoMapper();
+            services.AddAutoMapper(typeof(Startup).Assembly);
             services.AddMvc(options =>
                 {
                     var policy = new AuthorizationPolicyBuilder()
@@ -55,13 +62,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                         .Build();
                     options.Filters.Add(new AuthorizeFilter(policy));
                 })
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+                .AddJsonOptions(options => {
+                    options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+                });
 
             services.AddDbContext<ApplicationDbContext>(options =>
                 options
                     .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
                         builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
                     .EnableSensitiveDataLogging()
+            );
+            
+            services.AddDbContext<StatisticsDbContext>(options =>
+                options
+                    .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"),
+                        builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
+                    .EnableSensitiveDataLogging()
+                    .ConfigureWarnings(builder => builder.Ignore(RelationalEventId.ValueConversionSqlLiteralWarning))
             );
 
             // In production, the React files will be served from this directory
@@ -81,11 +99,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IDataBlockService, DataBlockService>();
             services.AddTransient<IPreReleaseService, PreReleaseService>();
             
+            services.AddTransient<IBoundaryLevelService, BoundaryLevelService>();
             services.AddTransient<IDataService<ResultWithMetaViewModel>, DataService>();
             services.AddTransient<IDataService<TableBuilderResultViewModel>, TableBuilderDataService>();
+            services.AddTransient<IFilterItemService, FilterItemService>();
+            services.AddTransient<IFootnoteService, FootnoteService>();
+            services.AddTransient<IGeoJsonService, GeoJsonService>();
+            services.AddTransient<IIndicatorGroupService, IndicatorGroupService>();
+            services.AddTransient<IIndicatorService, IndicatorService>();
+            services.AddTransient<ILocationService, LocationService>();
             services.AddTransient<IObservationService, ObservationService>();
             services.AddTransient<IPublicationMetaService, PublicationMetaService>();
             services.AddTransient<IResultBuilder<Observation, ObservationViewModel>, ResultBuilder>();
+            services.AddTransient<Data.Model.Services.Interfaces.IReleaseService, Data.Model.Services.ReleaseService>();
+            services.AddTransient<ISubjectService, SubjectService>();
             services.AddTransient<ISubjectMetaService, SubjectMetaService>();
             services.AddTransient<ITimePeriodService, TimePeriodService>();
             services.AddTransient<ITableBuilderSubjectMetaService, TableBuilderSubjectMetaService>();
@@ -100,6 +127,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            UpdateDatabase(app);
+            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -161,6 +190,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     spa.UseReactDevelopmentServer("start");
                 }
             });
+        }
+        
+        private static void UpdateDatabase(IApplicationBuilder app)
+        {
+            using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
+                .CreateScope())
+            {
+                using (var context = serviceScope.ServiceProvider.GetService<StatisticsDbContext>())
+                {
+                    context.Database.SetCommandTimeout(int.MaxValue);
+                    context.Database.Migrate();
+                }
+            }
         }
     }
 }
