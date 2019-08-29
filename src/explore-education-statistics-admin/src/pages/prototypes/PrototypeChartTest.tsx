@@ -1,17 +1,18 @@
 import ChartBuilder from '@admin/modules/chart-builder/ChartBuilder';
 import PrototypePage from '@admin/pages/prototypes/components/PrototypePage';
-import { ChartRendererProps } from '@common/modules/find-statistics/components/ChartRenderer';
-import DataBlockService, {
-  DataBlockRequest,
-  DataBlockResponse,
-  DataBlockRerequest,
-} from '@common/services/dataBlockService';
-import React from 'react';
-import { ChartType, Chart } from '@common/services/publicationService';
 import { FormSelect } from '@common/components/form';
 import { SelectOption } from '@common/components/form/FormSelect';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import { ChartRendererProps } from '@common/modules/find-statistics/components/ChartRenderer';
+import DataBlockService, {
+  DataBlockRequest,
+  DataBlockRerequest,
+  DataBlockResponse,
+} from '@common/services/dataBlockService';
+import { Chart, ChartType } from '@common/services/publicationService';
+import React from 'react';
 
+// @ts-ignore
 const options: ({ json: string; initialOptions?: Chart } & SelectOption)[] = [
   {
     label: 'Regional Absence',
@@ -153,6 +154,36 @@ const options: ({ json: string; initialOptions?: Chart } & SelectOption)[] = [
       },
     },
   },
+
+  {
+    label: '2',
+    value: '2',
+    json: `
+{
+  "subjectId": 1,
+  "geographicLevel": "Local_Authority_District",
+  "timePeriod": {
+    "startYear": "2016",
+    "startCode": "AY",
+    "endYear": "2017",
+    "endCode": "AY"
+  },
+  "filters": [
+    "1",
+    "58"
+  ],
+  "indicators": [
+    "23",
+    "26",
+    "28"
+  ],
+  "country": null,
+  "localAuthority": null,
+  "region": null
+}
+    
+`,
+  },
 ];
 
 const initialState = 0;
@@ -188,7 +219,36 @@ const PrototypeChartTest = () => {
 
   // eslint-disable-next-line
   const onChartSave = (props: ChartRendererProps) => {
-    // console.log('Saved ', props);
+    const {
+      title,
+      labels,
+      axes,
+      stacked,
+      height,
+      fileId,
+      geographicId,
+      legend,
+      legendHeight,
+      type,
+      width,
+    } = props;
+
+    const chart: Chart = {
+      title,
+      labels,
+      axes,
+      stacked,
+      height,
+      fileId,
+      geographicId,
+      legend,
+      legendHeight,
+      type: type === 'unknown' ? undefined : type,
+      width,
+    };
+
+    // eslint-disable-next-line no-console
+    console.log('Saved ', JSON.stringify(chart, null, 2));
   };
 
   const reRequestdata = (reRequest: DataBlockRerequest) => {
