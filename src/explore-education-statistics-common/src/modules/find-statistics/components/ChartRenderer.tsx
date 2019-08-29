@@ -8,7 +8,7 @@ import Infographic, {
   InfographicChartProps,
 } from '@common/modules/find-statistics/components/charts/Infographic';
 import { ChartProps, StackedBarProps } from './charts/ChartFunctions';
-import { MapProps} from './charts/MapBlock';
+import { MapProps } from './charts/MapBlock';
 
 const DynamicMapBlock = dynamic(
   () => import('@common/modules/find-statistics/components/charts/MapBlock'),
