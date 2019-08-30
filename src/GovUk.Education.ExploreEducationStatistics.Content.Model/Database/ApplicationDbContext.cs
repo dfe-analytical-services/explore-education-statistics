@@ -1697,6 +1697,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new ContentSection
                         {
+                            Id = new Guid("24c6e9a3-1415-4ca5-9f21-b6b51cb7ba94"),
                             Order = 1, Heading = "About these statistics", Caption = "",
                             Content = new List<IContentBlock>
                             {
@@ -1716,6 +1717,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("8965ef44-5ad7-4ab0-a142-78453d6f40af"),
                             Order = 2, Heading = "Pupil absence rates", Caption = "",
                             Content = new List<IContentBlock>
                             {
@@ -1865,6 +1867,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("6f493eee-443a-4403-9069-fef82e2f5788"),
                             Order = 3, Heading = "Persistent absence", Caption = "",
                             Content = new List<IContentBlock>
                             {
@@ -1887,6 +1890,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("fbf99442-3b72-46bc-836d-8866c552c53d"),
                             Order = 4, Heading = "Reasons for absence", Caption = "",
                             Content = new List<IContentBlock>
                             {
@@ -1919,6 +1923,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("6898538c-3f8d-488d-9e50-12ca7a9fd70c"),
                             Order = 5, Heading = "Distribution of absence", Caption = "",
                             Content = new List<IContentBlock>
                             {
@@ -1939,6 +1944,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("08b204a2-0eeb-4797-9e0b-a1274e7f6a38"),
                             Order = 6, Heading = "Absence by pupil characteristics", Caption = "",
                             Content = new List<IContentBlock>
                             {
@@ -1978,6 +1984,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("60f8c7ca-faff-4f0d-937d-17fe376461cf"),
                             Order = 7, Heading = "Absence for 4-year-olds", Caption = "",
                             Content = new List<IContentBlock>
                             {
@@ -1991,6 +1998,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("d5d604af-6b63-4a51-b106-0c09b8dbedfa"),
                             Order = 8, Heading = "Pupil referral unit absence", Caption = "",
                             Content = new List<IContentBlock>
                             {
@@ -2004,6 +2012,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("68e3028c-1291-42b3-9e7c-9be285dac9a1"),
                             Order = 9, Heading = "Regional and local authority (LA) breakdown", Caption = "",
                             Content = new List<IContentBlock>
                             {
@@ -2168,13 +2177,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
                     Content = new List<ContentSection>
                     {
-                        new ContentSection {Order = 1, Heading = "About these statistics", Caption = ""},
-                        new ContentSection {Order = 2, Heading = "Absence rates", Caption = ""},
-                        new ContentSection {Order = 3, Heading = "Persistent absence", Caption = ""},
-                        new ContentSection {Order = 4, Heading = "Distribution of absence", Caption = ""},
-                        new ContentSection {Order = 5, Heading = "Absence for four year olds", Caption = ""},
-                        new ContentSection {Order = 6, Heading = "Pupil referral unit absence", Caption = ""},
-                        new ContentSection {Order = 7, Heading = "Pupil absence by local authority", Caption = ""}
+                        new ContentSection {Id = new Guid("2156be8b-e23d-47d5-a810-14ab38cdced2"),Order = 1, Heading = "About these statistics", Caption = ""},
+                        new ContentSection {Id = new Guid("41456978-aafa-4e12-9d4a-4c2fc5081d8c"),Order = 2, Heading = "Absence rates", Caption = ""},
+                        new ContentSection {Id = new Guid("c513beea-398c-4e2b-89be-957fb8666c52"),Order = 3, Heading = "Persistent absence", Caption = ""},
+                        new ContentSection {Id = new Guid("117d6c6f-d54e-4ef4-8725-2197f705928d"),Order = 4, Heading = "Distribution of absence", Caption = ""},
+                        new ContentSection {Id = new Guid("67b58ac6-1a11-487c-aae5-a49df5edd471"),Order = 5, Heading = "Absence for four year olds", Caption = ""},
+                        new ContentSection {Id = new Guid("498513ae-c191-4ddf-9aa4-aa5e5c2a0718"),Order = 6, Heading = "Pupil referral unit absence", Caption = ""},
+                        new ContentSection {Id = new Guid("af3ab12b-ae97-479f-a3c8-d6f70c8208a4"),Order = 7, Heading = "Pupil absence by local authority", Caption = ""}
                     }
                 },
 
@@ -2320,6 +2329,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new ContentSection
                         {
+                            Id = new Guid("b7a968ab-eb49-4100-b133-3d9d94f23d60"),
                             Order = 1, Heading = "About this release", Caption = "",
                             Content = new List<IContentBlock>
                             {
@@ -2337,6 +2347,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("6ed87fd1-81a5-46dc-8841-4598bdae7fee"),
                             Order = 2, Heading = "Permanent exclusions", Caption = "",
                             Content = new List<IContentBlock>
                             {
@@ -2445,6 +2456,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("7981db34-afdb-4f84-99e8-bfd43e58f16d"),
                             Order = 3, Heading = "Fixed-period exclusions", Caption = "",
                             Content = new List<IContentBlock>
                             {
@@ -2554,6 +2566,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("50e7ca4c-e6c7-4ccd-afc1-93ee4298f358"),
                             Order = 4, Heading = "Number and length of fixed-period exclusions",
                             Caption = "",
                             Content = new List<IContentBlock>
@@ -2573,6 +2586,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("015d0cdd-6630-4b57-9ef3-7341fc3d573e"),
                             Order = 5, Heading = "Reasons for exclusions", Caption = "",
                             Content = new List<IContentBlock>
                             {
@@ -2594,6 +2608,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("5600ca55-6800-418a-94a5-2f3c3310304e"),
                             Order = 6, Heading = "Exclusions by pupil characteristics", Caption = "",
                             Content = new List<IContentBlock>
                             {
@@ -2626,6 +2641,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("68f8b290-4b7c-4cac-b0d9-0263609c341b"),
                             Order = 7, Heading = "Independent exclusion reviews", Caption = "",
                             Content = new List<IContentBlock>
                             {
@@ -2638,6 +2654,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("5708d443-7669-47d8-b6a3-6ad851090710"),
                             Order = 8, Heading = "Pupil referral units exclusions", Caption = "",
                             Content = new List<IContentBlock>
                             {
@@ -2655,6 +2672,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("3960ab94-0fad-442c-8aaa-6233eff3bc32"),
                             Order = 9, Heading = "Regional and local authority (LA) breakdown",
                             Caption = "",
                             Content = new List<IContentBlock>
@@ -2762,6 +2780,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new ContentSection
                         {
+                            Id = new Guid("def347bd-0b29-405f-a11f-cd03c853a6ed"),
                             Order = 1, Heading = "About this release",
                             Caption = "",
                             Content = new List<IContentBlock>
@@ -2777,6 +2796,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("6bfa9b19-25d6-4d45-8008-9447db541795"),
                             Order = 2, Heading = "Secondary applications and offers",
                             Caption = "",
                             Content = new List<IContentBlock>
@@ -2848,6 +2868,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("c1f17b4e-f576-40bc-80e1-63767998d080"),
                             Order = 3, Heading = "Secondary geographical variation",
                             Caption = "",
                             Content = new List<IContentBlock>
@@ -2888,6 +2909,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("c3eb66d0-ce13-4e68-861d-98bb914d0814"),
                             Order = 4, Heading = "Primary applications and offers",
                             Caption = "",
                             Content = new List<IContentBlock>
@@ -2959,6 +2981,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("b87f2e62-e3e7-4492-9d68-18df8dc29041"),
                             Order = 5, Heading = "Primary geographical variation",
                             Caption = "",
                             Content = new List<IContentBlock>
@@ -3268,6 +3291,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new ContentSection
                         {
+                            Id = new Guid("5a7fd947-d131-475d-afcd-11ab2b1ece67"),
                             Heading = "1. Overview of absence statistics",
                             Caption = "",
                             Order = 1,
@@ -3284,6 +3308,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("dabb7562-0433-42fc-96e4-64a68f399dac"),
                             Heading = "2. National Statistics badging",
                             Caption = "",
                             Order = 2,
@@ -3300,6 +3325,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("50b5031a-93e4-4756-843e-21f88f52ba68"),
                             Heading = "3. Methodology",
                             Caption = "",
                             Order = 3,
@@ -3316,6 +3342,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("e4ca520f-b609-4abb-a38c-c2d610a18e9f"),
                             Heading = "4. Data collection",
                             Caption = "",
                             Order = 4,
@@ -3332,6 +3359,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("da91d355-b878-4135-a0a9-fb538c601246"),
                             Heading = "5. Data processing",
                             Caption = "",
                             Order = 5,
@@ -3348,6 +3376,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("8df45966-5444-4487-be49-763c5009eea6"),
                             Heading = "6. Data quality",
                             Caption = "",
                             Order = 6,
@@ -3364,6 +3393,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("bf6870de-07d3-4e65-a877-373a63dbcc5d"),
                             Heading = "7. Contacts",
                             Caption = "",
                             Order = 7,
@@ -3383,6 +3413,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new ContentSection
                         {
+                            Id = new Guid("0522bb29-1e0d-455a-88ef-5887f76fb069"),
                             Heading = "Annex A - Calculations",
                             Caption = "",
                             Order = 1,
@@ -3399,6 +3430,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("f1aac714-665d-436e-a488-1ca409d618bf"),
                             Heading = "Annex B - School attendance codes",
                             Caption = "",
                             Order = 2,
@@ -3415,6 +3447,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("0b888133-215a-4b28-8c24-e0ee9a32df6e"),
                             Heading = "Annex C - Links to pupil absence national statistics and data",
                             Caption = "",
                             Order = 3,
@@ -3431,6 +3464,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("4c4c71e2-24e1-4b57-8a23-ce54fae9b329"),
                             Heading = "Annex D - Standard breakdowns",
                             Caption = "",
                             Order = 4,
@@ -3447,6 +3481,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("97a138bf-4ebb-4b17-86ab-ed78584608e3"),
                             Heading = "Annex E - Timeline",
                             Caption = "",
                             Order = 5,
@@ -3463,6 +3498,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("dc00e749-0893-47f7-8440-5a4da47ceed7"),
                             Heading = "Annex F - Absence rates over time",
                             Caption = "",
                             Order = 6,
@@ -3489,6 +3525,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new ContentSection
                         {
+                            Id = new Guid("d82b2a2c-b117-4f96-b812-80de5304ae21"),
                             Heading = "1. Overview of applications and offers statistics",
                             Caption = "",
                             Order = 1,
@@ -3508,6 +3545,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("f0814433-92d4-4ce5-b63b-2f2cb1b6f48a"),
                             Heading = "2. The admissions process",
                             Caption = "",
                             Order = 2,
@@ -3527,6 +3565,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("1d7a492b-3e59-4624-9a2a-076635d1f780"),
                             Heading = "3. Methodology",
                             Caption = "",
                             Order = 3,
@@ -3546,6 +3585,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("f129939b-803f-461b-8838-e7a3d8c6eca2"),
                             Heading = "4. Contacts",
                             Caption = "",
                             Order = 4,
@@ -3575,6 +3615,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new ContentSection
                         {
+                            Id = new Guid("bceaafc1-9548-4a03-98d5-d3476c8b9d99"),
                             Heading = "1. Overview of exclusion statistics",
                             Caption = "",
                             Order = 1,
@@ -3591,6 +3632,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("66b15928-46c6-48d5-90e6-12cf354b4e04"),
                             Heading = "2. National Statistics badging",
                             Caption = "",
                             Order = 2,
@@ -3607,6 +3649,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("863f2b02-67b1-41bd-b1c9-f998f4581297"),
                             Heading = "3. Methodology",
                             Caption = "",
                             Order = 3,
@@ -3623,6 +3666,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("fc66f72e-0176-4c75-b15f-2f35c7329563"),
                             Heading = "4. Data collection",
                             Caption = "",
                             Order = 4,
@@ -3639,6 +3683,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("0c44636a-9a31-4e05-8db7-331ed5eae366"),
                             Heading = "5. Data processing",
                             Caption = "",
                             Order = 5,
@@ -3655,6 +3700,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("69df08b6-dcda-449e-828e-5666c8e6d533"),
                             Heading = "6. Data quality",
                             Caption = "",
                             Order = 6,
@@ -3671,6 +3717,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("fa315759-a51b-4860-8ae5-7b9505873108"),
                             Heading = "7. Contacts",
                             Caption = "",
                             Order = 7,
@@ -3690,6 +3737,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     {
                         new ContentSection
                         {
+                            Id = new Guid("2bb1ce6d-8b54-4a77-bf7d-466c5f7f6bc3"),
                             Heading = "Annex A - Calculations",
                             Caption = "",
                             Order = 1,
@@ -3706,6 +3754,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("01e9feb8-8ca0-4d98-8a17-78672e4641a7"),
                             Heading = "Annex B - Exclusion by reason codes",
                             Caption = "",
                             Order = 2,
@@ -3722,6 +3771,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("39576875-4a54-4028-bdb0-fecc67041f82"),
                             Heading = "Annex C - Links to pupil exclusions statistics and data",
                             Caption = "",
                             Order = 3,
@@ -3738,6 +3788,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         new ContentSection
                         {
+                            Id = new Guid("e3bfcc04-7d91-45b7-b0ee-19713de4b433"),
                             Heading = "Annex D - Standard breakdowns",
                             Caption = "",
                             Order = 4,
