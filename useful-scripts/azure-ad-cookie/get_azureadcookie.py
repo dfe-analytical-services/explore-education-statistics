@@ -39,10 +39,13 @@ def wait_until_page_contains_xpath(context, selector):
     
 print("os.getcwd(): ", os.getcwd())
 print("os.listdir(os.getcwd()): ", os.listdir(os.getcwd()))
-print("os.listdir('.'): ", os.listdir('.'))
     
+chrome_options = webdriver.ChromeOptions()
+chrome_options.add_argument('--no-sandbox')
+chrome_options.add_argument('--headless')
+chrome_options.add_argument('--disable-gpu')
 # driver = webdriver.Chrome(executable_path=os.getcwd() + os.sep + "chromedriver")
-driver = webdriver.Chrome()
+driver = webdriver.Chrome(options=chrome_options)
 driver.get(args.url)
 
 wait_until_page_contains_xpath(driver, '//a[text()="Sign-in"]')
