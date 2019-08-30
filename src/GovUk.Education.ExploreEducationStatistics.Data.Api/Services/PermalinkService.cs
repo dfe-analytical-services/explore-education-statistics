@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         {
             var text = await _fileStorageService.DownloadTextAsync(ContainerName, id.ToString());
             var permalink = JsonConvert.DeserializeObject<Permalink>(text);
-            return CreatePermalinkViewModel(permalink);
+            return BuildViewModel(permalink);
         }
 
         public async Task<PermalinkViewModel> CreateAsync(TableBuilderQueryContext query)
@@ -48,18 +48,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             var permalink = new Permalink(result, query);
             await _fileStorageService.UploadFromStreamAsync(ContainerName, permalink.Id.ToString(), "application/json",
                 JsonConvert.SerializeObject(permalink));
-            return CreatePermalinkViewModel(permalink);
+            return BuildViewModel(permalink);
         }
 
-        private PermalinkViewModel CreatePermalinkViewModel(Permalink permalink)
+        private PermalinkViewModel BuildViewModel(Permalink permalink)
         {
-            var model = _mapper.Map<PermalinkViewModel>(permalink);
+            var viewModel = _mapper.Map<PermalinkViewModel>(permalink);
             var subject = _subjectService.Find(permalink.Query.SubjectId, new List<Expression<Func<Subject, object>>>
             {
                 s => s.Release
             });
-            model.Query.PublicationId = subject.Release.PublicationId;
-            return model;
+            viewModel.Query.PublicationId = subject.Release.PublicationId;
+            return viewModel;
         }
     }
 }
