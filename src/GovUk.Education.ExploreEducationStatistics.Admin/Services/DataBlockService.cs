@@ -8,7 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.EntityFrameworkCore.Query.ExpressionVisitors.Internal;
+using ContentSectionId = System.Guid;
 using DataBlockId = System.Guid;
 using ReleaseId = System.Guid;
 
@@ -29,25 +29,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _mapper = mapper;
         }
 
-        public async Task<Either<ValidationResult, DataBlockViewModel>> CreateAsync(DataBlockId releaseId,
-            CreateDataBlockViewModel createDataBlock)
+        public async Task<Either<ValidationResult, DataBlockViewModel>> CreateAsync(ReleaseId releaseId,
+            ContentSectionId contentSectionId, CreateDataBlockViewModel createDataBlock)
         {
             var release = await _releaseService.GetAsync(releaseId);
-            var id = DataBlockId.NewGuid();
-
+            var contentSection = release.Content.First(section => section.Id.Equals(contentSectionId));
+            
             var dataBlock = _mapper.Map<DataBlock>(createDataBlock);
-            // TODO DFE-1341 update the Content with the data block
+            dataBlock.Id = DataBlockId.NewGuid();
+            contentSection.Content.Add(dataBlock);
 
             _context.Releases.Update(release);
             await _context.SaveChangesAsync();
-            
-            // TODO DFE-1341 Remove me once the data block has been inserted
-            return new DataBlockViewModel
-            {
-                Id = id
-            };
-            
-            //return await GetAsync(releaseId, id);
+
+            return await GetAsync(releaseId, dataBlock.Id);
         }
 
         public async Task<DataBlockViewModel> GetAsync(ReleaseId releaseId, DataBlockId id)

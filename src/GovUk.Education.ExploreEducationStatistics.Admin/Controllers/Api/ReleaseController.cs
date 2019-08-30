@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using DataBlockId = System.Guid;
+using ContentSectionId = System.Guid;
 using PublicationId = System.Guid;
 using ReleaseId = System.Guid;
 
@@ -221,12 +222,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             );
         }
 
-        [HttpPost("release/{releaseId}/datablocks")]
+        [HttpPost("release/{releaseId}/section/{contentSectionId}/datablocks")]
         [AllowAnonymous]
-        public async Task<ActionResult<DataBlockViewModel>> CreateDataBlockAsync(CreateDataBlockViewModel dataBlock,
-            ReleaseId releaseId)
+        public async Task<ActionResult<DataBlockViewModel>> CreateDataBlockAsync(ReleaseId releaseId,
+            ContentSectionId contentSectionId, CreateDataBlockViewModel dataBlock)
         {
-            return await CheckReleaseExistsAsync(releaseId, () => _dataBlockService.CreateAsync(releaseId, dataBlock));
+            return await CheckReleaseExistsAsync(releaseId, () => _dataBlockService.CreateAsync(releaseId, 
+                contentSectionId, dataBlock));
         }
         
         [HttpGet("release/{releaseId}/datablocks/")]
