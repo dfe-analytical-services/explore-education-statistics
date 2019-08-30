@@ -8,7 +8,7 @@ import {
   LocationFilter,
   TimePeriodFilter,
 } from '@common/modules/full-table/types/filters';
-import { FullTable } from '@common/modules/full-table/services/permalinkService';
+import { FullTable } from '@common/modules/full-table/types/fullTable';
 import DataTableCaption from './DataTableCaption';
 import FixedMultiHeaderDataTable from './FixedMultiHeaderDataTable';
 import { TableHeadersFormValues } from './TableHeadersForm';

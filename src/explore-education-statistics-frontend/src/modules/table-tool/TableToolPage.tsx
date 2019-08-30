@@ -25,9 +25,8 @@ import mapValues from 'lodash/mapValues';
 import { NextContext } from 'next';
 import React, { Component, MouseEventHandler, createRef } from 'react';
 import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
-import permalinkService, {
-  FullTable,
-} from '@common/modules/full-table/services/permalinkService';
+import permalinkService from '@common/modules/full-table/services/permalinkService';
+import { FullTable } from '@common/modules/full-table/types/fullTable';
 import { mapFullTable } from '@common/modules/full-table/utils/mapPermalinks';
 import DownloadCsvButton from './components/DownloadCsvButton';
 import FiltersForm, { FilterFormSubmitHandler } from './components/FiltersForm';

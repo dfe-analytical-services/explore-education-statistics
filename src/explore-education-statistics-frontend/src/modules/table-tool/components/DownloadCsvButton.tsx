@@ -9,8 +9,8 @@ import {
 import { saveAs } from 'file-saver';
 import Papa from 'papaparse';
 import React from 'react';
-import { FullTable } from '@common/modules/full-table/services/permalinkService';
 import { transformTableMetaFiltersToCategoryFilters } from '@common/modules/full-table/utils/tableHeaders';
+import { FullTable } from '@common/modules/full-table/types/fullTable';
 
 interface Props {
   publicationSlug: string;
