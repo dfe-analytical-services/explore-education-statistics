@@ -15,11 +15,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
     public abstract class AbstractRepository<TEntity, TKey> : IRepository<TEntity, TKey> where TEntity : class
     {
-        protected readonly ApplicationDbContext _context;
+        protected readonly StatisticsDbContext _context;
 
         private readonly ILogger _logger;
 
-        protected AbstractRepository(ApplicationDbContext context, ILogger logger)
+        protected AbstractRepository(StatisticsDbContext context, ILogger logger)
         {
             _context = context;
             _logger = logger;

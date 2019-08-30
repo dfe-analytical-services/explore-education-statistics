@@ -6,11 +6,7 @@ import {
   UserDetails,
 } from '@admin/services/common/types';
 
-export enum ReleaseApprovalStatus {
-  Approved,
-  ReadyToReview,
-  None,
-}
+export type ReleaseStatus = 'Draft' | 'HigherLevelReview' | 'Approved';
 
 export interface ThemeAndTopics {
   title: string;
@@ -21,12 +17,20 @@ export interface ThemeAndTopics {
   }[];
 }
 
+export interface Comment {
+  message: string;
+  authorName: string;
+  createdDate: string;
+}
+
 export interface AdminDashboardRelease {
   id: string;
-  status: ReleaseApprovalStatus;
+  status: ReleaseStatus;
   latestRelease: boolean;
   live: boolean;
   releaseName: string;
+  publicationId: string;
+  publicationTitle: string;
   timePeriodCoverage: IdLabelPair;
   contact: ContactDetails;
   lastEditedUser: UserDetails;
@@ -34,6 +38,9 @@ export interface AdminDashboardRelease {
   publishScheduled: Date;
   published?: string;
   nextReleaseDate: DayMonthYearValues;
+  internalReleaseNote?: string;
+  draftComments: Comment[];
+  higherReviewComments: Comment[];
 }
 
 export interface AdminDashboardPublication {

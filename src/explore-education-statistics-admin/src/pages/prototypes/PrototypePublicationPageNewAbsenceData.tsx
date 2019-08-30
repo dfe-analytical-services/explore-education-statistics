@@ -1,14 +1,10 @@
-import React from 'react';
+import Link from '@admin/components/Link';
 import ModalConfirm from '@common/components/ModalConfirm';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import useToggle from '@common/hooks/useToggle';
-import Link from '@admin/components/Link';
-import Details from '@common/components/Details';
-import Accordion from '@common/components/Accordion';
-import AccordionSection from '@common/components/AccordionSection';
+import React from 'react';
 import PrototypeAddFootnotes from './components/PrototypeAddFootnotes';
-import PrototypeFootnotes from './components/PrototypeFootnotes';
 import PrototypeAdminNavigation from './components/PrototypeAdminNavigation';
 import PrototypePage from './components/PrototypePage';
 

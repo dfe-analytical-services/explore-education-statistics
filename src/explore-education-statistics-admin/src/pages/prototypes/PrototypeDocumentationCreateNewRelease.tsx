@@ -1,5 +1,3 @@
-import Accordion from '@common/components/Accordion';
-import AccordionSection from '@common/components/AccordionSection';
 import React from 'react';
 import { RouteChildrenProps } from 'react-router';
 import PrototypePage from './components/PrototypePage';
@@ -10,7 +8,7 @@ import imageCreateReleaseButton from './images/guidance/guidance-create-release-
 import imageCreateReleaseNavigation from './images/guidance/guidance-create-release-navigation.jpg';
 import imageSelectTheme from './images/guidance/guidance-select-theme.jpg';
 
-const DocumentationCreateNewRelease = ({ location }: RouteChildrenProps) => {
+const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
   const query = new URLSearchParams(window.location.search);
   const step = Number(query.get('step'));
 
