@@ -14,6 +14,8 @@ parser.add_argument(dest="password",
                     help="Password to login with")
 args = parser.parse_args()
 
+print("args.url: ", args.url)
+
 cdi.install(file_directory="./",
             verbose=True,
             chmod=True,
@@ -21,7 +23,7 @@ cdi.install(file_directory="./",
             version='75.0.3770.140')
             
 timeout = 10
-            
+
 def wait_until_page_contains_xpath(context, selector):
     max_time = time.time() + timeout
     elem = None
@@ -33,6 +35,10 @@ def wait_until_page_contains_xpath(context, selector):
         if elem is not None:
             return
     raise Exception(f"Timeout! Couldn't find element with xpath selector '{selector}'")
+    
+print("os.getcwd(): ", os.getcwd())
+print("os.listdir(os.getcwd()): ", os.listdir(os.getcwd()))
+print("os.listdir('.'): ", os.listdir('.'))
     
 driver = webdriver.Chrome(executable_path=os.getcwd() + os.sep + "chromedriver")
 driver.get(args.url)
