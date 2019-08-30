@@ -19,6 +19,7 @@ export interface Publication {
     id: string;
     releaseName: string;
     slug: string;
+    title: string;
   }[];
   legacyReleases: {
     id: string;
@@ -189,6 +190,7 @@ export interface AbstractRelease<ContentBlockType> {
   summary: string;
   publicationId: string;
   publication: Publication;
+  latestRelease: boolean;
   updates: {
     id: string;
     releaseId: string;
