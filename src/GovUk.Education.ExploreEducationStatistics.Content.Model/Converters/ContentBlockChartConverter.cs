@@ -20,7 +20,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Converters
             var jsonObject = JObject.Load(reader);
             var contentBlock = default(IContentBlockChart);
             
-            switch (jsonObject["Type"].Value<string>())
+            var type = jsonObject["Type"] ?? jsonObject["type"];
+            
+            switch (type.Value<string>())
             {
                 case "line":
                     contentBlock = new LineChart();
