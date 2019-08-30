@@ -1,7 +1,7 @@
 import {
   FilterOption,
   GroupedFilterOptions,
-} from '@common/services/tableBuilderService';
+} from '@common/modules/full-table/services/tableBuilderService';
 
 export default function mapOptionValues<T extends FilterOption>(
   options: GroupedFilterOptions | FilterOption[],

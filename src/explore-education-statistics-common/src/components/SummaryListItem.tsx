@@ -36,12 +36,16 @@ const SummaryListItem = ({
         </dd>
       )}
       {actions && <dd className="govuk-summary-list__actions">{actions}</dd>}
+      {children && !actions && <dd className="govuk-summary-list__actions" />}
       {!children && !actions && (
-        <dd
-          className={classNames('govuk-summary-list__value', {
-            'dfe-details-no-margin': detailsNoMargin,
-          })}
-        />
+        <>
+          <dd
+            className={classNames('govuk-summary-list__value', {
+              'dfe-details-no-margin': detailsNoMargin,
+            })}
+          />
+          <dd className="govuk-summary-list__actions" />
+        </>
       )}
     </div>
   );

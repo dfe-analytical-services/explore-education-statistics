@@ -17,12 +17,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
     public class ReleaseProcessorService : IReleaseProcessorService
     {
         private readonly ILogger<IReleaseProcessorService> _logger;
-        private readonly ApplicationDbContext _context;
+        private readonly StatisticsDbContext _context;
         private readonly IMapper _mapper;
         
         public ReleaseProcessorService(
             ILogger<IReleaseProcessorService> logger,
-            ApplicationDbContext context,
+            StatisticsDbContext context,
             IMapper mapper)
         {
             _logger = logger;

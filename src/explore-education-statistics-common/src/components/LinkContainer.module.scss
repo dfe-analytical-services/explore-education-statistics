@@ -1,0 +1,16 @@
+@import '../styles/govuk-base';
+
+.container {
+  border: 2px solid govuk-colour('grey-3');
+  display: inline-block;
+}
+
+.linkSelect {
+  background: govuk-colour('grey-4');
+  display: inline-block;
+  line-height: 1.4;
+  margin: 0;
+  padding: 6px;
+  user-select: all;
+  white-space: pre-wrap;
+}

@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services
                     Id = x.Id,
                     Title = x.Title,
                     Summary = x.Summary,
-                    Publications = x.Publications.Where(p => p.Methodology != null)
+                    Publications = x.Publications.Where(p => p.Methodology != null && p.Releases.Any(r => r.Published != null))
                         .Select(p => new PublicationTree
                         {
                             Id = p.Methodology.Id,

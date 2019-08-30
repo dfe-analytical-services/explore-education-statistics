@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         private readonly ImporterFilterService _importerFilterService;
         private readonly IImporterMetaService _importerMetaService;
         private readonly ImporterSchoolService _importerSchoolService;
-        private readonly ApplicationDbContext _context;
+        private readonly StatisticsDbContext _context;
         private readonly ILogger<ImporterService> _logger;
 
         private int _importCount;
@@ -95,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             ImporterLocationService importerLocationService,
             IImporterMetaService importerMetaService,
             ImporterSchoolService importerSchoolService,
-            ApplicationDbContext context,
+            StatisticsDbContext context,
             ILogger<ImporterService> logger)
         {
             _importerFilterService = importerFilterService;

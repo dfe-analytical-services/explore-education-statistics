@@ -55,17 +55,20 @@ export function parseCondensedTimePeriodRange(
 
 export interface AxesConfiguration {
   major: AxisConfiguration;
-  minor: AxisConfiguration;
+  minor?: AxisConfiguration;
 }
 
-export interface ChartProps {
+export interface AbstractChartProps {
   data: DataBlockData;
   meta: DataBlockMetadata;
-  labels: Dictionary<DataSetConfiguration>;
-  axes: AxesConfiguration;
   title?: string;
   height?: number;
   width?: number;
+}
+
+export interface ChartProps extends AbstractChartProps {
+  labels: Dictionary<DataSetConfiguration>;
+  axes: AxesConfiguration;
   legend?: 'none' | 'top' | 'bottom';
   legendHeight?: string;
 }
@@ -96,6 +99,7 @@ export interface ChartCapabilities {
   canSize: boolean;
   fixedAxisGroupBy: boolean;
   hasReferenceLines: boolean;
+  hasLegend: boolean;
 }
 
 export interface ChartDefinition {
@@ -406,14 +410,20 @@ export function sortChartData(
 ) {
   if (sortBy === undefined) return chartData;
 
-  return [...chartData].sort(({ [sortBy]: sortByA }, { [sortBy]: sortByB }) => {
-    if (sortByA !== undefined && sortByB !== undefined) {
-      return sortAsc
-        ? sortByA.localeCompare(sortByB)
-        : sortByB.localeCompare(sortByA);
-    }
-    return 0;
-  });
+  const mappedValueAndData = chartData.map(data => ({
+    value:
+      data[sortBy] === undefined ? undefined : Number.parseFloat(data[sortBy]),
+    data,
+  }));
+
+  return mappedValueAndData
+    .sort(({ value: valueA }, { value: valueB }) => {
+      if (valueA !== undefined && valueB !== undefined) {
+        return sortAsc ? valueA - valueB : valueB - valueA;
+      }
+      return 0;
+    })
+    .map(({ data }) => data);
 }
 
 export function createDataForAxis(

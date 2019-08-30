@@ -1,11 +1,13 @@
 import commaList from '@common/lib/utils/string/commaList';
-import { LocationFilter } from '@frontend/modules/table-tool/components/types/filters';
-import TimePeriod from '@frontend/modules/table-tool/components/types/TimePeriod';
+import {
+  LocationFilter,
+  TimePeriodFilter,
+} from '@common/modules/full-table/types/filters';
 import React from 'react';
 
 interface Props {
   id: string;
-  timePeriods: TimePeriod[];
+  timePeriodRange: TimePeriodFilter[];
   locations: LocationFilter[];
   subjectName: string;
   publicationName: string;
@@ -13,16 +15,16 @@ interface Props {
 
 const DataTableCaption = ({
   id = 'dataTableCaption',
-  timePeriods,
+  timePeriodRange,
   locations,
   subjectName,
   publicationName,
 }: Props) => {
   let timePeriodString = '';
 
-  if (timePeriods.length > 0) {
-    const startLabel = timePeriods[0].label;
-    const endLabel = timePeriods[timePeriods.length - 1].label;
+  if (timePeriodRange.length > 0) {
+    const startLabel = timePeriodRange[0].label;
+    const endLabel = timePeriodRange[timePeriodRange.length - 1].label;
 
     timePeriodString =
       startLabel === endLabel

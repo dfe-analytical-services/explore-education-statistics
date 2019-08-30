@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
 import { FormGroup, FormSelect } from '@common/components/form';
+import React, { useState } from 'react';
 import PrototypeAdminEmbedTables from './PrototypeAdminEmbedTables';
 
 // interface Props {

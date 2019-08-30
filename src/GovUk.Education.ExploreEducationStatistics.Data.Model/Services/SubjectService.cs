@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
     {
         private readonly IReleaseService _releaseService;
 
-        public SubjectService(ApplicationDbContext context,
+        public SubjectService(StatisticsDbContext context,
             ILogger<SubjectService> logger, IReleaseService releaseService) : base(context, logger)
         {
             _releaseService = releaseService;

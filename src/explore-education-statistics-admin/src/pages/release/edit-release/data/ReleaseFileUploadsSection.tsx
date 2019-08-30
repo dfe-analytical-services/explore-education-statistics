@@ -6,6 +6,9 @@ import Button from '@common/components/Button';
 import FormFieldFileSelector from '@common/components/form/FormFieldFileSelector';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { Form, FormFieldset, Formik } from '@common/components/form';
+import handleServerSideValidation, {
+  errorCodeToFieldError,
+} from '@common/components/form/util/serverValidationHandler';
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -46,6 +49,19 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
     setFiles(latestFiles);
   };
 
+  const handleServerValidation = handleServerSideValidation(
+    errorCodeToFieldError(
+      'CANNOT_OVERWRITE_FILE',
+      'file',
+      'Choose a unique file name',
+    ),
+    errorCodeToFieldError(
+      'FILE_CAN_NOT_BE_EMPTY',
+      'file',
+      'Choose a file that is not empty',
+    ),
+  );
+
   return (
     <Formik<FormValues>
       enableReinitialize
@@ -67,14 +83,14 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
       })}
       render={(form: FormikProps<FormValues>) => {
         return (
-          <Form id={formId}>
+          <Form id={formId} submitValidationHandler={handleServerValidation}>
             {files &&
               files.map(file => (
                 <SummaryList key={file.filename}>
                   <SummaryListItem term="Name">{file.title}</SummaryListItem>
                   <SummaryListItem term="File">
                     <a
-                      href={service.createDownloadDataFileLink(
+                      href={service.createDownloadAncillaryFileLink(
                         releaseId,
                         file.filename,
                       )}

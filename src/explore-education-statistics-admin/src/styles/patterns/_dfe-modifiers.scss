@@ -35,6 +35,12 @@
   margin-right: 0;
 }
 
+.dfe-hide-comments {
+  .dfe-comment-block {
+    display: none;
+  }
+}
+
 // stylelint-disable-next-line selector-no-qualifying-type
 h1.govuk-panel__title {
   color: govuk-colour('white');
@@ -49,6 +55,7 @@ h1.govuk-panel__title {
 
 .app-navigation__list {
   display: flex;
+  flex-wrap: wrap;
   list-style: none;
   margin: 0;
   padding: 0;

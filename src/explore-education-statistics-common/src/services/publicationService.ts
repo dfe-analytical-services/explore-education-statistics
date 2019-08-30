@@ -19,6 +19,7 @@ export interface Publication {
     id: string;
     releaseName: string;
     slug: string;
+    title: string;
   }[];
   legacyReleases: {
     id: string;
@@ -57,7 +58,12 @@ export interface Axis {
   size?: number;
 }
 
-export type ChartType = 'line' | 'verticalbar' | 'horizontalbar' | 'map';
+export type ChartType =
+  | 'line'
+  | 'verticalbar'
+  | 'horizontalbar'
+  | 'map'
+  | 'infographic';
 
 export interface ChartDataSet {
   indicator: string;
@@ -130,14 +136,21 @@ export interface AxisConfiguration {
 }
 
 export interface Chart {
-  type: ChartType;
-  labels: Dictionary<DataSetConfiguration>;
-  axes: AxesConfiguration;
+  type?: ChartType;
+
+  title?: string;
+  height?: number;
+  width?: number;
+
+  labels?: Dictionary<DataSetConfiguration>;
+  axes?: AxesConfiguration;
+
+  legend?: 'none' | 'top' | 'bottom';
+  legendHeight?: string;
 
   stacked?: boolean;
-  width?: number;
-  height?: number;
-  showLegend?: boolean;
+  fileId?: string;
+  geographicId?: string;
 }
 
 export interface Table {
@@ -177,6 +190,7 @@ export interface AbstractRelease<ContentBlockType> {
   summary: string;
   publicationId: string;
   publication: Publication;
+  latestRelease: boolean;
   updates: {
     id: string;
     releaseId: string;

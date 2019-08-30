@@ -54,11 +54,11 @@ export interface DayMonthYearInputs {
 }
 
 export const dayMonthYearValuesToInputs = (
-  dmy: DayMonthYearValues,
+  dmy?: DayMonthYearValues,
 ): DayMonthYearInputs => ({
-  day: dmy.day ? dmy.day.toString() : '',
-  month: dmy.month ? dmy.month.toString() : '',
-  year: dmy.year ? dmy.year.toString() : '',
+  day: dmy && dmy.day ? dmy.day.toString() : '',
+  month: dmy && dmy.month ? dmy.month.toString() : '',
+  year: dmy && dmy.year ? dmy.year.toString() : '',
 });
 
 export const dayMonthYearInputsToValues = (
@@ -91,7 +91,10 @@ export const dayMonthYearIsEmpty = (dmy?: DayMonthYearValues) => {
   return !dmy || (!dmy.day && !dmy.month && !dmy.year);
 };
 
-export const dayMonthYearToDate = (dmy: DayMonthYearValues) => {
+export const dayMonthYearToDate = (dmy?: DayMonthYearValues) => {
+  if (!dmy) {
+    throw Error(`Couldn't convert undefined DayMonthYearValues to Date`);
+  }
   if (!dayMonthYearIsComplete(dmy)) {
     throw Error(
       `Couldn't convert DayMonthYearValues ${JSON.stringify(

@@ -26,7 +26,9 @@ import {
 
 import './charts.scss';
 
-export default class HorizontalBarBlock extends Component<StackedBarProps> {
+export type HorizontalBarProps = StackedBarProps;
+
+export default class HorizontalBarBlock extends Component<HorizontalBarProps> {
   public static definition: ChartDefinition = {
     type: 'horizontalbar',
     name: 'Horizontal bar',
@@ -40,6 +42,7 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
       fixedAxisGroupBy: false,
       hasAxes: true,
       hasReferenceLines: true,
+      hasLegend: true,
     },
 
     data: [
@@ -82,6 +85,7 @@ export default class HorizontalBarBlock extends Component<StackedBarProps> {
     if (
       axes === undefined ||
       axes.major === undefined ||
+      axes.minor === undefined ||
       data === undefined ||
       meta === undefined
     )

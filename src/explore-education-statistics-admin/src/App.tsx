@@ -24,6 +24,9 @@ import PrototypeChartTest from './pages/prototypes/PrototypeChartTest';
 import AdminDocumentationGlossary from './pages/prototypes/PrototypeDocumentationGlossary';
 import AdminDocumentationStyle from './pages/prototypes/PrototypeDocumentationStyle';
 import AdminDocumentationHome from './pages/prototypes/PrototypeDocumentationHome';
+import AdminDocumentationUsingDashboard from './pages/prototypes/PrototypeDocumentationUsingDashboard';
+import AdminDocumentationCreateNewRelease from './pages/prototypes/PrototypeDocumentationCreateNewRelease';
+import AdminDocumentationCreateNewPublication from './pages/prototypes/PrototypeDocumentationCreateNewPublication';
 import PublicationAssignMethodology from './pages/prototypes/PrototypePublicationPageAssignMethodology';
 import PublicationConfirmNew from './pages/prototypes/PrototypePublicationPageConfirmNew';
 
@@ -121,6 +124,12 @@ function App() {
         />
         <Route
           exact
+          path="/prototypes/publication-preview"
+          component={PublicationReviewPage}
+          render={() => <PublicationReviewPage />}
+        />
+        <Route
+          exact
           path="/prototypes/publication-create-new"
           component={PublicationCreateNew}
         />
@@ -203,6 +212,21 @@ function App() {
           exact
           path="/prototypes/documentation/style-guide"
           component={AdminDocumentationStyle}
+        />
+        <Route
+          exact
+          path="/prototypes/documentation/using-dashboard"
+          component={AdminDocumentationUsingDashboard}
+        />
+        <Route
+          exact
+          path="/prototypes/documentation/create-new-release"
+          component={AdminDocumentationCreateNewRelease}
+        />
+        <Route
+          exact
+          path="/prototypes/documentation/create-new-publication"
+          component={AdminDocumentationCreateNewPublication}
         />
       </LoginContext.Provider>
     </BrowserRouter>
