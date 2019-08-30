@@ -39,6 +39,9 @@ import PublicationForm, {
 import PublicationSubjectForm, {
   PublicationSubjectFormSubmitHandler,
 } from './components/PublicationSubjectForm';
+import TableHeadersForm, {
+  TableHeadersFormValues,
+} from './components/TableHeadersForm';
 import TimePeriodDataTable from './components/TimePeriodDataTable';
 import TimePeriodForm, {
   TimePeriodFormSubmitHandler,
@@ -47,9 +50,6 @@ import mapOptionValues from './components/utils/mapOptionValues';
 import Wizard from './components/Wizard';
 import WizardStep from './components/WizardStep';
 import WizardStepHeading from './components/WizardStepHeading';
-import TableHeadersForm, {
-  TableHeadersFormValues,
-} from './components/TableHeadersForm';
 
 export interface PublicationOptions {
   id: string;
@@ -373,6 +373,7 @@ class TableToolPage extends Component<Props, State> {
                     <PublicationForm
                       {...stepProps}
                       publicationId={publicationId}
+                      publicationTitle={publication ? publication.title : ''}
                       options={themeMeta}
                       onSubmit={this.handlePublicationFormSubmit}
                     />

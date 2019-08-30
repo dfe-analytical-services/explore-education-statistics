@@ -1,11 +1,13 @@
 import { Polyfilla } from '@admin/services/util/polyfilla';
-import client from '@admin/services/util/service';
+import client, { baseURL } from '@admin/services/util/service';
 
 import {
   AncillaryFile,
   DataFile,
+  ChartFile,
   UploadAncillaryFileRequest,
   UploadDataFilesRequest,
+  UploadChartFileRequest,
 } from './types';
 
 export interface EditReleaseService {
@@ -30,6 +32,14 @@ export interface EditReleaseService {
     releaseId: string,
     fileId: string,
   ) => string;
+
+  getChartFiles: (releaseId: string) => Promise<ChartFile[]>;
+  uploadChartFile: (
+    releaseId: string,
+    request: UploadChartFileRequest,
+  ) => Promise<null>;
+
+  createDownloadChartFileLink: (releaseId: string, fileName: string) => string;
 }
 
 interface GetFileResponse {
@@ -95,13 +105,13 @@ const service: EditReleaseService = {
     return client.delete<null>(`/release/${releaseId}/data/${dataFileName}`);
   },
   createDownloadDataFileLink(releaseId: string, fileName: string): string {
-    return `/release/${releaseId}/data/${fileName}`;
+    return `${baseURL}release/${releaseId}/data/${fileName}`;
   },
   createDownloadDataMetadataFileLink(
     releaseId: string,
     fileName: string,
   ): string {
-    return `/release/${releaseId}/data/metadata/${fileName}`;
+    return `${baseURL}release/${releaseId}/data/${fileName}`;
   },
   getAncillaryFiles(releaseId: string): Promise<AncillaryFile[]> {
     return client
@@ -132,7 +142,35 @@ const service: EditReleaseService = {
     return client.delete<null>(`/release/${releaseId}/ancillary/${fileName}`);
   },
   createDownloadAncillaryFileLink(releaseId: string, fileName: string): string {
-    return `/release/${releaseId}/ancillary/${fileName}`;
+    return `${baseURL}release/${releaseId}/ancillary/${fileName}`;
+  },
+
+  async getChartFiles(releaseId: string) {
+    const response = await client.get<GetFileResponse[]>(
+      `/release/${releaseId}/chart`,
+    );
+
+    return response.map<ChartFile>(({ name, path, size }) => ({
+      title: name,
+      filename: getFileNameFromPath(path),
+      fileSize: {
+        size: parseInt(size.split(' ')[0], 10),
+        unit: size.split(' ')[1],
+      },
+    }));
+  },
+
+  async uploadChartFile(releaseId: string, request: UploadChartFileRequest) {
+    const data = new FormData();
+    data.append('file', request.file);
+    return client.post<null>(
+      `/release/${releaseId}/chart?name=${request.name}`,
+      data,
+    );
+  },
+
+  createDownloadChartFileLink(releaseId: string, fileName: string): string {
+    return `/api/release/${releaseId}/chart/${fileName}`;
   },
 };
 

@@ -1,9 +1,10 @@
-import React from 'react';
+import Link from '@admin/components/Link';
 import ModalConfirm from '@common/components/ModalConfirm';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import useToggle from '@common/hooks/useToggle';
-import Link from '@admin/components/Link';
+import React from 'react';
+import PrototypeAddFootnotes from './components/PrototypeAddFootnotes';
 import PrototypeAdminNavigation from './components/PrototypeAdminNavigation';
 import PrototypePage from './components/PrototypePage';
 
@@ -15,7 +16,7 @@ const PublicationDataPage = () => {
       wide
       breadcrumbs={[
         {
-          link: '/prototypes/admin-dashboard?status=editNewRelease',
+          link: '/prototypes/admin-dashboard?status=readyApproval',
           text: 'Administrator dashboard',
         },
         { text: 'Create new release', link: '#' },
@@ -211,6 +212,9 @@ const PublicationDataPage = () => {
             </div>
           </form>
         </TabsSection>
+        <TabsSection id="footnotes" title="Footnotes">
+          <PrototypeAddFootnotes />
+        </TabsSection>
         <TabsSection id="file-upload" title="File uploads">
           <p className="govuk-body">
             These files should be things like infographics or images of more
@@ -296,7 +300,7 @@ const PublicationDataPage = () => {
                   className="govuk-label govuk-label--s"
                   htmlFor="file-upload-1"
                 >
-                  Upload data
+                  Upload file
                 </label>
                 <input
                   className="govuk-file-upload"
