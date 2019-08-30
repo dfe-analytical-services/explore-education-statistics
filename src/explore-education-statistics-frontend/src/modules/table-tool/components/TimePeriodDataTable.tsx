@@ -2,6 +2,7 @@ import last from 'lodash/last';
 import React, { memo, forwardRef } from 'react';
 import cartesian from '@common/lib/utils/cartesian';
 import formatPretty from '@common/lib/utils/number/formatPretty';
+import WarningMessage from '@common/components/WarningMessage';
 import {
   CategoryFilter,
   Indicator,
@@ -22,6 +23,15 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
   (props: Props, dataTableRef) => {
     const { fullTable, tableHeadersConfig } = props;
     const { subjectMeta, results } = fullTable;
+
+    if (results.length === 0) {
+      return (
+        <WarningMessage>
+          A table could not be returned. There is no data for the options
+          selected.
+        </WarningMessage>
+      );
+    }
 
     const columnHeaders: string[][] = [
       ...tableHeadersConfig.columnGroups.map(colGroup =>
