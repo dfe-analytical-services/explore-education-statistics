@@ -188,6 +188,7 @@ const ChartDataSelector = ({
                     ),
                     colour: colours[selectedList.length % colours.length],
                     symbol: symbols[selectedList.length % symbols.length],
+                    unit: metaData.indicators[dataSet.indicator].unit || '',
                   },
                 };
 
@@ -214,9 +215,11 @@ const ChartDataSelector = ({
               <div className={styles.selectedData}>
                 <div className={styles.selectedDataRow}>
                   <div className={styles.selectedDataFilter}>
-                    {selected.dataSet.filters.map(_ => (
-                      <span key={_}>{metaData.filters[_].label}</span>
-                    ))}
+                    <span>
+                      {selected.dataSet.filters
+                        .map(_ => metaData.filters[_].label)
+                        .join(', ')}
+                    </span>
                   </div>
                   <div className={styles.selectedDataIndicator}>
                     {metaData.indicators[selected.dataSet.indicator].label}

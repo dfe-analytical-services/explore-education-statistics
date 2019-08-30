@@ -56,7 +56,9 @@ const generateLegendType = (symbol: LegendType | undefined): LegendType => {
   return symbol;
 };
 
-const LineChartBlock = (props: ChartProps) => {
+export type LineChartProps = ChartProps;
+
+const LineChartBlock = (props: LineChartProps) => {
   const {
     data,
     meta,
@@ -188,6 +190,10 @@ const definition: ChartDefinition = {
     lineStyle: true,
     gridLines: true,
     canSize: true,
+    fixedAxisGroupBy: false,
+    hasAxes: true,
+    hasReferenceLines: true,
+    hasLegend: true,
   },
 
   data: [

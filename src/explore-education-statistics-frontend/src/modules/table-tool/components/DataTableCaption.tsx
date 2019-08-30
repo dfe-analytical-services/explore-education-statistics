@@ -5,7 +5,7 @@ import React from 'react';
 
 interface Props {
   id: string;
-  timePeriods: TimePeriod[];
+  timePeriodRange: TimePeriod[];
   locations: LocationFilter[];
   subjectName: string;
   publicationName: string;
@@ -13,16 +13,16 @@ interface Props {
 
 const DataTableCaption = ({
   id = 'dataTableCaption',
-  timePeriods,
+  timePeriodRange,
   locations,
   subjectName,
   publicationName,
 }: Props) => {
   let timePeriodString = '';
 
-  if (timePeriods.length > 0) {
-    const startLabel = timePeriods[0].label;
-    const endLabel = timePeriods[timePeriods.length - 1].label;
+  if (timePeriodRange.length > 0) {
+    const startLabel = timePeriodRange[0].label;
+    const endLabel = timePeriodRange[timePeriodRange.length - 1].label;
 
     timePeriodString =
       startLabel === endLabel

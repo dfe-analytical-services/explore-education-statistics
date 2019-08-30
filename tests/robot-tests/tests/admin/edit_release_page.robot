@@ -26,15 +26,15 @@ Verify user can sign in
     user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(1)     Home
     user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(2)     Administrator dashboard
     
-    
 User selects theme and topic from dropdowns
     [Tags]  HappyPath
-    user clicks element   css:#my-publications-tab     
-    select from list by label  css:#selectTheme  School and college outcomes and performance
-    select from list by label  css:#selectTopic  Outcome based success measures
+    user clicks element   css:#my-publications-tab
+    user waits until page contains element   css:#selectTheme
+    user selects from list by label  css:#selectTheme  School and college outcomes and performance
+    user selects from list by label  css:#selectTopic  Outcome based success measures
+    user checks page contains accordion  Further education outcome-based success measures
     user checks accordion section contains text  Further education outcome-based success measures    Methodology
     user checks accordion section contains text  Further education outcome-based success measures    Releases
-
 
 User clicks edit release
    [Tags]  HappyPath
@@ -43,8 +43,7 @@ User clicks edit release
    user clicks element  css:[data-testid="details--expand"]
    user waits until page contains element  xpath://a[text()="Edit this release"]
    user clicks element   xpath://a[text()="Edit this release"]
-   
-   
+
 Validate release summary tab has correct details
     [Tags]  HappyPath
     user waits until page contains heading  Further education outcome-based success measures
@@ -55,16 +54,13 @@ Validate release summary tab has correct details
     user waits until page contains element   xpath://dt[text()="Scheduled release"]
     user waits until page contains element   xpath://dt[text()="Next release expected"]
     user waits until page contains element   xpath://dt[text()="Release type"]
-    
 
 User clicks Edit release setup details         
+    [Tags]  HappyPath   UnderConstruction
     user clicks element  xpath://a[text()="Edit release setup details"]
     user waits until page contains element   xpath://h2[text()="Edit release setup"]
-    get element attribute  css:#releaseSummaryForm-timePeriodCoverageStartYear  2014
+    user checks element attribute value should be  css:#releaseSummaryForm-timePeriodCoverageStartYear   value   2014
     user waits until page contains element  xpath://label[text()="Ad Hoc"]
     user clicks element   xpath://button[text()="Update release status"]
     user clicks element  xpath://a[text()="Edit release setup details"]
     user clicks element  xpath://a[text()="Cancel update"]
-    
-        
-        

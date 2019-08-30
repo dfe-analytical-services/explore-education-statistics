@@ -19,8 +19,8 @@ export default class PrototypeLoginService {
     },
     {
       id: '97d839e7-67fc-47b7-a40f-00f84d0cc3c4',
-      name: 'User 4',
-      permissions: [''],
+      name: 'BAU User',
+      permissions: ['bau'],
     },
     {
       id: '6b1b5bb4-9a9b-4996-9f57-8b75176e6bf1',

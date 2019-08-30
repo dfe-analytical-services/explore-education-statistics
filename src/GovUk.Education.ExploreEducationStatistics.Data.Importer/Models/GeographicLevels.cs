@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Data.Importer.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Models
@@ -35,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Models
                 }
             }
 
-            throw new ArgumentException("Unexpected value: " + value);
+            throw new InvalidGeographicLevelException(value);
         }
     }
 }

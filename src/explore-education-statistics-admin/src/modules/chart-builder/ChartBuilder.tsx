@@ -9,28 +9,42 @@ import TabsSection from '@common/components/TabsSection';
 import ChartRenderer, {
   ChartRendererProps,
 } from '@common/modules/find-statistics/components/ChartRenderer';
-import { ChartDefinition } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import {
+  ChartDefinition,
+  generateKeyFromDataSet,
+} from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import HorizontalBarBlock from '@common/modules/find-statistics/components/charts/HorizontalBarBlock';
 import LineChartBlock from '@common/modules/find-statistics/components/charts/LineChartBlock';
 import MapBlock from '@common/modules/find-statistics/components/charts/MapBlock';
 import VerticalBarBlock from '@common/modules/find-statistics/components/charts/VerticalBarBlock';
-import { DataBlockResponse } from '@common/services/dataBlockService';
+import {
+  DataBlockRerequest,
+  DataBlockResponse,
+} from '@common/services/dataBlockService';
 import {
   AxisConfiguration,
-  DataSetConfiguration,
+  Chart,
   ChartDataSet,
+  DataSetConfiguration,
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import React from 'react';
 import ChartConfiguration, {
   ChartOptions,
 } from '@admin/modules/chart-builder/ChartConfiguration';
+import classnames from 'classnames';
+import Infographic from '@common/modules/find-statistics/components/charts/Infographic';
+import service from '@admin/services/release/edit-release/data/service';
 import ChartAxisConfiguration from './ChartAxisConfiguration';
 import ChartTypeSelector from './ChartTypeSelector';
 import styles from './graph-builder.module.scss';
 
 interface Props {
   data: DataBlockResponse;
+  initialConfiguration?: Chart;
+  onChartSave?: (props: ChartRendererProps) => void;
+
+  onRequiresDataUpdate?: (parameters: DataBlockRerequest) => void;
 }
 
 function getReduceMetaDataForAxis(data: DataBlockResponse) {
@@ -74,22 +88,32 @@ const chartTypes: ChartDefinition[] = [
   MapBlock.definition,
 ];
 
-const ChartBuilder = ({ data }: Props) => {
+// need a constant reference as there are dependencies on this not changing if it isn't set
+const ChartBuilder = ({
+  data,
+  onChartSave,
+  initialConfiguration,
+  onRequiresDataUpdate,
+}: Props) => {
   const [selectedChartType, setSelectedChartType] = React.useState<
     ChartDefinition | undefined
   >();
 
-  const indicatorIds = Object.keys(data.metaData.indicators);
+  const [indicatorIds] = React.useState<string[]>(
+    Object.keys(data.metaData.indicators),
+  );
 
-  const filterIdCombinations: string[][] = Object.values(
-    data.result.reduce((filterSet, result) => {
-      const filterIds = Array.from(result.filters);
+  const [filterIdCombinations] = React.useState<string[][]>(
+    Object.values(
+      data.result.reduce((filterSet, result) => {
+        const filterIds = Array.from(result.filters);
 
-      return {
-        ...filterSet,
-        [filterIds.join('_')]: filterIds,
-      };
-    }, {}),
+        return {
+          ...filterSet,
+          [filterIds.join('_')]: filterIds,
+        };
+      }, {}),
+    ),
   );
 
   const [chartOptions, setChartOptions] = React.useState<ChartOptions>({
@@ -97,9 +121,9 @@ const ChartBuilder = ({ data }: Props) => {
     legend: 'top',
     legendHeight: '42',
     height: 300,
-    width: undefined,
     title: '',
   });
+
   const previousAxesConfiguration = React.useRef<Dictionary<AxisConfiguration>>(
     {},
   );
@@ -158,7 +182,13 @@ const ChartBuilder = ({ data }: Props) => {
     ChartRendererProps
   >();
   React.useEffect(() => {
-    if (selectedChartType)
+    if (
+      selectedChartType &&
+      (selectedChartType.axes.length === 0 ||
+        (selectedChartType.axes.length > 0 &&
+          majorAxisDataSets.length > 0 &&
+          axesConfiguration.major))
+    ) {
       setRenderedChartProps({
         type: selectedChartType.type,
 
@@ -177,8 +207,13 @@ const ChartBuilder = ({ data }: Props) => {
           },
         },
         labels: chartLabels,
+        chartFileDownloadService: service.createDownloadChartFileLink,
+
         ...chartOptions,
       });
+    } else {
+      setRenderedChartProps(undefined);
+    }
   }, [
     selectedChartType,
     axesConfiguration,
@@ -220,7 +255,10 @@ const ChartBuilder = ({ data }: Props) => {
               // hard-coded defaults
               type: axisDefinition.type,
               name: `${axisDefinition.title} (${axisDefinition.type} axis)`,
-              groupBy: previousConfig.groupBy || axisDefinition.defaultDataType,
+              groupBy:
+                axisDefinition.forcedDataType ||
+                previousConfig.groupBy ||
+                axisDefinition.defaultDataType,
               dataSets:
                 axisDefinition.type === 'major'
                   ? dataSetAndConfiguration.map(dsc => dsc.dataSet)
@@ -248,6 +286,78 @@ const ChartBuilder = ({ data }: Props) => {
     }
   }, [selectedChartType, dataSetAndConfiguration]);
 
+  const extractInitialChartOptions = (
+    {
+      type,
+      stacked = false,
+      legend = 'top',
+      legendHeight = '42',
+      height = 300,
+      width,
+      title = '',
+      fileId,
+      geographicId,
+      labels,
+      axes,
+    }: Chart = {
+      stacked: false,
+      legend: 'top',
+      legendHeight: '42',
+      height: 300,
+      title: '',
+    },
+  ) => {
+    return {
+      type,
+      options: {
+        stacked,
+        legend,
+        legendHeight,
+        height,
+        width,
+        title,
+        fileId,
+        geographicId,
+      },
+      axes,
+      labels,
+    };
+  };
+
+  // initial chart options set up
+  React.useEffect(() => {
+    const initial = extractInitialChartOptions(initialConfiguration);
+
+    setSelectedChartType(
+      () => initial && chartTypes.find(({ type }) => type === initial.type),
+    );
+
+    setChartOptions({ ...initial.options });
+
+    if (initial.labels) {
+      setChartLabels(initial.labels);
+    }
+
+    if (initial.axes && initial.labels) {
+      setAxesConfiguration((initial.axes as unknown) as Dictionary<
+        AxisConfiguration
+      >);
+
+      if (initial.axes.major && initial.axes.major.dataSets && initial.labels) {
+        const dataSetAndConfig = initial.axes.major.dataSets
+          .map(dataSet => {
+            const key = generateKeyFromDataSet(dataSet);
+            const configuration = initial.labels && initial.labels[key];
+            return { dataSet, configuration };
+          })
+          .filter(dsc => dsc.configuration !== undefined);
+
+        // @ts-ignore ... because Typescript is a pain
+        setDataSetAndConfiguration(dataSetAndConfig);
+      }
+    }
+  }, [initialConfiguration]);
+
   return (
     <div className={styles.editor}>
       <ChartTypeSelector
@@ -256,41 +366,77 @@ const ChartBuilder = ({ data }: Props) => {
         selectedChartType={selectedChartType}
       />
       <div className="govuk-!-margin-top-6 govuk-body-s dfe-align--right">
-        <a href="#">Choose an infographic as alternative</a>
+        <a
+          href="#"
+          onClick={e => {
+            e.preventDefault();
+            setSelectedChartType(Infographic.definition);
+          }}
+        >
+          Choose an infographic as alternative
+        </a>
       </div>
 
-      {renderedChartProps && (
+      {selectedChartType && (
         <Details summary="Chart preview" open>
-          <div className="govuk-width-container">
+          {renderedChartProps === undefined ? (
+            <div
+              className={classnames(styles.preview)}
+              style={{
+                width: chartOptions.width && `${chartOptions.width}px`,
+                height: chartOptions.height && `${chartOptions.height}px`,
+              }}
+            >
+              {selectedChartType.axes.length > 0 ? (
+                <span>Add data to view a preview of the chart</span>
+              ) : (
+                <span>
+                  Configure the {selectedChartType.name} to view a preview
+                </span>
+              )}
+            </div>
+          ) : (
             <ChartRenderer {...renderedChartProps} />
-          </div>
+          )}
         </Details>
       )}
 
       {selectedChartType && (
         <Tabs id="ChartTabs">
-          <TabsSection title="Data">
-            <p>Add data from the existing dataset to the chart</p>
-            <ChartDataSelector
-              onDataAdded={onDataAdded}
-              onDataRemoved={onDataRemoved}
-              onDataChanged={(newData: ChartDataSetAndConfiguration[]) => {
-                setDataSetAndConfiguration([...newData]);
-              }}
-              metaData={data.metaData}
-              indicatorIds={indicatorIds}
-              filterIds={filterIdCombinations}
-              selectedData={dataSetAndConfiguration}
-              chartType={selectedChartType}
-              capabilities={selectedChartType.capabilities}
-            />
-          </TabsSection>
+          {selectedChartType.data.length > 0 && (
+            <TabsSection title="Data">
+              <p>Add data from the existing dataset to the chart</p>
+              <ChartDataSelector
+                onDataAdded={onDataAdded}
+                onDataRemoved={onDataRemoved}
+                onDataChanged={(newData: ChartDataSetAndConfiguration[]) => {
+                  setDataSetAndConfiguration([...newData]);
+                }}
+                metaData={data.metaData}
+                indicatorIds={indicatorIds}
+                filterIds={filterIdCombinations}
+                selectedData={dataSetAndConfiguration}
+                chartType={selectedChartType}
+                capabilities={selectedChartType.capabilities}
+              />
+            </TabsSection>
+          )}
 
           <TabsSection title="Chart Configuration">
             <ChartConfiguration
               selectedChartType={selectedChartType}
               chartOptions={chartOptions}
               onChange={setChartOptions}
+              onBoundaryLevelChange={boundaryLevel =>
+                onRequiresDataUpdate &&
+                onRequiresDataUpdate({
+                  boundaryLevel: boundaryLevel
+                    ? Number.parseInt(boundaryLevel, 10)
+                    : undefined,
+                })
+              }
+              meta={data.metaData}
+              data={data}
             />
           </TabsSection>
 
@@ -316,6 +462,22 @@ const ChartBuilder = ({ data }: Props) => {
             </TabsSection>
           ))}
         </Tabs>
+      )}
+
+      {selectedChartType && renderedChartProps && (
+        <>
+          <button
+            type="button"
+            className="govuk-button"
+            onClick={() => {
+              if (onChartSave) {
+                onChartSave(renderedChartProps);
+              }
+            }}
+          >
+            Save chart options
+          </button>
+        </>
       )}
     </div>
   );

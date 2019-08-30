@@ -1,156 +1,237 @@
-import {
-  AdminDashboardPublication,
-  ThemeAndTopics,
-} from '@admin/services/dashboard/types';
-import React, { useContext, useEffect, useState } from 'react';
+import ButtonLink from '@admin/components/ButtonLink';
+import Link from '@admin/components/Link';
+import { LoginContext } from '@admin/components/Login';
+import Page from '@admin/components/Page';
+import ReleasesTab from '@admin/pages/admin-dashboard/components/ReleasesByStatusTab';
+import { summaryRoute } from '@admin/routes/edit-release/routes';
+import { UserDetails } from '@admin/services/common/types';
+import dashboardService from '@admin/services/dashboard/service';
+import { AdminDashboardRelease } from '@admin/services/dashboard/types';
+import loginService from '@admin/services/sign-in/service';
+import FormSelect from '@common/components/form/FormSelect';
 import RelatedInformation from '@common/components/RelatedInformation';
+import SummaryListItem from '@common/components/SummaryListItem';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import { LoginContext } from '@admin/components/Login';
-import { IdTitlePair } from '@admin/services/common/types';
-import dashboardService from '@admin/services/dashboard/service';
-import Link from '@admin/components/Link';
-import Page from '@admin/components/Page';
-import AdminDashboardPublicationsTab from './components/AdminDashboardPublicationsTab';
+import { Dictionary } from '@common/types';
+import React, { useContext, useEffect, useState } from 'react';
+import MyPublicationsTab from './components/MyPublicationsTab';
 
-const themeToThemeWithIdTitleAndTopics = (theme: ThemeAndTopics) => ({
-  id: theme.id,
-  title: theme.title,
-  topics: theme.topics.map(topic => ({
-    id: topic.id,
-    title: topic.title,
-  })),
-});
-
-const findThemeById = (
-  themeId: string,
-  availableThemes: ThemeAndTopicsIdsAndTitles[],
-) => availableThemes.find(theme => theme.id === themeId) || availableThemes[0];
-
-const findTopicById = (topicId: string, theme: ThemeAndTopicsIdsAndTitles) =>
-  theme.topics.find(topic => topic.id === topicId) || theme.topics[0];
-
-interface ThemeAndTopicsIdsAndTitles extends IdTitlePair {
-  topics: IdTitlePair[];
+interface Model {
+  draftReleases: AdminDashboardRelease[];
+  scheduledReleases: AdminDashboardRelease[];
+  availablePreReleaseContacts: UserDetails[];
+  preReleaseContactsByScheduledRelease: Dictionary<UserDetails[]>;
 }
 
 const AdminDashboardPage = () => {
-  const [myPublications, setMyPublications] = useState<
-    AdminDashboardPublication[]
-  >([]);
+  const { user } = useContext(LoginContext);
 
-  const [themes, setThemes] = useState<ThemeAndTopicsIdsAndTitles[]>();
-
-  const [selectedThemeAndTopic, setSelectedThemeAndTopic] = useState<{
-    theme: ThemeAndTopicsIdsAndTitles;
-    topic: IdTitlePair;
-  }>();
-
-  const authentication = useContext(LoginContext);
+  const [model, setModel] = useState<Model>();
 
   useEffect(() => {
-    if (!themes) {
-      dashboardService.getMyThemesAndTopics().then(themeList => {
-        const themesAsIdTitlePairs = themeList.map(
-          themeToThemeWithIdTitleAndTopics,
+    Promise.all([
+      dashboardService.getDraftReleases(),
+      dashboardService.getScheduledReleases(),
+      dashboardService.getAvailablePreReleaseContacts(),
+    ]).then(
+      ([draftReleases, scheduledReleases, availablePreReleaseContacts]) => {
+        const contactResultsByRelease = scheduledReleases.map(release =>
+          dashboardService
+            .getPreReleaseContactsForRelease(release.id)
+            .then(contacts => ({
+              releaseId: release.id,
+              contacts,
+            })),
         );
 
-        setThemes(themesAsIdTitlePairs);
-
-        setSelectedThemeAndTopic({
-          theme: themesAsIdTitlePairs[0],
-          topic: themesAsIdTitlePairs[0].topics[0],
+        Promise.all(contactResultsByRelease).then(contactResults => {
+          const preReleaseContactsByScheduledRelease: Dictionary<
+            UserDetails[]
+          > = {};
+          contactResults.forEach(result => {
+            const { releaseId, contacts } = result;
+            preReleaseContactsByScheduledRelease[releaseId] = contacts;
+          });
+          setModel({
+            draftReleases,
+            scheduledReleases,
+            availablePreReleaseContacts,
+            preReleaseContactsByScheduledRelease,
+          });
         });
-      });
-    }
-
-    if (selectedThemeAndTopic) {
-      dashboardService
-        .getMyPublicationsByTopic(selectedThemeAndTopic.topic.id)
-        .then(setMyPublications);
-    }
-  }, [authentication, selectedThemeAndTopic, themes]);
-
-  return (
-    <Page wide breadcrumbs={[{ name: 'Administrator dashboard' }]}>
-      <div className="govuk-grid-row">
-        <div className="govuk-grid-column-two-thirds">
-          <UserGreeting />
-        </div>
-        <div className="govuk-grid-column-one-third">
-          <RelatedInformation heading="Help and guidance">
-            <ul className="govuk-list">
-              <li>
-                <Link to="/prototypes/methodology-home">
-                  Administrators' guide{' '}
-                </Link>
-              </li>
-            </ul>
-          </RelatedInformation>
-        </div>
-      </div>
-      <Tabs id="publicationTabs">
-        <TabsSection
-          id="my-publications"
-          title="Manage publications and releases"
-        >
-          {themes && selectedThemeAndTopic && (
-            <AdminDashboardPublicationsTab
-              publications={myPublications}
-              noResultsMessage="You have not yet created any publications"
-              themes={themes}
-              topics={selectedThemeAndTopic.theme.topics}
-              selectedThemeId={selectedThemeAndTopic.theme.id}
-              selectedTopicId={selectedThemeAndTopic.topic.id}
-              onThemeChange={themeId =>
-                setSelectedThemeAndTopic({
-                  theme: findThemeById(themeId, themes),
-                  topic: findThemeById(themeId, themes).topics[0],
-                })
-              }
-              onTopicChange={topicId =>
-                setSelectedThemeAndTopic({
-                  theme: selectedThemeAndTopic.theme,
-                  topic: findTopicById(topicId, selectedThemeAndTopic.theme),
-                })
-              }
-            />
-          )}
-        </TabsSection>
-        <TabsSection id="draft-releases" title="View draft releases (0)">
-          <div className="govuk-inset-text">
-            There are currently no releases ready for you to review
-          </div>
-        </TabsSection>
-        <TabsSection
-          id="scheduled-releases"
-          title="View scheduled releases (0)"
-        >
-          <div className="govuk-inset-text">
-            There are currently no unresolved comments
-          </div>
-        </TabsSection>
-      </Tabs>
-    </Page>
-  );
-};
-
-const UserGreeting = () => {
-  const { user } = useContext(LoginContext);
+      },
+    );
+  }, []);
 
   return (
     <>
-      <span className="govuk-caption-xl">Welcome</span>
-
-      <h1 className="govuk-heading-xl">
-        {user ? user.name : ''}{' '}
-        <span className="govuk-body-s">
-          Not you?{' '}
-          <a className="govuk-link" href="{loginService.getSignOutLink()}">
-            Sign out
-          </a>
-        </span>
-      </h1>
+      {model && (
+        <Page wide breadcrumbs={[{ name: 'Administrator dashboard' }]}>
+          <div className="govuk-grid-row">
+            <div className="govuk-grid-column-two-thirds">
+              <span className="govuk-caption-xl">Welcome</span>
+              <h1 className="govuk-heading-xl">
+                {user ? user.name : ''}{' '}
+                <span className="govuk-body-s">
+                  Not you?{' '}
+                  <a
+                    className="govuk-link"
+                    href={loginService.getSignOutLink()}
+                  >
+                    Sign out
+                  </a>
+                </span>
+              </h1>
+            </div>
+            <div className="govuk-grid-column-one-third">
+              <RelatedInformation heading="Help and guidance">
+                <ul className="govuk-list">
+                  <li>
+                    <Link
+                      to="/prototypes/documentation/using-dashboard"
+                      target="_blank"
+                    >
+                      Using your administration dashboard{' '}
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/prototypes/documentation/create-new-release"
+                      target="_blank"
+                    >
+                      Creating a new release{' '}
+                    </Link>
+                  </li>
+                </ul>
+              </RelatedInformation>
+            </div>
+          </div>
+          <Tabs id="publicationTabs">
+            <TabsSection
+              id="my-publications"
+              title="Manage publications and releases"
+            >
+              <MyPublicationsTab />
+            </TabsSection>
+            <TabsSection
+              id="draft-releases"
+              title={`View draft releases (${model.draftReleases.length})`}
+            >
+              <ReleasesTab
+                releases={model.draftReleases}
+                noReleasesMessage="There are currently no draft releases"
+                actions={release => (
+                  <ButtonLink
+                    to={summaryRoute.generateLink(
+                      release.publicationId,
+                      release.id,
+                    )}
+                  >
+                    View and edit release
+                  </ButtonLink>
+                )}
+              />
+            </TabsSection>
+            <TabsSection
+              id="scheduled-releases"
+              title={`View scheduled releases (${model.scheduledReleases.length})`}
+            >
+              <ReleasesTab
+                releases={model.scheduledReleases}
+                noReleasesMessage="There are currently no scheduled releases"
+                actions={release => (
+                  <ButtonLink
+                    to={summaryRoute.generateLink(
+                      release.publicationId,
+                      release.id,
+                    )}
+                  >
+                    Preview release
+                  </ButtonLink>
+                )}
+              >
+                {release => (
+                  <>
+                    <SummaryListItem
+                      key="select"
+                      term="Select pre release access"
+                    >
+                      <FormSelect
+                        id="preReleaseAccessContact"
+                        name="preReleaseAccessContact"
+                        label=""
+                        options={[
+                          {
+                            label: 'Please select',
+                            value: '',
+                          },
+                          ...model.availablePreReleaseContacts
+                            .filter(
+                              contact =>
+                                !model.preReleaseContactsByScheduledRelease[
+                                  release.id
+                                ].find(c => c.id === contact.id),
+                            )
+                            .map(contact => ({
+                              label: contact.name,
+                              value: contact.id,
+                            })),
+                        ]}
+                        order={[]}
+                        className="govuk-!-width-full"
+                        onChange={async event => {
+                          const updatedContacts = await dashboardService.addPreReleaseContactToRelease(
+                            release.id,
+                            event.target.value,
+                          );
+                          setModel({
+                            ...model,
+                            preReleaseContactsByScheduledRelease: {
+                              ...model.preReleaseContactsByScheduledRelease,
+                              [release.id]: updatedContacts,
+                            },
+                          });
+                        }}
+                      />
+                    </SummaryListItem>
+                    {model.preReleaseContactsByScheduledRelease[release.id].map(
+                      existingContact => (
+                        <SummaryListItem
+                          key={existingContact.id}
+                          term="Pre release access"
+                          actions={
+                            <Link
+                              to=""
+                              onClick={async _ => {
+                                const updatedContacts = await dashboardService.removePreReleaseContactFromRelease(
+                                  release.id,
+                                  existingContact.id,
+                                );
+                                setModel({
+                                  ...model,
+                                  preReleaseContactsByScheduledRelease: {
+                                    ...model.preReleaseContactsByScheduledRelease,
+                                    [release.id]: updatedContacts,
+                                  },
+                                });
+                              }}
+                            >
+                              Remove
+                            </Link>
+                          }
+                        >
+                          {existingContact.name}
+                        </SummaryListItem>
+                      ),
+                    )}
+                  </>
+                )}
+              </ReleasesTab>
+            </TabsSection>
+          </Tabs>
+        </Page>
+      )}
     </>
   );
 };

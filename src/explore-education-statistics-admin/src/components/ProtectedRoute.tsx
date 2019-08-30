@@ -30,7 +30,7 @@ const AuthenticationCheckingComponent = ({
     loginService
       .getUserDetails()
       .then(user => setAuthentication({ user }))
-      .catch(_ => setAuthentication({}));
+      .catch(() => setAuthentication({}));
   }, []);
 
   if (!authentication || !component) {

@@ -1,8 +1,9 @@
 using System;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -13,18 +14,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controller
     {
         private readonly PermalinkController _controller;
 
+        private readonly Guid _createdId = Guid.NewGuid();
         private readonly Guid _validId = Guid.NewGuid();
-        private readonly ObservationQueryContext _query = new ObservationQueryContext();
+        private readonly TableBuilderQueryContext _query = new TableBuilderQueryContext();
 
         public PermalinkControllerTests()
         {
             var permalinkService = new Mock<IPermalinkService>();
 
             permalinkService.Setup(s => s.GetAsync(_validId)).ReturnsAsync(
-                new PermalinkViewModel() {Id = _validId, Title = "Example title", Data = new ResultWithMetaViewModel()}
+                new PermalinkViewModel
+                {
+                    Id = _validId,
+                    FullTable = new TableBuilderResultViewModel()
+                }
             );
+            
             permalinkService.Setup(s => s.CreateAsync(_query)).ReturnsAsync(
-                new PermalinkViewModel() {Id = Guid.NewGuid(), Title = "Example title", Data = new ResultWithMetaViewModel()}
+                new PermalinkViewModel
+                {
+                    Id = _createdId,
+                    FullTable = new TableBuilderResultViewModel()
+                }
             );
             
             _controller = new PermalinkController(permalinkService.Object);
@@ -40,17 +51,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controller
             var link = result.Value as PermalinkViewModel;
             
             Assert.Equal(_validId, link.Id);
-            Assert.Equal("Example title", link.Title);
-            Assert.Equal("/data-tables/permalink/" + _validId, link.Url);
-
         }
         
         [Fact]
         public async void Get_Permalink_NotFound()
         {
-            var result = _controller.Get(Guid.NewGuid());
+            var result = await _controller.Get(Guid.NewGuid());
 
-            Assert.IsAssignableFrom<NotFoundResult>(result.Result);
+            Assert.NotNull(result);
+            
+            Assert.IsAssignableFrom<NotFoundResult>(result);
         }
 
         [Fact]
@@ -61,9 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controller
             Assert.IsAssignableFrom<PermalinkViewModel>(result.Value);
             var link = result.Value as PermalinkViewModel;
 
-            Assert.NotNull(link.Id);
-            Assert.NotNull(link.Title);
-            Assert.Equal("/data-tables/permalink/" + link.Id, link.Url);
+            Assert.Equal(_createdId, link.Id);
         }
     }
 }

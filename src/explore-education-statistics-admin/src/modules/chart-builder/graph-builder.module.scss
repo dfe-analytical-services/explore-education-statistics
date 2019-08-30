@@ -155,3 +155,15 @@
 .margin-top-30 {
   margin-top: 30px;
 }
+
+.preview {
+  align-items: center;
+  background-color: #eee;
+  display: flex;
+  justify-content: center;
+
+  span {
+    font-size: 1.5em;
+    font-weight: bold;
+  }
+}

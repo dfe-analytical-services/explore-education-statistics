@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces
 {
@@ -6,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
     {
         IEnumerable<Footnote> GetFootnotes(
             long subjectId,
-            IEnumerable<Observation> observations,
+            IQueryable<Observation> observations,
             IEnumerable<long> indicators
         );
     }

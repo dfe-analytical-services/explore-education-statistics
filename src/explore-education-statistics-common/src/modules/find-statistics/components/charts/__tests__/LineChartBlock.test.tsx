@@ -78,6 +78,7 @@ describe('LineChartBlock', () => {
         {...props}
         axes={{
           ...axes,
+          // @ts-ignore
           minor: {
             ...axes.minor,
             visible: false,
@@ -97,6 +98,7 @@ describe('LineChartBlock', () => {
         {...props}
         axes={{
           ...axes,
+          // @ts-ignore
           minor: {
             ...axes.minor,
             visible: false,
@@ -195,6 +197,7 @@ describe('LineChartBlock', () => {
 
   test('can render minor axis reference line', () => {
     const { container } = render(
+      // @ts-ignore
       <Chart
         {...{
           ...props,
@@ -283,6 +286,7 @@ describe('LineChartBlock', () => {
       ...props,
       axes: {
         major: props.axes.major,
+        // @ts-ignore
         minor: {
           ...props.axes.minor,
           tickConfig: 'default',
@@ -300,6 +304,7 @@ describe('LineChartBlock', () => {
       ...props,
       axes: {
         major: props.axes.major,
+        // @ts-ignore
         minor: {
           ...props.axes.minor,
           tickConfig: 'startEnd',
@@ -317,6 +322,7 @@ describe('LineChartBlock', () => {
       ...props,
       axes: {
         major: props.axes.major,
+        // @ts-ignore
         minor: {
           ...props.axes.minor,
           tickConfig: 'custom',

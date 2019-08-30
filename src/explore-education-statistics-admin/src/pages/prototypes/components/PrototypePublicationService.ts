@@ -119,6 +119,7 @@ export default class PrototypePublicationService {
         topicId: '1003fa5c-b60a-4036-a178-e3a69a81b852',
         topic: null,
       },
+      latestRelease: true,
       updates: [
         {
           id: '9c0f0139-7f88-4750-afe0-1c85cdf1d047',
@@ -377,6 +378,57 @@ export default class PrototypePublicationService {
           size: '198 Kb',
         },
       ],
+      downloadFiles: [
+        {
+          extension: 'csv',
+          name: 'Absence by characteristic',
+          path:
+            'pupil-absence-in-schools-in-england/2016-17/absence_by_characteristic.csv',
+          size: '58 Mb',
+        },
+        {
+          extension: 'csv',
+          name: 'Absence by geographic level',
+          path:
+            'pupil-absence-in-schools-in-england/2016-17/absence_by_geographic_level.csv',
+          size: '63 Mb',
+        },
+        {
+          extension: 'csv',
+          name: 'Absence by term',
+          path:
+            'pupil-absence-in-schools-in-england/2016-17/absence_by_term.csv',
+          size: '2 Mb',
+        },
+        {
+          extension: 'csv',
+          name: 'Absence for four year olds',
+          path:
+            'pupil-absence-in-schools-in-england/2016-17/absence_for_four_year_olds.csv',
+          size: '13 Mb',
+        },
+        {
+          extension: 'csv',
+          name: 'Absence in prus',
+          path:
+            'pupil-absence-in-schools-in-england/2016-17/absence_in_prus.csv',
+          size: '141 Kb',
+        },
+        {
+          extension: 'csv',
+          name: 'Absence number missing at least one session by reason',
+          path:
+            'pupil-absence-in-schools-in-england/2016-17/absence_number_missing_at_least_one_session_by_reason.csv',
+          size: '19 Mb',
+        },
+        {
+          extension: 'csv',
+          name: 'Absence rate percent bands',
+          path:
+            'pupil-absence-in-schools-in-england/2016-17/absence_rate_percent_bands.csv',
+          size: '198 Kb',
+        },
+      ],
     });
   }
 
@@ -414,6 +466,7 @@ export default class PrototypePublicationService {
           },
         },
       },
+      latestRelease: true,
       updates: [],
       content: [
         {
@@ -532,6 +585,57 @@ export default class PrototypePublicationService {
         ],
       },
       dataFiles: [
+        {
+          extension: 'csv',
+          name: 'Absence by characteristic',
+          path:
+            'pupil-absence-in-schools-in-england/2016-17/absence_by_characteristic.csv',
+          size: '58 Mb',
+        },
+        {
+          extension: 'csv',
+          name: 'Absence by geographic level',
+          path:
+            'pupil-absence-in-schools-in-england/2016-17/absence_by_geographic_level.csv',
+          size: '63 Mb',
+        },
+        {
+          extension: 'csv',
+          name: 'Absence by term',
+          path:
+            'pupil-absence-in-schools-in-england/2016-17/absence_by_term.csv',
+          size: '2 Mb',
+        },
+        {
+          extension: 'csv',
+          name: 'Absence for four year olds',
+          path:
+            'pupil-absence-in-schools-in-england/2016-17/absence_for_four_year_olds.csv',
+          size: '13 Mb',
+        },
+        {
+          extension: 'csv',
+          name: 'Absence in prus',
+          path:
+            'pupil-absence-in-schools-in-england/2016-17/absence_in_prus.csv',
+          size: '141 Kb',
+        },
+        {
+          extension: 'csv',
+          name: 'Absence number missing at least one session by reason',
+          path:
+            'pupil-absence-in-schools-in-england/2016-17/absence_number_missing_at_least_one_session_by_reason.csv',
+          size: '19 Mb',
+        },
+        {
+          extension: 'csv',
+          name: 'Absence rate percent bands',
+          path:
+            'pupil-absence-in-schools-in-england/2016-17/absence_rate_percent_bands.csv',
+          size: '198 Kb',
+        },
+      ],
+      downloadFiles: [
         {
           extension: 'csv',
           name: 'Absence by characteristic',

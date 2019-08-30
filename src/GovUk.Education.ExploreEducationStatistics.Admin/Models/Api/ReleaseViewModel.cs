@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 {
@@ -14,6 +15,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 
         public string Title { get; set; }
 
+        public Guid PublicationId { get; set; }
+
         public string PublicationTitle { get; set; }
         public string ReleaseName { get; set; }
         
@@ -21,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         
         public string YearTitle { get; set; }
 
-        public Guid TypeId { get; set; }
+        public Guid? TypeId { get; set; }
 
         public PartialDate NextReleaseDate { get; set; }
 
@@ -30,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         public DateTime? Published { get; set; }
 
         [JsonConverter(typeof(TimeIdentifierJsonConverter))]
-        public TimeIdentifier TimePeriodCoverage { get; set; }
+        public TimeIdentifier? TimePeriodCoverage { get; set; }
 
         public bool LatestRelease { get; set; }
         
@@ -38,6 +41,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         
         public Contact Contact { get; set; }
         
+        [JsonConverter(typeof(StringEnumConverter))]
+        public ReleaseStatus Status { get; set; }
+
+        public string InternalReleaseNote { get; set; }
         
+        public List<Comment> DraftComments { get; set; }
+
+        public List<Comment> HigherReviewComments { get; set; }
+
+        public class Comment
+        {
+            public string AuthorName { get; set; }
+            
+            public DateTime CreatedDate { get; set; }
+
+            public string Message { get; set; }
+        }
     }
 }

@@ -1,9 +1,7 @@
-import React, { memo, forwardRef } from 'react';
 import last from 'lodash/last';
+import React, { memo, forwardRef } from 'react';
 import cartesian from '@common/lib/utils/cartesian';
 import formatPretty from '@common/lib/utils/number/formatPretty';
-import { TableData } from '@common/services/tableBuilderService';
-import { Dictionary } from '@common/types/util';
 import WarningMessage from '@common/components/WarningMessage';
 import {
   CategoryFilter,
@@ -11,25 +9,20 @@ import {
   LocationFilter,
 } from '@frontend/modules/table-tool/components/types/filters';
 import TimePeriod from '@frontend/modules/table-tool/components/types/TimePeriod';
+import { FullTable } from '@frontend/services/permalinkService';
 import DataTableCaption from './DataTableCaption';
 import FixedMultiHeaderDataTable from './FixedMultiHeaderDataTable';
 import { TableHeadersFormValues } from './TableHeadersForm';
 
 interface Props {
-  indicators: Indicator[];
-  filters: Dictionary<CategoryFilter[]>;
-  timePeriods: TimePeriod[];
-  publicationName: string;
-  subjectName: string;
-  locations: LocationFilter[];
-  results: TableData['result'];
-  footnotes?: TableData['footnotes'];
+  fullTable: FullTable;
   tableHeadersConfig: TableHeadersFormValues;
 }
 
 const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
   (props: Props, dataTableRef) => {
-    const { results, footnotes, tableHeadersConfig } = props;
+    const { fullTable, tableHeadersConfig } = props;
+    const { subjectMeta, results } = fullTable;
 
     if (results.length === 0) {
       return (
@@ -74,6 +67,7 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
         const indicator = (rowCol1 instanceof Indicator
           ? rowCol1
           : rowCol2) as Indicator;
+
         const timePeriod = (rowCol2 instanceof TimePeriod
           ? rowCol2
           : rowCol1) as TimePeriod;
@@ -121,12 +115,12 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
 
     return (
       <FixedMultiHeaderDataTable
-        caption={<DataTableCaption {...props} id="dataTableCaption" />}
+        caption={<DataTableCaption {...subjectMeta} id="dataTableCaption" />}
         columnHeaders={columnHeaders}
         rowHeaders={rowHeaders}
         rows={rows}
         ref={dataTableRef}
-        footnotes={footnotes}
+        footnotes={subjectMeta.footnotes}
       />
     );
   },

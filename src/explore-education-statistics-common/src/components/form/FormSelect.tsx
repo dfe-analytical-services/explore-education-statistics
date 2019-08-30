@@ -67,7 +67,7 @@ const FormSelect = ({
         value={value}
       >
         {options &&
-          (order === undefined
+          (order === undefined || order.length === 0
             ? options
             : orderBy(options, order, orderDirection)
           ).map(option => (
@@ -82,10 +82,10 @@ const FormSelect = ({
           ))}
         {optGroups &&
           Object.keys(optGroups).map(group => (
-            <optgroup key={group} label={group}>
+            <optgroup key={`group-${group}`} label={group}>
               {optGroups[group].map(option => (
                 <option
-                  key={option.value}
+                  key={`value-${option.value}`}
                   value={option.value}
                   style={option.style}
                 >

@@ -1,4 +1,3 @@
-import { TimePeriodCoverageGroup } from '@admin/pages/DummyReferenceData';
 import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
@@ -31,17 +30,14 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
     });
   }, [releaseId]);
 
-  const submitHandler = (values: EditFormValues) => {
+  const submitHandler = async (values: EditFormValues) => {
     const updatedReleaseDetails = assembleUpdateReleaseSummaryRequestFromForm(
       releaseId,
       values,
     );
 
-    service
-      .updateReleaseSummaryDetails(updatedReleaseDetails)
-      .then(_ =>
-        history.push(summaryRoute.generateLink(publication.id, releaseId)),
-      );
+    await service.updateReleaseSummaryDetails(updatedReleaseDetails);
+    history.push(summaryRoute.generateLink(publication.id, releaseId));
   };
 
   const cancelHandler = () =>
@@ -55,9 +51,7 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
 
           <ReleaseSummaryForm
             submitButtonText="Update release summary"
-            initialValuesSupplier={(
-              _: TimePeriodCoverageGroup[],
-            ): EditFormValues => ({
+            initialValuesSupplier={(): EditFormValues => ({
               timePeriodCoverageCode:
                 releaseSummaryDetails.timePeriodCoverage.value,
               timePeriodCoverageStartYear: releaseSummaryDetails.releaseName.toString(),

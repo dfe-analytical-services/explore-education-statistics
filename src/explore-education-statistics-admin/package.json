@@ -108,7 +108,7 @@
   },
   "scripts": {
     "start": "node scripts/start.js",
-    "start:nolint": "cross-env ESLINT_DISABLE=true node scripts/start.js",
+    "start:nolint": "cross-env ESLINT_DISABLE=true node --inspect scripts/start.js",
     "build": "node scripts/build.js",
     "lint": "npm run lint:js && npm run lint:style",
     "lint:js": "eslint --ext .ts,.tsx,.js,.jsx .",

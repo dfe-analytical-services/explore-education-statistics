@@ -2,7 +2,7 @@ import Client from '@common/services/api/Client';
 import { commaSeparated } from '@common/services/util/paramSerializers';
 import axios from 'axios';
 
-const baseURL = '/api/';
+export const baseURL = '/api/';
 
 const axiosInstance = axios.create({
   baseURL,

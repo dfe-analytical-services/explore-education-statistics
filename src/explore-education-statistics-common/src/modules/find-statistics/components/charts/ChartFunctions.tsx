@@ -55,17 +55,20 @@ export function parseCondensedTimePeriodRange(
 
 export interface AxesConfiguration {
   major: AxisConfiguration;
-  minor: AxisConfiguration;
+  minor?: AxisConfiguration;
 }
 
-export interface ChartProps {
+export interface AbstractChartProps {
   data: DataBlockData;
   meta: DataBlockMetadata;
-  labels: Dictionary<DataSetConfiguration>;
-  axes: AxesConfiguration;
   title?: string;
   height?: number;
   width?: number;
+}
+
+export interface ChartProps extends AbstractChartProps {
+  labels: Dictionary<DataSetConfiguration>;
+  axes: AxesConfiguration;
   legend?: 'none' | 'top' | 'bottom';
   legendHeight?: string;
 }
@@ -88,16 +91,22 @@ export interface DataSetResult {
 }
 
 export interface ChartCapabilities {
+  hasAxes: boolean;
   dataSymbols: boolean;
   stackable: boolean;
   lineStyle: boolean;
   gridLines: boolean;
   canSize: boolean;
+  fixedAxisGroupBy: boolean;
+  hasReferenceLines: boolean;
+  hasLegend: boolean;
 }
 
 export interface ChartDefinition {
   type: ChartType;
   name: string;
+
+  height?: number;
 
   capabilities: ChartCapabilities;
 
@@ -113,6 +122,7 @@ export interface ChartDefinition {
     title: string;
     type: AxisType;
     defaultDataType?: AxisGroupBy;
+    forcedDataType?: AxisGroupBy;
   }[];
 }
 
@@ -293,11 +303,16 @@ export function generateKeyFromDataSet(
 
 function generateNameForAxisConfiguration(
   result: Result,
+  dataSet: ChartDataSet,
   groupBy?: AxisGroupBy,
 ): string {
   switch (groupBy) {
     case 'timePeriods':
       return result.timePeriod;
+    case 'indicators':
+      return `${dataSet.indicator}`;
+    case 'filters':
+      return result.filters.join('_');
     case 'locations':
       if (
         result.location.localAuthorityDistrict &&
@@ -351,7 +366,7 @@ function getChartDataForAxis(
 
   return Object.values(
     dataForAxis.reduce<Dictionary<ChartDataB>>((r, result) => {
-      const name = generateNameForAxisConfiguration(result, groupBy);
+      const name = generateNameForAxisConfiguration(result, dataSet, groupBy);
 
       return {
         ...r,
@@ -395,14 +410,20 @@ export function sortChartData(
 ) {
   if (sortBy === undefined) return chartData;
 
-  return [...chartData].sort(({ [sortBy]: sortByA }, { [sortBy]: sortByB }) => {
-    if (sortByA !== undefined && sortByB !== undefined) {
-      return sortAsc
-        ? sortByA.localeCompare(sortByB)
-        : sortByB.localeCompare(sortByA);
-    }
-    return 0;
-  });
+  const mappedValueAndData = chartData.map(data => ({
+    value:
+      data[sortBy] === undefined ? undefined : Number.parseFloat(data[sortBy]),
+    data,
+  }));
+
+  return mappedValueAndData
+    .sort(({ value: valueA }, { value: valueB }) => {
+      if (valueA !== undefined && valueB !== undefined) {
+        return sortAsc ? valueA - valueB : valueB - valueA;
+      }
+      return 0;
+    })
+    .map(({ data }) => data);
 }
 
 export function createDataForAxis(
@@ -432,29 +453,31 @@ const FindFirstInDictionaries = (
   result || (meta && meta[name] && meta[name].label);
 
 export function mapNameToNameLabel(
+  keepOriginalValue: boolean = false,
   ...metaDataObjects: (Dictionary<DataSetConfiguration> | undefined)[]
 ) {
   return ({ name, ...otherdata }: { name: string }) => ({
-    ...otherdata,
+    ...(keepOriginalValue ? { __name: name } : {}),
     name:
       metaDataObjects.reduce(
         FindFirstInDictionaries(metaDataObjects, name),
         '',
       ) || name,
+    ...otherdata,
   });
 }
 
-export function createSortedAndMappedDataForAxis(
+export function createSortedDataForAxis(
   axisConfiguration: AxisConfiguration,
   results: Result[],
   meta: DataBlockMetadata,
-  labels: Dictionary<DataSetConfiguration>,
+  mapFunction: (data: ChartDataB) => ChartDataB = data => data,
 ): ChartDataB[] {
   const chartData: ChartDataB[] = createDataForAxis(
     axisConfiguration,
     results,
     meta,
-  ).map(mapNameToNameLabel(labels, meta.timePeriods, meta.locations));
+  ).map(mapFunction);
 
   const sorted = sortChartData(
     chartData,
@@ -467,6 +490,26 @@ export function createSortedAndMappedDataForAxis(
   }
 
   return sorted;
+}
+
+export function createSortedAndMappedDataForAxis(
+  axisConfiguration: AxisConfiguration,
+  results: Result[],
+  meta: DataBlockMetadata,
+  labels: Dictionary<DataSetConfiguration>,
+  keepOriginalValue: boolean = false,
+): ChartDataB[] {
+  return createSortedDataForAxis(
+    axisConfiguration,
+    results,
+    meta,
+    mapNameToNameLabel(
+      keepOriginalValue,
+      labels,
+      meta.timePeriods,
+      meta.locations,
+    ),
+  );
 }
 
 export function getKeysForChart(chartData: ChartDataB[]) {

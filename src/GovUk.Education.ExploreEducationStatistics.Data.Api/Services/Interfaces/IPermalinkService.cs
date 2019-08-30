@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces
 {
@@ -9,6 +9,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interface
     {
         Task<PermalinkViewModel> GetAsync(Guid id);
 
-        Task<PermalinkViewModel> CreateAsync(ObservationQueryContext tableQuery);
+        Task<PermalinkViewModel> CreateAsync(TableBuilderQueryContext query);
     }
 }

@@ -1,13 +1,11 @@
 using System;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 {
-
-    
     [Route("api/[controller]")]
     [ApiController]
     public class PermalinkController : ControllerBase
@@ -33,10 +31,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] ObservationQueryContext tableQuery)
+        public async Task<IActionResult> Create([FromBody] TableBuilderQueryContext query)
         {
-            var permalink = await _permalinkService.CreateAsync(tableQuery);
-
+            var permalink = await _permalinkService.CreateAsync(query);
             return Ok(permalink);
         }
     }

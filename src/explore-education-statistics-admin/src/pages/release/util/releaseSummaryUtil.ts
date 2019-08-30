@@ -1,6 +1,8 @@
 import {
   dayMonthYearInputsToDate,
   dayMonthYearInputsToValues,
+  IdTitlePair,
+  TimePeriodCoverageGroup,
 } from '@admin/services/common/types';
 import { CreateReleaseRequest } from '@admin/services/release/create-release/types';
 import { UpdateReleaseSummaryDetailsRequest } from '@admin/services/release/edit-release/summary/types';
@@ -43,5 +45,41 @@ export const assembleUpdateReleaseSummaryRequestFromForm = (
     ...assembleBaseReleaseSummaryRequestFromForm(values),
   };
 };
+
+export const findTimePeriodCoverageGroup = (
+  code: string,
+  timePeriodCoverageGroups: TimePeriodCoverageGroup[],
+) => {
+  return (
+    timePeriodCoverageGroups.find(group =>
+      group.timeIdentifiers
+        .map(option => option.identifier.value)
+        .some(id => id === code),
+    ) || timePeriodCoverageGroups[0]
+  );
+};
+
+export const findTimePeriodCoverageOption = (
+  code: string,
+  timePeriodCoverageGroups: TimePeriodCoverageGroup[],
+) =>
+  timePeriodCoverageGroups
+    .flatMap(group => group.timeIdentifiers)
+    .find(option => option.identifier.value === code) ||
+  timePeriodCoverageGroups[0].timeIdentifiers[0];
+
+export const getSelectedTimePeriodCoverageLabel = (
+  timePeriodCoverageCode: string,
+  timePeriodCoverageGroups: TimePeriodCoverageGroup[],
+) =>
+  findTimePeriodCoverageOption(timePeriodCoverageCode, timePeriodCoverageGroups)
+    .identifier.label;
+
+export const getSelectedReleaseType = (
+  releaseTypeId: string,
+  availableReleaseTypes: IdTitlePair[],
+) =>
+  availableReleaseTypes.find(type => type.id === releaseTypeId) ||
+  availableReleaseTypes[0];
 
 export default {};

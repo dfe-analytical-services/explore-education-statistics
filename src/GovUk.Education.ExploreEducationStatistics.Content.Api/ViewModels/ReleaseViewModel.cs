@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
@@ -19,6 +20,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels
         public string YearTitle { get; set; }
 
         public DateTime? Published { get; set; }
+
+        public bool LatestRelease { get; set; }
 
         public string Slug { get; set; }
 
@@ -39,5 +42,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels
         public List<FileInfo> AncillaryFiles { get; set; }
         
         public List<FileInfo> ChartFiles { get; set; }
+        
+        
+        // Files to download are the actual data files and ancillary files, but currently not the chart files.
+        public List<FileInfo> DownloadFiles
+        {
+            get
+            {
+                var data = DataFiles ?? new List<FileInfo>();
+                var ancillary = AncillaryFiles ?? new List<FileInfo>();
+                return data.Concat(ancillary).ToList();
+            }
+        }
     }
 }

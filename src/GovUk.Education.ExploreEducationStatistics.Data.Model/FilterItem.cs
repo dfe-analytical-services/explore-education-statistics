@@ -18,6 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         {
             Label = label;
             FilterGroup = filterGroup;
+            FilterGroupId = filterGroup.Id;
         }
     }
 }

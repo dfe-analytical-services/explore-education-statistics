@@ -16,7 +16,6 @@ Navigate to /methodology page
 Validate page contents
     [Tags]  HappyPath
     user checks page contains accordion    Pupils and schools
-    user checks accordion is in position   Pupils and schools   1
 
     user opens accordion section    Pupils and schools
 
