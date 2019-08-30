@@ -63,15 +63,15 @@ const reverseMapTableHeadersConfig = (
     fullTableSubjectMeta.locations,
   ];
 
-  const mapGroupGroups = (
-    groupGroups: SortableOption[][],
+  const mapGroupsToFilterGroups = (
+    optionsGroup: SortableOption[][],
   ): (LocationFilter | CategoryFilter)[][] =>
-    groupGroups.map(rowGroup => {
-      const currentIndex = locationAndFilterGroups.findIndex(group =>
-        group.find(element => element.value === rowGroup[0].value),
+    optionsGroup.map(options => {
+      const currentIndex = locationAndFilterGroups.findIndex(option =>
+        option.find(element => element.value === options[0].value),
       );
 
-      return rowGroup.map(
+      return options.map(
         ({ value }) =>
           locationAndFilterGroups[currentIndex].find(
             element => element.value === value,
@@ -81,9 +81,9 @@ const reverseMapTableHeadersConfig = (
 
   return {
     columns: mappedColumns,
-    columnGroups: mapGroupGroups(columnGroups),
+    columnGroups: mapGroupsToFilterGroups(columnGroups),
     rows: mappedRows,
-    rowGroups: mapGroupGroups(rowGroups),
+    rowGroups: mapGroupsToFilterGroups(rowGroups),
   };
 };
 
