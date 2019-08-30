@@ -1,14 +1,15 @@
 import FormattedDate from '@common/components/FormattedDate';
 import permalinkService, {
   Permalink,
-} from '@frontend/services/permalinkService';
+} from '@common/modules/full-table/services/permalinkService';
+import { mapPermalink } from '@common/modules/full-table/utils/mapPermalinks';
 import ButtonLink from '@frontend/components/ButtonLink';
 import Page from '@frontend/components/Page';
 import PrintThisPage from '@frontend/components/PrintThisPage';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
+import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
 import TimePeriodDataTable from '../table-tool/components/TimePeriodDataTable';
-import getDefaultTableHeaderConfig from '../table-tool/utils/tableHeaders';
 import DownloadCsvButton from '../table-tool/components/DownloadCsvButton';
 
 interface Props {
@@ -36,11 +37,11 @@ class PermalinkPage extends Component<Props> {
 
   public render() {
     const { data } = this.props;
-    const { fullTable /* , configuration */ } = data;
+    const { fullTable, configuration } = mapPermalink(data);
 
     return (
       <Page
-        title={data.title}
+        title={`'${fullTable.subjectMeta.subjectName}' from '${fullTable.subjectMeta.publicationName}'`}
         caption="Permanent data table"
         breadcrumbs={[
           { name: 'Data tables', link: '/data-tables' },
@@ -65,22 +66,18 @@ class PermalinkPage extends Component<Props> {
             </RelatedAside> */}
           </div>
         </div>
-
         <TimePeriodDataTable
           fullTable={fullTable}
           tableHeadersConfig={
-            /* configuration.tableHeadersConfig
+            configuration.tableHeadersConfig
               ? configuration.tableHeadersConfig
-              :  */ getDefaultTableHeaderConfig(
-              fullTable.subjectMeta,
-            )
+              : getDefaultTableHeaderConfig(fullTable.subjectMeta)
           }
         />
         <DownloadCsvButton
           publicationSlug={`permalink-${data.created}-${data.title}`}
           fullTable={fullTable}
         />
-
         <p className="govuk-body-s">Source: DfE prototype example statistics</p>
         <h2 className="govuk-heading-m govuk-!-margin-top-9">
           Create your own tables online
@@ -92,7 +89,6 @@ class PermalinkPage extends Component<Props> {
         <ButtonLink prefetch as="/data-tables/" href="/data-tables">
           Create tables
         </ButtonLink>
-
         <PrintThisPage
           analytics={{
             category: 'Page print',
