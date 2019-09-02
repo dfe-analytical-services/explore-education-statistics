@@ -96,6 +96,7 @@ interface TimePeriodQuery {
 }
 
 export type TableDataQuery = {
+  publicationId?: string;
   subjectId: string;
   filters: string[];
   indicators: string[];
