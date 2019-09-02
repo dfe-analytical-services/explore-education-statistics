@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             
             var batchSettings = GetBatchSettings(LoadAppSettings(context));
             
-            if (IsDataFileValid(message, batchSettings.BatchSize, logger)) {
+            if (IsDataFileValid(message, batchSettings.RowsPerBatch, logger)) {
                 
                 try
                 {
@@ -99,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             var allValid = true;
             foreach (var message in messages)
             {
-                if (!IsDataFileValid(message, batchSettings.BatchSize, logger))
+                if (!IsDataFileValid(message, batchSettings.RowsPerBatch, logger))
                 {
                     allValid = false;
                 }
@@ -132,12 +132,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             ILogger logger)
         {
             logger.LogInformation(
-                    $"{GetType().Name} function STARTED for : Batch: {message.BatchNo} of {message.BatchSize} with Datafile: {message.DataFileName}");
+                    $"{GetType().Name} function STARTED for : Batch: {message.BatchNo} of {message.NumBatches} with Datafile: {message.DataFileName}");
                 
             _fileImportService.ImportObservations(message).Wait();
 
             logger.LogInformation(
-                $"{GetType().Name} function COMPLETE for : Batch: {message.BatchNo}  of {message.BatchSize} with Datafile: {message.DataFileName}");
+                $"{GetType().Name} function COMPLETE for : Batch: {message.BatchNo}  of {message.NumBatches} with Datafile: {message.DataFileName}");
         }
 
         private SubjectData ProcessSubject(ImportMessage message)
@@ -158,26 +158,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             return subjectData;
         }
 
-        private bool IsDataFileValid(ImportMessage message, int batchSize, ILogger logger)
+        private bool IsDataFileValid(ImportMessage message, int rowsPerBatch, ILogger logger)
         {
             logger.LogInformation($"Validating Datafile: {message.DataFileName}");
 
             var subjectData = _fileStorageService.GetSubjectData(message).Result;
-            var numBatches = SplitFileService.GetNumBatches(subjectData.GetCsvLines().Count(), batchSize);
             
-            _batchService.UpdateStatus(
+            _batchService.CreateBatch(
                 message.Release.Id.ToString(), 
-                numBatches, ImportStatus.RUNNING_PHASE_1,
-                message.DataFileName).Wait();
+                message.DataFileName,
+                SplitFileService.GetNumBatches(subjectData.GetCsvLines().Count(), rowsPerBatch)
+                ).Wait();
             
-            var valid = _validatorService.IsDataValid(message, subjectData);
-
-            if (!valid)
+            var errors = _validatorService.Validate(message, subjectData);
+            
+            if (errors.Count > 0)
             {
                 logger.LogInformation($"Datafile: {message.DataFileName} has errors");
+
+                _batchService.FailBatch(
+                    message.Release.Id.ToString(), 
+                    errors, 
+                    message.DataFileName).Wait();
+                
+                return false;
             }
 
-            return valid;
+            return true;
         }
 
         private void SaveChanges()
@@ -196,7 +203,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
 
         private static BatchSettings GetBatchSettings(IConfigurationRoot config)
         {
-            return new BatchSettings {BatchSize = config.GetValue<int>("BatchSize")};
+            return new BatchSettings {RowsPerBatch = config.GetValue<int>("RowsPerBatch")};
         }
     }
 }

@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Importer.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
@@ -25,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
         private int _importCount;
         
-                private enum Columns
+        private enum Columns
         {
             SCHOOL_COLS,
             COUNTRY_COLS,
@@ -108,13 +107,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
         public SubjectMeta ImportMeta(List<string> metaLines, Subject subject)
         {
-            _logger.LogDebug("Importing meta lines for Publication {Publication}, {Subject}", subject.Release.Publication.Title, subject.Name);
+            //_logger.LogDebug("Importing meta lines for Publication {Publication}, {Subject}", subject.Release.Publication.Title, subject.Name);
             return _importerMetaService.Import(metaLines, subject);
         }
         
         public SubjectMeta GetMeta(List<string> metaLines, Subject subject)
         {
-            _logger.LogDebug("Getting meta lines for Publication {Publication}, {Subject}", subject.Release.Publication.Title, subject.Name);
+            //_logger.LogDebug("Getting meta lines for Publication {Publication}, {Subject}", subject.Release.Publication.Title, subject.Name);
             return _importerMetaService.Get(metaLines, subject);
         }
 
@@ -130,8 +129,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             });
         }
 
-        public void ImportObservations(List<string> lines, Subject subject, SubjectMeta subjectMeta)
+        public void ImportObservations(List<string> lines, Subject subject, SubjectMeta subjectMeta, int batchNo, int rowsPerBatch)
         {
+            _importCount = 0;
             _logger.LogDebug("Importing batch for Publication {Publication}, {Subject}", subject.Release.Publication.Title, subject.Name);
             
             var headers = lines.First().Split(',').ToList();
@@ -139,8 +139,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
             _logger.LogInformation($"Retrieving observations for {subject.Name}");
 
-            var observations = GetObservations(lines, headers, subject, subjectMeta).ToList();
-            
+            var observations = GetObservations(lines, headers, subject, subjectMeta, batchNo, rowsPerBatch).ToList();
+
             _logger.LogInformation($"Adding {observations.Count()} observations for {subject.Name}");
 
             var subEntities = new List<ObservationFilterItem>();
@@ -148,8 +148,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             using (var transaction = _context.Database.BeginTransaction())
             {
                 _context.BulkInsert(observations,
-                    new BulkConfig {PreserveInsertOrder = true, SetOutputIdentity = true});
-                
+                    new BulkConfig {WithHoldlock= true, BatchSize = observations.Count(), PreserveInsertOrder = true, SetOutputIdentity = true});
+
                 foreach (var o in observations)
                 {
                     foreach (var item in o.FilterItems)
@@ -160,7 +160,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                     
                     subEntities.AddRange(o.FilterItems);
                 }
-                _context.BulkInsert(subEntities);
+                _context.BulkInsert(subEntities,
+                        new BulkConfig {WithHoldlock= true, BatchSize = subEntities.Count()});
+                    
                 transaction.Commit();
             }
 
@@ -189,17 +191,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         private IEnumerable<Observation> GetObservations(IEnumerable<string> lines,
             List<string> headers,
             Subject subject,
-            SubjectMeta subjectMeta
+            SubjectMeta subjectMeta,
+            int batchNo,
+            int rowsPerBatch
             )
         {
-            return lines.Select(line => 
-                ObservationFromCsv(line, headers, subject, subjectMeta));
+            // In order to "Preserve Order" of the bulk insertion need to assign a temp id which cannot exist in db
+            var lastId = _context.Observation.Select(x => x.Id).DefaultIfEmpty(1).Max() + 1;
+            return lines.Select((line, i) =>
+            {
+                var csvRowNum = ((batchNo - 1) * rowsPerBatch) + i + 2;
+                return ObservationFromCsv(line, headers, subject, subjectMeta, csvRowNum, lastId++);
+            });
         }
         
         private Observation ObservationFromCsv(string raw,
             List<string> headers,
             Subject subject,
-            SubjectMeta subjectMeta)
+            SubjectMeta subjectMeta,
+            int csvRowNum,
+            long lastId)
         {
             var line = raw.Split(',');
         
@@ -214,6 +225,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 SubjectId = subject.Id,
                 TimeIdentifier = GetTimeIdentifier(line, headers),
                 Year = GetYear(line, headers),
+                CsvRow = csvRowNum,
+                Id = lastId
             };
         }
         
@@ -229,10 +242,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             GetSchool(line, headers);
 
             var mod = _importCount++;
-            if (mod % 1000 == 0)
-            {
-                _logger.LogInformation($"{mod} (of {numLines}) lines processed during first pass for {subjectName}");
-            }
+//            if (mod % 1000 == 0)
+//            {
+//                _logger.LogInformation($"{mod} (of {numLines}) lines processed during first pass for {subjectName}");
+//            }
         }
 
         private void CreateFilterItems(IReadOnlyList<string> line,
@@ -246,15 +259,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 _importerFilterService.Find(filterItemLabel, filterGroupLabel, filterMeta.Filter); 
             }
         }
-        
-        private IEnumerable<FilterItem> GetFilterItems(long subjectId)
-        {
-            return _context.FilterItem
-                .Include(fi => fi.FilterGroup)
-                .ThenInclude(fg => fg.Filter)
-                .AsNoTracking().Where(fi => fi.FilterGroup.Filter.SubjectId == subjectId);
-        }
-        
+
         private ICollection<ObservationFilterItem> GetFilterItems(IReadOnlyList<string> line,
             List<string> headers,
             IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)> filtersMeta)

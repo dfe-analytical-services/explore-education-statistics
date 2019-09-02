@@ -49,10 +49,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
             var subjects = SamplePublications.GetSubjects();
             foreach (var subject in subjects)
             {
-                _logger.LogInformation($"Processing subject {subject.Id}");
-                var file = SamplePublications.SubjectFiles[subject.Id];
-                StoreFiles(subject.Release, file, subject.Name);
-                Seed(file + ".csv", subject.Release, subjects.Count);
+                if (subject.Id < 29)
+                {
+                    _logger.LogInformation($"Processing subject {subject.Id}");
+                    var file = SamplePublications.SubjectFiles[subject.Id];
+                    StoreFiles(subject.Release, file, subject.Name);
+                    Seed(file + ".csv", subject.Release, subjects.Count -4);
+                }
             }
 
             stopWatch.Stop();
@@ -76,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
                     DataFileName = dataFileName,
                     Release = importMessageRelease,
                     BatchNo = 1,
-                    BatchSize = 1
+                    NumBatches = 1
                 });
 
                 var last = messages.Count == maxCount;
@@ -110,7 +113,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
                 DataFileName = dataFileName,
                 Release = importMessageRelease,
                 BatchNo = 1,
-                BatchSize = 1
+                NumBatches = 1,
+                RowsPerBatch = 10000   // Just for info - rows per batch is actually set in host.json of the processor function
             };
 
             return new CloudQueueMessage(JsonConvert.SerializeObject(message));

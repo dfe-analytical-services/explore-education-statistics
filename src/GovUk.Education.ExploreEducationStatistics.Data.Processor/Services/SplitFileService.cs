@@ -32,9 +32,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var batchCount = 1;
             var lines = subjectData.GetCsvLines();
 
-            if (lines.Count() > batchSettings.BatchSize + 1)
+            if (lines.Count() > batchSettings.RowsPerBatch + 1)
             {
-                List<IFormFile> files = SplitFile(message, lines, batchSettings.BatchSize);
+                List<IFormFile> files = SplitFile(message, lines, batchSettings.RowsPerBatch);
 
                 // Upload the split data files & send message to process to imports-available queue
                 foreach (var f in files)
@@ -46,11 +46,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     {
                         DataFileName = f.FileName,
                         Release = message.Release,
-                        BatchNo = batchCount,
-                        BatchSize = files.Count
+                        BatchNo = batchCount++,
+                        NumBatches = files.Count,
+                        RowsPerBatch = batchSettings.RowsPerBatch
                     };
 
-                    batchCount++;
                     collector.Add(iMessage);
                 }
             }
@@ -64,11 +64,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private static List<IFormFile> SplitFile(
             ImportMessage message,
             IEnumerable<string> csvLines,
-            int batchSize)
+            int rowsPerBatch)
         {
             var files = new List<IFormFile>();    
             var header = csvLines.First();
-            var batches = csvLines.Skip(1).Batch(batchSize);
+            var batches = csvLines.Skip(1).Batch(rowsPerBatch);
             var index = 1;
             
             foreach (var batch in batches)
@@ -88,18 +88,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 }
                 
                 var f = new FormFile(mStream, 0, mStream.Length, message.DataFileName,
-                    message.DataFileName + "_" + String.Format("{0:000000}", index)) 
+                    message.DataFileName + "_" + $"{index++:000000}") 
                 {
                     Headers = new HeaderDictionary(),
                     ContentType = "text/csv"
                 };
                 files.Add(f);
-                index++;
             }
             return files;
         }
-        public static int GetNumBatches(int rows, int batchSize) {
-            return (int)Math.Ceiling(rows / (double)batchSize);
+        public static int GetNumBatches(int rows, int rowsPerBatch) {
+            return (int)Math.Ceiling(rows / (double)rowsPerBatch);
         }
     }
 }

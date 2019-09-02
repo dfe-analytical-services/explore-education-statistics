@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Inte
         SubjectMeta GetMeta(List<string> metaLines, Subject subject);
 
         void ImportObservations(List<string> batch, Subject subject,
-            SubjectMeta subjectMeta);
+            SubjectMeta subjectMeta, int batchNo, int rowsPerBatch);
 
         void ImportFiltersLocationsAndSchools(List<string> lines, SubjectMeta subjectMeta, Subject subject);
     }

@@ -71,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 .Select((line, index) => GetMetaRow(line, headers));
         }
 
-        private static MetaRow GetMetaRow(string line, List<string> headers)
+        public static MetaRow GetMetaRow(string line, List<string> headers)
         {
             return CsvUtil.BuildType(line.Split(','), 
                 headers, Enum.GetNames(typeof(MetaColumns)), values => new MetaRow

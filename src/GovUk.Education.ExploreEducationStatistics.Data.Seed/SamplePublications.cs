@@ -34,33 +34,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                 {22, DataCsvFile.SEN2_MI},
                 {23, DataCsvFile.skeleton_dashboard_tidy_data_NARTS},
                 {24, DataCsvFile.skeleton_dashboard_tidy_data_annual_v4},
-                {25, DataCsvFile.clean_data_fe},
-                {26, DataCsvFile.level_2_3_national},
-                {27, DataCsvFile.level_2_3_sf},
-                {28, DataCsvFile.level_2_3_sfla},
-                {29, DataCsvFile.KS2_2016_test_UD},
-                {30, DataCsvFile.KS4_2018_LA_Char_Testdata},
-                {31, DataCsvFile.KS4_2018_Nat_Char_Testdata},
-                {32, DataCsvFile.KS4_2018_Subject_Tables_S1_TestData},
-                {33, DataCsvFile.KS4_2018_Subject_Tables_S3_TestData}
+                
+                {25, DataCsvFile.level_2_3_national},
+                {26, DataCsvFile.level_2_3_sf},
+                {27, DataCsvFile.level_2_3_sfla},
+                {28, DataCsvFile.KS2_2016_test_UD},
+                {29, DataCsvFile.KS4_2018_LA_Char_Testdata},
+                {30, DataCsvFile.KS4_2018_Nat_Char_Testdata},
+                {31, DataCsvFile.KS4_2018_Subject_Tables_S1_TestData},
+                {32, DataCsvFile.KS4_2018_Subject_Tables_S3_TestData},
+                
+                {33, DataCsvFile.clean_data_fe}
+
             };
 
         // Ignore these subjects for now until we are provided with valid data files.
         private static readonly List<DataCsvFile> IgnoredSubjectFiles = new List<DataCsvFile>
         {
-            DataCsvFile.level_2_3_sf,
-            DataCsvFile.KS2_2016_test_UD,
-            DataCsvFile.KS4_2018_Subject_Tables_S1_TestData,
-            DataCsvFile.clean_data_fe,
-            DataCsvFile.SEN2_MI,
-            DataCsvFile.level_2_3_sfla,
-            DataCsvFile.KS4_2018_LA_Char_Testdata,
-            DataCsvFile.KS4_2018_Nat_Char_Testdata,
-            DataCsvFile.KS4_2018_Subject_Tables_S3_TestData,
-            
-            // New excluded files which need fixing subsequent to the prev feed
-            DataCsvFile.exclusions_by_characteristic,
-            DataCsvFile.skeleton_dashboard_tidy_data_NARTS
+            DataCsvFile.clean_data_fe
         };
 
         public static List<Subject> GetSubjects()
@@ -435,7 +426,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                             {
                                                 new Subject
                                                 {
-                                                    Id = 25,
+                                                    Id = 33,
                                                     Name = "Further education and skills"
                                                 }
                                             }
@@ -477,17 +468,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                             {
                                                 new Subject
                                                 {
-                                                    Id = 26,
+                                                    Id = 25,
                                                     Name = "Level 2 and 3 National"
                                                 },
                                                 new Subject
                                                 {
-                                                    Id = 27,
+                                                    Id = 26,
                                                     Name = "Level 2 and 3 sf"
                                                 },
                                                 new Subject
                                                 {
-                                                    Id = 28,
+                                                    Id = 27,
                                                     Name = "Level 2 and 3 sf by Local authority"
                                                 }
                                             }
@@ -520,7 +511,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                             {
                                                 new Subject
                                                 {
-                                                    Id = 29,
+                                                    Id = 28,
                                                     Name = "2016 test data"
                                                 }
                                             }
@@ -553,22 +544,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
                                             {
                                                 new Subject
                                                 {
-                                                    Id = 30,
+                                                    Id = 29,
                                                     Name = "Characteristic test data by Local authority"
                                                 },
                                                 new Subject
                                                 {
-                                                    Id = 31,
+                                                    Id = 30,
                                                     Name = "National characteristic test data"
                                                 },
                                                 new Subject
                                                 {
-                                                    Id = 32,
+                                                    Id = 31,
                                                     Name = "Subject tables S1 test data"
                                                 },
                                                 new Subject
                                                 {
-                                                    Id = 33,
+                                                    Id = 32,
                                                     Name = "Subject tables S3 test data"
                                                 }
                                             }

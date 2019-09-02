@@ -26,6 +26,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         [EnumLabelValue("Metafile has invalid number of columns")]
         MetaFileHasInvalidNumberOfColumns,
         
+        [EnumLabelValue("Metafile has invalid values")]
+        MetaFileHasInvalidValues,
+        
         [EnumLabelValue("Datafile contains quotes")]
         DataFileContainsQuotes,
         
@@ -41,34 +44,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
     
     public class ValidatorService : IValidatorService
     {
-        private readonly IBatchService _batchService;
-
-        public ValidatorService(IBatchService batchService)
+        public ValidatorService()
         {
-            _batchService = batchService;
         }
 
-        public bool IsDataValid(ImportMessage message, SubjectData subjectData)
+        public List<string> Validate(ImportMessage message, SubjectData subjectData)
         {
-            List<string> errors = new List<string>();
-            
-            ValidateMetaHeader(subjectData.GetMetaLines().First(), message, errors);
+            var errors = new List<string>();
+
+            var metaHeaders = subjectData.GetMetaLines().First();
+            ValidateMetaHeader(metaHeaders, message, errors);
             ValidateMetaRows(subjectData.GetMetaLines(), message, errors);
             ValidateObservations(subjectData.GetCsvLines(), message, errors);
 
-            if (errors.Count > 0)
-            {
-                _batchService.FailBatch(
-                    message.Release.Id.ToString(), 
-                    errors, 
-                    message.DataFileName).Wait();
-                return false;
-            }
-
-            return true;
+            return errors;
         }
 
-        private void ValidateMetaHeader(string header, ImportMessage message, List<string> errors)
+        private static void ValidateMetaHeader(string header, ImportMessage message, List<string> errors)
         {
             if (RowContainsQuotes(header))
             {
@@ -91,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             
             foreach (var line in lines.Skip(1))
             {
-                ValidateMetaRow(line, idx++, headers.Count, message, errors);  
+                ValidateMetaRow(line, idx++, headers, message, errors);  
             }
         }
         
@@ -106,8 +98,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
         }
 
-        private void ValidateMetaRow(string row, int rowNumber, int numExpectedColumns, ImportMessage message, List<string> errors)
+        private void ValidateMetaRow(string row, int rowNumber, List<string> headers, ImportMessage message, List<string> errors)
         {
+            int numExpectedColumns = headers.Count;
+            
             if (RowContainsQuotes(row))
             {
                 errors.Add($"error at row {rowNumber}: " + ValidationErrorMessages.MetaFileContainsQuotes.GetEnumLabel());
@@ -116,6 +110,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             if (HasUnexpectedNumberOfColumns(row, numExpectedColumns))
             {
                 errors.Add($"error at row {rowNumber}: " + ValidationErrorMessages.MetaFileHasInvalidNumberOfColumns.GetEnumLabel());
+            }
+
+            try
+            {
+                ImporterMetaService.GetMetaRow(row, headers);
+            }
+            catch (Exception e)
+            {
+                errors.Add($"error at row {rowNumber}: " + ValidationErrorMessages.MetaFileHasInvalidValues.GetEnumLabel() + " : " + e.Message);
             }
         }
         

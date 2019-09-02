@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 
@@ -5,6 +6,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
 {
     public interface IValidatorService
     {
-        bool IsDataValid(ImportMessage message, SubjectData subjectData);
+        List<string> Validate(ImportMessage message, SubjectData subjectData);
     }
 }
