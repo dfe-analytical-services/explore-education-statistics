@@ -4,14 +4,16 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190902102025_ApplicationContactUpdate")]
+    partial class ApplicationContactUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -37,6 +39,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
                     b.ToTable("Contacts");
 
                     b.HasData(
+                        new
+                        {
+                            Id = new Guid("11bb7387-e85e-4571-9669-8a760dcb004f"),
+                            ContactName = "Simon Shakespeare",
+                            ContactTelNo = "0114 262 1619",
+                            TeamEmail = "teamshakes@gmail.com",
+                            TeamName = "Simon's Team"
+                        },
                         new
                         {
                             Id = new Guid("58117de4-5951-48e4-8537-9f74967a6233"),
