@@ -66,11 +66,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         }
 
         // TODO: this looks like it needs refactoring to return the release view model
-        // GET api/content/release/5
-        [HttpGet("release/{id}")]
-        public async Task<ActionResult<Release>> GetRelease(string id)
+        // GET api/content/publication/pupil-absence-in-schools-in-england/2017-18
+        [HttpGet("publication/{publicationSlug}/{releaseSlug}")]
+        public async Task<ActionResult<ReleaseViewModel>> GetRelease(string publicationSlug, string releaseSlug)
         {
-            var release = await _contentCacheService.GetReleaseAsync(id);
+            var release = await _contentCacheService.GetReleaseAsync(publicationSlug, releaseSlug);
 
             if (release != null)
             {

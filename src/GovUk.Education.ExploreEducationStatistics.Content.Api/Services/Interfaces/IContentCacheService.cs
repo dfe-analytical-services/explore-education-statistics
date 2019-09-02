@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interf
         
         Task<ReleaseViewModel> GetLatestReleaseAsync(string slug);
 
-        Task<Release> GetReleaseAsync(string slug);
+        Task<ReleaseViewModel> GetReleaseAsync(string publicationSlug, string releaseSlug);
 
 
     }

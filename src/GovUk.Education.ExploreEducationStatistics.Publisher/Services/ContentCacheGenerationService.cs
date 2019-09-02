@@ -37,17 +37,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task<bool> CleanAndRebuildFullCache()
         {
-            // Update the content trees
-            //var trees = await UpdateTrees();
+            try
+            {
+                // Update the content trees
+                var trees = await UpdateTrees();
 
-            // TODO: Generate methodologies
-            //var methodologies = await UpdateMethodologies();
+                var publications = await UpdatePublicationsAndReleases();
 
-            // TODO: Generate publications and releases
-            var publications = await UpdatePublicationsAndReleases();
+                var methodologies = await UpdateMethodologies();
 
-            return publications;
-//            return trees && methodologies && publications;
+                return trees && methodologies && publications;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw ex;
+            }
         }
 
         private async Task<bool> UpdateTrees()
@@ -65,8 +70,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             if (contentTree != null)
             {
-                var contentTreeBlob = _cloudBlobContainer.GetBlockBlobReference($"content/tree.json");
-                await contentTreeBlob.UploadTextAsync(JsonConvert.SerializeObject(contentTree));
+                var contentTreeBlob = _cloudBlobContainer.GetBlockBlobReference($"publications/tree.json");
+                await contentTreeBlob.UploadTextAsync(JsonConvert.SerializeObject(contentTree, null,
+                    new JsonSerializerSettings() {ReferenceLoopHandling = ReferenceLoopHandling.Ignore}));
                 return true;
             }
             else
@@ -75,6 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
         }
 
+        // TODO: Get this to work
         private async Task<bool> UpdateDownloadTree()
         {
             // This is assuming the files have been copied first
@@ -83,7 +90,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             if (downloadTree != null)
             {
                 var downloadTreeBlob = _cloudBlobContainer.GetBlockBlobReference($"download/tree.json");
-                await downloadTreeBlob.UploadTextAsync(JsonConvert.SerializeObject(downloadTree));
+                await downloadTreeBlob.UploadTextAsync(JsonConvert.SerializeObject(downloadTree, null,
+                    new JsonSerializerSettings() {ReferenceLoopHandling = ReferenceLoopHandling.Ignore}));
                 return true;
             }
             else
@@ -99,7 +107,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             if (methodologyTree != null)
             {
                 var methodologyTreeBlob = _cloudBlobContainer.GetBlockBlobReference($"methodology/tree.json");
-                await methodologyTreeBlob.UploadTextAsync(JsonConvert.SerializeObject(methodologyTree));
+                await methodologyTreeBlob.UploadTextAsync(JsonConvert.SerializeObject(methodologyTree, null,
+                    new JsonSerializerSettings() {ReferenceLoopHandling = ReferenceLoopHandling.Ignore}));
                 return true;
             }
             else
@@ -117,8 +126,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             {
                 // TODO: model might be incorrect so will need to validate
                 // TODO: Save the filename as slug rather than ID
-                var blob = _cloudBlobContainer.GetBlockBlobReference($"methodology/methodologies/{methodology}.json");
-                await blob.UploadTextAsync(JsonConvert.SerializeObject(methodology));
+                var blob = _cloudBlobContainer.GetBlockBlobReference($"methodology/methodologies/{methodology.Id}.json");
+                await blob.UploadTextAsync(JsonConvert.SerializeObject(methodology, null,
+                    new JsonSerializerSettings() {ReferenceLoopHandling = ReferenceLoopHandling.Ignore}));
             }
 
             return true;
@@ -133,7 +143,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 // TODO: Need to save as the publication view model
                 var publicationBlob =
                     _cloudBlobContainer.GetBlockBlobReference($"publications/{publication.Slug}/publication.json");
-                await publicationBlob.UploadTextAsync(JsonConvert.SerializeObject(publication));
+                await publicationBlob.UploadTextAsync(JsonConvert.SerializeObject(publication, null,
+                    new JsonSerializerSettings() {ReferenceLoopHandling = ReferenceLoopHandling.Ignore}));
 
                 var latestRelease = _releaseService.GetLatestRelease(publication.Id.ToString());
                 var latestReleaseBlob =

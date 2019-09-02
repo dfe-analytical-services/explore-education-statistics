@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services
 
         private IEnumerable<Release> GetReleases()
         {
-            return _context.Releases.Include(release => release.Publication.Topic.Theme);
+            return _context.Releases.Include(release => release.Publication.Topic.Theme).ToList();
         }
 
         private IEnumerable<FileInfo> ListFiles(string publication, string release, ReleaseFileTypes type)
