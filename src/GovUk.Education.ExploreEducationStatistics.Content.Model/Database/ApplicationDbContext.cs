@@ -1177,7 +1177,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     TopicId = new Guid("1a9636e4-29d5-4c90-8c07-f41db8dd019c"),
                     Slug = "secondary-and-primary-schools-applications-and-offers",
                     NextUpdate = new DateTime(2019, 6, 14),
-                    ContactId = new Guid("d246c696-4b3a-4aeb-842c-c1318ee334e8")
+                    ContactId = new Guid("74f5aade-6d24-4a0b-be23-2ab4b4b2d191")
                 },
                 new Publication
                 {
