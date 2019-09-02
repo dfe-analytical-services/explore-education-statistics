@@ -649,14 +649,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<Contact>().HasData(
                 new Contact
                 {
-                    Id = new Guid("11bb7387-e85e-4571-9669-8a760dcb004f"),
-                    TeamName = "Simon's Team",
-                    TeamEmail = "teamshakes@gmail.com",
-                    ContactName = "Simon Shakespeare",
-                    ContactTelNo = "0114 262 1619"
-                },
-                new Contact
-                {
                     Id = new Guid("58117de4-5951-48e4-8537-9f74967a6233"),
                     TeamName = "Test Team",
                     TeamEmail = "explore.statistics@education.gov.uk",
