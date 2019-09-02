@@ -11,23 +11,6 @@ function PrototypesIndexPage() {
         <li>
           <Link to="/prototypes/start">Start page</Link>
         </li>
-        <li>
-          <Link to="/prototypes/browse-releases">Browse releases</Link>
-        </li>
-        <li>
-          <Link to="/prototypes/publication">Publication page example</Link>
-          {` `}
-          (Outdated design){` `}
-          <Link to="/find-statistics/pupil-absence-in-schools-in-england">
-            See working app for latest version
-          </Link>
-        </li>
-
-        <li>
-          <Link to="/prototypes/methodology-absence">
-            Methodology page for absence
-          </Link>
-        </li>
       </ul>
     </PrototypePage>
   );
