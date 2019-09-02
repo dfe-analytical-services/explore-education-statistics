@@ -1,17 +1,18 @@
 import {Comment} from "@admin/services/dashboard/types";
 import FormFieldset from "@common/components/form/FormFieldset";
-import FormRadio from "@common/components/form/FormRadio";
 import FormRadioGroup from "@common/components/form/FormRadioGroup";
 import React, {useEffect, useState} from 'react';
 
+type PageMode = 'edit' | 'preview';
+
 interface Model {
   unresolvedComments: Comment[];
-  pageMode: 'edit' | 'preview';
+  pageMode: PageMode;
 }
 
 const ReleaseContentPage = () => {
 
-  const [model, setModel] = useState();
+  const [model, setModel] = useState<Model>();
 
   useEffect(() => {
     const unresolvedComments: Comment[] = [{
@@ -21,12 +22,12 @@ const ReleaseContentPage = () => {
     }, {
       message: 'And this too.\nThank you.',
       authorName: 'Dave Matthews',
-      createdDate: new Date('2019-08-10 10:15').toISOString(),
+      createdDate: new Date('2019-06-13 10:15').toISOString(),
     }];
 
     setModel({
       unresolvedComments,
-      pageView: 'edit',
+      pageMode: 'edit',
     })
   }, []);
 
@@ -47,7 +48,7 @@ const ReleaseContentPage = () => {
           )}
 
           <FormFieldset
-            id='pageModelFieldSet'
+            id='pageModelFieldset'
             legend=''
             className='dfe-toggle-edit'
             legendHidden
@@ -68,6 +69,12 @@ const ReleaseContentPage = () => {
                 },
               ]}
               inline
+              onChange={event => {
+                setModel({
+                  ...model,
+                  pageMode: event.target.value as PageMode,
+                });
+              }}
             />
           </FormFieldset>
         </div>
