@@ -1,33 +1,20 @@
+import BasicReleaseSummary from "@admin/pages/release/edit-release/content/components/BasicReleaseSummary";
 import ManageReleaseContext, {ManageRelease} from "@admin/pages/release/ManageReleaseContext";
-import {getReleaseStatusLabel} from "@admin/pages/release/util/releaseSummaryUtil";
-import commonService from '@admin/services/common/service';
-import {dayMonthYearIsComplete, dayMonthYearToDate} from "@admin/services/common/types";
 import {Comment} from "@admin/services/dashboard/types";
 import releaseService from '@admin/services/release/edit-release/summary/service';
 import {ReleaseSummaryDetails} from "@admin/services/release/types";
 import FormFieldset from "@common/components/form/FormFieldset";
 import FormRadioGroup from "@common/components/form/FormRadioGroup";
-import FormattedDate from "@common/components/FormattedDate";
+import WarningMessage from "@common/components/WarningMessage";
 import classNames from "classnames";
 import React, {useContext, useEffect, useState} from 'react';
 
 type PageMode = 'edit' | 'preview';
 
-interface ReleaseTypeIcon {
-  url: string;
-  altText: string;
-}
-
-const nationalStatisticsLogo: ReleaseTypeIcon = {
-  url: '/static/images/UKSA-quality-mark.jpg',
-  altText: 'UK statistics authority quality mark',
-};
-
 interface Model {
   unresolvedComments: Comment[];
   pageMode: PageMode;
   releaseSummary: ReleaseSummaryDetails;
-  releaseTypeIcon?: ReleaseTypeIcon;
 }
 
 const ReleaseContentPage = () => {
@@ -38,10 +25,7 @@ const ReleaseContentPage = () => {
 
   useEffect(() => {
 
-    Promise.all([
-      commonService.getReleaseTypes(),
-      releaseService.getReleaseSummaryDetails(releaseId),
-    ]).then(([releaseTypes, releaseSummary]) => {
+    releaseService.getReleaseSummaryDetails(releaseId).then(releaseSummary => {
 
       const unresolvedComments: Comment[] = [{
         message: 'Please resolve this.\nThank you.',
@@ -53,15 +37,11 @@ const ReleaseContentPage = () => {
         createdDate: new Date('2019-06-13 10:15').toISOString(),
       }];
 
-      const nationalStatisticsType = releaseTypes.find(type => type.title === 'National Statistics');
-
       setModel({
         unresolvedComments,
         pageMode: 'edit',
         releaseSummary,
-        releaseTypeIcon: nationalStatisticsType && releaseSummary.typeId === nationalStatisticsType.id ? nationalStatisticsLogo : undefined,
       });
-
     });
   }, [releaseId]);
 
@@ -71,15 +51,9 @@ const ReleaseContentPage = () => {
         <>
           <div className="govuk-form-group">
             {model.unresolvedComments.length > 0 && (
-              <div className="govuk-warning-text">
-                <span className="govuk-warning-text__icon" aria-hidden="true">
-                  !
-                </span>
-                <strong className="govuk-warning-text__text">
-                  <span className="govuk-warning-text__assistive">Warning</span>
-                  There are {model.unresolvedComments.length} unresolved comments
-                </strong>
-              </div>
+              <WarningMessage>
+                There are {model.unresolvedComments.length} unresolved comments
+              </WarningMessage>
             )}
 
             <FormFieldset
@@ -127,41 +101,7 @@ const ReleaseContentPage = () => {
               <div className="govuk-grid-row">
                 <div className="govuk-grid-column-two-thirds">
                   <div className="govuk-grid-row">
-                    <div className="govuk-grid-column-three-quarters">
-                      <span className="govuk-tag">
-                        {getReleaseStatusLabel(model.releaseSummary.status)}
-                      </span>
-
-                      <dl className="dfe-meta-content">
-                        <dt className="govuk-caption-m">Publish date: </dt>
-                        <dd>
-                          <strong><FormattedDate>{model.releaseSummary.publishScheduled}</FormattedDate></strong>
-                        </dd>
-                        <div>
-                          <dt className="govuk-caption-m">Next update: </dt>
-                          <dd>
-                            {dayMonthYearIsComplete(model.releaseSummary.nextReleaseDate) && (
-                              <strong>
-                                <FormattedDate>
-                                  {dayMonthYearToDate(model.releaseSummary.nextReleaseDate)}
-                                </FormattedDate>
-                              </strong>
-                            )}
-                          </dd>
-                        </div>
-                      </dl>
-                    </div>
-
-                    {model.releaseTypeIcon && (
-                      <div className="govuk-grid-column-one-quarter">
-                        <img
-                          src={model.releaseTypeIcon.url}
-                          alt={model.releaseTypeIcon.altText}
-                          height="120"
-                          width="120"
-                        />
-                      </div>
-                    )}
+                    <BasicReleaseSummary release={model.releaseSummary} />
                   </div>
                 </div>
               </div>
