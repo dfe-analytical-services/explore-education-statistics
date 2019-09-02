@@ -1,5 +1,8 @@
 import BasicReleaseSummary from "@admin/pages/release/edit-release/content/components/BasicReleaseSummary";
 import ManageReleaseContext, {ManageRelease} from "@admin/pages/release/ManageReleaseContext";
+import {
+  getTimePeriodCoverageDateRangeStringShort,
+} from "@admin/pages/release/util/releaseSummaryUtil";
 import {Comment} from "@admin/services/dashboard/types";
 import releaseService from '@admin/services/release/edit-release/summary/service';
 import {ReleaseSummaryDetails} from "@admin/services/release/types";
@@ -95,7 +98,10 @@ const ReleaseContentPage = () => {
           >
             <div className={model.pageMode === 'edit' ? 'page-editing' : ''}>
               <h1 className="govuk-heading-l">
-                <span className="govuk-caption-l">{model.releaseSummary.timePeriodCoverage.label} {model.releaseSummary.releaseName}</span>
+                <span className="govuk-caption-l">
+                  {model.releaseSummary.timePeriodCoverage.label}{' '}
+                  {getTimePeriodCoverageDateRangeStringShort(model.releaseSummary.releaseName, '/')}
+                </span>
                 {publication.title}
               </h1>
               <div className="govuk-grid-row">

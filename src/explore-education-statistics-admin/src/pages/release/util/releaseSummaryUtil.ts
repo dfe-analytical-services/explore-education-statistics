@@ -96,4 +96,16 @@ export const getReleaseStatusLabel = (approvalStatus: ReleaseStatus) => {
   }
 };
 
+export const getTimePeriodCoverageDateRangeStringLong = (releaseName: string, separatorString: string = ' to ') => {
+  const numberRegex = /[0-9]+/;
+  const results = numberRegex.exec(releaseName);
+  return results ? `${releaseName}${separatorString}${parseInt(results[0], 10) + 1}` : releaseName;
+};
+
+export const getTimePeriodCoverageDateRangeStringShort = (releaseName: string, separatorString: string = '/') => {
+  const fourYearRegex = /[0-9]*([0-9]{2})/;
+  const results = fourYearRegex.exec(releaseName);
+  return results ? `${releaseName}${separatorString}${parseInt(results[1], 10) + 1}` : releaseName;
+};
+
 export default {};
