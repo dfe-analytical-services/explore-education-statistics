@@ -22,7 +22,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services
         public PublicationViewModel GetPublication(string slug)
         {
             // TODO: Publisher function missing mapping config
-            return _mapper.Map<PublicationViewModel>(_context.Publications.FirstOrDefault(t => t.Slug == slug));
+            var publication = _context.Publications.FirstOrDefault(t => t.Slug == slug);
+
+            if (publication != null)
+            {
+                return new PublicationViewModel() {Id = publication.Id, Title = publication.Title};
+            }
+
+            return null;
         }
 
         public IEnumerable<Publication> ListPublicationsWithPublishedReleases()

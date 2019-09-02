@@ -9,7 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services
-{
+{    
     public class ReleaseService : IReleaseService
     {
         private readonly ApplicationDbContext _context;
@@ -23,63 +23,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services
             _mapper = mapper;
         }
 
-        public ReleaseViewModel GetRelease(string id)
+        public ReleaseViewModel GetRelease(Guid id)
         {
-            var release = Guid.TryParse(id, out var newGuid)
-                ? _context.Releases.Include(x => x.Publication).ThenInclude(x => x.LegacyReleases)
-                    .Include(x => x.Updates).FirstOrDefault(x => x.Id == newGuid)
-                : _context.Releases.Include(x => x.Publication).ThenInclude(x => x.LegacyReleases)
-                    .Include(x => x.Updates).FirstOrDefault(x => x.Slug == id);
+            var release = _context.Releases.Include(x => x.Publication).ThenInclude(x => x.LegacyReleases)
+                .Include(x => x.Updates).FirstOrDefault(x => x.Id == id);
 
             if (release != null)
             {
-                var releases = _context.Releases.Where(x => x.Publication.Id == release.Publication.Id).ToList();
-                release.Publication.Releases = new List<Release>();
-                releases.ForEach(r => release.Publication.Releases.Add(new Release
-                {
-                    Id = r.Id,
-                    ReleaseName = r.ReleaseName,
-                    Published = r.Published,
-                    Slug = r.Slug,
-                    Summary = r.Summary,
-                    Publication = r.Publication,
-                    PublicationId = r.PublicationId,
-                    Updates = r.Updates
-                }));
-            }
-            
-            var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
-            releaseViewModel.LatestRelease =  IsLatestRelease(release.PublicationId, releaseViewModel.Id);
-            
-            return releaseViewModel;
-        }
-
-        public ReleaseViewModel GetLatestRelease(string id)
-        {
-            Release release;
-
-            if (Guid.TryParse(id, out var newGuid))
-            {
-                release = _context.Releases
-                    .Include(x => x.Publication).ThenInclude(x => x.LegacyReleases)
-                    .Include(x => x.Publication).ThenInclude(p => p.Topic.Theme)
-                    .Include(x => x.Publication).ThenInclude(p => p.Contact)
-                    .Include(x => x.Updates).OrderBy(x => x.Published)
-                    .Last(t => t.PublicationId == newGuid);
-            }
-            else
-            {
-                release = _context.Releases
-                    .Include(x => x.Publication).ThenInclude(x => x.LegacyReleases)
-                    .Include(x => x.Publication).ThenInclude(p => p.Topic.Theme)
-                    .Include(x => x.Publication).ThenInclude(p => p.Contact)
-                    .Include(x => x.Updates).OrderBy(x => x.Published)
-                    .Last(t => t.Publication.Slug == id);
-            }
-
-            if (release != null)
-            {
-                var otherReleases = _context.Releases.Where(r => r.Id == release.Publication.Id && r.Id != release.Id).ToList();
+                var otherReleases = _context.Releases
+                    .Where(r => r.PublicationId == release.Publication.Id && r.Id != release.Id)
+                    .ToList();
+                
                 release.Publication.Releases = new List<Release>();
                 otherReleases.ForEach(r => release.Publication.Releases.Add(new Release
                 {
@@ -92,13 +46,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services
                     PublicationId = r.PublicationId,
                     Updates = r.Updates
                 }));
+            }
+
+            var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
+            releaseViewModel.LatestRelease = IsLatestRelease(release.PublicationId, releaseViewModel.Id);
+
+            return releaseViewModel;
+        }
+
+        public ReleaseViewModel GetLatestRelease(Guid id)
+        {
+            Release release;
+
+            release = _context.Releases
+                .Include(x => x.Publication).ThenInclude(x => x.LegacyReleases)
+                .Include(x => x.Publication).ThenInclude(p => p.Topic.Theme)
+                .Include(x => x.Publication).ThenInclude(p => p.Contact)
+                .Include(x => x.Updates).OrderBy(x => x.Published)
+                .Last(t => t.PublicationId == id);
+
+            if (release != null)
+            {
+                var otherReleases = _context.Releases
+                    .Where(r => r.PublicationId == release.Publication.Id && r.Id != release.Id)
+                    .ToList();
                 
+                release.Publication.Releases = new List<Release>();
+                otherReleases.ForEach(r => release.Publication.Releases.Add(new Release
+                {
+                    Id = r.Id,
+                    ReleaseName = r.ReleaseName,
+                    Published = r.Published,
+                    Slug = r.Slug,
+                    Summary = r.Summary,
+                    Publication = r.Publication,
+                    PublicationId = r.PublicationId,
+                    Updates = r.Updates
+                }));
+
                 var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
 //                releaseViewModel.DataFiles = ListFiles(release, ReleaseFileTypes.Data);
 //                releaseViewModel.ChartFiles = ListFiles(release, ReleaseFileTypes.Chart);
 //                releaseViewModel.AncillaryFiles = ListFiles(release, ReleaseFileTypes.Ancillary);
                 releaseViewModel.LatestRelease = true;
-                
+
                 return releaseViewModel;
             }
 
@@ -109,11 +100,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services
         private bool IsLatestRelease(Guid publicationId, Guid releaseId)
         {
             return (_context.Releases
-                        .Where(x=> x.PublicationId == publicationId)
+                        .Where(x => x.PublicationId == publicationId)
                         .OrderBy(x => x.Published)
                         .Last().Id == releaseId);
         }
-        
+
         private List<FileInfo> ListFiles(Release release, ReleaseFileTypes type)
         {
             return _fileStorageService.ListFiles(release.Publication.Slug, release.Slug, type).ToList();

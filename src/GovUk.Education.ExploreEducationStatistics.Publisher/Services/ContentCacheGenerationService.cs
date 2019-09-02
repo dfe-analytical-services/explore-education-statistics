@@ -1,8 +1,7 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
@@ -39,7 +38,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             try
             {
-                // Update the content trees
                 var trees = await UpdateTrees();
 
                 var publications = await UpdatePublicationsAndReleases();
@@ -57,11 +55,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private async Task<bool> UpdateTrees()
         {
-            var downloadTree = await UpdateDownloadTree();
+            //var downloadTree = await UpdateDownloadTree();
             var contentTree = await UpdateContentTree();
             var methodologyTree = await UpdateMethodologyTree();
 
-            return downloadTree && contentTree && methodologyTree;
+            return contentTree && methodologyTree;
         }
 
         private async Task<bool> UpdateContentTree()
@@ -124,7 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             foreach (var methodology in methodologies)
             {
-                // TODO: model might be incorrect so will need to validate
+                // TODO: model might be incorrect so will need to validate this
                 // TODO: Save the filename as slug rather than ID
                 var blob = _cloudBlobContainer.GetBlockBlobReference($"methodology/methodologies/{methodology.Id}.json");
                 await blob.UploadTextAsync(JsonConvert.SerializeObject(methodology, null,
@@ -140,22 +138,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             foreach (var publication in publications)
             {
-                // TODO: Need to save as the publication view model
                 var publicationBlob =
                     _cloudBlobContainer.GetBlockBlobReference($"publications/{publication.Slug}/publication.json");
-                await publicationBlob.UploadTextAsync(JsonConvert.SerializeObject(publication, null,
+                await publicationBlob.UploadTextAsync(JsonConvert.SerializeObject( new PublicationViewModel() {Id = publication.Id, Title = publication.Title}, null,
                     new JsonSerializerSettings() {ReferenceLoopHandling = ReferenceLoopHandling.Ignore}));
 
-                var latestRelease = _releaseService.GetLatestRelease(publication.Id.ToString());
-                var latestReleaseBlob =
-                    _cloudBlobContainer.GetBlockBlobReference(
-                        $"publications/{latestRelease.Publication.Slug}/latest-release.json");
-                await latestReleaseBlob.UploadTextAsync(JsonConvert.SerializeObject(latestRelease, null,
-                    new JsonSerializerSettings() {ReferenceLoopHandling = ReferenceLoopHandling.Ignore}));
+                var latestRelease = _releaseService.GetLatestRelease(publication.Id);
+                var latestReleaseJson = JsonConvert.SerializeObject(latestRelease, null,
+                    new JsonSerializerSettings() {ReferenceLoopHandling = ReferenceLoopHandling.Ignore});
+                
+                var latestReleaseBlob = _cloudBlobContainer.GetBlockBlobReference($"publications/{latestRelease.Publication.Slug}/latest-release.json");
+                var latestReleaseYearBlob = _cloudBlobContainer.GetBlockBlobReference($"publications/{latestRelease.Publication.Slug}/releases/{latestRelease.Slug}.json");
+
+                await latestReleaseBlob.UploadTextAsync(latestReleaseJson);
+                await latestReleaseYearBlob.UploadTextAsync(latestReleaseJson);
 
                 foreach (var r in publication.Releases)
                 {
-                    var release = _releaseService.GetRelease(r.Id.ToString());
+                    var release = _releaseService.GetRelease(r.Id);
 
                     var releaseBlob =
                         _cloudBlobContainer.GetBlockBlobReference(
