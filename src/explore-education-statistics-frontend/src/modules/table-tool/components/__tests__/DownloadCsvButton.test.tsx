@@ -345,6 +345,7 @@ describe('DownloadCsvButton', () => {
             {
               filters: ['gender_female', 'school_primary'],
               timePeriod: '2015_AY',
+              geographicLevel: 'Country',
               location: {
                 country: {
                   code: 'england',
@@ -380,6 +381,7 @@ describe('DownloadCsvButton', () => {
             {
               filters: ['gender_female', 'school_primary'],
               timePeriod: '2015_AY',
+              geographicLevel: 'Country',
               location: {
                 country: {
                   code: 'england',
