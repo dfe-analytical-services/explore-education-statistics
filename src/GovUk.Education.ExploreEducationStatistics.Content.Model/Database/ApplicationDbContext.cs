@@ -44,6 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             Percentage_of_pupils_with_fixed_period_exclusions,
             Number_of_admissions,
             Number_of_applications_received,
+            Number_of_first_preferences_offered,
             Number_of_second_preferences_offered,
             Number_of_third_preferences_offered,
             Number_that_received_one_of_their_first_three_preferences,
@@ -139,6 +140,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         },
                         {
                             IndicatorName.Number_of_applications_received, 212
+                        },
+                        {
+                            IndicatorName.Number_of_first_preferences_offered, 216
                         },
                         {
                             IndicatorName.Number_of_second_preferences_offered, 217
@@ -2711,6 +2715,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             {
                                 Indicator(17, IndicatorName.Number_of_admissions),
                                 Indicator(17, IndicatorName.Number_of_applications_received),
+                                Indicator(17, IndicatorName.Number_of_first_preferences_offered),
                                 Indicator(17, IndicatorName.Number_of_second_preferences_offered),
                                 Indicator(17, IndicatorName.Number_of_third_preferences_offered),
                                 Indicator(17, IndicatorName.Number_that_received_one_of_their_first_three_preferences),
@@ -2749,6 +2754,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 {
                                     Indicator(17, IndicatorName.Number_of_applications_received),
                                     Indicator(17, IndicatorName.Number_of_admissions),
+                                    Indicator(17, IndicatorName.Number_of_first_preferences_offered),
                                     Indicator(17, IndicatorName.Number_of_second_preferences_offered),
                                     Indicator(17, IndicatorName.Number_of_third_preferences_offered),
                                     Indicator(17,
