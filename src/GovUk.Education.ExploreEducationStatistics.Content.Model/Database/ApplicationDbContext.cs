@@ -42,8 +42,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             Number_of_fixed_period_exclusions,
             Fixed_period_exclusion_rate,
             Percentage_of_pupils_with_fixed_period_exclusions,
+            Number_of_admissions,
             Number_of_applications_received,
-            Number_of_first_preferences_offered,
             Number_of_second_preferences_offered,
             Number_of_third_preferences_offered,
             Number_that_received_one_of_their_first_three_preferences,
@@ -135,10 +135,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     17, new Dictionary<IndicatorName, int>
                     {
                         {
-                            IndicatorName.Number_of_applications_received, 212
+                            IndicatorName.Number_of_admissions, 211
                         },
                         {
-                            IndicatorName.Number_of_first_preferences_offered, 215
+                            IndicatorName.Number_of_applications_received, 212
                         },
                         {
                             IndicatorName.Number_of_second_preferences_offered, 217
@@ -2709,8 +2709,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             },
                             Indicators = new List<string>
                             {
+                                Indicator(17, IndicatorName.Number_of_admissions),
                                 Indicator(17, IndicatorName.Number_of_applications_received),
-                                Indicator(17, IndicatorName.Number_of_first_preferences_offered),
                                 Indicator(17, IndicatorName.Number_of_second_preferences_offered),
                                 Indicator(17, IndicatorName.Number_of_third_preferences_offered),
                                 Indicator(17, IndicatorName.Number_that_received_one_of_their_first_three_preferences),
@@ -2724,13 +2724,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             dataKeys = new List<string>
                             {
                                 Indicator(17, IndicatorName.Number_of_applications_received),
-                                Indicator(17, IndicatorName.Number_of_first_preferences_offered),
+                                Indicator(17, IndicatorName.Number_of_admissions),
                                 Indicator(17, IndicatorName.Number_of_second_preferences_offered)
                             },
                             dataSummary = new List<string>
                             {
                                 "Down from 620,330 in 2017",
-                                "Down from 558,411 in 2017",
+                                "Up from 709,548 in 2017",
                                 "Down from 34,792 in 2017"
                             },
                             description = new MarkDownBlock
@@ -2748,7 +2748,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 indicators = new List<string>
                                 {
                                     Indicator(17, IndicatorName.Number_of_applications_received),
-                                    Indicator(17, IndicatorName.Number_of_first_preferences_offered),
+                                    Indicator(17, IndicatorName.Number_of_admissions),
                                     Indicator(17, IndicatorName.Number_of_second_preferences_offered),
                                     Indicator(17, IndicatorName.Number_of_third_preferences_offered),
                                     Indicator(17,
