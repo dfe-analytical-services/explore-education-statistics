@@ -79,9 +79,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services
 
             if (release != null)
             {
-                var releases = _context.Releases.Where(x => x.Publication.Id == release.Publication.Id).ToList();
+                var otherReleases = _context.Releases.Where(r => r.Id == release.Publication.Id && r.Id != release.Id).ToList();
                 release.Publication.Releases = new List<Release>();
-                releases.ForEach(r => release.Publication.Releases.Add(new Release
+                otherReleases.ForEach(r => release.Publication.Releases.Add(new Release
                 {
                     Id = r.Id,
                     ReleaseName = r.ReleaseName,
