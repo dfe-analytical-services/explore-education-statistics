@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Seed.Extensions;
 using Microsoft.AspNetCore.Http;
@@ -49,13 +48,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
             var subjects = SamplePublications.GetSubjects();
             foreach (var subject in subjects)
             {
-                if (subject.Id < 29)
-                {
-                    _logger.LogInformation($"Processing subject {subject.Id}");
-                    var file = SamplePublications.SubjectFiles[subject.Id];
-                    StoreFiles(subject.Release, file, subject.Name);
-                    Seed(file + ".csv", subject.Release, subjects.Count -4);
-                }
+                _logger.LogInformation($"Processing subject {subject.Id}");
+                var file = SamplePublications.SubjectFiles[subject.Id];
+                StoreFiles(subject.Release, file, subject.Name);
+                Seed(file + ".csv", subject.Release, subjects.Count);
             }
 
             stopWatch.Stop();
