@@ -12,9 +12,6 @@ function PrototypesIndexPage() {
           <Link to="/prototypes/start">Start page</Link>
         </li>
         <li>
-          <Link to="/prototypes/home">Home page</Link>
-        </li>
-        <li>
           <Link to="/prototypes/browse-releases">Browse releases</Link>
         </li>
         <li>
