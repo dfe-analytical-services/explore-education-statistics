@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 using DataBlockId = System.Guid;
 using PublicationId = System.Guid;
 using ReleaseId = System.Guid;
+using FileInfo = GovUk.Education.ExploreEducationStatistics.Admin.Models.FileInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
