@@ -4,7 +4,8 @@ import ManageReleaseContext, {
 } from '@admin/pages/release/ManageReleaseContext';
 import {
   getSelectedReleaseType,
-  getSelectedTimePeriodCoverageLabel, getTimePeriodCoverageDateRangeStringLong,
+  getSelectedTimePeriodCoverageLabel,
+  getTimePeriodCoverageDateRangeStringLong,
 } from '@admin/pages/release/util/releaseSummaryUtil';
 import { summaryEditRoute } from '@admin/routes/edit-release/routes';
 import commonService from '@admin/services/common/service';
@@ -67,7 +68,11 @@ const ReleaseSummaryPage = () => {
               )}
             </SummaryListItem>
             <SummaryListItem term="Release period">
-              <time>{getTimePeriodCoverageDateRangeStringLong(model.releaseSummaryDetails.releaseName)}</time>
+              <time>
+                {getTimePeriodCoverageDateRangeStringLong(
+                  model.releaseSummaryDetails.releaseName,
+                )}
+              </time>
             </SummaryListItem>
             <SummaryListItem term="Lead statistician">
               {publication.contact && publication.contact.contactName}

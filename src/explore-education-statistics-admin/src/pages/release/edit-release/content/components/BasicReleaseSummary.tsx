@@ -1,10 +1,13 @@
-import {getReleaseStatusLabel} from "@admin/pages/release/util/releaseSummaryUtil";
-import commonService from "@admin/services/common/service";
-import {dayMonthYearIsComplete, dayMonthYearToDate} from "@admin/services/common/types";
-import {ReleaseSummaryDetails} from "@admin/services/release/types";
-import FormattedDate from "@common/components/FormattedDate";
-import {Dictionary} from "@common/types";
-import React, {useEffect, useState} from "react";
+import { getReleaseStatusLabel } from '@admin/pages/release/util/releaseSummaryUtil';
+import commonService from '@admin/services/common/service';
+import {
+  dayMonthYearIsComplete,
+  dayMonthYearToDate,
+} from '@admin/services/common/types';
+import { ReleaseSummaryDetails } from '@admin/services/release/types';
+import FormattedDate from '@common/components/FormattedDate';
+import { Dictionary } from '@common/types';
+import React, { useEffect, useState } from 'react';
 
 interface ReleaseTypeIcon {
   url: string;
@@ -20,19 +23,20 @@ interface Props {
   release: ReleaseSummaryDetails;
 }
 
-const BasicReleaseSummary = ({release} : Props) => {
-
-  const [releaseTypeIdsToIcons, setReleaseTypeIdsToIcons] = useState<Dictionary<ReleaseTypeIcon>>();
+const BasicReleaseSummary = ({ release }: Props) => {
+  const [releaseTypeIdsToIcons, setReleaseTypeIdsToIcons] = useState<
+    Dictionary<ReleaseTypeIcon>
+  >();
 
   useEffect(() => {
-
     commonService.getReleaseTypes().then(types => {
-
       const icons: Dictionary<ReleaseTypeIcon> = {};
 
       // TODO would be nicer to control this via some metadata from the back end rather than
       // trust this matching on title
-      const nationalStatisticsType = types.find(type => type.title === 'National Statistics');
+      const nationalStatisticsType = types.find(
+        type => type.title === 'National Statistics',
+      );
 
       if (nationalStatisticsType) {
         icons[nationalStatisticsType.id] = nationalStatisticsLogo;
@@ -40,7 +44,6 @@ const BasicReleaseSummary = ({release} : Props) => {
 
       setReleaseTypeIdsToIcons(icons);
     });
-
   }, []);
 
   return (
@@ -55,7 +58,9 @@ const BasicReleaseSummary = ({release} : Props) => {
             <dl className="dfe-meta-content">
               <dt className="govuk-caption-m">Publish date: </dt>
               <dd>
-                <strong><FormattedDate>{release.publishScheduled}</FormattedDate></strong>
+                <strong>
+                  <FormattedDate>{release.publishScheduled}</FormattedDate>
+                </strong>
               </dd>
               <div>
                 <dt className="govuk-caption-m">Next update: </dt>

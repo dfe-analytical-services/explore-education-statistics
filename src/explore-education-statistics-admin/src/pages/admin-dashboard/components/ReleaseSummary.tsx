@@ -1,16 +1,22 @@
-import {LoginContext} from '@admin/components/Login';
+import { LoginContext } from '@admin/components/Login';
 import {
   getReleaseStatusLabel,
   getTimePeriodCoverageDateRangeStringLong,
-} from "@admin/pages/release/util/releaseSummaryUtil";
-import {dayMonthYearIsComplete, dayMonthYearToDate,} from '@admin/services/common/types';
-import {AdminDashboardRelease, Comment,} from '@admin/services/dashboard/types';
+} from '@admin/pages/release/util/releaseSummaryUtil';
+import {
+  dayMonthYearIsComplete,
+  dayMonthYearToDate,
+} from '@admin/services/common/types';
+import {
+  AdminDashboardRelease,
+  Comment,
+} from '@admin/services/dashboard/types';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import {format} from 'date-fns';
-import React, {ReactNode, useContext} from 'react';
+import { format } from 'date-fns';
+import React, { ReactNode, useContext } from 'react';
 
 const getLiveLatestLabel = (isLive: boolean, isLatest: boolean) => {
   if (isLive && isLatest) {
@@ -36,9 +42,9 @@ const ReleaseSummary = ({ release, actions, children }: Props) => {
       ? 'me'
       : release.lastEditedUser.name;
 
-  const releaseSummaryLabel = `${release.timePeriodCoverage.label}, ${
-    getTimePeriodCoverageDateRangeStringLong(release.releaseName)
-  } 
+  const releaseSummaryLabel = `${
+    release.timePeriodCoverage.label
+  }, ${getTimePeriodCoverageDateRangeStringLong(release.releaseName)} 
      ${getLiveLatestLabel(release.live, release.latestRelease)}`;
 
   return (

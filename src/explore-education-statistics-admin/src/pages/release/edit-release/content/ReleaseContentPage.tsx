@@ -1,16 +1,16 @@
-import BasicReleaseSummary from "@admin/pages/release/edit-release/content/components/BasicReleaseSummary";
-import ManageReleaseContext, {ManageRelease} from "@admin/pages/release/ManageReleaseContext";
-import {
-  getTimePeriodCoverageDateRangeStringShort,
-} from "@admin/pages/release/util/releaseSummaryUtil";
-import {Comment} from "@admin/services/dashboard/types";
+import BasicReleaseSummary from '@admin/pages/release/edit-release/content/components/BasicReleaseSummary';
+import ManageReleaseContext, {
+  ManageRelease,
+} from '@admin/pages/release/ManageReleaseContext';
+import { getTimePeriodCoverageDateRangeStringShort } from '@admin/pages/release/util/releaseSummaryUtil';
+import { Comment } from '@admin/services/dashboard/types';
 import releaseService from '@admin/services/release/edit-release/summary/service';
-import {ReleaseSummaryDetails} from "@admin/services/release/types";
-import FormFieldset from "@common/components/form/FormFieldset";
-import FormRadioGroup from "@common/components/form/FormRadioGroup";
-import WarningMessage from "@common/components/WarningMessage";
-import classNames from "classnames";
-import React, {useContext, useEffect, useState} from 'react';
+import { ReleaseSummaryDetails } from '@admin/services/release/types';
+import FormFieldset from '@common/components/form/FormFieldset';
+import FormRadioGroup from '@common/components/form/FormRadioGroup';
+import WarningMessage from '@common/components/WarningMessage';
+import classNames from 'classnames';
+import React, { useContext, useEffect, useState } from 'react';
 
 type PageMode = 'edit' | 'preview';
 
@@ -21,24 +21,26 @@ interface Model {
 }
 
 const ReleaseContentPage = () => {
-
   const [model, setModel] = useState<Model>();
 
-  const { releaseId, publication } = useContext(ManageReleaseContext) as ManageRelease;
+  const { releaseId, publication } = useContext(
+    ManageReleaseContext,
+  ) as ManageRelease;
 
   useEffect(() => {
-
     releaseService.getReleaseSummaryDetails(releaseId).then(releaseSummary => {
-
-      const unresolvedComments: Comment[] = [{
-        message: 'Please resolve this.\nThank you.',
-        authorName: 'Amy Newton',
-        createdDate: new Date('2019-08-10 10:15').toISOString(),
-      }, {
-        message: 'And this too.\nThank you.',
-        authorName: 'Dave Matthews',
-        createdDate: new Date('2019-06-13 10:15').toISOString(),
-      }];
+      const unresolvedComments: Comment[] = [
+        {
+          message: 'Please resolve this.\nThank you.',
+          authorName: 'Amy Newton',
+          createdDate: new Date('2019-08-10 10:15').toISOString(),
+        },
+        {
+          message: 'And this too.\nThank you.',
+          authorName: 'Dave Matthews',
+          createdDate: new Date('2019-06-13 10:15').toISOString(),
+        },
+      ];
 
       setModel({
         unresolvedComments,
@@ -60,16 +62,16 @@ const ReleaseContentPage = () => {
             )}
 
             <FormFieldset
-              id='pageModelFieldset'
-              legend=''
-              className='dfe-toggle-edit'
+              id="pageModelFieldset"
+              legend=""
+              className="dfe-toggle-edit"
               legendHidden
             >
               <FormRadioGroup
-                id='pageMode'
-                name='pageMode'
+                id="pageMode"
+                name="pageMode"
                 value={model.pageMode}
-                legend='Set page view'
+                legend="Set page view"
                 options={[
                   {
                     label: 'Add / view comments and edit content',
@@ -100,7 +102,10 @@ const ReleaseContentPage = () => {
               <h1 className="govuk-heading-l">
                 <span className="govuk-caption-l">
                   {model.releaseSummary.timePeriodCoverage.label}{' '}
-                  {getTimePeriodCoverageDateRangeStringShort(model.releaseSummary.releaseName, '/')}
+                  {getTimePeriodCoverageDateRangeStringShort(
+                    model.releaseSummary.releaseName,
+                    '/',
+                  )}
                 </span>
                 {publication.title}
               </h1>
@@ -116,7 +121,7 @@ const ReleaseContentPage = () => {
         </>
       )}
     </>
-  )
+  );
 };
 
 export default ReleaseContentPage;
