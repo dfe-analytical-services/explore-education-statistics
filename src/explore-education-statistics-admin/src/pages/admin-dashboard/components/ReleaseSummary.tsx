@@ -99,7 +99,7 @@ const ReleaseSummary = ({ release, actions, children }: Props) => {
             />
           </SummaryListItem>
         )}
-        {children}
+
         <SummaryListItem term="Last edited" detailsNoMargin>
           <FormattedDate>{release.lastEditedDateTime}</FormattedDate>
           {' at '}
@@ -114,6 +114,7 @@ const ReleaseSummary = ({ release, actions, children }: Props) => {
           </SummaryListItem>
         )}
       </SummaryList>
+      {children}
 
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-one-half">{actions}</div>

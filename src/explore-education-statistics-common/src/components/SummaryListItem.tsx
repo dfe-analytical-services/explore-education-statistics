@@ -7,6 +7,7 @@ interface Props {
   term: string;
   detailsNoMargin?: boolean;
   smallKey?: boolean;
+  showActions?: boolean;
 }
 
 const SummaryListItem = ({
@@ -15,6 +16,7 @@ const SummaryListItem = ({
   term,
   detailsNoMargin,
   smallKey = false,
+  showActions,
 }: Props) => {
   return (
     <div className="govuk-summary-list__row">
@@ -36,7 +38,9 @@ const SummaryListItem = ({
         </dd>
       )}
       {actions && <dd className="govuk-summary-list__actions">{actions}</dd>}
-      {children && !actions && <dd className="govuk-summary-list__actions" />}
+      {children && !actions && showActions && (
+        <dd className="govuk-summary-list__actions" />
+      )}
       {!children && !actions && (
         <>
           <dd
