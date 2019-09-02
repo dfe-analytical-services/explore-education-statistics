@@ -9,7 +9,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services
 {
     public class TokenService : ITokenService
     {
-
         public string GenerateToken(string secretKey, string email, DateTime expiryDateTime)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
@@ -57,10 +56,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services
             {
                 ValidateLifetime = true, // Because there is no expiration in the generated token
                 ValidateAudience = false, // Because there is no audience in the generated token
-                ValidateIssuer = false,   // Because there is no issuer in the generated token
+                ValidateIssuer = false, // Because there is no issuer in the generated token
                 ValidIssuer = "Sample",
                 ValidAudience = "Sample",
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)) // The same key as the one that generate the token
+                IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(secretKey)) // The same key as the one that generate the token
             };
         }
     }
