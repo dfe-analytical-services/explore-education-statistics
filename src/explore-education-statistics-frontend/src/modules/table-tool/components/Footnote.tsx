@@ -1,5 +1,5 @@
 import React from 'react';
-import { FullTableMeta } from '@frontend/services/permalinkService';
+import { FullTableMeta } from '@common/modules/full-table/types/fullTable';
 import Details from '@common/components/Details';
 
 export interface FootnoteProps {

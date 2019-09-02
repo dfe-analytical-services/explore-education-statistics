@@ -121,8 +121,8 @@ user checks element does not contain
   element should not contain    ${element}    ${text}
 
 user waits until element is visible
-  [Arguments]    ${pageText}
-  wait until element is visible  ${pageText}
+  [Arguments]    ${selector}
+  wait until element is visible  ${selector}
 
 user checks element is visible
   [Arguments]   ${element}

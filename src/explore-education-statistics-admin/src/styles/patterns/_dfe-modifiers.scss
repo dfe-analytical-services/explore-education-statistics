@@ -55,6 +55,7 @@ h1.govuk-panel__title {
 
 .app-navigation__list {
   display: flex;
+  flex-wrap: wrap;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -102,10 +103,6 @@ h1.govuk-panel__title {
 
 .dfe-summary-list__key--small {
   width: 15%;
-}
-
-.dfe-summary-list__value--break-new-lines {
-  white-space: pre-line;
 }
 
 .dfe-toggle-edit {

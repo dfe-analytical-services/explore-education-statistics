@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { DataBlockProps } from '@common/modules/find-statistics/components/DataBlock';
-import { ChartProps } from 'explore-education-statistics-common/src/modules/find-statistics/components/charts/ChartFunctions';
-import { GeographicLevel } from 'explore-education-statistics-common/src/services/dataBlockService';
-import TimePeriod from 'explore-education-statistics-common/src/services/types/TimePeriod';
+import { ChartProps } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import { GeographicLevel } from '@common/services/dataBlockService';
+import TimePeriod from '@common/services/types/TimePeriod';
 
 export const newApiTest: DataBlockProps = {
   type: 'datablock',

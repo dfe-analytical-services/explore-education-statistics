@@ -11,7 +11,7 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import Yup from '@common/lib/validation/yup';
-import { ThemeMeta } from '@frontend/services/tableBuilderService';
+import { ThemeMeta } from '@common/modules/full-table/services/tableBuilderService';
 import { FormikProps } from 'formik';
 import camelCase from 'lodash';
 import React, { useState } from 'react';
@@ -29,6 +29,7 @@ interface Props {
   onSubmit: PublicationFormSubmitHandler;
   options: ThemeMeta[];
   publicationId?: string;
+  publicationTitle?: string;
 }
 
 const PublicationForm = (props: Props & InjectedWizardProps) => {
@@ -38,8 +39,9 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
     isActive,
     goToNextStep,
     publicationId = '',
+    publicationTitle = '',
   } = props;
-  const [publicationName, setPublicationName] = useState('');
+
   const [searchTerm, setSearchTerm] = useState('');
 
   const formId = 'publicationForm';
@@ -150,9 +152,6 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
                                     id={`${formId}-publicationId-${camelCase(
                                       topic.title,
                                     )}`}
-                                    onChange={(event, option) => {
-                                      setPublicationName(option.label);
-                                    }}
                                     options={topic.publications
                                       .filter(
                                         publication =>
@@ -183,7 +182,7 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
                 {stepHeading}
                 <SummaryList noBorder>
                   <SummaryListItem term="Publication">
-                    {publicationName}
+                    {publicationTitle}
                   </SummaryListItem>
                 </SummaryList>
               </>

@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
@@ -103,6 +104,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var release = await _context.Releases
                 .Where(r => r.Publication.Id == publicationId)
+                .HydrateReleaseForReleaseViewModel()
+                .ToListAsync();
+            return _mapper.Map<List<ReleaseViewModel>>(release);
+        }
+        
+        // TODO Authorisation will be required when users are introduced
+        public async Task<List<ReleaseViewModel>> GetReleasesForReleaseStatusesAsync(params ReleaseStatus[] releaseStatuses)
+        {
+            var release = await _context.Releases
+                .Where(r => releaseStatuses.Contains(r.Status))
                 .HydrateReleaseForReleaseViewModel()
                 .ToListAsync();
             return _mapper.Map<List<ReleaseViewModel>>(release);

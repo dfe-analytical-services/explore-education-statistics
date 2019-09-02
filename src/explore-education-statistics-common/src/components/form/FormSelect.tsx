@@ -67,7 +67,7 @@ const FormSelect = ({
         value={value}
       >
         {options &&
-          (order === undefined
+          (order === undefined || order.length === 0
             ? options
             : orderBy(options, order, orderDirection)
           ).map(option => (

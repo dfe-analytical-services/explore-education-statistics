@@ -2,7 +2,7 @@ import Papa from 'papaparse';
 import React from 'react';
 import { fireEvent, render } from 'react-testing-library';
 import TimePeriod from '@common/services/types/TimePeriod';
-import { FullTable } from '@frontend/services/permalinkService';
+import { FullTable } from '@common/modules/full-table/types/fullTable';
 import DownloadCsvButton from '../DownloadCsvButton';
 
 describe('DownloadCsvButton', () => {
