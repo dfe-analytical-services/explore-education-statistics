@@ -4,6 +4,7 @@ import {
   IdTitlePair,
   TimePeriodCoverageGroup,
 } from '@admin/services/common/types';
+import {ReleaseStatus} from "@admin/services/dashboard/types";
 import { CreateReleaseRequest } from '@admin/services/release/create-release/types';
 import { UpdateReleaseSummaryDetailsRequest } from '@admin/services/release/edit-release/summary/types';
 import { BaseReleaseSummaryDetailsRequest } from '@admin/services/release/types';
@@ -81,5 +82,18 @@ export const getSelectedReleaseType = (
 ) =>
   availableReleaseTypes.find(type => type.id === releaseTypeId) ||
   availableReleaseTypes[0];
+
+export const getReleaseStatusLabel = (approvalStatus: ReleaseStatus) => {
+  switch (approvalStatus) {
+    case 'Draft':
+      return 'Draft';
+    case 'HigherLevelReview':
+      return 'In Review';
+    case 'Approved':
+      return 'Approved for Publication';
+    default:
+      return undefined;
+  }
+};
 
 export default {};

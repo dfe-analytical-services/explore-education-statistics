@@ -1,4 +1,5 @@
 import { LoginContext } from '@admin/components/Login';
+import {getReleaseStatusLabel} from "@admin/pages/release/util/releaseSummaryUtil";
 import {
   dayMonthYearIsComplete,
   dayMonthYearToDate,
@@ -25,19 +26,6 @@ const getLiveLatestLabel = (isLive: boolean, isLatest: boolean) => {
   return '(not Live)';
 };
 
-const getStatusLabel = (approvalStatus: ReleaseStatus) => {
-  switch (approvalStatus) {
-    case 'Draft':
-      return 'Draft';
-    case 'HigherLevelReview':
-      return 'In Review';
-    case 'Approved':
-      return 'Approved for Publication';
-    default:
-      return undefined;
-  }
-};
-
 interface Props {
   release: AdminDashboardRelease;
   actions: ReactNode;
@@ -61,7 +49,7 @@ const ReleaseSummary = ({ release, actions, children }: Props) => {
     <Details
       className="govuk-!-margin-bottom-0"
       summary={releaseSummaryLabel}
-      tag={getStatusLabel(release.status)}
+      tag={getReleaseStatusLabel(release.status)}
     >
       <SummaryList additionalClassName="govuk-!-margin-bottom-3">
         <SummaryListItem term="Publish date">
