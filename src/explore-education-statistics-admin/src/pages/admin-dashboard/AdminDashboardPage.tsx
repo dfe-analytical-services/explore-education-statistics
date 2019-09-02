@@ -155,11 +155,15 @@ const AdminDashboardPage = () => {
               >
                 {release => (
                   <>
-                    <div className="govuk-!-margin-top-9 govuk-!-margin-bottom-6">
+                    <FormFieldset
+                      legend="Manage pre release access"
+                      legendSize="s"
+                      id="pre-release-selection"
+                    >
                       <FormSelect
                         id="preReleaseAccessContact"
                         name="preReleaseAccessContact"
-                        label="Select pre release access"
+                        label="Select user"
                         options={[
                           {
                             label: 'Please select',
@@ -193,7 +197,8 @@ const AdminDashboardPage = () => {
                           });
                         }}
                       />
-                    </div>
+                    </FormFieldset>
+
                     <SummaryList>
                       {model.preReleaseContactsByScheduledRelease[
                         release.id
