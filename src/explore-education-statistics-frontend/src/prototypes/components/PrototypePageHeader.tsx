@@ -39,7 +39,7 @@ const PageHeader = ({ wide }: Props) => (
         </div>
         <div className="govuk-header__content">
           <a
-            href="/prototypes/home-v2"
+            href="/"
             className="govuk-header__link govuk-header__link--service-name"
           >
             Explore education statistics
