@@ -21,12 +21,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services
 
         public PublicationViewModel GetPublication(string slug)
         {
+            // TODO: Publisher function missing mapping config
             return _mapper.Map<PublicationViewModel>(_context.Publications.FirstOrDefault(t => t.Slug == slug));
         }
 
         public IEnumerable<Publication> ListPublicationsWithPublishedReleases()
         {
-            return _context.Publications.Where(x => x.Releases.Any(r => r.Live)).Include(p => p.Releases.Where(r => r.Live));
+            // TODO: sort this to only be live releases
+            return _context.Publications.Where(x => x.Releases.Any(r => r.Live)).Include(p => p.Releases).ToList();
+//            return _context.Publications.Where(x => x.Releases.Any(r => r.Live)).Include(p => p.Releases.Where(r => r.Live)).ToList();
         }
     }
 }

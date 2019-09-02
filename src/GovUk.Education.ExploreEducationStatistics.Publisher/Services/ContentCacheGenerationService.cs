@@ -23,7 +23,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private const string ContainerName = "cache";
 
         public ContentCacheGenerationService(IDownloadService downloadService, IMethodologyService methodologyService,
-            IContentService contentService, IReleaseService releaseService,IPublicationService publicationService, IConfiguration config)
+            IContentService contentService, IReleaseService releaseService, IPublicationService publicationService,
+            IConfiguration config)
         {
             _contentService = contentService;
             _releaseService = releaseService;
@@ -37,25 +38,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public async Task<bool> CleanAndRebuildFullCache()
         {
             // Update the content trees
-            await UpdateTrees();
+            //var trees = await UpdateTrees();
 
             // TODO: Generate methodologies
-            await UpdateMethodologies();
-            
+            //var methodologies = await UpdateMethodologies();
+
             // TODO: Generate publications and releases
-            await UpdatePublicationsAndReleases();
-            
-            return true;
+            var publications = await UpdatePublicationsAndReleases();
+
+            return publications;
+//            return trees && methodologies && publications;
         }
 
-        private async Task UpdateTrees()
+        private async Task<bool> UpdateTrees()
         {
-            await UpdateDownloadTree();
-            await UpdateContentTree(); 
-            await UpdateMethodologyTree();
+            var downloadTree = await UpdateDownloadTree();
+            var contentTree = await UpdateContentTree();
+            var methodologyTree = await UpdateMethodologyTree();
+
+            return downloadTree && contentTree && methodologyTree;
         }
 
-      private async Task UpdateContentTree()
+        private async Task<bool> UpdateContentTree()
         {
             var contentTree = _contentService.GetContentTree();
 
@@ -63,6 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             {
                 var contentTreeBlob = _cloudBlobContainer.GetBlockBlobReference($"content/tree.json");
                 await contentTreeBlob.UploadTextAsync(JsonConvert.SerializeObject(contentTree));
+                return true;
             }
             else
             {
@@ -70,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
         }
 
-        private async Task UpdateDownloadTree()
+        private async Task<bool> UpdateDownloadTree()
         {
             // This is assuming the files have been copied first
             var downloadTree = _downloadService.GetDownloadTree();
@@ -79,6 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             {
                 var downloadTreeBlob = _cloudBlobContainer.GetBlockBlobReference($"download/tree.json");
                 await downloadTreeBlob.UploadTextAsync(JsonConvert.SerializeObject(downloadTree));
+                return true;
             }
             else
             {
@@ -86,7 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
         }
 
-        private async Task UpdateMethodologyTree()
+        private async Task<bool> UpdateMethodologyTree()
         {
             var methodologyTree = _methodologyService.GetTree();
 
@@ -94,15 +100,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             {
                 var methodologyTreeBlob = _cloudBlobContainer.GetBlockBlobReference($"methodology/tree.json");
                 await methodologyTreeBlob.UploadTextAsync(JsonConvert.SerializeObject(methodologyTree));
+                return true;
             }
             else
             {
                 throw new Exception("Methodology tree could not be retrieved");
             }
         }
-        
-        
-        private async Task UpdateMethodologies()
+
+
+        private async Task<bool> UpdateMethodologies()
         {
             var methodologies = _methodologyService.Get();
 
@@ -113,38 +120,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 var blob = _cloudBlobContainer.GetBlockBlobReference($"methodology/methodologies/{methodology}.json");
                 await blob.UploadTextAsync(JsonConvert.SerializeObject(methodology));
             }
+
+            return true;
         }
-        
-        private async Task UpdatePublicationsAndReleases()
+
+        private async Task<bool> UpdatePublicationsAndReleases()
         {
             var publications = _publicationService.ListPublicationsWithPublishedReleases();
 
             foreach (var publication in publications)
             {
-                // TODO: bit hacky but just to get the correct model for now
-                var publicationViewModel = _publicationService.GetPublication(publication.Slug);
-                
-                // Save the publication
-                var publicationBlob = _cloudBlobContainer.GetBlockBlobReference($"content/publications/{publication.Slug}.json");
-                await publicationBlob.UploadTextAsync(JsonConvert.SerializeObject(publicationViewModel));
-                
-                
-                // Save the Latest Release so that we can quickly retreive it
-                var latestRelease = _releaseService.GetLatestRelease(publication.Slug);
-                var latestReleaseBlob = _cloudBlobContainer.GetBlockBlobReference($"content/publications/{latestRelease.Publication.Slug}/releases/latest.json");
-                await latestReleaseBlob.UploadTextAsync(JsonConvert.SerializeObject(latestRelease));
+                // TODO: Need to save as the publication view model
+                var publicationBlob =
+                    _cloudBlobContainer.GetBlockBlobReference($"publications/{publication.Slug}/publication.json");
+                await publicationBlob.UploadTextAsync(JsonConvert.SerializeObject(publication));
 
+                var latestRelease = _releaseService.GetLatestRelease(publication.Id.ToString());
+                var latestReleaseBlob =
+                    _cloudBlobContainer.GetBlockBlobReference(
+                        $"publications/{latestRelease.Publication.Slug}/latest-release.json");
+                await latestReleaseBlob.UploadTextAsync(JsonConvert.SerializeObject(latestRelease, null,
+                    new JsonSerializerSettings() {ReferenceLoopHandling = ReferenceLoopHandling.Ignore}));
 
-                // Save each release with its unique identifier
                 foreach (var r in publication.Releases)
                 {
-                    var release = _releaseService.GetRelease(r.Slug);
-                    
-                    // TODO: ideally this would live alongside the latest relase above but current api implementation only takes the release slug
-                    var releaseBlob = _cloudBlobContainer.GetBlockBlobReference($"content/releases/{release.Slug}.json");
-                    await releaseBlob.UploadTextAsync(JsonConvert.SerializeObject(release));
+                    var release = _releaseService.GetRelease(r.Id.ToString());
+
+                    var releaseBlob =
+                        _cloudBlobContainer.GetBlockBlobReference(
+                            $"publications/{publication.Slug}/releases/{release.Slug}.json");
+
+                    // TODO: Fix model to ignore self referencing loop (quick workaround)
+                    var json = JsonConvert.SerializeObject(release, null,
+                        new JsonSerializerSettings() {ReferenceLoopHandling = ReferenceLoopHandling.Ignore});
+
+                    await releaseBlob.UploadTextAsync(json);
                 }
             }
+
+            return true;
         }
 
         private static CloudBlobContainer GetCloudBlobContainer(string connectionString)

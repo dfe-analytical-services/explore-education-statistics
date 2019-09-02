@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         }
 
         [FunctionName("RebuildContentCache")]
-        public async void RebuildContentCacheTrees(
+        public void RebuildContentCacheTrees(
             [QueueTrigger("content-cache", Connection = "")]
             // TODO: create the cache message object
             string message,
@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             logger.LogInformation($"{GetType().Name} function triggered: {message}");
 
             // TODO: switch actions based on message content, for now full rebuild
-            await _contentCacheGenerationService.CleanAndRebuildFullCache();
+            _contentCacheGenerationService.CleanAndRebuildFullCache().Wait();
 
             logger.LogInformation($"{GetType().Name} function completed");
         }

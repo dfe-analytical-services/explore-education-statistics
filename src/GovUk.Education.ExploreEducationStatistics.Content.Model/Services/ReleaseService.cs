@@ -94,9 +94,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services
                 }));
                 
                 var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
-                releaseViewModel.DataFiles = ListFiles(release, ReleaseFileTypes.Data);
-                releaseViewModel.ChartFiles = ListFiles(release, ReleaseFileTypes.Chart);
-                releaseViewModel.AncillaryFiles = ListFiles(release, ReleaseFileTypes.Ancillary);
+//                releaseViewModel.DataFiles = ListFiles(release, ReleaseFileTypes.Data);
+//                releaseViewModel.ChartFiles = ListFiles(release, ReleaseFileTypes.Chart);
+//                releaseViewModel.AncillaryFiles = ListFiles(release, ReleaseFileTypes.Ancillary);
                 releaseViewModel.LatestRelease = true;
                 
                 return releaseViewModel;

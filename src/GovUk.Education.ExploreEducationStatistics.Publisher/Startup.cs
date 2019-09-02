@@ -1,4 +1,5 @@
 ﻿using System;
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
@@ -6,8 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Publisher;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
-using Microsoft.Azure.Storage;
-using Microsoft.Azure.Storage.Blob;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using FileStorageService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.FileStorageService;
@@ -24,17 +23,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
             var contentDatabaseConnection = GetSqlAzureConnectionString("ContentDb");
             
             builder.Services
+                .AddAutoMapper(typeof(Startup).Assembly)
                 .AddMemoryCache()
                 .AddDbContext<ApplicationDbContext>(options =>
                     options.UseSqlServer(contentDatabaseConnection))
-                .AddTransient<IFileStorageService, FileStorageService>()
-                .AddTransient<IPublishingService, PublishingService>()
-                .AddTransient<IContentCacheGenerationService, ContentCacheGenerationService>()
-                .AddTransient<IContentService, ContentService>()
-                .AddTransient<IReleaseService, ReleaseService>()
-                .AddTransient<IPublicationService, PublicationService>()
-                .AddTransient<IDownloadService, DownloadService>()
-                .AddTransient<IMethodologyService, MethodologyService>()
+                .AddScoped<IFileStorageService, FileStorageService>()
+                .AddScoped<IPublishingService, PublishingService>()
+                .AddScoped<IContentCacheGenerationService, ContentCacheGenerationService>()
+                .AddScoped<IContentService, ContentService>()
+                .AddScoped<IReleaseService, ReleaseService>()
+                .AddScoped<IPublicationService, PublicationService>()
+                .AddScoped<IDownloadService, DownloadService>()
+                .AddScoped<IMethodologyService, MethodologyService>()
                 .BuildServiceProvider();
         }
         

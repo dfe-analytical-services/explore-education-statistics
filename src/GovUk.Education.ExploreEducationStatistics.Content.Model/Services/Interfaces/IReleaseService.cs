@@ -4,7 +4,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Inte
 {
     public interface IReleaseService
     {
-        Release GetRelease(string id);
+        ReleaseViewModel GetRelease(string id);
         
         ReleaseViewModel GetLatestRelease(string id);
     }
