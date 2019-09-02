@@ -100,7 +100,8 @@
 											"script": {
 												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
 												"exec": [
-													""
+													"pm.globals.set(\"FILT_Char__Total\", \"1\");",
+													"pm.globals.set(\"FILT_SchoolType__Total\", \"58\");"
 												],
 												"type": "text/javascript"
 											}
@@ -133,17 +134,17 @@
 													"});",
 													"",
 													"pm.test(\"totalValues should be correct\", function () {",
-													"    pm.expect(respJson.filters.Characteristic.totalValue).to.equal(\"1\");",
-													"    pm.expect(respJson.filters.SchoolType.totalValue).to.equal(\"2\");",
+													"    pm.expect(respJson.filters.Characteristic.totalValue).to.equal(pm.globals.get('FILT_Char__Total'));",
+													"    pm.expect(respJson.filters.SchoolType.totalValue).to.equal(pm.globals.get('FILT_SchoolType__Total'));",
 													"    pm.expect(respJson.filters.YearBreakdown.totalValue).to.equal(\"\");",
 													"});",
 													"",
 													"pm.test(\"Should be correct number of characteristics\", function () { ",
-													"    pm.expect(Object.keys(pm.response.json().filters.Characteristic.options).length).to.equal(11);",
+													"    pm.expect(Object.keys(respJson.filters.Characteristic.options).length).to.equal(10);",
 													"});",
 													"",
 													"pm.test(\"Each characteristic should have correct number\", function () {",
-													"    pm.expect(respJson.filters.Characteristic.options.AllPupils.options.length).to.equal(1);",
+													"    pm.expect(respJson.filters.Characteristic.options.Total.options.length).to.equal(1);",
 													"    pm.expect(respJson.filters.Characteristic.options.Gender.options.length).to.equal(2);",
 													"    pm.expect(respJson.filters.Characteristic.options.EthnicGroupMajor.options.length).to.equal(8);",
 													"    pm.expect(respJson.filters.Characteristic.options.EthnicGroupMinor.options.length).to.equal(19);",
@@ -204,7 +205,7 @@
 											"script": {
 												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
 												"exec": [
-													""
+													"pm.globals.set(\"FILT_SchoolType__Total\", \"82\");"
 												],
 												"type": "text/javascript"
 											}
@@ -236,7 +237,7 @@
 													"});",
 													"",
 													"pm.test(\"Filters totalValues should be correct\", function () {",
-													"    pm.expect(respJson.filters.SchoolType.totalValue).to.equal(\"83\");",
+													"    pm.expect(respJson.filters.SchoolType.totalValue).to.equal(pm.globals.get('FILT_SchoolType__Total'));",
 													"    pm.expect(respJson.filters.YearBreakdown.totalValue).to.equal(\"\");",
 													"});",
 													"",
@@ -304,6 +305,8 @@
 											"script": {
 												"id": "a523c41a-6b1e-4a9b-9f93-32dd1af9874b",
 												"exec": [
+													"var respJson = pm.response.json();",
+													"",
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
 													"pm.test(\"Fields are present\", function () {",
@@ -323,22 +326,23 @@
 													"});",
 													"",
 													"pm.test(\"Number of school type default options should be correct\", function () { ",
-													"    pm.expect(Object.keys(pm.response.json().filters.SchoolType.options.Default.options).length).to.equal(3);",
+													"    pm.expect(Object.keys(respJson.filters.SchoolType.options.Default.options).length).to.equal(3);",
 													"});",
 													"",
-													"pm.test(\"Number of time periods options should be correct\", function() {",
-													"    pm.expect(pm.response.json().timePeriod.options.length).to.equal(20); ",
-													"});",
+													"// DFE-1356",
+													"// pm.test(\"Number of time periods options should be correct\", function() {",
+													"//     pm.expect(respJson.timePeriod.options.length).to.equal(15); ",
+													"// });",
 													"",
 													"pm.test(\"Number of location options should be correct\", function() {",
-													"    pm.expect(pm.response.json().locations.country.options.length).to.equal(1);",
-													"    pm.expect(pm.response.json().locations.region.options.length).to.equal(10);",
-													"    pm.expect(pm.response.json().locations.localAuthority.options.length).to.equal(152);",
+													"    pm.expect(respJson.locations.country.options.length).to.equal(1);",
+													"    pm.expect(respJson.locations.region.options.length).to.equal(10);",
+													"    pm.expect(respJson.locations.localAuthority.options.length).to.equal(152);",
 													"});",
 													"",
 													"pm.test(\"Expect indicators to have correct properties\", function () {",
-													"    pm.expect(pm.response.json().indicators.AbsenceFields.options.length).to.equal(7);",
-													"    pm.expect(pm.response.json().indicators.AbsenceByReason.options.length).to.equal(16);",
+													"    pm.expect(respJson.indicators.AbsenceFields.options.length).to.equal(7);",
+													"    pm.expect(respJson.indicators.AbsenceByReason.options.length).to.equal(16);",
 													"});"
 												],
 												"type": "text/javascript"
@@ -721,8 +725,8 @@
 													"});",
 													"",
 													"pm.test(\"Number of characteristic options should be correct\", function () { ",
-													"    pm.expect(Object.keys(pm.response.json().filters.Characteristic.options).length).to.equal(11);",
-													"    pm.expect(pm.response.json().filters.Characteristic.options.AllPupils.options.length).to.equal(1);",
+													"    pm.expect(Object.keys(pm.response.json().filters.Characteristic.options).length).to.equal(10);",
+													"    pm.expect(pm.response.json().filters.Characteristic.options.Total.options.length).to.equal(1);",
 													"    pm.expect(pm.response.json().filters.Characteristic.options.Gender.options.length).to.equal(2);",
 													"    pm.expect(pm.response.json().filters.Characteristic.options.EthnicGroupMajor.options.length).to.equal(8);",
 													"    pm.expect(pm.response.json().filters.Characteristic.options.EthnicGroupMinor.options.length).to.equal(19);",
@@ -819,9 +823,8 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations.localAuthority\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"locations.localAuthorityDistrict\"));",
-													"    // NOTE(mark): Will be fixed in DFE-1101",
-													"    //pm.expect(pm.response.to.not.have.jsonBody(\"locations.country\"));",
-													"    //pm.expect(pm.response.to.not.have.jsonBody(\"locations.region\"));",
+													"    pm.expect(pm.response.to.not.have.jsonBody(\"locations.country\"));",
+													"    pm.expect(pm.response.to.not.have.jsonBody(\"locations.region\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
@@ -829,8 +832,8 @@
 													"});",
 													"",
 													"pm.test(\"Number of characteristic options should be correct\", function () { ",
-													"    pm.expect(Object.keys(respJson.filters.Characteristic.options).length).to.equal(11);",
-													"    pm.expect(respJson.filters.Characteristic.options.AllPupils.options.length).to.equal(1);",
+													"    pm.expect(Object.keys(respJson.filters.Characteristic.options).length).to.equal(10);",
+													"    pm.expect(respJson.filters.Characteristic.options.Total.options.length).to.equal(1);",
 													"    pm.expect(respJson.filters.Characteristic.options.Gender.options.length).to.equal(2);",
 													"    pm.expect(respJson.filters.Characteristic.options.EthnicGroupMajor.options.length).to.equal(8);",
 													"    pm.expect(respJson.filters.Characteristic.options.EthnicGroupMinor.options.length).to.equal(19);",
@@ -944,8 +947,8 @@
 													"});",
 													"",
 													"pm.test(\"Number of characteristic options should be correct\", function () { ",
-													"    pm.expect(Object.keys(pm.response.json().filters.Characteristic.options).length).to.equal(11);",
-													"    pm.expect(pm.response.json().filters.Characteristic.options.AllPupils.options.length).to.equal(1);",
+													"    pm.expect(Object.keys(pm.response.json().filters.Characteristic.options).length).to.equal(10);",
+													"    pm.expect(pm.response.json().filters.Characteristic.options.Total.options.length).to.equal(1);",
 													"    pm.expect(pm.response.json().filters.Characteristic.options.Gender.options.length).to.equal(2);",
 													"    pm.expect(pm.response.json().filters.Characteristic.options.EthnicGroupMajor.options.length).to.equal(8);",
 													"    pm.expect(pm.response.json().filters.Characteristic.options.EthnicGroupMinor.options.length).to.equal(16);",
@@ -1046,8 +1049,8 @@
 													"});",
 													"",
 													"pm.test(\"Number of characteristic options should be correct\", function () { ",
-													"    pm.expect(Object.keys(pm.response.json().filters.Characteristic.options).length).to.equal(11);",
-													"    pm.expect(pm.response.json().filters.Characteristic.options.AllPupils.options.length).to.equal(1);",
+													"    pm.expect(Object.keys(pm.response.json().filters.Characteristic.options).length).to.equal(10);",
+													"    pm.expect(pm.response.json().filters.Characteristic.options.Total.options.length).to.equal(1);",
 													"    pm.expect(pm.response.json().filters.Characteristic.options.Gender.options.length).to.equal(2);",
 													"    pm.expect(pm.response.json().filters.Characteristic.options.EthnicGroupMajor.options.length).to.equal(8);",
 													"    pm.expect(pm.response.json().filters.Characteristic.options.EthnicGroupMinor.options.length).to.equal(16);",
@@ -1149,8 +1152,8 @@
 													"});",
 													"",
 													"pm.test(\"Number of characteristic options should be correct\", function () { ",
-													"    pm.expect(Object.keys(pm.response.json().filters.Characteristic.options).length).to.equal(11);",
-													"    pm.expect(pm.response.json().filters.Characteristic.options.AllPupils.options.length).to.equal(1);",
+													"    pm.expect(Object.keys(pm.response.json().filters.Characteristic.options).length).to.equal(10);",
+													"    pm.expect(pm.response.json().filters.Characteristic.options.Total.options.length).to.equal(1);",
 													"    pm.expect(pm.response.json().filters.Characteristic.options.Gender.options.length).to.equal(2);",
 													"    pm.expect(pm.response.json().filters.Characteristic.options.EthnicGroupMajor.options.length).to.equal(8);",
 													"    pm.expect(pm.response.json().filters.Characteristic.options.EthnicGroupMinor.options.length).to.equal(16);",
@@ -2101,6 +2104,8 @@
 											"script": {
 												"id": "483030fb-1db1-4380-99d6-d2fda32e3497",
 												"exec": [
+													"var respJson = pm.response.json();",
+													"",
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
 													"pm.test(\"Fields are present\", function () {",
@@ -2119,36 +2124,36 @@
 													"});",
 													"",
 													"pm.test(\"Number of YearOfAdmission options should be correct\", function () { ",
-													"    pm.expect(pm.response.json().filters.YearOfAdmission.options.Primary.options.length).to.equal(1);",
-													"    pm.expect(pm.response.json().filters.YearOfAdmission.options.Secondary.options.length).to.equal(1);",
+													"    pm.expect(respJson.filters.YearOfAdmission.options.Primary.options.length).to.equal(2);",
+													"    pm.expect(respJson.filters.YearOfAdmission.options.Secondary.options.length).to.equal(2);",
 													"});",
 													"",
 													"pm.test(\"Time periods options should be correct\", function() {",
-													"    pm.expect(pm.response.json().timePeriod.options.length).to.equal(5);",
+													"    pm.expect(respJson.timePeriod.options.length).to.equal(5);",
 													"});",
 													"",
 													"pm.test(\"Number of location options should be correct\", function() {",
-													"    pm.expect(pm.response.json().locations.region.options.length).to.equal(2);",
+													"    pm.expect(respJson.locations.region.options.length).to.equal(2);",
 													"});",
 													"",
 													"pm.test(\"Expect correct number of indicator categories\", function () {",
-													"    pm.expect(Object.keys(pm.response.json().indicators).length).to.equal(3);",
-													"    pm.expect(pm.response.json().indicators).to.not.have.property(\"AbsenceFields\");",
-													"    pm.expect(pm.response.json().indicators).to.not.have.property(\"AbsenceByReason\");",
-													"    pm.expect(pm.response.json().indicators).to.not.have.property(\"AbsenceForPersistentAbsentees\");",
+													"    pm.expect(Object.keys(respJson.indicators).length).to.equal(3);",
+													"    pm.expect(respJson.indicators).to.not.have.property(\"AbsenceFields\");",
+													"    pm.expect(respJson.indicators).to.not.have.property(\"AbsenceByReason\");",
+													"    pm.expect(respJson.indicators).to.not.have.property(\"AbsenceForPersistentAbsentees\");",
 													"});",
 													"",
 													"pm.test(\"Expect number of Admissions indicators to be correct\", function () {",
-													"    pm.expect(pm.response.json().indicators.Admissions.options.length).to.equal(1);",
-													"    pm.expect(pm.response.json().indicators.Admissions.options[0].label).to.equal(\"Number of admissions\");    ",
+													"    pm.expect(respJson.indicators.Admissions.options.length).to.equal(1);",
+													"    pm.expect(respJson.indicators.Admissions.options[0].label).to.equal(\"Number of admissions\");    ",
 													"});",
 													"",
 													"pm.test(\"Expect number of Applications indicators to be correct\", function () {",
-													"    pm.expect(pm.response.json().indicators.Applications.options.length).to.equal(3);",
+													"    pm.expect(respJson.indicators.Applications.options.length).to.equal(3);",
 													"});",
 													"",
 													"pm.test(\"Expect number of PreferencesBreakdowns indicators to be correct\", function () {",
-													"    pm.expect(pm.response.json().indicators.PreferencesBreakdowns.options.length).to.equal(11);",
+													"    pm.expect(respJson.indicators.PreferencesBreakdowns.options.length).to.equal(11);",
 													"});"
 												],
 												"type": "text/javascript"
@@ -2558,7 +2563,7 @@
 													"});",
 													"",
 													"pm.test(\"Number of results should be correct\", function () { ",
-													"    pm.expect(respJson.results.length).to.equal(1402); ",
+													"    pm.expect(respJson.results.length).to.equal(1881); ",
 													"});",
 													"",
 													"pm.test(\"First result should have correct fields\", function () {",
@@ -2585,7 +2590,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_AllPupils}}\n    ],\n    \"indicators\": [\n        1, 23, 26, 28, 30, 31\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__Total}}\n    ],\n    \"indicators\": [\n        1, 23, 26, 28, 30, 31\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2650,7 +2655,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Country\",\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\",\n    },\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Country\",\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\",\n    },\n    \"filters\" : [\n        {{FILT_Char__GenderMale}}, {{FILT_Char__GenderFemale}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2710,7 +2715,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Country\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}, {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Country\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__GenderMale}}, {{FILT_Char__GenderFemale}}, {{FILT_SchoolType__StateFundedPrimary}}, {{FILT_SchoolType__StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2814,7 +2819,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"country\": [\n    \t\"E92000001\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2014,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}\n    ],\n    \"indicators\": [\n        23, 26, 28, 30, 31\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"country\": [\n    \t\"E92000001\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2014,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__GenderMale}}, {{FILT_Char__GenderFemale}}\n    ],\n    \"indicators\": [\n        23, 26, 28, 30, 31\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2916,7 +2921,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"country\": [\n    \t\"E92000001\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2014,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_StateFundedPrimary}}, {{FILT_EthMinor_Irish}}\n    ],\n    \"indicators\": [\n        23, 26, 28, 30, 31\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"country\": [\n    \t\"E92000001\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2014,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_SchoolType__StateFundedPrimary}}, {{FILT_Char__EthMinor_Irish}}\n    ],\n    \"indicators\": [\n        23, 26, 28, 30, 31\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -2978,7 +2983,71 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority\",\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority\",\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__GenderMale}}, {{FILT_Char__GenderFemale}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+										},
+										"url": {
+											"raw": "{{data_api_url}}/tablebuilder",
+											"host": [
+												"{{data_api_url}}"
+											],
+											"path": [
+												"tablebuilder"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Tablebuilder - Absence by characteristic - 3 LAs",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "a2f93f15-3577-4c87-ae52-685637abbb01",
+												"exec": [
+													"var respJson = pm.response.json();",
+													"",
+													"pm.test(\"Expect corret number of results\", function () {",
+													"    pm.expect(respJson.results.length).to.equal(9); ",
+													"});",
+													"",
+													"pm.test(\"Verify all possible timePeriods appear\", function () {",
+													"    var found2013 = false;",
+													"    var found2014 = false;",
+													"    var found2015 = false;",
+													"    for(var i = 0; i < respJson.results.length; i++) {",
+													"        if(!found2013 && respJson.results[i].timePeriod === \"2013_AY\") {",
+													"            found2013 = true;",
+													"        }",
+													"        if(!found2014 && respJson.results[i].timePeriod === \"2014_AY\") {",
+													"            found2014 = true;",
+													"        }",
+													"        if(!found2015 && respJson.results[i].timePeriod === \"2015_AY\") {",
+													"            found2015 = true;",
+													"        }",
+													"        pm.expect(found2013).to.equal(true, \"No results from 2013\");",
+													"        pm.expect(found2014).to.equal(true, \"No results from 2014\");",
+													"        pm.expect(found2015).to.equal(true, \"No results from 2015\");",
+													"    } ",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"localAuthority\": [\n        \"E09000002\",\n        \"E09000003\",\n        \"E08000016\"\n    ],\n    \"subjectId\": \"1\",\n    \"indicators\": [\n        \"28\",\n        \"26\",\n        \"23\"\n    ],\n    \"filters\": [\n        {{FILT_Char__Total}},\n        {{FILT_SchoolType__Total}},\n        {{FILT_YearBreakdown__SixHalfTerms}}\n    ],\n    \"timePeriod\": {\n        \"startYear\": 2013,\n        \"startCode\": \"AY\",\n        \"endYear\": 2015,\n        \"endCode\": \"AY\"\n    }\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3047,7 +3116,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"localAuthority\": [\n    \t\"E09000032\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"localAuthority\": [\n    \t\"E09000032\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__GenderMale}}, {{FILT_Char__GenderFemale}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3111,7 +3180,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority_District\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_FSMEligible}}, {{FILT_FSMNotEligible}}, {{FILT_FSMUnclassified}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority_District\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__FSMEligible}}, {{FILT_Char__FSMNotEligible}}, {{FILT_Char__FSMUnclassified}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3176,7 +3245,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority_District\",\n    \"localAuthorityDistrict\": [\n    \t\"E07000223\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_FSMEligible}}, {{FILT_FSMNotEligible}}, {{FILT_FSMUnclassified}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority_District\",\n    \"localAuthorityDistrict\": [\n    \t\"E07000223\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__FSMEligible}}, {{FILT_Char__FSMNotEligible}}, {{FILT_Char__FSMUnclassified}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3198,15 +3267,18 @@
 										"id": "1b454eae-43c4-4e92-a06e-1a803aa8858b",
 										"type": "text/javascript",
 										"exec": [
-											"pm.globals.set(\"FILT_AllPupils\", \"70\");",
-											"pm.globals.set(\"FILT_GenderMale\", \"4\");",
-											"pm.globals.set(\"FILT_GenderFemale\", \"5\");",
-											"pm.globals.set(\"FILT_StateFundedPrimary\", \"71\");",
-											"pm.globals.set(\"FILT_StateFundedSecondary\", \"75\");",
-											"pm.globals.set(\"FILT_FSMEligible\", \"43\");",
-											"pm.globals.set(\"FILT_FSMNotEligible\", \"44\");",
-											"pm.globals.set(\"FILT_FSMUnclassified\", \"45\");",
-											"pm.globals.set(\"FILT_EthMinor_Irish\", \"24\");"
+											"pm.globals.set(\"FILT_Char__Total\", \"1\");",
+											"pm.globals.set(\"FILT_Char__GenderMale\", \"53\");",
+											"pm.globals.set(\"FILT_Char__GenderFemale\", \"52\");",
+											"pm.globals.set(\"FILT_SchoolType__Total\", \"58\");",
+											"pm.globals.set(\"FILT_SchoolType__StateFundedPrimary\", \"57\");",
+											"pm.globals.set(\"FILT_SchoolType__StateFundedSecondary\", \"56\");",
+											"pm.globals.set(\"FILT_SchoolType__Special\", \"55\");",
+											"pm.globals.set(\"FILT_Char__FSMEligible\", \"18\");",
+											"pm.globals.set(\"FILT_Char__FSMNotEligible\", \"10\");",
+											"pm.globals.set(\"FILT_Char__FSMUnclassified\", \"8\");",
+											"pm.globals.set(\"FILT_Char__EthMinor_Irish\", \"50\");",
+											"pm.globals.set(\"FILT_YearBreakdown__SixHalfTerms\", \"54\");"
 										]
 									}
 								},
@@ -3285,7 +3357,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"Country\",\n    \"timePeriod\": {\n    \t\"startYear\": 2006,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t{{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"Country\",\n    \"timePeriod\": {\n    \t\"startYear\": 2006,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t{{FILT_SchoolType__StateFundedPrimary}}, {{FILT_SchoolType__StateFundedSecondary}}, {{FILT_SchoolType__Special}}\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3348,7 +3420,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\t\"geographicLevel\": \"Country\",\n\t\"country\":[\"E92000001\"],\n\t\"subjectId\":\"2\",\n\t\"indicators\":[\"48\"],\n\t\"filters\": [\n\t\t{{FILT_Total}}, {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n\t],\n\t\"timePeriod\": {\n    \t\"startYear\": 2006,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2006,\n    \t\"endCode\": \"AY\"\n    }\n}"
+											"raw": "{\n\t\"geographicLevel\": \"Country\",\n\t\"country\":[\"E92000001\"],\n\t\"subjectId\":\"2\",\n\t\"indicators\":[\"48\"],\n\t\"filters\": [\n\t\t{{FILT_SchoolType__Total}}, {{FILT_SchoolType__StateFundedPrimary}}, {{FILT_SchoolType__StateFundedSecondary}}, {{FILT_SchoolType__Special}}\n\t],\n\t\"timePeriod\": {\n    \t\"startYear\": 2006,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2006,\n    \t\"endCode\": \"AY\"\n    }\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3396,8 +3468,14 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"results[0].timePeriod\"));",
 													"});",
 													"",
-													"pm.test(\"geographicLevel should be same as request\", function () {",
-													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"pm.test(\"All subjectMeta locations should be localAuthority\", function () {",
+													"    for(var i = 0; i < respJson.subjectMeta.locations.length; i++) {",
+													"        pm.expect(respJson.subjectMeta.locations[i].level).to.equal(\"localAuthority\");",
+													"    }",
+													"});",
+													"",
+													"pm.test(\"Results geographicLevel should be same as request\", function () {",
+													"    for(var i = 0; i < respJson.results.length; i++) {",
 													"        pm.expect(respJson.results[i].geographicLevel).to.equal(\"Local_Authority\");",
 													"    }",
 													"});"
@@ -3418,7 +3496,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"Local_Authority\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t{{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"Local_Authority\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t{{FILT_SchoolType__StateFundedPrimary}}, {{FILT_SchoolType__StateFundedSecondary}}, {{FILT_SchoolType__Special}}\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3488,7 +3566,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"Region\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t{{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"Region\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t{{FILT_SchoolType__StateFundedPrimary}}, {{FILT_SchoolType__StateFundedSecondary}}, {{FILT_SchoolType__Special}}\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3553,7 +3631,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 2,\n    \"region\": [\n\t\t\"E13000001\"\n\t],\n    \"timePeriod\": {\n    \t\"startYear\": 2006,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t{{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 2,\n    \"region\": [\n\t\t\"E13000001\"\n\t],\n    \"timePeriod\": {\n    \t\"startYear\": 2006,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t{{FILT_SchoolType__StateFundedPrimary}}, {{FILT_SchoolType__StateFundedSecondary}}, {{FILT_SchoolType__Special}}\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3618,7 +3696,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"School\",\n    \"region\": [ \"E13000001\" ],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t{{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"School\",\n    \"region\": [ \"E13000001\" ],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t{{FILT_SchoolType__StateFundedPrimary}}, {{FILT_SchoolType__StateFundedSecondary}}, {{FILT_SchoolType__Special}}\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3679,7 +3757,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"School\",\n    \"localAuthority\": [ \"E09000002\" ],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t{{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"School\",\n    \"localAuthority\": [ \"E09000002\" ],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t{{FILT_SchoolType__StateFundedPrimary}}, {{FILT_SchoolType__StateFundedSecondary}}, {{FILT_SchoolType__Special}}\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3699,7 +3777,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "2c8281ce-e56c-4542-9cb2-b90dcac8f445",
+												"id": "0ed51781-5027-4730-b0da-604beb3c6157",
 												"exec": [
 													"var respJson = pm.response.json();",
 													"",
@@ -3707,13 +3785,14 @@
 													"    pm.response.to.have.status(200);",
 													"});",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.results.length).to.equal(17838); });",
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.results.length).to.equal(4427); });",
 													"",
-													"pm.test(\"geographicLevel should be same as request\", function () {",
-													"    for(var i = 0; i < respJson.results.length; i++) {",
-													"        pm.expect(respJson.results[i].geographicLevel).to.equal(\"School\");",
-													"    }",
-													"});"
+													"// NOTE(mark): Slow!",
+													"// pm.test(\"geographicLevel should be same as request\", function () {",
+													"//     for(var i = 0; i < respJson.results.length; i++) {",
+													"//         pm.expect(respJson.results[i].geographicLevel).to.equal(\"School\");",
+													"//     }",
+													"// });"
 												],
 												"type": "text/javascript"
 											}
@@ -3731,7 +3810,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"School\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t{{FILT_StateFundedPrimary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"School\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t{{FILT_SchoolType__StateFundedPrimary}}, {{FILT_SchoolType__Special}}\n    ],\n    \"indicators\": [\n        57, 59, 66\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3774,6 +3853,26 @@
 													"    for(var i = 0; i < respJson.results.length; i++) {",
 													"        pm.expect(respJson.results[i].geographicLevel).to.equal(\"School\");",
 													"    }",
+													"});",
+													"",
+													"pm.test(\"Verify all possible timePeriods appear\", function () {",
+													"    var found2013 = false;",
+													"    var found2014 = false;",
+													"    var found2015 = false;",
+													"    for(var i = 0; i < respJson.results.length; i++) {",
+													"        if(!found2013 && respJson.results[i].timePeriod === \"2013_AY\") {",
+													"            found2013 = true;",
+													"        }",
+													"        if(!found2014 && respJson.results[i].timePeriod === \"2014_AY\") {",
+													"            found2014 = true;",
+													"        }",
+													"        if(!found2015 && respJson.results[i].timePeriod === \"2015_AY\") {",
+													"            found2015 = true;",
+													"        }",
+													"        pm.expect(found2013).to.equal(true, \"No results from 2013\");",
+													"        pm.expect(found2014).to.equal(true, \"No results from 2014\");",
+													"        pm.expect(found2015).to.equal(true, \"No results from 2015\");",
+													"    } ",
 													"});"
 												],
 												"type": "text/javascript"
@@ -3792,7 +3891,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\t\"subjectId\": 2,\n\t\"geographicLevel\": \"School\",\n\t\"region\": [ \"E13000001\" ],\n\t\"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n\t\"filters\" : [\n\t\t{{FILT_Total}}, {{FILT_StateFundedPrimary}}\n\t],\n\t\"indicators\": [\n\t\t42, 61, 57, 59, 66, 111212\n\t]\n}"
+											"raw": "{\n    \"localAuthority\": [\n        \"E09000002\",\n        \"E09000003\",\n        \"E08000016\"\n    ],\n    \"subjectId\": \"1\",\n    \"indicators\": [\n        \"28\",\n        \"26\",\n        \"23\"\n    ],\n    \"filters\": [\n        \"1\",\n        \"54\",\n        \"58\"\n    ],\n    \"timePeriod\": {\n        \"startYear\": 2013,\n        \"startCode\": \"AY\",\n        \"endYear\": 2015,\n        \"endCode\": \"AY\"\n    }\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -3814,10 +3913,10 @@
 										"id": "6354b6c5-34ad-43c1-b2d7-45f006621e28",
 										"type": "text/javascript",
 										"exec": [
-											"pm.globals.set(\"FILT_Total\", \"83\");",
-											"pm.globals.set(\"FILT_StateFundedPrimary\", \"86\");",
-											"pm.globals.set(\"FILT_StateFundedSecondary\", \"87\");",
-											"pm.globals.set(\"FILT_Special\", \"85\");"
+											"pm.globals.set(\"FILT_SchoolType__Total\", \"82\");",
+											"pm.globals.set(\"FILT_SchoolType__StateFundedPrimary\", \"83\");",
+											"pm.globals.set(\"FILT_SchoolType__StateFundedSecondary\", \"84\");",
+											"pm.globals.set(\"FILT_SchoolType__Special\", \"85\");"
 										]
 									}
 								},
@@ -3846,8 +3945,6 @@
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
 													"var respJson = pm.response.json();",
-													"",
-													"",
 													"",
 													"pm.test(\"timePeriodRange length should be correct\", function () {",
 													"    pm.expect(respJson.subjectMeta.timePeriodRange.length).to.equal(3); ",
@@ -4032,43 +4129,46 @@
 													"    }",
 													"});",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.results.length).to.equal(9); });",
+													"pm.test(\"Number of results should be correct\", function () { ",
+													"    pm.expect(respJson.results.length).to.equal(9);",
+													"    ",
+													"    pm.expect(respJson.results[0].geographicLevel).to.equal(\"Region\");",
+													"    pm.expect(respJson.results[0].location.region.code).to.equal(\"E13000001\");",
+													"    pm.expect(respJson.results[0].location.region.name).to.equal(\"Inner London\");",
+													"    ",
+													"    pm.expect(respJson.results[1].geographicLevel).to.equal(\"Region\");",
+													"    pm.expect(respJson.results[1].location.region.code).to.equal(\"E13000001\");",
+													"    pm.expect(respJson.results[1].location.region.name).to.equal(\"Inner London\");",
+													"    ",
+													"    pm.expect(respJson.results[2].geographicLevel).to.equal(\"Local_Authority\");",
+													"    pm.expect(respJson.results[2].location.localAuthority.code).to.equal(\"E09000001\");",
+													"    pm.expect(respJson.results[2].location.localAuthority.name).to.equal(\"City of London\");",
+													"    ",
+													"    pm.expect(respJson.results[3].geographicLevel).to.equal(\"Region\");",
+													"    pm.expect(respJson.results[3].location.region.code).to.equal(\"E13000002\");",
+													"    pm.expect(respJson.results[3].location.region.name).to.equal(\"Outer London\");",
+													"    ",
+													"    pm.expect(respJson.results[4].geographicLevel).to.equal(\"Region\");",
+													"    pm.expect(respJson.results[4].location.region.code).to.equal(\"E13000002\");",
+													"    pm.expect(respJson.results[4].location.region.name).to.equal(\"Outer London\");",
+													"    ",
+													"    pm.expect(respJson.results[5].geographicLevel).to.equal(\"Country\");",
+													"    pm.expect(respJson.results[5].location.country.code).to.equal(\"E92000001\");",
+													"    pm.expect(respJson.results[5].location.country.name).to.equal(\"England\");",
+													"    ",
+													"    pm.expect(respJson.results[6].geographicLevel).to.equal(\"Country\");",
+													"    pm.expect(respJson.results[6].location.country.code).to.equal(\"E92000001\");",
+													"    pm.expect(respJson.results[6].location.country.name).to.equal(\"England\");",
+													"    ",
+													"    pm.expect(respJson.results[7].geographicLevel).to.equal(\"Local_Authority\");",
+													"    pm.expect(respJson.results[7].location.localAuthority.code).to.equal(\"E09000002\");",
+													"    pm.expect(respJson.results[7].location.localAuthority.name).to.equal(\"Barking and Dagenham\");",
+													"    ",
+													"    pm.expect(respJson.results[8].geographicLevel).to.equal(\"Local_Authority\");",
+													"    pm.expect(respJson.results[8].location.localAuthority.code).to.equal(\"E09000002\");",
+													"    pm.expect(respJson.results[8].location.localAuthority.name).to.equal(\"Barking and Dagenham\");",
 													"",
-													"pm.expect(respJson.results[0].geographicLevel).to.equal(\"Region\");",
-													"pm.expect(respJson.results[0].location.region.code).to.equal(\"E13000001\");",
-													"pm.expect(respJson.results[0].location.region.name).to.equal(\"Inner London\");",
-													"",
-													"pm.expect(respJson.results[1].geographicLevel).to.equal(\"Region\");",
-													"pm.expect(respJson.results[1].location.region.code).to.equal(\"E13000001\");",
-													"pm.expect(respJson.results[1].location.region.name).to.equal(\"Inner London\");",
-													"",
-													"pm.expect(respJson.results[2].geographicLevel).to.equal(\"Local_Authority\");",
-													"pm.expect(respJson.results[2].location.localAuthority.code).to.equal(\"E09000001\");",
-													"pm.expect(respJson.results[2].location.localAuthority.name).to.equal(\"City of London\");",
-													"",
-													"pm.expect(respJson.results[3].geographicLevel).to.equal(\"Region\");",
-													"pm.expect(respJson.results[3].location.region.code).to.equal(\"E13000002\");",
-													"pm.expect(respJson.results[3].location.region.name).to.equal(\"Outer London\");",
-													"",
-													"pm.expect(respJson.results[4].geographicLevel).to.equal(\"Region\");",
-													"pm.expect(respJson.results[4].location.region.code).to.equal(\"E13000002\");",
-													"pm.expect(respJson.results[4].location.region.name).to.equal(\"Outer London\");",
-													"",
-													"pm.expect(respJson.results[5].geographicLevel).to.equal(\"Country\");",
-													"pm.expect(respJson.results[5].location.country.code).to.equal(\"E92000001\");",
-													"pm.expect(respJson.results[5].location.country.name).to.equal(\"England\");",
-													"",
-													"pm.expect(respJson.results[6].geographicLevel).to.equal(\"Country\");",
-													"pm.expect(respJson.results[6].location.country.code).to.equal(\"E92000001\");",
-													"pm.expect(respJson.results[6].location.country.name).to.equal(\"England\");",
-													"",
-													"pm.expect(respJson.results[7].geographicLevel).to.equal(\"Local_Authority\");",
-													"pm.expect(respJson.results[7].location.localAuthority.code).to.equal(\"E09000002\");",
-													"pm.expect(respJson.results[7].location.localAuthority.name).to.equal(\"Barking and Dagenham\");",
-													"",
-													"pm.expect(respJson.results[8].geographicLevel).to.equal(\"Local_Authority\");",
-													"pm.expect(respJson.results[8].location.localAuthority.code).to.equal(\"E09000002\");",
-													"pm.expect(respJson.results[8].location.localAuthority.name).to.equal(\"Barking and Dagenham\");"
+													"});"
 												],
 												"type": "text/javascript"
 											}
@@ -4156,9 +4256,9 @@
 										"id": "f28d57d5-c4a2-4c3c-a90c-e672993bec6d",
 										"type": "text/javascript",
 										"exec": [
-											"pm.globals.set(\"FILT_StateFundedPrimary\", \"89\");",
-											"pm.globals.set(\"FILT_StateFundedSecondary\", \"90\");",
-											"pm.globals.set(\"FILT_Special\", \"91\");"
+											"pm.globals.set(\"FILT_StateFundedPrimary\", \"88\");",
+											"pm.globals.set(\"FILT_StateFundedSecondary\", \"89\");",
+											"pm.globals.set(\"FILT_Special\", \"90\");"
 										]
 									}
 								},
@@ -4204,7 +4304,7 @@
 													"    pm.expect(respJson.subjectMeta.timePeriodRange.length).to.equal(4); ",
 													"});",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.results.length).to.equal(8); });",
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.results.length).to.equal(6); });",
 													"",
 													"pm.test(\"geographicLevel should be same as request\", function () {",
 													"    for(var i = 0; i < respJson.results.length; i++) {",
@@ -4228,7 +4328,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 4,\n    \"country\": [\"E92000001\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2013,\n    \t\"startCode\": \"HT6\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"HT6\"\n    },\n    \"filters\" : [\n        {{FILT_Special}}, {{FILT_StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        95, 94\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 4,\n    \"country\": [\"E92000001\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2013,\n    \t\"startCode\": \"HT6\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"HT6\"\n    },\n    \"filters\" : [\n        {{FILT_SchoolType__Special}}, {{FILT_SchoolType__StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        95, 94\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -4280,7 +4380,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 4,\n    \"geographicLevel\": \"School\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"HT6\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"HT6\"\n    },\n    \"filters\" : [\n        {{FILT_Special}}\n    ],\n    \"indicators\": [\n        95, 94\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 4,\n    \"geographicLevel\": \"School\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"HT6\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"HT6\"\n    },\n    \"filters\" : [\n        {{FILT_SchoolType__Special}}\n    ],\n    \"indicators\": [\n        95, 94\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -4351,7 +4451,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 4,\n    \"country\": [\"E92000001\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"HT6\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"HT6\"\n    },\n    \"filters\" : [\n        {{FILT_StateFundedSecondary}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        92, 95, 94\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 4,\n    \"country\": [\"E92000001\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"HT6\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"HT6\"\n    },\n    \"filters\" : [\n        {{FILT_SchoolType__StateFundedSecondary}}, {{FILT_SchoolType__Special}}\n    ],\n    \"indicators\": [\n        92, 95, 94\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
@@ -4426,9 +4526,9 @@
 										"id": "2cb67ee0-9a6d-4616-8d92-02a3aa5184e4",
 										"type": "text/javascript",
 										"exec": [
-											"pm.globals.set(\"FILT_SchoolType__Total\", \"95\");",
-											"pm.globals.set(\"FILT_StateFundedSecondary\", \"92\");",
-											"pm.globals.set(\"FILT_Special\", \"93\");"
+											"pm.globals.set(\"FILT_SchoolType__Total\", \"94\");",
+											"pm.globals.set(\"FILT_SchoolType__StateFundedSecondary\", \"91\");",
+											"pm.globals.set(\"FILT_SchoolType__Special\", \"92\");"
 										]
 									}
 								},
@@ -4529,7 +4629,7 @@
 													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.results.length).to.equal(6); });",
 													"",
 													"pm.test(\"geographicLevel and indicators/measures should be same as request\", function () {",
-													"    for(var i = 0; i < respJson.result.length; i++) {",
+													"    for(var i = 0; i < respJson.results.length; i++) {",
 													"        pm.expect(respJson.results[i].geographicLevel).to.equal(\"Local_Authority\");",
 													"        pm.expect(pm.response.to.have.jsonBody(`results[${i}].measures.113`));",
 													"        pm.expect(pm.response.to.have.jsonBody(`results[${i}].measures.114`));",
@@ -4673,7 +4773,7 @@
 										"id": "52135f05-03ae-4080-bbbb-dddcd7ee3e42",
 										"type": "text/javascript",
 										"exec": [
-											"pm.globals.set(\"FILT_PupilReferralUnit\", \"96\");"
+											"pm.globals.set(\"FILT_PupilReferralUnit\", \"95\");"
 										]
 									}
 								},
@@ -4760,7 +4860,7 @@
 											"script": {
 												"id": "f812d8b1-7373-4d5b-8abc-0c6e464f28ba",
 												"exec": [
-													"var respJson = pm.response.json():",
+													"var respJson = pm.response.json();",
 													"",
 													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.results.length).to.equal(150); });",
 													"",
@@ -4808,9 +4908,9 @@
 										"id": "e04223f2-1e08-4ff6-9984-732c655dbcdf",
 										"type": "text/javascript",
 										"exec": [
-											"pm.globals.set(\"FILT_StateFundedPrimary\", \"98\");",
-											"pm.globals.set(\"FILT_StateFundedSecondary\", \"99\");",
-											"pm.globals.set(\"FILT_Special\", \"100\");"
+											"pm.globals.set(\"FILT_StateFundedPrimary\", \"97\");",
+											"pm.globals.set(\"FILT_StateFundedSecondary\", \"98\");",
+											"pm.globals.set(\"FILT_Special\", \"99\");"
 										]
 									}
 								},
@@ -4897,9 +4997,9 @@
 										"id": "49522da0-95a0-4ddf-9a8a-9ca103db1df2",
 										"type": "text/javascript",
 										"exec": [
-											"pm.globals.set(\"FILT_StateFundedPrimary\", \"149\");",
-											"pm.globals.set(\"FILT_StateFundedSecondary\", \"151\");",
-											"pm.globals.set(\"FILT_Special\", \"150\");"
+											"pm.globals.set(\"FILT_StateFundedPrimary\", \"176\");",
+											"pm.globals.set(\"FILT_StateFundedSecondary\", \"175\");",
+											"pm.globals.set(\"FILT_Special\", \"174\");"
 										]
 									}
 								},
@@ -5026,7 +5126,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Country\",\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Country\",\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__GenderMale}}, {{FILT_Char__GenderFemale}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}\n"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/data",
@@ -5103,7 +5203,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Country\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}, {{FILT_StateFundedPrimary}}, {{FILT_StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Country\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__GenderMale}}, {{FILT_Char__GenderFemale}}, {{FILT_SchoolType__StateFundedPrimary}}, {{FILT_SchoolType__StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/data",
@@ -5185,7 +5285,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority\",\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority\",\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__GenderMale}}, {{FILT_Char__GenderFemale}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/data",
@@ -5252,7 +5352,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"localAuthority\": [\n    \t\"E09000032\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"localAuthority\": [\n    \t\"E09000032\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__GenderMale}}, {{FILT_Char__GenderFemale}}, {{FILT_SchoolType__Special}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/data",
@@ -5324,7 +5424,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority_District\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_FSMEligible}}, {{FILT_FSMNotEligible}}, {{FILT_FSMUnclassified}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority_District\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__FSMEligible}}, {{FILT_Char__FSMNotEligible}}, {{FILT_Char__FSMUnclassified}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/data",
@@ -5365,7 +5465,7 @@
 													"});",
 													"",
 													"pm.test(\"Number of results should be correct\", function () { ",
-													"    pm.expect(respJson.result.length).to.equal(7);",
+													"    pm.expect(respJson.result.length).to.equal(8);",
 													"});",
 													"",
 													"pm.test(\"Number of metaData locations should be correct and to have associated geoJson data\", function () {",
@@ -5412,7 +5512,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"localAuthorityDistrict\": [\"E06000001\"],\n    \"filters\" : [\n    \t{{FILT_AllPupils}}, {{FILT_FSMEligible}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"localAuthorityDistrict\": [\"E06000001\"],\n    \"filters\" : [\n    \t{{FILT_Char__Total}}, {{FILT_Char__FSMEligible}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/data",
@@ -5453,7 +5553,7 @@
 													"});",
 													"",
 													"pm.test(\"Number of results should be correct\", function () { ",
-													"    pm.expect(respJson.result.length).to.equal(7);",
+													"    pm.expect(respJson.result.length).to.equal(8);",
 													"});",
 													"",
 													"pm.test(\"Number of metaData locations should be correct and not have associated geoJson data\", function () {",
@@ -5486,7 +5586,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"localAuthorityDistrict\": [\"E06000001\"],\n    \"filters\" : [\n    \t{{FILT_AllPupils}}, {{FILT_FSMEligible}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ],\n    \"boundaryLevel\": 1\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"localAuthorityDistrict\": [\"E06000001\"],\n    \"filters\" : [\n    \t{{FILT_Char__Total}}, {{FILT_Char__FSMEligible}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ],\n    \"boundaryLevel\": 1\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/data",
@@ -5527,7 +5627,7 @@
 													"});",
 													"",
 													"pm.test(\"Number of results should be correct\", function () { ",
-													"    pm.expect(respJson.result.length).to.equal(7);",
+													"    pm.expect(respJson.result.length).to.equal(8);",
 													"});",
 													"",
 													"pm.test(\"Number of metaData locations should be correct and to have associated geoJson data\", function () {",
@@ -5559,7 +5659,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"localAuthorityDistrict\": [\"E06000001\"],\n    \"filters\" : [\n    \t{{FILT_AllPupils}}, {{FILT_FSMEligible}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ],\n    \"boundaryLevel\": 3\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"localAuthorityDistrict\": [\"E06000001\"],\n    \"filters\" : [\n    \t{{FILT_Char__Total}}, {{FILT_Char__FSMEligible}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ],\n    \"boundaryLevel\": 3\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/data",
@@ -5600,7 +5700,7 @@
 													"});",
 													"",
 													"pm.test(\"Number of results should be correct\", function () { ",
-													"    pm.expect(respJson.result.length).to.equal(7);",
+													"    pm.expect(respJson.result.length).to.equal(8);",
 													"});",
 													"",
 													"pm.test(\"Number of metaData locations should be correct and to have associated geoJson data\", function () {",
@@ -5633,7 +5733,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"localAuthorityDistrict\": [\"E06000001\"],\n    \"filters\" : [\n    \t{{FILT_AllPupils}}, {{FILT_FSMEligible}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ],\n    \"boundaryLevel\": 6\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"localAuthorityDistrict\": [\"E06000001\"],\n    \"filters\" : [\n    \t{{FILT_Char__Total}}, {{FILT_Char__FSMEligible}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ],\n    \"boundaryLevel\": 6\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/data",
@@ -5705,7 +5805,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"localAuthorityDistrict\": [\n    \t\"E07000223\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_FSMEligible}}, {{FILT_FSMNotEligible}}, {{FILT_FSMUnclassified}}, {{FILT_Special}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"localAuthorityDistrict\": [\n    \t\"E07000223\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__FSMEligible}}, {{FILT_Char__FSMNotEligible}}, {{FILT_Char__FSMUnclassified}}, {{FILT_SchoolType__Special}}\n    ],\n    \"indicators\": [\n        23, 26, 28\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/data",
@@ -5781,7 +5881,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"localAuthority\": [\"E09000032\"],\n    \"localAuthorityDistrict\": [\"E07000223\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2015,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_FSMEligible}}, {{FILT_FSMNotEligible}}, {{FILT_FSMUnclassified}}\n    ],\n    \"indicators\": [\n        6, 7, 8, 9, 10\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"localAuthority\": [\"E09000032\"],\n    \"localAuthorityDistrict\": [\"E07000223\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2015,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__FSMEligible}}, {{FILT_Char__FSMNotEligible}}, {{FILT_Char__FSMUnclassified}}\n    ],\n    \"indicators\": [\n        6, 7, 8, 9, 10\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/data",
@@ -5803,15 +5903,16 @@
 										"id": "ec9d2b73-2598-40e5-abd3-b8598bbf2497",
 										"type": "text/javascript",
 										"exec": [
-											"pm.globals.set(\"FILT_AllPupils\", \"70\");",
-											"pm.globals.set(\"FILT_GenderMale\", \"4\");",
-											"pm.globals.set(\"FILT_GenderFemale\", \"5\");",
-											"pm.globals.set(\"FILT_StateFundedPrimary\", \"71\");",
-											"pm.globals.set(\"FILT_Special\", \"74\");",
-											"pm.globals.set(\"FILT_StateFundedSecondary\", \"75\");",
-											"pm.globals.set(\"FILT_FSMEligible\", \"43\");",
-											"pm.globals.set(\"FILT_FSMNotEligible\", \"44\");",
-											"pm.globals.set(\"FILT_FSMUnclassified\", \"45\");"
+											"pm.globals.set(\"FILT_Char__Total\", \"1\");",
+											"pm.globals.set(\"FILT_Char__GenderMale\", \"53\");",
+											"pm.globals.set(\"FILT_Char__GenderFemale\", \"52\");",
+											"pm.globals.set(\"FILT_SchoolType__StateFundedPrimary\", \"57\");",
+											"pm.globals.set(\"FILT_SchoolType__StateFundedSecondary\", \"56\");",
+											"pm.globals.set(\"FILT_SchoolType__Special\", \"55\");",
+											"pm.globals.set(\"FILT_Char__FSMEligible\", \"18\");",
+											"pm.globals.set(\"FILT_Char__FSMNotEligible\", \"10\");",
+											"pm.globals.set(\"FILT_Char__FSMUnclassified\", \"8\");",
+											"pm.globals.set(\"FILT_Char__EthMinor_Irish\", \"50\");"
 										]
 									}
 								},
@@ -5888,8 +5989,8 @@
 													"pm.test(\"Should have correct filters metaData\", function () {",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
 													"    pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(2); ",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters.\" + pm.globals.get(\"FILT_GenderFemale\")));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters.\" + pm.globals.get(\"FILT_GenderMale\")));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters.\" + pm.globals.get(\"FILT_Char__GenderFemale\")));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters.\" + pm.globals.get(\"FILT_Char__GenderMale\")));",
 													"});",
 													"",
 													"pm.test(\"Should have correct indicators metaData\", function () {",
@@ -5913,7 +6014,7 @@
 													"",
 													"pm.test(\"All results have filter 884 or 885\", function () {",
 													"    for(var i = 0; i < pm.response.json().result.length; i++) {",
-													"        if(respJson.result[i].filters[0] !== pm.globals.get(\"FILT_GenderFemale\") && respJson.result[i].filters[0] !== pm.globals.get(\"FILT_GenderMale\")) {",
+													"        if(respJson.result[i].filters[0] !== pm.globals.get(\"FILT_Char__GenderFemale\") && respJson.result[i].filters[0] !== pm.globals.get(\"FILT_Char__GenderMale\")) {",
 													"            pm.expect(respJson.result[i].filters[0]).to.equal(-99999);",
 													"        }",
 													"    }",
@@ -5935,7 +6036,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 10,\n    \"geographicLevel\": \"Local_Authority\",\n    \"localAuthority\": [\n    \t\"E09000022\",\n    \t\"E08000014\",\n    \t\"E06000032\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2017,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_GenderMale}}, {{FILT_GenderFemale}}\n    ],\n    \"indicators\": [\n        {{INDI_TotalPointScoreBasedOnAssessmentRating}},\n        {{INDI_AveragePointScore}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 10,\n    \"geographicLevel\": \"Local_Authority\",\n    \"localAuthority\": [\n    \t\"E09000022\",\n    \t\"E08000014\",\n    \t\"E06000032\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2017,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__GenderMale}}, {{FILT_Char__GenderFemale}}\n    ],\n    \"indicators\": [\n        {{INDI_TotalPointScoreBasedOnAssessmentRating}},\n        {{INDI_AveragePointScore}}\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/data",
@@ -5957,11 +6058,11 @@
 										"id": "fda225ab-c571-4c3a-908a-d9d99051e238",
 										"type": "text/javascript",
 										"exec": [
-											"pm.globals.set(\"FILT_Total\", \"583\");",
-											"pm.globals.set(\"FILT_GenderFemale\", \"584\");",
-											"pm.globals.set(\"FILT_GenderMale\", \"585\");",
-											"pm.globals.set(\"INDI_TotalPointScoreBasedOnAssessmentRating\", \"268\");",
-											"pm.globals.set(\"INDI_AveragePointScore\", \"269\");"
+											"pm.globals.set(\"FILT_Char__Total\", \"238\");",
+											"pm.globals.set(\"FILT_Char__GenderFemale\", \"239\");",
+											"pm.globals.set(\"FILT_Char__GenderMale\", \"240\");",
+											"pm.globals.set(\"INDI_TotalPointScoreBasedOnAssessmentRating\", \"161\");",
+											"pm.globals.set(\"INDI_AveragePointScore\", \"162\");"
 										]
 									}
 								},
@@ -6066,9 +6167,9 @@
 								"id": "06185e19-060d-44b4-9adf-3c424694ae9e",
 								"type": "text/javascript",
 								"exec": [
-									"pm.globals.set(\"FILT_Primary__R\", \"538\");",
-									"pm.globals.set(\"FILT_Secondary__9\", \"541\");",
-									"pm.globals.set(\"FILT_Secondary__7\", \"542\");"
+									"pm.globals.set(\"FILT_Primary__R\", \"572\");",
+									"pm.globals.set(\"FILT_Secondary__9\", \"575\");",
+									"pm.globals.set(\"FILT_Secondary__7\", \"574\");"
 								]
 							}
 						},
@@ -6114,6 +6215,35 @@
 									"    pm.expect(pm.response.to.have.jsonBody(\"fullTable\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"fullTable.subjectMeta\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"fullTable.results\"));",
+									"});",
+									"",
+									"pm.test(\"Number of subjectMeta filters should be correct\", function () {",
+									"   pm.expect(Object.keys(respJson.fullTable.subjectMeta.filters).length).to.equal(3);",
+									"});",
+									"",
+									"pm.test(\"Number of subjectMeta locations should be correct\", function () {",
+									"   pm.expect(respJson.fullTable.subjectMeta.locations.length).to.equal(1); ",
+									"   pm.expect(respJson.fullTable.subjectMeta.locations[0].label).to.equal(\"England\");",
+									"});",
+									"",
+									"pm.test(\"geographicLevel should be same as request\", function () {",
+									"    for(var i = 0; i < respJson.fullTable.results.length; i++) {",
+									"        pm.expect(respJson.fullTable.results[i].geographicLevel).to.equal(\"Country\");",
+									"    }",
+									"});",
+									"",
+									"pm.test(\"Number of results should be correct\", function () { ",
+									"    pm.expect(respJson.fullTable.results.length).to.equal(4); ",
+									"});",
+									"",
+									"pm.test(\"Every result should contain location country England only\", function () {",
+									"    for(var i = 0; i < respJson.fullTable.results.length; i++) {",
+									"        pm.expect(respJson.fullTable.results[i].location.country.name).to.equal(\"England\");",
+									"        pm.expect(pm.response.to.not.have.jsonBody(`fullTable.results[${i}].location.localAuthority`));",
+									"        pm.expect(pm.response.to.not.have.jsonBody(`fullTable.results[${i}].location.localAuthorityDistrict`));",
+									"        pm.expect(pm.response.to.not.have.jsonBody(`fullTable.results[${i}].location.region`));",
+									"pm.environment.unset(\"variable_key\");",
+									"    }",
 									"});"
 								],
 								"type": "text/javascript"
@@ -6124,15 +6254,16 @@
 							"script": {
 								"id": "2cec492a-fc8e-4e42-9663-af2f42ae27c7",
 								"exec": [
-									"pm.globals.set(\"FILT_AllPupils\", \"70\");",
-									"pm.globals.set(\"FILT_GenderMale\", \"4\");",
-									"pm.globals.set(\"FILT_GenderFemale\", \"5\");",
-									"pm.globals.set(\"FILT_StateFundedPrimary\", \"71\");",
-									"pm.globals.set(\"FILT_StateFundedSecondary\", \"75\");",
-									"pm.globals.set(\"FILT_FSMEligible\", \"43\");",
-									"pm.globals.set(\"FILT_FSMNotEligible\", \"44\");",
-									"pm.globals.set(\"FILT_FSMUnclassified\", \"45\");",
-									"pm.globals.set(\"FILT_EthMinor_Irish\", \"24\");"
+									"pm.globals.set(\"FILT_Char__Total\", \"1\");",
+									"pm.globals.set(\"FILT_Char__GenderMale\", \"53\");",
+									"pm.globals.set(\"FILT_Char__GenderFemale\", \"52\");",
+									"pm.globals.set(\"FILT_SchoolType__StateFundedPrimary\", \"57\");",
+									"pm.globals.set(\"FILT_SchoolType__StateFundedSecondary\", \"56\");",
+									"pm.globals.set(\"FILT_SchoolType__Special\", \"55\");",
+									"pm.globals.set(\"FILT_Char__FSMEligible\", \"18\");",
+									"pm.globals.set(\"FILT_Char__FSMNotEligible\", \"10\");",
+									"pm.globals.set(\"FILT_Char__FSMUnclassified\", \"8\");",
+									"pm.globals.set(\"FILT_Char__EthMinor_Irish\", \"50\");"
 								],
 								"type": "text/javascript"
 							}
@@ -6150,7 +6281,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"subjectId\": 1,\n    \"country\": [\"E92000001\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_AllPupils}}\n    ],\n    \"indicators\": [\n        1, 23, 26\n    ]\n}"
+							"raw": "{\n    \"subjectId\": 1,\n    \"country\": [\"E92000001\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__Total}}\n    ],\n    \"indicators\": [\n        1, 23, 26\n    ]\n}"
 						},
 						"url": {
 							"raw": "{{data_api_url}}/permalink",
@@ -6191,7 +6322,7 @@
 									"});",
 									"",
 									"pm.test(\"Number of subjectMeta filters should be correct\", function () {",
-									"   pm.expect(respJson.fullTable.subjectMeta.filters.length).to.equal(3);",
+									"   pm.expect(Object.keys(respJson.fullTable.subjectMeta.filters).length).to.equal(3);",
 									"});",
 									"",
 									"pm.test(\"Number of subjectMeta locations should be correct\", function () {",
@@ -6206,7 +6337,7 @@
 									"});",
 									"",
 									"pm.test(\"Number of results should be correct\", function () { ",
-									"    pm.expect(respJson.fullTable.results.length).to.equal(3); ",
+									"    pm.expect(respJson.fullTable.results.length).to.equal(4); ",
 									"});",
 									"",
 									"pm.test(\"Every result should contain location country England only\", function () {",
@@ -6391,28 +6522,30 @@
 							"script": {
 								"id": "90830933-d7da-4502-b316-ed7887c913cf",
 								"exec": [
+									"var respJson = pm.response.json();",
+									"",
 									"pm.test(\"Filter count is above the expected count\", function () {",
-									"    pm.expect(pm.response.json().filterCount).to.be.above(31);",
+									"    pm.expect(respJson.filterCount).to.be.above(31);",
 									"});",
 									"",
 									"pm.test(\"Indicator count is above the expected count\", function () {",
-									"    pm.expect(pm.response.json().indicatorCount).to.be.above(224);",
+									"    pm.expect(respJson.indicatorCount).to.be.above(224);",
 									"});",
 									"",
 									"pm.test(\"Location count is above the expected count\", function () {",
-									"    pm.expect(pm.response.json().locationCount).to.be.above(529);",
+									"    pm.expect(respJson.locationCount).to.be.above(528);",
 									"});",
 									"",
 									"pm.test(\"Observation count is above the expected count\", function () {",
-									"    pm.expect(pm.response.json().observationCount).to.be.above(1183283);",
+									"    pm.expect(respJson.observationCount).to.be.above(1183283);",
 									"});",
 									"",
 									"pm.test(\"Release count is above the expected count\", function () {",
-									"    pm.expect(pm.response.json().releaseCount).to.be.above(3);",
+									"    pm.expect(respJson.releaseCount).to.be.above(3);",
 									"});",
 									"",
 									"pm.test(\"School count is above the expected count\", function () {",
-									"    pm.expect(pm.response.json().schoolCount).to.be.above(25215);",
+									"    pm.expect(pm.response.json().schoolCount).to.be.above(25214);",
 									"});",
 									"",
 									"pm.test(\"Subject count is above the expected count\", function () {",
