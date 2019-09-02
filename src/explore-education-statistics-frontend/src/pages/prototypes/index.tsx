@@ -29,15 +29,6 @@ function PrototypesIndexPage() {
           </Link>
         </li>
       </ul>
-
-      <ul>
-        <li>
-          <a href="https://eesadminprototype.z33.web.core.windows.net/prototypes/">
-            Administrator Prototype Index
-          </a>
-        </li>
-      </ul>
-
       <ul>
         <li>
           <Link to="/prototypes/graphs">Example graphs page</Link>
