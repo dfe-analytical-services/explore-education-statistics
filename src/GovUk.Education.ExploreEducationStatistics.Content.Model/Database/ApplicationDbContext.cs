@@ -2729,13 +2729,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             dataKeys = new List<string>
                             {
                                 Indicator(17, IndicatorName.Number_of_applications_received),
-                                Indicator(17, IndicatorName.Number_of_admissions),
+                                Indicator(17, IndicatorName.Number_of_first_preferences_offered),
                                 Indicator(17, IndicatorName.Number_of_second_preferences_offered)
                             },
                             dataSummary = new List<string>
                             {
                                 "Down from 620,330 in 2017",
-                                "Up from 709,548 in 2017",
+                                "Down from 558,411 in 2017",
                                 "Down from 34,792 in 2017"
                             },
                             description = new MarkDownBlock
