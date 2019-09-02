@@ -14,14 +14,17 @@ parser.add_argument(dest="password",
                     help="Password to login with")
 args = parser.parse_args()
 
+print("args.url: ", args.url)
+
 cdi.install(file_directory="./",
             verbose=True,
             chmod=True,
             overwrite=False,
             version='75.0.3770.140')
+os.environ["PATH"] += os.pathsep + os.getcwd()
             
 timeout = 10
-            
+
 def wait_until_page_contains_xpath(context, selector):
     max_time = time.time() + timeout
     elem = None
@@ -34,7 +37,15 @@ def wait_until_page_contains_xpath(context, selector):
             return
     raise Exception(f"Timeout! Couldn't find element with xpath selector '{selector}'")
     
-driver = webdriver.Chrome(executable_path=os.getcwd() + os.sep + "chromedriver")
+print("os.getcwd(): ", os.getcwd())
+print("os.listdir(os.getcwd()): ", os.listdir(os.getcwd()))
+    
+chrome_options = webdriver.ChromeOptions()
+chrome_options.add_argument('--no-sandbox')
+chrome_options.add_argument('--headless')
+chrome_options.add_argument('--disable-gpu')
+# driver = webdriver.Chrome(executable_path=os.getcwd() + os.sep + "chromedriver")
+driver = webdriver.Chrome(options=chrome_options)
 driver.get(args.url)
 
 wait_until_page_contains_xpath(driver, '//a[text()="Sign-in"]')

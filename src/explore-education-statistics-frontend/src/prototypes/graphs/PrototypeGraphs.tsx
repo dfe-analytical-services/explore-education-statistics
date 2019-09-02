@@ -9,7 +9,7 @@ import {
   newChartsApiDataBlock,
 } from '@frontend/prototypes/publication/data/PrototypeDataFactory';
 import DataBlock from '@common/modules/find-statistics/components/DataBlock';
-import HorizontalBarBlock from 'explore-education-statistics-common/src/modules/find-statistics/components/charts/HorizontalBarBlock';
+import HorizontalBarBlock from '@common/modules/find-statistics/components/charts/HorizontalBarBlock';
 
 const GraphsPage = () => {
   return (

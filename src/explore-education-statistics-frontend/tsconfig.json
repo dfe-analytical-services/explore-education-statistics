@@ -8,12 +8,6 @@
       "@frontend/*": ["../explore-education-statistics-frontend/src/*"]
     }
   },
-  "include": [
-    "src",
-    "test"
-  ],
-  "exclude": [
-    "build",
-    "node_modules"
-  ]
+  "include": ["src", "test"],
+  "exclude": ["build", "node_modules"]
 }

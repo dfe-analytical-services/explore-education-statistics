@@ -1,20 +1,5 @@
-import ButtonText from '@common/components/ButtonText';
 import { ConfirmContextProvider } from '@common/context/ConfirmContext';
 import mapValuesWithKeys from '@common/lib/utils/mapValuesWithKeys';
-import { Dictionary } from '@common/types/util';
-import Link from '@frontend/components/Link';
-import Page from '@frontend/components/Page';
-import PreviousStepModalConfirm from '@frontend/modules/table-tool/components/PreviousStepModalConfirm';
-import {
-  CategoryFilter,
-  Indicator,
-  LocationFilter,
-} from '@frontend/modules/table-tool/components/types/filters';
-import { parseYearCodeTuple } from '@frontend/modules/table-tool/components/types/TimePeriod';
-import getDefaultTableHeaderConfig from '@frontend/modules/table-tool/utils/tableHeaders';
-import permalinkService, {
-  FullTable,
-} from '@frontend/services/permalinkService';
 import tableBuilderService, {
   FilterOption,
   IndicatorOption,
@@ -22,10 +7,27 @@ import tableBuilderService, {
   PublicationSubjectMeta,
   TableDataQuery,
   ThemeMeta,
-} from '@frontend/services/tableBuilderService';
+} from '@common/modules/full-table/services/tableBuilderService';
+import { Dictionary } from '@common/types/util';
+import ButtonText from '@common/components/ButtonText';
+import LinkContainer from '@common/components/LinkContainer';
+import LoadingSpinner from '@common/components/LoadingSpinner';
+import Link from '@frontend/components/Link';
+import Page from '@frontend/components/Page';
+import PreviousStepModalConfirm from '@frontend/modules/table-tool/components/PreviousStepModalConfirm';
+import {
+  CategoryFilter,
+  Indicator,
+  LocationFilter,
+} from '@common/modules/full-table/types/filters';
+import parseYearCodeTuple from '@common/modules/full-table/utils/TimePeriod';
 import mapValues from 'lodash/mapValues';
 import { NextContext } from 'next';
-import React, { Component, createRef, MouseEventHandler } from 'react';
+import React, { Component, MouseEventHandler, createRef } from 'react';
+import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
+import permalinkService from '@common/modules/full-table/services/permalinkService';
+import { FullTable } from '@common/modules/full-table/types/fullTable';
+import { mapFullTable } from '@common/modules/full-table/utils/mapPermalinks';
 import DownloadCsvButton from './components/DownloadCsvButton';
 import FiltersForm, { FilterFormSubmitHandler } from './components/FiltersForm';
 import LocationFiltersForm, {
@@ -294,9 +296,11 @@ class TableToolPage extends Component<Props, State> {
       indicator => new Indicator(indicatorsByValue[indicator]),
     );
 
-    const createdTable = await tableBuilderService.getTableData(
+    const unmappedCreatedTable = await tableBuilderService.getTableData(
       this.createQuery(filters, indicators),
     );
+
+    const createdTable = mapFullTable(unmappedCreatedTable);
 
     this.setState({
       createdTable,
@@ -446,6 +450,47 @@ class TableToolPage extends Component<Props, State> {
 
                       {publication && createdTable && (
                         <>
+                          <h3>Share your table</h3>
+                          <ul className="govuk-list">
+                            <li>
+                              {permalinkId ? (
+                                <>
+                                  <div>Generated permanent link:</div>
+                                  <LinkContainer
+                                    url={`${window.location.href}/permalink/${permalinkId}`}
+                                  />
+                                  <div>
+                                    <a
+                                      className="govuk-link"
+                                      href={`${window.location.href}/permalink/${permalinkId}`}
+                                      title="View created table permalink"
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                    >
+                                      View permanent link
+                                    </a>
+                                  </div>
+                                </>
+                              ) : (
+                                <>
+                                  {permalinkLoading ? (
+                                    <>
+                                      Generating permanent link
+                                      <LoadingSpinner inline size={19} />
+                                    </>
+                                  ) : (
+                                    <ButtonText
+                                      disabled={permalinkLoading}
+                                      onClick={this.handlePermalinkClick}
+                                    >
+                                      Generate permanent link
+                                    </ButtonText>
+                                  )}
+                                </>
+                              )}
+                            </li>
+                          </ul>
+
                           <h3>Additional options</h3>
 
                           <ul className="govuk-list">
@@ -456,31 +501,6 @@ class TableToolPage extends Component<Props, State> {
                               >
                                 Go to publication
                               </Link>
-                            </li>
-                            <li>
-                              {permalinkId ? (
-                                <ButtonText
-                                  onClick={() => {
-                                    window.open(
-                                      `${window.location.pathname}/permalink/${permalinkId}`,
-                                      'blank_',
-                                    );
-                                  }}
-                                >
-                                  View permanent link
-                                </ButtonText>
-                              ) : (
-                                <>
-                                  <ButtonText
-                                    onClick={this.handlePermalinkClick}
-                                  >
-                                    Create permanent link
-                                  </ButtonText>
-                                  {/* permalinkLoading && (
-                                    <LoadingSpinner size={20} />
-                                  ) */}
-                                </>
-                              )}
                             </li>
                             <li>
                               <DownloadCsvButton

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Helmet } from 'react-helmet';
+import Head from 'next/head';
 
 export interface PageMetaProps {
   title?: string;
@@ -13,7 +13,7 @@ const PageMeta = ({
   imgUrl,
 }: PageMetaProps) => {
   return (
-    <Helmet>
+    <Head>
       {/* <!-- Primary Meta Tags --> */}
       <title>{title}</title>
       <meta name="title" content={title} />
@@ -30,7 +30,7 @@ const PageMeta = ({
       <meta property="twitter:title" content={title} />
       <meta property="twitter:description" content={description} />
       {imgUrl && <meta property="twitter:image" content={imgUrl} />}
-    </Helmet>
+    </Head>
   );
 };
 

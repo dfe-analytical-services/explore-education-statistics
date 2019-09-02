@@ -1,7 +1,8 @@
-import Button from '@common/components/Button';
-import { FormGroup } from '@common/components/form';
 import { FormikState } from 'formik';
 import React, { MouseEventHandler } from 'react';
+import Button from '@common/components/Button';
+import { FormGroup } from '@common/components/form';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import { InjectedWizardProps } from './Wizard';
 
 interface Props {
@@ -53,6 +54,8 @@ const WizardStepFormActions = ({
           Previous step
         </Button>
       )}
+
+      {form.isSubmitting && <LoadingSpinner inline size={39} />}
     </FormGroup>
   );
 };

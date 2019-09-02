@@ -1,5 +1,5 @@
 import { Dictionary, PartialRecord } from '@common/types';
-import { FullTableMeta, FullTable } from '@frontend/services/permalinkService';
+import { FullTable } from '@common/modules/full-table/types/fullTable.ts';
 import { dataApi } from '@common/services/api';
 
 export interface FilterOption {
@@ -87,19 +87,6 @@ export type LocationLevelKeys =
   | 'rscRegion'
   | 'sponsor'
   | 'ward';
-
-export interface TableData {
-  subjectMeta: FullTableMeta;
-  results: {
-    timePeriod: string;
-    measures: Dictionary<string>;
-    filters: string[];
-    location: Dictionary<{
-      code: string;
-      name: string;
-    }>;
-  }[];
-}
 
 interface TimePeriodQuery {
   startYear: number;
