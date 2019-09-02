@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -64,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
             var table = GetCloudTable(_storageTableService, config, SubscriptionsTblName);
             var query = new TableQuery<SubscriptionEntity>()
                 .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal,
-                    publicationNotification.PublicationId));
+                    publicationNotification.PublicationId.ToString()));
 
             TableContinuationToken token = null;
             do
@@ -82,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
                     {
                         // Use values from the queue just in case the name or slug of the publication changes
                         {"publication_name", publicationNotification.Name},
-                        {"publication_link", webApplicationBaseUrl + "statistics/" + publicationNotification.Slug},
+                        {"publication_link", webApplicationBaseUrl + "find-statistics/" + publicationNotification.Slug},
                         {"unsubscribe_link", baseUrl + entity.PartitionKey + "/unsubscribe/" + unsubscribeToken}
                     };
 
@@ -333,9 +334,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
             return storageTableService.GetTable(connectionStr, tableName).Result;
         }
 
-        private static PublicationNotification ExtractNotification(JObject publicationNotification)
+        private static PublicationNotificationMessage ExtractNotification(JObject publicationNotification)
         {
-            return publicationNotification.ToObject<PublicationNotification>();
+            return publicationNotification.ToObject<PublicationNotificationMessage>();
         }
     }
 }
