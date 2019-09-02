@@ -7,7 +7,6 @@ import {
 } from '@common/modules/full-table/services/tableBuilderService';
 import { Dictionary } from '@common/types';
 import { FullTable } from '../types/fullTable';
-import { TableHeadersConfig } from '../utils/tableHeaders';
 
 export interface SortableOption {
   label: string;
@@ -50,9 +49,7 @@ export interface UnmappedPermalink {
   title: string;
   created: string;
   fullTable: UnmappedFullTable;
-  configuration: {
-    tableHeadersConfig: UnmappedTableHeadersConfig;
-  };
+  query: PermalinkCreateQuery;
 }
 
 export interface Permalink {
@@ -60,19 +57,18 @@ export interface Permalink {
   title: string;
   created: string;
   fullTable: FullTable;
-  configuration: {
-    tableHeadersConfig: TableHeadersConfig;
-  };
+  query: PermalinkCreateQuery;
 }
 
-interface PermalinkCreate extends TableDataQuery {
+interface PermalinkCreateQuery extends TableDataQuery {
   configuration: {
     tableHeadersConfig: UnmappedTableHeadersConfig;
   };
 }
-
 export default {
-  createTablePermalink(query: PermalinkCreate): Promise<UnmappedPermalink> {
+  createTablePermalink(
+    query: PermalinkCreateQuery,
+  ): Promise<UnmappedPermalink> {
     return dataApi.post('/permalink', query);
   },
   getPermalink(publicationSlug: string): Promise<UnmappedPermalink> {
