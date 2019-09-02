@@ -9,7 +9,6 @@ describe('DownloadCsvButton', () => {
   const emptyTable: FullTable = {
     subjectMeta: {
       publicationName: '',
-      subjectId: '',
       subjectName: '',
       footnotes: [],
       filters: {
