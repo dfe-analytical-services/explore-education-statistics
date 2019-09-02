@@ -1,19 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React from 'react';
-import { FormGroup, FormTextInput } from '@common/components/form';
+import ChartBuilder from '@admin/modules/chart-builder/ChartBuilder';
+import PrototypeTableContent from '@admin/pages/prototypes/components/PrototypeTableContent';
+import PrototypeChartSample from '@admin/pages/prototypes/publication/components/PrototypeChartSample';
 import Button from '@common/components/Button';
+import { FormGroup, FormTextInput } from '@common/components/form';
 import ModalConfirm from '@common/components/ModalConfirm';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import useToggle from '@common/hooks/useToggle';
-import PrototypeTableContent from '@admin/pages/prototypes/components/PrototypeTableContent';
-import ChartBuilder from '@admin/modules/chart-builder/ChartBuilder';
-import DataBlockService, {
-  DataBlockResponse,
-  GeographicLevel,
-} from '@common/services/dataBlockService';
-import Link from '@admin/components/Link';
-import PrototypeChartSample from '@admin/pages/prototypes/publication/components/PrototypeChartSample';
+import { DataBlockResponse } from '@common/services/dataBlockService';
+import React from 'react';
 import PrototypeData, { PrototypeTable } from '../PrototypeData';
 
 interface Props {
@@ -115,25 +111,42 @@ const PrototypeExampleTable = ({ task, table }: Props) => {
       )}
       {task === 'view' && (
         <>
+          <FormGroup>
+            <FormTextInput
+              id="permalink"
+              name="permalink"
+              label="Permalink"
+              hint="Copy this link to view a standalone version of this table. Use this link to refer to your table within your release.
+              "
+              defaultValue="http://dfe-url.gov.uk/example-permalink"
+              width={20}
+              onClick={e =>
+                e.currentTarget.setSelectionRange(
+                  0,
+                  e.currentTarget.value.length,
+                )
+              }
+            />
+          </FormGroup>
           <a
             className="govuk-button govuk-!-margin-right-3"
             href="/prototypes/publication-create-new-absence-table?status=step5#table-builder"
           >
-            Edit data block
+            Edit table
           </a>
 
           <Button variant="warning" onClick={() => toggleDeleteModal(true)}>
-            Delete data block
+            Delete table
           </Button>
 
           <ModalConfirm
             mounted={showDeleteModal}
-            title="Confirm delete data block"
+            title="Confirm delete table"
             onExit={() => toggleDeleteModal(false)}
             onConfirm={() => toggleDeleteModal(false)}
             onCancel={() => toggleDeleteModal(false)}
           >
-            <p>Are you sure you want to delete the data block?</p>
+            <p>Are you sure you want to delete the table?</p>
           </ModalConfirm>
         </>
       )}

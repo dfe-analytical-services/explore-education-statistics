@@ -18,6 +18,11 @@ describe('ChartFunctions', () => {
     filters: ['1', '72'],
   };
 
+  const dataSet99_1_72: ChartDataSet = {
+    indicator: '99',
+    filters: ['1', '72'],
+  };
+
   const dataSet26_1_71: ChartDataSet = {
     indicator: '26',
     filters: ['1', '71'],
@@ -59,6 +64,48 @@ describe('ChartFunctions', () => {
       {
         name: '2016_HT6',
         '26_1_72_____': '4',
+      },
+    ]);
+  });
+
+  test('createDataForAxis can sort by indicator from single indicator', () => {
+    const meta = Data.responseData.metaData;
+
+    const axis: AxisConfiguration = {
+      name: meta.indicators['99'].label,
+      type: 'major',
+      groupBy: 'timePeriods',
+      sortBy: '99_1_72_____',
+      sortAsc: true,
+      dataSets: [dataSet99_1_72],
+    };
+
+    const chartData = ChartFunctions.createSortedDataForAxis(
+      axis,
+      Data.responseData.result,
+      meta,
+    );
+
+    expect(chartData).toEqual([
+      {
+        name: '2013_HT6',
+        '99_1_72_____': '98',
+      },
+      {
+        name: '2012_HT6',
+        '99_1_72_____': '99',
+      },
+      {
+        name: '2015_HT6',
+        '99_1_72_____': '100',
+      },
+      {
+        name: '2016_HT6',
+        '99_1_72_____': '101',
+      },
+      {
+        name: '2014_HT6',
+        '99_1_72_____': '102',
       },
     ]);
   });

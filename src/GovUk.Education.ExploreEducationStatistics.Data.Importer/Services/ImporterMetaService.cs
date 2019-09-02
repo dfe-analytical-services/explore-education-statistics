@@ -21,10 +21,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
     public class ImporterMetaService : IImporterMetaService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly StatisticsDbContext _context;
 
         public ImporterMetaService(
-            ApplicationDbContext context)
+            StatisticsDbContext context)
         {
             _context = context;
         }

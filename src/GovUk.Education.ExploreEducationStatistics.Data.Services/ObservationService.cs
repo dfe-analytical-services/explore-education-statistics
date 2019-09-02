@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
     public class ObservationService : AbstractRepository<Observation, long>, IObservationService
     {
         public ObservationService(
-            ApplicationDbContext context,
+            StatisticsDbContext context,
             ILogger<ObservationService> logger) : base(context, logger)
         {
         }

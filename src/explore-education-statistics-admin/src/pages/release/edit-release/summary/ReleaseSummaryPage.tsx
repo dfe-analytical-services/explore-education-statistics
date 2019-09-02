@@ -3,7 +3,7 @@ import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
 import {
-  getSelectedReleaseTypeTitle,
+  getSelectedReleaseType,
   getSelectedTimePeriodCoverageLabel,
 } from '@admin/pages/release/util/releaseSummaryUtil';
 import { summaryEditRoute } from '@admin/routes/edit-release/routes';
@@ -52,59 +52,60 @@ const ReleaseSummaryPage = () => {
 
   return (
     <>
+      <h2 className="govuk-heading-m">Release summary</h2>
+      <p>These details will be shown to users to help identify this release.</p>
       {model && (
-        <SummaryList>
-          <SummaryListItem term="Publication title">
-            {publication.title}
-          </SummaryListItem>
-          <SummaryListItem term="Time period">
-            {getSelectedTimePeriodCoverageLabel(
-              model.releaseSummaryDetails.timePeriodCoverage.value,
-              model.timePeriodCoverageGroups,
-            )}
-          </SummaryListItem>
-          <SummaryListItem term="Release period">
-            <time>{model.releaseSummaryDetails.releaseName}</time> to{' '}
-            <time>
-              {parseInt(model.releaseSummaryDetails.releaseName, 10) + 1}
-            </time>
-          </SummaryListItem>
-          <SummaryListItem term="Lead statistician">
-            {publication.contact && publication.contact.contactName}
-          </SummaryListItem>
-          <SummaryListItem term="Scheduled release">
-            <FormattedDate>
-              {new Date(model.releaseSummaryDetails.publishScheduled)}
-            </FormattedDate>
-          </SummaryListItem>
-          <SummaryListItem term="Next release expected">
-            {dayMonthYearIsComplete(
-              model.releaseSummaryDetails.nextReleaseDate,
-            ) && (
+        <>
+          <SummaryList>
+            <SummaryListItem term="Publication title">
+              {publication.title}
+            </SummaryListItem>
+            <SummaryListItem term="Time period">
+              {getSelectedTimePeriodCoverageLabel(
+                model.releaseSummaryDetails.timePeriodCoverage.value,
+                model.timePeriodCoverageGroups,
+              )}
+            </SummaryListItem>
+            <SummaryListItem term="Release period">
+              <time>{model.releaseSummaryDetails.releaseName}</time> to{' '}
+              <time>
+                {parseInt(model.releaseSummaryDetails.releaseName, 10) + 1}
+              </time>
+            </SummaryListItem>
+            <SummaryListItem term="Lead statistician">
+              {publication.contact && publication.contact.contactName}
+            </SummaryListItem>
+            <SummaryListItem term="Scheduled release">
               <FormattedDate>
-                {dayMonthYearToDate(
-                  model.releaseSummaryDetails.nextReleaseDate,
-                )}
+                {new Date(model.releaseSummaryDetails.publishScheduled)}
               </FormattedDate>
-            )}
-          </SummaryListItem>
-          <SummaryListItem term="Release type">
-            {getSelectedReleaseTypeTitle(
-              model.releaseSummaryDetails.id,
-              model.releaseTypes,
-            )}
-          </SummaryListItem>
-          <SummaryListItem
-            term=""
-            actions={
-              <Link
-                to={summaryEditRoute.generateLink(publication.id, releaseId)}
-              >
-                Edit release setup details
-              </Link>
-            }
-          />
-        </SummaryList>
+            </SummaryListItem>
+            <SummaryListItem term="Next release expected">
+              {dayMonthYearIsComplete(
+                model.releaseSummaryDetails.nextReleaseDate,
+              ) && (
+                <FormattedDate>
+                  {dayMonthYearToDate(
+                    model.releaseSummaryDetails.nextReleaseDate,
+                  )}
+                </FormattedDate>
+              )}
+            </SummaryListItem>
+            <SummaryListItem term="Release type">
+              {
+                getSelectedReleaseType(
+                  model.releaseSummaryDetails.typeId,
+                  model.releaseTypes,
+                ).title
+              }
+            </SummaryListItem>
+          </SummaryList>
+          <div className="dfe-align--right">
+            <Link to={summaryEditRoute.generateLink(publication.id, releaseId)}>
+              Edit release setup details
+            </Link>
+          </div>
+        </>
       )}
     </>
   );

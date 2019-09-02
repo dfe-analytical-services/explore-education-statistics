@@ -1,12 +1,10 @@
-import Accordion from '@common/components/Accordion';
-import AccordionSection from '@common/components/AccordionSection';
 import React from 'react';
 import { RouteChildrenProps } from 'react-router';
 import PrototypePage from './components/PrototypePage';
 import StepNav from './components/PrototypeStepByStep';
 import StepNavItem from './components/PrototypeStepByStepItem';
 
-const DocumentationCreateNewRelease = ({ location }: RouteChildrenProps) => {
+const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
   const query = new URLSearchParams(window.location.search);
   const step = Number(query.get('step'));
 
