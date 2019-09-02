@@ -2,14 +2,13 @@ import Papa from 'papaparse';
 import React from 'react';
 import { fireEvent, render } from 'react-testing-library';
 import TimePeriod from '@common/services/types/TimePeriod';
-import { FullTable } from '@frontend/services/permalinkService';
+import { FullTable } from '@common/modules/full-table/types/fullTable';
 import DownloadCsvButton from '../DownloadCsvButton';
 
 describe('DownloadCsvButton', () => {
   const emptyTable: FullTable = {
     subjectMeta: {
       publicationName: '',
-      subjectId: '',
       subjectName: '',
       footnotes: [],
       filters: {
@@ -84,6 +83,7 @@ describe('DownloadCsvButton', () => {
             {
               filters: ['gender_male', 'school_primary'],
               timePeriod: '2014_AY',
+              geographicLevel: 'Country',
               location: {
                 country: {
                   code: 'england',
@@ -98,6 +98,7 @@ describe('DownloadCsvButton', () => {
             {
               filters: ['gender_male', 'school_secondary'],
               timePeriod: '2014_AY',
+              geographicLevel: 'Country',
               location: {
                 country: {
                   code: 'england',
@@ -112,6 +113,7 @@ describe('DownloadCsvButton', () => {
             {
               filters: ['gender_female', 'school_primary'],
               timePeriod: '2014_AY',
+              geographicLevel: 'Country',
               location: {
                 country: {
                   code: 'england',
@@ -126,6 +128,7 @@ describe('DownloadCsvButton', () => {
             {
               filters: ['gender_female', 'school_secondary'],
               timePeriod: '2014_AY',
+              geographicLevel: 'Country',
               location: {
                 country: {
                   code: 'england',
@@ -140,6 +143,7 @@ describe('DownloadCsvButton', () => {
             {
               filters: ['gender_male', 'school_primary'],
               timePeriod: '2015_AY',
+              geographicLevel: 'Country',
               location: {
                 country: {
                   code: 'england',
@@ -154,6 +158,7 @@ describe('DownloadCsvButton', () => {
             {
               filters: ['gender_male', 'school_secondary'],
               timePeriod: '2015_AY',
+              geographicLevel: 'Country',
               location: {
                 country: {
                   code: 'england',
@@ -168,6 +173,7 @@ describe('DownloadCsvButton', () => {
             {
               filters: ['gender_female', 'school_primary'],
               timePeriod: '2015_AY',
+              geographicLevel: 'Country',
               location: {
                 country: {
                   code: 'england',
@@ -182,6 +188,7 @@ describe('DownloadCsvButton', () => {
             {
               filters: ['gender_female', 'school_secondary'],
               timePeriod: '2015_AY',
+              geographicLevel: 'Country',
               location: {
                 country: {
                   code: 'england',
@@ -196,6 +203,7 @@ describe('DownloadCsvButton', () => {
             {
               filters: ['gender_male', 'school_primary'],
               timePeriod: '2014_AY',
+              geographicLevel: 'Country',
               location: {
                 region: {
                   code: 'south_yorkshire',
@@ -210,6 +218,7 @@ describe('DownloadCsvButton', () => {
             {
               filters: ['gender_male', 'school_secondary'],
               timePeriod: '2014_AY',
+              geographicLevel: 'Country',
               location: {
                 country: {
                   code: 'england',
@@ -224,6 +233,7 @@ describe('DownloadCsvButton', () => {
             {
               filters: ['gender_female', 'school_primary'],
               timePeriod: '2014_AY',
+              geographicLevel: 'Country',
               location: {
                 country: {
                   code: 'england',
@@ -238,6 +248,7 @@ describe('DownloadCsvButton', () => {
             {
               filters: ['gender_female', 'school_secondary'],
               timePeriod: '2014_AY',
+              geographicLevel: 'Country',
               location: {
                 country: {
                   code: 'england',
@@ -252,6 +263,7 @@ describe('DownloadCsvButton', () => {
             {
               filters: ['gender_male', 'school_primary'],
               timePeriod: '2014_AY',
+              geographicLevel: 'Country',
               location: {
                 country: {
                   code: 'england',
@@ -266,6 +278,7 @@ describe('DownloadCsvButton', () => {
             {
               filters: ['gender_male', 'school_secondary'],
               timePeriod: '2014_AY',
+              geographicLevel: 'Country',
               location: {
                 country: {
                   code: 'england',
@@ -280,6 +293,7 @@ describe('DownloadCsvButton', () => {
             {
               filters: ['gender_female', 'school_primary'],
               timePeriod: '2014_AY',
+              geographicLevel: 'Country',
               location: {
                 country: {
                   code: 'england',
@@ -294,6 +308,7 @@ describe('DownloadCsvButton', () => {
             {
               filters: ['gender_female', 'school_secondary'],
               timePeriod: '2014_AY',
+              geographicLevel: 'Country',
               location: {
                 country: {
                   code: 'england',
@@ -329,6 +344,7 @@ describe('DownloadCsvButton', () => {
             {
               filters: ['gender_female', 'school_primary'],
               timePeriod: '2015_AY',
+              geographicLevel: 'Country',
               location: {
                 country: {
                   code: 'england',
@@ -364,6 +380,7 @@ describe('DownloadCsvButton', () => {
             {
               filters: ['gender_female', 'school_primary'],
               timePeriod: '2015_AY',
+              geographicLevel: 'Country',
               location: {
                 country: {
                   code: 'england',

@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
         private readonly ISplitFileService _splitFileService;
         private readonly IImporterService _importerService;
         private readonly IBatchService _batchService;
-        private readonly ApplicationDbContext _context;
+        private readonly StatisticsDbContext _context;
         
         public Processor(
             IFileImportService fileImportService,
@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             ISplitFileService splitFileService,
             IImporterService importerService,
             IBatchService batchService,
-            ApplicationDbContext context
+            StatisticsDbContext context
         )
         {
             _fileImportService = fileImportService;

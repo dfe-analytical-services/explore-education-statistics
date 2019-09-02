@@ -51,7 +51,7 @@ class PublicationReleasePage extends Component<Props> {
   }
 
   public render() {
-    const { data, release } = this.props;
+    const { data } = this.props;
 
     const releaseCount =
       data.publication.releases.length + data.publication.legacyReleases.length;
@@ -68,22 +68,22 @@ class PublicationReleasePage extends Component<Props> {
           <div className="govuk-grid-column-two-thirds">
             <div className="govuk-grid-row">
               <div className="govuk-grid-column-three-quarters">
-                {!release ? (
+                {data.latestRelease ? (
                   <strong className="govuk-tag govuk-!-margin-right-6">
                     {' '}
                     This is the latest data{' '}
                   </strong>
                 ) : (
-                  <p>
-                    This is data from {release},{' '}
-                    <Link
-                      className="dfe-print-hidden"
-                      unvisited
-                      to={`/find-statistics/${data.publication.slug}`}
-                    >
-                      view latest release
-                    </Link>
-                  </p>
+                  <Link
+                    className="dfe-print-hidden"
+                    unvisited
+                    to={`/find-statistics/${data.publication.slug}`}
+                  >
+                    View latest data:{' '}
+                    <span className="govuk-!-font-weight-bold">
+                      {data.publication.releases.slice(-1)[0].title}
+                    </span>
+                  </Link>
                 )}
                 <dl className="dfe-meta-content govuk-!-margin-top-3 govuk-!-margin-bottom-1">
                   <dt className="govuk-caption-m">Published: </dt>

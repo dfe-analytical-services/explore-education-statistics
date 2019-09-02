@@ -1,7 +1,8 @@
 import {
   FilterOption,
   IndicatorOption,
-} from '@frontend/services/tableBuilderService';
+  TimePeriodOption,
+} from '@common/modules/full-table/services/tableBuilderService';
 import camelCase from 'lodash/camelCase';
 
 export abstract class Filter {
@@ -39,5 +40,18 @@ export class Indicator extends Filter {
   public constructor({ value, label, unit }: IndicatorOption) {
     super({ value, label });
     this.unit = unit;
+  }
+}
+
+export class TimePeriodFilter extends Filter {
+  public readonly year: number;
+
+  public readonly code: string;
+
+  public constructor({ year, code, label }: TimePeriodOption) {
+    super({ label, value: `${year}_${code}` });
+
+    this.code = code;
+    this.year = year;
   }
 }

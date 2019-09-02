@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
     public class LocationService : AbstractRepository<Location, long>, ILocationService
     {
-        public LocationService(ApplicationDbContext context, ILogger<LocationService> logger) : base(context, logger)
+        public LocationService(StatisticsDbContext context, ILogger<LocationService> logger) : base(context, logger)
         {
         }
 

@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
     public class FootnoteService : AbstractRepository<Footnote, long>, IFootnoteService
     {
-        public FootnoteService(ApplicationDbContext context, ILogger<FootnoteService> logger) : base(context, logger)
+        public FootnoteService(StatisticsDbContext context, ILogger<FootnoteService> logger) : base(context, logger)
         {
         }
 

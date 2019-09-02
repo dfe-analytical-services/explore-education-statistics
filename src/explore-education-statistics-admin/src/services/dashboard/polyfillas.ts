@@ -4,27 +4,29 @@ import {
 } from '@admin/services/dashboard/types';
 import { Polyfilla } from '@admin/services/util/polyfilla';
 
-const publicationPollyfilla: Polyfilla<AdminDashboardPublication> = (
+export const releasePolyfilla: Polyfilla<AdminDashboardRelease> = (
+  release: AdminDashboardRelease,
+) => ({
+  ...release,
+  lastEditedUser: {
+    id: 'TODO',
+    name: 'TODO editor user',
+  },
+  lastEditedDateTime: '1971-01-01 00:00',
+  contact: {
+    id: '-1',
+    contactName: 'TODO user',
+    contactTelNo: '01234 567890',
+    teamEmail: 'todo@example.com',
+    teamName: 'Team TODO',
+  },
+});
+
+export const publicationPolyfilla: Polyfilla<AdminDashboardPublication> = (
   publication: AdminDashboardPublication,
 ) => ({
   ...publication,
-  releases: publication.releases.map(release => {
-    const patchedRelease: AdminDashboardRelease = {
-      ...release,
-      lastEditedUser: {
-        id: 'TODO',
-        name: 'TODO editor user',
-      },
-      lastEditedDateTime: '1971-01-01 00:00',
-      nextReleaseDate: {
-        day: 2,
-        month: 2,
-        year: 1971,
-      },
-      contact: publication.contact,
-    };
-    return patchedRelease;
-  }),
+  releases: publication.releases.map(releasePolyfilla),
 });
 
-export default publicationPollyfilla;
+export default {};
