@@ -115,11 +115,14 @@ export const mapPermalink = (
   return {
     ...unmappedPermalink,
     fullTable: mappedFullTable,
-    configuration: {
-      tableHeadersConfig: reverseMapTableHeadersConfig(
-        unmappedPermalink.configuration.tableHeadersConfig,
-        mappedFullTable.subjectMeta,
-      ),
+    query: {
+      ...unmappedPermalink.query,
+      configuration: {
+        tableHeadersConfig: reverseMapTableHeadersConfig(
+          unmappedPermalink.query.configuration.tableHeadersConfig,
+          mappedFullTable.subjectMeta,
+        ),
+      },
     },
   };
 };
