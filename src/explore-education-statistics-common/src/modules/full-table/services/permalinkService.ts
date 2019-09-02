@@ -23,7 +23,6 @@ export interface UnmappedTableHeadersConfig {
 
 interface UnmappedFullTableSubjectMeta {
   publicationName: string;
-  subjectId: string;
   subjectName: string;
   locations: { label: string; value: string; level: string }[];
   timePeriodRange: TimePeriodOption[];

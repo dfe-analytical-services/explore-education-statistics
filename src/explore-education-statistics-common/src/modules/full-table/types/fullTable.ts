@@ -8,7 +8,6 @@ import {
 
 export interface FullTableMeta {
   publicationName: string;
-  subjectId: string;
   subjectName: string;
   locations: LocationFilter[];
   timePeriodRange: TimePeriodFilter[];
