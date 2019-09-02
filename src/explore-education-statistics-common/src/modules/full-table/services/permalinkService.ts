@@ -7,6 +7,7 @@ import {
 } from '@common/modules/full-table/services/tableBuilderService';
 import { Dictionary } from '@common/types';
 import { FullTable } from '../types/fullTable';
+import { TableHeadersConfig } from '../utils/tableHeaders';
 
 export interface SortableOption {
   label: string;
@@ -57,7 +58,7 @@ export interface Permalink {
   title: string;
   created: string;
   fullTable: FullTable;
-  query: PermalinkCreateQuery;
+  query: PermalinkQuery;
 }
 
 interface PermalinkCreateQuery extends TableDataQuery {
@@ -65,6 +66,13 @@ interface PermalinkCreateQuery extends TableDataQuery {
     tableHeadersConfig: UnmappedTableHeadersConfig;
   };
 }
+
+interface PermalinkQuery extends TableDataQuery {
+  configuration: {
+    tableHeadersConfig: TableHeadersConfig;
+  };
+}
+
 export default {
   createTablePermalink(
     query: PermalinkCreateQuery,
