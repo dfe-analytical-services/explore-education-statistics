@@ -28,13 +28,14 @@ export interface FullTableMeta {
 export interface TableData {
   subjectMeta: FullTableMeta;
   results: {
-    timePeriod: string;
-    measures: Dictionary<string>;
     filters: string[];
+    geographicLevel: string;
     location: Dictionary<{
       code: string;
       name: string;
     }>;
+    measures: Dictionary<string>;
+    timePeriod: string;
   }[];
 }
 
