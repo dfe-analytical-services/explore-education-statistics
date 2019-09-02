@@ -82,12 +82,13 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
               result.filters.includes(filter.value),
             ) &&
             result.timePeriod === timePeriod.value &&
-            locationFilters.every(
-              filter =>
-                result.location[camelCase(result.geographicLevel)] &&
-                result.location[camelCase(result.geographicLevel)].code ===
-                  filter.value,
-            )
+            locationFilters.every(filter => {
+              const geographicLevel = camelCase(result.geographicLevel);
+              return (
+                result.location[geographicLevel] &&
+                result.location[geographicLevel].code === filter.value
+              );
+            })
           );
         });
 
