@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
 {
-    public partial class CorrectFilterItemsIdsAfterReseed : Migration
+    public partial class CorrectFilterItemIdsAfterSeeding : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
