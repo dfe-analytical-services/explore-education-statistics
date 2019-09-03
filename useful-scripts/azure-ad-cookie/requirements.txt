@@ -1,0 +1,2 @@
+selenium==3.141.0
+chromedriver-install==0.3

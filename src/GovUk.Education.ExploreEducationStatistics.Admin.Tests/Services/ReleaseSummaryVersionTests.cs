@@ -185,7 +185,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 // Call the method under test
                 var result = await new ReleaseService2(context).EditReleaseSummaryAsync(
-                    new EditReleaseSummaryViewModel
+                    new ReleaseSummaryViewModel
                     {
                         Id = releaseId,
                         ReleaseName = "2019",

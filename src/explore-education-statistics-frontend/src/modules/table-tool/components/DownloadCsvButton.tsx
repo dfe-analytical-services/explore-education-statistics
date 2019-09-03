@@ -3,14 +3,14 @@ import cartesian from '@common/lib/utils/cartesian';
 import {
   CategoryFilter,
   LocationFilter,
+  TimePeriodFilter,
   Filter,
-} from '@frontend/modules/table-tool/components/types/filters';
-import TimePeriod from '@frontend/modules/table-tool/components/types/TimePeriod';
+} from '@common/modules/full-table/types/filters';
 import { saveAs } from 'file-saver';
 import Papa from 'papaparse';
 import React from 'react';
-import { FullTable } from '@frontend/services/permalinkService';
-import { transformTableMetaFiltersToCategoryFilters } from '../utils/tableHeaders';
+import { transformTableMetaFiltersToCategoryFilters } from '@common/modules/full-table/utils/tableHeaders';
+import { FullTable } from '@common/modules/full-table/types/fullTable';
 
 interface Props {
   publicationSlug: string;
@@ -54,7 +54,7 @@ const DownloadCsvButton = ({ publicationSlug, fullTable }: Props) => {
       // prettier-ignore
       const [location, timePeriod, ...filterOptions] = row as [
         LocationFilter,
-        TimePeriod,
+        TimePeriodFilter,
         ...CategoryFilter[]
       ];
 
@@ -64,7 +64,7 @@ const DownloadCsvButton = ({ publicationSlug, fullTable }: Props) => {
             filterOptions.every(filter =>
               result.filters.includes(filter.value),
             ) &&
-              result.timePeriod === new TimePeriod(timePeriod).value &&
+              result.timePeriod === timePeriod.value &&
               result.location[location.level] &&
               result.location[location.level].code === location.value,
           );

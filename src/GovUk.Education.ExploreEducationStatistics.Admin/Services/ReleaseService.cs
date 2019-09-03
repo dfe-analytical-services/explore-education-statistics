@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
@@ -77,15 +77,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         // TODO Authorisation will be required when users are introduced
-        public async Task<EditReleaseSummaryViewModel> GetReleaseSummaryAsync(ReleaseId releaseId)
+        public async Task<ReleaseSummaryViewModel> GetReleaseSummaryAsync(ReleaseId releaseId)
         {
             var release = await _context.Releases.FirstOrDefaultAsync(r => r.Id == releaseId);
-            return _mapper.Map<EditReleaseSummaryViewModel>(release);
+            return _mapper.Map<ReleaseSummaryViewModel>(release);
         }
 
         // TODO Authorisation will be required when users are introduced
         public async Task<Either<ValidationResult, ReleaseViewModel>> EditReleaseSummaryAsync(
-            EditReleaseSummaryViewModel model)
+            ReleaseSummaryViewModel model)
         {
             var publication = await GetAsync(model.Id);
             return await ValidateReleaseSlugUniqueToPublication(model.Slug, publication.Id, model.Id)
@@ -104,6 +104,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var release = await _context.Releases
                 .Where(r => r.Publication.Id == publicationId)
+                .HydrateReleaseForReleaseViewModel()
+                .ToListAsync();
+            return _mapper.Map<List<ReleaseViewModel>>(release);
+        }
+        
+        // TODO Authorisation will be required when users are introduced
+        public async Task<List<ReleaseViewModel>> GetReleasesForReleaseStatusesAsync(params ReleaseStatus[] releaseStatuses)
+        {
+            var release = await _context.Releases
+                .Where(r => releaseStatuses.Contains(r.Status))
                 .HydrateReleaseForReleaseViewModel()
                 .ToListAsync();
             return _mapper.Map<List<ReleaseViewModel>>(release);
@@ -146,6 +156,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return new List<ContentSection>();
         }
+
+        // TODO Authorisation will be required when users are introduced
+        public async Task<Either<ValidationResult, ReleaseSummaryViewModel>> UpdateReleaseStatusAsync(
+            ReleaseId releaseId, ReleaseStatus status, string internalReleaseNote)
+        {
+            var release = await GetAsync(releaseId);
+            release.Status = status;
+            release.InternalReleaseNote = internalReleaseNote;
+            _context.Releases.Update(release);
+            await _context.SaveChangesAsync();
+            return await GetReleaseSummaryAsync(releaseId);
+        }
     }
 
     public static class ReleaseLinqExtensions
@@ -160,7 +182,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Include(r => r.Publication.Releases) // Back refs required to work out latest
                 .Include(r => r.Publication.Contact)
                 .Include(r => r.Type)
-                .Include(r => r.ReleaseSummary.Versions)
                 .Include(r => r.ReleaseSummary.Versions)
                 .ThenInclude(v => v.Type);
         }

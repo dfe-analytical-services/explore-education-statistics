@@ -1,5 +1,6 @@
 import Link from '@admin/components/Link';
 import React from 'react';
+import styles from './PreviousNextLinks.module.scss';
 
 export interface PreviousNextLink {
   label: string;
@@ -24,12 +25,24 @@ const PreviousNextLinks = ({ previousSection, nextSection }: Props) => {
     return (
       <div className="govuk-grid-row govuk-!-margin-top-9">
         <div className="govuk-grid-column-one-half ">
-          <Link to={previousSection.linkTo}>
-            Previous step, {previousSection.label}
+          <Link to={previousSection.linkTo} className={styles.nextPrevious}>
+            <span className="govuk-heading-m govuk-!-margin-bottom-0">
+              Previous step
+            </span>
+            <span className={styles.nextPreviousSmall}>
+              {previousSection.label}
+            </span>
           </Link>
         </div>
         <div className="govuk-grid-column-one-half dfe-align--right">
-          <Link to={nextSection.linkTo}>Next step, {nextSection.label}</Link>
+          <Link to={nextSection.linkTo} className={styles.nextPrevious}>
+            <span className="govuk-heading-m govuk-!-margin-bottom-0">
+              Next step
+            </span>{' '}
+            <span className={styles.nextPreviousSmall}>
+              {nextSection.label}
+            </span>
+          </Link>
         </div>
       </div>
     );
@@ -38,8 +51,13 @@ const PreviousNextLinks = ({ previousSection, nextSection }: Props) => {
   if (previousSection) {
     return (
       <div className="govuk-!-margin-top-9">
-        <Link to={previousSection.linkTo}>
-          Previous step, {previousSection.label}
+        <Link to={previousSection.linkTo} className={styles.nextPrevious}>
+          <span className="govuk-heading-m govuk-!-margin-bottom-0">
+            Previous step
+          </span>
+          <span className={styles.nextPreviousSmall}>
+            {previousSection.label}
+          </span>
         </Link>
       </div>
     );
@@ -48,7 +66,12 @@ const PreviousNextLinks = ({ previousSection, nextSection }: Props) => {
   if (nextSection) {
     return (
       <div className="govuk-!-margin-top-9 dfe-align--right">
-        <Link to={nextSection.linkTo}>Next step, {nextSection.label}</Link>
+        <Link to={nextSection.linkTo} className={styles.nextPrevious}>
+          <span className="govuk-heading-m govuk-!-margin-bottom-0">
+            Next step
+          </span>{' '}
+          <span className={styles.nextPreviousSmall}>{nextSection.label}</span>
+        </Link>
       </div>
     );
   }

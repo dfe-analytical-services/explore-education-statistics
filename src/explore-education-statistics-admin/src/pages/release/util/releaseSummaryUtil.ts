@@ -4,6 +4,7 @@ import {
   IdTitlePair,
   TimePeriodCoverageGroup,
 } from '@admin/services/common/types';
+import { ReleaseStatus } from '@admin/services/dashboard/types';
 import { CreateReleaseRequest } from '@admin/services/release/create-release/types';
 import { UpdateReleaseSummaryDetailsRequest } from '@admin/services/release/edit-release/summary/types';
 import { BaseReleaseSummaryDetailsRequest } from '@admin/services/release/types';
@@ -75,11 +76,46 @@ export const getSelectedTimePeriodCoverageLabel = (
   findTimePeriodCoverageOption(timePeriodCoverageCode, timePeriodCoverageGroups)
     .identifier.label;
 
-export const getSelectedReleaseTypeTitle = (
+export const getSelectedReleaseType = (
   releaseTypeId: string,
   availableReleaseTypes: IdTitlePair[],
 ) =>
-  availableReleaseTypes.find(type => type.title === releaseTypeId) ||
-  availableReleaseTypes[0].title;
+  availableReleaseTypes.find(type => type.id === releaseTypeId) ||
+  availableReleaseTypes[0];
+
+export const getReleaseStatusLabel = (approvalStatus: ReleaseStatus) => {
+  switch (approvalStatus) {
+    case 'Draft':
+      return 'Draft';
+    case 'HigherLevelReview':
+      return 'In Review';
+    case 'Approved':
+      return 'Approved for Publication';
+    default:
+      return undefined;
+  }
+};
+
+export const getTimePeriodCoverageDateRangeStringLong = (
+  releaseName: string,
+  separatorString: string = ' to ',
+) => {
+  const numberRegex = /[0-9]+/;
+  const results = numberRegex.exec(releaseName);
+  return results
+    ? `${releaseName}${separatorString}${parseInt(results[0], 10) + 1}`
+    : releaseName;
+};
+
+export const getTimePeriodCoverageDateRangeStringShort = (
+  releaseName: string,
+  separatorString: string = '/',
+) => {
+  const fourYearRegex = /[0-9]*([0-9]{2})/;
+  const results = fourYearRegex.exec(releaseName);
+  return results
+    ? `${releaseName}${separatorString}${parseInt(results[1], 10) + 1}`
+    : releaseName;
+};
 
 export default {};

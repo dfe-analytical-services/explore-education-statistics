@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
     public class IndicatorGroupService : AbstractRepository<IndicatorGroup, long>, IIndicatorGroupService
     {
-        public IndicatorGroupService(ApplicationDbContext context,
+        public IndicatorGroupService(StatisticsDbContext context,
             ILogger<IndicatorGroupService> logger) : base(context, logger)
         {
         }

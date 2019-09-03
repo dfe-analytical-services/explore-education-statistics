@@ -1,11 +1,13 @@
 import commaList from '@common/lib/utils/string/commaList';
-import { LocationFilter } from '@frontend/modules/table-tool/components/types/filters';
-import TimePeriod from '@frontend/modules/table-tool/components/types/TimePeriod';
+import {
+  LocationFilter,
+  TimePeriodFilter,
+} from '@common/modules/full-table/types/filters';
 import React from 'react';
 
 interface Props {
   id: string;
-  timePeriodRange: TimePeriod[];
+  timePeriodRange: TimePeriodFilter[];
   locations: LocationFilter[];
   subjectName: string;
   publicationName: string;

@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                 config.Conventions.Add(new CommaSeparatedQueryStringConvention());
             }).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            services.AddDbContext<ApplicationDbContext>(options =>
+            services.AddDbContext<StatisticsDbContext>(options =>
                 options
                     .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"),
                         builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
@@ -141,7 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
                 .CreateScope())
             {
-                using (var context = serviceScope.ServiceProvider.GetService<ApplicationDbContext>())
+                using (var context = serviceScope.ServiceProvider.GetService<StatisticsDbContext>())
                 {
                     context.Database.SetCommandTimeout(int.MaxValue);
                     context.Database.Migrate();

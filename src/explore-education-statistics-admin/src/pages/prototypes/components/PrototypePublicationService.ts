@@ -119,6 +119,7 @@ export default class PrototypePublicationService {
         topicId: '1003fa5c-b60a-4036-a178-e3a69a81b852',
         topic: null,
       },
+      latestRelease: true,
       updates: [
         {
           id: '9c0f0139-7f88-4750-afe0-1c85cdf1d047',
@@ -465,6 +466,7 @@ export default class PrototypePublicationService {
           },
         },
       },
+      latestRelease: true,
       updates: [],
       content: [
         {

@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Documents.SystemFunctions;
@@ -52,14 +52,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         [HttpGet("releases/{releaseId}/summary")]
         [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
-        public async Task<ActionResult<EditReleaseSummaryViewModel>> GetReleaseSummaryAsync(ReleaseId releaseId)
+        public async Task<ActionResult<ReleaseSummaryViewModel>> GetReleaseSummaryAsync(ReleaseId releaseId)
         {
             return Ok(await _releaseService2.GetReleaseSummaryAsync(releaseId));
         }
 
         [HttpPut("releases/{releaseId}/summary")]
         [AllowAnonymous] // TODO revisit when authentication and authorisation is in place
-        public async Task<ActionResult<ReleaseViewModel>> EditReleaseSummaryAsync(EditReleaseSummaryViewModel model,
+        public async Task<ActionResult<ReleaseViewModel>> EditReleaseSummaryAsync(ReleaseSummaryViewModel model,
             ReleaseId releaseId)
         {
             return await CheckReleaseExistsAsync(releaseId, () =>
