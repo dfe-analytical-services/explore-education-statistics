@@ -203,7 +203,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
 
         private static BatchSettings GetBatchSettings(IConfigurationRoot config)
         {
-            return new BatchSettings {RowsPerBatch = config.GetValue<int>("RowsPerBatch")};
+            return new BatchSettings {RowsPerBatch = Convert.ToInt32(config.GetValue<string>("RowsPerBatch"))};
         }
     }
 }
