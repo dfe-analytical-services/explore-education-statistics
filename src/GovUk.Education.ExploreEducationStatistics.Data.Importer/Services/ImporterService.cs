@@ -107,13 +107,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
         public SubjectMeta ImportMeta(List<string> metaLines, Subject subject)
         {
-            //_logger.LogDebug("Importing meta lines for Publication {Publication}, {Subject}", subject.Release.Publication.Title, subject.Name);
             return _importerMetaService.Import(metaLines, subject);
         }
         
         public SubjectMeta GetMeta(List<string> metaLines, Subject subject)
         {
-            //_logger.LogDebug("Getting meta lines for Publication {Publication}, {Subject}", subject.Release.Publication.Title, subject.Name);
             return _importerMetaService.Get(metaLines, subject);
         }
 
@@ -124,8 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             lines.RemoveAt(0);
             lines.ToList().ForEach(line =>
             {
-                CreateFiltersLocationsAndSchoolsFromCsv(line, headers, subjectMeta.Filters, subject.Name,
-                        lines.Count);
+                CreateFiltersLocationsAndSchoolsFromCsv(line, headers, subjectMeta.Filters);
             });
         }
 
@@ -232,20 +229,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         
         private void CreateFiltersLocationsAndSchoolsFromCsv(string raw,
             List<string> headers,
-            IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)> filtersMeta,
-            string subjectName,
-            int numLines)
+            IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)> filtersMeta)
         {
             var line = raw.Split(',');
             CreateFilterItems(line, headers, filtersMeta);
             GetLocationId(line, headers);
             GetSchool(line, headers);
-
-            var mod = _importCount++;
-//            if (mod % 1000 == 0)
-//            {
-//                _logger.LogInformation($"{mod} (of {numLines}) lines processed during first pass for {subjectName}");
-//            }
         }
 
         private void CreateFilterItems(IReadOnlyList<string> line,
