@@ -1,7 +1,7 @@
 *** Settings ***
 Resource    ../libs/library.robot
 
-Force Tags  Admin
+Force Tags  Admin  NotAgainstProd
 
 Suite Setup       user opens the browser
 Suite Teardown    user closes the browser
@@ -33,12 +33,12 @@ Heading is present on tab
 Verify correct data is shown when theme and topic is shown
     [Tags]   HappyPath
     user clicks element   css:#my-publications-tab
-    user selects from list by label  css:#selectTheme  School and college outcomes and performance
-    user selects from list by label  css:#selectTopic  Outcome based success measures
-    user checks page contains accordion  Further education outcome-based success measures
-    user opens accordion section  Further education outcome-based success measures
-    user checks accordion section contains text  Further education outcome-based success measures    Methodology
-    user checks accordion section contains text  Further education outcome-based success measures    Releases
+    user selects from list by label  css:#selectTheme  Test Theme
+    user selects from list by label  css:#selectTopic  Automated Test Topic
+    user checks page contains accordion  Automated Test Publication
+    user opens accordion section  Automated Test Publication
+    user checks accordion section contains text  Automated Test Publication    Methodology
+    user checks accordion section contains text  Automated Test Publication    Releases
 
 User clicks create new release
     [Tags]  HappyPath
