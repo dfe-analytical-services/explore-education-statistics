@@ -1348,7 +1348,7 @@
               "value": "[reference(resourceId('microsoft.insights/components/', variables('importerAppInsights')), '2015-05-01').InstrumentationKey]"
             },
             {
-              "name": "BatchSize",
+              "name": "RowsPerBatch",
               "value": "1000"
             }
           ],

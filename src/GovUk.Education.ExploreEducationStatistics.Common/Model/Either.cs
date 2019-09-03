@@ -1,9 +1,9 @@
 using System;
 using System.Threading.Tasks;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
+namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 {
-    public class Either<Tl, Tr> {
+public class Either<Tl, Tr> {
         private readonly Tl _left;
         private readonly Tr _right;
 
@@ -75,5 +75,4 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
             return next;
         }
     }
-    
 }
