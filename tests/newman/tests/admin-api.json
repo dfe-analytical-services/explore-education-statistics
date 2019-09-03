@@ -503,7 +503,6 @@
 									"",
 									"pm.test(\"Expect non-null methodology to have correct fields\", function () {",
 									"    for(var i = 0; i < respJson.length; i++) {",
-									"        console.log(\"method \", respJson[i].methodology);",
 									"        if(respJson[i].methodology != null) {",
 									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].methodology.id`));",
 									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].methodology.title`));",
@@ -781,6 +780,164 @@
 								"E7774A74-1F62-4B76-B9B5-84F14DAC7278",
 								"summary",
 								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Release Status - Exclusions 2016",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
+								"exec": [
+									"var respJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Fields are present\", function () {",
+									"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"typeId\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.value\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.label\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"releaseName\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"slug\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"status\"));",
+									"});",
+									"",
+									"pm.test(\"id should match request id\", function () {",
+									"    pm.expect(respJson.id).to.equal(\"e7774a74-1f62-4b76-b9b5-84f14dac7278\");",
+									"});",
+									"",
+									"pm.test(\"typeId should should be correct\", function () { ",
+									"    pm.expect(respJson.typeId).to.equal(\"9d333457-9132-4e55-ae78-c55cb3673d7c\"); ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "dbde4b62-47dd-4c3d-93dc-5e01ec3f8231",
+								"exec": [
+									"postman.setNextRequest(null);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"releaseStatus\": \"Draft\",\n\t\"internalReleaseNote\": \"Test Note\"\n}"
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/releases/E7774A74-1F62-4B76-B9B5-84F14DAC7278/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"releases",
+								"E7774A74-1F62-4B76-B9B5-84F14DAC7278",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Draft Releases",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
+								"exec": [
+									"var respJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Fields are present\", function () {",
+									"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"typeId\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.value\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.label\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"releaseName\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"slug\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"status\"));",
+									"});",
+									"",
+									"pm.test(\"id should match request id\", function () {",
+									"    pm.expect(respJson.id).to.equal(\"e7774a74-1f62-4b76-b9b5-84f14dac7278\");",
+									"});",
+									"",
+									"pm.test(\"typeId should should be correct\", function () { ",
+									"    pm.expect(respJson.typeId).to.equal(\"9d333457-9132-4e55-ae78-c55cb3673d7c\"); ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "dbde4b62-47dd-4c3d-93dc-5e01ec3f8231",
+								"exec": [
+									"postman.setNextRequest(null);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"releaseStatus\": \"Draft\",\n\t\"internalReleaseNote\": \"Test Note\"\n}"
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/releases/draft",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"releases",
+								"draft"
 							]
 						}
 					},
