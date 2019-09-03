@@ -2126,53 +2126,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         }
                     }
                 },
-                new Release
-                {
-                    Id = new Guid("f75bc75e-ae58-4bc4-9b14-305ad5e4ff7d"),
-                    ReleaseName = "2015",
-                    PublicationId = new Guid("cbbd299f-8297-44bc-92ac-558bcf51f8ad"),
-                    Published = new DateTime(2016, 3, 25),
-                    Slug = "2015-16",
-                    Summary =
-                        "Read national statistical summaries and definitions, view charts and tables and download data files across a range of pupil absence subject areas.",
-                    TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                    TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
-
-                    KeyStatistics = new DataBlock
-                    {
-                        Id = new Guid("8a1a6a1e-5da2-45b0-a63d-6338a12585f1"),
-                        Summary = new Summary
-                        {
-                            dataKeys = new List<string>
-                            {
-                                "--",
-                                "--",
-                                "--"
-                            },
-                            dataSummary = new List<string>
-                            {
-                                "",
-                                "",
-                                ""
-                            },
-                            description = new MarkDownBlock
-                            {
-                                Body = ""
-                            }
-                        }
-                    },
-
-                    Content = new List<ContentSection>
-                    {
-                        new ContentSection {Order = 1, Heading = "About these statistics", Caption = ""},
-                        new ContentSection {Order = 2, Heading = "Absence rates", Caption = ""},
-                        new ContentSection {Order = 3, Heading = "Persistent absence", Caption = ""},
-                        new ContentSection {Order = 4, Heading = "Distribution of absence", Caption = ""},
-                        new ContentSection {Order = 5, Heading = "Absence for four year olds", Caption = ""},
-                        new ContentSection {Order = 6, Heading = "Pupil referral unit absence", Caption = ""},
-                        new ContentSection {Order = 7, Heading = "Pupil absence by local authority", Caption = ""}
-                    }
-                },
 
                 // exclusions
                 new Release
