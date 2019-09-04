@@ -205,6 +205,11 @@ user presses keys
   [Arguments]   ${keys}
   press keys  ${None}    ${keys}
 
+user enters text into element
+  [Arguments]   ${selector}   ${text}
+  user clicks element   ${selector}
+  user presses keys     ${text}
+
 user checks element count is x
   [Arguments]   ${locator}   ${amount}
   page should contain element   ${locator}   limit=${amount}
