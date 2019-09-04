@@ -38,9 +38,6 @@ const SummaryListItem = ({
         </dd>
       )}
       {actions && <dd className="govuk-summary-list__actions">{actions}</dd>}
-      {children && !actions && showActions && (
-        <dd className="govuk-summary-list__actions" />
-      )}
       {!children && !actions && (
         <>
           <dd
