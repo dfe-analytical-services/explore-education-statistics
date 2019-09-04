@@ -53,6 +53,19 @@ if (!Element.prototype.closest) {
   };
 }
 
+['classList'].forEach(propertyName => {
+  if (
+    propertyName in HTMLElement.prototype &&
+    !(propertyName in SVGElement.prototype)
+  ) {
+    const desc = Object.getOwnPropertyDescriptor(
+      HTMLElement.prototype,
+      propertyName,
+    );
+    Object.defineProperty(SVGElement.prototype, propertyName, desc);
+  }
+});
+
 if (!window.IntersectionObserver) {
   require('intersection-observer');
 }
