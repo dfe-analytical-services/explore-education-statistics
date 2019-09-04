@@ -96,6 +96,8 @@ if args.env == "ci":
 else:
     if args.env == 'local':
         robotArgs += ['--exclude', 'NotAgainstLocal']
+    if args.env == 'dev03':
+        robotArgs += ['--exclude', 'NotAgainstProd']
     load_dotenv(os.path.join(os.path.dirname(__file__), '.env.' + args.env))
 
 if os.getenv('PUBLIC_URL') is None or os.getenv('ADMIN_URL') is None:
