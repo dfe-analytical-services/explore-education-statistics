@@ -1,5 +1,4 @@
 using System;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels
@@ -12,6 +11,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels
 
         public TableBuilderResultViewModel FullTable { get; set; }
         
-        public TableBuilderQueryContext Query { get; set; }
+        public TableBuilderQueryViewModel Query { get; set; }
     }
 }

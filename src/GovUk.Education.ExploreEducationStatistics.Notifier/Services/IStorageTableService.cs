@@ -1,5 +1,4 @@
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage.Table;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services
@@ -10,10 +9,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services
 
         Task RemoveSubscriber(CloudTable table, SubscriptionEntity subscription);
 
-        Task<SubscriptionEntity> RetrieveSubscriber(CloudTable table,
-            SubscriptionEntity subscription);
+        Task<SubscriptionEntity> RetrieveSubscriber(CloudTable table, SubscriptionEntity subscription);
 
-        Task<CloudTable> GetTable(IConfiguration config, string connectionStr,
-            string storageTableName);
+        Task<CloudTable> GetTable(string connectionStr, string storageTableName);
     }
 }

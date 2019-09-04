@@ -42,6 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             Number_of_fixed_period_exclusions,
             Fixed_period_exclusion_rate,
             Percentage_of_pupils_with_fixed_period_exclusions,
+            Number_of_admissions,
             Number_of_applications_received,
             Number_of_first_preferences_offered,
             Number_of_second_preferences_offered,
@@ -71,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     12, new Dictionary<FilterItemName, int>
                     {
                         {
-                            FilterItemName.School_Type__Total, 457
+                            FilterItemName.School_Type__Total, 461
                         }
                     }
                 },
@@ -79,10 +80,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     17, new Dictionary<FilterItemName, int>
                     {
                         {
-                            FilterItemName.Year_of_admission__Primary_Total, 571
+                            FilterItemName.Year_of_admission__Primary_Total, 575
                         },
                         {
-                            FilterItemName.Year_of_admission__Secondary_Total, 573
+                            FilterItemName.Year_of_admission__Secondary_Total, 577
                         }
                     }
                 }
@@ -135,10 +136,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     17, new Dictionary<IndicatorName, int>
                     {
                         {
+                            IndicatorName.Number_of_admissions, 211
+                        },
+                        {
                             IndicatorName.Number_of_applications_received, 212
                         },
                         {
-                            IndicatorName.Number_of_first_preferences_offered, 215
+                            IndicatorName.Number_of_first_preferences_offered, 216
                         },
                         {
                             IndicatorName.Number_of_second_preferences_offered, 217
@@ -647,14 +651,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             );
 
             modelBuilder.Entity<Contact>().HasData(
-                new Contact
-                {
-                    Id = new Guid("11bb7387-e85e-4571-9669-8a760dcb004f"),
-                    TeamName = "Simon's Team",
-                    TeamEmail = "teamshakes@gmail.com",
-                    ContactName = "Simon Shakespeare",
-                    ContactTelNo = "0114 262 1619"
-                },
                 new Contact
                 {
                     Id = new Guid("58117de4-5951-48e4-8537-9f74967a6233"),
@@ -1177,7 +1173,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     TopicId = new Guid("1a9636e4-29d5-4c90-8c07-f41db8dd019c"),
                     Slug = "secondary-and-primary-schools-applications-and-offers",
                     NextUpdate = new DateTime(2019, 6, 14),
-                    ContactId = new Guid("d246c696-4b3a-4aeb-842c-c1318ee334e8")
+                    ContactId = new Guid("74f5aade-6d24-4a0b-be23-2ab4b4b2d191")
                 },
                 new Publication
                 {
@@ -2709,6 +2705,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             },
                             Indicators = new List<string>
                             {
+                                Indicator(17, IndicatorName.Number_of_admissions),
                                 Indicator(17, IndicatorName.Number_of_applications_received),
                                 Indicator(17, IndicatorName.Number_of_first_preferences_offered),
                                 Indicator(17, IndicatorName.Number_of_second_preferences_offered),
@@ -2748,6 +2745,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 indicators = new List<string>
                                 {
                                     Indicator(17, IndicatorName.Number_of_applications_received),
+                                    Indicator(17, IndicatorName.Number_of_admissions),
                                     Indicator(17, IndicatorName.Number_of_first_preferences_offered),
                                     Indicator(17, IndicatorName.Number_of_second_preferences_offered),
                                     Indicator(17, IndicatorName.Number_of_third_preferences_offered),

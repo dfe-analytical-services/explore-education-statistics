@@ -118,7 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             return await CheckReleaseExistsAsync(releaseId,
                 () => _fileStorageService.UploadFilesAsync(releaseId, file, name,
-                    ReleaseFileTypes.Ancillary));
+                    ReleaseFileTypes.Ancillary, false));
         }
 
         // POST api/release/{releaseId}/chart
@@ -132,7 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [Required] [FromQuery(Name = "name")] string name, IFormFile file)
         {
             return await CheckReleaseExistsAsync(releaseId,
-                () => _fileStorageService.UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Chart));
+                () => _fileStorageService.UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Chart, false));
         }
 
         // POST api/release/{releaseId}/data
@@ -148,7 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await CheckReleaseExistsAsync(releaseId, () =>
             {
                 // upload the files
-                var result = _fileStorageService.UploadDataFilesAsync(releaseId, file, metaFile, name);
+                var result = _fileStorageService.UploadDataFilesAsync(releaseId, file, metaFile, name, false);
                 // add message to queue to process these files
                 // TODO: Disabled adding message to queue
                 //.OnSuccess(() => _importService.Import(file.FileName, releaseId));

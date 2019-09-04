@@ -1,5 +1,6 @@
 import last from 'lodash/last';
 import React, { memo, forwardRef } from 'react';
+import camelCase from 'lodash/camelCase';
 import cartesian from '@common/lib/utils/cartesian';
 import formatPretty from '@common/lib/utils/number/formatPretty';
 import WarningMessage from '@common/components/WarningMessage';
@@ -91,11 +92,13 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
               result.filters.includes(filter.value),
             ) &&
             result.timePeriod === timePeriod.value &&
-            locationFilters.every(
-              filter =>
-                result.location[filter.level] &&
-                result.location[filter.level].code === filter.value,
-            )
+            locationFilters.every(filter => {
+              const geographicLevel = camelCase(result.geographicLevel);
+              return (
+                result.location[geographicLevel] &&
+                result.location[geographicLevel].code === filter.value
+              );
+            })
           );
         });
 
