@@ -26,8 +26,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         {
             Characteristic__Total,
             School_Type__Total,
-            Year_of_admission__Primary_Total,
-            Year_of_admission__Secondary_Total
+            Year_of_admission__Primary_All_primary,
+            Year_of_admission__Secondary_All_secondary
         }
 
         private enum IndicatorName
@@ -80,10 +80,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     17, new Dictionary<FilterItemName, int>
                     {
                         {
-                            FilterItemName.Year_of_admission__Primary_Total, 575
+                            FilterItemName.Year_of_admission__Primary_All_primary, 575
                         },
                         {
-                            FilterItemName.Year_of_admission__Secondary_Total, 577
+                            FilterItemName.Year_of_admission__Secondary_All_secondary, 577
                         }
                     }
                 }
@@ -2701,7 +2701,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             },
                             Filters = new List<string>
                             {
-                                FItem(17, FilterItemName.Year_of_admission__Primary_Total)
+                                FItem(17, FilterItemName.Year_of_admission__Primary_All_primary)
                             },
                             Indicators = new List<string>
                             {
@@ -2812,7 +2812,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
                                         Filters = new List<string>
                                         {
-                                            FItem(17, FilterItemName.Year_of_admission__Secondary_Total)
+                                            FItem(17, FilterItemName.Year_of_admission__Secondary_All_secondary)
                                         },
                                         Indicators = new List<string>
                                         {
@@ -2923,7 +2923,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
                                         Filters = new List<string>
                                         {
-                                            FItem(17, FilterItemName.Year_of_admission__Primary_Total)
+                                            FItem(17, FilterItemName.Year_of_admission__Primary_All_primary)
                                         },
                                         Indicators = new List<string>
                                         {
