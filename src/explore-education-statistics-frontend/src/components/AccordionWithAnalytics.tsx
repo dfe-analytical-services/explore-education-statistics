@@ -9,7 +9,9 @@ const AccordionWithAnalytics = (props: AccordionProps) => {
       onToggle={accordionSection => {
         logEvent(
           'Accordion',
-          `${accordionSection.title} accordion opened`,
+          accordionSection.publicationTitle
+            ? `${accordionSection.publicationTitle} | ${accordionSection.title} accordion opened`
+            : `${accordionSection.title} accordion opened`,
           `URL: ${window.location.pathname} | Accordion ID: ${accordionSection.id}`,
         );
       }}

@@ -19,7 +19,11 @@ export interface AccordionProps {
   children: ReactNode;
   id: string;
   onToggleAll?: (open: boolean) => void;
-  onToggle?: (accordionSection: { id: string; title: string }) => void;
+  onToggle?: (accordionSection: {
+    id: string;
+    title: string;
+    publicationTitle?: string;
+  }) => void;
 }
 
 const Accordion = ({ children, id, onToggleAll, onToggle }: AccordionProps) => {
@@ -153,7 +157,11 @@ const Accordion = ({ children, id, onToggleAll, onToggle }: AccordionProps) => {
             });
 
             if (onToggle && isOpen) {
-              onToggle({ id: headingId, title: section.props.heading });
+              onToggle({
+                id: headingId,
+                title: section.props.heading,
+                publicationTitle: section.props.publicationTitle,
+              });
             }
 
             if (section.props.onToggle) {

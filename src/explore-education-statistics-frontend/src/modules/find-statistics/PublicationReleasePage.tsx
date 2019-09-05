@@ -306,6 +306,7 @@ class PublicationReleasePage extends Component<Props> {
             heading={`${data.publication.title}: methodology`}
             caption="Find out how and why we collect, process and publish these statistics"
             headingTag="h3"
+            publicationTitle={data.publication.title}
           >
             <p>
               Read our{' '}
@@ -315,7 +316,11 @@ class PublicationReleasePage extends Component<Props> {
               guidance.
             </p>
           </AccordionSection>
-          <AccordionSection heading="National Statistics" headingTag="h3">
+          <AccordionSection
+            heading="National Statistics"
+            headingTag="h3"
+            publicationTitle={data.publication.title}
+          >
             <p className="govuk-body">
               The{' '}
               <a href="https://www.statisticsauthority.gov.uk/">
@@ -358,7 +363,11 @@ class PublicationReleasePage extends Component<Props> {
               guidance.
             </p>
           </AccordionSection>
-          <AccordionSection heading="Contact us" headingTag="h3">
+          <AccordionSection
+            heading="Contact us"
+            headingTag="h3"
+            publicationTitle={data.publication.title}
+          >
             <p>
               If you have a specific enquiry about{' '}
               {data.publication.topic.theme.title} statistics and data:
