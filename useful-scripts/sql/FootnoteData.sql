@@ -1,9 +1,104 @@
+CREATE OR ALTER PROCEDURE InsertSubjectFootnote
+    @subjectName NVARCHAR(max),
+    @footnoteId BIGINT
+AS
+DECLARE @subjectId BIGINT = (SELECT S.Id FROM Subject S WHERE S.Name = @subjectName);
+BEGIN TRY
+    INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subjectId, @footnoteId);
+END TRY
+BEGIN CATCH
+    DECLARE @errorMessage NVARCHAR(max) = ERROR_MESSAGE();
+    DECLARE @errorSeverity INT = ERROR_SEVERITY();
+    DECLARE @errorState INT = ERROR_SEVERITY();
+    DECLARE @errorProcedure NVARCHAR(max) = ERROR_PROCEDURE();
+    RAISERROR (N'Error executing %s(SUBJECT: %s, FOOTNOTE: %I64i) MESSAGE: %s', @errorSeverity, @errorState, @errorProcedure, @subjectName, @footnoteId, @errorMessage);
+END CATCH
+GO;
+
+CREATE OR ALTER PROCEDURE InsertIndicatorFootnote
+    @subjectName NVARCHAR(max),
+    @indicatorName NVARCHAR(max),
+    @footnoteId BIGINT
+AS
+DECLARE
+    @indicatorId BIGINT = (SELECT I.Id FROM Indicator I JOIN IndicatorGroup IG on I.IndicatorGroupId = IG.Id JOIN Subject S on IG.SubjectId = S.Id WHERE S.Name = @subjectName AND I.Name = @indicatorName);
+BEGIN TRY
+    INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (@indicatorId, @footnoteId);
+END TRY
+BEGIN CATCH
+    DECLARE @errorMessage NVARCHAR(max) = ERROR_MESSAGE();
+    DECLARE @errorSeverity INT = ERROR_SEVERITY();
+    DECLARE @errorState INT = ERROR_SEVERITY();
+    DECLARE @errorProcedure NVARCHAR(max) = ERROR_PROCEDURE();
+    RAISERROR (N'Error executing %s(SUBJECT: %s, INDICATOR: %s, FOOTNOTE: %I64i) MESSAGE: %s', @errorSeverity, @errorState, @errorProcedure, @subjectName, @indicatorName, @footnoteId, @errorMessage);
+END CATCH
+GO;
+
+CREATE OR ALTER PROCEDURE InsertFilterFootnote
+    @subjectName NVARCHAR(max),
+    @filterName NVARCHAR(max),
+    @footnoteId BIGINT
+AS
+DECLARE
+    @filterId BIGINT = (SELECT F.Id FROM Filter F JOIN Subject S on F.SubjectId = S.Id WHERE S.Name = @subjectName AND F.Name = @filterName);
+BEGIN TRY
+    INSERT INTO FilterFootnote (FilterId, FootnoteId) VALUES (@filterId, @footnoteId);
+END TRY
+BEGIN CATCH
+    DECLARE @errorMessage NVARCHAR(max) = ERROR_MESSAGE();
+    DECLARE @errorSeverity INT = ERROR_SEVERITY();
+    DECLARE @errorState INT = ERROR_SEVERITY();
+    DECLARE @errorProcedure NVARCHAR(max) = ERROR_PROCEDURE();
+    RAISERROR (N'Error executing %s(SUBJECT: %s, FILTER: %s, FOOTNOTE: %I64i) MESSAGE: %s', @errorSeverity, @errorState, @errorProcedure, @subjectName, @filterName, @footnoteId, @errorMessage);
+END CATCH
+GO;
+
+CREATE OR ALTER PROCEDURE InsertFilterGroupFootnote
+    @subjectName NVARCHAR(max),
+    @filterGroupName NVARCHAR(max),
+    @footnoteId BIGINT
+AS
+DECLARE
+    @filterGroupId BIGINT = (SELECT FG.Id FROM FilterGroup FG JOIN Filter F ON FG.FilterId = F.Id JOIN Subject S on F.SubjectId = S.Id WHERE S.Name = @subjectName AND FG.Label = @filterGroupName);
+BEGIN TRY
+    INSERT INTO FilterGroupFootnote (FilterGroupId, FootnoteId) VALUES (@filterGroupId, @footnoteId);
+END TRY
+BEGIN CATCH
+    DECLARE @errorMessage NVARCHAR(max) = ERROR_MESSAGE();
+    DECLARE @errorSeverity INT = ERROR_SEVERITY();
+    DECLARE @errorState INT = ERROR_SEVERITY();
+    DECLARE @errorProcedure NVARCHAR(max) = ERROR_PROCEDURE();
+    RAISERROR (N'Error executing %s(SUBJECT: %s, FILTER GROUP: %s, FOOTNOTE: %I64i) MESSAGE: %s', @errorSeverity, @errorState, @errorProcedure, @subjectName, @filterGroupName, @footnoteId, @errorMessage);
+END CATCH
+GO;
+
+CREATE OR ALTER PROCEDURE InsertFilterItemFootnote
+    @subjectName NVARCHAR(max),
+    @filterItemName NVARCHAR(max),
+    @footnoteId BIGINT
+AS
+DECLARE
+    @filterItemId BIGINT = (SELECT FI.Id FROM FilterItem FI JOIN FilterGroup FG ON FI.FilterGroupId = FG.Id JOIN Filter F on FG.FilterId = F.Id  JOIN Subject S on F.SubjectId = S.Id WHERE S.Name = @subjectName AND FI.Label = @filterItemName);
+BEGIN TRY
+    INSERT INTO FilterItemFootnote (FilterItemId, FootnoteId) VALUES (@filterItemId, @footnoteId);
+END TRY
+BEGIN CATCH
+    DECLARE @errorMessage NVARCHAR(max) = ERROR_MESSAGE();
+    DECLARE @errorSeverity INT = ERROR_SEVERITY();
+    DECLARE @errorState INT = ERROR_SEVERITY();
+    DECLARE @errorProcedure NVARCHAR(max) = ERROR_PROCEDURE();
+    RAISERROR (N'Error executing %s(SUBJECT: %s, FILTER ITEM: %s, FOOTNOTE: %I64i) MESSAGE: %s', @errorSeverity, @errorState, @errorProcedure, @subjectName, @filterItemName, @footnoteId, @errorMessage);
+END CATCH
+GO;
+
+
 DELETE FROM SubjectFootnote WHERE 1=1;
 DELETE FROM IndicatorFootnote WHERE 1=1;
 DELETE FROM FilterItemFootnote WHERE 1=1;
 DELETE FROM FilterGroupFootnote WHERE 1=1;
 DELETE FROM FilterFootnote WHERE 1=1;
 DELETE FROM Footnote WHERE 1=1;
+
 
 --
 -- Footnotes
@@ -113,430 +208,428 @@ SET IDENTITY_INSERT Footnote OFF
 -- Subjects
 --
 
-DECLARE @subject_absence_by_characteristic   BIGINT = (SELECT Id FROM Subject WHERE Name = 'Absence by characteristic');
-DECLARE @subject_absence_by_geographic_level BIGINT = (SELECT Id FROM Subject WHERE Name = 'Absence by geographic level');
-DECLARE @subject_absence_by_term             BIGINT = (SELECT Id FROM Subject WHERE Name = 'Absence by term');
-DECLARE @subject_absence_for_four_year_olds  BIGINT = (SELECT Id FROM Subject WHERE Name = 'Absence for four year olds');
-DECLARE @subject_absence_in_prus             BIGINT = (SELECT Id FROM Subject WHERE Name = 'Absence in prus');
-DECLARE @subject_absence_number_missing      BIGINT = (SELECT Id FROM Subject WHERE Name = 'Absence number missing at least one session by reason');
-DECLARE @subject_absence_rate_percent_bands  BIGINT = (SELECT Id FROM Subject WHERE Name = 'Absence rate percent bands');
 
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_characteristic, 1);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_geographic_level, 1);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_term, 1);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_for_four_year_olds, 1);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_in_prus, 1);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_number_missing, 1);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_rate_percent_bands, 1);
+DECLARE @subject_absence_by_characteristic   NVARCHAR(max) = 'Absence by characteristic';
+DECLARE @subject_absence_by_geographic_level NVARCHAR(max) = 'Absence by geographic level';
+DECLARE @subject_absence_by_term             NVARCHAR(max) = 'Absence by term';
+DECLARE @subject_absence_for_four_year_olds  NVARCHAR(max) = 'Absence for four year olds';
+DECLARE @subject_absence_in_prus             NVARCHAR(max) = 'Absence in prus';
+DECLARE @subject_absence_number_missing      NVARCHAR(max) = 'Absence number missing at least one session by reason';
+DECLARE @subject_absence_rate_percent_bands  NVARCHAR(max) = 'Absence rate percent bands';
 
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_characteristic, 2);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_geographic_level, 2);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_term, 2);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_for_four_year_olds, 2);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_in_prus, 2);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_number_missing, 2);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_rate_percent_bands, 2);
+EXEC InsertSubjectFootnote @subject_absence_by_characteristic, 1;
+EXEC InsertSubjectFootnote @subject_absence_by_geographic_level, 1;
+EXEC InsertSubjectFootnote @subject_absence_by_term, 1;
+EXEC InsertSubjectFootnote @subject_absence_for_four_year_olds, 1;
+EXEC InsertSubjectFootnote @subject_absence_in_prus, 1;
+EXEC InsertSubjectFootnote @subject_absence_number_missing, 1;
+EXEC InsertSubjectFootnote @subject_absence_rate_percent_bands, 1;
 
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_characteristic, 3);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_geographic_level, 3);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_term, 3);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_for_four_year_olds, 3);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_in_prus, 3);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_number_missing, 3);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_rate_percent_bands, 3);
+EXEC InsertSubjectFootnote @subject_absence_by_characteristic, 2;
+EXEC InsertSubjectFootnote @subject_absence_by_geographic_level, 2;
+EXEC InsertSubjectFootnote @subject_absence_by_term, 2;
+EXEC InsertSubjectFootnote @subject_absence_for_four_year_olds, 2;
+EXEC InsertSubjectFootnote @subject_absence_in_prus, 2;
+EXEC InsertSubjectFootnote @subject_absence_number_missing, 2;
+EXEC InsertSubjectFootnote @subject_absence_rate_percent_bands, 2;
 
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_characteristic, 4);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_geographic_level, 4);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_term, 4);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_for_four_year_olds, 4);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_in_prus, 4);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_number_missing, 4);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_rate_percent_bands, 4);
+EXEC InsertSubjectFootnote @subject_absence_by_characteristic, 3;
+EXEC InsertSubjectFootnote @subject_absence_by_geographic_level, 3;
+EXEC InsertSubjectFootnote @subject_absence_by_term, 3;
+EXEC InsertSubjectFootnote @subject_absence_for_four_year_olds, 3;
+EXEC InsertSubjectFootnote @subject_absence_in_prus, 3;
+EXEC InsertSubjectFootnote @subject_absence_number_missing, 3;
+EXEC InsertSubjectFootnote @subject_absence_rate_percent_bands, 3;
 
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_characteristic, 5);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_geographic_level, 5);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_term, 5);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_for_four_year_olds, 5);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_in_prus, 5);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_number_missing, 5);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_rate_percent_bands, 5);
+EXEC InsertSubjectFootnote @subject_absence_by_characteristic, 4;
+EXEC InsertSubjectFootnote @subject_absence_by_geographic_level, 4;
+EXEC InsertSubjectFootnote @subject_absence_by_term, 4;
+EXEC InsertSubjectFootnote @subject_absence_for_four_year_olds, 4;
+EXEC InsertSubjectFootnote @subject_absence_in_prus, 4;
+EXEC InsertSubjectFootnote @subject_absence_number_missing, 4;
+EXEC InsertSubjectFootnote @subject_absence_rate_percent_bands, 4;
 
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_characteristic, 6);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_geographic_level, 6);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_term, 6);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_for_four_year_olds, 6);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_in_prus, 6);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_number_missing, 6);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_rate_percent_bands, 6);
+EXEC InsertSubjectFootnote @subject_absence_by_characteristic, 5;
+EXEC InsertSubjectFootnote @subject_absence_by_geographic_level, 5;
+EXEC InsertSubjectFootnote @subject_absence_by_term, 5;
+EXEC InsertSubjectFootnote @subject_absence_for_four_year_olds, 5;
+EXEC InsertSubjectFootnote @subject_absence_in_prus, 5;
+EXEC InsertSubjectFootnote @subject_absence_number_missing, 5;
+EXEC InsertSubjectFootnote @subject_absence_rate_percent_bands, 5;
 
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_characteristic, 7);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_geographic_level, 7);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_term, 7);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_for_four_year_olds, 7);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_in_prus, 7);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_number_missing, 7);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_rate_percent_bands, 7);
+EXEC InsertSubjectFootnote @subject_absence_by_characteristic, 6;
+EXEC InsertSubjectFootnote @subject_absence_by_geographic_level, 6;
+EXEC InsertSubjectFootnote @subject_absence_by_term, 6;
+EXEC InsertSubjectFootnote @subject_absence_for_four_year_olds, 6;
+EXEC InsertSubjectFootnote @subject_absence_in_prus, 6;
+EXEC InsertSubjectFootnote @subject_absence_number_missing, 6;
+EXEC InsertSubjectFootnote @subject_absence_rate_percent_bands, 6;
 
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_characteristic, 8);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_geographic_level, 8);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_term, 8);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_for_four_year_olds, 8);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_in_prus, 8);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_number_missing, 8);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_rate_percent_bands, 8);
+EXEC InsertSubjectFootnote @subject_absence_by_characteristic, 7;
+EXEC InsertSubjectFootnote @subject_absence_by_geographic_level, 7;
+EXEC InsertSubjectFootnote @subject_absence_by_term, 7;
+EXEC InsertSubjectFootnote @subject_absence_for_four_year_olds, 7;
+EXEC InsertSubjectFootnote @subject_absence_in_prus, 7;
+EXEC InsertSubjectFootnote @subject_absence_number_missing, 7;
+EXEC InsertSubjectFootnote @subject_absence_rate_percent_bands, 7;
 
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_characteristic, 9);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_geographic_level, 9);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_term, 9);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_for_four_year_olds, 9);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_in_prus, 9);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_number_missing, 9);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_rate_percent_bands, 9);
+EXEC InsertSubjectFootnote @subject_absence_by_characteristic, 8;
+EXEC InsertSubjectFootnote @subject_absence_by_geographic_level, 8;
+EXEC InsertSubjectFootnote @subject_absence_by_term, 8;
+EXEC InsertSubjectFootnote @subject_absence_for_four_year_olds, 8;
+EXEC InsertSubjectFootnote @subject_absence_in_prus, 8;
+EXEC InsertSubjectFootnote @subject_absence_number_missing, 8;
+EXEC InsertSubjectFootnote @subject_absence_rate_percent_bands, 8;
 
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_characteristic, 10);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_geographic_level, 10);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_term, 10);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_for_four_year_olds, 10);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_in_prus, 10);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_number_missing, 10);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_rate_percent_bands, 10);
+EXEC InsertSubjectFootnote @subject_absence_by_characteristic, 9;
+EXEC InsertSubjectFootnote @subject_absence_by_geographic_level, 9;
+EXEC InsertSubjectFootnote @subject_absence_by_term, 9;
+EXEC InsertSubjectFootnote @subject_absence_for_four_year_olds, 9;
+EXEC InsertSubjectFootnote @subject_absence_in_prus, 9;
+EXEC InsertSubjectFootnote @subject_absence_number_missing, 9;
+EXEC InsertSubjectFootnote @subject_absence_rate_percent_bands, 9;
 
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_characteristic, 11);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_geographic_level, 11);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_term, 11);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_for_four_year_olds, 11);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_in_prus, 11);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_number_missing, 11);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_rate_percent_bands, 11);
+EXEC InsertSubjectFootnote @subject_absence_by_characteristic, 10;
+EXEC InsertSubjectFootnote @subject_absence_by_geographic_level, 10;
+EXEC InsertSubjectFootnote @subject_absence_by_term, 10;
+EXEC InsertSubjectFootnote @subject_absence_for_four_year_olds, 10;
+EXEC InsertSubjectFootnote @subject_absence_in_prus, 10;
+EXEC InsertSubjectFootnote @subject_absence_number_missing, 10;
+EXEC InsertSubjectFootnote @subject_absence_rate_percent_bands, 10;
+
+EXEC InsertSubjectFootnote @subject_absence_by_characteristic, 11;
+EXEC InsertSubjectFootnote @subject_absence_by_geographic_level, 11;
+EXEC InsertSubjectFootnote @subject_absence_by_term, 11;
+EXEC InsertSubjectFootnote @subject_absence_for_four_year_olds, 11;
+EXEC InsertSubjectFootnote @subject_absence_in_prus, 11;
+EXEC InsertSubjectFootnote @subject_absence_number_missing, 11;
+EXEC InsertSubjectFootnote @subject_absence_rate_percent_bands, 11;
 
 -- Except Absence for four year olds
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_characteristic, 12);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_geographic_level, 12);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_term, 12);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_in_prus, 12);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_number_missing, 12);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_rate_percent_bands, 12);
+EXEC InsertSubjectFootnote @subject_absence_by_characteristic, 12;
+EXEC InsertSubjectFootnote @subject_absence_by_geographic_level, 12;
+EXEC InsertSubjectFootnote @subject_absence_by_term, 12;
+EXEC InsertSubjectFootnote @subject_absence_in_prus, 12;
+EXEC InsertSubjectFootnote @subject_absence_number_missing, 12;
+EXEC InsertSubjectFootnote @subject_absence_rate_percent_bands, 12;
 
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_characteristic, 13);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_geographic_level, 13);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_term, 13);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_for_four_year_olds, 13);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_in_prus, 13);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_number_missing, 13);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_rate_percent_bands, 13);
+EXEC InsertSubjectFootnote @subject_absence_by_characteristic, 13;
+EXEC InsertSubjectFootnote @subject_absence_by_geographic_level, 13;
+EXEC InsertSubjectFootnote @subject_absence_by_term, 13;
+EXEC InsertSubjectFootnote @subject_absence_for_four_year_olds, 13;
+EXEC InsertSubjectFootnote @subject_absence_in_prus, 13;
+EXEC InsertSubjectFootnote @subject_absence_number_missing, 13;
+EXEC InsertSubjectFootnote @subject_absence_rate_percent_bands, 13;
 
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_characteristic, 14);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_geographic_level, 14);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_term, 14);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_for_four_year_olds, 14);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_in_prus, 14);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_number_missing, 14);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_rate_percent_bands, 14);
+EXEC InsertSubjectFootnote @subject_absence_by_characteristic, 14;
+EXEC InsertSubjectFootnote @subject_absence_by_geographic_level, 14;
+EXEC InsertSubjectFootnote @subject_absence_by_term, 14;
+EXEC InsertSubjectFootnote @subject_absence_for_four_year_olds, 14;
+EXEC InsertSubjectFootnote @subject_absence_in_prus, 14;
+EXEC InsertSubjectFootnote @subject_absence_number_missing, 14;
+EXEC InsertSubjectFootnote @subject_absence_rate_percent_bands, 14;
 
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_characteristic, 15);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_geographic_level, 15);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_term, 15);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_for_four_year_olds, 15);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_in_prus, 15);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_number_missing, 15);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_rate_percent_bands, 15);
+EXEC InsertSubjectFootnote @subject_absence_by_characteristic, 15;
+EXEC InsertSubjectFootnote @subject_absence_by_geographic_level, 15;
+EXEC InsertSubjectFootnote @subject_absence_by_term, 15;
+EXEC InsertSubjectFootnote @subject_absence_for_four_year_olds, 15;
+EXEC InsertSubjectFootnote @subject_absence_in_prus, 15;
+EXEC InsertSubjectFootnote @subject_absence_number_missing, 15;
+EXEC InsertSubjectFootnote @subject_absence_rate_percent_bands, 15;
 
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_characteristic, 16);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_geographic_level, 16);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_term, 16);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_for_four_year_olds, 16);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_in_prus, 16);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_number_missing, 16);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_rate_percent_bands, 16);
+EXEC InsertSubjectFootnote @subject_absence_by_characteristic, 16;
+EXEC InsertSubjectFootnote @subject_absence_by_geographic_level, 16;
+EXEC InsertSubjectFootnote @subject_absence_by_term, 16;
+EXEC InsertSubjectFootnote @subject_absence_for_four_year_olds, 16;
+EXEC InsertSubjectFootnote @subject_absence_in_prus, 16;
+EXEC InsertSubjectFootnote @subject_absence_number_missing, 16;
+EXEC InsertSubjectFootnote @subject_absence_rate_percent_bands, 16;
 
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_characteristic, 17);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_geographic_level, 17);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_term, 17);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_for_four_year_olds, 17);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_in_prus, 17);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_number_missing, 17);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_rate_percent_bands, 17);
+EXEC InsertSubjectFootnote @subject_absence_by_characteristic, 17;
+EXEC InsertSubjectFootnote @subject_absence_by_geographic_level, 17;
+EXEC InsertSubjectFootnote @subject_absence_by_term, 17;
+EXEC InsertSubjectFootnote @subject_absence_for_four_year_olds, 17;
+EXEC InsertSubjectFootnote @subject_absence_in_prus, 17;
+EXEC InsertSubjectFootnote @subject_absence_number_missing, 17;
+EXEC InsertSubjectFootnote @subject_absence_rate_percent_bands, 17;
 
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_characteristic, 18);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_geographic_level, 18);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_term, 18);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_for_four_year_olds, 18);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_in_prus, 18);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_number_missing, 18);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_rate_percent_bands, 18);
+EXEC InsertSubjectFootnote @subject_absence_by_characteristic, 18;
+EXEC InsertSubjectFootnote @subject_absence_by_geographic_level, 18;
+EXEC InsertSubjectFootnote @subject_absence_by_term, 18;
+EXEC InsertSubjectFootnote @subject_absence_for_four_year_olds, 18;
+EXEC InsertSubjectFootnote @subject_absence_in_prus, 18;
+EXEC InsertSubjectFootnote @subject_absence_number_missing, 18;
+EXEC InsertSubjectFootnote @subject_absence_rate_percent_bands, 18;
 
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_characteristic, 19);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_geographic_level, 19);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_term, 19);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_for_four_year_olds, 19);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_in_prus, 19);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_number_missing, 19);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_rate_percent_bands, 19);
+EXEC InsertSubjectFootnote @subject_absence_by_characteristic, 19;
+EXEC InsertSubjectFootnote @subject_absence_by_geographic_level, 19;
+EXEC InsertSubjectFootnote @subject_absence_by_term, 19;
+EXEC InsertSubjectFootnote @subject_absence_for_four_year_olds, 19;
+EXEC InsertSubjectFootnote @subject_absence_in_prus, 19;
+EXEC InsertSubjectFootnote @subject_absence_number_missing, 19;
+EXEC InsertSubjectFootnote @subject_absence_rate_percent_bands, 19;
 
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_characteristic, 20);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_geographic_level, 20);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_term, 20);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_for_four_year_olds, 20);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_in_prus, 20);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_number_missing, 20);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_rate_percent_bands, 20);
+EXEC InsertSubjectFootnote @subject_absence_by_characteristic, 20;
+EXEC InsertSubjectFootnote @subject_absence_by_geographic_level, 20;
+EXEC InsertSubjectFootnote @subject_absence_by_term, 20;
+EXEC InsertSubjectFootnote @subject_absence_for_four_year_olds, 20;
+EXEC InsertSubjectFootnote @subject_absence_in_prus, 20;
+EXEC InsertSubjectFootnote @subject_absence_number_missing, 20;
+EXEC InsertSubjectFootnote @subject_absence_rate_percent_bands, 20;
 
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_characteristic, 21);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_geographic_level, 21);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_term, 21);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_for_four_year_olds, 21);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_in_prus, 21);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_number_missing, 21);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_rate_percent_bands, 21);
+EXEC InsertSubjectFootnote @subject_absence_by_characteristic, 21;
+EXEC InsertSubjectFootnote @subject_absence_by_geographic_level, 21;
+EXEC InsertSubjectFootnote @subject_absence_by_term, 21;
+EXEC InsertSubjectFootnote @subject_absence_for_four_year_olds, 21;
+EXEC InsertSubjectFootnote @subject_absence_in_prus, 21;
+EXEC InsertSubjectFootnote @subject_absence_number_missing, 21;
+EXEC InsertSubjectFootnote @subject_absence_rate_percent_bands, 21;
 
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_characteristic, 22);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_geographic_level, 22);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_term, 22);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_for_four_year_olds, 22);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_in_prus, 22);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_number_missing, 22);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_rate_percent_bands, 22);
+EXEC InsertSubjectFootnote @subject_absence_by_characteristic, 22;
+EXEC InsertSubjectFootnote @subject_absence_by_geographic_level, 22;
+EXEC InsertSubjectFootnote @subject_absence_by_term, 22;
+EXEC InsertSubjectFootnote @subject_absence_for_four_year_olds, 22;
+EXEC InsertSubjectFootnote @subject_absence_in_prus, 22;
+EXEC InsertSubjectFootnote @subject_absence_number_missing, 22;
+EXEC InsertSubjectFootnote @subject_absence_rate_percent_bands, 22;
 
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_characteristic, 23);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_geographic_level, 23);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_by_term, 23);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_for_four_year_olds, 23);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_in_prus, 23);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_number_missing, 23);
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_rate_percent_bands, 23);
+EXEC InsertSubjectFootnote @subject_absence_by_characteristic, 23;
+EXEC InsertSubjectFootnote @subject_absence_by_geographic_level, 23;
+EXEC InsertSubjectFootnote @subject_absence_by_term, 23;
+EXEC InsertSubjectFootnote @subject_absence_for_four_year_olds, 23;
+EXEC InsertSubjectFootnote @subject_absence_in_prus, 23;
+EXEC InsertSubjectFootnote @subject_absence_number_missing, 23;
+EXEC InsertSubjectFootnote @subject_absence_rate_percent_bands, 23;
 
--- Only Absence for four year olds
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_for_four_year_olds, 24);
+EXEC InsertSubjectFootnote @subject_absence_for_four_year_olds, 24;
 
--- Only Absence for four year olds
-INSERT INTO SubjectFootnote (SubjectId, FootnoteId) VALUES (@subject_absence_for_four_year_olds, 25);
+EXEC InsertSubjectFootnote @subject_absence_for_four_year_olds, 25;
 
 --
 -- Indicators
 --
 
--- sess_overall_percent
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (26, 8);
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (57, 8);
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (85, 8);
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (95, 8);
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (115, 8);
--- sess_authorised_percent
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (28, 8);
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (59, 8);
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (84, 8);
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (114, 8);
--- sess_unauthorised_percent
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (23, 8);
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (66, 8);
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (83, 8);
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (113, 8);
 
+DECLARE @indicator_sess_overall_percent NVARCHAR(max) = 'sess_overall_percent';
+DECLARE @indicator_sess_authorised_percent NVARCHAR(max) = 'sess_authorised_percent';
+DECLARE @indicator_sess_unauthorised_percent NVARCHAR(max) = 'sess_unauthorised_percent';
+DECLARE @indicator_enrolments_pa_10_exact NVARCHAR(max) = 'enrolments_pa_10_exact';
+DECLARE @indicator_enrolments_pa_10_exact_percent NVARCHAR(max) = 'enrolments_pa_10_exact_percent';
+DECLARE @indicator_sess_possible_pa_10_exact NVARCHAR(max) = 'sess_possible_pa_10_exact';
+DECLARE @indicator_sess_overall_pa_10_exact NVARCHAR(max) = 'sess_overall_pa_10_exact';
+DECLARE @indicator_sess_authorised_pa_10_exact NVARCHAR(max) = 'sess_authorised_pa_10_exact';
+DECLARE @indicator_sess_unauthorised_pa_10_exact NVARCHAR(max) = 'sess_unauthorised_pa_10_exact';
+DECLARE @indicator_sess_overall_percent_pa_10_exact NVARCHAR(max) = 'sess_overall_percent_pa_10_exact';
+DECLARE @indicator_sess_authorised_percent_pa_10_exact NVARCHAR(max) = 'sess_authorised_percent_pa_10_exact';
+DECLARE @indicator_sess_unauthorised_percent_pa_10_exact NVARCHAR(max) = 'sess_unauthorised_percent_pa_10_exact';
+DECLARE @indicator_enrolments_pa10_exact_percent NVARCHAR(max) = 'enrolments_pa10_exact_percent';
+DECLARE @indicator_enrolments NVARCHAR(max) = 'enrolments';
+DECLARE @indicator_enrol_unauth_late NVARCHAR(max) = 'enrol_unauth_late';
+DECLARE @indicator_enrol_unauth_holiday NVARCHAR(max) = 'enrol_unauth_holiday';
+DECLARE @indicator_enrol_auth_other NVARCHAR(max) = 'enrol_auth_other';
+DECLARE @indicator_enrol_auth_excluded NVARCHAR(max) = 'enrol_auth_excluded';
+DECLARE @indicator_enrol_auth_ext_holiday NVARCHAR(max) = 'enrol_auth_ext_holiday';
+DECLARE @indicator_enrol_auth_holiday NVARCHAR(max) = 'enrol_auth_holiday';
+DECLARE @indicator_enrol_unauth_other NVARCHAR(max) = 'enrol_unauth_other';
+DECLARE @indicator_enrol_auth_traveller NVARCHAR(max) = 'enrol_auth_traveller';
+DECLARE @indicator_enrol_auth_religious NVARCHAR(max) = 'enrol_auth_religious';
+DECLARE @indicator_enrol_auth_appointments NVARCHAR(max) = 'enrol_auth_appointments';
+DECLARE @indicator_enrol_auth_illness NVARCHAR(max) = 'enrol_auth_illness';
+DECLARE @indicator_enrol_unauthorised NVARCHAR(max) = 'enrol_unauthorised';
+DECLARE @indicator_enrol_authorised NVARCHAR(max) = 'enrol_authorised';
+DECLARE @indicator_enrol_overall NVARCHAR(max) = 'enrol_overall';
+DECLARE @indicator_enrol_auth_study NVARCHAR(max) = 'enrol_auth_study';
+DECLARE @indicator_enrol_unauth_noyet NVARCHAR(max) = 'enrol_unauth_noyet';
+DECLARE @indicator_enrolments_overall_percent NVARCHAR(max) = 'enrolments_overall_percent';
+DECLARE @indicator_enrolments_authorised_percent NVARCHAR(max) = 'enrolments_authorised_percent';
+DECLARE @indicator_enrolments_unauthorised_percent NVARCHAR(max) = 'enrolments_unauthorised_percent';
+DECLARE @indicator_num_schools NVARCHAR(max) = 'num_schools';
+DECLARE @indicator_sess_overall NVARCHAR(max) = 'sess_overall';
 
--- enrolments_pa_10_exact
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (31, 9);
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (60, 9);
--- enrolments_pa_10_exact_percent
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (30, 9);
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (61, 9);
--- sess_possible_pa_10_exact
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (2, 9);
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (62, 9);
--- sess_overall_pa_10_exact
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (4, 9);
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (63, 9);
--- sess_authorised_pa_10_exact
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (6, 9);
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (64, 9);
--- sess_unauthorised_pa_10_exact
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (16, 9);
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (65, 9);
--- sess_overall_percent_pa_10_exact
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (3, 9);
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (51, 9);
--- sess_authorised_percent_pa_10_exact
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (5, 9);
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (50, 9);
--- sess_unauthorised_percent_pa_10_exact
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (33, 9);
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (49, 9);
+EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_sess_overall_percent, 8;
+EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_sess_overall_percent, 8;
+EXEC InsertIndicatorFootnote @subject_absence_by_term, @indicator_sess_overall_percent, 8;
+EXEC InsertIndicatorFootnote @subject_absence_for_four_year_olds, @indicator_sess_overall_percent, 8;
+EXEC InsertIndicatorFootnote @subject_absence_in_prus, @indicator_sess_overall_percent, 8;
 
+EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_sess_authorised_percent, 8;
+EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_sess_authorised_percent, 8;
+EXEC InsertIndicatorFootnote @subject_absence_by_term, @indicator_sess_authorised_percent, 8;
+EXEC InsertIndicatorFootnote @subject_absence_in_prus, @indicator_sess_authorised_percent, 8;
 
--- enrolments_pa_10_exact
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (31, 10);
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (60, 10);
--- enrolments_pa_10_exact_percent
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (30, 10);
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (61, 10);
--- sess_possible_pa_10_exact
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (2, 10);
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (62, 10);
--- sess_overall_pa_10_exact
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (4, 10);
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (63, 10);
--- sess_authorised_pa_10_exact
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (6, 10);
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (64, 10);
--- sess_unauthorised_pa_10_exact
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (16, 10);
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (65, 10);
--- sess_overall_percent_pa_10_exact
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (3, 10);
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (51, 10);
--- sess_authorised_percent_pa_10_exact
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (5, 10);
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (50, 10);
--- sess_unauthorised_percent_pa_10_exact
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (33, 10);
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (49, 10);
+EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_sess_unauthorised_percent, 8;
+EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_sess_unauthorised_percent, 8;
+EXEC InsertIndicatorFootnote @subject_absence_by_term, @indicator_sess_unauthorised_percent, 8;
+EXEC InsertIndicatorFootnote @subject_absence_in_prus, @indicator_sess_unauthorised_percent, 8;
 
+EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_enrolments_pa_10_exact, 9;
+EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_enrolments_pa_10_exact, 9;
 
--- enrolments_pa10_exact_percent
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (30, 11);
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (61, 11);
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (111, 11);
+EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_enrolments_pa_10_exact_percent, 9;
+EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_enrolments_pa_10_exact_percent, 9;
 
+EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_sess_possible_pa_10_exact, 9;
+EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_sess_possible_pa_10_exact, 9;
 
---enrolments
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (1, 12);
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (52, 12);
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (120, 12);
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (123, 12);
+EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_sess_overall_pa_10_exact, 9;
+EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_sess_overall_pa_10_exact, 9;
 
+EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_sess_authorised_pa_10_exact, 9;
+EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_sess_authorised_pa_10_exact, 9;
 
--- enrol_unauth_late
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (124, 13);
--- enrol_unauth_holiday
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (125, 13);
--- enrol_auth_other
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (126, 13);
--- enrol_auth_excluded
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (127, 13);
--- enrol_auth_ext_holiday
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (128, 13);
--- enrol_auth_holiday
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (129, 13);
--- enrol_unauth_other
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (130, 13);
--- enrol_auth_traveller
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (131, 13);
--- enrol_auth_religious
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (132, 13);
--- enrol_auth_appointments
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (133, 13);
--- enrol_auth_illness
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (134, 13);
--- enrol_unauthorised
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (135, 13);
--- enrol_authorised
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (136, 13);
--- enrol_overall
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (137, 13);
--- enrol_auth_study
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (138, 13);
--- enrol_unauth_noyet
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (139, 13);
+EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_sess_unauthorised_pa_10_exact, 9;
+EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_sess_unauthorised_pa_10_exact, 9;
 
+EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_sess_overall_percent_pa_10_exact, 9;
+EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_sess_overall_percent_pa_10_exact, 9;
 
--- enrolments_overall_percent
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (141, 14);
--- enrolments_authorised_percent
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (143, 14);
--- enrolments_unauthorised_percent
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (145, 14);
+EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_sess_authorised_percent_pa_10_exact, 9;
+EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_sess_authorised_percent_pa_10_exact, 9;
 
+EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_sess_unauthorised_percent_pa_10_exact, 9;
+EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_sess_unauthorised_percent_pa_10_exact, 9;
 
--- num_schools
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (34, 15);
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (91, 15);
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (96, 15);
+EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_enrolments_pa_10_exact, 10;
+EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_enrolments_pa_10_exact, 10;
 
+EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_enrolments_pa_10_exact_percent, 10;
+EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_enrolments_pa_10_exact_percent, 10;
 
---enrolments
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (92, 24);
+EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_sess_possible_pa_10_exact, 10;
+EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_sess_possible_pa_10_exact, 10;
 
+EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_sess_overall_pa_10_exact, 10;
+EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_sess_overall_pa_10_exact, 10;
 
--- sess_overall
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (94, 25);
+EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_sess_authorised_pa_10_exact, 10;
+EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_sess_authorised_pa_10_exact, 10;
 
+EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_sess_unauthorised_pa_10_exact, 10;
+EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_sess_unauthorised_pa_10_exact, 10;
 
--- sess_overall_percent
-INSERT INTO IndicatorFootnote (IndicatorId, FootnoteId) VALUES (95, 25);
+EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_sess_overall_percent_pa_10_exact, 10;
+EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_sess_overall_percent_pa_10_exact, 10;
+
+EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_sess_authorised_percent_pa_10_exact, 10;
+EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_sess_authorised_percent_pa_10_exact, 10;
+
+EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_sess_unauthorised_percent_pa_10_exact, 10;
+EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_sess_unauthorised_percent_pa_10_exact, 10;
+
+EXEC InsertIndicatorFootnote @subject_absence_in_prus, @indicator_enrolments_pa10_exact_percent, 11;
+
+EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_enrolments, 12;
+EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_enrolments, 12;
+EXEC InsertIndicatorFootnote @subject_absence_in_prus, @indicator_enrolments, 12;
+EXEC InsertIndicatorFootnote @subject_absence_number_missing, @indicator_enrolments, 12;
+
+EXEC InsertIndicatorFootnote @subject_absence_number_missing, @indicator_enrol_unauth_late, 13;
+EXEC InsertIndicatorFootnote @subject_absence_number_missing, @indicator_enrol_unauth_holiday, 13;
+EXEC InsertIndicatorFootnote @subject_absence_number_missing, @indicator_enrol_auth_other, 13;
+EXEC InsertIndicatorFootnote @subject_absence_number_missing, @indicator_enrol_auth_excluded, 13;
+EXEC InsertIndicatorFootnote @subject_absence_number_missing, @indicator_enrol_auth_ext_holiday, 13;
+EXEC InsertIndicatorFootnote @subject_absence_number_missing, @indicator_enrol_auth_holiday, 13;
+EXEC InsertIndicatorFootnote @subject_absence_number_missing, @indicator_enrol_unauth_other, 13;
+EXEC InsertIndicatorFootnote @subject_absence_number_missing, @indicator_enrol_auth_traveller, 13;
+EXEC InsertIndicatorFootnote @subject_absence_number_missing, @indicator_enrol_auth_religious, 13;
+EXEC InsertIndicatorFootnote @subject_absence_number_missing, @indicator_enrol_auth_appointments, 13;
+EXEC InsertIndicatorFootnote @subject_absence_number_missing, @indicator_enrol_auth_illness, 13;
+EXEC InsertIndicatorFootnote @subject_absence_number_missing, @indicator_enrol_unauthorised, 13;
+EXEC InsertIndicatorFootnote @subject_absence_number_missing, @indicator_enrol_authorised, 13;
+EXEC InsertIndicatorFootnote @subject_absence_number_missing, @indicator_enrol_overall, 13;
+EXEC InsertIndicatorFootnote @subject_absence_number_missing, @indicator_enrol_auth_study, 13;
+EXEC InsertIndicatorFootnote @subject_absence_number_missing, @indicator_enrol_unauth_noyet, 13;
+
+EXEC InsertIndicatorFootnote @subject_absence_rate_percent_bands, @indicator_enrolments_overall_percent, 14;
+EXEC InsertIndicatorFootnote @subject_absence_rate_percent_bands, @indicator_enrolments_authorised_percent, 14;
+EXEC InsertIndicatorFootnote @subject_absence_rate_percent_bands, @indicator_enrolments_unauthorised_percent, 14;
+
+EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_num_schools, 15;
+EXEC InsertIndicatorFootnote @subject_absence_for_four_year_olds, @indicator_num_schools, 15
+EXEC InsertIndicatorFootnote @subject_absence_in_prus, @indicator_num_schools, 15;
+
+EXEC InsertIndicatorFootnote @subject_absence_for_four_year_olds, @indicator_enrolments, 24;
+
+EXEC InsertIndicatorFootnote @subject_absence_for_four_year_olds, @indicator_sess_overall, 25;
+EXEC InsertIndicatorFootnote @subject_absence_for_four_year_olds, @indicator_sess_overall_percent, 25;
 
 
 --
--- Footnotes
+-- Filter Items
 --
 
--- State-funded primary 
-INSERT INTO FilterItemFootnote (FilterItemId, FootnoteId) VALUES (71, 1);
-INSERT INTO FilterItemFootnote (FilterItemId, FootnoteId) VALUES (86, 1);
-INSERT INTO FilterItemFootnote (FilterItemId, FootnoteId) VALUES (89, 1);
-INSERT INTO FilterItemFootnote (FilterItemId, FootnoteId) VALUES (94, 1);
-INSERT INTO FilterItemFootnote (FilterItemId, FootnoteId) VALUES (98, 1);
-INSERT INTO FilterItemFootnote (FilterItemId, FootnoteId) VALUES (149, 1);
--- State-funded secondary
-INSERT INTO FilterItemFootnote (FilterItemId, FootnoteId) VALUES (75, 1);
-INSERT INTO FilterItemFootnote (FilterItemId, FootnoteId) VALUES (87, 1);
-INSERT INTO FilterItemFootnote (FilterItemId, FootnoteId) VALUES (90, 1);
-INSERT INTO FilterItemFootnote (FilterItemId, FootnoteId) VALUES (92, 1);
-INSERT INTO FilterItemFootnote (FilterItemId, FootnoteId) VALUES (99, 1);
-INSERT INTO FilterItemFootnote (FilterItemId, FootnoteId) VALUES (151, 1);
+
+DECLARE @filterItem_State_funded_primary NVARCHAR(max) = 'State-funded primary';
+DECLARE @filterItem_State_funded_secondary NVARCHAR(max) = 'State-funded secondary';
+DECLARE @filterItem_Special NVARCHAR(max) = 'Special';
+DECLARE @filterItem_Social_emotional_and_mental_health NVARCHAR(max) = 'SEN primary need Social emotional and mental health';
+
+EXEC InsertFilterItemFootnote @subject_absence_by_characteristic, @filterItem_State_funded_primary, 1;
+EXEC InsertFilterItemFootnote @subject_absence_by_geographic_level, @filterItem_State_funded_primary, 1;
+EXEC InsertFilterItemFootnote @subject_absence_by_term, @filterItem_State_funded_primary, 1;
+EXEC InsertFilterItemFootnote @subject_absence_for_four_year_olds, @filterItem_State_funded_primary, 1;
+EXEC InsertFilterItemFootnote @subject_absence_number_missing, @filterItem_State_funded_primary, 1;
+EXEC InsertFilterItemFootnote @subject_absence_rate_percent_bands, @filterItem_State_funded_primary, 1;
+
+EXEC InsertFilterItemFootnote @subject_absence_by_characteristic, @filterItem_State_funded_secondary, 1;
+EXEC InsertFilterItemFootnote @subject_absence_by_geographic_level, @filterItem_State_funded_secondary, 1;
+EXEC InsertFilterItemFootnote @subject_absence_by_term, @filterItem_State_funded_secondary, 1;
+EXEC InsertFilterItemFootnote @subject_absence_for_four_year_olds, @filterItem_State_funded_secondary, 1;
+EXEC InsertFilterItemFootnote @subject_absence_number_missing, @filterItem_State_funded_secondary, 1;
+EXEC InsertFilterItemFootnote @subject_absence_rate_percent_bands, @filterItem_State_funded_secondary, 1;
+
+EXEC InsertFilterItemFootnote @subject_absence_by_characteristic, @filterItem_State_funded_primary, 2;
+EXEC InsertFilterItemFootnote @subject_absence_by_geographic_level, @filterItem_State_funded_primary, 2;
+EXEC InsertFilterItemFootnote @subject_absence_by_term, @filterItem_State_funded_primary, 2;
+EXEC InsertFilterItemFootnote @subject_absence_for_four_year_olds, @filterItem_State_funded_primary, 2;
+EXEC InsertFilterItemFootnote @subject_absence_number_missing, @filterItem_State_funded_primary, 2;
+EXEC InsertFilterItemFootnote @subject_absence_rate_percent_bands, @filterItem_State_funded_primary, 2;
+
+EXEC InsertFilterItemFootnote @subject_absence_by_characteristic, @filterItem_State_funded_secondary, 3;
+EXEC InsertFilterItemFootnote @subject_absence_by_geographic_level, @filterItem_State_funded_secondary, 3;
+EXEC InsertFilterItemFootnote @subject_absence_by_term, @filterItem_State_funded_secondary, 3;
+EXEC InsertFilterItemFootnote @subject_absence_for_four_year_olds, @filterItem_State_funded_secondary, 3;
+EXEC InsertFilterItemFootnote @subject_absence_number_missing, @filterItem_State_funded_secondary, 3;
+EXEC InsertFilterItemFootnote @subject_absence_rate_percent_bands, @filterItem_State_funded_secondary, 3;
+
+EXEC InsertFilterItemFootnote @subject_absence_by_characteristic, @filterItem_Special, 4;
+EXEC InsertFilterItemFootnote @subject_absence_by_geographic_level, @filterItem_Special, 4;
+EXEC InsertFilterItemFootnote @subject_absence_by_term, @filterItem_Special, 4;
+EXEC InsertFilterItemFootnote @subject_absence_for_four_year_olds, @filterItem_Special, 4;
+EXEC InsertFilterItemFootnote @subject_absence_number_missing, @filterItem_Special, 4;
+EXEC InsertFilterItemFootnote @subject_absence_rate_percent_bands, @filterItem_Special, 4;
+
+EXEC InsertFilterItemFootnote @subject_absence_by_characteristic, @filterItem_Social_emotional_and_mental_health, 23;
 
 
--- State-funded primary
-INSERT INTO FilterItemFootnote (FilterItemId, FootnoteId) VALUES (71, 2);
-INSERT INTO FilterItemFootnote (FilterItemId, FootnoteId) VALUES (86, 2);
-INSERT INTO FilterItemFootnote (FilterItemId, FootnoteId) VALUES (89, 2);
-INSERT INTO FilterItemFootnote (FilterItemId, FootnoteId) VALUES (94, 2);
-INSERT INTO FilterItemFootnote (FilterItemId, FootnoteId) VALUES (98, 2);
-INSERT INTO FilterItemFootnote (FilterItemId, FootnoteId) VALUES (149, 2);
+--
+-- Filters
+--
 
 
--- State-funded secondary
-INSERT INTO FilterItemFootnote (FilterItemId, FootnoteId) VALUES (75, 3);
-INSERT INTO FilterItemFootnote (FilterItemId, FootnoteId) VALUES (87, 3);
-INSERT INTO FilterItemFootnote (FilterItemId, FootnoteId) VALUES (90, 3);
-INSERT INTO FilterItemFootnote (FilterItemId, FootnoteId) VALUES (92, 3);
-INSERT INTO FilterItemFootnote (FilterItemId, FootnoteId) VALUES (99, 3);
-INSERT INTO FilterItemFootnote (FilterItemId, FootnoteId) VALUES (151, 3);
+DECLARE @filter_Characteristic NVARCHAR(max) = 'Characteristic';
+
+EXEC InsertFilterFootnote @subject_absence_by_characteristic, @filter_Characteristic, 16;
+EXEC InsertFilterFootnote @subject_absence_by_characteristic, @filter_Characteristic, 17;
 
 
--- Special
-INSERT INTO FilterItemFootnote (FilterItemId, FootnoteId) VALUES (74, 4);
-INSERT INTO FilterItemFootnote (FilterItemId, FootnoteId) VALUES (85, 4);
-INSERT INTO FilterItemFootnote (FilterItemId, FootnoteId) VALUES (91, 4);
-INSERT INTO FilterItemFootnote (FilterItemId, FootnoteId) VALUES (93, 4);
-INSERT INTO FilterItemFootnote (FilterItemId, FootnoteId) VALUES (100, 4);
-INSERT INTO FilterItemFootnote (FilterItemId, FootnoteId) VALUES (150, 4);
+--
+-- Filter Groups
+--
 
 
--- Characteristic
-INSERT INTO FilterFootnote (FilterId, FootnoteId) VALUES (1, 16);
+DECLARE @filterGroup_SEN_provision NVARCHAR(max) = 'SEN provision';
+DECLARE @filterGroup_Ethnic_group_minor NVARCHAR(max) = 'Ethnic group minor';
+DECLARE @filterGroup_SEN_primary_need NVARCHAR(max) = 'SEN primary need';
 
+EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_SEN_provision, 18;
+EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_SEN_provision, 19;
+EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_SEN_provision, 20;
+EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_Ethnic_group_minor, 21;
+EXEC InsertFilterGroupFootnote @subject_absence_by_characteristic, @filterGroup_SEN_primary_need, 22;
 
--- Characteristic
-INSERT INTO FilterFootnote (FilterId, FootnoteId) VALUES (1, 17);
-
-
--- SEN provision
-INSERT INTO FilterGroupFootnote (FilterGroupId, FootnoteId) VALUES (10, 18);
-
-
--- SEN provision
-INSERT INTO FilterGroupFootnote (FilterGroupId, FootnoteId) VALUES (10, 19);
-
-
--- SEN provision
-INSERT INTO FilterGroupFootnote (FilterGroupId, FootnoteId) VALUES (10, 20);
-
--- Ethnic group minor
-INSERT INTO FilterGroupFootnote (FilterGroupId, FootnoteId) VALUES (6, 21);
-
-
--- SEN primary need
-INSERT INTO FilterGroupFootnote (FilterGroupId, FootnoteId) VALUES (11, 22);
-
-
--- SEN primary need Social emotional and mental health
-INSERT INTO FilterItemFootnote (FilterItemId, FootnoteId) VALUES (58, 23);
+DROP PROCEDURE InsertSubjectFootnote;
+DROP PROCEDURE InsertIndicatorFootnote;
+DROP PROCEDURE InsertFilterFootnote;
+DROP PROCEDURE InsertFilterGroupFootnote;
+DROP PROCEDURE InsertFilterItemFootnote;
