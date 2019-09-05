@@ -1,3 +1,4 @@
+from logging import warn
 from robot.libraries.BuiltIn import BuiltIn
 from selenium.webdriver.common.action_chains  import ActionChains
 from selenium.common.exceptions import NoSuchElementException
@@ -297,3 +298,15 @@ def user_reorders_table_headers(drag_selector, drop_selector):
   action.move_to_element(drop_elem).perform()
   action.move_by_offset(0, 0).pause(0.01).perform()
   action.release().perform()
+
+def capture_large_screenshot():
+    currentWindow = sl.get_window_size()
+    page_height = sl._current_browser().execute_script("return document.documentElement.scrollHeight;")
+
+    page_width = currentWindow[0]
+    original_height = currentWindow[1]
+
+    sl.set_window_size(page_width, page_height)
+    warn("Capturing a screenshot at URL " + sl.get_location())
+    sl.capture_page_screenshot()
+    sl.set_window_size(page_width, original_height)

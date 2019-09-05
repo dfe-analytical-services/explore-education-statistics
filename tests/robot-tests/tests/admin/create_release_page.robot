@@ -33,12 +33,12 @@ Heading is present on tab
 Verify correct data is shown when theme and topic is shown
     [Tags]   HappyPath
     user clicks element   css:#my-publications-tab
-    user selects from list by label  css:#selectTheme  Test Theme
+    user selects from list by label  css:#selectTheme  Automated Test Theme
     user selects from list by label  css:#selectTopic  Automated Test Topic
-    user checks page contains accordion  Automated Test Publication
-    user opens accordion section  Automated Test Publication
-    user checks accordion section contains text  Automated Test Publication    Methodology
-    user checks accordion section contains text  Automated Test Publication    Releases
+    user checks page contains accordion  Automated Test Publication for Create Release
+    user opens accordion section  Automated Test Publication for Create Release
+    user checks accordion section contains text  Automated Test Publication for Create Release    Methodology
+    user checks accordion section contains text  Automated Test Publication for Create Release    Releases
 
 User clicks create new release
     [Tags]  HappyPath
@@ -69,6 +69,8 @@ User fills in form
     user clicks element  xpath://label[text()="National Statistics"]
 
 Check if data has been submitted
-    [Tags]  HappyPath  UnderConstruction
+    [Tags]  HappyPath  AltersData
     user clicks element   xpath://button[text()="Create new release"]
     user waits until page contains element  xpath://span[text()="Edit release"]
+    user waits until page contains element  xpath://h2[text()="Release summary"]
+

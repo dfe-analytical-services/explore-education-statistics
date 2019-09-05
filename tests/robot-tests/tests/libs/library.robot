@@ -16,9 +16,25 @@ ${implicit_wait}    20
 
 *** Keywords ***
 do this on failure
-  capture page screenshot
+  capture large screenshot
   set selenium timeout  3
   set selenium implicit wait  3
+
+user signs in
+  user opens the browser
+  environment variable should be set   ADMIN_URL
+  user goes to url  %{ADMIN_URL}
+  user waits until page contains heading     Sign-in
+  user clicks link   Sign-in
+
+  environment variable should be set   ADMIN_EMAIL
+  environment variable should be set   ADMIN_PASSWORD
+  user logs into microsoft online  %{ADMIN_EMAIL}   %{ADMIN_PASSWORD}
+
+  user checks url contains  %{ADMIN_URL}
+  user waits until page contains heading   User1 EESADMIN
+  user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(1)     Home
+  user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(2)     Administrator dashboard
 
 user opens the browser
   run keyword if    "${browser}" == "chrome"    user opens chrome
@@ -196,6 +212,10 @@ user selects newly opened window
 user checks element attribute value should be
   [Arguments]   ${locator}  ${attribute}    ${expected}
   element attribute value should be  ${locator}     ${attribute}   ${expected}
+
+user checks radio option should be
+  [Arguments]   ${radiogroupId}  ${expectedLabelText}
+  user checks page contains element  css:#${radiogroupId} [data-testid="${expectedLabelText}"]:checked
 
 user selects from list by label
   [Arguments]   ${locator}   ${label}

@@ -35,7 +35,7 @@ const PublicationSummary = ({ publication }: Props) => {
                     <ButtonLink
                       to={summaryRoute.generateLink(publication.id, release.id)}
                     >
-                      View and edit release
+                      Edit this release
                     </ButtonLink>
                   }
                 />
