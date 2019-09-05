@@ -49,10 +49,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
                     Updates = r.Updates
                 }));
             }
-            
+
             var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
-            releaseViewModel.LatestRelease =  IsLatestRelease(release.PublicationId, releaseViewModel.Id);
-            
+            releaseViewModel.LatestRelease = IsLatestRelease(release.PublicationId, releaseViewModel.Id);
+
             return releaseViewModel;
         }
 
@@ -81,9 +81,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 
             if (release != null)
             {
-                var releases = _context.Releases.Where(x => x.Publication.Id == release.Publication.Id).ToList();
+                var otherReleases = _context.Releases.Where(r => r.Publication.Id == release.Publication.Id
+                                                                 && r.Id != release.Id).ToList();
                 release.Publication.Releases = new List<Release>();
-                releases.ForEach(r => release.Publication.Releases.Add(new Release
+                otherReleases.ForEach(r => release.Publication.Releases.Add(new Release
                 {
                     Id = r.Id,
                     ReleaseName = r.ReleaseName,
@@ -94,13 +95,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
                     PublicationId = r.PublicationId,
                     Updates = r.Updates
                 }));
-                
+
                 var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
                 releaseViewModel.DataFiles = ListFiles(release, ReleaseFileTypes.Data);
                 releaseViewModel.ChartFiles = ListFiles(release, ReleaseFileTypes.Chart);
                 releaseViewModel.AncillaryFiles = ListFiles(release, ReleaseFileTypes.Ancillary);
                 releaseViewModel.LatestRelease = true;
-                
+
                 return releaseViewModel;
             }
 
@@ -111,11 +112,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
         private bool IsLatestRelease(Guid publicationId, Guid releaseId)
         {
             return (_context.Releases
-                        .Where(x=> x.PublicationId == publicationId)
+                        .Where(x => x.PublicationId == publicationId)
                         .OrderBy(x => x.Published)
                         .Last().Id == releaseId);
         }
-        
+
         private List<FileInfo> ListFiles(Release release, ReleaseFileTypes type)
         {
             return _fileStorageService.ListFiles(release.Publication.Slug, release.Slug, type).ToList();

@@ -35,3 +35,10 @@
     @include print-hide();
   }
 }
+
+.recharts-wrapper,
+.recharts-surface {
+  @media print {
+    width: calc(100%) !important;
+  }
+}

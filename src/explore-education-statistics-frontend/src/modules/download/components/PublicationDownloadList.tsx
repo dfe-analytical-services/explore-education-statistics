@@ -45,7 +45,7 @@ function PublicationList({ publications }: Props) {
             <h3 className="govuk-heading-s">Download files for: {title}</h3>
             <ul className="govuk-list govuk-list--bullet">
               {downloadFiles.map(({ extension, name, path, size }) => (
-                <li key={path}>
+                <li key={path} className="govuk-!-margin-bottom-6">
                   <Link
                     to={`${baseUrl.data}/api/download/${path}`}
                     className="govuk-link"

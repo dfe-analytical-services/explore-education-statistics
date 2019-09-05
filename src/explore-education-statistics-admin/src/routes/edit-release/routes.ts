@@ -1,5 +1,5 @@
 import ReleaseDataPage from '@admin/pages/release/edit-release/data/ReleaseDataPage';
-import ReleaseContentPage from '@admin/pages/release/edit-release/ReleaseContentPage';
+import ReleaseContentPage from '@admin/pages/release/edit-release/content/ReleaseContentPage';
 import ReleasePublishStatusPage from '@admin/pages/release/edit-release/ReleaseStatusPage';
 import ReleaseSummaryEditPage from '@admin/pages/release/edit-release/summary/ReleaseSummaryEditPage';
 import ReleaseSummaryPage from '@admin/pages/release/edit-release/summary/ReleaseSummaryPage';
