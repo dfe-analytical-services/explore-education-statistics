@@ -40,15 +40,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var subjectData = _fileStorageService.GetSubjectData(message).Result;
             var subject = GetSubject(message, subjectData.Name);
             var dataFileName = message.NumBatches > 1 ? message.DataFileName.Substring(0, message.DataFileName.LastIndexOf("_")) : message.DataFileName;
+            var releaseId = message.Release.Id.ToString();
+
+            if (await _batchService.IsBatchProcessed(releaseId, dataFileName, message.BatchNo))
+            {
+                _logger.LogInformation($"{message.DataFileName} already processed...skipping");
+                return;
+            }
             
-            _batchService.UpdateStatus(message.Release.Id.ToString(), ImportStatus.RUNNING_PHASE_2, dataFileName);
+            _batchService.UpdateStatus(message.Release.Id.ToString(), dataFileName, ImportStatus.RUNNING_PHASE_2);
             
             try
             {
                 var batch = subjectData.GetCsvLines().ToList();
                 var metaLines = subjectData.GetMetaLines().ToList();
-
-                _logger.LogInformation($"Start import of observations for {message.DataFileName}");  
                 
                 _importerService.ImportObservations(
                     batch,
@@ -63,19 +68,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     
                 if (message.NumBatches > 1)
                 {
-                    _fileStorageService.Delete(message);
+                    _fileStorageService.Delete(message.Release.Id.ToString(), message.DataFileName);
                 }
                 
                 _batchService.UpdateBatchCount(
-                    message.Release.Id.ToString(), message.NumBatches, message.BatchNo, dataFileName).Wait();
+                    message.Release.Id.ToString(), dataFileName, message.BatchNo).Wait();
             }
             catch (Exception e)
             {
                 _batchService.LogErrors(
                     message.Release.Id.ToString(),
-                    new List<String>{e.Message},
-                    message.BatchNo,
-                    dataFileName).Wait();
+                    dataFileName,
+                    new List<String>{e.Message}
+                    ).Wait();
                 
                 _logger.LogError(
                     $"{GetType().Name} function FAILED: : Batch: " +

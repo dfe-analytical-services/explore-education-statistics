@@ -1,18 +1,23 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces
 {
     public interface IBatchService
     {
-        Task CreateBatch(string releaseId, string dataFileName, int numBatches);
-            
-        Task UpdateBatchCount(string releaseId, int numBatches, int batchNo, string dataFileName);
+        Task UpdateBatchCount(string releaseId, string dataFileName, int batchNo);
 
-        Task<bool> IsBatchComplete(string releaseId, int numBatches, string dataFileName);
-        
-        Task UpdateStatus(string releaseId, ImportStatus status, string dataFileName);
-        Task FailBatch(string releaseId, List<string> errors, string dataFileName);
-        Task LogErrors(string releaseId, List<string> errors, int batchNo, string dataFileName);
+        Task UpdateStatus(string releaseId, string dataFileName, ImportStatus status);
+
+        Task FailImport(string releaseId, string dataFileName, List<string> errors);
+
+        Task LogErrors(string releaseId, string dataFileName, List<string> errors);
+
+        Task CreateImport(string releaseId, string dataFileName, int numBatches);
+
+        Task<DatafileImport> GetImport(string releaseId, string dataFileName);
+
+        Task<bool> IsBatchProcessed(string releaseId, string dataFileName, int batchNo);
     }
 }
