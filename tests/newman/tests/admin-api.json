@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "0268a5a9-9355-4b15-b428-f2684cbe71d7",
+		"_postman_id": "428f6ddb-8045-4eb9-85ee-9174c0c3cf0a",
 		"name": "DfE Admin API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -16,6 +16,8 @@
 							"script": {
 								"id": "2db4ed0b-6eeb-40b6-914f-f1692eb248fb",
 								"exec": [
+									"var respJson = pm.response.json();",
+									"",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 									"",
 									"pm.test(\"Fields are present\", function () {",
@@ -26,8 +28,13 @@
 									"    pm.expect(pm.response.to.have.jsonBody(\"[0].contactTelNo\"));",
 									"});",
 									"",
-									"pm.test(\"Team name should be correct\", function () { ",
-									"    pm.expect(pm.response.json()[0].teamName).to.equal(\"Simon's Team\"); ",
+									"pm.test(\"School absence and exclusions team details should be correct\", function () { ",
+									"    var team = respJson.filter(function(team) { return team.teamName === \"School absence and exclusions team\"});",
+									"    pm.expect(team.length).to.equal(1);",
+									"    var team = team[0];",
+									"    pm.expect(team.teamEmail).to.equal(\"schools.statistics@education.gov.uk\");",
+									"    pm.expect(team.contactName).to.equal(\"Mark Pearson\");",
+									"    pm.expect(team.contactTelNo).to.equal(\"01142742585\");",
 									"});"
 								],
 								"type": "text/javascript"
@@ -39,7 +46,7 @@
 						"header": [
 							{
 								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}; Domain={{azure_ad_cookie_domain}}",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
 								"type": "text"
 							}
 						],
@@ -111,7 +118,13 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Cookie",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "{{admin_api_url}}/meta/timeidentifiers",
 							"host": [
@@ -137,17 +150,20 @@
 									"",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 									"",
-									"pm.test(\"Should return 2 results\", function () { pm.expect(respJson.length).to.equal(2); });",
+									"pm.test(\"Should correct number of results\", function () { pm.expect(respJson.length).to.equal(3); });",
 									"",
-									"pm.test(\"Results should be correct\", function () {",
+									"pm.test(\"Results titles should be correct\", function () {",
 									"    var foundAdHoc = false;",
+									"    var foundNationalStatistics = false;",
 									"    var foundOfficialStatistics = false;",
 									"    for(var i = 0; i < respJson.length; i++) {",
 									"        if(respJson[i].title === \"Ad Hoc\") { foundAdHoc = true; }",
+									"        if(respJson[i].title === \"National Statistics\") { foundNationalStatistics = true; }",
 									"        if(respJson[i].title === \"Official Statistics\") { foundOfficialStatistics = true; }",
 									"    }",
-									"    pm.expect(foundAdHoc).to.equal(true);",
-									"    pm.expect(foundOfficialStatistics).to.equal(true);",
+									"    pm.expect(foundAdHoc).to.equal(true, \"No Ad Hoc type found!\");",
+									"    pm.expect(foundNationalStatistics).to.equal(true, \"No National Statistics type found!\")",
+									"    pm.expect(foundOfficialStatistics).to.equal(true, \"No Official Statistics type found!\");",
 									"});"
 								],
 								"type": "text/javascript"
@@ -156,7 +172,13 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Cookie",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "{{admin_api_url}}/meta/releasetypes",
 							"host": [
@@ -207,7 +229,13 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Cookie",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "{{admin_api_url}}/methodologies",
 							"host": [
@@ -245,7 +273,13 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Cookie",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "{{admin_api_url}}/topic/77941B7D-BBD6-4069-9107-565AF89E2DEC/methodologies",
 							"host": [
@@ -285,9 +319,7 @@
 									"",
 									"pm.test(\"First result should have correct fields\", function () {",
 									"    pm.expect(pm.response.to.have.jsonBody(\"[0].id\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[0].slug\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"[0].title\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[0].summary\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"[0].topics\"));",
 									"});",
 									"",
@@ -299,12 +331,7 @@
 									"            pm.expect(respJson[i].topics.length).to.equal(9);",
 									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].id`));",
 									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].title`));",
-									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].slug`));",
-									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].description`));",
 									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].themeId`));",
-									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].theme`));",
-									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].summary`));",
-									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].publications`));",
 									"        }",
 									"    }",
 									"    pm.expect(foundPupilsAndSchools).to.equal(true);",
@@ -316,7 +343,13 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Cookie",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "{{admin_api_url}}/me/themes",
 							"host": [
@@ -363,12 +396,41 @@
 									"    pm.expect(respJson.title).to.equal(\"Pupil absence in schools in England\"); ",
 									"});",
 									"",
+									"",
+									"pm.test(\"Methodology title should be correct\", function () {",
+									"    pm.expect(respJson.methodology.title).to.equal(\"Pupil absence statistics: methodology\"); ",
+									"});",
+									"",
 									"pm.test(\"Should be two releases\", function () {",
 									"    pm.expect(respJson.releases.length).to.equal(2); ",
 									"});",
 									"",
-									"pm.test(\"Methodology title should be correct\", function () {",
-									"    pm.expect(respJson.methodology.title).to.equal(\"Pupil absence statistics: methodology\"); ",
+									"pm.test(\"First release should have correct fields\", function () {",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].id`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].title`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].publicationId`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].publicationTitle`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].releaseName`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].coverageTitle`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].yearTitle`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].typeId`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].published`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].timePeriodCoverage`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].timePeriodCoverage.value`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].timePeriodCoverage.label`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].latestRelease`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].type`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].type.id`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].type.title`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].contact`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].contact.id`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].contact.teamName`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].contact.teamEmail`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].contact.contactName`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].contact.contactTelNo`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].status`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].draftComments`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].higherReviewComments`));",
 									"});"
 								],
 								"type": "text/javascript"
@@ -387,7 +449,13 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Cookie",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "{{admin_api_url}}/publications/cbbd299f-8297-44bc-92ac-558bcf51f8ad",
 							"host": [
@@ -435,7 +503,7 @@
 									"",
 									"pm.test(\"Expect non-null methodology to have correct fields\", function () {",
 									"    for(var i = 0; i < respJson.length; i++) {",
-									"        if(respJson[i].methodology !== null) {",
+									"        if(respJson[i].methodology != null) {",
 									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].methodology.id`));",
 									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].methodology.title`));",
 									"        }",
@@ -444,7 +512,7 @@
 									"",
 									"pm.test(\"Expect non-null contacts to have correct fields\", function () {",
 									"    for(var i = 0; i < respJson.length; i++) {",
-									"        if(respJson[i].contact !== null) {",
+									"        if(respJson[i].contact != null) {",
 									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].contact.id`));",
 									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].contact.teamName`));",
 									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].contact.teamEmail`));",
@@ -470,7 +538,13 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Cookie",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "{{admin_api_url}}/me/publications?topicId=67C249DE-1CCA-446E-8CCB-DCDAC542F460",
 							"host": [
@@ -545,7 +619,13 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Cookie",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "{{admin_api_url}}/me/publications?topicId=1a9636e4-29d5-4c90-8c07-f41db8dd019c",
 							"host": [
@@ -559,11 +639,6 @@
 								{
 									"key": "topicId",
 									"value": "1a9636e4-29d5-4c90-8c07-f41db8dd019c"
-								},
-								{
-									"key": "",
-									"value": "",
-									"disabled": true
 								}
 							]
 						}
@@ -576,6 +651,72 @@
 			"name": "Release",
 			"item": [
 				{
+					"name": "Release - Get exclusion release datablocks",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
+								"exec": [
+									"var respJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Fields are present\", function () {",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]id\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]heading\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]dataBlockRequest\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]dataBlockRequest.subjectId\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]dataBlockRequest.timePeriod\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]dataBlockRequest.filters\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]dataBlockRequest.indicators\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]charts\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]tables\"));",
+									"});",
+									"",
+									"pm.test(\"Number of results should be correct\", function () { ",
+									"    pm.expect(respJson.length).to.above(0);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "dbde4b62-47dd-4c3d-93dc-5e01ec3f8231",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/datablocks/",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+								"datablocks",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Release summary - Exclusions 2016",
 					"event": [
 						{
@@ -583,6 +724,8 @@
 							"script": {
 								"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
 								"exec": [
+									"var respJson = pm.response.json();",
+									"",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 									"",
 									"pm.test(\"Fields are present\", function () {",
@@ -591,13 +734,17 @@
 									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.value\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.label\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"publishScheduled\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"nextReleaseDate\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"releaseName\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"slug\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"status\"));",
+									"});",
+									"",
+									"pm.test(\"id should match request id\", function () {",
+									"    pm.expect(respJson.id).to.equal(\"e7774a74-1f62-4b76-b9b5-84f14dac7278\");",
 									"});",
 									"",
 									"pm.test(\"typeId should should be correct\", function () { ",
-									"    pm.expect(pm.response.json().typeId).to.equal(\"9d333457-9132-4e55-ae78-c55cb3673d7c\"); ",
+									"    pm.expect(respJson.typeId).to.equal(\"9d333457-9132-4e55-ae78-c55cb3673d7c\"); ",
 									"});"
 								],
 								"type": "text/javascript"
@@ -616,7 +763,13 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Cookie",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "{{admin_api_url}}/releases/E7774A74-1F62-4B76-B9B5-84F14DAC7278/summary/",
 							"host": [
@@ -627,6 +780,164 @@
 								"E7774A74-1F62-4B76-B9B5-84F14DAC7278",
 								"summary",
 								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Release Status - Exclusions 2016",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
+								"exec": [
+									"var respJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Fields are present\", function () {",
+									"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"typeId\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.value\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.label\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"releaseName\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"slug\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"status\"));",
+									"});",
+									"",
+									"pm.test(\"id should match request id\", function () {",
+									"    pm.expect(respJson.id).to.equal(\"e7774a74-1f62-4b76-b9b5-84f14dac7278\");",
+									"});",
+									"",
+									"pm.test(\"typeId should should be correct\", function () { ",
+									"    pm.expect(respJson.typeId).to.equal(\"9d333457-9132-4e55-ae78-c55cb3673d7c\"); ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "dbde4b62-47dd-4c3d-93dc-5e01ec3f8231",
+								"exec": [
+									"postman.setNextRequest(null);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"releaseStatus\": \"Draft\",\n\t\"internalReleaseNote\": \"Test Note\"\n}"
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/releases/E7774A74-1F62-4B76-B9B5-84F14DAC7278/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"releases",
+								"E7774A74-1F62-4B76-B9B5-84F14DAC7278",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Draft Releases",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
+								"exec": [
+									"var respJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Fields are present\", function () {",
+									"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"typeId\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.value\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.label\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"releaseName\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"slug\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"status\"));",
+									"});",
+									"",
+									"pm.test(\"id should match request id\", function () {",
+									"    pm.expect(respJson.id).to.equal(\"e7774a74-1f62-4b76-b9b5-84f14dac7278\");",
+									"});",
+									"",
+									"pm.test(\"typeId should should be correct\", function () { ",
+									"    pm.expect(respJson.typeId).to.equal(\"9d333457-9132-4e55-ae78-c55cb3673d7c\"); ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "dbde4b62-47dd-4c3d-93dc-5e01ec3f8231",
+								"exec": [
+									"postman.setNextRequest(null);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"releaseStatus\": \"Draft\",\n\t\"internalReleaseNote\": \"Test Note\"\n}"
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/releases/draft",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"releases",
+								"draft"
 							]
 						}
 					},
@@ -684,6 +995,11 @@
 								"key": "Content-Type",
 								"name": "Content-Type",
 								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Cookie",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
 								"type": "text"
 							}
 						],
@@ -754,6 +1070,11 @@
 								"name": "Content-Type",
 								"value": "application/json",
 								"type": "text"
+							},
+							{
+								"key": "Cookie",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -809,6 +1130,11 @@
 								"key": "Content-Type",
 								"name": "Content-Type",
 								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Cookie",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
 								"type": "text"
 							}
 						],
@@ -877,7 +1203,13 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Cookie",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "{{admin_api_url}}/release/85d43d6f-ec91-452d-aba2-03303ab4363a/data",
 							"host": [
@@ -896,7 +1228,13 @@
 					"name": "Delete data file",
 					"request": {
 						"method": "DELETE",
-						"header": [],
+						"header": [
+							{
+								"key": "Cookie",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": ""
@@ -949,7 +1287,13 @@
 					],
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Cookie",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "formdata",
 							"formdata": [
@@ -1010,7 +1354,13 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Cookie",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "{{admin_api_url}}/release/85d43d6f-ec91-452d-aba2-03303ab4363a/ancillary?name=test",
 							"host": [
@@ -1035,7 +1385,13 @@
 					"name": "Delete ancillary file",
 					"request": {
 						"method": "DELETE",
-						"header": [],
+						"header": [
+							{
+								"key": "Cookie",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": ""
@@ -1085,7 +1441,13 @@
 					],
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Cookie",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "formdata",
 							"formdata": [
@@ -1146,7 +1508,13 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Cookie",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "{{admin_api_url}}/release/85d43d6f-ec91-452d-aba2-03303ab4363a/chart",
 							"host": [
@@ -1165,7 +1533,13 @@
 					"name": "Delete chart file",
 					"request": {
 						"method": "DELETE",
-						"header": [],
+						"header": [
+							{
+								"key": "Cookie",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": ""
@@ -1184,6 +1558,115 @@
 						}
 					},
 					"response": []
+				}
+			]
+		},
+		{
+			"name": "Data",
+			"item": [
+				{
+					"name": "Meta",
+					"item": [
+						{
+							"name": "Themes",
+							"item": [
+								{
+									"name": "Themes Meta",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "2db4ed0b-6eeb-40b6-914f-f1692eb248fb",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Expect correct number of themes\", function () {",
+													"    pm.expect(pm.response.json().length).to.be.above(1);",
+													"});",
+													"",
+													"pm.test(\"Pupils and school theme should contain more than 2 topics\", function () {",
+													"    for(var i = 0; i < pm.response.json().length; i++) {",
+													"        if(pm.response.json()[i].title === \"Pupils and schools\") {",
+													"            pm.expect(pm.response.json()[i].topics.length).to.be.above(2);",
+													"            pm.expect(pm.response.to.have.jsonBody(`[${i}].id`));",
+													"            pm.expect(pm.response.to.have.jsonBody(`[${i}].slug`));",
+													"        }",
+													"    }",
+													"});",
+													"        ",
+													"pm.test(\"Children, early years and social care should contain correct data\", function () {",
+													"    for(var i = 0; i < pm.response.json().length; i++) {",
+													"        if(pm.response.json()[i].title === \"Children, early years and social care\") {",
+													"            pm.expect(pm.response.json()[i].topics.length).to.equal(1);",
+													"            pm.expect(pm.response.json()[i].topics[0].title).to.equal(\"Early years foundation stage profile\");",
+													"            pm.expect(pm.response.to.have.jsonBody(`[${i}].id`));",
+													"            pm.expect(pm.response.to.have.jsonBody(`[${i}].slug`));",
+													"            ",
+													"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].id`));",
+													"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].slug`));",
+													"            pm.expect(pm.response.json()[i].topics[0].publications.length).to.equal(1);",
+													"            pm.expect(pm.response.json()[i].topics[0].publications[0].title).to.equal(\"Early years foundation stage profile results\");",
+													"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].publications[0].id`));",
+													"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].publications[0].slug`));",
+													"        }",
+													"    }",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cookie",
+												"type": "text",
+												"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+											}
+										],
+										"url": {
+											"raw": "{{admin_api_url}}/data/meta/themes",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"data",
+												"meta",
+												"themes"
+											]
+										},
+										"description": "Returns all contacts"
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						}
+					],
+					"_postman_isSubFolder": true
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "7f3d3acc-0493-419e-87a1-f9de87f052c0",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "ca57d5a3-d2ae-4438-8c91-32ab3e2f592d",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
 				}
 			]
 		}

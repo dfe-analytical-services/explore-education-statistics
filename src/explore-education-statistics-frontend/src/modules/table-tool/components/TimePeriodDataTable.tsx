@@ -1,34 +1,38 @@
-import React, { memo, forwardRef } from 'react';
 import last from 'lodash/last';
+import React, { memo, forwardRef } from 'react';
+import camelCase from 'lodash/camelCase';
 import cartesian from '@common/lib/utils/cartesian';
 import formatPretty from '@common/lib/utils/number/formatPretty';
-import { TableData } from '@common/services/tableBuilderService';
-import { Dictionary } from '@common/types/util';
+import WarningMessage from '@common/components/WarningMessage';
 import {
   CategoryFilter,
   Indicator,
   LocationFilter,
-} from '@frontend/modules/table-tool/components/types/filters';
-import TimePeriod from '@frontend/modules/table-tool/components/types/TimePeriod';
+  TimePeriodFilter,
+} from '@common/modules/full-table/types/filters';
+import { FullTable } from '@common/modules/full-table/types/fullTable';
 import DataTableCaption from './DataTableCaption';
 import FixedMultiHeaderDataTable from './FixedMultiHeaderDataTable';
 import { TableHeadersFormValues } from './TableHeadersForm';
 
 interface Props {
-  indicators: Indicator[];
-  filters: Dictionary<CategoryFilter[]>;
-  timePeriods: TimePeriod[];
-  publicationName: string;
-  subjectName: string;
-  locations: LocationFilter[];
-  results: TableData['result'];
-  footnotes?: TableData['footnotes'];
+  fullTable: FullTable;
   tableHeadersConfig: TableHeadersFormValues;
 }
 
 const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
   (props: Props, dataTableRef) => {
-    const { results, footnotes, tableHeadersConfig } = props;
+    const { fullTable, tableHeadersConfig } = props;
+    const { subjectMeta, results } = fullTable;
+
+    if (results.length === 0) {
+      return (
+        <WarningMessage>
+          A table could not be returned. There is no data for the options
+          selected.
+        </WarningMessage>
+      );
+    }
 
     const columnHeaders: string[][] = [
       ...tableHeadersConfig.columnGroups.map(colGroup =>
@@ -64,9 +68,10 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
         const indicator = (rowCol1 instanceof Indicator
           ? rowCol1
           : rowCol2) as Indicator;
-        const timePeriod = (rowCol2 instanceof TimePeriod
+
+        const timePeriod = (rowCol2 instanceof TimePeriodFilter
           ? rowCol2
-          : rowCol1) as TimePeriod;
+          : rowCol1) as TimePeriodFilter;
 
         const filterCombination = [
           ...rowFilterCombination,
@@ -87,11 +92,13 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
               result.filters.includes(filter.value),
             ) &&
             result.timePeriod === timePeriod.value &&
-            locationFilters.every(
-              filter =>
-                result.location[filter.level] &&
-                result.location[filter.level].code === filter.value,
-            )
+            locationFilters.every(filter => {
+              const geographicLevel = camelCase(result.geographicLevel);
+              return (
+                result.location[geographicLevel] &&
+                result.location[geographicLevel].code === filter.value
+              );
+            })
           );
         });
 
@@ -111,12 +118,12 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
 
     return (
       <FixedMultiHeaderDataTable
-        caption={<DataTableCaption {...props} id="dataTableCaption" />}
+        caption={<DataTableCaption {...subjectMeta} id="dataTableCaption" />}
         columnHeaders={columnHeaders}
         rowHeaders={rowHeaders}
         rows={rows}
         ref={dataTableRef}
-        footnotes={footnotes}
+        footnotes={subjectMeta.footnotes}
       />
     );
   },

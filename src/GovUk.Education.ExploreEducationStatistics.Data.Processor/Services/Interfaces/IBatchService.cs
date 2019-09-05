@@ -5,13 +5,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
 {
     public interface IBatchService
     {
-        Task UpdateBatchCount(string releaseId, string subjectId, int batchSize, int batchNo);
+        Task CreateBatch(string releaseId, string dataFileName, int numBatches);
+            
+        Task UpdateBatchCount(string releaseId, int numBatches, int batchNo, string dataFileName);
 
-        Task<bool> IsBatchComplete(string releaseId, string subjectId, int batchSize);
-
-        Task UpdateStatus(string releaseId, string subjectId, int batchSize, ImportStatus status);
-        Task UpdateStatus(string releaseId, string subjectId, ImportStatus status);
-        Task FailBatch(string releaseId, string subjectId, List<string> errors);
-        Task LogErrors(string releaseId, string subjectId, List<string> errors, int batchNo);
+        Task<bool> IsBatchComplete(string releaseId, int numBatches, string dataFileName);
+        
+        Task UpdateStatus(string releaseId, ImportStatus status, string dataFileName);
+        Task FailBatch(string releaseId, List<string> errors, string dataFileName);
+        Task LogErrors(string releaseId, List<string> errors, int batchNo, string dataFileName);
     }
 }

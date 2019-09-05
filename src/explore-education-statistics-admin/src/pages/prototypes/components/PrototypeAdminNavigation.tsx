@@ -1,4 +1,5 @@
 import React from 'react';
+import RelatedInformation from '@common/components/RelatedInformation';
 import Link from '@admin/components/Link';
 
 interface Props {
@@ -9,10 +10,28 @@ interface Props {
 const PrototypeAdminNavigation = ({ sectionId }: Props) => {
   return (
     <>
-      <h1 className="govuk-heading-xl">
-        <span className="govuk-caption-xl">Create new release</span>
-        Pupil absence statistics and data for schools in England{' '}
-      </h1>
+      <div className="govuk-grid-row">
+        <div className="govuk-grid-column-two-thirds">
+          <h1 className="govuk-heading-xl">
+            <span className="govuk-caption-l">Create new release</span> Pupil
+            absence statistics and data for schools in England{' '}
+          </h1>
+        </div>
+        <div className="govuk-grid-column-one-third">
+          <RelatedInformation heading="Help and guidance">
+            <ul className="govuk-list">
+              <li>
+                <Link
+                  to="/prototypes/documentation/create-new-release"
+                  target="blank"
+                >
+                  Creating a new release{' '}
+                </Link>
+              </li>
+            </ul>
+          </RelatedInformation>
+        </div>
+      </div>
 
       <nav className="app-navigation govuk-!-margin-bottom-9">
         <ul className="app-navigation__list govuk-!-margin-bottom-0">

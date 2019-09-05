@@ -40,6 +40,10 @@ class DownloadIndexPage extends Component<Props> {
               Find the latest data files behind our range of national and
               regional statistics for your own analysis.
             </p>
+            <p className="govuk-body">
+              Previous release data can be found on their respective release
+              pages.
+            </p>
             <PageSearchFormWithAnalytics />
           </div>
           <div className="govuk-grid-column-one-third">

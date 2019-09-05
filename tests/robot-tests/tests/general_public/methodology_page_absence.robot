@@ -15,6 +15,15 @@ Navigate to Pupil absence in schools in England methodology page
 
     user opens accordion section  Pupils and schools
     user opens details dropdown   Pupil absence
+
+Should only be one link to absence methodology page
+    [Documentation]  DFE-1359
+    [Tags]  HappyPath
+    ${count}=  get element count  xpath://a[text()="Pupil absence statistics: methodology"]
+    should be true   ${count} == 1
+
+User navigates to absence methodology page
+    [Tags]  HappyPath
     user clicks link    Pupil absence statistics: methodology
     user waits until page contains heading   Pupil absence statistics: methodology
 

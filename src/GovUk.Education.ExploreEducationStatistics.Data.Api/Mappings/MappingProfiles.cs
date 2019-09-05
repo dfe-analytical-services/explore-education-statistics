@@ -2,8 +2,10 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Mappings
 {
@@ -14,6 +16,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Mappings
     {
         public MappingProfiles()
         {
+            // Null collections will be mapped to null collections instead of empty collections.
+            AllowNullCollections = true;
+            
+            CreateMap<BoundaryLevel, IdLabel>();
+            
             CreateMap<FastTrack, FastTrackViewModel>();
 
             CreateMap<IObservationalUnit, LabelValue>()
@@ -26,15 +33,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Mappings
 
             CreateMap<Location, LocationViewModel>();
 
-            CreateMap<Permalink, PermalinkViewModel>()
-                .ForMember(dest => dest.Configuration,
-                    opts => opts.MapFrom(permalink => permalink.Query.Configuration));
+            CreateMap<Permalink, PermalinkViewModel>();
 
             CreateMap<Publication, PublicationMetaViewModel>();
 
-            CreateMap<Subject, IdLabelViewModel>()
+            CreateMap<Subject, IdLabel>()
                 .ForMember(dest => dest.Label, opts => opts.MapFrom(subject => subject.Name));
 
+            CreateMap<TableBuilderQueryContext, TableBuilderQueryViewModel>();
+            
             CreateMap<Theme, ThemeMetaViewModel>();
 
             CreateMap<Topic, TopicMetaViewModel>();

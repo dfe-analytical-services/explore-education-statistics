@@ -1,43 +1,36 @@
 import ButtonText from '@common/components/ButtonText';
 import cartesian from '@common/lib/utils/cartesian';
 import {
-  PublicationSubjectMeta,
-  TableData,
-} from '@common/services/tableBuilderService';
-import { Dictionary } from '@common/types';
-import {
   CategoryFilter,
-  Indicator,
   LocationFilter,
+  TimePeriodFilter,
   Filter,
-} from '@frontend/modules/table-tool/components/types/filters';
-import TimePeriod from '@frontend/modules/table-tool/components/types/TimePeriod';
+} from '@common/modules/full-table/types/filters';
 import { saveAs } from 'file-saver';
 import Papa from 'papaparse';
 import React from 'react';
+import { transformTableMetaFiltersToCategoryFilters } from '@common/modules/full-table/utils/tableHeaders';
+import { FullTable } from '@common/modules/full-table/types/fullTable';
 
 interface Props {
   publicationSlug: string;
-  meta: PublicationSubjectMeta;
-  indicators: Indicator[];
-  filters: Dictionary<CategoryFilter[]>;
-  timePeriods: TimePeriod[];
-  locations: LocationFilter[];
-  results: TableData['result'];
+  fullTable: FullTable;
 }
 
-const DownloadCsvButton = ({
-  publicationSlug,
-  meta,
-  indicators,
-  filters,
-  timePeriods,
-  locations,
-  results,
-}: Props) => {
+const DownloadCsvButton = ({ publicationSlug, fullTable }: Props) => {
+  const { subjectMeta, results } = fullTable;
+  const {
+    indicators,
+    filters: metaFilters,
+    timePeriodRange: timePeriods,
+    locations,
+  } = subjectMeta;
+
+  const filters = transformTableMetaFiltersToCategoryFilters(metaFilters);
+
   const getCsvData = (): string[][] => {
-    const filterColumns = Object.entries(filters).map(
-      ([key]) => meta.filters[key].legend,
+    const filterColumns = Object.entries(metaFilters).map(
+      ([key]) => metaFilters[key].legend,
     );
 
     const indicatorColumns = indicators.map(indicator => {
@@ -61,7 +54,7 @@ const DownloadCsvButton = ({
       // prettier-ignore
       const [location, timePeriod, ...filterOptions] = row as [
         LocationFilter,
-        TimePeriod,
+        TimePeriodFilter,
         ...CategoryFilter[]
       ];
 
@@ -76,11 +69,9 @@ const DownloadCsvButton = ({
               result.location[location.level].code === location.value,
           );
         });
-
         if (!matchingResult) {
           return 'n/a';
         }
-
         return matchingResult.measures[indicator.value];
       });
 

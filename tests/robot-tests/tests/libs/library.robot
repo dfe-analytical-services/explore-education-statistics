@@ -121,8 +121,8 @@ user checks element does not contain
   element should not contain    ${element}    ${text}
 
 user waits until element is visible
-  [Arguments]    ${pageText}
-  wait until element is visible  ${pageText}
+  [Arguments]    ${selector}
+  wait until element is visible  ${selector}
 
 user checks element is visible
   [Arguments]   ${element}
@@ -204,6 +204,11 @@ user selects from list by label
 user presses keys
   [Arguments]   ${keys}
   press keys  ${None}    ${keys}
+
+user enters text into element
+  [Arguments]   ${selector}   ${text}
+  user clicks element   ${selector}
+  user presses keys     ${text}
 
 user checks element count is x
   [Arguments]   ${locator}   ${amount}

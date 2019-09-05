@@ -10,12 +10,17 @@
 
 .spinner {
   animation: spin 2s linear infinite;
-  border: 12px solid govuk-colour('grey-4');
+  border-color: govuk-colour('grey-4');
   border-radius: 50%;
+  border-style: solid;
   border-top-color: govuk-colour('blue');
   display: block;
-  height: 80px;
-  width: 80px;
+}
+
+.inline {
+  display: inline-block;
+  margin-bottom: 0;
+  margin-left: govuk-spacing(2);
 }
 
 @keyframes spin {

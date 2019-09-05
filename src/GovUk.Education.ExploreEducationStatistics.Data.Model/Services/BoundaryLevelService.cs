@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
     public class BoundaryLevelService : AbstractRepository<BoundaryLevel, long>, IBoundaryLevelService
     {
-        public BoundaryLevelService(ApplicationDbContext context, ILogger<BoundaryLevelService> logger)
+        public BoundaryLevelService(StatisticsDbContext context, ILogger<BoundaryLevelService> logger)
             : base(context, logger)
         {
         }

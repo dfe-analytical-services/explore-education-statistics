@@ -40,6 +40,11 @@ const responseData: DataBlockResponse = {
         unit: '%',
         value: '28',
       },
+      '99': {
+        label: 'Fake data',
+        unit: '%',
+        value: '99',
+      },
     },
     locations: {
       E92000001: {
@@ -3474,6 +3479,7 @@ const responseData: DataBlockResponse = {
       measures: {
         '28': '3',
         '26': '3.9',
+        '99': '98',
         '23': '0.8',
       },
       timePeriod: '2013_HT6',
@@ -3564,6 +3570,7 @@ const responseData: DataBlockResponse = {
       measures: {
         '28': '3.9',
         '26': '4.7',
+        '99': '99',
         '23': '0.8',
       },
       timePeriod: '2012_HT6',
@@ -3579,6 +3586,7 @@ const responseData: DataBlockResponse = {
       measures: {
         '28': '3.1',
         '26': '4',
+        '99': '100',
         '23': '0.9',
       },
       timePeriod: '2015_HT6',
@@ -3609,6 +3617,7 @@ const responseData: DataBlockResponse = {
       measures: {
         '28': '3',
         '26': '4',
+        '99': '101',
         '23': '1.1',
       },
       timePeriod: '2016_HT6',
@@ -3639,6 +3648,7 @@ const responseData: DataBlockResponse = {
       measures: {
         '28': '3.1',
         '26': '4',
+        '99': '102',
         '23': '0.9',
       },
       timePeriod: '2014_HT6',
