@@ -23,7 +23,6 @@ export interface AccordionSectionProps {
   id?: string;
   open?: boolean;
   onToggle?: ToggleHandler;
-  publicationTitle?: string;
 }
 
 const classes = {
@@ -47,7 +46,6 @@ const AccordionSection = ({
   headingTag = 'h2',
   open = false,
   onToggle,
-  publicationTitle,
 }: AccordionSectionProps) => {
   const { isMounted } = useMounted();
 

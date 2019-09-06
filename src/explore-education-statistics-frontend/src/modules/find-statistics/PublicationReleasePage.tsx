@@ -301,12 +301,14 @@ class PublicationReleasePage extends Component<Props> {
         >
           Help and support
         </h2>
-        <AccordionWithAnalytics id="extra-information-sections">
+        <AccordionWithAnalytics
+          publicationTitle={data.publication.title}
+          id="extra-information-sections"
+        >
           <AccordionSection
             heading={`${data.publication.title}: methodology`}
             caption="Find out how and why we collect, process and publish these statistics"
             headingTag="h3"
-            publicationTitle={data.publication.title}
           >
             <p>
               Read our{' '}
@@ -316,11 +318,7 @@ class PublicationReleasePage extends Component<Props> {
               guidance.
             </p>
           </AccordionSection>
-          <AccordionSection
-            heading="National Statistics"
-            headingTag="h3"
-            publicationTitle={data.publication.title}
-          >
+          <AccordionSection heading="National Statistics" headingTag="h3">
             <p className="govuk-body">
               The{' '}
               <a href="https://www.statisticsauthority.gov.uk/">
@@ -363,11 +361,7 @@ class PublicationReleasePage extends Component<Props> {
               guidance.
             </p>
           </AccordionSection>
-          <AccordionSection
-            heading="Contact us"
-            headingTag="h3"
-            publicationTitle={data.publication.title}
-          >
+          <AccordionSection heading="Contact us" headingTag="h3">
             <p>
               If you have a specific enquiry about{' '}
               {data.publication.topic.theme.title} statistics and data:
