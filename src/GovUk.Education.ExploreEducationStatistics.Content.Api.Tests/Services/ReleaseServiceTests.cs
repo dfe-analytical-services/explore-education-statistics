@@ -84,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
             {
                 var service = new ReleaseService(context, fileStorageService.Object, mapper);
 
-                var result = service.GetLatestRelease("1003fa5c-b60a-4036-a178-e3a69a81b852");
+                var result = service.GetLatestRelease(Guid.Parse("1003fa5c-b60a-4036-a178-e3a69a81b852"));
 
                 Assert.IsType<ReleaseViewModel>(result);
             }
@@ -121,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
             {
                 var service = new ReleaseService(context, fileStorageService.Object, mapper);
 
-                var result = service.GetRelease("1003fa5c-b60a-4036-a178-e3a69a81b852");
+                var result = service.GetRelease(Guid.Parse("1003fa5c-b60a-4036-a178-e3a69a81b852"));
 
                 Assert.Equal("Academic Year Q1", result.Title);
             }

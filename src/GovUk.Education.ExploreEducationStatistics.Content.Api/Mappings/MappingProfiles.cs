@@ -11,8 +11,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Mappings
     {
         public MappingProfiles()
         {
-            CreateMap<Release, ReleaseViewModel>()
-                .ForMember(dest => dest.DataFiles, opts => opts.Ignore());
         }
     }
 }

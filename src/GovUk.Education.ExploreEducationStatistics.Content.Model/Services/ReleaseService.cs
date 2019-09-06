@@ -50,6 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services
 
             var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
             releaseViewModel.LatestRelease = IsLatestRelease(release.PublicationId, releaseViewModel.Id);
+            releaseViewModel.DownloadFiles = _fileStorageService.ListPublicFiles(release.Publication.Slug, release.Slug).ToList();
 
             return releaseViewModel;
         }
@@ -85,9 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services
                 }));
 
                 var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
-//                releaseViewModel.DataFiles = ListFiles(release, ReleaseFileTypes.Data);
-//                releaseViewModel.ChartFiles = ListFiles(release, ReleaseFileTypes.Chart);
-//                releaseViewModel.AncillaryFiles = ListFiles(release, ReleaseFileTypes.Ancillary);
+                releaseViewModel.DownloadFiles = _fileStorageService.ListPublicFiles(release.Publication.Slug, release.Slug).ToList();
                 releaseViewModel.LatestRelease = true;
 
                 return releaseViewModel;
@@ -103,11 +102,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services
                         .Where(x => x.PublicationId == publicationId)
                         .OrderBy(x => x.Published)
                         .Last().Id == releaseId);
-        }
-
-        private List<FileInfo> ListFiles(Release release, ReleaseFileTypes type)
-        {
-            return _fileStorageService.ListFiles(release.Publication.Slug, release.Slug, type).ToList();
         }
     }
 }

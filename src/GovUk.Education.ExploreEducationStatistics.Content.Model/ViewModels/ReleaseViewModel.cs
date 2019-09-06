@@ -36,22 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels
 
         public DataBlock KeyStatistics { get; set; }
         
-        public List<FileInfo> DataFiles { get; set; }
-        
-        public List<FileInfo> AncillaryFiles { get; set; }
-        
-        public List<FileInfo> ChartFiles { get; set; }
-        
-        
         // Files to download are the actual data files and ancillary files, but currently not the chart files.
-        public List<FileInfo> DownloadFiles
-        {
-            get
-            {
-                var data = DataFiles ?? new List<FileInfo>();
-                var ancillary = AncillaryFiles ?? new List<FileInfo>();
-                return data.Concat(ancillary).ToList();
-            }
-        }
+        public List<FileInfo> DownloadFiles { get; set; }
     }
 }
