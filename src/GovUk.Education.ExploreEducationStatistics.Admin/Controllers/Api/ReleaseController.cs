@@ -203,7 +203,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return Ok(await _releaseService.GetReleasesForReleaseStatusesAsync(ReleaseStatus.Approved));
         }
         
-        [AllowAnonymous]
         [HttpGet("release/{releaseId}/data/{fileName}/import/status")]
         public async Task<ActionResult<ImportStatus>> GetDataUploadStatus(string releaseId, string fileName)
         {
