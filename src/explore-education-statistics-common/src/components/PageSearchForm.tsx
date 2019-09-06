@@ -167,7 +167,11 @@ class PageSearchForm extends Component<PageSearchFormProps, State> {
 
     return (
       <form
-        className={classNames(styles.container, className)}
+        className={classNames(
+          styles.container,
+          className,
+          'govuk-!-margin-bottom-6',
+        )}
         onSubmit={e => e.preventDefault()}
         autoComplete="off"
         role="search"

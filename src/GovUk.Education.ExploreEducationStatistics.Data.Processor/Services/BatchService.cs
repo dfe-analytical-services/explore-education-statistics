@@ -32,68 +32,55 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _logger = logger;
         }
 
-        public async Task UpdateBatchCount(string releaseId, string subjectId, int batchSize, int batchNo)
+        public async Task UpdateBatchCount(string releaseId, int numBatches, int batchNo, string dataFileName)
         {
-            var batch = GetOrCreateBatch(releaseId, subjectId, batchSize).Result;
+            var batch = GetBatch(releaseId, dataFileName).Result;
             var bitArray = new BitArray(batch.BatchesProcessed);
             bitArray.Set(batchNo - 1, true);
             bitArray.CopyTo(batch.BatchesProcessed, 0);
             await _table.ExecuteAsync(TableOperation.InsertOrReplace(batch));
-            await IsBatchComplete(releaseId, subjectId, batchSize);
+            await IsBatchComplete(releaseId, numBatches, dataFileName);
         }
         
-        public async Task<bool> IsBatchComplete(string releaseId, string subjectId, int batchSize)
+        public async Task<bool> IsBatchComplete(string releaseId, int numBatches, string dataFileName)
         {
-            var batch = await GetOrCreateBatch(releaseId, subjectId, batchSize);
+            var batch = await GetBatch(releaseId, dataFileName);
             var count = (from bool b in new BitArray(batch.BatchesProcessed)
                 where b
                 select b).Count();
             
-            _logger.LogInformation($"batchSize={batch.BatchSize} count={count}");
+            var complete = count == batch.NumBatches;
 
-            var complete = count == batch.BatchSize;
+            if (!complete) return complete;
             
-            if (complete)
-            {
-                await UpdateStatus(releaseId, subjectId, 
-                    batch.Errors.Equals("") ? ImportStatus.COMPLETE : ImportStatus.FAILED);
+            await UpdateStatus(releaseId, 
+                batch.Errors.Equals("") ? ImportStatus.COMPLETE : ImportStatus.FAILED,
+                dataFileName);
 
-                if (batch.Errors.Equals(""))
-                {
-                    _logger.LogInformation($"All batches imported for {releaseId} : {subjectId} with no error");
-                }
-                else
-                {
-                    _logger.LogInformation(
-                        $"All batches imported for {releaseId} : {subjectId} but with errors - check storage log"
-                        );
-                }
-            }
+            _logger.LogInformation(batch.Errors.Equals("")
+                ? $"All batches imported for {releaseId} : {dataFileName} with no errors"
+                : $"All batches imported for {releaseId} : {dataFileName} but with errors - check storage log");
+            
             return complete;
         }
 
-        public async Task UpdateStatus(string releaseId, string subjectId, int batchSize, ImportStatus status)
+        public async Task UpdateStatus(string releaseId, ImportStatus status, string dataFileName)
         {
-            var batch = await GetOrCreateBatch(releaseId, subjectId, batchSize);
+            var batch = await GetBatch(releaseId, dataFileName);
             batch.Status = (int)status;
             await _table.ExecuteAsync(TableOperation.InsertOrReplace(batch));
         }
-        
-        public async Task UpdateStatus(string releaseId, string subjectId, ImportStatus status)
+
+        public async Task FailBatch(string releaseId, List<string> errors, string dataFileName)
         {
-            await UpdateStatus(releaseId, subjectId, -1, status);
-        }
-        
-        public async Task FailBatch(string releaseId, string subjectId, List<string> errors)
-        {
-            var batch = await GetOrCreateBatch(releaseId, subjectId, -1);
+            var batch = await GetBatch(releaseId, dataFileName);
             batch.Status = (int)ImportStatus.FAILED;
             batch.Errors = JsonConvert.SerializeObject(errors);
             await _table.ExecuteAsync(TableOperation.InsertOrReplace(batch));
         }
-        public async Task LogErrors(string releaseId, string subjectId, List<string> errors, int batchNo)
+        public async Task LogErrors(string releaseId, List<string> errors, int batchNo, string dataFileName)
         {
-            var batch = await GetOrCreateBatch(releaseId, subjectId, -1);
+            var batch = await GetBatch(releaseId, dataFileName);
             if (!batch.Errors.Equals(""))
             {
                 var currentErrors = JsonConvert.DeserializeObject<List<string>>(batch.Errors);
@@ -106,26 +93,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
             
             await _table.ExecuteAsync(TableOperation.InsertOrReplace(batch));
-            // Set this batch to processed
-            await UpdateBatchCount(releaseId, subjectId, -1, batchNo);
         }
 
-        private async Task<Batch> GetOrCreateBatch(string releaseId, string subjectId, int batchSize)
+        public async Task CreateBatch(string releaseId, string dataFileName, int numBatches)
+        {
+            var batch = new Batch(releaseId, dataFileName, numBatches)
+            {
+                Status = (int) ImportStatus.RUNNING_PHASE_1
+            };
+            await _table.ExecuteAsync(TableOperation.InsertOrReplace(batch));
+        }
+        
+        private async Task<Batch> GetBatch(string releaseId, string dataFileName)
         {
             // Need to define the extra columns to retrieve
-            var columns = new List<string>(){ "BatchSize", "BatchesProcessed", "Status", "Errors"};
-            Batch batch;
-
-            var result = await _table.ExecuteAsync(TableOperation.Retrieve<Batch>(releaseId, subjectId, columns));
-            if (result.Result == null)
-            {
-                batch = new Batch(releaseId, subjectId, batchSize);
-            }
-            else
-            {
-                batch = (Batch) result.Result;
-            }
-            return batch;
+            var result = await _table.ExecuteAsync(TableOperation.Retrieve<Batch>(
+                releaseId, 
+                dataFileName, 
+                        new List<string>(){ "NumBatches", "BatchesProcessed", "Status", "Errors"}));
+            
+            return (Batch) result.Result;
         }
     }
 }

@@ -1,8 +1,8 @@
 using System;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Azure.Storage;
@@ -56,11 +56,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var message = _context.Publications
                 .Where(p => p.Id.Equals(publicationId))
-                .Select(p => new NotifySubscribersMessage
+                .Select(p => new PublicationNotificationMessage
                 {
                     Name = p.Title,
                     Slug = p.Slug,
-                    PublicationId = p.Id.ToString()
+                    PublicationId = p.Id
                 }).FirstOrDefault();
 
             return new CloudQueueMessage(JsonConvert.SerializeObject(message));

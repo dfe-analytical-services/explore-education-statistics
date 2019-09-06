@@ -12,6 +12,7 @@ export interface FormFieldsetProps {
   legend: ReactNode | string;
   legendSize?: 'xl' | 'l' | 'm' | 's';
   legendHidden?: boolean;
+  className?: string;
 }
 
 const FormFieldset = ({
@@ -22,11 +23,14 @@ const FormFieldset = ({
   legend,
   legendSize = 'm',
   legendHidden = false,
+  className,
 }: FormFieldsetProps) => {
   return (
     <FormGroup hasError={!!error}>
       <fieldset
-        className="govuk-fieldset"
+        className={classNames('govuk-fieldset', {
+          [className || '']: className,
+        })}
         id={id}
         aria-describedby={createDescribedBy({
           id,

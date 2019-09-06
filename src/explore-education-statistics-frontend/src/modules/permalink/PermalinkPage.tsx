@@ -37,7 +37,8 @@ class PermalinkPage extends Component<Props> {
 
   public render() {
     const { data } = this.props;
-    const { fullTable, configuration } = mapPermalink(data);
+    const { fullTable, query } = mapPermalink(data);
+    const { configuration } = query;
 
     return (
       <Page

@@ -153,7 +153,10 @@ const Accordion = ({ children, id, onToggleAll, onToggle }: AccordionProps) => {
             });
 
             if (onToggle && isOpen) {
-              onToggle({ id: headingId, title: section.props.heading });
+              onToggle({
+                id: headingId,
+                title: section.props.heading,
+              });
             }
 
             if (section.props.onToggle) {

@@ -314,14 +314,12 @@
 									"});",
 									"",
 									"pm.test(\"Number of themes should be correct\", function () {",
-									"    pm.expect(respJson.length).to.equal(9);",
+									"    pm.expect(respJson.length).to.be.above(8);",
 									"});",
 									"",
 									"pm.test(\"First result should have correct fields\", function () {",
 									"    pm.expect(pm.response.to.have.jsonBody(\"[0].id\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[0].slug\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"[0].title\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[0].summary\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"[0].topics\"));",
 									"});",
 									"",
@@ -333,12 +331,7 @@
 									"            pm.expect(respJson[i].topics.length).to.equal(9);",
 									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].id`));",
 									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].title`));",
-									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].slug`));",
-									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].description`));",
 									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].themeId`));",
-									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].theme`));",
-									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].summary`));",
-									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].publications`));",
 									"        }",
 									"    }",
 									"    pm.expect(foundPupilsAndSchools).to.equal(true);",
@@ -403,12 +396,41 @@
 									"    pm.expect(respJson.title).to.equal(\"Pupil absence in schools in England\"); ",
 									"});",
 									"",
+									"",
+									"pm.test(\"Methodology title should be correct\", function () {",
+									"    pm.expect(respJson.methodology.title).to.equal(\"Pupil absence statistics: methodology\"); ",
+									"});",
+									"",
 									"pm.test(\"Should be two releases\", function () {",
 									"    pm.expect(respJson.releases.length).to.equal(2); ",
 									"});",
 									"",
-									"pm.test(\"Methodology title should be correct\", function () {",
-									"    pm.expect(respJson.methodology.title).to.equal(\"Pupil absence statistics: methodology\"); ",
+									"pm.test(\"First release should have correct fields\", function () {",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].id`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].title`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].publicationId`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].publicationTitle`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].releaseName`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].coverageTitle`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].yearTitle`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].typeId`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].published`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].timePeriodCoverage`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].timePeriodCoverage.value`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].timePeriodCoverage.label`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].latestRelease`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].type`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].type.id`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].type.title`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].contact`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].contact.id`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].contact.teamName`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].contact.teamEmail`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].contact.contactName`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].contact.contactTelNo`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].status`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].draftComments`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].higherReviewComments`));",
 									"});"
 								],
 								"type": "text/javascript"
@@ -481,7 +503,7 @@
 									"",
 									"pm.test(\"Expect non-null methodology to have correct fields\", function () {",
 									"    for(var i = 0; i < respJson.length; i++) {",
-									"        if(respJson[i].methodology !== null) {",
+									"        if(respJson[i].methodology != null) {",
 									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].methodology.id`));",
 									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].methodology.title`));",
 									"        }",
@@ -490,7 +512,7 @@
 									"",
 									"pm.test(\"Expect non-null contacts to have correct fields\", function () {",
 									"    for(var i = 0; i < respJson.length; i++) {",
-									"        if(respJson[i].contact !== null) {",
+									"        if(respJson[i].contact != null) {",
 									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].contact.id`));",
 									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].contact.teamName`));",
 									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].contact.teamEmail`));",
@@ -653,7 +675,7 @@
 									"});",
 									"",
 									"pm.test(\"Number of results should be correct\", function () { ",
-									"    pm.expect(respJson.length).to.above(0); ",
+									"    pm.expect(respJson.length).to.above(0);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -664,7 +686,7 @@
 							"script": {
 								"id": "dbde4b62-47dd-4c3d-93dc-5e01ec3f8231",
 								"exec": [
-									"postman.setNextRequest(null);"
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -702,6 +724,8 @@
 							"script": {
 								"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
 								"exec": [
+									"var respJson = pm.response.json();",
+									"",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 									"",
 									"pm.test(\"Fields are present\", function () {",
@@ -710,13 +734,17 @@
 									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.value\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.label\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"publishScheduled\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"nextReleaseDate\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"releaseName\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"slug\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"status\"));",
+									"});",
+									"",
+									"pm.test(\"id should match request id\", function () {",
+									"    pm.expect(respJson.id).to.equal(\"e7774a74-1f62-4b76-b9b5-84f14dac7278\");",
 									"});",
 									"",
 									"pm.test(\"typeId should should be correct\", function () { ",
-									"    pm.expect(pm.response.json().typeId).to.equal(\"9d333457-9132-4e55-ae78-c55cb3673d7c\"); ",
+									"    pm.expect(respJson.typeId).to.equal(\"9d333457-9132-4e55-ae78-c55cb3673d7c\"); ",
 									"});"
 								],
 								"type": "text/javascript"
@@ -752,6 +780,164 @@
 								"E7774A74-1F62-4B76-B9B5-84F14DAC7278",
 								"summary",
 								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Release Status - Exclusions 2016",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
+								"exec": [
+									"var respJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Fields are present\", function () {",
+									"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"typeId\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.value\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.label\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"releaseName\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"slug\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"status\"));",
+									"});",
+									"",
+									"pm.test(\"id should match request id\", function () {",
+									"    pm.expect(respJson.id).to.equal(\"e7774a74-1f62-4b76-b9b5-84f14dac7278\");",
+									"});",
+									"",
+									"pm.test(\"typeId should should be correct\", function () { ",
+									"    pm.expect(respJson.typeId).to.equal(\"9d333457-9132-4e55-ae78-c55cb3673d7c\"); ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "dbde4b62-47dd-4c3d-93dc-5e01ec3f8231",
+								"exec": [
+									"postman.setNextRequest(null);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"releaseStatus\": \"Draft\",\n\t\"internalReleaseNote\": \"Test Note\"\n}"
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/releases/E7774A74-1F62-4B76-B9B5-84F14DAC7278/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"releases",
+								"E7774A74-1F62-4B76-B9B5-84F14DAC7278",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Draft Releases",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
+								"exec": [
+									"var respJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Fields are present\", function () {",
+									"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"typeId\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.value\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.label\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"releaseName\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"slug\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"status\"));",
+									"});",
+									"",
+									"pm.test(\"id should match request id\", function () {",
+									"    pm.expect(respJson.id).to.equal(\"e7774a74-1f62-4b76-b9b5-84f14dac7278\");",
+									"});",
+									"",
+									"pm.test(\"typeId should should be correct\", function () { ",
+									"    pm.expect(respJson.typeId).to.equal(\"9d333457-9132-4e55-ae78-c55cb3673d7c\"); ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "dbde4b62-47dd-4c3d-93dc-5e01ec3f8231",
+								"exec": [
+									"postman.setNextRequest(null);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"releaseStatus\": \"Draft\",\n\t\"internalReleaseNote\": \"Test Note\"\n}"
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/releases/draft",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"releases",
+								"draft"
 							]
 						}
 					},

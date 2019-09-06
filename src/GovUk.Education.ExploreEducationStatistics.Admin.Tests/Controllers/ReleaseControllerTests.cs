@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
                 .Returns(Task.FromResult(new Release {Id = releaseId}));
             mocks.FileStorageService
                 .Setup(service =>
-                    service.UploadFilesAsync(releaseId, ancillaryFile, "File name", ReleaseFileTypes.Ancillary))
+                    service.UploadFilesAsync(releaseId, ancillaryFile, "File name", ReleaseFileTypes.Ancillary, false))
                 .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<FileInfo>>>(new List<FileInfo>()));
             var controller = ReleasesControllerWithMocks(mocks);
 
@@ -127,8 +127,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
             mocks.ReleaseService.Setup(s => s.GetAsync(It.IsAny<Guid>()))
                 .Returns(Task.FromResult(new Release {Id = releaseId}));
             mocks.FileStorageService
-                .Setup(service => service.UploadDataFilesAsync(releaseId, dataFile, metaFile, "Subject name"))
-                .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<Models.FileInfo>>>(new List<Models.FileInfo>()));
+                .Setup(service => service.UploadDataFilesAsync(releaseId, dataFile, metaFile, "Subject name", false))
+                .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<FileInfo>>>(new List<FileInfo>()));
             
             // Call the method under test
             var controller = ReleasesControllerWithMocks(mocks);
@@ -160,8 +160,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
             mocks.ReleaseService.Setup(s => s.GetAsync(It.IsAny<Guid>()))
                 .Returns(Task.FromResult(new Release {Id = releaseId}));
             mocks.FileStorageService
-                .Setup(service => service.UploadDataFilesAsync(releaseId, dataFile, metaFile, "Subject name"))
-                .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<Models.FileInfo>>>(
+                .Setup(service => service.UploadDataFilesAsync(releaseId, dataFile, metaFile, "Subject name", false))
+                .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<FileInfo>>>(
                     ValidationResult(CannotOverwriteFile)));
             var controller = ReleasesControllerWithMocks(mocks);
 
