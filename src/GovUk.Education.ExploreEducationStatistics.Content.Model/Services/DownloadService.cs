@@ -15,40 +15,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services
         private readonly ApplicationDbContext _context;
         private readonly IFileStorageService _fileStorageService;
         private readonly ILogger _logger;
-
+        private readonly IMapper _mapper;
 
         public DownloadService(ApplicationDbContext context,
             IFileStorageService fileStorageService,
-            ILogger<DownloadService> logger)
+            ILogger<DownloadService> logger, IMapper mapper)
         {
             _context = context;
             _fileStorageService = fileStorageService;
             _logger = logger;
+            _mapper = mapper;
         }
 
         public IEnumerable<ThemeTree> GetDownloadTree()
         {
-            var config = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateMap<Publication, PublicationTree>()
-                    .ForMember(
-                        dest => dest.DataFiles, m => m.MapFrom(publication =>
-                            ListFiles(publication.Slug, GetLatestRelease(publication).Slug, ReleaseFileTypes.Data)))
-                    .ForMember(
-                    dest => dest.AncillaryFiles, m => m.MapFrom(publication =>
-                        ListFiles(publication.Slug, GetLatestRelease(publication).Slug, ReleaseFileTypes.Ancillary)))
-                    .ForMember(
-                    dest => dest.ChartFiles, m => m.MapFrom(publication =>
-                        ListFiles(publication.Slug, GetLatestRelease(publication).Slug, ReleaseFileTypes.Chart)));
-            });
+//            var config = new MapperConfiguration(cfg =>
+//            {
+//                cfg.CreateMap<Publication, PublicationTree>()
+//                    .ForMember(
+//                        dest => dest.DataFiles, m => m.MapFrom(publication =>
+//                            ListFiles(publication.Slug, GetLatestRelease(publication).Slug, ReleaseFileTypes.Data)))
+//                    .ForMember(
+//                        dest => dest.AncillaryFiles, m => m.MapFrom(publication =>
+//                            ListFiles(publication.Slug, GetLatestRelease(publication).Slug,
+//                                ReleaseFileTypes.Ancillary)))
+//                    .ForMember(
+//                        dest => dest.ChartFiles, m => m.MapFrom(publication =>
+//                            ListFiles(publication.Slug, GetLatestRelease(publication).Slug, ReleaseFileTypes.Chart)));
+//            });
 
-            var mapper = config.CreateMapper();
+            // TODO: not including the topics
+            var themes = GetReleases();
 
-            var themes = GetReleases()
-                .GroupBy(release => release.Publication.Topic.Theme)
-                .Select(grouping => grouping.Key);
-
-            return mapper.Map<IEnumerable<ThemeTree>>(themes);
+            return _mapper.Map<IEnumerable<ThemeTree>>(themes);
         }
 
         private static Release GetLatestRelease(Publication publication)
@@ -58,9 +57,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services
                 .FirstOrDefault();
         }
 
-        private IEnumerable<Release> GetReleases()
+        private IEnumerable<Theme> GetReleases()
         {
-            return _context.Releases.Include(release => release.Publication.Topic.Theme).ToList();
+            return _context.Releases.Include(x => x.Publication.Topic).ThenInclude(x => x.Theme)
+                .GroupBy(release => release.Publication.Topic.Theme)
+                .Select(grouping => grouping.Key).ToList();
         }
 
         private IEnumerable<FileInfo> ListFiles(string publication, string release, ReleaseFileTypes type)

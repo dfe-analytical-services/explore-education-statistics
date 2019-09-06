@@ -55,11 +55,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private async Task<bool> UpdateTrees()
         {
-            //var downloadTree = await UpdateDownloadTree();
+            var downloadTree = await UpdateDownloadTree();
             var contentTree = await UpdateContentTree();
             var methodologyTree = await UpdateMethodologyTree();
 
-            return contentTree && methodologyTree;
+            return downloadTree && contentTree && methodologyTree;
         }
 
         private async Task<bool> UpdateContentTree()

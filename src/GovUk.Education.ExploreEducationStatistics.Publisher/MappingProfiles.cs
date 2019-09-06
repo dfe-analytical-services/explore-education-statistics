@@ -13,6 +13,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
         {
             CreateMap<Release, ReleaseViewModel>()
                 .ForMember(dest => dest.DataFiles, opts => opts.Ignore());
+
+            CreateMap<Theme, ThemeTree>()
+                .ForMember(dest => dest.Topics, m => m.MapFrom(theme => theme.Topics));
         }
     }
 }
