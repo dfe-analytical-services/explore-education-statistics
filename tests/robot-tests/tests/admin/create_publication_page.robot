@@ -1,7 +1,7 @@
 *** Settings ***
 Resource    ../libs/library.robot
 
-Force Tags  Admin
+Force Tags  Admin  NotAgainstProd
 
 Suite Setup       user signs in
 Suite Teardown    user closes the browser
@@ -28,7 +28,7 @@ Validate Pubulication and Release dropdown is dynamic and table is populated
 Error message appears when user clicks continue is title is empty
     [Tags]  HappyPath
     user checks element is not visible  css:#createPublicationForm-publicationTitle-error
-    user clicks button   Continue
+    user clicks button   Create publication
     user checks element is visible  css:#createPublicationForm-publicationTitle-error
     
 User redirects to the dashboard when clicking the cancel publication link

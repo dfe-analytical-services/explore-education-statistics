@@ -4,10 +4,10 @@ import {
   IdTitlePair,
   TimePeriodCoverageGroup,
 } from '@admin/services/common/types';
-import { ReleaseStatus } from '@admin/services/dashboard/types';
+import {AdminDashboardRelease, ReleaseStatus} from '@admin/services/dashboard/types';
 import { CreateReleaseRequest } from '@admin/services/release/create-release/types';
 import { UpdateReleaseSummaryDetailsRequest } from '@admin/services/release/edit-release/summary/types';
-import { BaseReleaseSummaryDetailsRequest } from '@admin/services/release/types';
+import {BaseReleaseSummaryDetailsRequest, ReleaseSummaryDetails} from '@admin/services/release/types';
 import { FormValues as CreateFormValues } from '../create-release/CreateReleasePage';
 import { EditFormValues } from '../summary/ReleaseSummaryForm';
 
@@ -117,5 +117,20 @@ export const getTimePeriodCoverageDateRangeStringShort = (
     ? `${releaseName}${separatorString}${parseInt(results[1], 10) + 1}`
     : releaseName;
 };
+
+const getLiveLatestLabel = (isLive: boolean, isLatest: boolean) => {
+  if (isLive && isLatest) {
+    return '(Live - Latest release)';
+  }
+  if (isLive) {
+    return '(Live)';
+  }
+  return '(not Live)';
+};
+
+export const getReleaseSummaryLabel = (release: AdminDashboardRelease) => `
+  ${release.timePeriodCoverage.label}, 
+  ${getTimePeriodCoverageDateRangeStringLong(release.releaseName)} 
+  ${getLiveLatestLabel(release.live, release.latestRelease)}`;
 
 export default {};

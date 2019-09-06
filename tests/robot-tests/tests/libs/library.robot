@@ -200,7 +200,7 @@ user clicks element
 
 user clicks link
   [Arguments]   ${text}
-  click element  xpath://a[text()="${text}"]
+  click link  ${text}
 
 user clicks button
   [Arguments]   ${text}
@@ -242,6 +242,14 @@ user checks url contains
 user checks page contains link with text and url
   [Arguments]  ${text}  ${href}
   user checks page contains element  xpath://a[@href="${href}" and text()="${text}"]
+
+user checks page contains details section
+  [Arguments]  ${text}
+  user checks page contains element  css:[data-testid="Expand Details Section ${text}"]
+
+user opens details section
+  [Arguments]  ${text}
+  user clicks element    css:[data-testid="Expand Details Section ${text}"]
 
 user waits until results table appears
   # NOTE(mark): Increasing timeout to stop known failure and created DFE-1158

@@ -1,8 +1,10 @@
 import ButtonLink from '@admin/components/ButtonLink';
 import Link from '@admin/components/Link';
 import ReleaseSummary from '@admin/pages/admin-dashboard/components/ReleaseSummary';
+import {getReleaseSummaryLabel} from "@admin/pages/release/util/releaseSummaryUtil";
 import releaseRoutes, { summaryRoute } from '@admin/routes/edit-release/routes';
 import { AdminDashboardPublication } from '@admin/services/dashboard/types';
+import {formatTestId} from "@admin/util/test-utils";
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import React from 'react';
@@ -34,6 +36,7 @@ const PublicationSummary = ({ publication }: Props) => {
                   actions={
                     <ButtonLink
                       to={summaryRoute.generateLink(publication.id, release.id)}
+                      testId={formatTestId(`Edit release link for ${publication.title}, ${getReleaseSummaryLabel(release)}`)}
                     >
                       Edit this release
                     </ButtonLink>

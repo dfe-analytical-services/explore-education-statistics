@@ -3,29 +3,10 @@ Resource    ../libs/library.robot
 
 Force Tags  Admin  NotAgainstProd
 
-Suite Setup       user opens the browser
+Suite Setup       user signs in
 Suite Teardown    user closes the browser
 
 *** Test Cases ***
-Verify admin index page loads
-    [Tags]  HappyPath
-    environment variable should be set   ADMIN_URL
-    user goes to url  %{ADMIN_URL}
-    user waits until page contains heading     Sign-in
-
-Verify user can sign in
-    [Tags]   HappyPath
-    user clicks link   Sign-in
-
-    environment variable should be set   ADMIN_EMAIL
-    environment variable should be set   ADMIN_PASSWORD
-    user logs into microsoft online  %{ADMIN_EMAIL}   %{ADMIN_PASSWORD}
-
-    user checks url contains  %{ADMIN_URL}
-    user waits until page contains heading   User1 EESADMIN
-    user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(1)     Home
-    user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(2)     Administrator dashboard
-
 Heading is present on tab
     [Tags]  HappyPath
     user checks element contains  css:#my-publications-tab  Manage publications and releases
@@ -42,8 +23,8 @@ Verify correct data is shown when theme and topic is shown
 
 User clicks create new release
     [Tags]  HappyPath
-    user waits until page contains element  xpath://a[text()="Create new release"]
-    user clicks element   xpath://a[text()="Create new release"]
+    user waits until page contains link  Create new release
+    user clicks link  Create new release
    
 Check page has correct fields
     [Tags]  HappyPath
