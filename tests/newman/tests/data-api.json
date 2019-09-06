@@ -6771,6 +6771,30 @@
 					},
 					"response": []
 				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "ed583c2e-33b1-4e58-b324-6c75f5dd0180",
+						"type": "text/javascript",
+						"exec": [
+							"pm.globals.set(\"FILT_AbsenceForFourYearOlds__SchoolType__StateFundedPrimary\", \"97\");",
+							"",
+							"pm.globals.set(\"IND_AbsenceForFourYearOlds__AbsenceFields__NumberOfOverallAbsenceSessions\", \"94\");"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "a2fe84e3-f593-456d-be3e-e73aa891f1a8",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
 			]
 		},
 		{
