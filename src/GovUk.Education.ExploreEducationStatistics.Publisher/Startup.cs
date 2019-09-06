@@ -11,6 +11,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using FileStorageService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.FileStorageService;
 using IFileStorageService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IFileStorageService;
+using FileStorageServiceContentModel = GovUk.Education.ExploreEducationStatistics.Content.Model.Services.FileStorageService;
+using IFileStorageServiceContentModel = GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces.IFileStorageService;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 
@@ -28,6 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddDbContext<ApplicationDbContext>(options =>
                     options.UseSqlServer(contentDatabaseConnection))
                 .AddScoped<IFileStorageService, FileStorageService>()
+                .AddScoped<IFileStorageServiceContentModel, FileStorageServiceContentModel>()
                 .AddScoped<IPublishingService, PublishingService>()
                 .AddScoped<IContentCacheGenerationService, ContentCacheGenerationService>()
                 .AddScoped<IContentService, ContentService>()

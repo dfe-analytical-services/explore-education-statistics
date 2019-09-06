@@ -29,44 +29,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services
 
         public IEnumerable<ThemeTree> GetDownloadTree()
         {
-//            var config = new MapperConfiguration(cfg =>
-//            {
-//                cfg.CreateMap<Publication, PublicationTree>()
-//                    .ForMember(
-//                        dest => dest.DataFiles, m => m.MapFrom(publication =>
-//                            ListFiles(publication.Slug, GetLatestRelease(publication).Slug, ReleaseFileTypes.Data)))
-//                    .ForMember(
-//                        dest => dest.AncillaryFiles, m => m.MapFrom(publication =>
-//                            ListFiles(publication.Slug, GetLatestRelease(publication).Slug,
-//                                ReleaseFileTypes.Ancillary)))
-//                    .ForMember(
-//                        dest => dest.ChartFiles, m => m.MapFrom(publication =>
-//                            ListFiles(publication.Slug, GetLatestRelease(publication).Slug, ReleaseFileTypes.Chart)));
-//            });
+            var tree = _context.Themes.Select(t => new ThemeTree
+            {
+                Id = t.Id, Title = t.Title, Summary = t.Summary,
+                Topics = t.Topics.Select(x => new TopicTree
+                {
+                    Id = x.Id, Title = x.Title, Summary = x.Summary,
+                    Publications = x.Publications.Where(pub => pub.Releases.Any())
+                        .Select(p => new PublicationTree
+                        {
+                            Id = p.Id,
+                            Title = p.Title,
+                            Summary = p.Summary,
+                            Slug = p.Slug,
+                            DownloadFiles = _fileStorageService.ListPublicFiles(p.Slug, p.Releases.OrderByDescending(r => r.Published).FirstOrDefault().Slug).ToList()
+                        }).Where(publication => publication.DownloadFiles.Any()).OrderBy(publication => publication.Title).ToList()
+                }).Where(topic => topic.Publications.Any()).OrderBy(topic => topic.Title).ToList()
+            }).Where(theme=> theme.Topics.Any()).OrderBy(theme => theme.Title).ToList();
 
-            // TODO: not including the topics
-            var themes = GetReleases();
-
-            return _mapper.Map<IEnumerable<ThemeTree>>(themes);
-        }
-
-        private static Release GetLatestRelease(Publication publication)
-        {
-            return publication.Releases.ToList()
-                .OrderByDescending(release => release.Published)
-                .FirstOrDefault();
-        }
-
-        private IEnumerable<Theme> GetReleases()
-        {
-            return _context.Releases.Include(x => x.Publication.Topic).ThenInclude(x => x.Theme)
-                .GroupBy(release => release.Publication.Topic.Theme)
-                .Select(grouping => grouping.Key).ToList();
-        }
-
-        private IEnumerable<FileInfo> ListFiles(string publication, string release, ReleaseFileTypes type)
-        {
-            return _fileStorageService.ListFiles(publication, release, type);
+            return tree;
         }
     }
 }

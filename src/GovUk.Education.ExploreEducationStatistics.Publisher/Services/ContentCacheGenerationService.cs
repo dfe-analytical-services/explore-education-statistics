@@ -89,7 +89,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             {
                 var downloadTreeBlob = _cloudBlobContainer.GetBlockBlobReference($"download/tree.json");
                 await downloadTreeBlob.UploadTextAsync(JsonConvert.SerializeObject(downloadTree, null,
-                    new JsonSerializerSettings() {ReferenceLoopHandling = ReferenceLoopHandling.Ignore}));
+                    new JsonSerializerSettings()
+                    {
+                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                        NullValueHandling = NullValueHandling.Ignore
+                    }));
                 return true;
             }
             else
@@ -106,7 +110,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             {
                 var methodologyTreeBlob = _cloudBlobContainer.GetBlockBlobReference($"methodology/tree.json");
                 await methodologyTreeBlob.UploadTextAsync(JsonConvert.SerializeObject(methodologyTree, null,
-                    new JsonSerializerSettings() {ReferenceLoopHandling = ReferenceLoopHandling.Ignore}));
+                    new JsonSerializerSettings()
+                    {
+                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                        NullValueHandling = NullValueHandling.Ignore
+                    }));
                 return true;
             }
             else
@@ -124,7 +132,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             {
                 // TODO: model might be incorrect so will need to validate this
                 // TODO: Save the filename as slug rather than ID
-                var blob = _cloudBlobContainer.GetBlockBlobReference($"methodology/methodologies/{methodology.Id}.json");
+                var blob = _cloudBlobContainer.GetBlockBlobReference(
+                    $"methodology/methodologies/{methodology.Id}.json");
                 await blob.UploadTextAsync(JsonConvert.SerializeObject(methodology, null,
                     new JsonSerializerSettings() {ReferenceLoopHandling = ReferenceLoopHandling.Ignore}));
             }
@@ -140,15 +149,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             {
                 var publicationBlob =
                     _cloudBlobContainer.GetBlockBlobReference($"publications/{publication.Slug}/publication.json");
-                await publicationBlob.UploadTextAsync(JsonConvert.SerializeObject( new PublicationViewModel() {Id = publication.Id, Title = publication.Title}, null,
+                await publicationBlob.UploadTextAsync(JsonConvert.SerializeObject(
+                    new PublicationViewModel() {Id = publication.Id, Title = publication.Title}, null,
                     new JsonSerializerSettings() {ReferenceLoopHandling = ReferenceLoopHandling.Ignore}));
 
                 var latestRelease = _releaseService.GetLatestRelease(publication.Id);
                 var latestReleaseJson = JsonConvert.SerializeObject(latestRelease, null,
                     new JsonSerializerSettings() {ReferenceLoopHandling = ReferenceLoopHandling.Ignore});
-                
-                var latestReleaseBlob = _cloudBlobContainer.GetBlockBlobReference($"publications/{latestRelease.Publication.Slug}/latest-release.json");
-                var latestReleaseYearBlob = _cloudBlobContainer.GetBlockBlobReference($"publications/{latestRelease.Publication.Slug}/releases/{latestRelease.Slug}.json");
+
+                var latestReleaseBlob =
+                    _cloudBlobContainer.GetBlockBlobReference(
+                        $"publications/{latestRelease.Publication.Slug}/latest-release.json");
+                var latestReleaseYearBlob = _cloudBlobContainer.GetBlockBlobReference(
+                    $"publications/{latestRelease.Publication.Slug}/releases/{latestRelease.Slug}.json");
 
                 await latestReleaseBlob.UploadTextAsync(latestReleaseJson);
                 await latestReleaseYearBlob.UploadTextAsync(latestReleaseJson);

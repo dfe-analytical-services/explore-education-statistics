@@ -5,6 +5,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Inte
 {
     public interface IFileStorageService
     {
+        IEnumerable<FileInfo> ListPublicFiles(string publication, string release);
         IEnumerable<FileInfo> ListFiles(string publication, string release, ReleaseFileTypes type);
     }
 }

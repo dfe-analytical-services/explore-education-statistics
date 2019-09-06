@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -10,6 +11,7 @@ using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.Extensions.Configuration;
 using MimeTypes;
+using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services
 {
@@ -34,6 +36,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services
             _storageConnectionString = config.GetConnectionString("PublicStorage");
         }
 
+        public IEnumerable<FileInfo> ListPublicFiles(string publication, string release)
+        {
+            var files = new List<FileInfo>();
+            
+            files.AddRange(ListFiles(publication, release, ReleaseFileTypes.Data));
+            files.AddRange(ListFiles(publication, release, ReleaseFileTypes.Ancillary));
+
+            return files.OrderBy(f => f.Name);
+
+        }
+
         public IEnumerable<FileInfo> ListFiles(string publication, string release, ReleaseFileTypes type)
         {
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
@@ -52,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services
                     Path = file.Name,
                     Size = GetSize(file)
                 })
-                .OrderBy(info => info.Name);
+                .OrderBy(info => info.Name).ToList();
             return result;
         }
 
