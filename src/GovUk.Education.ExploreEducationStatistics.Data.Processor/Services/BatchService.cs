@@ -1,6 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -9,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfa
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
@@ -19,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private readonly CloudTable _table;
         private readonly IFileStorageService _fileStorageService;
         private readonly IImportStatusService _importStatusService;
-        
+
         public BatchService(
             ITableStorageService tblStorageService,
             IFileStorageService fileStorageService,
@@ -36,9 +40,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             // Note that optimistic locking applies to azure table so to avoid concurrency issue acquire a lease on the block blob 
             var cloudBlockBlob = _fileStorageService.GetCloudBlockBlob(releaseId, dataFileName);
-            var leaseId = await _fileStorageService.GetLeaseId(cloudBlockBlob);
+            var leaseId = await GetLease(cloudBlockBlob);
             DatafileImport import;
-            
+
             try
             {
                 import = GetImport(releaseId, dataFileName).Result;
@@ -51,13 +55,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             {
                 await cloudBlockBlob.ReleaseLeaseAsync(AccessCondition.GenerateLeaseCondition(leaseId));
             }
-            
+
             if (_importStatusService.GetImportStatus(releaseId, dataFileName).Result.PercentageComplete == 100)
             {
                 await UpdateStatus(releaseId, dataFileName,
                     import.Errors.Equals("") ? IStatus.COMPLETE : IStatus.FAILED
                 );
-        
+
                 _logger.LogInformation(import.Errors.Equals("")
                     ? $"All batches imported for {releaseId} : {dataFileName} with no errors"
                     : $"All batches imported for {releaseId} : {dataFileName} but with errors - check storage log");
@@ -68,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             // Note that optimistic locking applies to azure table so to avoid concurrency issue acquire a lease on the block blob 
             var cloudBlockBlob = _fileStorageService.GetCloudBlockBlob(releaseId, dataFileName);
-            var leaseId = await _fileStorageService.GetLeaseId(cloudBlockBlob);
+            var leaseId = await GetLease(cloudBlockBlob);
 
             try
             {
@@ -89,6 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             import.Errors = JsonConvert.SerializeObject(errors);
             await _table.ExecuteAsync(TableOperation.InsertOrReplace(import));
         }
+
         public async Task LogErrors(string releaseId, string dataFileName, List<string> errors)
         {
             var import = await GetImport(releaseId, dataFileName);
@@ -102,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             {
                 import.Errors = JsonConvert.SerializeObject(errors);
             }
-            
+
             await _table.ExecuteAsync(TableOperation.InsertOrReplace(import));
         }
 
@@ -119,16 +124,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 new DatafileImport(releaseId, dataFileName, numBatches))
             );
         }
-        
+
         private async Task<DatafileImport> GetImport(string releaseId, string dataFileName)
         {
             // Need to define the extra columns to retrieve
             var result = await _table.ExecuteAsync(TableOperation.Retrieve<DatafileImport>(
-                releaseId, 
-                dataFileName, 
-                new List<string>(){ "NumBatches", "BatchesProcessed", "Status", "Errors"}));
-            
+                releaseId,
+                dataFileName,
+                new List<string>() {"NumBatches", "BatchesProcessed", "Status", "Errors"}));
+
             return (DatafileImport) result.Result;
+        }
+
+        private async Task<string> GetLease(CloudBlockBlob cloudBlockBlob)
+        {
+            string leaseId = null;
+
+            // TODO Improve error handling & max retries 
+            while (leaseId == null)
+            {
+                try
+                {
+                    //Acquire the lease for 60 seconds.
+                    leaseId = await _fileStorageService.GetLeaseId(cloudBlockBlob);
+                }
+                catch (Microsoft.WindowsAzure.Storage.StorageException se)
+                {
+                    var response = se.RequestInformation.HttpStatusCode;
+                    if (response != null && (response == (int) HttpStatusCode.Conflict))
+                    {
+                        // A Conflict has been found, lease is being used by another process
+                        // wait and try again.
+                        Thread.Sleep(TimeSpan.FromSeconds(2));
+                    }
+                    else
+                    {
+                        throw se;
+                    }
+                }
+            }
+
+            return leaseId;
         }
     }
 }

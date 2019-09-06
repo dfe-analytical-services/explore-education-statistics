@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -49,13 +48,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
             var subjects = SamplePublications.GetSubjects();
             foreach (var subject in subjects)
             {
-                if (subject.Id == 1)
-                {
-                    _logger.LogInformation($"Processing subject {subject.Id}");
-                    var file = SamplePublications.SubjectFiles[subject.Id];
-                    StoreFiles(subject.Release, file, subject.Name);
-                    Seed(file + ".csv", subject.Release, 1);
-                }
+                _logger.LogInformation($"Processing subject {subject.Id}");
+                var file = SamplePublications.SubjectFiles[subject.Id];
+                StoreFiles(subject.Release, file, subject.Name);
+                Seed(file + ".csv", subject.Release, subjects.Count);
             }
 
             stopWatch.Stop();
