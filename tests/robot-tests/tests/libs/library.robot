@@ -233,7 +233,7 @@ user checks radio option for "${radiogroupId}" should be "${expectedLabelText}"
   user checks page contains element  css:#${radiogroupId} [data-testid="${expectedLabelText}"]:checked
 
 user checks summary list item "${dtText}" should be "${ddText}"
-  user checks page contains element  xpath://dl[//dt[contains(text(),"${dtText}")] and //dd//*[contains(text(), "${ddText}")]]
+  user checks page contains element  xpath://dl[//dt[contains(text(),"${dtText}")] and (//dd[contains(text(), "${ddText}")] or //dd//*[contains(text(), "${ddText}")])]
 
 user selects from list by label
   [Arguments]   ${locator}   ${label}

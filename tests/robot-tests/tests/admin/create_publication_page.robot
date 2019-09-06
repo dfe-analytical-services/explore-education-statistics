@@ -21,11 +21,11 @@ Page shows dropdown of methodologies when radio button clicked
     user clicks element          xpath://label[text()="Add existing methodology"]
     user checks element is visible    xpath://label[text()="Select methodology"]
     
-Validate Pubulication and Release dropdown is dynamic and table is populated
+Validate Publication and Release dropdown is dynamic and table is populated
     [Tags]  HappyPath
     user selects from list by label  css:#createPublicationForm-selectedContactId  Sean Gibson
-    user waits until page contains element   xpath://dd[text()="sen.statistics@education.gov.uk"]
-    user waits until page contains element   xpath://dd[text()="01325340987"]
+    user checks summary list item "Email" should be "sen.statistics@education.gov.uk"
+    user checks summary list item "Telephone" should be "01325340987"
 
 Error message appears when user clicks continue is title is empty
     [Tags]  HappyPath
