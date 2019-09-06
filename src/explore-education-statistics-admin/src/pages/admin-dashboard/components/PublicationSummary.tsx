@@ -4,7 +4,7 @@ import ReleaseSummary from '@admin/pages/admin-dashboard/components/ReleaseSumma
 import {getReleaseSummaryLabel} from "@admin/pages/release/util/releaseSummaryUtil";
 import releaseRoutes, { summaryRoute } from '@admin/routes/edit-release/routes';
 import { AdminDashboardPublication } from '@admin/services/dashboard/types';
-import {formatTestId} from "@admin/util/test-utils";
+import {formatTestId} from "@common/util/test-utils";
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import React from 'react';
