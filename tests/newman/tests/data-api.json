@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "96b52e07-693c-4618-8081-cefc109859e6",
+		"_postman_id": "38c57900-cab3-4e6f-ac40-ff081fb40f2b",
 		"name": "DfE Data API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -6545,7 +6545,7 @@
 					"response": []
 				},
 				{
-					"name": "Permalink - Absence by characteristic - invalid permalinkId",
+					"name": "Permalink - invalid permalinkId",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -6562,12 +6562,9 @@
 							"script": {
 								"id": "c80a67f6-be1b-4a79-89b6-f21275308965",
 								"exec": [
-									"// DFE-1330",
-									"/*",
 									"pm.test(\"Status code is 404\", function () {",
 									"    pm.response.to.have.status(404);",
-									"});",
-									"*/"
+									"});"
 								],
 								"type": "text/javascript"
 							}
@@ -6621,6 +6618,62 @@
 							"path": [
 								"fasttrack",
 								"a8f78ed9-3ec4-4816-ba1a-fd4d9167a82f"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fasttrack - invalid fasttrackId",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "022c9044-3a78-41f6-9476-916e5c92e4b6",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "c80a67f6-be1b-4a79-89b6-f21275308965",
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{data_api_url}}/fasttrack/1ac50422-3e16-407a-b6c7-63af2d1ed1c1",
+							"host": [
+								"{{data_api_url}}"
+							],
+							"path": [
+								"fasttrack",
+								"1ac50422-3e16-407a-b6c7-63af2d1ed1c1"
 							]
 						}
 					},
