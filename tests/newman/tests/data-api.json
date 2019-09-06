@@ -6365,6 +6365,7 @@
 									"    pm.expect(pm.response.to.have.jsonBody(\"fullTable\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"fullTable.subjectMeta\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"fullTable.results\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"query\"));",
 									"});",
 									"",
 									"pm.test(\"Number of subjectMeta filters should be correct\", function () {",
@@ -6392,8 +6393,11 @@
 									"        pm.expect(pm.response.to.not.have.jsonBody(`fullTable.results[${i}].location.localAuthority`));",
 									"        pm.expect(pm.response.to.not.have.jsonBody(`fullTable.results[${i}].location.localAuthorityDistrict`));",
 									"        pm.expect(pm.response.to.not.have.jsonBody(`fullTable.results[${i}].location.region`));",
-									"pm.environment.unset(\"variable_key\");",
 									"    }",
+									"});",
+									"",
+									"pm.test(\"Query contains publication id\", function () {",
+									"   pm.expect(respJson.query.publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\");",
 									"});"
 								],
 								"type": "text/javascript"
@@ -6475,6 +6479,7 @@
 									"    pm.expect(pm.response.to.have.jsonBody(\"fullTable\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"fullTable.subjectMeta\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"fullTable.results\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"query\"));",
 									"});",
 									"",
 									"pm.test(\"Response id should match request permalink id\", function () {",
@@ -6506,8 +6511,11 @@
 									"        pm.expect(pm.response.to.not.have.jsonBody(`fullTable.results[${i}].location.localAuthority`));",
 									"        pm.expect(pm.response.to.not.have.jsonBody(`fullTable.results[${i}].location.localAuthorityDistrict`));",
 									"        pm.expect(pm.response.to.not.have.jsonBody(`fullTable.results[${i}].location.region`));",
-									"pm.environment.unset(\"variable_key\");",
 									"    }",
+									"});",
+									"",
+									"pm.test(\"Query contains publication id\", function () {",
+									"   pm.expect(respJson.query.publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\");",
 									"});"
 								],
 								"type": "text/javascript"
@@ -6552,7 +6560,7 @@
 							"script": {
 								"id": "022c9044-3a78-41f6-9476-916e5c92e4b6",
 								"exec": [
-									"postman.setNextRequest('Download - Absence by term');"
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -6606,18 +6614,102 @@
 			"name": "Fasttrack",
 			"item": [
 				{
-					"name": "Fasttrack - Absence by characteristic - get fasttrack",
+					"name": "Fasttrack - Absence for four year olds - get fasttrack",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "0eff5d76-4361-43c8-92b1-fcd6f6238f37",
+								"exec": [
+									"var respJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Should have correct fields\", function () {",
+									"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"created\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"fullTable\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"fullTable.subjectMeta\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"fullTable.results\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"query\"));",
+									"});",
+									"",
+									"pm.test(\"Response id should match request fasttrack id\", function () {",
+									"    pm.expect(respJson.id).to.equal(\"f8911c5f-7d42-4051-a85c-34d2f4568c6d\");",
+									"});",
+									"",
+									"pm.test(\"Created date should be correct\", function () {",
+									"    pm.expect(respJson.created).to.equal(\"2019-09-06T14:42:05.5042107Z\");",
+									"});",
+									"",
+									"pm.test(\"Number of subjectMeta filters should be correct\", function () {",
+									"   pm.expect(Object.keys(respJson.fullTable.subjectMeta.filters).length).to.equal(1);",
+									"});",
+									"",
+									"pm.test(\"Number of subjectMeta locations should be correct\", function () {",
+									"   pm.expect(respJson.fullTable.subjectMeta.locations.length).to.equal(1); ",
+									"   pm.expect(respJson.fullTable.subjectMeta.locations[0].label).to.equal(\"Derbyshire\");",
+									"});",
+									"",
+									"pm.test(\"geographicLevel should be same as request\", function () {",
+									"    for(var i = 0; i < respJson.fullTable.results.length; i++) {",
+									"        pm.expect(respJson.fullTable.results[i].geographicLevel).to.equal(\"Local_Authority\");",
+									"    }",
+									"});",
+									"",
+									"pm.test(\"Number of results should be correct\", function () { ",
+									"    pm.expect(respJson.fullTable.results.length).to.equal(3); ",
+									"});",
+									"",
+									"pm.test(\"Query contains publication id\", function () {",
+									"   pm.expect(respJson.query.publicationId).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\");",
+									"});",
+									"",
+									"pm.test(\"Query contains table configuration\", function () {",
+									"    var tableHeadersConfig = respJson.query.configuration.tableHeadersConfig;",
+									"    pm.expect(tableHeadersConfig.columnGroups.length).to.equal(1);",
+									"    pm.expect(tableHeadersConfig.columnGroups[0].length).to.equal(1);",
+									"    pm.expect(tableHeadersConfig.columnGroups[0][0].label).to.equal(\"State-funded primary\");",
+									"    pm.expect(tableHeadersConfig.columns.length).to.equal(3);",
+									"    pm.expect(tableHeadersConfig.columns[0].label).to.equal(\"2014/15\");",
+									"    pm.expect(tableHeadersConfig.columns[1].label).to.equal(\"2015/16\");",
+									"    pm.expect(tableHeadersConfig.columns[2].label).to.equal(\"2016/17\");",
+									"    pm.expect(tableHeadersConfig.rowGroups.length).to.equal(1);",
+									"    pm.expect(tableHeadersConfig.rowGroups[0].length).to.equal(1);",
+									"    pm.expect(tableHeadersConfig.rowGroups[0][0].label).to.equal(\"Derbyshire\");",
+									"});",
+									"",
+									"pm.test(\"Query contains expected fields\", function () {",
+									"    pm.expect(respJson.query.subjectId).to.equal(4);",
+									"    pm.expect(respJson.query.timePeriod.startYear).to.equal(2014);",
+									"    pm.expect(respJson.query.timePeriod.startCode).to.equal(\"HT6\");",
+									"    pm.expect(respJson.query.timePeriod.endYear).to.equal(2016);",
+									"    pm.expect(respJson.query.timePeriod.endCode).to.equal(\"HT6\");",
+									"    pm.expect(respJson.query.filters.length).to.equal(1);",
+									"    pm.expect(respJson.query.filters[0]).to.equal(parseInt(pm.globals.get(\"FILT_AbsenceForFourYearOlds__SchoolType__StateFundedPrimary\")));",
+									"    pm.expect(respJson.query.indicators.length).to.equal(1);",
+									"    pm.expect(respJson.query.indicators[0]).to.equal(parseInt(pm.globals.get(\"IND_AbsenceForFourYearOlds__AbsenceFields__NumberOfOverallAbsenceSessions\")));",
+									"    pm.expect(respJson.query.localAuthority.length).to.equal(1);",
+									"    pm.expect(respJson.query.localAuthority[0]).to.equal(\"E10000007\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{data_api_url}}/fasttrack/a8f78ed9-3ec4-4816-ba1a-fd4d9167a82f",
+							"raw": "{{data_api_url}}/fasttrack/f8911c5f-7d42-4051-a85c-34d2f4568c6d",
 							"host": [
 								"{{data_api_url}}"
 							],
 							"path": [
 								"fasttrack",
-								"a8f78ed9-3ec4-4816-ba1a-fd4d9167a82f"
+								"f8911c5f-7d42-4051-a85c-34d2f4568c6d"
 							]
 						}
 					},
