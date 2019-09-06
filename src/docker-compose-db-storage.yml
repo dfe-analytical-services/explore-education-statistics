@@ -1,30 +1,5 @@
 version: "3"
 services:
-  data-api:
-    container_name: ees-data
-    build:
-      context: .
-      dockerfile: Dockerfile-Data-Api
-    ports:
-    - "5000:5000"
-    - "5001:5001"
-    environment:
-      ASPNETCORE_ENVIRONMENT: Development
-    depends_on:
-    - db
-    - data-storage
-  content-api:
-    container_name: ees-content
-    build:
-      context: .
-      dockerfile: Dockerfile-Content-Api
-    ports:
-    - "5010:5010"
-    - "5011:5011"
-    environment:
-      ASPNETCORE_ENVIRONMENT: Development
-    depends_on:
-    - data-storage
   data-storage:
     container_name: ees-storage
     image: arafato/azurite
