@@ -1,52 +1,25 @@
 *** Settings ***
 Resource    ../libs/library.robot
+Resource    ./admin_common.robot
 
-Force Tags  Admin  NotAgainstProd
+Force Tags  Admin  NotAgainstProd  AltersData
 
 Suite Setup       user signs in
 Suite Teardown    user closes the browser
 
 *** Test Cases ***
-User selects theme and topic from dropdowns
+User creates a new release for use in this test
     [Tags]  HappyPath
-    user clicks element   css:#my-publications-tab
-    user waits until page contains element   css:#selectTheme
-    user selects from list by label  css:#selectTheme  Automated Test Theme
-    user selects from list by label  css:#selectTopic  Automated Test Topic
-    user checks page contains accordion  Automated Test Publication for Edit Release
-    user checks accordion section contains text  Automated Test Publication for Edit Release    Methodology
-    user checks accordion section contains text  Automated Test Publication for Edit Release    Releases
+    user selects theme "Automated Test Theme" and topic "Automated Test Topic" from the admin dashboard
+    user creates a new release for publication "Automated Test Publication for Edit Release" for start year "2017"
 
-User clicks edit release
+User selects the Manage Content section
     [Tags]  HappyPath
-    user checks page contains accordion  Automated Test Publication for Edit Release
-    user opens accordion section  Automated Test Publication for Edit Release
-    user checks page contains details section  Academic Year, 2018 to 2019 (not Live)
-    user opens details section  Academic Year, 2018 to 2019 (not Live)
-    user waits until page contains element  css:[data-testid="Edit release link for Automated Test Publication for Edit Release, Academic Year, 2018 to 2019 (not Live)"]
-    user clicks element  css:[data-testid="Edit release link for Automated Test Publication for Edit Release, Academic Year, 2018 to 2019 (not Live)"]
-
-Validate release summary tab has correct details
-    [Tags]  HappyPath
-    user waits until page contains heading  Automated Test Publication for Edit Release
-    user waits until page contains element   xpath://dt[text()="Publication title"]
-    user waits until page contains element   xpath://dt[text()="Time period"]
-    user waits until page contains element   xpath://dt[text()="Release period"]
-    user waits until page contains element   xpath://dt[text()="Lead statistician"]
-    user waits until page contains element   xpath://dt[text()="Scheduled release"]
-    user waits until page contains element   xpath://dt[text()="Next release expected"]
-    user waits until page contains element   xpath://dt[text()="Release type"]
-
-User clicks Edit release summary, checks details and cancels
-    [Tags]  HappyPath
-    user clicks link  Edit release summary
-    user waits until page contains element   xpath://h2[text()="Edit release summary"]
-    user checks element attribute value should be  css:#releaseSummaryForm-timePeriodCoverageStartYear   value   2018
-    user checks radio option should be  releaseSummaryForm-releaseTypeId  Official Statistics
-    user clicks link  Cancel update
-    user waits until page contains element   xpath://h2[text()="Release summary"]
-
-User clicks Edit release summary, changes details and updates
-    [Tags]  HappyPath  AltersData
-    user waits until page contains link  Edit release summary
-    user clicks link  Edit release summary
+    user clicks link  Manage content
+    user waits until page contains  Set page view
+    user checks radio option for "pageMode" should be "Add / view comments and edit content"
+    user checks page contains  Academic Year Q1-Q4 2017/18
+    user checks page contains heading 1  Automated Test Publication for Edit Release
+    user checks page contains tag  Draft
+    user checks summary list item "Publish date" should be "30 September 2017"
+    user checks summary list item "Next update" should be "01 September 2018"

@@ -1,5 +1,6 @@
 *** Settings ***
 Resource    ../libs/library.robot
+Resource    ./admin_common.robot
 
 Force Tags  Admin  NotAgainstProd
 
@@ -9,6 +10,7 @@ Suite Teardown    user closes the browser
 *** Test Cases ***
 Page has correct heading
     [Tags]  HappyPath
+    user selects theme "Automated Test Theme" and topic "Automated Test Topic" from the admin dashboard
     user waits until page contains element    xpath://a[text()="Create new publication"]
     user clicks link  Create new publication
     user waits until page contains heading    Create new publication

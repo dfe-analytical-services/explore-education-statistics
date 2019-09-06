@@ -1,5 +1,6 @@
 *** Settings ***
 Resource    ../libs/library.robot
+Resource    ./admin_common.robot
 
 Force Tags  Admin  NotAgainstProd
 
@@ -7,15 +8,9 @@ Suite Setup       user signs in
 Suite Teardown    user closes the browser
 
 *** Test Cases ***
-Heading is present on tab
-    [Tags]  HappyPath
-    user checks element contains  css:#my-publications-tab  Manage publications and releases
-
 Verify correct data is shown when theme and topic is shown
     [Tags]   HappyPath
-    user clicks element   css:#my-publications-tab
-    user selects from list by label  css:#selectTheme  Automated Test Theme
-    user selects from list by label  css:#selectTopic  Automated Test Topic
+    user selects theme "Automated Test Theme" and topic "Automated Test Topic" from the admin dashboard
     user checks page contains accordion  Automated Test Publication for Create Release
     user opens accordion section  Automated Test Publication for Create Release
     user checks accordion section contains text  Automated Test Publication for Create Release    Methodology
@@ -23,8 +18,8 @@ Verify correct data is shown when theme and topic is shown
 
 User clicks create new release
     [Tags]  HappyPath
-    user waits until page contains link  Create new release
-    user clicks link  Create new release
+    user waits until page contains element  css:[data-testid="Create new release link for Automated Test Publication for Create Release"]
+    user clicks element  css:[data-testid="Create new release link for Automated Test Publication for Create Release"]
    
 Check page has correct fields
     [Tags]  HappyPath

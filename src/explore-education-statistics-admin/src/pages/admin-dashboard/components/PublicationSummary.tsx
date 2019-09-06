@@ -50,6 +50,7 @@ const PublicationSummary = ({ publication }: Props) => {
       <ButtonLink
         to={releaseRoutes.createReleaseRoute.generateLink(publication.id)}
         className="govuk-!-margin-right-6"
+        testId={`Create new release link for ${publication.title}`}
       >
         Create new release
       </ButtonLink>

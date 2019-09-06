@@ -83,7 +83,7 @@ implicit_wait = 20
 
 # Set robotArgs
 robotArgs = ["--outputdir", "test-results/", "--exclude", "Failing",
-             "--exclude", "UnderConstruction"]
+             "--exclude", "UnderConstruction", "--exclude", "AltersData"]
 
 if args.tags:
     robotArgs += ["--include", args.tags]

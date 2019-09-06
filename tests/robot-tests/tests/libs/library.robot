@@ -206,6 +206,22 @@ user clicks button
   [Arguments]   ${text}
   click button  ${text}
 
+user checks page contains tag
+  [Arguments]   ${text}
+  user checks page contains element  xpath://span[contains(@class, "govuk-tag")][text()="${text}"]
+
+user checks page contains heading 1
+  [Arguments]   ${text}
+  user checks page contains element  xpath://h1[text()="${text}"]
+
+user checks page contains heading 2
+  [Arguments]   ${text}
+  user checks page contains element  xpath://h2[text()="${text}"]
+
+user checks page contains heading 3
+  [Arguments]   ${text}
+  user checks page contains element  xpath://h3[text()="${text}"]
+
 user selects newly opened window
   select window   NEW
 
@@ -213,9 +229,11 @@ user checks element attribute value should be
   [Arguments]   ${locator}  ${attribute}    ${expected}
   element attribute value should be  ${locator}     ${attribute}   ${expected}
 
-user checks radio option should be
-  [Arguments]   ${radiogroupId}  ${expectedLabelText}
+user checks radio option for "${radiogroupId}" should be "${expectedLabelText}"
   user checks page contains element  css:#${radiogroupId} [data-testid="${expectedLabelText}"]:checked
+
+user checks summary list item "${dtText}" should be "${ddText}"
+  user checks page contains element  xpath://dl[//dt[contains(text(),"${dtText}")] and //dd//*[contains(text(), "${ddText}")]]
 
 user selects from list by label
   [Arguments]   ${locator}   ${label}
