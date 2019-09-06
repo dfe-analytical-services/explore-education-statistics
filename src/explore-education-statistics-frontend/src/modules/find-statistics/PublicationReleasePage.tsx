@@ -185,9 +185,8 @@ class PublicationReleasePage extends Component<Props> {
                   >
                     <ul className="govuk-list">
                       {[
-                        ...data.publication.releases
-                          .slice(1)
-                          .map(({ id, slug, releaseName }) => [
+                        ...data.publication.releases.map(
+                          ({ id, slug, releaseName }) => [
                             releaseName,
                             <li key={id} data-testid="previous-release-item">
                               <Link
@@ -196,7 +195,8 @@ class PublicationReleasePage extends Component<Props> {
                                 {releaseName}
                               </Link>
                             </li>,
-                          ]),
+                          ],
+                        ),
                         ...data.publication.legacyReleases.map(
                           ({ id, description, url }) => [
                             description,
