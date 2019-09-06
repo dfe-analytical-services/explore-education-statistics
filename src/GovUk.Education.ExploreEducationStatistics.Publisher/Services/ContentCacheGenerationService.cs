@@ -70,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             {
                 var contentTreeBlob = _cloudBlobContainer.GetBlockBlobReference($"publications/tree.json");
                 await contentTreeBlob.UploadTextAsync(JsonConvert.SerializeObject(contentTree, null,
-                    new JsonSerializerSettings() {ReferenceLoopHandling = ReferenceLoopHandling.Ignore}));
+                    new JsonSerializerSettings() {ReferenceLoopHandling = ReferenceLoopHandling.Ignore,NullValueHandling = NullValueHandling.Ignore}));
                 return true;
             }
             else
