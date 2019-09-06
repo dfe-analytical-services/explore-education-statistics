@@ -23,13 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         public Task<string> DownloadTextAsync(string containerName, string blobName)
         {
             var blobContainer = GetCloudBlobContainer(containerName);
-            var blob = blobContainer.GetBlockBlobReference(blobName);
-
-            if (!blob.Exists())
-            {
-                throw new ArgumentException("File not found: {blobName}", blob.Name);
-            }
-
+            var blob = blobContainer.GetBlockBlobReference(blobName); 
             return blob.DownloadTextAsync();
         }
         
