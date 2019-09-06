@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using Microsoft.Azure.Cosmos.Table;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model
@@ -16,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
             NumBatches = numBatches;
             BatchesProcessed = new byte[64];
             Errors = "";
-            Status = 1;
+            Status = (int) IStatus.RUNNING_PHASE_1;
         }
 
         public DatafileImport()

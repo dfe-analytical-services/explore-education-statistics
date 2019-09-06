@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -48,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 return;
             }
             
-            _batchService.UpdateStatus(message.Release.Id.ToString(), dataFileName, ImportStatus.RUNNING_PHASE_2);
+            _batchService.UpdateStatus(message.Release.Id.ToString(), dataFileName, IStatus.RUNNING_PHASE_2);
             
             try
             {

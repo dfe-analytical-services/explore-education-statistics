@@ -28,19 +28,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         private readonly IFileStorageService _fileStorageService;
         private readonly IPublicationService _publicationService;
         private readonly IDataBlockService _dataBlockService;
-        private readonly IUploadStatusService _uploadStatusService;
+        private readonly IImportStatusService _importStatusService;
 
         public ReleasesController(IReleaseService releaseService,
             IFileStorageService fileStorageService,
             IPublicationService publicationService,
             IDataBlockService dataBlockService,
-            IUploadStatusService uploadStatusService)
+            IImportStatusService importStatusService)
         {
             _releaseService = releaseService;
             _fileStorageService = fileStorageService;
             _publicationService = publicationService;
             _dataBlockService = dataBlockService;
-            _uploadStatusService = uploadStatusService;
+            _importStatusService = importStatusService;
         }
 
         [HttpGet("release/{releaseId}/chart/{filename}")]
@@ -75,8 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 return _releaseService.CreateReleaseAsync(release);
             });
         }
-
-
+        
         // GET api/release/{releaseId}/data
         [HttpGet("release/{releaseId}/data")]
         [Produces("application/json")]
@@ -205,11 +204,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return Ok(await _releaseService.GetReleasesForReleaseStatusesAsync(ReleaseStatus.Approved));
         }
         
-        [HttpGet("release/{releaseId}/data/{fileName}/progress")]
-        public async Task<ActionResult<int>> GetImportProgress(ReleaseId releaseId, string fileName)
+        [AllowAnonymous]
+        [HttpGet("release/{releaseId}/data/{fileName}/import/status")]
+        public async Task<ActionResult<ImportStatus>> GetDataUploadStatus(ReleaseId releaseId, string fileName)
         {
-            return Ok(await _uploadStatusService.GetPercentageComplete(releaseId.ToString(), fileName));
-
+            return Ok(await _importStatusService.GetImportStatus(releaseId.ToString(), fileName));
         }
 
         [HttpDelete("release/{releaseId}/data/{fileName}")]

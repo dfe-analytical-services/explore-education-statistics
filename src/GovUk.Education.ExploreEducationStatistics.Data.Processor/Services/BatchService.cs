@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.Azure.Cosmos.Table;
@@ -12,30 +13,22 @@ using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
-    public enum ImportStatus
-    {
-        RUNNING_PHASE_1 = 1,
-        RUNNING_PHASE_2 = 2,
-        COMPLETE = 3,
-        FAILED = 4
-    };
-    
     public class BatchService : IBatchService
     {
         private readonly ILogger<IBatchService> _logger;
         private readonly CloudTable _table;
         private readonly IFileStorageService _fileStorageService;
-        private readonly IUploadStatusService _uploadStatusService;
+        private readonly IImportStatusService _importStatusService;
         
         public BatchService(
             ITableStorageService tblStorageService,
             IFileStorageService fileStorageService,
-            IUploadStatusService uploadStatusService,
+            IImportStatusService importStatusService,
             ILogger<IBatchService> logger)
         {
             _table = tblStorageService.GetTableAsync("imports").Result;
             _fileStorageService = fileStorageService;
-            _uploadStatusService = uploadStatusService;
+            _importStatusService = importStatusService;
             _logger = logger;
         }
 
@@ -59,10 +52,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 await cloudBlockBlob.ReleaseLeaseAsync(AccessCondition.GenerateLeaseCondition(leaseId));
             }
             
-            if (await _uploadStatusService.GetPercentageComplete(releaseId, dataFileName) == 100)
+            if (_importStatusService.GetImportStatus(releaseId, dataFileName).Result.PercentageComplete == 100)
             {
                 await UpdateStatus(releaseId, dataFileName,
-                    import.Errors.Equals("") ? ImportStatus.COMPLETE : ImportStatus.FAILED
+                    import.Errors.Equals("") ? IStatus.COMPLETE : IStatus.FAILED
                 );
         
                 _logger.LogInformation(import.Errors.Equals("")
@@ -71,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
         }
 
-        public async Task UpdateStatus(string releaseId, string dataFileName, ImportStatus status)
+        public async Task UpdateStatus(string releaseId, string dataFileName, IStatus status)
         {
             // Note that optimistic locking applies to azure table so to avoid concurrency issue acquire a lease on the block blob 
             var cloudBlockBlob = _fileStorageService.GetCloudBlockBlob(releaseId, dataFileName);
@@ -92,7 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         public async Task FailImport(string releaseId, string dataFileName, List<string> errors)
         {
             var import = await GetImport(releaseId, dataFileName);
-            import.Status = (int)ImportStatus.FAILED;
+            import.Status = (int)IStatus.FAILED;
             import.Errors = JsonConvert.SerializeObject(errors);
             await _table.ExecuteAsync(TableOperation.InsertOrReplace(import));
         }
@@ -122,12 +115,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public async Task CreateImport(string releaseId, string dataFileName, int numBatches)
         {
-            await _uploadStatusService.CreateImport(releaseId, dataFileName, numBatches);
+            await _table.ExecuteAsync(TableOperation.InsertOrReplace(
+                new DatafileImport(releaseId, dataFileName, numBatches))
+            );
         }
-
-        public async Task<DatafileImport> GetImport(string releaseId, string dataFileName)
+        
+        private async Task<DatafileImport> GetImport(string releaseId, string dataFileName)
         {
-            return await _uploadStatusService.GetImport(releaseId, dataFileName);
+            // Need to define the extra columns to retrieve
+            var result = await _table.ExecuteAsync(TableOperation.Retrieve<DatafileImport>(
+                releaseId, 
+                dataFileName, 
+                new List<string>(){ "NumBatches", "BatchesProcessed", "Status", "Errors"}));
+            
+            return (DatafileImport) result.Result;
         }
     }
 }

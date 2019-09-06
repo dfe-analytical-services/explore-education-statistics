@@ -119,7 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<ITimePeriodService, TimePeriodService>();
             services.AddTransient<ITableBuilderSubjectMetaService, TableBuilderSubjectMetaService>();
             services.AddTransient<ITableBuilderResultSubjectMetaService, TableBuilderResultSubjectMetaService>();
-            services.AddTransient<IUploadStatusService, UploadStatusService>();
+            services.AddTransient<IImportStatusService, ImportStatusService>();
             
             services.AddSwaggerGen(c =>
             {

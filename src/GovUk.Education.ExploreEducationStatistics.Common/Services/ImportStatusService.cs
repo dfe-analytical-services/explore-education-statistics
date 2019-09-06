@@ -8,33 +8,40 @@ using Microsoft.Azure.Cosmos.Table;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 {
-    public class UploadStatusService : IUploadStatusService
+    public enum IStatus
+    {
+        RUNNING_PHASE_1 = 1,
+        RUNNING_PHASE_2 = 2,
+        COMPLETE = 3,
+        FAILED = 4
+    };
+    
+    public class ImportStatusService : IImportStatusService
     {
         private readonly CloudTable _table;
 
-        public UploadStatusService(
+        public ImportStatusService(
             ITableStorageService tblStorageService)
         {
             _table = tblStorageService.GetTableAsync("imports").Result;
         }
         
-        public async Task<int> GetPercentageComplete(string releaseId, string dataFileName)
+        public async Task<ImportStatus> GetImportStatus(string releaseId, string dataFileName)
         {
             var import = await GetImport(releaseId, dataFileName);
             var count = (from bool b in new BitArray(import.BatchesProcessed)
                 where b
                 select b).Count();
             
-            var pComplete = (count * 100) / import.NumBatches;
-            return pComplete;
+            return new ImportStatus
+            {
+                Errors = import.Errors,
+                PercentageComplete = (count * 100) / import.NumBatches,
+                Status = import.Status
+            };
         }
-        
-        public async Task CreateImport(string releaseId, string dataFileName, int numBatches)
-        {
-            await _table.ExecuteAsync(TableOperation.InsertOrReplace(new DatafileImport(releaseId, dataFileName, numBatches)));
-        }
-        
-        public async Task<DatafileImport> GetImport(string releaseId, string dataFileName)
+
+        private async Task<DatafileImport> GetImport(string releaseId, string dataFileName)
         {
             // Need to define the extra columns to retrieve
             var result = await _table.ExecuteAsync(TableOperation.Retrieve<DatafileImport>(
