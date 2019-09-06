@@ -21,7 +21,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     // TODO rename to Releases once the current Crud releases controller is removed
     [Route("api")]
     [ApiController]
-    [Authorize]
     public class ReleasesController : ControllerBase
     {
         private readonly IReleaseService _releaseService;
@@ -206,9 +205,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         
         [AllowAnonymous]
         [HttpGet("release/{releaseId}/data/{fileName}/import/status")]
-        public async Task<ActionResult<ImportStatus>> GetDataUploadStatus(ReleaseId releaseId, string fileName)
+        public async Task<ActionResult<ImportStatus>> GetDataUploadStatus(string releaseId, string fileName)
         {
-            return Ok(await _importStatusService.GetImportStatus(releaseId.ToString(), fileName));
+            return Ok(await _importStatusService.GetImportStatus(releaseId, fileName));
         }
 
         [HttpDelete("release/{releaseId}/data/{fileName}")]

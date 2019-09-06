@@ -120,7 +120,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<ITableBuilderSubjectMetaService, TableBuilderSubjectMetaService>();
             services.AddTransient<ITableBuilderResultSubjectMetaService, TableBuilderResultSubjectMetaService>();
             services.AddTransient<IImportStatusService, ImportStatusService>();
-            
+            services.AddTransient<ITableStorageService, TableStorageService>(s => new TableStorageService(Configuration.GetConnectionString("CoreStorage")));
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info {Title = "Explore education statistics - Admin API", Version = "v1"});

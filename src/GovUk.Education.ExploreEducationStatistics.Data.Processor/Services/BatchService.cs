@@ -73,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             try
             {
                 var import = await GetImport(releaseId, dataFileName);
-                import.Status = (int)status;
+                import.Status = status;
                 await _table.ExecuteAsync(TableOperation.InsertOrReplace(import));
             }
             finally
@@ -85,7 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         public async Task FailImport(string releaseId, string dataFileName, List<string> errors)
         {
             var import = await GetImport(releaseId, dataFileName);
-            import.Status = (int)IStatus.FAILED;
+            import.Status = IStatus.FAILED;
             import.Errors = JsonConvert.SerializeObject(errors);
             await _table.ExecuteAsync(TableOperation.InsertOrReplace(import));
         }
