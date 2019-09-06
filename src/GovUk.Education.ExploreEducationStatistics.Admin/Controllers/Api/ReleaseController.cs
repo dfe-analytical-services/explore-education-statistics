@@ -204,9 +204,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
         
         [HttpGet("release/{releaseId}/data/{fileName}/import/status")]
-        public async Task<ActionResult<ImportStatus>> GetDataUploadStatus(string releaseId, string fileName)
+        public async Task<ActionResult<ImportStatus>> GetDataUploadStatus(ReleaseId releaseId, string fileName)
         {
-            return Ok(await _importStatusService.GetImportStatus(releaseId, fileName));
+            return Ok(await _importStatusService.GetImportStatus(releaseId.ToString(), fileName));
         }
 
         [HttpDelete("release/{releaseId}/data/{fileName}")]
