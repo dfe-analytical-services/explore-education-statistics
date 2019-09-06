@@ -314,7 +314,7 @@
 									"});",
 									"",
 									"pm.test(\"Number of themes should be correct\", function () {",
-									"    pm.expect(respJson.length).to.equal(9);",
+									"    pm.expect(respJson.length).to.be.above(8);",
 									"});",
 									"",
 									"pm.test(\"First result should have correct fields\", function () {",
