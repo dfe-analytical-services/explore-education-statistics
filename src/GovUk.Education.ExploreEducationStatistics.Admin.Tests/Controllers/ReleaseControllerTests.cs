@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
@@ -354,19 +353,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
             Assert.Contains(ValidationResult(message).ErrorMessage, validationProblem.Errors[string.Empty]);
             return validationProblem;
         }
-        
-        private static (Mock<IReleaseService> ReleaseService, Mock<IFileStorageService> FileStorageService,
+
+        private static (Mock<IImportService> ImportService,
+            Mock<IReleaseService> ReleaseService,
+            Mock<IFileStorageService> FileStorageService,
             Mock<IPublicationService> PublicationService) Mocks()
         {
-            return (new Mock<IReleaseService>(), new Mock<IFileStorageService>(), new Mock<IPublicationService>());
+            return (new Mock<IImportService>(),
+                    new Mock<IReleaseService>(),
+                    new Mock<IFileStorageService>(),
+                    new Mock<IPublicationService>()
+                );
         }
 
-        private static ReleasesController ReleasesControllerWithMocks(
-            (Mock<IReleaseService> ReleaseService, Mock<IFileStorageService> FileStorageService, 
-                Mock<IPublicationService> PublicationService) mocks)
+        private static ReleasesController ReleasesControllerWithMocks((Mock<IImportService> ImportService,
+            Mock<IReleaseService> ReleaseService,
+            Mock<IFileStorageService> FileStorageService,
+            Mock<IPublicationService> PublicationService) mocks)
         {
-            return new ReleasesController(mocks.ReleaseService.Object, mocks.FileStorageService.Object, 
-                mocks.PublicationService.Object,null);
+            return new ReleasesController(mocks.ImportService.Object,
+                mocks.ReleaseService.Object,
+                mocks.FileStorageService.Object, 
+                mocks.PublicationService.Object,
+                null);
         }
     }
 }

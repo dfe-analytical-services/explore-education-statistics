@@ -279,7 +279,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var summary = await new ReleaseService(context, MapperForProfile<MappingProfiles>())
                     .GetReleaseSummaryAsync(releaseId);
 
-
                 Assert.Equal(publishScheduled, summary.PublishScheduled);
                 Assert.Equal(nextReleaseDate, summary.NextReleaseDate);
                 Assert.Equal(addHocReleaseTypeId, summary.TypeId);
