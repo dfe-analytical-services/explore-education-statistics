@@ -23,18 +23,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     [ApiController]
     public class ReleasesController : ControllerBase
     {
+        private readonly IImportService _importService;
         private readonly IReleaseService _releaseService;
         private readonly IFileStorageService _fileStorageService;
         private readonly IPublicationService _publicationService;
         private readonly IDataBlockService _dataBlockService;
         private readonly IImportStatusService _importStatusService;
 
-        public ReleasesController(IReleaseService releaseService,
+        public ReleasesController(IImportService importService,
+            IReleaseService releaseService,
             IFileStorageService fileStorageService,
             IPublicationService publicationService,
             IDataBlockService dataBlockService,
             IImportStatusService importStatusService)
         {
+            _importService = importService;
             _releaseService = releaseService;
             _fileStorageService = fileStorageService;
             _publicationService = publicationService;
@@ -150,11 +153,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await CheckReleaseExistsAsync(releaseId, () =>
             {
                 // upload the files
-                var result = _fileStorageService.UploadDataFilesAsync(releaseId, file, metaFile, name, false);
-                // add message to queue to process these files
-                // TODO: Disabled adding message to queue
-                //.OnSuccess(() => _importService.Import(file.FileName, releaseId));
-                return result;
+                return _fileStorageService.UploadDataFilesAsync(releaseId, file, metaFile, name, false)
+                    // add message to queue to process these files
+                    .OnSuccess(() => _importService.Import(file.FileName, releaseId));
             });
         }
 
