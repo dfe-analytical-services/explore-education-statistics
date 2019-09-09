@@ -379,6 +379,7 @@ EXEC InsertIndicatorFootnote @subject_absence_in_prus, @indicator_sess_unauthori
 
 EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_enrolments_pa_10_exact, 8;
 EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_enrolments_pa_10_exact, 8;
+EXEC InsertIndicatorFootnote @subject_absence_in_prus, @indicator_enrolments_pa_10_exact, 8;
 
 EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_enrolments_pa_10_exact_percent, 8;
 EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_enrolments_pa_10_exact_percent, 8;
@@ -407,6 +408,7 @@ EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_se
 
 EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_enrolments_pa_10_exact, 9;
 EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_enrolments_pa_10_exact, 9;
+EXEC InsertIndicatorFootnote @subject_absence_in_prus, @indicator_enrolments_pa_10_exact, 9;
 
 EXEC InsertIndicatorFootnote @subject_absence_by_characteristic, @indicator_enrolments_pa_10_exact_percent, 9;
 EXEC InsertIndicatorFootnote @subject_absence_by_geographic_level, @indicator_enrolments_pa_10_exact_percent, 9;
