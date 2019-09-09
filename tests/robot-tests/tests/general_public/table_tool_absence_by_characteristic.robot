@@ -19,14 +19,15 @@ Select "Pupil absence" publication
     user opens details dropdown    Pupil absence
     user selects radio      Pupil absence in schools in England
     user clicks element    css:#publicationForm-submit
-    user waits until page contains    Choose a subject
+    user waits until element is visible  xpath://h2[text()="Choose a subject"]
     user checks previous table tool step contains  1   Publication   Pupil absence in schools in England
 
 Select subject "Absence by characteristic"
     [Tags]  HappyPath
     user selects radio   Absence by characteristic
     user clicks element   css:#publicationSubjectForm-submit
-    user waits until page contains    Choose locations
+    # Extra timeout until EES-234
+    user waits until element is visible  xpath://h2[text()="Choose locations"]   90
     user checks previous table tool step contains  2    Subject     Absence by characteristic
 
 Select Location Country, England
@@ -34,7 +35,7 @@ Select Location Country, England
     user opens details dropdown     Country
     user clicks checkbox    England
     user clicks element     css:#locationFiltersForm-submit
-    user waits until page contains  Choose time period
+    user waits until element is visible  xpath://h2[text()="Choose time period"]
     user checks previous table tool step contains  3    Country    England
 
 Select Start date and End date
@@ -42,7 +43,7 @@ Select Start date and End date
     user selects start date     2012/13
     user selects end date       2015/16
     user clicks element     css:#timePeriodForm-submit
-    user waits until page contains   Choose your filters
+    user waits until element is visible  xpath://h2[text()="Choose your filters"]
     user checks previous table tool step contains  4    Start date    2012/13
     user checks previous table tool step contains  4    End date      2015/16
 
@@ -61,6 +62,7 @@ Select Characteristics
 Create table
     [Tags]  HappyPath
     user clicks element     css:#filtersForm-submit
+    # Extra timeout until EES-234
     user waits until results table appears
 
 Validate results table column headings
@@ -122,6 +124,83 @@ Validate Gender female Overall absence rate row
     user checks results table cell contains  5    4     4.5%
 
 Validate Gender female Authorised absence rate row
+    [Tags]  HappyPath
+    user checks results table cell contains  6    1     4.2%
+    user checks results table cell contains  6    2     3.5%
+    user checks results table cell contains  6    3     3.5%
+    user checks results table cell contains  6    4     3.4%
+
+User generates a permanent link
+    [Tags]   HappyPath
+    user clicks element    xpath://*[text()="Generate permanent link"]
+    # Extra timeout until EES-234
+    user waits until page contains element   xpath://a[text()="View permanent link"]   60
+    user checks generated permalink is valid
+
+User validates permanent link works correctly
+    [Tags]   HappyPath
+    user clicks link   View permanent link
+    select window    NEW
+    user waits until page contains heading  'Absence by characteristic' from 'Pupil absence in schools in England'
+
+User validates permalink table columns
+    [Tags]   HappyPath
+    user checks results table column heading contains  1   1   six half terms
+
+    user checks results table column heading contains  2   1   2012/13
+    user checks results table column heading contains  2   2   2013/14
+    user checks results table column heading contains  2   3   2014/15
+    user checks results table column heading contains  2   4   2015/16
+
+User validates permalink table rows
+    [Tags]   HappyPath
+    user checks results table row heading contains  1    1    England
+
+    user checks results table row heading contains  1    2    Gender male
+    user checks results table row heading contains  1    3    Unauthorised absence rate
+    user checks results table row heading contains  2    1    Overall absence rate
+    user checks results table row heading contains  3    1    Authorised absence rate
+
+    user checks results table row heading contains  4    1    Gender female
+    user checks results table row heading contains  4    2    Unauthorised absence rate
+    user checks results table row heading contains  5    1    Overall absence rate
+
+Validate Permalink Gender male Unauthorised absence rate row
+    [Tags]  HappyPath
+    user checks results table cell contains  1    1     1.1%
+    user checks results table cell contains  1    2     1.1%
+    user checks results table cell contains  1    3     1.1%
+    user checks results table cell contains  1    4     1.1%
+
+Validate Permalink Gender male Overall absence rate row
+    [Tags]  HappyPath
+    user checks results table cell contains  2    1     5.2%
+    user checks results table cell contains  2    2     4.5%
+    user checks results table cell contains  2    3     4.6%
+    user checks results table cell contains  2    4     4.6%
+
+Validate Permalink Gender male Authorised absence rate row
+    [Tags]  HappyPath
+    user checks results table cell contains  3    1     4.2%
+    user checks results table cell contains  3    2     3.4%
+    user checks results table cell contains  3    3     3.6%
+    user checks results table cell contains  3    4     3.5%
+
+Validate Permalink Gender female Unauthorised absence rate row
+    [Tags]  HappyPath
+    user checks results table cell contains  4    1     1.1%
+    user checks results table cell contains  4    2     1.1%
+    user checks results table cell contains  4    3     1.1%
+    user checks results table cell contains  4    4     1.1%
+
+Validate Permalink Gender female Overall absence rate row
+    [Tags]  HappyPath
+    user checks results table cell contains  5    1     5.3%
+    user checks results table cell contains  5    2     4.5%
+    user checks results table cell contains  5    3     4.6%
+    user checks results table cell contains  5    4     4.5%
+
+Validate Permalink Gender female Authorised absence rate row
     [Tags]  HappyPath
     user checks results table cell contains  6    1     4.2%
     user checks results table cell contains  6    2     3.5%
