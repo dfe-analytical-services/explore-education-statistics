@@ -1,7 +1,7 @@
 import { LoginContext } from '@admin/components/Login';
 import {
-  getReleaseStatusLabel, getReleaseSummaryLabel,
-  getTimePeriodCoverageDateRangeStringLong,
+  getReleaseStatusLabel,
+  getReleaseSummaryLabel,
 } from '@admin/pages/release/util/releaseSummaryUtil';
 import {
   dayMonthYearIsComplete,

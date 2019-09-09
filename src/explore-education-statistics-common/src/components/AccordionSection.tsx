@@ -1,4 +1,3 @@
-import {formatTestId} from "@common/util/test-utils";
 import useMounted from '@common/hooks/useMounted';
 import findAllParents from '@common/lib/dom/findAllParents';
 import classNames from 'classnames';
