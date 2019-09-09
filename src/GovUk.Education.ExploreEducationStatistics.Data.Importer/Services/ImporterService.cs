@@ -129,17 +129,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         public void ImportObservations(List<string> lines, Subject subject, SubjectMeta subjectMeta, int batchNo, int rowsPerBatch)
         {
             _importCount = 0;
-            _logger.LogDebug("Importing batch for Publication {Publication}, {Subject}", subject.Release.Publication.Title, subject.Name);
-            
             var headers = lines.First().Split(',').ToList();
             lines.RemoveAt(0);
-
-            _logger.LogInformation($"Retrieving observations for {subject.Name}");
-
             var observations = GetObservations(lines, headers, subject, subjectMeta, batchNo, rowsPerBatch).ToList();
-
-            _logger.LogInformation($"Adding {observations.Count()} observations for {subject.Name}");
-
+            
             var subEntities = new List<ObservationFilterItem>();
             
             using (var transaction = _context.Database.BeginTransaction())

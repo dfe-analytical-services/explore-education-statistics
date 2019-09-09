@@ -55,8 +55,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             [Queue("imports-available")] ICollector<ImportMessage> collector
             )
         {
-            logger.LogInformation($"{GetType().Name} function STARTED for : Datafile: {message.DataFileName}");
-            
             var batchSettings = GetBatchSettings(LoadAppSettings(context));
             
             if (IsDataFileValid(message, batchSettings.RowsPerBatch, logger)) {
@@ -78,8 +76,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 logger.LogError(
                     $"Import FAILED for {message.DataFileName}...check log"); 
             }
-            
-            logger.LogInformation($"{GetType().Name} function COMPLETE for : Datafile: {message.DataFileName}");
         }
         
         [FunctionName("ProcessUploadsSequentially")]
@@ -91,8 +87,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             [Queue("imports-available")] ICollector<ImportMessage> collector
         )
         {
-            logger.LogInformation($"{GetType().Name} function STARTED");
-            
             var batchSettings = GetBatchSettings(LoadAppSettings(context));
 
             // Log all initial validation messages
@@ -121,8 +115,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 logger.LogError(
                     $"Seeding FAILED...check log"); 
             }
-
-            logger.LogInformation($"{GetType().Name} function COMPLETE");
         }
         
         [FunctionName("ImportObservations")]
@@ -131,13 +123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             ImportMessage message,
             ILogger logger)
         {
-            logger.LogInformation(
-                    $"{GetType().Name} function STARTED for : Batch: {message.BatchNo} of {message.NumBatches} with Datafile: {message.DataFileName}");
-                
             _fileImportService.ImportObservations(message).Wait();
-
-            logger.LogInformation(
-                $"{GetType().Name} function COMPLETE for : Batch: {message.BatchNo}  of {message.NumBatches} with Datafile: {message.DataFileName}");
         }
 
         private SubjectData ProcessSubject(ImportMessage message)
@@ -164,7 +150,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
 
             var subjectData = _fileStorageService.GetSubjectData(message).Result;
             
-            _batchService.CreateBatch(
+            _batchService.CreateImport(
                 message.Release.Id.ToString(), 
                 message.DataFileName,
                 SplitFileService.GetNumBatches(subjectData.GetCsvLines().Count(), rowsPerBatch)
@@ -176,10 +162,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             {
                 logger.LogInformation($"Datafile: {message.DataFileName} has errors");
 
-                _batchService.FailBatch(
-                    message.Release.Id.ToString(), 
-                    errors, 
-                    message.DataFileName).Wait();
+                _batchService.FailImport(
+                    message.Release.Id.ToString(),
+                    message.DataFileName,
+                    errors
+                    ).Wait();
                 
                 return false;
             }

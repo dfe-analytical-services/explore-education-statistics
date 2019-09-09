@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -357,25 +358,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
         private static (Mock<IImportService> ImportService,
             Mock<IReleaseService> ReleaseService,
             Mock<IFileStorageService> FileStorageService,
-            Mock<IPublicationService> PublicationService) Mocks()
+            Mock<IPublicationService> PublicationService,
+            Mock<IImportStatusService> ImportStatusService) Mocks()
         {
             return (new Mock<IImportService>(),
                     new Mock<IReleaseService>(),
                     new Mock<IFileStorageService>(),
-                    new Mock<IPublicationService>()
+                    new Mock<IPublicationService>(),
+                    new Mock<IImportStatusService>()
                 );
         }
 
         private static ReleasesController ReleasesControllerWithMocks((Mock<IImportService> ImportService,
             Mock<IReleaseService> ReleaseService,
             Mock<IFileStorageService> FileStorageService,
-            Mock<IPublicationService> PublicationService) mocks)
+            Mock<IPublicationService> PublicationService,
+            Mock<IImportStatusService> ImportStatusService) mocks)
         {
             return new ReleasesController(mocks.ImportService.Object,
                 mocks.ReleaseService.Object,
-                mocks.FileStorageService.Object, 
+                mocks.FileStorageService.Object,
                 mocks.PublicationService.Object,
-                null);
+                null,
+                mocks.ImportStatusService.Object);
         }
     }
 }
