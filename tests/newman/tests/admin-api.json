@@ -1408,7 +1408,7 @@
 					"response": []
 				},
 				{
-					"name": "Import Status - Absence by characteristic - invalid release id",
+					"name": "Import Status - invalid release id",
 					"event": [
 						{
 							"listen": "test",
@@ -2203,53 +2203,6 @@
 								"release",
 								"85d43d6f-ec91-452d-aba2-03303ab4363a",
 								"data"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get import status",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "8703eb2c-90a2-45c6-b49a-c0552fba7d0d",
-								"exec": [
-									"var respJson = pm.response.json();",
-									"",
-									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-									"",
-									"pm.test(\"Fields are present\", function () {",
-									"    pm.expect(pm.response.to.have.jsonBody(\"status\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"percentageComplete\"));",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{admin_api_url}}/release/85d43d6f-ec91-452d-aba2-03303ab4363a/data/my_file.csv/import/status",
-							"host": [
-								"{{admin_api_url}}"
-							],
-							"path": [
-								"release",
-								"85d43d6f-ec91-452d-aba2-03303ab4363a",
-								"data",
-								"my_file.csv",
-								"import",
-								"status"
 							]
 						}
 					},
