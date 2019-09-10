@@ -651,6 +651,164 @@
 			"name": "Release",
 			"item": [
 				{
+					"name": "Release - Get approved releases",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
+								"exec": [
+									"var respJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Should have at least one result\", function () { ",
+									"    pm.expect(respJson.length).to.above(0);",
+									"});",
+									"",
+									"pm.test(\"Fields of first result are correct\", function () {",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]id\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]title\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]publicationId\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]publicationTitle\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]releaseName\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]coverageTitle\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]yearTitle\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]typeId\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]nextReleaseDate\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]publishScheduled\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]timePeriodCoverage\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]latestRelease\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]type\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]contact\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]status\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]internalReleaseNote\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]draftComments\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]higherReviewComments\"));",
+									"});",
+									"",
+									"pm.test(\"Every result should be status Approved\", function () {",
+									"    for(var i = 0; i < respJson.length; i++) {",
+									"        pm.expect(respJson[i].status).to.equal(\"Approved\");",
+									"    }",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "dbde4b62-47dd-4c3d-93dc-5e01ec3f8231",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/releases/scheduled",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"releases",
+								"scheduled"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Release - Get draft and higherlevelreview releases",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
+								"exec": [
+									"var respJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Should have at least one result\", function () { ",
+									"    pm.expect(respJson.length).to.above(0);",
+									"});",
+									"",
+									"pm.test(\"Fields of first result are correct\", function () {",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]id\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]title\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]publicationId\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]publicationTitle\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]releaseName\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]coverageTitle\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]yearTitle\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]typeId\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]nextReleaseDate\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]publishScheduled\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]timePeriodCoverage\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]latestRelease\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]type\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]status\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]draftComments\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]higherReviewComments\"));",
+									"});",
+									"",
+									"pm.test(\"Every result should be status Draft or HigherLevelReview\", function () {",
+									"    for(var i = 0; i < respJson.length; i++) {",
+									"        pm.expect(respJson[i].status).to.oneOf([\"Draft\", \"HigherLevelReview\"]);",
+									"    }",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "dbde4b62-47dd-4c3d-93dc-5e01ec3f8231",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/releases/draft",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"releases",
+								"draft"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Release - Get exclusion release datablocks",
 					"event": [
 						{
