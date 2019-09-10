@@ -1,5 +1,9 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
+﻿using System;
+using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -14,21 +18,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var cache = new Mock<IContentCacheService>();
 
 
-//            service.Setup(s => s.GetTree()).Returns(
-//                new List<ThemeTree>
-//                {
-//                    new ThemeTree
-//                    {
-//                        Title = "Theme A"
-//                    }
-//                }
-//            );
+            cache.Setup(s => s.GetMethodologyTreeAsync()).ReturnsAsync(
+                new List<ThemeTree>
+                {
+                    new ThemeTree
+                    {
+                        Title = "Theme A"
+                    }
+                }
+            );
 
             var controller = new MethodologyController(cache.Object);
 
             var result = controller.GetMethodologyTree();
 
-//            Assert.IsAssignableFrom<List<ThemeTree>>(result.Value);
+            Assert.IsAssignableFrom<List<ThemeTree>>(result.Result.Value);
         }
 
         [Fact]
@@ -37,16 +41,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var cache = new Mock<IContentCacheService>();
 
 
-//            service.Setup(s => s.GetTree()).Returns(
-//                new List<ThemeTree>()
-//                );
+            cache.Setup(s => s.GetMethodologyTreeAsync()).ReturnsAsync(
+                new List<ThemeTree>()
+                );
 
 
             var controller = new MethodologyController(cache.Object);
 
             var result = controller.GetMethodologyTree();
 
-            //Assert.IsAssignableFrom<NoContentResult>(result.Result);
+            Assert.IsAssignableFrom<NoContentResult>(result.Result);
         }
 
         [Fact]
@@ -55,18 +59,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var cache = new Mock<IContentCacheService>();
 
 
-//            service.Setup(s => s.Get("test-slug")).Returns(
-//                new Methodology
-//                {
-//                    Id = new Guid("a7772148-fbbd-4c85-8530-f33c9ef25488")
-//                }
-//            );
+            cache.Setup(s => s.GetMethodologyAsync("test-slug")).ReturnsAsync(
+                new Methodology
+                {
+                    Id = new Guid("a7772148-fbbd-4c85-8530-f33c9ef25488")
+                }
+            );
 
             var controller = new MethodologyController(cache.Object);
 
             var result = controller.Get("test-slug");
 
-//            Assert.Equal("a7772148-fbbd-4c85-8530-f33c9ef25488", result.Value.Id.ToString());
+            Assert.Equal("a7772148-fbbd-4c85-8530-f33c9ef25488", result.Result.Value.Id.ToString());
         }
         
         [Fact]
@@ -74,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         {
             var cache = new Mock<IContentCacheService>();
 
-//            service.Setup(s => s.Get("unknown-slug")).Returns((Methodology) null);
+            cache.Setup(s => s.GetMethodologyAsync("unknown-slug")).ReturnsAsync((Methodology) null);
 
             var controller = new MethodologyController(cache.Object);
 

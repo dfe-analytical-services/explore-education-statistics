@@ -32,7 +32,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Service
                             Title = "Methodology A",
                         } 
                     },
-                    
                 };
 
                 context.AddRange(publications);

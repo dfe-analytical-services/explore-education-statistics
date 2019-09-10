@@ -1,26 +1,28 @@
 using System;
 using System.Collections.Generic;
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Services
 {
     public class ReleaseServiceTests
     {
-        private readonly MapperConfiguration config = new MapperConfiguration(cfg => {
+        private readonly MapperConfiguration _config = new MapperConfiguration(cfg => {
             cfg.CreateMap<Release, ReleaseViewModel>();
         });
             
-        private readonly IMapper mapper;
+        private readonly IMapper _mapper;
 
         public ReleaseServiceTests()
         {
-           mapper = config.CreateMapper();
+           _mapper = _config.CreateMapper();
         }
 
         [Fact]
@@ -77,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Service
 
             using (var context = new ApplicationDbContext(options))
             {
-                var service = new ReleaseService(context, fileStorageService.Object, mapper);
+                var service = new ReleaseService(context, fileStorageService.Object, _mapper);
 
                 var result = service.GetLatestRelease(Guid.Parse("1003fa5c-b60a-4036-a178-e3a69a81b852"));
 
@@ -114,7 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Service
 
             using (var context = new ApplicationDbContext(options))
             {
-                var service = new ReleaseService(context, fileStorageService.Object, mapper);
+                var service = new ReleaseService(context, fileStorageService.Object, _mapper);
 
                 var result = service.GetRelease(Guid.Parse("1003fa5c-b60a-4036-a178-e3a69a81b852"));
 
