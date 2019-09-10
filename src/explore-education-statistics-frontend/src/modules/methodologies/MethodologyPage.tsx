@@ -49,7 +49,7 @@ class MethodologyPage extends Component<Props> {
       >
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
-            <dl className="dfe-meta-content govuk-!-margin-0">
+            <dl className="dfe-meta-content govuk-!-margin-top-0">
               <div>
                 <dt className="govuk-caption-m">Published: </dt>
                 <dd data-testid="published-date">
@@ -69,8 +69,6 @@ class MethodologyPage extends Component<Props> {
                 </>
               )}
             </dl>
-          </div>
-          <div className="govuk-grid-column-one-third">
             <PageSearchFormWithAnalytics />
           </div>
         </div>

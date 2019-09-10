@@ -15,6 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
     public class FileStorageService : IFileStorageService
     {
         private readonly CloudBlobContainer _blobContainer;
+        private readonly TimeSpan _minimumAcquireLeaseTimeSpan = TimeSpan.FromSeconds(15);
 
         private const string ContainerName = "releases";
 
@@ -49,11 +50,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return true;
         }
 
-        public void Delete(ImportMessage importMessage)
+        public void Delete(string releaseId, string dataFileName)
         {
-            var releaseId = importMessage.Release.Id.ToString();
-            var blob = _blobContainer.GetBlockBlobReference($"{releaseId}/data/{importMessage.DataFileName}");
-            blob.DeleteAsync();
+            GetCloudBlockBlob(releaseId, dataFileName).DeleteAsync();
+        }
+
+        public Task<string> GetLeaseId(CloudBlockBlob cloudBlockBlob)
+        {
+            return cloudBlockBlob.AcquireLeaseAsync(
+                _minimumAcquireLeaseTimeSpan, 
+                Guid.NewGuid().ToString());
+        }
+
+        public CloudBlockBlob GetCloudBlockBlob(string releaseId, string dataFileName)
+        {
+            return _blobContainer.GetBlockBlobReference($"{releaseId}/data/{dataFileName}");
+        }
+
+        private string GenerateCloudLockBlobLeaseName(string blobLeaseNamePrefix)
+        {
+            return $"{blobLeaseNamePrefix}.lck";
         }
 
         private async Task UploadFileAsync(string releaseId,
