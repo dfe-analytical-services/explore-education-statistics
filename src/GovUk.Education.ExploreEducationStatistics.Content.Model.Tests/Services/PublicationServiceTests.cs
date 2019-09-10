@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Service
 
             });
 
-            IMapper iMapper = config.CreateMapper();
+            var iMapper = config.CreateMapper();
 
             using (var context = new ApplicationDbContext(options))
             {
