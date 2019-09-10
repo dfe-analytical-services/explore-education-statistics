@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "428f6ddb-8045-4eb9-85ee-9174c0c3cf0a",
+		"_postman_id": "1bf89397-f10f-4695-bd7e-b4807f14a809",
 		"name": "DfE Admin API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -2306,7 +2306,7 @@
 					"name": "Data",
 					"item": [
 						{
-							"name": "Data - Absence by characteristic - Adur (LAD) + Wandsworth (LA) Copy",
+							"name": "Data - Absence by characteristic - Adur (LAD) + Wandsworth (LA)",
 							"event": [
 								{
 									"listen": "test",
@@ -2443,6 +2443,152 @@
 							""
 						]
 					}
+				}
+			]
+		},
+		{
+			"name": "Import",
+			"item": [
+				{
+					"name": "Import Status - Absence by characteristic",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+								"exec": [
+									"var respJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"/* TODO EES-3 absence_by_characteristic.csv has been imported but",
+									"the import status table was only added after the last seed of test data. Waiting for data reseed.",
+									"",
+									"pm.test(\"Status should be complete\", function () {",
+									"    pm.expect(respJson.status).to.equal(\"COMPLETE\");",
+									"    pm.expect(respJson.percentageComplete).to.equal(100);",
+									"});",
+									"",
+									"pm.test(\"There should be no errors\", function () {",
+									"    pm.expect(pm.response.to.have.jsonBody(\"errors\", \"\"));",
+									"});",
+									"*/",
+									"",
+									"pm.test(\"Status should be not found\", function () {",
+									"    pm.expect(respJson.status).to.equal(\"NOT_FOUND\");",
+									"});",
+									"",
+									"pm.test(\"Percentage complete should be zero\", function () {",
+									"    pm.expect(respJson.percentageComplete).to.equal(0);",
+									"});",
+									"",
+									"pm.test(\"There should be no errors field\", function () {",
+									"pm.expect(pm.response.to.not.have.jsonBody(\"errors\"));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5/data/absence_by_characteristic.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5",
+								"data",
+								"absence_by_characteristic.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Import Status - Absence by characteristic - invalid release id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+								"exec": [
+									"var respJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Status should be not found\", function () {",
+									"    pm.expect(respJson.status).to.equal(\"NOT_FOUND\");",
+									"});",
+									"",
+									"pm.test(\"Percentage complete should be zero\", function () {",
+									"    pm.expect(respJson.percentageComplete).to.equal(0);",
+									"});",
+									"",
+									"pm.test(\"There should be no errors field\", function () {",
+									"pm.expect(pm.response.to.not.have.jsonBody(\"errors\"));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/228f8aaf-e438-4155-8912-983943a88989/data/expected_not_found.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"228f8aaf-e438-4155-8912-983943a88989",
+								"data",
+								"expected_not_found.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		}
