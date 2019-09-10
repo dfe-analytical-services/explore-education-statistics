@@ -14,13 +14,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interf
         Task<List<ThemeTree>> GetDownloadTreeAsync();
 
         Task<Methodology> GetMethodologyAsync(string slug);
-        
+
         Task<PublicationViewModel> GetPublicationAsync(string slug);
-        
+
         Task<ReleaseViewModel> GetLatestReleaseAsync(string slug);
 
         Task<ReleaseViewModel> GetReleaseAsync(string publicationSlug, string releaseSlug);
-
-
     }
 }

@@ -1,14 +1,12 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Api.Services;
-using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Services;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Services
 {
     public class MethodologyServiceTests
     {

@@ -1,10 +1,9 @@
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Converters;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Converters
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Converters
 {
     public class ContentBlockConverterTests
     {

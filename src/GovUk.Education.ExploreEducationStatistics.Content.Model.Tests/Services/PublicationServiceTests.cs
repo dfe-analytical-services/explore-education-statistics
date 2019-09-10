@@ -1,15 +1,12 @@
 using System;
 using System.Collections.Generic;
-using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Services;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Services
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Services
 {
     public class PublicationServiceTests
     {
