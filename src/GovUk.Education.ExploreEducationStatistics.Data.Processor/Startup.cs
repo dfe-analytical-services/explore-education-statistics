@@ -37,6 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 .AddTransient<ImporterMemoryCache>()
                 .AddTransient<ITableStorageService, TableStorageService>(s => new TableStorageService(GetConnectionString("CoreStorage", $"{ConnectionTypeValues[ConnectionTypes.AZURE_STORAGE]}")))
                 .AddTransient<IBatchService, BatchService>()
+                .AddTransient<IImportStatusService, ImportStatusService>()
                 .AddSingleton<IValidatorService, ValidatorService>()
                 .BuildServiceProvider();
         }

@@ -1,8 +1,10 @@
 using System;
+using System.Net;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Storage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 {
@@ -20,14 +22,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(Guid id)
         {
-            var permalink = await _permalinkService.GetAsync(id);    
-
-            if (permalink == null)
+            try
+            {
+                var permalink = await _permalinkService.GetAsync(id);
+                return Ok(permalink);
+            }
+            catch (StorageException e)
+                when ((HttpStatusCode) e.RequestInformation.HttpStatusCode == HttpStatusCode.NotFound)
             {
                 return NotFound();
             }
-
-            return Ok(permalink);
         }
 
         [HttpPost]
