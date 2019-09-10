@@ -57,8 +57,10 @@ class ContentSectionIndex extends Component<Props> {
       <>
         {indexComplete && indexResults.length > 0 && (
           <>
-            <h3 className="govuk-heading-s">In this section</h3>
-            <ul className="govuk-body-s">
+            <h3 className="govuk-heading-s dfe-print-hidden">
+              In this section
+            </h3>
+            <ul className="govuk-body-s dfe-print-hidden">
               {indexResults.map(item => {
                 return (
                   <>

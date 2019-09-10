@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.WindowsAzure.Storage.Blob;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces
 {
@@ -13,6 +14,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
         Task<Boolean> UploadDataFileAsync(Guid releaseId, IFormFile dataFile, string metaFileName,
             string name);
 
-        void Delete(ImportMessage importMessage);
+        void Delete(string releaseId, string dataFileName);
+        
+        CloudBlockBlob GetCloudBlockBlob(string releaseId, string dataFileName);
+        
+        Task<string> GetLeaseId(CloudBlockBlob cloudBlockBlob);
     }
 }

@@ -1,8 +1,6 @@
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Seed.Extensions;
 using Microsoft.AspNetCore.Http;
@@ -22,7 +20,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
         private readonly IMapper _mapper;
         private readonly string _storageConnectionString;
         private readonly IFileStorageService _fileStorageService;
-
         private readonly List<ImportMessage> messages = new List<ImportMessage>();
 
         private const bool PROCESS_SEQUENTIALLY = true;
@@ -41,11 +38,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
 
         public void Seed()
         {
-            _logger.LogInformation("Seeding");
-
-            var stopWatch = new Stopwatch();
-            stopWatch.Start();
-
             var subjects = SamplePublications.GetSubjects();
             foreach (var subject in subjects)
             {
@@ -54,17 +46,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
                 StoreFiles(subject.Release, file, subject.Name);
                 Seed(file + ".csv", subject.Release, subjects.Count);
             }
-
-            stopWatch.Stop();
-            _logger.LogInformation("All import messages queued. Completed with duration {duration} ",
-                stopWatch.Elapsed.ToString());
         }
 
         private void Seed(string dataFileName, Release release, int maxCount)
         {
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
             var client = storageAccount.CreateCloudQueueClient();
-
             var aQueue = client.GetQueueReference("imports-available");
             aQueue.CreateIfNotExists();
 
@@ -76,11 +63,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
                     DataFileName = dataFileName,
                     Release = importMessageRelease,
                     BatchNo = 1,
-                    BatchSize = 1
+                    NumBatches = 1
                 });
 
-                var last = messages.Count == maxCount;
-                if (last)
+                if (messages.Count == maxCount)
                 {
                     var sQueue = client.GetQueueReference("imports-pending-sequential");
                     sQueue.CreateIfNotExists();
@@ -110,7 +96,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
                 DataFileName = dataFileName,
                 Release = importMessageRelease,
                 BatchNo = 1,
-                BatchSize = 1
+                NumBatches = 1,
+                RowsPerBatch = 10000   // Just for info - rows per batch is actually set in host.json of the processor function
             };
 
             return new CloudQueueMessage(JsonConvert.SerializeObject(message));
@@ -122,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
             var metaFile = CreateFormFile(file.GetMetaCsvLines(), file + ".meta.csv", "metaFile");
 
             _logger.LogInformation("Uploading files for \"{subjectName}\"", subjectName);
-            var result = _fileStorageService.UploadDataFilesAsync(release.Id, dataFile, metaFile, subjectName).Result;
+            var result = _fileStorageService.UploadDataFilesAsync(release.Id, dataFile, metaFile, subjectName, true).Result;
         }
 
         private static IFormFile CreateFormFile(IEnumerable<string> lines, string fileName, string name)

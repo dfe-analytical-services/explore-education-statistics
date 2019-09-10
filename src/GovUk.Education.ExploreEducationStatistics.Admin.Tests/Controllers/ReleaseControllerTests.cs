@@ -4,11 +4,11 @@ using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
                 .Returns(Task.FromResult(new Release {Id = releaseId}));
             mocks.FileStorageService
                 .Setup(service =>
-                    service.UploadFilesAsync(releaseId, ancillaryFile, "File name", ReleaseFileTypes.Ancillary))
+                    service.UploadFilesAsync(releaseId, ancillaryFile, "File name", ReleaseFileTypes.Ancillary, false))
                 .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<FileInfo>>>(new List<FileInfo>()));
             var controller = ReleasesControllerWithMocks(mocks);
 
@@ -127,7 +127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
             mocks.ReleaseService.Setup(s => s.GetAsync(It.IsAny<Guid>()))
                 .Returns(Task.FromResult(new Release {Id = releaseId}));
             mocks.FileStorageService
-                .Setup(service => service.UploadDataFilesAsync(releaseId, dataFile, metaFile, "Subject name"))
+                .Setup(service => service.UploadDataFilesAsync(releaseId, dataFile, metaFile, "Subject name", false))
                 .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<FileInfo>>>(new List<FileInfo>()));
             
             // Call the method under test
@@ -160,7 +160,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
             mocks.ReleaseService.Setup(s => s.GetAsync(It.IsAny<Guid>()))
                 .Returns(Task.FromResult(new Release {Id = releaseId}));
             mocks.FileStorageService
-                .Setup(service => service.UploadDataFilesAsync(releaseId, dataFile, metaFile, "Subject name"))
+                .Setup(service => service.UploadDataFilesAsync(releaseId, dataFile, metaFile, "Subject name", false))
                 .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<FileInfo>>>(
                     ValidationResult(CannotOverwriteFile)));
             var controller = ReleasesControllerWithMocks(mocks);
@@ -354,19 +354,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
             Assert.Contains(ValidationResult(message).ErrorMessage, validationProblem.Errors[string.Empty]);
             return validationProblem;
         }
-        
-        private static (Mock<IReleaseService> ReleaseService, Mock<IFileStorageService> FileStorageService,
-            Mock<IPublicationService> PublicationService) Mocks()
+
+        private static (Mock<IImportService> ImportService,
+            Mock<IReleaseService> ReleaseService,
+            Mock<IFileStorageService> FileStorageService,
+            Mock<IPublicationService> PublicationService,
+            Mock<IImportStatusService> ImportStatusService) Mocks()
         {
-            return (new Mock<IReleaseService>(), new Mock<IFileStorageService>(), new Mock<IPublicationService>());
+            return (new Mock<IImportService>(),
+                    new Mock<IReleaseService>(),
+                    new Mock<IFileStorageService>(),
+                    new Mock<IPublicationService>(),
+                    new Mock<IImportStatusService>()
+                );
         }
 
-        private static ReleasesController ReleasesControllerWithMocks(
-            (Mock<IReleaseService> ReleaseService, Mock<IFileStorageService> FileStorageService, 
-                Mock<IPublicationService> PublicationService) mocks)
+        private static ReleasesController ReleasesControllerWithMocks((Mock<IImportService> ImportService,
+            Mock<IReleaseService> ReleaseService,
+            Mock<IFileStorageService> FileStorageService,
+            Mock<IPublicationService> PublicationService,
+            Mock<IImportStatusService> ImportStatusService) mocks)
         {
-            return new ReleasesController(mocks.ReleaseService.Object, mocks.FileStorageService.Object, 
-                mocks.PublicationService.Object,null);
+            return new ReleasesController(mocks.ImportService.Object,
+                mocks.ReleaseService.Object,
+                mocks.FileStorageService.Object,
+                mocks.PublicationService.Object,
+                null,
+                mocks.ImportStatusService.Object);
         }
     }
 }

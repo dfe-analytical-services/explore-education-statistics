@@ -44,14 +44,28 @@ const TableHeadersForm = (props: Props) => {
                 .of<SortableOption>(Yup.object())
                 .ensure(),
             )
-            .min(1, 'Must have at least one row group'),
+            .min(
+              initialValues.columnGroups.length +
+                initialValues.rowGroups.length >
+                1
+                ? 1
+                : 0,
+              'Must have at least one row group',
+            ),
           columnGroups: Yup.array()
             .of(
               Yup.array()
                 .of<SortableOption>(Yup.object())
                 .ensure(),
             )
-            .min(1, 'Must have at least one column group'),
+            .min(
+              initialValues.columnGroups.length +
+                initialValues.rowGroups.length >
+                1
+                ? 1
+                : 0,
+              'Must have at least one column group',
+            ),
           columns: Yup.array()
             .of<SortableOption>(Yup.object())
             .ensure(),
