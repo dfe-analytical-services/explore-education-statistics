@@ -93,14 +93,15 @@ if args.env == "ci":
     # NOTE(mark): Ensure secrets aren't visible in CI logs/reports
     robotArgs += ["--removekeywords", "name:library.user logs into microsoft online"]
     robotArgs += ["--removekeywords", "name:operatingsystem.environment variable should be set"]
-
 else:
     if args.env == 'local':
         robotArgs += ['--exclude', 'NotAgainstLocal']
+    if args.env == 'dev03':
+        robotArgs += ['--exclude', 'NotAgainstProd']
     load_dotenv(os.path.join(os.path.dirname(__file__), '.env.' + args.env))
 
 if os.getenv('PUBLIC_URL') is None or os.getenv('ADMIN_URL') is None:
-    print("PUBLIC_URL and/or ADMIN_URL are None -- .env.{env} file needs to be set")
+    print("PUBLIC_URL and/or ADMIN_URL are None -- .env.{env} file or pipeline variables needs to be set")
     sys.exit(1)
 
 if args.visual:

@@ -18,19 +18,19 @@ function PublicationList({ publications }: Props) {
     <>
       {publications.length > 0 ? (
         publications.map(({ id, legacyPublicationUrl, slug, title }) => (
-          <li key={id}>
-            <strong>{title}</strong>
+          <li key={id} className="govuk-!-margin-bottom-0">
+            <h3 className="govuk-heading-s govuk-!-margin-bottom-0">{title}</h3>
             {legacyPublicationUrl ? (
-              <span>
+              <div className="govuk-!-margin-bottom-3">
                 {' '}
-                - currently available via{' '}
+                Currently available via{' '}
                 <a href={legacyPublicationUrl}>Statistics at DfE</a>
-              </span>
+              </div>
             ) : (
-              <div className="govuk-grid-row govuk-!-margin-top-0 govuk-!-margin-bottom-4">
-                <div className="govuk-grid-column-one-third">
+              <div className="govuk-grid-row govuk-!-margin-bottom-3">
+                <div className="govuk-grid-column-one-third govuk-!-margin-bottom-1">
                   <Link
-                    className="govuk-link govuk-!-margin-right-9"
+                    className="govuk-link"
                     to={`/find-statistics/publication?publication=${slug}`}
                     as={`/find-statistics/${slug}`}
                     data-testid={`view-stats-${slug}`}
