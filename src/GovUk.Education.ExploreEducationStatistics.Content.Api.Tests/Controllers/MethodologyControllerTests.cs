@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 
             var result = controller.GetMethodologyTree();
 
-            Assert.IsAssignableFrom<NoContentResult>(result.Result);
+            Assert.IsAssignableFrom<NoContentResult>(result.Result.Result);
         }
 
         [Fact]
@@ -84,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 
             var result = controller.Get("unknown-slug");
 
-            Assert.IsAssignableFrom<NotFoundResult>(result.Result);
+            Assert.IsAssignableFrom<NotFoundResult>(result.Result.Result);
         }
     }
 }
