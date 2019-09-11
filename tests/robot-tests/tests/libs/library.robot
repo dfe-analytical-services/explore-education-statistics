@@ -248,3 +248,11 @@ user logs into microsoft online
   wait until element is enabled   css:input[value="No"]
   sleep  1
   user clicks element   css:input[value="No"]
+
+user checks publication bullet contains link
+  [Arguments]   ${publication}   ${link}
+  user checks page contains element  xpath://details[@open]//*[text()="${publication}"]/..//a[text()="${link}"]
+
+user checks publication bullet does not contain link
+  [Arguments]   ${publication}   ${link}
+  user checks page does not contain element  xpath://details[@open]//*[text()="${publication}"]/..//a[text()="${link}"]
