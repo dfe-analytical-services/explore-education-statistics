@@ -1,6 +1,6 @@
 *** Settings ***
 Resource    ../libs/library.robot
-Resource    ./admin_common.robot
+Resource    ./libs/common-keywords.robot
 
 Force Tags  Admin  NotAgainstProd
 
