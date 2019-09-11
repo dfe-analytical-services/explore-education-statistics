@@ -520,10 +520,12 @@ class TableToolPage extends Component<Props, State> {
                                 Go to methodology
                               </Link>
                             </li>
-                            <li>
-                              <a href="#contact">Contact</a>
-                            </li>
                           </ul>
+                          <p className="govuk-body">
+                            If you have a question about the data or methods
+                            used to create this table contact the named
+                            statistician via the relevant release page.
+                          </p>
                         </>
                       )}
                     </>
