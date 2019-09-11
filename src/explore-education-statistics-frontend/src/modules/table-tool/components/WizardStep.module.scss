@@ -3,12 +3,16 @@
 $circle-size: 40px;
 $circle-border-size: 4px;
 $step-padding-top: govuk-spacing(6);
+$step-padding-top-mobile: govuk-spacing(7);
 
 .step {
   align-items: flex-start;
   display: flex;
   padding-left: govuk-spacing(8);
   position: relative;
+  @include govuk-media-query($until: tablet) {
+    padding-left: govuk-spacing(4);
+  }
 
   &.stepHidden {
     display: none;
@@ -76,4 +80,7 @@ $step-padding-top: govuk-spacing(6);
   margin-left: govuk-spacing(6);
   padding-top: $step-padding-top;
   width: 100%;
+  @include govuk-media-query($until: tablet) {
+    padding-top: $step-padding-top-mobile;
+  }
 }
