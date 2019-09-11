@@ -4,12 +4,15 @@ import {
   IdTitlePair,
   TimePeriodCoverageGroup,
 } from '@admin/services/common/types';
-import {AdminDashboardRelease, ReleaseStatus,} from '@admin/services/dashboard/types';
-import {CreateReleaseRequest} from '@admin/services/release/create-release/types';
-import {UpdateReleaseSummaryDetailsRequest} from '@admin/services/release/edit-release/summary/types';
-import {BaseReleaseSummaryDetailsRequest,} from '@admin/services/release/types';
-import {FormValues as CreateFormValues} from '../create-release/CreateReleasePage';
-import {EditFormValues} from '../summary/ReleaseSummaryForm';
+import {
+  AdminDashboardRelease,
+  ReleaseStatus,
+} from '@admin/services/dashboard/types';
+import { CreateReleaseRequest } from '@admin/services/release/create-release/types';
+import { UpdateReleaseSummaryDetailsRequest } from '@admin/services/release/edit-release/summary/types';
+import { BaseReleaseSummaryDetailsRequest } from '@admin/services/release/types';
+import { FormValues as CreateFormValues } from '../create-release/CreateReleasePage';
+import { EditFormValues } from '../summary/ReleaseSummaryForm';
 
 export const assembleBaseReleaseSummaryRequestFromForm = (
   values: EditFormValues,
