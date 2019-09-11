@@ -92,8 +92,8 @@ user waits until page contains
   wait until page contains   ${pageText}
 
 user waits until page contains element
-  [Arguments]    ${element}
-  wait until page contains element  ${element}
+  [Arguments]    ${element}        ${wait}=${timeout}
+  wait until page contains element  ${element}   timeout=${wait}
 
 user waits until page does not contain element
   [Arguments]    ${element}
@@ -121,8 +121,8 @@ user checks element does not contain
   element should not contain    ${element}    ${text}
 
 user waits until element is visible
-  [Arguments]    ${selector}
-  wait until element is visible  ${selector}
+  [Arguments]    ${selector}    ${wait}=${timeout}
+  wait until element is visible  ${selector}   timeout=${wait}
 
 user checks element is visible
   [Arguments]   ${element}
@@ -224,12 +224,8 @@ user checks page contains link with text and url
   user checks page contains element  xpath://a[@href="${href}" and text()="${text}"]
 
 user waits until results table appears
-  # NOTE(mark): Increasing timeout to stop known failure and created DFE-1158
-  set selenium timeout          60
-  set selenium implicit wait    60
-  user waits until page contains element   css:table thead th
-  set selenium timeout          ${timeout}
-  set selenium implicit wait    ${implicit_wait}
+  # Extra timeout until EES-234
+  user waits until page contains element   css:table thead th    60
 
 user logs into microsoft online
   [Arguments]  ${email}   ${password}
@@ -252,3 +248,11 @@ user logs into microsoft online
   wait until element is enabled   css:input[value="No"]
   sleep  1
   user clicks element   css:input[value="No"]
+
+user checks publication bullet contains link
+  [Arguments]   ${publication}   ${link}
+  user checks page contains element  xpath://details[@open]//*[text()="${publication}"]/..//a[text()="${link}"]
+
+user checks publication bullet does not contain link
+  [Arguments]   ${publication}   ${link}
+  user checks page does not contain element  xpath://details[@open]//*[text()="${publication}"]/..//a[text()="${link}"]
