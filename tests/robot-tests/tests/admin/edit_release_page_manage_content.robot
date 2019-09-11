@@ -1,5 +1,4 @@
 *** Settings ***
-Resource    ../libs/library.robot
 Resource    ./libs/common-keywords.robot
 
 Force Tags  Admin  NotAgainstProd  AltersData
@@ -10,7 +9,7 @@ Suite Teardown    user closes the browser
 *** Test Cases ***
 User creates a new release for use in this test
     [Tags]  HappyPath
-    user selects theme "Automated Test Theme" and topic "Automated Test Topic" from the admin dashboard
+    user selects theme "Test Theme" and topic "Automated Test Topic" from the admin dashboard
     user creates a new release for publication "Automated Test Publication for Edit Release" for start year "2017"
 
 User selects the Manage Content section
