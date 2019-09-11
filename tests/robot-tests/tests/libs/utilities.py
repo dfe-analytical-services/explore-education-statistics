@@ -139,7 +139,7 @@ def user_checks_details_dropdown_contains_publication(details_heading, publicati
     raise AssertionError(f'Cannot find details component "{details_heading}"')
 
   try:
-    sl.driver.find_element_by_xpath(f'//*[@class="govuk-details__summary-text" and text()="{details_heading}"]/../..//strong[text()="{publication_name}"]')
+    sl.driver.find_element_by_xpath(f'//*[@class="govuk-details__summary-text" and text()="{details_heading}"]/../..//*[text()="{publication_name}"]')
   except:
     raise AssertionError(f'Cannot find publication "{publication_name}" inside details component "{details_heading}"')
 
