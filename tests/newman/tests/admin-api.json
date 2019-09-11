@@ -1169,11 +1169,12 @@
 									"raw": "{\n    \"subjectId\": 1,\n    \"country\": [\n    \t\"E92000001\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2014,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__GenderMale}}, {{FILT_Char__GenderFemale}}\n    ],\n    \"indicators\": [\n    \t{{IND_AbsenceFields__UnauthorisedAbsenceRate}}, \n        {{IND_AbsenceFields__OverallAbsenceRate}}, \n        {{IND_AbsenceFields__AuthorisedAbsenceRate}},\n        {{IND_AbsenceFields__PercentageOfPersistentAbsentees}},\n        {{IND_AbsenceFields__NumberOfPersistentAbsentees}}\n    ]\n}"
 								},
 								"url": {
-									"raw": "{{data_api_url}}/tablebuilder",
+									"raw": "{{admin_api_url}}/data/tablebuilder",
 									"host": [
-										"{{data_api_url}}"
+										"{{admin_api_url}}"
 									],
 									"path": [
+										"data",
 										"tablebuilder"
 									]
 								}
