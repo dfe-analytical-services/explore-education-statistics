@@ -133,7 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 // TODO: model might be incorrect so will need to validate this
                 // TODO: Save the filename as slug rather than ID
                 var blob = _cloudBlobContainer.GetBlockBlobReference(
-                    $"methodology/methodologies/{methodology.Id}.json");
+                    $"methodology/methodologies/{methodology.Slug}.json");
                 await blob.UploadTextAsync(JsonConvert.SerializeObject(methodology, null,
                     new JsonSerializerSettings() {ReferenceLoopHandling = ReferenceLoopHandling.Ignore}));
             }
