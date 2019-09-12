@@ -4341,6 +4341,144 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Upload data file - invalid (data file has missing observational unit column)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"exec": [
+									"/*",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Should return some results\", function () {",
+									"    pm.expect(pm.response.json().length).to.equal(2);    ",
+									"});",
+									"",
+									"pm.test(\"Name should be correct\", function () { ",
+									"    pm.expect(pm.response.json()[1].name).to.equal(\"testName\"); ",
+									"});",
+									"",
+									"pm.test(\"Extension should be csv\", function () { ",
+									"    pm.expect(pm.response.json()[0].extension).to.equal(\"csv\"); ",
+									"});",
+									"*/"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/missing_observational_units_in_data_file.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/missing_observational_units_in_data_file.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=invalid_data_file_has_missing_observational_unit_column",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "invalid_data_file_has_missing_observational_unit_column"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload data file - invalid (data file has missing observational unit column) - check status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"exec": [
+									"/*",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Should return some results\", function () {",
+									"    pm.expect(pm.response.json().length).to.equal(2);    ",
+									"});",
+									"",
+									"pm.test(\"Name should be correct\", function () { ",
+									"    pm.expect(pm.response.json()[1].name).to.equal(\"testName\"); ",
+									"});",
+									"",
+									"pm.test(\"Extension should be csv\", function () { ",
+									"    pm.expect(pm.response.json()[0].extension).to.equal(\"csv\"); ",
+									"});",
+									"*/"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/missing_observational_units_in_data_file.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"missing_observational_units_in_data_file.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		}
