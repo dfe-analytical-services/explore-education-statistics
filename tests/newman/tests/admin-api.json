@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "09aadbdc-4e30-44a8-addc-8b7e6afd8de0",
+		"_postman_id": "b3a6c901-2fb2-4b7e-99ee-6ec9ea20c9fe",
 		"name": "DfE Admin API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -4611,6 +4611,3709 @@
 								"{{file_upload_validation_release_id}}",
 								"data",
 								"missing_columns_in_data_file.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Release - Small File uploads",
+			"item": [
+				{
+					"name": "Upload small file - 3digit_illegal",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/3digit_illegal.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/3digit_illegal.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=3digit_illegal",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "3digit_illegal"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - 3digit_illegal - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/3digit_illegal.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"3digit_illegal.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - 4and6digit_overlapping",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/4and6digit_overlapping.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/4and6digit_overlapping.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=4and6digit_overlapping",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "4and6digit_overlapping"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - 4and6digit_overlapping - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/4and6digit_overlapping.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"4and6digit_overlapping.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - 4and6digit_simple",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/4and6digit_simple.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/4and6digit_simple.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=4and6digit_simple",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "4and6digit_simple"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - 4and6digit_simple - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/4and6digit_simple.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"4and6digit_simple.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - 4digit_duplicate",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/4digit_duplicate.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/4digit_duplicate.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=4digit_duplicate",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "4digit_duplicate"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - 4digit_duplicate - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/4digit_duplicate.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"4digit_duplicate.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - 4digit_extreme_gaps",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/4digit_extreme_gaps.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/4digit_extreme_gaps.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=4digit_extreme_gaps",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "4digit_extreme_gaps"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - 4digit_extreme_gaps - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/4digit_extreme_gaps.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"4digit_extreme_gaps.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - 4digit_simple",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/4digit_simple.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/4digit_simple.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=4digit_simple",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "4digit_simple"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - 4digit_simple - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/4digit_simple.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"4digit_simple.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - 6digit_dodgy",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/6digit_dodgy.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/6digit_dodgy.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=6digit_dodgy",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "6digit_dodgy"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - 6digit_dodgy - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/6digit_dodgy.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"6digit_dodgy.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - 6digit_simple",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/6digit_simple.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/6digit_simple.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=6digit_simple",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "6digit_simple"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - 6digit_simple - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/6digit_simple.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"6digit_simple.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - 7digit_iffy",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/7digit_iffy.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/7digit_iffy.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=7digit_iffy",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "7digit_iffy"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - 7digit_iffy - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/7digit_iffy.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"7digit_iffy.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - All_geographies",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/All_geographies.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/All_geographies.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=All_geographies",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "All_geographies"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - All_geographies - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/All_geographies.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"All_geographies.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - All_geographies_messy",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/All_geographies_messy.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/All_geographies_messy.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=All_geographies_messy",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "All_geographies_messy"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - All_geographies_messy - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/All_geographies_messy.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"All_geographies_messy.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - all_year_empty",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/all_year_empty.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/all_year_empty.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=all_year_empty",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "all_year_empty"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - all_year_empty - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/all_year_empty.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"all_year_empty.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - all_year_identifer_blank",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/all_year_identifer_blank.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/all_year_identifer_blank.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=all_year_identifer_blank",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "all_year_identifer_blank"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - all_year_identifer_blank - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/all_year_identifer_blank.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"all_year_identifer_blank.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - combined_terms",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/combined_terms.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/combined_terms.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=combined_terms",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "combined_terms"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - combined_terms - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/combined_terms.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"combined_terms.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - combined_terms_duplicates",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/combined_terms_duplicates.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/combined_terms_duplicates.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=combined_terms_duplicates",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "combined_terms_duplicates"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - combined_terms_duplicates - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/combined_terms_duplicates.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"combined_terms_duplicates.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - different_time_years",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/different_time_years.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/different_time_years.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=different_time_years",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "different_time_years"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - different_time_years - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/different_time_years.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"different_time_years.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - financial_year_duplicate_gaps",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/financial_year_duplicate_gaps.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/financial_year_duplicate_gaps.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=financial_year_duplicate_gaps",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "financial_year_duplicate_gaps"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - financial_year_duplicate_gaps - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/financial_year_duplicate_gaps.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"financial_year_duplicate_gaps.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - financial_year_simple",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/financial_year_simple.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/financial_year_simple.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=financial_year_simple",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "financial_year_simple"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - financial_year_simple - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/financial_year_simple.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"financial_year_simple.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - LA",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/LA.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/LA.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=LA",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "LA"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - LA - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/LA.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"LA.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - LAD",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/LAD.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/LAD.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=LAD",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "LAD"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - LAD - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/LAD.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"LAD.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - LA_with_SOME_regional_columns",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/LA_with_SOME_regional_columns.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/LA_with_SOME_regional_columns.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=LA_with_SOME_regional_columns",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "LA_with_SOME_regional_columns"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - LA_with_SOME_regional_columns - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/LA_with_SOME_regional_columns.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"LA_with_SOME_regional_columns.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - LEP",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/LEP.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/LEP.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=LEP",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "LEP"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - LEP - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/LEP.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"LEP.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - MCA",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/MCA.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/MCA.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=MCA",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "MCA"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - MCA - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/MCA.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"MCA.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - mixed_digits",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/mixed_digits.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/mixed_digits.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=mixed_digits",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "mixed_digits"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - mixed_digits - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/mixed_digits.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"mixed_digits.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - monthly_missing",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/monthly_missing.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/monthly_missing.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=monthly_missing",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "monthly_missing"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - monthly_missing - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/monthly_missing.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"monthly_missing.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - monthly_simple",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/monthly_simple.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/monthly_simple.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=monthly_simple",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "monthly_simple"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - monthly_simple - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/monthly_simple.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"monthly_simple.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - MSOA",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/MSOA.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/MSOA.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=MSOA",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "MSOA"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - MSOA - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/MSOA.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"MSOA.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - one_row_simple",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/one_row_simple.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/one_row_simple.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=one_row_simple",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "one_row_simple"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - one_row_simple - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/one_row_simple.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"one_row_simple.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - overlapping_terms",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/overlapping_terms.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/overlapping_terms.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=overlapping_terms",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "overlapping_terms"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - overlapping_terms - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/overlapping_terms.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"overlapping_terms.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - PCon",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/PCon.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/PCon.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=PCon",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "PCon"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - PCon - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/PCon.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"PCon.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - Regional",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/Regional.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/Regional.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=Regional",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "Regional"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - Regional - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/Regional.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"Regional.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - regional_different_years",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/regional_different_years.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/regional_different_years.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=regional_different_years",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "regional_different_years"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - regional_different_years - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/regional_different_years.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"regional_different_years.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - RSC",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/RSC.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/RSC.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=RSC",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "RSC"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - RSC - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/RSC.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"RSC.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - some_identifier_missing",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/some_identifier_missing.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/some_identifier_missing.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=some_identifier_missing",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "some_identifier_missing"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - some_identifier_missing - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/some_identifier_missing.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"some_identifier_missing.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - some_year_missing",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/some_year_missing.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/some_year_missing.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=some_year_missing",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "some_year_missing"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - some_year_missing - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/some_year_missing.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"some_year_missing.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - string_digits",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/string_digits.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/string_digits.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=string_digits",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "string_digits"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - string_digits - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/string_digits.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"string_digits.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - tax_year_simple",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/tax_year_simple.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/tax_year_simple.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=tax_year_simple",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "tax_year_simple"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - tax_year_simple - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/tax_year_simple.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"tax_year_simple.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - termly_missing",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/termly_missing.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/termly_missing.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=termly_missing",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "termly_missing"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - termly_missing - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/termly_missing.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"termly_missing.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - termly_simple",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/termly_simple.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/termly_simple.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=termly_simple",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "termly_simple"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - termly_simple - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/termly_simple.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"termly_simple.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - up_until_31st_march",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/up_until_31st_march.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/up_until_31st_march.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=up_until_31st_march",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "up_until_31st_march"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - up_until_31st_march - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/up_until_31st_march.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"up_until_31st_march.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - up_until_31st_march_iffy",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/up_until_31st_march_iffy.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/up_until_31st_march_iffy.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=up_until_31st_march_iffy",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "up_until_31st_march_iffy"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - up_until_31st_march_iffy - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/up_until_31st_march_iffy.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"up_until_31st_march_iffy.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - ward",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/ward.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/ward.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=ward",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "ward"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - ward - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/ward.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"ward.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - year_identifier_missing_columns",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/year_identifier_missing_columns.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "{{files_dir}}/small-files/year_identifier_missing_columns.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=year_identifier_missing_columns",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "year_identifier_missing_columns"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload small file - year_identifier_missing_columns - check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/year_identifier_missing_columns.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"year_identifier_missing_columns.csv",
 								"import",
 								"status"
 							]
