@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import Link from '@admin/components/Link';
 import service from '@admin/services/release/edit-release/data/service';
+import importStatusService from '@admin/services/release/import-status/service';
 import { DataFile } from '@admin/services/release/edit-release/data/types';
 import Button from '@common/components/Button';
 import { Form, FormFieldset, Formik } from '@common/components/form';
@@ -37,6 +38,13 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
   useEffect(() => {
     service.getReleaseDataFiles(releaseId).then(setDataFiles);
   }, [publicationId, releaseId]);
+
+  importStatusService
+    .getImportStatus(
+      '0dafd89b-b754-44a8-b3f1-72baac0a108a',
+      'level_2_3_national.csv',
+    )
+    .then(res => console.log(res));
 
   const resetPage = async <T extends {}>({ resetForm }: FormikActions<T>) => {
     resetForm();
