@@ -2687,6 +2687,144 @@
 					"response": []
 				},
 				{
+					"name": "Upload data file - invalid (meta incorrect values)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"exec": [
+									"/*",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Should return some results\", function () {",
+									"    pm.expect(pm.response.json().length).to.equal(2);    ",
+									"});",
+									"",
+									"pm.test(\"Name should be correct\", function () { ",
+									"    pm.expect(pm.response.json()[1].name).to.equal(\"testName\"); ",
+									"});",
+									"",
+									"pm.test(\"Extension should be csv\", function () { ",
+									"    pm.expect(pm.response.json()[0].extension).to.equal(\"csv\"); ",
+									"});",
+									"*/"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/invalid_data_in_metadata_file.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/invalid_data_in_metadata_file.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=upload_data_file_invalid_values_in_metadata_file",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "upload_data_file_invalid_values_in_metadata_file"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload data file - invalid (meta incorrect values) - check status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"exec": [
+									"/*",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Should return some results\", function () {",
+									"    pm.expect(pm.response.json().length).to.equal(2);    ",
+									"});",
+									"",
+									"pm.test(\"Name should be correct\", function () { ",
+									"    pm.expect(pm.response.json()[1].name).to.equal(\"testName\"); ",
+									"});",
+									"",
+									"pm.test(\"Extension should be csv\", function () { ",
+									"    pm.expect(pm.response.json()[0].extension).to.equal(\"csv\"); ",
+									"});",
+									"*/"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/invalid_data_in_metadata_file.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"invalid_data_in_metadata_file.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Upload data file - invalid (meta row includes quotes)",
 					"event": [
 						{
@@ -2765,7 +2903,7 @@
 					"response": []
 				},
 				{
-					"name": "Upload data file - invalid (meta row includes quotes) - check status Copy",
+					"name": "Upload data file - invalid (meta row includes quotes) - check status Copy Copy",
 					"event": [
 						{
 							"listen": "test",
@@ -2817,6 +2955,144 @@
 								"{{file_upload_validation_release_id}}",
 								"data",
 								"quotes_in_metadata_file.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload data file - invalid (data file includes quotes)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"exec": [
+									"/*",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Should return some results\", function () {",
+									"    pm.expect(pm.response.json().length).to.equal(2);    ",
+									"});",
+									"",
+									"pm.test(\"Name should be correct\", function () { ",
+									"    pm.expect(pm.response.json()[1].name).to.equal(\"testName\"); ",
+									"});",
+									"",
+									"pm.test(\"Extension should be csv\", function () { ",
+									"    pm.expect(pm.response.json()[0].extension).to.equal(\"csv\"); ",
+									"});",
+									"*/"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/quotes_in_data_file.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/quotes_in_data_file.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=upload_data_file_invalid_quotes_in_data_file",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "upload_data_file_invalid_quotes_in_data_file"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload data file - invalid (data file includes quotes) - check status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"exec": [
+									"/*",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Should return some results\", function () {",
+									"    pm.expect(pm.response.json().length).to.equal(2);    ",
+									"});",
+									"",
+									"pm.test(\"Name should be correct\", function () { ",
+									"    pm.expect(pm.response.json()[1].name).to.equal(\"testName\"); ",
+									"});",
+									"",
+									"pm.test(\"Extension should be csv\", function () { ",
+									"    pm.expect(pm.response.json()[0].extension).to.equal(\"csv\"); ",
+									"});",
+									"*/"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/quotes_in_data_file.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"quotes_in_data_file.csv",
 								"import",
 								"status"
 							]
@@ -3231,6 +3507,360 @@
 								"{{file_upload_validation_release_id}}",
 								"data",
 								"unexpected_number_of_columns_in_metadata_file.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload data file - invalid (data file has unexpected number of columns)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"exec": [
+									"/*",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Should return some results\", function () {",
+									"    pm.expect(pm.response.json().length).to.equal(2);    ",
+									"});",
+									"",
+									"pm.test(\"Name should be correct\", function () { ",
+									"    pm.expect(pm.response.json()[1].name).to.equal(\"testName\"); ",
+									"});",
+									"",
+									"pm.test(\"Extension should be csv\", function () { ",
+									"    pm.expect(pm.response.json()[0].extension).to.equal(\"csv\"); ",
+									"});",
+									"*/"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/unexpected_number_of_columns_in_data_file.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/unexpected_number_of_columns_in_data_file.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=invalid_data_file_has_unexpected_number_of_columns",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "invalid_data_file_has_unexpected_number_of_columns"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload data file - invalid (data file has invalid geographic level)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"exec": [
+									"/*",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Should return some results\", function () {",
+									"    pm.expect(pm.response.json().length).to.equal(2);    ",
+									"});",
+									"",
+									"pm.test(\"Name should be correct\", function () { ",
+									"    pm.expect(pm.response.json()[1].name).to.equal(\"testName\"); ",
+									"});",
+									"",
+									"pm.test(\"Extension should be csv\", function () { ",
+									"    pm.expect(pm.response.json()[0].extension).to.equal(\"csv\"); ",
+									"});",
+									"*/"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/invalid_geographic_level_in_data_file.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/invalid_geographic_level_in_data_file.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=invalid_data_file_has_invalid_geographic_level",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "invalid_data_file_has_invalid_geographic_level"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload data file - invalid (data file has invalid geographic level) - check status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"exec": [
+									"/*",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Should return some results\", function () {",
+									"    pm.expect(pm.response.json().length).to.equal(2);    ",
+									"});",
+									"",
+									"pm.test(\"Name should be correct\", function () { ",
+									"    pm.expect(pm.response.json()[1].name).to.equal(\"testName\"); ",
+									"});",
+									"",
+									"pm.test(\"Extension should be csv\", function () { ",
+									"    pm.expect(pm.response.json()[0].extension).to.equal(\"csv\"); ",
+									"});",
+									"*/"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/invalid_geographic_level_in_data_file.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"invalid_geographic_level_in_data_file.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload data file - invalid (data file has invalid time identifier)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"exec": [
+									"/*",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Should return some results\", function () {",
+									"    pm.expect(pm.response.json().length).to.equal(2);    ",
+									"});",
+									"",
+									"pm.test(\"Name should be correct\", function () { ",
+									"    pm.expect(pm.response.json()[1].name).to.equal(\"testName\"); ",
+									"});",
+									"",
+									"pm.test(\"Extension should be csv\", function () { ",
+									"    pm.expect(pm.response.json()[0].extension).to.equal(\"csv\"); ",
+									"});",
+									"*/"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/invalid_time_identifier_in_data_file.csv"
+								},
+								{
+									"key": "metaFile",
+									"type": "file",
+									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/invalid_time_identifier_in_data_file.meta.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=invalid_data_file_has_invalid_time_identifier",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "invalid_data_file_has_invalid_time_identifier"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload data file - invalid (data file has invalid time identifier) - check status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3a4035f5-600e-47c8-bd3b-27960abf8cfe",
+								"exec": [
+									"/*",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Should return some results\", function () {",
+									"    pm.expect(pm.response.json().length).to.equal(2);    ",
+									"});",
+									"",
+									"pm.test(\"Name should be correct\", function () { ",
+									"    pm.expect(pm.response.json()[1].name).to.equal(\"testName\"); ",
+									"});",
+									"",
+									"pm.test(\"Extension should be csv\", function () { ",
+									"    pm.expect(pm.response.json()[0].extension).to.equal(\"csv\"); ",
+									"});",
+									"*/"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/invalid_time_identifier_in_data_file.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"{{file_upload_validation_release_id}}",
+								"data",
+								"invalid_time_identifier_in_data_file.csv",
 								"import",
 								"status"
 							]
