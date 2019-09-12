@@ -23,7 +23,6 @@ export interface UnmappedTableHeadersConfig {
 
 interface UnmappedFullTableSubjectMeta {
   publicationName: string;
-  subjectId: string;
   subjectName: string;
   locations: { label: string; value: string; level: string }[];
   timePeriodRange: TimePeriodOption[];
@@ -50,9 +49,7 @@ export interface UnmappedPermalink {
   title: string;
   created: string;
   fullTable: UnmappedFullTable;
-  configuration: {
-    tableHeadersConfig: UnmappedTableHeadersConfig;
-  };
+  query: PermalinkCreateQuery;
 }
 
 export interface Permalink {
@@ -60,19 +57,25 @@ export interface Permalink {
   title: string;
   created: string;
   fullTable: FullTable;
-  configuration: {
-    tableHeadersConfig: TableHeadersConfig;
-  };
+  query: PermalinkQuery;
 }
 
-interface PermalinkCreate extends TableDataQuery {
+interface PermalinkCreateQuery extends TableDataQuery {
   configuration: {
     tableHeadersConfig: UnmappedTableHeadersConfig;
   };
 }
 
+interface PermalinkQuery extends TableDataQuery {
+  configuration: {
+    tableHeadersConfig: TableHeadersConfig;
+  };
+}
+
 export default {
-  createTablePermalink(query: PermalinkCreate): Promise<UnmappedPermalink> {
+  createTablePermalink(
+    query: PermalinkCreateQuery,
+  ): Promise<UnmappedPermalink> {
     return dataApi.post('/permalink', query);
   },
   getPermalink(publicationSlug: string): Promise<UnmappedPermalink> {

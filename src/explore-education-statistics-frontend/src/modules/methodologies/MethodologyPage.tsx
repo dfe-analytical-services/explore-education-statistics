@@ -10,8 +10,8 @@ import PrintThisPage from '@frontend/components/PrintThisPage';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import ContentBlock from '@frontend/modules/find-statistics/components/ContentBlock';
-import MethodologyContent from '@frontend/prototypes/methodology/components/MethodologyContent';
-import MethodologyHeader from '@frontend/prototypes/methodology/components/MethodologyHeader';
+import MethodologyContent from '@frontend/modules/methodologies/components/MethodologyContent';
+import MethodologyHeader from '@frontend/modules/methodologies/components/MethodologyHeader';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
 
@@ -49,7 +49,7 @@ class MethodologyPage extends Component<Props> {
       >
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
-            <dl className="dfe-meta-content govuk-!-margin-0">
+            <dl className="dfe-meta-content govuk-!-margin-top-0">
               <div>
                 <dt className="govuk-caption-m">Published: </dt>
                 <dd data-testid="published-date">
@@ -69,8 +69,6 @@ class MethodologyPage extends Component<Props> {
                 </>
               )}
             </dl>
-          </div>
-          <div className="govuk-grid-column-one-third">
             <PageSearchFormWithAnalytics />
           </div>
         </div>

@@ -1,12 +1,15 @@
 import { LoginContext } from '@admin/components/Login';
 import {
+  getReleaseStatusLabel,
+  getReleaseSummaryLabel,
+} from '@admin/pages/release/util/releaseSummaryUtil';
+import {
   dayMonthYearIsComplete,
   dayMonthYearToDate,
 } from '@admin/services/common/types';
 import {
   AdminDashboardRelease,
   Comment,
-  ReleaseStatus,
 } from '@admin/services/dashboard/types';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
@@ -14,29 +17,6 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import { format } from 'date-fns';
 import React, { ReactNode, useContext } from 'react';
-
-const getLiveLatestLabel = (isLive: boolean, isLatest: boolean) => {
-  if (isLive && isLatest) {
-    return '(Live - Latest release)';
-  }
-  if (isLive) {
-    return '(Live)';
-  }
-  return '(not Live)';
-};
-
-const getStatusLabel = (approvalStatus: ReleaseStatus) => {
-  switch (approvalStatus) {
-    case 'Draft':
-      return 'Draft';
-    case 'HigherLevelReview':
-      return 'In Review';
-    case 'Approved':
-      return 'Approved for Publication';
-    default:
-      return undefined;
-  }
-};
 
 interface Props {
   release: AdminDashboardRelease;
@@ -52,16 +32,11 @@ const ReleaseSummary = ({ release, actions, children }: Props) => {
       ? 'me'
       : release.lastEditedUser.name;
 
-  const releaseSummaryLabel = `${release.timePeriodCoverage.label}, ${
-    release.releaseName
-  } 
-     ${getLiveLatestLabel(release.live, release.latestRelease)}`;
-
   return (
     <Details
       className="govuk-!-margin-bottom-0"
-      summary={releaseSummaryLabel}
-      tag={getStatusLabel(release.status)}
+      summary={getReleaseSummaryLabel(release)}
+      tag={getReleaseStatusLabel(release.status)}
     >
       <SummaryList additionalClassName="govuk-!-margin-bottom-3">
         <SummaryListItem term="Publish date">

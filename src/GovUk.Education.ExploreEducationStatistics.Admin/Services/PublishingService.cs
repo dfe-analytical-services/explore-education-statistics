@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public PublishingService(ApplicationDbContext applicationDbContext,
             IConfiguration config,
-            ILogger<ImportService> logger
+            ILogger<PublishingService> logger
         )
         {
             _context = applicationDbContext;

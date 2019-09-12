@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "428f6ddb-8045-4eb9-85ee-9174c0c3cf0a",
+		"_postman_id": "0d92796b-bd03-4b1d-b021-e28011c9a9ed",
 		"name": "DfE Admin API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -314,14 +314,12 @@
 									"});",
 									"",
 									"pm.test(\"Number of themes should be correct\", function () {",
-									"    pm.expect(respJson.length).to.equal(9);",
+									"    pm.expect(respJson.length).to.be.above(8);",
 									"});",
 									"",
 									"pm.test(\"First result should have correct fields\", function () {",
 									"    pm.expect(pm.response.to.have.jsonBody(\"[0].id\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[0].slug\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"[0].title\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[0].summary\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"[0].topics\"));",
 									"});",
 									"",
@@ -333,12 +331,7 @@
 									"            pm.expect(respJson[i].topics.length).to.equal(9);",
 									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].id`));",
 									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].title`));",
-									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].slug`));",
-									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].description`));",
 									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].themeId`));",
-									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].theme`));",
-									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].summary`));",
-									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].publications`));",
 									"        }",
 									"    }",
 									"    pm.expect(foundPupilsAndSchools).to.equal(true);",
@@ -403,12 +396,41 @@
 									"    pm.expect(respJson.title).to.equal(\"Pupil absence in schools in England\"); ",
 									"});",
 									"",
-									"pm.test(\"Should be two releases\", function () {",
-									"    pm.expect(respJson.releases.length).to.equal(2); ",
-									"});",
 									"",
 									"pm.test(\"Methodology title should be correct\", function () {",
 									"    pm.expect(respJson.methodology.title).to.equal(\"Pupil absence statistics: methodology\"); ",
+									"});",
+									"",
+									"pm.test(\"Should be at least one release\", function () {",
+									"    pm.expect(respJson.releases.length).to.be.above(0); ",
+									"});",
+									"",
+									"pm.test(\"First release should have correct fields\", function () {",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].id`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].title`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].publicationId`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].publicationTitle`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].releaseName`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].coverageTitle`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].yearTitle`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].typeId`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].published`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].timePeriodCoverage`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].timePeriodCoverage.value`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].timePeriodCoverage.label`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].latestRelease`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].type`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].type.id`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].type.title`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].contact`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].contact.id`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].contact.teamName`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].contact.teamEmail`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].contact.contactName`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].contact.contactTelNo`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].status`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].draftComments`));",
+									"    pm.expect(pm.response.to.have.jsonBody(`releases[0].higherReviewComments`));",
 									"});"
 								],
 								"type": "text/javascript"
@@ -481,7 +503,7 @@
 									"",
 									"pm.test(\"Expect non-null methodology to have correct fields\", function () {",
 									"    for(var i = 0; i < respJson.length; i++) {",
-									"        if(respJson[i].methodology !== null) {",
+									"        if(respJson[i].methodology != null) {",
 									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].methodology.id`));",
 									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].methodology.title`));",
 									"        }",
@@ -490,7 +512,7 @@
 									"",
 									"pm.test(\"Expect non-null contacts to have correct fields\", function () {",
 									"    for(var i = 0; i < respJson.length; i++) {",
-									"        if(respJson[i].contact !== null) {",
+									"        if(respJson[i].contact != null) {",
 									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].contact.id`));",
 									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].contact.teamName`));",
 									"            pm.expect(pm.response.to.have.jsonBody(`[${i}].contact.teamEmail`));",
@@ -626,8 +648,993 @@
 			]
 		},
 		{
+			"name": "Data",
+			"item": [
+				{
+					"name": "Meta",
+					"item": [
+						{
+							"name": "Themes",
+							"item": [
+								{
+									"name": "Themes Meta",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "2db4ed0b-6eeb-40b6-914f-f1692eb248fb",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Expect correct number of themes\", function () {",
+													"    pm.expect(pm.response.json().length).to.be.above(1);",
+													"});",
+													"",
+													"pm.test(\"Pupils and school theme should contain more than 2 topics\", function () {",
+													"    for(var i = 0; i < pm.response.json().length; i++) {",
+													"        if(pm.response.json()[i].title === \"Pupils and schools\") {",
+													"            pm.expect(pm.response.json()[i].topics.length).to.be.above(2);",
+													"            pm.expect(pm.response.to.have.jsonBody(`[${i}].id`));",
+													"            pm.expect(pm.response.to.have.jsonBody(`[${i}].slug`));",
+													"        }",
+													"    }",
+													"});",
+													"        ",
+													"pm.test(\"Children, early years and social care should contain correct data\", function () {",
+													"    for(var i = 0; i < pm.response.json().length; i++) {",
+													"        if(pm.response.json()[i].title === \"Children, early years and social care\") {",
+													"            pm.expect(pm.response.json()[i].topics.length).to.equal(1);",
+													"            pm.expect(pm.response.json()[i].topics[0].title).to.equal(\"Early years foundation stage profile\");",
+													"            pm.expect(pm.response.to.have.jsonBody(`[${i}].id`));",
+													"            pm.expect(pm.response.to.have.jsonBody(`[${i}].slug`));",
+													"            ",
+													"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].id`));",
+													"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].slug`));",
+													"            pm.expect(pm.response.json()[i].topics[0].publications.length).to.equal(1);",
+													"            pm.expect(pm.response.json()[i].topics[0].publications[0].title).to.equal(\"Early years foundation stage profile results\");",
+													"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].publications[0].id`));",
+													"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].publications[0].slug`));",
+													"        }",
+													"    }",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cookie",
+												"type": "text",
+												"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+											}
+										],
+										"url": {
+											"raw": "{{admin_api_url}}/data/meta/themes",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"data",
+												"meta",
+												"themes"
+											]
+										},
+										"description": "Returns all contacts"
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Subject",
+							"item": [
+								{
+									"name": "Subject Meta - Absence by characteristic Copy",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"exec": [
+													"pm.globals.set(\"FILT_Char__Total\", \"1\");",
+													"pm.globals.set(\"FILT_SchoolType__Total\", \"58\");"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"id": "483030fb-1db1-4380-99d6-d2fda32e3497",
+												"exec": [
+													"var respJson = pm.response.json();",
+													"",
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"filters\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"filters.Characteristic\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"filters.SchoolType\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceFields\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceByReason\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceForPersistentAbsentees\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.country\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.localAuthority\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.localAuthorityDistrict\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.options\"));",
+													"});",
+													"",
+													"pm.test(\"totalValues should be correct\", function () {",
+													"    pm.expect(respJson.filters.Characteristic.totalValue).to.equal(pm.globals.get('FILT_Char__Total'));",
+													"    pm.expect(respJson.filters.SchoolType.totalValue).to.equal(pm.globals.get('FILT_SchoolType__Total'));",
+													"    pm.expect(respJson.filters.YearBreakdown.totalValue).to.equal(\"\");",
+													"});",
+													"",
+													"pm.test(\"Should be correct number of characteristics\", function () { ",
+													"    pm.expect(Object.keys(respJson.filters.Characteristic.options).length).to.equal(10);",
+													"});",
+													"",
+													"pm.test(\"Each characteristic should have correct number\", function () {",
+													"    pm.expect(respJson.filters.Characteristic.options.Total.options.length).to.equal(1);",
+													"    pm.expect(respJson.filters.Characteristic.options.Gender.options.length).to.equal(2);",
+													"    pm.expect(respJson.filters.Characteristic.options.EthnicGroupMajor.options.length).to.equal(8);",
+													"    pm.expect(respJson.filters.Characteristic.options.EthnicGroupMinor.options.length).to.equal(19);",
+													"    pm.expect(respJson.filters.Characteristic.options.NCYear.options.length).to.equal(14);",
+													"    pm.expect(respJson.filters.Characteristic.options.FSM.options.length).to.equal(3);",
+													"    pm.expect(respJson.filters.Characteristic.options.FSMEver6.options.length).to.equal(3);",
+													"    pm.expect(respJson.filters.Characteristic.options.SENProvision.options.length).to.equal(8);",
+													"    pm.expect(respJson.filters.Characteristic.options.SENPrimaryNeed.options.length).to.equal(14);",
+													"    pm.expect(respJson.filters.Characteristic.options.FirstLanguage.options.length).to.equal(4);",
+													"});",
+													"",
+													"pm.test(\"Number of school type default options should be correct\", function () { ",
+													"    pm.expect(Object.keys(respJson.filters.SchoolType.options.Default.options).length).to.equal(4);",
+													"});",
+													"",
+													"pm.test(\"Number of time periods options should be correct\", function() {",
+													"    pm.expect(respJson.timePeriod.options.length).to.equal(5); ",
+													"});",
+													"",
+													"pm.test(\"Number of location options should be correct\", function() {",
+													"    pm.expect(respJson.locations.country.options.length).to.equal(1);",
+													"    pm.expect(respJson.locations.localAuthority.options.length).to.equal(152);",
+													"    pm.expect(respJson.locations.localAuthorityDistrict.options.length).to.equal(326);",
+													"});",
+													"",
+													"pm.test(\"Expect indicators to have correct properties\", function () {",
+													"    pm.expect(respJson.indicators.AbsenceFields.options.length).to.equal(10);",
+													"    pm.expect(respJson.indicators.AbsenceByReason.options.length).to.equal(16);",
+													"    pm.expect(respJson.indicators.AbsenceForPersistentAbsentees.options.length).to.equal(7);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cookie",
+												"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{admin_api_url}}/data/meta/subject/1",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"data",
+												"meta",
+												"subject",
+												"1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Subject Meta - Filter SubjectId 1",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "08c7178b-9b71-4fb9-8c3e-9770e6d90e49",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"filters\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"filters.Characteristic\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"filters.SchoolType\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceFields\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceByReason\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceForPersistentAbsentees\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.country\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.localAuthority\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"locations.localAuthorityDistrict\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.options\"));",
+													"});",
+													"",
+													"pm.test(\"Number of characteristic options should be correct\", function () { ",
+													"    pm.expect(Object.keys(pm.response.json().filters.Characteristic.options).length).to.equal(10);",
+													"    pm.expect(pm.response.json().filters.Characteristic.options.Total.options.length).to.equal(1);",
+													"    pm.expect(pm.response.json().filters.Characteristic.options.Gender.options.length).to.equal(2);",
+													"    pm.expect(pm.response.json().filters.Characteristic.options.EthnicGroupMajor.options.length).to.equal(8);",
+													"    pm.expect(pm.response.json().filters.Characteristic.options.EthnicGroupMinor.options.length).to.equal(19);",
+													"    pm.expect(pm.response.json().filters.Characteristic.options.NCYear.options.length).to.equal(14);",
+													"    pm.expect(pm.response.json().filters.Characteristic.options.FSM.options.length).to.equal(3);",
+													"    pm.expect(pm.response.json().filters.Characteristic.options.FSMEver6.options.length).to.equal(3);",
+													"    pm.expect(pm.response.json().filters.Characteristic.options.SENProvision.options.length).to.equal(8);",
+													"    pm.expect(pm.response.json().filters.Characteristic.options.SENPrimaryNeed.options.length).to.equal(14);",
+													"    pm.expect(pm.response.json().filters.Characteristic.options.FirstLanguage.options.length).to.equal(4);",
+													"});",
+													"",
+													"pm.test(\"Number of school type default options should be correct\", function () { ",
+													"    pm.expect(Object.keys(pm.response.json().filters.SchoolType.options.Default.options).length).to.equal(4);",
+													"});",
+													"",
+													"pm.test(\"Number of time periods options should be correct\", function() {",
+													"    pm.expect(pm.response.json().timePeriod.options.length).to.equal(5); ",
+													"});",
+													"",
+													"pm.test(\"Number of location options should be correct\", function() {",
+													"    pm.expect(pm.response.json().locations.country.options.length).to.equal(1);",
+													"    pm.expect(pm.response.json().locations.localAuthority.options.length).to.equal(152);",
+													"    pm.expect(pm.response.json().locations.localAuthorityDistrict.options.length).to.equal(326);",
+													"});",
+													"",
+													"pm.test(\"Expect indicators to have correct properties\", function () {",
+													"    pm.expect(pm.response.json().indicators.AbsenceFields.options.length).to.equal(10);",
+													"    pm.expect(pm.response.json().indicators.AbsenceByReason.options.length).to.equal(16);",
+													"    pm.expect(pm.response.json().indicators.AbsenceForPersistentAbsentees.options.length).to.equal(7);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "6db8370e-6078-4279-94d7-438d85a476f7",
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											},
+											{
+												"key": "Cookie",
+												"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\tsubjectId: 1\n}"
+										},
+										"url": {
+											"raw": "{{admin_api_url}}/data/meta/subject",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"data",
+												"meta",
+												"subject"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Publication",
+							"item": [
+								{
+									"name": "Publication Meta - Pupil absence in schools in England",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
+												"exec": [
+													"pm.variables.set('publication_id', 'cbbd299f-8297-44bc-92ac-558bcf51f8ad')"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"id": "ac4b1f03-19f2-44f5-b80f-840e78849333",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+													"",
+													"pm.test(\"Fields are present\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"subjects\"));",
+													"});",
+													"",
+													"pm.test(\"Publication id matches the publication requested\", function () { pm.expect(pm.response.json().publicationId).to.equal(pm.variables.get(\"publication_id\")); });",
+													"",
+													"pm.test(\"Number of subjects should be correct\", function () {",
+													"    pm.expect(pm.response.json().subjects.length).to.equal(7);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cookie",
+												"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{admin_api_url}}/data/meta/publication/{{publication_id}}",
+											"host": [
+												"{{admin_api_url}}"
+											],
+											"path": [
+												"data",
+												"meta",
+												"publication",
+												"{{publication_id}}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Tablebuilder",
+					"item": [
+						{
+							"name": "Tablebuilder - Absence by characteristic - England - Male, Female",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "be43473c-e6d5-4af2-bd3b-69ab2f3c948c",
+										"exec": [
+											"respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+											"",
+											"pm.test(\"Fields are present\", function () {",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.filters\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.footnotes\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.indicators\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.locations\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.publicationName\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.subjectName\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjectMeta.timePeriodRange\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"results\"));",
+											"});",
+											"",
+											"pm.test(\"Validate footnotes\", function () {",
+											"    pm.expect(respJson.subjectMeta.footnotes.length).to.be.above(0);",
+											"    //pm.expect(respJson.subjectMeta.footnotes.length).to.equal(12); // Uncomment when id 10 appears!",
+											"    for(var i = 0; i < respJson.subjectMeta.footnotes.length; i++) {",
+											"        switch(respJson.subjectMeta.footnotes[i].id) {",
+											"            case 1:",
+											"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"State-funded primary schools include all primary academies, including free schools.\");",
+											"                break;",
+											"            case 2:",
+											"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"State-funded secondary schools include city technology colleges and all secondary academies, including all-through academies and free schools.\");",
+											"                break;",
+											"            case 3:",
+											"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Special schools include maintained special schools, non-maintained special schools and special academies.  Excludes general hospital schools, independent special schools and independent schools approved for SEN pupils.\");",
+											"                break;",
+											"            case 4:",
+											"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Totals may not appear to equal the sum of component parts because numbers have been rounded to the nearest 5.\");",
+											"                break;",
+											"            case 5:",
+											"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"x - 1 or 2 enrolments, or a percentage based on 1 or 2 enrolments.\");",
+											"                break;",
+											"            case 6:",
+											"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"There may be discrepancies between totals and the sum of constituent parts  as national and regional totals and totals across school types have been rounded to the nearest 5.\");",
+											"                break;",
+											"            case 7:",
+											"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Absence rates are the number of absence sessions expressed as a percentage of the total number of possible sessions.\");",
+											"                break;",
+											"            case 8:",
+											"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Pupil enrolments missing 10 percent or more of their own possible sessions (due to authorised or unauthorised absence) are classified as persistent absentees.\");",
+											"                break;",
+											"            case 9:",
+											"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"The definition of persistent absence changed from the 2015/16 academic year - The information presented for years prior to 2015/16 has been produced using the same methodology in order to allow users to make comparisons on a consistent basis over time.\");",
+											"                break;",
+											"            // 10 should appear! But won't until enrolments_pa_10_exact_percent/enrolments_pa10_exact_percent ",
+											"            // difference is changed in data and then imported",
+											"            //case 10:",
+											"                //pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"The persistent absentee rate is the number of persistent absentees expressed as a percentage of the total number of enrolments.\");",
+											"                //break;",
+											"            case 15:",
+											"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal('See \"Guide to absence statistics\" for more information on how absence and pupil characteristic data have been linked.');",
+											"                break;",
+											"            case 16:",
+											"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Figures for pupils with unclassified or missing characteristics information should be interpreted with caution.\");",
+											"                break;",
+											"            default:",
+											"                pm.expect(true).to.equal(false, `Didn't expect this footnote to appear!, id: \"${respJson.subjectMeta.footnotes[i].id}\"`)",
+											"                break;",
+											"        }",
+											"    }",
+											"});",
+											"",
+											"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.results.length).to.equal(8); });",
+											"",
+											"pm.test(\"geographicLevel should be same as request\", function () {",
+											"    for(var i = 0; i < respJson.results.length; i++) {",
+											"        pm.expect(respJson.results[i].geographicLevel).to.equal(\"Country\");",
+											"    }",
+											"});",
+											"",
+											"pm.test(\"First result should have correct fields\", function () {",
+											"    pm.expect(pm.response.to.have.jsonBody(\"results[0].filters\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"results[0].geographicLevel\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"results[0].location\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"results[0].measures\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"results[0].timePeriod\"));",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "462e277e-a7ce-4584-b95d-89ed1786d5f5",
+										"exec": [
+											"pm.globals.set(\"FILT_Char__Total\", \"1\");",
+											"pm.globals.set(\"FILT_Char__GenderMale\", \"53\");",
+											"pm.globals.set(\"FILT_Char__GenderFemale\", \"52\");",
+											"pm.globals.set(\"FILT_SchoolType__Total\", \"58\");",
+											"pm.globals.set(\"FILT_SchoolType__StateFundedPrimary\", \"57\");",
+											"pm.globals.set(\"FILT_SchoolType__StateFundedSecondary\", \"56\");",
+											"pm.globals.set(\"FILT_SchoolType__Special\", \"55\");",
+											"pm.globals.set(\"FILT_Char__FSMEligible\", \"18\");",
+											"pm.globals.set(\"FILT_Char__FSMNotEligible\", \"10\");",
+											"pm.globals.set(\"FILT_Char__FSMUnclassified\", \"8\");",
+											"pm.globals.set(\"FILT_Char__EthMinor_Irish\", \"50\");",
+											"pm.globals.set(\"FILT_YearBreakdown__SixHalfTerms\", \"54\");",
+											"",
+											"pm.globals.set(\"IND_AbsenceFields__NumberOfPupilEnrolments\", \"1\");",
+											"pm.globals.set(\"IND_AbsenceFields__NumberOfSessionsPossible\", \"25\");",
+											"pm.globals.set(\"IND_AbsenceFields__UnauthorisedAbsenceRate\", \"23\");",
+											"pm.globals.set(\"IND_AbsenceFields__OverallAbsenceRate\", \"26\");",
+											"pm.globals.set(\"IND_AbsenceFields__AuthorisedAbsenceRate\", \"28\");",
+											"pm.globals.set(\"IND_AbsenceFields__PercentageOfPersistentAbsentees\", \"30\");",
+											"pm.globals.set(\"IND_AbsenceFields__NumberOfPersistentAbsentees\", \"31\");"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Cookie",
+										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"subjectId\": 1,\n    \"country\": [\n    \t\"E92000001\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2014,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__GenderMale}}, {{FILT_Char__GenderFemale}}\n    ],\n    \"indicators\": [\n    \t{{IND_AbsenceFields__UnauthorisedAbsenceRate}}, \n        {{IND_AbsenceFields__OverallAbsenceRate}}, \n        {{IND_AbsenceFields__AuthorisedAbsenceRate}},\n        {{IND_AbsenceFields__PercentageOfPersistentAbsentees}},\n        {{IND_AbsenceFields__NumberOfPersistentAbsentees}}\n    ]\n}"
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/data/tablebuilder",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"data",
+										"tablebuilder"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Data",
+					"item": [
+						{
+							"name": "Data - Absence by characteristic - Adur (LAD) + Wandsworth (LA)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+										"exec": [
+											"var respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+											"",
+											"pm.test(\"Should have correct fields\", function () {",
+											"    pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
+											"});",
+											"",
+											"pm.test(\"Number of metaData filters should be correct\", function () {",
+											"   pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(8); ",
+											"});",
+											"",
+											"pm.test(\"Number of metaData indicators should be correct\", function () {",
+											"   pm.expect(Object.keys(respJson.metaData.indicators).length).to.equal(5); ",
+											"});",
+											"",
+											"pm.test(\"Number of metaData locations should be correct\", function () {",
+											"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(2);",
+											"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E09000032\")); // LA Wandsworth",
+											"   pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E07000223\")); // LAD Adur",
+											"});",
+											"",
+											"pm.test(\"Number of results should be correct\", function () { ",
+											"    pm.expect(respJson.result.length).to.equal(35); // LA 24 + LAD 11",
+											"});",
+											"",
+											"pm.test(\"All results should have correction geographicLevel\", function () {",
+											"    for(var i = 0; i < pm.response.json().result.length; i++) {",
+											"        pm.expect(respJson.result[i].geographicLevel).to.satisfy(function(geoLevel) {",
+											"           return geoLevel === \"Local_Authority\" || geoLevel === \"Local_Authority_District\"; ",
+											"        });",
+											"    }",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+										"exec": [
+											"pm.globals.set(\"FILT_Char__Total\", \"1\");",
+											"pm.globals.set(\"FILT_Char__GenderMale\", \"53\");",
+											"pm.globals.set(\"FILT_Char__GenderFemale\", \"52\");",
+											"pm.globals.set(\"FILT_SchoolType__StateFundedPrimary\", \"57\");",
+											"pm.globals.set(\"FILT_SchoolType__StateFundedSecondary\", \"56\");",
+											"pm.globals.set(\"FILT_SchoolType__Special\", \"55\");",
+											"pm.globals.set(\"FILT_Char__FSMEligible\", \"18\");",
+											"pm.globals.set(\"FILT_Char__FSMNotEligible\", \"10\");",
+											"pm.globals.set(\"FILT_Char__FSMUnclassified\", \"8\");",
+											"pm.globals.set(\"FILT_Char__EthMinor_Irish\", \"50\");",
+											"",
+											"pm.globals.set(\"IND_AbsenceFields__NumberOfPupilEnrolments\", \"1\");",
+											"pm.globals.set(\"IND_AbsenceFields__NumberOfSessionsPossible\", \"25\");",
+											"pm.globals.set(\"IND_AbsenceFields__UnauthorisedAbsenceRate\", \"23\");",
+											"pm.globals.set(\"IND_AbsenceFields__OverallAbsenceRate\", \"26\");",
+											"pm.globals.set(\"IND_AbsenceFields__AuthorisedAbsenceRate\", \"28\");",
+											"pm.globals.set(\"IND_AbsenceFields__PercentageOfPersistentAbsentees\", \"30\");",
+											"pm.globals.set(\"IND_AbsenceFields__NumberOfPersistentAbsentees\", \"31\");",
+											"pm.globals.set(\"IND_AbsenceForPersistentAbsentees__NumberOfAuthorisedAbsenceSessionsForPersistentAbsentees\", \"6\");",
+											"pm.globals.set(\"IND_AbsenceByReason__NumberOfUnauthorisedReasonsSessions\", \"7\");",
+											"pm.globals.set(\"IND_AbsenceByReason__NumberOfUnauthorisedOtherSessions\", \"8\");",
+											"pm.globals.set(\"IND_AbsenceByReason__NumberOfNoReasonYetSessions\", \"9\");",
+											"pm.globals.set(\"IND_AbsenceByReason__NumberOfLateSessions\", \"10\");"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Cookie",
+										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"subjectId\": 1,\n    \"localAuthority\": [\"E09000032\"],\n    \"localAuthorityDistrict\": [\"E07000223\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2015,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__FSMEligible}}, \n        {{FILT_Char__FSMNotEligible}}, \n        {{FILT_Char__FSMUnclassified}}\n    ],\n    \"indicators\": [\n    \t{{IND_AbsenceForPersistentAbsentees__NumberOfAuthorisedAbsenceSessionsForPersistentAbsentees}},\n    \t{{IND_AbsenceByReason__NumberOfUnauthorisedReasonsSessions}},\n    \t{{IND_AbsenceByReason__NumberOfUnauthorisedOtherSessions}},\n    \t{{IND_AbsenceByReason__NumberOfNoReasonYetSessions}},\n    \t{{IND_AbsenceByReason__NumberOfLateSessions}}\n    ]\n}"
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/data/data",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"data",
+										"data"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "7f3d3acc-0493-419e-87a1-f9de87f052c0",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "ca57d5a3-d2ae-4438-8c91-32ab3e2f592d",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Import",
+			"item": [
+				{
+					"name": "Import Status - Absence by characteristic",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+								"exec": [
+									"var respJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"/* TODO EES-3 absence_by_characteristic.csv has been imported but",
+									"the import status table was only added after the last seed of test data. Waiting for data reseed.",
+									"",
+									"pm.test(\"Status should be complete\", function () {",
+									"    pm.expect(respJson.status).to.equal(\"COMPLETE\");",
+									"    pm.expect(respJson.percentageComplete).to.equal(100);",
+									"});",
+									"",
+									"pm.test(\"There should be no errors\", function () {",
+									"    pm.expect(pm.response.to.have.jsonBody(\"errors\", \"\"));",
+									"});",
+									"*/",
+									"",
+									"pm.test(\"Status should be not found\", function () {",
+									"    pm.expect(respJson.status).to.equal(\"NOT_FOUND\");",
+									"});",
+									"",
+									"pm.test(\"Percentage complete should be zero\", function () {",
+									"    pm.expect(respJson.percentageComplete).to.equal(0);",
+									"});",
+									"",
+									"pm.test(\"There should be no errors field\", function () {",
+									"pm.expect(pm.response.to.not.have.jsonBody(\"errors\"));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5/data/absence_by_characteristic.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5",
+								"data",
+								"absence_by_characteristic.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Import Status - invalid release id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+								"exec": [
+									"var respJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Status should be not found\", function () {",
+									"    pm.expect(respJson.status).to.equal(\"NOT_FOUND\");",
+									"});",
+									"",
+									"pm.test(\"Percentage complete should be zero\", function () {",
+									"    pm.expect(respJson.percentageComplete).to.equal(0);",
+									"});",
+									"",
+									"pm.test(\"There should be no errors field\", function () {",
+									"pm.expect(pm.response.to.not.have.jsonBody(\"errors\"));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/228f8aaf-e438-4155-8912-983943a88989/data/expected_not_found.csv/import/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"228f8aaf-e438-4155-8912-983943a88989",
+								"data",
+								"expected_not_found.csv",
+								"import",
+								"status"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "Release",
 			"item": [
+				{
+					"name": "Release - Get approved releases",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
+								"exec": [
+									"var respJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Should have at least one result\", function () { ",
+									"    pm.expect(respJson.length).to.above(0);",
+									"});",
+									"",
+									"pm.test(\"Fields of first result are correct\", function () {",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]id\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]title\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]publicationId\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]publicationTitle\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]releaseName\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]coverageTitle\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]yearTitle\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]typeId\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]nextReleaseDate\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]publishScheduled\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]timePeriodCoverage\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]latestRelease\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]type\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]contact\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]status\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]internalReleaseNote\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]draftComments\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]higherReviewComments\"));",
+									"});",
+									"",
+									"pm.test(\"Every result should be status Approved\", function () {",
+									"    for(var i = 0; i < respJson.length; i++) {",
+									"        pm.expect(respJson[i].status).to.equal(\"Approved\");",
+									"    }",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "dbde4b62-47dd-4c3d-93dc-5e01ec3f8231",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/releases/scheduled",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"releases",
+								"scheduled"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Release - Get draft and higherlevelreview releases",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
+								"exec": [
+									"var respJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Should have at least one result\", function () { ",
+									"    pm.expect(respJson.length).to.above(0);",
+									"});",
+									"",
+									"pm.test(\"Fields of first result are correct\", function () {",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]id\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]title\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]publicationId\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]publicationTitle\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]releaseName\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]coverageTitle\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]yearTitle\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]typeId\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]nextReleaseDate\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]publishScheduled\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]timePeriodCoverage\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]latestRelease\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]type\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]status\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]draftComments\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[0]higherReviewComments\"));",
+									"});",
+									"",
+									"pm.test(\"Every result should be status Draft or HigherLevelReview\", function () {",
+									"    for(var i = 0; i < respJson.length; i++) {",
+									"        pm.expect(respJson[i].status).to.oneOf([\"Draft\", \"HigherLevelReview\"]);",
+									"    }",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "dbde4b62-47dd-4c3d-93dc-5e01ec3f8231",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/releases/draft",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"releases",
+								"draft"
+							]
+						}
+					},
+					"response": []
+				},
 				{
 					"name": "Release - Get exclusion release datablocks",
 					"event": [
@@ -653,7 +1660,7 @@
 									"});",
 									"",
 									"pm.test(\"Number of results should be correct\", function () { ",
-									"    pm.expect(respJson.length).to.above(0); ",
+									"    pm.expect(respJson.length).to.above(0);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -664,7 +1671,7 @@
 							"script": {
 								"id": "dbde4b62-47dd-4c3d-93dc-5e01ec3f8231",
 								"exec": [
-									"postman.setNextRequest(null);"
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -702,6 +1709,8 @@
 							"script": {
 								"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
 								"exec": [
+									"var respJson = pm.response.json();",
+									"",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 									"",
 									"pm.test(\"Fields are present\", function () {",
@@ -710,13 +1719,17 @@
 									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.value\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.label\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"publishScheduled\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"nextReleaseDate\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"releaseName\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"slug\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"status\"));",
+									"});",
+									"",
+									"pm.test(\"id should match request id\", function () {",
+									"    pm.expect(respJson.id).to.equal(\"e7774a74-1f62-4b76-b9b5-84f14dac7278\");",
 									"});",
 									"",
 									"pm.test(\"typeId should should be correct\", function () { ",
-									"    pm.expect(pm.response.json().typeId).to.equal(\"9d333457-9132-4e55-ae78-c55cb3673d7c\"); ",
+									"    pm.expect(respJson.typeId).to.equal(\"9d333457-9132-4e55-ae78-c55cb3673d7c\"); ",
 									"});"
 								],
 								"type": "text/javascript"
@@ -752,6 +1765,164 @@
 								"E7774A74-1F62-4B76-B9B5-84F14DAC7278",
 								"summary",
 								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Release Status - Exclusions 2016",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
+								"exec": [
+									"var respJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Fields are present\", function () {",
+									"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"typeId\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.value\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.label\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"releaseName\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"slug\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"status\"));",
+									"});",
+									"",
+									"pm.test(\"id should match request id\", function () {",
+									"    pm.expect(respJson.id).to.equal(\"e7774a74-1f62-4b76-b9b5-84f14dac7278\");",
+									"});",
+									"",
+									"pm.test(\"typeId should should be correct\", function () { ",
+									"    pm.expect(respJson.typeId).to.equal(\"9d333457-9132-4e55-ae78-c55cb3673d7c\"); ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "dbde4b62-47dd-4c3d-93dc-5e01ec3f8231",
+								"exec": [
+									"postman.setNextRequest(null);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"releaseStatus\": \"Draft\",\n\t\"internalReleaseNote\": \"Test Note\"\n}"
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/releases/E7774A74-1F62-4B76-B9B5-84F14DAC7278/status",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"releases",
+								"E7774A74-1F62-4B76-B9B5-84F14DAC7278",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Draft Releases",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
+								"exec": [
+									"var respJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Fields are present\", function () {",
+									"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"typeId\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.value\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"timePeriodCoverage.label\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"releaseName\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"slug\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"status\"));",
+									"});",
+									"",
+									"pm.test(\"id should match request id\", function () {",
+									"    pm.expect(respJson.id).to.equal(\"e7774a74-1f62-4b76-b9b5-84f14dac7278\");",
+									"});",
+									"",
+									"pm.test(\"typeId should should be correct\", function () { ",
+									"    pm.expect(respJson.typeId).to.equal(\"9d333457-9132-4e55-ae78-c55cb3673d7c\"); ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "dbde4b62-47dd-4c3d-93dc-5e01ec3f8231",
+								"exec": [
+									"postman.setNextRequest(null);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"releaseStatus\": \"Draft\",\n\t\"internalReleaseNote\": \"Test Note\"\n}"
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/releases/draft",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"releases",
+								"draft"
 							]
 						}
 					},
@@ -1372,115 +2543,6 @@
 						}
 					},
 					"response": []
-				}
-			]
-		},
-		{
-			"name": "Data",
-			"item": [
-				{
-					"name": "Meta",
-					"item": [
-						{
-							"name": "Themes",
-							"item": [
-								{
-									"name": "Themes Meta",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "2db4ed0b-6eeb-40b6-914f-f1692eb248fb",
-												"exec": [
-													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-													"",
-													"pm.test(\"Expect correct number of themes\", function () {",
-													"    pm.expect(pm.response.json().length).to.be.above(1);",
-													"});",
-													"",
-													"pm.test(\"Pupils and school theme should contain more than 2 topics\", function () {",
-													"    for(var i = 0; i < pm.response.json().length; i++) {",
-													"        if(pm.response.json()[i].title === \"Pupils and schools\") {",
-													"            pm.expect(pm.response.json()[i].topics.length).to.be.above(2);",
-													"            pm.expect(pm.response.to.have.jsonBody(`[${i}].id`));",
-													"            pm.expect(pm.response.to.have.jsonBody(`[${i}].slug`));",
-													"        }",
-													"    }",
-													"});",
-													"        ",
-													"pm.test(\"Children, early years and social care should contain correct data\", function () {",
-													"    for(var i = 0; i < pm.response.json().length; i++) {",
-													"        if(pm.response.json()[i].title === \"Children, early years and social care\") {",
-													"            pm.expect(pm.response.json()[i].topics.length).to.equal(1);",
-													"            pm.expect(pm.response.json()[i].topics[0].title).to.equal(\"Early years foundation stage profile\");",
-													"            pm.expect(pm.response.to.have.jsonBody(`[${i}].id`));",
-													"            pm.expect(pm.response.to.have.jsonBody(`[${i}].slug`));",
-													"            ",
-													"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].id`));",
-													"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].slug`));",
-													"            pm.expect(pm.response.json()[i].topics[0].publications.length).to.equal(1);",
-													"            pm.expect(pm.response.json()[i].topics[0].publications[0].title).to.equal(\"Early years foundation stage profile results\");",
-													"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].publications[0].id`));",
-													"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].publications[0].slug`));",
-													"        }",
-													"    }",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "GET",
-										"header": [
-											{
-												"key": "Cookie",
-												"type": "text",
-												"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-											}
-										],
-										"url": {
-											"raw": "{{admin_api_url}}/data/meta/themes",
-											"host": [
-												"{{admin_api_url}}"
-											],
-											"path": [
-												"data",
-												"meta",
-												"themes"
-											]
-										},
-										"description": "Returns all contacts"
-									},
-									"response": []
-								}
-							],
-							"_postman_isSubFolder": true
-						}
-					],
-					"_postman_isSubFolder": true
-				}
-			],
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"id": "7f3d3acc-0493-419e-87a1-f9de87f052c0",
-						"type": "text/javascript",
-						"exec": [
-							""
-						]
-					}
-				},
-				{
-					"listen": "test",
-					"script": {
-						"id": "ca57d5a3-d2ae-4438-8c91-32ab3e2f592d",
-						"type": "text/javascript",
-						"exec": [
-							""
-						]
-					}
 				}
 			]
 		}

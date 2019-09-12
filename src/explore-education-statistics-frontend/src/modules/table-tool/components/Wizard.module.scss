@@ -1,4 +1,9 @@
+@import '~explore-education-statistics-common/src/styles/govuk-base';
+
 .stepNav {
   list-style: none;
   padding-left: 0;
+  @include govuk-media-query($until: tablet) {
+    margin-left: -0.25rem;
+  }
 }

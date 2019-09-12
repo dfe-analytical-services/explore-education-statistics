@@ -2,9 +2,9 @@ using System;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Storage;
 using Moq;
 using Xunit;
 
@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controller
         private readonly FastTrackController _controller;
 
         private readonly Guid _validId = Guid.NewGuid();
-        private readonly TableBuilderQueryContext _query = new TableBuilderQueryContext();
+        private readonly Guid _notFoundId = Guid.NewGuid();
 
         public FastTrackControllerTests()
         {
@@ -28,7 +28,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controller
                     FullTable = new TableBuilderResultViewModel()
                 }
             );
-            
+
+            fastTrackService.Setup(s => s.GetAsync(_notFoundId)).Throws(new StorageException(new RequestResult
+            {
+                HttpStatusCode = 404
+            }, null, null));
+
             _controller = new FastTrackController(fastTrackService.Object);
         }
 
@@ -40,17 +45,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controller
             Assert.IsAssignableFrom<FastTrackViewModel>(result.Value);
 
             var link = result.Value as FastTrackViewModel;
-            
+
             Assert.Equal(_validId, link.Id);
         }
-        
+
         [Fact]
         public async void Get_FastTrack_NotFound()
         {
-            var result = await _controller.Get(Guid.NewGuid());
+            var result = await _controller.Get(_notFoundId);
 
             Assert.NotNull(result);
-            
+
             Assert.IsAssignableFrom<NotFoundResult>(result);
         }
     }

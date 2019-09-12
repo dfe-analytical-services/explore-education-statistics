@@ -2,7 +2,11 @@ import React from 'react';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import Accordion, { AccordionProps } from '@common/components/Accordion';
 
-const AccordionWithAnalytics = (props: AccordionProps) => {
+interface Props extends AccordionProps {
+  publicationTitle: string;
+}
+
+const AccordionWithAnalytics = (props: Props) => {
   return (
     <Accordion
       {...props}
@@ -10,7 +14,7 @@ const AccordionWithAnalytics = (props: AccordionProps) => {
         logEvent(
           'Accordion',
           `${accordionSection.title} accordion opened`,
-          `URL: ${window.location.pathname} | Accordion ID: ${accordionSection.id}`,
+          props.publicationTitle,
         );
       }}
     />

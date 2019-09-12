@@ -741,15 +741,15 @@
             },
             {
               "name": "CONTENT_API_BASE_URL",
-              "value": "[concat('https://', variables('contentAppName'),'.azurewebsites.net/')]"
+              "value": "[concat('https://', variables('contentAppName'),'.azurewebsites.net/api')]"
             },
             {
               "name": "DATA_API_BASE_URL",
-              "value": "[concat('https://', variables('dataAppName'),'.azurewebsites.net/')]"
+              "value": "[concat('https://', variables('dataAppName'),'.azurewebsites.net/api')]"
             },
             {
               "name": "FUNCTION_API_BASE_URL",
-              "value": "[concat('https://', variables('notificationsAppName'),'.azurewebsites.net/')]"
+              "value": "[concat('https://', variables('notificationsAppName'),'.azurewebsites.net/api')]"
             },
             {
               "name": "BASIC_AUTH",
@@ -1223,7 +1223,8 @@
           "connectionStrings": [
             {
               "name": "TableStorageConnString",
-              "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('notificationsstorageAccountName'), ';AccountKey=', listKeys(variables('notificationsstorageAccountId'),'2015-05-01-preview').key1)]"
+              "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('notificationsstorageAccountName'), ';AccountKey=', listKeys(variables('notificationsstorageAccountId'),'2015-05-01-preview').key1)]",
+              "type": "Custom"
             }
           ]
         }
@@ -1347,8 +1348,8 @@
               "value": "[reference(resourceId('microsoft.insights/components/', variables('importerAppInsights')), '2015-05-01').InstrumentationKey]"
             },
             {
-              "name": "BatchSize",
-              "value": "1000"
+              "name": "RowsPerBatch",
+              "value": "10000"
             }
           ],
           "connectionStrings": [

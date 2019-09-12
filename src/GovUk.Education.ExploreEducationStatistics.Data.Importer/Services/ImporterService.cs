@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Importer.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
@@ -25,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
         private int _importCount;
         
-                private enum Columns
+        private enum Columns
         {
             SCHOOL_COLS,
             COUNTRY_COLS,
@@ -108,43 +107,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
         public SubjectMeta ImportMeta(List<string> metaLines, Subject subject)
         {
-            _logger.LogDebug("Importing meta lines for Publication {Publication}, {Subject}", subject.Release.Publication.Title, subject.Name);
             return _importerMetaService.Import(metaLines, subject);
         }
         
         public SubjectMeta GetMeta(List<string> metaLines, Subject subject)
         {
-            _logger.LogDebug("Getting meta lines for Publication {Publication}, {Subject}", subject.Release.Publication.Title, subject.Name);
             return _importerMetaService.Get(metaLines, subject);
         }
 
-        public void ImportFiltersLocationsAndSchools(List<string> lines, SubjectMeta subjectMeta, string subjectName)
+        public void ImportFiltersLocationsAndSchools(List<string> lines, SubjectMeta subjectMeta, Subject subject)
         {
             _importCount = 0;
             var headers = lines.First().Split(',').ToList();
             lines.RemoveAt(0);
-            lines.ToList().ForEach(line => CreateFiltersLocationsAndSchoolsFromCsv(line, headers, subjectMeta.Filters, subjectName, lines.Count));
+            lines.ToList().ForEach(line =>
+            {
+                CreateFiltersLocationsAndSchoolsFromCsv(line, headers, subjectMeta.Filters);
+            });
         }
 
-        public void ImportObservations(List<string> lines, Subject subject, SubjectMeta subjectMeta)
+        public void ImportObservations(List<string> lines, Subject subject, SubjectMeta subjectMeta, int batchNo, int rowsPerBatch)
         {
-            _logger.LogDebug("Importing batch for Publication {Publication}, {Subject}", subject.Release.Publication.Title, subject.Name);
-            
+            _importCount = 0;
             var headers = lines.First().Split(',').ToList();
             lines.RemoveAt(0);
-
-            _logger.LogInformation($"Retrieving observations for {subject.Name}");
-
-            var observations = GetObservations(lines, headers, subject, subjectMeta).ToList();
+            var observations = GetObservations(lines, headers, subject, subjectMeta, batchNo, rowsPerBatch).ToList();
             
-            _logger.LogInformation($"Adding {observations.Count()} observations for {subject.Name}");
-
             var subEntities = new List<ObservationFilterItem>();
             
             using (var transaction = _context.Database.BeginTransaction())
             {
                 _context.BulkInsert(observations,
-                    new BulkConfig {PreserveInsertOrder = true, SetOutputIdentity = true});
+                    new BulkConfig {WithHoldlock= true, BatchSize = observations.Count(), PreserveInsertOrder = true, SetOutputIdentity = true});
+
                 foreach (var o in observations)
                 {
                     foreach (var item in o.FilterItems)
@@ -155,73 +150,84 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                     
                     subEntities.AddRange(o.FilterItems);
                 }
-                _context.BulkInsert(subEntities);
+                _context.BulkInsert(subEntities,
+                        new BulkConfig {WithHoldlock= true, BatchSize = subEntities.Count()});
+                    
                 transaction.Commit();
             }
 
             _logger.LogDebug($"{observations.Count()} observations added successfully for {subject.Name}");
         }
+        
+        public static GeographicLevel GetGeographicLevel(IReadOnlyList<string> line, List<string> headers)
+        {
+            return GeographicLevels.EnumFromStringForImport(CsvUtil.Value(line, headers, "geographic_level"));
+        }
+        
+        public static TimeIdentifier GetTimeIdentifier(IReadOnlyList<string> line, List<string> headers)
+        {
+            var timeIdentifier = CsvUtil.Value(line, headers, "time_identifier").ToLower();
+            foreach (var value in Enum.GetValues(typeof(TimeIdentifier)).Cast<TimeIdentifier>())
+            {
+                if (value.GetEnumLabel().Equals(timeIdentifier, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return value;
+                }
+            }
+
+            throw new InvalidTimeIdentifierException(timeIdentifier);
+        }
 
         private IEnumerable<Observation> GetObservations(IEnumerable<string> lines,
             List<string> headers,
             Subject subject,
-            SubjectMeta subjectMeta
+            SubjectMeta subjectMeta,
+            int batchNo,
+            int rowsPerBatch
             )
         {
-            // Retrieve all the observations created in the first pass for this subject
-            var filterItems = GetFilterItems(subject.Id);
-            return lines.Select(
-                (line, index) => 
-                ObservationFromCsv(line, headers, subject, subjectMeta, filterItems, index));
+            // In order to "Preserve Order" of the bulk insertion need to assign a temp id which cannot exist in db
+            var lastId = _context.Observation.Select(x => x.Id).DefaultIfEmpty(1).Max() + 1;
+            return lines.Select((line, i) =>
+            {
+                var csvRowNum = ((batchNo - 1) * rowsPerBatch) + i + 2;
+                return ObservationFromCsv(line, headers, subject, subjectMeta, csvRowNum, lastId++);
+            });
         }
         
         private Observation ObservationFromCsv(string raw,
             List<string> headers,
             Subject subject,
             SubjectMeta subjectMeta,
-            IEnumerable<FilterItem> filterItems,
-            int row)
+            int csvRowNum,
+            long lastId)
         {
-            try
+            var line = raw.Split(',');
+        
+            return new Observation
             {
-                var line = raw.Split(',');
-            
-                return new Observation
-                {
-                    FilterItems = GetFilterItems(line, headers, subjectMeta.Filters),
-                    GeographicLevel = GetGeographicLevel(line, headers),
-                    LocationId = GetLocationId(line, headers),
-                    Measures = GetMeasures(line, headers, subjectMeta.Indicators),
-                    ProviderUrn = GetProvider(line, headers)?.Urn,
-                    SchoolLaEstab = GetSchool(line, headers)?.LaEstab,
-                    SubjectId = subject.Id,
-                    TimeIdentifier = GetTimeIdentifier(line, headers),
-                    Year = GetYear(line, headers),
-                };
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw new InvalidObservationException(subject.Id, row, e.Message);
-            }
+                FilterItems = GetFilterItems(line, headers, subjectMeta.Filters),
+                GeographicLevel = GetGeographicLevel(line, headers),
+                LocationId = GetLocationId(line, headers),
+                Measures = GetMeasures(line, headers, subjectMeta.Indicators),
+                ProviderUrn = GetProvider(line, headers)?.Urn,
+                SchoolLaEstab = GetSchool(line, headers)?.LaEstab,
+                SubjectId = subject.Id,
+                TimeIdentifier = GetTimeIdentifier(line, headers),
+                Year = GetYear(line, headers),
+                CsvRow = csvRowNum,
+                Id = lastId
+            };
         }
         
         private void CreateFiltersLocationsAndSchoolsFromCsv(string raw,
             List<string> headers,
-            IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)> filtersMeta,
-            string subjectName,
-            int numLines)
+            IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)> filtersMeta)
         {
             var line = raw.Split(',');
             CreateFilterItems(line, headers, filtersMeta);
             GetLocationId(line, headers);
             GetSchool(line, headers);
-
-            var mod = _importCount++;
-            if (mod % 1000 == 0)
-            {
-                _logger.LogInformation($"{mod} (of {numLines}) lines processed during first pass for {subjectName}");
-            }
         }
 
         private void CreateFilterItems(IReadOnlyList<string> line,
@@ -235,15 +241,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 _importerFilterService.Find(filterItemLabel, filterGroupLabel, filterMeta.Filter); 
             }
         }
-        
-        private IEnumerable<FilterItem> GetFilterItems(long subjectId)
-        {
-            return _context.FilterItem
-                .Include(fi => fi.FilterGroup)
-                .ThenInclude(fg => fg.Filter)
-                .AsNoTracking().Where(fi => fi.FilterGroup.Filter.SubjectId == subjectId);
-        }
-        
+
         private ICollection<ObservationFilterItem> GetFilterItems(IReadOnlyList<string> line,
             List<string> headers,
             IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)> filtersMeta)
@@ -260,28 +258,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             }).ToList();
         }
 
-        private static TimeIdentifier GetTimeIdentifier(IReadOnlyList<string> line, List<string> headers)
-        {
-            var timeIdentifier = CsvUtil.Value(line, headers, "time_identifier").ToLower();
-            foreach (var value in Enum.GetValues(typeof(TimeIdentifier)).Cast<TimeIdentifier>())
-            {
-                if (value.GetEnumLabel().Equals(timeIdentifier, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    return value;
-                }
-            }
-
-            throw new InvalidTimeIdentifierException(timeIdentifier);
-        }
-
         private static int GetYear(IReadOnlyList<string> line, List<string> headers)
         {
             return int.Parse(CsvUtil.Value(line, headers, "time_period").Substring(0, 4));
-        }
-
-        private static GeographicLevel GetGeographicLevel(IReadOnlyList<string> line, List<string> headers)
-        {
-            return GeographicLevels.EnumFromStringForImport(CsvUtil.Value(line, headers, "geographic_level"));
         }
 
         private long GetLocationId(IReadOnlyList<string> line, List<string> headers)

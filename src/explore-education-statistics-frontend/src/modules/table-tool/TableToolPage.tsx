@@ -457,12 +457,12 @@ class TableToolPage extends Component<Props, State> {
                                 <>
                                   <div>Generated permanent link:</div>
                                   <LinkContainer
-                                    url={`${window.location.href}/permalink/${permalinkId}`}
+                                    url={`${window.location.host}/data-tables/permalink/${permalinkId}`}
                                   />
                                   <div>
                                     <a
                                       className="govuk-link"
-                                      href={`${window.location.href}/permalink/${permalinkId}`}
+                                      href={`/data-tables/permalink/${permalinkId}`}
                                       title="View created table permalink"
                                       target="_blank"
                                       rel="noopener noreferrer"
@@ -520,10 +520,12 @@ class TableToolPage extends Component<Props, State> {
                                 Go to methodology
                               </Link>
                             </li>
-                            <li>
-                              <a href="#contact">Contact</a>
-                            </li>
                           </ul>
+                          <p className="govuk-body">
+                            If you have a question about the data or methods
+                            used to create this table contact the named
+                            statistician via the relevant release page.
+                          </p>
                         </>
                       )}
                     </>

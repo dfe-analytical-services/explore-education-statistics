@@ -7,11 +7,13 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using DataBlockId = System.Guid;
+using ContentSectionId = System.Guid;
 using PublicationId = System.Guid;
 using ReleaseId = System.Guid;
 
@@ -23,20 +25,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     [Authorize]
     public class ReleasesController : ControllerBase
     {
+        private readonly IImportService _importService;
         private readonly IReleaseService _releaseService;
         private readonly IFileStorageService _fileStorageService;
         private readonly IPublicationService _publicationService;
         private readonly IDataBlockService _dataBlockService;
+        private readonly IImportStatusService _importStatusService;
 
-        public ReleasesController(IReleaseService releaseService,
+        public ReleasesController(IImportService importService,
+            IReleaseService releaseService,
             IFileStorageService fileStorageService,
             IPublicationService publicationService,
-            IDataBlockService dataBlockService)
+            IDataBlockService dataBlockService,
+            IImportStatusService importStatusService)
         {
+            _importService = importService;
             _releaseService = releaseService;
             _fileStorageService = fileStorageService;
             _publicationService = publicationService;
             _dataBlockService = dataBlockService;
+            _importStatusService = importStatusService;
         }
 
         [HttpGet("release/{releaseId}/chart/{filename}")]
@@ -71,8 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 return _releaseService.CreateReleaseAsync(release);
             });
         }
-
-
+        
         // GET api/release/{releaseId}/data
         [HttpGet("release/{releaseId}/data")]
         [Produces("application/json")]
@@ -118,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             return await CheckReleaseExistsAsync(releaseId,
                 () => _fileStorageService.UploadFilesAsync(releaseId, file, name,
-                    ReleaseFileTypes.Ancillary));
+                    ReleaseFileTypes.Ancillary, false));
         }
 
         // POST api/release/{releaseId}/chart
@@ -132,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [Required] [FromQuery(Name = "name")] string name, IFormFile file)
         {
             return await CheckReleaseExistsAsync(releaseId,
-                () => _fileStorageService.UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Chart));
+                () => _fileStorageService.UploadFilesAsync(releaseId, file, name, ReleaseFileTypes.Chart, false));
         }
 
         // POST api/release/{releaseId}/data
@@ -148,11 +155,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await CheckReleaseExistsAsync(releaseId, () =>
             {
                 // upload the files
-                var result = _fileStorageService.UploadDataFilesAsync(releaseId, file, metaFile, name);
-                // add message to queue to process these files
-                // TODO: Disabled adding message to queue
-                //.OnSuccess(() => _importService.Import(file.FileName, releaseId));
-                return result;
+                return _fileStorageService.UploadDataFilesAsync(releaseId, file, metaFile, name, false)
+                    // add message to queue to process these files
+                    .OnSuccess(() => _importService.Import(file.FileName, releaseId));
             });
         }
 
@@ -200,6 +205,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             return Ok(await _releaseService.GetReleasesForReleaseStatusesAsync(ReleaseStatus.Approved));
         }
+        
+        [HttpGet("release/{releaseId}/data/{fileName}/import/status")]
+        public async Task<ActionResult<ImportStatus>> GetDataUploadStatus(ReleaseId releaseId, string fileName)
+        {
+            return Ok(await _importStatusService.GetImportStatus(releaseId.ToString(), fileName));
+        }
 
         [HttpDelete("release/{releaseId}/data/{fileName}")]
         public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteDataFiles(ReleaseId releaseId, string fileName)
@@ -236,18 +247,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             );
         }
 
+        [HttpPost("release/{releaseId}/section/{contentSectionId}/datablocks")]
+        [AllowAnonymous]
+        public async Task<ActionResult<DataBlockViewModel>> CreateDataBlockAsync(ReleaseId releaseId,
+            ContentSectionId contentSectionId, CreateDataBlockViewModel dataBlock)
+        {
+            return await CheckReleaseExistsAsync(releaseId, () => _dataBlockService.CreateAsync(releaseId, 
+                contentSectionId, dataBlock));
+        }
+        
         [HttpGet("release/{releaseId}/datablocks/")]
         [AllowAnonymous]
-        public async Task<ActionResult<List<DataBlockViewModel>>> GetDataBlocks(ReleaseId releaseId)
+        public async Task<ActionResult<List<DataBlockViewModel>>> GetDataBlocksAsync(ReleaseId releaseId)
         {
             return await CheckReleaseExistsAsync(releaseId,  async () => Ok(await _dataBlockService.ListAsync(releaseId)));
         }
         
         [HttpGet("release/{releaseId}/datablock/{id}")]
         [AllowAnonymous]
-        public async Task<ActionResult<DataBlockViewModel>> GetDataBlock(ReleaseId releaseId, DataBlockId id)
+        public async Task<ActionResult<DataBlockViewModel>> GetDataBlockAsync(ReleaseId releaseId, DataBlockId id)
         {
-            return await CheckReleaseExistsAsync(releaseId,  async () => Ok(await _dataBlockService.Get(releaseId, id)));
+            return await CheckReleaseExistsAsync(releaseId,  async () => 
+                Ok(await _dataBlockService.GetAsync(releaseId, id)));
         }
 
         private async Task<ActionResult> CheckReleaseExistsAsync(ReleaseId releaseId, Func<Task<ActionResult>> andThen)

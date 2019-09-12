@@ -143,7 +143,7 @@ class PublicationReleasePage extends Component<Props> {
                   {data.downloadFiles.map(({ extension, name, path, size }) => (
                     <li key={path}>
                       <Link
-                        to={`${baseUrl.data}/api/download/${path}`}
+                        to={`${baseUrl.data}/download/${path}`}
                         className="govuk-link"
                         analytics={{
                           category: 'Downloads',
@@ -185,9 +185,8 @@ class PublicationReleasePage extends Component<Props> {
                   >
                     <ul className="govuk-list">
                       {[
-                        ...data.publication.releases
-                          .slice(1)
-                          .map(({ id, slug, releaseName }) => [
+                        ...data.publication.releases.map(
+                          ({ id, slug, releaseName }) => [
                             releaseName,
                             <li key={id} data-testid="previous-release-item">
                               <Link
@@ -196,7 +195,8 @@ class PublicationReleasePage extends Component<Props> {
                                 {releaseName}
                               </Link>
                             </li>,
-                          ]),
+                          ],
+                        ),
                         ...data.publication.legacyReleases.map(
                           ({ id, description, url }) => [
                             description,
@@ -301,7 +301,10 @@ class PublicationReleasePage extends Component<Props> {
         >
           Help and support
         </h2>
-        <AccordionWithAnalytics id="extra-information-sections">
+        <AccordionWithAnalytics
+          publicationTitle={data.publication.title}
+          id="extra-information-sections"
+        >
           <AccordionSection
             heading={`${data.publication.title}: methodology`}
             caption="Find out how and why we collect, process and publish these statistics"

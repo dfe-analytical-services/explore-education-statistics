@@ -1,131 +1,168 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Logging;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
-    public enum ImportStatus
-    {
-        RUNNING_PHASE_1 = 1,
-        RUNNING_PHASE_2 = 2,
-        COMPLETE = 3,
-        FAILED = 4
-    };
-    
     public class BatchService : IBatchService
     {
         private readonly ILogger<IBatchService> _logger;
         private readonly CloudTable _table;
+        private readonly IFileStorageService _fileStorageService;
+        private readonly IImportStatusService _importStatusService;
 
         public BatchService(
             ITableStorageService tblStorageService,
+            IFileStorageService fileStorageService,
+            IImportStatusService importStatusService,
             ILogger<IBatchService> logger)
         {
-            _table = tblStorageService.GetTableAsync("uploads").Result;
+            _table = tblStorageService.GetTableAsync("imports").Result;
+            _fileStorageService = fileStorageService;
+            _importStatusService = importStatusService;
             _logger = logger;
         }
 
-        public async Task UpdateBatchCount(string releaseId, string subjectId, int batchSize, int batchNo)
+        public async Task UpdateBatchCount(string releaseId, string dataFileName, int batchNo)
         {
-            var batch = GetOrCreateBatch(releaseId, subjectId, batchSize).Result;
-            var bitArray = new BitArray(batch.BatchesProcessed);
-            bitArray.Set(batchNo - 1, true);
-            bitArray.CopyTo(batch.BatchesProcessed, 0);
-            await _table.ExecuteAsync(TableOperation.InsertOrReplace(batch));
-            await IsBatchComplete(releaseId, subjectId, batchSize);
-        }
-        
-        public async Task<bool> IsBatchComplete(string releaseId, string subjectId, int batchSize)
-        {
-            var batch = await GetOrCreateBatch(releaseId, subjectId, batchSize);
-            var count = (from bool b in new BitArray(batch.BatchesProcessed)
-                where b
-                select b).Count();
-            
-            _logger.LogInformation($"batchSize={batch.BatchSize} count={count}");
+            // Note that optimistic locking applies to azure table so to avoid concurrency issue acquire a lease on the block blob 
+            var cloudBlockBlob = _fileStorageService.GetCloudBlockBlob(releaseId, dataFileName);
+            var leaseId = await GetLease(cloudBlockBlob);
+            DatafileImport import;
 
-            var complete = count == batch.BatchSize;
-            
-            if (complete)
+            try
             {
-                await UpdateStatus(releaseId, subjectId, 
-                    batch.Errors.Equals("") ? ImportStatus.COMPLETE : ImportStatus.FAILED);
-
-                if (batch.Errors.Equals(""))
-                {
-                    _logger.LogInformation($"All batches imported for {releaseId} : {subjectId} with no error");
-                }
-                else
-                {
-                    _logger.LogInformation(
-                        $"All batches imported for {releaseId} : {subjectId} but with errors - check storage log"
-                        );
-                }
+                import = GetImport(releaseId, dataFileName).Result;
+                var bitArray = new BitArray(import.BatchesProcessed);
+                bitArray.Set(batchNo - 1, true);
+                bitArray.CopyTo(import.BatchesProcessed, 0);
+                await _table.ExecuteAsync(TableOperation.InsertOrReplace(import));
             }
-            return complete;
+            finally
+            {
+                await cloudBlockBlob.ReleaseLeaseAsync(AccessCondition.GenerateLeaseCondition(leaseId));
+            }
+
+            if (_importStatusService.GetImportStatus(releaseId, dataFileName).Result.PercentageComplete == 100)
+            {
+                await UpdateStatus(releaseId, dataFileName,
+                    import.Errors.Equals("") ? IStatus.COMPLETE : IStatus.FAILED
+                );
+
+                _logger.LogInformation(import.Errors.Equals("")
+                    ? $"All batches imported for {releaseId} : {dataFileName} with no errors"
+                    : $"All batches imported for {releaseId} : {dataFileName} but with errors - check storage log");
+            }
         }
 
-        public async Task UpdateStatus(string releaseId, string subjectId, int batchSize, ImportStatus status)
+        public async Task UpdateStatus(string releaseId, string dataFileName, IStatus status)
         {
-            var batch = await GetOrCreateBatch(releaseId, subjectId, batchSize);
-            batch.Status = (int)status;
-            await _table.ExecuteAsync(TableOperation.InsertOrReplace(batch));
-        }
-        
-        public async Task UpdateStatus(string releaseId, string subjectId, ImportStatus status)
-        {
-            await UpdateStatus(releaseId, subjectId, -1, status);
-        }
-        
-        public async Task FailBatch(string releaseId, string subjectId, List<string> errors)
-        {
-            var batch = await GetOrCreateBatch(releaseId, subjectId, -1);
-            batch.Status = (int)ImportStatus.FAILED;
-            batch.Errors = JsonConvert.SerializeObject(errors);
-            await _table.ExecuteAsync(TableOperation.InsertOrReplace(batch));
-        }
-        public async Task LogErrors(string releaseId, string subjectId, List<string> errors, int batchNo)
-        {
-            var batch = await GetOrCreateBatch(releaseId, subjectId, -1);
-            if (!batch.Errors.Equals(""))
+            // Note that optimistic locking applies to azure table so to avoid concurrency issue acquire a lease on the block blob 
+            var cloudBlockBlob = _fileStorageService.GetCloudBlockBlob(releaseId, dataFileName);
+            var leaseId = await GetLease(cloudBlockBlob);
+
+            try
             {
-                var currentErrors = JsonConvert.DeserializeObject<List<string>>(batch.Errors);
+                var import = await GetImport(releaseId, dataFileName);
+                import.Status = status;
+                await _table.ExecuteAsync(TableOperation.InsertOrReplace(import));
+            }
+            finally
+            {
+                await cloudBlockBlob.ReleaseLeaseAsync(AccessCondition.GenerateLeaseCondition(leaseId));
+            }
+        }
+
+        public async Task FailImport(string releaseId, string dataFileName, List<string> errors)
+        {
+            var import = await GetImport(releaseId, dataFileName);
+            import.Status = IStatus.FAILED;
+            import.Errors = JsonConvert.SerializeObject(errors);
+            await _table.ExecuteAsync(TableOperation.InsertOrReplace(import));
+        }
+
+        public async Task LogErrors(string releaseId, string dataFileName, List<string> errors)
+        {
+            var import = await GetImport(releaseId, dataFileName);
+            if (!import.Errors.Equals(""))
+            {
+                var currentErrors = JsonConvert.DeserializeObject<List<string>>(import.Errors);
                 currentErrors.Concat(errors);
-                batch.Errors = JsonConvert.SerializeObject(currentErrors);
+                import.Errors = JsonConvert.SerializeObject(currentErrors);
             }
             else
             {
-                batch.Errors = JsonConvert.SerializeObject(errors);
+                import.Errors = JsonConvert.SerializeObject(errors);
             }
-            
-            await _table.ExecuteAsync(TableOperation.InsertOrReplace(batch));
-            // Set this batch to processed
-            await UpdateBatchCount(releaseId, subjectId, -1, batchNo);
+
+            await _table.ExecuteAsync(TableOperation.InsertOrReplace(import));
         }
 
-        private async Task<Batch> GetOrCreateBatch(string releaseId, string subjectId, int batchSize)
+        public async Task<bool> IsBatchProcessed(string releaseId, string dataFileName, int batchNo)
         {
-            // Need to define the extra columns to retrieve
-            var columns = new List<string>(){ "BatchSize", "BatchesProcessed", "Status", "Errors"};
-            Batch batch;
+            var import = await GetImport(releaseId, dataFileName);
+            var bitArray = new BitArray(import.BatchesProcessed);
+            return bitArray.Get(batchNo - 1);
+        }
 
-            var result = await _table.ExecuteAsync(TableOperation.Retrieve<Batch>(releaseId, subjectId, columns));
-            if (result.Result == null)
+        public async Task CreateImport(string releaseId, string dataFileName, int numBatches)
+        {
+            await _table.ExecuteAsync(TableOperation.InsertOrReplace(
+                new DatafileImport(releaseId, dataFileName, numBatches))
+            );
+        }
+
+        private async Task<DatafileImport> GetImport(string releaseId, string dataFileName)
+        {
+            var result = await _table.ExecuteAsync(TableOperation.Retrieve<DatafileImport>(
+                releaseId,
+                dataFileName,
+                new List<string>() {"NumBatches", "BatchesProcessed", "Status", "Errors"}));
+
+            return (DatafileImport) result.Result;
+        }
+
+        private async Task<string> GetLease(CloudBlockBlob cloudBlockBlob)
+        {
+            string leaseId = null;
+
+            // TODO Improve error handling & max retries 
+            while (leaseId == null)
             {
-                batch = new Batch(releaseId, subjectId, batchSize);
+                try
+                {
+                    leaseId = await _fileStorageService.GetLeaseId(cloudBlockBlob);
+                }
+                catch (Microsoft.WindowsAzure.Storage.StorageException se)
+                {
+                    var response = se.RequestInformation.HttpStatusCode;
+                    if (response != null && (response == (int) HttpStatusCode.Conflict))
+                    {
+                        // A Conflict has been found, lease is being used by another process
+                        // wait and try again.
+                        Thread.Sleep(TimeSpan.FromSeconds(2));
+                    }
+                    else
+                    {
+                        throw se;
+                    }
+                }
             }
-            else
-            {
-                batch = (Batch) result.Result;
-            }
-            return batch;
+
+            return leaseId;
         }
     }
 }

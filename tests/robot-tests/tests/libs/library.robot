@@ -16,9 +16,25 @@ ${implicit_wait}    20
 
 *** Keywords ***
 do this on failure
-  capture page screenshot
+  capture large screenshot
   set selenium timeout  3
   set selenium implicit wait  3
+
+user signs in
+  user opens the browser
+  environment variable should be set   ADMIN_URL
+  user goes to url  %{ADMIN_URL}
+  user waits until page contains heading     Sign-in
+  user clicks link   Sign-in
+
+  environment variable should be set   ADMIN_EMAIL
+  environment variable should be set   ADMIN_PASSWORD
+  user logs into microsoft online  %{ADMIN_EMAIL}   %{ADMIN_PASSWORD}
+
+  user checks url contains  %{ADMIN_URL}
+  user waits until page contains heading   User1 EESADMIN
+  user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(1)     Home
+  user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(2)     Administrator dashboard
 
 user opens the browser
   run keyword if    "${browser}" == "chrome"    user opens chrome
@@ -92,8 +108,8 @@ user waits until page contains
   wait until page contains   ${pageText}
 
 user waits until page contains element
-  [Arguments]    ${element}
-  wait until page contains element  ${element}
+  [Arguments]    ${element}        ${wait}=${timeout}
+  wait until page contains element  ${element}   timeout=${wait}
 
 user waits until page does not contain element
   [Arguments]    ${element}
@@ -121,8 +137,8 @@ user checks element does not contain
   element should not contain    ${element}    ${text}
 
 user waits until element is visible
-  [Arguments]    ${selector}
-  wait until element is visible  ${selector}
+  [Arguments]    ${selector}    ${wait}=${timeout}
+  wait until element is visible  ${selector}   timeout=${wait}
 
 user checks element is visible
   [Arguments]   ${element}
@@ -184,11 +200,27 @@ user clicks element
 
 user clicks link
   [Arguments]   ${text}
-  click element  xpath://a[text()="${text}"]
+  click link  ${text}
 
 user clicks button
   [Arguments]   ${text}
   click button  ${text}
+
+user checks page contains tag
+  [Arguments]   ${text}
+  user checks page contains element  xpath://span[contains(@class, "govuk-tag")][text()="${text}"]
+
+user checks page contains heading 1
+  [Arguments]   ${text}
+  user checks page contains element  xpath://h1[text()="${text}"]
+
+user checks page contains heading 2
+  [Arguments]   ${text}
+  user checks page contains element  xpath://h2[text()="${text}"]
+
+user checks page contains heading 3
+  [Arguments]   ${text}
+  user checks page contains element  xpath://h3[text()="${text}"]
 
 user selects newly opened window
   select window   NEW
@@ -197,6 +229,12 @@ user checks element attribute value should be
   [Arguments]   ${locator}  ${attribute}    ${expected}
   element attribute value should be  ${locator}     ${attribute}   ${expected}
 
+user checks radio option for "${radiogroupId}" should be "${expectedLabelText}"
+  user checks page contains element  css:#${radiogroupId} [data-testid="${expectedLabelText}"]:checked
+
+user checks summary list item "${dtText}" should be "${ddText}"
+  user checks page contains element  xpath://dl[//dt[contains(text(),"${dtText}")] and (//dd[contains(text(), "${ddText}")] or //dd//*[contains(text(), "${ddText}")])]
+
 user selects from list by label
   [Arguments]   ${locator}   ${label}
   select from list by label   ${locator}   ${label}
@@ -204,6 +242,11 @@ user selects from list by label
 user presses keys
   [Arguments]   ${keys}
   press keys  ${None}    ${keys}
+
+user enters text into element
+  [Arguments]   ${selector}   ${text}
+  user clicks element   ${selector}
+  user presses keys     ${text}
 
 user checks element count is x
   [Arguments]   ${locator}   ${amount}
@@ -218,13 +261,17 @@ user checks page contains link with text and url
   [Arguments]  ${text}  ${href}
   user checks page contains element  xpath://a[@href="${href}" and text()="${text}"]
 
+user checks page contains details section
+  [Arguments]  ${text}
+  user checks page contains element  css:[data-testid="Expand Details Section ${text}"]
+
+user opens details section
+  [Arguments]  ${text}
+  user clicks element    css:[data-testid="Expand Details Section ${text}"]
+
 user waits until results table appears
-  # NOTE(mark): Increasing timeout to stop known failure and created DFE-1158
-  set selenium timeout          60
-  set selenium implicit wait    60
-  user waits until page contains element   css:table thead th
-  set selenium timeout          ${timeout}
-  set selenium implicit wait    ${implicit_wait}
+  # Extra timeout until EES-234
+  user waits until page contains element   css:table thead th    60
 
 user logs into microsoft online
   [Arguments]  ${email}   ${password}
@@ -247,3 +294,11 @@ user logs into microsoft online
   wait until element is enabled   css:input[value="No"]
   sleep  1
   user clicks element   css:input[value="No"]
+
+user checks publication bullet contains link
+  [Arguments]   ${publication}   ${link}
+  user checks page contains element  xpath://details[@open]//*[text()="${publication}"]/..//a[text()="${link}"]
+
+user checks publication bullet does not contain link
+  [Arguments]   ${publication}   ${link}
+  user checks page does not contain element  xpath://details[@open]//*[text()="${publication}"]/..//a[text()="${link}"]
