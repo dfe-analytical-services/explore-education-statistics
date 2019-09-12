@@ -29,6 +29,9 @@ const nextApp = require('next');
 const referrerPolicy = require('referrer-policy');
 const url = require('url');
 const cookiesMiddleware = require('universal-cookie-express');
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 const app = nextApp({
   dev: process.env.NODE_ENV !== 'production',
@@ -47,15 +50,16 @@ async function startServer(port = process.env.PORT || 3000) {
 
   const cspConnectSrc = [
     "'self'",
-    process.env.CONTENT_API_BASE_URL,
-    process.env.DATA_API_BASE_URL,
-    process.env.FUNCTION_API_BASE_URL,
+    process.env.CONTENT_API_BASE_URL.replace('/api', ''),
+    process.env.DATA_API_BASE_URL.replace('/api', ''),
+    process.env.FUNCTION_API_BASE_URL.replace('/api', ''),
     'http://*.hotjar.com:*',
     'https://*.hotjar.com:*',
     'https://vc.hotjar.io:*',
     'wss://*.hotjar.com',
     'https://dc.services.visualstudio.com/v2/track',
   ];
+
   const cspScriptSrc = [
     "'self'",
     'https://www.google-analytics.com/',
