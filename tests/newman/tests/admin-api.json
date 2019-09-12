@@ -2133,7 +2133,7 @@
 								{
 									"key": "metaFile",
 									"type": "file",
-									"src": "{{files_dir}/my_metafile.csv"
+									"src": "{{files_dir}}/my_metafile.csv"
 								}
 							]
 						},
@@ -2597,12 +2597,12 @@
 								{
 									"key": "file",
 									"type": "file",
-									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/quotes_in_metadata_file_headings.csv"
+									"src": "{{files_dir}}/file-upload-validation/quotes_in_metadata_file_headings.csv"
 								},
 								{
 									"key": "metaFile",
 									"type": "file",
-									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/quotes_in_metadata_file_headings.meta.csv"
+									"src": "{{files_dir}}/file-upload-validation/quotes_in_metadata_file_headings.meta.csv"
 								}
 							]
 						},
@@ -2735,12 +2735,12 @@
 								{
 									"key": "file",
 									"type": "file",
-									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/invalid_data_in_metadata_file.csv"
+									"src": "{{files_dir}}/file-upload-validation/invalid_data_in_metadata_file.csv"
 								},
 								{
 									"key": "metaFile",
 									"type": "file",
-									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/invalid_data_in_metadata_file.meta.csv"
+									"src": "{{files_dir}}/file-upload-validation/invalid_data_in_metadata_file.meta.csv"
 								}
 							]
 						},
@@ -2873,12 +2873,12 @@
 								{
 									"key": "file",
 									"type": "file",
-									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/quotes_in_metadata_file.csv"
+									"src": "{{files_dir}}/file-upload-validation/quotes_in_metadata_file.csv"
 								},
 								{
 									"key": "metaFile",
 									"type": "file",
-									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/quotes_in_metadata_file.meta.csv"
+									"src": "{{files_dir}}/file-upload-validation/quotes_in_metadata_file.meta.csv"
 								}
 							]
 						},
@@ -3011,12 +3011,12 @@
 								{
 									"key": "file",
 									"type": "file",
-									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/quotes_in_data_file.csv"
+									"src": "{{files_dir}}/file-upload-validation/quotes_in_data_file.csv"
 								},
 								{
 									"key": "metaFile",
 									"type": "file",
-									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/quotes_in_data_file.meta.csv"
+									"src": "{{files_dir}}/file-upload-validation/quotes_in_data_file.meta.csv"
 								}
 							]
 						},
@@ -3149,12 +3149,12 @@
 								{
 									"key": "file",
 									"type": "file",
-									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/unexpected_metadata_in_metadata_file.csv"
+									"src": "{{files_dir}}/file-upload-validation/unexpected_metadata_in_metadata_file.csv"
 								},
 								{
 									"key": "metaFile",
 									"type": "file",
-									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/unexpected_metadata_in_metadata_file.meta.csv"
+									"src": "{{files_dir}}/file-upload-validation/unexpected_metadata_in_metadata_file.meta.csv"
 								}
 							]
 						},
@@ -3287,12 +3287,12 @@
 								{
 									"key": "file",
 									"type": "file",
-									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/unexpected_columns_in_metadata_file.csv"
+									"src": "{{files_dir}}/file-upload-validation/unexpected_columns_in_metadata_file.csv"
 								},
 								{
 									"key": "metaFile",
 									"type": "file",
-									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/unexpected_columns_in_metadata_file.meta.csv"
+									"src": "{{files_dir}}/file-upload-validation/unexpected_columns_in_metadata_file.meta.csv"
 								}
 							]
 						},
@@ -3425,12 +3425,12 @@
 								{
 									"key": "file",
 									"type": "file",
-									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/unexpected_number_of_columns_in_metadata_file.csv"
+									"src": "{{files_dir}}/file-upload-validation/unexpected_number_of_columns_in_metadata_file.csv"
 								},
 								{
 									"key": "metaFile",
 									"type": "file",
-									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/unexpected_number_of_columns_in_metadata_file.meta.csv"
+									"src": "{{files_dir}}/file-upload-validation/unexpected_number_of_columns_in_metadata_file.meta.csv"
 								}
 							]
 						},
@@ -3563,12 +3563,12 @@
 								{
 									"key": "file",
 									"type": "file",
-									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/unexpected_number_of_columns_in_data_file.csv"
+									"src": "{{files_dir}}/file-upload-validation/unexpected_number_of_columns_in_data_file.csv"
 								},
 								{
 									"key": "metaFile",
 									"type": "file",
-									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/unexpected_number_of_columns_in_data_file.meta.csv"
+									"src": "{{files_dir}}/file-upload-validation/unexpected_number_of_columns_in_data_file.meta.csv"
 								}
 							]
 						},
@@ -3701,12 +3701,12 @@
 								{
 									"key": "file",
 									"type": "file",
-									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/invalid_geographic_level_in_data_file.csv"
+									"src": "{{files_dir}}/file-upload-validation/invalid_geographic_level_in_data_file.csv"
 								},
 								{
 									"key": "metaFile",
 									"type": "file",
-									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/invalid_geographic_level_in_data_file.meta.csv"
+									"src": "{{files_dir}}/file-upload-validation/invalid_geographic_level_in_data_file.meta.csv"
 								}
 							]
 						},
@@ -3839,12 +3839,12 @@
 								{
 									"key": "file",
 									"type": "file",
-									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/invalid_time_identifier_in_data_file.csv"
+									"src": "{{files_dir}}/file-upload-validation/invalid_time_identifier_in_data_file.csv"
 								},
 								{
 									"key": "metaFile",
 									"type": "file",
-									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/invalid_time_identifier_in_data_file.meta.csv"
+									"src": "{{files_dir}}/file-upload-validation/invalid_time_identifier_in_data_file.meta.csv"
 								}
 							]
 						},
@@ -3977,12 +3977,12 @@
 								{
 									"key": "file",
 									"type": "file",
-									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/missing_time_period_column_in_data_file.csv"
+									"src": "{{files_dir}}/file-upload-validation/missing_time_period_column_in_data_file.csv"
 								},
 								{
 									"key": "metaFile",
 									"type": "file",
-									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/missing_time_period_column_in_data_file.meta.csv"
+									"src": "{{files_dir}}/file-upload-validation/missing_time_period_column_in_data_file.meta.csv"
 								}
 							]
 						},
@@ -4115,12 +4115,12 @@
 								{
 									"key": "file",
 									"type": "file",
-									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/missing_time_identifier_column_in_data_file.csv"
+									"src": "{{files_dir}}/file-upload-validation/missing_time_identifier_column_in_data_file.csv"
 								},
 								{
 									"key": "metaFile",
 									"type": "file",
-									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/missing_time_identifier_column_in_data_file.meta.csv"
+									"src": "{{files_dir}}/file-upload-validation/missing_time_identifier_column_in_data_file.meta.csv"
 								}
 							]
 						},
@@ -4253,12 +4253,12 @@
 								{
 									"key": "file",
 									"type": "file",
-									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/missing_time_identifier_column_in_data_file.csv"
+									"src": "{{files_dir}}/file-upload-validation/missing_time_identifier_column_in_data_file.csv"
 								},
 								{
 									"key": "metaFile",
 									"type": "file",
-									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/missing_time_identifier_column_in_data_file.meta.csv"
+									"src": "{{files_dir}}/file-upload-validation/missing_time_identifier_column_in_data_file.meta.csv"
 								}
 							]
 						},
@@ -4391,12 +4391,12 @@
 								{
 									"key": "file",
 									"type": "file",
-									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/missing_observational_units_in_data_file.csv"
+									"src": "{{files_dir}}/file-upload-validation/missing_observational_units_in_data_file.csv"
 								},
 								{
 									"key": "metaFile",
 									"type": "file",
-									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/missing_observational_units_in_data_file.meta.csv"
+									"src": "{{files_dir}}/file-upload-validation/missing_observational_units_in_data_file.meta.csv"
 								}
 							]
 						},
@@ -4529,12 +4529,12 @@
 								{
 									"key": "file",
 									"type": "file",
-									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/missing_columns_in_data_file.csv"
+									"src": "{{files_dir}}/file-upload-validation/missing_columns_in_data_file.csv"
 								},
 								{
 									"key": "metaFile",
 									"type": "file",
-									"src": "/home/dwatson/development/projects/dfe/ees-test-data/csvs/file-upload-validation/missing_columns_in_data_file.meta.csv"
+									"src": "{{files_dir}}/file-upload-validation/missing_columns_in_data_file.meta.csv"
 								}
 							]
 						},
