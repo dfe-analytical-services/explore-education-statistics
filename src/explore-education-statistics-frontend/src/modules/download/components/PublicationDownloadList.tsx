@@ -47,7 +47,7 @@ function PublicationList({ publications }: Props) {
               {downloadFiles.map(({ extension, name, path, size }) => (
                 <li key={path} className="govuk-!-margin-bottom-6">
                   <Link
-                    to={`${baseUrl.data}/api/download/${path}`}
+                    to={`${baseUrl.data}/download/${path}`}
                     className="govuk-link"
                     data-testid={`download-stats-${path}`}
                   >
