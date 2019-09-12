@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import Link from '@admin/components/Link';
 import service from '@admin/services/release/edit-release/data/service';
 import { DataFile } from '@admin/services/release/edit-release/data/types';
@@ -14,6 +15,7 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
 import { FormikActions, FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
+import styles from './ReleaseDataUploadsSection.module.scss';
 
 interface FormValues {
   subjectTitle: string;
@@ -140,7 +142,25 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                     </a>
                   </SummaryListItem>
                   <SummaryListItem term="Status">
-                    <strong className="govuk-tag">Status summary</strong>
+                    <strong
+                      className={classNames('govuk-tag', [styles.ragStatusRed])}
+                    >
+                      Failed
+                    </strong>
+                    <strong
+                      className={classNames('govuk-tag', [
+                        styles.ragStatusAmber,
+                      ])}
+                    >
+                      Processing
+                    </strong>
+                    <strong
+                      className={classNames('govuk-tag', [
+                        styles.ragStatusGreen,
+                      ])}
+                    >
+                      Complete
+                    </strong>
                   </SummaryListItem>
                   <SummaryListItem
                     term="Actions"
