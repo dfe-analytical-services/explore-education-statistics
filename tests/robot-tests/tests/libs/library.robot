@@ -12,7 +12,7 @@ ${browser}    chrome
 ${headless}   1
 
 ${timeout}          20
-${implicit_wait}    20
+${implicit_wait}    3
 
 *** Keywords ***
 do this on failure
@@ -272,6 +272,7 @@ user opens details section
 user waits until results table appears
   # Extra timeout until EES-234
   user waits until page contains element   css:table thead th    60
+  user waits until page does not contain element  css:[class^="dfe-LoadingSpinner"]
 
 user logs into microsoft online
   [Arguments]  ${email}   ${password}
