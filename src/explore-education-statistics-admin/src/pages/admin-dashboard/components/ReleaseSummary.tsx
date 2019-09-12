@@ -1,7 +1,7 @@
 import { LoginContext } from '@admin/components/Login';
 import {
   getReleaseStatusLabel,
-  getTimePeriodCoverageDateRangeStringLong,
+  getReleaseSummaryLabel,
 } from '@admin/pages/release/util/releaseSummaryUtil';
 import {
   dayMonthYearIsComplete,
@@ -18,16 +18,6 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import { format } from 'date-fns';
 import React, { ReactNode, useContext } from 'react';
 
-const getLiveLatestLabel = (isLive: boolean, isLatest: boolean) => {
-  if (isLive && isLatest) {
-    return '(Live - Latest release)';
-  }
-  if (isLive) {
-    return '(Live)';
-  }
-  return '(not Live)';
-};
-
 interface Props {
   release: AdminDashboardRelease;
   actions: ReactNode;
@@ -42,15 +32,10 @@ const ReleaseSummary = ({ release, actions, children }: Props) => {
       ? 'me'
       : release.lastEditedUser.name;
 
-  const releaseSummaryLabel = `${
-    release.timePeriodCoverage.label
-  }, ${getTimePeriodCoverageDateRangeStringLong(release.releaseName)} 
-     ${getLiveLatestLabel(release.live, release.latestRelease)}`;
-
   return (
     <Details
       className="govuk-!-margin-bottom-0"
-      summary={releaseSummaryLabel}
+      summary={getReleaseSummaryLabel(release)}
       tag={getReleaseStatusLabel(release.status)}
     >
       <SummaryList additionalClassName="govuk-!-margin-bottom-3">

@@ -1,49 +1,24 @@
 *** Settings ***
-Resource    ../libs/library.robot
+Resource    ./libs/common-keywords.robot
 
 Force Tags  Admin  NotAgainstProd
 
-Suite Setup       user opens the browser
+Suite Setup       user signs in
 Suite Teardown    user closes the browser
 
 *** Test Cases ***
-Verify admin index page loads
-    [Tags]  HappyPath
-    environment variable should be set   ADMIN_URL
-    user goes to url  %{ADMIN_URL}
-    user waits until page contains heading     Sign-in
-
-Verify user can sign in
-    [Tags]   HappyPath
-    user clicks link   Sign-in
-
-    environment variable should be set   ADMIN_EMAIL
-    environment variable should be set   ADMIN_PASSWORD
-    user logs into microsoft online  %{ADMIN_EMAIL}   %{ADMIN_PASSWORD}
-
-    user checks url contains  %{ADMIN_URL}
-    user waits until page contains heading   User1 EESADMIN
-    user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(1)     Home
-    user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(2)     Administrator dashboard
-
-Heading is present on tab
-    [Tags]  HappyPath
-    user checks element contains  css:#my-publications-tab  Manage publications and releases
-
 Verify correct data is shown when theme and topic is shown
     [Tags]   HappyPath
-    user clicks element   css:#my-publications-tab
-    user selects from list by label  css:#selectTheme  Test Theme
-    user selects from list by label  css:#selectTopic  Automated Test Topic
-    user checks page contains accordion  Automated Test Publication
-    user opens accordion section  Automated Test Publication
-    user checks accordion section contains text  Automated Test Publication    Methodology
-    user checks accordion section contains text  Automated Test Publication    Releases
+    user selects theme "Test Theme" and topic "Automated Test Topic" from the admin dashboard
+    user checks page contains accordion  Automated Test Publication for Create Release
+    user opens accordion section  Automated Test Publication for Create Release
+    user checks accordion section contains text  Automated Test Publication for Create Release    Methodology
+    user checks accordion section contains text  Automated Test Publication for Create Release    Releases
 
 User clicks create new release
     [Tags]  HappyPath
-    user waits until page contains element  xpath://a[text()="Create new release"]
-    user clicks element   xpath://a[text()="Create new release"]
+    user waits until page contains element  css:[data-testid="Create new release link for Automated Test Publication for Create Release"]
+    user clicks element  css:[data-testid="Create new release link for Automated Test Publication for Create Release"]
    
 Check page has correct fields
     [Tags]  HappyPath
@@ -69,6 +44,8 @@ User fills in form
     user clicks element  xpath://label[text()="National Statistics"]
 
 Check if data has been submitted
-    [Tags]  HappyPath  UnderConstruction
+    [Tags]  HappyPath  AltersData
     user clicks element   xpath://button[text()="Create new release"]
     user waits until page contains element  xpath://span[text()="Edit release"]
+    user waits until page contains element  xpath://h2[text()="Release summary"]
+
