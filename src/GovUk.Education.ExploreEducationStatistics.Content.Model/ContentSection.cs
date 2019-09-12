@@ -8,6 +8,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
     public class ContentSection
     {
+        public Guid Id { get; set; }
+        
         public int Order { get; set; }
         
         public string Heading { get; set; }
