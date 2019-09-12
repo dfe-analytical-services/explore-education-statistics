@@ -105,9 +105,12 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
           <Form id={formId} submitValidationHandler={handleServerValidation}>
             {dataFiles &&
               dataFiles.map(dataFile => (
-                <SummaryList key={dataFile.filename}>
+                <SummaryList
+                  key={dataFile.filename}
+                  additionalClassName="govuk-!-margin-bottom-9"
+                >
                   <SummaryListItem term="Subject title">
-                    {dataFile.title}
+                    <h4 className="govuk-heading-m">{dataFile.title}</h4>
                   </SummaryListItem>
                   <SummaryListItem term="Data file">
                     <a
@@ -136,11 +139,15 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                       {dataFile.metadataFilename}
                     </a>
                   </SummaryListItem>
+                  <SummaryListItem term="Status">
+                    <strong className="govuk-tag">Status summary</strong>
+                  </SummaryListItem>
                   <SummaryListItem
                     term="Actions"
                     actions={
                       <Link
                         to="#"
+                        className="govuk-button govuk-button--secondary govuk-!-margin-0"
                         onClick={() => setDeleteFileName(dataFile.filename)}
                       >
                         Delete files
