@@ -7,18 +7,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interf
 {
     public interface IContentCacheService
     {
-        Task<List<ThemeTree>> GetContentTreeAsync();
+        Task<string> GetContentTreeAsync();
 
-        Task<List<ThemeTree>> GetMethodologyTreeAsync();
+        Task<string> GetMethodologyTreeAsync();
 
-        Task<List<ThemeTree>> GetDownloadTreeAsync();
+        Task<string> GetDownloadTreeAsync();
 
-        Task<Methodology> GetMethodologyAsync(string slug);
+        Task<string> GetMethodologyAsync(string slug);
 
-        Task<PublicationViewModel> GetPublicationAsync(string slug);
+        Task<string> GetPublicationAsync(string slug);
 
-        Task<ReleaseViewModel> GetLatestReleaseAsync(string slug);
+        Task<string> GetLatestReleaseAsync(string slug);
 
-        Task<ReleaseViewModel> GetReleaseAsync(string publicationSlug, string releaseSlug);
+        Task<string> GetReleaseAsync(string publicationSlug, string releaseSlug);
     }
 }

@@ -23,16 +23,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(204)]
         [Produces("application/json")]
-        public async Task<ActionResult<List<ThemeTree>>> GetDownloadTree()
+        public async Task<ActionResult<string>> GetDownloadTree()
         {
             var tree = await _contentCacheService.GetDownloadTreeAsync();
 
-            if (tree.Any())
+            if (string.IsNullOrWhiteSpace(tree))
             {
-                return tree.ToList();
+                return NoContent();
             }
 
-            return NoContent();
+            return tree;
         }
     }
 }

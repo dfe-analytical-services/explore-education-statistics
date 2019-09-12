@@ -18,71 +18,67 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
             _cloudBlobClient = cloudBlobClient;
         }
 
-        public async Task<List<ThemeTree>> GetContentTreeAsync()
+        public async Task<string> GetContentTreeAsync()
         {
             var container = await GetCloudBlobContainer();
 
             var blob = container.GetBlockBlobReference("publications/tree.json");
 
-            return !blob.Exists() ? null : JsonConvert.DeserializeObject<List<ThemeTree>>(blob.DownloadText());
+            return !blob.Exists() ? null :  await blob.DownloadTextAsync();
         }
 
-        public async Task<List<ThemeTree>> GetMethodologyTreeAsync()
+        public async Task<string> GetMethodologyTreeAsync()
         {
             var container = await GetCloudBlobContainer();
 
             var blob = container.GetBlockBlobReference("methodology/tree.json");
 
-            return !blob.Exists() ? null : JsonConvert.DeserializeObject<List<ThemeTree>>(blob.DownloadText());
+            return !blob.Exists() ? null :  await blob.DownloadTextAsync();
         }
 
-        public async Task<List<ThemeTree>> GetDownloadTreeAsync()
+        public async Task<string> GetDownloadTreeAsync()
         {
             var container = await GetCloudBlobContainer();
 
             var blob = container.GetBlockBlobReference("download/tree.json");
 
-            return !blob.Exists() ? null : JsonConvert.DeserializeObject<List<ThemeTree>>(blob.DownloadText());
+            return !blob.Exists() ? null :  await blob.DownloadTextAsync();
         }
 
-        public async Task<Methodology> GetMethodologyAsync(string slug)
+        public async Task<string> GetMethodologyAsync(string slug)
         {
             var container = await GetCloudBlobContainer();
 
             var blob = container.GetBlockBlobReference($"methodology/methodologies/{slug}.json");
 
-            // TODO: this errors as the entire response is encoded as json and the converter will still try to convert the content blocks
-            return !blob.Exists() ? null : JsonConvert.DeserializeObject<Methodology>(blob.DownloadText());
+            return !blob.Exists() ? null :  await blob.DownloadTextAsync();
         }
 
-        public async Task<PublicationViewModel> GetPublicationAsync(string slug)
+        public async Task<string> GetPublicationAsync(string slug)
         {
             var container = await GetCloudBlobContainer();
 
             var blob = container.GetBlockBlobReference($"publications/{slug}/publication.json");
 
-            // TODO: this errors as the entire response is encoded as json and the converter will still try to convert the content blocks
-            return !blob.Exists() ? null : JsonConvert.DeserializeObject<PublicationViewModel>(blob.DownloadText());
+            return !blob.Exists() ? null :  await blob.DownloadTextAsync();
         }
 
-        public async Task<ReleaseViewModel> GetLatestReleaseAsync(string slug)
+        public async Task<string> GetLatestReleaseAsync(string slug)
         {
             var container = await GetCloudBlobContainer();
 
             var blob = container.GetBlockBlobReference($"publications/{slug}/latest-release.json");
 
-            // TODO: this errors as the entire response is encoded as json and the converter will still try to convert the content blocks
-            return !blob.Exists() ? null : JsonConvert.DeserializeObject<ReleaseViewModel>(blob.DownloadText());
+            return !blob.Exists() ? null :  await blob.DownloadTextAsync();
         }
 
-        public async Task<ReleaseViewModel> GetReleaseAsync(string publicationSlug, string releaseSlug)
+        public async Task<string> GetReleaseAsync(string publicationSlug, string releaseSlug)
         {
             var container = await GetCloudBlobContainer();
 
             var blob = container.GetBlockBlobReference($"publications/{publicationSlug}/releases/{releaseSlug}.json");
 
-            // TODO: this errors as the entire response is encoded as json and the converter will still try to convert the content blocks
-            return !blob.Exists() ? null : JsonConvert.DeserializeObject<ReleaseViewModel>(blob.DownloadText());
+            return !blob.Exists() ? null :  await blob.DownloadTextAsync();
         }
 
         private async Task<CloudBlobContainer> GetCloudBlobContainer()

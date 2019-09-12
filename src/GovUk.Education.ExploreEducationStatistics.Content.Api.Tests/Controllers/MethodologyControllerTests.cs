@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using Newtonsoft.Json;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers
@@ -19,20 +20,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 
 
             cache.Setup(s => s.GetMethodologyTreeAsync()).ReturnsAsync(
-                new List<ThemeTree>
+                JsonConvert.SerializeObject(new List<ThemeTree>
                 {
                     new ThemeTree
                     {
                         Title = "Theme A"
                     }
                 }
-            );
+            ));
 
             var controller = new MethodologyController(cache.Object);
 
             var result = controller.GetMethodologyTree();
 
-            Assert.IsAssignableFrom<List<ThemeTree>>(result.Result.Value);
+            Assert.IsAssignableFrom<List<ThemeTree>>(JsonConvert.DeserializeObject<List<ThemeTree>>(result.Result.Value));
+            Assert.Contains("Theme A", result.Result.Value);
         }
 
         [Fact]
@@ -42,8 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 
 
             cache.Setup(s => s.GetMethodologyTreeAsync()).ReturnsAsync(
-                new List<ThemeTree>()
-                );
+                (string) null);
 
 
             var controller = new MethodologyController(cache.Object);
@@ -60,17 +61,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 
 
             cache.Setup(s => s.GetMethodologyAsync("test-slug")).ReturnsAsync(
-                new Methodology
+                JsonConvert.SerializeObject( new Methodology
                 {
                     Id = new Guid("a7772148-fbbd-4c85-8530-f33c9ef25488")
                 }
-            );
+            ));
 
             var controller = new MethodologyController(cache.Object);
 
             var result = controller.Get("test-slug");
 
-            Assert.Equal("a7772148-fbbd-4c85-8530-f33c9ef25488", result.Result.Value.Id.ToString());
+            Assert.Contains("a7772148-fbbd-4c85-8530-f33c9ef25488", result.Result.Value);
         }
         
         [Fact]
@@ -78,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         {
             var cache = new Mock<IContentCacheService>();
 
-            cache.Setup(s => s.GetMethodologyAsync("unknown-slug")).ReturnsAsync((Methodology) null);
+            cache.Setup(s => s.GetMethodologyAsync("unknown-slug")).ReturnsAsync((string) null);
 
             var controller = new MethodologyController(cache.Object);
 

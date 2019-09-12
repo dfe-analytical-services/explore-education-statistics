@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces
 using GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using Newtonsoft.Json;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers
@@ -17,20 +18,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var cache = new Mock<IContentCacheService>();
 
             cache.Setup(s => s.GetContentTreeAsync()).ReturnsAsync(
-                new List<ThemeTree>
+                JsonConvert.SerializeObject(new List<ThemeTree>
                 {
                     new ThemeTree
                     {
                         Title = "Theme A"
                     }
                 }
-            );
+            ));
 
             var controller = new ContentController(cache.Object);
 
             var result = controller.GetContentTree();
 
-            Assert.IsAssignableFrom<List<ThemeTree>>(result.Result.Value);
+            Assert.IsAssignableFrom<List<ThemeTree>>(JsonConvert.DeserializeObject<List<ThemeTree>>(result.Result.Value));
+            Assert.Contains("Theme A", result.Result.Value);           
         }
 
         [Fact]
@@ -39,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var cache = new Mock<IContentCacheService>();
 
             cache.Setup(s => s.GetContentTreeAsync()).ReturnsAsync(
-                new List<ThemeTree>()
+                 (string)null
             );
 
             var controller = new ContentController(cache.Object);
@@ -55,19 +57,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var cache = new Mock<IContentCacheService>();
 
             cache.Setup(s => s.GetPublicationAsync("publication-a")).ReturnsAsync(
-                new PublicationViewModel
+                JsonConvert.SerializeObject(new PublicationViewModel
                 {
                     Id = new Guid("a7772148-fbbd-4c85-8530-f33c9ef25488"),
                     Title = "Publication A"
-                });
+                }));
 
             var controller = new ContentController(cache.Object);
 
             var result = controller.GetPublication("publication-a");
 
-            Assert.IsAssignableFrom<PublicationViewModel>(result.Result.Value);
-            Assert.Equal("a7772148-fbbd-4c85-8530-f33c9ef25488", result.Result.Value.Id.ToString());
-            Assert.Equal("Publication A", result.Result.Value.Title);
+            Assert.IsAssignableFrom<PublicationViewModel>(JsonConvert.DeserializeObject<PublicationViewModel>(result.Result.Value));
+            Assert.Contains("a7772148-fbbd-4c85-8530-f33c9ef25488", result.Result.Value);
+            Assert.Contains("Publication A", result.Result.Value);
         }
 
         [Fact]
@@ -76,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var cache = new Mock<IContentCacheService>();
 
             cache.Setup(s => s.GetPublicationAsync("test-publication")).ReturnsAsync(
-                (PublicationViewModel) null);
+                (string) null);
 
             var controller = new ContentController(cache.Object);
 
@@ -92,19 +94,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
              var cache = new Mock<IContentCacheService>();
 
              cache.Setup(s => s.GetLatestReleaseAsync("publication-a")).ReturnsAsync(
-                 new ReleaseViewModel
+                 JsonConvert.SerializeObject(new ReleaseViewModel
                  {
                      Title = "Publication A",
                      Slug = "publication-a"
-                 });
+                 }));
 
              var controller =
                  new ContentController(cache.Object);
 
              var result = controller.GetLatestRelease("publication-a");
 
-             Assert.IsAssignableFrom<ReleaseViewModel>(result.Result.Value);
-             Assert.Equal("Publication A", result.Result.Value.Title);
+             Assert.Contains("Publication A", result.Result.Value);
          }
 
          [Fact]
@@ -112,7 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
          {
              var cache = new Mock<IContentCacheService>();
 
-             cache.Setup(s => s.GetLatestReleaseAsync("publication-a")).ReturnsAsync((ReleaseViewModel) null);
+             cache.Setup(s => s.GetLatestReleaseAsync("publication-a")).ReturnsAsync((string) null);
 
              var controller =
                  new ContentController(cache.Object);
@@ -128,18 +129,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
              var cache = new Mock<IContentCacheService>();
 
              cache.Setup(s => s.GetReleaseAsync("publication-a", "2016")).ReturnsAsync(
-                 new ReleaseViewModel()
+                 JsonConvert.SerializeObject(new ReleaseViewModel()
                  {
                      Slug = "publication-a"
-                 });
+                 }));
 
              var controller =
                  new ContentController(cache.Object);
 
              var result = controller.GetRelease("publication-a", "2016");
 
-             Assert.IsAssignableFrom<ReleaseViewModel>(result.Result.Value);
-             Assert.Equal("publication-a", result.Result.Value.Slug);
+             Assert.Contains("publication-a", result.Result.Value);
          }
 
          [Fact]
@@ -147,7 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
          {
              var cache = new Mock<IContentCacheService>();
 
-             cache.Setup(s => s.GetReleaseAsync("publication-a", "2000")).ReturnsAsync((ReleaseViewModel) null);
+             cache.Setup(s => s.GetReleaseAsync("publication-a", "2000")).ReturnsAsync((string) null);
 
              var controller =
                  new ContentController(cache.Object);

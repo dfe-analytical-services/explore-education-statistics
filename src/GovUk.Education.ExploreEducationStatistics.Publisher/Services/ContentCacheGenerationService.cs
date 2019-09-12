@@ -70,7 +70,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             {
                 var contentTreeBlob = _cloudBlobContainer.GetBlockBlobReference($"publications/tree.json");
                 await contentTreeBlob.UploadTextAsync(JsonConvert.SerializeObject(contentTree, null,
-                    new JsonSerializerSettings() {ReferenceLoopHandling = ReferenceLoopHandling.Ignore,NullValueHandling = NullValueHandling.Ignore}));
+                    new JsonSerializerSettings()
+                    {
+                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                        NullValueHandling = NullValueHandling.Ignore
+                    }));
                 return true;
             }
             else
@@ -106,21 +110,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             var methodologyTree = _methodologyService.GetTree();
 
-            if (methodologyTree != null)
-            {
-                var methodologyTreeBlob = _cloudBlobContainer.GetBlockBlobReference($"methodology/tree.json");
-                await methodologyTreeBlob.UploadTextAsync(JsonConvert.SerializeObject(methodologyTree, null,
-                    new JsonSerializerSettings()
-                    {
-                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                        NullValueHandling = NullValueHandling.Ignore
-                    }));
-                return true;
-            }
-            else
-            {
-                throw new Exception("Methodology tree could not be retrieved");
-            }
+            var methodologyTreeBlob = _cloudBlobContainer.GetBlockBlobReference($"methodology/tree.json");
+            await methodologyTreeBlob.UploadTextAsync(JsonConvert.SerializeObject(methodologyTree, null,
+                new JsonSerializerSettings()
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                    NullValueHandling = NullValueHandling.Ignore
+                }));
+            return true;
         }
 
 

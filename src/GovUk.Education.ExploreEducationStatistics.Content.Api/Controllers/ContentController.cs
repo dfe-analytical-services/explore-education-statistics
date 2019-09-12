@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,59 +26,59 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(204)]
         [Produces("application/json")]
-        public async Task<ActionResult<List<ThemeTree>>> GetContentTree()
+        public async Task<ActionResult<string>> GetContentTree()
         {
             var tree = await _contentCacheService.GetContentTreeAsync();
 
-            if (tree.Any())
+            if (string.IsNullOrWhiteSpace(tree))
             {
-                return tree;
+                return NoContent();
             }
 
-            return NoContent();
+            return tree;
         }
 
         // GET api/content/publication/pupil-absence-in-schools-in-england
         [HttpGet("publication/{slug}")]
-        public async Task<ActionResult<PublicationViewModel>> GetPublication(string slug)
+        public async Task<ActionResult<string>> GetPublication(string slug)
         {
             var publication = await _contentCacheService.GetPublicationAsync(slug);
 
-            if (publication != null)
+            if (string.IsNullOrWhiteSpace(publication))
             {
-                return publication;
+                return NotFound();
             }
 
-            return NotFound();
+            return publication;
         }
 
         // GET api/content/publication/pupil-absence-in-schools-in-england/latest
         [HttpGet("publication/{publicationSlug}/latest")]
-        public async Task<ActionResult<ReleaseViewModel>> GetLatestRelease(string publicationSlug)
+        public async Task<ActionResult<string>> GetLatestRelease(string publicationSlug)
         {
             var release = await _contentCacheService.GetLatestReleaseAsync(publicationSlug);
 
-            if (release != null)
+            if (string.IsNullOrWhiteSpace(release))
             {
-                return release;
+                return NotFound();
             }
 
-            return NotFound();
+            return release;
         }
 
         // TODO: this looks like it needs refactoring to return the release view model
         // GET api/content/publication/pupil-absence-in-schools-in-england/2017-18
         [HttpGet("publication/{publicationSlug}/{releaseSlug}")]
-        public async Task<ActionResult<ReleaseViewModel>> GetRelease(string publicationSlug, string releaseSlug)
+        public async Task<ActionResult<string>> GetRelease(string publicationSlug, string releaseSlug)
         {
             var release = await _contentCacheService.GetReleaseAsync(publicationSlug, releaseSlug);
 
-            if (release != null)
+            if (string.IsNullOrWhiteSpace(release))
             {
-                return release;
+                return NotFound();
             }
 
-            return NotFound();
+            return release;
         }
     }
 }

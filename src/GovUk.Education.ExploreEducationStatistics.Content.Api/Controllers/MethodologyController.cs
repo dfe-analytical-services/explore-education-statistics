@@ -26,16 +26,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(204)]
         [Produces("application/json")]
-        public async Task<ActionResult<List<ThemeTree>>> GetMethodologyTree()
+        public async Task<ActionResult<string>> GetMethodologyTree()
         {
             var tree = await _contentCacheService.GetMethodologyTreeAsync();
 
-            if (tree.Any())
+            if (string.IsNullOrWhiteSpace(tree))
             {
-                return tree;
+                return NoContent();
             }
+            return tree;
 
-            return NoContent();
         }
         
         // GET api/methodology/name-of-content
@@ -43,16 +43,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
         [Produces("application/json")]
-        public async Task<ActionResult<Methodology>> Get(string slug)
+        public async Task<ActionResult<string>> Get(string slug)
         {
             var methodology = await _contentCacheService.GetMethodologyAsync(slug);
-
-            if (methodology != null)
-            {
-                return methodology;
-            }
             
-            return NotFound();
+            if (string.IsNullOrWhiteSpace(methodology))
+            {
+                return NotFound();
+            }
+            return methodology;
         }
     }
 }

@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces
 using GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using Newtonsoft.Json;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers
@@ -18,23 +19,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var cache = new Mock<IContentCacheService>();
 
             cache.Setup(s => s.GetDownloadTreeAsync()).ReturnsAsync(
-                new List<ThemeTree>
+                JsonConvert.SerializeObject(new List<ThemeTree>
                 {
                     new ThemeTree
                     {
                         Title = "Theme A"
-                    }
+                    }, 
+                    new ThemeTree {
+                        Title = "Theme B"
+                    }, 
                 }
-            );
+            ));
 
             var controller = new DownloadController(cache.Object);
 
             var result = controller.GetDownloadTree();
 
-            Assert.IsAssignableFrom<List<ThemeTree>>(result.Result.Value);
+            Assert.IsAssignableFrom<List<ThemeTree>>(JsonConvert.DeserializeObject<List<ThemeTree>>(result.Result.Value));
+            Assert.Contains("Theme A", result.Result.Value);
+            Assert.Contains("Theme B", result.Result.Value);
 
-            var firstTheme = result.Result.Value.FirstOrDefault();
-            Assert.Equal("Theme A", firstTheme.Title);
         }
 
         [Fact]
@@ -43,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var cache = new Mock<IContentCacheService>();
 
             cache.Setup(s => s.GetDownloadTreeAsync()).ReturnsAsync(
-                new List<ThemeTree>()
+                (string) null
             );
 
             var controller = new DownloadController(cache.Object);
