@@ -98,7 +98,7 @@ const PublicationPage = ({ reviewing, newBlankRelease }: Props) => {
                 />
               )}
               <label className="govuk-label govuk-radios__label" htmlFor="edit">
-                Add / view comments and edit content
+                Add / edit content and comments
               </label>
             </div>
             <div className="govuk-radios__item">

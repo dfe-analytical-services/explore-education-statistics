@@ -25,8 +25,6 @@ const PublicationSummary = ({ publication }: Props) => {
           )}
           {!publication.methodology && <>No methodology available</>}
         </SummaryListItem>
-      </SummaryList>
-      <SummaryList>
         <SummaryListItem term="Releases" smallKey>
           <ul className="govuk-list dfe-admin">
             {publication.releases.map(release => (
@@ -51,31 +49,35 @@ const PublicationSummary = ({ publication }: Props) => {
           </ul>
         </SummaryListItem>
       </SummaryList>
-      <ButtonLink
-        to={releaseRoutes.createReleaseRoute.generateLink(publication.id)}
-        className="govuk-!-margin-right-6"
-        testId={`Create new release link for ${publication.title}`}
-      >
-        Create new release
-      </ButtonLink>
+      <SummaryList>
+        <SummaryListItem term="" smallKey>
+          <ButtonLink
+            to={releaseRoutes.createReleaseRoute.generateLink(publication.id)}
+            className="govuk-!-margin-right-6"
+            testId={`Create new release link for ${publication.title}`}
+          >
+            Create new release
+          </ButtonLink>
 
-      {publication.methodology && (
-        <ButtonLink
-          to="/prototypes/publication-assign-methodology"
-          className="govuk-button--secondary"
-        >
-          Manage methodology
-        </ButtonLink>
-      )}
+          {publication.methodology && (
+            <ButtonLink
+              to="/prototypes/publication-assign-methodology"
+              className="govuk-button--secondary"
+            >
+              Manage methodology
+            </ButtonLink>
+          )}
 
-      {!publication.methodology && (
-        <ButtonLink
-          to="/prototypes/publication-assign-methodology"
-          className="govuk-button--secondary"
-        >
-          Add methodology
-        </ButtonLink>
-      )}
+          {!publication.methodology && (
+            <ButtonLink
+              to="/prototypes/publication-assign-methodology"
+              className="govuk-button--secondary"
+            >
+              Add methodology
+            </ButtonLink>
+          )}
+        </SummaryListItem>
+      </SummaryList>
     </>
   );
 };
