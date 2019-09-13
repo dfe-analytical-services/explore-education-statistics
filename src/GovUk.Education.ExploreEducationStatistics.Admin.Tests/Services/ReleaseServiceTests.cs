@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
@@ -65,24 +66,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             {
                                 new ContentSection
                                 {
+                                    Id = new Guid("3cb10587-7b05-4c30-9f13-9f2025aca6a0"),
+                                    ReleaseId = new Guid("26f17bad-fc48-4496-9387-d6e5b2cb0e7f"),
                                     Caption = "Template caption index 0", // Should be copied 
                                     Heading = "Template heading index 0", // Should be copied
                                     Order = 0,
                                     Content = new List<IContentBlock>
                                     {
                                         // TODO currently is not copied - should it be?
-                                        new HtmlBlock {Body = @"<div></div>"}
+                                        new HtmlBlock
+                                        {
+                                            Id = new Guid("e2b96bea-fbbb-4089-ad9c-fecba58ee054"),
+                                            Body = @"<div></div>"
+                                        }
                                     }
                                 },
                                 new ContentSection
                                 {
+                                    Id = new Guid("8e804c94-61b3-4955-9d71-83a56d133a89"),
+                                    ReleaseId = new Guid("26f17bad-fc48-4496-9387-d6e5b2cb0e7f"),
                                     Caption = "Template caption index 1", // Should be copied 
                                     Heading = "Template heading index 1", // Should be copied
                                     Order = 1,
                                     Content = new List<IContentBlock>
                                     {
                                         // TODO currently is not copied - should it be?
-                                        new InsetTextBlock {Body = "Text", Heading = "Heading"}
+                                        new InsetTextBlock
+                                        {
+                                            Id = new Guid("34884271-a30a-4cbd-9c08-e6d11d7f8c8e"),
+                                            Body = "Text",
+                                            Heading = "Heading"
+                                        }
                                     }
                                 }
                             }
@@ -107,7 +121,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     });
 
                 // Do an in depth check of the saved release
-                var release = context.Releases.Single(r => r.Id == result.Result.Right.Id);
+                var release = context.Releases
+                    .Include(r => r.Content)
+                    .Single(r => r.Id == result.Result.Right.Id);
                 Assert.Equal(2, release.Content.Count);
                 Assert.Equal("Template caption index 0", release.Content[0].Caption);
                 Assert.Equal("Template heading index 0", release.Content[0].Heading);
