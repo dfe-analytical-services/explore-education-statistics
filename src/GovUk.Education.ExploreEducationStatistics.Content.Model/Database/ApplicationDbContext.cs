@@ -1982,6 +1982,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new DataBlock
                 {
                     Id = new Guid("5d1e6b67-26d7-4440-9e77-c0de71a9fc21"),
+                    ContentSectionId = null, //KeyStatistics
                     ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                     DataBlockRequest = new DataBlockRequest
                     {
@@ -2353,6 +2354,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new DataBlock
                 {
                     Id = new Guid("17a0272b-318d-41f6-bda9-3bd88f78cd3d"),
+                    ContentSectionId = null, // KeyStatistics
                     ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                     DataBlockRequest = new DataBlockRequest
                     {
@@ -2651,6 +2653,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 new DataBlock
                 {
                     Id = new Guid("475738b4-ba10-4c29-a50d-6ca82c10de6e"),
+                    ContentSectionId = null, // KeyStatistics
                     ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
                     DataBlockRequest = new DataBlockRequest
                     {
