@@ -80,8 +80,6 @@ class ImportStatusPoller extends Component<Props> {
     const { current } = this.state;
     const currentStatus: ImportStatus = (current as unknown) as ImportStatus;
 
-    console.log(currentStatus);
-
     return (
       <SummaryListItem term="Status">
         <strong className={classNames('govuk-tag', [styles.ragStatusRed])}>
