@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 {
-    public class SampleMarkDownContent
+    public static class SampleMarkDownContent
     {
-        public static Dictionary<Guid, string> Content = new Dictionary<Guid, string>
+        public static readonly Dictionary<Guid, string> Content = new Dictionary<Guid, string>
         {
             {
                 // absence
