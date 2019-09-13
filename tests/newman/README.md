@@ -1,15 +1,15 @@
-#Postman and Newman tests
+# Postman and Newman tests
 
-##Set up Postman with the API endpoints
+## Set up Postman with the API endpoints
 
 1. Install Postman.
 1. Choose "Import" -> "Import Folder", and import the "tests/newman/tests" folder.
 1. Choose "Manage environments" -> "Import" and import each of the files in "tests/newman/environments".
 1. Choose "Settings" and change the Workspace Folder to "<codebase folder>/tests/newman".
 
-##Calling endpoints
+## Calling endpoints
 
-###Prerequisites
+### Prerequisites
 
 1. If calling endpoints against the Admin application, you will need to get an Azure AD cookie for the environment 
 that you will be targeting. 
@@ -27,8 +27,10 @@ supply a value for the environment variable "file_upload_validation_release_id".
     1. Copy the Release ID from the URL.
     1. In Postman, click Manage Environments, and click on the environment that you are testing on.
     1. Paste the Release ID value into the "file_upload_validation_release_id" variable.
-    
-###Making calls
+
+NOTE: If the AzureADCookie you previously used no longer authenticates you in Postman, you'll need to get a new ".AspNetCore.AzureAdCookie" value *and* remove previously set cookies in Postman.
+
+### Making calls
 
 1. From the Environments dropdown, choose the environment you will be making calls against.
 1. Open the desired endpoint collection (e.g. "DfE Admin API"), choose an endpoint to call, and hit "Send".
