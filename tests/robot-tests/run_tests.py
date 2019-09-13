@@ -94,15 +94,16 @@ if args.env == "ci":
     robotArgs += ["--removekeywords", "name:library.user logs into microsoft online"]
     robotArgs += ["--removekeywords", "name:operatingsystem.environment variable should be set"]
 else:
-    if args.env == 'local':
-        robotArgs += ['--exclude', 'NotAgainstLocal']
-    else:
-        robotArgs += ['--exclude', 'LocalOnly']
-
-    if args.env == 'dev03':
-        robotArgs += ['--exclude', 'NotAgainstProd']
-
     load_dotenv(os.path.join(os.path.dirname(__file__), '.env.' + args.env))
+
+if args.env == 'local':
+    robotArgs += ['--exclude', 'NotAgainstLocal']
+else:
+    robotArgs += ['--exclude', 'LocalOnly']
+
+if args.env == 'dev03':
+    robotArgs += ['--exclude', 'NotAgainstProd']
+
 
 if os.getenv('PUBLIC_URL') is None or os.getenv('ADMIN_URL') is None:
     print("PUBLIC_URL and/or ADMIN_URL are None -- .env.{env} file or pipeline variables needs to be set")
