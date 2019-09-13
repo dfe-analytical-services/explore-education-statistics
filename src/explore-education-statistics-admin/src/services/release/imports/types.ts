@@ -6,9 +6,9 @@ export type ImportStatusCode =
   | 'FAILED';
 
 export interface ImportStatus {
-  Status: ImportStatusCode;
-  PercentageComplete?: string;
-  Errors?: string[];
+  status: ImportStatusCode;
+  percentageComplete?: string;
+  errors?: string[];
 }
 
 export default {};

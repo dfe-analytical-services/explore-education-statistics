@@ -1,7 +1,6 @@
 import classNames from 'classnames';
 import Link from '@admin/components/Link';
 import service from '@admin/services/release/edit-release/data/service';
-import importStatusService from '@admin/services/release/import-status/service';
 import { DataFile } from '@admin/services/release/edit-release/data/types';
 import Button from '@common/components/Button';
 import { Form, FormFieldset, Formik } from '@common/components/form';
@@ -16,6 +15,7 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
 import { FormikActions, FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
+import ImportStatusPoller from '@admin/components/ImportStatusPoller';
 import styles from './ReleaseDataUploadsSection.module.scss';
 
 interface FormValues {
@@ -38,13 +38,6 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
   useEffect(() => {
     service.getReleaseDataFiles(releaseId).then(setDataFiles);
   }, [publicationId, releaseId]);
-
-  importStatusService
-    .getImportStatus(
-      '0dafd89b-b754-44a8-b3f1-72baac0a108a',
-      'level_2_3_national.csv',
-    )
-    .then(res => console.log(res));
 
   const resetPage = async <T extends {}>({ resetForm }: FormikActions<T>) => {
     resetForm();
@@ -149,38 +142,10 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                       {dataFile.metadataFilename}
                     </a>
                   </SummaryListItem>
-                  <SummaryListItem term="Status">
-                    <strong
-                      className={classNames('govuk-tag', [styles.ragStatusRed])}
-                    >
-                      Failed
-                    </strong>
-                    <strong
-                      className={classNames('govuk-tag', [
-                        styles.ragStatusAmber,
-                      ])}
-                    >
-                      Processing
-                    </strong>
-                    <strong
-                      className={classNames('govuk-tag', [
-                        styles.ragStatusGreen,
-                      ])}
-                    >
-                      Complete
-                    </strong>
-                  </SummaryListItem>
-                  <SummaryListItem
-                    term="Actions"
-                    actions={
-                      <Link
-                        to="#"
-                        className="govuk-button govuk-button--secondary govuk-!-margin-0"
-                        onClick={() => setDeleteFileName(dataFile.filename)}
-                      >
-                        Delete files
-                      </Link>
-                    }
+
+                  <ImportStatusPoller
+                    releaseId={releaseId}
+                    datafileName={dataFile.filename}
                   />
                 </SummaryList>
               ))}
