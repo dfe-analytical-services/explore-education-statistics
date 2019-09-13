@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
     [Route("api")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class DataBlocksController : ControllerBase
     {
         private readonly IDataBlockService _dataBlockService;
@@ -27,7 +27,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPost("release/{releaseId}/datablocks")]
-        [AllowAnonymous]
         public async Task<ActionResult<DataBlockViewModel>> CreateDataBlockAsync(ReleaseId releaseId,
             CreateDataBlockViewModel dataBlock)
         {
@@ -36,7 +35,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("release/{releaseId}/datablocks")]
-        [AllowAnonymous]
         public async Task<ActionResult<List<DataBlockViewModel>>> GetDataBlocksAsync(ReleaseId releaseId)
         {
             return await CheckReleaseExistsAsync(releaseId,
@@ -44,7 +42,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("datablocks/{id}")]
-        [AllowAnonymous]
         public async Task<ActionResult<DataBlockViewModel>> GetDataBlockAsync(DataBlockId id)
         {
             return await _dataBlockService.GetAsync(id);
