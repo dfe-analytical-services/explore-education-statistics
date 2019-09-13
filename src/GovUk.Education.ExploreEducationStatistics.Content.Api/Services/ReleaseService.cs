@@ -27,11 +27,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 
         public ReleaseViewModel GetRelease(string id)
         {
-            var release = Guid.TryParse(id, out var newGuid)
-                ? _context.Releases.Include(x => x.Publication).ThenInclude(x => x.LegacyReleases)
-                    .Include(x => x.Updates).FirstOrDefault(x => x.Id == newGuid)
-                : _context.Releases.Include(x => x.Publication).ThenInclude(x => x.LegacyReleases)
-                    .Include(x => x.Updates).FirstOrDefault(x => x.Slug == id);
+            var queryable = _context.Releases
+                .Include(x => x.Content)
+                .ThenInclude(x => x.Content)
+                .Include(x => x.KeyStatistics)
+                .Include(x => x.Publication)
+                .ThenInclude(x => x.LegacyReleases)
+                .Include(x => x.Updates);
+
+            var release = Guid.TryParse(id, out var newGuid) ? 
+                queryable.FirstOrDefault(x => x.Id == newGuid) : 
+                queryable.FirstOrDefault(x => x.Slug == id);
 
             if (release != null)
             {
