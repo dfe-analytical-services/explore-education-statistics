@@ -104,7 +104,7 @@ const ReleaseSummaryPage = () => {
           </SummaryList>
           <div className="dfe-align--right">
             <Link to={summaryEditRoute.generateLink(publication.id, releaseId)}>
-              Edit release setup details
+              Edit release summary
             </Link>
           </div>
         </>

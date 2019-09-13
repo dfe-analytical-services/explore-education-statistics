@@ -56,12 +56,12 @@ const BrowseReleasesPage = () => {
         <div className="govuk-grid-column-one-third">
           <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
             <Link to="/prototypes/documentation/create-new-publication">
-              Creating a new publication
+              Managing content
             </Link>
           </h4>
           <p className="govuk-caption-m govuk-!-margin-top-1">
-            How to create a new publication - including adding a methodology and
-            contact details.{' '}
+            How to manage content within a release - including adding new and
+            editing existing content.{' '}
           </p>
         </div>
         <div className="govuk-grid-column-one-third">

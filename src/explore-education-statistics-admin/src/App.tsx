@@ -26,6 +26,7 @@ import AdminDocumentationStyle from './pages/prototypes/PrototypeDocumentationSt
 import AdminDocumentationHome from './pages/prototypes/PrototypeDocumentationHome';
 import AdminDocumentationUsingDashboard from './pages/prototypes/PrototypeDocumentationUsingDashboard';
 import AdminDocumentationCreateNewRelease from './pages/prototypes/PrototypeDocumentationCreateNewRelease';
+import AdminDocumentationManageContent from './pages/prototypes/PrototypeDocumentationManageContent';
 import AdminDocumentationCreateNewPublication from './pages/prototypes/PrototypeDocumentationCreateNewPublication';
 import PublicationAssignMethodology from './pages/prototypes/PrototypePublicationPageAssignMethodology';
 import PublicationConfirmNew from './pages/prototypes/PrototypePublicationPageConfirmNew';
@@ -222,6 +223,11 @@ function App() {
           exact
           path="/prototypes/documentation/create-new-release"
           component={AdminDocumentationCreateNewRelease}
+        />
+        <Route
+          exact
+          path="/prototypes/documentation/manage-content"
+          component={AdminDocumentationManageContent}
         />
         <Route
           exact

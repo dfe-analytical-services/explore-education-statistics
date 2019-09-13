@@ -6,6 +6,7 @@ type Props = {
   children: ReactNode;
   className?: string;
   disabled?: boolean;
+  testId?: string;
 } & LinkProps;
 
 const ButtonLink = ({
@@ -13,6 +14,7 @@ const ButtonLink = ({
   className,
   disabled = false,
   to,
+  testId,
   ...props
 }: Props) => {
   return (
@@ -28,6 +30,7 @@ const ButtonLink = ({
       )}
       role="button"
       aria-disabled={disabled}
+      data-testid={testId}
     >
       {children}
     </RouterLink>

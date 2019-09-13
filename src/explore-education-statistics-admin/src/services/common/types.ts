@@ -102,7 +102,7 @@ export const dayMonthYearToDate = (dmy?: DayMonthYearValues) => {
       )} to Date - missing required value`,
     );
   }
-  return new Date(dmy.year || 0, (dmy.month || 0) - 1, dmy.day);
+  return new Date(Date.UTC(dmy.year || 0, (dmy.month || 0) - 1, dmy.day));
 };
 
 export const dayMonthYearInputsToDate = (dmy: DayMonthYearInputs): Date =>
