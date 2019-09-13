@@ -379,7 +379,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
                 mocks.ReleaseService.Object,
                 mocks.FileStorageService.Object,
                 mocks.PublicationService.Object,
-                null,
                 mocks.ImportStatusService.Object);
         }
     }
