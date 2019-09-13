@@ -55,6 +55,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
                     return new ValidationResult("CANNOT_OVERWRITE_METADATA_FILE");
                 case DataAndMetadataFilesCannotHaveTheSameName: 
                     return new ValidationResult("DATA_AND_METADATA_FILES_CANNOT_HAVE_THE_SAME_NAME");
+                case DataFileMustBeCsvFile: 
+                    return new ValidationResult("DATA_FILE_MUST_BE_A_CSV_FILE");
+                case MetaFileMustBeCsvFile: 
+                    return new ValidationResult("META_FILE_MUST_BE_A_CSV_FILE");
                 default:
                     throw new ArgumentOutOfRangeException(nameof(message), message, null);
             }
@@ -75,6 +79,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         MetadataFileCannotBeEmpty,
         CannotOverwriteDataFile,
         CannotOverwriteMetadataFile,
-        DataAndMetadataFilesCannotHaveTheSameName
+        DataAndMetadataFilesCannotHaveTheSameName,
+        DataFileMustBeCsvFile,
+        MetaFileMustBeCsvFile
     }
 }

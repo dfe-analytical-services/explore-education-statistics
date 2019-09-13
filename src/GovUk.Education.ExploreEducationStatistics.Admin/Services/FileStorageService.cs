@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
+using MimeMapping;
 using MimeTypes;
 using static System.StringComparison;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -78,8 +79,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 return ValidationResult(MetadataFileCannotBeEmpty);
             }
+            
             var dataFilePath = AdminReleasePath(releaseId, ReleaseFileTypes.Data, dataFile.FileName);
             var metadataFilePath = AdminReleasePath(releaseId, ReleaseFileTypes.Data, metaFile.FileName);
+            
+            if (!IsCsvFile(dataFilePath))
+            {
+                return ValidationResult(DataFileMustBeCsvFile);
+            }
+
+            if (!IsCsvFile(metadataFilePath))
+            {
+                return ValidationResult(MetaFileMustBeCsvFile);
+            }
+            
             if (!overwrite && blobContainer.GetBlockBlobReference(dataFilePath).Exists())
             {
                 return ValidationResult(CannotOverwriteDataFile);
@@ -300,6 +313,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 FileDownloadName = fileName
             };
         }
-
+        private static bool IsCsvFile(string filename)
+        {
+            return MimeUtility.GetMimeMapping(filename).Equals("text/csv");
+        }
     }
 }
