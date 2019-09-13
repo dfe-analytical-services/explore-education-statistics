@@ -12,13 +12,12 @@ ${browser}    chrome
 ${headless}   1
 
 ${timeout}          20
-${implicit_wait}    20
+${implicit_wait}    3
 
 *** Keywords ***
 do this on failure
   capture large screenshot
   set selenium timeout  3
-  set selenium implicit wait  3
 
 user signs in
   user opens the browser
