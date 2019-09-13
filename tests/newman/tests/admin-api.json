@@ -69,7 +69,7 @@
 			"name": "Meta",
 			"item": [
 				{
-					"name": "Time identifers",
+					"name": "Time identifiers",
 					"event": [
 						{
 							"listen": "test",
@@ -5398,7 +5398,7 @@
 					"response": []
 				},
 				{
-					"name": "Upload small file - All_geographies",
+					"name": "Upload small file - all_geographies",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -5420,17 +5420,17 @@
 								{
 									"key": "file",
 									"type": "file",
-									"src": "{{files_dir}}/small-files/All_geographies.csv"
+									"src": "{{files_dir}}/small-files/all_geographies.csv"
 								},
 								{
 									"key": "metaFile",
 									"type": "file",
-									"src": "{{files_dir}}/small-files/All_geographies.meta.csv"
+									"src": "{{files_dir}}/small-files/all_geographies.meta.csv"
 								}
 							]
 						},
 						"url": {
-							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=All_geographies",
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=all_geographies",
 							"host": [
 								"{{admin_api_url}}"
 							],
@@ -5442,7 +5442,7 @@
 							"query": [
 								{
 									"key": "name",
-									"value": "All_geographies"
+									"value": "all_geographies"
 								}
 							]
 						}
@@ -5450,7 +5450,7 @@
 					"response": []
 				},
 				{
-					"name": "Upload small file - All_geographies - check status",
+					"name": "Upload small file - all_geographies - check status",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -5467,7 +5467,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/All_geographies.csv/import/status",
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/all_geographies.csv/import/status",
 							"host": [
 								"{{admin_api_url}}"
 							],
@@ -5475,7 +5475,7 @@
 								"release",
 								"{{file_upload_validation_release_id}}",
 								"data",
-								"All_geographies.csv",
+								"all_geographies.csv",
 								"import",
 								"status"
 							]
@@ -5484,7 +5484,7 @@
 					"response": []
 				},
 				{
-					"name": "Upload small file - All_geographies_messy",
+					"name": "Upload small file - all_geographies_messy",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -5506,17 +5506,17 @@
 								{
 									"key": "file",
 									"type": "file",
-									"src": "{{files_dir}}/small-files/All_geographies_messy.csv"
+									"src": "{{files_dir}}/small-files/all_geographies_messy.csv"
 								},
 								{
 									"key": "metaFile",
 									"type": "file",
-									"src": "{{files_dir}}/small-files/All_geographies_messy.meta.csv"
+									"src": "{{files_dir}}/small-files/all_geographies_messy.meta.csv"
 								}
 							]
 						},
 						"url": {
-							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=All_geographies_messy",
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=all_geographies_messy",
 							"host": [
 								"{{admin_api_url}}"
 							],
@@ -5528,7 +5528,7 @@
 							"query": [
 								{
 									"key": "name",
-									"value": "All_geographies_messy"
+									"value": "all_geographies_messy"
 								}
 							]
 						}
@@ -5536,7 +5536,7 @@
 					"response": []
 				},
 				{
-					"name": "Upload small file - All_geographies_messy - check status",
+					"name": "Upload small file - all_geographies_messy - check status",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -5553,7 +5553,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/All_geographies_messy.csv/import/status",
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/all_geographies_messy.csv/import/status",
 							"host": [
 								"{{admin_api_url}}"
 							],
@@ -5561,7 +5561,7 @@
 								"release",
 								"{{file_upload_validation_release_id}}",
 								"data",
-								"All_geographies_messy.csv",
+								"all_geographies_messy.csv",
 								"import",
 								"status"
 							]
@@ -5656,7 +5656,7 @@
 					"response": []
 				},
 				{
-					"name": "Upload small file - all_year_identifer_blank",
+					"name": "Upload small file - all_year_identifier_blank",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -5678,17 +5678,17 @@
 								{
 									"key": "file",
 									"type": "file",
-									"src": "{{files_dir}}/small-files/all_year_identifer_blank.csv"
+									"src": "{{files_dir}}/small-files/all_year_identifier_blank.csv"
 								},
 								{
 									"key": "metaFile",
 									"type": "file",
-									"src": "{{files_dir}}/small-files/all_year_identifer_blank.meta.csv"
+									"src": "{{files_dir}}/small-files/all_year_identifier_blank.meta.csv"
 								}
 							]
 						},
 						"url": {
-							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=all_year_identifer_blank",
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=all_year_identifier_blank",
 							"host": [
 								"{{admin_api_url}}"
 							],
@@ -5700,7 +5700,7 @@
 							"query": [
 								{
 									"key": "name",
-									"value": "all_year_identifer_blank"
+									"value": "all_year_identifier_blank"
 								}
 							]
 						}
@@ -5708,7 +5708,7 @@
 					"response": []
 				},
 				{
-					"name": "Upload small file - all_year_identifer_blank - check status",
+					"name": "Upload small file - all_year_identifier_blank - check status",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -5725,7 +5725,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/all_year_identifer_blank.csv/import/status",
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/all_year_identifier_blank.csv/import/status",
 							"host": [
 								"{{admin_api_url}}"
 							],
@@ -5733,7 +5733,7 @@
 								"release",
 								"{{file_upload_validation_release_id}}",
 								"data",
-								"all_year_identifer_blank.csv",
+								"all_year_identifier_blank.csv",
 								"import",
 								"status"
 							]
@@ -7204,7 +7204,7 @@
 					"response": []
 				},
 				{
-					"name": "Upload small file - Regional",
+					"name": "Upload small file - regional",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -7226,17 +7226,17 @@
 								{
 									"key": "file",
 									"type": "file",
-									"src": "{{files_dir}}/small-files/Regional.csv"
+									"src": "{{files_dir}}/small-files/regional.csv"
 								},
 								{
 									"key": "metaFile",
 									"type": "file",
-									"src": "{{files_dir}}/small-files/Regional.meta.csv"
+									"src": "{{files_dir}}/small-files/regional.meta.csv"
 								}
 							]
 						},
 						"url": {
-							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=Regional",
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data?name=regional",
 							"host": [
 								"{{admin_api_url}}"
 							],
@@ -7248,7 +7248,7 @@
 							"query": [
 								{
 									"key": "name",
-									"value": "Regional"
+									"value": "regional"
 								}
 							]
 						}
@@ -7256,7 +7256,7 @@
 					"response": []
 				},
 				{
-					"name": "Upload small file - Regional - check status",
+					"name": "Upload small file - regional - check status",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -7273,7 +7273,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/Regional.csv/import/status",
+							"raw": "{{admin_api_url}}/release/{{file_upload_validation_release_id}}/data/regional.csv/import/status",
 							"host": [
 								"{{admin_api_url}}"
 							],
@@ -7281,7 +7281,7 @@
 								"release",
 								"{{file_upload_validation_release_id}}",
 								"data",
-								"Regional.csv",
+								"regional.csv",
 								"import",
 								"status"
 							]
