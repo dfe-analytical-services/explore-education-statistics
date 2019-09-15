@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import importStatusService from '@admin/services/release/imports/service';
-import {ImportStatus, ImportStatusCode} from '@admin/services/release/imports/types';
+import {
+  ImportStatus,
+  ImportStatusCode,
+} from '@admin/services/release/imports/types';
 import classNames from 'classnames';
 import styles from '@admin/pages/release/edit-release/data/ReleaseDataUploadsSection.module.scss';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -17,20 +20,37 @@ interface Props {
 }
 
 export const getImportStatusLabel = (importstatusCode: ImportStatusCode) => {
-    switch (importstatusCode) {
-        case "NOT_FOUND":
-            return 'Queued';
-        case 'RUNNING_PHASE_1':
-            return 'Validating';
-        case 'RUNNING_PHASE_2':
-            return 'Importing...';
-        case 'COMPLETE':
-            return 'Complete';
-        case 'FAILED':
-            return 'Failed';
-        default:
-            return undefined;
-    }
+  switch (importstatusCode) {
+    case 'NOT_FOUND':
+      return 'Queued';
+    case 'RUNNING_PHASE_1':
+      return 'Validating';
+    case 'RUNNING_PHASE_2':
+      return 'Importing...';
+    case 'COMPLETE':
+      return 'Complete';
+    case 'FAILED':
+      return 'Failed';
+    default:
+      return undefined;
+  }
+};
+
+export const getImportStatusClass = (importstatusCode: ImportStatusCode) => {
+  switch (importstatusCode) {
+    case 'NOT_FOUND':
+      return [styles.ragStatusAmber];
+    case 'RUNNING_PHASE_1':
+      return [styles.ragStatusAmber];
+    case 'RUNNING_PHASE_2':
+      return [styles.ragStatusAmber];
+    case 'COMPLETE':
+      return [styles.ragStatusGreen];
+    case 'FAILED':
+      return [styles.ragStatusRed];
+    default:
+      return undefined;
+  }
 };
 
 class ImporterStatus extends Component<Props> {
@@ -99,14 +119,13 @@ class ImporterStatus extends Component<Props> {
 
     return (
       <SummaryListItem term="Status">
-        <strong className={classNames('govuk-tag', [styles.ragStatusRed])}>
-          Failed
-        </strong>
-        <strong className={classNames('govuk-tag', [styles.ragStatusAmber])}>
+        <strong
+          className={classNames(
+            'govuk-tag',
+            currentStatus && getImportStatusClass(currentStatus.status),
+          )}
+        >
           {currentStatus && getImportStatusLabel(currentStatus.status)}
-        </strong>
-        <strong className={classNames('govuk-tag', [styles.ragStatusGreen])}>
-          Complete
         </strong>
       </SummaryListItem>
     );
