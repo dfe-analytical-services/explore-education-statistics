@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import importStatusService from '@admin/services/release/imports/service';
-import { ImportStatus } from '@admin/services/release/imports/types';
+import {ImportStatus, ImportStatusCode} from '@admin/services/release/imports/types';
 import classNames from 'classnames';
 import styles from '@admin/pages/release/edit-release/data/ReleaseDataUploadsSection.module.scss';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -16,7 +16,24 @@ interface Props {
   datafileName: string;
 }
 
-class ImportStatusPoller extends Component<Props> {
+export const getImportStatusLabel = (importstatusCode: ImportStatusCode) => {
+    switch (importstatusCode) {
+        case "NOT_FOUND":
+            return 'Queued';
+        case 'RUNNING_PHASE_1':
+            return 'Validating';
+        case 'RUNNING_PHASE_2':
+            return 'Importing...';
+        case 'COMPLETE':
+            return 'Complete';
+        case 'FAILED':
+            return 'Failed';
+        default:
+            return undefined;
+    }
+};
+
+class ImporterStatus extends Component<Props> {
   public state = {
     isFetching: true,
     current: undefined,
@@ -86,7 +103,7 @@ class ImportStatusPoller extends Component<Props> {
           Failed
         </strong>
         <strong className={classNames('govuk-tag', [styles.ragStatusAmber])}>
-          {currentStatus && currentStatus.status}
+          {currentStatus && getImportStatusLabel(currentStatus.status)}
         </strong>
         <strong className={classNames('govuk-tag', [styles.ragStatusGreen])}>
           Complete
@@ -96,4 +113,4 @@ class ImportStatusPoller extends Component<Props> {
   }
 }
 
-export default ImportStatusPoller;
+export default ImporterStatus;

@@ -2,7 +2,7 @@ export type ImportStatusCode =
   | 'COMPLETE'
   | 'RUNNING_PHASE_1'
   | 'RUNNING_PHASE_2'
-  | 'QUEUED'
+  | 'NOT_FOUND'
   | 'FAILED';
 
 export interface ImportStatus {

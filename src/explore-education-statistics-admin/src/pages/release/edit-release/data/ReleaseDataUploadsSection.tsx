@@ -15,7 +15,7 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
 import { FormikActions, FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
-import ImportStatusPoller from '@admin/components/ImportStatusPoller';
+import ImporterStatus from '@admin/components/ImporterStatus';
 import styles from './ReleaseDataUploadsSection.module.scss';
 
 interface FormValues {
@@ -143,7 +143,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                     </a>
                   </SummaryListItem>
 
-                  <ImportStatusPoller
+                  <ImporterStatus
                     releaseId={releaseId}
                     datafileName={dataFile.filename}
                   />
