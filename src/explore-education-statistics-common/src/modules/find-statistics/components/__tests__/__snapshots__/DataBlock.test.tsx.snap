@@ -360,7 +360,7 @@ exports[`DataBlock renders summary 1`] = `
         >
           <span
             class="govuk-details__summary-text"
-            data-testid="details--expand"
+            data-testid="Expand Details Section Define 'Unauthorised absence rate'"
           >
             Define 'Unauthorised absence rate'
           </span>
@@ -413,7 +413,7 @@ exports[`DataBlock renders summary 1`] = `
         >
           <span
             class="govuk-details__summary-text"
-            data-testid="details--expand"
+            data-testid="Expand Details Section Define 'Overall absence rate'"
           >
             Define 'Overall absence rate'
           </span>
@@ -466,7 +466,7 @@ exports[`DataBlock renders summary 1`] = `
         >
           <span
             class="govuk-details__summary-text"
-            data-testid="details--expand"
+            data-testid="Expand Details Section Define 'Authorised absence rate'"
           >
             Define 'Authorised absence rate'
           </span>

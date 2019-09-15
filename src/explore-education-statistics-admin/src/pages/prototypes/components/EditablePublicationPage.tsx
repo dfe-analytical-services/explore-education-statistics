@@ -577,12 +577,12 @@ class EditablePublicationPage extends Component<Props, State> {
               resolveComments,
             )}
           <h2 className="govuk-heading-m govuk-!-margin-top-9">
-            Extra information
+            Help and support
           </h2>
           <Accordion id="extra-information-sections">
             <AccordionSection
-              heading="Where does this data come from?"
-              caption="Our methodology, how we collect and process the data"
+              heading="Pupil absence in schools in England: methodology"
+              caption="Find out how and why we collect, process and publish these statistics"
               headingTag="h3"
             >
               <ul className="govuk-list">
@@ -612,7 +612,7 @@ class EditablePublicationPage extends Component<Props, State> {
                 </li>
               </ul>
             </AccordionSection>
-            <AccordionSection heading="Feedback and questions" headingTag="h3">
+            <AccordionSection heading="National Statistics" headingTag="h3">
               <ul className="govuk-list">
                 <li>
                   <a href="#" className="govuk-link">

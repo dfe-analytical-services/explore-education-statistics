@@ -32,6 +32,7 @@ junit.xml
 /tests/robot-tests/webdriver
 /tests/robot-tests/.env.*
 /tests/robot-tests/.pabotsuitenames
+/tests/robot-tests/geckodriver.log
 
 ## Data API Seed CSV data
 

@@ -1,3 +1,4 @@
+import { formatTestId } from '@common/util/test-utils';
 import useMounted from '@common/hooks/useMounted';
 import useToggle from '@common/hooks/useToggle';
 import findAllParents from '@common/lib/dom/findAllParents';
@@ -102,7 +103,7 @@ const Details = ({
       >
         <span
           className="govuk-details__summary-text"
-          data-testid="details--expand"
+          data-testid={formatTestId(`Expand Details Section ${summary}`)}
         >
           {summary}
           {tag && (
