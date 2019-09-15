@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
+using MimeDetective;
+using MimeDetective.Extensions;
 using MimeMapping;
 using MimeTypes;
 using static System.StringComparison;
@@ -83,12 +85,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var dataFilePath = AdminReleasePath(releaseId, ReleaseFileTypes.Data, dataFile.FileName);
             var metadataFilePath = AdminReleasePath(releaseId, ReleaseFileTypes.Data, metaFile.FileName);
             
-            if (!IsCsvFile(dataFilePath))
+            if (!IsCsvFile(dataFilePath, dataFile.OpenReadStream()))
             {
                 return ValidationResult(DataFileMustBeCsvFile);
             }
 
-            if (!IsCsvFile(metadataFilePath))
+            if (!IsCsvFile(metadataFilePath, metaFile.OpenReadStream()))
             {
                 return ValidationResult(MetaFileMustBeCsvFile);
             }
@@ -313,9 +315,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 FileDownloadName = fileName
             };
         }
-        private static bool IsCsvFile(string filename)
+        private static bool IsCsvFile(string filePath, Stream fileStream)
         {
-            return MimeUtility.GetMimeMapping(filename).Equals("text/csv");
+            using (var reader = new StreamReader(fileStream))
+            {
+                Stream fileDataStream = reader.BaseStream;
+                FileType fileType = fileDataStream.GetFileType();
+                return MimeUtility.GetMimeMapping(filePath).Equals("text/csv") 
+                       && (fileType.Mime.StartsWith("text") || fileType.Mime.StartsWith("txt"));
+            }
         }
     }
 }
