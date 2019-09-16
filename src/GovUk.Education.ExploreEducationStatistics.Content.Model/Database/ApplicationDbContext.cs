@@ -2074,7 +2074,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                         },
                                         new ChartDataSet
                                         {
-                                            Indicator = Indicator(1, IndicatorName.Overall_absence_rate),
+                                            Indicator = Indicator(1, IndicatorName.Authorised_absence_rate),
                                             Filters = new List<string>
                                             {
                                                 FItem(1, FilterItemName.Characteristic__Total),
@@ -2086,6 +2086,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 },
                                 ["minor"] = new AxisConfigurationItem
                                 {
+                                    Min = 0,
                                     Title = "Absence Rate"
                                 }
                             },
@@ -2094,7 +2095,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 [$"{Indicator(1, IndicatorName.Unauthorised_absence_rate)}_{FItem(1, FilterItemName.Characteristic__Total)}_{FItem(1, FilterItemName.School_Type__Total)}_____"]
                                     = new ChartConfiguration
                                     {
-                                        Label = "Unauthorised Absence Rate",
+                                        Label = "Unauthorised absence rate",
                                         Unit = "%",
                                         Colour = "#4763a5",
                                         symbol = ChartSymbol.circle
@@ -2102,7 +2103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 [$"{Indicator(1, IndicatorName.Overall_absence_rate)}_{FItem(1, FilterItemName.Characteristic__Total)}_{FItem(1, FilterItemName.School_Type__Total)}_____"]
                                     = new ChartConfiguration
                                     {
-                                        Label = "Overall Absence Rate",
+                                        Label = "Overall absence rate",
                                         Unit = "%",
                                         Colour = "#f5a450",
                                         symbol = ChartSymbol.cross
@@ -2110,12 +2111,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 [$"{Indicator(1, IndicatorName.Authorised_absence_rate)}_{FItem(1, FilterItemName.Characteristic__Total)}_{FItem(1, FilterItemName.School_Type__Total)}_____"]
                                     = new ChartConfiguration
                                     {
-                                        Label = "Authorised Absence Rate",
+                                        Label = "Authorised absence rate",
                                         Unit = "%",
                                         Colour = "#005ea5",
                                         symbol = ChartSymbol.diamond
                                     }
-                            }
+                            },
+                            Legend = Legend.top
                         }
                     }
                 },
@@ -2208,6 +2210,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 },
                                 ["minor"] = new AxisConfigurationItem
                                 {
+                                    Min = 0,
                                     Title = "Absence Rate"
                                 }
                             },
@@ -2216,7 +2219,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 [$"{Indicator(1, IndicatorName.Unauthorised_absence_rate)}_{FItem(1, FilterItemName.Characteristic__Total)}_{FItem(1, FilterItemName.School_Type__Total)}_____"]
                                     = new ChartConfiguration
                                     {
-                                        Label = "Unauthorised Absence Rate",
+                                        Label = "Unauthorised absence rate",
                                         Unit = "%",
                                         Colour = "#4763a5",
                                         symbol = ChartSymbol.circle
@@ -2224,7 +2227,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 [$"{Indicator(1, IndicatorName.Overall_absence_rate)}_{FItem(1, FilterItemName.Characteristic__Total)}_{FItem(1, FilterItemName.School_Type__Total)}_____"]
                                     = new ChartConfiguration
                                     {
-                                        Label = "Overall Absence Rate",
+                                        Label = "Overall absence rate",
                                         Unit = "%",
                                         Colour = "#f5a450",
                                         symbol = ChartSymbol.cross
@@ -2232,12 +2235,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 [$"{Indicator(1, IndicatorName.Authorised_absence_rate)}_{FItem(1, FilterItemName.Characteristic__Total)}_{FItem(1, FilterItemName.School_Type__Total)}_____"]
                                     = new ChartConfiguration
                                     {
-                                        Label = "Authorised Absence Rate",
+                                        Label = "Authorised absence rate",
                                         Unit = "%",
                                         Colour = "#005ea5",
                                         symbol = ChartSymbol.diamond
                                     }
-                            }
+                            }, 
+                            Legend = Legend.top
                         }
                     }
                 },
@@ -2324,7 +2328,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 [$"{Indicator(1, IndicatorName.Unauthorised_absence_rate)}_{FItem(1, FilterItemName.Characteristic__Total)}_{FItem(1, FilterItemName.School_Type__Total)}_____"]
                                     = new ChartConfiguration
                                     {
-                                        Label = "Unauthorised Absence Rate",
+                                        Label = "Unauthorised absence rate",
                                         Unit = "%",
                                         Colour = "#4763a5",
                                         symbol = ChartSymbol.circle
@@ -2332,7 +2336,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 [$"{Indicator(1, IndicatorName.Overall_absence_rate)}_{FItem(1, FilterItemName.Characteristic__Total)}_{FItem(1, FilterItemName.School_Type__Total)}_____"]
                                     = new ChartConfiguration
                                     {
-                                        Label = "Overall Absence Rate",
+                                        Label = "Overall absence rate",
                                         Unit = "%",
                                         Colour = "#f5a450",
                                         symbol = ChartSymbol.cross
@@ -2340,7 +2344,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 [$"{Indicator(1, IndicatorName.Authorised_absence_rate)}_{FItem(1, FilterItemName.Characteristic__Total)}_{FItem(1, FilterItemName.School_Type__Total)}_____"]
                                     = new ChartConfiguration
                                     {
-                                        Label = "Authorised Absence Rate",
+                                        Label = "Authorised absence rate",
                                         Unit = "%",
                                         Colour = "#005ea5",
                                         symbol = ChartSymbol.diamond
@@ -2453,6 +2457,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 },
                                 ["minor"] = new AxisConfigurationItem
                                 {
+                                    Min = 0,
                                     Title = "Absence Rate"
                                 }
                             },
@@ -2462,7 +2467,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     =
                                     new ChartConfiguration
                                     {
-                                        Label = "Fixed period exclusion Rate",
+                                        Label = "Fixed period exclusion rate",
                                         Unit = "%",
                                         Colour = "#4763a5",
                                         symbol = ChartSymbol.circle
@@ -2471,12 +2476,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     =
                                     new ChartConfiguration
                                     {
-                                        Label = "Pupils with one ore more exclusion",
+                                        Label = "Pupils with one or more exclusion",
                                         Unit = "%",
                                         Colour = "#f5a450",
                                         symbol = ChartSymbol.cross
                                     }
-                            }
+                            },
+                            Legend = Legend.top
                         }
                     }
                 },
@@ -2545,6 +2551,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 },
                                 ["minor"] = new AxisConfigurationItem
                                 {
+                                    Min = 0,
                                     Title = "Exclusion Rate"
                                 }
                             },
@@ -2554,12 +2561,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     =
                                     new ChartConfiguration
                                     {
-                                        Label = "Fixed period exclusion Rate",
+                                        Label = "Fixed period exclusion rate",
                                         Unit = "%",
                                         Colour = "#4763a5",
                                         symbol = ChartSymbol.circle
                                     }
-                            }
+                            },
+                            Legend = Legend.top
                         }
                     }
                 },
@@ -2630,6 +2638,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                 },
                                 ["minor"] = new AxisConfigurationItem
                                 {
+                                    Min = 0,
                                     Title = "Absence Rate"
                                 }
                             },
@@ -2639,12 +2648,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                                     =
                                     new ChartConfiguration
                                     {
-                                        Label = "Fixed period exclusion Rate",
+                                        Label = "Fixed period exclusion rate",
                                         Unit = "%",
                                         Colour = "#4763a5",
                                         symbol = ChartSymbol.circle
                                     }
-                            }
+                            },
+                            Legend = Legend.top
                         }
                     }
                 },
