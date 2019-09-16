@@ -46,6 +46,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             return await _dataBlockService.GetAsync(id);
         }
+        
+        [HttpPut("datablocks/{id}")]
+        public async Task<ActionResult<DataBlockViewModel>> UpdateDataBlockAsync(DataBlockId id, UpdateDataBlockViewModel dataBlock)
+        {
+            return await _dataBlockService.UpdateAsync(id, dataBlock);
+        }
 
         private async Task<ActionResult> CheckReleaseExistsAsync(ReleaseId releaseId, Func<Task<ActionResult>> andThen)
         {
