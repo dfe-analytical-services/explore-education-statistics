@@ -123,7 +123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                         // TODO currently is not copied - should it be?
                                         new InsetTextBlock
                                         {
-                                            Id = new Guid("e2b96bea-fbbb-4089-ad9c-fecba58ee054"),
+                                            Id = new Guid("05370392-bd5c-4d9d-a077-4eb82cc35ae9"),
                                             Body = "Text",
                                             Heading = "Heading"
                                         }
