@@ -13,6 +13,7 @@
     "core-js": "^2.6.5",
     "cross-env": "^5.2.0",
     "cross-fetch": "^3.0.4",
+    "custom-event-polyfill": "^1.0.7",
     "date-fns": "^2.0.0-beta.2",
     "dotenv": "^8.0.0",
     "dotenv-expand": "^5.1.0",

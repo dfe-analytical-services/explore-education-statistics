@@ -41,6 +41,26 @@ if (!Element.prototype.matches) {
     Element.prototype.webkitMatchesSelector;
 }
 
+/* eslint-disable */
+(function() {
+  if (typeof window.CustomEvent === 'function') return false;
+
+  function CustomEvent(event, params) {
+    params = params || { bubbles: false, cancelable: false, detail: null };
+    var evt = document.createEvent('CustomEvent');
+    evt.initCustomEvent(
+      event,
+      params.bubbles,
+      params.cancelable,
+      params.detail,
+    );
+    return evt;
+  }
+
+  Event = CustomEvent;
+})();
+/* eslint-enable */
+
 if (!Element.prototype.closest) {
   Element.prototype.closest = function closest(s) {
     let el = this;
