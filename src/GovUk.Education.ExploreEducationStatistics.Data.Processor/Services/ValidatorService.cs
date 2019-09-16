@@ -39,15 +39,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         DataFileHasInvalidGeographicLevel,
         
         [EnumLabelValue("Datafile has invalid time identifier")]
-        DataFileHasInvalidTimeIdentifier
+        DataFileHasInvalidTimeIdentifier,
+        
+        [EnumLabelValue("Datafile has invalid time period")]
+        DataFileHasInvalidTimePeriod
     }
     
     public class ValidatorService : IValidatorService
     {
-        public ValidatorService()
-        {
-        }
-
         public List<string> Validate(ImportMessage message, SubjectData subjectData)
         {
             var errors = new List<string>();
@@ -139,14 +138,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 var line = row.Split(',');
                 ImporterService.GetGeographicLevel(line, headers);
                 ImporterService.GetTimeIdentifier(line, headers);
+                ImporterService.GetYear(line, headers);
             }
             catch (InvalidGeographicLevelException e)
             {
-                errors.Add( $"error at row {rowNumber}: " + ValidationErrorMessages.DataFileHasInvalidGeographicLevel.GetEnumLabel());
+                errors.Add($"error at row {rowNumber}: " +
+                           ValidationErrorMessages.DataFileHasInvalidGeographicLevel.GetEnumLabel());
             }
             catch (InvalidTimeIdentifierException e)
             {
-                errors.Add( $"error at row {rowNumber}: " + ValidationErrorMessages.DataFileHasInvalidTimeIdentifier.GetEnumLabel());
+                errors.Add($"error at row {rowNumber}: " +
+                           ValidationErrorMessages.DataFileHasInvalidTimeIdentifier.GetEnumLabel());
+            }
+            catch (InvalidTimePeriod e)
+            {
+                errors.Add($"error at row {rowNumber}: " +
+                           ValidationErrorMessages.DataFileHasInvalidTimePeriod.GetEnumLabel());
             }
         }
 

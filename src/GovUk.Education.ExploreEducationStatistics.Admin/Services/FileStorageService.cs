@@ -183,6 +183,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return blobContainer
                 .ListBlobs(AdminReleaseDirectoryPath(releaseId, type), true, BlobListingDetails.Metadata)
+                .Where(cbb => !IsBatchedFile(cbb, releaseId))
                 .OfType<CloudBlockBlob>()
                 .Select(file => new FileInfo
                 {
@@ -266,6 +267,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return blob.Metadata.TryGetValue(MetaFileKey, out var name) ? name : "";
         }
+        
+        private static bool IsBatchedFile(IListBlobItem blobItem, string releaseId)
+        {
+            return blobItem.Parent.Prefix.Equals(AdminReleaseBatchesDirectoryPath(releaseId));
+        }
 
         private static string GetSize(CloudBlob blob)
         {
@@ -294,8 +300,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             await blob.SetMetadataAsync();
         }
-        
-        
+
         public async Task<Either<ValidationResult, FileStreamResult>> StreamFile(Guid releaseId, ReleaseFileTypes type, string fileName)
         {
             var blobContainer = await GetCloudBlobContainer();
