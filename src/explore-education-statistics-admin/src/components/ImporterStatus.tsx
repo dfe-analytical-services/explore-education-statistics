@@ -36,23 +36,6 @@ export const getImportStatusLabel = (importstatusCode: ImportStatusCode) => {
   }
 };
 
-export const getImportStatusClass = (importstatusCode: ImportStatusCode) => {
-  switch (importstatusCode) {
-    case 'NOT_FOUND':
-      return [styles.ragStatusAmber];
-    case 'RUNNING_PHASE_1':
-      return [styles.ragStatusAmber];
-    case 'RUNNING_PHASE_2':
-      return [styles.ragStatusAmber];
-    case 'COMPLETE':
-      return [styles.ragStatusGreen];
-    case 'FAILED':
-      return [styles.ragStatusRed];
-    default:
-      return undefined;
-  }
-};
-
 class ImporterStatus extends Component<Props> {
   public state = {
     isFetching: true,
@@ -69,6 +52,25 @@ class ImporterStatus extends Component<Props> {
   public componentWillUnmount() {
     this.cancelTimer();
   }
+
+  private getImportStatusClass = (importstatusCode: ImportStatusCode) => {
+    switch (importstatusCode) {
+      case 'NOT_FOUND':
+        return [styles.ragStatusAmber];
+      case 'RUNNING_PHASE_1':
+        return [styles.ragStatusAmber];
+      case 'RUNNING_PHASE_2':
+        return [styles.ragStatusAmber];
+      case 'COMPLETE':
+        this.cancelTimer();
+        return [styles.ragStatusGreen];
+      case 'FAILED':
+        this.cancelTimer();
+        return [styles.ragStatusRed];
+      default:
+        return undefined;
+    }
+  };
 
   private fetchImportStatus() {
     const { datafileName, releaseId } = this.props;
@@ -122,7 +124,7 @@ class ImporterStatus extends Component<Props> {
         <strong
           className={classNames(
             'govuk-tag',
-            currentStatus && getImportStatusClass(currentStatus.status),
+            currentStatus && this.getImportStatusClass(currentStatus.status),
           )}
         >
           {currentStatus && getImportStatusLabel(currentStatus.status)}
