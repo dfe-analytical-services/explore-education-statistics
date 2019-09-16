@@ -370,9 +370,9 @@ exports[`DataBlock renders summary 1`] = `
           class="govuk-details__text"
           id="details-content-4"
         >
-          <p>
-            This service is not yet available
-          </p>
+          <div>
+            a
+          </div>
         </div>
       </details>
     </div>
@@ -423,9 +423,9 @@ exports[`DataBlock renders summary 1`] = `
           class="govuk-details__text"
           id="details-content-5"
         >
-          <p>
-            This service is not yet available
-          </p>
+          <div>
+            b
+          </div>
         </div>
       </details>
     </div>
@@ -476,9 +476,9 @@ exports[`DataBlock renders summary 1`] = `
           class="govuk-details__text"
           id="details-content-6"
         >
-          <p>
-            This service is not yet available
-          </p>
+          <div>
+            c
+          </div>
         </div>
       </details>
     </div>

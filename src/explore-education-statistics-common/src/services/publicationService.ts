@@ -160,6 +160,7 @@ export interface Table {
 export interface Summary {
   dataKeys: string[];
   dataSummary: string[];
+  dataDefinition: string[];
   description: { type: string; body: string };
 }
 

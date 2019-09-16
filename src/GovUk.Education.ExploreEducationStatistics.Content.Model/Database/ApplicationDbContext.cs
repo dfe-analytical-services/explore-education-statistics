@@ -2022,6 +2022,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             "Similar to previous years",
                             "Up from 1.1% in 2015/16"
                         },
+                        dataDefinition = new List<string>
+                        {
+                            @"Total number of all authorised and unauthorised absences from possible school sessions for all pupils. <a href=""/glossary#overall-absence"">More >>></a>",
+                            @"Number of authorised absences as a percentage of the overall school population. <a href=""/glossary#authorised-absence"">More >>></a>",
+                            @"Number of unauthorised absences as a percentage of the overall school population. <a href=""/glossary#unauthorised-absence"">More >>></a>"
+                        },
                         description = new MarkDownBlock
                         {
                             Id = new Guid("f928762e-9bd5-4538-a4f0-d7f34b2874e6"),
@@ -2401,6 +2407,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             "Up from 4.29% in 2015/16",
                             "Up from 6,685 in 2015/16"
                         },
+                        dataDefinition = new List<string>
+                        {
+                            @"Number of permanent exclusions as a percentage of the overall school population. <a href=""/glossary#permanent-exclusion"">More >>></a>",
+                            @"Number of fixed-period exclusions as a percentage of the overall school population. <a href=""/glossary#permanent-exclusion"">More >>></a>",
+                            @"Total number of permanent exclusions within a school year. <a href=""/glossary#permanent-exclusion"">More >>></a>"
+                        },
                         description = new MarkDownBlock
                         {
                             Id = new Guid("132bef6e-c2a3-459d-996e-40f29ed6e74f"),
@@ -2706,6 +2718,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             "Down from 620,330 in 2017",
                             "Down from 558,411 in 2017",
                             "Down from 34,792 in 2017"
+                        },
+                        dataDefinition = new List<string>
+                        {
+                            @"Total number of applications received for places at primary and secondary schools.",
+                            @"Total number of first preferences offered to applicants by schools.",
+                            @"Total number of second preferences offered to applicants by schools."
                         },
                         description = new MarkDownBlock
                         {
