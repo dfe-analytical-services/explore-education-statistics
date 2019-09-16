@@ -1,7 +1,10 @@
+from logging import warn
 from robot.libraries.BuiltIn import BuiltIn
 from selenium.webdriver.common.action_chains  import ActionChains
 from selenium.common.exceptions import NoSuchElementException
 sl = BuiltIn().get_library_instance('SeleniumLibrary')
+import os
+import re
 
 def cookie_should_not_exist(name):
   for cookie in sl.driver.get_cookies():
@@ -137,7 +140,7 @@ def user_checks_details_dropdown_contains_publication(details_heading, publicati
     raise AssertionError(f'Cannot find details component "{details_heading}"')
 
   try:
-    sl.driver.find_element_by_xpath(f'//*[@class="govuk-details__summary-text" and text()="{details_heading}"]/../..//strong[text()="{publication_name}"]')
+    sl.driver.find_element_by_xpath(f'//*[@class="govuk-details__summary-text" and text()="{details_heading}"]/../..//*[text()="{publication_name}"]')
   except:
     raise AssertionError(f'Cannot find publication "{publication_name}" inside details component "{details_heading}"')
 
@@ -261,15 +264,23 @@ def user_checks_results_table_cell_contains(row, column, expected):
 def user_checks_previous_table_tool_step_contains(step, key, value):
   try:
     sl.wait_until_page_contains_element(f'xpath://*[@id="tableTool-steps-step-{step}"]//*[text()="Go to this step"]')
-    elem = sl.driver.find_element_by_css_selector(f"#tableTool-steps-step-{step}")
+    sl.driver.find_element_by_xpath(f'//*[@id="tableTool-steps-step-{step}"]//*[text()="Go to this step"]')
   except:
-    raise AssertionError(f'Element "#tableTool-steps-step-{step}" isn\'t the previous step!')
+    sl.capture_page_screenshot()
+    raise AssertionError(f'Previous step wasn\'t found!')
 
   try:
-    elem.find_element_by_xpath(f'.//dt[text()="{key}"]/../dd[text()="{value}"]')
+    sl.driver.find_element_by_xpath(f'.//*[@id="tableTool-steps-step-{step}"]//dt[text()="{key}"]/../dd[text()="{value}"]')
   except:
     sl.capture_page_screenshot()
     raise AssertionError(f'Element "#tableTool-steps-step-{step}" containing "{key}" and "{value}" not found!')
+
+def user_checks_generated_permalink_is_valid():
+  elem = sl.driver.find_element_by_css_selector('[class^="dfe-LinkContainer-module__linkSelect"]')
+  url_without_http = re.sub(r'https?://', '', os.environ['PUBLIC_URL'])
+  url_without_basic_auth = re.sub(r'.*@', '', url_without_http)
+  if not elem.text.startswith(f"{url_without_basic_auth}/data-tables/permalink/"):
+    raise AssertionError(f'Generated permalink "{elem.text}" is invalid! Should match "{url_without_basic_auth}"')
 
 def user_reorders_table_headers(drag_selector, drop_selector):
   drag_elem = None
@@ -297,3 +308,15 @@ def user_reorders_table_headers(drag_selector, drop_selector):
   action.move_to_element(drop_elem).perform()
   action.move_by_offset(0, 0).pause(0.01).perform()
   action.release().perform()
+
+def capture_large_screenshot():
+    currentWindow = sl.get_window_size()
+    page_height = sl._current_browser().execute_script("return document.documentElement.scrollHeight;")
+
+    page_width = currentWindow[0]
+    original_height = currentWindow[1]
+
+    sl.set_window_size(page_width, page_height)
+    warn("Capturing a screenshot at URL " + sl.get_location())
+    sl.capture_page_screenshot()
+    sl.set_window_size(page_width, original_height)

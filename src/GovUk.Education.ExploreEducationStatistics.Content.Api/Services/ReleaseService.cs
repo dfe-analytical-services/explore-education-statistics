@@ -27,11 +27,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 
         public ReleaseViewModel GetRelease(string id)
         {
-            var release = Guid.TryParse(id, out var newGuid)
-                ? _context.Releases.Include(x => x.Publication).ThenInclude(x => x.LegacyReleases)
-                    .Include(x => x.Updates).FirstOrDefault(x => x.Id == newGuid)
-                : _context.Releases.Include(x => x.Publication).ThenInclude(x => x.LegacyReleases)
-                    .Include(x => x.Updates).FirstOrDefault(x => x.Slug == id);
+            var queryable = _context.Releases
+                .Include(r => r.Content)
+                .ThenInclude(section => section.Content)
+                .Include(r => r.KeyStatistics)
+                .Include(r => r.Publication)
+                .ThenInclude(publication => publication.LegacyReleases)
+                .Include(r => r.Updates);
+
+            var release = Guid.TryParse(id, out var newGuid) ? 
+                queryable.FirstOrDefault(r => r.Id == newGuid) : 
+                queryable.FirstOrDefault(r => r.Slug == id);
 
             if (release != null)
             {
@@ -51,6 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
             }
 
             var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
+            releaseViewModel.Content.Sort((x, y) => x.Order.CompareTo(y.Order));
             releaseViewModel.LatestRelease = IsLatestRelease(release.PublicationId, releaseViewModel.Id);
 
             return releaseViewModel;
@@ -58,26 +65,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 
         public ReleaseViewModel GetLatestRelease(string id)
         {
-            Release release;
+            var queryable = _context.Releases
+                .Include(r => r.Content)
+                .ThenInclude(section => section.Content)
+                .Include(r => r.KeyStatistics)
+                .Include(r => r.Publication).ThenInclude(p => p.LegacyReleases)
+                .Include(r => r.Publication).ThenInclude(p => p.Topic.Theme)
+                .Include(r => r.Publication).ThenInclude(p => p.Contact)
+                .Include(r => r.Updates)
+                .OrderBy(r => r.Published);
 
-            if (Guid.TryParse(id, out var newGuid))
-            {
-                release = _context.Releases
-                    .Include(x => x.Publication).ThenInclude(x => x.LegacyReleases)
-                    .Include(x => x.Publication).ThenInclude(p => p.Topic.Theme)
-                    .Include(x => x.Publication).ThenInclude(p => p.Contact)
-                    .Include(x => x.Updates).OrderBy(x => x.Published)
-                    .Last(t => t.PublicationId == newGuid);
-            }
-            else
-            {
-                release = _context.Releases
-                    .Include(x => x.Publication).ThenInclude(x => x.LegacyReleases)
-                    .Include(x => x.Publication).ThenInclude(p => p.Topic.Theme)
-                    .Include(x => x.Publication).ThenInclude(p => p.Contact)
-                    .Include(x => x.Updates).OrderBy(x => x.Published)
-                    .Last(t => t.Publication.Slug == id);
-            }
+            var release = Guid.TryParse(id, out var newGuid) ? 
+                queryable.Last(r => r.PublicationId == newGuid) : 
+                queryable.Last(r => r.Publication.Slug == id);
 
             if (release != null)
             {
@@ -97,6 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
                 }));
 
                 var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
+                releaseViewModel.Content.Sort((x, y) => x.Order.CompareTo(y.Order));
                 releaseViewModel.DataFiles = ListFiles(release, ReleaseFileTypes.Data);
                 releaseViewModel.ChartFiles = ListFiles(release, ReleaseFileTypes.Chart);
                 releaseViewModel.AncillaryFiles = ListFiles(release, ReleaseFileTypes.Ancillary);
