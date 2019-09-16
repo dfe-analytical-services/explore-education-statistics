@@ -1,4 +1,3 @@
-import classNames from 'classnames';
 import Link from '@admin/components/Link';
 import service from '@admin/services/release/edit-release/data/service';
 import { DataFile } from '@admin/services/release/edit-release/data/types';
@@ -16,7 +15,6 @@ import Yup from '@common/lib/validation/yup';
 import { FormikActions, FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
 import ImporterStatus from '@admin/components/ImporterStatus';
-import styles from './ReleaseDataUploadsSection.module.scss';
 
 interface FormValues {
   subjectTitle: string;
@@ -142,10 +140,20 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                       {dataFile.metadataFilename}
                     </a>
                   </SummaryListItem>
-
                   <ImporterStatus
                     releaseId={releaseId}
                     datafileName={dataFile.filename}
+                  />
+                  <SummaryListItem
+                    term="Actions"
+                    actions={
+                      <Link
+                        to="#"
+                        onClick={() => setDeleteFileName(dataFile.filename)}
+                      >
+                        Delete files
+                      </Link>
+                    }
                   />
                 </SummaryList>
               ))}

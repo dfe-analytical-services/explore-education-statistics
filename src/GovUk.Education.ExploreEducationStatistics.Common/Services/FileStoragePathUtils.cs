@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
          */
         public static string AdminReleaseBatchesDirectoryPath(string releaseId)
         {
-            return AdminReleaseDirectoryPath(releaseId) + $"{ReleaseFileTypes.Data.GetEnumLabel()}/{BatchesDir}";
+            return AdminReleaseDirectoryPath(releaseId) + $"{ReleaseFileTypes.Data.GetEnumLabel()}/{BatchesDir}/";
         }
 
         /**

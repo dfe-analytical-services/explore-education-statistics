@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using EFCore.BulkExtensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -9,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Importer.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using Microsoft.EntityFrameworkCore.Query.ExpressionVisitors.Internal;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
@@ -23,6 +25,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         private readonly ILogger<ImporterService> _logger;
 
         private int _importCount;
+
+        private static readonly Regex regexTimePeriod = new Regex(@"^[0-9]{4}$", RegexOptions.Compiled);
         
         private enum Columns
         {
@@ -177,6 +181,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
             throw new InvalidTimeIdentifierException(timeIdentifier);
         }
+        
+        public static int GetYear(IReadOnlyList<string> line, List<string> headers)
+        {
+            var tp = CsvUtil.Value(line, headers, "time_period");
+//            Regex insanely slow - need revisit
+//            if (tp == null || !regexTimePeriod.IsMatch(tp))
+//            {
+//                throw new InvalidTimePeriod();
+//            }
+            return int.Parse(tp.Substring(0, 4));
+        }
 
         private IEnumerable<Observation> GetObservations(IEnumerable<string> lines,
             List<string> headers,
@@ -256,11 +271,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                     FilterItem = _importerFilterService.Find(filterItemLabel, filterGroupLabel, filterMeta.Filter)
                 };
             }).ToList();
-        }
-
-        private static int GetYear(IReadOnlyList<string> line, List<string> headers)
-        {
-            return int.Parse(CsvUtil.Value(line, headers, "time_period").Substring(0, 4));
         }
 
         private long GetLocationId(IReadOnlyList<string> line, List<string> headers)
