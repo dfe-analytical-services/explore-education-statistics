@@ -2,7 +2,7 @@ using System;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 {
-    public class UserDetailsViewModel
+    public class UserDetailsPermissionsViewModel
 
     {
         public Guid Id { get; set; }
