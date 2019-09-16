@@ -1,3 +1,4 @@
+/* eslint-disable react/no-danger */
 import Details, { DetailsToggleHandler } from '@common/components/Details';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
@@ -14,6 +15,7 @@ export interface SummaryRendererProps {
   meta: DataBlockMetadata;
   dataKeys: string[];
   dataSummary: string[];
+  dataDefinition: string[];
   description: { type: string; body: string };
   onToggle?: DetailsToggleHandler;
 }
@@ -35,6 +37,7 @@ export default function SummaryRenderer({
   data,
   dataKeys,
   dataSummary,
+  dataDefinition,
   onToggle,
 }: SummaryRendererProps) {
   let measures: { [key: string]: string } = {};
@@ -80,22 +83,9 @@ export default function SummaryRenderer({
                 onToggle={onToggle}
                 summary={`Define '${meta.indicators[key].label}'`}
               >
-                <p>
-                  This service is not yet available
-                  {/*
-                  {`${
-                    meta.indicators[key].label
-                  } is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.`}
-                  */}
-                </p>
-                {/*
-                <a
-                  className="govuk-details__summary-text"
-                  href={`/glossary#${meta.indicators[key].label}`}
-                >
-                  More &gt;&gt;&gt;
-                </a>
-                */}
+                <div
+                  dangerouslySetInnerHTML={{ __html: dataDefinition[index] }}
+                />
               </Details>
             </div>
           );

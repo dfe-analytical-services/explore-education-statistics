@@ -86,6 +86,9 @@ const ReleaseManageDataBlocksPage = () => {
             label="Select data block"
             onChange={e => {
               setRequest(dataBlocks[+e.target.value].dataBlockRequest);
+              setRequestConfiguration(
+                (dataBlocks[+e.target.value].charts || [undefined])[0],
+              );
               setSelectedDataBlock(e.target.value);
             }}
             order={[]}

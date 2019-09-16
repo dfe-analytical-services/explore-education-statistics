@@ -11,10 +11,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IDataBlockService
     {
-        Task<Either<ValidationResult, DataBlockViewModel>> CreateAsync(ReleaseId releaseId, 
-            ContentSectionId contentSectionId, CreateDataBlockViewModel createDataBlock);
+        Task<DataBlockViewModel> CreateAsync(ReleaseId releaseId, CreateDataBlockViewModel createDataBlock);
 
-        Task<DataBlockViewModel> GetAsync(ReleaseId releaseId, DataBlockId id);
+        Task<DataBlockViewModel> GetAsync(DataBlockId id);
 
         Task<List<DataBlockViewModel>> ListAsync(ReleaseId releaseId);
     }

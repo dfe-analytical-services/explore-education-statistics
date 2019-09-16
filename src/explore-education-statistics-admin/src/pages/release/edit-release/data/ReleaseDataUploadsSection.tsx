@@ -77,6 +77,16 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
       'metadataFile',
       'Choose a metadata file that is not empty',
     ),
+    errorCodeToFieldError(
+      'DATA_FILE_MUST_BE_A_CSV_FILE',
+      'dataFile',
+      'Data file must be a csv file',
+    ),
+    errorCodeToFieldError(
+      'META_FILE_MUST_BE_A_CSV_FILE',
+      'metadataFile',
+      'Meta file must be a csv file',
+    ),
   );
 
   return (

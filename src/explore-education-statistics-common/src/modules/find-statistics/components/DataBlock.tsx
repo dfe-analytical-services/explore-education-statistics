@@ -191,9 +191,17 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
 
                   return (
                     <React.Fragment key={key}>
-                      <ChartRenderer {...chart} height={height} />
-                      <DataSource />
-                      <DownloadDetails />
+                      {chart.data &&
+                      chart.meta &&
+                      chart.data.result.length > 0 ? (
+                        <>
+                          <ChartRenderer {...chart} height={height} />
+                          <DataSource />
+                          <DownloadDetails />
+                        </>
+                      ) : (
+                        <div>Invalid data specified</div>
+                      )}
                     </React.Fragment>
                   );
                 })}

@@ -8,10 +8,10 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using ContentSectionId = System.Guid;
 using PublicationId = System.Guid;
 using ReleaseId = System.Guid;
 
@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _mapper = mapper;
         }
 
-        public Release Get(PublicationId id)
+        public Release Get(ReleaseId id)
         {
             return _context.Releases.FirstOrDefault(x => x.Id == id);
         }
@@ -42,7 +42,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _context.Releases.FirstOrDefaultAsync(x => x.Id == id);
         }
-
+        
+        public List<ContentSection> GetContent(ReleaseId id)
+        {
+            return _context.ContentSections.Where(section => section.ReleaseId == id).ToList();
+        }
+        
         public List<Release> List()
         {
             return _context.Releases.ToList();
@@ -141,11 +146,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             if (releaseId.HasValue)
             {
-                var templateContent = Get(releaseId.Value).Content;
+                var templateContent = GetContent(releaseId.Value);
                 if (templateContent != null)
                 {
                     return templateContent.Select(c => new ContentSection
                     {
+                        Id = new ContentSectionId(),
+                        ReleaseId = c.ReleaseId,
                         Caption = c.Caption,
                         Heading = c.Heading,
                         Order = c.Order,

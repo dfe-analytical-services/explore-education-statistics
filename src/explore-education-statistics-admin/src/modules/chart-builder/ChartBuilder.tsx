@@ -307,6 +307,23 @@ const ChartBuilder = ({
       title: '',
     },
   ) => {
+    let checkLabels = labels;
+
+    if (labels) {
+      checkLabels = Object.keys(labels).reduce<
+        Dictionary<DataSetConfiguration>
+      >(
+        (newLabels, key) => ({
+          ...newLabels,
+          [key]: {
+            ...labels[key],
+            value: labels[key].value || key,
+          },
+        }),
+        {},
+      );
+    }
+
     return {
       type,
       options: {
@@ -320,7 +337,7 @@ const ChartBuilder = ({
         geographicId,
       },
       axes,
-      labels,
+      labels: checkLabels,
     };
   };
 
