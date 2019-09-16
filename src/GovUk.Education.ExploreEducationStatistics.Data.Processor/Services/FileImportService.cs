@@ -40,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             var subjectData = _fileStorageService.GetSubjectData(message).Result;
             var subject = GetSubject(message, subjectData.Name);
-            var dataFileName = message.NumBatches > 1 ? message.DataFileName.Substring(0, message.DataFileName.LastIndexOf("_")) : message.DataFileName;
+            var dataFileName = GetDataFileName(message);
             var releaseId = message.Release.Id.ToString();
 
             if (await _batchService.IsBatchProcessed(releaseId, dataFileName, message.BatchNo))
@@ -113,6 +113,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .ThenInclude(p => p.Topic)
                 .ThenInclude(t => t.Theme)
                 .FirstOrDefault(s => s.Name.Equals(subjectName) && s.ReleaseId == message.Release.Id);
+        }
+
+        private string GetDataFileName(ImportMessage message)
+        {
+            var i = FileStoragePathUtils.BatchesDir.Length;
+            return message.NumBatches > 1 ? message.DataFileName.Substring(
+                i + 1,message.DataFileName.LastIndexOf("_") - i - 1) : message.DataFileName;
         }
     }
 }

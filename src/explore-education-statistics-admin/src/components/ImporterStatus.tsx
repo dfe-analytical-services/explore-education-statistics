@@ -26,7 +26,7 @@ export const getImportStatusLabel = (importstatusCode: ImportStatusCode) => {
     case 'RUNNING_PHASE_1':
       return 'Validating';
     case 'RUNNING_PHASE_2':
-      return 'Importing...';
+      return 'Importing';
     case 'COMPLETE':
       return 'Complete';
     case 'FAILED':
@@ -52,6 +52,8 @@ class ImporterStatus extends Component<Props> {
   public componentWillUnmount() {
     this.cancelTimer();
   }
+
+  private static refreshPeriod = 5000;
 
   private getImportStatusClass = (importstatusCode: ImportStatusCode) => {
     switch (importstatusCode) {
@@ -106,7 +108,10 @@ class ImporterStatus extends Component<Props> {
   }
 
   private initialiseTimer() {
-    this.intervalId = setInterval(this.fetchImportStatus.bind(this), 10000);
+    this.intervalId = setInterval(
+      this.fetchImportStatus.bind(this),
+      ImporterStatus.refreshPeriod,
+    );
   }
 
   private cancelTimer() {

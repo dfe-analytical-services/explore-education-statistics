@@ -16,6 +16,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
          */
         public const string DataFileKey = "datafile";
         
+        /*
+         * Property key on a metadata file to point at the data file
+         */
+        public const string BatchesDir = "batches";
+        
         /**
          * The top level admin directory path where files on a release are stored.
          */
@@ -30,6 +35,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         public static string AdminReleaseDirectoryPath(string releaseId, ReleaseFileTypes type)
         {
             return AdminReleaseDirectoryPath(releaseId) + $"{type.GetEnumLabel()}/";
+        }
+        
+        /**
+         * The admin directory path where data files are batched for importing
+         */
+        public static string AdminReleaseBatchesDirectoryPath(string releaseId)
+        {
+            return AdminReleaseDirectoryPath(releaseId) + $"{ReleaseFileTypes.Data.GetEnumLabel()}/{BatchesDir}";
         }
 
         /**
