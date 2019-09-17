@@ -300,15 +300,20 @@ class TableToolPage extends Component<Props, State> {
       this.createQuery(filters, indicators),
     );
 
-    const createdTable = mapFullTable(unmappedCreatedTable);
+    try {
+      const createdTable = mapFullTable(unmappedCreatedTable);
 
-    this.setState({
-      createdTable,
-      filters,
-      indicators,
-      permalinkId: '',
-      tableHeaders: getDefaultTableHeaderConfig(createdTable.subjectMeta),
-    });
+      this.setState({
+        createdTable,
+        filters,
+        indicators,
+        permalinkId: '',
+        tableHeaders: getDefaultTableHeaderConfig(createdTable.subjectMeta),
+      });
+    } catch (e) {
+      console.log(e);
+    }
+
   };
 
   private handlePermalinkClick: MouseEventHandler = async () => {

@@ -90,17 +90,25 @@ const reverseMapTableHeadersConfig = (
 export const mapFullTable = (
   unmappedFullTable: UnmappedFullTable,
 ): FullTable => {
+
+  const subjectMeta = unmappedFullTable.subjectMeta || {
+    indicators: [],
+    locations: [],
+    timePeriodRange: []
+  };
+
   return {
     ...unmappedFullTable,
     subjectMeta: {
+      filters:{},
       ...unmappedFullTable.subjectMeta,
-      indicators: unmappedFullTable.subjectMeta.indicators.map(
+      indicators: subjectMeta.indicators.map(
         indicator => new Indicator(indicator),
       ),
-      locations: unmappedFullTable.subjectMeta.locations.map(
+      locations: subjectMeta.locations.map(
         location => new LocationFilter(location, location.level),
       ),
-      timePeriodRange: unmappedFullTable.subjectMeta.timePeriodRange.map(
+      timePeriodRange: subjectMeta.timePeriodRange.map(
         timePeriod => new TimePeriodFilter(timePeriod),
       ),
     },
