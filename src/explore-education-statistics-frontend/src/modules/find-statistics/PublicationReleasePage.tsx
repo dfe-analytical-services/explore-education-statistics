@@ -143,7 +143,7 @@ class PublicationReleasePage extends Component<Props> {
                   {data.downloadFiles.map(({ extension, name, path, size }) => (
                     <li key={path}>
                       <Link
-                        to={`${baseUrl.data}/api/download/${path}`}
+                        to={`${baseUrl.data}/download/${path}`}
                         className="govuk-link"
                         analytics={{
                           category: 'Downloads',

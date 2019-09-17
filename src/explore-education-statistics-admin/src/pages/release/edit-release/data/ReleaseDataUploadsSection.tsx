@@ -14,6 +14,7 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
 import { FormikActions, FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
+import ImporterStatus from '@admin/components/ImporterStatus';
 
 interface FormValues {
   subjectTitle: string;
@@ -76,6 +77,16 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
       'metadataFile',
       'Choose a metadata file that is not empty',
     ),
+    errorCodeToFieldError(
+      'DATA_FILE_MUST_BE_A_CSV_FILE',
+      'dataFile',
+      'Data file must be a csv file',
+    ),
+    errorCodeToFieldError(
+      'META_FILE_MUST_BE_A_CSV_FILE',
+      'metadataFile',
+      'Meta file must be a csv file',
+    ),
   );
 
   return (
@@ -105,9 +116,12 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
           <Form id={formId} submitValidationHandler={handleServerValidation}>
             {dataFiles &&
               dataFiles.map(dataFile => (
-                <SummaryList key={dataFile.filename}>
+                <SummaryList
+                  key={dataFile.filename}
+                  additionalClassName="govuk-!-margin-bottom-9"
+                >
                   <SummaryListItem term="Subject title">
-                    {dataFile.title}
+                    <h4 className="govuk-heading-m">{dataFile.title}</h4>
                   </SummaryListItem>
                   <SummaryListItem term="Data file">
                     <a
@@ -136,6 +150,10 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                       {dataFile.metadataFilename}
                     </a>
                   </SummaryListItem>
+                  <ImporterStatus
+                    releaseId={releaseId}
+                    datafileName={dataFile.filename}
+                  />
                   <SummaryListItem
                     term="Actions"
                     actions={

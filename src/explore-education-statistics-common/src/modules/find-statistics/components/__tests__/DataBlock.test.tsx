@@ -218,6 +218,7 @@ describe('DataBlock', () => {
         summary={{
           dataKeys: ['23', '26', '28'],
           dataSummary: ['up 10%', 'down 10%', 'up 11%'],
+          dataDefinition: ['a', 'b', 'c'],
           description: {
             type: 'MarkDownBlock',
             body: `<div>test</div>`,

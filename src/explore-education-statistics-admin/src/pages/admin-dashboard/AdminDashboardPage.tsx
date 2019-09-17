@@ -8,6 +8,7 @@ import { UserDetails } from '@admin/services/common/types';
 import dashboardService from '@admin/services/dashboard/service';
 import { AdminDashboardRelease } from '@admin/services/dashboard/types';
 import loginService from '@admin/services/sign-in/service';
+import FormFieldset from '@common/components/form/FormFieldset';
 import FormSelect from '@common/components/form/FormSelect';
 import RelatedInformation from '@common/components/RelatedInformation';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -15,6 +16,7 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import { Dictionary } from '@common/types';
 import React, { useContext, useEffect, useState } from 'react';
+import SummaryList from '@common/components/SummaryList';
 import MyPublicationsTab from './components/MyPublicationsTab';
 
 interface Model {
@@ -153,14 +155,15 @@ const AdminDashboardPage = () => {
               >
                 {release => (
                   <>
-                    <SummaryListItem
-                      key="select"
-                      term="Select pre release access"
+                    <FormFieldset
+                      legend="Manage pre release access"
+                      legendSize="s"
+                      id="pre-release-selection"
                     >
                       <FormSelect
                         id="preReleaseAccessContact"
                         name="preReleaseAccessContact"
-                        label=""
+                        label="Select user"
                         options={[
                           {
                             label: 'Please select',
@@ -179,7 +182,7 @@ const AdminDashboardPage = () => {
                             })),
                         ]}
                         order={[]}
-                        className="govuk-!-width-full"
+                        className="govuk-!-width-one-third"
                         onChange={async event => {
                           const updatedContacts = await dashboardService.addPreReleaseContactToRelease(
                             release.id,
@@ -194,9 +197,12 @@ const AdminDashboardPage = () => {
                           });
                         }}
                       />
-                    </SummaryListItem>
-                    {model.preReleaseContactsByScheduledRelease[release.id].map(
-                      existingContact => (
+                    </FormFieldset>
+
+                    <SummaryList>
+                      {model.preReleaseContactsByScheduledRelease[
+                        release.id
+                      ].map(existingContact => (
                         <SummaryListItem
                           key={existingContact.id}
                           term="Pre release access"
@@ -223,8 +229,8 @@ const AdminDashboardPage = () => {
                         >
                           {existingContact.name}
                         </SummaryListItem>
-                      ),
-                    )}
+                      ))}
+                    </SummaryList>
                   </>
                 )}
               </ReleasesTab>

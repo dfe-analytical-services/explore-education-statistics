@@ -30,21 +30,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         private readonly IReleaseService _releaseService;
         private readonly IFileStorageService _fileStorageService;
         private readonly IPublicationService _publicationService;
-        private readonly IDataBlockService _dataBlockService;
         private readonly IImportStatusService _importStatusService;
 
         public ReleasesController(IImportService importService,
             IReleaseService releaseService,
             IFileStorageService fileStorageService,
             IPublicationService publicationService,
-            IDataBlockService dataBlockService,
             IImportStatusService importStatusService)
         {
             _importService = importService;
             _releaseService = releaseService;
             _fileStorageService = fileStorageService;
             _publicationService = publicationService;
-            _dataBlockService = dataBlockService;
             _importStatusService = importStatusService;
         }
 
@@ -246,30 +243,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 releaseId, 
                 () => _releaseService.UpdateReleaseStatusAsync(releaseId, updateRequest.ReleaseStatus, updateRequest.InternalReleaseNote)
             );
-        }
-
-        [HttpPost("release/{releaseId}/section/{contentSectionId}/datablocks")]
-        [AllowAnonymous]
-        public async Task<ActionResult<DataBlockViewModel>> CreateDataBlockAsync(ReleaseId releaseId,
-            ContentSectionId contentSectionId, CreateDataBlockViewModel dataBlock)
-        {
-            return await CheckReleaseExistsAsync(releaseId, () => _dataBlockService.CreateAsync(releaseId, 
-                contentSectionId, dataBlock));
-        }
-        
-        [HttpGet("release/{releaseId}/datablocks/")]
-        [AllowAnonymous]
-        public async Task<ActionResult<List<DataBlockViewModel>>> GetDataBlocksAsync(ReleaseId releaseId)
-        {
-            return await CheckReleaseExistsAsync(releaseId,  async () => Ok(await _dataBlockService.ListAsync(releaseId)));
-        }
-        
-        [HttpGet("release/{releaseId}/datablock/{id}")]
-        [AllowAnonymous]
-        public async Task<ActionResult<DataBlockViewModel>> GetDataBlockAsync(ReleaseId releaseId, DataBlockId id)
-        {
-            return await CheckReleaseExistsAsync(releaseId,  async () => 
-                Ok(await _dataBlockService.GetAsync(releaseId, id)));
         }
 
         private async Task<ActionResult> CheckReleaseExistsAsync(ReleaseId releaseId, Func<Task<ActionResult>> andThen)

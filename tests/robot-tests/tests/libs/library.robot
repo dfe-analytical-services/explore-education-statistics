@@ -12,13 +12,28 @@ ${browser}    chrome
 ${headless}   1
 
 ${timeout}          20
-${implicit_wait}    20
+${implicit_wait}    3
 
 *** Keywords ***
 do this on failure
-  capture page screenshot
+  capture large screenshot
   set selenium timeout  3
-  set selenium implicit wait  3
+
+user signs in
+  user opens the browser
+  environment variable should be set   ADMIN_URL
+  user goes to url  %{ADMIN_URL}
+  user waits until page contains heading     Sign-in
+  user clicks link   Sign-in
+
+  environment variable should be set   ADMIN_EMAIL
+  environment variable should be set   ADMIN_PASSWORD
+  user logs into microsoft online  %{ADMIN_EMAIL}   %{ADMIN_PASSWORD}
+
+  user checks url contains  %{ADMIN_URL}
+  user waits until page contains heading   User1 EESADMIN
+  user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(1)     Home
+  user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(2)     Administrator dashboard
 
 user opens the browser
   run keyword if    "${browser}" == "chrome"    user opens chrome
@@ -184,11 +199,27 @@ user clicks element
 
 user clicks link
   [Arguments]   ${text}
-  click element  xpath://a[text()="${text}"]
+  click link  ${text}
 
 user clicks button
   [Arguments]   ${text}
   click button  ${text}
+
+user checks page contains tag
+  [Arguments]   ${text}
+  user checks page contains element  xpath://span[contains(@class, "govuk-tag")][text()="${text}"]
+
+user checks page contains heading 1
+  [Arguments]   ${text}
+  user checks page contains element  xpath://h1[text()="${text}"]
+
+user checks page contains heading 2
+  [Arguments]   ${text}
+  user checks page contains element  xpath://h2[text()="${text}"]
+
+user checks page contains heading 3
+  [Arguments]   ${text}
+  user checks page contains element  xpath://h3[text()="${text}"]
 
 user selects newly opened window
   select window   NEW
@@ -196,6 +227,12 @@ user selects newly opened window
 user checks element attribute value should be
   [Arguments]   ${locator}  ${attribute}    ${expected}
   element attribute value should be  ${locator}     ${attribute}   ${expected}
+
+user checks radio option for "${radiogroupId}" should be "${expectedLabelText}"
+  user checks page contains element  css:#${radiogroupId} [data-testid="${expectedLabelText}"]:checked
+
+user checks summary list item "${dtText}" should be "${ddText}"
+  user checks page contains element  xpath://dl[//dt[contains(text(),"${dtText}")] and (//dd[contains(text(), "${ddText}")] or //dd//*[contains(text(), "${ddText}")])]
 
 user selects from list by label
   [Arguments]   ${locator}   ${label}
@@ -222,6 +259,14 @@ user checks url contains
 user checks page contains link with text and url
   [Arguments]  ${text}  ${href}
   user checks page contains element  xpath://a[@href="${href}" and text()="${text}"]
+
+user checks page contains details section
+  [Arguments]  ${text}
+  user checks page contains element  css:[data-testid="Expand Details Section ${text}"]
+
+user opens details section
+  [Arguments]  ${text}
+  user clicks element    css:[data-testid="Expand Details Section ${text}"]
 
 user waits until results table appears
   # Extra timeout until EES-234

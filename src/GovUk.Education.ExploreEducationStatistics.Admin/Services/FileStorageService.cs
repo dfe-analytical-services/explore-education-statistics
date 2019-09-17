@@ -8,9 +8,12 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
+using Microsoft.Extensions.Configuration;
+using MimeDetective;
+using MimeDetective.Extensions;
+using MimeMapping;
 using MimeTypes;
 using static System.StringComparison;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -78,8 +81,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 return ValidationResult(MetadataFileCannotBeEmpty);
             }
+            
             var dataFilePath = AdminReleasePath(releaseId, ReleaseFileTypes.Data, dataFile.FileName);
             var metadataFilePath = AdminReleasePath(releaseId, ReleaseFileTypes.Data, metaFile.FileName);
+            
+            if (!IsCsvFile(dataFilePath, dataFile.OpenReadStream()))
+            {
+                return ValidationResult(DataFileMustBeCsvFile);
+            }
+
+            if (!IsCsvFile(metadataFilePath, metaFile.OpenReadStream()))
+            {
+                return ValidationResult(MetaFileMustBeCsvFile);
+            }
+            
             if (!overwrite && blobContainer.GetBlockBlobReference(dataFilePath).Exists())
             {
                 return ValidationResult(CannotOverwriteDataFile);
@@ -168,6 +183,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return blobContainer
                 .ListBlobs(AdminReleaseDirectoryPath(releaseId, type), true, BlobListingDetails.Metadata)
+                .Where(cbb => !IsBatchedFile(cbb, releaseId))
                 .OfType<CloudBlockBlob>()
                 .Select(file => new FileInfo
                 {
@@ -251,6 +267,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return blob.Metadata.TryGetValue(MetaFileKey, out var name) ? name : "";
         }
+        
+        private static bool IsBatchedFile(IListBlobItem blobItem, string releaseId)
+        {
+            return blobItem.Parent.Prefix.Equals(AdminReleaseBatchesDirectoryPath(releaseId));
+        }
 
         private static string GetSize(CloudBlob blob)
         {
@@ -279,8 +300,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             await blob.SetMetadataAsync();
         }
-        
-        
+
         public async Task<Either<ValidationResult, FileStreamResult>> StreamFile(Guid releaseId, ReleaseFileTypes type, string fileName)
         {
             var blobContainer = await GetCloudBlobContainer();
@@ -300,6 +320,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 FileDownloadName = fileName
             };
         }
-
+        private static bool IsCsvFile(string filePath, Stream fileStream)
+        {
+            using (var reader = new StreamReader(fileStream))
+            {
+                Stream fileDataStream = reader.BaseStream;
+                FileType fileType = fileDataStream.GetFileType();
+                return MimeUtility.GetMimeMapping(filePath).Equals("text/csv") 
+                       && (fileType.Mime.StartsWith("text") || fileType.Mime.StartsWith("txt"));
+            }
+        }
     }
 }
