@@ -1,6 +1,7 @@
 import { logPageView } from '@frontend/services/googleAnalyticsService';
 import { initHotJar } from '@frontend/services/hotjarService';
 import { initApplicationInsights } from '@frontend/services/applicationInsightsService';
+import '@frontend/polyfill';
 import BaseApp, { Container, NextAppContext } from 'next/app';
 import Router from 'next/router';
 import React from 'react';
