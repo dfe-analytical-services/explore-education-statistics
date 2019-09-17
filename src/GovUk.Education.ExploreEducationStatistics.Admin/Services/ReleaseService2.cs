@@ -116,7 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         // TODO Authorisation will be required when users are introduced
-        public async Task<ReleaseSummaryViewModel> GetReleaseSummaryAsync(ContentSectionId releaseId)
+        public async Task<ReleaseSummaryViewModel> GetReleaseSummaryAsync(ReleaseId releaseId)
         {
             var release = await _context.Releases
                 .Where(r => r.Id == releaseId)
@@ -148,7 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         // TODO Authorisation will be required when users are introduced
-        public async Task<List<ReleaseViewModel>> GetReleasesForPublicationAsync(ContentSectionId publicationId)
+        public async Task<List<ReleaseViewModel>> GetReleasesForPublicationAsync(PublicationId publicationId)
         {
             var release = await _context.Releases
                 .Where(r => r.Publication.Id == publicationId)
