@@ -1,5 +1,6 @@
 import 'cross-fetch/polyfill';
-import 'custom-event-polyfill/polyfill';
+
+require('custom-event-polyfill/polyfill');
 
 if (typeof window.Event === 'undefined') {
   window.Event = window.CustomEvent;
