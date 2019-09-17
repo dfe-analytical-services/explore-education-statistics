@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
@@ -33,6 +34,68 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
             var controller = ControllerWithMocks(mocks);
 
             var result = await controller.CreateDataBlockAsync(_releaseId, dataBlock);
+            AssertOkResult(result);
+        }
+
+        [Fact]
+        public async void Get_DataBlock_Returns_Ok()
+        {
+            var mocks = Mocks();
+
+            var id = Guid.NewGuid();
+
+            mocks.DataBlockService.Setup(s => s.GetAsync(id)).Returns(Task.FromResult(new DataBlockViewModel()));
+
+            mocks.ReleaseService.Setup(s => s.GetAsync(_releaseId))
+                .Returns(Task.FromResult(new Release
+                {
+                    Id = _releaseId
+                }));
+
+            var controller = ControllerWithMocks(mocks);
+
+            var result = await controller.GetDataBlockAsync(id);
+            AssertOkResult(result);
+        }
+
+        [Fact]
+        public async void Get_DataBlocks_Returns_Ok()
+        {
+            var mocks = Mocks();
+
+            var sampleRes = new List<DataBlockViewModel>
+            {
+                new DataBlockViewModel()
+            };
+
+            mocks.DataBlockService.Setup(s => s.ListAsync(_releaseId)).Returns(Task.FromResult(sampleRes));
+
+            mocks.ReleaseService.Setup(s => s.GetAsync(_releaseId))
+                .Returns(Task.FromResult(new Release
+                {
+                    Id = _releaseId
+                }));
+
+            var controller = ControllerWithMocks(mocks);
+
+            var result = await controller.GetDataBlocksAsync(_releaseId);
+            AssertOkResult(result);
+        }
+
+        [Fact]
+        public async void Update_DataBlock_Returns_Ok()
+        {
+            var mocks = Mocks();
+
+            var id = Guid.NewGuid();
+            var dataBlock = new UpdateDataBlockViewModel();
+
+            mocks.DataBlockService.Setup(s => s.UpdateAsync(id, dataBlock))
+                .Returns(Task.FromResult(new DataBlockViewModel()));
+
+            var controller = ControllerWithMocks(mocks);
+
+            var result = await controller.UpdateDataBlockAsync(id, dataBlock);
             AssertOkResult(result);
         }
 
