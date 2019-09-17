@@ -136,5 +136,8 @@
   },
   "jest-junit": {
     "ancestorSeparator": " › "
+  },
+  "dependencies": {
+    "custom-event-polyfill": "^1.0.7"
   }
 }
