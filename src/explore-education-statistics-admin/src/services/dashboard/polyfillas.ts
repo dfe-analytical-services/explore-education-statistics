@@ -12,7 +12,7 @@ export const releasePolyfilla: Polyfilla<AdminDashboardRelease> = (
     id: 'TODO',
     name: 'TODO editor user',
   },
-  lastEditedDateTime: '1971-01-01 00:00',
+  lastEditedDateTime: '1971-01-01T00:00',
   contact: {
     id: '-1',
     contactName: 'TODO user',
