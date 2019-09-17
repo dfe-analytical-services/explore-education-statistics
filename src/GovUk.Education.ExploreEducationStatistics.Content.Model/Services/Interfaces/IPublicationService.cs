@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels;
 

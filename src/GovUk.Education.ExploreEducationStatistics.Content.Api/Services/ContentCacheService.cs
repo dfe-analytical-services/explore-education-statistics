@@ -1,10 +1,6 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels;
 using Microsoft.Azure.Storage.Blob;
-using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Services
 {

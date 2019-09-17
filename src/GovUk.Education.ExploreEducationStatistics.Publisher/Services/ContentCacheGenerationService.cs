@@ -68,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             if (contentTree != null)
             {
-                var contentTreeBlob = _cloudBlobContainer.GetBlockBlobReference($"publications/tree.json");
+                var contentTreeBlob = _cloudBlobContainer.GetBlockBlobReference("publications/tree.json");
                 await contentTreeBlob.UploadTextAsync(JsonConvert.SerializeObject(contentTree, null,
                     new JsonSerializerSettings()
                     {
@@ -91,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             if (downloadTree != null)
             {
-                var downloadTreeBlob = _cloudBlobContainer.GetBlockBlobReference($"download/tree.json");
+                var downloadTreeBlob = _cloudBlobContainer.GetBlockBlobReference("download/tree.json");
                 await downloadTreeBlob.UploadTextAsync(JsonConvert.SerializeObject(downloadTree, null,
                     new JsonSerializerSettings()
                     {
@@ -110,7 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             var methodologyTree = _methodologyService.GetTree();
 
-            var methodologyTreeBlob = _cloudBlobContainer.GetBlockBlobReference($"methodology/tree.json");
+            var methodologyTreeBlob = _cloudBlobContainer.GetBlockBlobReference("methodology/tree.json");
             await methodologyTreeBlob.UploadTextAsync(JsonConvert.SerializeObject(methodologyTree, null,
                 new JsonSerializerSettings()
                 {

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
@@ -14,9 +13,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using DataBlockId = System.Guid;
 using ContentSectionId = System.Guid;
+using FileInfo = GovUk.Education.ExploreEducationStatistics.Admin.Models.FileInfo;
 using PublicationId = System.Guid;
 using ReleaseId = System.Guid;
-using FileInfo = GovUk.Education.ExploreEducationStatistics.Admin.Models.FileInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {

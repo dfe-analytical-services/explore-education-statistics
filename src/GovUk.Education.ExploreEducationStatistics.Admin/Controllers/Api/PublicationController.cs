@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -28,9 +27,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpGet("api/me/publications")]
         public async Task<ActionResult<List<PublicationViewModel>>> GetPublicationsAsync(
             [Required] [FromQuery(Name = "topicId")]
-            Guid topicId)
+            PublicationId topicId)
         {
-            var userId = new Guid(); // TODO get the Guid from AD
+            var userId = new PublicationId(); // TODO get the Guid from AD
             var result = await _publicationService.GetByTopicAndUserAsync(topicId, userId);
 
             if (result.Any())
@@ -44,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         // GET api/publications/{publicationId}
         [HttpGet("api/publications/{publicationId}")]
         public async Task<ActionResult<PublicationViewModel>> GetPublicationByIdAsync(
-            [Required] Guid publicationId)
+            [Required] PublicationId publicationId)
         {
             // var userId = new Guid(); // TODO get the Guid from AD
             var result = await _publicationService.GetViewModelAsync(publicationId);
@@ -59,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         // POST api/topic/{topicId}/publications
         [HttpPost("api/topic/{topicId}/publications")]
-        public async Task<ActionResult<PublicationViewModel>> CreatePublicationAsync(CreatePublicationViewModel publication, Guid topicId)
+        public async Task<ActionResult<PublicationViewModel>> CreatePublicationAsync(CreatePublicationViewModel publication, PublicationId topicId)
         {
             publication.TopicId = topicId;
             var result = await _publicationService.CreatePublicationAsync(publication);

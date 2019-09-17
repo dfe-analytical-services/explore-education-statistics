@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Newtonsoft.Json;
+using StorageException = Microsoft.WindowsAzure.Storage.StorageException;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
@@ -146,7 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 {
                     leaseId = await _fileStorageService.GetLeaseId(cloudBlockBlob);
                 }
-                catch (Microsoft.WindowsAzure.Storage.StorageException se)
+                catch (StorageException se)
                 {
                     var response = se.RequestInformation.HttpStatusCode;
                     if (response != null && (response == (int) HttpStatusCode.Conflict))

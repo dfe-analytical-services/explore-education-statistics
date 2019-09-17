@@ -10,8 +10,8 @@ using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using FileStorageService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.FileStorageService;
-using IFileStorageService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IFileStorageService;
 using FileStorageServiceContentModel = GovUk.Education.ExploreEducationStatistics.Content.Model.Services.FileStorageService;
+using IFileStorageService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IFileStorageService;
 using IFileStorageServiceContentModel = GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces.IFileStorageService;
 
 [assembly: FunctionsStartup(typeof(Startup))]

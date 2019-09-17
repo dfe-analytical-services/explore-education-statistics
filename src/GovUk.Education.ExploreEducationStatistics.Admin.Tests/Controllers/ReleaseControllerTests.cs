@@ -75,16 +75,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
         public async Task GetAncillaryFilesAsync_Returns_A_List_Of_Files()
         {
             var releaseId = Guid.NewGuid();
-            IEnumerable<Models.FileInfo> testFiles = new[]
+            IEnumerable<FileInfo> testFiles = new[]
             {
-                new Models.FileInfo
+                new FileInfo
                 {
                     Extension = "doc",
                     Name = "Ancillary 1",
                     Path = "file1.doc",
                     Size = "1 Kb"
                 },
-                new Models.FileInfo
+                new FileInfo
                 {
                     Extension = "doc",
                     Name = "Ancillary 2",
@@ -101,7 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
             
             // Call the method under test
             var result = await controller.GetAncillaryFilesAsync(releaseId);
-            var unboxed = AssertOkResult<IEnumerable<Models.FileInfo>>(result);
+            var unboxed = AssertOkResult<IEnumerable<FileInfo>>(result);
             Assert.NotNull(unboxed);
         }
 
@@ -174,16 +174,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
         public async Task GetDataFilesAsync_Returns_A_List_Of_Files()
         {
             var releaseId = Guid.NewGuid();
-            IEnumerable<Models.FileInfo> testFiles = new[]
+            IEnumerable<FileInfo> testFiles = new[]
             {
-                new Models.FileInfo
+                new FileInfo
                 {
                     Extension = "csv",
                     Name = "Release a file 1",
                     Path = "file1.csv",
                     Size = "1 Kb"
                 },
-                new Models.FileInfo
+                new FileInfo
                 {
                     Extension = "csv",
                     Name = "Release a file 2",
@@ -227,7 +227,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
                 .Returns(Task.FromResult(new Release {Id = releaseId}));
             mocks.FileStorageService
                 .Setup(service => service.DeleteDataFileAsync(releaseId, "datafilename"))
-                .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<Models.FileInfo>>>(new List<Models.FileInfo>()));
+                .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<FileInfo>>>(new List<FileInfo>()));
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Call the method under test
@@ -245,7 +245,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
                 .Returns(Task.FromResult(new Release {Id = releaseId}));
             mocks.FileStorageService
                 .Setup(service => service.DeleteDataFileAsync(releaseId, "datafilename"))
-                .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<Models.FileInfo>>>(
+                .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<FileInfo>>>(
                     ValidationResult(UnableToFindMetadataFileToDelete)));
             var controller = ReleasesControllerWithMocks(mocks);
 

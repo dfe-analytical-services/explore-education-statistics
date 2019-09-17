@@ -5,7 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-
 namespace GovUk.Education.ExploreEducationStatistics.Common.Converters
 {
     public class TimeIdentifierJsonConverter : JsonConverter<TimeIdentifier?>
