@@ -1,4 +1,9 @@
 import 'cross-fetch/polyfill';
+import 'custom-event-polyfill/polyfill';
+
+if (typeof window.Event === 'undefined') {
+  window.Event = window.CustomEvent;
+}
 
 if (typeof Promise === 'undefined') {
   window.Promise = require('core-js/fn/promise');
