@@ -1,8 +1,8 @@
 import 'cross-fetch/polyfill';
-import 'custom-event-polyfill/polyfill'
+import 'custom-event-polyfill/polyfill';
 
 if (typeof window.Event === 'undefined') {
-    window.Event = window.CustomEvent;
+  window.Event = window.CustomEvent;
 }
 
 if (typeof Promise === 'undefined') {
