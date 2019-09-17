@@ -5,7 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels
 {
     public class PublicationTree
-
     {
         public Guid Id { get; set; }
         public string Title { get; set; }
