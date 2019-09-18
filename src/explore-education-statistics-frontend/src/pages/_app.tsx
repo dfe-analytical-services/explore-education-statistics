@@ -8,7 +8,6 @@ import Helmet from 'react-helmet';
 import './_app.scss';
 import { CookiesProvider, Cookies } from 'react-cookie';
 import { NextContext } from 'next';
-import 'custom-event-polyfill/polyfill';
 
 process.env.APP_ROOT_ID = '__next';
 
@@ -43,10 +42,6 @@ class App extends BaseApp<Props> {
   }
 
   public componentDidMount() {
-    if (typeof (window as any).Event === 'undefined') {
-      (window as any).Event = (window as any).CustomEvent;
-    }
-
     logPageView();
     initHotJar();
     initApplicationInsights();
