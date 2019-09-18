@@ -43,7 +43,6 @@ class App extends BaseApp<Props> {
   }
 
   public componentDidMount() {
-
     if (typeof (window as any).Event === 'undefined') {
       (window as any).Event = (window as any).CustomEvent;
     }
