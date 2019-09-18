@@ -99,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             
             if (!overwrite && blobContainer.GetBlockBlobReference(dataFilePath).Exists())
             {
-                return ValidationResult(CannotOverwriteDataFile);
+                return ValidationResult(CannotOverwriteMetadataFile);
             }
 
             if (!overwrite && blobContainer.GetBlockBlobReference(metadataFilePath).Exists())
