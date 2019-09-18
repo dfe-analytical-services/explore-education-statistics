@@ -52,6 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 
             CreateMap<DataBlock, DataBlockViewModel>();
             CreateMap<CreateDataBlockViewModel, DataBlock>();
+            CreateMap<UpdateDataBlockViewModel, DataBlock>();
         }
     }
 }

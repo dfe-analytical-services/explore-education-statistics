@@ -48,5 +48,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var releases = await _context.DataBlocks.Where(block => block.ReleaseId.Equals(releaseId)).ToListAsync();
             return _mapper.Map<List<DataBlockViewModel>>(releases);
         }
+
+        public async Task<DataBlockViewModel> UpdateAsync(DataBlockId id, UpdateDataBlockViewModel updateDataBlock)
+        {
+            var existing = await _context.DataBlocks.FirstOrDefaultAsync(block => block.Id.Equals(id));
+            _context.DataBlocks.Update(existing);
+            _mapper.Map(updateDataBlock, existing);
+            await _context.SaveChangesAsync();
+            return await GetAsync(id);
+        }
     }
 }
