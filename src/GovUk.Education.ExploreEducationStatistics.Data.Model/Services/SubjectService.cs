@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.Extensions.Logging;
+using ReleaseId = System.Guid;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
@@ -25,6 +27,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 throw new ArgumentException("Subject does not exist", nameof(subjectId));
             }
             return _releaseService.GetLatestRelease(subject.Release.PublicationId).Equals(subject.ReleaseId);
+        }
+        
+        public bool Exists(ReleaseId id, string name)
+        {
+            return _context.Subject.Any(x => x.ReleaseId == id && x.Name == name);
         }
     }
 }

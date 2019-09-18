@@ -106,6 +106,11 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
       'metadataFile',
       'Meta file must be a csv file',
     ),
+    errorCodeToFieldError(
+      'SUBJECT_TITLE_MUST_BE_UNIQUE',
+      'subjectTitle',
+      'Subject title must be unique',
+    ),
   );
 
   return (
@@ -126,7 +131,20 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
         await resetPage(actions);
       }}
       validationSchema={Yup.object<FormValues>({
-        subjectTitle: Yup.string().required('Enter a subject title'),
+        subjectTitle: Yup.string()
+          .required('Enter a subject title')
+          .test('unique', 'Subject title must be unique', function unique(
+            value: string,
+          ) {
+            if (!value) {
+              return true;
+            }
+            return (
+              dataFiles.find(
+                f => f.title.toUpperCase() === value.toUpperCase(),
+              ) === undefined
+            );
+          }),
         dataFile: Yup.mixed().required('Choose a data file'),
         metadataFile: Yup.mixed().required('Choose a metadata file'),
       })}

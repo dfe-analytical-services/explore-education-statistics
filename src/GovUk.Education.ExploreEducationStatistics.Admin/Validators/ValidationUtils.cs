@@ -59,6 +59,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
                     return new ValidationResult("DATA_FILE_MUST_BE_A_CSV_FILE");
                 case MetaFileMustBeCsvFile: 
                     return new ValidationResult("META_FILE_MUST_BE_A_CSV_FILE");
+                case SubjectTitleMustBeUnique: 
+                    return new ValidationResult("SUBJECT_TITLE_MUST_BE_UNIQUE");
                 default:
                     throw new ArgumentOutOfRangeException(nameof(message), message, null);
             }
@@ -81,6 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         CannotOverwriteMetadataFile,
         DataAndMetadataFilesCannotHaveTheSameName,
         DataFileMustBeCsvFile,
-        MetaFileMustBeCsvFile
+        MetaFileMustBeCsvFile,
+        SubjectTitleMustBeUnique
     }
 }
