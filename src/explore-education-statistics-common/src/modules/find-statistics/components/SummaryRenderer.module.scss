@@ -10,7 +10,7 @@
   display: flex;
   flex: 1 0 32.3%;
   flex-direction: column;
-  margin: 0.5% 0.5% 1.5%;
+  margin: 0.5% 0.5% 0;
   max-width: 32.3;
   @media print {
     display: block;
@@ -25,7 +25,7 @@
   .keyStat {
     background: $govuk-brand-colour;
     color: govuk-colour('white');
-    flex-basis: 8rem;
+    flex: 1 0 auto;
     padding: 0.7rem 1rem;
 
     @include govuk-media-query($until: tablet) {
@@ -68,6 +68,15 @@
   details {
     font-size: 1rem;
     margin: 0 0.5rem 0 0;
+    min-height: 7.5rem;
     padding-top: 0.5rem;
+
+    @include govuk-media-query($until: tablet) {
+      min-height: auto;
+    }
   }
+}
+
+.keyStatTile :global(.govuk-details__text) {
+  padding: 0 20px;
 }
