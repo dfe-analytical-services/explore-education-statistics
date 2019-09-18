@@ -1,0 +1,9 @@
+time_period,time_identifier,geographic_level,country_code,country_name,pcon_code,pcon_name,school_type,gender,admission_numbers
+2018,Calendar year,Parliamentary constituency,E92000001,England,E14000895,Richmond (Yorks),State-funded primary,Male,16659
+2018,Calendar year,Parliamentary constituency,E92000001,England,E14000895,Richmond (Yorks),State-funded secondary,Female,3017
+2018,Calendar year,Parliamentary constituency,E92000001,England,E14000895,Richmond (Yorks),Special,Male,14020
+2018,Calendar year,Parliamentary constituency,E92000001,England,E14000895,Richmond (Yorks),Special,Female,2590
+2017,Calendar year,Parliamentary constituency,E92000001,England,E14000895,Richmond (Yorks),State-funded primary,Male,16688
+2017,Calendar year,Parliamentary constituency,E92000001,England,E14000895,Richmond (Yorks),State-funded secondary,Female,3053
+2017,Calendar year,Parliamentary constituency,E92000001,England,E14000895,Richmond (Yorks),Special,Male,14120
+2017,Calendar year,Parliamentary constituency,E92000001,England,E14000895,Richmond (Yorks),Special,Female,2555
