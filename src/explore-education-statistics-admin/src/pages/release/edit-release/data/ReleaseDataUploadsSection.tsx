@@ -15,6 +15,7 @@ import Yup from '@common/lib/validation/yup';
 import { FormikActions, FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
 import ImporterStatus from '@admin/components/ImporterStatus';
+import { ImportStatusCode } from '@admin/services/release/imports/types';
 
 interface FormValues {
   subjectTitle: string;
@@ -30,7 +31,7 @@ interface Props {
 const formId = 'dataFileUploadForm';
 
 const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
-  const [dataFiles, setDataFiles] = useState<DataFile[]>();
+  const [dataFiles, setDataFiles] = useState<DataFile[]>([]);
   const [deleteFileName, setDeleteFileName] = useState('');
 
   useEffect(() => {
@@ -49,6 +50,24 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
 
     const files = await service.getReleaseDataFiles(releaseId);
     setDataFiles(files);
+  };
+
+  const statusChangeHandler = async (
+    dataFile: DataFile,
+    importstatusCode: ImportStatusCode,
+  ) => {
+    const updatedDataFiles = [...dataFiles];
+    const updatedFile = updatedDataFiles.find(
+      file => file.filename === dataFile.filename,
+    );
+
+    if (!updatedFile) {
+      return;
+    }
+    updatedFile.canDelete =
+      importstatusCode &&
+      (importstatusCode === 'COMPLETE' || importstatusCode === 'FAILED');
+    setDataFiles(updatedDataFiles);
   };
 
   const handleServerValidation = handleServerSideValidation(
@@ -114,46 +133,47 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
       render={(form: FormikProps<FormValues>) => {
         return (
           <Form id={formId} submitValidationHandler={handleServerValidation}>
-            {dataFiles &&
-              dataFiles.map(dataFile => (
-                <SummaryList
-                  key={dataFile.filename}
-                  additionalClassName="govuk-!-margin-bottom-9"
-                >
-                  <SummaryListItem term="Subject title">
-                    <h4 className="govuk-heading-m">{dataFile.title}</h4>
-                  </SummaryListItem>
-                  <SummaryListItem term="Data file">
-                    <a
-                      href={service.createDownloadDataFileLink(
-                        releaseId,
-                        dataFile.filename,
-                      )}
-                    >
-                      {dataFile.filename}
-                    </a>
-                  </SummaryListItem>
-                  <SummaryListItem term="Filesize">
-                    {dataFile.fileSize.size.toLocaleString()}{' '}
-                    {dataFile.fileSize.unit}
-                  </SummaryListItem>
-                  <SummaryListItem term="Number of rows">
-                    {dataFile.numberOfRows.toLocaleString()}
-                  </SummaryListItem>
-                  <SummaryListItem term="Metadata file">
-                    <a
-                      href={service.createDownloadDataMetadataFileLink(
-                        releaseId,
-                        dataFile.filename,
-                      )}
-                    >
-                      {dataFile.metadataFilename}
-                    </a>
-                  </SummaryListItem>
-                  <ImporterStatus
-                    releaseId={releaseId}
-                    datafileName={dataFile.filename}
-                  />
+            {dataFiles.map(dataFile => (
+              <SummaryList
+                key={dataFile.filename}
+                additionalClassName="govuk-!-margin-bottom-9"
+              >
+                <SummaryListItem term="Subject title">
+                  <h4 className="govuk-heading-m">{dataFile.title}</h4>
+                </SummaryListItem>
+                <SummaryListItem term="Data file">
+                  <a
+                    href={service.createDownloadDataFileLink(
+                      releaseId,
+                      dataFile.filename,
+                    )}
+                  >
+                    {dataFile.filename}
+                  </a>
+                </SummaryListItem>
+                <SummaryListItem term="Filesize">
+                  {dataFile.fileSize.size.toLocaleString()}{' '}
+                  {dataFile.fileSize.unit}
+                </SummaryListItem>
+                <SummaryListItem term="Number of rows">
+                  {dataFile.numberOfRows.toLocaleString()}
+                </SummaryListItem>
+                <SummaryListItem term="Metadata file">
+                  <a
+                    href={service.createDownloadDataMetadataFileLink(
+                      releaseId,
+                      dataFile.filename,
+                    )}
+                  >
+                    {dataFile.metadataFilename}
+                  </a>
+                </SummaryListItem>
+                <ImporterStatus
+                  releaseId={releaseId}
+                  dataFile={dataFile}
+                  onStatusChangeHandler={statusChangeHandler}
+                />
+                {dataFile.canDelete && (
                   <SummaryListItem
                     term="Actions"
                     actions={
@@ -165,8 +185,9 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                       </Link>
                     }
                   />
-                </SummaryList>
-              ))}
+                )}
+              </SummaryList>
+            ))}
             <FormFieldset
               id={`${formId}-allFieldsFieldset`}
               legend="Add new data to release"
