@@ -6,14 +6,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
-using MimeDetective;
-using MimeDetective.Extensions;
-using MimeMapping;
 using MimeTypes;
 using static System.StringComparison;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -322,12 +320,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
         private static bool IsCsvFile(string filePath, Stream fileStream)
         {
+            if (!filePath.EndsWith(".csv"))
+            {
+                return false;
+            }
             using (var reader = new StreamReader(fileStream))
             {
-                Stream fileDataStream = reader.BaseStream;
-                FileType fileType = fileDataStream.GetFileType();
-                return MimeUtility.GetMimeMapping(filePath).Equals("text/csv") 
-                       && (fileType.Mime.StartsWith("text") || fileType.Mime.StartsWith("txt"));
+                return reader.BaseStream.IsTextFile();
             }
         }
     }
