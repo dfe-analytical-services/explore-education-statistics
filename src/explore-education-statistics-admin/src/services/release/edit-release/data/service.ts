@@ -85,6 +85,7 @@ const service: EditReleaseService = {
             metadataFilename: associatedMetadataFile
               ? getFileNameFromPath(associatedMetadataFile.path)
               : '',
+            canDelete: true,
           };
         });
       });
