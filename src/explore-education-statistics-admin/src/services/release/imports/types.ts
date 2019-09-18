@@ -9,6 +9,7 @@ export interface ImportStatus {
   status: ImportStatusCode;
   percentageComplete?: string;
   errors?: string[];
+  numberOfRows: number;
 }
 
 export default {};

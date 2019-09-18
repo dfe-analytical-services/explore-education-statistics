@@ -55,6 +55,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
   const statusChangeHandler = async (
     dataFile: DataFile,
     importstatusCode: ImportStatusCode,
+    numberOfRows: number,
   ) => {
     const updatedDataFiles = [...dataFiles];
     const updatedFile = updatedDataFiles.find(
@@ -67,6 +68,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
     updatedFile.canDelete =
       importstatusCode &&
       (importstatusCode === 'COMPLETE' || importstatusCode === 'FAILED');
+    updatedFile.numberOfRows = numberOfRows;
     setDataFiles(updatedDataFiles);
   };
 

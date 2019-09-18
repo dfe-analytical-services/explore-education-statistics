@@ -18,7 +18,11 @@ interface State {
 interface Props {
   releaseId: string;
   dataFile: DataFile;
-  onStatusChangeHandler: (datafile: DataFile, status: ImportStatusCode) => void;
+  onStatusChangeHandler: (
+    datafile: DataFile,
+    status: ImportStatusCode,
+    numberOfRows: number,
+  ) => void;
 }
 
 export const getImportStatusLabel = (importstatusCode: ImportStatusCode) => {
@@ -44,7 +48,7 @@ class ImporterStatus extends Component<Props> {
     current: undefined,
   };
 
-  private intervalId?: any;
+  private intervalId?: NodeJS.Timeout;
 
   public componentDidMount() {
     this.fetchImportStatus();
@@ -100,7 +104,7 @@ class ImporterStatus extends Component<Props> {
           }),
       )
       .catch(
-        error =>
+        () =>
           this.intervalId &&
           this.setState({
             current: null,
@@ -110,7 +114,11 @@ class ImporterStatus extends Component<Props> {
       .finally(() => {
         const { current } = this.state;
         const currentStatus: ImportStatus = (current as unknown) as ImportStatus;
-        onStatusChangeHandler(dataFile, currentStatus.status);
+        onStatusChangeHandler(
+          dataFile,
+          currentStatus.status,
+          currentStatus.numberOfRows,
+        );
       });
   }
 
