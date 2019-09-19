@@ -226,12 +226,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
             mocks.ReleaseService.Setup(s => s.GetAsync(It.IsAny<Guid>()))
                 .Returns(Task.FromResult(new Release {Id = releaseId}));
             mocks.FileStorageService
-                .Setup(service => service.DeleteDataFileAsync(releaseId, "datafilename"))
+                .Setup(service => service.DeleteDataFileAsync(releaseId, "datafilename","subject title"))
                 .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<FileInfo>>>(new List<FileInfo>()));
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Call the method under test
-            var result = await controller.DeleteDataFiles(releaseId, "datafilename");
+            var result = await controller.DeleteDataFiles(releaseId, "datafilename","subject title");
             var unboxed = AssertOkResult(result);
             Assert.NotNull(unboxed);
         }
@@ -244,13 +244,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
             mocks.ReleaseService.Setup(s => s.GetAsync(It.IsAny<Guid>()))
                 .Returns(Task.FromResult(new Release {Id = releaseId}));
             mocks.FileStorageService
-                .Setup(service => service.DeleteDataFileAsync(releaseId, "datafilename"))
+                .Setup(service => service.DeleteDataFileAsync(releaseId, "datafilename","subject title"))
                 .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<FileInfo>>>(
                     ValidationResult(UnableToFindMetadataFileToDelete)));
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Call the method under test
-            var result = await controller.DeleteDataFiles(releaseId, "datafilename");
+            var result = await controller.DeleteDataFiles(releaseId, "datafilename","subject title");
             AssertValidationProblem(result, UnableToFindMetadataFileToDelete);
         }
 
