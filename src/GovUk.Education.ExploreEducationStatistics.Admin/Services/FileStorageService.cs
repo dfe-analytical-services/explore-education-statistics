@@ -6,7 +6,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -27,6 +29,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         private readonly string _storageConnectionString;
 
+        private readonly ISubjectService _subjectService;
+
         private const string ContainerName = "releases";
 
         private const string NameKey = "name";
@@ -41,9 +45,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Tb
         }
 
-        public FileStorageService(IConfiguration config)
+        public FileStorageService(IConfiguration config, ISubjectService subjectService)
         {
             _storageConnectionString = config.GetConnectionString("CoreStorage");
+            _subjectService = subjectService;
         }
 
         public async Task<IEnumerable<FileInfo>> ListFilesAsync(Guid releaseId, ReleaseFileTypes type)
@@ -57,15 +62,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var blobContainer = await GetCloudBlobContainer();
             var dataInfo = new Dictionary<string, string> {{NameKey, name}, {MetaFileKey, metadataFile.FileName}};
             var metaDataInfo = new Dictionary<string, string> {{DataFileKey, dataFile.FileName}};
-            return await ValidateDataFilesForUpload(blobContainer, releaseId, dataFile, metadataFile, overwrite)
+            return await ValidateDataFilesForUpload(blobContainer, releaseId, dataFile, metadataFile, name, overwrite)
                 .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, dataFile, ReleaseFileTypes.Data, dataInfo, overwrite))
                 .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, metadataFile, ReleaseFileTypes.Data, metaDataInfo, overwrite))
                 .OnSuccess(() => ListFilesAsync(releaseId, ReleaseFileTypes.Data));
         }
 
         // We cannot rely on the normal upload validation as we want this to be an atomic operation for both files.
-        private static async Task<Either<ValidationResult,bool>> ValidateDataFilesForUpload(CloudBlobContainer blobContainer, Guid releaseId,
-            IFormFile dataFile, IFormFile metaFile, bool overwrite)
+        private async Task<Either<ValidationResult,bool>> ValidateDataFilesForUpload(CloudBlobContainer blobContainer, Guid releaseId,
+            IFormFile dataFile, IFormFile metaFile, string name, bool overwrite)
         {
             if (string.Equals(dataFile.FileName, metaFile.FileName, OrdinalIgnoreCase))
             {
@@ -102,13 +107,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 return ValidationResult(CannotOverwriteMetadataFile);
             }
+
+            if (_subjectService.Exists(releaseId, name))
+            {
+                return ValidationResult(SubjectTitleMustBeUnique); 
+            }
+            
             return true;
         }
         
         public async Task<Either<ValidationResult, IEnumerable<FileInfo>>> DeleteDataFileAsync(Guid releaseId,
             string fileName)
         {
-            // TODO what are the conditions in which we allow deletion?
             var blobContainer = await GetCloudBlobContainer();
             // Get the paths of the files to delete
             return await DataPathsForDeletion(blobContainer, releaseId, fileName)

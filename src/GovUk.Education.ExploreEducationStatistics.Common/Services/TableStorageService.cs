@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using Microsoft.Azure.Cosmos.Table;
@@ -11,7 +12,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         public TableStorageService(string connectionString)
         {
             var account = CloudStorageAccount.Parse(connectionString);
-
             _client = account.CreateCloudTableClient();
         }
 
@@ -31,6 +31,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             }
 
             return table;
+        }
+        
+        public async Task<TableResult> DeleteEntityAsync(string tableName, ITableEntity entity)
+        {
+            var table = _client.GetTableReference(tableName);
+            entity.ETag = "*";
+            return await table.ExecuteAsync(TableOperation.Delete(entity));
+        }
+        
+        public async Task<TableResult> RetrieveEntity(string tableName, ITableEntity entity, List<string> columns)
+        {
+            var table = _client.GetTableReference(tableName);
+            return await table.ExecuteAsync(TableOperation.Retrieve(entity.PartitionKey,entity.RowKey, columns));
+        }
+        
+        public async Task<TableResult> UpdateEntity(string tableName, ITableEntity entity)
+        {
+            var table = _client.GetTableReference(tableName);
+            return await table.ExecuteAsync(TableOperation.InsertOrReplace(entity));
         }
     }
 }

@@ -30,9 +30,18 @@ interface Props {
 
 const formId = 'dataFileUploadForm';
 
+const emptyDataFile: DataFile = {
+  canDelete: false,
+  fileSize: { size: 0, unit: '' },
+  filename: '',
+  metadataFilename: '',
+  numberOfRows: 0,
+  title: '',
+};
+
 const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
   const [dataFiles, setDataFiles] = useState<DataFile[]>([]);
-  const [deleteFileName, setDeleteFileName] = useState('');
+  const [deleteDataFile, setDeleteDataFile] = useState<DataFile>(emptyDataFile);
 
   useEffect(() => {
     service.getReleaseDataFiles(releaseId).then(setDataFiles);
@@ -106,6 +115,11 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
       'metadataFile',
       'Meta file must be a csv file',
     ),
+    errorCodeToFieldError(
+      'SUBJECT_TITLE_MUST_BE_UNIQUE',
+      'subjectTitle',
+      'Subject title must be unique',
+    ),
   );
 
   return (
@@ -126,7 +140,20 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
         await resetPage(actions);
       }}
       validationSchema={Yup.object<FormValues>({
-        subjectTitle: Yup.string().required('Enter a subject title'),
+        subjectTitle: Yup.string()
+          .required('Enter a subject title')
+          .test('unique', 'Subject title must be unique', function unique(
+            value: string,
+          ) {
+            if (!value) {
+              return true;
+            }
+            return (
+              dataFiles.find(
+                f => f.title.toUpperCase() === value.toUpperCase(),
+              ) === undefined
+            );
+          }),
         dataFile: Yup.mixed().required('Choose a data file'),
         metadataFile: Yup.mixed().required('Choose a metadata file'),
       })}
@@ -177,10 +204,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                   <SummaryListItem
                     term="Actions"
                     actions={
-                      <Link
-                        to="#"
-                        onClick={() => setDeleteFileName(dataFile.filename)}
-                      >
+                      <Link to="#" onClick={() => setDeleteDataFile(dataFile)}>
                         Delete files
                       </Link>
                     }
@@ -225,13 +249,13 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
             </div>
 
             <ModalConfirm
-              mounted={deleteFileName != null && deleteFileName.length > 0}
+              mounted={deleteDataFile && deleteDataFile.title.length > 0}
               title="Confirm deletion of selected data files"
-              onExit={() => setDeleteFileName('')}
-              onCancel={() => setDeleteFileName('')}
+              onExit={() => setDeleteDataFile(emptyDataFile)}
+              onCancel={() => setDeleteDataFile(emptyDataFile)}
               onConfirm={async () => {
-                await service.deleteDataFiles(releaseId, deleteFileName);
-                setDeleteFileName('');
+                await service.deleteDataFiles(releaseId, deleteDataFile);
+                setDeleteDataFile(emptyDataFile);
                 resetPage(form);
               }}
             >
