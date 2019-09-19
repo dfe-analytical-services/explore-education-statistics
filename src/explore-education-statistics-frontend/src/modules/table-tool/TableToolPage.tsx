@@ -496,8 +496,8 @@ class TableToolPage extends Component<Props, State> {
                           <ul className="govuk-list">
                             <li>
                               <Link
-                                as={`/statistics/${publication.slug}`}
-                                to={`/statistics/publication?publication=${publication.slug}`}
+                                as={`/find-statistics/${publication.slug}`}
+                                to={`/find-statistics/publication?publication=${publication.slug}`}
                               >
                                 Go to publication
                               </Link>
