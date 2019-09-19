@@ -100,12 +100,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             
             if (!overwrite && blobContainer.GetBlockBlobReference(dataFilePath).Exists())
             {
-                return ValidationResult(CannotOverwriteMetadataFile);
+                return ValidationResult(CannotOverwriteDataFile);
             }
 
             if (!overwrite && blobContainer.GetBlockBlobReference(metadataFilePath).Exists())
             {
-                return ValidationResult(SubjectTitleMustBeUnique);
+                return ValidationResult(CannotOverwriteMetadataFile);
             }
 
             if (_subjectService.Exists(releaseId, name))
