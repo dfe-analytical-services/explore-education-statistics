@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             IFormFile dataFile, string name, ReleaseFileTypes type, bool overwrite);
         Task<Either<ValidationResult, IEnumerable<FileInfo>>> DeleteFileAsync(ReleaseId releaseId, ReleaseFileTypes type, string fileName);
         
-        Task<Either<ValidationResult, IEnumerable<FileInfo>>> DeleteDataFileAsync(ReleaseId releaseId, string fileName);
+        Task<Either<ValidationResult, IEnumerable<FileInfo>>> DeleteDataFileAsync(ReleaseId releaseId, string fileName, string subjectTitle);
 
         Task<Either<ValidationResult, FileStreamResult>> StreamFile(ReleaseId releaseId, ReleaseFileTypes type, string fileName);
     }

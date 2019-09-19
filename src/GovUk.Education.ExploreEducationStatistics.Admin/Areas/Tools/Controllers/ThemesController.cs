@@ -133,7 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Tools.Controlle
             if (theme == null)
             {
                 return NotFound();
-            }
+            }Remove
 
             return View(theme);
         }

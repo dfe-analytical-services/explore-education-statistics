@@ -30,9 +30,18 @@ interface Props {
 
 const formId = 'dataFileUploadForm';
 
+const emptyDataFile: DataFile = {
+  canDelete: false,
+  fileSize: { size: 0, unit: '' },
+  filename: '',
+  metadataFilename: '',
+  numberOfRows: 0,
+  title: '',
+};
+
 const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
   const [dataFiles, setDataFiles] = useState<DataFile[]>([]);
-  const [deleteFileName, setDeleteFileName] = useState('');
+  const [deleteDataFile, setDeleteDataFile] = useState<DataFile>(emptyDataFile);
 
   useEffect(() => {
     service.getReleaseDataFiles(releaseId).then(setDataFiles);
@@ -195,10 +204,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                   <SummaryListItem
                     term="Actions"
                     actions={
-                      <Link
-                        to="#"
-                        onClick={() => setDeleteFileName(dataFile.filename)}
-                      >
+                      <Link to="#" onClick={() => setDeleteDataFile(dataFile)}>
                         Delete files
                       </Link>
                     }
@@ -243,13 +249,13 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
             </div>
 
             <ModalConfirm
-              mounted={deleteFileName != null && deleteFileName.length > 0}
+              mounted={deleteDataFile && deleteDataFile.title.length > 0}
               title="Confirm deletion of selected data files"
-              onExit={() => setDeleteFileName('')}
-              onCancel={() => setDeleteFileName('')}
+              onExit={() => setDeleteDataFile(emptyDataFile)}
+              onCancel={() => setDeleteDataFile(emptyDataFile)}
               onConfirm={async () => {
-                await service.deleteDataFiles(releaseId, deleteFileName);
-                setDeleteFileName('');
+                await service.deleteDataFiles(releaseId, deleteDataFile);
+                setDeleteDataFile(emptyDataFile);
                 resetPage(form);
               }}
             >

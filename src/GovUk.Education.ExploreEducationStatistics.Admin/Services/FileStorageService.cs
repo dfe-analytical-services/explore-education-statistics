@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -29,6 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly string _storageConnectionString;
 
         private readonly ISubjectService _subjectService;
+        private readonly ITableStorageService _tableStorageService;
 
         private const string ContainerName = "releases";
 
@@ -44,10 +46,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Tb
         }
 
-        public FileStorageService(IConfiguration config, ISubjectService subjectService)
+        public FileStorageService(IConfiguration config, ISubjectService subjectService, ITableStorageService tableStorageService)
         {
             _storageConnectionString = config.GetConnectionString("CoreStorage");
             _subjectService = subjectService;
+            _tableStorageService = tableStorageService;
         }
 
         public async Task<IEnumerable<FileInfo>> ListFilesAsync(Guid releaseId, ReleaseFileTypes type)
@@ -116,7 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
         
         public async Task<Either<ValidationResult, IEnumerable<FileInfo>>> DeleteDataFileAsync(Guid releaseId,
-            string fileName)
+            string fileName, string subjectTitle)
         {
             // TODO what are the conditions in which we allow deletion?
             var blobContainer = await GetCloudBlobContainer();
@@ -128,6 +131,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return DeleteFileAsync(blobContainer, path.dataFilePath)
                         // and the metadata file
                         .OnSuccess(() => DeleteFileAsync(blobContainer, path.metadataFilePath))
+                        // and the import tracking entry
+                        .OnSuccess(() => _tableStorageService.DeleteEntityAsync("imports", new DatafileImport(releaseId.ToString(), fileName,0)))
+                        // and delete subject
+                        .OnSuccess(() => _subjectService.DeleteAsync(releaseId, subjectTitle))
                         // and return the remaining files
                         .OnSuccess(() => ListFilesAsync(releaseId, ReleaseFileTypes.Data));
                 });

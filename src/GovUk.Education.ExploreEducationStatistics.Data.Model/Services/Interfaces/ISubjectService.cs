@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using ReleaseId = System.Guid;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces
@@ -6,6 +7,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
     {
         bool IsSubjectForLatestRelease(long subjectId);
 
-        bool Exists(ReleaseId id, string name);
+        bool Exists(ReleaseId releaseId, string name);
+
+        Task DeleteAsync(ReleaseId releaseId, string name);
     }
 }

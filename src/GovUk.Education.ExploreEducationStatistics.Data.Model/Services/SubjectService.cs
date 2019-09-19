@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Linq;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using ReleaseId = System.Guid;
 
@@ -29,9 +31,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             return _releaseService.GetLatestRelease(subject.Release.PublicationId).Equals(subject.ReleaseId);
         }
         
-        public bool Exists(ReleaseId id, string name)
+        public bool Exists(ReleaseId releaseId, string name)
         {
-            return _context.Subject.Any(x => x.ReleaseId == id && x.Name == name);
+            return _context.Subject.Any(x => x.ReleaseId == releaseId && x.Name == name);
+        }
+        
+        public async Task DeleteAsync(ReleaseId releaseId, string name)
+        {
+            var subject = await _context.Subject.FirstOrDefaultAsync(s => s.ReleaseId == releaseId && s.Name == name);
+            if (subject != null)
+            {
+                _context.Subject.Remove(subject);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

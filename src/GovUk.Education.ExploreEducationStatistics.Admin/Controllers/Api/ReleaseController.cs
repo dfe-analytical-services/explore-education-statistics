@@ -209,11 +209,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return Ok(await _importStatusService.GetImportStatus(releaseId.ToString(), fileName));
         }
 
-        [HttpDelete("release/{releaseId}/data/{fileName}")]
-        public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteDataFiles(ReleaseId releaseId, string fileName)
+        [HttpDelete("release/{releaseId}/data/{fileName}/{subjectTitle}")]
+        public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteDataFiles(ReleaseId releaseId, string fileName, string subjectTitle)
         {
             return await CheckReleaseExistsAsync(releaseId,
-                () => _fileStorageService.DeleteDataFileAsync(releaseId, fileName));
+                () => _fileStorageService.DeleteDataFileAsync(releaseId, fileName, subjectTitle));
         }
 
         // DELETE api/release/{releaseId}/ancillary/{fileName}
