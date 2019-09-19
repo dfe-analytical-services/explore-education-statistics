@@ -38,12 +38,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         
         public async Task DeleteAsync(ReleaseId releaseId, string name)
         {
-            var subject = await _context.Subject.FirstOrDefaultAsync(s => s.ReleaseId == releaseId && s.Name == name);
+            var subject = await GetAsync(releaseId, name);
             if (subject != null)
             {
                 _context.Subject.Remove(subject);
                 await _context.SaveChangesAsync();
             }
+        }
+        
+        public async Task<Subject> GetAsync(ReleaseId releaseId, string name)
+        {
+            return await _context.Subject.FirstOrDefaultAsync(s => s.ReleaseId == releaseId && s.Name == name);
         }
     }
 }

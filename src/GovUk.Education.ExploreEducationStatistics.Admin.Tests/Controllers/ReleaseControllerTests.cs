@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -17,6 +18,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using FileInfo = GovUk.Education.ExploreEducationStatistics.Admin.Models.FileInfo;
+using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
 {
@@ -226,7 +228,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
             mocks.ReleaseService.Setup(s => s.GetAsync(It.IsAny<Guid>()))
                 .Returns(Task.FromResult(new Release {Id = releaseId}));
             mocks.FileStorageService
-                .Setup(service => service.DeleteDataFileAsync(releaseId, "datafilename","subject title"))
+                .Setup(service => service.DeleteDataFileAsync(releaseId, "datafilename"))
                 .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<FileInfo>>>(new List<FileInfo>()));
             var controller = ReleasesControllerWithMocks(mocks);
 
@@ -244,7 +246,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
             mocks.ReleaseService.Setup(s => s.GetAsync(It.IsAny<Guid>()))
                 .Returns(Task.FromResult(new Release {Id = releaseId}));
             mocks.FileStorageService
-                .Setup(service => service.DeleteDataFileAsync(releaseId, "datafilename","subject title"))
+                .Setup(service => service.DeleteDataFileAsync(releaseId, "datafilename"))
                 .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<FileInfo>>>(
                     ValidationResult(UnableToFindMetadataFileToDelete)));
             var controller = ReleasesControllerWithMocks(mocks);
@@ -359,27 +361,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
             Mock<IReleaseService> ReleaseService,
             Mock<IFileStorageService> FileStorageService,
             Mock<IPublicationService> PublicationService,
-            Mock<IImportStatusService> ImportStatusService) Mocks()
+            Mock<IImportStatusService> ImportStatusService,
+            Mock<ISubjectService> SubjectService,
+            Mock<ITableStorageService> TableStorageService) Mocks()
         {
             return (new Mock<IImportService>(),
                     new Mock<IReleaseService>(),
                     new Mock<IFileStorageService>(),
                     new Mock<IPublicationService>(),
-                    new Mock<IImportStatusService>()
+                    new Mock<IImportStatusService>(),
+                    new Mock<ISubjectService>(),
+                    new Mock<ITableStorageService>()
                 );
         }
 
-        private static ReleasesController ReleasesControllerWithMocks((Mock<IImportService> ImportService,
+        private static ReleasesController ReleasesControllerWithMocks((
+            Mock<IImportService> ImportService,
             Mock<IReleaseService> ReleaseService,
             Mock<IFileStorageService> FileStorageService,
             Mock<IPublicationService> PublicationService,
-            Mock<IImportStatusService> ImportStatusService) mocks)
+            Mock<IImportStatusService> ImportStatusService,
+            Mock<ISubjectService> SubjectService,
+            Mock<ITableStorageService> TableStorageService) mocks)
         {
             return new ReleasesController(mocks.ImportService.Object,
                 mocks.ReleaseService.Object,
                 mocks.FileStorageService.Object,
                 mocks.PublicationService.Object,
-                mocks.ImportStatusService.Object);
+                mocks.ImportStatusService.Object,
+                mocks.SubjectService.Object,
+                mocks.TableStorageService.Object);
         }
     }
 }

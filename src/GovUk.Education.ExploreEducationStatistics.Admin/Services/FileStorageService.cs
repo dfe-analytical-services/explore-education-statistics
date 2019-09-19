@@ -30,7 +30,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly string _storageConnectionString;
 
         private readonly ISubjectService _subjectService;
-        private readonly ITableStorageService _tableStorageService;
 
         private const string ContainerName = "releases";
 
@@ -46,11 +45,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Tb
         }
 
-        public FileStorageService(IConfiguration config, ISubjectService subjectService, ITableStorageService tableStorageService)
+        public FileStorageService(IConfiguration config, ISubjectService subjectService)
         {
             _storageConnectionString = config.GetConnectionString("CoreStorage");
             _subjectService = subjectService;
-            _tableStorageService = tableStorageService;
         }
 
         public async Task<IEnumerable<FileInfo>> ListFilesAsync(Guid releaseId, ReleaseFileTypes type)
@@ -119,9 +117,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
         
         public async Task<Either<ValidationResult, IEnumerable<FileInfo>>> DeleteDataFileAsync(Guid releaseId,
-            string fileName, string subjectTitle)
+            string fileName)
         {
-            // TODO what are the conditions in which we allow deletion?
             var blobContainer = await GetCloudBlobContainer();
             // Get the paths of the files to delete
             return await DataPathsForDeletion(blobContainer, releaseId, fileName)
@@ -131,10 +128,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return DeleteFileAsync(blobContainer, path.dataFilePath)
                         // and the metadata file
                         .OnSuccess(() => DeleteFileAsync(blobContainer, path.metadataFilePath))
-                        // and the import tracking entry
-                        .OnSuccess(() => _tableStorageService.DeleteEntityAsync("imports", new DatafileImport(releaseId.ToString(), fileName,0)))
-                        // and delete subject
-                        .OnSuccess(() => _subjectService.DeleteAsync(releaseId, subjectTitle))
                         // and return the remaining files
                         .OnSuccess(() => ListFilesAsync(releaseId, ReleaseFileTypes.Data));
                 });
