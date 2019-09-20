@@ -3,12 +3,10 @@ DROP TABLE Link;
 DROP TABLE ReleaseSummaryVersions;
 DROP TABLE [Update];
 DROP TABLE ReleaseSummaries;
-alter table ContentBlock
-    drop constraint FK_ContentBlock_Releases_DataBlock_ReleaseId
-go
-alter table ContentBlock
-    drop constraint FK_ContentBlock_ContentSections_ContentSectionId
-go
+ALTER TABLE ContentBlock
+DROP CONSTRAINT FK_ContentBlock_Releases_DataBlock_ReleaseId
+ALTER TABLE ContentBlock
+DROP CONSTRAINT FK_ContentBlock_ContentSections_ContentSectionId
 DROP TABLE ContentSections;
 DROP TABLE Releases;
 DROP TABLE ReleaseTypes;
