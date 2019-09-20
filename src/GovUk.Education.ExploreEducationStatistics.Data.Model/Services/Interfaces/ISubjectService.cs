@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
 
         bool Exists(ReleaseId releaseId, string name);
 
-        Task DeleteAsync(ReleaseId releaseId, string name);
+        Task<bool> DeleteAsync(ReleaseId releaseId, string name);
 
         Task<Subject> GetAsync(ReleaseId releaseId, string name);
     }
