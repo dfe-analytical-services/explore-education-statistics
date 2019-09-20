@@ -35,7 +35,7 @@ const emptyDataFile: DataFile = {
   fileSize: { size: 0, unit: '' },
   filename: '',
   metadataFilename: '',
-  numberOfRows: 0,
+  rows: 0,
   title: '',
 };
 
