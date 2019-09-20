@@ -18,11 +18,7 @@ interface State {
 interface Props {
   releaseId: string;
   dataFile: DataFile;
-  onStatusChangeHandler: (
-    datafile: DataFile,
-    status: ImportStatusCode,
-    numberOfRows: number,
-  ) => void;
+  onStatusChangeHandler: (datafile: DataFile, status: ImportStatusCode) => void;
 }
 
 export const getImportStatusLabel = (importstatusCode: ImportStatusCode) => {
@@ -114,11 +110,7 @@ class ImporterStatus extends Component<Props> {
       .finally(() => {
         const { current } = this.state;
         const currentStatus: ImportStatus = (current as unknown) as ImportStatus;
-        onStatusChangeHandler(
-          dataFile,
-          currentStatus.status,
-          currentStatus.numberOfRows,
-        );
+        onStatusChangeHandler(dataFile, currentStatus.status);
       });
   }
 
