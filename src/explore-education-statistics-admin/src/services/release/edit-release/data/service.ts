@@ -15,7 +15,7 @@ export interface EditReleaseService {
     releaseId: string,
     request: UploadDataFilesRequest,
   ) => Promise<null>;
-  deleteDataFiles: (releaseId: string, dataFileId: string) => Promise<null>;
+  deleteDataFiles: (releaseId: string, dataFile: DataFile) => Promise<null>;
   createDownloadDataFileLink: (releaseId: string, fileId: string) => string;
   createDownloadDataMetadataFileLink: (
     releaseId: string,
@@ -95,8 +95,10 @@ const service: EditReleaseService = {
       data,
     );
   },
-  deleteDataFiles(releaseId: string, dataFileName: string): Promise<null> {
-    return client.delete<null>(`/release/${releaseId}/data/${dataFileName}`);
+  deleteDataFiles(releaseId: string, dataFile: DataFile): Promise<null> {
+    return client.delete<null>(
+      `/release/${releaseId}/data/${dataFile.filename}/${dataFile.title}`,
+    );
   },
   createDownloadDataFileLink(releaseId: string, fileName: string): string {
     return `${baseURL}release/${releaseId}/data/${fileName}`;
