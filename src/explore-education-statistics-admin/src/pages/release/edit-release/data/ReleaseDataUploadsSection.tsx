@@ -254,9 +254,12 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
               onExit={() => setDeleteDataFile(emptyDataFile)}
               onCancel={() => setDeleteDataFile(emptyDataFile)}
               onConfirm={async () => {
-                await service.deleteDataFiles(releaseId, deleteDataFile);
-                setDeleteDataFile(emptyDataFile);
-                resetPage(form);
+                await service
+                  .deleteDataFiles(releaseId, deleteDataFile)
+                  .finally(() => {
+                    setDeleteDataFile(emptyDataFile);
+                    resetPage(form);
+                  });
               }}
             >
               <p>

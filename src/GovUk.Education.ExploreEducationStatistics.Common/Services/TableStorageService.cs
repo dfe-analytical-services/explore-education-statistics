@@ -32,14 +32,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
             return table;
         }
-        
-        public async Task<TableResult> DeleteEntityAsync(string tableName, ITableEntity entity)
+
+        public async Task<bool> DeleteEntityAsync(string tableName, ITableEntity entity)
         {
-            var table = _client.GetTableReference(tableName);
-            entity.ETag = "*";
-            return await table.ExecuteAsync(TableOperation.Delete(entity));
+            try
+            {
+                var table = _client.GetTableReference(tableName);
+                entity.ETag = "*";
+                var result = await table.ExecuteAsync(TableOperation.Delete(entity));
+                return result != null;
+            }
+            catch
+            {
+                return false;
+            }
         }
-        
+
         public async Task<TableResult> RetrieveEntity(string tableName, ITableEntity entity, List<string> columns)
         {
             var table = _client.GetTableReference(tableName);

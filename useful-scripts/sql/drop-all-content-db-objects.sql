@@ -2,6 +2,8 @@ DROP TABLE __EFMigrationsHistory;
 DROP TABLE Link;
 DROP TABLE ReleaseSummaryVersions;
 DROP TABLE [Update];
+DROP TABLE ContenBlock;
+DROP TABLE ContenSections;
 DROP TABLE ReleaseSummaries;
 DROP TABLE Releases;
 DROP TABLE ReleaseTypes;
