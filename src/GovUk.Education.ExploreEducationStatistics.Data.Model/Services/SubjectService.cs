@@ -36,14 +36,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             return _context.Subject.Any(x => x.ReleaseId == releaseId && x.Name == name);
         }
         
-        public async Task DeleteAsync(ReleaseId releaseId, string name)
+        public async Task<bool> DeleteAsync(ReleaseId releaseId, string name)
         {
             var subject = await GetAsync(releaseId, name);
             if (subject != null)
             {
                 _context.Subject.Remove(subject);
                 await _context.SaveChangesAsync();
+                return true;
             }
+            return false;
         }
         
         public async Task<Subject> GetAsync(ReleaseId releaseId, string name)
