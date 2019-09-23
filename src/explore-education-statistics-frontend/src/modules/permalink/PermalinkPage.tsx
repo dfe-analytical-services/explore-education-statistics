@@ -9,8 +9,8 @@ import PrintThisPage from '@frontend/components/PrintThisPage';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
 import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
-import TimePeriodDataTable from '../table-tool/components/TimePeriodDataTable';
-import DownloadCsvButton from '../table-tool/components/DownloadCsvButton';
+import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
+import DownloadCsvButton from '@common/modules/table-tool/components/DownloadCsvButton';
 
 interface Props {
   permalink: string;

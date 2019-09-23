@@ -1,1 +1,1 @@
-import 'explore-education-statistics-common/src/polyfill';
+import '@common/polyfill';

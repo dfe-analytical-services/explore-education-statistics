@@ -14,7 +14,7 @@ import LinkContainer from '@common/components/LinkContainer';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
-import PreviousStepModalConfirm from '@frontend/modules/table-tool/components/PreviousStepModalConfirm';
+import PreviousStepModalConfirm from '@common/modules/table-tool/components/PreviousStepModalConfirm';
 import {
   CategoryFilter,
   Indicator,
@@ -28,28 +28,28 @@ import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableH
 import permalinkService from '@common/modules/full-table/services/permalinkService';
 import { FullTable } from '@common/modules/full-table/types/fullTable';
 import { mapFullTable } from '@common/modules/full-table/utils/mapPermalinks';
-import DownloadCsvButton from './components/DownloadCsvButton';
-import FiltersForm, { FilterFormSubmitHandler } from './components/FiltersForm';
+import DownloadCsvButton from '@common/modules/table-tool/components/DownloadCsvButton';
+import FiltersForm, { FilterFormSubmitHandler } from '@common/modules/table-tool/components/FiltersForm';
 import LocationFiltersForm, {
   LocationFiltersFormSubmitHandler,
-} from './components/LocationFiltersForm';
+} from '@common/modules/table-tool/components/LocationFiltersForm';
 import PublicationForm, {
   PublicationFormSubmitHandler,
-} from './components/PublicationForm';
+} from '@common/modules/table-tool/components/PublicationForm';
 import PublicationSubjectForm, {
   PublicationSubjectFormSubmitHandler,
-} from './components/PublicationSubjectForm';
+} from '@common/modules/table-tool/components/PublicationSubjectForm';
 import TableHeadersForm, {
   TableHeadersFormValues,
-} from './components/TableHeadersForm';
-import TimePeriodDataTable from './components/TimePeriodDataTable';
+} from '@common/modules/table-tool/components/TableHeadersForm';
+import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import TimePeriodForm, {
   TimePeriodFormSubmitHandler,
-} from './components/TimePeriodForm';
-import mapOptionValues from './components/utils/mapOptionValues';
-import Wizard from './components/Wizard';
-import WizardStep from './components/WizardStep';
-import WizardStepHeading from './components/WizardStepHeading';
+} from '@common/modules/table-tool/components/TimePeriodForm';
+import mapOptionValues from '@common/modules/table-tool/components/utils/mapOptionValues';
+import Wizard from '@common/modules/table-tool/components/Wizard';
+import WizardStep from '@common/modules/table-tool/components/WizardStep';
+import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 
 export interface PublicationOptions {
   id: string;
