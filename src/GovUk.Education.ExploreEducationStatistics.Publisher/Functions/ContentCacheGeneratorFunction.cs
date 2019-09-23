@@ -16,14 +16,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         [FunctionName("RebuildContentCache")]
         public void RebuildContentCacheTrees(
             [QueueTrigger("content-cache", Connection = "")]
-            // TODO: create the cache message object
             string message,
             ILogger logger)
         {
             logger.LogInformation($"{GetType().Name} function triggered: {message}");
 
             // TODO: switch actions based on message content, for now full rebuild
-            _contentCacheGenerationService.CleanAndRebuildFullCache().Wait();
+            switch (message)
+            {
+                default:
+                    _contentCacheGenerationService.CleanAndRebuildFullCache().Wait();
+                    break;
+            }
 
             logger.LogInformation($"{GetType().Name} function completed");
         }

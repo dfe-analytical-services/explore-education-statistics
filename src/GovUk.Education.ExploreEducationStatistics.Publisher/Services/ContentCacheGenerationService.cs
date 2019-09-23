@@ -171,7 +171,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                         _cloudBlobContainer.GetBlockBlobReference(
                             $"publications/{publication.Slug}/releases/{release.Slug}.json");
 
-                    // TODO: Fix model to ignore self referencing loop (quick workaround)
                     var json = JsonConvert.SerializeObject(release, null,
                         new JsonSerializerSettings() {ReferenceLoopHandling = ReferenceLoopHandling.Ignore});
 

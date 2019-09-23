@@ -11,10 +11,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Service
     public class MethodologyServiceTests
     {
         [Fact]
-        public void MethodologyService_Get_Methodology_By_Slug()
+        public void MethodologyService_Get_Methodology_By_Id()
         {
             var builder = new DbContextOptionsBuilder<ApplicationDbContext>();
-            builder.UseInMemoryDatabase(databaseName: "GetBySlug");
+            builder.UseInMemoryDatabase(databaseName: "GetById");
             var options = builder.Options;
 
             using (var context = new ApplicationDbContext(options))
@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Service
             {
                 var service = new MethodologyService(context);
 
-                var result = service.Get("publication-a-slug");
+                var result = service.Get(Guid.Parse("0144e3f2-41e1-4aec-9c55-2671f454c85f"));
 
                 Assert.True(result != null);
                 Assert.Equal("Methodology A", result.Title);
@@ -50,10 +50,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Service
         }
 
         [Fact]
-        public void MethodologyService_Get_Methodology_By_Slug_Not_Found()
+        public void MethodologyService_Get_Methodology_By_Id_Not_Found()
         {
             var builder = new DbContextOptionsBuilder<ApplicationDbContext>();
-            builder.UseInMemoryDatabase(databaseName: "GetBySlug_Fail");
+            builder.UseInMemoryDatabase(databaseName: "GetById_Fail");
             var options = builder.Options;
 
             using (var context = new ApplicationDbContext(options))
@@ -87,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Service
             {
                 var service = new MethodologyService(context);
 
-                var result = service.Get("publication-a-slug-error");
+                var result = service.Get(Guid.Parse("14e894c4-e3e5-4e05-ade9-bb14550b15a6"));
 
                 Assert.True(result == null);
             }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
@@ -17,11 +18,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services
             _context = context;
         }
 
-        public Methodology Get(string slug)
+        public Methodology Get(Guid id)
         {
-            var publication = _context.Publications.Include(p => p.Methodology)
-                .FirstOrDefault(p => p.Methodology != null && p.Slug == slug);
-            return publication?.Methodology;
+            return _context.Methodologies.FirstOrDefault(p => p.Id == id);
         }
         
         public IEnumerable<Methodology> Get()

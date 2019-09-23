@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces
@@ -7,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Inte
     {
         List<ThemeTree> GetTree();
 
-        Methodology Get(string slug);
+        Methodology Get(Guid id);
 
         IEnumerable<Methodology> Get();
     }
