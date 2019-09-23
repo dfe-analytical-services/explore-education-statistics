@@ -95,8 +95,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         {
             return $"{publicationSlug}/{releaseSlug}/"; 
         }
-        
-        
-        
     }
 }

@@ -1,0 +1,21 @@
+time_period,time_identifier,geographic_level,country_code,country_name,old_la_code,new_la_code,la_name,admission_numbers
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,16659
+,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,3017
+,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,14020
+2018,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,2590
+2017,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,16688
+,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,3053
+2017,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,14120
+2017,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,2555
+2016,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,16457
+,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,3089
+2016,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,13944
+2016,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,2520
+,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,13860
+2015,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,2490
+2015,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,16268
+2015,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,3029
+2014,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,2490
+,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley,13321
+2014,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,2955
+2014,Calendar year,Local authority,E92000001,England,202,E09000007,Camden,16054

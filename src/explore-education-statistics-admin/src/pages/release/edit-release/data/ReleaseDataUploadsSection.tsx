@@ -15,6 +15,7 @@ import Yup from '@common/lib/validation/yup';
 import { FormikActions, FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
 import ImporterStatus from '@admin/components/ImporterStatus';
+import { ImportStatusCode } from '@admin/services/release/imports/types';
 
 interface FormValues {
   subjectTitle: string;
@@ -29,9 +30,18 @@ interface Props {
 
 const formId = 'dataFileUploadForm';
 
+const emptyDataFile: DataFile = {
+  canDelete: false,
+  fileSize: { size: 0, unit: '' },
+  filename: '',
+  metadataFilename: '',
+  numberOfRows: 0,
+  title: '',
+};
+
 const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
-  const [dataFiles, setDataFiles] = useState<DataFile[]>();
-  const [deleteFileName, setDeleteFileName] = useState('');
+  const [dataFiles, setDataFiles] = useState<DataFile[]>([]);
+  const [deleteDataFile, setDeleteDataFile] = useState<DataFile>(emptyDataFile);
 
   useEffect(() => {
     service.getReleaseDataFiles(releaseId).then(setDataFiles);
@@ -49,6 +59,24 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
 
     const files = await service.getReleaseDataFiles(releaseId);
     setDataFiles(files);
+  };
+
+  const statusChangeHandler = async (
+    dataFile: DataFile,
+    importstatusCode: ImportStatusCode,
+  ) => {
+    const updatedDataFiles = [...dataFiles];
+    const updatedFile = updatedDataFiles.find(
+      file => file.filename === dataFile.filename,
+    );
+
+    if (!updatedFile) {
+      return;
+    }
+    updatedFile.canDelete =
+      importstatusCode &&
+      (importstatusCode === 'COMPLETE' || importstatusCode === 'FAILED');
+    setDataFiles(updatedDataFiles);
   };
 
   const handleServerValidation = handleServerSideValidation(
@@ -87,6 +115,11 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
       'metadataFile',
       'Meta file must be a csv file',
     ),
+    errorCodeToFieldError(
+      'SUBJECT_TITLE_MUST_BE_UNIQUE',
+      'subjectTitle',
+      'Subject title must be unique',
+    ),
   );
 
   return (
@@ -107,66 +140,78 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
         await resetPage(actions);
       }}
       validationSchema={Yup.object<FormValues>({
-        subjectTitle: Yup.string().required('Enter a subject title'),
+        subjectTitle: Yup.string()
+          .required('Enter a subject title')
+          .test('unique', 'Subject title must be unique', function unique(
+            value: string,
+          ) {
+            if (!value) {
+              return true;
+            }
+            return (
+              dataFiles.find(
+                f => f.title.toUpperCase() === value.toUpperCase(),
+              ) === undefined
+            );
+          }),
         dataFile: Yup.mixed().required('Choose a data file'),
         metadataFile: Yup.mixed().required('Choose a metadata file'),
       })}
       render={(form: FormikProps<FormValues>) => {
         return (
           <Form id={formId} submitValidationHandler={handleServerValidation}>
-            {dataFiles &&
-              dataFiles.map(dataFile => (
-                <SummaryList
-                  key={dataFile.filename}
-                  additionalClassName="govuk-!-margin-bottom-9"
-                >
-                  <SummaryListItem term="Subject title">
-                    <h4 className="govuk-heading-m">{dataFile.title}</h4>
-                  </SummaryListItem>
-                  <SummaryListItem term="Data file">
-                    <a
-                      href={service.createDownloadDataFileLink(
-                        releaseId,
-                        dataFile.filename,
-                      )}
-                    >
-                      {dataFile.filename}
-                    </a>
-                  </SummaryListItem>
-                  <SummaryListItem term="Filesize">
-                    {dataFile.fileSize.size.toLocaleString()}{' '}
-                    {dataFile.fileSize.unit}
-                  </SummaryListItem>
-                  <SummaryListItem term="Number of rows">
-                    {dataFile.numberOfRows.toLocaleString()}
-                  </SummaryListItem>
-                  <SummaryListItem term="Metadata file">
-                    <a
-                      href={service.createDownloadDataMetadataFileLink(
-                        releaseId,
-                        dataFile.filename,
-                      )}
-                    >
-                      {dataFile.metadataFilename}
-                    </a>
-                  </SummaryListItem>
-                  <ImporterStatus
-                    releaseId={releaseId}
-                    datafileName={dataFile.filename}
-                  />
+            {dataFiles.map(dataFile => (
+              <SummaryList
+                key={dataFile.filename}
+                additionalClassName="govuk-!-margin-bottom-9"
+              >
+                <SummaryListItem term="Subject title">
+                  <h4 className="govuk-heading-m">{dataFile.title}</h4>
+                </SummaryListItem>
+                <SummaryListItem term="Data file">
+                  <a
+                    href={service.createDownloadDataFileLink(
+                      releaseId,
+                      dataFile.filename,
+                    )}
+                  >
+                    {dataFile.filename}
+                  </a>
+                </SummaryListItem>
+                <SummaryListItem term="Filesize">
+                  {dataFile.fileSize.size.toLocaleString()}{' '}
+                  {dataFile.fileSize.unit}
+                </SummaryListItem>
+                <SummaryListItem term="Number of rows">
+                  {dataFile.numberOfRows.toLocaleString()}
+                </SummaryListItem>
+                <SummaryListItem term="Metadata file">
+                  <a
+                    href={service.createDownloadDataMetadataFileLink(
+                      releaseId,
+                      dataFile.filename,
+                    )}
+                  >
+                    {dataFile.metadataFilename}
+                  </a>
+                </SummaryListItem>
+                <ImporterStatus
+                  releaseId={releaseId}
+                  dataFile={dataFile}
+                  onStatusChangeHandler={statusChangeHandler}
+                />
+                {dataFile.canDelete && (
                   <SummaryListItem
                     term="Actions"
                     actions={
-                      <Link
-                        to="#"
-                        onClick={() => setDeleteFileName(dataFile.filename)}
-                      >
+                      <Link to="#" onClick={() => setDeleteDataFile(dataFile)}>
                         Delete files
                       </Link>
                     }
                   />
-                </SummaryList>
-              ))}
+                )}
+              </SummaryList>
+            ))}
             <FormFieldset
               id={`${formId}-allFieldsFieldset`}
               legend="Add new data to release"
@@ -204,14 +249,17 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
             </div>
 
             <ModalConfirm
-              mounted={deleteFileName != null && deleteFileName.length > 0}
+              mounted={deleteDataFile && deleteDataFile.title.length > 0}
               title="Confirm deletion of selected data files"
-              onExit={() => setDeleteFileName('')}
-              onCancel={() => setDeleteFileName('')}
+              onExit={() => setDeleteDataFile(emptyDataFile)}
+              onCancel={() => setDeleteDataFile(emptyDataFile)}
               onConfirm={async () => {
-                await service.deleteDataFiles(releaseId, deleteFileName);
-                setDeleteFileName('');
-                resetPage(form);
+                await service
+                  .deleteDataFiles(releaseId, deleteDataFile)
+                  .finally(() => {
+                    setDeleteDataFile(emptyDataFile);
+                    resetPage(form);
+                  });
               }}
             >
               <p>

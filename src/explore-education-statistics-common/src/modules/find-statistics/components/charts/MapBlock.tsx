@@ -1,4 +1,3 @@
-import Details from '@common/components/Details';
 import { FormSelect } from '@common/components/form';
 import { SelectOption } from '@common/components/form/FormSelect';
 import {
@@ -595,9 +594,11 @@ const MapBlock = ({
                 >
                   <span>{` ${result.value}${labels[result.id].unit} `}</span>
                 </p>
+                {/*
                 <Details summary={`What is ${labels[result.id].label}?`}>
                   Description for {labels[result.id].label}
                 </Details>
+*/}
               </div>
             ))}
           </div>

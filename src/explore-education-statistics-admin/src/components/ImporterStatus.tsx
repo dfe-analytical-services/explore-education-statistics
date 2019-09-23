@@ -7,6 +7,7 @@ import {
 import classNames from 'classnames';
 import styles from '@admin/pages/release/edit-release/data/ReleaseDataUploadsSection.module.scss';
 import SummaryListItem from '@common/components/SummaryListItem';
+import { DataFile } from '@admin/services/release/edit-release/data/types';
 
 interface State {
   isFetching: boolean;
@@ -16,7 +17,8 @@ interface State {
 
 interface Props {
   releaseId: string;
-  datafileName: string;
+  dataFile: DataFile;
+  onStatusChangeHandler: (datafile: DataFile, status: ImportStatusCode) => void;
 }
 
 export const getImportStatusLabel = (importstatusCode: ImportStatusCode) => {
@@ -75,7 +77,7 @@ class ImporterStatus extends Component<Props> {
   };
 
   private fetchImportStatus() {
-    const { datafileName, releaseId } = this.props;
+    const { dataFile, releaseId, onStatusChangeHandler } = this.props;
 
     // Do check to avoid an extra render on mount.
     const { isFetching } = this.state;
@@ -88,7 +90,7 @@ class ImporterStatus extends Component<Props> {
     // the component has unmounted.
 
     importStatusService
-      .getImportStatus(releaseId, datafileName)
+      .getImportStatus(releaseId, dataFile.filename)
       .then(
         importStatus =>
           this.intervalId &&
@@ -104,7 +106,12 @@ class ImporterStatus extends Component<Props> {
             current: null,
             isFetching: false,
           }),
-      );
+      )
+      .finally(() => {
+        const { current } = this.state;
+        const currentStatus: ImportStatus = (current as unknown) as ImportStatus;
+        onStatusChangeHandler(dataFile, currentStatus.status);
+      });
   }
 
   private initialiseTimer() {

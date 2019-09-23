@@ -97,8 +97,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                 c.RoutePrefix = "docs";
             });
 
-            app.UseHttpsRedirection();
-            app.UseCors(options => options.WithOrigins("http://localhost:3000", "http://localhost:3001").AllowAnyMethod());
+            if (!env.IsDevelopment())
+            {
+                app.UseHttpsRedirection();
+            }
+
+            app.UseCors(options => options.WithOrigins("http://localhost:3000", "http://localhost:3001","https://localhost:3000","https://localhost:3001").AllowAnyMethod().AllowAnyHeader());
             app.UseMvc();
 
             var option = new RewriteOptions();

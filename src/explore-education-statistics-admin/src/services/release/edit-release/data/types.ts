@@ -7,6 +7,7 @@ export interface DataFile {
   };
   numberOfRows: number;
   metadataFilename: string;
+  canDelete?: boolean;
 }
 
 export interface UploadDataFilesRequest {
