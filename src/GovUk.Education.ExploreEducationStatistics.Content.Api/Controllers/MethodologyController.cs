@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             {
                 return NoContent();
             }
-            return tree;wa
+            return tree;
 
         }
         
