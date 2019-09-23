@@ -163,13 +163,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<IEnumerable<FileInfo>>> AddDataFilesAsync(ReleaseId releaseId,
             [Required] [FromQuery(Name = "name")] string name, IFormFile file, IFormFile metaFile)
         {
-
-            return await CheckReleaseExistsAsync(releaseId, async () =>
+            return await CheckReleaseExistsAsync(releaseId, () =>
             {
-                var email = _userService.GetLoggedInUserEmail(HttpContext);
+                var email = _userService.GetLoggedInUserEmail(HttpContext);    
                 
                 // upload the files
-                return await _fileStorageService.UploadDataFilesAsync(releaseId, file, metaFile, name, false, email)
+                return _fileStorageService.UploadDataFilesAsync(releaseId, file, metaFile, name, false, email)
                     // add message to queue to process these files
                     .OnSuccess(() => _importService.Import(file.FileName, releaseId));
             });

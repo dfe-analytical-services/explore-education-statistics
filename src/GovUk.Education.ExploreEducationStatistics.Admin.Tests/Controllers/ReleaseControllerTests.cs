@@ -131,6 +131,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
             mocks.FileStorageService
                 .Setup(service => service.UploadDataFilesAsync(releaseId, dataFile, metaFile, "Subject name", false, "test user"))
                 .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<FileInfo>>>(new List<FileInfo>()));
+            mocks.UserService
+                .Setup(service => service.GetLoggedInUserEmail(null))
+                .Returns("test user");
             
             // Call the method under test
             var controller = ReleasesControllerWithMocks(mocks);
@@ -166,6 +169,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
                     "test user"))
                 .Returns(Task.FromResult<Either<ValidationResult, IEnumerable<FileInfo>>>(
                     ValidationResult(CannotOverwriteFile)));
+            mocks.UserService
+                .Setup(service => service.GetLoggedInUserEmail(null))
+                .Returns("test user");
+
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Call the method under test

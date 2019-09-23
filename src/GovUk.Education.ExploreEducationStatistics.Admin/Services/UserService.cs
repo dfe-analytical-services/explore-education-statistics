@@ -10,6 +10,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public string GetLoggedInUserEmail(HttpContext http)
         {
             var email = http.User.Claims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")?.Value;
+            
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                email = http.User.Claims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn")?.Value;
+            }
+            
 
             return email;
         }
