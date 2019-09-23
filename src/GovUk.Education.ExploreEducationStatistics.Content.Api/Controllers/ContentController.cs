@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
@@ -17,8 +19,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         // GET api/content/tree
         /// <response code="204">If the item is null</response>    
         [HttpGet("tree")]
-        [ProducesResponseType(200)]
         [ProducesResponseType(204)]
+        [ProducesResponseType(typeof(List<ThemeTree>), 200)]
         [Produces("application/json")]
         public async Task<ActionResult<string>> GetContentTree()
         {
@@ -34,6 +36,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 
         // GET api/content/publication/pupil-absence-in-schools-in-england
         [HttpGet("publication/{slug}")]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(typeof(PublicationViewModel), 200)]
+        [Produces("application/json")]
         public async Task<ActionResult<string>> GetPublication(string slug)
         {
             var publication = await _contentCacheService.GetPublicationAsync(slug);
@@ -48,6 +53,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 
         // GET api/content/publication/pupil-absence-in-schools-in-england/latest
         [HttpGet("publication/{publicationSlug}/latest")]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(typeof(ReleaseViewModel), 200)]
+        [Produces("application/json")]
         public async Task<ActionResult<string>> GetLatestRelease(string publicationSlug)
         {
             var release = await _contentCacheService.GetLatestReleaseAsync(publicationSlug);
@@ -63,6 +71,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         // TODO: this looks like it needs refactoring to return the release view model
         // GET api/content/publication/pupil-absence-in-schools-in-england/2017-18
         [HttpGet("publication/{publicationSlug}/{releaseSlug}")]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(typeof(ReleaseViewModel), 200)]
+        [Produces("application/json")]
         public async Task<ActionResult<string>> GetRelease(string publicationSlug, string releaseSlug)
         {
             var release = await _contentCacheService.GetReleaseAsync(publicationSlug, releaseSlug);

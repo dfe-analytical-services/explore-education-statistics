@@ -1,5 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
@@ -17,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 
         /// <response code="204">If the item is null</response>    
         [HttpGet("tree")]
-        [ProducesResponseType(200)]
+        [ProducesResponseType(typeof(List<ThemeTree>),200)]
         [ProducesResponseType(204)]
         [Produces("application/json")]
         public async Task<ActionResult<string>> GetDownloadTree()
