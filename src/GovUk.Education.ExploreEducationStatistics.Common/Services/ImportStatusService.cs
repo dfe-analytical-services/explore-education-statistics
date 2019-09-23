@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                                       where b
                                       select b).Count() * 100) / import.NumBatches,
                 Status = import.Status.GetEnumValue(),
-                NumberOfRows = import.NumberOfRows
+                NumberOfRows = import.NumberOfRows,
             };
         }
 

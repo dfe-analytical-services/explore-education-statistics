@@ -157,6 +157,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 message.DataFileName,
                 numberOfRows,
                 SplitFileService.GetNumBatches(numberOfRows, rowsPerBatch)
+                
                 ).Wait();
             
             var errors = _validatorService.Validate(message, subjectData);

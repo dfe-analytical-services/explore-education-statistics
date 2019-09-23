@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using DataBlockId = System.Guid;
 using ContentSectionId = System.Guid;
@@ -34,6 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         private readonly IImportStatusService _importStatusService;
         private readonly ISubjectService _subjectService;
         private readonly ITableStorageService _tableStorageService;
+        private readonly IUserService _userService;
 
         public ReleasesController(IImportService importService,
             IReleaseService releaseService,
@@ -41,7 +43,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             IPublicationService publicationService,
             IImportStatusService importStatusService,
             ISubjectService subjectService,
-            ITableStorageService tableStorageService)
+            ITableStorageService tableStorageService,
+            IUserService userService
+            )
         {
             _importService = importService;
             _releaseService = releaseService;
@@ -50,6 +54,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _importStatusService = importStatusService;
             _subjectService = subjectService;
             _tableStorageService = tableStorageService;
+            _userService = userService;
+            
         }
 
         [HttpGet("release/{releaseId}/chart/{filename}")]
@@ -159,8 +165,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             return await CheckReleaseExistsAsync(releaseId, () =>
             {
+                var email = _userService.GetLoggedInUserEmail(HttpContext);    
+                
                 // upload the files
-                return _fileStorageService.UploadDataFilesAsync(releaseId, file, metaFile, name, false)
+                return _fileStorageService.UploadDataFilesAsync(releaseId, file, metaFile, name, false, email)
                     // add message to queue to process these files
                     .OnSuccess(() => _importService.Import(file.FileName, releaseId));
             });
