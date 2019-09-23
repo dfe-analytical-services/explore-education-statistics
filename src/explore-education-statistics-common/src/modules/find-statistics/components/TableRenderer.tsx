@@ -7,16 +7,22 @@ import {
 import formatPretty from '@common/lib/utils/number/formatPretty';
 
 export interface Props {
+  heading?: string;
   data: DataBlockData;
   meta: DataBlockMetadata;
   indicators: string[];
 }
 
-const Caption = ({ data, meta, indicators }: Props) => {
-  return <caption className="govuk-heading-s">Table representing</caption>;
+const Caption = ({ data, meta, indicators, heading }: Props) => {
+  console.log(heading);
+  return (
+    <caption className="govuk-heading-s">
+      {heading && `Table representing ${heading}`}
+    </caption>
+  );
 };
 
-const TableHeading = ({ data, meta, indicators }: Props) => {
+const TableHeading = ({ data, meta, indicators, heading }: Props) => {
   return (
     <thead className="govuk-table__head">
       <tr>
@@ -40,7 +46,7 @@ const TableHeading = ({ data, meta, indicators }: Props) => {
   );
 };
 
-const TableBody = ({ data, meta, indicators }: Props) => {
+const TableBody = ({ data, meta, indicators, heading }: Props) => {
   return (
     <tbody className="govuk-table__body">
       {indicators.map(indicator => (

@@ -97,12 +97,13 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
     const data: DataBlockData = response;
     const meta = response.metaData;
 
-    const { charts, summary, tables } = this.props;
+    const { charts, summary, tables, heading } = this.props;
 
     if (response.result.length > 0) {
       if (tables) {
         newState.tables = [
           {
+            heading,
             data,
             meta,
             ...tables[0], /// at present only one chart
@@ -140,7 +141,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
 
   public render() {
     const {
-      heading = '',
+      heading,
       height,
       showTables,
       additionalTabContent,
