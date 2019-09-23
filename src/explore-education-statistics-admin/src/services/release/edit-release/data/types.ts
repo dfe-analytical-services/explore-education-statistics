@@ -5,7 +5,7 @@ export interface DataFile {
     size: number;
     unit: string;
   };
-  numberOfRows: number;
+  rows: number;
   metadataFilename: string;
   canDelete?: boolean;
 }

@@ -199,7 +199,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     Name = GetName(file),
                     Path = file.Name,
                     Size = GetSize(file),
-                    MetaFileName = GetMetaFileName(file)
+                    MetaFileName = GetMetaFileName(file),
+                    Rows = GetNumberOfRows(file)
                 })
                 .OrderBy(info => info.Name);
         }
@@ -222,6 +223,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             blob.Properties.ContentType = file.ContentType;
             var path = await UploadToTemporaryFile(file);
             await blob.UploadFromFileAsync(path);
+
+            metaValues["NumberOfRows"] = CalculateNumberOfRows(file.OpenReadStream()).ToString();
+            
             await AddMetaValuesAsync(blob, metaValues);
             return true;
         }
@@ -275,6 +279,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return blob.Metadata.TryGetValue(MetaFileKey, out var name) ? name : "";
         }
+
+        private static int GetNumberOfRows(CloudBlob blob)
+        {
+            return 
+                blob.Metadata.TryGetValue(NumberOfRows, out var numberOfRows) &&
+                   int.TryParse(numberOfRows, out var numberOfRowsValue)
+                ? numberOfRowsValue
+                : 0;
+        }
+
         
         private static bool IsBatchedFile(IListBlobItem blobItem, string releaseId)
         {
@@ -337,6 +351,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             using (var reader = new StreamReader(fileStream))
             {
                 return reader.BaseStream.IsTextFile();
+            }
+        }
+
+        private static int CalculateNumberOfRows(Stream fileStream)
+        {
+            using (var reader = new StreamReader(fileStream))
+            {
+                var numberOfLines = 0;
+                while (reader.ReadLine() != null)
+                {
+                    ++numberOfLines;
+                }
+
+                return numberOfLines;
             }
         }
     }

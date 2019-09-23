@@ -149,11 +149,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             logger.LogInformation($"Validating Datafile: {message.DataFileName}");
 
             var subjectData = _fileStorageService.GetSubjectData(message).Result;
+
+            var numberOfRows = subjectData.GetCsvLines().Count();
             
             _batchService.CreateImport(
                 message.Release.Id.ToString(), 
                 message.DataFileName,
-                SplitFileService.GetNumBatches(subjectData.GetCsvLines().Count(), rowsPerBatch)
+                numberOfRows,
+                SplitFileService.GetNumBatches(numberOfRows, rowsPerBatch)
                 ).Wait();
             
             var errors = _validatorService.Validate(message, subjectData);

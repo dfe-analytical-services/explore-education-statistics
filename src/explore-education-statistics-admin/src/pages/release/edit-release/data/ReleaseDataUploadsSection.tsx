@@ -35,7 +35,7 @@ const emptyDataFile: DataFile = {
   fileSize: { size: 0, unit: '' },
   filename: '',
   metadataFilename: '',
-  numberOfRows: 0,
+  rows: 0,
   title: '',
 };
 
@@ -183,7 +183,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                   {dataFile.fileSize.unit}
                 </SummaryListItem>
                 <SummaryListItem term="Number of rows">
-                  {dataFile.numberOfRows.toLocaleString()}
+                  {dataFile.rows.toLocaleString()}
                 </SummaryListItem>
                 <SummaryListItem term="Metadata file">
                   <a
