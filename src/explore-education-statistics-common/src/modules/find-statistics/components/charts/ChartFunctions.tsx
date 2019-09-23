@@ -64,6 +64,7 @@ export interface AbstractChartProps {
   title?: string;
   height?: number;
   width?: number;
+  children?: ReactNode[];
 }
 
 export interface ChartProps extends AbstractChartProps {
