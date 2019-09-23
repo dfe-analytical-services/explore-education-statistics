@@ -57,11 +57,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ValidationResult, IEnumerable<FileInfo>>> UploadDataFilesAsync(Guid releaseId,
-            IFormFile dataFile, IFormFile metadataFile, string name, bool overwrite)
+            IFormFile dataFile, IFormFile metadataFile, string name, bool overwrite, string userName)
         {
             var blobContainer = await GetCloudBlobContainer();
-            var dataInfo = new Dictionary<string, string> {{NameKey, name}, {MetaFileKey, metadataFile.FileName}};
-            var metaDataInfo = new Dictionary<string, string> {{DataFileKey, dataFile.FileName}};
+            var dataInfo = new Dictionary<string, string> {{NameKey, name}, {MetaFileKey, metadataFile.FileName}, {UserName, userName}};
+            var metaDataInfo = new Dictionary<string, string> {{DataFileKey, dataFile.FileName}, {UserName, userName}};
             return await ValidateDataFilesForUpload(blobContainer, releaseId, dataFile, metadataFile, name, overwrite)
                 .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, dataFile, ReleaseFileTypes.Data, dataInfo, overwrite))
                 .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, metadataFile, ReleaseFileTypes.Data, metaDataInfo, overwrite))
@@ -200,7 +200,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     Path = file.Name,
                     Size = GetSize(file),
                     MetaFileName = GetMetaFileName(file),
-                    Rows = GetNumberOfRows(file)
+                    Rows = GetNumberOfRows(file),
+                    UserName = GetUserName(file)
                 })
                 .OrderBy(info => info.Name);
         }
@@ -289,6 +290,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 : 0;
         }
 
+        private static string GetUserName(CloudBlob blob)
+        {
+            return blob.Metadata.TryGetValue(UserName, out var name) ? name : "";
+        }
         
         private static bool IsBatchedFile(IListBlobItem blobItem, string releaseId)
         {

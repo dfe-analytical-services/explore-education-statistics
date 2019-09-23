@@ -12,6 +12,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         public const string MetaFileKey = "metafile";
 
         public const string NumberOfRows = "NumberOfRows";
+
+        public const string UserName = "userName";
         
         /*
          * Property key on a metadata file to point at the data file
