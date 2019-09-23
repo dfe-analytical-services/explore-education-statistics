@@ -3,8 +3,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Converters;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Services;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -63,12 +61,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             var cloudStorageAccount = CloudStorageAccount.Parse(Configuration.GetConnectionString("PublicStorage"));
             services.AddSingleton<CloudBlobClient>(a => cloudStorageAccount.CreateCloudBlobClient());
             
-            services.AddTransient<IContentService, ContentService>();
-            services.AddTransient<IFileStorageService, FileStorageService>();
-            services.AddTransient<IReleaseService, ReleaseService>();
-            services.AddTransient<IPublicationService, PublicationService>();
-            services.AddTransient<IMethodologyService, MethodologyService>();
-            services.AddTransient<IDownloadService, DownloadService>();
             services.AddTransient<IContentCacheService, ContentCacheService>();
         }
 
@@ -83,6 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             }
             else
             {
+                app.UseHttpsRedirection();
                 app.UseHsts();
             }
 
@@ -96,11 +89,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Content API V1");
                 c.RoutePrefix = "docs";
             });
-
-            if (!env.IsDevelopment())
-            {
-                app.UseHttpsRedirection();
-            }
 
             app.UseCors(options => options.WithOrigins("http://localhost:3000", "http://localhost:3001","https://localhost:3000","https://localhost:3001").AllowAnyMethod().AllowAnyHeader());
             app.UseMvc();
