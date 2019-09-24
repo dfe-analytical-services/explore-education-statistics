@@ -14,6 +14,7 @@ import MethodologyContent from '@frontend/modules/methodologies/components/Metho
 import MethodologyHeader from '@frontend/modules/methodologies/components/MethodologyHeader';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
+import { parse } from 'date-fns';
 
 interface Props {
   publication: string;
@@ -43,8 +44,12 @@ class MethodologyPage extends Component<Props> {
 
     return (
       <Page
-        title={data.title}
-        caption="Methodology"
+        title={`${data.title} - ${parse(
+          data.published,
+          'dd MMMM yyyy',
+          new Date(),
+        )}`}
+        caption={data.summary}
         breadcrumbs={[{ name: 'Methodologies', link: '/methodology' }]}
       >
         <div className="govuk-grid-row">
