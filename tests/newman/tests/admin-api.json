@@ -987,7 +987,7 @@
 													"pm.test(\"Publication id matches the publication requested\", function () { pm.expect(pm.response.json().publicationId).to.equal(pm.variables.get(\"publication_id\")); });",
 													"",
 													"pm.test(\"Number of subjects should be correct\", function () {",
-													"    pm.expect(pm.response.json().subjects.length).to.equal(7);",
+													"    pm.expect(pm.response.json().subjects.length).to.be.above(7);",
 													"});"
 												],
 												"type": "text/javascript"
