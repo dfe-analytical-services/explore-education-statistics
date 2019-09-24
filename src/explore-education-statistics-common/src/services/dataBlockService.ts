@@ -275,10 +275,13 @@ export interface DataBlockResponse {
 const DataBlockService = {
   async getDataBlockForSubject(
     request: DataBlockRequest,
-  ): Promise<DataBlockResponse> {
-    const response: DataBlockResponse = await dataApi.post('/Data', request);
-
-    return response;
+  ): Promise<DataBlockResponse | undefined> {
+    try {
+      const response: DataBlockResponse = await dataApi.post('/Data', request);
+      return response;
+    } catch (_) {
+      return undefined;
+    }
   },
 };
 
