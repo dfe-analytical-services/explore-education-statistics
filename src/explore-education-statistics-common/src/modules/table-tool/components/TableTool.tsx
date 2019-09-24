@@ -57,11 +57,11 @@ interface FinalStepProps {
   query: TableDataQuery;
   tableHeaders: TableHeadersFormValues;
 }
+
 interface Props {
   themeMeta: ThemeMeta[];
   publicationId: string;
-
-  finalStepExtra: (props: FinalStepProps) => ReactNode;
+  finalStepExtra?: (props: FinalStepProps) => ReactNode;
 }
 
 interface State {
@@ -80,7 +80,7 @@ interface State {
   tableHeaders: TableHeadersFormValues;
 }
 
-class TableToolComponent extends Component<Props, State> {
+class TableTool extends Component<Props, State> {
   public state: State = {
     filters: {},
     indicators: [],
@@ -395,6 +395,7 @@ class TableToolComponent extends Component<Props, State> {
 
                     {publication &&
                       createdTable &&
+                      finalStepExtra &&
                       finalStepExtra({
                         createdTable,
                         publication,
@@ -414,4 +415,4 @@ class TableToolComponent extends Component<Props, State> {
   }
 }
 
-export default TableToolComponent;
+export default TableTool;

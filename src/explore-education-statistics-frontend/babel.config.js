@@ -12,5 +12,5 @@ module.exports = {
       },
     ],
     '@zeit/next-typescript/babel',
-  ]
+  ],
 };

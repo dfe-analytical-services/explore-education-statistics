@@ -12,7 +12,7 @@ import React, { Component, createRef } from 'react';
 import permalinkService from '@common/modules/full-table/services/permalinkService';
 import DownloadCsvButton from '@common/modules/table-tool/components/DownloadCsvButton';
 import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
-import TableToolComponent from './TableToolComponent';
+import TableTool from '@common/modules/table-tool/components/TableTool';
 
 export interface PublicationOptions {
   id: string;
@@ -100,10 +100,9 @@ class TableToolPage extends Component<Props, State> {
           for your own offline analysis.
         </p>
 
-        <TableToolComponent
+        <TableTool
           publicationId={publicationId}
           themeMeta={themeMeta}
-          onCreate
           finalStepExtra={finalStepProps => (
             <>
               <h3>Share your table</h3>
