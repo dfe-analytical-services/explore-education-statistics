@@ -39,26 +39,26 @@ time_period,time_identifier,geographic_level,country_code,country_name,old_la_co
 2012,Calendar year,Local authority district,E92000001,England,,,,,,E06000002,Middlesbrough,,,,,,,,,,1090
 2008,Calendar year,Local authority district,E92000001,England,,,,,,E06000003,Redcar and Cleveland,,,,,,,,,,8730
 2018,Calendar year,Local authority district,E92000001,England,,,,,,E06000004,Stockton-on-Tees,,,,,,,,,,7423
-2011,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000001,Black Country,,,,,,,,5876
-2017,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000003,Chesire and Warrington,,,,,,,,5124
-2017,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000005,Cornwall and Isles of Scilly,,,,,,,,2076
-2018,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000006,Coventry and Warwickshire,,,,,,,,6170
-2014,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000001,Black Country,,,,,,,,3085
-2020,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000003,Chesire and Warrington,,,,,,,,4503
-2011,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000005,Cornwall and Isles of Scilly,,,,,,,,1574
-2016,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000006,Coventry and Warwickshire,,,,,,,,3221
-2010,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000001,Black Country,,,,,,,,4368
-2006,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000003,Chesire and Warrington,,,,,,,,7360
-2017,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000005,Cornwall and Isles of Scilly,,,,,,,,6385
-2012,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000006,Coventry and Warwickshire,,,,,,,,9216
-2010,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000001,Black Country,,,,,,,,1816
-2020,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000003,Chesire and Warrington,,,,,,,,6078
-2014,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000005,Cornwall and Isles of Scilly,,,,,,,,5018
-2015,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000006,Coventry and Warwickshire,,,,,,,,6882
-2016,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000001,Black Country,,,,,,,,6493
-2011,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000003,Chesire and Warrington,,,,,,,,3902
-2019,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000005,Cornwall and Isles of Scilly,,,,,,,,8179
-2019,Calendar year,Local enterprise partnership,E92000001,England,,,,,,,,E37000006,Coventry and Warwickshire,,,,,,,,2701
+2011,Calendar year,Local enterprise partnerships,E92000001,England,,,,,,,,E37000001,Black Country,,,,,,,,5876
+2017,Calendar year,Local enterprise partnerships,E92000001,England,,,,,,,,E37000003,Chesire and Warrington,,,,,,,,5124
+2017,Calendar year,Local enterprise partnerships,E92000001,England,,,,,,,,E37000005,Cornwall and Isles of Scilly,,,,,,,,2076
+2018,Calendar year,Local enterprise partnerships,E92000001,England,,,,,,,,E37000006,Coventry and Warwickshire,,,,,,,,6170
+2014,Calendar year,Local enterprise partnerships,E92000001,England,,,,,,,,E37000001,Black Country,,,,,,,,3085
+2020,Calendar year,Local enterprise partnerships,E92000001,England,,,,,,,,E37000003,Chesire and Warrington,,,,,,,,4503
+2011,Calendar year,Local enterprise partnerships,E92000001,England,,,,,,,,E37000005,Cornwall and Isles of Scilly,,,,,,,,1574
+2016,Calendar year,Local enterprise partnerships,E92000001,England,,,,,,,,E37000006,Coventry and Warwickshire,,,,,,,,3221
+2010,Calendar year,Local enterprise partnerships,E92000001,England,,,,,,,,E37000001,Black Country,,,,,,,,4368
+2006,Calendar year,Local enterprise partnerships,E92000001,England,,,,,,,,E37000003,Chesire and Warrington,,,,,,,,7360
+2017,Calendar year,Local enterprise partnerships,E92000001,England,,,,,,,,E37000005,Cornwall and Isles of Scilly,,,,,,,,6385
+2012,Calendar year,Local enterprise partnerships,E92000001,England,,,,,,,,E37000006,Coventry and Warwickshire,,,,,,,,9216
+2010,Calendar year,Local enterprise partnerships,E92000001,England,,,,,,,,E37000001,Black Country,,,,,,,,1816
+2020,Calendar year,Local enterprise partnerships,E92000001,England,,,,,,,,E37000003,Chesire and Warrington,,,,,,,,6078
+2014,Calendar year,Local enterprise partnerships,E92000001,England,,,,,,,,E37000005,Cornwall and Isles of Scilly,,,,,,,,5018
+2015,Calendar year,Local enterprise partnerships,E92000001,England,,,,,,,,E37000006,Coventry and Warwickshire,,,,,,,,6882
+2016,Calendar year,Local enterprise partnerships,E92000001,England,,,,,,,,E37000001,Black Country,,,,,,,,6493
+2011,Calendar year,Local enterprise partnerships,E92000001,England,,,,,,,,E37000003,Chesire and Warrington,,,,,,,,3902
+2019,Calendar year,Local enterprise partnerships,E92000001,England,,,,,,,,E37000005,Cornwall and Isles of Scilly,,,,,,,,8179
+2019,Calendar year,Local enterprise partnerships,E92000001,England,,,,,,,,E37000006,Coventry and Warwickshire,,,,,,,,2701
 2013,Calendar year,RSC region,E92000001,England,,,,,,,,,,East of England and North-East London,,,,,,,3908
 2007,Calendar year,RSC region,E92000001,England,,,,,,,,,,East Midlands and the Humber,,,,,,,9023
 2018,Calendar year,RSC region,E92000001,England,,,,,,,,,,Lancashire and West Yorkshire,,,,,,,7612
@@ -79,26 +79,26 @@ time_period,time_identifier,geographic_level,country_code,country_name,old_la_co
 2006,Calendar year,RSC region,E92000001,England,,,,,,,,,,East Midlands and the Humber,,,,,,,3338
 2019,Calendar year,RSC region,E92000001,England,,,,,,,,,,Lancashire and West Yorkshire,,,,,,,1258
 2019,Calendar year,RSC region,E92000001,England,,,,,,,,,,North of England,,,,,,,1023
-2019,Calendar year,Output area,E92000001,England,,,,,,,,,,,E02000984,Bolton 001,,,,,8533
-2008,Calendar year,Output area,E92000001,England,,,,,,,,,,,E02000985,Bolton 002,,,,,4587
-2010,Calendar year,Output area,E92000001,England,,,,,,,,,,,E02000986,Bolton 003,,,,,4621
-2020,Calendar year,Output area,E92000001,England,,,,,,,,,,,E02000987,Bolton 004,,,,,6031
-2009,Calendar year,Output area,E92000001,England,,,,,,,,,,,E05000364,Bolton 001,,,,,5815
-2016,Calendar year,Output area,E92000001,England,,,,,,,,,,,E05006937,Bolton 002,,,,,5831
-2020,Calendar year,Output area,E92000001,England,,,,,,,,,,,E05010291,Bolton 003,,,,,1028
-2017,Calendar year,Output area,E92000001,England,,,,,,,,,,,E05010450,Bolton 004,,,,,3481
-2017,Calendar year,Output area,E92000001,England,,,,,,,,,,,E05000364,Bolton 001,,,,,6373
-2006,Calendar year,Output area,E92000001,England,,,,,,,,,,,E05006937,Bolton 002,,,,,9341
-2020,Calendar year,Output area,E92000001,England,,,,,,,,,,,E05010291,Bolton 003,,,,,6641
-2005,Calendar year,Output area,E92000001,England,,,,,,,,,,,E05010450,Bolton 004,,,,,8557
-2017,Calendar year,Output area,E92000001,England,,,,,,,,,,,E05000364,Bolton 001,,,,,3837
-2020,Calendar year,Output area,E92000001,England,,,,,,,,,,,E05006937,Bolton 002,,,,,5680
-2017,Calendar year,Output area,E92000001,England,,,,,,,,,,,E05010291,Bolton 003,,,,,1869
-2017,Calendar year,Output area,E92000001,England,,,,,,,,,,,E05010450,Bolton 004,,,,,8427
-2010,Calendar year,Output area,E92000001,England,,,,,,,,,,,E05000364,Bolton 001,,,,,5595
-2019,Calendar year,Output area,E92000001,England,,,,,,,,,,,E05006937,Bolton 002,,,,,6945
-2014,Calendar year,Output area,E92000001,England,,,,,,,,,,,E05010291,Bolton 003,,,,,8084
-2018,Calendar year,Output area,E92000001,England,,,,,,,,,,,E05010450,Bolton 004,,,,,8630
+2019,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E02000984,Bolton 001,,,,,8533
+2008,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E02000985,Bolton 002,,,,,4587
+2010,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E02000986,Bolton 003,,,,,4621
+2020,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E02000987,Bolton 004,,,,,6031
+2009,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E05000364,Bolton 001,,,,,5815
+2016,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E05006937,Bolton 002,,,,,5831
+2020,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E05010291,Bolton 003,,,,,1028
+2017,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E05010450,Bolton 004,,,,,3481
+2017,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E05000364,Bolton 001,,,,,6373
+2006,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E05006937,Bolton 002,,,,,9341
+2020,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E05010291,Bolton 003,,,,,6641
+2005,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E05010450,Bolton 004,,,,,8557
+2017,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E05000364,Bolton 001,,,,,3837
+2020,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E05006937,Bolton 002,,,,,5680
+2017,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E05010291,Bolton 003,,,,,1869
+2017,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E05010450,Bolton 004,,,,,8427
+2010,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E05000364,Bolton 001,,,,,5595
+2019,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E05006937,Bolton 002,,,,,6945
+2014,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E05010291,Bolton 003,,,,,8084
+2018,Calendar year,Opportunity area,E92000001,England,,,,,,,,,,,E05010450,Bolton 004,,,,,8630
 2018,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14000683,East Yorkshire,,,5549
 2020,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14000895,Richmond (Yorks),,,6676
 2009,Calendar year,Parliamentary constituency,E92000001,England,,,,,,,,,,,,,E14001061,York Central,,,2409
