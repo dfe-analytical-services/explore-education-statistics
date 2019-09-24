@@ -19,6 +19,7 @@ import classNames from 'classnames';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
 import ReactMarkdown from 'react-markdown';
+import { parse } from 'date-fns';
 import ContentBlock from './components/ContentBlock';
 import styles from './PublicationReleasePage.module.scss';
 
@@ -58,7 +59,11 @@ class PublicationReleasePage extends Component<Props> {
 
     return (
       <Page
-        title={`${data.publication.title} - ${data.title}`}
+        title={`${data.publication.title} - ${parse(
+          data.published,
+          'dd MMMM yyyy',
+          new Date(),
+        )}`}
         caption={data.summary}
         breadcrumbs={[
           { name: 'Find statistics and data', link: '/find-statistics' },
