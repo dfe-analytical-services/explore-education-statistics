@@ -1,4 +1,4 @@
-import Accordion from '@common/components/Accordion';
+import Accordion, { generateIdList } from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import ContentSectionIndex from '@common/components/ContentSectionIndex';
 import FormattedDate from '@common/components/FormattedDate';
@@ -21,6 +21,8 @@ interface Props {
 }
 
 class MethodologyPage extends Component<Props> {
+  private accId: string[] = generateIdList(2);
+
   public static async getInitialProps({
     query,
   }: NextContext<{
@@ -100,7 +102,7 @@ class MethodologyPage extends Component<Props> {
         )}
 
         {data.content && (
-          <Accordion id="contents-sections">
+          <Accordion id={this.accId[0]}>
             {data.content.map(({ heading, caption, order, content }) => {
               return (
                 <AccordionSection
@@ -131,7 +133,7 @@ class MethodologyPage extends Component<Props> {
           <>
             <h2 className="govuk-heading-l govuk-!-margin-top-9">Annexes</h2>
 
-            <Accordion id="contents-sections">
+            <Accordion id={this.accId[1]}>
               {data.annexes.map(({ heading, caption, order, content }) => {
                 return (
                   <AccordionSection

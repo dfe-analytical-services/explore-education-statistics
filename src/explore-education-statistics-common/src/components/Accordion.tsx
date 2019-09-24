@@ -22,6 +22,10 @@ export interface AccordionProps {
   onToggle?: (accordionSection: { id: string; title: string }) => void;
 }
 
+export function generateIdList(count: number) {
+  return new Array(count).fill('content-section-').map((id, n) => id + (n + 1));
+}
+
 const Accordion = ({ children, id, onToggleAll, onToggle }: AccordionProps) => {
   const ref = useRef<HTMLDivElement>(null);
 
