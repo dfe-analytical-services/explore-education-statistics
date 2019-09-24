@@ -119,9 +119,9 @@
       "^.+\\.module\\.(css|sass|scss)$"
     ],
     "moduleNameMapper": {
+      "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy",
       "^@common/(.*)$": "<rootDir>/src/$1",
-      "^@common-test/(.*)$": "<rootDir>/test/$1",
-      "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy"
+      "^@common-test/(.*)$": "<rootDir>/test/$1"
     },
     "moduleFileExtensions": [
       "web.js",
