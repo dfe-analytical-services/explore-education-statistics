@@ -1,5 +1,9 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { ChartProps } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import {
+  ChartMetaData,
+  ChartProps,
+  parseMetaData
+} from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import {
   DataBlockData,
   DataBlockMetadata,
@@ -341,14 +345,21 @@ const labels = {
 
 const metaData: DataBlockMetadata = {
   filters: {
-    '1': {
-      label: 'All Schools',
-      value: '1',
-    },
-    '2': {
-      label: 'All Pupils',
-      value: '1',
-    },
+    'test': {
+      totalValue: '',
+      legend: '',
+      hint: '',
+      options: {
+        '1': {
+          label: 'All Schools',
+          value: '1',
+        },
+        '2': {
+          label: 'All Pupils',
+          value: '1',
+        },
+      }
+    }
   },
 
   indicators: {
@@ -2992,9 +3003,12 @@ const responseMetadata: ResponseMetaData = {
   },
 };
 
+const chartMetaData : ChartMetaData =  parseMetaData(metaData);
+
+
 const AbstractChartProps: ChartProps = {
   data,
-  meta: metaData,
+  meta: chartMetaData,
 
   width: 900,
   height: 300,
@@ -3060,12 +3074,12 @@ const AbstractChartProps: ChartProps = {
 const AbstractChartProps2: ChartProps = {
   data: data2,
   meta: {
-    ...metaData,
+    ...chartMetaData,
     timePeriods: {
-      ...metaData.timePeriods,
+      ...chartMetaData.timePeriods,
       '2016_HT6': {
         label: '2016/17',
-        year: 2016, code: 'HT6',
+        value: '2016_HT6',
       },
     },
   },
@@ -3127,25 +3141,25 @@ const AbstractChartProps2: ChartProps = {
 
 const AbstractMultipleChartProps: ChartProps = {
   data: multipleData,
-  meta: metaData,
+  meta: chartMetaData,
   width: 900,
   height: 300,
 
   labels: {
     '23_1_2_____': {
-      label: metaData.indicators['23'].label,
+      label: chartMetaData.indicators['23'].label,
       name: '23_1_2_____',
       unit: '%',
       value: '23_1_2_____',
     },
     '26_1_2_____': {
-      label: metaData.indicators['26'].label,
+      label: chartMetaData.indicators['26'].label,
       name: '26_1_2_____',
       unit: '%',
       value: '26_1_2_____',
     },
     '28_1_2_____': {
-      label: metaData.indicators['28'].label,
+      label: chartMetaData.indicators['28'].label,
       name: '28_1_2_____',
       unit: '%',
       value: '28_1_2_____',
@@ -3204,35 +3218,36 @@ const testResponseData_23_26__1_2_LAD: DataBlockResponse = {
   },
 };
 
+const AbstractLargeDataChartPropsMeta = parseMetaData(testResponseData_23_26_28__1_2_LAD.metaData);
 const AbstractLargeDataChartProps: ChartProps = {
   data: testResponseData_23_26_28__1_2_LAD,
-  meta: testResponseData_23_26_28__1_2_LAD.metaData,
+  meta: AbstractLargeDataChartPropsMeta,
   width: 900,
   height: 300,
 
   labels: {
     '2014_HT6': {
-      label: metaData.timePeriods['2014_HT6'].label,
+      label: AbstractLargeDataChartPropsMeta.timePeriods['2014_HT6'].label,
       value: '2014_HT6',
     },
     '2015_HT6': {
-      label: metaData.timePeriods['2015_HT6'].label,
+      label: AbstractLargeDataChartPropsMeta.timePeriods['2015_HT6'].label,
       value: '2015_HT6',
     },
     '23_1_2_____': {
-      label: metaData.indicators['23'].label,
+      label: AbstractLargeDataChartPropsMeta.indicators['23'].label,
       unit: '%',
       value: '23_1_2_____',
       name: '23_1_2_____',
     },
     '26_1_2_____': {
-      label: metaData.indicators['26'].label,
+      label: AbstractLargeDataChartPropsMeta.indicators['26'].label,
       unit: '%',
       value: '26_1_2_____',
       name: '26_1_2_____',
     },
     '28_1_2_____': {
-      label: metaData.indicators['28'].label,
+      label: AbstractLargeDataChartPropsMeta.indicators['28'].label,
       unit: '%',
       value: '26_1_2_____',
       name: '26_1_2_____',
@@ -3269,38 +3284,39 @@ const AbstractLargeDataChartProps: ChartProps = {
   },
 };
 
+const AbstractLargeDataChartProps_smaller_datasetsMeta = parseMetaData(testResponseData_23_26__1_2_LAD.metaData);
 const AbstractLargeDataChartProps_smaller_datasets: ChartProps = {
   data: testResponseData_23_26__1_2_LAD,
-  meta: testResponseData_23_26__1_2_LAD.metaData,
+  meta: AbstractLargeDataChartProps_smaller_datasetsMeta,
 
   width: 900,
   height: 300,
 
   labels: {
     '2014_HT6': {
-      label: metaData.timePeriods['2014_HT6'].label,
+      label: AbstractLargeDataChartProps_smaller_datasetsMeta.timePeriods['2014_HT6'].label,
       value: '2014_HT6',
     },
     '2015_HT6': {
-      label: metaData.timePeriods['2015_HT6'].label,
+      label: AbstractLargeDataChartProps_smaller_datasetsMeta.timePeriods['2015_HT6'].label,
       value: '2015_HT6',
     },
     '23_1_2_____': {
-      label: metaData.indicators['23'].label,
+      label: AbstractLargeDataChartProps_smaller_datasetsMeta.indicators['23'].label,
       unit: '%',
       value: '23_1_2_____',
       name: '23_1_2_____',
       colour: '#285252',
     },
     '26_1_2_____': {
-      label: metaData.indicators['26'].label,
+      label: AbstractLargeDataChartProps_smaller_datasetsMeta.indicators['26'].label,
       unit: '%',
       value: '26_1_2_____',
       name: '26_1_2_____',
       colour: '#572957',
     },
     '28_1_2_____': {
-      label: metaData.indicators['28'].label,
+      label: AbstractLargeDataChartProps_smaller_datasetsMeta.indicators['28'].label,
       unit: '%',
       value: '28_1_2_____',
       name: '28_1_2_____',
@@ -3335,29 +3351,30 @@ const AbstractLargeDataChartProps_smaller_datasets: ChartProps = {
   },
 };
 
+
 const AbstractMissingDataChartProps: ChartProps = {
   data: missingData,
   width: 900,
   height: 300,
 
   meta: {
-    ...metaData,
+    ...chartMetaData,
     timePeriods: {
       '2013_HT6': {
         label: '2013/14',
-        year: 2013, code: 'HT6',
+        value: '2013_HT6',
       },
       '2014_HT6': {
         label: '2014/15',
-        year: 2014, code: 'HT6',
+        value: '2014_HT6',
       },
       '2015_HT6': {
         label: '2015/16',
-        year: 2015, code: 'HT6',
+        value: '2015_HT6',
       },
       '2016_HT6': {
         label: '2016/17',
-        year: 2016, code: 'HT6',
+        value: '2016_HT6',
       },
     },
   },

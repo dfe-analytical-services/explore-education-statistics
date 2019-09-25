@@ -131,7 +131,7 @@ export interface DataBlockData {
 
 // --- Meta data
 
-interface LabelValueMetadata {
+export interface LabelValueMetadata {
   label: string;
   value: string;
 }

@@ -1,7 +1,7 @@
 import {
   BoundaryLevel,
   DataBlockData, DataBlockFilterMeta, DataBlockLocationMetadata,
-  DataBlockMetadata, LabelValueUnitMetadata,
+  DataBlockMetadata, LabelValueMetadata, LabelValueUnitMetadata,
   Location,
   Result,
 } from '@common/services/dataBlockService';
@@ -55,11 +55,11 @@ export function parseCondensedTimePeriodRange(
 }
 
 export interface ChartMetaData {
-  filters: Dictionary<LabelValueUnitMetadata>;
+  filters: Dictionary<LabelValueMetadata>;
   indicators: Dictionary<LabelValueUnitMetadata>;
   locations: Dictionary<DataBlockLocationMetadata>;
   boundaryLevels?: BoundaryLevel[];
-  timePeriods: Dictionary<LabelValueUnitMetadata>;
+  timePeriods: Dictionary<LabelValueMetadata>;
 }
 
 export interface AxesConfiguration {

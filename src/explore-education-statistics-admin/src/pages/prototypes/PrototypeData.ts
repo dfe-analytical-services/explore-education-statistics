@@ -43,21 +43,28 @@ const tables: Dictionary<PrototypeTable> = {
 const testResponse: DataBlockResponse = {
   metaData: {
     filters: {
-      '1': {
-        label: 'All pupils',
-        value: '1',
-      },
-      '72': {
-        label: 'State-funded primary',
-        value: '72',
-      },
-      '73': {
-        label: 'State-funded secondary',
-        value: '73',
-      },
-      '71': {
-        label: 'Special',
-        value: '71',
+      'test': {
+        hint: '',
+        legend: '',
+        totalValue: '',
+        options: {
+          '1': {
+            label: 'All pupils',
+            value: '1',
+          },
+          '72': {
+            label: 'State-funded primary',
+            value: '72',
+          },
+          '73': {
+            label: 'State-funded secondary',
+            value: '73',
+          },
+          '71': {
+            label: 'Special',
+            value: '71',
+          },
+        },
       },
     },
     indicators: {

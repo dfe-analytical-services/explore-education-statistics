@@ -1,7 +1,7 @@
 import PrototypeData from '@common/modules/find-statistics/components/charts/__tests__/__data__/testBlockData';
 import { expectTicks } from '@common/modules/find-statistics/components/charts/__tests__/testUtils';
 import {
-  AxesConfiguration,
+  AxesConfiguration, ChartMetaData,
   ChartProps,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import {
@@ -227,7 +227,7 @@ describe('LineChartBlock', () => {
 
   test('dies gracefully with bad data', () => {
     const invalidData: DataBlockData = (undefined as unknown) as DataBlockData;
-    const invalidMeta: DataBlockMetadata = (undefined as unknown) as DataBlockMetadata;
+    const invalidMeta: ChartMetaData = (undefined as unknown) as ChartMetaData;
     const invalidAxes: AxesConfiguration = (undefined as unknown) as AxesConfiguration;
 
     const { container } = render(
