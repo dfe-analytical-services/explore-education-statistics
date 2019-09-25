@@ -104,11 +104,16 @@ export interface DataBlockLocation {
   region?: Region;
   localAuthority?: LocalAuthority;
   localAuthorityDistrict?: LocalAuthorityDistrict;
+
+  // I don't like using any, but it's required here to simplify mapping to the Table Tool, for now
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [ key : string ]: any ;
 }
 
 export interface Result {
   filters: string[];
   location: DataBlockLocation;
+  geographicLevel: GeographicLevel;
   measures: {
     [key: string]: string;
   };
@@ -208,9 +213,10 @@ export interface DataBlockGeoJsonProperties {
 export type DataBlockGeoJSON = Feature<Geometry, DataBlockGeoJsonProperties>;
 
 export interface DataBlockLocationMetadata {
-  value: string;
-  label: string;
+  level: string;
   geoJson: DataBlockGeoJSON[];
+  label: string;
+  value: string;
 }
 
 // ------------------------------------------
@@ -219,12 +225,20 @@ export interface BoundaryLevel {
   id: number;
   label: string;
 }
+
+export interface DataBlockFilterMeta {
+  totalValue: string,
+  hint: string,
+  legend:string,
+  options: Dictionary<LabelValueMetadata>;
+}
+
 export interface DataBlockMetadata {
+  filters: Dictionary<DataBlockFilterMeta>;
   indicators: Dictionary<LabelValueUnitMetadata>;
-  filters: Dictionary<LabelValueMetadata>;
-  timePeriods: Dictionary<LabelValueMetadata>;
   locations: Dictionary<DataBlockLocationMetadata>;
   boundaryLevels?: BoundaryLevel[];
+  timePeriods: Dictionary<TimePeriodOptionMetadata>;
 }
 
 interface DataBlockTimePeriod {

@@ -11,6 +11,7 @@ import {
   ChartCapabilities,
   ChartDataB,
   createSortedAndMappedDataForAxis,
+  ChartMetaData,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import {
   DataBlockData,
@@ -32,7 +33,7 @@ interface Props {
   defaultDataType?: AxisGroupBy;
   configuration: AxisConfiguration;
   data: DataBlockData;
-  meta: DataBlockMetadata;
+  meta: ChartMetaData;
   labels: Dictionary<DataSetConfiguration>;
   capabilities: ChartCapabilities;
   onConfigurationChange: (configuration: AxisConfiguration) => void;
@@ -57,7 +58,7 @@ const getSortOptions = (
 const getAxisLabels = (
   configuration: AxisConfiguration,
   data: DataBlockData,
-  meta: DataBlockMetadata,
+  meta: ChartMetaData,
   labels: Dictionary<DataSetConfiguration>,
   dataSets: ChartDataSet[],
 ): SelectOption[] => {

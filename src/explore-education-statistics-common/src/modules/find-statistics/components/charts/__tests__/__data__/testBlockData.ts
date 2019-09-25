@@ -22,7 +22,7 @@ const data: DataBlockData = {
   geographicLevel: GeographicLevel.Country,
   result: [
     {
-      filters: ['1', '2'],
+      geographicLevel: GeographicLevel.Country, filters: ['1', '2'],
       location: {
         country: {
           code: 'E92000001',
@@ -50,7 +50,7 @@ const data: DataBlockData = {
       timePeriod: '2014_HT6',
     },
     {
-      filters: ['1', '2'],
+      geographicLevel: GeographicLevel.Country, filters: ['1', '2'],
       location: {
         country: {
           code: 'E92000001',
@@ -88,7 +88,7 @@ const data2: DataBlockData = {
   geographicLevel: GeographicLevel.Country,
   result: [
     {
-      filters: ['1', '2'],
+      geographicLevel: GeographicLevel.Country, filters: ['1', '2'],
       location: {
         country: {
           code: 'E92000001',
@@ -116,7 +116,7 @@ const data2: DataBlockData = {
       timePeriod: '2014_HT6',
     },
     {
-      filters: ['1', '2'],
+      geographicLevel: GeographicLevel.Country, filters: ['1', '2'],
       location: {
         country: {
           code: 'E92000001',
@@ -144,7 +144,7 @@ const data2: DataBlockData = {
       timePeriod: '2015_HT6',
     },
     {
-      filters: ['1', '2'],
+      geographicLevel: GeographicLevel.Country, filters: ['1', '2'],
       location: {
         country: {
           code: 'E92000001',
@@ -182,7 +182,7 @@ const missingData: DataBlockData = {
   geographicLevel: GeographicLevel.Country,
   result: [
     {
-      filters: ['1', '2'],
+      geographicLevel: GeographicLevel.Country, filters: ['1', '2'],
       location: {
         country: {
           code: 'E92000001',
@@ -209,7 +209,7 @@ const missingData: DataBlockData = {
       timePeriod: '2013_HT6',
     },
     {
-      filters: ['1', '2'],
+      geographicLevel: GeographicLevel.Country, filters: ['1', '2'],
       location: {
         country: {
           code: 'E92000001',
@@ -237,7 +237,7 @@ const missingData: DataBlockData = {
       timePeriod: '2015_HT6',
     },
     {
-      filters: ['1', '2'],
+      geographicLevel: GeographicLevel.Country, filters: ['1', '2'],
       location: {
         country: {
           code: 'E92000001',
@@ -275,7 +275,7 @@ const multipleData: DataBlockData = {
   geographicLevel: GeographicLevel.Country,
   result: [
     {
-      filters: ['1', '2'],
+      geographicLevel: GeographicLevel.Country, filters: ['1', '2'],
       location: {
         country: {
           code: 'E92000001',
@@ -303,7 +303,7 @@ const multipleData: DataBlockData = {
       timePeriod: '2015_HT6',
     },
     {
-      filters: ['1', '2'],
+      geographicLevel: GeographicLevel.Country, filters: ['1', '2'],
       location: {
         country: {
           code: 'S92000001',
@@ -372,21 +372,23 @@ const metaData: DataBlockMetadata = {
   timePeriods: {
     '2014_HT6': {
       label: '2014/15',
-      value: '2014_HT6',
+      year: 2014, code: 'HT6',
     },
     '2015_HT6': {
       label: '2015/16',
-      value: '2015_HT6',
+      year: 2015, code: 'HT6',
     },
   },
 
   locations: {
     E92000001: {
+      level: GeographicLevel.Country,
       value: 'E92000001',
       label: 'England',
       geoJson: [Features.E92000001],
     },
     S92000001: {
+      level: GeographicLevel.Country,
       value: 'S92000001',
       label: 'Scotland',
       geoJson: [Features.S92000001],
@@ -3063,7 +3065,7 @@ const AbstractChartProps2: ChartProps = {
       ...metaData.timePeriods,
       '2016_HT6': {
         label: '2016/17',
-        value: '2016_HT6',
+        year: 2016, code: 'HT6',
       },
     },
   },
@@ -3343,19 +3345,19 @@ const AbstractMissingDataChartProps: ChartProps = {
     timePeriods: {
       '2013_HT6': {
         label: '2013/14',
-        value: '2013_HT6',
+        year: 2013, code: 'HT6',
       },
       '2014_HT6': {
         label: '2014/15',
-        value: '2014_HT6',
+        year: 2014, code: 'HT6',
       },
       '2015_HT6': {
         label: '2015/16',
-        value: '2015_HT6',
+        year: 2015, code: 'HT6',
       },
       '2016_HT6': {
         label: '2016/17',
-        value: '2016_HT6',
+        year: 2016, code: 'HT6',
       },
     },
   },

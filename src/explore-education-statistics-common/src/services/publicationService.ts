@@ -90,8 +90,11 @@ export type ChartSymbol =
 
 export type LineStyle = 'solid' | 'dashed' | 'dotted';
 
-export interface DataSetConfiguration {
+export interface LabelConfiguration {
   label: string;
+}
+
+export interface DataSetConfiguration extends LabelConfiguration {
   value: string;
   name?: string;
   unit?: string;

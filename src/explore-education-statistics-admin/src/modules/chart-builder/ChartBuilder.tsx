@@ -12,6 +12,8 @@ import ChartRenderer, {
 import {
   ChartDefinition,
   generateKeyFromDataSet,
+  parseMetaData,
+  ChartMetaData,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import HorizontalBarBlock from '@common/modules/find-statistics/components/charts/HorizontalBarBlock';
 import LineChartBlock from '@common/modules/find-statistics/components/charts/LineChartBlock';
@@ -47,7 +49,7 @@ interface Props {
   onRequiresDataUpdate?: (parameters: DataBlockRerequest) => void;
 }
 
-function getReduceMetaDataForAxis(data: DataBlockResponse) {
+function getReduceMetaDataForAxis(data: DataBlockResponse, metaData: ChartMetaData) {
   return (
     items: Dictionary<DataSetConfiguration>,
     groupName?: string,
@@ -56,10 +58,10 @@ function getReduceMetaDataForAxis(data: DataBlockResponse) {
       return {
         ...items,
         ...data.result.reduce<Dictionary<DataSetConfiguration>>(
-          (moreItems, result) => ({
+          (moreItems, {timePeriod}) => ({
             ...moreItems,
-            [result.timePeriod]: data.metaData.timePeriods[result.timePeriod],
-          }),
+            [timePeriod]: metaData.timePeriods[timePeriod],
+            }),
           {},
         ),
       };
@@ -71,11 +73,12 @@ function getReduceMetaDataForAxis(data: DataBlockResponse) {
 function generateAxesMetaData(
   axes: Dictionary<AxisConfiguration>,
   data: DataBlockResponse,
+  metaData: ChartMetaData,
 ) {
   return Object.values(axes).reduce(
     (allValues, axis) => ({
       ...allValues,
-      ...[axis.groupBy].reduce(getReduceMetaDataForAxis(data), {}),
+      ...[axis.groupBy].reduce(getReduceMetaDataForAxis(data, metaData), {}),
     }),
     {},
   );
@@ -99,8 +102,16 @@ const ChartBuilder = ({
     ChartDefinition | undefined
   >();
 
+  const [metaData, setMetaData] = React.useState<ChartMetaData>(parseMetaData(data.metaData));
+
+  React.useEffect(() => {
+    if (data) {
+      setMetaData(parseMetaData(data.metaData));
+    };
+  }, [data]);
+
   const [indicatorIds] = React.useState<string[]>(
-    Object.keys(data.metaData.indicators),
+    Object.keys(metaData.indicators),
   );
 
   const [filterIdCombinations] = React.useState<string[][]>(
@@ -166,7 +177,7 @@ const ChartBuilder = ({
         }),
         {},
       ),
-      ...generateAxesMetaData(axesConfiguration, data),
+      ...generateAxesMetaData(axesConfiguration, data, metaData),
     });
   }, [dataSetAndConfiguration, axesConfiguration, data]);
 
@@ -194,7 +205,7 @@ const ChartBuilder = ({
 
         data,
 
-        meta: data.metaData,
+        meta: metaData,
 
         axes: {
           major: {
@@ -429,7 +440,7 @@ const ChartBuilder = ({
                 onDataChanged={(newData: ChartDataSetAndConfiguration[]) => {
                   setDataSetAndConfiguration([...newData]);
                 }}
-                metaData={data.metaData}
+                metaData={metaData}
                 indicatorIds={indicatorIds}
                 filterIds={filterIdCombinations}
                 selectedData={dataSetAndConfiguration}
@@ -452,7 +463,7 @@ const ChartBuilder = ({
                     : undefined,
                 })
               }
-              meta={data.metaData}
+              meta={metaData}
               data={data}
             />
           </TabsSection>
@@ -465,7 +476,7 @@ const ChartBuilder = ({
                   configuration={axis}
                   capabilities={selectedChartType.capabilities}
                   data={data}
-                  meta={data.metaData}
+                  meta={metaData}
                   labels={chartLabels}
                   dataSets={axis.type === 'major' ? majorAxisDataSets : []}
                   onConfigurationChange={updatedConfig => {

@@ -9,10 +9,11 @@ import {
 } from '@common/services/dataBlockService';
 import formatPretty from '@common/lib/utils/number/formatPretty';
 import styles from './SummaryRenderer.module.scss';
+import {ChartMetaData} from "@common/modules/find-statistics/components/charts/ChartFunctions";
 
 export interface SummaryRendererProps {
   data: DataBlockData;
-  meta: DataBlockMetadata;
+  meta: ChartMetaData;
   dataKeys: string[];
   dataSummary: string[];
   dataDefinition: string[];

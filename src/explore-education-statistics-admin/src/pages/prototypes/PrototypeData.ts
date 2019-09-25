@@ -1,9 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { Dictionary } from '@common/types';
-import {
-  DataBlockResponse,
-  GeographicLevel,
-} from '@common/services/dataBlockService';
+import {Dictionary} from '@common/types';
+import {DataBlockResponse, GeographicLevel,} from '@common/services/dataBlockService';
 
 export interface PrototypeTable {
   label: string;
@@ -82,28 +79,30 @@ const testResponse: DataBlockResponse = {
     },
     timePeriods: {
       '2012_HT6': {
+        code: "HT6",
+        year: 2012,
         label: '2012/2013',
-        value: '2012_HT6',
       },
       '2013_HT6': {
         label: '2013/2014',
-        value: '2013_HT6',
+        year: 2013, code: 'HT6',
       },
       '2014_HT6': {
         label: '2014/2015',
-        value: '2014_HT6',
+        year: 2014, code: 'HT6',
       },
       '2015_HT6': {
         label: '2015/2016',
-        value: '2015_HT6',
+        year: 2015, code: 'HT6',
       },
       '2016_HT6': {
         label: '2016/2017',
-        value: '2016_HT6',
+        year: 2016, code: 'HT6',
       },
     },
     locations: {
       E92000001: {
+        level: GeographicLevel.Country,
         geoJson: [
           {
             type: 'Feature',
@@ -3503,6 +3502,7 @@ const testResponse: DataBlockResponse = {
   geographicLevel: GeographicLevel.Country,
   result: [
     {
+      geographicLevel: GeographicLevel.Country,
       filters: ['1', '72'],
       location: {
         country: {
@@ -3518,6 +3518,7 @@ const testResponse: DataBlockResponse = {
       timePeriod: '2013_HT6',
     },
     {
+      geographicLevel: GeographicLevel.Country,
       filters: ['1', '73'],
       location: {
         country: {
@@ -3533,7 +3534,7 @@ const testResponse: DataBlockResponse = {
       timePeriod: '2013_HT6',
     },
     {
-      filters: ['1', '71'],
+      geographicLevel: GeographicLevel.Country, filters: ['1', '71'],
       location: {
         country: {
           code: 'E92000001',
@@ -3548,7 +3549,7 @@ const testResponse: DataBlockResponse = {
       timePeriod: '2013_HT6',
     },
     {
-      filters: ['1', '71'],
+      geographicLevel: GeographicLevel.Country, filters: ['1', '71'],
       location: {
         country: {
           code: 'E92000001',
@@ -3563,7 +3564,7 @@ const testResponse: DataBlockResponse = {
       timePeriod: '2014_HT6',
     },
     {
-      filters: ['1', '73'],
+      geographicLevel: GeographicLevel.Country, filters: ['1', '73'],
       location: {
         country: {
           code: 'E92000001',
@@ -3578,7 +3579,7 @@ const testResponse: DataBlockResponse = {
       timePeriod: '2012_HT6',
     },
     {
-      filters: ['1', '71'],
+      geographicLevel: GeographicLevel.Country, filters: ['1', '71'],
       location: {
         country: {
           code: 'E92000001',
@@ -3593,7 +3594,7 @@ const testResponse: DataBlockResponse = {
       timePeriod: '2012_HT6',
     },
     {
-      filters: ['1', '72'],
+      geographicLevel: GeographicLevel.Country, filters: ['1', '72'],
       location: {
         country: {
           code: 'E92000001',
@@ -3608,7 +3609,7 @@ const testResponse: DataBlockResponse = {
       timePeriod: '2012_HT6',
     },
     {
-      filters: ['1', '72'],
+      geographicLevel: GeographicLevel.Country, filters: ['1', '72'],
       location: {
         country: {
           code: 'E92000001',
@@ -3623,7 +3624,7 @@ const testResponse: DataBlockResponse = {
       timePeriod: '2015_HT6',
     },
     {
-      filters: ['1', '73'],
+      geographicLevel: GeographicLevel.Country, filters: ['1', '73'],
       location: {
         country: {
           code: 'E92000001',
@@ -3638,7 +3639,7 @@ const testResponse: DataBlockResponse = {
       timePeriod: '2016_HT6',
     },
     {
-      filters: ['1', '72'],
+      geographicLevel: GeographicLevel.Country, filters: ['1', '72'],
       location: {
         country: {
           code: 'E92000001',
@@ -3653,7 +3654,7 @@ const testResponse: DataBlockResponse = {
       timePeriod: '2016_HT6',
     },
     {
-      filters: ['1', '71'],
+      geographicLevel: GeographicLevel.Country, filters: ['1', '71'],
       location: {
         country: {
           code: 'E92000001',
@@ -3668,7 +3669,7 @@ const testResponse: DataBlockResponse = {
       timePeriod: '2016_HT6',
     },
     {
-      filters: ['1', '72'],
+      geographicLevel: GeographicLevel.Country, filters: ['1', '72'],
       location: {
         country: {
           code: 'E92000001',
@@ -3683,7 +3684,7 @@ const testResponse: DataBlockResponse = {
       timePeriod: '2014_HT6',
     },
     {
-      filters: ['1', '73'],
+      geographicLevel: GeographicLevel.Country, filters: ['1', '73'],
       location: {
         country: {
           code: 'E92000001',
@@ -3698,7 +3699,7 @@ const testResponse: DataBlockResponse = {
       timePeriod: '2014_HT6',
     },
     {
-      filters: ['1', '73'],
+      geographicLevel: GeographicLevel.Country, filters: ['1', '73'],
       location: {
         country: {
           code: 'E92000001',
@@ -3713,7 +3714,7 @@ const testResponse: DataBlockResponse = {
       timePeriod: '2015_HT6',
     },
     {
-      filters: ['1', '71'],
+      geographicLevel: GeographicLevel.Country, filters: ['1', '71'],
       location: {
         country: {
           code: 'E92000001',
