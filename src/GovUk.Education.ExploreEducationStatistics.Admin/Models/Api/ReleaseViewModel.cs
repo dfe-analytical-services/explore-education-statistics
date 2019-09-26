@@ -32,6 +32,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 
         public DateTime? Published { get; set; }
 
+        public bool Live => Published != null && Published > DateTime.UtcNow;
+
         [JsonConverter(typeof(TimeIdentifierJsonConverter))]
         public TimeIdentifier? TimePeriodCoverage { get; set; }
 
