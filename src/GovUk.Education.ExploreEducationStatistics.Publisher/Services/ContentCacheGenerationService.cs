@@ -7,6 +7,7 @@ using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -73,7 +74,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     new JsonSerializerSettings()
                     {
                         ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                        NullValueHandling = NullValueHandling.Ignore
+                        NullValueHandling = NullValueHandling.Ignore,
+                        ContractResolver = new DefaultContractResolver
+                        {
+                            NamingStrategy = new LowerCaseNamingStrategy()
+                        }
                     }));
                 return true;
             }
@@ -96,7 +101,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     new JsonSerializerSettings()
                     {
                         ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                        NullValueHandling = NullValueHandling.Ignore
+                        NullValueHandling = NullValueHandling.Ignore,
+                        ContractResolver = new DefaultContractResolver
+                        {
+                            NamingStrategy = new LowerCaseNamingStrategy()
+                        }
                     }));
                 return true;
             }
@@ -115,7 +124,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 new JsonSerializerSettings()
                 {
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                    NullValueHandling = NullValueHandling.Ignore
+                    NullValueHandling = NullValueHandling.Ignore,
+                    ContractResolver = new DefaultContractResolver
+                    {
+                        NamingStrategy = new LowerCaseNamingStrategy()
+                    }
                 }));
             return true;
         }
@@ -132,7 +145,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 var blob = _cloudBlobContainer.GetBlockBlobReference(
                     $"methodology/methodologies/{methodology.Slug}.json");
                 await blob.UploadTextAsync(JsonConvert.SerializeObject(methodology, null,
-                    new JsonSerializerSettings() {ReferenceLoopHandling = ReferenceLoopHandling.Ignore}));
+                    new JsonSerializerSettings()
+                    {
+                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                        ContractResolver = new DefaultContractResolver
+                        {
+                            NamingStrategy = new LowerCaseNamingStrategy()
+                        }
+                    }));
             }
 
             return true;
@@ -148,11 +168,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     _cloudBlobContainer.GetBlockBlobReference($"publications/{publication.Slug}/publication.json");
                 await publicationBlob.UploadTextAsync(JsonConvert.SerializeObject(
                     new PublicationViewModel() {Id = publication.Id, Title = publication.Title}, null,
-                    new JsonSerializerSettings() {ReferenceLoopHandling = ReferenceLoopHandling.Ignore}));
+                    new JsonSerializerSettings()
+                    {
+                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                        ContractResolver = new DefaultContractResolver
+                        {
+                            NamingStrategy = new LowerCaseNamingStrategy()
+                        }
+                    }));
 
                 var latestRelease = _releaseService.GetLatestRelease(publication.Id);
                 var latestReleaseJson = JsonConvert.SerializeObject(latestRelease, null,
-                    new JsonSerializerSettings() {ReferenceLoopHandling = ReferenceLoopHandling.Ignore});
+                    new JsonSerializerSettings()
+                    {
+                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                        ContractResolver = new DefaultContractResolver
+                        {
+                            NamingStrategy = new LowerCaseNamingStrategy()
+                        }
+                    });
 
                 var latestReleaseBlob =
                     _cloudBlobContainer.GetBlockBlobReference(
@@ -172,7 +206,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                             $"publications/{publication.Slug}/releases/{release.Slug}.json");
 
                     var json = JsonConvert.SerializeObject(release, null,
-                        new JsonSerializerSettings() {ReferenceLoopHandling = ReferenceLoopHandling.Ignore});
+                        new JsonSerializerSettings()
+                        {
+                            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                            ContractResolver = new DefaultContractResolver
+                            {
+                                NamingStrategy = new LowerCaseNamingStrategy()
+                            }
+                        });
 
                     await releaseBlob.UploadTextAsync(json);
                 }
@@ -191,4 +232,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return blobContainer;
         }
     }
+
+    class LowerCaseNamingStrategy : CamelCaseNamingStrategy
+    {
+        protected override string ResolvePropertyName(string name)
+        {
+            return name.ToLower();
+        }
+    }
+
 }
