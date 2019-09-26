@@ -227,13 +227,13 @@ export interface BoundaryLevel {
 }
 
 export interface DataBlockFilterMeta {
-  legend: string;
+  label: string;
   options: LabelValueMetadata[];
 }
 
 export interface DataBlockFilterGroupMeta {
-  totalValue: string;
-  hint: string;
+  totalValue?: string;
+  hint?: string;
   legend: string;
   options: Dictionary<DataBlockFilterMeta>;
 }

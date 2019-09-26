@@ -52,7 +52,7 @@ const testResponse: DataBlockResponse = {
         totalValue: '',
         options: {
           test: {
-            legend: 'test',
+            label: 'test',
             options: [
               {
                 label: 'All pupils',
