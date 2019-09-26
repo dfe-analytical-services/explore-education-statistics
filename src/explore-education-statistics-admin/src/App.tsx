@@ -21,6 +21,7 @@ import IndexPage from './pages/IndexPage';
 import PrototypeAdminDashboard from './pages/prototypes/PrototypeAdminDashboard';
 
 import PrototypeChartTest from './pages/prototypes/PrototypeChartTest';
+import PrototypeTableTool from './pages/prototypes/PrototypeTableTool';
 import AdminDocumentationGlossary from './pages/prototypes/PrototypeDocumentationGlossary';
 import AdminDocumentationStyle from './pages/prototypes/PrototypeDocumentationStyle';
 import AdminDocumentationHome from './pages/prototypes/PrototypeDocumentationHome';
@@ -102,6 +103,11 @@ function App() {
         />
 
         <Route exact path="/prototypes/charts" component={PrototypeChartTest} />
+        <Route
+          exact
+          path="/prototypes/table-tool"
+          component={PrototypeTableTool}
+        />
 
         <Route
           exact
