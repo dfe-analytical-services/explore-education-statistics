@@ -86,15 +86,17 @@ const ViewDataBlocks = () => {
 
     if (request) {
       DataBlockService.getDataBlockForSubject(request).then(response => {
-        setChartBuilderData({
-          ...response,
-          releaseId,
-        });
-        setInitialConfiguration(requestConfiguration);
+        if (response) {
+          setChartBuilderData({
+            ...response,
+            releaseId,
+          });
+          setInitialConfiguration(requestConfiguration);
 
-        // const createdTable = mapFullTable(response);
+          // const createdTable = mapFullTable(response);
 
-        // const tableHeaders = getDefaultTableHeaderConfig(createdTable.subjectMeta);
+          // const tableHeaders = getDefaultTableHeaderConfig(createdTable.subjectMeta);
+        }
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
