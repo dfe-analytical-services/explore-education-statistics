@@ -291,6 +291,7 @@ const MapBlock = ({
   height,
   labels,
   axes,
+  children,
 }: MapProps) => {
   const mapRef = React.createRef<Map>();
   const geoJsonRef = React.createRef<GeoJSON>();
@@ -544,7 +545,7 @@ const MapBlock = ({
     axisMajor === undefined ||
     axisMajor.dataSets === undefined
   )
-    return <div>An error occurred</div>;
+    return <div>Unable to render map, map incorrectly configured</div>;
 
   return (
     <div className="govuk-grid-row" ref={container}>
@@ -669,6 +670,7 @@ const MapBlock = ({
           </Map>
         )}
       </div>
+      {children}
     </div>
   );
 };

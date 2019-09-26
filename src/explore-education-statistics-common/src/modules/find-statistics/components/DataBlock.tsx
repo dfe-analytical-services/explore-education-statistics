@@ -53,6 +53,7 @@ export interface DataBlockProps {
 
 interface DataBlockState {
   isLoading: boolean;
+  isError: boolean;
   charts?: ChartRendererProps[];
   tables?: TableRendererProps[];
   summary?: SummaryRendererProps;
@@ -65,6 +66,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
 
   public state: DataBlockState = {
     isLoading: false,
+    isError: false,
   };
 
   private query?: DataQuery = undefined;
@@ -72,14 +74,21 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
   public async componentDidMount() {
     const { dataBlockRequest } = this.props;
 
-    this.setState({ isLoading: true });
+    this.setState({ isLoading: true, isError: false });
 
     if (dataBlockRequest) {
       const result = await DataBlockService.getDataBlockForSubject(
         dataBlockRequest,
       );
 
-      this.parseDataResponse(result);
+      if (result) {
+        this.parseDataResponse(result);
+      } else {
+        this.setState({
+          isError: true,
+          isLoading: false,
+        });
+      }
     } else {
       const { dataBlockResponse } = this.props;
       if (dataBlockResponse) {
@@ -93,7 +102,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
   }
 
   private parseDataResponse(response: DataBlockResponse): void {
-    const newState: DataBlockState = { isLoading: false };
+    const newState: DataBlockState = { isLoading: false, isError: false };
 
     const data: DataBlockData = response;
     const meta = parseMetaData(response.metaData);
@@ -149,7 +158,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
       onSummaryDetailsToggle,
       id,
     } = this.props;
-    const { charts, summary, tables, isLoading } = this.state;
+    const { charts, summary, tables, isLoading, isError } = this.state;
     return (
       <>
         {heading && <h3>{heading}</h3>}
@@ -158,6 +167,12 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
           <LoadingSpinner text="Loading content..." />
         ) : (
           <Tabs id={id} onToggle={onToggle}>
+            {isError && (
+              <TabsSection id={`${id}-error`} title="Error">
+                An error occurred while loading the data, please try again later
+              </TabsSection>
+            )}
+
             {summary && (
               <TabsSection id={`${id}-summary`} title="Summary">
                 <SummaryRenderer
@@ -196,12 +211,15 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
                       chart.meta &&
                       chart.data.result.length > 0 ? (
                         <>
-                          <ChartRenderer {...chart} height={height} />
-                          <DataSource />
-                          <DownloadDetails />
+                          <ChartRenderer {...chart} height={height}>
+                            <DataSource />
+                            <DownloadDetails />
+                          </ChartRenderer>
                         </>
                       ) : (
-                        <div>Invalid data specified</div>
+                        <div>
+                          Unable to render chart, invalid data configured
+                        </div>
                       )}
                     </React.Fragment>
                   );

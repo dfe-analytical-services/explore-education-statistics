@@ -39,7 +39,12 @@ function ChartTypeRenderer({ type, ...chartProps }: ChartRendererProps) {
       return <Infographic {...chartProps} />;
     }
     default:
-      return <div>[ Unimplemented chart type requested ${type} ]</div>;
+      return (
+        <div>
+          Unable to render chart, an unimplemented chart type was requested '$
+          {type}'
+        </div>
+      );
   }
 }
 
@@ -47,7 +52,7 @@ function ChartRenderer(props: ChartRendererProps) {
   const { data, meta, title } = props;
 
   // TODO : Temporary sort on the results to get them in date order
-  data.result.sort((a, b) => a.timePeriod.localeCompare(b.timePeriod));
+  // data.result.sort((a, b) => a.timePeriod.localeCompare(b.timePeriod));
 
   if (data && meta && data.result.length > 0) {
     return (
@@ -58,7 +63,7 @@ function ChartRenderer(props: ChartRendererProps) {
     );
   }
 
-  return <div>Invalid data specified</div>;
+  return <div>Unable to render chart, invalid data configured</div>;
 }
 
 export default ChartRenderer;

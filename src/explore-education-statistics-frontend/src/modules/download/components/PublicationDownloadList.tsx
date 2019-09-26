@@ -53,7 +53,7 @@ function PublicationList({ publications }: Props) {
                   >
                     {`${name}${getPublicationDate(path)}`}
                   </Link>
-                  {` (${extension}, ${size})`}
+                  {` (${extension.toUpperCase()}, ${size.toUpperCase()})`}
                 </li>
               ))}
             </ul>
