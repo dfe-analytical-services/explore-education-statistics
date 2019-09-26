@@ -6,7 +6,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -27,6 +29,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         private readonly string _storageConnectionString;
 
+        private readonly ISubjectService _subjectService;
+
         private const string ContainerName = "releases";
 
         private const string NameKey = "name";
@@ -41,9 +45,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Tb
         }
 
-        public FileStorageService(IConfiguration config)
+        public FileStorageService(IConfiguration config, ISubjectService subjectService)
         {
             _storageConnectionString = config.GetConnectionString("CoreStorage");
+            _subjectService = subjectService;
         }
 
         public async Task<IEnumerable<FileInfo>> ListFilesAsync(Guid releaseId, ReleaseFileTypes type)
@@ -52,20 +57,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ValidationResult, IEnumerable<FileInfo>>> UploadDataFilesAsync(Guid releaseId,
-            IFormFile dataFile, IFormFile metadataFile, string name, bool overwrite)
+            IFormFile dataFile, IFormFile metadataFile, string name, bool overwrite, string userName)
         {
             var blobContainer = await GetCloudBlobContainer();
-            var dataInfo = new Dictionary<string, string> {{NameKey, name}, {MetaFileKey, metadataFile.FileName}};
-            var metaDataInfo = new Dictionary<string, string> {{DataFileKey, dataFile.FileName}};
-            return await ValidateDataFilesForUpload(blobContainer, releaseId, dataFile, metadataFile, overwrite)
+            var dataInfo = new Dictionary<string, string> {{NameKey, name}, {MetaFileKey, metadataFile.FileName}, {UserName, userName}};
+            var metaDataInfo = new Dictionary<string, string> {{DataFileKey, dataFile.FileName}, {UserName, userName}};
+            return await ValidateDataFilesForUpload(blobContainer, releaseId, dataFile, metadataFile, name, overwrite)
                 .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, dataFile, ReleaseFileTypes.Data, dataInfo, overwrite))
                 .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, metadataFile, ReleaseFileTypes.Data, metaDataInfo, overwrite))
                 .OnSuccess(() => ListFilesAsync(releaseId, ReleaseFileTypes.Data));
         }
 
         // We cannot rely on the normal upload validation as we want this to be an atomic operation for both files.
-        private static async Task<Either<ValidationResult,bool>> ValidateDataFilesForUpload(CloudBlobContainer blobContainer, Guid releaseId,
-            IFormFile dataFile, IFormFile metaFile, bool overwrite)
+        private async Task<Either<ValidationResult,bool>> ValidateDataFilesForUpload(CloudBlobContainer blobContainer, Guid releaseId,
+            IFormFile dataFile, IFormFile metaFile, string name, bool overwrite)
         {
             if (string.Equals(dataFile.FileName, metaFile.FileName, OrdinalIgnoreCase))
             {
@@ -102,13 +107,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 return ValidationResult(CannotOverwriteMetadataFile);
             }
+
+            if (_subjectService.Exists(releaseId, name))
+            {
+                return ValidationResult(SubjectTitleMustBeUnique); 
+            }
+            
             return true;
         }
         
         public async Task<Either<ValidationResult, IEnumerable<FileInfo>>> DeleteDataFileAsync(Guid releaseId,
             string fileName)
         {
-            // TODO what are the conditions in which we allow deletion?
             var blobContainer = await GetCloudBlobContainer();
             // Get the paths of the files to delete
             return await DataPathsForDeletion(blobContainer, releaseId, fileName)
@@ -189,7 +199,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     Name = GetName(file),
                     Path = file.Name,
                     Size = GetSize(file),
-                    MetaFileName = GetMetaFileName(file)
+                    MetaFileName = GetMetaFileName(file),
+                    Rows = GetNumberOfRows(file),
+                    UserName = GetUserName(file)
                 })
                 .OrderBy(info => info.Name);
         }
@@ -212,6 +224,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             blob.Properties.ContentType = file.ContentType;
             var path = await UploadToTemporaryFile(file);
             await blob.UploadFromFileAsync(path);
+
+            metaValues["NumberOfRows"] = CalculateNumberOfRows(file.OpenReadStream()).ToString();
+            
             await AddMetaValuesAsync(blob, metaValues);
             return true;
         }
@@ -264,6 +279,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private static string GetMetaFileName(CloudBlob blob)
         {
             return blob.Metadata.TryGetValue(MetaFileKey, out var name) ? name : "";
+        }
+
+        private static int GetNumberOfRows(CloudBlob blob)
+        {
+            return 
+                blob.Metadata.TryGetValue(NumberOfRows, out var numberOfRows) &&
+                   int.TryParse(numberOfRows, out var numberOfRowsValue)
+                ? numberOfRowsValue
+                : 0;
+        }
+
+        private static string GetUserName(CloudBlob blob)
+        {
+            return blob.Metadata.TryGetValue(UserName, out var name) ? name : "";
         }
         
         private static bool IsBatchedFile(IListBlobItem blobItem, string releaseId)
@@ -327,6 +356,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             using (var reader = new StreamReader(fileStream))
             {
                 return reader.BaseStream.IsTextFile();
+            }
+        }
+
+        private static int CalculateNumberOfRows(Stream fileStream)
+        {
+            using (var reader = new StreamReader(fileStream))
+            {
+                var numberOfLines = 0;
+                while (reader.ReadLine() != null)
+                {
+                    ++numberOfLines;
+                }
+
+                return numberOfLines;
             }
         }
     }

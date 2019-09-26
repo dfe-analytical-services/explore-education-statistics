@@ -1,4 +1,3 @@
-import Details from '@common/components/Details';
 import { FormSelect } from '@common/components/form';
 import { SelectOption } from '@common/components/form/FormSelect';
 import {
@@ -292,6 +291,7 @@ const MapBlock = ({
   height,
   labels,
   axes,
+  children,
 }: MapProps) => {
   const mapRef = React.createRef<Map>();
   const geoJsonRef = React.createRef<GeoJSON>();
@@ -545,7 +545,7 @@ const MapBlock = ({
     axisMajor === undefined ||
     axisMajor.dataSets === undefined
   )
-    return <div>An error occurred</div>;
+    return <div>Unable to render map, map incorrectly configured</div>;
 
   return (
     <div className="govuk-grid-row" ref={container}>
@@ -595,9 +595,11 @@ const MapBlock = ({
                 >
                   <span>{` ${result.value}${labels[result.id].unit} `}</span>
                 </p>
+                {/*
                 <Details summary={`What is ${labels[result.id].label}?`}>
                   Description for {labels[result.id].label}
                 </Details>
+*/}
               </div>
             ))}
           </div>
@@ -668,6 +670,7 @@ const MapBlock = ({
           </Map>
         )}
       </div>
+      {children}
     </div>
   );
 };

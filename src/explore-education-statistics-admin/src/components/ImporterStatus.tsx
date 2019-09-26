@@ -44,7 +44,7 @@ class ImporterStatus extends Component<Props> {
     current: undefined,
   };
 
-  private intervalId?: any;
+  private intervalId?: NodeJS.Timeout;
 
   public componentDidMount() {
     this.fetchImportStatus();
@@ -100,7 +100,7 @@ class ImporterStatus extends Component<Props> {
           }),
       )
       .catch(
-        error =>
+        () =>
           this.intervalId &&
           this.setState({
             current: null,

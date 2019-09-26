@@ -16,6 +16,7 @@ const Infographic = ({
   chartFileDownloadService,
   width,
   height,
+  children,
 }: InfographicChartProps) => {
   const [file, setFile] = React.useState<string>();
 
@@ -28,7 +29,12 @@ const Infographic = ({
   if (fileId === undefined || fileId === '')
     return <div>Infographic not configured</div>;
 
-  return <img alt="infographic" src={file} width={width} height={height} />;
+  return (
+    <>
+      <img alt="infographic" src={file} width={width} height={height} />
+      {children}
+    </>
+  );
 };
 
 const definition: ChartDefinition = {

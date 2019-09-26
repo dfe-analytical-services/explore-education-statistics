@@ -9,11 +9,14 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using DataBlockId = System.Guid;
 using ContentSectionId = System.Guid;
+using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using PublicationId = System.Guid;
 using ReleaseId = System.Guid;
 
@@ -30,18 +33,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         private readonly IFileStorageService _fileStorageService;
         private readonly IPublicationService _publicationService;
         private readonly IImportStatusService _importStatusService;
+        private readonly ISubjectService _subjectService;
+        private readonly ITableStorageService _tableStorageService;
+        private readonly IUserService _userService;
 
         public ReleasesController(IImportService importService,
             IReleaseService releaseService,
             IFileStorageService fileStorageService,
             IPublicationService publicationService,
-            IImportStatusService importStatusService)
+            IImportStatusService importStatusService,
+            ISubjectService subjectService,
+            ITableStorageService tableStorageService,
+            IUserService userService
+            )
         {
             _importService = importService;
             _releaseService = releaseService;
             _fileStorageService = fileStorageService;
             _publicationService = publicationService;
             _importStatusService = importStatusService;
+            _subjectService = subjectService;
+            _tableStorageService = tableStorageService;
+            _userService = userService;
+            
         }
 
         [HttpGet("release/{releaseId}/chart/{filename}")]
@@ -151,8 +165,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             return await CheckReleaseExistsAsync(releaseId, () =>
             {
+                var email = _userService.GetLoggedInUserEmail(HttpContext);    
+                
                 // upload the files
-                return _fileStorageService.UploadDataFilesAsync(releaseId, file, metaFile, name, false)
+                return _fileStorageService.UploadDataFilesAsync(releaseId, file, metaFile, name, false, email)
                     // add message to queue to process these files
                     .OnSuccess(() => _importService.Import(file.FileName, releaseId));
             });
@@ -209,11 +225,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return Ok(await _importStatusService.GetImportStatus(releaseId.ToString(), fileName));
         }
 
-        [HttpDelete("release/{releaseId}/data/{fileName}")]
-        public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteDataFiles(ReleaseId releaseId, string fileName)
+        [HttpDelete("release/{releaseId}/data/{fileName}/{subjectTitle}")]
+        public async Task<ActionResult<IEnumerable<FileInfo>>> DeleteDataFiles(ReleaseId releaseId, string fileName, string subjectTitle)
         {
-            return await CheckReleaseExistsAsync(releaseId,
-                () => _fileStorageService.DeleteDataFileAsync(releaseId, fileName));
+            return await CheckReleaseExistsAsync(releaseId, async () =>
+                {
+                    await _tableStorageService.DeleteEntityAsync("imports",
+                        new DatafileImport(releaseId.ToString(), fileName, 0,0));
+                    await _subjectService.DeleteAsync(releaseId, subjectTitle);
+                    return await _fileStorageService.DeleteDataFileAsync(releaseId, fileName);
+                });
         }
 
         // DELETE api/release/{releaseId}/ancillary/{fileName}

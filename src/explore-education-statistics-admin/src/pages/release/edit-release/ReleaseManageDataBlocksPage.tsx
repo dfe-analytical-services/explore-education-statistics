@@ -51,11 +51,13 @@ const ReleaseManageDataBlocksPage = () => {
 
     if (request) {
       DataBlockService.getDataBlockForSubject(request).then(response => {
-        setChartBuilderData({
-          ...response,
-          releaseId,
-        });
-        setInitialConfiguration(requestConfiguration);
+        if (response) {
+          setChartBuilderData({
+            ...response,
+            releaseId,
+          });
+          setInitialConfiguration(requestConfiguration);
+        }
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -11,8 +11,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IFileStorageService
     {
-        Task<Either<ValidationResult,IEnumerable<FileInfo>>> UploadDataFilesAsync(ReleaseId releaseId,
-            IFormFile dataFile, IFormFile metaFile, string name, bool overwrite);
+        Task<Either<ValidationResult, IEnumerable<FileInfo>>> UploadDataFilesAsync(ReleaseId releaseId,
+            IFormFile dataFile, IFormFile metaFile, string name, bool overwrite, string userName);
         Task<IEnumerable<FileInfo>> ListFilesAsync(ReleaseId releaseId, ReleaseFileTypes type);
 
         Task<Either<ValidationResult, IEnumerable<FileInfo>>> UploadFilesAsync(ReleaseId releaseId,

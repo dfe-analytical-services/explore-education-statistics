@@ -24,7 +24,10 @@ function PublicationList({ publications }: Props) {
               <div className="govuk-!-margin-bottom-3">
                 {' '}
                 Currently available via{' '}
-                <a href={legacyPublicationUrl}>Statistics at DfE</a>
+                <a href={legacyPublicationUrl}>
+                  Statistics at DfE{' '}
+                  <span className="govuk-visually-hidden">for {title}</span>
+                </a>
               </div>
             ) : (
               <div className="govuk-grid-row govuk-!-margin-bottom-3">
@@ -35,7 +38,8 @@ function PublicationList({ publications }: Props) {
                     as={`/find-statistics/${slug}`}
                     data-testid={`view-stats-${slug}`}
                   >
-                    View statistics and data
+                    View statistics and data{' '}
+                    <span className="govuk-visually-hidden">for {title}</span>
                   </Link>
                 </div>
                 <div className="govuk-grid-column-one-third">
@@ -44,7 +48,8 @@ function PublicationList({ publications }: Props) {
                     to={`/data-tables/${slug}`}
                     data-testid={`create-table-${slug}`}
                   >
-                    Create your own tables online
+                    Create your own tables online{' '}
+                    <span className="govuk-visually-hidden">for {title}</span>
                   </Link>
                 </div>
               </div>
