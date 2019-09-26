@@ -107,7 +107,7 @@ export interface DataBlockLocation {
 
   // I don't like using any, but it's required here to simplify mapping to the Table Tool, for now
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [ key : string ]: any ;
+  [key: string]: any;
 }
 
 export interface Result {
@@ -227,14 +227,19 @@ export interface BoundaryLevel {
 }
 
 export interface DataBlockFilterMeta {
-  totalValue: string,
-  hint: string,
-  legend:string,
-  options: Dictionary<LabelValueMetadata>;
+  legend: string;
+  options: LabelValueMetadata[];
+}
+
+export interface DataBlockFilterGroupMeta {
+  totalValue: string;
+  hint: string;
+  legend: string;
+  options: Dictionary<DataBlockFilterMeta>;
 }
 
 export interface DataBlockMetadata {
-  filters: Dictionary<DataBlockFilterMeta>;
+  filters: Dictionary<DataBlockFilterGroupMeta>;
   indicators: Dictionary<LabelValueUnitMetadata>;
   locations: Dictionary<DataBlockLocationMetadata>;
   boundaryLevels?: BoundaryLevel[];

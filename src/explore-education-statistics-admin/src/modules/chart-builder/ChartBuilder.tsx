@@ -49,7 +49,10 @@ interface Props {
   onRequiresDataUpdate?: (parameters: DataBlockRerequest) => void;
 }
 
-function getReduceMetaDataForAxis(data: DataBlockResponse, metaData: ChartMetaData) {
+function getReduceMetaDataForAxis(
+  data: DataBlockResponse,
+  metaData: ChartMetaData,
+) {
   return (
     items: Dictionary<DataSetConfiguration>,
     groupName?: string,
@@ -58,10 +61,10 @@ function getReduceMetaDataForAxis(data: DataBlockResponse, metaData: ChartMetaDa
       return {
         ...items,
         ...data.result.reduce<Dictionary<DataSetConfiguration>>(
-          (moreItems, {timePeriod}) => ({
+          (moreItems, { timePeriod }) => ({
             ...moreItems,
             [timePeriod]: metaData.timePeriods[timePeriod],
-            }),
+          }),
           {},
         ),
       };
@@ -91,6 +94,13 @@ const chartTypes: ChartDefinition[] = [
   MapBlock.definition,
 ];
 
+const emptyMetadata = {
+  timePeriods: {},
+  filters: {},
+  indicators: {},
+  locations: {},
+};
+
 // need a constant reference as there are dependencies on this not changing if it isn't set
 const ChartBuilder = ({
   data,
@@ -102,12 +112,17 @@ const ChartBuilder = ({
     ChartDefinition | undefined
   >();
 
-  const [metaData, setMetaData] = React.useState<ChartMetaData>(parseMetaData(data.metaData));
+  const [metaData, setMetaData] = React.useState<ChartMetaData>(() => {
+    if (data && data.metaData) {
+      return parseMetaData(data.metaData);
+    }
+    return emptyMetadata;
+  });
 
   React.useEffect(() => {
-    if (data) {
+    if (data && data.metaData) {
       setMetaData(parseMetaData(data.metaData));
-    };
+    }
   }, [data]);
 
   const [indicatorIds] = React.useState<string[]>(
@@ -179,7 +194,7 @@ const ChartBuilder = ({
       ),
       ...generateAxesMetaData(axesConfiguration, data, metaData),
     });
-  }, [dataSetAndConfiguration, axesConfiguration, data]);
+  }, [dataSetAndConfiguration, axesConfiguration, data, metaData]);
 
   const [majorAxisDataSets, setMajorAxisDataSets] = React.useState<
     ChartDataSet[]
@@ -230,6 +245,7 @@ const ChartBuilder = ({
     axesConfiguration,
     dataSetAndConfiguration,
     data,
+    metaData,
     chartOptions,
     chartLabels,
     majorAxisDataSets,

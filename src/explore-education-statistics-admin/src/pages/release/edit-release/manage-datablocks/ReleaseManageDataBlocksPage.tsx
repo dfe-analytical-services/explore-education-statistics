@@ -1,8 +1,8 @@
 import React from 'react';
-import TabsSection from "@common/components/TabsSection";
+import TabsSection from '@common/components/TabsSection';
 import Tabs from '@common/components/Tabs';
-import CreateDataBlocks from "./CreateDataBlocks";
-import ViewDataBlocks from "./ViewDataBlocks";
+import CreateDataBlocks from './CreateDataBlocks';
+import ViewDataBlocks from './ViewDataBlocks';
 
 const ReleaseManageDataBlocksPage = () => {
   return (

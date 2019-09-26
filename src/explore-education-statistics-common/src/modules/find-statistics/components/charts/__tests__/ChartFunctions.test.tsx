@@ -6,7 +6,6 @@ import {
 import * as ChartFunctions from '../ChartFunctions';
 
 import Data from './__data__/chartFunctionsData';
-import {parseMetaData} from "../ChartFunctions";
 
 describe('ChartFunctions', () => {
   const dataSet23_1_72: ChartDataSet = {
@@ -31,7 +30,7 @@ describe('ChartFunctions', () => {
 
   test('createDataForAxis from single indicator', () => {
     const meta = Data.responseData.metaData;
-    const chartMeta = parseMetaData(meta);
+    const chartMeta = ChartFunctions.parseMetaData(meta);
 
     const minorAxisConfiguration: AxisConfiguration = {
       name: meta.indicators['26'].label,
@@ -72,7 +71,7 @@ describe('ChartFunctions', () => {
 
   test('createDataForAxis can sort by indicator from single indicator', () => {
     const meta = Data.responseData.metaData;
-    const chartMeta = parseMetaData(meta);
+    const chartMeta = ChartFunctions.parseMetaData(meta);
 
     const axis: AxisConfiguration = {
       name: meta.indicators['99'].label,
@@ -115,7 +114,7 @@ describe('ChartFunctions', () => {
 
   test('createDataForAxis from multiple indicators', () => {
     const meta = Data.responseData.metaData;
-    const chartMeta = parseMetaData(meta);
+    const chartMeta = ChartFunctions.parseMetaData(meta);
 
     const minorAxisConfiguration: AxisConfiguration = {
       name: meta.indicators['26'].label,
@@ -161,7 +160,7 @@ describe('ChartFunctions', () => {
 
   test('createDataForAxis from multiple filters', () => {
     const meta = Data.responseData.metaData;
-    const chartMeta = parseMetaData(meta);
+    const chartMeta = ChartFunctions.parseMetaData(meta);
 
     const minorAxisConfiguration: AxisConfiguration = {
       name: meta.indicators['26'].label,
@@ -207,7 +206,7 @@ describe('ChartFunctions', () => {
 
   test('createDataForAxis returns full data range if data is missing', () => {
     const meta = Data.responseWithMissingData.metaData;
-    const chartMeta = parseMetaData(meta);
+    const chartMeta = ChartFunctions.parseMetaData(meta);
 
     const axisConfig: AxisConfiguration = {
       name: meta.indicators['26'].label,
@@ -247,5 +246,19 @@ describe('ChartFunctions', () => {
         '26_1_72_____': '4',
       },
     ]);
+  });
+
+  test('parseMetaData', () => {
+    const meta = Data.responseData.metaData;
+    const chartMeta = ChartFunctions.parseMetaData(meta);
+
+    expect(chartMeta.filters).not.toBeUndefined();
+    expect(chartMeta.indicators).not.toBeUndefined();
+    expect(chartMeta.locations).not.toBeUndefined();
+    expect(chartMeta.timePeriods).not.toBeUndefined();
+
+    expect(chartMeta.filters['1']).not.toBeUndefined();
+    expect(chartMeta.filters['1'].label).toEqual('All pupils');
+    expect(chartMeta.filters['1'].value).toEqual('1');
   });
 });

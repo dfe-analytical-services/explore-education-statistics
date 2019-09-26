@@ -24,7 +24,7 @@ import {
   Table,
 } from '@common/services/publicationService';
 import React, { Component, MouseEvent, ReactNode } from 'react';
-import {parseMetaData} from "@common/modules/find-statistics/components/charts/ChartFunctions";
+import { parseMetaData } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import DownloadDetails from './DownloadDetails';
 
 export interface DataBlockProps {

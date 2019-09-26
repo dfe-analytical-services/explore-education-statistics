@@ -26,7 +26,7 @@ export interface PageSearchFormProps {
   elementSelectors: string[];
   id: string;
   minInput: number;
-  onSearch?: any;
+  onSearch?: (s: string) => void;
 }
 
 interface State {

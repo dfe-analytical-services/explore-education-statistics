@@ -10,7 +10,6 @@ import {
   symbols,
   ChartMetaData,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
-import { DataBlockMetadata } from '@common/services/dataBlockService';
 import {
   ChartDataSet,
   DataSetConfiguration,
@@ -46,11 +45,7 @@ export interface ChartDataSetAndConfiguration {
   configuration: DataSetConfiguration;
 }
 
-function dataName(
-  meta: ChartMetaData,
-  indicator: string,
-  filters: string[],
-) {
+function dataName(meta: ChartMetaData, indicator: string, filters: string[]) {
   return [
     meta.indicators[indicator].label,
     '(',

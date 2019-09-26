@@ -10,13 +10,10 @@ import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
 import {
   ChartCapabilities,
   ChartDataB,
-  createSortedAndMappedDataForAxis,
   ChartMetaData,
+  createSortedAndMappedDataForAxis,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
-import {
-  DataBlockData,
-  DataBlockMetadata,
-} from '@common/services/dataBlockService';
+import { DataBlockData } from '@common/services/dataBlockService';
 import {
   AxisConfiguration,
   AxisGroupBy,

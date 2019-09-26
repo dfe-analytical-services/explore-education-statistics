@@ -2,7 +2,8 @@ import { FormSelect } from '@common/components/form';
 import { SelectOption } from '@common/components/form/FormSelect';
 import {
   ChartDataB,
-  ChartDefinition, ChartMetaData,
+  ChartDefinition,
+  ChartMetaData,
   ChartProps,
   createSortedAndMappedDataForAxis,
   generateKeyFromDataSet,
@@ -11,7 +12,6 @@ import {
 import {
   DataBlockData,
   DataBlockGeoJsonProperties,
-  DataBlockMetadata,
 } from '@common/services/dataBlockService';
 import {
   AxisConfiguration,

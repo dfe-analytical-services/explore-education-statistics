@@ -16,25 +16,24 @@ import DataBlockService, {
 } from '@common/services/dataBlockService';
 import { Chart } from '@common/services/publicationService';
 import React, { useContext } from 'react';
-import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
-import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
-import { Indicator, LocationFilter, TimePeriodFilter } from '@common/modules/full-table/types/filters';
+import {
+  Indicator,
+  LocationFilter,
+  TimePeriodFilter,
+} from '@common/modules/full-table/types/filters';
 import { FullTable } from '@common/modules/full-table/types/fullTable';
 
-const mapFullTable = (
-  unmappedFullTable: DataBlockResponse,
-): FullTable => {
+const mapFullTable = (unmappedFullTable: DataBlockResponse): FullTable => {
   const subjectMeta = unmappedFullTable.metaData || {
     indicators: {},
     locations: {},
     timePeriodRange: {},
   };
 
-
   return {
     ...unmappedFullTable,
     subjectMeta: {
-      publicationName: "Test",
+      publicationName: 'Test',
       footnotes: [],
       // @ts-ignore
       filters: {},
@@ -52,8 +51,9 @@ const mapFullTable = (
   };
 };
 const ViewDataBlocks = () => {
-
-  const { releaseId, publication } = useContext(ManageReleaseContext) as ManageRelease;
+  const { releaseId, publication } = useContext(
+    ManageReleaseContext,
+  ) as ManageRelease;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedDataBlock, setSelectedDataBlock] = React.useState<string>('');
@@ -67,17 +67,17 @@ const ViewDataBlocks = () => {
 
   const [chartBuilderData, setChartBuilderData] = React.useState<
     DataBlockResponse
-    >();
+  >();
 
   const [request, setRequest] = React.useState<DataBlockRequest>();
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [requestConfiguration, setRequestConfiguration] = React.useState<
     Chart | undefined
-    >();
+  >();
   const [initialConfiguration, setInitialConfiguration] = React.useState<
     Chart | undefined
-    >();
+  >();
 
   React.useEffect(() => {
     // destroy the existing setup before the response completes
@@ -144,10 +144,7 @@ const ViewDataBlocks = () => {
         <>
           <hr />
           <Tabs id="editDataBlockSections">
-            <TabsSection title="table">
-
-              Table
-            </TabsSection>
+            <TabsSection title="table">Table</TabsSection>
             <TabsSection title="Create Chart">
               {chartBuilderData ? (
                 <ChartBuilder
@@ -165,7 +162,6 @@ const ViewDataBlocks = () => {
       )}
     </>
   );
-
 };
 
 export default ViewDataBlocks;
