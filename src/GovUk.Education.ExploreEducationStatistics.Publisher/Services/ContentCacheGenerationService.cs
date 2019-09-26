@@ -19,6 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly IDownloadService _downloadService;
         private readonly IMethodologyService _methodologyService;
         private readonly CloudBlobContainer _cloudBlobContainer;
+        private readonly JsonSerializerSettings _jsonSerializerSettings = GetJsonSerializerSettings();
 
         private const string ContainerName = "cache";
 
@@ -70,16 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             if (contentTree != null)
             {
                 var contentTreeBlob = _cloudBlobContainer.GetBlockBlobReference("publications/tree.json");
-                await contentTreeBlob.UploadTextAsync(JsonConvert.SerializeObject(contentTree, null,
-                    new JsonSerializerSettings()
-                    {
-                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                        NullValueHandling = NullValueHandling.Ignore,
-                        ContractResolver = new DefaultContractResolver
-                        {
-                            NamingStrategy = new LowerCaseNamingStrategy()
-                        }
-                    }));
+                await contentTreeBlob.UploadTextAsync(JsonConvert.SerializeObject(contentTree, null, _jsonSerializerSettings));
                 return true;
             }
             else
@@ -97,16 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             if (downloadTree != null)
             {
                 var downloadTreeBlob = _cloudBlobContainer.GetBlockBlobReference("download/tree.json");
-                await downloadTreeBlob.UploadTextAsync(JsonConvert.SerializeObject(downloadTree, null,
-                    new JsonSerializerSettings()
-                    {
-                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                        NullValueHandling = NullValueHandling.Ignore,
-                        ContractResolver = new DefaultContractResolver
-                        {
-                            NamingStrategy = new LowerCaseNamingStrategy()
-                        }
-                    }));
+                await downloadTreeBlob.UploadTextAsync(JsonConvert.SerializeObject(downloadTree, null, _jsonSerializerSettings));
                 return true;
             }
             else
@@ -120,16 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var methodologyTree = _methodologyService.GetTree();
 
             var methodologyTreeBlob = _cloudBlobContainer.GetBlockBlobReference("methodology/tree.json");
-            await methodologyTreeBlob.UploadTextAsync(JsonConvert.SerializeObject(methodologyTree, null,
-                new JsonSerializerSettings()
-                {
-                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                    NullValueHandling = NullValueHandling.Ignore,
-                    ContractResolver = new DefaultContractResolver
-                    {
-                        NamingStrategy = new LowerCaseNamingStrategy()
-                    }
-                }));
+            await methodologyTreeBlob.UploadTextAsync(JsonConvert.SerializeObject(methodologyTree, null, _jsonSerializerSettings));
             return true;
         }
 
@@ -144,15 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 // TODO: Save the filename as slug rather than ID
                 var blob = _cloudBlobContainer.GetBlockBlobReference(
                     $"methodology/methodologies/{methodology.Slug}.json");
-                await blob.UploadTextAsync(JsonConvert.SerializeObject(methodology, null,
-                    new JsonSerializerSettings()
-                    {
-                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                        ContractResolver = new DefaultContractResolver
-                        {
-                            NamingStrategy = new LowerCaseNamingStrategy()
-                        }
-                    }));
+                await blob.UploadTextAsync(JsonConvert.SerializeObject(methodology, null, _jsonSerializerSettings));
             }
 
             return true;
@@ -178,15 +144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     }));
 
                 var latestRelease = _releaseService.GetLatestRelease(publication.Id);
-                var latestReleaseJson = JsonConvert.SerializeObject(latestRelease, null,
-                    new JsonSerializerSettings()
-                    {
-                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                        ContractResolver = new DefaultContractResolver
-                        {
-                            NamingStrategy = new LowerCaseNamingStrategy()
-                        }
-                    });
+                var latestReleaseJson = JsonConvert.SerializeObject(latestRelease, null, _jsonSerializerSettings);
 
                 var latestReleaseBlob =
                     _cloudBlobContainer.GetBlockBlobReference(
@@ -231,14 +189,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             blobContainer.CreateIfNotExists();
             return blobContainer;
         }
+
+        private static JsonSerializerSettings GetJsonSerializerSettings()
+        {
+            return new JsonSerializerSettings()
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                //NullValueHandling = NullValueHandling.Ignore,
+                ContractResolver = new DefaultContractResolver
+                {
+                    NamingStrategy = new LowerCaseNamingStrategy()
+                }
+            };
+        }
     }
 
-    class LowerCaseNamingStrategy : CamelCaseNamingStrategy
+    internal class LowerCaseNamingStrategy : CamelCaseNamingStrategy
     {
         protected override string ResolvePropertyName(string name)
         {
             return name.ToLower();
         }
     }
-
 }
