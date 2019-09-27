@@ -30,8 +30,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             {
                 return NoContent();
             }
-
-            return tree;
+            
+            return Content(tree, "application/json");
         }
     }
 }

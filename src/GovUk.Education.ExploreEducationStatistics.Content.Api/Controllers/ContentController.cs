@@ -1,8 +1,12 @@
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 {
@@ -31,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                 return NoContent();
             }
 
-            return tree;
+            return Content(tree, "application/json");
         }
 
         // GET api/content/publication/pupil-absence-in-schools-in-england
@@ -48,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                 return NotFound();
             }
 
-            return publication;
+            return Content(publication, "application/json");
         }
 
         // GET api/content/publication/pupil-absence-in-schools-in-england/latest
@@ -65,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                 return NotFound();
             }
 
-            return release;
+            return Content(release, "application/json");
         }
 
         // TODO: this looks like it needs refactoring to return the release view model
@@ -83,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                 return NotFound();
             }
 
-            return release;
+            return Content(release, "application/json");
         }
     }
 }

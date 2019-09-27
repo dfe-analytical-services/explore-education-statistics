@@ -32,8 +32,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             {
                 return NoContent();
             }
-            return tree;
-
+            
+            return Content(tree, "application/json");
         }
         
         // GET api/methodology/name-of-content
@@ -49,7 +49,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             {
                 return NotFound();
             }
-            return methodology;
+            
+            return Content(methodology, "application/json");
         }
     }
 }
