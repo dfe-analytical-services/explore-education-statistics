@@ -16,6 +16,7 @@ import DataBlockService, {
 } from '@common/services/dataBlockService';
 import { Chart } from '@common/services/publicationService';
 import React, { useContext } from 'react';
+import Link from '@admin/components/Link';
 
 const ReleaseManageDataBlocksPage = () => {
   const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
@@ -79,8 +80,26 @@ const ReleaseManageDataBlocksPage = () => {
 
   return (
     <>
+      <div className="govuk-inset-text">
+        <h3>This functionality is still in development.</h3>
+        <p>
+          We're currently working on embedding a version of the table tool
+          filtered to data uploaded from this release within the page. This will
+          then allow the creation of data blocks and the ability to create
+          charts and tables.
+        </p>
+        <p>
+          While this work is in progress we have added a temporary table tool
+          page that allows access to data you have uploaded.
+        </p>
+        <Link to="/prototypes/table-tool" target="_blank">
+          Temporary admin table tool
+        </Link>
+      </div>
       <Tabs id="manageDataBlocks">
-        <TabsSection title="Create data blocks">something</TabsSection>
+        <TabsSection title="Create data blocks">
+          Currently in developent
+        </TabsSection>
         <TabsSection title="View datablocks">
           <FormSelect
             id="selectDataBlock"
