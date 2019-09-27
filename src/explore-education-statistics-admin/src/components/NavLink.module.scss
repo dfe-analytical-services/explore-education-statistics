@@ -3,3 +3,8 @@
 .app-navigation--current-page {
   border-bottom: 0.3rem solid $govuk-link-colour;
 }
+
+.app-navigation--current-page:global(.govuk-link):focus {
+  background: govuk-colour('white');
+  color: $govuk-link-colour;
+}
