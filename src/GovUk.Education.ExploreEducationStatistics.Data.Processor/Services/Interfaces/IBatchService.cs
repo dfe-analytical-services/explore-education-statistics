@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
 
         Task LogErrors(string releaseId, string dataFileName, List<string> errors);
 
-        Task CreateImport(string releaseId, string dataFileName, int numBatches);
+        Task CreateImport(string releaseId, string dataFileName, int numberOfRows, int numBatches);
 
         Task<bool> IsBatchProcessed(string releaseId, string dataFileName, int batchNo);
     }

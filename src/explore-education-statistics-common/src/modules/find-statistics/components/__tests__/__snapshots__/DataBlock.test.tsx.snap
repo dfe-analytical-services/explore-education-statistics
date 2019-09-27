@@ -298,13 +298,13 @@ exports[`DataBlock renders map instead of chart 1`] = `
         </div>
       </div>
     </div>
-  </div>
-  <div>
-    <p
-      class="govuk-body-s"
-    >
-      Source: Department for Education
-    </p>
+    <div>
+      <p
+        class="govuk-body-s"
+      >
+        Source: Department for Education
+      </p>
+    </div>
   </div>
 </section>
 `;

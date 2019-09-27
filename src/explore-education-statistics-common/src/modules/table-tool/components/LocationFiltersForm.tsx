@@ -4,7 +4,7 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
 import { PublicationSubjectMeta } from '@common/modules/full-table/services/tableBuilderService';
 import { Dictionary } from '@common/types/util';
-import useResetFormOnPreviousStep from '@frontend/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
+import useResetFormOnPreviousStep from '@common/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
 import { FormikProps } from 'formik';
 import sortBy from 'lodash/sortBy';
 import React, { useRef } from 'react';

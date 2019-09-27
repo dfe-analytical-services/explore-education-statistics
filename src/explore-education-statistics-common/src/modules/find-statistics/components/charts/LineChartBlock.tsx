@@ -68,6 +68,7 @@ const LineChartBlock = (props: LineChartProps) => {
     legend,
     legendHeight,
     width,
+    children,
   } = props;
 
   if (
@@ -77,7 +78,7 @@ const LineChartBlock = (props: LineChartProps) => {
     data === undefined ||
     meta === undefined
   )
-    return <div>Unable to render chart</div>;
+    return <div>Unable to render chart, chart incorrectly configured</div>;
 
   const chartData: ChartDataB[] = createSortedAndMappedDataForAxis(
     axes.major,
@@ -92,91 +93,99 @@ const LineChartBlock = (props: LineChartProps) => {
   const majorDomainTicks = generateMajorAxis(chartData, axes.major);
 
   return (
-    <ResponsiveContainer width={width || '100%'} height={height || 300}>
-      <LineChart
-        data={chartData}
-        className={classnames({ 'legend-bottom': legend === 'bottom' })}
-        margin={{
-          left: 30,
-          top: legend === 'top' ? 10 : 0,
-        }}
-      >
-        <Tooltip content={CustomToolTip} />
+    <>
+      <ResponsiveContainer width={width || '100%'} height={height || 300}>
+        <LineChart
+          data={chartData}
+          className={classnames({ 'legend-bottom': legend === 'bottom' })}
+          margin={{
+            left: 30,
+            top: legend === 'top' ? 10 : 0,
+          }}
+        >
+          <Tooltip content={CustomToolTip} />
 
-        {(legend === 'top' || legend === 'bottom') && (
-          <Legend verticalAlign={legend} height={+(legendHeight || '50')} />
-        )}
-
-        <CartesianGrid
-          strokeDasharray="3 3"
-          horizontal={axes.minor.showGrid !== false}
-          vertical={axes.major.showGrid !== false}
-        />
-
-        <YAxis
-          type="number"
-          dataKey="value"
-          hide={axes.minor.visible === false}
-          unit={
-            (axes.minor.unit && axes.minor.unit !== '' && axes.minor.unit) || ''
-          }
-          scale="auto"
-          {...minorDomainTicks}
-          width={conditionallyAdd(axes.minor.size)}
-        />
-
-        <XAxis
-          type="category"
-          dataKey="name"
-          hide={axes.major.visible === false}
-          unit={
-            (axes.major.unit && axes.major.unit !== '' && axes.major.unit) || ''
-          }
-          scale="auto"
-          {...majorDomainTicks}
-          padding={{ left: 20, right: 20 }}
-          height={conditionallyAdd(
-            axes.major.size,
-            legend === 'bottom' ? 0 : undefined,
+          {(legend === 'top' || legend === 'bottom') && (
+            <Legend verticalAlign={legend} height={+(legendHeight || '50')} />
           )}
-          tickMargin={10}
-        />
 
-        {keysForChart.map(name => (
-          <Line
-            key={name}
-            {...populateDefaultChartProps(name, labels[name])}
-            type="linear"
-            legendType={generateLegendType(labels[name] && labels[name].symbol)}
-            dot={generateDot(labels[name] && labels[name].symbol)}
-            strokeWidth="2"
-            strokeDasharray={
-              labels[name] &&
-              labels[name].lineStyle &&
-              LineStyles[labels[name].lineStyle || 'solid']
-            }
+          <CartesianGrid
+            strokeDasharray="3 3"
+            horizontal={axes.minor.showGrid !== false}
+            vertical={axes.major.showGrid !== false}
           />
-        ))}
 
-        {axes.major.referenceLines &&
-          axes.major.referenceLines.map(referenceLine => (
-            <ReferenceLine
-              key={`${referenceLine.position}_${referenceLine.label}`}
-              x={referenceLine.position}
-              label={referenceLine.label}
+          <YAxis
+            type="number"
+            dataKey="value"
+            hide={axes.minor.visible === false}
+            unit={
+              (axes.minor.unit && axes.minor.unit !== '' && axes.minor.unit) ||
+              ''
+            }
+            scale="auto"
+            {...minorDomainTicks}
+            width={conditionallyAdd(axes.minor.size)}
+          />
+
+          <XAxis
+            type="category"
+            dataKey="name"
+            hide={axes.major.visible === false}
+            unit={
+              (axes.major.unit && axes.major.unit !== '' && axes.major.unit) ||
+              ''
+            }
+            scale="auto"
+            {...majorDomainTicks}
+            padding={{ left: 20, right: 20 }}
+            height={conditionallyAdd(
+              axes.major.size,
+              legend === 'bottom' ? 0 : undefined,
+            )}
+            tickMargin={10}
+          />
+
+          {keysForChart.map(name => (
+            <Line
+              key={name}
+              {...populateDefaultChartProps(name, labels[name])}
+              type="linear"
+              legendType={generateLegendType(
+                labels[name] && labels[name].symbol,
+              )}
+              dot={generateDot(labels[name] && labels[name].symbol)}
+              strokeWidth="2"
+              strokeDasharray={
+                labels[name] &&
+                labels[name].lineStyle &&
+                LineStyles[labels[name].lineStyle || 'solid']
+              }
             />
           ))}
 
-        {axes.minor.referenceLines &&
-          axes.minor.referenceLines.map(referenceLine => (
-            <ReferenceLine
-              key={`${referenceLine.position}_${referenceLine.label}`}
-              y={referenceLine.position}
-              label={referenceLine.label}
-            />
-          ))}
-      </LineChart>
-    </ResponsiveContainer>
+          {axes.major.referenceLines &&
+            axes.major.referenceLines.map(referenceLine => (
+              <ReferenceLine
+                key={`${referenceLine.position}_${referenceLine.label}`}
+                x={referenceLine.position}
+                label={referenceLine.label}
+              />
+            ))}
+
+          {axes.minor.referenceLines &&
+            axes.minor.referenceLines.map(referenceLine => (
+              <ReferenceLine
+                key={`${referenceLine.position}_${referenceLine.label}`}
+                y={referenceLine.position}
+                label={referenceLine.label}
+              />
+            ))}
+        </LineChart>
+      </ResponsiveContainer>
+
+      {children}
+    </>
   );
 };
 

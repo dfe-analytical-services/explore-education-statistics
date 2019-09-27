@@ -7,5 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
         public string Path { get; set; }
         public string Size { get; set; }
         public string MetaFileName { get; set; }
+        public int Rows { get; set; }
+        public string UserName { get; set; }
     }
 }

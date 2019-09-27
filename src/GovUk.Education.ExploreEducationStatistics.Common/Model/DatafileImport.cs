@@ -12,8 +12,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
         [EntityEnumPropertyConverter]
         public IStatus Status { get; set; }
         public string Errors { get; set; }
+        
+        public int NumberOfRows { get; set; }
 
-        public DatafileImport(string releaseId, string dataFileName, int numBatches)
+        public DatafileImport(string releaseId, string dataFileName, int numberOfRows, int numBatches)
         {
             PartitionKey = releaseId;
             RowKey = dataFileName;
@@ -21,6 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
             BatchesProcessed = new byte[64];
             Errors = "";
             Status = IStatus.RUNNING_PHASE_1;
+            NumberOfRows = numberOfRows;
         }
 
         public DatafileImport()

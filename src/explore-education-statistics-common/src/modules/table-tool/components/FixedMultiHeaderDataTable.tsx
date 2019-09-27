@@ -1,5 +1,5 @@
 import React, { forwardRef, ReactNode, Ref, useRef, useEffect } from 'react';
-import Footnote from '@frontend/modules/table-tool/components/Footnote';
+import Footnote from '@common/modules/table-tool/components/Footnote';
 import { FullTableMeta } from '@common/modules/full-table/types/fullTable';
 import MultiHeaderTable from './MultiHeaderTable';
 import styles from './FixedMultiHeaderDataTable.module.scss';

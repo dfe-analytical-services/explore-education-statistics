@@ -31,6 +31,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
 
         public DateTime? Published { get; set; }
 
+        public bool Live => Published != null;
+
         [JsonConverter(typeof(TimeIdentifierJsonConverter))]
         public TimeIdentifier? TimePeriodCoverage { get; set; }
 

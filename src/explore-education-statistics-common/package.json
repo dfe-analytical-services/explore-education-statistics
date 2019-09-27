@@ -4,13 +4,16 @@
   "description": "",
   "devDependencies": {
     "@types/classnames": "^2.2.9",
+    "@types/file-saver": "^2.0.1",
     "@types/jest": "^24.0.15",
     "@types/lodash": "^4.14.136",
     "@types/memoizee": "^0.4.2",
     "@types/next": "^8.0.5",
     "@types/node": "^12.6.1",
+    "@types/papaparse": "^5.0.1",
     "@types/react": "^16.8.23",
     "@types/react-aria-modal": "^2.12.2",
+    "@types/react-beautiful-dnd": "^11.0.3",
     "@types/react-dom": "^16.8.4",
     "@types/react-helmet": "^5.0.8",
     "@types/react-highlight-words": "^0.16.0",
@@ -33,6 +36,7 @@
     "eslint-plugin-import": "^2.18.0",
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-react": "^7.14.2",
+    "file-saver": "^2.0.2",
     "formik": "^1.5.7",
     "geojson": "^0.5.0",
     "govuk-frontend": "^2.13.0",
@@ -51,8 +55,10 @@
     "memoizee": "^0.4.14",
     "next": "^8.1.0",
     "next-server": "^8.1.0",
+    "papaparse": "^5.1.0",
     "react": "^16.8.6",
     "react-aria-modal": "^4.0.0",
+    "react-beautiful-dnd": "^11.0.5",
     "react-dom": "^16.8.6",
     "react-helmet": "^5.2.1",
     "react-highlight-words": "^0.16.0",
@@ -113,9 +119,9 @@
       "^.+\\.module\\.(css|sass|scss)$"
     ],
     "moduleNameMapper": {
+      "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy",
       "^@common/(.*)$": "<rootDir>/src/$1",
-      "^@common-test/(.*)$": "<rootDir>/test/$1",
-      "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy"
+      "^@common-test/(.*)$": "<rootDir>/test/$1"
     },
     "moduleFileExtensions": [
       "web.js",

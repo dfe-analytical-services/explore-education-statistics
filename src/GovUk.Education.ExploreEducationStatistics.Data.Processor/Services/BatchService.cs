@@ -119,10 +119,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return bitArray.Get(batchNo - 1);
         }
 
-        public async Task CreateImport(string releaseId, string dataFileName, int numBatches)
+        public async Task CreateImport(string releaseId, string dataFileName, int numberOfRows, int numBatches)
         {
             await _table.ExecuteAsync(TableOperation.InsertOrReplace(
-                new DatafileImport(releaseId, dataFileName, numBatches))
+                new DatafileImport(releaseId, dataFileName, numberOfRows, numBatches))
             );
         }
 
@@ -131,7 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var result = await _table.ExecuteAsync(TableOperation.Retrieve<DatafileImport>(
                 releaseId,
                 dataFileName,
-                new List<string>() {"NumBatches", "BatchesProcessed", "Status", "Errors"}));
+                new List<string>() {"NumBatches", "BatchesProcessed", "Status", "NumberOfRows", "Errors"}));
 
             return (DatafileImport) result.Result;
         }

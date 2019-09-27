@@ -43,6 +43,9 @@ describe('dataBlockService', () => {
 
     expect(dataApi.post).toBeCalledWith('/Data', dataBlockRequest);
 
-    expect(result).toMatchSnapshot(result);
+    expect(result).not.toBeUndefined();
+    if (result) {
+      expect(result).toMatchSnapshot(result);
+    }
   });
 });

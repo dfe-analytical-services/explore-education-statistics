@@ -57,11 +57,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ValidationResult, IEnumerable<FileInfo>>> UploadDataFilesAsync(Guid releaseId,
-            IFormFile dataFile, IFormFile metadataFile, string name, bool overwrite)
+            IFormFile dataFile, IFormFile metadataFile, string name, bool overwrite, string userName)
         {
             var blobContainer = await GetCloudBlobContainer();
-            var dataInfo = new Dictionary<string, string> {{NameKey, name}, {MetaFileKey, metadataFile.FileName}};
-            var metaDataInfo = new Dictionary<string, string> {{DataFileKey, dataFile.FileName}};
+            var dataInfo = new Dictionary<string, string> {{NameKey, name}, {MetaFileKey, metadataFile.FileName}, {UserName, userName}};
+            var metaDataInfo = new Dictionary<string, string> {{DataFileKey, dataFile.FileName}, {UserName, userName}};
             return await ValidateDataFilesForUpload(blobContainer, releaseId, dataFile, metadataFile, name, overwrite)
                 .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, dataFile, ReleaseFileTypes.Data, dataInfo, overwrite))
                 .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, metadataFile, ReleaseFileTypes.Data, metaDataInfo, overwrite))
@@ -199,7 +199,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     Name = GetName(file),
                     Path = file.Name,
                     Size = GetSize(file),
-                    MetaFileName = GetMetaFileName(file)
+                    MetaFileName = GetMetaFileName(file),
+                    Rows = GetNumberOfRows(file),
+                    UserName = GetUserName(file)
                 })
                 .OrderBy(info => info.Name);
         }
@@ -222,6 +224,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             blob.Properties.ContentType = file.ContentType;
             var path = await UploadToTemporaryFile(file);
             await blob.UploadFromFileAsync(path);
+
+            metaValues["NumberOfRows"] = CalculateNumberOfRows(file.OpenReadStream()).ToString();
+            
             await AddMetaValuesAsync(blob, metaValues);
             return true;
         }
@@ -274,6 +279,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private static string GetMetaFileName(CloudBlob blob)
         {
             return blob.Metadata.TryGetValue(MetaFileKey, out var name) ? name : "";
+        }
+
+        private static int GetNumberOfRows(CloudBlob blob)
+        {
+            return 
+                blob.Metadata.TryGetValue(NumberOfRows, out var numberOfRows) &&
+                   int.TryParse(numberOfRows, out var numberOfRowsValue)
+                ? numberOfRowsValue
+                : 0;
+        }
+
+        private static string GetUserName(CloudBlob blob)
+        {
+            return blob.Metadata.TryGetValue(UserName, out var name) ? name : "";
         }
         
         private static bool IsBatchedFile(IListBlobItem blobItem, string releaseId)
@@ -337,6 +356,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             using (var reader = new StreamReader(fileStream))
             {
                 return reader.BaseStream.IsTextFile();
+            }
+        }
+
+        private static int CalculateNumberOfRows(Stream fileStream)
+        {
+            using (var reader = new StreamReader(fileStream))
+            {
+                var numberOfLines = 0;
+                while (reader.ReadLine() != null)
+                {
+                    ++numberOfLines;
+                }
+
+                return numberOfLines;
             }
         }
     }

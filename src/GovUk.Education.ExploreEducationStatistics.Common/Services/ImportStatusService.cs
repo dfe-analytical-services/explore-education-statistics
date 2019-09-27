@@ -46,7 +46,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 PercentageComplete = ((from bool b in new BitArray(import.BatchesProcessed)
                                       where b
                                       select b).Count() * 100) / import.NumBatches,
-                Status = import.Status.GetEnumValue()
+                Status = import.Status.GetEnumValue(),
+                NumberOfRows = import.NumberOfRows,
             };
         }
 
@@ -56,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             var result = await _table.ExecuteAsync(TableOperation.Retrieve<DatafileImport>(
                 releaseId, 
                 dataFileName, 
-                new List<string>(){ "NumBatches", "BatchesProcessed", "Status", "Errors"}));
+                new List<string>(){ "NumBatches", "BatchesProcessed", "Status", "NumberOfRows", "Errors"}));
             
             return result.Result != null ? (DatafileImport) result.Result : new DatafileImport {Status = IStatus.NOT_FOUND};
         }
