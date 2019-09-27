@@ -30,9 +30,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var controller = new ContentController(cache.Object);
 
             var result = controller.GetContentTree();
-
-            Assert.IsAssignableFrom<List<ThemeTree>>(JsonConvert.DeserializeObject<List<ThemeTree>>(result.Result.Value));
-            Assert.Contains("Theme A", result.Result.Value);           
+            var content = result.Result.Result as ContentResult;
+            
+            Assert.Equal(200, content.StatusCode);
+            Assert.IsAssignableFrom<List<ThemeTree>>(JsonConvert.DeserializeObject<List<ThemeTree>>(content.Content));
+            Assert.Contains("Theme A", content.Content);           
         }
 
         [Fact]
@@ -66,10 +68,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var controller = new ContentController(cache.Object);
 
             var result = controller.GetPublication("publication-a");
+            var content = result.Result.Result as ContentResult;
 
-            Assert.IsAssignableFrom<PublicationViewModel>(JsonConvert.DeserializeObject<PublicationViewModel>(result.Result.Value));
-            Assert.Contains("a7772148-fbbd-4c85-8530-f33c9ef25488", result.Result.Value);
-            Assert.Contains("Publication A", result.Result.Value);
+            Assert.IsAssignableFrom<PublicationViewModel>(JsonConvert.DeserializeObject<PublicationViewModel>(content.Content));
+            Assert.Contains("a7772148-fbbd-4c85-8530-f33c9ef25488", content.Content);
+            Assert.Contains("Publication A", content.Content);
+            Assert.Equal(200, content.StatusCode);
         }
 
         [Fact]
