@@ -156,8 +156,19 @@ export interface Chart {
   geographicId?: string;
 }
 
+interface TableOption {
+  label: string;
+  value: string;
+}
+
 export interface Table {
   indicators: string[];
+  tableHeaders: {
+    columnGroups: TableOption[][];
+    columns: TableOption[];
+    rowGroups: TableOption[][];
+    rows: TableOption[];
+  }
 }
 
 export interface Summary {

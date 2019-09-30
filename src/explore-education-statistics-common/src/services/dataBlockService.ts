@@ -1,5 +1,5 @@
 import { dataApi } from '@common/services/api';
-import { Dictionary } from '@common/types/util';
+import { Dictionary, PartialRecord } from '@common/types/util';
 import { Feature, Geometry } from 'geojson';
 
 export enum GeographicLevel {
@@ -20,7 +20,7 @@ export enum GeographicLevel {
   Ward = 'Ward',
 }
 
-type TimeIdentifier =
+export type TimeIdentifier =
   | 'AY'
   | 'AYQ1'
   | 'AYQ1Q2'
@@ -255,37 +255,40 @@ export interface DataBlockMetadata {
 }
 
 interface DataBlockTimePeriod {
-  startYear: string;
-  startCode: TimeIdentifier;
-  endYear: string;
-  endCode: TimeIdentifier;
+  startYear: number;
+  startCode: TimeIdentifier ;
+  endYear: number;
+  endCode: TimeIdentifier ;
 }
 
-export interface DataBlockRequest {
-  subjectId: number;
-  timePeriod: DataBlockTimePeriod;
-  filters: string[];
-  geographicLevel: GeographicLevel;
-  boundaryLevel?: number;
-  indicators: string[];
+type LocationKeys =
+  'country'
+  | 'institution'
+  | 'localAuthoriy'
+  | 'localAuthorityDistrict'
+  | 'localEnterprisePartnership'
+  | 'multiAcademyTrust'
+  | 'mayoralCombinedAuthority'
+  | 'opportunityArea'
+  | 'parliamentaryConstituency'
+  | 'region'
+  | 'rscRegion'
+  | 'sponsor'
+  | 'ward';
 
-  country?: string[];
-  localAuthority?: string[];
-  localAuthorityDistrict?: string[];
-  localEnterprisePartnership?: string[];
-  multiAcademyTrust?: string[];
-  mayoralCombinedAuthority?: string[];
-  opportunityArea?: string[];
-  parliamentaryConstituency?: string[];
-  region?: string[];
-  rscRegion?: string[];
-  sponsor?: string[];
-  ward?: string[];
-}
 
 export interface DataBlockRerequest {
   boundaryLevel?: number;
 }
+
+export type DataBlockRequest = {
+  subjectId: string;
+  timePeriod?: DataBlockTimePeriod;
+  filters: string[];
+  geographicLevel?: GeographicLevel;
+  indicators: string[];
+} & DataBlockRerequest & PartialRecord<LocationKeys, string[]>;
+
 
 export interface DataBlockResponse {
   metaData: DataBlockMetadata;

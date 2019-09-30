@@ -62,6 +62,7 @@ interface Props {
   themeMeta: ThemeMeta[];
   publicationId: string;
   finalStepExtra?: (props: FinalStepProps) => ReactNode;
+  finalStepHeading?: string;
 }
 
 interface State {
@@ -288,7 +289,12 @@ class TableTool extends Component<Props, State> {
   };
 
   public render() {
-    const { themeMeta, publicationId, finalStepExtra } = this.props;
+    const {
+      themeMeta,
+      publicationId,
+      finalStepExtra,
+      finalStepHeading
+    } = this.props;
     const {
       createdTable,
       publication,
@@ -365,7 +371,7 @@ class TableTool extends Component<Props, State> {
                 {stepProps => (
                   <>
                     <WizardStepHeading {...stepProps}>
-                      Explore data
+                      { finalStepHeading || "Explore data" }
                     </WizardStepHeading>
 
                     <div className="govuk-!-margin-bottom-4">
