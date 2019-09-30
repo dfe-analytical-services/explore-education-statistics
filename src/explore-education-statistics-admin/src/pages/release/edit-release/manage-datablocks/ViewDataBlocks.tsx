@@ -92,10 +92,6 @@ const ViewDataBlocks = () => {
             releaseId,
           });
           setInitialConfiguration(requestConfiguration);
-
-          // const createdTable = mapFullTable(response);
-
-          // const tableHeaders = getDefaultTableHeaderConfig(createdTable.subjectMeta);
         }
       });
     }
@@ -118,6 +114,30 @@ const ViewDataBlocks = () => {
 
   return (
     <>
+      <FormSelect
+        id="selectDataBlock"
+        name="selectDataBlock"
+        label="Select data block"
+        onChange={e => {
+          setRequest(dataBlocks[+e.target.value].dataBlockRequest);
+          setRequestConfiguration(
+            (dataBlocks[+e.target.value].charts || [undefined])[0],
+          );
+          setSelectedDataBlock(e.target.value);
+        }}
+        order={[]}
+        options={[
+          {
+            label: 'select',
+            value: '',
+          },
+          ...dataBlocks.map((dataBlock, index) => ({
+            label: `${index} ${dataBlock.heading}`,
+            value: `${index}`,
+          })),
+        ]}
+      />
+
       <FormSelect
         id="selectDataBlock"
         name="selectDataBlock"

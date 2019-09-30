@@ -91,7 +91,6 @@ const ManageReleasePageContainer = ({
                   <NavLink
                     key={route.path}
                     to={route.generateLink(publicationId, releaseId)}
-                    activeClassName="app-navigation--current-page"
                   >
                     {route.title}
                   </NavLink>
