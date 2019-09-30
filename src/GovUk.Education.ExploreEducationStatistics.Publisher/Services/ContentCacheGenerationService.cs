@@ -198,7 +198,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 //NullValueHandling = NullValueHandling.Ignore,
                 ContractResolver = new DefaultContractResolver
                 {
-                    NamingStrategy = new LowerCaseNamingStrategy()
+                    NamingStrategy = new CamelCaseNamingStrategy()
                 }
             };
         }
