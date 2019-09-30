@@ -23,9 +23,7 @@ const NavLink = ({
       activeClassName={styles['app-navigation--current-page']}
       className={classNames(
         'govuk-link',
-        {
-          'govuk-link--no-visited-state': unvisited,
-        },
+        'govuk-link--no-visited-state',
         className,
       )}
     >
