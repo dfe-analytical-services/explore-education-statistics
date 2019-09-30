@@ -54,7 +54,7 @@ const mapFullTable = (unmappedFullTable: DataBlockResponse): FullTable => {
   };
 };
 const ViewDataBlocks = () => {
-  const { releaseId, publication } = useContext(
+  const { releaseId } = useContext(
     ManageReleaseContext,
   ) as ManageRelease;
 
