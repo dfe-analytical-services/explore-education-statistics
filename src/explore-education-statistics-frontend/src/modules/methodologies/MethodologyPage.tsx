@@ -46,12 +46,8 @@ class MethodologyPage extends Component<Props> {
 
     return (
       <Page
-        title={`${data.title} - ${parse(
-          data.published,
-          'dd MMMM yyyy',
-          new Date(),
-        )}`}
-        caption={data.summary}
+        title={data.title}
+        seoDescription={data.summary}
         breadcrumbs={[{ name: 'Methodologies', link: '/methodology' }]}
       >
         <div className="govuk-grid-row">
