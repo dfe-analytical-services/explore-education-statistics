@@ -15,9 +15,9 @@ export interface Props {
 
 const Caption = ({ data, meta, indicators, heading }: Props) => {
   return (
-    <caption className="govuk-heading-s">
-      {heading && `Table representing ${heading}`}
-    </caption>
+    <>
+      {heading && <caption className="govuk-heading-s">{`${heading}`}</caption>}
+    </>
   );
 };
 
