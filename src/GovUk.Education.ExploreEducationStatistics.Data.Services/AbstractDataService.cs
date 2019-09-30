@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         protected IEnumerable<Observation> GetObservations(ObservationQueryContext queryContext, ReleaseId? releaseId = null)
         {
             // If release Id is not specified then verify that the subject id passed exists for the latest release.
-            if (releaseId == null && !_subjectService.IsSubjectForLatestRelease(queryContext.SubjectId))
+            if ((releaseId == null || releaseId == Guid.Empty) && !_subjectService.IsSubjectForLatestRelease(queryContext.SubjectId))
             {
                 throw new InvalidOperationException("Subject is not for the latest release of this publication");
             }
