@@ -228,7 +228,7 @@ export default {
   getLatestPublicationRelease(publicationSlug: string): Promise<Release> {
     return contentApi.get(`content/publication/${publicationSlug}/latest`);
   },
-  getPublicationRelease(releaseId: string): Promise<Release> {
-    return contentApi.get(`content/release/${releaseId}`);
+  getPublicationRelease(publicationSlug: string, releaseSlug: string): Promise<Release> {
+    return contentApi.get(`content/publication/${publicationSlug}/${releaseSlug}`);
   },
 };
