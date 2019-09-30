@@ -32,9 +32,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var result = controller.GetContentTree();
             var content = result.Result.Result as ContentResult;
             
-            Assert.Equal(200, content.StatusCode);
             Assert.IsAssignableFrom<List<ThemeTree>>(JsonConvert.DeserializeObject<List<ThemeTree>>(content.Content));
-            Assert.Contains("Theme A", content.Content);           
+            Assert.Contains("Theme A", content.Content);     
+            Assert.Equal("application/json", content.ContentType);
         }
 
         [Fact]
@@ -73,7 +73,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             Assert.IsAssignableFrom<PublicationViewModel>(JsonConvert.DeserializeObject<PublicationViewModel>(content.Content));
             Assert.Contains("a7772148-fbbd-4c85-8530-f33c9ef25488", content.Content);
             Assert.Contains("Publication A", content.Content);
-            Assert.Equal(200, content.StatusCode);
         }
 
         [Fact]
@@ -108,8 +107,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                  new ContentController(cache.Object);
 
              var result = controller.GetLatestRelease("publication-a");
+             var content = result.Result.Result as ContentResult;
 
-             Assert.Contains("Publication A", result.Result.Value);
+             Assert.Contains("Publication A", content.Content);
          }
 
          [Fact]
@@ -142,8 +142,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                  new ContentController(cache.Object);
 
              var result = controller.GetRelease("publication-a", "2016");
-
-             Assert.Contains("publication-a", result.Result.Value);
+             var content = result.Result.Result as ContentResult;
+             
+             Assert.Contains("publication-a", content.Content);
          }
 
          [Fact]
@@ -157,7 +158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                  new ContentController(cache.Object);
 
              var result = controller.GetRelease("publication-a", "2000");
-
+             
              Assert.IsAssignableFrom<NotFoundResult>(result.Result.Result);
          }
     }

@@ -33,9 +33,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 
             var result = controller.GetDownloadTree();
 
-            Assert.IsAssignableFrom<List<ThemeTree>>(JsonConvert.DeserializeObject<List<ThemeTree>>(result.Result.Value));
-            Assert.Contains("Theme A", result.Result.Value);
-            Assert.Contains("Theme B", result.Result.Value);
+            var content = result.Result.Result as ContentResult;
+
+            Assert.IsAssignableFrom<List<ThemeTree>>(JsonConvert.DeserializeObject<List<ThemeTree>>(content.Content));
+            Assert.Contains("Theme A", content.Content);
+            Assert.Contains("Theme B", content.Content);
 
         }
 

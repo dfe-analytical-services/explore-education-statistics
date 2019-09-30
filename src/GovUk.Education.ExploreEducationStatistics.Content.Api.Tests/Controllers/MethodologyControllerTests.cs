@@ -32,9 +32,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var controller = new MethodologyController(cache.Object);
 
             var result = controller.GetMethodologyTree();
+            var content = result.Result.Result as ContentResult;
 
-            Assert.IsAssignableFrom<List<ThemeTree>>(JsonConvert.DeserializeObject<List<ThemeTree>>(result.Result.Value));
-            Assert.Contains("Theme A", result.Result.Value);
+            Assert.IsAssignableFrom<List<ThemeTree>>(JsonConvert.DeserializeObject<List<ThemeTree>>(content.Content));
+            Assert.Contains("Theme A", content.Content);
         }
 
         [Fact]
@@ -70,8 +71,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var controller = new MethodologyController(cache.Object);
 
             var result = controller.Get("test-slug");
+            var content = result.Result.Result as ContentResult;
 
-            Assert.Contains("a7772148-fbbd-4c85-8530-f33c9ef25488", result.Result.Value);
+
+            Assert.Contains("a7772148-fbbd-4c85-8530-f33c9ef25488", content.Content);
         }
         
         [Fact]
