@@ -5,16 +5,19 @@ import { TableDataQuery } from '@common/modules/full-table/services/tableBuilder
 import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
 import { DataBlockRequest, GeographicLevel, TimeIdentifier } from '@common/services/dataBlockService';
 import Button from '@common/components/Button';
-
+import { DataBlock } from '@admin/services/release/edit-release/datablocks/types';
+import DBService from '@admin/services/release/edit-release/datablocks/service';
 
 interface Props {
   query: TableDataQuery,
-  tableHeaders: TableHeadersFormValues
+  tableHeaders: TableHeadersFormValues,
+  releaseId: string
 };
 
 const DataBlockDetailsForm = ({
   query,
-  tableHeaders
+  tableHeaders,
+  releaseId,
 }: Props) => {
 
   const [dataBlockTitle, setDataBlockTitle] = React.useState<string>();
@@ -33,6 +36,25 @@ const DataBlockDetailsForm = ({
         endCode: query.timePeriod.endCode as TimeIdentifier,
       },
     };
+
+    const dataBlock: DataBlock = {
+      dataBlockRequest,
+      heading: dataBlockTitle,
+      tables: [
+        {
+          indicators: [],
+          tableHeaders,
+        },
+      ],
+    };
+
+    DBService.postDataBlock(releaseId, dataBlock)
+      .then((result: DataBlock) => {
+        console.log(result);
+
+      }).catch((error: unknown) => {
+      console.error(error);
+    });
 
 
   };

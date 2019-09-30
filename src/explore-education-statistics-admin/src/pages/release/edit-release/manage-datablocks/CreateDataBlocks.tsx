@@ -5,15 +5,9 @@ import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
 import tableBuilderService, {
-  ThemeMeta, TableDataQuery,
+  ThemeMeta
 } from '@common/modules/full-table/services/tableBuilderService';
-import PrototypePage from '@admin/pages/prototypes/components/PrototypePage';
 import TableTool from '@common/modules/table-tool/components/TableTool';
-import Button from '@common/components/Button';
-import { DataBlockRequest, GeographicLevel, TimeIdentifier } from '@common/services/dataBlockService';
-import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
-import { FormFieldset, FormTextInput } from '@common/components/form';
-import FormTextArea from '@common/components/form/FormTextArea';
 
 const CreateDataBlocks = () => {
   const { publication, releaseId } = useContext(
@@ -47,6 +41,7 @@ const CreateDataBlocks = () => {
             <DataBlockDetailsForm
               query={query}
               tableHeaders={tableHeaders}
+              releaseId={releaseId}
             />
           )}
         />
