@@ -1,4 +1,4 @@
-import Accordion from '@common/components/Accordion';
+import Accordion, { generateIdList } from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
@@ -21,6 +21,8 @@ interface Props {
 }
 
 class DownloadIndexPage extends Component<Props> {
+  private accId: string[] = generateIdList(1);
+
   public static defaultProps = {
     themes: [],
   };
@@ -66,7 +68,7 @@ class DownloadIndexPage extends Component<Props> {
         </div>
 
         {themes.length > 0 ? (
-          <Accordion id="themesDownloads">
+          <Accordion id={this.accId[0]}>
             {themes.map(
               ({
                 id: themeId,

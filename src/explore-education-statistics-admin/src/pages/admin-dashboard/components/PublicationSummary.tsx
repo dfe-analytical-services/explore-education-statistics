@@ -46,6 +46,7 @@ const PublicationSummary = ({ publication }: Props) => {
                 />
               </li>
             ))}
+            {publication.releases.length < 1 && <>No releases created</>}
           </ul>
         </SummaryListItem>
       </SummaryList>
