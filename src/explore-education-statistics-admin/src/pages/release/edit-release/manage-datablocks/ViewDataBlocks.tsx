@@ -3,28 +3,28 @@ import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
 import DataBlocksService from '@admin/services/release/edit-release/datablocks/service';
-import {DataBlock} from '@admin/services/release/edit-release/datablocks/types';
+import { DataBlock } from '@admin/services/release/edit-release/datablocks/types';
 import FormSelect from '@common/components/form/FormSelect';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import {ChartRendererProps} from '@common/modules/find-statistics/components/ChartRenderer';
+import { ChartRendererProps } from '@common/modules/find-statistics/components/ChartRenderer';
 import DataBlockService, {
   DataBlockRequest,
   DataBlockRerequest,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
-import {Chart} from '@common/services/publicationService';
-import React, {useContext} from 'react';
+import { Chart } from '@common/services/publicationService';
+import React, { useContext } from 'react';
 import {
   Indicator,
   LocationFilter,
   TimePeriodFilter,
 } from '@common/modules/full-table/types/filters';
-import {FullTable} from '@common/modules/full-table/types/fullTable';
+import { FullTable } from '@common/modules/full-table/types/fullTable';
 import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
-import {TableHeadersFormValues} from '@common/modules/table-tool/components/TableHeadersForm';
+import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
 
 const mapFullTable = (unmappedFullTable: DataBlockResponse): FullTable => {
   const subjectMeta = unmappedFullTable.metaData || {
@@ -36,7 +36,7 @@ const mapFullTable = (unmappedFullTable: DataBlockResponse): FullTable => {
   return {
     results: unmappedFullTable.result,
     subjectMeta: {
-      subjectName: "",
+      subjectName: '',
       publicationName: 'Test',
       footnotes: [],
       filters: {},
@@ -54,7 +54,7 @@ const mapFullTable = (unmappedFullTable: DataBlockResponse): FullTable => {
   };
 };
 const ViewDataBlocks = () => {
-  const {releaseId, publication} = useContext(
+  const { releaseId, publication } = useContext(
     ManageReleaseContext,
   ) as ManageRelease;
 
@@ -68,15 +68,24 @@ const ViewDataBlocks = () => {
     });
   }, [releaseId]);
 
-  const [chartBuilderData, setChartBuilderData] = React.useState<DataBlockResponse>();
+  const [chartBuilderData, setChartBuilderData] = React.useState<
+    DataBlockResponse
+  >();
 
   const [request, setRequest] = React.useState<DataBlockRequest>();
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [requestConfiguration, setRequestConfiguration] = React.useState<Chart | undefined>();
-  const [initialConfiguration, setInitialConfiguration] = React.useState<Chart | undefined>();
+  const [requestConfiguration, setRequestConfiguration] = React.useState<
+    Chart | undefined
+  >();
+  const [initialConfiguration, setInitialConfiguration] = React.useState<
+    Chart | undefined
+  >();
 
-  const [tableData, setTableData] = React.useState<{ fullTable: FullTable, tableHeadersConfig: TableHeadersFormValues }>();
+  const [tableData, setTableData] = React.useState<{
+    fullTable: FullTable;
+    tableHeadersConfig: TableHeadersFormValues;
+  }>();
 
   React.useEffect(() => {
     // destroy the existing setup before the response completes
@@ -93,13 +102,14 @@ const ViewDataBlocks = () => {
           setInitialConfiguration(requestConfiguration);
 
           const fullTable = mapFullTable(response);
-          const tableHeadersConfig = getDefaultTableHeaderConfig(fullTable.subjectMeta);
+          const tableHeadersConfig = getDefaultTableHeaderConfig(
+            fullTable.subjectMeta,
+          );
 
           setTableData({
             fullTable,
-            tableHeadersConfig
+            tableHeadersConfig,
           });
-
         }
       });
     }
@@ -151,11 +161,7 @@ const ViewDataBlocks = () => {
           <hr />
           <Tabs id="editDataBlockSections">
             <TabsSection title="table">
-              {tableData && (
-                <TimePeriodDataTable
-                  {...tableData}
-                />
-              )}
+              {tableData && <TimePeriodDataTable {...tableData} />}
             </TabsSection>
             <TabsSection title="Create Chart">
               {chartBuilderData ? (

@@ -354,6 +354,10 @@ const labels = {
 };
 
 const metaData: DataBlockMetadata = {
+  publicationName: 'test',
+  subjectName: 'test',
+  footnotes: [],
+
   filters: {
     test: {
       totalValue: '',
@@ -361,7 +365,7 @@ const metaData: DataBlockMetadata = {
       hint: '',
       options: {
         test: {
-          legend: 'test',
+          label: 'test',
           options: [
             {
               label: 'All Schools',

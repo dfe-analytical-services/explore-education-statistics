@@ -6,6 +6,10 @@ import {
 
 const responseData: DataBlockResponse = {
   metaData: {
+    publicationName: 'test',
+    subjectName: 'test',
+    footnotes: [],
+
     filters: {
       test: {
         totalValue: '',
@@ -13,7 +17,7 @@ const responseData: DataBlockResponse = {
         hint: '',
         options: {
           test: {
-            legend: 'test',
+            label: 'test',
             options: [
               {
                 label: 'All pupils',

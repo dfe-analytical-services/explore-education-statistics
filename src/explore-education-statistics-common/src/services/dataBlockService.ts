@@ -238,12 +238,20 @@ export interface DataBlockFilterGroupMeta {
   options: Dictionary<DataBlockFilterMeta>;
 }
 
+export interface FootnoteMetadata {
+  id: number;
+  label: string;
+}
+
 export interface DataBlockMetadata {
   filters: Dictionary<DataBlockFilterGroupMeta>;
   indicators: Dictionary<LabelValueUnitMetadata>;
   locations: Dictionary<DataBlockLocationMetadata>;
   boundaryLevels?: BoundaryLevel[];
   timePeriods: Dictionary<TimePeriodOptionMetadata>;
+  publicationName: string;
+  subjectName: string;
+  footnotes: FootnoteMetadata[];
 }
 
 interface DataBlockTimePeriod {
