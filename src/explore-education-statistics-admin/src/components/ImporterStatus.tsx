@@ -8,10 +8,12 @@ import classNames from 'classnames';
 import styles from '@admin/pages/release/edit-release/data/ReleaseDataUploadsSection.module.scss';
 import SummaryListItem from '@common/components/SummaryListItem';
 import { DataFile } from '@admin/services/release/edit-release/data/types';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 
 interface State {
   isFetching: boolean;
   current?: ImportStatus | undefined;
+  running: boolean;
   errorMessage: string;
 }
 
@@ -42,6 +44,7 @@ class ImporterStatus extends Component<Props> {
   public state = {
     isFetching: true,
     current: undefined,
+    running: false,
   };
 
   private intervalId?: NodeJS.Timeout;
@@ -97,6 +100,9 @@ class ImporterStatus extends Component<Props> {
           this.setState({
             current: importStatus,
             isFetching: false,
+            running: 'NOT_FOUND,RUNNING_PHASE_1, RUNNING_PHASE_2'.match(
+              importStatus.status,
+            ),
           }),
       )
       .catch(
@@ -105,6 +111,7 @@ class ImporterStatus extends Component<Props> {
           this.setState({
             current: null,
             isFetching: false,
+            running: false,
           }),
       )
       .finally(() => {
@@ -128,7 +135,7 @@ class ImporterStatus extends Component<Props> {
   }
 
   public render() {
-    const { current } = this.state;
+    const { current, running } = this.state;
     const currentStatus: ImportStatus = (current as unknown) as ImportStatus;
 
     return (
@@ -141,6 +148,7 @@ class ImporterStatus extends Component<Props> {
         >
           {currentStatus && getImportStatusLabel(currentStatus.status)}
         </strong>
+        {running && <LoadingSpinner inline size={22} />}
       </SummaryListItem>
     );
   }
