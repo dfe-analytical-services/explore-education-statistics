@@ -53,9 +53,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils
 
         private static bool IsTextFile(Func<byte[]> fileHeaderReadFunc)
         {
-            // if none of the types match, return null
-            FileType fileType = null;
-
             // read first n-bytes from the file
             byte[] fileHeader = fileHeaderReadFunc();
 
@@ -96,17 +93,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils
             return matchingCount;
         }
 
-        private static byte[] ReadFileHeader(FileInfo file, int MaxHeaderSize)
+        private static byte[] ReadFileHeader(FileInfo file, int maxHeaderSize)
         {
-            var header = new byte[MaxHeaderSize];
+            var header = new byte[maxHeaderSize];
             try
             {
                 using (var fsSource = new FileStream(file.FullName, FileMode.Open, FileAccess.Read))
                 {
                     // read first symbols from file into array of bytes.
-                    fsSource.Read(header, 0, MaxHeaderSize);
-                }   // close the file stream
-
+                    fsSource.Read(header, 0, maxHeaderSize);
+                }
             }
             catch (Exception e) // file could not be found/read
             {
