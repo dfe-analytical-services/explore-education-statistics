@@ -1,5 +1,3 @@
-using Newtonsoft.Json;
-
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
     public class LocalAuthorityDistrict: IObservationalUnit
