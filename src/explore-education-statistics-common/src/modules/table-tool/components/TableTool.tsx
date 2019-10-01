@@ -303,8 +303,6 @@ class TableTool extends Component<Props, State> {
       subjectMeta,
       subjects,
       tableHeaders,
-      indicators,
-      filters,
       query,
     } = this.state;
 
