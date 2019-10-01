@@ -72,8 +72,6 @@ interface State {
   endYear?: number;
   endCode?: string;
   locations: Dictionary<LocationFilter[]>;
-  filters: Dictionary<CategoryFilter[]>;
-  indicators: Indicator[];
   publication?: Publication;
   subjects: PublicationSubject[];
   subjectId: string;
@@ -84,8 +82,6 @@ interface State {
 
 class TableTool extends Component<Props, State> {
   public state: State = {
-    filters: {},
-    indicators: [],
     locations: {},
     subjectId: '',
     subjectMeta: {
@@ -283,8 +279,6 @@ class TableTool extends Component<Props, State> {
 
     this.setState({
       createdTable,
-      filters,
-      indicators,
       tableHeaders: getDefaultTableHeaderConfig(createdTable.subjectMeta),
       query,
     });

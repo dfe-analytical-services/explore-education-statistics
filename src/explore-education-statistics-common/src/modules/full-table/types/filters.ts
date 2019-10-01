@@ -5,11 +5,6 @@ import {
 } from '@common/modules/full-table/services/tableBuilderService';
 import camelCase from 'lodash/camelCase';
 
-interface ToJSONFilter {
-  _class: string;
-  _construct: string;
-}
-
 export abstract class Filter {
   public readonly value: string;
 
@@ -20,7 +15,7 @@ export abstract class Filter {
     this.label = label;
   }
 
-  public toJSON(): ToJSONFilter {
+  public toJSON() {
     return {
       _class: 'Filter',
       _construct: JSON.stringify([{ value: this.value, label: this.label }]),
