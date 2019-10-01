@@ -79,6 +79,7 @@ interface State {
   subjectId: string;
   subjectMeta: PublicationSubjectMeta;
   tableHeaders: TableHeadersFormValues;
+  query?: TableDataQuery;
 }
 
 class TableTool extends Component<Props, State> {
@@ -274,9 +275,9 @@ class TableTool extends Component<Props, State> {
       indicator => new Indicator(indicatorsByValue[indicator]),
     );
 
-    const unmappedCreatedTable = await tableBuilderService.getTableData(
-      this.createQuery(filters, indicators),
-    );
+    const query: TableDataQuery = this.createQuery(filters, indicators);
+
+    const unmappedCreatedTable = await tableBuilderService.getTableData(query);
 
     const createdTable = mapFullTable(unmappedCreatedTable);
 
@@ -285,6 +286,7 @@ class TableTool extends Component<Props, State> {
       filters,
       indicators,
       tableHeaders: getDefaultTableHeaderConfig(createdTable.subjectMeta),
+      query,
     });
   };
 
@@ -293,7 +295,7 @@ class TableTool extends Component<Props, State> {
       themeMeta,
       publicationId,
       finalStepExtra,
-      finalStepHeading
+      finalStepHeading,
     } = this.props;
     const {
       createdTable,
@@ -303,6 +305,7 @@ class TableTool extends Component<Props, State> {
       tableHeaders,
       indicators,
       filters,
+      query,
     } = this.state;
 
     return (
@@ -371,7 +374,7 @@ class TableTool extends Component<Props, State> {
                 {stepProps => (
                   <>
                     <WizardStepHeading {...stepProps}>
-                      { finalStepHeading || "Explore data" }
+                      {finalStepHeading || 'Explore data'}
                     </WizardStepHeading>
 
                     <div className="govuk-!-margin-bottom-4">
@@ -402,11 +405,12 @@ class TableTool extends Component<Props, State> {
                     {publication &&
                       createdTable &&
                       finalStepExtra &&
+                      query &&
                       finalStepExtra({
                         createdTable,
                         publication,
                         tableHeaders,
-                        query: this.createQuery(filters, indicators),
+                        query,
                       })}
                   </>
                 )}

@@ -1,10 +1,11 @@
+import { AxesConfiguration } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
 import {
   DataBlockLocation,
   DataBlockRequest,
 } from '@common/services/dataBlockService';
 import { Dictionary } from '@common/types';
 import { PositionType } from 'recharts';
-import { AxesConfiguration } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import { contentApi } from './api';
 
 export interface Publication {
@@ -156,19 +157,9 @@ export interface Chart {
   geographicId?: string;
 }
 
-interface TableOption {
-  label: string;
-  value: string;
-}
-
 export interface Table {
   indicators: string[];
-  tableHeaders: {
-    columnGroups: TableOption[][];
-    columns: TableOption[];
-    rowGroups: TableOption[][];
-    rows: TableOption[];
-  }
+  tableHeaders: TableHeadersFormValues;
 }
 
 export interface Summary {

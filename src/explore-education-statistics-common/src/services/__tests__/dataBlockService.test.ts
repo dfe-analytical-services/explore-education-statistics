@@ -24,7 +24,7 @@ describe('dataBlockService', () => {
   });
 
   const dataBlockRequest: DataBlockRequest = {
-    subjectId: "1",
+    subjectId: '1',
     geographicLevel: GeographicLevel.Country,
     timePeriod: {
       startYear: 2014,

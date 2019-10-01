@@ -512,7 +512,7 @@ export default class PrototypePublicationService {
         type: 'DataBlock',
         body: '',
         dataBlockRequest: {
-          subjectId: "1",
+          subjectId: '1',
           filters: ['1', '2'],
           indicators: ['23', '26', '28'],
           timePeriod: {

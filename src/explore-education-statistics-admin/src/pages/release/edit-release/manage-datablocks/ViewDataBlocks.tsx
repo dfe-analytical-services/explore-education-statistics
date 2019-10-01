@@ -54,7 +54,9 @@ const mapFullTable = (unmappedFullTable: DataBlockResponse): FullTable => {
   };
 };
 const ViewDataBlocks = () => {
-  const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
+  const { releaseId, lastModified } = useContext(
+    ManageReleaseContext,
+  ) as ManageRelease;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedDataBlock, setSelectedDataBlock] = React.useState<string>('');
@@ -64,7 +66,7 @@ const ViewDataBlocks = () => {
     DataBlocksService.getDataBlocks(releaseId).then(blocks => {
       setDataBlocks(blocks);
     });
-  }, [releaseId]);
+  }, [releaseId, lastModified]);
 
   const [chartBuilderData, setChartBuilderData] = React.useState<
     DataBlockResponse
@@ -103,15 +105,9 @@ const ViewDataBlocks = () => {
 
           const fullTable = mapFullTable(response);
 
-          console.log((table && table[0].tableHeaders));
-
-          console.log(getDefaultTableHeaderConfig(
-            fullTable.subjectMeta,
-          ));
-
-          const tableHeadersConfig = (table && table[0].tableHeaders) || getDefaultTableHeaderConfig(
-            fullTable.subjectMeta,
-          );
+          const tableHeadersConfig =
+            (table && table[0].tableHeaders) ||
+            getDefaultTableHeaderConfig(fullTable.subjectMeta);
 
           setTableData({
             fullTable,

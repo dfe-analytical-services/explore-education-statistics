@@ -5,7 +5,7 @@ import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
 import tableBuilderService, {
-  ThemeMeta
+  ThemeMeta,
 } from '@common/modules/full-table/services/tableBuilderService';
 import TableTool from '@common/modules/table-tool/components/TableTool';
 
@@ -25,11 +25,6 @@ const CreateDataBlocks = () => {
     });
   }, []);
 
-  const [dataBlockTitle, setDataBlockTitle] = React.useState<string>();
-  const [dataBlockSource, setDataBlockSource] = React.useState<string>();
-  const [dataBlockFootnotes, setDataBlockFootnotes] = React.useState<string>();
-  const [dataBlockName, setDataBlockName] = React.useState<string>();
-
   return (
     <div>
       {themeMeta && publicationId !== undefined && (
@@ -37,7 +32,7 @@ const CreateDataBlocks = () => {
           publicationId={publicationId}
           themeMeta={themeMeta}
           finalStepHeading="Configure data block"
-          finalStepExtra={({query, tableHeaders}) => (
+          finalStepExtra={({ query, tableHeaders }) => (
             <DataBlockDetailsForm
               query={query}
               tableHeaders={tableHeaders}

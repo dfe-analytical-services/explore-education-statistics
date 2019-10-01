@@ -1,32 +1,65 @@
-import React from 'react';
-import { FormFieldset, FormTextInput } from '@common/components/form';
-import FormTextArea from '@common/components/form/FormTextArea';
+import ManageReleaseContext, {
+  ManageRelease,
+} from '@admin/pages/release/ManageReleaseContext';
+import DBService from '@admin/services/release/edit-release/datablocks/service';
+import { DataBlock } from '@admin/services/release/edit-release/datablocks/types';
+import Button from '@common/components/Button';
+import {
+  Form,
+  FormFieldset,
+  FormFieldTextInput,
+  FormGroup,
+  Formik,
+} from '@common/components/form';
+import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
+import Yup from '@common/lib/validation/yup';
 import { TableDataQuery } from '@common/modules/full-table/services/tableBuilderService';
 import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
-import { DataBlockRequest, GeographicLevel, TimeIdentifier } from '@common/services/dataBlockService';
-import Button from '@common/components/Button';
-import { DataBlock } from '@admin/services/release/edit-release/datablocks/types';
-import DBService from '@admin/services/release/edit-release/datablocks/service';
+import {
+  DataBlockRequest,
+  GeographicLevel,
+  TimeIdentifier,
+} from '@common/services/dataBlockService';
+import { FormikProps } from 'formik';
+import React, { useContext } from 'react';
+import { ObjectSchemaDefinition } from 'yup';
 
 interface Props {
-  query: TableDataQuery,
-  tableHeaders: TableHeadersFormValues,
-  releaseId: string
-};
+  query: TableDataQuery;
+  tableHeaders: TableHeadersFormValues;
+  releaseId: string;
+}
 
-const DataBlockDetailsForm = ({
-  query,
-  tableHeaders,
-  releaseId,
-}: Props) => {
+interface FormValues {
+  title: string;
+  source: string;
+  footnotes: string;
+  name: string;
+}
 
-  const [dataBlockTitle, setDataBlockTitle] = React.useState<string>();
-  const [dataBlockSource, setDataBlockSource] = React.useState<string>();
-  const [dataBlockFootnotes, setDataBlockFootnotes] = React.useState<string>();
-  const [dataBlockName, setDataBlockName] = React.useState<string>();
+const DataBlockDetailsForm = ({ query, tableHeaders, releaseId }: Props) => {
+  const { invalidate: invalidateContext } = useContext(
+    ManageReleaseContext,
+  ) as ManageRelease;
 
-  const saveDataBlock = () => {
+  const [blockState, setBlockState] = React.useReducer(
+    (state, { saved, error } = { saved: false, error: false }) => {
+      if (saved) {
+        return { saved: true };
+      }
+      if (error) {
+        return { error: true };
+      }
+      return { saved: false, error: false };
+    },
+    { saved: false, error: false },
+  );
 
+  React.useEffect(() => {
+    setBlockState({ saved: false, error: false });
+  }, [query, tableHeaders, releaseId]);
+
+  const saveDataBlock = async (values: FormValues) => {
     const dataBlockRequest: DataBlockRequest = {
       ...query,
       geographicLevel: query.geographicLevel as GeographicLevel,
@@ -39,7 +72,7 @@ const DataBlockDetailsForm = ({
 
     const dataBlock: DataBlock = {
       dataBlockRequest,
-      heading: dataBlockTitle,
+      heading: values.title,
       tables: [
         {
           indicators: [],
@@ -48,70 +81,89 @@ const DataBlockDetailsForm = ({
       ],
     };
 
-    DBService.postDataBlock(releaseId, dataBlock)
-      .then((result: DataBlock) => {
-        console.log(result);
-
-      }).catch((error: unknown) => {
-      console.error(error);
-    });
-
-
+    try {
+      const result = await DBService.postDataBlock(releaseId, dataBlock);
+      setBlockState({ saved: true });
+      invalidateContext();
+    } catch (error) {
+      setBlockState({ error: true });
+    }
   };
 
+  const baseValidationRules: ObjectSchemaDefinition<FormValues> = {
+    title: Yup.string().required('Please enter a title'),
+    name: Yup.string().required('Please supply a name'),
+    source: Yup.string(),
+    footnotes: Yup.string(),
+  };
 
   return (
-    <div>
-      <FormFieldset id="details" legend="Data block details">
+    <Formik<FormValues>
+      initialValues={{
+        title: '',
+        footnotes: '',
+        name: '',
+        source: '',
+      }}
+      validationSchema={Yup.object<FormValues>(baseValidationRules)}
+      onSubmit={saveDataBlock}
+      render={(form: FormikProps<FormValues>) => {
+        return (
+          <div>
+            <Form {...form} id="dataBlockDetails">
+              <FormGroup>
+                <FormFieldset id="details" legend="Data block details">
+                  <FormFieldTextInput<FormValues>
+                    id="data-block-title"
+                    name="title"
+                    label="Data block title"
+                  />
 
-        <FormTextInput
-          id="data-block-title"
-          name="data-block-title"
-          label="Data block title"
-          value={dataBlockTitle}
-          onChange={e => setDataBlockTitle(e.target.value)}
-        />
+                  <FormFieldTextInput<FormValues>
+                    id="data-block-source"
+                    name="source"
+                    label="Source"
+                  />
 
-        <FormTextInput
-          id="data-block-source"
-          name="data-block-source"
-          label="Source"
-          width={10}
-          value={dataBlockSource}
-          onChange={e => setDataBlockSource(e.target.value)}
-        />
+                  <FormFieldTextArea<FormValues>
+                    id="data-block-footnotes"
+                    name="Release footnotes"
+                    label="Footnotes"
+                  />
 
-        <FormTextArea
-          id="data-block-footnotes"
-          name="data-block-footnotes"
-          label="Release footnotes"
-          value={dataBlockFootnotes}
-          onChange={e => setDataBlockFootnotes(e.target.value)}
-        />
+                  <p>
+                    Name and save your datablock before viewing it under the
+                    'View data blocks' tab at the top of this page.
+                  </p>
 
-        <p>
-          Name and save your datablock before viewing it under the 'View data blocks' tab at the top of this
-          page.
-        </p>
+                  <FormFieldTextInput<FormValues>
+                    id="data-block-name"
+                    name="name"
+                    label="Data block name"
+                  />
 
-        <FormTextInput
-          id="data-block-name"
-          name="data-block-name"
-          label="Name data block"
-          value={dataBlockName}
-          onChange={e => setDataBlockName(e.target.value)}
-        />
+                  <Button
+                    disabled={!form.isValid}
+                    type="submit"
+                    className="govuk-!-margin-top-6"
+                  >
+                    Save data block
+                  </Button>
+                </FormFieldset>
+              </FormGroup>
 
-        <Button
-          type="button"
-          onClick={() => {
-            saveDataBlock();
-          }}
-        >
-          Save
-        </Button>
-      </FormFieldset>
-    </div>
+              {blockState.error && (
+                <div>
+                  An error occurred saving the Data Block, please try again
+                  later.
+                </div>
+              )}
+              {blockState.saved && <div>The Data Block has been saved.</div>}
+            </Form>
+          </div>
+        );
+      }}
+    />
   );
 };
 

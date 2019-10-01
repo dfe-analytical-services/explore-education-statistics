@@ -256,13 +256,13 @@ export interface DataBlockMetadata {
 
 interface DataBlockTimePeriod {
   startYear: number;
-  startCode: TimeIdentifier ;
+  startCode: TimeIdentifier;
   endYear: number;
-  endCode: TimeIdentifier ;
+  endCode: TimeIdentifier;
 }
 
 type LocationKeys =
-  'country'
+  | 'country'
   | 'institution'
   | 'localAuthoriy'
   | 'localAuthorityDistrict'
@@ -276,7 +276,6 @@ type LocationKeys =
   | 'sponsor'
   | 'ward';
 
-
 export interface DataBlockRerequest {
   boundaryLevel?: number;
 }
@@ -287,8 +286,8 @@ export type DataBlockRequest = {
   filters: string[];
   geographicLevel?: GeographicLevel;
   indicators: string[];
-} & DataBlockRerequest & PartialRecord<LocationKeys, string[]>;
-
+} & DataBlockRerequest &
+  PartialRecord<LocationKeys, string[]>;
 
 export interface DataBlockResponse {
   metaData: DataBlockMetadata;
