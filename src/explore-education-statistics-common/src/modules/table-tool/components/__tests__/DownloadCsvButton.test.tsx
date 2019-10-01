@@ -1,13 +1,8 @@
-import {
-  Indicator,
-  LocationFilter,
-  TimePeriodFilter,
-} from '@common/modules/full-table/types/filters';
+import { Indicator, LocationFilter, TimePeriodFilter } from '@common/modules/full-table/types/filters';
+import { FullTable } from '@common/modules/full-table/types/fullTable';
 import Papa from 'papaparse';
 import React from 'react';
 import { fireEvent, render } from 'react-testing-library';
-import TimePeriod from '@common/services/types/TimePeriod';
-import { FullTable } from '@common/modules/full-table/types/fullTable';
 import DownloadCsvButton from '../DownloadCsvButton';
 
 describe('DownloadCsvButton', () => {
