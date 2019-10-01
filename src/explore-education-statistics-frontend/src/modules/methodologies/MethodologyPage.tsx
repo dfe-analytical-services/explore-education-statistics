@@ -113,14 +113,14 @@ class MethodologyPage extends Component<Props> {
                 >
                   <MethodologyHeader>
                     <ContentSectionIndex
-                      fromId={`contents-sections-${order}-content`}
+                      fromId={`${this.accId[0]}-${order}-content`}
                     />
                   </MethodologyHeader>
 
                   <MethodologyContent>
                     <ContentBlock
                       content={content}
-                      id={`content_${order}`}
+                      id={`${this.accId[0]}_${order}`}
                       publication={data.publication}
                     />
                   </MethodologyContent>
@@ -144,7 +144,7 @@ class MethodologyPage extends Component<Props> {
                   >
                     <ContentBlock
                       content={content}
-                      id={`content_${order}`}
+                      id={`${this.accId[1]}_${order}`}
                       publication={data.publication}
                     />
                   </AccordionSection>
