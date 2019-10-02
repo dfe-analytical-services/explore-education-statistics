@@ -2,17 +2,14 @@
 import Details, { DetailsToggleHandler } from '@common/components/Details';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import {
-  DataBlockData,
-  DataBlockMetadata,
-  Result,
-} from '@common/services/dataBlockService';
+import { DataBlockData, Result } from '@common/services/dataBlockService';
 import formatPretty from '@common/lib/utils/number/formatPretty';
+import { ChartMetaData } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import styles from './SummaryRenderer.module.scss';
 
 export interface SummaryRendererProps {
   data: DataBlockData;
-  meta: DataBlockMetadata;
+  meta: ChartMetaData;
   dataKeys: string[];
   dataSummary: string[];
   dataDefinition: string[];

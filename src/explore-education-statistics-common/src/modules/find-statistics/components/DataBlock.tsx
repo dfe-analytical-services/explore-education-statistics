@@ -24,6 +24,7 @@ import {
   Table,
 } from '@common/services/publicationService';
 import React, { Component, MouseEvent, ReactNode } from 'react';
+import { parseMetaData } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import DownloadDetails from './DownloadDetails';
 
 export interface DataBlockProps {
@@ -104,7 +105,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
     const newState: DataBlockState = { isLoading: false, isError: false };
 
     const data: DataBlockData = response;
-    const meta = response.metaData;
+    const meta = parseMetaData(response.metaData);
 
     const { charts, summary, tables, heading } = this.props;
 

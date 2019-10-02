@@ -4,7 +4,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Me
 {
     public class TableBuilderResultSubjectMetaViewModel
     {
-        public Dictionary<string, TableBuilderFilterMetaViewModel> Filters { get; set; }
+        public Dictionary<string, FilterMetaViewModel> Filters { get; set; }
 
         public IEnumerable<FootnoteViewModel> Footnotes { get; set; }
 

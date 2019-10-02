@@ -8,8 +8,8 @@ import {
   colours,
   generateKeyFromDataSet,
   symbols,
+  ChartMetaData,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
-import { DataBlockMetadata } from '@common/services/dataBlockService';
 import {
   ChartDataSet,
   DataSetConfiguration,
@@ -33,7 +33,7 @@ interface Props {
   indicatorIds: string[];
   filterIds: string[][];
   selectedData?: ChartDataSetAndConfiguration[];
-  metaData: DataBlockMetadata;
+  metaData: ChartMetaData;
   onDataAdded?: (data: SelectedData) => void;
   onDataRemoved?: (data: SelectedData, index: number) => void;
   onDataChanged?: (data: SelectedData[]) => void;
@@ -45,11 +45,7 @@ export interface ChartDataSetAndConfiguration {
   configuration: DataSetConfiguration;
 }
 
-function dataName(
-  meta: DataBlockMetadata,
-  indicator: string,
-  filters: string[],
-) {
+function dataName(meta: ChartMetaData, indicator: string, filters: string[]) {
   return [
     meta.indicators[indicator].label,
     '(',

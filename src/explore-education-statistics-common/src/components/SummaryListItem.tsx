@@ -16,7 +16,6 @@ const SummaryListItem = ({
   term,
   detailsNoMargin,
   smallKey = false,
-  showActions,
 }: Props) => {
   return (
     <div className="govuk-summary-list__row">

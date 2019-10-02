@@ -3,6 +3,7 @@ import { SelectOption } from '@common/components/form/FormSelect';
 import {
   ChartDataB,
   ChartDefinition,
+  ChartMetaData,
   ChartProps,
   createSortedAndMappedDataForAxis,
   generateKeyFromDataSet,
@@ -11,7 +12,6 @@ import {
 import {
   DataBlockData,
   DataBlockGeoJsonProperties,
-  DataBlockMetadata,
 } from '@common/services/dataBlockService';
 import {
   AxisConfiguration,
@@ -69,7 +69,7 @@ interface MapClickEvent extends LeafletMouseEvent {
 // <editor-fold desc=" Static functions">
 function getLocationsForDataSet(
   data: DataBlockData,
-  meta: DataBlockMetadata,
+  meta: ChartMetaData,
   chartData: ChartDataB[],
 ) {
   const allLocationIds = chartData.map(({ __name }) => __name);
@@ -95,7 +95,7 @@ function getLocationsForDataSet(
 }
 
 function getGeometryForOptions(
-  meta: DataBlockMetadata,
+  meta: ChartMetaData,
   selectedDataSet: DataSetConfiguration,
   sourceData: ChartDataB[],
   min: number,
@@ -143,7 +143,7 @@ function calculateMinAndScaleForSourceData(sourceData: ChartDataB[]) {
 }
 
 function generateGeometryAndLegendForSelectedOptions(
-  meta: DataBlockMetadata,
+  meta: ChartMetaData,
   labels: Dictionary<DataSetConfiguration>,
   chartData: ChartDataB[],
   selectedDataSet: string,

@@ -3,10 +3,6 @@ import { RouteChildrenProps } from 'react-router';
 import PrototypePage from './components/PrototypePage';
 import StepNav from './components/PrototypeStepByStep';
 import StepNavItem from './components/PrototypeStepByStepItem';
-import imageTest1 from './images/guidance/guidance-choose-publication.jpg';
-import imageTest2 from './images/guidance/guidance-create-release-button.jpg';
-import imageTest3 from './images/guidance/guidance-create-release-navigation.jpg';
-import imageTest4 from './images/guidance/guidance-select-theme.jpg';
 
 const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
   const query = new URLSearchParams(window.location.search);

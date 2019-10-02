@@ -7,11 +7,11 @@ import {
   FormTextInput,
 } from '@common/components/form';
 import { SelectOption } from '@common/components/form/FormSelect';
-import { ChartDefinition } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import {
-  DataBlockMetadata,
-  DataBlockResponse,
-} from '@common/services/dataBlockService';
+  ChartDefinition,
+  ChartMetaData,
+} from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import { DataBlockResponse } from '@common/services/dataBlockService';
 import React from 'react';
 import Button from '@common/components/Button';
 
@@ -20,7 +20,7 @@ interface Props {
   chartOptions: ChartOptions;
   onChange: (chartOptions: ChartOptions) => void;
   data: DataBlockResponse;
-  meta: DataBlockMetadata;
+  meta: ChartMetaData;
 
   onBoundaryLevelChange?: (boundaryLevel: string) => void;
 }

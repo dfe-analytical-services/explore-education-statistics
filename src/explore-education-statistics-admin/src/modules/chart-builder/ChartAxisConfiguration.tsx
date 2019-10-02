@@ -10,12 +10,10 @@ import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
 import {
   ChartCapabilities,
   ChartDataB,
+  ChartMetaData,
   createSortedAndMappedDataForAxis,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
-import {
-  DataBlockData,
-  DataBlockMetadata,
-} from '@common/services/dataBlockService';
+import { DataBlockData } from '@common/services/dataBlockService';
 import {
   AxisConfiguration,
   AxisGroupBy,
@@ -32,7 +30,7 @@ interface Props {
   defaultDataType?: AxisGroupBy;
   configuration: AxisConfiguration;
   data: DataBlockData;
-  meta: DataBlockMetadata;
+  meta: ChartMetaData;
   labels: Dictionary<DataSetConfiguration>;
   capabilities: ChartCapabilities;
   onConfigurationChange: (configuration: AxisConfiguration) => void;
@@ -57,7 +55,7 @@ const getSortOptions = (
 const getAxisLabels = (
   configuration: AxisConfiguration,
   data: DataBlockData,
-  meta: DataBlockMetadata,
+  meta: ChartMetaData,
   labels: Dictionary<DataSetConfiguration>,
   dataSets: ChartDataSet[],
 ): SelectOption[] => {

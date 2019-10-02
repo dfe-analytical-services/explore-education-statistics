@@ -5,11 +5,12 @@ import {
   DataBlockMetadata,
 } from '@common/services/dataBlockService';
 import formatPretty from '@common/lib/utils/number/formatPretty';
+import { ChartMetaData } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 
 export interface Props {
   heading?: string;
   data: DataBlockData;
-  meta: DataBlockMetadata;
+  meta: ChartMetaData;
   indicators: string[];
 }
 

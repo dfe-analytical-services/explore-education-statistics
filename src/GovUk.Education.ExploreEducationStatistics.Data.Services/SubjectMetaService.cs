@@ -1,24 +1,29 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
-    public class SubjectMetaService : ISubjectMetaService
+    public class SubjectMetaService : AbstractTableBuilderSubjectMetaService, ISubjectMetaService
     {
         private readonly IBoundaryLevelService _boundaryLevelService;
-        private readonly IFilterItemService _filterItemService;
+        
         private readonly IGeoJsonService _geoJsonService;
         private readonly IIndicatorService _indicatorService;
         private readonly ILocationService _locationService;
         private readonly ITimePeriodService _timePeriodService;
+        private readonly ISubjectService _subjectService;
+        private readonly IFootnoteService _footnoteService;
         private readonly IMapper _mapper;
 
         public SubjectMetaService(IBoundaryLevelService boundaryLevelService,
@@ -27,21 +32,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             IIndicatorService indicatorService,
             ILocationService locationService,
             IMapper mapper,
-            ITimePeriodService timePeriodService)
+            ITimePeriodService timePeriodService,
+            ISubjectService subjectService,
+            IFootnoteService footnoteService
+            ) : base(filterItemService)
         {
             _boundaryLevelService = boundaryLevelService;
-            _filterItemService = filterItemService;
             _geoJsonService = geoJsonService;
             _indicatorService = indicatorService;
             _locationService = locationService;
             _mapper = mapper;
             _timePeriodService = timePeriodService;
+            _subjectService = subjectService;
+            _footnoteService = footnoteService;
         }
 
         public SubjectMetaViewModel GetSubjectMeta(
             SubjectMetaQueryContext query,
             IQueryable<Observation> observations)
         {
+            
+            var subject = _subjectService.Find(query.SubjectId,
+                new List<Expression<Func<Subject, object>>> {s => s.Release.Publication});
+            if (subject == null)
+            {
+                throw new ArgumentException("Subject does not exist", nameof(query.SubjectId));
+            }
+            
             var observationalUnits = GetObservationalUnits(observations);
             return new SubjectMetaViewModel
             {
@@ -49,20 +66,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 Indicators = GetIndicators(query),
                 Locations = GetGeoJsonObservationalUnits(observationalUnits, query.BoundaryLevel),
                 BoundaryLevels = GetBoundaryLevelOptions(query.BoundaryLevel, observationalUnits.Keys),
-                TimePeriods = GetTimePeriods(observations)
+                PublicationName = subject.Release.Publication.Title,
+                SubjectName = subject.Name,
+                TimePeriods = GetTimePeriods(observations),
+                Footnotes = GetFootnotes(observations, query),
             };
         }
 
-        private Dictionary<string, LabelValue> GetFilters(IQueryable<Observation> observations)
-        {
-            return _filterItemService.GetFilterItems(observations).ToDictionary(
-                item => item.Id.ToString(),
-                item => new LabelValue
-                {
-                    Label = item.Label,
-                    Value = item.Id.ToString()
-                });
-        }
+
 
         private Dictionary<string, IndicatorMetaViewModel> GetIndicators(SubjectMetaQueryContext query)
         {
@@ -122,5 +133,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             var geoJson = _geoJsonService.Find(boundaryLevelId, observationalUnit.Code);
             return geoJson != null ? JsonConvert.DeserializeObject(geoJson.Value) : null;
         }
+        
+        private IEnumerable<FootnoteViewModel> GetFootnotes(IQueryable<Observation> observations,
+            SubjectMetaQueryContext queryContext)
+        {
+            return _footnoteService.GetFootnotes(queryContext.SubjectId, observations, queryContext.Indicators)
+                .Select(footnote => new FootnoteViewModel
+                {
+                    Id = footnote.Id,
+                    Label = footnote.Content
+                });
+        }
+        
+        
     }
+    
+    
 }

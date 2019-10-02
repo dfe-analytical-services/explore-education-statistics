@@ -3,7 +3,7 @@ import ReleaseContentPage from '@admin/pages/release/edit-release/content/Releas
 import ReleasePublishStatusPage from '@admin/pages/release/edit-release/ReleaseStatusPage';
 import ReleaseSummaryEditPage from '@admin/pages/release/edit-release/summary/ReleaseSummaryEditPage';
 import ReleaseSummaryPage from '@admin/pages/release/edit-release/summary/ReleaseSummaryPage';
-import ReleaseManageDataBlocksPage from '@admin/pages/release/edit-release/ReleaseManageDataBlocksPage';
+import ReleaseManageDataBlocksPage from '@admin/pages/release/edit-release/manage-datablocks/ReleaseManageDataBlocksPage';
 
 export interface ReleaseRoute {
   path: string;

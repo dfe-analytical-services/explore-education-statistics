@@ -1,5 +1,9 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { ChartProps } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import {
+  ChartMetaData,
+  ChartProps,
+  parseMetaData,
+} from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import {
   DataBlockData,
   DataBlockMetadata,
@@ -10,9 +14,9 @@ import {
 
 import Features from './testLocationData';
 
-import testResponseData_23_26_28__1_2_LAD_JSON from './testResponseData_23_26_28__1_2_LAD.json';
+import testResponseData_23_26_28__1_2_LA_JSON from './testResponseData_23_26_28__1_2_LA.json';
 
-const testResponseData_23_26_28__1_2_LAD: DataBlockResponse = (testResponseData_23_26_28__1_2_LAD_JSON as unknown) as DataBlockResponse;
+const testResponseData_23_26_28__1_2_LA: DataBlockResponse = (testResponseData_23_26_28__1_2_LA_JSON as unknown) as DataBlockResponse;
 
 const data: DataBlockData = {
   publicationId: 'test',
@@ -22,6 +26,7 @@ const data: DataBlockData = {
   geographicLevel: GeographicLevel.Country,
   result: [
     {
+      geographicLevel: GeographicLevel.Country,
       filters: ['1', '2'],
       location: {
         country: {
@@ -50,6 +55,7 @@ const data: DataBlockData = {
       timePeriod: '2014_HT6',
     },
     {
+      geographicLevel: GeographicLevel.Country,
       filters: ['1', '2'],
       location: {
         country: {
@@ -88,6 +94,7 @@ const data2: DataBlockData = {
   geographicLevel: GeographicLevel.Country,
   result: [
     {
+      geographicLevel: GeographicLevel.Country,
       filters: ['1', '2'],
       location: {
         country: {
@@ -116,6 +123,7 @@ const data2: DataBlockData = {
       timePeriod: '2014_HT6',
     },
     {
+      geographicLevel: GeographicLevel.Country,
       filters: ['1', '2'],
       location: {
         country: {
@@ -144,6 +152,7 @@ const data2: DataBlockData = {
       timePeriod: '2015_HT6',
     },
     {
+      geographicLevel: GeographicLevel.Country,
       filters: ['1', '2'],
       location: {
         country: {
@@ -182,6 +191,7 @@ const missingData: DataBlockData = {
   geographicLevel: GeographicLevel.Country,
   result: [
     {
+      geographicLevel: GeographicLevel.Country,
       filters: ['1', '2'],
       location: {
         country: {
@@ -209,6 +219,7 @@ const missingData: DataBlockData = {
       timePeriod: '2013_HT6',
     },
     {
+      geographicLevel: GeographicLevel.Country,
       filters: ['1', '2'],
       location: {
         country: {
@@ -237,6 +248,7 @@ const missingData: DataBlockData = {
       timePeriod: '2015_HT6',
     },
     {
+      geographicLevel: GeographicLevel.Country,
       filters: ['1', '2'],
       location: {
         country: {
@@ -275,6 +287,7 @@ const multipleData: DataBlockData = {
   geographicLevel: GeographicLevel.Country,
   result: [
     {
+      geographicLevel: GeographicLevel.Country,
       filters: ['1', '2'],
       location: {
         country: {
@@ -303,6 +316,7 @@ const multipleData: DataBlockData = {
       timePeriod: '2015_HT6',
     },
     {
+      geographicLevel: GeographicLevel.Country,
       filters: ['1', '2'],
       location: {
         country: {
@@ -340,14 +354,30 @@ const labels = {
 };
 
 const metaData: DataBlockMetadata = {
+  publicationName: 'test',
+  subjectName: 'test',
+  footnotes: [],
+
   filters: {
-    '1': {
-      label: 'All Schools',
-      value: '1',
-    },
-    '2': {
-      label: 'All Pupils',
-      value: '1',
+    test: {
+      totalValue: '',
+      legend: '',
+      hint: '',
+      options: {
+        test: {
+          label: 'test',
+          options: [
+            {
+              label: 'All Schools',
+              value: '1',
+            },
+            {
+              label: 'All Pupils',
+              value: '1',
+            },
+          ],
+        },
+      },
     },
   },
 
@@ -372,21 +402,25 @@ const metaData: DataBlockMetadata = {
   timePeriods: {
     '2014_HT6': {
       label: '2014/15',
-      value: '2014_HT6',
+      year: 2014,
+      code: 'HT6',
     },
     '2015_HT6': {
       label: '2015/16',
-      value: '2015_HT6',
+      year: 2015,
+      code: 'HT6',
     },
   },
 
   locations: {
     E92000001: {
+      level: GeographicLevel.Country,
       value: 'E92000001',
       label: 'England',
       geoJson: [Features.E92000001],
     },
     S92000001: {
+      level: GeographicLevel.Country,
       value: 'S92000001',
       label: 'Scotland',
       geoJson: [Features.S92000001],
@@ -2990,9 +3024,11 @@ const responseMetadata: ResponseMetaData = {
   },
 };
 
+const chartMetaData: ChartMetaData = parseMetaData(metaData);
+
 const AbstractChartProps: ChartProps = {
   data,
-  meta: metaData,
+  meta: chartMetaData,
 
   width: 900,
   height: 300,
@@ -3058,9 +3094,9 @@ const AbstractChartProps: ChartProps = {
 const AbstractChartProps2: ChartProps = {
   data: data2,
   meta: {
-    ...metaData,
+    ...chartMetaData,
     timePeriods: {
-      ...metaData.timePeriods,
+      ...chartMetaData.timePeriods,
       '2016_HT6': {
         label: '2016/17',
         value: '2016_HT6',
@@ -3125,25 +3161,25 @@ const AbstractChartProps2: ChartProps = {
 
 const AbstractMultipleChartProps: ChartProps = {
   data: multipleData,
-  meta: metaData,
+  meta: chartMetaData,
   width: 900,
   height: 300,
 
   labels: {
     '23_1_2_____': {
-      label: metaData.indicators['23'].label,
+      label: chartMetaData.indicators['23'].label,
       name: '23_1_2_____',
       unit: '%',
       value: '23_1_2_____',
     },
     '26_1_2_____': {
-      label: metaData.indicators['26'].label,
+      label: chartMetaData.indicators['26'].label,
       name: '26_1_2_____',
       unit: '%',
       value: '26_1_2_____',
     },
     '28_1_2_____': {
-      label: metaData.indicators['28'].label,
+      label: chartMetaData.indicators['28'].label,
       name: '28_1_2_____',
       unit: '%',
       value: '28_1_2_____',
@@ -3180,10 +3216,10 @@ const AbstractMultipleChartProps: ChartProps = {
   },
 };
 
-const testResponseData_23_26__1_2_LAD: DataBlockResponse = {
-  ...testResponseData_23_26_28__1_2_LAD,
+const testResponseData_23_26__1_2_LA: DataBlockResponse = {
+  ...testResponseData_23_26_28__1_2_LA,
 
-  result: testResponseData_23_26_28__1_2_LAD.result.map(r => {
+  result: testResponseData_23_26_28__1_2_LA.result.map(r => {
     return {
       ...r,
       measures: {
@@ -3194,43 +3230,46 @@ const testResponseData_23_26__1_2_LAD: DataBlockResponse = {
   }),
 
   metaData: {
-    ...testResponseData_23_26_28__1_2_LAD.metaData,
+    ...testResponseData_23_26_28__1_2_LA.metaData,
     indicators: {
-      '23': testResponseData_23_26_28__1_2_LAD.metaData.indicators['23'],
-      '26': testResponseData_23_26_28__1_2_LAD.metaData.indicators['26'],
+      '23': testResponseData_23_26_28__1_2_LA.metaData.indicators['23'],
+      '26': testResponseData_23_26_28__1_2_LA.metaData.indicators['26'],
     },
   },
 };
 
+const AbstractLargeDataChartPropsMeta = parseMetaData(
+  testResponseData_23_26_28__1_2_LA.metaData,
+);
 const AbstractLargeDataChartProps: ChartProps = {
-  data: testResponseData_23_26_28__1_2_LAD,
-  meta: testResponseData_23_26_28__1_2_LAD.metaData,
+  data: testResponseData_23_26_28__1_2_LA,
+  meta: AbstractLargeDataChartPropsMeta,
   width: 900,
   height: 300,
 
   labels: {
-    '2014_HT6': {
-      label: metaData.timePeriods['2014_HT6'].label,
-      value: '2014_HT6',
+    '2014_AY': {
+      label: AbstractLargeDataChartPropsMeta.timePeriods['2014_AY'].label,
+      value: '2014_AY',
     },
-    '2015_HT6': {
-      label: metaData.timePeriods['2015_HT6'].label,
-      value: '2015_HT6',
+    '2015_AY': {
+      label: AbstractLargeDataChartPropsMeta.timePeriods['2015_AY'].label,
+      value: '2015_AY',
     },
     '23_1_2_____': {
-      label: metaData.indicators['23'].label,
+      label: AbstractLargeDataChartPropsMeta.indicators['23'].label,
       unit: '%',
       value: '23_1_2_____',
       name: '23_1_2_____',
     },
     '26_1_2_____': {
-      label: metaData.indicators['26'].label,
+      label: AbstractLargeDataChartPropsMeta.indicators['26'].label,
       unit: '%',
       value: '26_1_2_____',
       name: '26_1_2_____',
     },
     '28_1_2_____': {
-      label: metaData.indicators['28'].label,
+      label: AbstractLargeDataChartPropsMeta.indicators['28'].label,
       unit: '%',
       value: '26_1_2_____',
       name: '26_1_2_____',
@@ -3267,38 +3306,48 @@ const AbstractLargeDataChartProps: ChartProps = {
   },
 };
 
+const AbstractLargeDataChartProps_smaller_datasetsMeta = parseMetaData(
+  testResponseData_23_26_28__1_2_LA.metaData,
+);
 const AbstractLargeDataChartProps_smaller_datasets: ChartProps = {
-  data: testResponseData_23_26__1_2_LAD,
-  meta: testResponseData_23_26__1_2_LAD.metaData,
+  data: testResponseData_23_26__1_2_LA,
+  meta: AbstractLargeDataChartProps_smaller_datasetsMeta,
 
   width: 900,
   height: 300,
 
   labels: {
-    '2014_HT6': {
-      label: metaData.timePeriods['2014_HT6'].label,
-      value: '2014_HT6',
+    '2014_AY': {
+      label:
+        AbstractLargeDataChartProps_smaller_datasetsMeta.timePeriods['2014_AY']
+          .label,
+      value: '2014_AY',
     },
-    '2015_HT6': {
-      label: metaData.timePeriods['2015_HT6'].label,
-      value: '2015_HT6',
+    '2015_AY': {
+      label:
+        AbstractLargeDataChartProps_smaller_datasetsMeta.timePeriods['2015_AY']
+          .label,
+      value: '2015_AY',
     },
     '23_1_2_____': {
-      label: metaData.indicators['23'].label,
+      label:
+        AbstractLargeDataChartProps_smaller_datasetsMeta.indicators['23'].label,
       unit: '%',
       value: '23_1_2_____',
       name: '23_1_2_____',
       colour: '#285252',
     },
     '26_1_2_____': {
-      label: metaData.indicators['26'].label,
+      label:
+        AbstractLargeDataChartProps_smaller_datasetsMeta.indicators['26'].label,
       unit: '%',
       value: '26_1_2_____',
       name: '26_1_2_____',
       colour: '#572957',
     },
     '28_1_2_____': {
-      label: metaData.indicators['28'].label,
+      label:
+        AbstractLargeDataChartProps_smaller_datasetsMeta.indicators['28'].label,
       unit: '%',
       value: '28_1_2_____',
       name: '28_1_2_____',
@@ -3339,7 +3388,7 @@ const AbstractMissingDataChartProps: ChartProps = {
   height: 300,
 
   meta: {
-    ...metaData,
+    ...chartMetaData,
     timePeriods: {
       '2013_HT6': {
         label: '2013/14',

@@ -5,15 +5,28 @@ Object {
   "geographicLevel": "Country",
   "metaData": Object {
     "filters": Object {
-      "1": Object {
-        "label": "All Schools",
-        "value": "1",
-      },
-      "2": Object {
-        "label": "All Pupils",
-        "value": "1",
+      "test": Object {
+        "hint": "",
+        "legend": "",
+        "options": Object {
+          "test": Object {
+            "label": "test",
+            "options": Array [
+              Object {
+                "label": "All Schools",
+                "value": "1",
+              },
+              Object {
+                "label": "All Pupils",
+                "value": "1",
+              },
+            ],
+          },
+        },
+        "totalValue": "",
       },
     },
+    "footnotes": Array [],
     "indicators": Object {
       "23": Object {
         "label": "Unauthorised absence rate",
@@ -13163,6 +13176,7 @@ Object {
           },
         ],
         "label": "England",
+        "level": "Country",
         "value": "E92000001",
       },
       "S92000001": Object {
@@ -26296,17 +26310,22 @@ Object {
           },
         ],
         "label": "Scotland",
+        "level": "Country",
         "value": "S92000001",
       },
     },
+    "publicationName": "test",
+    "subjectName": "test",
     "timePeriods": Object {
       "2014_HT6": Object {
+        "code": "HT6",
         "label": "2014/15",
-        "value": "2014_HT6",
+        "year": 2014,
       },
       "2015_HT6": Object {
+        "code": "HT6",
         "label": "2015/16",
-        "value": "2015_HT6",
+        "year": 2015,
       },
     },
   },
@@ -26319,6 +26338,7 @@ Object {
         "1",
         "2",
       ],
+      "geographicLevel": "Country",
       "location": Object {
         "country": Object {
           "code": "E92000001",
@@ -26350,6 +26370,7 @@ Object {
         "1",
         "2",
       ],
+      "geographicLevel": "Country",
       "location": Object {
         "country": Object {
           "code": "E92000001",
