@@ -2,13 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using Microsoft.Azure.Cosmos.Table;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 {

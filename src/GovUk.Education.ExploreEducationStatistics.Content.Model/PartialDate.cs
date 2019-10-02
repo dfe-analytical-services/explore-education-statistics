@@ -1,7 +1,7 @@
 using System;
+using System.Text.RegularExpressions;
 using static System.Int32;
 using static System.String;
-using System.Text.RegularExpressions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {

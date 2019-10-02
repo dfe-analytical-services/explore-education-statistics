@@ -3,6 +3,7 @@ using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta.TableBuilder;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
@@ -18,13 +19,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _filterItemService = filterItemService;
         }
 
-        protected Dictionary<string, TableBuilderFilterMetaViewModel> GetFilters(IQueryable<Observation> observations)
+        protected Dictionary<string, FilterMetaViewModel> GetFilters(IQueryable<Observation> observations)
         {
             return _filterItemService.GetFilterItemsIncludingFilters(observations)
                 .GroupBy(item => item.FilterGroup.Filter, item => item, FilterComparer)
                 .ToDictionary(
                     itemsGroupedByFilter => itemsGroupedByFilter.Key.Label.PascalCase(),
-                    itemsGroupedByFilter => new TableBuilderFilterMetaViewModel
+                    itemsGroupedByFilter => new FilterMetaViewModel
                     {
                         Hint = itemsGroupedByFilter.Key.Hint,
                         Legend = itemsGroupedByFilter.Key.Label,
@@ -33,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                             .ToDictionary(
                                 itemsGroupedByFilterGroup => itemsGroupedByFilterGroup.Key.Label.PascalCase(),
                                 itemsGroupedByFilterGroup =>
-                                    new TableBuilderFilterItemsMetaViewModel
+                                    new FilterItemsMetaViewModel
                                     {
                                         Label = itemsGroupedByFilterGroup.Key.Label,
                                         Options = itemsGroupedByFilterGroup.Select(item => new LabelValue

@@ -8,7 +8,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PublicationId = System.Guid;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
@@ -30,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [Required] [FromQuery(Name = "topicId")]
             Guid topicId)
         {
-            var userId = new Guid(); // TODO get the Guid from AD
+            var userId = Guid.NewGuid(); // TODO get the Guid from AD
             var result = await _publicationService.GetByTopicAndUserAsync(topicId, userId);
 
             if (result.Any())
@@ -40,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
             return NoContent();
         }
-        
+
         // GET api/publications/{publicationId}
         [HttpGet("api/publications/{publicationId}")]
         public async Task<ActionResult<PublicationViewModel>> GetPublicationByIdAsync(
@@ -59,7 +58,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         // POST api/topic/{topicId}/publications
         [HttpPost("api/topic/{topicId}/publications")]
-        public async Task<ActionResult<PublicationViewModel>> CreatePublicationAsync(CreatePublicationViewModel publication, Guid topicId)
+        public async Task<ActionResult<PublicationViewModel>> CreatePublicationAsync(
+            CreatePublicationViewModel publication, Guid topicId)
         {
             publication.TopicId = topicId;
             var result = await _publicationService.CreatePublicationAsync(publication);
@@ -68,6 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 ValidationUtils.AddErrors(ModelState, result.Left);
                 return ValidationProblem();
             }
+
             return result.Right;
         }
     }
