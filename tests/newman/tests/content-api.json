@@ -268,7 +268,6 @@
 									"                if(respJson[i].topics[j].title === \"Pupil absence\") {",
 									"                    for(var k = 0; respJson[i].topics[j].publications.length; k++) {",
 									"                        if(respJson[i].topics[j].publications[k].title === \"Pupil absence in schools in England\") {",
-									"                            pm.expect(respJson[i].topics[j].publications[k].dataFiles.length).to.equal(8);",
 									"                            pm.expect(respJson[i].topics[j].publications[k].downloadFiles.length).to.equal(8);",
 									"                            return;",
 									"                        }",
