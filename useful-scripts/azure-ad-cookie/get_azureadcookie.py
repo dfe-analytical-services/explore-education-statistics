@@ -20,7 +20,7 @@ cdi.install(file_directory="./",
             verbose=True,
             chmod=True,
             overwrite=False,
-            version='75.0.3770.140')
+            version='76.0.3809.126')
 os.environ["PATH"] += os.pathsep + os.getcwd()
             
 timeout = 10
