@@ -167,7 +167,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{content_api_url}}/content/release/4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5",
+									"raw": "{{content_api_url}}/content/publication/pupil-absence-in-schools-in-england/2016-17",
 									"host": [
 										"{{content_api_url}}"
 									],
