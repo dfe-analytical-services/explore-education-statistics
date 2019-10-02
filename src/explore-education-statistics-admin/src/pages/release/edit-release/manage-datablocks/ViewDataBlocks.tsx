@@ -72,16 +72,23 @@ const ViewDataBlocks = (
     ManageReleaseContext,
   ) as ManageRelease;
 
-
   const [chartBuilderData, setChartBuilderData] = React.useState<DataBlockResponse>(dataBlockResponse);
-
-  const [request, setRequest] = React.useState<DataBlockRequest>();
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [requestConfiguration, setRequestConfiguration] = React.useState<Chart | undefined>();
   const [initialConfiguration, setInitialConfiguration] = React.useState<Chart | undefined>();
 
+  React.useEffect(() => {
+    setChartBuilderData(dataBlockResponse);
+  }, [dataBlockResponse]);
 
+  React.useEffect(() => {
+    if (dataBlock && dataBlock.charts) {
+      setInitialConfiguration({
+        ...dataBlock.charts[0]
+      });
+    }
+  }, [dataBlock]);
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
   const [tableData, setTableData] = React.useState<{
     fullTable: FullTable,
@@ -90,7 +97,7 @@ const ViewDataBlocks = (
 
   React.useEffect(() => {
     const table = dataBlock.tables;
-    const fullTable = mapFullTable(dataBlockResponse);
+    const fullTable = mapFullTable(chartBuilderData);
     const tableHeadersConfig =
       (table && table[0].tableHeaders) ||
       getDefaultTableHeaderConfig(fullTable.subjectMeta);
@@ -99,7 +106,7 @@ const ViewDataBlocks = (
       fullTable,
       tableHeadersConfig
     })
-  },[dataBlock.tables, dataBlockResponse]);
+  }, [dataBlock.tables, chartBuilderData]);
 
 
   // eslint-disable-next-line
@@ -108,14 +115,21 @@ const ViewDataBlocks = (
   };
 
   const reRequestdata = (reRequest: DataBlockRerequest) => {
-    /*
-    if (request) {
-      setRequest({
-        ...request,
-        ...reRequest,
+
+    const newRequest = {
+      ...dataBlockRequest,
+      ...reRequest
+    };
+
+    DataBlockService.getDataBlockForSubject(newRequest)
+      .then(response => {
+
+        if (response) {
+          setChartBuilderData(response);
+        }
+
       });
-    }
-     */
+
   };
 
   return (

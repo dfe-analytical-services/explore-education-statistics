@@ -30,6 +30,7 @@ export type FilterFormSubmitHandler = (values: FormValues) => void;
 interface Props {
   subjectMeta: PublicationSubjectMeta;
   onSubmit: FilterFormSubmitHandler;
+  values?: FormValues
 }
 
 const FiltersForm = (props: Props & InjectedWizardProps) => {
@@ -39,6 +40,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
     goToNextStep,
     currentStep,
     stepNumber,
+    values = {indicators: [], filters: {}}
   } = props;
 
   const ref = useRef<HTMLDivElement>(null);
@@ -57,7 +59,10 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
       enableReinitialize
       ref={formikRef}
       initialValues={{
-        filters: mapValues(subjectMeta.filters, filter => {
+        filters: mapValues(subjectMeta.filters, (filter,index) => {
+
+          if (values.filters && values.filters[index]) return values.filters[index];
+
           if (typeof filter.options.Default !== 'undefined') {
             // Automatically select filter option when there is only one
             return filter.options.Default.options.length === 1
@@ -66,7 +71,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
           }
           return [];
         }),
-        indicators: [],
+        indicators: values.indicators,
       }}
       validationSchema={Yup.object<FormValues>({
         indicators: Yup.array()

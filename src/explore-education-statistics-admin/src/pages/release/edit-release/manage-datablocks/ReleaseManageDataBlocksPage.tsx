@@ -10,6 +10,7 @@ import ManageReleaseContext, {ManageRelease} from "@admin/pages/release/ManageRe
 import {FormSelect} from '@common/components/form';
 import DataBlockService, {DataBlockResponse, DataBlockRequest} from '@common/services/dataBlockService';
 import {SelectOption} from '@common/components/form/FormSelect';
+import Button from '@common/components/Button';
 
 const ReleaseManageDataBlocksPage = () => {
 
@@ -116,12 +117,27 @@ const ReleaseManageDataBlocksPage = () => {
         {dataBlock ? dataBlock.heading || "title not set" : "Create new Data Block"}
       </h2>
 
+
       <Tabs id="manageDataBlocks">
-        <TabsSection title={dataBlock ? "Edit data block" : "Create Data block"}>
-          <CreateDataBlocks
-            dataBlockRequest={dataBlockRequest}
-            dataBlockResponse={dataBlockResponse}
-          />
+        <TabsSection title={dataBlock ? "Update data block" : "Create Data block"}>
+
+          {dataBlock && (
+            <div className="govuk-!-margin-top-4">
+              <Button
+                type="button"
+              >
+                Delete this data block
+              </Button>
+            </div>
+          )}
+
+          <div style={{overflow: "hidden"}}>
+            <CreateDataBlocks
+              dataBlockRequest={dataBlockRequest}
+              dataBlockResponse={dataBlockResponse}
+            />
+          </div>
+
         </TabsSection>
         {dataBlock && dataBlockResponse && dataBlockRequest && (
           <TabsSection title="Configure Content">
