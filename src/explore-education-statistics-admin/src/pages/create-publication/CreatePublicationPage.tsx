@@ -107,10 +107,7 @@ const CreatePublicationPage = ({
           <RelatedInformation heading="Help and guidance">
             <ul className="govuk-list">
               <li>
-                <Link
-                  to="/prototypes/documentation/create-new-publication"
-                  target="blank"
-                >
+                <Link to="/documentation/create-new-publication" target="blank">
                   Creating a new publication{' '}
                 </Link>
               </li>
