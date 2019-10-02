@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "b3a6c901-2fb2-4b7e-99ee-6ec9ea20c9fe",
+		"_postman_id": "1c0c3428-3013-481d-837a-dd953c38f15a",
 		"name": "DfE Admin API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -1637,72 +1637,6 @@
 					"response": []
 				},
 				{
-					"name": "Release - Get exclusion release datablocks",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
-								"exec": [
-									"var respJson = pm.response.json();",
-									"",
-									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-									"",
-									"pm.test(\"Fields are present\", function () {",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[1]id\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[1]heading\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[1]dataBlockRequest\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[1]dataBlockRequest.subjectId\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[1]dataBlockRequest.timePeriod\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[1]dataBlockRequest.filters\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[1]dataBlockRequest.indicators\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[1]charts\"));",
-									"    pm.expect(pm.response.to.have.jsonBody(\"[1]tables\"));",
-									"});",
-									"",
-									"pm.test(\"Number of results should be correct\", function () { ",
-									"    pm.expect(respJson.length).to.above(0);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "dbde4b62-47dd-4c3d-93dc-5e01ec3f8231",
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-							}
-						],
-						"url": {
-							"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/datablocks/",
-							"host": [
-								"{{admin_api_url}}"
-							],
-							"path": [
-								"release",
-								"e7774a74-1f62-4b76-b9b5-84f14dac7278",
-								"datablocks",
-								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Release summary - Exclusions 2016",
 					"event": [
 						{
@@ -2540,6 +2474,339 @@
 								"85d43d6f-ec91-452d-aba2-03303ab4363a",
 								"chart",
 								"chart.png"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Release - DataBlock",
+			"item": [
+				{
+					"name": "Get DataBlocks by Release - Permanent and fixed-period exclusions in England",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
+								"exec": [
+									"var respJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Fields are present\", function () {",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[1]id\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[1]heading\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[1]dataBlockRequest\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[1]dataBlockRequest.subjectId\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[1]dataBlockRequest.timePeriod\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[1]dataBlockRequest.filters\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[1]dataBlockRequest.indicators\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[1]charts\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"[1]tables\"));",
+									"});",
+									"",
+									"pm.test(\"Number of results should be correct\", function () { ",
+									"    pm.expect(respJson.length).to.above(0);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "dbde4b62-47dd-4c3d-93dc-5e01ec3f8231",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/datablocks/",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+								"datablocks",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create DataBlock",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+								"exec": [
+									"var respJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"// NOTE: Save DataBlock id for use in the next request",
+									"pm.globals.set(\"datablock_id\", respJson.id);",
+									"",
+									"pm.test(\"Fields are present\", function () {",
+									"    pm.expect(pm.response.to.have.jsonBody(\"dataBlockRequest\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"heading\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"charts\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"tables\"));",
+									"});",
+									"",
+									"pm.test(\"id should match request id\", function () {",
+									"    pm.expect(respJson.id).to.equal(pm.globals.get(\"datablock_id\"));",
+									"});",
+									"",
+									"pm.test(\"heading should should be correct\", function () { ",
+									"    pm.expect(respJson.heading).to.equal(\"Postman test chart showing permanent exclusions in England\"); ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"heading\": \"Postman test chart showing permanent exclusions in England\",\n    \"dataBlockRequest\": {\n        \"subjectId\": 12,\n        \"geographicLevel\": \"Country\",\n        \"timePeriod\": {\n            \"startYear\": \"2012\",\n            \"startCode\": \"AY\",\n            \"endYear\": \"2016\",\n            \"endCode\": \"AY\"\n        },\n        \"filters\": [\n            \"457\"\n        ],\n        \"indicators\": [\n            \"179\",\n            \"177\",\n            \"178\"\n        ]\n    },\n    \"tables\": [\n        {\n            \"indicators\": [\n                \"177\",\n                \"178\",\n                \"179\"\n            ]\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/datablocks",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"release",
+								"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+								"datablocks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get DataBlock by created Id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+								"exec": [
+									"var respJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Fields are present\", function () {",
+									"    pm.expect(pm.response.to.have.jsonBody(\"dataBlockRequest\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"heading\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"charts\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"tables\"));",
+									"});",
+									"",
+									"pm.test(\"id should match request id\", function () {",
+									"    pm.expect(respJson.id).to.equal(pm.globals.get(\"datablock_id\"));",
+									"});",
+									"",
+									"pm.test(\"heading should should be correct\", function () { ",
+									"    pm.expect(respJson.heading).to.equal(\"Postman test chart showing permanent exclusions in England\"); ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/datablocks/{{datablock_id}}",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"datablocks",
+								"{{datablock_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update DataBlock",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+								"exec": [
+									"var respJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"pm.test(\"Fields are present\", function () {",
+									"    pm.expect(pm.response.to.have.jsonBody(\"dataBlockRequest\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"heading\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"charts\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"tables\"));",
+									"});",
+									"",
+									"pm.test(\"id should match request id\", function () {",
+									"    pm.expect(respJson.id).to.equal(pm.globals.get(\"datablock_id\"));",
+									"});",
+									"",
+									"pm.test(\"heading should should be correct\", function () { ",
+									"    pm.expect(respJson.heading).to.equal(\"Postman test chart showing permanent exclusions in England - Updated\"); ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"heading\": \"Postman test chart showing permanent exclusions in England - Updated\",\n    \"dataBlockRequest\": {\n        \"subjectId\": 12,\n        \"geographicLevel\": \"Country\",\n        \"timePeriod\": {\n            \"startYear\": \"2012\",\n            \"startCode\": \"AY\",\n            \"endYear\": \"2016\",\n            \"endCode\": \"AY\"\n        },\n        \"filters\": [\n            \"457\"\n        ],\n        \"indicators\": [\n            \"179\",\n            \"177\",\n            \"178\"\n        ]\n    },\n    \"tables\": [\n        {\n            \"indicators\": [\n                \"177\",\n                \"178\",\n                \"179\"\n            ]\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{admin_api_url}}/datablocks/{{datablock_id}}",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"datablocks",
+								"{{datablock_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete DataBlock",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+								"exec": [
+									"pm.test(\"Status code is 204\", function () { pm.response.to.have.status(204); });"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Cookie",
+								"type": "text",
+								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+							}
+						],
+						"url": {
+							"raw": "{{admin_api_url}}/datablocks/{{datablock_id}}",
+							"host": [
+								"{{admin_api_url}}"
+							],
+							"path": [
+								"datablocks",
+								"{{datablock_id}}"
 							]
 						}
 					},
