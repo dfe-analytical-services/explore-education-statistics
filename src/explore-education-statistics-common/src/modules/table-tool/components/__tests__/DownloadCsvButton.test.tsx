@@ -1,4 +1,8 @@
-import { Indicator, LocationFilter, TimePeriodFilter } from '@common/modules/full-table/types/filters';
+import {
+  Indicator,
+  LocationFilter,
+  TimePeriodFilter,
+} from '@common/modules/full-table/types/filters';
 import { FullTable } from '@common/modules/full-table/types/fullTable';
 import Papa from 'papaparse';
 import React from 'react';
