@@ -34,6 +34,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 Ok(await _dataBlockService.CreateAsync(releaseId, dataBlock)));
         }
 
+        [HttpDelete("datablocks/{id}")]
+        public async Task<ActionResult> DeleteDataBlockAsync(DataBlockId id)
+        {
+            await _dataBlockService.DeleteAsync(id);
+            return new NoContentResult();
+        }
+
         [HttpGet("release/{releaseId}/datablocks")]
         public async Task<ActionResult<List<DataBlockViewModel>>> GetDataBlocksAsync(ReleaseId releaseId)
         {

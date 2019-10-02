@@ -37,6 +37,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await GetAsync(dataBlock.Id);
         }
 
+        public async Task DeleteAsync(DataBlockId id)
+        {
+            var dataBlock = await _context.DataBlocks.FirstOrDefaultAsync(block => block.Id.Equals(id));
+            if (dataBlock != null)
+            {
+                _context.DataBlocks.Remove(dataBlock);
+                await _context.SaveChangesAsync();
+            }
+        }
+        
         public async Task<DataBlockViewModel> GetAsync(DataBlockId id)
         {
             var dataBlock = await _context.DataBlocks.FirstOrDefaultAsync(block => block.Id.Equals(id));
