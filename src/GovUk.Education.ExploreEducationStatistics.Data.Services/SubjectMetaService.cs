@@ -12,10 +12,10 @@ using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
-    public class SubjectMetaService : ISubjectMetaService
+    public class SubjectMetaService : AbstractTableBuilderSubjectMetaService, ISubjectMetaService
     {
         private readonly IBoundaryLevelService _boundaryLevelService;
-        private readonly IFilterItemService _filterItemService;
+        
         private readonly IGeoJsonService _geoJsonService;
         private readonly IIndicatorService _indicatorService;
         private readonly ILocationService _locationService;
@@ -28,10 +28,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             IIndicatorService indicatorService,
             ILocationService locationService,
             IMapper mapper,
-            ITimePeriodService timePeriodService)
+            ITimePeriodService timePeriodService) : base(filterItemService)
         {
             _boundaryLevelService = boundaryLevelService;
-            _filterItemService = filterItemService;
             _geoJsonService = geoJsonService;
             _indicatorService = indicatorService;
             _locationService = locationService;
@@ -46,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             var observationalUnits = GetObservationalUnits(observations);
             return new SubjectMetaViewModel
             {
-                Filters = GetFilters2(observations),
+                Filters = GetFilters(observations),
                 Indicators = GetIndicators(query),
                 Locations = GetGeoJsonObservationalUnits(observationalUnits, query.BoundaryLevel),
                 BoundaryLevels = GetBoundaryLevelOptions(query.BoundaryLevel, observationalUnits.Keys),
@@ -54,45 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             };
         }
 
-        private Dictionary<string, LabelValue> GetFilters(IQueryable<Observation> observations)
-        {
-            return _filterItemService.GetFilterItems(observations).ToDictionary(
-                item => item.Id.ToString(),
-                item => new LabelValue
-                {
-                    Label = item.Label,
-                    Value = item.Id.ToString()
-                });
-        }
-        private static IEqualityComparer<Filter> FilterComparer { get; } = new FilterEqualityComparer();
-        private static IEqualityComparer<FilterGroup> FilterGroupComparer { get; } = new FilterGroupEqualityComparer();
-        protected Dictionary<string, TableBuilderFilterMetaViewModel> GetFilters2(IQueryable<Observation> observations)
-        {
-            return _filterItemService.GetFilterItemsIncludingFilters(observations)
-                .GroupBy(item => item.FilterGroup.Filter, item => item, FilterComparer)
-                .ToDictionary(
-                    itemsGroupedByFilter => itemsGroupedByFilter.Key.Label.PascalCase(),
-                    itemsGroupedByFilter => new TableBuilderFilterMetaViewModel
-                    {
-                        Hint = itemsGroupedByFilter.Key.Hint,
-                        Legend = itemsGroupedByFilter.Key.Label,
-                        Options = itemsGroupedByFilter
-                            .GroupBy(item => item.FilterGroup, item => item, FilterGroupComparer)
-                            .ToDictionary(
-                                itemsGroupedByFilterGroup => itemsGroupedByFilterGroup.Key.Label.PascalCase(),
-                                itemsGroupedByFilterGroup =>
-                                    new TableBuilderFilterItemsMetaViewModel
-                                    {
-                                        Label = itemsGroupedByFilterGroup.Key.Label,
-                                        Options = itemsGroupedByFilterGroup.Select(item => new LabelValue
-                                        {
-                                            Label = item.Label,
-                                            Value = item.Id.ToString()
-                                        })
-                                    }),
-                        TotalValue = GetTotalValue(itemsGroupedByFilter)
-                    });
-        }
+
 
         private Dictionary<string, IndicatorMetaViewModel> GetIndicators(SubjectMetaQueryContext query)
         {
@@ -154,45 +115,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         }
         
         
-        private sealed class FilterEqualityComparer : IEqualityComparer<Filter>
-        {
-            public bool Equals(Filter x, Filter y)
-            {
-                if (ReferenceEquals(x, y)) return true;
-                if (ReferenceEquals(x, null)) return false;
-                if (ReferenceEquals(y, null)) return false;
-                if (x.GetType() != y.GetType()) return false;
-                return x.Id == y.Id;
-            }
-
-            public int GetHashCode(Filter obj)
-            {
-                return obj.Id.GetHashCode();
-            }
-        }
-        
-        private sealed class FilterGroupEqualityComparer : IEqualityComparer<FilterGroup>
-        {
-            public bool Equals(FilterGroup x, FilterGroup y)
-            {
-                if (ReferenceEquals(x, y)) return true;
-                if (ReferenceEquals(x, null)) return false;
-                if (ReferenceEquals(y, null)) return false;
-                if (x.GetType() != y.GetType()) return false;
-                return x.Id == y.Id;
-            }
-
-            public int GetHashCode(FilterGroup obj)
-            {
-                return obj.Id.GetHashCode();
-            }
-        }
-        
-        private string GetTotalValue(IEnumerable<FilterItem> filterItems)
-        {
-            return _filterItemService.GetTotal(filterItems)?.Id.ToString() ?? string.Empty;
-        }
-
     }
     
     
