@@ -8,8 +8,19 @@ import tableBuilderService, {
   ThemeMeta,
 } from '@common/modules/full-table/services/tableBuilderService';
 import TableTool from '@common/modules/table-tool/components/TableTool';
+import { DataBlockRequest, DataBlockResponse } from '@common/services/dataBlockService';
 
-const CreateDataBlocks = () => {
+interface Props {
+  dataBlockRequest?: DataBlockRequest,
+  dataBlockResponse?: DataBlockResponse
+}
+
+const CreateDataBlocks = (
+  {
+    dataBlockRequest,
+    dataBlockResponse
+  } : Props
+) => {
   const { publication, releaseId } = useContext(
     ManageReleaseContext,
   ) as ManageRelease;
