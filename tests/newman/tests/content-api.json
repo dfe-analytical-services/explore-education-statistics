@@ -48,13 +48,13 @@
 											"    pm.expect(pm.response.json().publication.slug).to.equal(\"pupil-absence-in-schools-in-england\");",
 											"});",
 											"",
-											"(pm.environment.get(\"content_api_url\") === \"http://localhost:5010/api\" ? pm.test.skip : pm.test)(\"Should have correct number of dataFiles\", function () {",
-											"    pm.expect(pm.response.json().dataFiles.length).to.be.above(6) ",
+											"(pm.environment.get(\"content_api_url\") === \"http://localhost:5010/api\" ? pm.test.skip : pm.test)(\"Should have correct number of downloadFiles\", function () {",
+											"    pm.expect(pm.response.json().downloadFiles.length).to.be.above(6) ",
 											"});",
 											"",
-											"pm.test(\"All dataFiles should have extension \\\"csv\\\" or \\\"docx\\\"\", function () {",
-											"    for(var i = 0; i < pm.response.json().dataFiles.length; i++) {",
-											"        pm.expect(pm.response.json().dataFiles[i].extension).to.be.oneOf([\"csv\", \"docx\"]); ",
+											"pm.test(\"All downloadFiles should have extension \\\"csv\\\" or \\\"docx\\\"\", function () {",
+											"    for(var i = 0; i < pm.response.json().downloadFiles.length; i++) {",
+											"        pm.expect(pm.response.json().downloadFiles[i].extension).to.be.oneOf([\"csv\", \"docx\"]); ",
 											"    }",
 											"});"
 										],
@@ -167,7 +167,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{content_api_url}}/content/release/4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5",
+									"raw": "{{content_api_url}}/content/publication/pupil-absence-in-schools-in-england/2016-17",
 									"host": [
 										"{{content_api_url}}"
 									],
@@ -268,7 +268,6 @@
 									"                if(respJson[i].topics[j].title === \"Pupil absence\") {",
 									"                    for(var k = 0; respJson[i].topics[j].publications.length; k++) {",
 									"                        if(respJson[i].topics[j].publications[k].title === \"Pupil absence in schools in England\") {",
-									"                            pm.expect(respJson[i].topics[j].publications[k].dataFiles.length).to.equal(8);",
 									"                            pm.expect(respJson[i].topics[j].publications[k].downloadFiles.length).to.equal(8);",
 									"                            return;",
 									"                        }",
