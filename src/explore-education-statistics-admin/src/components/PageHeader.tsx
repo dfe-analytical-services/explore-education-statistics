@@ -66,10 +66,7 @@ const PageHeader = ({ wide }: Props) => {
                 aria-label="Top Level Navigation"
               >
                 <li className="govuk-header__navigation-item">
-                  <a
-                    className="govuk-header__link"
-                    href="/prototypes/documentation"
-                  >
+                  <a className="govuk-header__link" href="/documentation">
                     Administrators' guide
                   </a>
                 </li>

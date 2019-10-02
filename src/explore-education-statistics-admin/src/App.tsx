@@ -18,16 +18,18 @@ import './App.scss';
 import { LoginContext } from './components/Login';
 import AdminDashboardPage from './pages/admin-dashboard/AdminDashboardPage';
 import IndexPage from './pages/IndexPage';
-import PrototypeAdminDashboard from './pages/prototypes/PrototypeAdminDashboard';
 
+import AdminDocumentationGlossary from './pages/documentation/DocumentationGlossary';
+import AdminDocumentationStyle from './pages/documentation/DocumentationStyle';
+import AdminDocumentationHome from './pages/documentation/DocumentationHome';
+import AdminDocumentationUsingDashboard from './pages/documentation/DocumentationUsingDashboard';
+import AdminDocumentationCreateNewRelease from './pages/documentation/DocumentationCreateNewRelease';
+import AdminDocumentationManageContent from './pages/documentation/DocumentationManageContent';
+import AdminDocumentationManageData from './pages/documentation/DocumentationManageData';
+
+import PrototypeAdminDashboard from './pages/prototypes/PrototypeAdminDashboard';
 import PrototypeChartTest from './pages/prototypes/PrototypeChartTest';
 import PrototypeTableTool from './pages/prototypes/PrototypeTableTool';
-import AdminDocumentationGlossary from './pages/prototypes/PrototypeDocumentationGlossary';
-import AdminDocumentationStyle from './pages/prototypes/PrototypeDocumentationStyle';
-import AdminDocumentationHome from './pages/prototypes/PrototypeDocumentationHome';
-import AdminDocumentationUsingDashboard from './pages/prototypes/PrototypeDocumentationUsingDashboard';
-import AdminDocumentationCreateNewRelease from './pages/prototypes/PrototypeDocumentationCreateNewRelease';
-import AdminDocumentationManageContent from './pages/prototypes/PrototypeDocumentationManageContent';
 import AdminDocumentationCreateNewPublication from './pages/prototypes/PrototypeDocumentationCreateNewPublication';
 import PublicationAssignMethodology from './pages/prototypes/PrototypePublicationPageAssignMethodology';
 import PublicationConfirmNew from './pages/prototypes/PrototypePublicationPageConfirmNew';
@@ -207,33 +209,38 @@ function App() {
         />
         <Route
           exact
-          path="/prototypes/documentation/"
+          path="/documentation/"
           component={AdminDocumentationHome}
         />
         <Route
           exact
-          path="/prototypes/documentation/glossary"
+          path="/documentation/glossary"
           component={AdminDocumentationGlossary}
         />
         <Route
           exact
-          path="/prototypes/documentation/style-guide"
+          path="/documentation/style-guide"
           component={AdminDocumentationStyle}
         />
         <Route
           exact
-          path="/prototypes/documentation/using-dashboard"
+          path="/documentation/using-dashboard"
           component={AdminDocumentationUsingDashboard}
         />
         <Route
           exact
-          path="/prototypes/documentation/create-new-release"
+          path="/documentation/create-new-release"
           component={AdminDocumentationCreateNewRelease}
         />
         <Route
           exact
-          path="/prototypes/documentation/manage-content"
+          path="/documentation/manage-content"
           component={AdminDocumentationManageContent}
+        />
+        <Route
+          exact
+          path="/documentation/manage-data"
+          component={AdminDocumentationManageData}
         />
         <Route
           exact

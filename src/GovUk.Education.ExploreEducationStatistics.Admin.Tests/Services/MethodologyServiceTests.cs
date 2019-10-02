@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;

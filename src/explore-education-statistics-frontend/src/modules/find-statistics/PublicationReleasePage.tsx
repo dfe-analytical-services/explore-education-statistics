@@ -41,7 +41,7 @@ class PublicationReleasePage extends Component<Props> {
     const { publication, release } = query;
 
     const request = release
-      ? publicationService.getPublicationRelease(release)
+      ? publicationService.getPublicationRelease(publication, release)
       : publicationService.getLatestPublicationRelease(publication);
 
     const data = await request;
@@ -61,12 +61,9 @@ class PublicationReleasePage extends Component<Props> {
 
     return (
       <Page
-        title={`${data.publication.title} - ${parse(
-          data.published,
-          'dd MMMM yyyy',
-          new Date(),
-        )}`}
-        caption={data.summary}
+        title={data.publication.title}
+        caption={data.title}
+        seoDescription={data.summary}
         breadcrumbs={[
           { name: 'Find statistics and data', link: '/find-statistics' },
         ]}

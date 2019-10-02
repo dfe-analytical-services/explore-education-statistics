@@ -11,6 +11,7 @@ import PageTitle from './PageTitle';
 type Props = {
   title: string;
   caption?: string;
+  seoDescription?: string;
   breadcrumbLabel?: string;
   pageMeta?: PageMetaProps;
   children?: ReactNode;
@@ -21,6 +22,7 @@ type Props = {
 const Page = ({
   title,
   caption = '',
+  seoDescription = '',
   breadcrumbLabel = '',
   pageMeta,
   children = null,
@@ -31,7 +33,11 @@ const Page = ({
   return (
     <>
       <CookieBanner wide={wide} />
-      <PageMeta title={title} description={caption} {...pageMeta} />
+      <PageMeta
+        title={`${title}${caption && `, ${caption}`}`}
+        description={seoDescription}
+        {...pageMeta}
+      />
       <PageHeader wide={wide} />
 
       <div
