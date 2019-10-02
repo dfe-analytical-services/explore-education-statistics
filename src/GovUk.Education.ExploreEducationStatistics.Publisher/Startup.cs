@@ -1,5 +1,5 @@
-﻿using System;
-using AutoMapper;
+﻿using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
@@ -22,13 +22,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
     {
         public override void Configure(IFunctionsHostBuilder builder)
         {
-            var contentDatabaseConnection = GetSqlAzureConnectionString("ContentDb");
-            
             builder.Services
                 .AddAutoMapper(typeof(Startup).Assembly)
                 .AddMemoryCache()
                 .AddDbContext<ApplicationDbContext>(options =>
-                    options.UseSqlServer(contentDatabaseConnection))
+                    options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("ContentDb")))
                 .AddScoped<IFileStorageService, FileStorageService>()
                 .AddScoped<IFileStorageServiceContentModel, FileStorageServiceContentModel>()
                 .AddScoped<IPublishingService, PublishingService>()
@@ -39,24 +37,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddScoped<IDownloadService, DownloadService>()
                 .AddScoped<IMethodologyService, MethodologyService>()
                 .BuildServiceProvider();
-        }
-        
-        private static string GetSqlAzureConnectionString(string name)
-        {
-            // Attempt to get a connection string defined for running locally.
-            // Settings in the local.settings.json file are only used by Functions tools when running locally.
-            var connectionString =
-                Environment.GetEnvironmentVariable($"ConnectionStrings:{name}", EnvironmentVariableTarget.Process);
-
-            if (string.IsNullOrEmpty(connectionString))
-            {
-                // Get the connection string from the Azure Functions App using the naming convention for type SQLAzure.
-                connectionString = Environment.GetEnvironmentVariable(
-                    $"SQLAZURECONNSTR_{name}",
-                    EnvironmentVariableTarget.Process);
-            }
-
-            return connectionString;
         }
     }
 }

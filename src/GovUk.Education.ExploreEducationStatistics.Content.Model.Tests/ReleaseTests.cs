@@ -44,8 +44,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
                 new Release {ReleaseName = "Hello"}; // Not Ok
                 Assert.True(false, "Should have failed validation");
             }
-            catch (FormatException e)
+            catch
             {
+                // ignored
             }
         }
 
@@ -63,8 +64,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
                 new Release {NextReleaseDate = new PartialDate {Day = "45"}}; // Not Ok
                 Assert.True(false, "Should have failed validation");
             }
-            catch (FormatException e)
+            catch
             {
+                // ignored
             }
         }
 
@@ -87,17 +89,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
                 new Release {ReleaseName = "190"};
                 Assert.True(false, "190 is not a year we are interested in");
             }
-            catch (FormatException e)
+            catch
             {
+                // ignored
             }
-            
+
             try
             {
                 new Release {ReleaseName = "ABC123"};
                 Assert.True(false, "Not a year");
             }
-            catch (FormatException e)
+            catch
             {
+                // ignored
             }
 
             try
@@ -105,8 +109,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
                 new Release {ReleaseName = "20000"};
                 Assert.True(false, "20000 is not a year we are interested in");
             }
-            catch (FormatException e)
+            catch
             {
+                // ignored
             }
 
             new Release {ReleaseName = "2011"};
