@@ -1,5 +1,4 @@
-﻿using System;
-using AutoMapper;
+﻿using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Services;
@@ -23,14 +22,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
     {
         public override void Configure(IFunctionsHostBuilder builder)
         {
-            var contentDatabaseConnection = ConnectionUtils.GetConnectionString("ContentDb",
-                $"{ConnectionUtils.ConnectionTypeValues[ConnectionUtils.ConnectionTypes.AZURE_SQL]}");
-            
             builder.Services
                 .AddAutoMapper(typeof(Startup).Assembly)
                 .AddMemoryCache()
                 .AddDbContext<ApplicationDbContext>(options =>
-                    options.UseSqlServer(contentDatabaseConnection))
+                    options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("ContentDb")))
                 .AddScoped<IFileStorageService, FileStorageService>()
                 .AddScoped<IFileStorageServiceContentModel, FileStorageServiceContentModel>()
                 .AddScoped<IPublishingService, PublishingService>()

@@ -17,8 +17,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
     {
         private readonly ILogger _logger;
 
-        private readonly string _privateStorageConnectionString;
-        private readonly string _publicStorageConnectionString;
+        private readonly string _privateStorageConnectionString = ConnectionUtils.GetAzureStorageConnectionString("CoreStorage");
+        private readonly string _publicStorageConnectionString = ConnectionUtils.GetAzureStorageConnectionString("PublicStorage");
 
         private const string PrivateContainerName = "releases";
         private const string PublicContainerName = "downloads";
@@ -27,10 +27,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             ILogger<FileStorageService> logger)
         {
             _logger = logger;
-            _privateStorageConnectionString = ConnectionUtils.GetConnectionString("CoreStorage",
-                $"{ConnectionUtils.ConnectionTypeValues[ConnectionUtils.ConnectionTypes.AZURE_STORAGE]}");
-            _publicStorageConnectionString = ConnectionUtils.GetConnectionString("PublicStorage",
-                $"{ConnectionUtils.ConnectionTypeValues[ConnectionUtils.ConnectionTypes.AZURE_STORAGE]}");
         }
 
         public async Task CopyReleaseToPublicContainer(PublishReleaseDataMessage message)

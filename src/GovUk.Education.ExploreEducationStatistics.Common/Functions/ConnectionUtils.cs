@@ -3,9 +3,28 @@ using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Functions
 {
+    public enum ConnectionTypes
+    {
+        AZURE_STORAGE,
+        AZURE_SQL
+    }
+
     public static class ConnectionUtils
     {
-        public static string GetConnectionString(string name, string connectionTypeValue)
+
+        public static string GetAzureStorageConnectionString(string name)
+        {
+            return ConnectionUtils.GetConnectionString(name,
+                $"{ConnectionTypeValues[ConnectionTypes.AZURE_STORAGE]}");
+        }
+        
+        public static string GetAzureSqlConnectionString(string name)
+        {
+            return ConnectionUtils.GetConnectionString(name,
+                $"{ConnectionTypeValues[ConnectionTypes.AZURE_SQL]}");
+        }
+        
+        private static string GetConnectionString(string name, string connectionTypeValue)
         {
             // Attempt to get a connection string defined for running locally.
             // Settings in the local.settings.json file are only used by Functions tools when running locally.
@@ -20,14 +39,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Functions
 
             return connectionString;
         }
+
         
-        public enum ConnectionTypes
-        {
-            AZURE_STORAGE,
-            AZURE_SQL
-        }
-        
-        public static readonly Dictionary<ConnectionTypes, string> ConnectionTypeValues =
+        private static readonly Dictionary<ConnectionTypes, string> ConnectionTypeValues =
             new Dictionary<ConnectionTypes, string>
             {
                 {
