@@ -227,15 +227,20 @@ export interface BoundaryLevel {
 }
 
 export interface DataBlockFilterMeta {
-  legend: string;
+  label: string;
   options: LabelValueMetadata[];
 }
 
 export interface DataBlockFilterGroupMeta {
-  totalValue: string;
-  hint: string;
+  totalValue?: string;
+  hint?: string;
   legend: string;
   options: Dictionary<DataBlockFilterMeta>;
+}
+
+export interface FootnoteMetadata {
+  id: number;
+  label: string;
 }
 
 export interface DataBlockMetadata {
@@ -244,6 +249,9 @@ export interface DataBlockMetadata {
   locations: Dictionary<DataBlockLocationMetadata>;
   boundaryLevels?: BoundaryLevel[];
   timePeriods: Dictionary<TimePeriodOptionMetadata>;
+  publicationName: string;
+  subjectName: string;
+  footnotes: FootnoteMetadata[];
 }
 
 interface DataBlockTimePeriod {

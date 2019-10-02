@@ -1,4 +1,4 @@
-import Accordion from '@common/components/Accordion';
+import Accordion, { generateIdList } from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
@@ -30,6 +30,8 @@ interface Props {
 }
 
 class PublicationReleasePage extends Component<Props> {
+  private accId: string[] = generateIdList(2);
+
   public static async getInitialProps({
     query,
   }: NextContext<{
@@ -275,7 +277,7 @@ class PublicationReleasePage extends Component<Props> {
         )}
 
         {data.content.length > 0 && (
-          <Accordion id="contents-sections">
+          <Accordion id={this.accId[0]}>
             {data.content.map(({ heading, caption, order, content }) => {
               return (
                 <AccordionSection
@@ -308,7 +310,7 @@ class PublicationReleasePage extends Component<Props> {
         </h2>
         <AccordionWithAnalytics
           publicationTitle={data.publication.title}
-          id="extra-information-sections"
+          id={this.accId[1]}
         >
           <AccordionSection
             heading={`${data.publication.title}: methodology`}

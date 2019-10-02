@@ -45,6 +45,9 @@ const tables: Dictionary<PrototypeTable> = {
 
 const testResponse: DataBlockResponse = {
   metaData: {
+    publicationName: 'test',
+    subjectName: 'test',
+    footnotes: [],
     filters: {
       test: {
         hint: '',
@@ -52,7 +55,7 @@ const testResponse: DataBlockResponse = {
         totalValue: '',
         options: {
           test: {
-            legend: 'test',
+            label: 'test',
             options: [
               {
                 label: 'All pupils',

@@ -10,7 +10,7 @@ Object {
         "legend": "",
         "options": Object {
           "test": Object {
-            "legend": "test",
+            "label": "test",
             "options": Array [
               Object {
                 "label": "All Schools",
@@ -26,6 +26,7 @@ Object {
         "totalValue": "",
       },
     },
+    "footnotes": Array [],
     "indicators": Object {
       "23": Object {
         "label": "Unauthorised absence rate",
@@ -26313,6 +26314,8 @@ Object {
         "value": "S92000001",
       },
     },
+    "publicationName": "test",
+    "subjectName": "test",
     "timePeriods": Object {
       "2014_HT6": Object {
         "code": "HT6",

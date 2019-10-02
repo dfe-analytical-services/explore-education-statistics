@@ -22,6 +22,9 @@ import {
   TimePeriodFilter,
 } from '@common/modules/full-table/types/filters';
 import { FullTable } from '@common/modules/full-table/types/fullTable';
+import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
+import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
+import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
 
 const mapFullTable = (unmappedFullTable: DataBlockResponse): FullTable => {
   const subjectMeta = unmappedFullTable.metaData || {
@@ -31,11 +34,11 @@ const mapFullTable = (unmappedFullTable: DataBlockResponse): FullTable => {
   };
 
   return {
-    ...unmappedFullTable,
+    results: unmappedFullTable.result,
     subjectMeta: {
+      subjectName: '',
       publicationName: 'Test',
       footnotes: [],
-      // @ts-ignore
       filters: {},
       ...unmappedFullTable.metaData,
       indicators: Object.values(subjectMeta.indicators).map(
@@ -51,9 +54,7 @@ const mapFullTable = (unmappedFullTable: DataBlockResponse): FullTable => {
   };
 };
 const ViewDataBlocks = () => {
-  const { releaseId, publication } = useContext(
-    ManageReleaseContext,
-  ) as ManageRelease;
+  const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedDataBlock, setSelectedDataBlock] = React.useState<string>('');
@@ -79,6 +80,11 @@ const ViewDataBlocks = () => {
     Chart | undefined
   >();
 
+  const [tableData, setTableData] = React.useState<{
+    fullTable: FullTable;
+    tableHeadersConfig: TableHeadersFormValues;
+  }>();
+
   React.useEffect(() => {
     // destroy the existing setup before the response completes
     setChartBuilderData(undefined);
@@ -93,9 +99,15 @@ const ViewDataBlocks = () => {
           });
           setInitialConfiguration(requestConfiguration);
 
-          // const createdTable = mapFullTable(response);
+          const fullTable = mapFullTable(response);
+          const tableHeadersConfig = getDefaultTableHeaderConfig(
+            fullTable.subjectMeta,
+          );
 
-          // const tableHeaders = getDefaultTableHeaderConfig(createdTable.subjectMeta);
+          setTableData({
+            fullTable,
+            tableHeadersConfig,
+          });
         }
       });
     }
@@ -142,11 +154,37 @@ const ViewDataBlocks = () => {
         ]}
       />
 
+      <FormSelect
+        id="selectDataBlock"
+        name="selectDataBlock"
+        label="Select data block"
+        onChange={e => {
+          setRequest(dataBlocks[+e.target.value].dataBlockRequest);
+          setRequestConfiguration(
+            (dataBlocks[+e.target.value].charts || [undefined])[0],
+          );
+          setSelectedDataBlock(e.target.value);
+        }}
+        order={[]}
+        options={[
+          {
+            label: 'select',
+            value: '',
+          },
+          ...dataBlocks.map((dataBlock, index) => ({
+            label: `${index} ${dataBlock.heading}`,
+            value: `${index}`,
+          })),
+        ]}
+      />
+
       {selectedDataBlock && (
         <>
           <hr />
           <Tabs id="editDataBlockSections">
-            <TabsSection title="table">Table</TabsSection>
+            <TabsSection title="table">
+              {tableData && <TimePeriodDataTable {...tableData} />}
+            </TabsSection>
             <TabsSection title="Create Chart">
               {chartBuilderData ? (
                 <ChartBuilder
