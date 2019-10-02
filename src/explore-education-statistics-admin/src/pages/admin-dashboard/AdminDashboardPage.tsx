@@ -90,16 +90,13 @@ const AdminDashboardPage = () => {
               <RelatedInformation heading="Help and guidance">
                 <ul className="govuk-list">
                   <li>
-                    <Link
-                      to="/prototypes/documentation/using-dashboard"
-                      target="_blank"
-                    >
+                    <Link to="/documentation/using-dashboard" target="_blank">
                       Using your administration dashboard{' '}
                     </Link>
                   </li>
                   <li>
                     <Link
-                      to="/prototypes/documentation/create-new-release"
+                      to="/documentation/create-new-release"
                       target="_blank"
                     >
                       Creating a new release{' '}

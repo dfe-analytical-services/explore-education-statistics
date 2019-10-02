@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.Storage;
@@ -16,8 +17,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
     {
         private readonly ILogger _logger;
 
-        private readonly string _privateStorageConnectionString;
-        private readonly string _publicStorageConnectionString;
+        private readonly string _privateStorageConnectionString = ConnectionUtils.GetAzureStorageConnectionString("CoreStorage");
+        private readonly string _publicStorageConnectionString = ConnectionUtils.GetAzureStorageConnectionString("PublicStorage");
 
         private const string PrivateContainerName = "releases";
         private const string PublicContainerName = "downloads";
@@ -26,8 +27,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             ILogger<FileStorageService> logger)
         {
             _logger = logger;
-            _privateStorageConnectionString = config.GetConnectionString("CoreStorage");
-            _publicStorageConnectionString = config.GetConnectionString("PublicStorage");
         }
 
         public async Task CopyReleaseToPublicContainer(PublishReleaseDataMessage message)

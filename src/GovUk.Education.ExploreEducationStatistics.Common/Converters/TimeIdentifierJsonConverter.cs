@@ -5,7 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-
 namespace GovUk.Education.ExploreEducationStatistics.Common.Converters
 {
     public class TimeIdentifierJsonConverter : JsonConverter<TimeIdentifier?>
@@ -25,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Converters
             JsonSerializer serializer)
         {
             if (reader.TokenType == JsonToken.Null) return null;
-            
+
             var jsonValue = JObject.Load(reader).GetValue("value").Value<string>();
             var timeIdentifiers = ((TimeIdentifier[]) Enum.GetValues(typeof(TimeIdentifier)));
             return timeIdentifiers.First(identifier => identifier.GetEnumValue() == jsonValue);

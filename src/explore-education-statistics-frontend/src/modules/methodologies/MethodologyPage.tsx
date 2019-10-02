@@ -46,12 +46,8 @@ class MethodologyPage extends Component<Props> {
 
     return (
       <Page
-        title={`${data.title} - ${parse(
-          data.published,
-          'dd MMMM yyyy',
-          new Date(),
-        )}`}
-        caption={data.summary}
+        title={data.title}
+        seoDescription={data.summary}
         breadcrumbs={[{ name: 'Methodologies', link: '/methodology' }]}
       >
         <div className="govuk-grid-row">
@@ -117,14 +113,14 @@ class MethodologyPage extends Component<Props> {
                 >
                   <MethodologyHeader>
                     <ContentSectionIndex
-                      fromId={`contents-sections-${order}-content`}
+                      fromId={`${this.accId[0]}-${order}-content`}
                     />
                   </MethodologyHeader>
 
                   <MethodologyContent>
                     <ContentBlock
                       content={content}
-                      id={`content_${order}`}
+                      id={`${this.accId[0]}_${order}`}
                       publication={data.publication}
                     />
                   </MethodologyContent>
@@ -148,7 +144,7 @@ class MethodologyPage extends Component<Props> {
                   >
                     <ContentBlock
                       content={content}
-                      id={`content_${order}`}
+                      id={`${this.accId[1]}_${order}`}
                       publication={data.publication}
                     />
                   </AccordionSection>

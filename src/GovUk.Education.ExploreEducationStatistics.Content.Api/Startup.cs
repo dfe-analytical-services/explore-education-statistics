@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Converters;
@@ -8,6 +7,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Rewrite;
+using Microsoft.Azure.Storage;
+using Microsoft.Azure.Storage.Blob;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -56,13 +57,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             });
 
             services.AddCors();
-            services.AddAutoMapper();
-            services.AddTransient<IContentService, ContentService>();
-            services.AddTransient<IFileStorageService, FileStorageService>();
-            services.AddTransient<IReleaseService, ReleaseService>();
-            services.AddTransient<IPublicationService, PublicationService>();
-            services.AddTransient<IMethodologyService, MethodologyService>();
-            services.AddTransient<IDownloadService, DownloadService>();
+            
+            var cloudStorageAccount = CloudStorageAccount.Parse(Configuration.GetConnectionString("PublicStorage"));
+            services.AddSingleton<CloudBlobClient>(a => cloudStorageAccount.CreateCloudBlobClient());
+            
+            services.AddTransient<IContentCacheService, ContentCacheService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -76,6 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             }
             else
             {
+                app.UseHttpsRedirection();
                 app.UseHsts();
             }
 
@@ -89,11 +89,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Content API V1");
                 c.RoutePrefix = "docs";
             });
-
-            if (!env.IsDevelopment())
-            {
-                app.UseHttpsRedirection();
-            }
 
             app.UseCors(options => options.WithOrigins("http://localhost:3000", "http://localhost:3001","https://localhost:3000","https://localhost:3001").AllowAnyMethod().AllowAnyHeader());
             app.UseMvc();

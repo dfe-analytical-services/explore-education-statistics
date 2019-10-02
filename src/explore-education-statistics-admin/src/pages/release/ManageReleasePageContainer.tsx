@@ -73,7 +73,7 @@ const ManageReleasePageContainer = ({
                 <ul className="govuk-list">
                   <li>
                     <Link
-                      to="/prototypes/documentation/create-new-release"
+                      to="/documentation/create-new-release"
                       target="_blank"
                     >
                       Creating a new release{' '}
