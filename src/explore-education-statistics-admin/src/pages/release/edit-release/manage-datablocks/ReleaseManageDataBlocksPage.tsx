@@ -11,18 +11,16 @@ const ReleaseManageDataBlocksPage = () => {
       <div className="govuk-inset-text">
         <h3>This functionality is still in development.</h3>
         <p>
-          We're currently working on embedding a version of the table tool
-          filtered to data uploaded from this release within the page. This will
-          then allow the creation of data blocks and the ability to create
-          charts and tables.
+          Functionality to go through the creation process via the table has
+          been added, however the ability to save data blocks has not yet been
+          implemented.
         </p>
         <p>
-          While this work is in progress we have added a temporary table tool
-          page that allows access to data you have uploaded.
+          Work is also ongoing to remove the publication step from the table
+          tool below and we are working to display the list of subjects specific
+          to the release you are viewing. Currently this will display subjects
+          only for the last created release on the publicaiton.
         </p>
-        <Link to="/prototypes/table-tool" target="_blank">
-          Temporary admin table tool
-        </Link>
       </div>
 
       <Tabs id="manageDataBlocks">
