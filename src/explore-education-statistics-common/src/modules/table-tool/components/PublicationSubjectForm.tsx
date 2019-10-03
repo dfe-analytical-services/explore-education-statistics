@@ -22,6 +22,7 @@ export type PublicationSubjectFormSubmitHandler = (values: {
 interface Props {
   onSubmit: PublicationSubjectFormSubmitHandler;
   options: PublicationSubject[];
+  subjectId?: string;
 }
 
 const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
@@ -32,8 +33,11 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
     goToNextStep,
     currentStep,
     stepNumber,
+    subjectId: initialSubjectId = '',
   } = props;
-  const [subjectName, setSubjectName] = useState('');
+  const [subjectName, setSubjectName] = useState(
+    (options.find(({ id }) => initialSubjectId === id) || { label: '' }).label,
+  );
 
   const formikRef = useRef<Formik<FormValues>>(null);
   const formId = 'publicationSubjectForm';
@@ -49,7 +53,7 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
   );
 
   const initialValues = {
-    subjectId: '',
+    subjectId: initialSubjectId,
   };
 
   return (
