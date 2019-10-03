@@ -11,6 +11,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     {
         Task<DataBlockViewModel> CreateAsync(ReleaseId releaseId, CreateDataBlockViewModel createDataBlock);
 
+        Task DeleteAsync(DataBlockId id);
+        
         Task<DataBlockViewModel> GetAsync(DataBlockId id);
 
         Task<List<DataBlockViewModel>> ListAsync(ReleaseId releaseId);
