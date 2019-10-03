@@ -138,6 +138,7 @@ const ViewDataBlocks = (
         <TabsSection title="table">
           {tableData && <TimePeriodDataTable {...tableData} />}
         </TabsSection>
+        {/*
         <TabsSection title="Create Chart">
           {chartBuilderData ? (
             <ChartBuilder
@@ -150,6 +151,7 @@ const ViewDataBlocks = (
             <LoadingSpinner />
           )}
         </TabsSection>
+        */}
       </Tabs>
     </>
   );

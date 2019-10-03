@@ -1,33 +1,20 @@
-import ManageReleaseContext, {
-  ManageRelease,
-} from '@admin/pages/release/ManageReleaseContext';
-import DBService from '@admin/services/release/edit-release/datablocks/service';
 import { DataBlock } from '@admin/services/release/edit-release/datablocks/types';
 import Button from '@common/components/Button';
-import {
-  Form,
-  FormFieldset,
-  FormFieldTextInput,
-  FormGroup,
-  Formik,
-} from '@common/components/form';
+import { Form, FormFieldset, FormFieldTextInput, FormGroup, Formik } from '@common/components/form';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import Yup from '@common/lib/validation/yup';
 import { TableDataQuery } from '@common/modules/full-table/services/tableBuilderService';
 import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
-import {
-  DataBlockRequest,
-  GeographicLevel,
-  TimeIdentifier,
-} from '@common/services/dataBlockService';
+import { GeographicLevel, TimeIdentifier } from '@common/services/dataBlockService';
 import { FormikProps } from 'formik';
-import React, { useContext } from 'react';
+import React from 'react';
 import { ObjectSchemaDefinition } from 'yup';
 
 interface Props {
   query: TableDataQuery;
   tableHeaders: TableHeadersFormValues;
   releaseId: string;
+  onDataBlockSave: (dataBlock: DataBlock) => Promise<DataBlock>;
 }
 
 interface FormValues {
@@ -37,10 +24,7 @@ interface FormValues {
   name: string;
 }
 
-const DataBlockDetailsForm = ({ query, tableHeaders, releaseId }: Props) => {
-  const { invalidate: invalidateContext } = useContext(
-    ManageReleaseContext,
-  ) as ManageRelease;
+const DataBlockDetailsForm = ({ query, tableHeaders, releaseId, onDataBlockSave }: Props) => {
 
   const [blockState, setBlockState] = React.useReducer(
     (state, { saved, error } = { saved: false, error: false }) => {
@@ -60,18 +44,18 @@ const DataBlockDetailsForm = ({ query, tableHeaders, releaseId }: Props) => {
   }, [query, tableHeaders, releaseId]);
 
   const saveDataBlock = async (values: FormValues) => {
-    const dataBlockRequest: DataBlockRequest = {
-      ...query,
-      geographicLevel: query.geographicLevel as GeographicLevel,
-      timePeriod: query.timePeriod && {
-        ...query.timePeriod,
-        startCode: query.timePeriod.startCode as TimeIdentifier,
-        endCode: query.timePeriod.endCode as TimeIdentifier,
-      },
-    };
 
     const dataBlock: DataBlock = {
-      dataBlockRequest,
+      dataBlockRequest :  {
+        ...query,
+        geographicLevel: query.geographicLevel as GeographicLevel,
+        timePeriod: query.timePeriod && {
+          ...query.timePeriod,
+          startCode: query.timePeriod.startCode as TimeIdentifier,
+          endCode: query.timePeriod.endCode as TimeIdentifier,
+        },
+      },
+
       heading: values.title,
       tables: [
         {
@@ -81,10 +65,10 @@ const DataBlockDetailsForm = ({ query, tableHeaders, releaseId }: Props) => {
       ],
     };
 
+
     try {
-      const result = await DBService.postDataBlock(releaseId, dataBlock);
+      await onDataBlockSave(dataBlock);
       setBlockState({ saved: true });
-      invalidateContext();
     } catch (error) {
       setBlockState({ error: true });
     }
