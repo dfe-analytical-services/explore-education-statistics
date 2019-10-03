@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
+using ReleaseId = System.Guid;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
@@ -21,9 +22,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _subjectMetaService = subjectMetaService;
         }
 
-        public override ResultWithMetaViewModel Query(ObservationQueryContext queryContext)
+        public override ResultWithMetaViewModel Query(ObservationQueryContext queryContext, ReleaseId? releaseId = null)
         {
-            var observations = GetObservations(queryContext).AsQueryable();
+            var observations = GetObservations(queryContext, releaseId).AsQueryable();
             if (!observations.Any())
             {
                 return new ResultWithMetaViewModel();
