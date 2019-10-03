@@ -37,8 +37,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpDelete("datablocks/{id}")]
         public async Task<ActionResult> DeleteDataBlockAsync(DataBlockId id)
         {
-            await _dataBlockService.DeleteAsync(id);
-            return new NoContentResult();
+            return await CheckDataBlockExistsAsync(id, async () =>
+            {
+                await _dataBlockService.DeleteAsync(id);
+                return new NoContentResult();
+            });
         }
 
         [HttpGet("release/{releaseId}/datablocks")]
@@ -59,6 +62,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             UpdateDataBlockViewModel dataBlock)
         {
             return Ok(await _dataBlockService.UpdateAsync(id, dataBlock));
+        }
+
+        private async Task<ActionResult> CheckDataBlockExistsAsync(DataBlockId dataBlockId,
+            Func<Task<ActionResult>> andThen)
+        {
+            var dataBlock = await _dataBlockService.GetAsync(dataBlockId);
+            if (dataBlock == null)
+            {
+                return NotFound("DataBlock does not exist");
+            }
+
+            return await andThen.Invoke();
         }
 
         private async Task<ActionResult> CheckReleaseExistsAsync(ReleaseId releaseId, Func<Task<ActionResult>> andThen)

@@ -54,6 +54,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
         }
 
         [Fact]
+        public async void Delete_DataBlock_Returns_NotFound()
+        {
+            var mocks = Mocks();
+
+            var id = Guid.NewGuid();
+
+            var controller = ControllerWithMocks(mocks);
+
+            var result = await controller.DeleteDataBlockAsync(id);
+            Assert.IsAssignableFrom<NotFoundResult>(result);
+        }
+
+        [Fact]
         public async void Get_DataBlock_Returns_Ok()
         {
             var mocks = Mocks();
