@@ -62,6 +62,7 @@ interface Props {
   themeMeta: ThemeMeta[];
   publicationId: string;
   finalStepExtra?: (props: FinalStepProps) => ReactNode;
+  finalStepHeading?: string;
 }
 
 interface State {
@@ -71,19 +72,16 @@ interface State {
   endYear?: number;
   endCode?: string;
   locations: Dictionary<LocationFilter[]>;
-  filters: Dictionary<CategoryFilter[]>;
-  indicators: Indicator[];
   publication?: Publication;
   subjects: PublicationSubject[];
   subjectId: string;
   subjectMeta: PublicationSubjectMeta;
   tableHeaders: TableHeadersFormValues;
+  query?: TableDataQuery;
 }
 
 class TableTool extends Component<Props, State> {
   public state: State = {
-    filters: {},
-    indicators: [],
     locations: {},
     subjectId: '',
     subjectMeta: {
@@ -273,30 +271,33 @@ class TableTool extends Component<Props, State> {
       indicator => new Indicator(indicatorsByValue[indicator]),
     );
 
-    const unmappedCreatedTable = await tableBuilderService.getTableData(
-      this.createQuery(filters, indicators),
-    );
+    const query: TableDataQuery = this.createQuery(filters, indicators);
+
+    const unmappedCreatedTable = await tableBuilderService.getTableData(query);
 
     const createdTable = mapFullTable(unmappedCreatedTable);
 
     this.setState({
       createdTable,
-      filters,
-      indicators,
       tableHeaders: getDefaultTableHeaderConfig(createdTable.subjectMeta),
+      query,
     });
   };
 
   public render() {
-    const { themeMeta, publicationId, finalStepExtra } = this.props;
+    const {
+      themeMeta,
+      publicationId,
+      finalStepExtra,
+      finalStepHeading,
+    } = this.props;
     const {
       createdTable,
       publication,
       subjectMeta,
       subjects,
       tableHeaders,
-      indicators,
-      filters,
+      query,
     } = this.state;
 
     return (
@@ -365,7 +366,7 @@ class TableTool extends Component<Props, State> {
                 {stepProps => (
                   <>
                     <WizardStepHeading {...stepProps}>
-                      Explore data
+                      {finalStepHeading || 'Explore data'}
                     </WizardStepHeading>
 
                     <div className="govuk-!-margin-bottom-4">
@@ -396,11 +397,12 @@ class TableTool extends Component<Props, State> {
                     {publication &&
                       createdTable &&
                       finalStepExtra &&
+                      query &&
                       finalStepExtra({
                         createdTable,
                         publication,
                         tableHeaders,
-                        query: this.createQuery(filters, indicators),
+                        query,
                       })}
                   </>
                 )}

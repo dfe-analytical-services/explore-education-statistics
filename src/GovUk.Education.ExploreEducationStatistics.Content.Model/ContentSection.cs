@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     public class MarkDownBlock : IContentBlock
     {
         public string Body { get; set; }
-        
+
         public override string Type { get; set; } = "MarkDownBlock";
     }
 
@@ -86,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public List<string> dataKeys { get; set; }
 
         public List<string> dataSummary { get; set; }
-        
+
         public List<string> dataDefinition { get; set; }
 
         public MarkDownBlock description { get; set; }
@@ -95,5 +95,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     public class Table
     {
         public List<string> indicators { get; set; }
+
+        public TableHeaders tableHeaders { get; set; }
+    }
+
+    public class TableHeaders
+    {
+        public List<List<TableOption>> columnGroups { get; set; }
+        public List<TableOption> columns { get; set; }
+        public List<List<TableOption>> rowGroups { get; set; }
+        public List<TableOption> rows { get; set; }
+    }
+
+    public class TableOption
+    {
+        public string _class { get; set; }
+        public string _construct { get; set; }
+        
+        public string label { get; set; }
+        public string value { get; set; }
     }
 }

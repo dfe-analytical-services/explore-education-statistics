@@ -1,4 +1,5 @@
 /* eslint-disable */
+import DataBlockDetailsForm from '@admin/pages/release/edit-release/manage-datablocks/DataBlockDetailsForm';
 import React, { useContext } from 'react';
 import ManageReleaseContext, {
   ManageRelease,
@@ -6,9 +7,7 @@ import ManageReleaseContext, {
 import tableBuilderService, {
   ThemeMeta,
 } from '@common/modules/full-table/services/tableBuilderService';
-import PrototypePage from '@admin/pages/prototypes/components/PrototypePage';
 import TableTool from '@common/modules/table-tool/components/TableTool';
-import Button from '@common/components/Button';
 
 const CreateDataBlocks = () => {
   const { publication, releaseId } = useContext(
@@ -32,17 +31,13 @@ const CreateDataBlocks = () => {
         <TableTool
           publicationId={publicationId}
           themeMeta={themeMeta}
-          finalStepExtra={({ query }) => (
-            <div>
-              <Button
-                type="button"
-                onClick={() => {
-                  console.log(query);
-                }}
-              >
-                Save
-              </Button>
-            </div>
+          finalStepHeading="Configure data block"
+          finalStepExtra={({ query, tableHeaders }) => (
+            <DataBlockDetailsForm
+              query={query}
+              tableHeaders={tableHeaders}
+              releaseId={releaseId}
+            />
           )}
         />
       )}

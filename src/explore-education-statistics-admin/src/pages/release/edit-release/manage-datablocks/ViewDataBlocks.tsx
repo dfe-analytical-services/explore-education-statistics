@@ -54,7 +54,9 @@ const mapFullTable = (unmappedFullTable: DataBlockResponse): FullTable => {
   };
 };
 const ViewDataBlocks = () => {
-  const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
+  const { releaseId, lastModified } = useContext(
+    ManageReleaseContext,
+  ) as ManageRelease;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedDataBlock, setSelectedDataBlock] = React.useState<string>('');
@@ -64,7 +66,7 @@ const ViewDataBlocks = () => {
     DataBlocksService.getDataBlocks(releaseId).then(blocks => {
       setDataBlocks(blocks);
     });
-  }, [releaseId]);
+  }, [releaseId, lastModified]);
 
   const [chartBuilderData, setChartBuilderData] = React.useState<
     DataBlockResponse
@@ -99,10 +101,13 @@ const ViewDataBlocks = () => {
           });
           setInitialConfiguration(requestConfiguration);
 
+          const table = dataBlocks[+selectedDataBlock].tables;
+
           const fullTable = mapFullTable(response);
-          const tableHeadersConfig = getDefaultTableHeaderConfig(
-            fullTable.subjectMeta,
-          );
+
+          const tableHeadersConfig =
+            (table && table[0].tableHeaders) ||
+            getDefaultTableHeaderConfig(fullTable.subjectMeta);
 
           setTableData({
             fullTable,
@@ -130,30 +135,6 @@ const ViewDataBlocks = () => {
 
   return (
     <>
-      <FormSelect
-        id="selectDataBlock"
-        name="selectDataBlock"
-        label="Select data block"
-        onChange={e => {
-          setRequest(dataBlocks[+e.target.value].dataBlockRequest);
-          setRequestConfiguration(
-            (dataBlocks[+e.target.value].charts || [undefined])[0],
-          );
-          setSelectedDataBlock(e.target.value);
-        }}
-        order={[]}
-        options={[
-          {
-            label: 'select',
-            value: '',
-          },
-          ...dataBlocks.map((dataBlock, index) => ({
-            label: `${index} ${dataBlock.heading}`,
-            value: `${index}`,
-          })),
-        ]}
-      />
-
       <FormSelect
         id="selectDataBlock"
         name="selectDataBlock"

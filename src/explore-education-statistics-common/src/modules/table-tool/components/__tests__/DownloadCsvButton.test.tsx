@@ -1,8 +1,12 @@
+import {
+  Indicator,
+  LocationFilter,
+  TimePeriodFilter,
+} from '@common/modules/full-table/types/filters';
+import { FullTable } from '@common/modules/full-table/types/fullTable';
 import Papa from 'papaparse';
 import React from 'react';
 import { fireEvent, render } from 'react-testing-library';
-import TimePeriod from '@common/services/types/TimePeriod';
-import { FullTable } from '@common/modules/full-table/types/fullTable';
 import DownloadCsvButton from '../DownloadCsvButton';
 
 describe('DownloadCsvButton', () => {
@@ -46,28 +50,33 @@ describe('DownloadCsvButton', () => {
         },
       },
       indicators: [
-        {
+        new Indicator({
           label: 'Authorised absence rate',
           value: 'auth_abs_rate',
           unit: '%',
-        },
-        {
+        }),
+        new Indicator({
           label: 'Number of authorised absence sessions',
           value: 'auth_abs_sess',
           unit: '',
-        },
+        }),
       ],
       locations: [
-        {
-          value: 'england',
-          label: 'England',
-          level: 'country',
-        },
-        { value: 'south_yorkshire', label: 'South Yorkshire', level: 'region' },
+        new LocationFilter(
+          {
+            value: 'england',
+            label: 'England',
+          },
+          'country',
+        ),
+        new LocationFilter(
+          { value: 'south_yorkshire', label: 'South Yorkshire' },
+          'region',
+        ),
       ],
       timePeriodRange: [
-        TimePeriod.fromString('2014_AY'),
-        TimePeriod.fromString('2015_AY'),
+        new TimePeriodFilter({ code: 'AY', year: 2014, label: '2014/15' }),
+        new TimePeriodFilter({ code: 'AY', year: 2015, label: '2015/16' }),
       ],
     },
     results: [],
