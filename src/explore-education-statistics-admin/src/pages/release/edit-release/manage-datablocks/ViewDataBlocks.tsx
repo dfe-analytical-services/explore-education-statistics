@@ -2,29 +2,27 @@ import ChartBuilder from '@admin/modules/chart-builder/ChartBuilder';
 import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
-import DataBlocksService from '@admin/services/release/edit-release/datablocks/service';
-import {DataBlock} from '@admin/services/release/edit-release/datablocks/types';
-import FormSelect from '@common/components/form/FormSelect';
+import { DataBlock } from '@admin/services/release/edit-release/datablocks/types';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import {ChartRendererProps} from '@common/modules/find-statistics/components/ChartRenderer';
-import DataBlockService, {
-  DataBlockRequest,
-  DataBlockRerequest,
-  DataBlockResponse,
-} from '@common/services/dataBlockService';
-import {Chart} from '@common/services/publicationService';
-import React, {useContext} from 'react';
+import { ChartRendererProps } from '@common/modules/find-statistics/components/ChartRenderer';
 import {
   Indicator,
   LocationFilter,
   TimePeriodFilter,
 } from '@common/modules/full-table/types/filters';
-import {FullTable} from '@common/modules/full-table/types/fullTable';
+import { FullTable } from '@common/modules/full-table/types/fullTable';
 import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
+import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
-import {TableHeadersFormValues} from '@common/modules/table-tool/components/TableHeadersForm';
+import DataBlockService, {
+  DataBlockRequest,
+  DataBlockRerequest,
+  DataBlockResponse,
+} from '@common/services/dataBlockService';
+import { Chart } from '@common/services/publicationService';
+import React, { useContext } from 'react';
 
 const mapFullTable = (unmappedFullTable: DataBlockResponse): FullTable => {
   const subjectMeta = unmappedFullTable.metaData || {
@@ -55,26 +53,22 @@ const mapFullTable = (unmappedFullTable: DataBlockResponse): FullTable => {
 };
 
 interface Props {
-  dataBlock: DataBlock,
-  dataBlockRequest: DataBlockRequest,
-  dataBlockResponse: DataBlockResponse
+  dataBlock: DataBlock;
+  dataBlockRequest: DataBlockRequest;
+  dataBlockResponse: DataBlockResponse;
 }
 
-
-const ViewDataBlocks = (
-  {
-    dataBlock,
-    dataBlockResponse,
-    dataBlockRequest
-  }: Props
-) => {
-  const {releaseId} = useContext(
-    ManageReleaseContext,
-  ) as ManageRelease;
-
-  const [chartBuilderData, setChartBuilderData] = React.useState<DataBlockResponse>(dataBlockResponse);
-  const [requestConfiguration, setRequestConfiguration] = React.useState<Chart | undefined>();
-  const [initialConfiguration, setInitialConfiguration] = React.useState<Chart | undefined>();
+const ViewDataBlocks = ({
+  dataBlock,
+  dataBlockResponse,
+  dataBlockRequest,
+}: Props) => {
+  const [chartBuilderData, setChartBuilderData] = React.useState<
+    DataBlockResponse
+  >(dataBlockResponse);
+  const [initialConfiguration, setInitialConfiguration] = React.useState<
+    Chart | undefined
+  >();
 
   React.useEffect(() => {
     setChartBuilderData(dataBlockResponse);
@@ -83,7 +77,7 @@ const ViewDataBlocks = (
   React.useEffect(() => {
     if (dataBlock && dataBlock.charts) {
       setInitialConfiguration({
-        ...dataBlock.charts[0]
+        ...dataBlock.charts[0],
       });
     }
   }, [dataBlock]);
@@ -91,7 +85,7 @@ const ViewDataBlocks = (
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
   const [tableData, setTableData] = React.useState<{
-    fullTable: FullTable,
+    fullTable: FullTable;
     tableHeadersConfig: TableHeadersFormValues;
   }>();
 
@@ -104,10 +98,9 @@ const ViewDataBlocks = (
 
     setTableData({
       fullTable,
-      tableHeadersConfig
-    })
+      tableHeadersConfig,
+    });
   }, [dataBlock.tables, chartBuilderData]);
-
 
   // eslint-disable-next-line
   const onChartSave = (props: ChartRendererProps) => {
@@ -115,21 +108,16 @@ const ViewDataBlocks = (
   };
 
   const reRequestdata = (reRequest: DataBlockRerequest) => {
-
     const newRequest = {
       ...dataBlockRequest,
-      ...reRequest
+      ...reRequest,
     };
 
-    DataBlockService.getDataBlockForSubject(newRequest)
-      .then(response => {
-
-        if (response) {
-          setChartBuilderData(response);
-        }
-
-      });
-
+    DataBlockService.getDataBlockForSubject(newRequest).then(response => {
+      if (response) {
+        setChartBuilderData(response);
+      }
+    });
   };
 
   return (
@@ -139,7 +127,7 @@ const ViewDataBlocks = (
           {tableData && <TimePeriodDataTable {...tableData} />}
         </TabsSection>
         {/*
-        <TabsSection title="Create Chart">
+          <TabsSection title="Create Chart">
           {chartBuilderData ? (
             <ChartBuilder
               data={chartBuilderData}
@@ -150,7 +138,7 @@ const ViewDataBlocks = (
           ) : (
             <LoadingSpinner />
           )}
-        </TabsSection>
+          </TabsSection>
         */}
       </Tabs>
     </>

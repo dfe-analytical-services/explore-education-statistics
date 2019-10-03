@@ -18,9 +18,7 @@ import CreateDataBlocks from './CreateDataBlocks';
 import ViewDataBlocks from './ViewDataBlocks';
 
 const ReleaseManageDataBlocksPage = () => {
-  const { releaseId: r } = useContext(ManageReleaseContext) as ManageRelease;
-
-  const [releaseId, setReleaseId] = React.useState<string>(r);
+  const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
 
   const [selectedDataBlock, setSelectedDataBlock] = React.useState<string>('');
   const [dataBlocks, setDataBlocks] = React.useState<DataBlock[]>([]);
