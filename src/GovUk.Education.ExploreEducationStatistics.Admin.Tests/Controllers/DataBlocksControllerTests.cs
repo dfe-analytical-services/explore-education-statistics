@@ -44,6 +44,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
 
             var id = Guid.NewGuid();
 
+            mocks.DataBlockService.Setup(s => s.GetAsync(id)).Returns(Task.FromResult(new DataBlockViewModel()));
+
             mocks.DataBlockService.Setup(s => s.DeleteAsync(id))
                 .Returns(Task.CompletedTask);
 

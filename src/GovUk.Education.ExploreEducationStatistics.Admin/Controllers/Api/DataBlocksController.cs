@@ -70,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             var dataBlock = await _dataBlockService.GetAsync(dataBlockId);
             if (dataBlock == null)
             {
-                return NotFound("DataBlock does not exist");
+                return NotFound();
             }
 
             return await andThen.Invoke();
