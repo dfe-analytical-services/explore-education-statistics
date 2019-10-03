@@ -145,7 +145,6 @@ const ReleaseManageDataBlocksPage = () => {
         {dataBlock ? dataBlock.heading || 'title not set' : 'Create new Data Block'}
       </h2>
 
-
       <Tabs id="manageDataBlocks">
         <TabsSection title={dataBlock ? 'Update Data source' : 'Create Data source'}>
 

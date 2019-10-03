@@ -18,6 +18,7 @@ export interface DataBlockService {
     releaseId: string,
     dataBlock: DataBlock,
   ) => Promise<DataBlock>;
+  deleteDataBlock: (releaseId: string, dataBlock: DataBlock) => Promise<DataBlock>;
 }
 
 type AllowedClasses =
