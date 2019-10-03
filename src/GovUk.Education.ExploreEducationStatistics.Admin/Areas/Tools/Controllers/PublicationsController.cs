@@ -49,31 +49,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Tools.Controlle
             return View(publication);
         }
 
-        // GET: Publications/Create
-        public IActionResult Create()
-        {
-            ViewData["TopicId"] = new SelectList(_context.Topics.OrderBy(t => t.Title), "Id", "Title");
-            return View();
-        }
-
-        // POST: Publications/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Slug,Title,Description,DataSource,Summary,NextUpdate,LegacyPublicationUrl,TopicId")] Publication publication)
-        {
-            if (ModelState.IsValid)
-            {
-                publication.Id = Guid.NewGuid();
-                _context.Add(publication);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["TopicId"] = new SelectList(_context.Topics, "Id", "Title", publication.TopicId);
-            return View(publication);
-        }
-
         // GET: Publications/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {

@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "1c0c3428-3013-481d-837a-dd953c38f15a",
+		"_postman_id": "766debca-5a45-43cf-889a-2b637da570b1",
 		"name": "DfE Admin API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -994,7 +994,7 @@
 													"pm.test(\"Publication id matches the publication requested\", function () { pm.expect(pm.response.json().publicationId).to.equal(pm.variables.get(\"publication_id\")); });",
 													"",
 													"pm.test(\"Number of subjects should be correct\", function () {",
-													"    pm.expect(pm.response.json().subjects.length).to.be.above(7);",
+													"    pm.expect(pm.response.json().subjects.length).to.be.above(6);",
 													"});"
 												],
 												"type": "text/javascript"

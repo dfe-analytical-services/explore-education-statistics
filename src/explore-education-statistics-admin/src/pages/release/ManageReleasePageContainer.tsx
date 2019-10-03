@@ -56,8 +56,6 @@ const ManageReleasePageContainer = ({
       }
     : undefined;
 
-  const [lastModified, setLastModified] = React.useState<Date>(new Date());
-
   return (
     <>
       {publication && (
@@ -105,8 +103,6 @@ const ManageReleasePageContainer = ({
             value={{
               publication,
               releaseId,
-              lastModified,
-              invalidate: () => setLastModified(new Date()),
             }}
           >
             {releaseRoutes.manageReleaseRoutes.map(route => (

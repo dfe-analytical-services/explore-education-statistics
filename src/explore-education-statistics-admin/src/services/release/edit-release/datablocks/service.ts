@@ -18,6 +18,7 @@ export interface DataBlockService {
     releaseId: string,
     dataBlock: DataBlock,
   ) => Promise<DataBlock>;
+  deleteDataBlock: (id: string) => Promise<void>;
 }
 
 type AllowedClasses =
@@ -75,6 +76,10 @@ const service: DataBlockService = {
       dataBlock,
       { transformResponse },
     );
+  },
+
+  async deleteDataBlock(id: string) {
+    return client.delete(`/datablocks/${id}`);
   },
 };
 
