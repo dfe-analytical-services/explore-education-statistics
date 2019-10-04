@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
     public class SubjectMetaService : AbstractTableBuilderSubjectMetaService, ISubjectMetaService
     {
         private readonly IBoundaryLevelService _boundaryLevelService;
-        
+
         private readonly IGeoJsonService _geoJsonService;
         private readonly IIndicatorService _indicatorService;
         private readonly ILocationService _locationService;
@@ -35,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             ITimePeriodService timePeriodService,
             ISubjectService subjectService,
             IFootnoteService footnoteService
-            ) : base(filterItemService)
+        ) : base(filterItemService)
         {
             _boundaryLevelService = boundaryLevelService;
             _geoJsonService = geoJsonService;
@@ -51,14 +51,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             SubjectMetaQueryContext query,
             IQueryable<Observation> observations)
         {
-            
             var subject = _subjectService.Find(query.SubjectId,
                 new List<Expression<Func<Subject, object>>> {s => s.Release.Publication});
             if (subject == null)
             {
                 throw new ArgumentException("Subject does not exist", nameof(query.SubjectId));
             }
-            
+
             var observationalUnits = GetObservationalUnits(observations);
             return new SubjectMetaViewModel
             {
@@ -72,8 +71,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 Footnotes = GetFootnotes(observations, query),
             };
         }
-
-
 
         private Dictionary<string, IndicatorMetaViewModel> GetIndicators(SubjectMetaQueryContext query)
         {
@@ -113,7 +110,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return _boundaryLevelService.FindLatestByGeographicLevel(geographicLevel);
         }
 
-        private IEnumerable<IdLabel> GetBoundaryLevelOptions(long? boundaryLevelId, IEnumerable<GeographicLevel> geographicLevels)
+        private IEnumerable<IdLabel> GetBoundaryLevelOptions(long? boundaryLevelId,
+            IEnumerable<GeographicLevel> geographicLevels)
         {
             var boundaryLevels = boundaryLevelId.HasValue
                 ? _boundaryLevelService.FindRelatedByBoundaryLevel(boundaryLevelId.Value)
@@ -133,7 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             var geoJson = _geoJsonService.Find(boundaryLevelId, observationalUnit.Code);
             return geoJson != null ? JsonConvert.DeserializeObject(geoJson.Value) : null;
         }
-        
+
         private IEnumerable<FootnoteViewModel> GetFootnotes(IQueryable<Observation> observations,
             SubjectMetaQueryContext queryContext)
         {
@@ -144,9 +142,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     Label = footnote.Content
                 });
         }
-        
-        
     }
-    
-    
 }

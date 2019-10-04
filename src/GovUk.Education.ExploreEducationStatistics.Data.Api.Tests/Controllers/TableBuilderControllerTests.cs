@@ -6,7 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Moq;
 using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controller
+namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 {
     public class TableBuilderControllerTests
     {

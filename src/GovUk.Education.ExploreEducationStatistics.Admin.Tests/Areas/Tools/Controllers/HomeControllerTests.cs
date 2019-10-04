@@ -3,7 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Tools.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Tools.Controllers
 {
     public class HomeControllerTests
     {
