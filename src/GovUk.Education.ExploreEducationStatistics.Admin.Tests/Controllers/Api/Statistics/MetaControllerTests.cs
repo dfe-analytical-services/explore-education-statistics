@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         private readonly MetaController _controller;
 
         private readonly ReleaseId _releaseId = ReleaseId.NewGuid();
-        
+
         public MetaControllerTests()
         {
             var releaseMetaService = new Mock<IReleaseMetaService>();
@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             var result = _controller.GetSubjectsForRelease(_releaseId);
 
-            Assert.IsAssignableFrom<PublicationSubjectsMetaViewModel>(result.Value);
+            Assert.IsAssignableFrom<ReleaseSubjectsMetaViewModel>(result.Value);
         }
 
         [Fact]
