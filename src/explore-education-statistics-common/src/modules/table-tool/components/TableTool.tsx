@@ -1,4 +1,4 @@
-import { ConfirmContextProvider } from '@common/context/ConfirmContext';
+import {ConfirmContextProvider} from '@common/context/ConfirmContext';
 import mapValuesWithKeys from '@common/lib/utils/mapValuesWithKeys';
 import tableBuilderService, {
   FilterOption,
@@ -8,38 +8,22 @@ import tableBuilderService, {
   TableDataQuery,
   ThemeMeta,
 } from '@common/modules/full-table/services/tableBuilderService';
-import { Dictionary } from '@common/types/util';
+import {Dictionary} from '@common/types/util';
 import PreviousStepModalConfirm from '@common/modules/table-tool/components/PreviousStepModalConfirm';
-import {
-  CategoryFilter,
-  Indicator,
-  LocationFilter,
-} from '@common/modules/full-table/types/filters';
+import {CategoryFilter, Indicator, LocationFilter,} from '@common/modules/full-table/types/filters';
 import parseYearCodeTuple from '@common/modules/full-table/utils/TimePeriod';
 import mapValues from 'lodash/mapValues';
-import React, { Component, createRef, ReactNode } from 'react';
+import React, {createRef, ReactNode} from 'react';
 import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
-import { FullTable } from '@common/modules/full-table/types/fullTable';
-import { mapFullTable } from '@common/modules/full-table/utils/mapPermalinks';
-import FiltersForm, {
-  FilterFormSubmitHandler,
-} from '@common/modules/table-tool/components/FiltersForm';
-import LocationFiltersForm, {
-  LocationFiltersFormSubmitHandler,
-} from '@common/modules/table-tool/components/LocationFiltersForm';
-import PublicationForm, {
-  PublicationFormSubmitHandler,
-} from '@common/modules/table-tool/components/PublicationForm';
-import PublicationSubjectForm, {
-  PublicationSubjectFormSubmitHandler,
-} from '@common/modules/table-tool/components/PublicationSubjectForm';
-import TableHeadersForm, {
-  TableHeadersFormValues,
-} from '@common/modules/table-tool/components/TableHeadersForm';
+import {FullTable} from '@common/modules/full-table/types/fullTable';
+import {mapFullTable} from '@common/modules/full-table/utils/mapPermalinks';
+import FiltersForm, {FilterFormSubmitHandler,} from '@common/modules/table-tool/components/FiltersForm';
+import LocationFiltersForm, {LocationFiltersFormSubmitHandler,} from '@common/modules/table-tool/components/LocationFiltersForm';
+import PublicationForm, {PublicationFormSubmitHandler,} from '@common/modules/table-tool/components/PublicationForm';
+import PublicationSubjectForm, {PublicationSubjectFormSubmitHandler,} from '@common/modules/table-tool/components/PublicationSubjectForm';
+import TableHeadersForm, {TableHeadersFormValues,} from '@common/modules/table-tool/components/TableHeadersForm';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
-import TimePeriodForm, {
-  TimePeriodFormSubmitHandler,
-} from '@common/modules/table-tool/components/TimePeriodForm';
+import TimePeriodForm, {TimePeriodFormSubmitHandler,} from '@common/modules/table-tool/components/TimePeriodForm';
 import mapOptionValues from '@common/modules/table-tool/components/utils/mapOptionValues';
 import Wizard from '@common/modules/table-tool/components/Wizard';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
@@ -61,7 +45,7 @@ interface FinalStepProps {
 interface Props {
   themeMeta: ThemeMeta[];
   publicationId: string;
-  fixedPublicationId?: string;
+  fixedPublicationId?: boolean;
 
   finalStepExtra?: (props: FinalStepProps) => ReactNode;
   finalStepHeading?: string;
@@ -82,15 +66,13 @@ interface State {
   query?: TableDataQuery;
 }
 
-
 const TableTool = ({
   themeMeta,
   publicationId,
-  fixedPublicationId,
+  fixedPublicationId = false,
   finalStepExtra,
   finalStepHeading,
 }: Props) => {
-
   const dataTableRef = createRef<HTMLTableElement>();
 
   const [state, setState] = React.useState<State>({
@@ -116,7 +98,7 @@ const TableTool = ({
   });
 
   const handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
-    publicationId : pid,
+    publicationId: pid,
   }) => {
     const publication = themeMeta
       .flatMap(option => option.topics)
@@ -127,9 +109,7 @@ const TableTool = ({
       return;
     }
 
-    const { subjects } = await tableBuilderService.getPublicationMeta(
-      pid,
-    );
+    const { subjects } = await tableBuilderService.getPublicationMeta(pid);
 
     setState({
       ...state,
@@ -137,6 +117,8 @@ const TableTool = ({
       subjects,
     });
   };
+
+
 
   const handlePublicationSubjectFormSubmit: PublicationSubjectFormSubmitHandler = async ({
     subjectId,
@@ -151,6 +133,13 @@ const TableTool = ({
       subjectId,
     });
   };
+
+  React.useEffect(() => {
+    if (fixedPublicationId === true) {
+      handlePublicationFormSubmit({ publicationId });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [publicationId, fixedPublicationId]);
 
   const handleLocationFiltersFormSubmit: LocationFiltersFormSubmitHandler = async ({
     locations,
@@ -313,17 +302,21 @@ const TableTool = ({
               return nextStep;
             }}
           >
-            <WizardStep>
-              {stepProps => (
-                <PublicationForm
-                  {...stepProps}
-                  publicationId={publicationId}
-                  publicationTitle={state.publication ? state.publication.title : ''}
-                  options={themeMeta}
-                  onSubmit={handlePublicationFormSubmit}
-                />
-              )}
-            </WizardStep>
+            {fixedPublicationId !== true && (
+              <WizardStep>
+                {stepProps => (
+                  <PublicationForm
+                    {...stepProps}
+                    publicationId={publicationId}
+                    publicationTitle={
+                      state.publication ? state.publication.title : ''
+                    }
+                    options={themeMeta}
+                    onSubmit={handlePublicationFormSubmit}
+                  />
+                )}
+              </WizardStep>
+            )}
             <WizardStep>
               {stepProps => (
                 <PublicationSubjectForm
@@ -394,15 +387,15 @@ const TableTool = ({
                   </div>
 
                   {state.publication &&
-                  state.createdTable &&
-                  finalStepExtra &&
-                  state.query &&
-                  finalStepExtra({
-                    createdTable: state.createdTable ,
-                    publication: state.publication,
-                    tableHeaders: state.tableHeaders,
-                    query: state.query,
-                  })}
+                    state.createdTable &&
+                    finalStepExtra &&
+                    state.query &&
+                    finalStepExtra({
+                      createdTable: state.createdTable,
+                      publication: state.publication,
+                      tableHeaders: state.tableHeaders,
+                      query: state.query,
+                    })}
                 </>
               )}
             </WizardStep>
