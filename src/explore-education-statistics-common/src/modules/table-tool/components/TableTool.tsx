@@ -17,7 +17,7 @@ import {
 } from '@common/modules/full-table/types/filters';
 import parseYearCodeTuple from '@common/modules/full-table/utils/TimePeriod';
 import mapValues from 'lodash/mapValues';
-import React, { Component, createRef, ReactNode } from 'react';
+import React, { createRef, ReactNode } from 'react';
 import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
 import { FullTable } from '@common/modules/full-table/types/fullTable';
 import { mapFullTable } from '@common/modules/full-table/utils/mapPermalinks';
@@ -61,6 +61,8 @@ interface FinalStepProps {
 interface Props {
   themeMeta: ThemeMeta[];
   publicationId: string;
+  fixedPublicationId?: boolean;
+
   finalStepExtra?: (props: FinalStepProps) => ReactNode;
   finalStepHeading?: string;
 }
@@ -80,8 +82,16 @@ interface State {
   query?: TableDataQuery;
 }
 
-class TableTool extends Component<Props, State> {
-  public state: State = {
+const TableTool = ({
+  themeMeta,
+  publicationId,
+  fixedPublicationId = false,
+  finalStepExtra,
+  finalStepHeading,
+}: Props) => {
+  const dataTableRef = createRef<HTMLTableElement>();
+
+  const [state, setState] = React.useState<State>({
     locations: {},
     subjectId: '',
     subjectMeta: {
@@ -101,59 +111,64 @@ class TableTool extends Component<Props, State> {
       rowGroups: [],
       rows: [],
     },
-  };
+  });
 
-  private dataTableRef = createRef<HTMLTableElement>();
-
-  private handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
-    publicationId,
+  const handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
+    publicationId: pid,
   }) => {
-    const { themeMeta } = this.props;
     const publication = themeMeta
       .flatMap(option => option.topics)
       .flatMap(option => option.publications)
-      .find(option => option.id === publicationId);
+      .find(option => option.id === pid);
 
     if (!publication) {
       return;
     }
 
-    const { subjects } = await tableBuilderService.getPublicationMeta(
-      publicationId,
-    );
+    const { subjects } = await tableBuilderService.getPublicationMeta(pid);
 
-    this.setState({
+    setState({
+      ...state,
       publication,
       subjects,
     });
   };
 
-  private handlePublicationSubjectFormSubmit: PublicationSubjectFormSubmitHandler = async ({
+  const handlePublicationSubjectFormSubmit: PublicationSubjectFormSubmitHandler = async ({
     subjectId,
   }) => {
     const subjectMeta = await tableBuilderService.getPublicationSubjectMeta(
       subjectId,
     );
 
-    this.setState({
+    setState({
+      ...state,
       subjectMeta,
       subjectId,
     });
   };
 
-  private handleLocationFiltersFormSubmit: LocationFiltersFormSubmitHandler = async ({
+  React.useEffect(() => {
+    if (fixedPublicationId === true) {
+      handlePublicationFormSubmit({ publicationId });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [publicationId, fixedPublicationId]);
+
+  const handleLocationFiltersFormSubmit: LocationFiltersFormSubmitHandler = async ({
     locations,
   }) => {
-    const { subjectId } = this.state;
+    const { subjectId } = state;
 
     const subjectMeta = await tableBuilderService.filterPublicationSubjectMeta({
       ...locations,
       subjectId,
     });
 
-    this.setState(prevState => ({
+    setState({
+      ...state,
       subjectMeta: {
-        ...prevState.subjectMeta,
+        ...state.subjectMeta,
         timePeriod: subjectMeta.timePeriod,
       },
       locations: mapValuesWithKeys(
@@ -161,7 +176,7 @@ class TableTool extends Component<Props, State> {
         (locationLevel, locationOptions) =>
           locationOptions
             .map(location =>
-              prevState.subjectMeta.locations[locationLevel].options.find(
+              state.subjectMeta.locations[locationLevel].options.find(
                 option => option.value === location,
               ),
             )
@@ -171,11 +186,11 @@ class TableTool extends Component<Props, State> {
                 new LocationFilter(option as FilterOption, locationLevel),
             ),
       ),
-    }));
+    });
   };
 
-  private handleTimePeriodFormSubmit: TimePeriodFormSubmitHandler = async values => {
-    const { subjectId, locations } = this.state;
+  const handleTimePeriodFormSubmit: TimePeriodFormSubmitHandler = async values => {
+    const { subjectId, locations } = state;
 
     const [startYear, startCode] = parseYearCodeTuple(values.start);
     const [endYear, endCode] = parseYearCodeTuple(values.end);
@@ -193,19 +208,20 @@ class TableTool extends Component<Props, State> {
       },
     });
 
-    this.setState(prevState => ({
+    setState({
+      ...state,
       startYear,
       startCode,
       endYear,
       endCode,
       subjectMeta: {
-        ...prevState.subjectMeta,
+        ...state.subjectMeta,
         filters: subjectMeta.filters,
       },
-    }));
+    });
   };
 
-  private createQuery = (
+  const createQuery = (
     filters: Dictionary<CategoryFilter[]>,
     indicators: Indicator[],
   ): TableDataQuery => {
@@ -216,7 +232,7 @@ class TableTool extends Component<Props, State> {
       endYear,
       endCode,
       locations,
-    } = this.state;
+    } = state;
 
     if (!startYear || !startCode || !endYear || !endCode) {
       throw new Error('Missing required timePeriod parameters');
@@ -240,8 +256,8 @@ class TableTool extends Component<Props, State> {
     };
   };
 
-  private handleFiltersFormSubmit: FilterFormSubmitHandler = async values => {
-    const { startYear, startCode, endYear, endCode, subjectMeta } = this.state;
+  const handleFiltersFormSubmit: FilterFormSubmitHandler = async values => {
+    const { startYear, startCode, endYear, endCode, subjectMeta } = state;
 
     if (!startYear || !startCode || !endYear || !endCode) {
       return;
@@ -271,150 +287,139 @@ class TableTool extends Component<Props, State> {
       indicator => new Indicator(indicatorsByValue[indicator]),
     );
 
-    const query: TableDataQuery = this.createQuery(filters, indicators);
+    const query: TableDataQuery = createQuery(filters, indicators);
 
     const unmappedCreatedTable = await tableBuilderService.getTableData(query);
 
     const createdTable = mapFullTable(unmappedCreatedTable);
 
-    this.setState({
+    setState({
+      ...state,
       createdTable,
       tableHeaders: getDefaultTableHeaderConfig(createdTable.subjectMeta),
       query,
     });
   };
 
-  public render() {
-    const {
-      themeMeta,
-      publicationId,
-      finalStepExtra,
-      finalStepHeading,
-    } = this.props;
-    const {
-      createdTable,
-      publication,
-      subjectMeta,
-      subjects,
-      tableHeaders,
-      query,
-    } = this.state;
+  return (
+    <ConfirmContextProvider>
+      {({ askConfirm }) => (
+        <>
+          <Wizard
+            id="tableTool-steps"
+            onStepChange={async (nextStep, previousStep) => {
+              if (nextStep < previousStep) {
+                const confirmed = await askConfirm();
+                return confirmed ? nextStep : previousStep;
+              }
 
-    return (
-      <ConfirmContextProvider>
-        {({ askConfirm }) => (
-          <>
-            <Wizard
-              id="tableTool-steps"
-              onStepChange={async (nextStep, previousStep) => {
-                if (nextStep < previousStep) {
-                  const confirmed = await askConfirm();
-                  return confirmed ? nextStep : previousStep;
-                }
-
-                return nextStep;
-              }}
-            >
+              return nextStep;
+            }}
+          >
+            {fixedPublicationId !== true && (
               <WizardStep>
                 {stepProps => (
                   <PublicationForm
                     {...stepProps}
                     publicationId={publicationId}
-                    publicationTitle={publication ? publication.title : ''}
+                    publicationTitle={
+                      state.publication ? state.publication.title : ''
+                    }
                     options={themeMeta}
-                    onSubmit={this.handlePublicationFormSubmit}
+                    onSubmit={handlePublicationFormSubmit}
                   />
                 )}
               </WizardStep>
-              <WizardStep>
-                {stepProps => (
-                  <PublicationSubjectForm
-                    {...stepProps}
-                    options={subjects}
-                    onSubmit={this.handlePublicationSubjectFormSubmit}
-                  />
-                )}
-              </WizardStep>
-              <WizardStep>
-                {stepProps => (
-                  <LocationFiltersForm
-                    {...stepProps}
-                    options={subjectMeta.locations}
-                    onSubmit={this.handleLocationFiltersFormSubmit}
-                  />
-                )}
-              </WizardStep>
-              <WizardStep>
-                {stepProps => (
-                  <TimePeriodForm
-                    {...stepProps}
-                    options={subjectMeta.timePeriod.options}
-                    onSubmit={this.handleTimePeriodFormSubmit}
-                  />
-                )}
-              </WizardStep>
-              <WizardStep>
-                {stepProps => (
-                  <FiltersForm
-                    {...stepProps}
-                    onSubmit={this.handleFiltersFormSubmit}
-                    subjectMeta={subjectMeta}
-                  />
-                )}
-              </WizardStep>
-              <WizardStep>
-                {stepProps => (
-                  <>
-                    <WizardStepHeading {...stepProps}>
-                      {finalStepHeading || 'Explore data'}
-                    </WizardStepHeading>
+            )}
+            <WizardStep>
+              {stepProps => (
+                <PublicationSubjectForm
+                  {...stepProps}
+                  options={state.subjects}
+                  onSubmit={handlePublicationSubjectFormSubmit}
+                />
+              )}
+            </WizardStep>
+            <WizardStep>
+              {stepProps => (
+                <LocationFiltersForm
+                  {...stepProps}
+                  options={state.subjectMeta.locations}
+                  onSubmit={handleLocationFiltersFormSubmit}
+                />
+              )}
+            </WizardStep>
+            <WizardStep>
+              {stepProps => (
+                <TimePeriodForm
+                  {...stepProps}
+                  options={state.subjectMeta.timePeriod.options}
+                  onSubmit={handleTimePeriodFormSubmit}
+                />
+              )}
+            </WizardStep>
+            <WizardStep>
+              {stepProps => (
+                <FiltersForm
+                  {...stepProps}
+                  onSubmit={handleFiltersFormSubmit}
+                  subjectMeta={state.subjectMeta}
+                />
+              )}
+            </WizardStep>
+            <WizardStep>
+              {stepProps => (
+                <>
+                  <WizardStepHeading {...stepProps}>
+                    {finalStepHeading || 'Explore data'}
+                  </WizardStepHeading>
 
-                    <div className="govuk-!-margin-bottom-4">
-                      <TableHeadersForm
-                        initialValues={tableHeaders}
-                        onSubmit={tableHeaderConfig => {
-                          this.setState({
-                            tableHeaders: tableHeaderConfig,
+                  <div className="govuk-!-margin-bottom-4">
+                    <TableHeadersForm
+                      initialValues={state.tableHeaders}
+                      onSubmit={tableHeaderConfig => {
+                        setState({
+                          ...state,
+                          tableHeaders: tableHeaderConfig,
+                        });
+
+                        if (dataTableRef.current) {
+                          dataTableRef.current.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start',
                           });
-
-                          if (this.dataTableRef.current) {
-                            this.dataTableRef.current.scrollIntoView({
-                              behavior: 'smooth',
-                              block: 'start',
-                            });
-                          }
-                        }}
+                        }
+                      }}
+                    />
+                    {state.createdTable ? (
+                      <TimePeriodDataTable
+                        ref={dataTableRef}
+                        fullTable={state.createdTable}
+                        tableHeadersConfig={state.tableHeaders}
                       />
-                      {createdTable ? (
-                        <TimePeriodDataTable
-                          ref={this.dataTableRef}
-                          fullTable={createdTable}
-                          tableHeadersConfig={tableHeaders}
-                        />
-                      ) : null}
-                    </div>
+                    ) : null}
+                  </div>
 
-                    {publication &&
-                      createdTable &&
-                      finalStepExtra &&
-                      query &&
-                      finalStepExtra({
-                        createdTable,
-                        publication,
-                        tableHeaders,
-                        query,
-                      })}
-                  </>
-                )}
-              </WizardStep>
-            </Wizard>
+                  {state.publication &&
+                    state.createdTable &&
+                    finalStepExtra &&
+                    state.query &&
+                    finalStepExtra({
+                      createdTable: state.createdTable,
+                      publication: state.publication,
+                      tableHeaders: state.tableHeaders,
+                      query: state.query,
+                    })}
+                </>
+              )}
+            </WizardStep>
+          </Wizard>
 
-            <PreviousStepModalConfirm />
-          </>
-        )}
-      </ConfirmContextProvider>
-    );
-  }
-}
+          <PreviousStepModalConfirm />
+        </>
+      )}
+    </ConfirmContextProvider>
+  );
+};
 
 export default TableTool;

@@ -13,7 +13,7 @@ export interface InjectedWizardProps {
 }
 
 interface Props {
-  children: ReactElement | ReactElement[];
+  children: ReactElement | (ReactElement | undefined | boolean)[];
   initialStep?: number;
   id: string;
   onStepChange?: (
@@ -27,7 +27,7 @@ const Wizard = ({ children, initialStep = 1, id, onStepChange }: Props) => {
 
   const filteredChildren = Children.toArray(children).filter(child =>
     isComponentType(child, WizardStep),
-  );
+  ) as (ReactElement[]);
 
   const lastStep = filteredChildren.length;
 
