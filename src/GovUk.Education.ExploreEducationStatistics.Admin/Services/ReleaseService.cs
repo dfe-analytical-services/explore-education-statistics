@@ -91,22 +91,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         // TODO Authorisation will be required when users are introduced
-        public async Task<Either<ValidationResult, ReleaseViewModel>> EditReleaseSummaryAsyncOld(
-            ReleaseSummaryViewModel model)
-        {
-            var publication = await GetAsync(model.Id);
-            return await ValidateReleaseSlugUniqueToPublication(model.Slug, publication.Id, model.Id)
-                .OnSuccess(async () =>
-                {
-                    var release = await _context.Releases.FirstOrDefaultAsync(r => r.Id == model.Id);
-                    _context.Releases.Update(release);
-                    _mapper.Map(model, release);
-                    await _context.SaveChangesAsync();
-                    return await GetReleaseForIdAsync(model.Id);
-                });
-        }
-        
-        // TODO Authorisation will be required when users are introduced
         public async Task<ReleaseSummaryViewModel> GetReleaseSummaryAsync(ReleaseId releaseId)
         {
             var release = await _context.Releases
