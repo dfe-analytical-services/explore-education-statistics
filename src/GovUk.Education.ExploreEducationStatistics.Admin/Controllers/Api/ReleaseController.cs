@@ -184,7 +184,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpGet("releases/{releaseId}/summary")]
         public async Task<ActionResult<ReleaseSummaryViewModel>> GetReleaseSummaryAsync(ReleaseId releaseId)
         {
-            return Ok(await _releaseService.GetReleaseSummaryAsync(releaseId));
+            return await _releaseService.GetReleaseSummaryAsync(releaseId);
         }
 
         [HttpPut("releases/{releaseId}/summary")]

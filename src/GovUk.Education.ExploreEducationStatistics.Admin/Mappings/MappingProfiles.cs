@@ -45,6 +45,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<ReleaseSummaryViewModel, Release>();
 
             CreateMap<CreateReleaseViewModel, Release>();
+            
+            CreateMap<CreateReleaseViewModel, ReleaseSummaryVersion>().ForMember(r => r.Id, m => m.Ignore());
+            CreateMap<ReleaseSummaryViewModel, ReleaseSummaryVersion>().ForMember(r => r.Id, m => m.Ignore());
+            CreateMap<ReleaseSummary, ReleaseSummaryViewModel>();
 
             CreateMap<Methodology, MethodologyViewModel>();
 
