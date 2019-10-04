@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "38c57900-cab3-4e6f-ac40-ff081fb40f2b",
+		"_postman_id": "f9bab3b5-4109-409c-b9ec-ca4f8d316696",
 		"name": "DfE Data API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -86,6 +86,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -1424,6 +1425,7 @@
 									}
 								}
 							],
+							"protocolProfileBehavior": {},
 							"_postman_isSubFolder": true
 						},
 						{
@@ -1794,6 +1796,7 @@
 									"response": []
 								}
 							],
+							"protocolProfileBehavior": {},
 							"_postman_isSubFolder": true
 						},
 						{
@@ -1988,6 +1991,7 @@
 									"response": []
 								}
 							],
+							"protocolProfileBehavior": {},
 							"_postman_isSubFolder": true
 						},
 						{
@@ -2293,6 +2297,7 @@
 									"response": []
 								}
 							],
+							"protocolProfileBehavior": {},
 							"_postman_isSubFolder": true
 						}
 					],
@@ -2318,6 +2323,7 @@
 							}
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -2453,6 +2459,7 @@
 							}
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				}
 			],
@@ -2477,7 +2484,8 @@
 						]
 					}
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Tablebuilder",
@@ -3368,6 +3376,7 @@
 									}
 								}
 							],
+							"protocolProfileBehavior": {},
 							"_postman_isSubFolder": true
 						},
 						{
@@ -4024,6 +4033,7 @@
 									}
 								}
 							],
+							"protocolProfileBehavior": {},
 							"_postman_isSubFolder": true
 						},
 						{
@@ -4383,6 +4393,7 @@
 									}
 								}
 							],
+							"protocolProfileBehavior": {},
 							"_postman_isSubFolder": true
 						},
 						{
@@ -4673,6 +4684,7 @@
 									}
 								}
 							],
+							"protocolProfileBehavior": {},
 							"_postman_isSubFolder": true
 						},
 						{
@@ -4923,6 +4935,7 @@
 									}
 								}
 							],
+							"protocolProfileBehavior": {},
 							"_postman_isSubFolder": true
 						},
 						{
@@ -5064,6 +5077,7 @@
 									}
 								}
 							],
+							"protocolProfileBehavior": {},
 							"_postman_isSubFolder": true
 						},
 						{
@@ -5158,9 +5172,11 @@
 									}
 								}
 							],
+							"protocolProfileBehavior": {},
 							"_postman_isSubFolder": true
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				}
 			],
@@ -5185,7 +5201,8 @@
 						]
 					}
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Data",
@@ -5213,11 +5230,19 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.boundaryLevels\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.timePeriods\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.publicationName\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.subjectName\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.footnotes\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
 													"});",
 													"",
 													"pm.test(\"Number of metaData filters should be correct\", function () {",
-													"   pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(7); ",
+													"   pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(3);",
+													"   pm.expect(respJson.metaData.filters.Characteristic.options.Gender.options.length).to.equal(2);",
+													"   pm.expect(respJson.metaData.filters.YearBreakdown.options.Default.options.length).to.equal(1);",
+													"   pm.expect(respJson.metaData.filters.SchoolType.options.Default.options.length).to.equal(4);",
 													"});",
 													"",
 													"pm.test(\"Number of metaData locations should be correct\", function () {",
@@ -5290,11 +5315,19 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.boundaryLevels\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.timePeriods\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.publicationName\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.subjectName\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.footnotes\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
 													"});",
 													"",
 													"pm.test(\"Number of metaData filters should be correct\", function () {",
-													"   pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(5); ",
+													"    pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(3);",
+													"    pm.expect(respJson.metaData.filters.Characteristic.options.Gender.options.length).to.equal(2);",
+													"    pm.expect(respJson.metaData.filters.YearBreakdown.options.Default.options.length).to.equal(1);",
+													"    pm.expect(respJson.metaData.filters.SchoolType.options.Default.options.length).to.equal(2);",
 													"});",
 													"",
 													"pm.test(\"Number of metaData locations should be correct\", function () {",
@@ -5367,6 +5400,11 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.boundaryLevels\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.timePeriods\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.publicationName\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.subjectName\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.footnotes\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
 													"});",
 													"",
@@ -5377,7 +5415,10 @@
 													"});",
 													"",
 													"pm.test(\"Number of metaData filters should be correct\", function () {",
-													"   pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(7); ",
+													"    pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(3);",
+													"    pm.expect(respJson.metaData.filters.Characteristic.options.Gender.options.length).to.equal(2);",
+													"    pm.expect(respJson.metaData.filters.YearBreakdown.options.Default.options.length).to.equal(1);",
+													"    pm.expect(respJson.metaData.filters.SchoolType.options.Default.options.length).to.equal(4);",
 													"});",
 													"",
 													"/*",
@@ -5449,11 +5490,19 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.boundaryLevels\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.timePeriods\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.publicationName\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.subjectName\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.footnotes\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
 													"});",
 													"",
 													"pm.test(\"Number of metaData filters should be correct\", function () {",
-													"   pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(4); ",
+													"    pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(3);",
+													"    pm.expect(respJson.metaData.filters.Characteristic.options.Gender.options.length).to.equal(2);",
+													"    pm.expect(respJson.metaData.filters.YearBreakdown.options.Default.options.length).to.equal(1);",
+													"    pm.expect(respJson.metaData.filters.SchoolType.options.Default.options.length).to.equal(1);",
 													"});",
 													"",
 													"pm.test(\"Number of metaData locations should be correct and have associated geoJson data\", function () {",
@@ -5516,11 +5565,19 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.boundaryLevels\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.timePeriods\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.publicationName\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.subjectName\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.footnotes\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
 													"});",
 													"",
 													"pm.test(\"Number of metaData filters should be correct\", function () {",
-													"   pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(8);",
+													"    pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(3);",
+													"    pm.expect(respJson.metaData.filters.Characteristic.options.FSM.options.length).to.equal(3);",
+													"    pm.expect(respJson.metaData.filters.YearBreakdown.options.Default.options.length).to.equal(1);",
+													"    pm.expect(respJson.metaData.filters.SchoolType.options.Default.options.length).to.equal(4);",
 													"});",
 													"",
 													"pm.test(\"geographicLevel should be same as request\", function () {",
@@ -5588,6 +5645,11 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.boundaryLevels\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.timePeriods\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.publicationName\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.subjectName\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.footnotes\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
 													"});",
 													"",
@@ -5676,6 +5738,11 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.boundaryLevels\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.timePeriods\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.publicationName\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.subjectName\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.footnotes\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
 													"});",
 													"",
@@ -5750,6 +5817,11 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.boundaryLevels\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.timePeriods\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.publicationName\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.subjectName\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.footnotes\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
 													"});",
 													"",
@@ -5823,6 +5895,11 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.boundaryLevels\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.timePeriods\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.publicationName\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.subjectName\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.footnotes\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
 													"});",
 													"",
@@ -5897,11 +5974,19 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.boundaryLevels\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.timePeriods\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.publicationName\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.subjectName\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.footnotes\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
 													"});",
 													"",
 													"pm.test(\"Number of metaData filters should be correct\", function () {",
-													"   pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(4); ",
+													"    pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(3);",
+													"    pm.expect(respJson.metaData.filters.Characteristic.options.FSM.options.length).to.equal(2);",
+													"    pm.expect(respJson.metaData.filters.YearBreakdown.options.Default.options.length).to.equal(1);",
+													"    pm.expect(respJson.metaData.filters.SchoolType.options.Default.options.length).to.equal(1);",
 													"});",
 													"",
 													"pm.test(\"Number of metaData indicators should be correct\", function () {",
@@ -5973,7 +6058,10 @@
 													"});",
 													"",
 													"pm.test(\"Number of metaData filters should be correct\", function () {",
-													"   pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(8); ",
+													"    pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(3);",
+													"    pm.expect(respJson.metaData.filters.Characteristic.options.FSM.options.length).to.equal(3);",
+													"    pm.expect(respJson.metaData.filters.YearBreakdown.options.Default.options.length).to.equal(1);",
+													"    pm.expect(respJson.metaData.filters.SchoolType.options.Default.options.length).to.equal(4);",
 													"});",
 													"",
 													"pm.test(\"Number of metaData indicators should be correct\", function () {",
@@ -6073,6 +6161,7 @@
 									}
 								}
 							],
+							"protocolProfileBehavior": {},
 							"_postman_isSubFolder": true
 						}
 					],
@@ -6098,6 +6187,7 @@
 							}
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -6123,6 +6213,11 @@
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.boundaryLevels\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.timePeriods\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.publicationName\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.subjectName\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.footnotes\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
 													"});",
 													"",
@@ -6134,9 +6229,8 @@
 													"",
 													"pm.test(\"Should have correct filters metaData\", function () {",
 													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
-													"    pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(2); ",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters.\" + pm.globals.get(\"FILT_Char__GenderFemale\")));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters.\" + pm.globals.get(\"FILT_Char__GenderMale\")));",
+													"    pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(1);",
+													"    pm.expect(respJson.metaData.filters.Characteristic.options.Gender.options.length).to.equal(2);",
 													"});",
 													"",
 													"pm.test(\"Should have correct indicators metaData\", function () {",
@@ -6223,9 +6317,11 @@
 									}
 								}
 							],
+							"protocolProfileBehavior": {},
 							"_postman_isSubFolder": true
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -6248,6 +6344,11 @@
 											"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"metaData.boundaryLevels\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"metaData.timePeriods\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"metaData.publicationName\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"metaData.subjectName\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"metaData.footnotes\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
 											"});",
 											"",
@@ -6334,9 +6435,11 @@
 							}
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Permalink",
@@ -6608,7 +6711,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Fasttrack",
@@ -6795,7 +6899,8 @@
 						]
 					}
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Download",
@@ -6838,7 +6943,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Debug",
@@ -6901,7 +7007,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		}
 	],
 	"event": [
@@ -6925,5 +7032,6 @@
 				]
 			}
 		}
-	]
+	],
+	"protocolProfileBehavior": {}
 }
