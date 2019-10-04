@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Web.Http;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
@@ -21,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         }
 
         [HttpPost]
-        public ActionResult<ResultWithMetaViewModel> Query([FromUri] ReleaseId release,
+        public ActionResult<ResultWithMetaViewModel> Query([FromUri, Required] ReleaseId release,
             [FromBody] ObservationQueryContext query)
         {
             return _dataService.Query(query, release);

@@ -1099,13 +1099,19 @@
 									"raw": "{\n    \"subjectId\": 1,\n    \"country\": [\n    \t\"E92000001\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2014,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__GenderMale}}, {{FILT_Char__GenderFemale}}\n    ],\n    \"indicators\": [\n    \t{{IND_AbsenceFields__UnauthorisedAbsenceRate}}, \n        {{IND_AbsenceFields__OverallAbsenceRate}}, \n        {{IND_AbsenceFields__AuthorisedAbsenceRate}},\n        {{IND_AbsenceFields__PercentageOfPersistentAbsentees}},\n        {{IND_AbsenceFields__NumberOfPersistentAbsentees}}\n    ]\n}"
 								},
 								"url": {
-									"raw": "{{admin_api_url}}/data/tablebuilder",
+									"raw": "{{admin_api_url}}/data/tablebuilder?release=4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5",
 									"host": [
 										"{{admin_api_url}}"
 									],
 									"path": [
 										"data",
 										"tablebuilder"
+									],
+									"query": [
+										{
+											"key": "release",
+											"value": "4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"
+										}
 									]
 								}
 							},
@@ -1220,13 +1226,19 @@
 									"raw": "{\n    \"subjectId\": 1,\n    \"localAuthority\": [\"E09000032\"],\n    \"localAuthorityDistrict\": [\"E07000223\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2015,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__FSMEligible}}, \n        {{FILT_Char__FSMNotEligible}}, \n        {{FILT_Char__FSMUnclassified}}\n    ],\n    \"indicators\": [\n    \t{{IND_AbsenceForPersistentAbsentees__NumberOfAuthorisedAbsenceSessionsForPersistentAbsentees}},\n    \t{{IND_AbsenceByReason__NumberOfUnauthorisedReasonsSessions}},\n    \t{{IND_AbsenceByReason__NumberOfUnauthorisedOtherSessions}},\n    \t{{IND_AbsenceByReason__NumberOfNoReasonYetSessions}},\n    \t{{IND_AbsenceByReason__NumberOfLateSessions}}\n    ]\n}"
 								},
 								"url": {
-									"raw": "{{admin_api_url}}/data/data",
+									"raw": "{{admin_api_url}}/data/data?release=4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5",
 									"host": [
 										"{{admin_api_url}}"
 									],
 									"path": [
 										"data",
 										"data"
+									],
+									"query": [
+										{
+											"key": "release",
+											"value": "4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"
+										}
 									]
 								}
 							},
