@@ -61,7 +61,7 @@ const ViewDataBlocks = ({
   const [chartBuilderData, setChartBuilderData] = React.useState<
     DataBlockResponse
   >(dataBlockResponse);
-  
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [initialConfiguration, setInitialConfiguration] = React.useState<
     Chart | undefined
