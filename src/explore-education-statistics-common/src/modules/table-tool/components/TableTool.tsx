@@ -66,6 +66,48 @@ interface State {
   query?: TableDataQuery;
 }
 
+const createQuery = (
+  filters: Dictionary<CategoryFilter[]>,
+  indicators: Indicator[],
+  {
+    subjectId,
+    startYear,
+    startCode,
+    endYear,
+    endCode,
+    locations,
+  } : {
+    subjectId : string,
+    startYear?: number,
+    startCode?: string,
+    endYear?:  number,
+    endCode?: string,
+    locations: Dictionary<LocationFilter[]>,
+  }
+): TableDataQuery => {
+
+  if (!startYear || !startCode || !endYear || !endCode) {
+    throw new Error('Missing required timePeriod parameters');
+  }
+
+  return {
+    ...mapValues(locations, locationLevel =>
+      locationLevel.map(location => location.value),
+    ),
+    subjectId,
+    indicators: indicators.map(indicator => indicator.value),
+    filters: Object.values(filters).flatMap(categoryFilters =>
+      categoryFilters.flatMap(filter => filter.value),
+    ),
+    timePeriod: {
+      startYear,
+      startCode,
+      endYear,
+      endCode,
+    },
+  };
+};
+
 const TableTool = ({
   themeMeta,
   publicationId,
@@ -117,8 +159,6 @@ const TableTool = ({
       subjects,
     });
   };
-
-
 
   const handlePublicationSubjectFormSubmit: PublicationSubjectFormSubmitHandler = async ({
     subjectId,
@@ -207,41 +247,6 @@ const TableTool = ({
     });
   };
 
-  const createQuery = (
-    filters: Dictionary<CategoryFilter[]>,
-    indicators: Indicator[],
-  ): TableDataQuery => {
-    const {
-      subjectId,
-      startYear,
-      startCode,
-      endYear,
-      endCode,
-      locations,
-    } = state;
-
-    if (!startYear || !startCode || !endYear || !endCode) {
-      throw new Error('Missing required timePeriod parameters');
-    }
-
-    return {
-      ...mapValues(locations, locationLevel =>
-        locationLevel.map(location => location.value),
-      ),
-      subjectId,
-      indicators: indicators.map(indicator => indicator.value),
-      filters: Object.values(filters).flatMap(categoryFilters =>
-        categoryFilters.flatMap(filter => filter.value),
-      ),
-      timePeriod: {
-        startYear,
-        startCode,
-        endYear,
-        endCode,
-      },
-    };
-  };
-
   const handleFiltersFormSubmit: FilterFormSubmitHandler = async values => {
     const { startYear, startCode, endYear, endCode, subjectMeta } = state;
 
@@ -273,7 +278,7 @@ const TableTool = ({
       indicator => new Indicator(indicatorsByValue[indicator]),
     );
 
-    const query: TableDataQuery = createQuery(filters, indicators);
+    const query: TableDataQuery = createQuery(filters, indicators, state);
 
     const unmappedCreatedTable = await tableBuilderService.getTableData(query);
 
