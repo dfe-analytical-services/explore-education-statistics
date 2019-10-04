@@ -51,8 +51,8 @@ Validate Pupil absence data downloads are available
 Validate School applications data downloads are available
     [Tags]  HappyPath   NotAgainstLocal
     user opens details dropdown   School applications
-    user checks details dropdown contains download link  School applications   School applications and offers, 2018
-    user checks page contains link with text and url  School applications and offers, 2018   %{DATA_API_URL}/download/secondary-and-primary-schools-applications-and-offers/2018/data/school_applications_and_offers.csv
+    user checks details dropdown contains download link  School applications   Applications and offers by school phase, 2018
+    user checks page contains link with text and url  Applications and offers by school phase, 2018   %{DATA_API_URL}/download/secondary-and-primary-schools-applications-and-offers/2018/data/school_applications_and_offers.csv
     user closes details dropdown  School applications
 
 Validate Exclusions data downloads are available
@@ -62,8 +62,8 @@ Validate Exclusions data downloads are available
     user checks page contains link with text and url  Duration of fixed exclusions, 2016/17   %{DATA_API_URL}/download/permanent-and-fixed-period-exclusions-in-england/2016-17/data/exclusions_duration_of_fixed_exclusions.csv
     user checks details dropdown contains download link  Exclusions  Exclusion metadata, 2016/17
     user checks page contains link with text and url  Exclusion metadata, 2016/17   %{DATA_API_URL}/download/permanent-and-fixed-period-exclusions-in-england/2016-17/data/exclusion_metadata.docx
-    user checks details dropdown contains download link  Exclusions  Exclusion by characteristic, 2016/17
-    user checks page contains link with text and url  Exclusion by characteristic, 2016/17   %{DATA_API_URL}/download/permanent-and-fixed-period-exclusions-in-england/2016-17/data/exclusions_by_characteristic.csv
+    user checks details dropdown contains download link  Exclusions  Exclusions by characteristic, 2016/17
+    user checks page contains link with text and url  Exclusions by characteristic, 2016/17   %{DATA_API_URL}/download/permanent-and-fixed-period-exclusions-in-england/2016-17/data/exclusions_by_characteristic.csv
     user checks details dropdown contains download link  Exclusions  Exclusion by geographic level, 2016/17
     user checks page contains link with text and url  Exclusion by geographic level, 2016/17   %{DATA_API_URL}/download/permanent-and-fixed-period-exclusions-in-england/2016-17/data/exclusions_by_geographic_level.csv
     user checks details dropdown contains download link  Exclusions  Exclusion by reason, 2016/17
