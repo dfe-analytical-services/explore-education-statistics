@@ -1,4 +1,4 @@
-import {ConfirmContextProvider} from '@common/context/ConfirmContext';
+import { ConfirmContextProvider } from '@common/context/ConfirmContext';
 import mapValuesWithKeys from '@common/lib/utils/mapValuesWithKeys';
 import tableBuilderService, {
   FilterOption,
@@ -8,22 +8,38 @@ import tableBuilderService, {
   TableDataQuery,
   ThemeMeta,
 } from '@common/modules/full-table/services/tableBuilderService';
-import {Dictionary} from '@common/types/util';
+import { Dictionary } from '@common/types/util';
 import PreviousStepModalConfirm from '@common/modules/table-tool/components/PreviousStepModalConfirm';
-import {CategoryFilter, Indicator, LocationFilter,} from '@common/modules/full-table/types/filters';
+import {
+  CategoryFilter,
+  Indicator,
+  LocationFilter,
+} from '@common/modules/full-table/types/filters';
 import parseYearCodeTuple from '@common/modules/full-table/utils/TimePeriod';
 import mapValues from 'lodash/mapValues';
-import React, {createRef, ReactNode} from 'react';
+import React, { createRef, ReactNode } from 'react';
 import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
-import {FullTable} from '@common/modules/full-table/types/fullTable';
-import {mapFullTable} from '@common/modules/full-table/utils/mapPermalinks';
-import FiltersForm, {FilterFormSubmitHandler,} from '@common/modules/table-tool/components/FiltersForm';
-import LocationFiltersForm, {LocationFiltersFormSubmitHandler,} from '@common/modules/table-tool/components/LocationFiltersForm';
-import PublicationForm, {PublicationFormSubmitHandler,} from '@common/modules/table-tool/components/PublicationForm';
-import PublicationSubjectForm, {PublicationSubjectFormSubmitHandler,} from '@common/modules/table-tool/components/PublicationSubjectForm';
-import TableHeadersForm, {TableHeadersFormValues,} from '@common/modules/table-tool/components/TableHeadersForm';
+import { FullTable } from '@common/modules/full-table/types/fullTable';
+import { mapFullTable } from '@common/modules/full-table/utils/mapPermalinks';
+import FiltersForm, {
+  FilterFormSubmitHandler,
+} from '@common/modules/table-tool/components/FiltersForm';
+import LocationFiltersForm, {
+  LocationFiltersFormSubmitHandler,
+} from '@common/modules/table-tool/components/LocationFiltersForm';
+import PublicationForm, {
+  PublicationFormSubmitHandler,
+} from '@common/modules/table-tool/components/PublicationForm';
+import PublicationSubjectForm, {
+  PublicationSubjectFormSubmitHandler,
+} from '@common/modules/table-tool/components/PublicationSubjectForm';
+import TableHeadersForm, {
+  TableHeadersFormValues,
+} from '@common/modules/table-tool/components/TableHeadersForm';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
-import TimePeriodForm, {TimePeriodFormSubmitHandler,} from '@common/modules/table-tool/components/TimePeriodForm';
+import TimePeriodForm, {
+  TimePeriodFormSubmitHandler,
+} from '@common/modules/table-tool/components/TimePeriodForm';
 import mapOptionValues from '@common/modules/table-tool/components/utils/mapOptionValues';
 import Wizard from '@common/modules/table-tool/components/Wizard';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
@@ -117,8 +133,6 @@ const TableTool = ({
       subjects,
     });
   };
-
-
 
   const handlePublicationSubjectFormSubmit: PublicationSubjectFormSubmitHandler = async ({
     subjectId,
