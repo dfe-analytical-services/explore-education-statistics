@@ -22,10 +22,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         }
 
         [HttpPost]
-        public ActionResult<ResultWithMetaViewModel> Query([FromUri, Required] ReleaseId release,
+        public ActionResult<ResultWithMetaViewModel> Query([FromUri] ReleaseId releaseId,
             [FromBody] ObservationQueryContext query)
         {
-            return _dataService.Query(query, release);
+            return _dataService.Query(query, releaseId);
         }
     }
 }
