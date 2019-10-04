@@ -64,10 +64,10 @@ Validate Exclusions data downloads are available
     user checks page contains link with text and url  Exclusion metadata, 2016/17   %{DATA_API_URL}/download/permanent-and-fixed-period-exclusions-in-england/2016-17/data/exclusion_metadata.docx
     user checks details dropdown contains download link  Exclusions  Exclusions by characteristic, 2016/17
     user checks page contains link with text and url  Exclusions by characteristic, 2016/17   %{DATA_API_URL}/download/permanent-and-fixed-period-exclusions-in-england/2016-17/data/exclusions_by_characteristic.csv
-    user checks details dropdown contains download link  Exclusions  Exclusion by geographic level, 2016/17
-    user checks page contains link with text and url  Exclusion by geographic level, 2016/17   %{DATA_API_URL}/download/permanent-and-fixed-period-exclusions-in-england/2016-17/data/exclusions_by_geographic_level.csv
-    user checks details dropdown contains download link  Exclusions  Exclusion by reason, 2016/17
-    user checks page contains link with text and url  Exclusion by reason, 2016/17    %{DATA_API_URL}/download/permanent-and-fixed-period-exclusions-in-england/2016-17/data/exclusions_by_reason.csv
+    user checks details dropdown contains download link  Exclusions  Exclusions by geographic level, 2016/17
+    user checks page contains link with text and url  Exclusions by geographic level, 2016/17   %{DATA_API_URL}/download/permanent-and-fixed-period-exclusions-in-england/2016-17/data/exclusions_by_geographic_level.csv
+    user checks details dropdown contains download link  Exclusions  Exclusions by reason, 2016/17
+    user checks page contains link with text and url  Exclusions by reason, 2016/17    %{DATA_API_URL}/download/permanent-and-fixed-period-exclusions-in-england/2016-17/data/exclusions_by_reason.csv
     user checks details dropdown contains download link  Exclusions  Number of fixed exclusions, 2016/17
     user checks page contains link with text and url  Number of fixed exclusions, 2016/17    %{DATA_API_URL}/download/permanent-and-fixed-period-exclusions-in-england/2016-17/data/exclusions_number_of_fixed_exclusions.csv
     user checks details dropdown contains download link  Exclusions  Total days missed due to fixed period exclusions, 2016/17
