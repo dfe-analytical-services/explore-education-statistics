@@ -46,6 +46,7 @@ const CreateDataBlocks = ({
       {themeMeta && publicationId !== undefined && (
         <TableTool
           publicationId={publicationId}
+          fixedPublicationId
           themeMeta={themeMeta}
           finalStepHeading="Configure data block"
           finalStepExtra={({ query, tableHeaders }) => (
