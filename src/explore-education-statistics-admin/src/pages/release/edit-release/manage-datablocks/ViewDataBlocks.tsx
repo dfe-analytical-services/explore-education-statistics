@@ -1,9 +1,4 @@
-import ChartBuilder from '@admin/modules/chart-builder/ChartBuilder';
-import ManageReleaseContext, {
-  ManageRelease,
-} from '@admin/pages/release/ManageReleaseContext';
 import { DataBlock } from '@admin/services/release/edit-release/datablocks/types';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import { ChartRendererProps } from '@common/modules/find-statistics/components/ChartRenderer';
@@ -22,7 +17,7 @@ import DataBlockService, {
   DataBlockResponse,
 } from '@common/services/dataBlockService';
 import { Chart } from '@common/services/publicationService';
-import React, { useContext } from 'react';
+import React from 'react';
 
 const mapFullTable = (unmappedFullTable: DataBlockResponse): FullTable => {
   const subjectMeta = unmappedFullTable.metaData || {
@@ -66,6 +61,8 @@ const ViewDataBlocks = ({
   const [chartBuilderData, setChartBuilderData] = React.useState<
     DataBlockResponse
   >(dataBlockResponse);
+  
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [initialConfiguration, setInitialConfiguration] = React.useState<
     Chart | undefined
   >();
@@ -107,6 +104,7 @@ const ViewDataBlocks = ({
     // console.log('Saved ', props);
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const reRequestdata = (reRequest: DataBlockRerequest) => {
     const newRequest = {
       ...dataBlockRequest,
