@@ -140,15 +140,25 @@ class ImporterStatus extends Component<Props> {
 
     return (
       <SummaryListItem term="Status">
-        <strong
-          className={classNames(
-            'govuk-tag',
-            currentStatus && this.getImportStatusClass(currentStatus.status),
+        <div className={styles.currentStatusContainer}>
+          <strong
+            className={classNames(
+              'govuk-!-margin-right-1',
+              'govuk-tag',
+              currentStatus && this.getImportStatusClass(currentStatus.status),
+            )}
+          >
+            {currentStatus && getImportStatusLabel(currentStatus.status)}
+          </strong>
+          {running && (
+            <>
+              <LoadingSpinner inline size={22} />{' '}
+              <span className="govuk-visually-hidden">
+                Currently processing data
+              </span>
+            </>
           )}
-        >
-          {currentStatus && getImportStatusLabel(currentStatus.status)}
-        </strong>
-        {running && <LoadingSpinner inline size={22} />}
+        </div>
       </SummaryListItem>
     );
   }
