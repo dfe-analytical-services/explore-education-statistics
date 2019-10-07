@@ -4,7 +4,7 @@ import Client from './Client';
 
 export const baseUrl = {
   content: process.env.CONTENT_API_BASE_URL,
-  data: process.env.DATA_API_BASE_URL || '/api/Data',
+  data: process.env.DATA_API_BASE_URL || '/api/data',
   function: process.env.FUNCTION_API_BASE_URL,
 };
 

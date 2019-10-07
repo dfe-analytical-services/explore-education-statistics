@@ -50,6 +50,11 @@ export interface PublicationMeta {
   subjects: PublicationSubject[];
 }
 
+export interface ReleaseMeta {
+  releaseId: string;
+  subjects: PublicationSubject[];
+}
+
 export interface PublicationSubjectMeta {
   filters: Dictionary<{
     legend: string;
@@ -111,6 +116,9 @@ export default {
   getPublicationMeta(publicationUuid: string): Promise<PublicationMeta> {
     return dataApi.get(`/meta/publication/${publicationUuid}`);
   },
+  getReleaseMeta(releaseUuid: string): Promise<ReleaseMeta> {
+    return dataApi.get(`/meta/release/${releaseUuid}`);
+  },
   getPublicationSubjectMeta(
     subjectId: string,
   ): Promise<PublicationSubjectMeta> {
@@ -127,5 +135,11 @@ export default {
   },
   getTableData(query: TableDataQuery): Promise<FullTable> {
     return dataApi.post('/tablebuilder', query);
+  },
+  getTableDataForRelease(
+    query: TableDataQuery,
+    releaseId: string,
+  ): Promise<FullTable> {
+    return dataApi.post(`/tablebuilder?releaseId=${releaseId}`, query);
   },
 };

@@ -8,7 +8,7 @@ using Microsoft.Azure.Storage;
 using Moq;
 using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controller
+namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 {
     public class FastTrackControllerTests
     {

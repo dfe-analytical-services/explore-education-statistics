@@ -60,204 +60,210 @@ interface FinalStepProps {
 
 interface Props {
   themeMeta: ThemeMeta[];
-  publicationId: string;
-  fixedPublicationId?: boolean;
+  publicationId?: string;
+  releaseId?: string;
 
   finalStepExtra?: (props: FinalStepProps) => ReactNode;
   finalStepHeading?: string;
 }
 
-interface State {
-  createdTable?: FullTable;
+interface DateRangeState {
   startYear?: number;
   startCode?: string;
   endYear?: number;
   endCode?: string;
-  locations: Dictionary<LocationFilter[]>;
-  publication?: Publication;
-  subjects: PublicationSubject[];
-  subjectId: string;
-  subjectMeta: PublicationSubjectMeta;
-  tableHeaders: TableHeadersFormValues;
-  query?: TableDataQuery;
 }
+
+const createQuery = (
+  filters: Dictionary<CategoryFilter[]>,
+  indicators: Indicator[],
+  {
+    subjectId,
+    startYear,
+    startCode,
+    endYear,
+    endCode,
+    locations,
+  }: {
+    subjectId: string;
+    locations: Dictionary<LocationFilter[]>;
+  } & DateRangeState,
+): TableDataQuery => {
+  if (!startYear || !startCode || !endYear || !endCode) {
+    throw new Error('Missing required timePeriod parameters');
+  }
+
+  return {
+    ...mapValues(locations, locationLevel =>
+      locationLevel.map(location => location.value),
+    ),
+    subjectId,
+    indicators: indicators.map(indicator => indicator.value),
+    filters: Object.values(filters).flatMap(categoryFilters =>
+      categoryFilters.flatMap(filter => filter.value),
+    ),
+    timePeriod: {
+      startYear,
+      startCode,
+      endYear,
+      endCode,
+    },
+  };
+};
 
 const TableTool = ({
   themeMeta,
   publicationId,
-  fixedPublicationId = false,
+  releaseId,
   finalStepExtra,
   finalStepHeading,
 }: Props) => {
   const dataTableRef = createRef<HTMLTableElement>();
 
-  const [state, setState] = React.useState<State>({
+  const [subjects, setSubjects] = React.useState<PublicationSubject[]>([]);
+
+  const [publication, setPublication] = React.useState<Publication>();
+
+  const [subjectId, setSubjectId] = React.useState<string>('');
+
+  const [subjectMeta, setSubjectMeta] = React.useState<PublicationSubjectMeta>({
+    timePeriod: {
+      hint: '',
+      legend: '',
+      options: [],
+    },
     locations: {},
-    subjectId: '',
-    subjectMeta: {
-      timePeriod: {
-        hint: '',
-        legend: '',
-        options: [],
-      },
-      locations: {},
-      indicators: {},
-      filters: {},
-    },
-    subjects: [],
-    tableHeaders: {
-      columnGroups: [],
-      columns: [],
-      rowGroups: [],
-      rows: [],
-    },
+    indicators: {},
+    filters: {},
   });
 
+  const [locations, setLocations] = React.useState<
+    Dictionary<LocationFilter[]>
+  >({});
+
+  const [dateRange, setDateRange] = React.useState<DateRangeState>({});
+
+  const [tableHeaders, setTableHeaders] = React.useState<
+    TableHeadersFormValues
+  >({
+    columnGroups: [],
+    columns: [],
+    rowGroups: [],
+    rows: [],
+  });
+
+  const [createdTable, setCreatedTable] = React.useState<FullTable>();
+
+  const [query, setQuery] = React.useState<TableDataQuery>();
+
   const handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
-    publicationId: pid,
+    publicationId: selectedPublicationId,
   }) => {
-    const publication = themeMeta
+    const selectedPublication = themeMeta
       .flatMap(option => option.topics)
       .flatMap(option => option.publications)
-      .find(option => option.id === pid);
+      .find(option => option.id === selectedPublicationId);
 
-    if (!publication) {
+    if (!selectedPublication) {
       return;
     }
 
-    const { subjects } = await tableBuilderService.getPublicationMeta(pid);
+    const {
+      subjects: publicationSubjects,
+    } = await tableBuilderService.getPublicationMeta(selectedPublicationId);
 
-    setState({
-      ...state,
-      publication,
-      subjects,
-    });
+    setSubjects(publicationSubjects);
+
+    setPublication(selectedPublication);
   };
 
   const handlePublicationSubjectFormSubmit: PublicationSubjectFormSubmitHandler = async ({
-    subjectId,
+    subjectId: selectedSubjectId,
   }) => {
-    const subjectMeta = await tableBuilderService.getPublicationSubjectMeta(
-      subjectId,
+    const selectedSubjectMeta = await tableBuilderService.getPublicationSubjectMeta(
+      selectedSubjectId,
     );
 
-    setState({
-      ...state,
-      subjectMeta,
-      subjectId,
-    });
+    setSubjectId(selectedSubjectId);
+    setSubjectMeta(selectedSubjectMeta);
   };
 
   React.useEffect(() => {
-    if (fixedPublicationId === true) {
-      handlePublicationFormSubmit({ publicationId });
+    if (releaseId) {
+      tableBuilderService
+        .getReleaseMeta(releaseId)
+        .then(({ subjects: releaseSubjects }) => {
+          setSubjects(releaseSubjects);
+        });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [publicationId, fixedPublicationId]);
+  }, [releaseId]);
 
   const handleLocationFiltersFormSubmit: LocationFiltersFormSubmitHandler = async ({
-    locations,
+    locations: selectedLocations,
   }) => {
-    const { subjectId } = state;
-
-    const subjectMeta = await tableBuilderService.filterPublicationSubjectMeta({
-      ...locations,
-      subjectId,
-    });
-
-    setState({
-      ...state,
-      subjectMeta: {
-        ...state.subjectMeta,
-        timePeriod: subjectMeta.timePeriod,
+    const selectedSubjectMeta = await tableBuilderService.filterPublicationSubjectMeta(
+      {
+        ...selectedLocations,
+        subjectId,
       },
-      locations: mapValuesWithKeys(
-        locations,
-        (locationLevel, locationOptions) =>
-          locationOptions
-            .map(location =>
-              state.subjectMeta.locations[locationLevel].options.find(
-                option => option.value === location,
-              ),
-            )
-            .filter(option => typeof option !== 'undefined')
-            .map(
-              option =>
-                new LocationFilter(option as FilterOption, locationLevel),
-            ),
-      ),
+    );
+
+    setSubjectMeta({
+      ...subjectMeta,
+      timePeriod: selectedSubjectMeta.timePeriod,
     });
+
+    setLocations(
+      mapValuesWithKeys(selectedLocations, (locationLevel, locationOptions) =>
+        locationOptions
+          .map(location =>
+            subjectMeta.locations[locationLevel].options.find(
+              option => option.value === location,
+            ),
+          )
+          .filter(option => typeof option !== 'undefined')
+          .map(
+            option => new LocationFilter(option as FilterOption, locationLevel),
+          ),
+      ),
+    );
   };
 
   const handleTimePeriodFormSubmit: TimePeriodFormSubmitHandler = async values => {
-    const { subjectId, locations } = state;
-
     const [startYear, startCode] = parseYearCodeTuple(values.start);
     const [endYear, endCode] = parseYearCodeTuple(values.end);
 
-    const subjectMeta = await tableBuilderService.filterPublicationSubjectMeta({
-      ...mapValues(locations, locationLevel =>
-        locationLevel.map(location => location.value),
-      ),
-      subjectId,
-      timePeriod: {
-        startYear,
-        startCode,
-        endYear,
-        endCode,
+    const selectedSubjectMeta = await tableBuilderService.filterPublicationSubjectMeta(
+      {
+        ...mapValues(locations, locationLevel =>
+          locationLevel.map(location => location.value),
+        ),
+        subjectId,
+        timePeriod: {
+          startYear,
+          startCode,
+          endYear,
+          endCode,
+        },
       },
+    );
+
+    setSubjectMeta({
+      ...subjectMeta,
+      filters: selectedSubjectMeta.filters,
     });
 
-    setState({
-      ...state,
+    setDateRange({
       startYear,
       startCode,
       endYear,
       endCode,
-      subjectMeta: {
-        ...state.subjectMeta,
-        filters: subjectMeta.filters,
-      },
     });
-  };
-
-  const createQuery = (
-    filters: Dictionary<CategoryFilter[]>,
-    indicators: Indicator[],
-  ): TableDataQuery => {
-    const {
-      subjectId,
-      startYear,
-      startCode,
-      endYear,
-      endCode,
-      locations,
-    } = state;
-
-    if (!startYear || !startCode || !endYear || !endCode) {
-      throw new Error('Missing required timePeriod parameters');
-    }
-
-    return {
-      ...mapValues(locations, locationLevel =>
-        locationLevel.map(location => location.value),
-      ),
-      subjectId,
-      indicators: indicators.map(indicator => indicator.value),
-      filters: Object.values(filters).flatMap(categoryFilters =>
-        categoryFilters.flatMap(filter => filter.value),
-      ),
-      timePeriod: {
-        startYear,
-        startCode,
-        endYear,
-        endCode,
-      },
-    };
   };
 
   const handleFiltersFormSubmit: FilterFormSubmitHandler = async values => {
-    const { startYear, startCode, endYear, endCode, subjectMeta } = state;
+    const { startYear, startCode, endYear, endCode } = dateRange;
 
     if (!startYear || !startCode || !endYear || !endCode) {
       return;
@@ -287,18 +293,32 @@ const TableTool = ({
       indicator => new Indicator(indicatorsByValue[indicator]),
     );
 
-    const query: TableDataQuery = createQuery(filters, indicators);
-
-    const unmappedCreatedTable = await tableBuilderService.getTableData(query);
-
-    const createdTable = mapFullTable(unmappedCreatedTable);
-
-    setState({
-      ...state,
-      createdTable,
-      tableHeaders: getDefaultTableHeaderConfig(createdTable.subjectMeta),
-      query,
+    const createdQuery: TableDataQuery = createQuery(filters, indicators, {
+      subjectId,
+      locations,
+      ...dateRange,
     });
+
+    let unmappedCreatedTable;
+
+    if (releaseId) {
+      unmappedCreatedTable = await tableBuilderService.getTableDataForRelease(
+        createdQuery,
+        releaseId,
+      );
+    } else {
+      unmappedCreatedTable = await tableBuilderService.getTableData(
+        createdQuery,
+      );
+    }
+
+    const table = mapFullTable(unmappedCreatedTable);
+
+    setCreatedTable(table);
+
+    setTableHeaders(getDefaultTableHeaderConfig(table.subjectMeta));
+
+    setQuery(createdQuery);
   };
 
   return (
@@ -316,15 +336,13 @@ const TableTool = ({
               return nextStep;
             }}
           >
-            {fixedPublicationId !== true && (
+            {releaseId === undefined && (
               <WizardStep>
                 {stepProps => (
                   <PublicationForm
                     {...stepProps}
                     publicationId={publicationId}
-                    publicationTitle={
-                      state.publication ? state.publication.title : ''
-                    }
+                    publicationTitle={publication ? publication.title : ''}
                     options={themeMeta}
                     onSubmit={handlePublicationFormSubmit}
                   />
@@ -335,7 +353,7 @@ const TableTool = ({
               {stepProps => (
                 <PublicationSubjectForm
                   {...stepProps}
-                  options={state.subjects}
+                  options={subjects}
                   onSubmit={handlePublicationSubjectFormSubmit}
                 />
               )}
@@ -344,7 +362,7 @@ const TableTool = ({
               {stepProps => (
                 <LocationFiltersForm
                   {...stepProps}
-                  options={state.subjectMeta.locations}
+                  options={subjectMeta.locations}
                   onSubmit={handleLocationFiltersFormSubmit}
                 />
               )}
@@ -353,7 +371,7 @@ const TableTool = ({
               {stepProps => (
                 <TimePeriodForm
                   {...stepProps}
-                  options={state.subjectMeta.timePeriod.options}
+                  options={subjectMeta.timePeriod.options}
                   onSubmit={handleTimePeriodFormSubmit}
                 />
               )}
@@ -363,7 +381,7 @@ const TableTool = ({
                 <FiltersForm
                   {...stepProps}
                   onSubmit={handleFiltersFormSubmit}
-                  subjectMeta={state.subjectMeta}
+                  subjectMeta={subjectMeta}
                 />
               )}
             </WizardStep>
@@ -376,12 +394,9 @@ const TableTool = ({
 
                   <div className="govuk-!-margin-bottom-4">
                     <TableHeadersForm
-                      initialValues={state.tableHeaders}
+                      initialValues={tableHeaders}
                       onSubmit={tableHeaderConfig => {
-                        setState({
-                          ...state,
-                          tableHeaders: tableHeaderConfig,
-                        });
+                        setTableHeaders(tableHeaderConfig);
 
                         if (dataTableRef.current) {
                           dataTableRef.current.scrollIntoView({
@@ -391,24 +406,24 @@ const TableTool = ({
                         }
                       }}
                     />
-                    {state.createdTable ? (
+                    {createdTable ? (
                       <TimePeriodDataTable
                         ref={dataTableRef}
-                        fullTable={state.createdTable}
-                        tableHeadersConfig={state.tableHeaders}
+                        fullTable={createdTable}
+                        tableHeadersConfig={tableHeaders}
                       />
                     ) : null}
                   </div>
 
-                  {state.publication &&
-                    state.createdTable &&
+                  {publication &&
+                    createdTable &&
                     finalStepExtra &&
-                    state.query &&
+                    query &&
                     finalStepExtra({
-                      createdTable: state.createdTable,
-                      publication: state.publication,
-                      tableHeaders: state.tableHeaders,
-                      query: state.query,
+                      createdTable,
+                      publication,
+                      tableHeaders,
+                      query,
                     })}
                 </>
               )}
