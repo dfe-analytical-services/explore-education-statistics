@@ -299,9 +299,18 @@ const TableTool = ({
       ...dateRange,
     });
 
-    const unmappedCreatedTable = await tableBuilderService.getTableData(
-      createdQuery,
-    );
+    let unmappedCreatedTable;
+
+    if (releaseId) {
+      unmappedCreatedTable = await tableBuilderService.getTableDataForRelease(
+        createdQuery,
+        releaseId,
+      );
+    } else {
+      unmappedCreatedTable = await tableBuilderService.getTableData(
+        createdQuery,
+      );
+    }
 
     const table = mapFullTable(unmappedCreatedTable);
 
