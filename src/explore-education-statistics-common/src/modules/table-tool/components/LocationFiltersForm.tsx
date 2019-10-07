@@ -14,10 +14,10 @@ import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
 
+export type LocationsFormValues = Dictionary<string[]>;
+
 interface FormValues {
-  locations: {
-    [level: string]: string[];
-  };
+  locations: LocationsFormValues;
 }
 
 export type LocationFiltersFormSubmitHandler = (values: FormValues) => void;

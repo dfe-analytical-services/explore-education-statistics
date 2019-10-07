@@ -1,4 +1,4 @@
-import { ConfirmContextProvider } from '@common/context/ConfirmContext';
+import {ConfirmContextProvider} from '@common/context/ConfirmContext';
 import mapValuesWithKeys from '@common/lib/utils/mapValuesWithKeys';
 import tableBuilderService, {
   FilterOption,
@@ -8,7 +8,7 @@ import tableBuilderService, {
   TableDataQuery,
   ThemeMeta,
 } from '@common/modules/full-table/services/tableBuilderService';
-import { Dictionary } from '@common/types/util';
+import {Dictionary} from '@common/types/util';
 import PreviousStepModalConfirm from '@common/modules/table-tool/components/PreviousStepModalConfirm';
 import {
   CategoryFilter,
@@ -17,15 +17,15 @@ import {
 } from '@common/modules/full-table/types/filters';
 import parseYearCodeTuple from '@common/modules/full-table/utils/TimePeriod';
 import mapValues from 'lodash/mapValues';
-import React, { createRef, ReactNode } from 'react';
+import React, {createRef, ReactNode} from 'react';
 import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
-import { FullTable } from '@common/modules/full-table/types/fullTable';
-import { mapFullTable } from '@common/modules/full-table/utils/mapPermalinks';
+import {FullTable} from '@common/modules/full-table/types/fullTable';
+import {mapFullTable} from '@common/modules/full-table/utils/mapPermalinks';
 import FiltersForm, {
   FilterFormSubmitHandler,
 } from '@common/modules/table-tool/components/FiltersForm';
 import LocationFiltersForm, {
-  LocationFiltersFormSubmitHandler,
+  LocationFiltersFormSubmitHandler, LocationsFormValues,
 } from '@common/modules/table-tool/components/LocationFiltersForm';
 import PublicationForm, {
   PublicationFormSubmitHandler,
@@ -65,6 +65,8 @@ interface Props {
 
   finalStepExtra?: (props: FinalStepProps) => ReactNode;
   finalStepHeading?: string;
+
+  initialQuery?: TableDataQuery;
 }
 
 interface DateRangeState {
@@ -117,6 +119,7 @@ const TableTool = ({
   releaseId,
   finalStepExtra,
   finalStepHeading,
+  initialQuery,
 }: Props) => {
   const dataTableRef = createRef<HTMLTableElement>();
 
@@ -137,15 +140,11 @@ const TableTool = ({
     filters: {},
   });
 
-  const [locations, setLocations] = React.useState<
-    Dictionary<LocationFilter[]>
-  >({});
+  const [locations, setLocations] = React.useState<Dictionary<LocationFilter[]>>({});
 
   const [dateRange, setDateRange] = React.useState<DateRangeState>({});
 
-  const [tableHeaders, setTableHeaders] = React.useState<
-    TableHeadersFormValues
-  >({
+  const [tableHeaders, setTableHeaders] = React.useState<TableHeadersFormValues>({
     columnGroups: [],
     columns: [],
     rowGroups: [],
@@ -155,6 +154,36 @@ const TableTool = ({
   const [createdTable, setCreatedTable] = React.useState<FullTable>();
 
   const [query, setQuery] = React.useState<TableDataQuery>();
+
+  const [initialStep, setInitialStep] = React.useState(1);
+
+  const mapLocations = (selectedLocations : LocationsFormValues) =>  mapValuesWithKeys(selectedLocations, (locationLevel, locationOptions) =>
+      locationOptions
+        .map(location =>
+          subjectMeta.locations[locationLevel].options.find(
+            option => option.value === location,
+          ),
+        )
+        .filter(option => typeof option !== 'undefined')
+        .map(
+          option => new LocationFilter(option as FilterOption, locationLevel),
+        ),
+    );
+
+  React.useEffect(() => {
+
+    console.log(initialQuery);
+
+    if (initialQuery) {
+
+      const mappedLocations = mapLocations();
+
+      setSubjectId(initialQuery.subjectId);
+      setLocations(initialQuery.)
+      setInitialStep(2);
+    }
+
+  }, [initialQuery]);
 
   const handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
     publicationId: selectedPublicationId,
@@ -192,7 +221,7 @@ const TableTool = ({
     if (releaseId) {
       tableBuilderService
         .getReleaseMeta(releaseId)
-        .then(({ subjects: releaseSubjects }) => {
+        .then(({subjects: releaseSubjects}) => {
           setSubjects(releaseSubjects);
         });
     }
@@ -214,20 +243,7 @@ const TableTool = ({
       timePeriod: selectedSubjectMeta.timePeriod,
     });
 
-    setLocations(
-      mapValuesWithKeys(selectedLocations, (locationLevel, locationOptions) =>
-        locationOptions
-          .map(location =>
-            subjectMeta.locations[locationLevel].options.find(
-              option => option.value === location,
-            ),
-          )
-          .filter(option => typeof option !== 'undefined')
-          .map(
-            option => new LocationFilter(option as FilterOption, locationLevel),
-          ),
-      ),
-    );
+    setLocations(mapLocations(selectedLocations));
   };
 
   const handleTimePeriodFormSubmit: TimePeriodFormSubmitHandler = async values => {
@@ -263,7 +279,7 @@ const TableTool = ({
   };
 
   const handleFiltersFormSubmit: FilterFormSubmitHandler = async values => {
-    const { startYear, startCode, endYear, endCode } = dateRange;
+    const {startYear, startCode, endYear, endCode} = dateRange;
 
     if (!startYear || !startCode || !endYear || !endCode) {
       return;
@@ -323,9 +339,10 @@ const TableTool = ({
 
   return (
     <ConfirmContextProvider>
-      {({ askConfirm }) => (
+      {({askConfirm}) => (
         <>
           <Wizard
+            initialStep={initialStep}
             id="tableTool-steps"
             onStepChange={async (nextStep, previousStep) => {
               if (nextStep < previousStep) {
@@ -354,6 +371,7 @@ const TableTool = ({
                 <PublicationSubjectForm
                   {...stepProps}
                   options={subjects}
+                  initialSubjectId={initialQuery && initialQuery.subjectId}
                   onSubmit={handlePublicationSubjectFormSubmit}
                 />
               )}
@@ -416,14 +434,14 @@ const TableTool = ({
                   </div>
 
                   {createdTable &&
-                    finalStepExtra &&
-                    query &&
-                    finalStepExtra({
-                      createdTable,
-                      publication,
-                      tableHeaders,
-                      query,
-                    })}
+                  finalStepExtra &&
+                  query &&
+                  finalStepExtra({
+                    createdTable,
+                    publication,
+                    tableHeaders,
+                    query,
+                  })}
                 </>
               )}
             </WizardStep>

@@ -1,21 +1,21 @@
-import { DataBlock } from '@admin/services/release/edit-release/datablocks/types';
+import {DataBlock} from '@admin/services/release/edit-release/datablocks/types';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import { ChartRendererProps } from '@common/modules/find-statistics/components/ChartRenderer';
-import { FullTable } from '@common/modules/full-table/types/fullTable';
+import {ChartRendererProps} from '@common/modules/find-statistics/components/ChartRenderer';
+import {FullTable} from '@common/modules/full-table/types/fullTable';
 import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
-import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
+import {TableHeadersFormValues} from '@common/modules/table-tool/components/TableHeadersForm';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import DataBlockService, {
   DataBlockRequest,
   DataBlockRerequest,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
-import { Chart } from '@common/services/publicationService';
+import {Chart} from '@common/services/publicationService';
 import React from 'react';
 import {
   mapFullTable,
-  reverseMapTableHeadersConfigForDataBlock,
+  reverseMapTableHeadersConfig,
 } from '@admin/pages/release/edit-release/manage-datablocks/tableUtil';
 
 interface Props {
@@ -29,14 +29,10 @@ const ViewDataBlocks = ({
   dataBlockResponse,
   dataBlockRequest,
 }: Props) => {
-  const [chartBuilderData, setChartBuilderData] = React.useState<
-    DataBlockResponse
-  >(dataBlockResponse);
+  const [chartBuilderData, setChartBuilderData] = React.useState<DataBlockResponse>(dataBlockResponse);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [initialConfiguration, setInitialConfiguration] = React.useState<
-    Chart | undefined
-  >();
+  const [initialConfiguration, setInitialConfiguration] = React.useState<Chart | undefined>();
 
   React.useEffect(() => {
     setChartBuilderData(dataBlockResponse);
@@ -66,9 +62,9 @@ const ViewDataBlocks = ({
 
     setTableData({
       fullTable,
-      tableHeadersConfig: reverseMapTableHeadersConfigForDataBlock(
+      tableHeadersConfig: reverseMapTableHeadersConfig(
         tableHeadersConfig,
-        dataBlockResponse.metaData,
+        fullTable.subjectMeta,
       ),
     });
   }, [dataBlock.tables, chartBuilderData, dataBlockResponse]);

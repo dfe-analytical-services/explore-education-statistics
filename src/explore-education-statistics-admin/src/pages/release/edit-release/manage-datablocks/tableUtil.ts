@@ -14,6 +14,7 @@ import {
 import {
   DataBlockResponse,
   DataBlockMetadata,
+  LabelValueUnitMetadata,
 } from '@common/services/dataBlockService';
 import mapValuesWithKeys from '@common/lib/utils/mapValuesWithKeys';
 import { Dictionary } from '@common/types/util';
@@ -38,9 +39,9 @@ const transformTableMetaFiltersToCategoryFilters = (
   );
 };
 
-export const reverseMapTableHeadersConfigForDataBlock = (
+export const reverseMapTableHeadersConfig = (
   { columns, rows, columnGroups, rowGroups }: UnmappedTableHeadersConfig,
-  fullTableSubjectMeta: DataBlockMetadata,
+  fullTableSubjectMeta: FullTableMeta,
 ): TableHeadersConfig => {
   /**
    * config filters only contain `values`.
@@ -54,27 +55,34 @@ export const reverseMapTableHeadersConfigForDataBlock = (
   if (Number.isNaN(Number(initialValue))) {
     // if NaN then timePeriod
     mappedColumns = columns.map(({ value }) => {
-      return fullTableSubjectMeta.timePeriods[value] as TimePeriodFilter;
+      return fullTableSubjectMeta.timePeriodRange.find(
+        timePeriod => `${timePeriod.year}_${timePeriod.code}` === value,
+      ) as TimePeriodFilter;
     });
     mappedRows = rows.map(({ value }) => {
-      return fullTableSubjectMeta.indicators[value] as Indicator;
+      return fullTableSubjectMeta.indicators.find(
+        indicator => indicator.value === value,
+      ) as Indicator;
     });
   } else {
     mappedRows = rows.map(({ value }) => {
-      return fullTableSubjectMeta.timePeriods[value] as TimePeriodFilter;
+      return fullTableSubjectMeta.timePeriodRange.find(
+        timePeriod => `${timePeriod.year}_${timePeriod.code}` === value,
+      ) as TimePeriodFilter;
     });
     mappedColumns = columns.map(({ value }) => {
-      return fullTableSubjectMeta.indicators[value] as Indicator;
+      return fullTableSubjectMeta.indicators.find(
+        indicator => indicator.value === value,
+      ) as Indicator;
     });
   }
 
-  const categoryFilters: Dictionary<
-    CategoryFilter[]
-  > = transformTableMetaFiltersToCategoryFilters(fullTableSubjectMeta.filters);
   // rowGroups/columnGroups can only be filters and locations
   const locationAndFilterGroups: (LocationFilter | CategoryFilter)[][] = [
-    ...Object.values(categoryFilters),
-    Object.values(fullTableSubjectMeta.locations),
+    ...Object.values(
+      transformTableMetaFiltersToCategoryFilters(fullTableSubjectMeta.filters),
+    ),
+    fullTableSubjectMeta.locations,
   ];
 
   const mapOptionGroupsToFilterGroups = (

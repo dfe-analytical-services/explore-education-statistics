@@ -178,6 +178,7 @@ const ReleaseManageDataBlocksPage = () => {
             <CreateDataBlocks
               dataBlockRequest={dataBlockRequest}
               dataBlockResponse={dataBlockResponse}
+              dataBlock={dataBlock}
               onDataBlockSave={onDataBlockSave}
             />
           </div>
