@@ -34,47 +34,15 @@ const classMap: Dictionary<AllowedClasses> = {
   LocationFilter,
 };
 
-const transformResponse: AxiosTransformer[] = [
-  data => {
-    let parsed;
-    try {
-      parsed = JSON.parse(data, (key, value) => {
-        try {
-          const className: string = value['_class'];
-
-          if (className) {
-            const filterClass = classMap[className];
-            if (filterClass) {
-              // @ts-ignore
-              value = new filterClass(...JSON.parse(value['_construct']));
-            }
-          }
-        } catch (_) {
-          //
-        }
-
-        return value;
-      });
-    } catch (_) {
-      // nothing
-    }
-
-    return parsed;
-  },
-];
-
 const service: DataBlockService = {
   async getDataBlocks(releaseId: string) {
-    return client.get<DataBlock[]>(`/release/${releaseId}/datablocks`, {
-      transformResponse,
-    });
+    return client.get<DataBlock[]>(`/release/${releaseId}/datablocks`, {});
   },
 
   async postDataBlock(releaseId: string, dataBlock: DataBlock) {
     return client.post<DataBlock>(
       `/release/${releaseId}/datablocks`,
       dataBlock,
-      { transformResponse },
     );
   },
 
