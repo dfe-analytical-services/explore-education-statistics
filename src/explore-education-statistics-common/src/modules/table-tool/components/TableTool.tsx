@@ -52,7 +52,7 @@ interface Publication {
 }
 
 interface FinalStepProps {
-  publication: Publication;
+  publication?: Publication;
   createdTable: FullTable;
   query: TableDataQuery;
   tableHeaders: TableHeadersFormValues;
@@ -415,8 +415,7 @@ const TableTool = ({
                     ) : null}
                   </div>
 
-                  {publication &&
-                    createdTable &&
+                  {createdTable &&
                     finalStepExtra &&
                     query &&
                     finalStepExtra({

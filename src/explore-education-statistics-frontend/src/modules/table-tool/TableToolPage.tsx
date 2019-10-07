@@ -150,34 +150,36 @@ class TableToolPage extends Component<Props, State> {
 
               <h3>Additional options</h3>
 
-              <ul className="govuk-list">
-                <li>
-                  <Link
-                    as={`/find-statistics/${finalStepProps.publication.slug}`}
-                    to={`/find-statistics/publication?publication=${finalStepProps.publication.slug}`}
-                  >
-                    Go to publication
-                  </Link>
-                </li>
-                <li>
-                  <DownloadCsvButton
-                    publicationSlug={finalStepProps.publication.slug}
-                    fullTable={finalStepProps.createdTable}
-                  />
-                </li>
+              {finalStepProps.publication && (
+                <ul className="govuk-list">
+                  <li>
+                    <Link
+                      as={`/find-statistics/${finalStepProps.publication.slug}`}
+                      to={`/find-statistics/publication?publication=${finalStepProps.publication.slug}`}
+                    >
+                      Go to publication
+                    </Link>
+                  </li>
+                  <li>
+                    <DownloadCsvButton
+                      publicationSlug={finalStepProps.publication.slug}
+                      fullTable={finalStepProps.createdTable}
+                    />
+                  </li>
 
-                <li>
-                  <a href="#api">Access developer API</a>
-                </li>
-                <li>
-                  <Link
-                    as={`/methodology/${finalStepProps.publication.slug}`}
-                    to={`/methodology/methodology?methodology=${finalStepProps.publication.slug}`}
-                  >
-                    Go to methodology
-                  </Link>
-                </li>
-              </ul>
+                  <li>
+                    <a href="#api">Access developer API</a>
+                  </li>
+                  <li>
+                    <Link
+                      as={`/methodology/${finalStepProps.publication.slug}`}
+                      to={`/methodology/methodology?methodology=${finalStepProps.publication.slug}`}
+                    >
+                      Go to methodology
+                    </Link>
+                  </li>
+                </ul>
+              )}
               <p className="govuk-body">
                 If you have a question about the data or methods used to create
                 this table contact the named statistician via the relevant
