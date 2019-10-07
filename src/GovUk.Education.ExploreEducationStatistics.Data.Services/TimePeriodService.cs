@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
@@ -10,6 +11,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
     public class TimePeriodService : ITimePeriodService
     {
+        private readonly StatisticsDbContext _context;
+
+        public TimePeriodService(StatisticsDbContext context)
+        {
+            _context = context;
+        }
+        
+        public IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriods(long subjectId)
+        {
+            return _context.Observation
+                .Where(observation => observation.SubjectId == subjectId)
+                .Select(o => new {o.Year, o.TimeIdentifier})
+                .Distinct()
+                .OrderBy(tuple => tuple.Year)
+                .ThenBy(tuple => tuple.TimeIdentifier)
+                .ToList()
+                .Select(tuple => (tuple.Year, tuple.TimeIdentifier));
+        }
+        
         public IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriods(
             IQueryable<Observation> observations)
         {

@@ -10,18 +10,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
     public class LocationService : AbstractRepository<Location, long>, ILocationService
     {
+        private static readonly List<GeographicLevel> IgnoredLevels = new List<GeographicLevel>
+        {
+            GeographicLevel.School,
+            GeographicLevel.Provider
+        };
+
         public LocationService(StatisticsDbContext context, ILogger<LocationService> logger) : base(context, logger)
         {
+        }
+
+        public Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> GetObservationalUnits(long subjectId)
+        {
+            var locations = GetLocationsGroupedByGeographicLevel(subjectId);
+            return GetObservationalUnits(locations);
         }
 
         public Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> GetObservationalUnits(
             IQueryable<Observation> observations)
         {
-            var locations = GetLocations(observations);
+            var locations = GetLocationsGroupedByGeographicLevel(observations);
             return GetObservationalUnits(locations);
         }
 
-        private Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> GetObservationalUnits(
+        private static Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> GetObservationalUnits(
             Dictionary<GeographicLevel, IEnumerable<Location>> locations)
         {
             return locations.ToDictionary(
@@ -67,20 +79,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             }
         }
 
-        private Dictionary<GeographicLevel, IEnumerable<Location>> GetLocations(IQueryable<Observation> observations)
+        private Dictionary<GeographicLevel, IEnumerable<Location>> GetLocationsGroupedByGeographicLevel(long subjectId)
         {
-            var ignored = new List<GeographicLevel>
-            {
-                GeographicLevel.School,
-                GeographicLevel.Provider
-            };
-
-            var locationIdsWithGeographicLevel = observations
-                .Where(observation => !ignored.Contains(observation.GeographicLevel))
+            var locationIdsWithGeographicLevel = _context.Observation
+                .Where(observation =>
+                    !IgnoredLevels.Contains(observation.GeographicLevel) && observation.SubjectId == subjectId)
                 .Select(observation => new {observation.GeographicLevel, observation.LocationId})
                 .Distinct()
-                .ToList();
+                .ToList()
+                .Select(arg => (arg.GeographicLevel, arg.LocationId));
+            
+            return GetLocationsGroupedByGeographicLevel(locationIdsWithGeographicLevel);
+        }
 
+        private Dictionary<GeographicLevel, IEnumerable<Location>> GetLocationsGroupedByGeographicLevel(
+            IQueryable<Observation> observations)
+        {
+            var locationIdsWithGeographicLevel = observations
+                .Where(observation => !IgnoredLevels.Contains(observation.GeographicLevel))
+                .Select(observation => new {observation.GeographicLevel, observation.LocationId})
+                .Distinct()
+                .ToList()
+                .Select(arg => (arg.GeographicLevel, arg.LocationId));
+            
+            return GetLocationsGroupedByGeographicLevel(locationIdsWithGeographicLevel);
+        }
+
+        private Dictionary<GeographicLevel, IEnumerable<Location>> GetLocationsGroupedByGeographicLevel(
+            IEnumerable<(GeographicLevel GeographicLevel, long LocationId)> locationIdsWithGeographicLevel)
+        {
             var locationIdsGroupedByGeographicLevel = locationIdsWithGeographicLevel.GroupBy(
                 tuple => tuple.GeographicLevel,
                 tuple => tuple.LocationId);

@@ -7,9 +7,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces
 {
     public interface ITimePeriodService
     {
+        IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriods(long subjectId);
+
         IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriods(IQueryable<Observation> observations);
 
-        IEnumerable<(int Year, TimeIdentifier TimeIdentifier)>
-            GetTimePeriodRange(IQueryable<Observation> observations);
+        IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriodRange(IQueryable<Observation> observations);
     }
 }
