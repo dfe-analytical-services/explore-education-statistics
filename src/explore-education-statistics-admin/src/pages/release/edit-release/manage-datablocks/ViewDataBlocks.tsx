@@ -2,11 +2,6 @@ import { DataBlock } from '@admin/services/release/edit-release/datablocks/types
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import { ChartRendererProps } from '@common/modules/find-statistics/components/ChartRenderer';
-import {
-  Indicator,
-  LocationFilter,
-  TimePeriodFilter,
-} from '@common/modules/full-table/types/filters';
 import { FullTable } from '@common/modules/full-table/types/fullTable';
 import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
 import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
@@ -18,34 +13,10 @@ import DataBlockService, {
 } from '@common/services/dataBlockService';
 import { Chart } from '@common/services/publicationService';
 import React from 'react';
-
-const mapFullTable = (unmappedFullTable: DataBlockResponse): FullTable => {
-  const subjectMeta = unmappedFullTable.metaData || {
-    indicators: {},
-    locations: {},
-    timePeriodRange: {},
-  };
-
-  return {
-    results: unmappedFullTable.result,
-    subjectMeta: {
-      subjectName: '',
-      publicationName: 'Test',
-      footnotes: [],
-      filters: {},
-      ...unmappedFullTable.metaData,
-      indicators: Object.values(subjectMeta.indicators).map(
-        indicator => new Indicator(indicator),
-      ),
-      locations: Object.values(subjectMeta.locations).map(
-        location => new LocationFilter(location, location.level),
-      ),
-      timePeriodRange: Object.values(subjectMeta.timePeriods).map(
-        timePeriod => new TimePeriodFilter(timePeriod),
-      ),
-    },
-  };
-};
+import {
+  mapFullTable,
+  reverseMapTableHeadersConfigForDataBlock,
+} from '@admin/pages/release/edit-release/manage-datablocks/tableUtil';
 
 interface Props {
   dataBlock: DataBlock;
@@ -95,9 +66,12 @@ const ViewDataBlocks = ({
 
     setTableData({
       fullTable,
-      tableHeadersConfig,
+      tableHeadersConfig: reverseMapTableHeadersConfigForDataBlock(
+        tableHeadersConfig,
+        dataBlockResponse.metaData,
+      ),
     });
-  }, [dataBlock.tables, chartBuilderData]);
+  }, [dataBlock.tables, chartBuilderData, dataBlockResponse]);
 
   // eslint-disable-next-line
   const onChartSave = (props: ChartRendererProps) => {
