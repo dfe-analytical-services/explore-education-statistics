@@ -3,9 +3,7 @@ import mapValuesWithKeys from '@common/lib/utils/mapValuesWithKeys';
 import tableBuilderService, {
   FilterOption,
   IndicatorOption,
-  LocationLevelKeys,
   LocationLevelKeysEnum,
-  LocationLevelKeysNames,
   PublicationSubject,
   PublicationSubjectMeta,
   TableDataQuery,
@@ -13,37 +11,23 @@ import tableBuilderService, {
 } from '@common/modules/full-table/services/tableBuilderService';
 import {Dictionary} from '@common/types/util';
 import PreviousStepModalConfirm from '@common/modules/table-tool/components/PreviousStepModalConfirm';
-import {
-  CategoryFilter,
-  Indicator,
-  LocationFilter,
-} from '@common/modules/full-table/types/filters';
+import {CategoryFilter, Indicator, LocationFilter,} from '@common/modules/full-table/types/filters';
 import parseYearCodeTuple from '@common/modules/full-table/utils/TimePeriod';
 import mapValues from 'lodash/mapValues';
 import React, {createRef, ReactNode} from 'react';
 import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
 import {FullTable} from '@common/modules/full-table/types/fullTable';
 import {mapFullTable} from '@common/modules/full-table/utils/mapPermalinks';
-import FiltersForm, {
-  FilterFormSubmitHandler,
-} from '@common/modules/table-tool/components/FiltersForm';
+import FiltersForm, {FilterFormSubmitHandler,} from '@common/modules/table-tool/components/FiltersForm';
 import LocationFiltersForm, {
   LocationFiltersFormSubmitHandler,
   LocationsFormValues,
 } from '@common/modules/table-tool/components/LocationFiltersForm';
-import PublicationForm, {
-  PublicationFormSubmitHandler,
-} from '@common/modules/table-tool/components/PublicationForm';
-import PublicationSubjectForm, {
-  PublicationSubjectFormSubmitHandler,
-} from '@common/modules/table-tool/components/PublicationSubjectForm';
-import TableHeadersForm, {
-  TableHeadersFormValues,
-} from '@common/modules/table-tool/components/TableHeadersForm';
+import PublicationForm, {PublicationFormSubmitHandler,} from '@common/modules/table-tool/components/PublicationForm';
+import PublicationSubjectForm, {PublicationSubjectFormSubmitHandler,} from '@common/modules/table-tool/components/PublicationSubjectForm';
+import TableHeadersForm, {TableHeadersFormValues,} from '@common/modules/table-tool/components/TableHeadersForm';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
-import TimePeriodForm, {
-  TimePeriodFormSubmitHandler,
-} from '@common/modules/table-tool/components/TimePeriodForm';
+import TimePeriodForm, {TimePeriodFormSubmitHandler,} from '@common/modules/table-tool/components/TimePeriodForm';
 import mapOptionValues from '@common/modules/table-tool/components/utils/mapOptionValues';
 import Wizard from '@common/modules/table-tool/components/Wizard';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
@@ -132,6 +116,12 @@ const mapLocations = (
       .map(option => new LocationFilter(option as FilterOption, locationLevel)),
   );
 
+const getSelectedLocationsForQuery = (locationQuery: Dictionary<string[] | undefined>) =>
+  mapValuesWithKeys(
+    LocationLevelKeysEnum,
+    (key, _) => locationQuery[key] || [],
+  );
+
 const TableTool = ({
   themeMeta,
   publicationId,
@@ -186,24 +176,15 @@ const TableTool = ({
           // populate subject data
           setSubjectId(initialQuery.subjectId);
 
-          // generate and populate location data
-          const locationQuery: Dictionary<string[] | undefined> = initialQuery;
-          const selectedLocations = mapValuesWithKeys(
-            LocationLevelKeysEnum,
-            (key, _) => locationQuery[key] || [],
-          );
-          const mappedLocations = mapLocations(
-            selectedLocations,
+          // populate location data
+          setLocations(mapLocations(
+            getSelectedLocationsForQuery(initialQuery),
             meta.locations,
-          );
-          setLocations(mappedLocations);
+          ));
 
           // generate and populate time period data
+          setDateRange({...initialQuery.timePeriod});
 
-          const dater: DateRangeState = {
-            ...initialQuery.timePeriod
-          };
-          setDateRange(dater);
 
           setInitialStep(4);
         });
@@ -428,6 +409,12 @@ const TableTool = ({
                 <FiltersForm
                   {...stepProps}
                   onSubmit={handleFiltersFormSubmit}
+                  initialValues={
+                    initialQuery && {
+                      filters: initialQuery.filters,
+                      indicators: initialQuery.indicators
+                    }
+                  }
                   subjectMeta={subjectMeta}
                 />
               )}

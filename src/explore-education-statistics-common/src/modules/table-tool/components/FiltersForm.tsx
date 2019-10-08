@@ -7,7 +7,7 @@ import {
 } from '@common/components/form';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import Yup from '@common/lib/validation/yup';
-import { PublicationSubjectMeta } from '@common/modules/full-table/services/tableBuilderService';
+import { PublicationSubjectMeta, FilterOption } from '@common/modules/full-table/services/tableBuilderService';
 import useResetFormOnPreviousStep from '@common/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
 import { FormikProps } from 'formik';
 import camelCase from 'lodash/camelCase';
@@ -25,12 +25,18 @@ export interface FormValues {
   };
 }
 
+interface InitialValuesType {
+  indicators: string[];
+  filters: string[];
+}
+
 export type FilterFormSubmitHandler = (values: FormValues) => void;
 
 interface Props {
   subjectMeta: PublicationSubjectMeta;
   onSubmit: FilterFormSubmitHandler;
-  values?: FormValues;
+  initialValues?: InitialValuesType;
+
 }
 
 const FiltersForm = (props: Props & InjectedWizardProps) => {
@@ -40,7 +46,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
     goToNextStep,
     currentStep,
     stepNumber,
-    values = { indicators: [], filters: {} },
+    initialValues
   } = props;
 
   const ref = useRef<HTMLDivElement>(null);
@@ -54,25 +60,53 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
     <WizardStepHeading {...props}>Choose your filters</WizardStepHeading>
   );
 
+  const buildInitialFormValue = (
+    meta : PublicationSubjectMeta,
+    initial?: InitialValuesType
+  ) => {
+
+    return {
+      filters: mapValues(meta.filters, (filter) => {
+
+        if (initial && initial.filters) {
+
+          const allFilterOptions= ([] as FilterOption[])
+            .concat(... Object.values(filter.options).map( ({options}) => options));
+
+          const allFilterValues=allFilterOptions.map( ({value}) => value)
+
+          return allFilterValues.filter((value) => initial.filters.includes(value));
+        }
+
+        if (typeof filter.options.Default !== 'undefined') {
+          // Automatically select filter option when there is only one
+          return filter.options.Default.options.length === 1
+            ? [filter.options.Default.options[0].value]
+            : [];
+        }
+        return [];
+      }),
+      indicators: initialValues && initialValues.indicators || [],
+    }
+  };
+
+  const [initialFormValue, setInitialFormValue] = React.useState(() => buildInitialFormValue(subjectMeta, initialValues));
+
+  React.useEffect(() => {
+
+    if (formikRef.current) {
+      const newFormValue = buildInitialFormValue(subjectMeta, initialValues);
+      setInitialFormValue(newFormValue);
+      formikRef.current.setValues(newFormValue);
+    }
+
+  }, [initialValues, subjectMeta.filters]);
+
   return (
     <Formik<FormValues>
       enableReinitialize
       ref={formikRef}
-      initialValues={{
-        filters: mapValues(subjectMeta.filters, (filter, index) => {
-          if (values.filters && values.filters[index])
-            return values.filters[index];
-
-          if (typeof filter.options.Default !== 'undefined') {
-            // Automatically select filter option when there is only one
-            return filter.options.Default.options.length === 1
-              ? [filter.options.Default.options[0].value]
-              : [];
-          }
-          return [];
-        }),
-        indicators: values.indicators,
-      }}
+      initialValues={initialFormValue}
       validationSchema={Yup.object<FormValues>({
         indicators: Yup.array()
           .of(Yup.string())
