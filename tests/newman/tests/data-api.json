@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "f9bab3b5-4109-409c-b9ec-ca4f8d316696",
+		"_postman_id": "2fda6387-1e74-4059-aedc-3d92cef5968b",
 		"name": "DfE Data API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -694,109 +694,6 @@
 												"meta",
 												"subject",
 												"99999"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Subject Meta - Filter SubjectId 1",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "08c7178b-9b71-4fb9-8c3e-9770e6d90e49",
-												"exec": [
-													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-													"",
-													"pm.test(\"Fields are present\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"filters\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"filters.Characteristic\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"filters.SchoolType\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceFields\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceByReason\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"indicators.AbsenceForPersistentAbsentees\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.country\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.localAuthority\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"locations.localAuthorityDistrict\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.hint\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.legend\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"timePeriod.options\"));",
-													"});",
-													"",
-													"pm.test(\"Number of characteristic options should be correct\", function () { ",
-													"    pm.expect(Object.keys(pm.response.json().filters.Characteristic.options).length).to.equal(10);",
-													"    pm.expect(pm.response.json().filters.Characteristic.options.Total.options.length).to.equal(1);",
-													"    pm.expect(pm.response.json().filters.Characteristic.options.Gender.options.length).to.equal(2);",
-													"    pm.expect(pm.response.json().filters.Characteristic.options.EthnicGroupMajor.options.length).to.equal(8);",
-													"    pm.expect(pm.response.json().filters.Characteristic.options.EthnicGroupMinor.options.length).to.equal(19);",
-													"    pm.expect(pm.response.json().filters.Characteristic.options.NCYear.options.length).to.equal(14);",
-													"    pm.expect(pm.response.json().filters.Characteristic.options.FSM.options.length).to.equal(3);",
-													"    pm.expect(pm.response.json().filters.Characteristic.options.FSMEver6.options.length).to.equal(3);",
-													"    pm.expect(pm.response.json().filters.Characteristic.options.SENProvision.options.length).to.equal(8);",
-													"    pm.expect(pm.response.json().filters.Characteristic.options.SENPrimaryNeed.options.length).to.equal(14);",
-													"    pm.expect(pm.response.json().filters.Characteristic.options.FirstLanguage.options.length).to.equal(4);",
-													"});",
-													"",
-													"pm.test(\"Number of school type default options should be correct\", function () { ",
-													"    pm.expect(Object.keys(pm.response.json().filters.SchoolType.options.Default.options).length).to.equal(4);",
-													"});",
-													"",
-													"pm.test(\"Number of time periods options should be correct\", function() {",
-													"    pm.expect(pm.response.json().timePeriod.options.length).to.equal(5); ",
-													"});",
-													"",
-													"pm.test(\"Number of location options should be correct\", function() {",
-													"    pm.expect(pm.response.json().locations.country.options.length).to.equal(1);",
-													"    pm.expect(pm.response.json().locations.localAuthority.options.length).to.equal(152);",
-													"    pm.expect(pm.response.json().locations.localAuthorityDistrict.options.length).to.equal(326);",
-													"});",
-													"",
-													"pm.test(\"Expect indicators to have correct properties\", function () {",
-													"    pm.expect(pm.response.json().indicators.AbsenceFields.options.length).to.equal(10);",
-													"    pm.expect(pm.response.json().indicators.AbsenceByReason.options.length).to.equal(16);",
-													"    pm.expect(pm.response.json().indicators.AbsenceForPersistentAbsentees.options.length).to.equal(7);",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										},
-										{
-											"listen": "prerequest",
-											"script": {
-												"id": "6db8370e-6078-4279-94d7-438d85a476f7",
-												"exec": [
-													""
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"value": "application/json",
-												"type": "text"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n\tsubjectId: 1\n}"
-										},
-										"url": {
-											"raw": "{{data_api_url}}/meta/subject",
-											"host": [
-												"{{data_api_url}}"
-											],
-											"path": [
-												"meta",
-												"subject"
 											]
 										}
 									},
@@ -3865,59 +3762,6 @@
 										"body": {
 											"mode": "raw",
 											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"School\",\n    \"localAuthority\": [ \"E09000002\" ],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t{{FILT_SchoolType__StateFundedPrimary}}, \n    \t{{FILT_SchoolType__StateFundedSecondary}}, \n    \t{{FILT_SchoolType__Special}}\n    ],\n    \"indicators\": [\n        {{IND_AbsenceFields__OverallAbsenceRate}},\n\t\t{{IND_AbsenceFields__AuthorisedAbsenceRate}},\n\t\t{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\n    ]\n}"
-										},
-										"url": {
-											"raw": "{{data_api_url}}/tablebuilder",
-											"host": [
-												"{{data_api_url}}"
-											],
-											"path": [
-												"tablebuilder"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Tablebuilder - Absence by geographic level - School - * - Primary AND Special",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "0ed51781-5027-4730-b0da-604beb3c6157",
-												"exec": [
-													"var respJson = pm.response.json();",
-													"",
-													"pm.test(\"Status code is 200\", function () {",
-													"    pm.response.to.have.status(200);",
-													"});",
-													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.results.length).to.equal(17838); });",
-													"",
-													"// NOTE(mark): Slow!",
-													"// pm.test(\"geographicLevel should be same as request\", function () {",
-													"//     for(var i = 0; i < respJson.results.length; i++) {",
-													"//         pm.expect(respJson.results[i].geographicLevel).to.equal(\"School\");",
-													"//     }",
-													"// });"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"type": "text",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 2,\n    \"geographicLevel\": \"School\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n    \t{{FILT_SchoolType__StateFundedPrimary}}, \n    \t{{FILT_SchoolType__Special}}\n    ],\n    \"indicators\": [\n        {{IND_AbsenceFields__OverallAbsenceRate}},\n\t\t{{IND_AbsenceFields__AuthorisedAbsenceRate}},\n\t\t{{IND_AbsenceFields__UnauthorisedAbsenceRate}}\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/tablebuilder",
