@@ -25,7 +25,6 @@ interface Props {
 const Wizard = ({ children, initialStep = 1, id, onStepChange }: Props) => {
   const [currentStep, setCurrentStepState] = useState(initialStep);
 
-
   const filteredChildren = Children.toArray(children).filter(child =>
     isComponentType(child, WizardStep),
   ) as (ReactElement[]);
@@ -43,7 +42,7 @@ const Wizard = ({ children, initialStep = 1, id, onStepChange }: Props) => {
   };
 
   React.useEffect(() => {
-    setCurrentStepState(initialStep)
+    setCurrentStepState(initialStep);
   }, [initialStep]);
 
   return (

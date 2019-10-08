@@ -1,12 +1,12 @@
-import {Form, FormFieldRadioGroup, Formik} from '@common/components/form';
+import { Form, FormFieldRadioGroup, Formik } from '@common/components/form';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
-import {PublicationSubject} from '@common/modules/full-table/services/tableBuilderService';
+import { PublicationSubject } from '@common/modules/full-table/services/tableBuilderService';
 import useResetFormOnPreviousStep from '@common/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
-import {FormikProps} from 'formik';
-import React, {useRef, useState} from 'react';
-import {InjectedWizardProps} from './Wizard';
+import { FormikProps } from 'formik';
+import React, { useRef, useState } from 'react';
+import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
 
@@ -36,9 +36,12 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
     initialSubjectId = '',
   } = props;
 
-  const initialiseSubjectName = (sid: string): string => (options.find(({id}) => sid === id) || {label: ''}).label;
+  const initialiseSubjectName = (sid: string): string =>
+    (options.find(({ id }) => sid === id) || { label: '' }).label;
 
-  const [subjectName, setSubjectName] = useState(() => initialiseSubjectName(initialSubjectId));
+  const [subjectName, setSubjectName] = useState(() =>
+    initialiseSubjectName(initialSubjectId),
+  );
 
   const formikRef = useRef<Formik<FormValues>>(null);
   const formId = 'publicationSubjectForm';
@@ -60,8 +63,8 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
   React.useEffect(() => {
     if (formikRef.current) {
       formikRef.current.setValues({
-        subjectId: `${initialSubjectId}`
-      })
+        subjectId: `${initialSubjectId}`,
+      });
     }
     setSubjectName(initialiseSubjectName(initialSubjectId));
   }, [options, initialSubjectId]);
@@ -70,7 +73,7 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
     <Formik<FormValues>
       enableReinitialize
       ref={formikRef}
-      onSubmit={async ({subjectId}) => {
+      onSubmit={async ({ subjectId }) => {
         await onSubmit({
           subjectId,
           subjectName,
