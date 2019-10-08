@@ -19,7 +19,9 @@ export enum GeographicLevel {
   RSCRegion = 'RSC_Region',
   School = 'School',
   Ward = 'Ward',
+  Instituation = 'institution',
 }
+
 
 export type TimeIdentifier =
   | 'AY'
