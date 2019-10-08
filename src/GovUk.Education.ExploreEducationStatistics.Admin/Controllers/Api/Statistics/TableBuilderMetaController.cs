@@ -24,10 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         {
             try
             {
-                return _subjectMetaService.GetSubjectMeta(new SubjectMetaQueryContext
-                {
-                    SubjectId = subjectId
-                });
+                return _subjectMetaService.GetSubjectMeta(subjectId);
             }
             catch (ArgumentException e)
             {
