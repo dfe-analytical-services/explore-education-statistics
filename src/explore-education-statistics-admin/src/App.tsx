@@ -26,6 +26,7 @@ import AdminDocumentationUsingDashboard from './pages/documentation/Documentatio
 import AdminDocumentationCreateNewRelease from './pages/documentation/DocumentationCreateNewRelease';
 import AdminDocumentationManageContent from './pages/documentation/DocumentationManageContent';
 import AdminDocumentationManageData from './pages/documentation/DocumentationManageData';
+import AdminDocumentationManageDataBlocks from './pages/documentation/DocumentationManageDataBlocks';
 
 import PrototypeAdminDashboard from './pages/prototypes/PrototypeAdminDashboard';
 import PrototypeChartTest from './pages/prototypes/PrototypeChartTest';
@@ -241,6 +242,11 @@ function App() {
           exact
           path="/documentation/manage-data"
           component={AdminDocumentationManageData}
+        />
+        <Route
+          exact
+          path="/documentation/manage-data-block"
+          component={AdminDocumentationManageDataBlocks}
         />
         <Route
           exact
