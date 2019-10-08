@@ -75,9 +75,9 @@ If you need to change the chromedriver version used by the CI pipeline, it can b
 If searching for an IDE to add/edit these tests, consider using IntelliJ with "IntelliBot @ SeleniumLibrary Patched" and "Robot Framework Support" plugins. This should give you autocompletion and allow you to click through to keywords defined in both .robot and .py files. For this to work, you'll need to change the Project Structure to use "No SDK".
 
 IntelliJ also allows you use to External Tools to right click on a file and run that file exclusively with these settings:
-- Program: /home/${USER}/.local/bin/pipenv   (Or wherever pipenv is located)
-- Arguments: run ./run_tests.py --visual -i robot -f "$FilePath$" -e dev
-- Working directory: $ProjectFileDir$   (which should represent the robot-tests directory. You may have to do something like "$ProjectFileDir$/../tests/robot-tests")
+- Program: `/home/${USER}/.local/bin/pipenv` OR `C:\Python37\Scripts\pipenv.exe` OR wherever pipenv is located -- use `whereis pipenv` on linux or `where pipenv` on windows
+- Arguments: `run python run_tests.py --visual -i robot -f "$FilePath$" -e dev`
+- Working directory: `$ProjectFileDir$` (which should represent the robot-tests directory. You may have to do something like `$ProjectFileDir$/../tests/robot-tests`)
 
 ### Parallelism / Pabot
 It is essential that the test suites can run in parallel. This might not be the case if one test suite relies on test data that another changes. AND this might cause the tests, when run in parallel, to fail in unpredictable ways, making it difficult to determine what test data is the failure-making culprit.

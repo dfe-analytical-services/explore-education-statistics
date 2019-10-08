@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "0cf828c2-bb6c-46a8-9195-d4c43087e427",
+		"_postman_id": "efdd5e05-84e6-48d2-a347-5c641f2a8fc8",
 		"name": "DfE Admin API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -1145,7 +1145,10 @@
 											"});",
 											"",
 											"pm.test(\"Number of metaData filters should be correct\", function () {",
-											"   pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(8); ",
+											"    pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(3);",
+											"    pm.expect(respJson.metaData.filters.Characteristic.options.FSM.options.length).to.equal(3);",
+											"    pm.expect(respJson.metaData.filters.YearBreakdown.options.Default.options.length).to.equal(1);",
+											"    pm.expect(respJson.metaData.filters.SchoolType.options.Default.options.length).to.equal(4);",
 											"});",
 											"",
 											"pm.test(\"Number of metaData indicators should be correct\", function () {",
