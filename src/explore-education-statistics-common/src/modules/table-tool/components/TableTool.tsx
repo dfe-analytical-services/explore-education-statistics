@@ -138,16 +138,18 @@ const TableTool = ({
 
   const [subjectId, setSubjectId] = React.useState<string>('');
 
-  const [subjectMeta, setSubjectMeta] = React.useState<PublicationSubjectMeta>({
+  const getDefaultSubjectMeta = () => ({
     timePeriod: {
       hint: '',
-      legend: '',
-      options: [],
+        legend: '',
+        options: [],
     },
     locations: {},
     indicators: {},
     filters: {},
   });
+
+  const [subjectMeta, setSubjectMeta] = React.useState<PublicationSubjectMeta>(getDefaultSubjectMeta());
 
   const [locations, setLocations] = React.useState<Dictionary<LocationFilter[]>>({});
 
@@ -166,7 +168,12 @@ const TableTool = ({
 
   const [initialStep, setInitialStep] = React.useState(1);
 
+  const [validInitialQuery, setValidInitialQuery] = React.useState<TableDataQuery>();
+
   React.useEffect(() => {
+    setValidInitialQuery(undefined);
+    setInitialStep(1);
+
     if (initialQuery) {
       tableBuilderService
         .filterPublicationSubjectMeta(initialQuery)
@@ -187,10 +194,10 @@ const TableTool = ({
 
 
           setInitialStep(4);
+          setValidInitialQuery(initialQuery);
         });
-    } else {
-      setInitialStep(1);
     }
+
   }, [initialQuery]);
 
   const handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
@@ -379,7 +386,7 @@ const TableTool = ({
                 <PublicationSubjectForm
                   {...stepProps}
                   options={subjects}
-                  initialSubjectId={initialQuery && initialQuery.subjectId}
+                  initialSubjectId={validInitialQuery && validInitialQuery.subjectId}
                   onSubmit={handlePublicationSubjectFormSubmit}
                 />
               )}
@@ -389,7 +396,7 @@ const TableTool = ({
                 <LocationFiltersForm
                   {...stepProps}
                   options={subjectMeta.locations}
-                  initialValues={initialQuery && initialQuery}
+                  initialValues={validInitialQuery}
                   onSubmit={handleLocationFiltersFormSubmit}
                 />
               )}
@@ -398,7 +405,7 @@ const TableTool = ({
               {stepProps => (
                 <TimePeriodForm
                   {...stepProps}
-                  initialValues={initialQuery && initialQuery.timePeriod}
+                  initialValues={validInitialQuery && validInitialQuery.timePeriod}
                   options={subjectMeta.timePeriod.options}
                   onSubmit={handleTimePeriodFormSubmit}
                 />
@@ -410,9 +417,9 @@ const TableTool = ({
                   {...stepProps}
                   onSubmit={handleFiltersFormSubmit}
                   initialValues={
-                    initialQuery && {
-                      filters: initialQuery.filters,
-                      indicators: initialQuery.indicators
+                    validInitialQuery && {
+                      filters: validInitialQuery.filters,
+                      indicators: validInitialQuery.indicators
                     }
                   }
                   subjectMeta={subjectMeta}

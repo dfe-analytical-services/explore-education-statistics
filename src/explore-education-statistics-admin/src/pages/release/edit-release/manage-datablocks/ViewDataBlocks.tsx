@@ -1,17 +1,17 @@
-import { DataBlock } from '@admin/services/release/edit-release/datablocks/types';
+import {DataBlock} from '@admin/services/release/edit-release/datablocks/types';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import { ChartRendererProps } from '@common/modules/find-statistics/components/ChartRenderer';
-import { FullTable } from '@common/modules/full-table/types/fullTable';
+import {ChartRendererProps} from '@common/modules/find-statistics/components/ChartRenderer';
+import {FullTable} from '@common/modules/full-table/types/fullTable';
 import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
-import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
+import {TableHeadersFormValues} from '@common/modules/table-tool/components/TableHeadersForm';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import DataBlockService, {
   DataBlockRequest,
   DataBlockRerequest,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
-import { Chart } from '@common/services/publicationService';
+import {Chart} from '@common/services/publicationService';
 import React from 'react';
 import {
   mapFullTable,
@@ -29,18 +29,17 @@ const ViewDataBlocks = ({
   dataBlockResponse,
   dataBlockRequest,
 }: Props) => {
-  const [chartBuilderData, setChartBuilderData] = React.useState<
-    DataBlockResponse
-  >(dataBlockResponse);
+  // we want to modify this internally as our own data, copying it
+  const [chartBuilderData, setChartBuilderData] = React.useState<DataBlockResponse>({...dataBlockResponse});
+
+  // only update it if the external reference changes
+  React.useEffect(() => {
+    setChartBuilderData({...dataBlockResponse});
+  }, [dataBlockResponse]);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [initialConfiguration, setInitialConfiguration] = React.useState<
-    Chart | undefined
-  >();
+  const [initialConfiguration, setInitialConfiguration] = React.useState<Chart | undefined>();
 
-  React.useEffect(() => {
-    setChartBuilderData(dataBlockResponse);
-  }, [dataBlockResponse]);
 
   React.useEffect(() => {
     if (dataBlock && dataBlock.charts) {
@@ -71,7 +70,7 @@ const ViewDataBlocks = ({
         fullTable.subjectMeta,
       ),
     });
-  }, [dataBlock.tables, chartBuilderData, dataBlockResponse]);
+  }, [dataBlock.tables, chartBuilderData]);
 
   // eslint-disable-next-line
   const onChartSave = (props: ChartRendererProps) => {
@@ -87,7 +86,7 @@ const ViewDataBlocks = ({
 
     DataBlockService.getDataBlockForSubject(newRequest).then(response => {
       if (response) {
-        setChartBuilderData(response);
+        setChartBuilderData({...response});
       }
     });
   };

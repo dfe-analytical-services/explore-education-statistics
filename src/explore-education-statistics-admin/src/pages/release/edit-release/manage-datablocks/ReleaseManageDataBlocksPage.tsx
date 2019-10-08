@@ -77,6 +77,11 @@ const ReleaseManageDataBlocksPage = () => {
   };
 
   React.useEffect(() => {
+
+    setDataBlockResponse(undefined);
+    setDataBlock(undefined);
+    setDataBlockRequest(undefined);
+
     Promise.resolve(dataBlocks.find(({ id }) => selectedDataBlock === id))
       .then(db => {
         if (db === undefined) throw new Error();
