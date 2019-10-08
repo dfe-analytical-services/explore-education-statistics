@@ -158,6 +158,7 @@ class ImporterStatus extends Component<Props> {
               </span>
             </>
           )}
+          {currentStatus && currentStatus.errors}
         </div>
       </SummaryListItem>
     );
