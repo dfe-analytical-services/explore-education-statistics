@@ -5,6 +5,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces
 {
     public interface ITableBuilderSubjectMetaService
     {
+        TableBuilderSubjectMetaViewModel GetSubjectMeta(long subjectId);
+        
         TableBuilderSubjectMetaViewModel GetSubjectMeta(SubjectMetaQueryContext query);
     }
 }

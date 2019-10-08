@@ -29,6 +29,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .Include(item => item.FilterGroup.Filter);
         }
 
+        public FilterItem GetTotal(Filter filter)
+        {
+            return GetTotalGroup(filter)?.FilterItems.FirstOrDefault(IsFilterItemTotal);
+        }
+
         public FilterItem GetTotal(IEnumerable<FilterItem> filterItems)
         {
             return GetTotalGroup(filterItems)?.FirstOrDefault(IsFilterItemTotal);
@@ -37,10 +42,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         private static IEnumerable<FilterItem> GetTotalGroup(IEnumerable<FilterItem> filterItems)
         {
             var itemsGroupedByFilterGroup = filterItems.GroupBy(item => item.FilterGroup).ToList();
-            //Return the group if there is only one, otherwise the 'Total' group if it exists
+
+            // Return the group if there is only one, otherwise the 'Total' group if it exists
             return itemsGroupedByFilterGroup.Count == 1
                 ? itemsGroupedByFilterGroup.First()
                 : itemsGroupedByFilterGroup.FirstOrDefault(items => IsFilterGroupTotal(items.Key));
+        }
+
+        private static FilterGroup GetTotalGroup(Filter filter)
+        {
+            var filterGroups = filter.FilterGroups;
+
+            // Return the group if there is only one, otherwise the 'Total' group if it exists
+            return filterGroups.Count() == 1
+                ? filterGroups.First()
+                : filterGroups.FirstOrDefault(IsFilterGroupTotal);
         }
 
         private static bool IsFilterItemTotal(FilterItem item)

@@ -9,6 +9,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
         
         IEnumerable<FilterItem> GetFilterItemsIncludingFilters(IQueryable<Observation> observations);
 
+        FilterItem GetTotal(Filter filter);
+        
         FilterItem GetTotal(IEnumerable<FilterItem> filterItems);
     }
 }
