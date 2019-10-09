@@ -190,7 +190,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                   <a
                     href={service.createDownloadDataMetadataFileLink(
                       releaseId,
-                      dataFile.filename,
+                      dataFile.metadataFilename,
                     )}
                   >
                     {dataFile.metadataFilename}
