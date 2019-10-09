@@ -72,6 +72,12 @@ class MethodologyPage extends Component<Props> {
                 </>
               )}
             </dl>
+            <PrintThisPage
+              analytics={{
+                category: 'Page print',
+                action: 'Print this page link selected',
+              }}
+            />
             <PageSearchFormWithAnalytics />
           </div>
         </div>

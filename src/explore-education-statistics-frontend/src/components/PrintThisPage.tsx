@@ -15,7 +15,12 @@ const PrintThisPage = ({ analytics, ...props }: AnalyticProps) => {
 
   return (
     <div className={classNames('govuk-!-margin-top-6', 'dfe-print-hidden')}>
-      <a {...props} href="#" onClick={() => openPrint()}>
+      <a
+        className="govuk-button govuk-button--secondary"
+        {...props}
+        href="#"
+        onClick={() => openPrint()}
+      >
         Print this page
       </a>
     </div>
