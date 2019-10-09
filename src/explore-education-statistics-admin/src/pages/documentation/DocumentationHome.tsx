@@ -77,6 +77,16 @@ const BrowseReleasesPage = () => {
         How to create a new release - including uploading data and files and
         creating data blocks (ie tables and charts) and content.{' '}
       </p>
+
+      <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
+        <Link to="/documentation/manage-data-block">
+          Managing data blocks and creating tables and charts
+        </Link>
+      </h4>
+      <p className="govuk-caption-m govuk-!-margin-top-1">
+        How to manage data blocks within a release - including creating tables
+        and charts.{' '}
+      </p>
     </Page>
   );
 };
