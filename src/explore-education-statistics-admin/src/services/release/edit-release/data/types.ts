@@ -7,6 +7,7 @@ export interface DataFile {
   };
   rows: number;
   metadataFilename: string;
+  userName: string;
   canDelete?: boolean;
 }
 
