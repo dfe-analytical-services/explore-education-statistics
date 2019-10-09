@@ -141,31 +141,36 @@ class ImporterStatus extends Component<Props> {
 
     return (
       <SummaryListItem term="Status">
-        <div className={styles.currentStatusContainer}>
-          <strong
-            className={classNames(
-              'govuk-!-margin-right-1',
-              'govuk-tag',
-              currentStatus && this.getImportStatusClass(currentStatus.status),
+        <div>
+          <div className={styles.currentStatusContainer}>
+            <strong
+              className={classNames(
+                'govuk-!-margin-right-1',
+                'govuk-tag',
+                currentStatus &&
+                  this.getImportStatusClass(currentStatus.status),
+              )}
+            >
+              {currentStatus && getImportStatusLabel(currentStatus.status)}
+            </strong>
+            {running && (
+              <>
+                <LoadingSpinner inline size={22} />{' '}
+                <span className="govuk-visually-hidden">
+                  Currently processing data
+                </span>
+              </>
             )}
-          >
-            {currentStatus && getImportStatusLabel(currentStatus.status)}
-          </strong>
-          {running && (
-            <>
-              <LoadingSpinner inline size={22} />{' '}
-              <span className="govuk-visually-hidden">
-                Currently processing data
-              </span>
-            </>
-          )}
+          </div>
           {currentStatus &&
             currentStatus.errors &&
             currentStatus.errors.length > 0 && (
               <Details className={styles.errorSummary} summary="See Errors">
-                {currentStatus.errors.map((error, index) => (
-                  <li key={index.toString()}>{error}</li>
-                ))}
+                <ul>
+                  {currentStatus.errors.map((error, index) => (
+                    <li key={index.toString()}>{error}</li>
+                  ))}
+                </ul>
               </Details>
             )}
         </div>
