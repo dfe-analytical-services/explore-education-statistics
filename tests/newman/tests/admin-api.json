@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "766debca-5a45-43cf-889a-2b637da570b1",
+		"_postman_id": "efdd5e05-84e6-48d2-a347-5c641f2a8fc8",
 		"name": "DfE Admin API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -659,83 +659,6 @@
 					"name": "Meta",
 					"item": [
 						{
-							"name": "Themes",
-							"item": [
-								{
-									"name": "Themes Meta",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "2db4ed0b-6eeb-40b6-914f-f1692eb248fb",
-												"exec": [
-													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-													"",
-													"pm.test(\"Expect correct number of themes\", function () {",
-													"    pm.expect(pm.response.json().length).to.be.above(1);",
-													"});",
-													"",
-													"pm.test(\"Pupils and school theme should contain more than 2 topics\", function () {",
-													"    for(var i = 0; i < pm.response.json().length; i++) {",
-													"        if(pm.response.json()[i].title === \"Pupils and schools\") {",
-													"            pm.expect(pm.response.json()[i].topics.length).to.be.above(2);",
-													"            pm.expect(pm.response.to.have.jsonBody(`[${i}].id`));",
-													"            pm.expect(pm.response.to.have.jsonBody(`[${i}].slug`));",
-													"        }",
-													"    }",
-													"});",
-													"        ",
-													"pm.test(\"Children, early years and social care should contain correct data\", function () {",
-													"    for(var i = 0; i < pm.response.json().length; i++) {",
-													"        if(pm.response.json()[i].title === \"Children, early years and social care\") {",
-													"            pm.expect(pm.response.json()[i].topics.length).to.be.above(1);",
-													"            pm.expect(pm.response.json()[i].topics[1].title).to.equal(\"Early years foundation stage profile\");",
-													"            pm.expect(pm.response.to.have.jsonBody(`[${i}].id`));",
-													"            pm.expect(pm.response.to.have.jsonBody(`[${i}].slug`));",
-													"            ",
-													"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].id`));",
-													"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].slug`));",
-													"            pm.expect(pm.response.json()[i].topics[0].publications.length).to.equal(1);",
-													"            pm.expect(pm.response.json()[i].topics[1].publications[0].title).to.equal(\"Early years foundation stage profile results\");",
-													"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].publications[0].id`));",
-													"            pm.expect(pm.response.to.have.jsonBody(`[${i}].topics[0].publications[0].slug`));",
-													"        }",
-													"    }",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "GET",
-										"header": [
-											{
-												"key": "Cookie",
-												"type": "text",
-												"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-											}
-										],
-										"url": {
-											"raw": "{{admin_api_url}}/data/meta/themes",
-											"host": [
-												"{{admin_api_url}}"
-											],
-											"path": [
-												"data",
-												"meta",
-												"themes"
-											]
-										},
-										"description": "Returns all contacts"
-									},
-									"response": []
-								}
-							],
-							"protocolProfileBehavior": {},
-							"_postman_isSubFolder": true
-						},
-						{
 							"name": "Subject",
 							"item": [
 								{
@@ -964,10 +887,10 @@
 							"_postman_isSubFolder": true
 						},
 						{
-							"name": "Publication",
+							"name": "Release",
 							"item": [
 								{
-									"name": "Publication Meta - Pupil absence in schools in England",
+									"name": "Release Meta - Pupil absence in schools in England",
 									"event": [
 										{
 											"listen": "prerequest",
@@ -987,11 +910,11 @@
 													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 													"",
 													"pm.test(\"Fields are present\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"publicationId\"));",
+													"    pm.expect(pm.response.to.have.jsonBody(\"releaseId\"));",
 													"    pm.expect(pm.response.to.have.jsonBody(\"subjects\"));",
 													"});",
 													"",
-													"pm.test(\"Publication id matches the publication requested\", function () { pm.expect(pm.response.json().publicationId).to.equal(pm.variables.get(\"publication_id\")); });",
+													"pm.test(\"Release id matches the release requested\", function () { pm.expect(pm.response.json().releaseId).to.equal(\"4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5\"); });",
 													"",
 													"pm.test(\"Number of subjects should be correct\", function () {",
 													"    pm.expect(pm.response.json().subjects.length).to.be.above(6);",
@@ -1011,15 +934,15 @@
 											}
 										],
 										"url": {
-											"raw": "{{admin_api_url}}/data/meta/publication/{{publication_id}}",
+											"raw": "{{admin_api_url}}/data/meta/release/4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5",
 											"host": [
 												"{{admin_api_url}}"
 											],
 											"path": [
 												"data",
 												"meta",
-												"publication",
-												"{{publication_id}}"
+												"release",
+												"4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"
 											]
 										}
 									},
@@ -1176,13 +1099,19 @@
 									"raw": "{\n    \"subjectId\": 1,\n    \"country\": [\n    \t\"E92000001\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2014,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__GenderMale}}, {{FILT_Char__GenderFemale}}\n    ],\n    \"indicators\": [\n    \t{{IND_AbsenceFields__UnauthorisedAbsenceRate}}, \n        {{IND_AbsenceFields__OverallAbsenceRate}}, \n        {{IND_AbsenceFields__AuthorisedAbsenceRate}},\n        {{IND_AbsenceFields__PercentageOfPersistentAbsentees}},\n        {{IND_AbsenceFields__NumberOfPersistentAbsentees}}\n    ]\n}"
 								},
 								"url": {
-									"raw": "{{admin_api_url}}/data/tablebuilder",
+									"raw": "{{admin_api_url}}/data/tablebuilder?releaseId=4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5",
 									"host": [
 										"{{admin_api_url}}"
 									],
 									"path": [
 										"data",
 										"tablebuilder"
+									],
+									"query": [
+										{
+											"key": "releaseId",
+											"value": "4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"
+										}
 									]
 								}
 							},
@@ -1216,7 +1145,10 @@
 											"});",
 											"",
 											"pm.test(\"Number of metaData filters should be correct\", function () {",
-											"   pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(8); ",
+											"    pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(3);",
+											"    pm.expect(respJson.metaData.filters.Characteristic.options.FSM.options.length).to.equal(3);",
+											"    pm.expect(respJson.metaData.filters.YearBreakdown.options.Default.options.length).to.equal(1);",
+											"    pm.expect(respJson.metaData.filters.SchoolType.options.Default.options.length).to.equal(4);",
 											"});",
 											"",
 											"pm.test(\"Number of metaData indicators should be correct\", function () {",
@@ -1297,13 +1229,19 @@
 									"raw": "{\n    \"subjectId\": 1,\n    \"localAuthority\": [\"E09000032\"],\n    \"localAuthorityDistrict\": [\"E07000223\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2015,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__FSMEligible}}, \n        {{FILT_Char__FSMNotEligible}}, \n        {{FILT_Char__FSMUnclassified}}\n    ],\n    \"indicators\": [\n    \t{{IND_AbsenceForPersistentAbsentees__NumberOfAuthorisedAbsenceSessionsForPersistentAbsentees}},\n    \t{{IND_AbsenceByReason__NumberOfUnauthorisedReasonsSessions}},\n    \t{{IND_AbsenceByReason__NumberOfUnauthorisedOtherSessions}},\n    \t{{IND_AbsenceByReason__NumberOfNoReasonYetSessions}},\n    \t{{IND_AbsenceByReason__NumberOfLateSessions}}\n    ]\n}"
 								},
 								"url": {
-									"raw": "{{admin_api_url}}/data/data",
+									"raw": "{{admin_api_url}}/data/data?releaseId=4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5",
 									"host": [
 										"{{admin_api_url}}"
 									],
 									"path": [
 										"data",
 										"data"
+									],
+									"query": [
+										{
+											"key": "releaseId",
+											"value": "4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"
+										}
 									]
 								}
 							},

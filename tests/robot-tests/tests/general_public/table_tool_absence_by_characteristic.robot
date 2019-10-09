@@ -26,7 +26,7 @@ Select subject "Absence by characteristic"
     [Tags]  HappyPath
     user selects radio   Absence by characteristic
     user clicks element   css:#publicationSubjectForm-submit
-    # Extra timeout until EES-234
+    # Extra timeout until EES-313
     user waits until element is visible  xpath://h2[text()="Choose locations"]   90
     user checks previous table tool step contains  2    Subject     Absence by characteristic
 
@@ -35,7 +35,8 @@ Select Location Country, England
     user opens details dropdown     Country
     user clicks checkbox    England
     user clicks element     css:#locationFiltersForm-submit
-    user waits until element is visible  xpath://h2[text()="Choose time period"]
+    # Extra timeout until EES-313
+    user waits until element is visible  xpath://h2[text()="Choose time period"]   90
     user checks previous table tool step contains  3    Country    England
 
 Select Start date and End date

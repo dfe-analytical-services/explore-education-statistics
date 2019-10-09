@@ -4,7 +4,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta.TableBuilder;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
@@ -33,18 +32,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                             .GroupBy(item => item.FilterGroup, item => item, FilterGroupComparer)
                             .ToDictionary(
                                 itemsGroupedByFilterGroup => itemsGroupedByFilterGroup.Key.Label.PascalCase(),
-                                itemsGroupedByFilterGroup =>
-                                    new FilterItemsMetaViewModel
-                                    {
-                                        Label = itemsGroupedByFilterGroup.Key.Label,
-                                        Options = itemsGroupedByFilterGroup.Select(item => new LabelValue
-                                        {
-                                            Label = item.Label,
-                                            Value = item.Id.ToString()
-                                        })
-                                    }),
+                                itemsGroupedByFilterGroup => BuildFilterItemsViewModel(itemsGroupedByFilterGroup.Key,
+                                    itemsGroupedByFilterGroup)
+                            ),
                         TotalValue = GetTotalValue(itemsGroupedByFilter)
                     });
+        }
+
+        protected static FilterItemsMetaViewModel BuildFilterItemsViewModel(FilterGroup filterGroup,
+            IEnumerable<FilterItem> filterItems)
+        {
+            return new FilterItemsMetaViewModel
+            {
+                Label = filterGroup.Label,
+                Options = filterItems.Select(item => new LabelValue
+                {
+                    Label = item.Label,
+                    Value = item.Id.ToString()
+                })
+            };
         }
 
         private string GetTotalValue(IEnumerable<FilterItem> filterItems)

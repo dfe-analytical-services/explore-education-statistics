@@ -104,6 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IBoundaryLevelService, BoundaryLevelService>();
             services.AddTransient<IDataService<ResultWithMetaViewModel>, DataService>();
             services.AddTransient<IDataService<TableBuilderResultViewModel>, TableBuilderDataService>();
+            services.AddTransient<IFilterService, FilterService>();
             services.AddTransient<IFilterItemService, FilterItemService>();
             services.AddTransient<IFootnoteService, FootnoteService>();
             services.AddTransient<IGeoJsonService, GeoJsonService>();
@@ -111,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IIndicatorService, IndicatorService>();
             services.AddTransient<ILocationService, LocationService>();
             services.AddTransient<IObservationService, ObservationService>();
-            services.AddTransient<IPublicationMetaService, PublicationMetaService>();
+            services.AddTransient<IReleaseMetaService, ReleaseMetaService>();
             services.AddTransient<IResultBuilder<Observation, ObservationViewModel>, ResultBuilder>();
             services.AddTransient<Data.Model.Services.Interfaces.IReleaseService, Data.Model.Services.ReleaseService>();
             services.AddTransient<ISubjectService, SubjectService>();

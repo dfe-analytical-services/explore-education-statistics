@@ -7,7 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Moq;
 using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 {
     public class MetaControllerTests
     {

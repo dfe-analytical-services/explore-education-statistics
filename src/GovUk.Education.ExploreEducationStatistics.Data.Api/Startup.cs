@@ -69,6 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<IDataService<ResultWithMetaViewModel>, DataService>();
             services.AddTransient<IPublicationMetaService, PublicationMetaService>();
             services.AddTransient<ISubjectMetaService, SubjectMetaService>();
+            services.AddTransient<IThemeMetaService, ThemeMetaService>();
             services.AddTransient<ITableBuilderResultSubjectMetaService, TableBuilderResultSubjectMetaService>();
             services.AddTransient<ITableBuilderSubjectMetaService, TableBuilderSubjectMetaService>();
             services.AddTransient<IFileStorageService, FileStorageService>();

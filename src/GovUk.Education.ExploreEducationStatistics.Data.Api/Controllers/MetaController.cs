@@ -12,22 +12,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
     public class MetaController : ControllerBase
     {
         private readonly IPublicationMetaService _publicationMetaService;
+        private readonly IThemeMetaService _themeMetaService;
 
-        public MetaController(IPublicationMetaService publicationMetaService)
+        public MetaController(IPublicationMetaService publicationMetaService, IThemeMetaService themeMetaService)
         {
             _publicationMetaService = publicationMetaService;
+            _themeMetaService = themeMetaService;
         }
 
         [HttpGet("themes")]
         public ActionResult<IEnumerable<ThemeMetaViewModel>> GetThemes()
         {
-            return _publicationMetaService.GetThemes().ToList();
+            return _themeMetaService.GetThemes().ToList();
         }
-        
+
         [HttpGet("publication/{publicationId}")]
-        public ActionResult<PublicationSubjectsMetaViewModel> GetPublication(Guid publicationId)
+        public ActionResult<PublicationSubjectsMetaViewModel> GetSubjectsForLatestRelease(Guid publicationId)
         {
-            var viewModel = _publicationMetaService.GetPublication(publicationId);
+            var viewModel = _publicationMetaService.GetSubjectsForLatestRelease(publicationId);
             if (viewModel == null)
             {
                 return NotFound();

@@ -6,44 +6,45 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
+using PublicationId = System.Guid;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controller
+namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 {
     public class MetaControllerTests
     {
         private readonly MetaController _controller;
 
+        private readonly PublicationId _publicationId = PublicationId.NewGuid();
+
         public MetaControllerTests()
         {
             var publicationMetaService = new Mock<IPublicationMetaService>();
+            var themeMetaService = new Mock<IThemeMetaService>();
 
-            publicationMetaService.Setup(s => s.GetPublication(new Guid("c102b638-a5ba-4579-aa29-0381f64df344")))
+            publicationMetaService.Setup(s => s.GetSubjectsForLatestRelease(_publicationId))
                 .Returns(new PublicationSubjectsMetaViewModel());
 
-            publicationMetaService.Setup(s => s.GetPublication(new Guid("31c7bf9c-bc0e-47f3-8341-36d3ee4d113a")))
-                .Returns(new PublicationSubjectsMetaViewModel());
-
-            publicationMetaService.Setup(s => s.GetThemes())
+            themeMetaService.Setup(s => s.GetThemes())
                 .Returns(new List<ThemeMetaViewModel>
                 {
                     new ThemeMetaViewModel()
                 });
 
-            _controller = new MetaController(publicationMetaService.Object);
+            _controller = new MetaController(publicationMetaService.Object, themeMetaService.Object);
         }
 
         [Fact]
-        public void Get_Publication_Returns_Ok()
+        public void Get_SubjectsForLatestRelease_Returns_Ok()
         {
-            var result = _controller.GetPublication(new Guid("c102b638-a5ba-4579-aa29-0381f64df344"));
+            var result = _controller.GetSubjectsForLatestRelease(_publicationId);
 
             Assert.IsAssignableFrom<PublicationSubjectsMetaViewModel>(result.Value);
         }
 
         [Fact]
-        public void Get_Publication_Returns_NotFound()
+        public void Get_SubjectsForLatestRelease_Returns_NotFound()
         {
-            var result = _controller.GetPublication(new Guid("9ad58d8b-997a-4dba-9255-d0caeae176ab"));
+            var result = _controller.GetSubjectsForLatestRelease(new Guid("9ad58d8b-997a-4dba-9255-d0caeae176ab"));
 
             Assert.IsAssignableFrom<NotFoundResult>(result.Result);
         }

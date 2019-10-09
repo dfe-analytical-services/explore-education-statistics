@@ -249,17 +249,17 @@ def user_clicks_select_all_for_category(category_label):
 def user_checks_results_table_column_heading_contains(row, column, expected):
   elem = sl.driver.find_element_by_xpath(f'//table/thead/tr[{row}]/th[{column}]')
   if expected not in elem.text:
-    raise AssertionError(f'"{expected}" not found in th tag in results table thead row {row}, column {column}')
+    raise AssertionError(f'"{expected}" not found in th tag in results table thead row {row}, column {column}. Found text "{elem.text}".')
 
 def user_checks_results_table_row_heading_contains(row, column, expected):
   elem = sl.driver.find_element_by_xpath(f'//table/tbody/tr[{row}]/th[{column}]')
   if expected not in elem.text:
-    raise AssertionError(f'"{expected}" not found in th tag in results table tbody row {row}, column {column}')
+    raise AssertionError(f'"{expected}" not found in th tag in results table tbody row {row}, column {column}. Found text "{elem.text}".')
 
 def user_checks_results_table_cell_contains(row, column, expected):
   elem = sl.driver.find_element_by_xpath(f'//table/tbody/tr[{row}]/td[{column}]')
   if expected not in elem.text:
-    raise AssertionError(f'"{expected}" not found in td tag in results table tbody row {row}, column {column}')
+    raise AssertionError(f'"{expected}" not found in td tag in results table tbody row {row}, column {column}. Found text "{elem.text}".')
 
 def user_checks_previous_table_tool_step_contains(step, key, value):
   try:

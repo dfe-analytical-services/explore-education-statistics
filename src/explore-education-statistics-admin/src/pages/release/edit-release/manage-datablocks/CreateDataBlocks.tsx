@@ -30,23 +30,12 @@ const CreateDataBlocks = ({
     ManageReleaseContext,
   ) as ManageRelease;
 
-  const [themeMeta, setThemeMeta] = React.useState<ThemeMeta[]>();
-  const [publicationId, setPublicationId] = React.useState<string>(
-    publication.id,
-  );
-
-  React.useEffect(() => {
-    tableBuilderService.getThemes().then(themeMeta => {
-      setThemeMeta(themeMeta);
-    });
-  }, []);
-
   return (
     <div>
-      {themeMeta && publicationId !== undefined && (
+      {releaseId !== undefined && (
         <TableTool
-          publicationId={publicationId}
-          themeMeta={themeMeta}
+          releaseId={releaseId}
+          themeMeta={[]}
           finalStepHeading="Configure data block"
           finalStepExtra={({ query, tableHeaders }) => (
             <DataBlockDetailsForm

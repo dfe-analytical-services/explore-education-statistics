@@ -11,3 +11,8 @@
 :global(.govuk-tag).ragStatusGreen {
   background: govuk-colour('green');
 }
+
+.currentStatusContainer {
+  align-items: center;
+  display: flex;
+}

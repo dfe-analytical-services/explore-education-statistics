@@ -7,7 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using Moq;
 using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 {
     public class MethodologiesControllerTests
     {
