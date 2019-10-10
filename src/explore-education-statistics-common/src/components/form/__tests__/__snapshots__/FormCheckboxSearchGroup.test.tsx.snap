@@ -5,7 +5,7 @@ exports[`FormCheckboxSearchGroup renders list of checkboxes in correct order 1`]
   <fieldset class="govuk-fieldset"
             id="test-checkboxes"
   >
-    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
       Choose options
     </legend>
     <label class="govuk-label"

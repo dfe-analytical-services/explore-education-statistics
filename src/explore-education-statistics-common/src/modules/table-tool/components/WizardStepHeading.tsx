@@ -14,7 +14,7 @@ const WizardStepHeading = ({
   currentStep,
   fieldsetHeading = false,
   isActive,
-  size = 'm',
+  size = 'l',
   stepNumber,
   setCurrentStep,
 }: Props & InjectedWizardProps) => {
