@@ -54,10 +54,9 @@ pipenv run python run_tests.py -h
 pipenv run python backup-local.py
 ```
 
-The backup-local.py script is used to backup the data on your current local environment. This means both the content and statistics databases, and the content cache blob container. The script assumes you have both the ees-mssql docker container running and a local azure emulator running. The data is saved in the backup-data directory. Be warned that running this script does delete any files that were previously in your backup-data directory.
+The backup-local.py script is used to backup the data on your current local environment. This means both the content and statistics databases, and the cache and releases blob containers. The script assumes you have both the ees-mssql docker container running and a local azure emulator running. The data is saved in the backup-data directory. Be warned that running this script does delete any files that were previously in your backup-data directory.
 
 NOTE: Before you run the backup-local.py script, you will want to put any message into your local `content-cache` queue to regenerate the content cache. If you don't, your backup of the cache will be out of sync with the database backup!
-
 
 
 # How do I restore the test data on my local environment?
@@ -66,7 +65,7 @@ NOTE: Before you run the backup-local.py script, you will want to put any messag
 pipenv run python restore-local.py
 ```
 
-The restore-local.py script takes the data in the backup-data directory and puts it in your local database and the cache blob container. Be warned that you will lose any data you have in your local database and content cache.
+The restore-local.py script takes the data in the backup-data directory and puts it in the content and statistics databases and the cache and releases blob containers. Be warned that you will lose any data in your local environment when you run this!
 
 
 # Directory structure

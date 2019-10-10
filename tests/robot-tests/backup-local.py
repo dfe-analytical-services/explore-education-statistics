@@ -4,13 +4,12 @@ import subprocess
 import docker
 from azure.storage.blob import BlockBlobService
 
-# Set up directories
+# Remove all previous backup files and directories in backup-data directory
 if os.path.exists('backup-data'):
     shutil.rmtree('backup-data')
-os.makedirs(os.path.join('backup-data', 'content-cache'))
-os.makedirs(os.path.join('backup-data', 'mssql'))
 
 # Back up ees-mssql docker container db
+os.makedirs(os.path.join('backup-data', 'mssql'))
 client = docker.from_env()
 container = client.containers.get('ees-mssql')
 backup_cmds = [
@@ -33,6 +32,7 @@ for cmd in copy_from_container_cmds:
     print(subprocess.run(cmd.split()))
 
 # Backup cache blob container to backup-data/content-cache
+os.makedirs(os.path.join('backup-data', 'content-cache'))
 block_blob_service = BlockBlobService(is_emulated=True)
 generator = block_blob_service.list_blobs('cache')
 for blob in generator:
@@ -42,4 +42,16 @@ for blob in generator:
         block_blob_service.get_blob_to_path('cache', blob.name, os.path.join(os.getcwd(), 'backup-data', 'content-cache', head, tail))
     else:
         block_blob_service.get_blob_to_path('cache', blob.name, os.path.join(os.getcwd(), 'backup-data', 'content-cache', blob.name))
+
+# Backup downloads blob container to backup-data/releases
+os.makedirs(os.path.join('backup-data', 'releases'))
+block_blob_service = BlockBlobService(is_emulated=True)
+generator = block_blob_service.list_blobs('releases')
+for blob in generator:
+    if '/' in blob.name:
+        head, tail = os.path.split(blob.name)
+        os.makedirs(os.path.join(os.getcwd(), 'backup-data', 'releases', head), exist_ok=True)
+        block_blob_service.get_blob_to_path('releases', blob.name, os.path.join(os.getcwd(), 'backup-data', 'releases', head, tail))
+    else:
+        block_blob_service.get_blob_to_path('releases', blob.name, os.path.join(os.getcwd(), 'backup-data', 'releases', blob.name))
 

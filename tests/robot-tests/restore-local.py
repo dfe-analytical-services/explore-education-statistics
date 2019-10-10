@@ -39,3 +39,16 @@ for (dirpath, _, filenames) in os.walk(os.path.join(os.getcwd(), 'backup-data', 
         file_path = os.path.join(dirpath, filename)
         blob_name = os.path.join(dirpath, filename).split(f'content-cache{os.sep}', 1)[1]
         block_blob_service.create_blob_from_path('cache', blob_name, file_path)
+
+# Delete all files in releases blob container
+block_blob_service = BlockBlobService(is_emulated=True)
+generator = block_blob_service.list_blobs('releases')
+for blob in generator:
+    block_blob_service.delete_blob('releases', blob.name)
+
+# Restore all files to releases blob container
+for (dirpath, _, filenames) in os.walk(os.path.join(os.getcwd(), 'backup-data', 'releases')):
+    for filename in filenames:
+        file_path = os.path.join(dirpath, filename)
+        blob_name = os.path.join(dirpath, filename).split(f'releases{os.sep}', 1)[1]
+        block_blob_service.create_blob_from_path('releases', blob_name, file_path)
