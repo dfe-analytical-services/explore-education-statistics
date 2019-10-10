@@ -20,7 +20,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using FileInfo = GovUk.Education.ExploreEducationStatistics.Admin.Models.FileInfo;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 {
     public class ReleaseControllerTests
     {

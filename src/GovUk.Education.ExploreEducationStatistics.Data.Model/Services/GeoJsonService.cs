@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
@@ -18,6 +19,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             return _context.GeoJson.FirstOrDefault(geoJson =>
                 geoJson.BoundaryLevelId == boundaryLevelId &&
                 geoJson.Code.Equals(code));
+        }
+        
+        public IQueryable<GeoJson> Find(long boundaryLevelId, IEnumerable<string> codes)
+        {
+            return _context.GeoJson.Where(geoJson =>
+                geoJson.BoundaryLevelId == boundaryLevelId &&
+                codes.Contains(geoJson.Code));
         }
     }
 }

@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
     {
         protected readonly StatisticsDbContext _context;
 
-        private readonly ILogger _logger;
+        protected readonly ILogger _logger;
 
         protected AbstractRepository(StatisticsDbContext context, ILogger logger)
         {

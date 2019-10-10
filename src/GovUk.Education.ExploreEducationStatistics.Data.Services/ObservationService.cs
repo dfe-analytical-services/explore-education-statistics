@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -26,6 +28,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         public IEnumerable<Observation> FindObservations(ObservationQueryContext query)
         {
+            var stopwatch = Stopwatch.StartNew();
+            stopwatch.Start();
+
             var subjectIdParam = new SqlParameter("subjectId", query.SubjectId);
             var geographicLevelParam = new SqlParameter("geographicLevel",
                 query.GeographicLevel?.GetEnumValue() ?? (object) DBNull.Value);
@@ -90,7 +95,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     wardListParam,
                     filtersListParam);
 
-            var ids = inner.Select(obs => obs.Id).ToList();
+            _logger.LogTrace("Executed inner stored procedure in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+            stopwatch.Restart();
+
+            var ids = inner.Select(obs => obs.Id).ToArray();
+
+            _logger.LogTrace("Fetched Observation id's from inner result in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+            stopwatch.Restart();
+
             var batches = ids.Batch(10000);
 
             var result = new List<Observation>();
@@ -105,6 +117,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     .ThenInclude(item => item.FilterItem.FilterGroup.Filter));
             }
 
+            _logger.LogTrace("Fetched Observations by id from {Count} batches in {Time} ms", batches.Count(),
+                stopwatch.Elapsed.TotalMilliseconds);
+            stopwatch.Restart();
+
             // Nullify all of the Observational Unit fields which are empty
             // Do this here on the set of distinct Locations rather than when building each ObservationViewModel
             // (since a Location may be referenced by more than one Observation) 
@@ -112,6 +128,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .Distinct()
                 .ToList()
                 .ForEach(location => location.ReplaceEmptyOwnedTypeValuesWithNull());
+
+            _logger.LogTrace("Nullified all of the empty Observational Unit fields in {Time} ms",
+                stopwatch.Elapsed.TotalMilliseconds);
+            stopwatch.Stop();
 
             return result;
         }
