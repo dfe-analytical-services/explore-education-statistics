@@ -281,6 +281,7 @@ const TableTool = ({
   >();
 
   React.useEffect(() => {
+
     setValidInitialQuery(undefined);
     setInitialStep(1);
 
@@ -396,6 +397,20 @@ const TableTool = ({
       };
 
       doit();
+    } else {
+
+      setSubjectMeta(getDefaultSubjectMeta());
+      setSubjectId('');
+      setLocations({});
+      setDateRange({});
+      setTableHeaders({
+        columnGroups: [],
+        columns: [],
+        rowGroups: [],
+        rows: [],
+      });
+      setCreatedTable(undefined);
+      setQuery(undefined);
     }
   }, [initialQuery, initialTableHeaders, onInitialQueryCompleted, releaseId]);
 

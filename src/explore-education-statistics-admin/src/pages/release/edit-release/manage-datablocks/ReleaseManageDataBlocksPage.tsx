@@ -48,12 +48,9 @@ const ReleaseManageDataBlocksPage = () => {
 
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [dataBlock, setDataBlock] = React.useState<DataBlock>();
-  const [dataBlockRequest, setDataBlockRequest] = React.useState<
-    DataBlockRequest
-  >();
-  const [dataBlockResponse, setDataBlockResponse] = React.useState<
-    DataBlockResponse
-  >();
+  const [dataBlockRequest, setDataBlockRequest] = React.useState<DataBlockRequest>();
+
+  const [dataBlockResponse, setDataBlockResponse] = React.useState<DataBlockResponse>();
 
   const onDataBlockSave = async (db: DataBlock) => {
     let newDataBlock;
@@ -73,10 +70,10 @@ const ReleaseManageDataBlocksPage = () => {
     return newDataBlock;
   };
 
-  const [deleteDataBlock, setOnDeleteDataBlock] = React.useState<DataBlock>();
+  const [deleteDataBlock, setDeleteDataBlock] = React.useState<DataBlock>();
 
   const onDeleteDataBlock = (db: DataBlock) => {
-    setOnDeleteDataBlock(undefined);
+    setDeleteDataBlock(undefined);
     if (db.id) {
       DataBlocksService.deleteDataBlock(db.id)
         .then(() => updateDataBlocks(releaseId))
@@ -173,7 +170,7 @@ const ReleaseManageDataBlocksPage = () => {
                   <div className="govuk-!-margin-top-4">
                     <Button
                       type="button"
-                      onClick={() => setOnDeleteDataBlock(dataBlock)}
+                      onClick={() => setDeleteDataBlock(dataBlock)}
                     >
                       Delete this data block
                     </Button>
@@ -186,8 +183,8 @@ const ReleaseManageDataBlocksPage = () => {
                   title="Delete Data Block"
                   mounted={deleteDataBlock !== undefined}
                   onConfirm={() => onDeleteDataBlock(deleteDataBlock)}
-                  onExit={() => setOnDeleteDataBlock(undefined)}
-                  onCancel={() => setOnDeleteDataBlock(undefined)}
+                  onExit={() => setDeleteDataBlock(undefined)}
+                  onCancel={() => setDeleteDataBlock(undefined)}
                 >
                   <p>Are you sure you wish to delete this Data Block?</p>
                 </ModalConfirm>
