@@ -15,9 +15,9 @@ client = docker.from_env()
 container = client.containers.get('ees-mssql')
 backup_cmds = [
     'rm -rf /tmp/*',
-    '/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "BACKUP DATABASE [content] TO DISK = N\'/tmp/content.bak\' WITH NOFORMAT, NOINIT, NAME = \'content-full\', SKIP, NOREWIND, NOUNLOAD, STATS = 10"',
+    '/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "BACKUP DATABASE [content] TO DISK = N\'/tmp/content.bak\' WITH FORMAT, NAME = \'content-full\', SKIP, NOREWIND, NOUNLOAD, COMPRESSION, STATS = 10"',
     '/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "BACKUP LOG [content] TO DISK = N\'/tmp/content_LogBackup.bak\' WITH NOFORMAT, NOINIT, NAME = N\'content_LogBackup\', NOSKIP, NOREWIND, NOUNLOAD, STATS = 5"',
-    '/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "BACKUP DATABASE [statistics] TO DISK = N\'/tmp/statistics.bak\' WITH NOFORMAT, NOINIT, NAME = \'statistics-full\', SKIP, NOREWIND, NOUNLOAD, STATS = 10"',
+    '/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "BACKUP DATABASE [statistics] TO DISK = N\'/tmp/statistics.bak\' WITH FORMAT, NAME = \'statistics-full\', SKIP, NOREWIND, NOUNLOAD, COMPRESSION, STATS = 10"',
     '/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "BACKUP LOG [statistics] TO DISK = N\'/tmp/statistics_LogBackup.bak\' WITH NOFORMAT, NOINIT, NAME = N\'statistics_LogBackup\', NOSKIP, NOREWIND, NOUNLOAD, STATS = 5"'
 ]
 for cmd in backup_cmds:
