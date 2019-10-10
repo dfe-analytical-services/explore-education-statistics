@@ -30,7 +30,7 @@ const SummaryListItem = ({
         return (
           <>
             {React.Children.map(children, (child, i) => {
-              if (i > collapseAfter) {
+              if (i >= collapseAfter) {
                 return null;
               }
               return child;
