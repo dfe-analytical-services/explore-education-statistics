@@ -6,9 +6,9 @@ export interface DataBlock {
   id?: string;
 
   heading?: string;
-  customFootnotes?:string;
-  name?:string;
-  source?:string;
+  customFootnotes?: string;
+  name?: string;
+  source?: string;
 
   dataBlockRequest?: DataBlockRequest;
   charts?: Chart[];
