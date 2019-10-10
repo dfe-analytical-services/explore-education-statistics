@@ -39,6 +39,36 @@ interface Props {
 
 }
 
+export const buildInitialFormValue = (
+  meta : PublicationSubjectMeta,
+  initial?: InitialValuesType
+) => {
+
+  return {
+    filters: mapValues(meta.filters, (filter) => {
+
+      if (initial && initial.filters) {
+
+        const allFilterOptions= ([] as FilterOption[])
+          .concat(... Object.values(filter.options).map( ({options}) => options));
+
+        const allFilterValues=allFilterOptions.map( ({value}) => value)
+
+        return allFilterValues.filter((value) => initial.filters.includes(value));
+      }
+
+      if (typeof filter.options.Default !== 'undefined') {
+        // Automatically select filter option when there is only one
+        return filter.options.Default.options.length === 1
+          ? [filter.options.Default.options[0].value]
+          : [];
+      }
+      return [];
+    }),
+    indicators: initial && initial.indicators || [],
+  }
+};
+
 const FiltersForm = (props: Props & InjectedWizardProps) => {
   const {
     onSubmit,
@@ -60,35 +90,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
     <WizardStepHeading {...props}>Choose your filters</WizardStepHeading>
   );
 
-  const buildInitialFormValue = (
-    meta : PublicationSubjectMeta,
-    initial?: InitialValuesType
-  ) => {
 
-    return {
-      filters: mapValues(meta.filters, (filter) => {
-
-        if (initial && initial.filters) {
-
-          const allFilterOptions= ([] as FilterOption[])
-            .concat(... Object.values(filter.options).map( ({options}) => options));
-
-          const allFilterValues=allFilterOptions.map( ({value}) => value)
-
-          return allFilterValues.filter((value) => initial.filters.includes(value));
-        }
-
-        if (typeof filter.options.Default !== 'undefined') {
-          // Automatically select filter option when there is only one
-          return filter.options.Default.options.length === 1
-            ? [filter.options.Default.options[0].value]
-            : [];
-        }
-        return [];
-      }),
-      indicators: initialValues && initialValues.indicators || [],
-    }
-  };
 
   const [initialFormValue, setInitialFormValue] = React.useState(() => buildInitialFormValue(subjectMeta, initialValues));
 

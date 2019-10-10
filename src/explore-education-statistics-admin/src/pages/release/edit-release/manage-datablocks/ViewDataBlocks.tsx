@@ -49,8 +49,6 @@ const ViewDataBlocks = ({
     }
   }, [dataBlock]);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-
   const [tableData, setTableData] = React.useState<{
     fullTable: FullTable;
     tableHeadersConfig: TableHeadersFormValues;

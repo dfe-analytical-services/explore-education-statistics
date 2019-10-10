@@ -15,10 +15,10 @@ import {CategoryFilter, Indicator, LocationFilter,} from '@common/modules/full-t
 import parseYearCodeTuple from '@common/modules/full-table/utils/TimePeriod';
 import mapValues from 'lodash/mapValues';
 import React, {createRef, ReactNode} from 'react';
-import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
+import getDefaultTableHeaderConfig, {TableHeadersConfig} from '@common/modules/full-table/utils/tableHeaders';
 import {FullTable} from '@common/modules/full-table/types/fullTable';
 import {mapFullTable} from '@common/modules/full-table/utils/mapPermalinks';
-import FiltersForm, {FilterFormSubmitHandler,} from '@common/modules/table-tool/components/FiltersForm';
+import FiltersForm, {FilterFormSubmitHandler, FormValues,} from '@common/modules/table-tool/components/FiltersForm';
 import LocationFiltersForm, {
   LocationFiltersFormSubmitHandler,
   LocationsFormValues,
@@ -55,6 +55,8 @@ interface Props {
   finalStepHeading?: string;
 
   initialQuery?: TableDataQuery;
+  initialTableHeaders?: TableHeadersFormValues;
+  onInitialQueryCompleted?: () => void;
 }
 
 interface DateRangeState {
@@ -122,6 +124,88 @@ const getSelectedLocationsForQuery = (locationQuery: Dictionary<string[] | undef
     (key, _) => locationQuery[key] || [],
   );
 
+const getFiltersForTableGeneration = ({filters: metaFilters}: PublicationSubjectMeta, {filters}: FormValues) => {
+  const filtersByValue = mapValues(metaFilters, value =>
+    mapOptionValues(value.options),
+  );
+
+  return mapValuesWithKeys(
+    filters,
+    (filterGroup, selectedFilters) =>
+      selectedFilters.map(
+        filter =>
+          new CategoryFilter(
+            filtersByValue[filterGroup][filter],
+            filter === metaFilters[filterGroup].totalValue,
+          ),
+      ),
+  );
+};
+
+const getIndicatorsForTableGeneration = ({indicators: indicatorsMeta}: PublicationSubjectMeta, {indicators}: FormValues) => {
+
+  const indicatorsByValue = mapOptionValues<IndicatorOption>(
+    indicatorsMeta,
+  );
+
+  return indicators.map(
+    indicator => new Indicator(indicatorsByValue[indicator]),
+  );
+
+};
+
+const queryForTable = async (query: TableDataQuery, releaseId?: string): Promise<FullTable> => {
+  if (releaseId) {
+    return tableBuilderService.getTableDataForRelease(
+      query,
+      releaseId,
+    );
+  }
+  return tableBuilderService.getTableData(
+    query,
+  );
+
+};
+
+const tableGeneration = async (
+  dateRange: DateRangeState,
+  subjectMeta: PublicationSubjectMeta,
+  values: FormValues,
+  subjectId: string,
+  locations: Dictionary<LocationFilter[]>,
+  releaseId: string | undefined,
+): Promise<{
+  table?: FullTable,
+  tableHeaders?: TableHeadersConfig,
+  query?: TableDataQuery
+}> => {
+  const {startYear, startCode, endYear, endCode} = dateRange;
+
+  if (!startYear || !startCode || !endYear || !endCode) {
+    return {};
+  }
+
+  const query: TableDataQuery = createQuery(
+    getFiltersForTableGeneration(subjectMeta, values),
+    getIndicatorsForTableGeneration(subjectMeta, values),
+    {
+      subjectId,
+      locations,
+      ...dateRange,
+    });
+
+  const unmappedCreatedTable = await queryForTable(query, releaseId);
+  const table = mapFullTable(unmappedCreatedTable);
+  const tableHeaders = getDefaultTableHeaderConfig(table.subjectMeta);
+
+  return {
+    table,
+    tableHeaders,
+    query
+  };
+
+};
+
 const TableTool = ({
   themeMeta,
   publicationId,
@@ -129,6 +213,8 @@ const TableTool = ({
   finalStepExtra,
   finalStepHeading,
   initialQuery,
+  initialTableHeaders,
+  onInitialQueryCompleted
 }: Props) => {
   const dataTableRef = createRef<HTMLTableElement>();
 
@@ -141,8 +227,8 @@ const TableTool = ({
   const getDefaultSubjectMeta = () => ({
     timePeriod: {
       hint: '',
-        legend: '',
-        options: [],
+      legend: '',
+      options: [],
     },
     locations: {},
     indicators: {},
@@ -175,30 +261,112 @@ const TableTool = ({
     setInitialStep(1);
 
     if (initialQuery) {
-      tableBuilderService
-        .filterPublicationSubjectMeta(initialQuery)
-        .then(meta => {
+      const doit = async () => {
+
+        try {
+
+          let newQuery: TableDataQuery = {
+            subjectId: '',
+            filters: [],
+            indicators: [],
+          };
+
+          const meta = await tableBuilderService.filterPublicationSubjectMeta(initialQuery);
           setSubjectMeta(meta);
 
-          // populate subject data
-          setSubjectId(initialQuery.subjectId);
+          if (initialQuery.subjectId === undefined || initialQuery.subjectId === '') {
+            setInitialStep(1);
+            setQuery(newQuery);
+            setValidInitialQuery(newQuery);
+          } else {
 
-          // populate location data
-          setLocations(mapLocations(
-            getSelectedLocationsForQuery(initialQuery),
-            meta.locations,
-          ));
+            newQuery.subjectId = initialQuery.subjectId;
+            setSubjectId(initialQuery.subjectId);
 
-          // generate and populate time period data
-          setDateRange({...initialQuery.timePeriod});
+            // validate location data
+            // parse out all the location query information, filter it to only those that are set
+            const initialLocations: Dictionary<string[]> =
+              Object.entries(
+                mapValuesWithKeys(LocationLevelKeysEnum, keyName => (initialQuery as Dictionary<string[]>)[keyName])
+              )
+                .reduce((filtered, [, value]) => ({...filtered, ...((value && value.length > 0) ? value : {})}), {});
+
+            // check if any are actually set to validate if it's actually valid
+            const allLocations = ([] as string[]).concat(...Object.values(initialLocations));
+            if (allLocations.length === 0) {
+              setInitialStep(2);
+              setQuery(newQuery);
+              setValidInitialQuery(newQuery);
+            } else {
+
+              // populate location data
+              const newLocations = mapLocations(
+                getSelectedLocationsForQuery(initialQuery),
+                meta.locations,
+              );
+              newQuery = {...newQuery, ...initialLocations};
+              setLocations(newLocations);
 
 
-          setInitialStep(4);
-          setValidInitialQuery(initialQuery);
-        });
+              // validate time period
+              // generate and populate time period data
+              const newDateRange: DateRangeState = {...initialQuery.timePeriod};
+              if (newDateRange.endCode === undefined || newDateRange.endYear === undefined || newDateRange.startCode === undefined || newDateRange.startYear === undefined) {
+                setInitialStep(3);
+                setQuery(newQuery);
+                setValidInitialQuery(newQuery);
+
+              } else {
+
+                newQuery = {...newQuery, timePeriod: initialQuery.timePeriod};
+                setDateRange(newDateRange);
+
+                if (initialQuery.filters.length === 0 || initialQuery.indicators.length === 0) {
+                  setInitialStep(4);
+                  setQuery(newQuery);
+                  setValidInitialQuery(newQuery);
+
+                } else {
+
+                  newQuery = {...newQuery, filters: initialQuery.filters, indicators: initialQuery.indicators};
+
+                  // const newValues: FormValues = buildInitialFormValue(meta, newQuery);
+
+                  const newTable = await queryForTable(newQuery, releaseId);
+
+                  const newTableHeaders = initialTableHeaders || getDefaultTableHeaderConfig(newTable.subjectMeta);
+
+                  setInitialStep(5);
+                  setCreatedTable(newTable);
+                  setTableHeaders(newTableHeaders);
+                  setQuery(newQuery);
+                  setValidInitialQuery(newQuery);
+
+
+                }
+
+              }
+
+            }
+
+
+          }
+
+
+        } catch (_) {
+          //
+        }
+
+        if (onInitialQueryCompleted) onInitialQueryCompleted();
+
+      };
+
+      doit();
+
+
     }
 
-  }, [initialQuery]);
+  }, [initialQuery, initialTableHeaders, onInitialQueryCompleted]);
 
   const handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
     publicationId: selectedPublicationId,
@@ -293,63 +461,25 @@ const TableTool = ({
     });
   };
 
+
   const handleFiltersFormSubmit: FilterFormSubmitHandler = async values => {
-    const {startYear, startCode, endYear, endCode} = dateRange;
 
-    if (!startYear || !startCode || !endYear || !endCode) {
-      return;
-    }
-
-    const filtersByValue = mapValues(subjectMeta.filters, value =>
-      mapOptionValues(value.options),
-    );
-
-    const indicatorsByValue = mapOptionValues<IndicatorOption>(
-      subjectMeta.indicators,
-    );
-
-    const filters = mapValuesWithKeys(
-      values.filters,
-      (filterGroup, selectedFilters) =>
-        selectedFilters.map(
-          filter =>
-            new CategoryFilter(
-              filtersByValue[filterGroup][filter],
-              filter === subjectMeta.filters[filterGroup].totalValue,
-            ),
-        ),
-    );
-
-    const indicators = values.indicators.map(
-      indicator => new Indicator(indicatorsByValue[indicator]),
-    );
-
-    const createdQuery: TableDataQuery = createQuery(filters, indicators, {
+    const {table, tableHeaders: generatedTableHeaders, query: createdQuery} = await tableGeneration(
+      dateRange,
+      subjectMeta,
+      values,
       subjectId,
       locations,
-      ...dateRange,
-    });
+      releaseId
+    );
 
-    let unmappedCreatedTable;
-
-    if (releaseId) {
-      unmappedCreatedTable = await tableBuilderService.getTableDataForRelease(
-        createdQuery,
-        releaseId,
-      );
-    } else {
-      unmappedCreatedTable = await tableBuilderService.getTableData(
-        createdQuery,
-      );
+    if (table && generatedTableHeaders && createdQuery) {
+      setCreatedTable(table);
+      setTableHeaders(generatedTableHeaders);
+      setQuery(createdQuery);
     }
 
-    const table = mapFullTable(unmappedCreatedTable);
 
-    setCreatedTable(table);
-
-    setTableHeaders(getDefaultTableHeaderConfig(table.subjectMeta));
-
-    setQuery(createdQuery);
   };
 
   return (

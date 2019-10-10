@@ -32,6 +32,27 @@ interface Props {
   onSubmit: LocationFiltersFormSubmitHandler;
 }
 
+export const calculateInitialValues = (
+  initial: Dictionary<string[] | undefined> | undefined,
+  opts: PublicationSubjectMeta['locations'],
+): FormValues => {
+  const initialNotUndef = initial || {};
+
+  return {
+    locations: Object.entries(opts).reduce((acc, [level, levelOptions]) => {
+      const initialLevel = initialNotUndef[level] || [];
+      return {
+        ...acc,
+        [level]: initialLevel.filter(
+          initialId =>
+            levelOptions.options.find(({ value }) => value === initialId) !==
+            undefined,
+        ),
+      };
+    }, {}),
+  };
+};
+
 const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
   const {
     options,
@@ -62,26 +83,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
     </WizardStepHeading>
   );
 
-  const calculateInitialValues = (
-    initial: Dictionary<string[] | undefined> | undefined,
-    opts: PublicationSubjectMeta['locations'],
-  ): FormValues => {
-    const initialNotUndef = initial || {};
 
-    return {
-      locations: Object.entries(opts).reduce((acc, [level, levelOptions]) => {
-        const initialLevel = initialNotUndef[level] || [];
-        return {
-          ...acc,
-          [level]: initialLevel.filter(
-            initialId =>
-              levelOptions.options.find(({ value }) => value === initialId) !==
-              undefined,
-          ),
-        };
-      }, {}),
-    };
-  };
 
   const [formInitialValues, setFormInitialValues] = React.useState(
     calculateInitialValues(initialValues, options),
