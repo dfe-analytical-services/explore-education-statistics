@@ -1,19 +1,19 @@
 # What is this?
 
-This test framework runs UI tests against the Explore Education Statistics service using selenium and robot framework.
+This test framework runs UI tests against the Explore Education Statistics service using Selenium and Robot Framework.
 
-Currently, these tests are being maintained so they can be run on Linux. They're not being maintained for Windows or MacOS, but they may work without too much trouble. If you try MacOS, ensure you're using python3 and not python2!
+Currently, these tests are being maintained so they can be run on Windows. They're not being maintained for Linux or MacOS, but they may work without too much trouble. If you try MacOS, ensure you're using Python3 and not Python2!
 
 # What do I need to install?
 
-Firstly, install python3.7 or greater
-   * For Windows, you'll need to download python3 from here: https://www.python.org/downloads/
-   * For Linux, use the package manager (i.e. On ubuntu, "sudo apt-get install python3.7")
+Firstly, install Python3.7 or greater
+   * For Windows, you'll need to download Python3 from here: https://www.python.org/downloads/
+   * For Linux, use the package manager (i.e. On Ubuntu, "sudo apt-get install python3.7")
 
 Then ensure python and pip are included in your PATH environment variable
    * `python --version` should return a version >= 3.7. If it doesn't you can try using the commands `python3` or `python3.7`, if you have multiple versions of python installed on your machine.
    * To verify pip is installed, it is probably easiest to run entering `python -m pip` into a terminal. You should see the pip help text in response.
-   * For Windows, I needed to add `C:\Program Files\Python37` and `C:\Program Files\Python37\Scripts`. Check your Program Files directory to find out where python is installed on your computer. A search engine will tell you how to add them to the PATH.
+   * For Windows, I needed to add `C:\Program Files\Python37` and `C:\Program Files\Python37\Scripts`. Check your Program Files directory to find out where Python is installed on your computer. A search engine will tell you how to add them to the PATH.
    
 Then install pipenv
 ```
@@ -27,11 +27,11 @@ python -m pip install pipenv
 
 Then in the robot-tests directory run
 ```
-pipenv install
+pipenv install --dev
 ```
 OR
 ```
-python -m pipenv install
+python -m pipenv install --dev
 ```
 
 If you intend to run the tests from your local machine, you will also need to create .env files for the relevant environments: ".env.dev", ".env.test", and ".env.dev03". You can copy and rename the .env.example file in the robot-tests directory, replacing the variable values with those for that file's specific environment. The tests rely on these environment variables being set.
@@ -48,9 +48,33 @@ Further instructions available options
 pipenv run python run_tests.py -h
 ```
 
+# How do I backup the test data on my local environment?
+
+```
+pipenv run python backup-local.py
+```
+
+The backup-local.py script is used to backup the data on your current local environment. This means both the content and statistics databases, and the content cache blob container. The script assumes you have both the ees-mssql docker container running and a local azure emulator running. The data is saved in the backup-data directory. Be warned that running this script does delete any files that were previously in your backup-data directory.
+
+NOTE: Before you run the backup-local.py script, you will want to put any message into your local `content-cache` queue to regenerate the content cache. If you don't, your backup of the cache will be out of sync with the database backup!
+
+
+
+# How do I restore the test data on my local environment?
+
+```
+pipenv run python restore-local.py
+```
+
+The restore-local.py script takes the data in the backup-data directory and puts it in your local database and the cache blob container. Be warned that you will lose any data you have in your local database and content cache.
+
+
 # Directory structure
 
 This section details what the various directories in robot-tests contain.
+
+### backup-data
+This directory holds backup data for both the MSSQL database and the content cache. If you run backup-local.py, the backup is stored here. If you run restore-local.py, it uses the data in this directory to restore to your local docker database and content cache.
 
 ### scripts
 This directory holds scripts used by run\_tests.py and the CI pipeline.
