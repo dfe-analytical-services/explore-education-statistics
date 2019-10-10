@@ -1,4 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Converters;
@@ -9,9 +11,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
+using Microsoft.Azure.Storage.Queue;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Swagger;
 
@@ -20,9 +24,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
     [ExcludeFromCodeCoverage]
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private readonly ILogger<Startup> _logger;
+
+        public Startup(IConfiguration configuration, ILogger<Startup> logger)
         {
             Configuration = configuration;
+            _logger = logger;
         }
 
         public IConfiguration Configuration { get; }
@@ -72,6 +79,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                
+                GenerateContentCache();
             }
             else
             {
@@ -108,6 +117,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                 {
                     context.Database.Migrate();
                 }
+            }
+        }
+
+        // TODO: this should only be used in development, adds the required message to the content-cache queue
+        private void GenerateContentCache()
+        {
+            CloudQueueClient cloudStorageClient = null;
+            
+            try
+            {
+                var cloudStorageAccount = CloudStorageAccount.Parse(Configuration.GetConnectionString("PublicStorage"));
+                cloudStorageClient = cloudStorageAccount.CreateCloudQueueClient();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Unable to create content-cache queue client");
+                throw;
+            }
+
+            try
+            {
+                var queue = cloudStorageClient.GetQueueReference("content-cache");
+                queue.CreateIfNotExists();
+                
+                var message = new CloudQueueMessage("Generation triggered by the Content API Startup");
+                queue.AddMessage(message);
+                
+                _logger.LogInformation("Message added to content-cache queue.");
+                _logger.LogInformation("Please ensure the publisher function is running");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Unable add message to content-cache queue");
+                throw;
             }
         }
     }
