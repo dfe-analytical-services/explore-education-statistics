@@ -6,7 +6,7 @@ exports[`FormFieldCheckboxGroupsMenu renders multiple checkbox groups in correct
   id="test"
 >
   <legend
-    class="govuk-fieldset__legend govuk-fieldset__legend--m govuk-visually-hidden"
+    class="govuk-fieldset__legend govuk-fieldset__legend--l govuk-visually-hidden"
   >
     Choose options
   </legend>
@@ -140,7 +140,7 @@ exports[`FormFieldCheckboxGroupsMenu renders single checkbox group with search i
   id="test"
 >
   <legend
-    class="govuk-fieldset__legend govuk-fieldset__legend--m govuk-visually-hidden"
+    class="govuk-fieldset__legend govuk-fieldset__legend--l govuk-visually-hidden"
   >
     Choose options
   </legend>
@@ -215,7 +215,7 @@ exports[`FormFieldCheckboxGroupsMenu renders single checkbox group with single c
   id="test"
 >
   <legend
-    class="govuk-fieldset__legend govuk-fieldset__legend--m"
+    class="govuk-fieldset__legend govuk-fieldset__legend--l"
   >
     Choose options
   </legend>
