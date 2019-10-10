@@ -22,7 +22,12 @@ const PrintThisPage = ({ analytics, ...props }: AnalyticProps) => {
         styles.mobileHidden,
       )}
     >
-      <a {...props} href="#" onClick={() => openPrint()}>
+      <a
+        className="govuk-button govuk-button--secondary"
+        {...props}
+        href="#"
+        onClick={() => openPrint()}
+      >
         Print this page
       </a>
     </div>

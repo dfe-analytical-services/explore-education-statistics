@@ -167,9 +167,11 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
                         id={`${formId}-levels-${levelKey}`}
                         legend={level.legend}
                         legendHidden
-                        selectAll={false}
                         onAllChange={() => {
                           updateLocationLevels(draft => {
+                            if (!draft[levelKey]) {
+                              draft[levelKey] = [];
+                            }
                             draft[levelKey] =
                               draft[levelKey].length < level.options.length
                                 ? level.options
@@ -219,6 +221,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
                   <SummaryListItem
                     term={options[levelKey].legend}
                     key={levelKey}
+                    shouldCollapse
                   >
                     {sortBy(levelOptions, ['label']).map(level => (
                       <React.Fragment key={level.value}>
