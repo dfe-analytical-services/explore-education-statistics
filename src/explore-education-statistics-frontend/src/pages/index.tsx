@@ -4,11 +4,7 @@ import Page from '../components/Page';
 
 function HomePage() {
   return (
-    <Page
-      title="Choose how to explore our statistics and data"
-      pageMeta={{ title: 'Explore education statistics' }}
-      isHomepage
-    >
+    <Page title="Choose how to explore our statistics and data" isHomepage>
       <p className="govuk-body-l">
         Select an option to find the national and regional level statistics and
         data you’re looking for.
