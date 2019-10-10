@@ -30,15 +30,15 @@ const SummaryListItem = ({
         return (
           <>
             {React.Children.map(children, (child, i) => {
-              if (i >= collapseAfter - 1) {
+              if (i >= collapseAfter - 2) {
                 return null;
               }
               return child;
             })}
-            {React.Children.count(children) - (collapseAfter - 1) && (
+            {React.Children.count(children) - (collapseAfter - 2) && (
               <strong>
                 {`And ${React.Children.count(children) -
-                  (collapseAfter - 1)} more...`}
+                  (collapseAfter - 2)} more...`}
                 <br />
               </strong>
             )}
