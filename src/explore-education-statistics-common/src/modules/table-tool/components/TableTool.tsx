@@ -317,10 +317,8 @@ const TableTool = ({
                 keyName => (initialQuery as Dictionary<string[]>)[keyName],
               ),
             ).reduce(
-              (filtered, [, value]) => ({
-                ...filtered,
-                ...(value && value.length > 0 ? value : {}),
-              }),
+              (filtered, [key, value]) =>
+                value ? { ...filtered, [key]: value } : filtered,
               {},
             );
 

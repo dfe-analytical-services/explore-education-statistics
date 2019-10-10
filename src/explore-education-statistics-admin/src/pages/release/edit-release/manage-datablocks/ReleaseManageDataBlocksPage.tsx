@@ -56,7 +56,15 @@ const ReleaseManageDataBlocksPage = () => {
   >();
 
   const onDataBlockSave = async (db: DataBlock) => {
-    const newDataBlock = await DataBlocksService.postDataBlock(releaseId, db);
+    let newDataBlock;
+
+    console.log(db);
+
+    if (db.id) {
+      newDataBlock = await DataBlocksService.putDataBlock(db.id, db);
+    } else {
+      newDataBlock = await DataBlocksService.postDataBlock(releaseId, db);
+    }
 
     if (db.id !== selectedDataBlock) {
       updateDataBlocks(releaseId).then(() => {

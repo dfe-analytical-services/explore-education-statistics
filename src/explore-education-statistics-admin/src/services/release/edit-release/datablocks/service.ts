@@ -18,6 +18,10 @@ export interface DataBlockService {
     releaseId: string,
     dataBlock: DataBlock,
   ) => Promise<DataBlock>;
+  putDataBlock: (
+    dataBlockId: string,
+    dataBlock: DataBlock,
+  ) => Promise<DataBlock>;
   deleteDataBlock: (id: string) => Promise<void>;
 }
 
@@ -44,6 +48,10 @@ const service: DataBlockService = {
       `/release/${releaseId}/datablocks`,
       dataBlock,
     );
+  },
+
+  async putDataBlock(dataBlockId: string, dataBlock: DataBlock) {
+    return client.put<DataBlock>(`/datablocks/${dataBlockId}`, dataBlock);
   },
 
   async deleteDataBlock(id: string) {
