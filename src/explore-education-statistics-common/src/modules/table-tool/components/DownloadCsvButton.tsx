@@ -95,7 +95,7 @@ const DownloadCsvButton = ({ publicationSlug, fullTable }: Props) => {
         });
       }}
     >
-      Download the underlying data of this table (.CSV)
+      Download the underlying data of this table (CSV)
     </ButtonText>
   );
 };
