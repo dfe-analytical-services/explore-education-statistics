@@ -4,15 +4,18 @@ import {
   FormFieldset,
   Formik,
 } from '@common/components/form';
-import {SelectOption} from '@common/components/form/FormSelect';
+import { SelectOption } from '@common/components/form/FormSelect';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
-import {PublicationSubjectMeta, TimePeriodQuery} from '@common/modules/full-table/services/tableBuilderService';
+import {
+  PublicationSubjectMeta,
+  TimePeriodQuery,
+} from '@common/modules/full-table/services/tableBuilderService';
 import useResetFormOnPreviousStep from '@common/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
-import {FormikProps} from 'formik';
-import React, {useRef} from 'react';
-import {InjectedWizardProps} from './Wizard';
+import { FormikProps } from 'formik';
+import React, { useRef } from 'react';
+import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
 
@@ -59,7 +62,6 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
   ];
 
   React.useEffect(() => {
-
     if (formikRef.current) {
       let start = '';
       let end = '';
@@ -69,9 +71,8 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
         end = `${initialValues.endYear}_${initialValues.endCode}`;
       }
 
-      formikRef.current.setValues({start, end});
+      formikRef.current.setValues({ start, end });
     }
-
   }, [options, initialValues]);
 
   const getOptionLabel = (optionValue: string) => {

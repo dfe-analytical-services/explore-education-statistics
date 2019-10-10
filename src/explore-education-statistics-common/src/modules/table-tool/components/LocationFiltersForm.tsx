@@ -1,17 +1,20 @@
-import {Form, FormFieldset, Formik} from '@common/components/form';
+import { Form, FormFieldset, Formik } from '@common/components/form';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
-import {FilterOption, PublicationSubjectMeta,} from '@common/modules/full-table/services/tableBuilderService';
-import {Dictionary} from '@common/types/util';
+import {
+  FilterOption,
+  PublicationSubjectMeta,
+} from '@common/modules/full-table/services/tableBuilderService';
+import { Dictionary } from '@common/types/util';
 import useResetFormOnPreviousStep from '@common/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
-import {FormikProps} from 'formik';
+import { FormikProps } from 'formik';
 import sortBy from 'lodash/sortBy';
-import React, {useRef} from 'react';
-import {useImmer} from 'use-immer';
+import React, { useRef } from 'react';
+import { useImmer } from 'use-immer';
 import mapValuesWithKeys from '@common/lib/utils/mapValuesWithKeys';
 import FormFieldCheckboxMenu from './FormFieldCheckboxMenu';
-import {InjectedWizardProps} from './Wizard';
+import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
 
@@ -79,8 +82,6 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
       Choose locations
     </WizardStepHeading>
   );
-
-
 
   const [formInitialValues, setFormInitialValues] = React.useState(
     calculateInitialValues(initialValues, options),

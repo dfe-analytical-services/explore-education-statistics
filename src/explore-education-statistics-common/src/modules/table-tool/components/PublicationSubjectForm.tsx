@@ -1,12 +1,12 @@
-import { Form, FormFieldRadioGroup, Formik } from '@common/components/form';
+import {Form, FormFieldRadioGroup, Formik} from '@common/components/form';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
-import { PublicationSubject } from '@common/modules/full-table/services/tableBuilderService';
+import {PublicationSubject} from '@common/modules/full-table/services/tableBuilderService';
 import useResetFormOnPreviousStep from '@common/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
-import { FormikProps } from 'formik';
-import React, { useRef, useState } from 'react';
-import { InjectedWizardProps } from './Wizard';
+import {FormikProps} from 'formik';
+import React, {useRef, useState} from 'react';
+import {InjectedWizardProps} from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
 
@@ -24,6 +24,8 @@ interface Props {
   options: PublicationSubject[];
   initialSubjectId?: string;
 }
+const initialiseSubjectName = (sid: string, options: PublicationSubject[]): string =>
+  (options.find(({ id }) => sid === id) || { label: '' }).label;
 
 const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
   const {
@@ -36,11 +38,9 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
     initialSubjectId = '',
   } = props;
 
-  const initialiseSubjectName = (sid: string): string =>
-    (options.find(({ id }) => sid === id) || { label: '' }).label;
 
   const [subjectName, setSubjectName] = useState(() =>
-    initialiseSubjectName(initialSubjectId),
+    initialiseSubjectName(initialSubjectId,options ),
   );
 
   const formikRef = useRef<Formik<FormValues>>(null);
@@ -66,7 +66,8 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
         subjectId: `${initialSubjectId}`,
       });
     }
-    setSubjectName(initialiseSubjectName(initialSubjectId));
+    setSubjectName(initialiseSubjectName(initialSubjectId, options));
+    // eslint-disable-next-line
   }, [options, initialSubjectId]);
 
   return (

@@ -20,10 +20,10 @@ const LoadingSpinner = ({
   return (
     <div
       className={classNames({
-          [styles.container]: true,
-          [styles.inline]: inline,
-          [styles.overlay]: overlay,
-        })}
+        [styles.container]: true,
+        [styles.inline]: inline,
+        [styles.overlay]: overlay,
+      })}
     >
       {text && <p className={styles.text}>{text}</p>}
       <div

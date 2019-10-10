@@ -1,4 +1,4 @@
-import {ConfirmContextProvider} from '@common/context/ConfirmContext';
+import { ConfirmContextProvider } from '@common/context/ConfirmContext';
 import mapValuesWithKeys from '@common/lib/utils/mapValuesWithKeys';
 import tableBuilderService, {
   FilterOption,
@@ -9,25 +9,42 @@ import tableBuilderService, {
   TableDataQuery,
   ThemeMeta,
 } from '@common/modules/full-table/services/tableBuilderService';
-import {Dictionary} from '@common/types/util';
+import { Dictionary } from '@common/types/util';
 import PreviousStepModalConfirm from '@common/modules/table-tool/components/PreviousStepModalConfirm';
-import {CategoryFilter, Indicator, LocationFilter,} from '@common/modules/full-table/types/filters';
+import {
+  CategoryFilter,
+  Indicator,
+  LocationFilter,
+} from '@common/modules/full-table/types/filters';
 import parseYearCodeTuple from '@common/modules/full-table/utils/TimePeriod';
 import mapValues from 'lodash/mapValues';
-import React, {createRef, ReactNode} from 'react';
-import getDefaultTableHeaderConfig, {TableHeadersConfig} from '@common/modules/full-table/utils/tableHeaders';
-import {FullTable} from '@common/modules/full-table/types/fullTable';
-import {mapFullTable} from '@common/modules/full-table/utils/mapPermalinks';
-import FiltersForm, {FilterFormSubmitHandler, FormValues,} from '@common/modules/table-tool/components/FiltersForm';
+import React, { createRef, ReactNode } from 'react';
+import getDefaultTableHeaderConfig, {
+  TableHeadersConfig,
+} from '@common/modules/full-table/utils/tableHeaders';
+import { FullTable } from '@common/modules/full-table/types/fullTable';
+import { mapFullTable } from '@common/modules/full-table/utils/mapPermalinks';
+import FiltersForm, {
+  FilterFormSubmitHandler,
+  FormValues,
+} from '@common/modules/table-tool/components/FiltersForm';
 import LocationFiltersForm, {
   LocationFiltersFormSubmitHandler,
   LocationsFormValues,
 } from '@common/modules/table-tool/components/LocationFiltersForm';
-import PublicationForm, {PublicationFormSubmitHandler,} from '@common/modules/table-tool/components/PublicationForm';
-import PublicationSubjectForm, {PublicationSubjectFormSubmitHandler,} from '@common/modules/table-tool/components/PublicationSubjectForm';
-import TableHeadersForm, {TableHeadersFormValues,} from '@common/modules/table-tool/components/TableHeadersForm';
+import PublicationForm, {
+  PublicationFormSubmitHandler,
+} from '@common/modules/table-tool/components/PublicationForm';
+import PublicationSubjectForm, {
+  PublicationSubjectFormSubmitHandler,
+} from '@common/modules/table-tool/components/PublicationSubjectForm';
+import TableHeadersForm, {
+  TableHeadersFormValues,
+} from '@common/modules/table-tool/components/TableHeadersForm';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
-import TimePeriodForm, {TimePeriodFormSubmitHandler,} from '@common/modules/table-tool/components/TimePeriodForm';
+import TimePeriodForm, {
+  TimePeriodFormSubmitHandler,
+} from '@common/modules/table-tool/components/TimePeriodForm';
 import mapOptionValues from '@common/modules/table-tool/components/utils/mapOptionValues';
 import Wizard from '@common/modules/table-tool/components/Wizard';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
@@ -118,53 +135,52 @@ const mapLocations = (
       .map(option => new LocationFilter(option as FilterOption, locationLevel)),
   );
 
-const getSelectedLocationsForQuery = (locationQuery: Dictionary<string[] | undefined>) =>
+const getSelectedLocationsForQuery = (
+  locationQuery: Dictionary<string[] | undefined>,
+) =>
   mapValuesWithKeys(
     LocationLevelKeysEnum,
     (key, _) => locationQuery[key] || [],
   );
 
-const getFiltersForTableGeneration = ({filters: metaFilters}: PublicationSubjectMeta, {filters}: FormValues) => {
+const getFiltersForTableGeneration = (
+  { filters: metaFilters }: PublicationSubjectMeta,
+  { filters }: FormValues,
+) => {
   const filtersByValue = mapValues(metaFilters, value =>
     mapOptionValues(value.options),
   );
 
-  return mapValuesWithKeys(
-    filters,
-    (filterGroup, selectedFilters) =>
-      selectedFilters.map(
-        filter =>
-          new CategoryFilter(
-            filtersByValue[filterGroup][filter],
-            filter === metaFilters[filterGroup].totalValue,
-          ),
-      ),
+  return mapValuesWithKeys(filters, (filterGroup, selectedFilters) =>
+    selectedFilters.map(
+      filter =>
+        new CategoryFilter(
+          filtersByValue[filterGroup][filter],
+          filter === metaFilters[filterGroup].totalValue,
+        ),
+    ),
   );
 };
 
-const getIndicatorsForTableGeneration = ({indicators: indicatorsMeta}: PublicationSubjectMeta, {indicators}: FormValues) => {
-
-  const indicatorsByValue = mapOptionValues<IndicatorOption>(
-    indicatorsMeta,
-  );
+const getIndicatorsForTableGeneration = (
+  { indicators: indicatorsMeta }: PublicationSubjectMeta,
+  { indicators }: FormValues,
+) => {
+  const indicatorsByValue = mapOptionValues<IndicatorOption>(indicatorsMeta);
 
   return indicators.map(
     indicator => new Indicator(indicatorsByValue[indicator]),
   );
-
 };
 
-const queryForTable = async (query: TableDataQuery, releaseId?: string): Promise<FullTable> => {
+const queryForTable = async (
+  query: TableDataQuery,
+  releaseId?: string,
+): Promise<FullTable> => {
   if (releaseId) {
-    return tableBuilderService.getTableDataForRelease(
-      query,
-      releaseId,
-    );
+    return tableBuilderService.getTableDataForRelease(query, releaseId);
   }
-  return tableBuilderService.getTableData(
-    query,
-  );
-
+  return tableBuilderService.getTableData(query);
 };
 
 const tableGeneration = async (
@@ -175,11 +191,11 @@ const tableGeneration = async (
   locations: Dictionary<LocationFilter[]>,
   releaseId: string | undefined,
 ): Promise<{
-  table?: FullTable,
-  tableHeaders?: TableHeadersConfig,
-  query?: TableDataQuery
+  table?: FullTable;
+  tableHeaders?: TableHeadersConfig;
+  query?: TableDataQuery;
 }> => {
-  const {startYear, startCode, endYear, endCode} = dateRange;
+  const { startYear, startCode, endYear, endCode } = dateRange;
 
   if (!startYear || !startCode || !endYear || !endCode) {
     return {};
@@ -192,7 +208,8 @@ const tableGeneration = async (
       subjectId,
       locations,
       ...dateRange,
-    });
+    },
+  );
 
   const unmappedCreatedTable = await queryForTable(query, releaseId);
   const table = mapFullTable(unmappedCreatedTable);
@@ -201,9 +218,8 @@ const tableGeneration = async (
   return {
     table,
     tableHeaders,
-    query
+    query,
   };
-
 };
 
 const TableTool = ({
@@ -214,7 +230,7 @@ const TableTool = ({
   finalStepHeading,
   initialQuery,
   initialTableHeaders,
-  onInitialQueryCompleted
+  onInitialQueryCompleted,
 }: Props) => {
   const dataTableRef = createRef<HTMLTableElement>();
 
@@ -235,13 +251,19 @@ const TableTool = ({
     filters: {},
   });
 
-  const [subjectMeta, setSubjectMeta] = React.useState<PublicationSubjectMeta>(getDefaultSubjectMeta());
+  const [subjectMeta, setSubjectMeta] = React.useState<PublicationSubjectMeta>(
+    getDefaultSubjectMeta(),
+  );
 
-  const [locations, setLocations] = React.useState<Dictionary<LocationFilter[]>>({});
+  const [locations, setLocations] = React.useState<
+    Dictionary<LocationFilter[]>
+  >({});
 
   const [dateRange, setDateRange] = React.useState<DateRangeState>({});
 
-  const [tableHeaders, setTableHeaders] = React.useState<TableHeadersFormValues>({
+  const [tableHeaders, setTableHeaders] = React.useState<
+    TableHeadersFormValues
+  >({
     columnGroups: [],
     columns: [],
     rowGroups: [],
@@ -254,7 +276,9 @@ const TableTool = ({
 
   const [initialStep, setInitialStep] = React.useState(1);
 
-  const [validInitialQuery, setValidInitialQuery] = React.useState<TableDataQuery>();
+  const [validInitialQuery, setValidInitialQuery] = React.useState<
+    TableDataQuery
+  >();
 
   React.useEffect(() => {
     setValidInitialQuery(undefined);
@@ -262,111 +286,120 @@ const TableTool = ({
 
     if (initialQuery) {
       const doit = async () => {
-
         try {
-
           let newQuery: TableDataQuery = {
             subjectId: '',
             filters: [],
             indicators: [],
           };
 
-          const meta = await tableBuilderService.filterPublicationSubjectMeta(initialQuery);
+          const meta = await tableBuilderService.filterPublicationSubjectMeta(
+            initialQuery,
+          );
           setSubjectMeta(meta);
 
-          if (initialQuery.subjectId === undefined || initialQuery.subjectId === '') {
+          if (
+            initialQuery.subjectId === undefined ||
+            initialQuery.subjectId === ''
+          ) {
             setInitialStep(1);
             setQuery(newQuery);
             setValidInitialQuery(newQuery);
           } else {
-
             newQuery.subjectId = initialQuery.subjectId;
             setSubjectId(initialQuery.subjectId);
 
             // validate location data
             // parse out all the location query information, filter it to only those that are set
-            const initialLocations: Dictionary<string[]> =
-              Object.entries(
-                mapValuesWithKeys(LocationLevelKeysEnum, keyName => (initialQuery as Dictionary<string[]>)[keyName])
-              )
-                .reduce((filtered, [, value]) => ({...filtered, ...((value && value.length > 0) ? value : {})}), {});
+            const initialLocations: Dictionary<string[]> = Object.entries(
+              mapValuesWithKeys(
+                LocationLevelKeysEnum,
+                keyName => (initialQuery as Dictionary<string[]>)[keyName],
+              ),
+            ).reduce(
+              (filtered, [, value]) => ({
+                ...filtered,
+                ...(value && value.length > 0 ? value : {}),
+              }),
+              {},
+            );
 
             // check if any are actually set to validate if it's actually valid
-            const allLocations = ([] as string[]).concat(...Object.values(initialLocations));
+            const allLocations = ([] as string[]).concat(
+              ...Object.values(initialLocations),
+            );
             if (allLocations.length === 0) {
               setInitialStep(2);
               setQuery(newQuery);
               setValidInitialQuery(newQuery);
             } else {
-
               // populate location data
               const newLocations = mapLocations(
                 getSelectedLocationsForQuery(initialQuery),
                 meta.locations,
               );
-              newQuery = {...newQuery, ...initialLocations};
+              newQuery = { ...newQuery, ...initialLocations };
               setLocations(newLocations);
-
 
               // validate time period
               // generate and populate time period data
-              const newDateRange: DateRangeState = {...initialQuery.timePeriod};
-              if (newDateRange.endCode === undefined || newDateRange.endYear === undefined || newDateRange.startCode === undefined || newDateRange.startYear === undefined) {
+              const newDateRange: DateRangeState = {
+                ...initialQuery.timePeriod,
+              };
+              if (
+                newDateRange.endCode === undefined ||
+                newDateRange.endYear === undefined ||
+                newDateRange.startCode === undefined ||
+                newDateRange.startYear === undefined
+              ) {
                 setInitialStep(3);
                 setQuery(newQuery);
                 setValidInitialQuery(newQuery);
-
               } else {
-
-                newQuery = {...newQuery, timePeriod: initialQuery.timePeriod};
+                newQuery = { ...newQuery, timePeriod: initialQuery.timePeriod };
                 setDateRange(newDateRange);
 
-                if (initialQuery.filters.length === 0 || initialQuery.indicators.length === 0) {
+                if (
+                  initialQuery.filters.length === 0 ||
+                  initialQuery.indicators.length === 0
+                ) {
                   setInitialStep(4);
                   setQuery(newQuery);
                   setValidInitialQuery(newQuery);
-
                 } else {
-
-                  newQuery = {...newQuery, filters: initialQuery.filters, indicators: initialQuery.indicators};
+                  newQuery = {
+                    ...newQuery,
+                    filters: initialQuery.filters,
+                    indicators: initialQuery.indicators,
+                  };
 
                   // const newValues: FormValues = buildInitialFormValue(meta, newQuery);
 
                   const newTable = await queryForTable(newQuery, releaseId);
 
-                  const newTableHeaders = initialTableHeaders || getDefaultTableHeaderConfig(newTable.subjectMeta);
+                  const newTableHeaders =
+                    initialTableHeaders ||
+                    getDefaultTableHeaderConfig(newTable.subjectMeta);
 
                   setInitialStep(5);
                   setCreatedTable(newTable);
                   setTableHeaders(newTableHeaders);
                   setQuery(newQuery);
                   setValidInitialQuery(newQuery);
-
-
                 }
-
               }
-
             }
-
-
           }
-
-
         } catch (_) {
           //
         }
 
         if (onInitialQueryCompleted) onInitialQueryCompleted();
-
       };
 
       doit();
-
-
     }
-
-  }, [initialQuery, initialTableHeaders, onInitialQueryCompleted]);
+  }, [initialQuery, initialTableHeaders, onInitialQueryCompleted, releaseId]);
 
   const handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
     publicationId: selectedPublicationId,
@@ -404,7 +437,7 @@ const TableTool = ({
     if (releaseId) {
       tableBuilderService
         .getReleaseMeta(releaseId)
-        .then(({subjects: releaseSubjects}) => {
+        .then(({ subjects: releaseSubjects }) => {
           setSubjects(releaseSubjects);
         });
     }
@@ -461,16 +494,18 @@ const TableTool = ({
     });
   };
 
-
   const handleFiltersFormSubmit: FilterFormSubmitHandler = async values => {
-
-    const {table, tableHeaders: generatedTableHeaders, query: createdQuery} = await tableGeneration(
+    const {
+      table,
+      tableHeaders: generatedTableHeaders,
+      query: createdQuery,
+    } = await tableGeneration(
       dateRange,
       subjectMeta,
       values,
       subjectId,
       locations,
-      releaseId
+      releaseId,
     );
 
     if (table && generatedTableHeaders && createdQuery) {
@@ -478,13 +513,11 @@ const TableTool = ({
       setTableHeaders(generatedTableHeaders);
       setQuery(createdQuery);
     }
-
-
   };
 
   return (
     <ConfirmContextProvider>
-      {({askConfirm}) => (
+      {({ askConfirm }) => (
         <>
           <Wizard
             initialStep={initialStep}
@@ -516,7 +549,9 @@ const TableTool = ({
                 <PublicationSubjectForm
                   {...stepProps}
                   options={subjects}
-                  initialSubjectId={validInitialQuery && validInitialQuery.subjectId}
+                  initialSubjectId={
+                    validInitialQuery && validInitialQuery.subjectId
+                  }
                   onSubmit={handlePublicationSubjectFormSubmit}
                 />
               )}
@@ -535,7 +570,9 @@ const TableTool = ({
               {stepProps => (
                 <TimePeriodForm
                   {...stepProps}
-                  initialValues={validInitialQuery && validInitialQuery.timePeriod}
+                  initialValues={
+                    validInitialQuery && validInitialQuery.timePeriod
+                  }
                   options={subjectMeta.timePeriod.options}
                   onSubmit={handleTimePeriodFormSubmit}
                 />
@@ -549,7 +586,7 @@ const TableTool = ({
                   initialValues={
                     validInitialQuery && {
                       filters: validInitialQuery.filters,
-                      indicators: validInitialQuery.indicators
+                      indicators: validInitialQuery.indicators,
                     }
                   }
                   subjectMeta={subjectMeta}
@@ -587,14 +624,14 @@ const TableTool = ({
                   </div>
 
                   {createdTable &&
-                  finalStepExtra &&
-                  query &&
-                  finalStepExtra({
-                    createdTable,
-                    publication,
-                    tableHeaders,
-                    query,
-                  })}
+                    finalStepExtra &&
+                    query &&
+                    finalStepExtra({
+                      createdTable,
+                      publication,
+                      tableHeaders,
+                      query,
+                    })}
                 </>
               )}
             </WizardStep>

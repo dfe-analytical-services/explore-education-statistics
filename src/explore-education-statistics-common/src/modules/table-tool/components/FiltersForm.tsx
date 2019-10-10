@@ -7,7 +7,10 @@ import {
 } from '@common/components/form';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import Yup from '@common/lib/validation/yup';
-import { PublicationSubjectMeta, FilterOption } from '@common/modules/full-table/services/tableBuilderService';
+import {
+  PublicationSubjectMeta,
+  FilterOption,
+} from '@common/modules/full-table/services/tableBuilderService';
 import useResetFormOnPreviousStep from '@common/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
 import { FormikProps } from 'formik';
 import camelCase from 'lodash/camelCase';
@@ -36,25 +39,22 @@ interface Props {
   subjectMeta: PublicationSubjectMeta;
   onSubmit: FilterFormSubmitHandler;
   initialValues?: InitialValuesType;
-
 }
 
 export const buildInitialFormValue = (
-  meta : PublicationSubjectMeta,
-  initial?: InitialValuesType
+  meta: PublicationSubjectMeta,
+  initial?: InitialValuesType,
 ) => {
-
   return {
-    filters: mapValues(meta.filters, (filter) => {
-
+    filters: mapValues(meta.filters, filter => {
       if (initial && initial.filters) {
+        const allFilterOptions = ([] as FilterOption[]).concat(
+          ...Object.values(filter.options).map(({ options }) => options),
+        );
 
-        const allFilterOptions= ([] as FilterOption[])
-          .concat(... Object.values(filter.options).map( ({options}) => options));
+        const allFilterValues = allFilterOptions.map(({ value }) => value);
 
-        const allFilterValues=allFilterOptions.map( ({value}) => value)
-
-        return allFilterValues.filter((value) => initial.filters.includes(value));
+        return allFilterValues.filter(value => initial.filters.includes(value));
       }
 
       if (typeof filter.options.Default !== 'undefined') {
@@ -65,8 +65,8 @@ export const buildInitialFormValue = (
       }
       return [];
     }),
-    indicators: initial && initial.indicators || [],
-  }
+    indicators: (initial && initial.indicators) || [],
+  };
 };
 
 const FiltersForm = (props: Props & InjectedWizardProps) => {
@@ -76,7 +76,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
     goToNextStep,
     currentStep,
     stepNumber,
-    initialValues
+    initialValues,
   } = props;
 
   const ref = useRef<HTMLDivElement>(null);
@@ -90,19 +90,17 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
     <WizardStepHeading {...props}>Choose your filters</WizardStepHeading>
   );
 
-
-
-  const [initialFormValue, setInitialFormValue] = React.useState(() => buildInitialFormValue(subjectMeta, initialValues));
+  const [initialFormValue, setInitialFormValue] = React.useState(() =>
+    buildInitialFormValue(subjectMeta, initialValues),
+  );
 
   React.useEffect(() => {
-
     if (formikRef.current) {
       const newFormValue = buildInitialFormValue(subjectMeta, initialValues);
       setInitialFormValue(newFormValue);
       formikRef.current.setValues(newFormValue);
     }
-
-  }, [initialValues, subjectMeta.filters]);
+  }, [initialValues, subjectMeta, subjectMeta.filters]);
 
   return (
     <Formik<FormValues>

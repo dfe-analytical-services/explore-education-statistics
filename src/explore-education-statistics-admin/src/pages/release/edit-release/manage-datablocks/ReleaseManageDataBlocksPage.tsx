@@ -1,24 +1,31 @@
-import ManageReleaseContext, {ManageRelease,} from '@admin/pages/release/ManageReleaseContext';
+import ManageReleaseContext, {
+  ManageRelease,
+} from '@admin/pages/release/ManageReleaseContext';
 import DataBlocksService from '@admin/services/release/edit-release/datablocks/service';
-import {DataBlock} from '@admin/services/release/edit-release/datablocks/types';
+import { DataBlock } from '@admin/services/release/edit-release/datablocks/types';
 import Button from '@common/components/Button';
-import {FormSelect} from '@common/components/form';
-import {SelectOption} from '@common/components/form/FormSelect';
+import { FormSelect } from '@common/components/form';
+import { SelectOption } from '@common/components/form/FormSelect';
 import ModalConfirm from '@common/components/ModalConfirm';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import DataBlockService, {DataBlockRequest, DataBlockResponse,} from '@common/services/dataBlockService';
-import React, {useContext} from 'react';
+import DataBlockService, {
+  DataBlockRequest,
+  DataBlockResponse,
+} from '@common/services/dataBlockService';
+import React, { useContext } from 'react';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import CreateDataBlocks from './CreateDataBlocks';
 import ViewDataBlocks from './ViewDataBlocks';
 
 const ReleaseManageDataBlocksPage = () => {
-  const {releaseId} = useContext(ManageReleaseContext) as ManageRelease;
+  const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
 
   const [selectedDataBlock, setSelectedDataBlock] = React.useState<string>('');
   const [dataBlocks, setDataBlocks] = React.useState<DataBlock[]>([]);
-  const [dataBlockOptions, setDataBlockOptions] = React.useState<SelectOption[]>([]);
+  const [dataBlockOptions, setDataBlockOptions] = React.useState<
+    SelectOption[]
+  >([]);
 
   const updateDataBlocks = (rId: string) => {
     return DataBlocksService.getDataBlocks(rId).then(blocks => {
@@ -27,13 +34,12 @@ const ReleaseManageDataBlocksPage = () => {
   };
 
   React.useEffect(() => {
-    updateDataBlocks(releaseId).then(() => {
-    });
+    updateDataBlocks(releaseId).then(() => {});
   }, [releaseId]);
 
   React.useEffect(() => {
     setDataBlockOptions(
-      dataBlocks.map(({heading, id}, index) => ({
+      dataBlocks.map(({ heading, id }, index) => ({
         label: `${heading || index}`,
         value: `${id}`,
       })),
@@ -42,8 +48,12 @@ const ReleaseManageDataBlocksPage = () => {
 
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [dataBlock, setDataBlock] = React.useState<DataBlock>();
-  const [dataBlockRequest, setDataBlockRequest] = React.useState<DataBlockRequest>();
-  const [dataBlockResponse, setDataBlockResponse] = React.useState<DataBlockResponse>();
+  const [dataBlockRequest, setDataBlockRequest] = React.useState<
+    DataBlockRequest
+  >();
+  const [dataBlockResponse, setDataBlockResponse] = React.useState<
+    DataBlockResponse
+  >();
 
   const onDataBlockSave = async (db: DataBlock) => {
     const newDataBlock = await DataBlocksService.postDataBlock(releaseId, db);
@@ -69,14 +79,13 @@ const ReleaseManageDataBlocksPage = () => {
   };
 
   React.useEffect(() => {
-
     setDataBlockResponse(undefined);
     setDataBlock(undefined);
     setDataBlockRequest(undefined);
 
     setIsLoading(true);
 
-    Promise.resolve(dataBlocks.find(({id}) => selectedDataBlock === id))
+    Promise.resolve(dataBlocks.find(({ id }) => selectedDataBlock === id))
       .then(db => {
         if (db === undefined) throw new Error();
         setDataBlock(db);
@@ -137,11 +146,8 @@ const ReleaseManageDataBlocksPage = () => {
 
       <hr />
 
-      <div style={{position: 'relative'}}>
-
-        {isLoading && (
-          <LoadingSpinner text="Loading Data block" overlay />
-        )}
+      <div style={{ position: 'relative' }}>
+        {isLoading && <LoadingSpinner text="Loading Data block" overlay />}
 
         <div>
           <h2>
@@ -149,7 +155,6 @@ const ReleaseManageDataBlocksPage = () => {
               ? dataBlock.heading || 'title not set'
               : 'Create new Data Block'}
           </h2>
-
 
           <Tabs id="manageDataBlocks">
             <TabsSection
@@ -182,7 +187,7 @@ const ReleaseManageDataBlocksPage = () => {
                 </ModalConfirm>
               )}
 
-              <div style={{overflow: 'hidden'}}>
+              <div style={{ overflow: 'hidden' }}>
                 <CreateDataBlocks
                   dataBlockRequest={dataBlockRequest}
                   dataBlockResponse={dataBlockResponse}
@@ -202,7 +207,6 @@ const ReleaseManageDataBlocksPage = () => {
               </TabsSection>
             )}
           </Tabs>
-
         </div>
       </div>
     </>
