@@ -58,8 +58,6 @@ const ReleaseManageDataBlocksPage = () => {
   const onDataBlockSave = async (db: DataBlock) => {
     let newDataBlock;
 
-    console.log(db);
-
     if (db.id) {
       newDataBlock = await DataBlocksService.putDataBlock(db.id, db);
     } else {
