@@ -37,6 +37,7 @@ const emptyDataFile: DataFile = {
   metadataFilename: '',
   rows: 0,
   title: '',
+  userName: '',
 };
 
 const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
@@ -189,7 +190,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                   <a
                     href={service.createDownloadDataMetadataFileLink(
                       releaseId,
-                      dataFile.filename,
+                      dataFile.metadataFilename,
                     )}
                   >
                     {dataFile.metadataFilename}
@@ -200,6 +201,11 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                   dataFile={dataFile}
                   onStatusChangeHandler={statusChangeHandler}
                 />
+                <SummaryListItem term="Uploaded by">
+                  <a href={`mailto:${dataFile.userName}`}>
+                    {dataFile.userName}
+                  </a>
+                </SummaryListItem>
                 {dataFile.canDelete && (
                   <SummaryListItem
                     term="Actions"
