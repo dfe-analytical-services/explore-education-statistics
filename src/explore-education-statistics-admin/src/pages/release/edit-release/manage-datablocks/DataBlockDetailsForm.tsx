@@ -23,13 +23,14 @@ interface Props {
   query: TableDataQuery;
   tableHeaders: TableHeadersFormValues;
   releaseId: string;
+  initialDataBlock?: DataBlock;
   onDataBlockSave: (dataBlock: DataBlock) => Promise<DataBlock>;
 }
 
 interface FormValues {
   title: string;
   source: string;
-  footnotes: string;
+  customFootnotes: string;
   name: string;
 }
 
@@ -37,8 +38,12 @@ const DataBlockDetailsForm = ({
   query,
   tableHeaders,
   releaseId,
+  initialDataBlock,
   onDataBlockSave,
 }: Props) => {
+
+  const formikRef = React.useRef<Formik<FormValues>>(null);
+
   const [blockState, setBlockState] = React.useReducer(
     (state, { saved, error } = { saved: false, error: false }) => {
       if (saved) {
@@ -89,17 +94,35 @@ const DataBlockDetailsForm = ({
     title: Yup.string().required('Please enter a title'),
     name: Yup.string().required('Please supply a name'),
     source: Yup.string(),
-    footnotes: Yup.string(),
+    customFootnotes: Yup.string(),
   };
+
+  const [initialValues, setInitialValues] = React.useState<FormValues>({
+    title: initialDataBlock && initialDataBlock.heading || '',
+    customFootnotes: '',
+    name: '',
+    source: ''
+  });
+
+
+  React.useEffect(() => {
+    const newInitialValues = {
+      title: initialDataBlock && initialDataBlock.heading || '',
+      customFootnotes: '',
+      name: '',
+      source: ''
+    };
+    setInitialValues(newInitialValues);
+
+    if (formikRef.current) {
+      formikRef.current.setValues(newInitialValues);
+    }
+  }, [initialDataBlock]);
 
   return (
     <Formik<FormValues>
-      initialValues={{
-        title: '',
-        footnotes: '',
-        name: '',
-        source: '',
-      }}
+      ref={formikRef}
+      initialValues={initialValues}
       validationSchema={Yup.object<FormValues>(baseValidationRules)}
       onSubmit={saveDataBlock}
       render={(form: FormikProps<FormValues>) => {

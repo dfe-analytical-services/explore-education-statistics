@@ -65,6 +65,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     public class DataBlock : IContentBlock
     {
         public string Heading { get; set; }
+        
+        public string CustomFootnotes { get; set; }
+        
+        public string Name { get; set; }
+        
+        public string Source { get; set; }
 
         public DataBlockRequest DataBlockRequest { get; set; }
 

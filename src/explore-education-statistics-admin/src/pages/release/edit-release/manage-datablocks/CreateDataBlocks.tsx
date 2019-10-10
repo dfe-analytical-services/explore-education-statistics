@@ -47,6 +47,7 @@ const CreateDataBlocks = ({
             <DataBlockDetailsForm
               query={query}
               tableHeaders={tableHeaders}
+              initialDataBlock={dataBlock}
               releaseId={releaseId}
               onDataBlockSave={onDataBlockSave}
             />
