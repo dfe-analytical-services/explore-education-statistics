@@ -104,6 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IBoundaryLevelService, BoundaryLevelService>();
             services.AddTransient<IDataService<ResultWithMetaViewModel>, DataService>();
             services.AddTransient<IDataService<TableBuilderResultViewModel>, TableBuilderDataService>();
+            services.AddTransient<IFilterService, FilterService>();
             services.AddTransient<IFilterItemService, FilterItemService>();
             services.AddTransient<IFootnoteService, FootnoteService>();
             services.AddTransient<IGeoJsonService, GeoJsonService>();

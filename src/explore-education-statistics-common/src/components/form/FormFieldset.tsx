@@ -21,7 +21,7 @@ const FormFieldset = ({
   hint,
   id,
   legend,
-  legendSize = 'm',
+  legendSize = 'l',
   legendHidden = false,
   className,
 }: FormFieldsetProps) => {

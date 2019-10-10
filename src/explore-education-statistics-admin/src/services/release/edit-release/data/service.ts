@@ -48,6 +48,7 @@ interface GetFileResponse {
   size: string;
   metaFileName: string;
   rows: number;
+  userName: string;
 }
 
 const getFileNameFromPath = (path: string) =>
@@ -79,6 +80,7 @@ const service: EditReleaseService = {
               ? getFileNameFromPath(associatedMetadataFile.path)
               : '',
             canDelete: true,
+            userName: dataFile.userName,
           };
         });
       });

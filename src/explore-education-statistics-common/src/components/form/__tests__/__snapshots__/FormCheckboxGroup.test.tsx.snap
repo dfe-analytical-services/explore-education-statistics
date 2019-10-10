@@ -5,7 +5,7 @@ exports[`FormCheckboxGroup generates option IDs from id and value if none specif
   <fieldset class="govuk-fieldset"
             id="test-checkboxes"
   >
-    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
       Test checkboxes
     </legend>
     <div class="govuk-checkboxes">
@@ -58,7 +58,7 @@ exports[`FormCheckboxGroup renders \`Select all 3 options\` button when \`select
   <fieldset class="govuk-fieldset"
             id="test-checkboxes"
   >
-    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
       Test checkboxes
     </legend>
     <div class="govuk-checkboxes">
@@ -117,7 +117,7 @@ exports[`FormCheckboxGroup renders checkboxes with some pre-checked 1`] = `
   <fieldset class="govuk-fieldset"
             id="test-checkboxes"
   >
-    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
       Test checkboxes
     </legend>
     <div class="govuk-checkboxes">
@@ -171,7 +171,7 @@ exports[`FormCheckboxGroup renders correctly with legend 1`] = `
   <fieldset class="govuk-fieldset"
             id="test-checkboxes"
   >
-    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
       Choose some checkboxes
     </legend>
     <div class="govuk-checkboxes">
@@ -203,7 +203,7 @@ exports[`FormCheckboxGroup renders correctly with small size variants 1`] = `
       id="test-checkboxes"
     >
       <legend
-        class="govuk-fieldset__legend govuk-fieldset__legend--m"
+        class="govuk-fieldset__legend govuk-fieldset__legend--l"
       >
         Test checkboxes
       </legend>
@@ -238,7 +238,7 @@ exports[`FormCheckboxGroup renders list of checkboxes in correct order 1`] = `
   <fieldset class="govuk-fieldset"
             id="test-checkboxes"
   >
-    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
       Test checkboxes
     </legend>
     <div class="govuk-checkboxes">
@@ -291,7 +291,7 @@ exports[`FormCheckboxGroup renders option with conditional contents 1`] = `
   <fieldset class="govuk-fieldset"
             id="test-checkboxes"
   >
-    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
       Test checkboxes
     </legend>
     <div class="govuk-checkboxes">
