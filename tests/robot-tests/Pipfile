@@ -4,6 +4,8 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+docker = "==4.1.0"
+azure-storage-blob = "==2.1.0"
 
 [packages]
 robotframework-seleniumlibrary = "==3.3.1"
