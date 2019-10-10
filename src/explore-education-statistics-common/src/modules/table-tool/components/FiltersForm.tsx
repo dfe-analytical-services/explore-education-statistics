@@ -107,7 +107,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                       name="indicators"
                       id={`${formId}-indicators`}
                       legend="Indicators"
-                      legendSize="s"
+                      legendSize="m"
                       hint="Select at least one indicator"
                       error={getError('indicators')}
                       selectAll

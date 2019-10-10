@@ -6,7 +6,7 @@ exports[`FormFieldset renders correctly with error 1`] = `
             id="test-fieldset"
             aria-describedby="test-fieldset-error"
   >
-    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
       Fill the form
     </legend>
     <span class="govuk-error-message"
@@ -30,7 +30,7 @@ exports[`FormFieldset renders correctly with hint 1`] = `
             id="test-fieldset"
             aria-describedby="test-fieldset-hint"
   >
-    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
       Fill the form
     </legend>
     <span class="govuk-hint"
@@ -53,7 +53,7 @@ exports[`FormFieldset renders correctly with required props 1`] = `
   <fieldset class="govuk-fieldset"
             id="test-fieldset"
   >
-    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
       Fill the form
     </legend>
     <input type="text"
