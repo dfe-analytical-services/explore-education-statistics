@@ -167,6 +167,12 @@ class PublicationReleasePage extends Component<Props> {
           </div>
 
           <div className="govuk-grid-column-one-third">
+            <PrintThisPage
+              analytics={{
+                category: 'Page print',
+                action: 'Print this page link selected',
+              }}
+            />
             <RelatedAside>
               <h3>About these statistics</h3>
 

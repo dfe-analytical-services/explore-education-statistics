@@ -58,7 +58,7 @@ function GlossaryIndexPage() {
             Lasts from 31 August to 31 July. Generally broken into 3 terms -
             autumn, spring and summer.
           </p>
-          <h3 id="academic-year">Ad hoc statistics</h3>
+          <h3 id="ad-hoc-statistics">Ad hoc statistics</h3>
           <p>
             Releases of statistics which are not part of DfE's regular annual
             official statistical release calendar.
@@ -353,7 +353,7 @@ function GlossaryIndexPage() {
               possible school session
             </a>
           </p>
-          <h3 id="school-session">School year</h3>
+          <h3 id="school-year">School year</h3>
           <p>
             See <a href="/glossary#academic-year">academic year</a>
           </p>
