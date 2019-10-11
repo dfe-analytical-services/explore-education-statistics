@@ -9,20 +9,16 @@ container = client.containers.get('ees-mssql')
 print(container.exec_run('rm -r /tmp/*'))
 copy_to_container_cmds = [
     f'docker cp {os.path.join(os.getcwd(), "backup-data", "mssql", "content.bak")} ees-mssql:/tmp/',
-    f'docker cp {os.path.join(os.getcwd(), "backup-data", "mssql", "content_LogBackup.bak")} ees-mssql:/tmp/',
     f'docker cp {os.path.join(os.getcwd(), "backup-data", "mssql", "statistics.bak")} ees-mssql:/tmp/',
-    f'docker cp {os.path.join(os.getcwd(), "backup-data", "mssql", "statistics_LogBackup.bak")} ees-mssql:/tmp/'
 ]
 for cmd in copy_to_container_cmds:
     print(subprocess.run(cmd.split()))
 
 restore_cmds = [
-    '/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "ALTER DATABASE [content] SET SINGLE_USER WITH ROLLBACK IMMEDIATE; RESTORE DATABASE [content] FROM DISK = N\'/tmp/content.bak\' WITH FILE = 1, NOUNLOAD, REPLACE, NORECOVERY, STATS = 5"',
-    '/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "RESTORE LOG [content] FROM DISK = N\'/tmp/content_LogBackup.bak\'"',
-    '/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "ALTER DATABASE [content] SET MULTI_USER"',
-    '/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "ALTER DATABASE [statistics] SET SINGLE_USER WITH ROLLBACK IMMEDIATE; RESTORE DATABASE [statistics] FROM DISK = N\'/tmp/statistics.bak\' WITH FILE = 1, NOUNLOAD, REPLACE, NORECOVERY, STATS = 5"',
-    '/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "RESTORE LOG [statistics] FROM DISK = N\'/tmp/statistics_LogBackup.bak\'"',
-    '/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "ALTER DATABASE [statistics] SET MULTI_USER"'
+    '''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "ALTER DATABASE [content] SET SINGLE_USER WITH ROLLBACK IMMEDIATE; BACKUP LOG [content] TO  DISK = N'/tmp/content_LogBackup.bak' WITH NOFORMAT, NOINIT,  NAME = N'content_LogBackup', NOSKIP, NOREWIND, NOUNLOAD,  NORECOVERY ,  STATS = 5; RESTORE DATABASE [content] FROM DISK = N'/tmp/content.bak' WITH FILE = 1, MOVE N'content' TO N'/var/opt/mssql/data/content.mdf',  MOVE N'content_log' TO N'/var/opt/mssql/data/content_log.ldf',  NOUNLOAD,  STATS = 5"''',
+    '''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "ALTER DATABASE [content] SET MULTI_USER"''',
+    '''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "ALTER DATABASE [statistics] SET SINGLE_USER WITH ROLLBACK IMMEDIATE; BACKUP LOG [statistics] TO  DISK = N'/tmp/statistics_LogBackup.bak' WITH NOFORMAT, NOINIT,  NAME = N'statistics_LogBackup', NOSKIP, NOREWIND, NOUNLOAD,  NORECOVERY ,  STATS = 5; RESTORE DATABASE [statistics] FROM DISK = N'/tmp/statistics.bak' WITH FILE = 1,MOVE N'statistics' TO N'/var/opt/mssql/data/statistics.mdf',  MOVE N'statistics_log' TO N'/var/opt/mssql/data/statistics_log.ldf',  NOUNLOAD,  STATS = 5 "''',
+    '''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "ALTER DATABASE [statistics] SET MULTI_USER"'''
 ]
 for cmd in restore_cmds:
     print(container.exec_run(cmd))
