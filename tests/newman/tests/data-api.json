@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "2fda6387-1e74-4059-aedc-3d92cef5968b",
+		"_postman_id": "f668864e-b21e-4ceb-8a04-8e8de75d69ed",
 		"name": "DfE Data API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -5228,7 +5228,7 @@
 									"response": []
 								},
 								{
-									"name": "Data - Absence by characteristic - LA - *",
+									"name": "Data - Absence by characteristic - Derbyshire - Male AND Secondary",
 									"event": [
 										{
 											"listen": "test",
@@ -5260,32 +5260,24 @@
 													"",
 													"pm.test(\"Number of metaData filters should be correct\", function () {",
 													"    pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(3);",
-													"    pm.expect(respJson.metaData.filters.Characteristic.options.Gender.options.length).to.equal(2);",
+													"    pm.expect(respJson.metaData.filters.Characteristic.options.Gender.options.length).to.equal(1);",
 													"    pm.expect(respJson.metaData.filters.YearBreakdown.options.Default.options.length).to.equal(1);",
-													"    pm.expect(respJson.metaData.filters.SchoolType.options.Default.options.length).to.equal(4);",
+													"    pm.expect(respJson.metaData.filters.SchoolType.options.Default.options.length).to.equal(1);",
 													"});",
 													"",
-													"/*",
-													"$ csvgrep -p time_period/201415\\|201516/ -p geographic_level/local\\ authority/ -p characteristic/Gender\\ [M,m]ale\\|Gender\\ [F,f]emale/ csvs/absence_by_characteristic.csv | csvcut -k la_name | sed 1d | sort | uniq | wc -l",
-													"152",
-													"*/",
 													"pm.test(\"Number of metaData locations should be correct\", function () {",
-													"    var locations = Object.keys(respJson.metaData.locations)",
-													"    pm.expect(locations.length).to.equal(152);",
-													"    //locations.forEach(item => item !== \"E13000001\" && item !== \"E13000002\" ? pm.expect(pm.response.to.have.jsonBody(`metaData.locations.${item}.geoJson`)) : null);",
+													"    pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(1);",
+													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations.E10000007.geoJson\"));",
 													"});",
 													"",
-													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(2412); });",
+													"pm.test(\"Number of results should be correct\", function () { pm.expect(respJson.result.length).to.equal(1); });",
 													"",
-													"// NOTE(mark): Takes a long time to run this test",
-													"// pm.test(\"Every result should contain location country, localAuthority, and region\", function () {",
-													"//     for(var i = 0; i < respJson.result.length; i++) {",
-													"//         pm.expect(respJson.result[i].location.country.name).to.equal(\"England\");",
-													"//         pm.expect(pm.response.to.have.jsonBody(`result[${i}].location.localAuthority`));",
-													"//         pm.expect(pm.response.to.not.have.jsonBody(`result[${i}].location.localAuthorityDistrict`));",
-													"//         pm.expect(pm.response.to.have.jsonBody(`result[${i}].location.region`));",
-													"//     }",
-													"// });"
+													"pm.test(\"Every result should contain location country, localAuthority, and region\", function () {",
+													"    pm.expect(respJson.result[0].location.country.name).to.equal(\"England\");",
+													"    pm.expect(pm.response.to.have.jsonBody(`result[${0}].location.localAuthority`));",
+													"    pm.expect(pm.response.to.not.have.jsonBody(`result[${0}].location.localAuthorityDistrict`));",
+													"    pm.expect(pm.response.to.have.jsonBody(`result[${0}].location.region`));",
+													"});"
 												],
 												"type": "text/javascript"
 											}
@@ -5303,7 +5295,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority\",\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__GenderMale}}, \n        {{FILT_Char__GenderFemale}}\n    ],\n    \"indicators\": [\n        {{IND_AbsenceFields__UnauthorisedAbsenceRate}},\n    \t{{IND_AbsenceFields__OverallAbsenceRate}},\n    \t{{IND_AbsenceFields__AuthorisedAbsenceRate}}\n    ]\n}"
+											"raw": "{\n    \"subjectId\": 1,\n    \"localAuthority\": [\n    \t\"E10000007\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__GenderMale}}, \n        {{FILT_SchoolType__StateFundedSecondary}}\n    ],\n    \"indicators\": [\n        {{IND_AbsenceFields__UnauthorisedAbsenceRate}},\n    \t{{IND_AbsenceFields__OverallAbsenceRate}},\n    \t{{IND_AbsenceFields__AuthorisedAbsenceRate}}\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/data",
@@ -5379,86 +5371,6 @@
 										"body": {
 											"mode": "raw",
 											"raw": "{\n    \"subjectId\": 1,\n    \"localAuthority\": [\n    \t\"E09000032\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2015,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__GenderMale}}, \n        {{FILT_Char__GenderFemale}}, \n        {{FILT_SchoolType__Special}}\n    ],\n    \"indicators\": [\n        {{IND_AbsenceFields__UnauthorisedAbsenceRate}},\n    \t{{IND_AbsenceFields__OverallAbsenceRate}},\n    \t{{IND_AbsenceFields__AuthorisedAbsenceRate}}\n    ]\n}"
-										},
-										"url": {
-											"raw": "{{data_api_url}}/data",
-											"host": [
-												"{{data_api_url}}"
-											],
-											"path": [
-												"data"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Data - Absence by characteristic - LAD - *",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
-												"exec": [
-													"var respJson = pm.response.json();",
-													"",
-													"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-													"",
-													"pm.test(\"Should have correct fields\", function () {",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.filters\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.indicators\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.locations\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.boundaryLevels\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.timePeriods\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.publicationName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.subjectName\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"metaData.footnotes\"));",
-													"    pm.expect(pm.response.to.have.jsonBody(\"result\"));",
-													"});",
-													"",
-													"pm.test(\"Number of metaData filters should be correct\", function () {",
-													"    pm.expect(Object.keys(respJson.metaData.filters).length).to.equal(3);",
-													"    pm.expect(respJson.metaData.filters.Characteristic.options.FSM.options.length).to.equal(3);",
-													"    pm.expect(respJson.metaData.filters.YearBreakdown.options.Default.options.length).to.equal(1);",
-													"    pm.expect(respJson.metaData.filters.SchoolType.options.Default.options.length).to.equal(4);",
-													"});",
-													"",
-													"pm.test(\"geographicLevel should be same as request\", function () {",
-													"    for(var i = 0; i < respJson.result.length; i++) {",
-													"        pm.expect(respJson.result[i].geographicLevel).to.equal(\"Local_Authority_District\");",
-													"    }",
-													"});",
-													"",
-													"/*",
-													"$ csvgrep -p time_period/201617/ -p geographic_level/local\\ authority\\ district/ -p characteristic/FSM\\ eligible$\\|FSM\\ not\\ eligible$\\|FSM\\ unclassified$/ csvs/absence_by_characteristic.csv | csvcut -k sch_lad_name | sed 1d | sort | uniq | wc -l",
-													"326",
-													"*/",
-													"pm.test(\"Number of metaData locations should be correct\", function () {",
-													"   pm.expect(Object.keys(respJson.metaData.locations).length).to.equal(326);",
-													"});",
-													"",
-													"pm.test(\"Number of results should be correct\", function () {",
-													"    pm.expect(respJson.result.length).to.equal(3688);",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"type": "text",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"subjectId\": 1,\n    \"geographicLevel\": \"Local_Authority_District\",\n    \"timePeriod\": {\n    \t\"startYear\": 2016,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__FSMEligible}}, \n        {{FILT_Char__FSMNotEligible}}, \n        {{FILT_Char__FSMUnclassified}}\n    ],\n    \"indicators\": [\n        {{IND_AbsenceFields__UnauthorisedAbsenceRate}},\n    \t{{IND_AbsenceFields__OverallAbsenceRate}},\n    \t{{IND_AbsenceFields__AuthorisedAbsenceRate}}\n    ]\n}"
 										},
 										"url": {
 											"raw": "{{data_api_url}}/data",
