@@ -1,4 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Newtonsoft.Json;
 
@@ -7,12 +8,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
     public class TimePeriodQuery
     {
         public int StartYear { get; set; }
-        
+
         [JsonConverter(typeof(EnumToEnumValueJsonConverter<TimeIdentifier>))]
         public TimeIdentifier StartCode { get; set; }
 
         public int EndYear { get; set; }
-        
+
         [JsonConverter(typeof(EnumToEnumValueJsonConverter<TimeIdentifier>))]
         public TimeIdentifier EndCode { get; set; }
 
@@ -26,6 +27,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
             StartCode = startCode;
             EndYear = endYear;
             EndCode = endCode;
+        }
+
+        public override string ToString()
+        {
+            return $"{nameof(StartYear)}: {StartYear}, " +
+                   $"{nameof(StartCode)}: {StartCode.GetEnumValue()}, " +
+                   $"{nameof(EndYear)}: {EndYear}, " +
+                   $"{nameof(EndCode)}: {EndCode.GetEnumValue()}";
         }
     }
 }
