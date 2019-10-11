@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistic
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using ReleaseId = System.Guid;
@@ -19,6 +20,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
         public TableBuilderControllerTests()
         {
+            var logger = new Mock<ILogger<TableBuilderController>>();
+            
             var tableBuilderService = new Mock<IDataService<TableBuilderResultViewModel>>();
 
             tableBuilderService.Setup(s => s.Query(It.IsNotIn(_query), null)).Returns(
@@ -37,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 });
 
             _controller = new TableBuilderController(
-                tableBuilderService.Object
+                tableBuilderService.Object, logger.Object
             );
         }
 
