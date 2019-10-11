@@ -7,6 +7,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
     {
         GeoJson Find(long boundaryLevelId, string code);
 
-        IQueryable<GeoJson> Find(long boundaryLevelId, IEnumerable<string> codes);
+        IEnumerable<GeoJson> Find(long boundaryLevelId, IEnumerable<string> codes);
     }
 }
