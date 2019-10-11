@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         {
             return _cache.GetOrCreate(key, factory);
         }
-        
+
         public TItem GetOrDefault(object key)
         {
             return _cache.Get<TItem>(key);
@@ -20,6 +20,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         public TItem Set(object key, TItem item)
         {
             return _cache.Set(key, item);
+        }
+
+        public TItem Set(object key, TItem item, TimeSpan absoluteExpirationRelativeToNow)
+        {
+            return _cache.Set(key, item, absoluteExpirationRelativeToNow);
         }
     }
 }

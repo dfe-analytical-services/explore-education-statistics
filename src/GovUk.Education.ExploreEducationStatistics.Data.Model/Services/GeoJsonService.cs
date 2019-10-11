@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -41,27 +42,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             var geoJsonList = _context.GeoJson.Where(geoJson =>
                 geoJson.BoundaryLevelId == boundaryLevelId &&
                 codes.Contains(geoJson.Code));
-            
+
             AddAllToCache(boundaryLevelId, geoJsonList.ToList());
 
             return geoJsonList;
         }
-        
+
         private IEnumerable<GeoJson> TryCacheLookup(long boundaryLevelId, IEnumerable<string> codes)
         {
             return codes.Select(code => TryCacheLookup(boundaryLevelId, code)).Where(geoJson => geoJson != null);
         }
-        
+
         private GeoJson TryCacheLookup(long boundaryLevelId, string code)
         {
             return _cache.GetOrDefault($"{boundaryLevelId}_{code}");
         }
-        
+
         private void AddAllToCache(long boundaryLevelId, List<GeoJson> geoJsonList)
         {
             foreach (var geoJson in geoJsonList)
             {
-                _cache.Set($"{boundaryLevelId}_{geoJson.Code}", geoJson);
+                _cache.Set($"{boundaryLevelId}_{geoJson.Code}", geoJson, TimeSpan.FromMinutes(30));
             }
         }
     }
