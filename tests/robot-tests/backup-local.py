@@ -2,6 +2,7 @@
 import shutil
 import subprocess
 import docker
+import json
 from azure.storage.blob import BlockBlobService
 
 # Remove all previous backup files and directories in backup-data directory
@@ -52,7 +53,11 @@ for blob in generator:
     if '/' in blob.name:
         head, tail = os.path.split(blob.name)
         os.makedirs(os.path.join(os.getcwd(), 'backup-data', 'releases', head), exist_ok=True)
-        block_blob_service.get_blob_to_path('releases', blob.name, os.path.join(os.getcwd(), 'backup-data', 'releases', head, tail))
+        blob_obj = block_blob_service.get_blob_to_path('releases', blob.name, os.path.join(os.getcwd(), 'backup-data', 'releases', head, tail))
+        with open(os.path.join(os.getcwd(), 'backup-data', 'releases', head, tail + '.metadata'), 'w') as file:
+            file.write(json.dumps(blob_obj.metadata))
     else:
-        block_blob_service.get_blob_to_path('releases', blob.name, os.path.join(os.getcwd(), 'backup-data', 'releases', blob.name))
+        blob_obj = block_blob_service.get_blob_to_path('releases', blob.name, os.path.join(os.getcwd(), 'backup-data', 'releases', blob.name))
+        with open(os.path.join(os.getcwd(), 'backup-data', 'releases', blob.name + '.metadata'), 'w') as file:
+            file.write(blob_obj.metadata)
 

@@ -1,6 +1,7 @@
 import os
 import docker
 import subprocess
+import json
 from azure.storage.blob import BlockBlobService
 
 # Restore ees-mssql docker container db
@@ -45,6 +46,12 @@ for blob in generator:
 # Restore all files to releases blob container
 for (dirpath, _, filenames) in os.walk(os.path.join(os.getcwd(), 'backup-data', 'releases')):
     for filename in filenames:
+        if filename.endswith('.metadata'):
+            continue
         file_path = os.path.join(dirpath, filename)
+        metadata_file_path = os.path.join(dirpath, filename + '.metadata')
+        with open(metadata_file_path, 'r') as file:
+            metadata = json.loads(file.read())
+        print('metadata', metadata)
         blob_name = os.path.join(dirpath, filename).split(f'releases{os.sep}', 1)[1]
-        block_blob_service.create_blob_from_path('releases', blob_name, file_path)
+        block_blob_service.create_blob_from_path('releases', blob_name, file_path, metadata=metadata)
