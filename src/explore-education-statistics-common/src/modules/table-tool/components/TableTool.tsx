@@ -281,9 +281,10 @@ const TableTool = ({
   >();
 
   React.useEffect(() => {
-
     setValidInitialQuery(undefined);
     setInitialStep(1);
+
+    console.log(initialQuery);
 
     if (initialQuery) {
       const doit = async () => {
@@ -398,7 +399,6 @@ const TableTool = ({
 
       doit();
     } else {
-
       setSubjectMeta(getDefaultSubjectMeta());
       setSubjectId('');
       setLocations({});
