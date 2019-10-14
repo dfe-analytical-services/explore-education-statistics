@@ -5,8 +5,7 @@
       "default": "None",
       "Function.Publisher": "Information",
       "Function.RebuildContentCache": "Information",
-      "GovUk.Education.ExploreEducationStatistics.Publisher.Functions.Publisher": "Information",
-      "GovUk.Education.ExploreEducationStatistics.Publisher.Functions.ContentCacheGeneration": "Information"
+      "GovUk.Education.ExploreEducationStatistics.Publisher": "Information"
     }
   }
 }
