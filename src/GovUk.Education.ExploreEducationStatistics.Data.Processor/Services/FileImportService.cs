@@ -41,17 +41,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             var subjectData = _fileStorageService.GetSubjectData(message).Result;
             var subject = GetSubject(message, subjectData.Name);
-            var dataFileName = ProcessorUtils.GetDataFileName(message);
             var releaseId = message.Release.Id.ToString();
 
-            if (await _batchService.IsBatchProcessed(releaseId, dataFileName, message.BatchNo))
+            if (await _batchService.IsBatchProcessed(releaseId, message.OrigDataFileName, message.BatchNo))
             {
                 _logger.LogInformation($"{message.DataFileName} already processed...skipping");
                 return;
             }
 
             // Potentially status could already be failed so don't continue
-            if (await _batchService.UpdateStatus(message.Release.Id.ToString(), dataFileName, IStatus.RUNNING_PHASE_2))
+            if (await _batchService.UpdateStatus(message.Release.Id.ToString(), message.OrigDataFileName, IStatus.RUNNING_PHASE_2))
             {
 
                 try
@@ -76,13 +75,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     }
 
                     _batchService.UpdateBatchCount(
-                        message.Release.Id.ToString(), dataFileName, message.BatchNo).Wait();
+                        message.Release.Id.ToString(), message.OrigDataFileName, message.BatchNo).Wait();
                 }
                 catch (Exception e)
                 {
                     _batchService.LogErrors(
                         message.Release.Id.ToString(),
-                        dataFileName,
+                        message.OrigDataFileName,
                         new List<String> {e.Message}
                     ).Wait();
 
