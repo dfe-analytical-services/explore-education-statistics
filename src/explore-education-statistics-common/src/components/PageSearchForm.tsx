@@ -27,6 +27,7 @@ export interface PageSearchFormProps {
   id: string;
   minInput: number;
   onSearch?: (s: string) => void;
+  inputLabel: string;
 }
 
 interface State {
@@ -162,7 +163,7 @@ class PageSearchForm extends Component<PageSearchFormProps, State> {
   }
 
   public render() {
-    const { className, id } = this.props;
+    const { className, id, inputLabel } = this.props;
     const { searchResults, searchComplete } = this.state;
 
     return (
@@ -184,7 +185,7 @@ class PageSearchForm extends Component<PageSearchFormProps, State> {
           inputProps={{
             placeholder: 'Search this page',
           }}
-          inputLabel="Find on this page"
+          inputLabel={inputLabel}
           afterInput={({ value }) => (
             <button
               type="submit"
