@@ -16,7 +16,10 @@ function GlossaryIndexPage() {
             education statistics and data.
           </p>
 
-          <PageSearchFormWithAnalytics />
+          <PageSearchFormWithAnalytics
+            inputLabel="Search our A to Z list of definitions for terms used across
+            education statistics and data."
+          />
         </div>
         <div className="govuk-grid-column-one-third">
           <RelatedInformation>

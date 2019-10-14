@@ -78,7 +78,7 @@ class MethodologyPage extends Component<Props> {
                 action: 'Print this page link selected',
               }}
             />
-            <PageSearchFormWithAnalytics />
+            <PageSearchFormWithAnalytics inputLabel="Search in this methodology page." />
           </div>
         </div>
 
