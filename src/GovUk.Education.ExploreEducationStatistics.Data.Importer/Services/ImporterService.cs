@@ -164,7 +164,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         
         public static GeographicLevel GetGeographicLevel(IReadOnlyList<string> line, List<string> headers)
         {
-            return GeographicLevels.EnumFromStringForImport(CsvUtil.Value(line, headers, "geographic_level"));
+            return GetGeographicLevelFromString(CsvUtil.Value(line, headers, "geographic_level"));
+        }
+
+        private static GeographicLevel GetGeographicLevelFromString(string value)
+        {
+            foreach (GeographicLevel val in Enum.GetValues(typeof(GeographicLevel)))
+            {
+                if (val.GetEnumLabel().ToLower().Equals(value.ToLower()))
+                {
+                    return val;
+                }
+            }
+            
+            throw new InvalidGeographicLevelException(value);
         }
         
         public static TimeIdentifier GetTimeIdentifier(IReadOnlyList<string> line, List<string> headers)
