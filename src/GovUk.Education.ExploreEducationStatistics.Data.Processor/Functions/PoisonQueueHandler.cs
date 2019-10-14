@@ -1,7 +1,4 @@
-using System;
 using System.Collections.Generic;
-using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
@@ -15,10 +12,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
 
         public PoisonQueueHandler(IBatchService batchService)
         {
+            _batchService = batchService;
         }
 
         [FunctionName("ProcessUploadsPoisonHandler")]
-        public void ProcessUploadsPoisonQueueHandler(
+        public async void ProcessUploadsPoisonQueueHandler(
             [QueueTrigger("imports-pending-poison")]
             ImportMessage message,
             ILogger logger
@@ -26,27 +24,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
         {
             var errors = new List<string>() { "File failed to import for unknown reason in upload processing stage."};
             
-            _batchService.FailImport(
+            await _batchService.FailImport(
                 message.Release.Id.ToString(),
                 message.DataFileName,
                 errors
-            ).Wait();
+            );
         }
 
 
         [FunctionName("ImportObservationsPoisonHandler")]
-        public void ImportObservationsPoisonQueueHandler(
+        public async void ImportObservationsPoisonQueueHandler(
             [QueueTrigger("imports-available-poison")]
             ImportMessage message,
             ILogger logger)
         {
             var errors = new List<string>() { "File failed to import for unknown reason in observation import stage." };
             
-            _batchService.FailImport(
+            await _batchService.FailImport(
                 message.Release.Id.ToString(),
                 message.DataFileName,
                 errors
-            ).Wait();
+            );
         }
     }
 }
