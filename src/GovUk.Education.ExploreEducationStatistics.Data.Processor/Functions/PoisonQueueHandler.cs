@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 
@@ -42,7 +43,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             
             await _batchService.FailImport(
                 message.Release.Id.ToString(),
-                message.DataFileName,
+                // N.B. need real file name - potentially this could be a batched file name so convert
+                ProcessorUtils.GetDataFileName(message),
                 errors
             );
         }

@@ -11,7 +11,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
+namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
 {
     // ReSharper disable once UnusedMember.Global
     public class Processor

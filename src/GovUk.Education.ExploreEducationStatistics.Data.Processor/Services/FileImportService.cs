@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -40,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             var subjectData = _fileStorageService.GetSubjectData(message).Result;
             var subject = GetSubject(message, subjectData.Name);
-            var dataFileName = GetDataFileName(message);
+            var dataFileName = ProcessorUtils.GetDataFileName(message);
             var releaseId = message.Release.Id.ToString();
 
             if (await _batchService.IsBatchProcessed(releaseId, dataFileName, message.BatchNo))
@@ -48,47 +49,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 _logger.LogInformation($"{message.DataFileName} already processed...skipping");
                 return;
             }
-            
-            _batchService.UpdateStatus(message.Release.Id.ToString(), dataFileName, IStatus.RUNNING_PHASE_2);
-            
-            try
+
+            // Potentially status could already be failed so don't continue
+            if (await _batchService.UpdateStatus(message.Release.Id.ToString(), dataFileName, IStatus.RUNNING_PHASE_2))
             {
-                var batch = subjectData.GetCsvLines().ToList();
-                var metaLines = subjectData.GetMetaLines().ToList();
-                
-                _importerService.ImportObservations(
-                    batch,
-                    subject,
-                    _importerService.GetMeta(metaLines, subject),
-                    message.BatchNo,
-                    message.RowsPerBatch
+
+                try
+                {
+                    var batch = subjectData.GetCsvLines().ToList();
+                    var metaLines = subjectData.GetMetaLines().ToList();
+
+                    _importerService.ImportObservations(
+                        batch,
+                        subject,
+                        _importerService.GetMeta(metaLines, subject),
+                        message.BatchNo,
+                        message.RowsPerBatch
                     );
 
-                // If the batch size is > 1 i.e. The file was split into batches
-                // then delete each split batch processed
-                    
-                if (message.NumBatches > 1)
-                {
-                    _fileStorageService.Delete(message.Release.Id.ToString(), message.DataFileName);
+                    // If the batch size is > 1 i.e. The file was split into batches
+                    // then delete each split batch processed
+
+                    if (message.NumBatches > 1)
+                    {
+                        _fileStorageService.Delete(message.Release.Id.ToString(), message.DataFileName);
+                    }
+
+                    _batchService.UpdateBatchCount(
+                        message.Release.Id.ToString(), dataFileName, message.BatchNo).Wait();
                 }
-                
-                _batchService.UpdateBatchCount(
-                    message.Release.Id.ToString(), dataFileName, message.BatchNo).Wait();
-            }
-            catch (Exception e)
-            {
-                _batchService.LogErrors(
-                    message.Release.Id.ToString(),
-                    dataFileName,
-                    new List<String>{e.Message}
+                catch (Exception e)
+                {
+                    _batchService.LogErrors(
+                        message.Release.Id.ToString(),
+                        dataFileName,
+                        new List<String> {e.Message}
                     ).Wait();
-                
-                _logger.LogError(
-                    $"{GetType().Name} function FAILED: : Batch: " +
-                    $"{message.BatchNo} of {message.NumBatches} with Datafile: " +
-                    $"{message.DataFileName} : {e.Message} : will retry unknown exceptions 3 times...");
-                
-                throw e;
+
+                    _logger.LogError(
+                        $"{GetType().Name} function FAILED: : Batch: " +
+                        $"{message.BatchNo} of {message.NumBatches} with Datafile: " +
+                        $"{message.DataFileName} : {e.Message} : will retry unknown exceptions 3 times...");
+
+                    throw e;
+                }
             }
         }
         
@@ -113,13 +117,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .ThenInclude(p => p.Topic)
                 .ThenInclude(t => t.Theme)
                 .FirstOrDefault(s => s.Name.Equals(subjectName) && s.ReleaseId == message.Release.Id);
-        }
-
-        private string GetDataFileName(ImportMessage message)
-        {
-            var i = FileStoragePathUtils.BatchesDir.Length;
-            return message.NumBatches > 1 ? message.DataFileName.Substring(
-                i + 1,message.DataFileName.LastIndexOf("_") - i - 1) : message.DataFileName;
         }
     }
 }
