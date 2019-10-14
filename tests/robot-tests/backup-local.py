@@ -5,6 +5,11 @@ import docker
 import json
 from azure.storage.blob import BlockBlobService
 
+# Variables used by AzCopy
+AzCopy = 'C:\Program Files (x86)\Microsoft SDKs\Azure\AzCopy\AzCopy.exe'
+storage_table_url = 'http://127.0.0.1:10002/devstoreaccount1'
+storage_key = 'Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=='
+
 # Remove all previous backup files and directories in backup-data directory
 if os.path.exists('backup-data'):
     shutil.rmtree('backup-data')
@@ -16,10 +21,8 @@ container = client.containers.get('ees-mssql')
 backup_cmds = [
     'rm -rf /tmp/',
     'mkdir tmp',
-    '''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "BACKUP DATABASE [content] TO DISK = N'/tmp/content.bak' WITH NOFORMAT, INIT, NAME = 'content-full', NOSKIP, REWIND, NOUNLOAD, COMPRESSION, STATS = 10"''',
-    #'''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "declare @backupSetIdContent as int select @backupSetIdContent = position from msdb..backupset where database_name=N'content' and backup_set_id=(select max(backup_set_id) from msdb..backupset where database_name=N'content' ) if @backupSetIdContent is null begin raiserror(N'Verify failed. Backup information for database ''content'' not found.', 16, 1) end RESTORE VERIFYONLY FROM  DISK = N'/tmp/content.bak' WITH  FILE = @backupSetIdContent,  NOUNLOAD"'''
-    '''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "BACKUP DATABASE [statistics] TO DISK = N'/tmp/statistics.bak' WITH NOFORMAT, INIT, NAME = 'statistics-full', NOSKIP, REWIND, NOUNLOAD, COMPRESSION, STATS = 10"''',
-    #'''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "declare @backupSetIdStatistics as int select @backupSetIdStatistics = position from msdb..backupset where database_name=N'statistics' and backup_set_id=(select max(backup_set_id) from msdb..backupset where database_name=N'statistics' ) if @backupSetIdStatistics is null begin raiserror(N'Verify failed. Backup information for database ''statistics'' not found.', 16, 1) end RESTORE VERIFYONLY FROM  DISK = N'/tmp/statistics.bak' WITH  FILE = @backupSetIdStatistics,  NOUNLOAD"'''
+    '''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "BACKUP DATABASE [content] TO DISK = N'/tmp/content.bak' WITH NOFORMAT, NOINIT, NAME = 'content-full', SKIP, NOREWIND, NOUNLOAD, COMPRESSION, STATS = 10"''',
+    '''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "BACKUP DATABASE [statistics] TO DISK = N'/tmp/statistics.bak' WITH NOFORMAT, NOINIT, NAME = 'statistics-full', SKIP, NOREWIND, NOUNLOAD, COMPRESSION, STATS = 10"''',
 ]
 for cmd in backup_cmds:
     print(container.exec_run(cmd))
@@ -60,4 +63,10 @@ for blob in generator:
         blob_obj = block_blob_service.get_blob_to_path('releases', blob.name, os.path.join(os.getcwd(), 'backup-data', 'releases', blob.name))
         with open(os.path.join(os.getcwd(), 'backup-data', 'releases', blob.name + '.metadata'), 'w') as file:
             file.write(blob_obj.metadata)
+
+# Backup imports table to backup-data/imports
+os.makedirs(os.path.join('backup-data', 'imports'))
+backup_table_cmd = [AzCopy, f'/Source:{storage_table_url}/imports', '/sourceType:table', f'/Dest:{os.path.join(os.getcwd(),"backup-data", "imports")}', f'/SourceKey:{storage_key}', '/Manifest:table-backup.manifest']
+print(subprocess.run(backup_table_cmd))
+
 
