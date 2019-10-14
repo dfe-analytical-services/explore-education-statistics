@@ -189,9 +189,11 @@ class PageSearchForm extends Component<PageSearchFormProps, State> {
             <button
               type="submit"
               className={styles.searchButton}
-              value="Search this page"
+              value="Search"
               onClick={() => this.search(value)}
-            />
+            >
+              <span className="govuk-visually-hidden">Search</span>
+            </button>
           )}
           listBoxLabelId={`${id}-resultsLabel`}
           listBoxLabel={() => (
