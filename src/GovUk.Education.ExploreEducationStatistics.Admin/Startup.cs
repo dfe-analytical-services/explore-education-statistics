@@ -1,4 +1,6 @@
-﻿using AutoMapper;
+﻿using System.IdentityModel.Tokens.Jwt;
+using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.IdentityData;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -12,20 +14,19 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.AzureAD.UI;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Swagger;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
@@ -50,9 +51,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
+            
+            services
+                .AddDefaultIdentity<IdentityUser>()
+                .AddRoles<IdentityRole>()
+                .AddEntityFrameworkStores<IdentityDbContext>()
+                .AddDefaultTokenProviders();
 
-            services.AddAuthentication(AzureADDefaults.AuthenticationScheme)
-                .AddAzureAD(options => Configuration.Bind("AzureAd", options));
+            services
+                .AddIdentityServer(options =>
+                {
+                    options.Events.RaiseErrorEvents = true;
+                    options.Events.RaiseInformationEvents = true;
+                    options.Events.RaiseFailureEvents = true;
+                    options.Events.RaiseSuccessEvents = true;
+                })
+                .AddApiAuthorization<IdentityUser, IdentityDbContext>(options =>
+                {
+                    options.ApiResources[0].UserClaims.Add("role");
+                })
+                .AddDeveloperSigningCredential();
+
+            // remove default Microsoft remapping of the name of the OpenID "roles" claim mapping
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("roles");
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("role");
+            
+            services.AddAuthentication()
+                .AddOpenIdConnect(options =>
+                {
+                    options.ClientId = "3b7bd910-fd37-40a2-9808-e69b1b031152";
+                    options.Authority = "https://login.microsoftonline.com/dc4138fb-2e79-4aee-a57a-7cb149dab136/";
+                    options.CallbackPath = "/signin-oidc";
+                    options.ResponseType = "code id_token";
+                    options.Resource = "https://graph.microsoft.com/";
+                    options.ClientSecret = "s2BXNc9meOF8BxUn9ZIQpGmJBjiL/-=@";
+                    options.TokenValidationParameters.RoleClaimType = "role";
+                })
+                .AddIdentityServerJwt();
 
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
@@ -63,11 +98,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                         .RequireAuthenticatedUser()
                         .Build();
                     options.Filters.Add(new AuthorizeFilter(policy));
+                    options.EnableEndpointRouting = false;
                 })
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
                 .AddJsonOptions(options => {
-                    options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+                    options.JsonSerializerOptions.IgnoreNullValues = true;
                 });
+
+            services.AddDbContext<IdentityDbContext>(options =>
+                options
+                    .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
+                        builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
+                    .EnableSensitiveDataLogging()
+            );
 
             services.AddDbContext<ApplicationDbContext>(options =>
                 options
@@ -81,7 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"),
                         builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
                     .EnableSensitiveDataLogging()
-                    .ConfigureWarnings(builder => builder.Ignore(RelationalEventId.ValueConversionSqlLiteralWarning))
+//                    .ConfigureWarnings(builder => builder.Ignore(RelationalEventId.WarValueConversionSqlLiteralWarning))
             );
 
             // In production, the React files will be served from this directory
@@ -129,7 +172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Info {Title = "Explore education statistics - Admin API", Version = "v1"});
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Explore education statistics - Admin API", Version = "v1" });
             });
         }
 
@@ -206,11 +249,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
                 .CreateScope())
             {
+                /*
                 using (var context = serviceScope.ServiceProvider.GetService<StatisticsDbContext>())
                 {
                     context.Database.SetCommandTimeout(int.MaxValue);
                     context.Database.Migrate();
+                }*/
+                /*
+                using (var context = serviceScope.ServiceProvider.GetService<IdentityDbContext>())
+                {
+                    context.Database.SetCommandTimeout(int.MaxValue);
+                    context.Database.Migrate();
                 }
+                */
             }
         }
     }

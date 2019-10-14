@@ -1,6 +1,9 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,9 +14,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     public class AccountController : ControllerBase
     {
         [HttpGet("api/signin")]
-        public IActionResult Signin()
+        [AllowAnonymous]
+        public async Task Signin()
         {
-            return Redirect("/");
+            await HttpContext.ChallengeAsync(
+                OpenIdConnectDefaults.AuthenticationScheme,
+                new AuthenticationProperties { RedirectUri = "/" });
         }
         
         [HttpGet("api/signout")]

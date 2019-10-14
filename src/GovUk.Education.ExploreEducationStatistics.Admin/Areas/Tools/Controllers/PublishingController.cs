@@ -35,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Tools.Controlle
             return RedirectToAction("ReleaseDataPublished", "Publishing", new {releaseId});
         }
 
-        [Route("{controller}/publish/complete")]
+        [Route("[controller]/publish/complete")]
         public IActionResult ReleaseDataPublished(Guid releaseId)
         {
             var release = _context.Releases.FirstOrDefault(r => r.Id.Equals(releaseId));

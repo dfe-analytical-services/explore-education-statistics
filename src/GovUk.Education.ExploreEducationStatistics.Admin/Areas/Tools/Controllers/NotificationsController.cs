@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Tools.Controlle
             return new BadRequestResult();
         }
 
-        [Route("{controller}/notify/sent")]
+        [Route("[controller]/notify/sent")]
         public IActionResult NotificationsSent(Guid publicationId)
         {
             var publication = _context.Publications.FirstOrDefault(p => p.Id.Equals(publicationId));
