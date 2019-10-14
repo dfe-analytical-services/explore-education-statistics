@@ -42,6 +42,7 @@ const Wizard = ({ children, initialStep = 1, id, onStepChange }: Props) => {
   };
 
   React.useEffect(() => {
+    console.log(initialStep);
     setCurrentStepState(initialStep);
   }, [initialStep]);
 

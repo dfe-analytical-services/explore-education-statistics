@@ -23,7 +23,7 @@ import imageFileSave from './images/guidance/guidance-file-save.jpg';
 import imageFileSummary from './images/guidance/guidance-file-summary.jpg';
 import imageFileDelete from './images/guidance/guidance-file-delete.jpg';
 
-const DocumentationManageContent = ({ location }: RouteChildrenProps) => {
+const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
   const query = new URLSearchParams(window.location.search);
   const step = Number(query.get('step'));
 
@@ -31,7 +31,7 @@ const DocumentationManageContent = ({ location }: RouteChildrenProps) => {
     <Page
       wide
       breadcrumbs={[
-        { name: "Administrator's guide", link: '/documentation' },
+        { name: 'Administrator\'s guide', link: '/documentation' },
         { name: 'Managing data' },
       ]}
     >

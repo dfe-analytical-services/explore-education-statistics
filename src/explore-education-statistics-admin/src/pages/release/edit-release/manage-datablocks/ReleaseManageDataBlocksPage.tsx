@@ -1,31 +1,29 @@
-import ManageReleaseContext, {
-  ManageRelease,
-} from '@admin/pages/release/ManageReleaseContext';
+/* eslint-disable no-shadow */
+import ManageReleaseContext, { ManageRelease } from '@admin/pages/release/ManageReleaseContext';
 import DataBlocksService from '@admin/services/release/edit-release/datablocks/service';
 import { DataBlock } from '@admin/services/release/edit-release/datablocks/types';
 import Button from '@common/components/Button';
 import { FormSelect } from '@common/components/form';
-import { SelectOption } from '@common/components/form/FormSelect';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import DataBlockService, {
-  DataBlockRequest,
-  DataBlockResponse,
-} from '@common/services/dataBlockService';
+import DataBlockService, { DataBlockRequest, DataBlockResponse } from '@common/services/dataBlockService';
 import React, { useContext } from 'react';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 import CreateDataBlocks from './CreateDataBlocks';
 import ViewDataBlocks from './ViewDataBlocks';
+
+interface DataBlockData {
+  dataBlock : DataBlock;
+  dataBlockRequest: DataBlockRequest;
+  dataBlockResponse: DataBlockResponse;
+}
 
 const ReleaseManageDataBlocksPage = () => {
   const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
 
   const [selectedDataBlock, setSelectedDataBlock] = React.useState<string>('');
   const [dataBlocks, setDataBlocks] = React.useState<DataBlock[]>([]);
-  const [dataBlockOptions, setDataBlockOptions] = React.useState<
-    SelectOption[]
-  >([]);
 
   const updateDataBlocks = (rId: string) => {
     return DataBlocksService.getDataBlocks(rId).then(blocks => {
@@ -34,25 +32,21 @@ const ReleaseManageDataBlocksPage = () => {
   };
 
   React.useEffect(() => {
-    updateDataBlocks(releaseId).then(() => {});
+    updateDataBlocks(releaseId).then(() => {
+    });
   }, [releaseId]);
 
-  React.useEffect(() => {
-    setDataBlockOptions(
-      dataBlocks.map(({ heading, id }, index) => ({
-        label: `${heading || index}`,
-        value: `${id}`,
-      })),
-    );
-  }, [dataBlocks]);
+  const dataBlockOptions = React.useMemo( () => dataBlocks.map(({ heading, id }, index) => ({
+    label: `${heading || index}`,
+    value: `${id}`,
+  })), [dataBlocks]);
 
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
-  const [dataBlock, setDataBlock] = React.useState<DataBlock>();
-  const [dataBlockRequest, setDataBlockRequest] = React.useState<DataBlockRequest>();
 
-  const [dataBlockResponse, setDataBlockResponse] = React.useState<DataBlockResponse>();
+  const [dataBlockData, setDataBlockData] = React.useState<DataBlockData>();
 
-  const onDataBlockSave = async (db: DataBlock) => {
+
+  const onDataBlockSave = React.useMemo(() => async (db: DataBlock) => {
     let newDataBlock;
 
     if (db.id) {
@@ -68,7 +62,7 @@ const ReleaseManageDataBlocksPage = () => {
     }
 
     return newDataBlock;
-  };
+  }, [releaseId, selectedDataBlock]);
 
   const [deleteDataBlock, setDeleteDataBlock] = React.useState<DataBlock>();
 
@@ -81,50 +75,52 @@ const ReleaseManageDataBlocksPage = () => {
     }
   };
 
-  React.useEffect(() => {
-    setDataBlockResponse(undefined);
-    setDataBlock(undefined);
-    setDataBlockRequest(undefined);
+  const unsetIsLoading = React.useCallback(() => setIsLoading(false), []);
+
+  const load = React.useMemo(() => async (dataBlocks: DataBlock[], releaseId: string, selectedDataBlockId: string) => {
 
     setIsLoading(true);
 
-    Promise.resolve(dataBlocks.find(({ id }) => selectedDataBlock === id))
-      .then(db => {
-        if (db === undefined) throw new Error();
-        setDataBlock(db);
+    if (!selectedDataBlockId) return {};
 
-        const request = db.dataBlockRequest;
-        if (request === undefined) throw new Error();
+    const db = dataBlocks.find(({ id }) => selectedDataBlockId === id);
 
-        setDataBlockRequest(request);
-        return request;
+    if (db === undefined) return {};
+
+    const request = db.dataBlockRequest;
+    if (request === undefined) return {};
+
+    const response = await DataBlockService.getDataBlockForSubject(request);
+
+    if (response === undefined) return {};
+
+    return {
+      dataBlock: db,
+      request,
+      response: {
+        ...response,
+        releaseId,
+      },
+    };
+
+
+  }, []);
+
+  React.useEffect(() => {
+
+    load(dataBlocks, releaseId, selectedDataBlock)
+      .then(({ dataBlock, request: dataBlockRequest, response: dataBlockResponse }) => {
+
+        if (dataBlock && dataBlockRequest && dataBlockResponse) {
+          setDataBlockData({dataBlock, dataBlockRequest, dataBlockResponse});
+        } else {
+          setDataBlockData(undefined);
+          setIsLoading(false);
+        }
       })
-      .then(request => DataBlockService.getDataBlockForSubject(request))
-      .then(response => {
-        if (response === undefined) throw new Error('undefined response');
+    ;
 
-        setDataBlockResponse({
-          ...response,
-          releaseId,
-        });
-      })
-      .catch(() => {
-        setDataBlockResponse(undefined);
-        setDataBlock(undefined);
-        setDataBlockRequest(undefined);
-        setIsLoading(false);
-      });
-
-    const selectedIndex = Number.parseInt(selectedDataBlock, 10);
-
-    if (!Number.isNaN(selectedIndex) && dataBlocks[selectedIndex]) {
-      const request = dataBlocks[selectedIndex].dataBlockRequest;
-
-      if (request) {
-        DataBlockService.getDataBlockForSubject(request);
-      }
-    }
-  }, [dataBlocks, releaseId, selectedDataBlock]);
+  }, [load, dataBlocks, releaseId, selectedDataBlock]);
 
   return (
     <>
@@ -154,23 +150,23 @@ const ReleaseManageDataBlocksPage = () => {
 
         <div>
           <h2>
-            {dataBlock
-              ? dataBlock.heading || 'title not set'
+            {dataBlockData && dataBlockData.dataBlock
+              ? dataBlockData.dataBlock.heading || 'title not set'
               : 'Create new Data Block'}
           </h2>
 
           <Tabs id="manageDataBlocks">
             <TabsSection
-              title={dataBlock ? 'Update Data source' : 'Create Data source'}
+              title={dataBlockData && dataBlockData.dataBlock ? 'Update Data source' : 'Create Data source'}
             >
               <p>Configure the data source for the data block</p>
 
-              {dataBlock && (
+              {dataBlockData && dataBlockData.dataBlock && (
                 <>
                   <div className="govuk-!-margin-top-4">
                     <Button
                       type="button"
-                      onClick={() => setDeleteDataBlock(dataBlock)}
+                      onClick={() => setDeleteDataBlock(dataBlockData.dataBlock)}
                     >
                       Delete this data block
                     </Button>
@@ -192,20 +188,17 @@ const ReleaseManageDataBlocksPage = () => {
 
               <div style={{ overflow: 'hidden' }}>
                 <CreateDataBlocks
-                  dataBlockRequest={dataBlockRequest}
-                  dataBlockResponse={dataBlockResponse}
-                  dataBlock={dataBlock}
+                  releaseId={releaseId}
+                  {...dataBlockData}
                   onDataBlockSave={onDataBlockSave}
-                  onTableToolLoaded={() => setIsLoading(false)}
+                  onTableToolLoaded={unsetIsLoading}
                 />
               </div>
             </TabsSection>
-            {dataBlock && dataBlockResponse && dataBlockRequest && (
+            {dataBlockData && (
               <TabsSection title="Configure Content">
                 <ViewDataBlocks
-                  dataBlock={dataBlock}
-                  dataBlockRequest={dataBlockRequest}
-                  dataBlockResponse={dataBlockResponse}
+                  {...dataBlockData}
                 />
               </TabsSection>
             )}

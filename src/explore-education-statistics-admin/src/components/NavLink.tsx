@@ -13,7 +13,7 @@ const NavLink = ({
   children,
   className,
   to,
-  unvisited = false,
+  // unvisited = false,
   ...props
 }: Props) => {
   return (
