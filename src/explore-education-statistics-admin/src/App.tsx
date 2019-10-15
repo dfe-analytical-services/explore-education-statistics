@@ -28,6 +28,8 @@ import AdminDocumentationManageContent from './pages/documentation/Documentation
 import AdminDocumentationManageData from './pages/documentation/DocumentationManageData';
 import AdminDocumentationManageDataBlocks from './pages/documentation/DocumentationManageDataBlocks';
 
+import ApiAuthorizationRoutes from './components/api-authorization/ApiAuthorizationRoutes';
+
 import PrototypeAdminDashboard from './pages/prototypes/PrototypeAdminDashboard';
 import PrototypeChartTest from './pages/prototypes/PrototypeChartTest';
 import PrototypeTableTool from './pages/prototypes/PrototypeTableTool';
@@ -56,6 +58,9 @@ function App() {
   return (
     <BrowserRouter>
       {/* Non-Prototype Routes*/}
+
+      <ApiAuthorizationRoutes />
+
       <ProtectedRoute
         exact
         path={dashboardRoutes.adminDashboard}

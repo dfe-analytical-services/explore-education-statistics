@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -51,26 +52,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
-            
-            services
-                .AddDefaultIdentity<IdentityUser>()
-                .AddRoles<IdentityRole>()
-                .AddEntityFrameworkStores<IdentityDbContext>()
-                .AddDefaultTokenProviders();
-
-            services
-                .AddIdentityServer(options =>
-                {
-                    options.Events.RaiseErrorEvents = true;
-                    options.Events.RaiseInformationEvents = true;
-                    options.Events.RaiseFailureEvents = true;
-                    options.Events.RaiseSuccessEvents = true;
-                })
-                .AddApiAuthorization<IdentityUser, IdentityDbContext>(options =>
-                {
-                    options.ApiResources[0].UserClaims.Add("role");
-                })
-                .AddDeveloperSigningCredential();
 
             // remove default Microsoft remapping of the name of the OpenID "roles" claim mapping
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("roles");
@@ -105,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     options.JsonSerializerOptions.IgnoreNullValues = true;
                 });
 
-            services.AddDbContext<IdentityDbContext>(options =>
+            services.AddDbContext<ApplicationUserDbContext>(options =>
                 options
                     .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
                         builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
@@ -126,6 +107,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     .EnableSensitiveDataLogging()
 //                    .ConfigureWarnings(builder => builder.Ignore(RelationalEventId.WarValueConversionSqlLiteralWarning))
             );
+            
+            services
+                .AddDefaultIdentity<ApplicationUser>()
+                .AddRoles<IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationUserDbContext>()
+                .AddDefaultTokenProviders();
+
+            services
+                .AddIdentityServer(options =>
+                {
+                    options.Events.RaiseErrorEvents = true;
+                    options.Events.RaiseInformationEvents = true;
+                    options.Events.RaiseFailureEvents = true;
+                    options.Events.RaiseSuccessEvents = true;
+                })
+                .AddApiAuthorization<ApplicationUser, ApplicationUserDbContext>(options =>
+                {
+                    options.ApiResources[0].UserClaims.Add("role");
+                })
+                .AddDeveloperSigningCredential();
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration => { configuration.RootPath = "wwwroot"; });
@@ -201,7 +202,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 .StyleSources(s => s.Self())
                 .StyleSources(s => s.UnsafeInline())
                 .FontSources(s => s.Self())
-                .FormActions(s => s.Self())
+                .FormActions(s => s
+                    .CustomSources("https://login.microsoftonline.com")
+                    .Self()
+                )
                 .FrameAncestors(s => s.Self())
                 .ImageSources(s => s.Self())
                 .ImageSources(s => s.CustomSources("data:"))
@@ -215,6 +219,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             app.UseCookiePolicy();
 
             app.UseAuthentication();
+            app.UseIdentityServer();
 
             app.UseMvc(routes =>
             {
@@ -255,13 +260,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     context.Database.SetCommandTimeout(int.MaxValue);
                     context.Database.Migrate();
                 }*/
-                /*
-                using (var context = serviceScope.ServiceProvider.GetService<IdentityDbContext>())
+                
+                using (var context = serviceScope.ServiceProvider.GetService<ApplicationUserDbContext>())
                 {
                     context.Database.SetCommandTimeout(int.MaxValue);
                     context.Database.Migrate();
                 }
-                */
+                
             }
         }
     }

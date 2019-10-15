@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.IdentityData.Migrations
 {
-    [DbContext(typeof(IdentityDbContext))]
+    [DbContext(typeof(ApplicationUserDbContext))]
     [Migration("00000000000000_CreateIdentitySchema")]
     partial class CreateIdentitySchema
     {
@@ -18,10 +18,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.IdentityData.Migratio
             modelBuilder
                 .HasAnnotation("ProductVersion", "3.0.0-rc1.19455.8");
 
-            modelBuilder.Entity("jwt_with_external_login.Models.ApplicationUser", b =>
+            modelBuilder.Entity("dfe_admin.Models.ApplicationUser", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("TEXT");
+                    b.Property<Guid>("Id");
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("INTEGER");
@@ -31,7 +30,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.IdentityData.Migratio
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Email")
-                        .HasColumnType("TEXT")
                         .HasMaxLength(256);
 
                     b.Property<bool>("EmailConfirmed")
@@ -44,11 +42,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.IdentityData.Migratio
                         .HasColumnType("TEXT");
 
                     b.Property<string>("NormalizedEmail")
-                        .HasColumnType("TEXT")
                         .HasMaxLength(256);
 
                     b.Property<string>("NormalizedUserName")
-                        .HasColumnType("TEXT")
                         .HasMaxLength(256);
 
                     b.Property<string>("PasswordHash")
@@ -67,7 +63,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.IdentityData.Migratio
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("UserName")
-                        .HasColumnType("TEXT")
                         .HasMaxLength(256);
 
                     b.HasKey("Id");
@@ -85,12 +80,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.IdentityData.Migratio
             modelBuilder.Entity("IdentityServer4.EntityFramework.Entities.DeviceFlowCodes", b =>
                 {
                     b.Property<string>("UserCode")
-                        .HasColumnType("TEXT")
                         .HasMaxLength(200);
 
                     b.Property<string>("ClientId")
                         .IsRequired()
-                        .HasColumnType("TEXT")
                         .HasMaxLength(200);
 
                     b.Property<DateTime>("CreationTime")
@@ -98,12 +91,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.IdentityData.Migratio
 
                     b.Property<string>("Data")
                         .IsRequired()
-                        .HasColumnType("TEXT")
                         .HasMaxLength(50000);
 
                     b.Property<string>("DeviceCode")
                         .IsRequired()
-                        .HasColumnType("TEXT")
                         .HasMaxLength(200);
 
                     b.Property<DateTime?>("Expiration")
@@ -111,7 +102,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.IdentityData.Migratio
                         .HasColumnType("TEXT");
 
                     b.Property<string>("SubjectId")
-                        .HasColumnType("TEXT")
                         .HasMaxLength(200);
 
                     b.HasKey("UserCode");
@@ -127,12 +117,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.IdentityData.Migratio
             modelBuilder.Entity("IdentityServer4.EntityFramework.Entities.PersistedGrant", b =>
                 {
                     b.Property<string>("Key")
-                        .HasColumnType("TEXT")
                         .HasMaxLength(200);
 
                     b.Property<string>("ClientId")
                         .IsRequired()
-                        .HasColumnType("TEXT")
                         .HasMaxLength(200);
 
                     b.Property<DateTime>("CreationTime")
@@ -140,19 +128,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.IdentityData.Migratio
 
                     b.Property<string>("Data")
                         .IsRequired()
-                        .HasColumnType("TEXT")
                         .HasMaxLength(50000);
 
                     b.Property<DateTime?>("Expiration")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("SubjectId")
-                        .HasColumnType("TEXT")
                         .HasMaxLength(200);
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("TEXT")
                         .HasMaxLength(50);
 
                     b.HasKey("Key");
@@ -174,11 +159,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.IdentityData.Migratio
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
-                        .HasColumnType("TEXT")
                         .HasMaxLength(256);
 
                     b.Property<string>("NormalizedName")
-                        .HasColumnType("TEXT")
                         .HasMaxLength(256);
 
                     b.HasKey("Id");
@@ -239,11 +222,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.IdentityData.Migratio
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("TEXT")
                         .HasMaxLength(128);
 
                     b.Property<string>("ProviderKey")
-                        .HasColumnType("TEXT")
                         .HasMaxLength(128);
 
                     b.Property<string>("ProviderDisplayName")
@@ -281,11 +262,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.IdentityData.Migratio
                         .HasColumnType("TEXT");
 
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("TEXT")
                         .HasMaxLength(128);
 
                     b.Property<string>("Name")
-                        .HasColumnType("TEXT")
                         .HasMaxLength(128);
 
                     b.Property<string>("Value")
@@ -307,7 +286,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.IdentityData.Migratio
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("jwt_with_external_login.Models.ApplicationUser", null)
+                    b.HasOne("dfe_admin.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -316,7 +295,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.IdentityData.Migratio
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("jwt_with_external_login.Models.ApplicationUser", null)
+                    b.HasOne("dfe_admin.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -331,7 +310,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.IdentityData.Migratio
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("jwt_with_external_login.Models.ApplicationUser", null)
+                    b.HasOne("dfe_admin.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -340,7 +319,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.IdentityData.Migratio
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("jwt_with_external_login.Models.ApplicationUser", null)
+                    b.HasOne("dfe_admin.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)

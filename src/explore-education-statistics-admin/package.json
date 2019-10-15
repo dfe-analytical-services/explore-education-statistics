@@ -182,6 +182,7 @@
   ],
   "dependencies": {
     "lodash": "^4.17.13",
+    "oidc-client": "^1.9.1",
     "whatwg-fetch": "^3.0.0"
   }
 }
