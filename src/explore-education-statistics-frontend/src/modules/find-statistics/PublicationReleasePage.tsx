@@ -164,7 +164,7 @@ class PublicationReleasePage extends Component<Props> {
               </Details>
             )}
             <PageSearchFormWithAnalytics
-              inputLabel="Search in this publication page."
+              inputLabel="Search in this release page."
               className="govuk-!-margin-top-3 govuk-!-margin-bottom-3"
             />
           </div>
