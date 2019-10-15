@@ -99,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             var footnotes = GetFootnotes(observations, query);
 
             _logger.LogTrace("Got Footnotes in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-            stopwatch.Restart();
+            stopwatch.Stop();
 
             return new SubjectMetaViewModel
             {
