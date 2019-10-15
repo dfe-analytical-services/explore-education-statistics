@@ -10,7 +10,7 @@ Suite Teardown    user closes the browser
 Page has correct heading
     [Tags]  HappyPath
     user selects theme "Test Theme" and topic "Automated Test Topic" from the admin dashboard
-    user waits until page contains element    xpath://a[text()="Create new publication"]
+    user waits until page contains element    xpath://a[text()="Create new publication"]     60
     user clicks link  Create new publication
     user waits until page contains heading    Create new publication
     

@@ -31,11 +31,11 @@ Select subject "Absence in prus"
 
 Select Location Country, England
     [Tags]  HappyPath
-    user opens details dropdown     Country
+    user opens details dropdown     National
     user clicks checkbox    England
     user clicks element     css:#locationFiltersForm-submit
     user waits until page contains  Choose time period
-    user checks previous table tool step contains  3    Country    England
+    user checks previous table tool step contains  3   National     England
 
 Select Start date and End date
     [Tags]  HappyPath
@@ -85,11 +85,11 @@ Go back to Locations step
 Unselect England as a location
     [Documentation]  DFE-1142  EES-231
     [Tags]  HappyPath
-    user opens details dropdown     Country
+    user opens details dropdown     National
     user clicks checkbox            England
     # EES-231
     #user checks page does not contain element  xpath://h2[text()="There is a problem"]
-    user closes details dropdown    Country
+    user closes details dropdown    National
 
 Select locations LAs Barnet, Barnsley, Bedford
     [Tags]  HappyPath
