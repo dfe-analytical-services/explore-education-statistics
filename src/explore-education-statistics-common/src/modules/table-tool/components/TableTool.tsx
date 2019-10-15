@@ -1,27 +1,28 @@
-import { ConfirmContextProvider } from '@common/context/ConfirmContext';
+/* eslint-disable no-shadow */
+import {ConfirmContextProvider} from '@common/context/ConfirmContext';
 import tableBuilderService, {
   PublicationSubject,
   PublicationSubjectMeta,
   TableDataQuery,
   ThemeMeta,
 } from '@common/modules/full-table/services/tableBuilderService';
-import { LocationFilter } from '@common/modules/full-table/types/filters';
-import { FullTable } from '@common/modules/full-table/types/fullTable';
+import {LocationFilter} from '@common/modules/full-table/types/filters';
+import {FullTable} from '@common/modules/full-table/types/fullTable';
 import parseYearCodeTuple from '@common/modules/full-table/utils/TimePeriod';
-import FiltersForm, { FilterFormSubmitHandler } from '@common/modules/table-tool/components/FiltersForm';
-import LocationFiltersForm, { LocationFiltersFormSubmitHandler } from '@common/modules/table-tool/components/LocationFiltersForm';
+import FiltersForm, {FilterFormSubmitHandler} from '@common/modules/table-tool/components/FiltersForm';
+import LocationFiltersForm, {LocationFiltersFormSubmitHandler} from '@common/modules/table-tool/components/LocationFiltersForm';
 import PreviousStepModalConfirm from '@common/modules/table-tool/components/PreviousStepModalConfirm';
-import PublicationForm, { PublicationFormSubmitHandler } from '@common/modules/table-tool/components/PublicationForm';
-import PublicationSubjectForm, { PublicationSubjectFormSubmitHandler } from '@common/modules/table-tool/components/PublicationSubjectForm';
-import TableHeadersForm, { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
+import PublicationForm, {PublicationFormSubmitHandler} from '@common/modules/table-tool/components/PublicationForm';
+import PublicationSubjectForm, {PublicationSubjectFormSubmitHandler} from '@common/modules/table-tool/components/PublicationSubjectForm';
+import TableHeadersForm, {TableHeadersFormValues} from '@common/modules/table-tool/components/TableHeadersForm';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
-import TimePeriodForm, { TimePeriodFormSubmitHandler } from '@common/modules/table-tool/components/TimePeriodForm';
+import TimePeriodForm, {TimePeriodFormSubmitHandler} from '@common/modules/table-tool/components/TimePeriodForm';
 import Wizard from '@common/modules/table-tool/components/Wizard';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
-import { Dictionary } from '@common/types/util';
+import {Dictionary} from '@common/types/util';
 import mapValues from 'lodash/mapValues';
-import React, { createRef, ReactNode } from 'react';
+import React, {createRef, ReactNode} from 'react';
 
 import {
   DateRangeState,
@@ -58,6 +59,18 @@ interface Props {
 }
 
 
+interface TableToolState {
+  query: TableDataQuery | undefined;
+  createdTable: FullTable | undefined;
+  tableHeaders: TableHeadersFormValues;
+  validInitialQuery: TableDataQuery | undefined;
+  dateRange: DateRangeState;
+  locations: Dictionary<LocationFilter[]>;
+  subjectId: string;
+  subjectMeta: PublicationSubjectMeta;
+  initialStep: number;
+}
+
 const TableTool = ({
   themeMeta,
   publicationId,
@@ -70,18 +83,16 @@ const TableTool = ({
 }: Props) => {
   const dataTableRef = createRef<HTMLTableElement>();
 
-  const [subjects, setSubjects] = React.useState<PublicationSubject[]>([]);
-
   const [publication, setPublication] = React.useState<Publication>();
+  const [subjects, setSubjects] = React.useState<PublicationSubject[]>([]);
+  
+  const [initialStep, setInitialStep] = React.useState(1);
 
   const [subjectId, setSubjectId] = React.useState<string>('');
-
-
 
   const [subjectMeta, setSubjectMeta] = React.useState<PublicationSubjectMeta>(
     getDefaultSubjectMeta(),
   );
-
 
   const [locations, setLocations] = React.useState<Dictionary<LocationFilter[]>>({});
 
@@ -98,34 +109,60 @@ const TableTool = ({
 
   const [query, setQuery] = React.useState<TableDataQuery>();
 
-  const [initialStep, setInitialStep] = React.useState(1);
-
   const [validInitialQuery, setValidInitialQuery] = React.useState<TableDataQuery>();
+
+  const [tableToolState, setTableToolState] = React.useState<TableToolState>({
+    initialStep: 1,
+    subjectId: '',
+    subjectMeta: getDefaultSubjectMeta(),
+    locations: {},
+    dateRange: {},
+    tableHeaders: {
+      columnGroups: [],
+      columns: [],
+      rowGroups: [],
+      rows: [],
+    },
+    createdTable: undefined,
+    query: undefined,
+    validInitialQuery: undefined
+  });
+
+  React.useEffect(() => {
+    if (releaseId) {
+      tableBuilderService
+        .getReleaseMeta(releaseId)
+        .then(({subjects: releaseSubjects}) => {
+          setSubjects(releaseSubjects);
+        });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [releaseId]);
 
   React.useEffect(() => {
 
-    initialiseFromInitialQuery(releaseId, initialQuery, initialTableHeaders)
-      .then(({
-        query: newQuery,
-        validInitialQuery: newValidInitialQuery,
-        subjectId: newSubjectId,
-        locations: newLocations,
-        dateRange: newDateRange,
-        subjectMeta: meta,
-        createdTable: newTable,
-        tableHeaders: newTableHeaders,
-        initialStep: finalValidStepNumber,
-      }) => {
+    console.log("TABLE TOOL RELOAD FROM INITIAL QUERY");
 
-        setInitialStep(finalValidStepNumber);
-        setQuery(newQuery);
-        setValidInitialQuery(newValidInitialQuery);
-        setSubjectId(newSubjectId);
-        setLocations(newLocations);
-        setDateRange(newDateRange);
-        setSubjectMeta(meta);
-        setCreatedTable(newTable);
-        setTableHeaders(newTableHeaders);
+    initialiseFromInitialQuery(releaseId, initialQuery, initialTableHeaders)
+      .then(({tableHeaders, subjectMeta, subjectId, createdTable, locations, query, initialStep, dateRange, validInitialQuery} : TableToolState) => {
+
+        setTableToolState(
+          {tableHeaders, subjectMeta, subjectId, createdTable, locations, query, initialStep, dateRange, validInitialQuery}
+        );
+
+        console.log("TABLE TOOL SETUP");
+
+
+        setInitialStep(initialStep);
+        setSubjectMeta(subjectMeta);
+        setSubjectId(subjectId);
+        setLocations(locations);
+        setDateRange(dateRange);
+        setValidInitialQuery(validInitialQuery);
+
+        setTableHeaders(tableHeaders);
+        setCreatedTable(createdTable);
+        setQuery(query);
 
 
         if (onInitialQueryCompleted) onInitialQueryCompleted();
@@ -150,7 +187,6 @@ const TableTool = ({
     } = await tableBuilderService.getPublicationMeta(selectedPublicationId);
 
     setSubjects(publicationSubjects);
-
     setPublication(selectedPublication);
   };
 
@@ -165,16 +201,6 @@ const TableTool = ({
     setSubjectMeta(selectedSubjectMeta);
   };
 
-  React.useEffect(() => {
-    if (releaseId) {
-      tableBuilderService
-        .getReleaseMeta(releaseId)
-        .then(({ subjects: releaseSubjects }) => {
-          setSubjects(releaseSubjects);
-        });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [releaseId]);
 
   const handleLocationFiltersFormSubmit: LocationFiltersFormSubmitHandler = async ({
     locations: selectedLocations,
@@ -249,7 +275,7 @@ const TableTool = ({
 
   return (
     <ConfirmContextProvider>
-      {({ askConfirm }) => (
+      {({askConfirm}) => (
         <>
           <Wizard
             initialStep={initialStep}
@@ -346,13 +372,13 @@ const TableTool = ({
                         }
                       }}
                     />
-                    {createdTable ? (
+                    {createdTable && (
                       <TimePeriodDataTable
                         ref={dataTableRef}
                         fullTable={createdTable}
                         tableHeadersConfig={tableHeaders}
                       />
-                    ) : null}
+                    )}
                   </div>
 
                   {createdTable &&

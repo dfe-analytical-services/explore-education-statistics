@@ -22,7 +22,14 @@ const CreateDataBlocks = ({
   onTableToolLoaded,
 }: Props) => {
 
-  console.log(dataBlock, dataBlockRequest);
+  const initialQuery = dataBlockRequest;
+  const initialTableHeaders =   (dataBlock &&
+    dataBlock.tables &&
+    dataBlock.tables.length > 0 &&
+    {...dataBlock.tables[0].tableHeaders}) ||
+    undefined;
+
+  console.log("CDB", initialQuery, initialTableHeaders);
 
   return (
     <div>
@@ -30,14 +37,8 @@ const CreateDataBlocks = ({
         <TableTool
           releaseId={releaseId}
           themeMeta={[]}
-          initialQuery={dataBlockRequest}
-          initialTableHeaders={
-            (dataBlock &&
-              dataBlock.tables &&
-              dataBlock.tables.length > 0 &&
-              dataBlock.tables[0].tableHeaders) ||
-            undefined
-          }
+          initialQuery={initialQuery}
+          initialTableHeaders={initialTableHeaders}
           onInitialQueryCompleted={onTableToolLoaded}
           finalStepHeading="Configure data block"
           finalStepExtra={({ query, tableHeaders }) => (

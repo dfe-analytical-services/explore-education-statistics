@@ -25,6 +25,8 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
     const { fullTable, tableHeadersConfig } = props;
     const { subjectMeta, results } = fullTable;
 
+    console.log("TPDT", tableHeadersConfig);
+
     if (results.length === 0) {
       return (
         <WarningMessage>
