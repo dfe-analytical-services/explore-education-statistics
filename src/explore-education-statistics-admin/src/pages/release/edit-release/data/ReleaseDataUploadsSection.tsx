@@ -12,6 +12,7 @@ import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
+import { format } from 'date-fns';
 import { FormikActions, FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
 import ImporterStatus from '@admin/components/ImporterStatus';
@@ -38,6 +39,7 @@ const emptyDataFile: DataFile = {
   rows: 0,
   title: '',
   userName: '',
+  created: new Date(),
 };
 
 const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
@@ -205,6 +207,9 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                   <a href={`mailto:${dataFile.userName}`}>
                     {dataFile.userName}
                   </a>
+                </SummaryListItem>
+                <SummaryListItem term="Date Uploaded">
+                  {format(dataFile.created, 'do MMMM yyyy HH:mm')}
                 </SummaryListItem>
                 {dataFile.canDelete && (
                   <SummaryListItem
