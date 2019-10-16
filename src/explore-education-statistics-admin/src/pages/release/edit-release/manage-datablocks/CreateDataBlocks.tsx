@@ -22,11 +22,11 @@ const CreateDataBlocks = ({
   onTableToolLoaded,
 }: Props) => {
 
-  const initialTableHeaders = React.useMemo(() => (dataBlock &&
+  const initialTableHeaders = (dataBlock &&
     dataBlock.tables &&
     dataBlock.tables.length > 0 &&
     {...dataBlock.tables[0].tableHeaders}) ||
-    undefined, [dataBlock]);
+    undefined;
 
   return (
     <div>

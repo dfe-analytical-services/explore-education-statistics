@@ -68,7 +68,7 @@ export const reverseMapTableHeadersConfig = (
     });
 
     mappedRows = rows.map(({value}) => {
-      const i= fullTableSubjectMeta.indicators.find(
+      const i = fullTableSubjectMeta.indicators.find(
         indicator => indicator.value === value,
       ) as Indicator;
       if (i) return new Indicator(i);
@@ -76,7 +76,7 @@ export const reverseMapTableHeadersConfig = (
     });
   } else {
     mappedRows = rows.map(({value}) => {
-      const tp= fullTableSubjectMeta.timePeriodRange.find(
+      const tp = fullTableSubjectMeta.timePeriodRange.find(
         timePeriod => value === `${timePeriod.year}_${timePeriod.code}`,
       ) as TimePeriodFilter;
       if (tp) {
@@ -85,7 +85,7 @@ export const reverseMapTableHeadersConfig = (
       return tp;
     });
     mappedColumns = columns.map(({value}) => {
-      const i= fullTableSubjectMeta.indicators.find(
+      const i = fullTableSubjectMeta.indicators.find(
         indicator => indicator.value === value,
       ) as Indicator;
       if (i) return new Indicator(i);
@@ -402,9 +402,6 @@ export const initialiseFromInitialQuery = async (releaseId?: string, initialQuer
       newTableHeaders =
         (initialTableHeaders && reverseMapTableHeadersConfig(initialTableHeaders, newTable.subjectMeta)) ||
         getDefaultTableHeaderConfig(newTable.subjectMeta);
-
-      console.log(newTableHeaders);
-
     }
 
 

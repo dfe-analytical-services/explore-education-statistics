@@ -121,12 +121,17 @@ const TableTool = ({
   React.useEffect(() => {
 
     setInitialStep(1);
+    setTableToolState({
+      ...tableToolState,
+      validInitialQuery: undefined,
+      createdTable: undefined,
+      tableHeaders: undefined
+    });
 
     initialiseFromInitialQuery(releaseId, initialQuery, initialTableHeaders)
       .then(( state ) => {
 
         const {tableHeaders, subjectMeta, subjectId, createdTable, locations, query, initialStep, dateRange, validInitialQuery} = state;
-
 
         setTableToolState(
           {
@@ -146,7 +151,7 @@ const TableTool = ({
         if (onInitialQueryCompleted) onInitialQueryCompleted();
       });
 
-  }, [initialQuery, initialTableHeaders, onInitialQueryCompleted, releaseId]);
+  }, [initialQuery, initialTableHeaders, releaseId]);
 
   const handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
     publicationId: selectedPublicationId,

@@ -35,8 +35,6 @@ const TableHeadersForm = ({
   }
 }: Props) => {
 
-  console.log(initialValues);
-
   return (
     <Details summary="Re-order table headers">
       <p className="govuk-hint">

@@ -100,9 +100,6 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
       ),
     );
 
-    if (formikRef.current) {
-      formikRef.current.setValues(formInitialValues);
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formInitialValues, options]);
 
