@@ -1,6 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Admin.IdentityData;
+using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -86,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     options.JsonSerializerOptions.IgnoreNullValues = true;
                 });
 
-            services.AddDbContext<ApplicationUserDbContext>(options =>
+            services.AddDbContext<UsersAndRolesDbContext>(options =>
                 options
                     .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
                         builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
@@ -111,7 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services
                 .AddDefaultIdentity<ApplicationUser>()
                 .AddRoles<IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationUserDbContext>()
+                .AddEntityFrameworkStores<UsersAndRolesDbContext>()
                 .AddDefaultTokenProviders();
 
             services
@@ -122,7 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     options.Events.RaiseFailureEvents = true;
                     options.Events.RaiseSuccessEvents = true;
                 })
-                .AddApiAuthorization<ApplicationUser, ApplicationUserDbContext>(options =>
+                .AddApiAuthorization<ApplicationUser, UsersAndRolesDbContext>(options =>
                 {
                     options.ApiResources[0].UserClaims.Add("role");
                 })
