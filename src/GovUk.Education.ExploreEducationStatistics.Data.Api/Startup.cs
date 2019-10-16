@@ -20,6 +20,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Swagger;
 
@@ -50,7 +51,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                     .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"),
                         builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
                     .EnableSensitiveDataLogging()
-                    .ConfigureWarnings(builder => builder.Ignore(RelationalEventId.ValueConversionSqlLiteralWarning))
             );
 
             // ReSharper disable once CommentTypo
@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Info {Title = "Explore education statistics - Data API", Version = "v1"});
+                c.SwaggerDoc("v1", new OpenApiInfo {Title = "Explore education statistics - Data API", Version = "v1"});
             });
 
             services.AddTransient<IResultBuilder<Observation, ObservationViewModel>, ResultBuilder>();
@@ -93,7 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<ITableStorageService, TableStorageService>(s => new TableStorageService(Configuration.GetConnectionString("PublicStorage")));
 
             services.AddMvc()
-                .AddJsonOptions(options => {
+                .AddNewtonsoftJson(options => {
                     options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                 });
             

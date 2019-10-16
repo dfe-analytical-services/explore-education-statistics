@@ -25,9 +25,11 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Swagger;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
@@ -82,9 +84,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     options.EnableEndpointRouting = false;
                 })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
-                .AddJsonOptions(options => {
-                    options.JsonSerializerOptions.IgnoreNullValues = true;
-                });
+                .AddNewtonsoftJson(options =>
+                    {
+                        options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+                    });
 
             services.AddDbContext<UsersAndRolesDbContext>(options =>
                 options
@@ -105,7 +108,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"),
                         builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
                     .EnableSensitiveDataLogging()
-//                    .ConfigureWarnings(builder => builder.Ignore(RelationalEventId.WarValueConversionSqlLiteralWarning))
             );
             
             services

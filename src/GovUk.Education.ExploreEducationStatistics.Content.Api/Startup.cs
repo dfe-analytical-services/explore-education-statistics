@@ -43,12 +43,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                     options.EnableEndpointRouting = false;
                 })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
-                .AddJsonOptions(options =>
-                {
-//                    options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-//                    options.SerializerSettings.TypeNameHandling = TypeNameHandling.Auto;
-//                    options.SerializerSettings.Converters.Add(new ContentBlockConverter());
-                });
+                .AddNewtonsoftJson(options =>
+                    {
+                        options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                        options.SerializerSettings.TypeNameHandling = TypeNameHandling.Auto;
+                        options.SerializerSettings.Converters.Add(new ContentBlockConverter());
+                    });
 
             services.AddDbContext<ApplicationDbContext>(options =>
                 options
