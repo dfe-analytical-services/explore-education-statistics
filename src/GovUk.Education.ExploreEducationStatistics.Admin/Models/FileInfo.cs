@@ -1,3 +1,5 @@
+using System;
+
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
 {
     public class FileInfo
@@ -9,5 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
         public string MetaFileName { get; set; }
         public int Rows { get; set; }
         public string UserName { get; set; }
+
+        public DateTimeOffset? Created { get; set; }
     }
 }

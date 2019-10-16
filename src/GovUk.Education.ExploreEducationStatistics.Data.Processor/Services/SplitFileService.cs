@@ -45,6 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     var iMessage = new ImportMessage
                     {
                         DataFileName = f.FileName,
+                        OrigDataFileName = message.DataFileName,
                         Release = message.Release,
                         BatchNo = batchCount++,
                         NumBatches = files.Count,

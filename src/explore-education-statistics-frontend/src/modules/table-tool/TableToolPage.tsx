@@ -173,7 +173,7 @@ class TableToolPage extends Component<Props, State> {
                   <li>
                     <Link
                       as={`/methodology/${finalStepProps.publication.slug}`}
-                      to={`/methodology/methodology?methodology=${finalStepProps.publication.slug}`}
+                      to={`/methodology/methodology?publication=${finalStepProps.publication.slug}`}
                     >
                       Go to methodology
                     </Link>

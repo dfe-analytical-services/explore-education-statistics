@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
     {
         Task UpdateBatchCount(string releaseId, string dataFileName, int batchNo);
 
-        Task UpdateStatus(string releaseId, string dataFileName, IStatus status);
+        Task<bool> UpdateStatus(string releaseId, string dataFileName, IStatus status);
 
         Task FailImport(string releaseId, string dataFileName, List<string> errors);
 
