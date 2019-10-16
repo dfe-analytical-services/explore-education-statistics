@@ -10,8 +10,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         [Required] public string Title { get; set; }
 
-        public string Slug { get; set; }
-
         public string Summary { get; set; }
         
         public DateTime? Published { get; set; }

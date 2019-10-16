@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             {
                 Id = Guid.Parse(user.Id),
                 Email = user.Email,
-                Name = user.NormalizedEmail,
+                Name = user.NormalizedEmail.Substring(0, user.NormalizedEmail.IndexOf('@')),
                 Permissions = roles.ToArray(),
             };
         }
