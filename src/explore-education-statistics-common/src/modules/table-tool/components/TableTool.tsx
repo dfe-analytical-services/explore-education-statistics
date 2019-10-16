@@ -31,7 +31,6 @@ import {
   mapLocations,
   tableGeneration,
 } from './utils/tableToolHelpers';
-import {TableHeadersConfig} from "@common/modules/full-table/utils/tableHeaders";
 
 interface Publication {
   id: string;
@@ -133,24 +132,29 @@ const TableTool = ({
 
   React.useEffect(() => {
 
-    setInitialStep(1);
-    setTableToolState({
-      ...tableToolState,
-      validInitialQuery: undefined,
-      createdTable: undefined,
-      tableHeaders: undefined
-    });
+
 
     if (currentlyLoadingQuery.current.releaseId !== releaseId
       || currentlyLoadingQuery.current.initialQuery !== initialQuery
       || currentlyLoadingQuery.current.initialTableHeaders !==initialTableHeaders
     ) {
 
+      setInitialStep(1);
+      setTableToolState(getInitialState());
+
+      /*{
+        ...tableToolState,
+        validInitialQuery: undefined,
+        createdTable: undefined,
+        tableHeaders: undefined,
+      });
+       */
+
       currentlyLoadingQuery.current = {
         releaseId,
         initialQuery,
         initialTableHeaders
-      }
+      };
 
       initialiseFromInitialQuery(releaseId, initialQuery, initialTableHeaders)
         .then((state) => {
@@ -160,6 +164,10 @@ const TableTool = ({
             && currentlyLoadingQuery.current.initialTableHeaders ===initialTableHeaders
           ) {
             const {tableHeaders, subjectMeta, subjectId, createdTable, locations, query, initialStep, dateRange, validInitialQuery} = state;
+
+            console.log(locations);
+
+            setInitialStep(initialStep);
 
             setTableToolState(
               {
@@ -174,7 +182,7 @@ const TableTool = ({
               }
             );
 
-            setInitialStep(initialStep);
+
 
             if (onInitialQueryCompleted) onInitialQueryCompleted();
           }
@@ -296,7 +304,6 @@ const TableTool = ({
         query: createdQuery
 
       };
-      console.log("submit", newState);
       setTableToolState(newState);
     }
   };
@@ -396,7 +403,7 @@ const TableTool = ({
                         }
                       }}
                     />
-                    {tableToolState.createdTable && tableToolState.tableHeaders && (
+                    {tableToolState.createdTable && tableToolState.tableHeaders &&(
                       <TimePeriodDataTable
                         ref={dataTableRef}
                         fullTable={tableToolState.createdTable}

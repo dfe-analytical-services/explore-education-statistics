@@ -166,8 +166,11 @@ export const createQuery = (
 export const mapLocations = (
   selectedLocations: LocationsFormValues,
   locationsMeta: PublicationSubjectMeta['locations'],
-) =>
-  mapValuesWithKeys(selectedLocations, (locationLevel, locationOptions) =>
+) => {
+
+  console.log(locationsMeta);
+
+  return mapValuesWithKeys(selectedLocations, (locationLevel, locationOptions) =>
     locationOptions
       .map(location =>
         locationsMeta[locationLevel].options.find(
@@ -177,6 +180,7 @@ export const mapLocations = (
       .filter(option => typeof option !== 'undefined')
       .map(option => new LocationFilter(option as FilterOption, locationLevel)),
   );
+};
 
 export const getSelectedLocationsForQuery = (
   locationQuery: Dictionary<string[] | undefined>,
@@ -370,12 +374,7 @@ export const initialiseFromInitialQuery = async (releaseId?: string, initialQuer
   let finalValidStepNumber = 1;
   let meta: PublicationSubjectMeta;
 
-  const t = Math.random();
-
-  console.log("ENTRY", t);
-
   if (initialQuery) {
-    console.log("IN initialQuery",t);
 
     meta = await tableBuilderService.filterPublicationSubjectMeta(
       initialQuery,
@@ -420,13 +419,10 @@ export const initialiseFromInitialQuery = async (releaseId?: string, initialQuer
 
     newQuery = buildNewQuery;
 
-    console.log("OUT initialQuery",t);
   } else {
     newQuery = undefined;
     meta = getDefaultSubjectMeta();
   }
-
-  console.log("FINAL", t, " = " , finalValidStepNumber);
 
   return {
     query: newQuery,
