@@ -51,3 +51,5 @@ lerna-debug.log
 admin-start.sh
 remote-profile
 
+## IdentityServer Developer Signing key
+tempkey.rsa
