@@ -14,7 +14,7 @@ import { SortableOption } from './FormSortableList';
 import styles from './TableHeadersForm.module.scss';
 
 interface Props {
-  initialValues: TableHeadersFormValues;
+  initialValues?: TableHeadersFormValues;
   onSubmit: (values: TableHeadersFormValues) => void;
 }
 
@@ -25,8 +25,17 @@ export interface TableHeadersFormValues {
   rows: SortableOption[];
 }
 
-const TableHeadersForm = (props: Props) => {
-  const { onSubmit, initialValues } = props;
+const TableHeadersForm = ({
+  onSubmit,
+  initialValues = {
+    columnGroups: [],
+    columns: [],
+    rowGroups: [],
+    rows: []
+  }
+}: Props) => {
+
+  console.log(initialValues);
 
   return (
     <Details summary="Re-order table headers">

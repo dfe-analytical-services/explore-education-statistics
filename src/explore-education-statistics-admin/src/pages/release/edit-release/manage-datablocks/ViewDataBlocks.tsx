@@ -1,7 +1,6 @@
 import {
   mapFullTable,
-  reverseMapTableHeadersConfig,
-} from '@admin/pages/release/edit-release/manage-datablocks/tableUtil';
+  } from '@admin/pages/release/edit-release/manage-datablocks/tableUtil';
 import { DataBlock } from '@admin/services/release/edit-release/datablocks/types';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
@@ -17,6 +16,7 @@ import DataBlockService, {
 } from '@common/services/dataBlockService';
 import { Chart } from '@common/services/publicationService';
 import React from 'react';
+import { reverseMapTableHeadersConfig } from '@common/modules/table-tool/components/utils/tableToolHelpers';
 
 interface Props {
   dataBlock: DataBlock;

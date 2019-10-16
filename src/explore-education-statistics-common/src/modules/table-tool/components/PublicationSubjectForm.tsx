@@ -22,7 +22,7 @@ export type PublicationSubjectFormSubmitHandler = (values: {
 interface Props {
   onSubmit: PublicationSubjectFormSubmitHandler;
   options: PublicationSubject[];
-  initialSubjectId?: string;
+  initialValues?: { subjectId? : string };
 }
 const initialiseSubjectName = (
   sid: string,
@@ -37,7 +37,7 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
     goToNextStep,
     currentStep,
     stepNumber,
-    initialSubjectId = '',
+    initialValues : { subjectId: initialSubjectId = ''  } = {},
   } = props;
 
   const [subjectName, setSubjectName] = useState(() =>

@@ -28,7 +28,7 @@ export type TimePeriodFormSubmitHandler = (values: FormValues) => void;
 
 interface Props {
   options: PublicationSubjectMeta['timePeriod']['options'];
-  initialValues?: TimePeriodQuery;
+  initialValues?: { timePeriod?: TimePeriodQuery }
   onSubmit: TimePeriodFormSubmitHandler;
 }
 
@@ -40,7 +40,7 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
     goToNextStep,
     currentStep,
     stepNumber,
-    initialValues,
+    initialValues = { timePeriod: undefined },
   } = props;
 
   const formikRef = useRef<Formik<FormValues>>(null);
@@ -66,9 +66,9 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
       let start = '';
       let end = '';
 
-      if (initialValues) {
-        start = `${initialValues.startYear}_${initialValues.startCode}`;
-        end = `${initialValues.endYear}_${initialValues.endCode}`;
+      if (initialValues && initialValues.timePeriod) {
+        start = `${initialValues.timePeriod.startYear}_${initialValues.timePeriod.startCode}`;
+        end = `${initialValues.timePeriod.endYear}_${initialValues.timePeriod.endCode}`;
       }
 
       formikRef.current.setValues({ start, end });

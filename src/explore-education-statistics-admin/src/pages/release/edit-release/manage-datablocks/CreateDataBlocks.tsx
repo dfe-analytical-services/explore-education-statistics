@@ -1,7 +1,7 @@
 import DataBlockDetailsForm from '@admin/pages/release/edit-release/manage-datablocks/DataBlockDetailsForm';
-import { DataBlock } from '@admin/services/release/edit-release/datablocks/types';
+import {DataBlock} from '@admin/services/release/edit-release/datablocks/types';
 import TableTool from '@common/modules/table-tool/components/TableTool';
-import { DataBlockRequest, DataBlockResponse } from '@common/services/dataBlockService';
+import {DataBlockRequest, DataBlockResponse} from '@common/services/dataBlockService';
 import React from 'react';
 
 interface Props {
@@ -16,20 +16,17 @@ interface Props {
 
 const CreateDataBlocks = ({
   releaseId,
-  dataBlockRequest,
+  dataBlockRequest: initialQuery,
   dataBlock,
   onDataBlockSave,
   onTableToolLoaded,
 }: Props) => {
 
-  const initialQuery = dataBlockRequest;
-  const initialTableHeaders =   (dataBlock &&
+  const initialTableHeaders = React.useMemo(() => (dataBlock &&
     dataBlock.tables &&
     dataBlock.tables.length > 0 &&
     {...dataBlock.tables[0].tableHeaders}) ||
-    undefined;
-
-  console.log("CDB", initialQuery, initialTableHeaders);
+    undefined, [dataBlock]);
 
   return (
     <div>
@@ -41,7 +38,7 @@ const CreateDataBlocks = ({
           initialTableHeaders={initialTableHeaders}
           onInitialQueryCompleted={onTableToolLoaded}
           finalStepHeading="Configure data block"
-          finalStepExtra={({ query, tableHeaders }) => (
+          finalStepExtra={({query, tableHeaders}) => (
             <DataBlockDetailsForm
               query={query}
               tableHeaders={tableHeaders}

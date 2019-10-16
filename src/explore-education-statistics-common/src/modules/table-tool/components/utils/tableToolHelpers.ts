@@ -4,17 +4,19 @@ import tableBuilderService, {
   PublicationSubjectMeta,
   TableDataQuery,
 } from '@common/modules/full-table/services/tableBuilderService';
-import { CategoryFilter, Indicator, LocationFilter } from '@common/modules/full-table/types/filters';
-import { FullTable } from '@common/modules/full-table/types/fullTable';
-import { mapFullTable } from '@common/modules/full-table/utils/mapPermalinks';
-import getDefaultTableHeaderConfig, { TableHeadersConfig } from '@common/modules/full-table/utils/tableHeaders';
-import { FormValues } from '@common/modules/table-tool/components/FiltersForm';
-import { LocationsFormValues } from '@common/modules/table-tool/components/LocationFiltersForm';
-import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
+import {CategoryFilter, Indicator, LocationFilter, TimePeriodFilter} from '@common/modules/full-table/types/filters';
+import {FullTable, FullTableMeta} from '@common/modules/full-table/types/fullTable';
+import {mapFullTable} from '@common/modules/full-table/utils/mapPermalinks';
+import getDefaultTableHeaderConfig, {TableHeadersConfig} from '@common/modules/full-table/utils/tableHeaders';
+import {FormValues} from '@common/modules/table-tool/components/FiltersForm';
+import {LocationsFormValues} from '@common/modules/table-tool/components/LocationFiltersForm';
+import {TableHeadersFormValues} from '@common/modules/table-tool/components/TableHeadersForm';
 import mapOptionValues from '@common/modules/table-tool/components/utils/mapOptionValues';
-import { Dictionary } from '@common/types';
+import {Dictionary} from '@common/types';
 
 import mapValues from 'lodash/mapValues';
+import {SortableOption} from "@common/modules/table-tool/components/FormSortableList";
+import {DataBlockMetadata} from "@common/services/dataBlockService";
 
 
 export interface DateRangeState {
@@ -23,6 +25,105 @@ export interface DateRangeState {
   endYear?: number;
   endCode?: string;
 }
+
+const transformTableMetaFiltersToCategoryFilters = (
+  filters: DataBlockMetadata['filters'],
+): Dictionary<CategoryFilter[]> => {
+  return mapValuesWithKeys(filters, (filterKey, filterValue) =>
+    Object.values(filterValue.options)
+      .flatMap(options => options.options)
+      .map(
+        filter =>
+          new CategoryFilter(filter, filter.value === filterValue.totalValue),
+      ),
+  );
+};
+
+
+export const reverseMapTableHeadersConfig = (
+  {columns, rows, columnGroups, rowGroups}: TableHeadersFormValues,
+  fullTableSubjectMeta: FullTableMeta,
+): TableHeadersConfig => {
+  /**
+   * config filters only contain `values`.
+   * This function remaps the config filters into full filters, using the subjectMeta
+   */
+  let mappedRows: (TimePeriodFilter | Indicator)[] = [];
+  let mappedColumns: (TimePeriodFilter | Indicator)[] = [];
+
+  const initialValue = columns[0].value;
+  // rows/columns can only be TimePeriods / Indicators
+  if (Number.isNaN(Number(initialValue))) {
+    // if NaN then timePeriod
+    mappedColumns = columns.map(({value}) => {
+
+      const tp = fullTableSubjectMeta.timePeriodRange.find(
+        timePeriod => value === `${timePeriod.year}_${timePeriod.code}`,
+      ) as TimePeriodFilter;
+
+      if (tp) {
+        return new TimePeriodFilter(tp);
+      }
+      return tp;
+    });
+
+    mappedRows = rows.map(({value}) => {
+      const i= fullTableSubjectMeta.indicators.find(
+        indicator => indicator.value === value,
+      ) as Indicator;
+      if (i) return new Indicator(i);
+      return i;
+    });
+  } else {
+    mappedRows = rows.map(({value}) => {
+      const tp= fullTableSubjectMeta.timePeriodRange.find(
+        timePeriod => value === `${timePeriod.year}_${timePeriod.code}`,
+      ) as TimePeriodFilter;
+      if (tp) {
+        return new TimePeriodFilter(tp);
+      }
+      return tp;
+    });
+    mappedColumns = columns.map(({value}) => {
+      const i= fullTableSubjectMeta.indicators.find(
+        indicator => indicator.value === value,
+      ) as Indicator;
+      if (i) return new Indicator(i);
+      return i;
+    });
+  }
+
+  // rowGroups/columnGroups can only be filters and locations
+  const locationAndFilterGroups: (LocationFilter | CategoryFilter)[][] = [
+    ...Object.values(
+      transformTableMetaFiltersToCategoryFilters(fullTableSubjectMeta.filters),
+    ),
+    fullTableSubjectMeta.locations,
+  ];
+
+  const mapOptionGroupsToFilterGroups = (
+    optionsGroups: SortableOption[][],
+  ): (LocationFilter | CategoryFilter)[][] =>
+    optionsGroups.map(optionGroup => {
+      const currentIndex = locationAndFilterGroups.findIndex(options =>
+        options.find(element => element.value === optionGroup[0].value),
+      );
+
+      return optionGroup.map(
+        ({value}) =>
+          locationAndFilterGroups[currentIndex].find(
+            element => element.value === value,
+          ) as LocationFilter | CategoryFilter,
+      );
+    });
+
+  return {
+    columns: mappedColumns,
+    columnGroups: mapOptionGroupsToFilterGroups(columnGroups),
+    rows: mappedRows,
+    rowGroups: mapOptionGroupsToFilterGroups(rowGroups),
+  };
+};
 
 
 export const createQuery = (
@@ -86,8 +187,8 @@ export const getSelectedLocationsForQuery = (
   );
 
 export const getFiltersForTableGeneration = (
-  { filters: metaFilters }: PublicationSubjectMeta,
-  { filters }: FormValues,
+  {filters: metaFilters}: PublicationSubjectMeta,
+  {filters}: FormValues,
 ) => {
   const filtersByValue = mapValues(metaFilters, value =>
     mapOptionValues(value.options),
@@ -105,8 +206,8 @@ export const getFiltersForTableGeneration = (
 };
 
 export const getIndicatorsForTableGeneration = (
-  { indicators: indicatorsMeta }: PublicationSubjectMeta,
-  { indicators }: FormValues,
+  {indicators: indicatorsMeta}: PublicationSubjectMeta,
+  {indicators}: FormValues,
 ) => {
   const indicatorsByValue = mapOptionValues<IndicatorOption>(indicatorsMeta);
 
@@ -137,7 +238,7 @@ export const tableGeneration = async (
   tableHeaders?: TableHeadersConfig;
   query?: TableDataQuery;
 }> => {
-  const { startYear, startCode, endYear, endCode } = dateRange;
+  const {startYear, startCode, endYear, endCode} = dateRange;
 
   if (!startYear || !startCode || !endYear || !endCode) {
     return {};
@@ -188,7 +289,7 @@ export const validateAndPopulateLocations = (initialQuery: TableDataQuery): Opti
     ),
   ).reduce(
     (filtered, [key, value]) =>
-      value ? { ...filtered, [key]: value } : filtered,
+      value ? {...filtered, [key]: [...value]} : filtered,
     {},
   );
 
@@ -232,8 +333,8 @@ export const validateAndPopulateFiltersAndIndicators = (initialQuery: TableDataQ
   }
 
   return {
-    filters: initialQuery.filters,
-    indicators: initialQuery.indicators,
+    filters: [...initialQuery.filters],
+    indicators: [...initialQuery.indicators],
   };
 };
 
@@ -261,12 +362,7 @@ export const initialiseFromInitialQuery = async (releaseId?: string, initialQuer
   let newQuery: TableDataQuery | undefined;
   let newTable: FullTable | undefined;
 
-  let newTableHeaders: TableHeadersFormValues = {
-    columnGroups: [],
-    columns: [],
-    rowGroups: [],
-    rows: [],
-  };
+  let newTableHeaders: TableHeadersFormValues | undefined;
 
   let newSubjectId = '';
   let newLocations: Dictionary<LocationFilter[]> = {};
@@ -293,18 +389,22 @@ export const initialiseFromInitialQuery = async (releaseId?: string, initialQuer
       if (q === undefined) return false;
 
       finalValidStepNumber = idx + 1;
-      buildNewQuery = { ...buildNewQuery, ...q };
+      buildNewQuery = {...buildNewQuery, ...q};
 
       return true;
     });
 
 
     if (finalValidStepNumber === 5) {
+
       newTable = await queryForTable(buildNewQuery, releaseId);
 
       newTableHeaders =
-        initialTableHeaders ||
+        (initialTableHeaders && reverseMapTableHeadersConfig(initialTableHeaders, newTable.subjectMeta)) ||
         getDefaultTableHeaderConfig(newTable.subjectMeta);
+
+      console.log(newTableHeaders);
+
     }
 
 
@@ -315,7 +415,7 @@ export const initialiseFromInitialQuery = async (releaseId?: string, initialQuer
       meta.locations,
     );
 
-    if (finalValidStepNumber > 3) newDateRange = { ...buildNewQuery.timePeriod };
+    if (finalValidStepNumber > 3) newDateRange = {...buildNewQuery.timePeriod};
 
     newQuery = buildNewQuery;
   } else {

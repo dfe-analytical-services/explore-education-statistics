@@ -1,4 +1,4 @@
-import { Form, FormFieldset, Formik } from '@common/components/form';
+import {Form, FormFieldset, Formik} from '@common/components/form';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
@@ -6,15 +6,15 @@ import {
   FilterOption,
   PublicationSubjectMeta,
 } from '@common/modules/full-table/services/tableBuilderService';
-import { Dictionary } from '@common/types/util';
+import {Dictionary} from '@common/types/util';
 import useResetFormOnPreviousStep from '@common/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
-import { FormikProps } from 'formik';
+import {FormikProps} from 'formik';
 import sortBy from 'lodash/sortBy';
-import React, { useRef } from 'react';
-import { useImmer } from 'use-immer';
+import React, {useRef} from 'react';
+import {useImmer} from 'use-immer';
 import mapValuesWithKeys from '@common/lib/utils/mapValuesWithKeys';
 import FormFieldCheckboxMenu from './FormFieldCheckboxMenu';
-import { InjectedWizardProps } from './Wizard';
+import {InjectedWizardProps} from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
 
@@ -45,7 +45,7 @@ export const calculateInitialValues = (
         ...acc,
         [level]: initialLevel.filter(
           initialId =>
-            levelOptions.options.find(({ value }) => value === initialId) !==
+            levelOptions.options.find(({value}) => value === initialId) !==
             undefined,
         ),
       };
@@ -67,9 +67,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
   const formikRef = useRef<Formik<FormValues>>(null);
   const formId = 'locationFiltersForm';
 
-  const [locationLevels, updateLocationLevels] = useImmer<
-    Dictionary<{ label: string; value: string }[]>
-  >({});
+  const [locationLevels, updateLocationLevels] = useImmer<Dictionary<{ label: string; value: string }[]>>({});
 
   useResetFormOnPreviousStep(formikRef, currentStep, stepNumber, () => {
     updateLocationLevels(() => {
@@ -83,34 +81,30 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
     </WizardStepHeading>
   );
 
-  const [formInitialValues, setFormInitialValues] = React.useState(
-    calculateInitialValues(initialValues, options),
-  );
+  const formInitialValues = React.useMemo( () => calculateInitialValues(initialValues,options), [initialValues, options]);
 
   React.useEffect(() => {
+
+    updateLocationLevels(() =>
+      mapValuesWithKeys<Dictionary<string[]>, FilterOption[]>(
+        formInitialValues.locations,
+        (key: string, value: string[]) => {
+          const oN = (options[key] && options[key].options) || [];
+
+          return value.reduce<FilterOption[]>((v, n) => {
+            const found = oN.find(i => i.value === n);
+            if (found) return [...v, found];
+            return v;
+          }, []);
+        },
+      ),
+    );
+
     if (formikRef.current) {
-      const vals = calculateInitialValues(initialValues, options);
-      setFormInitialValues(vals);
-
-      updateLocationLevels(() =>
-        mapValuesWithKeys<Dictionary<string[]>, FilterOption[]>(
-          vals.locations,
-          (key: string, value: string[]) => {
-            const oN = (options[key] && options[key].options) || [];
-
-            return value.reduce<FilterOption[]>((v, n) => {
-              const found = oN.find(i => i.value === n);
-              if (found) return [...v, found];
-              return v;
-            }, []);
-          },
-        ),
-      );
-
-      formikRef.current.setValues(vals);
+      formikRef.current.setValues(formInitialValues);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialValues, options]);
+  }, [formInitialValues, options]);
 
   return (
     <Formik<FormValues>
@@ -131,7 +125,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
           {},
         );
 
-        await onSubmit({ locations });
+        await onSubmit({locations});
         goToNextStep();
       }}
       initialValues={formInitialValues}
@@ -184,7 +178,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
                               draft[levelKey] = [];
                             }
 
-                            const { value } = event.target;
+                            const {value} = event.target;
 
                             const matchingOption = draft[levelKey].find(
                               levelOption => levelOption.value === value,

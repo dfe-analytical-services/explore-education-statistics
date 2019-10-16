@@ -106,9 +106,9 @@ const ReleaseManageDataBlocksPage = () => {
 
   }, []);
 
-  React.useEffect(() => {
+  const doLoad = React.useCallback((selectedDataBlockId : string) => {
 
-    load(dataBlocks, releaseId, selectedDataBlock)
+    load(dataBlocks, releaseId, selectedDataBlockId)
       .then(({ dataBlock, request: dataBlockRequest, response: dataBlockResponse }) => {
 
         if (dataBlock && dataBlockRequest && dataBlockResponse) {
@@ -120,7 +120,7 @@ const ReleaseManageDataBlocksPage = () => {
       })
     ;
 
-  }, [load, dataBlocks, releaseId, selectedDataBlock]);
+  },[dataBlocks, load, releaseId]);
 
   return (
     <>
@@ -130,6 +130,8 @@ const ReleaseManageDataBlocksPage = () => {
         label="Select a existing data block to edit or create a new one"
         onChange={e => {
           setSelectedDataBlock(e.target.value);
+
+          doLoad(e.target.value);
         }}
         order={[]}
         optGroups={{

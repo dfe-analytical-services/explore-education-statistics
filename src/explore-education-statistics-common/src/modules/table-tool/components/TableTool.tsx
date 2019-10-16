@@ -62,13 +62,12 @@ interface Props {
 interface TableToolState {
   query: TableDataQuery | undefined;
   createdTable: FullTable | undefined;
-  tableHeaders: TableHeadersFormValues;
+  tableHeaders: TableHeadersFormValues | undefined;
   validInitialQuery: TableDataQuery | undefined;
   dateRange: DateRangeState;
   locations: Dictionary<LocationFilter[]>;
   subjectId: string;
   subjectMeta: PublicationSubjectMeta;
-  initialStep: number;
 }
 
 const TableTool = ({
@@ -85,33 +84,11 @@ const TableTool = ({
 
   const [publication, setPublication] = React.useState<Publication>();
   const [subjects, setSubjects] = React.useState<PublicationSubject[]>([]);
-  
+
   const [initialStep, setInitialStep] = React.useState(1);
 
-  const [subjectId, setSubjectId] = React.useState<string>('');
 
-  const [subjectMeta, setSubjectMeta] = React.useState<PublicationSubjectMeta>(
-    getDefaultSubjectMeta(),
-  );
-
-  const [locations, setLocations] = React.useState<Dictionary<LocationFilter[]>>({});
-
-  const [dateRange, setDateRange] = React.useState<DateRangeState>({});
-
-  const [tableHeaders, setTableHeaders] = React.useState<TableHeadersFormValues>({
-    columnGroups: [],
-    columns: [],
-    rowGroups: [],
-    rows: [],
-  });
-
-  const [createdTable, setCreatedTable] = React.useState<FullTable>();
-
-  const [query, setQuery] = React.useState<TableDataQuery>();
-
-  const [validInitialQuery, setValidInitialQuery] = React.useState<TableDataQuery>();
-
-  const [tableToolState, setTableToolState] = React.useState<TableToolState>({
+  const getInitialState = () => ({
     initialStep: 1,
     subjectId: '',
     subjectMeta: getDefaultSubjectMeta(),
@@ -128,6 +105,8 @@ const TableTool = ({
     validInitialQuery: undefined
   });
 
+  const [tableToolState, setTableToolState] = React.useState<TableToolState>(getInitialState);
+
   React.useEffect(() => {
     if (releaseId) {
       tableBuilderService
@@ -141,29 +120,28 @@ const TableTool = ({
 
   React.useEffect(() => {
 
-    console.log("TABLE TOOL RELOAD FROM INITIAL QUERY");
+    setInitialStep(1);
 
     initialiseFromInitialQuery(releaseId, initialQuery, initialTableHeaders)
-      .then(({tableHeaders, subjectMeta, subjectId, createdTable, locations, query, initialStep, dateRange, validInitialQuery} : TableToolState) => {
+      .then(( state ) => {
+
+        const {tableHeaders, subjectMeta, subjectId, createdTable, locations, query, initialStep, dateRange, validInitialQuery} = state;
+
 
         setTableToolState(
-          {tableHeaders, subjectMeta, subjectId, createdTable, locations, query, initialStep, dateRange, validInitialQuery}
+          {
+            tableHeaders,
+            subjectMeta,
+            subjectId,
+            createdTable,
+            locations,
+            query,
+            dateRange,
+            validInitialQuery
+          }
         );
 
-        console.log("TABLE TOOL SETUP");
-
-
         setInitialStep(initialStep);
-        setSubjectMeta(subjectMeta);
-        setSubjectId(subjectId);
-        setLocations(locations);
-        setDateRange(dateRange);
-        setValidInitialQuery(validInitialQuery);
-
-        setTableHeaders(tableHeaders);
-        setCreatedTable(createdTable);
-        setQuery(query);
-
 
         if (onInitialQueryCompleted) onInitialQueryCompleted();
       });
@@ -197,8 +175,11 @@ const TableTool = ({
       selectedSubjectId,
     );
 
-    setSubjectId(selectedSubjectId);
-    setSubjectMeta(selectedSubjectMeta);
+    setTableToolState({
+      ...tableToolState,
+      subjectId: selectedSubjectId,
+      subjectMeta: selectedSubjectMeta
+    })
   };
 
 
@@ -208,16 +189,19 @@ const TableTool = ({
     const selectedSubjectMeta = await tableBuilderService.filterPublicationSubjectMeta(
       {
         ...selectedLocations,
-        subjectId,
+        subjectId: tableToolState.subjectId,
       },
     );
 
-    setSubjectMeta({
-      ...subjectMeta,
-      timePeriod: selectedSubjectMeta.timePeriod,
-    });
+    setTableToolState({
+      ...tableToolState,
+      subjectMeta: {
+        ...tableToolState.subjectMeta,
+        timePeriod: selectedSubjectMeta.timePeriod
+      },
+      locations: mapLocations(selectedLocations, tableToolState.subjectMeta.locations)
+    })
 
-    setLocations(mapLocations(selectedLocations, subjectMeta.locations));
   };
 
   const handleTimePeriodFormSubmit: TimePeriodFormSubmitHandler = async values => {
@@ -226,10 +210,10 @@ const TableTool = ({
 
     const selectedSubjectMeta = await tableBuilderService.filterPublicationSubjectMeta(
       {
-        ...mapValues(locations, locationLevel =>
+        ...mapValues(tableToolState.locations, locationLevel =>
           locationLevel.map(location => location.value),
         ),
-        subjectId,
+        subjectId: tableToolState.subjectId,
         timePeriod: {
           startYear,
           startCode,
@@ -239,17 +223,20 @@ const TableTool = ({
       },
     );
 
-    setSubjectMeta({
-      ...subjectMeta,
-      filters: selectedSubjectMeta.filters,
+    setTableToolState({
+      ...tableToolState,
+      subjectMeta: {
+        ...tableToolState.subjectMeta,
+        filters: selectedSubjectMeta.filters,
+      },
+      dateRange: {
+        startYear,
+        startCode,
+        endYear,
+        endCode,
+      }
     });
 
-    setDateRange({
-      startYear,
-      startCode,
-      endYear,
-      endCode,
-    });
   };
 
   const handleFiltersFormSubmit: FilterFormSubmitHandler = async values => {
@@ -258,18 +245,24 @@ const TableTool = ({
       tableHeaders: generatedTableHeaders,
       query: createdQuery,
     } = await tableGeneration(
-      dateRange,
-      subjectMeta,
+      tableToolState.dateRange,
+      tableToolState.subjectMeta,
       values,
-      subjectId,
-      locations,
+      tableToolState.subjectId,
+      tableToolState.locations,
       releaseId,
     );
 
     if (table && generatedTableHeaders && createdQuery) {
-      setCreatedTable(table);
-      setTableHeaders(generatedTableHeaders);
-      setQuery(createdQuery);
+      const newState = {
+        ...tableToolState,
+        createdTable: table,
+        tableHeaders: generatedTableHeaders,
+        query: createdQuery
+
+      };
+      console.log("submit", newState);
+      setTableToolState(newState);
     }
   };
 
@@ -307,9 +300,7 @@ const TableTool = ({
                 <PublicationSubjectForm
                   {...stepProps}
                   options={subjects}
-                  initialSubjectId={
-                    validInitialQuery && validInitialQuery.subjectId
-                  }
+                  initialValues={tableToolState.validInitialQuery}
                   onSubmit={handlePublicationSubjectFormSubmit}
                 />
               )}
@@ -318,8 +309,8 @@ const TableTool = ({
               {stepProps => (
                 <LocationFiltersForm
                   {...stepProps}
-                  options={subjectMeta.locations}
-                  initialValues={validInitialQuery}
+                  options={tableToolState.subjectMeta.locations}
+                  initialValues={tableToolState.validInitialQuery}
                   onSubmit={handleLocationFiltersFormSubmit}
                 />
               )}
@@ -328,10 +319,8 @@ const TableTool = ({
               {stepProps => (
                 <TimePeriodForm
                   {...stepProps}
-                  initialValues={
-                    validInitialQuery && validInitialQuery.timePeriod
-                  }
-                  options={subjectMeta.timePeriod.options}
+                  initialValues={tableToolState.validInitialQuery}
+                  options={tableToolState.subjectMeta.timePeriod.options}
                   onSubmit={handleTimePeriodFormSubmit}
                 />
               )}
@@ -342,12 +331,9 @@ const TableTool = ({
                   {...stepProps}
                   onSubmit={handleFiltersFormSubmit}
                   initialValues={
-                    validInitialQuery && {
-                      filters: validInitialQuery.filters,
-                      indicators: validInitialQuery.indicators,
-                    }
+                    tableToolState.validInitialQuery
                   }
-                  subjectMeta={subjectMeta}
+                  subjectMeta={tableToolState.subjectMeta}
                 />
               )}
             </WizardStep>
@@ -360,9 +346,12 @@ const TableTool = ({
 
                   <div className="govuk-!-margin-bottom-4">
                     <TableHeadersForm
-                      initialValues={tableHeaders}
+                      initialValues={tableToolState.tableHeaders}
                       onSubmit={tableHeaderConfig => {
-                        setTableHeaders(tableHeaderConfig);
+                        setTableToolState({
+                          ...tableToolState,
+                          tableHeaders: tableHeaderConfig
+                        });
 
                         if (dataTableRef.current) {
                           dataTableRef.current.scrollIntoView({
@@ -372,23 +361,24 @@ const TableTool = ({
                         }
                       }}
                     />
-                    {createdTable && (
+                    {tableToolState.createdTable && tableToolState.tableHeaders && (
                       <TimePeriodDataTable
                         ref={dataTableRef}
-                        fullTable={createdTable}
-                        tableHeadersConfig={tableHeaders}
+                        fullTable={tableToolState.createdTable}
+                        tableHeadersConfig={tableToolState.tableHeaders}
                       />
                     )}
                   </div>
 
-                  {createdTable &&
+                  {tableToolState.createdTable &&
+                  tableToolState.tableHeaders &&
                   finalStepExtra &&
-                  query &&
+                  tableToolState.query &&
                   finalStepExtra({
-                    createdTable,
+                    createdTable: tableToolState.createdTable,
                     publication,
-                    tableHeaders,
-                    query,
+                    tableHeaders: tableToolState.tableHeaders,
+                    query: tableToolState.query,
                   })}
                 </>
               )}
