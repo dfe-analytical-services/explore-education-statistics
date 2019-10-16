@@ -207,7 +207,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     Size = GetSize(file),
                     MetaFileName = GetMetaFileName(file),
                     Rows = GetNumberOfRows(file),
-                    UserName = GetUserName(file)
+                    UserName = GetUserName(file),
+                    Created = file.Properties.Created
                 })
                 .OrderBy(info => info.Name);
         }
