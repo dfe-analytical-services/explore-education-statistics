@@ -23,10 +23,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
         public IEnumerable<FilterItem> GetFilterItemsIncludingFilters(IQueryable<Observation> observations)
         {
-            return observations.SelectMany(observation => observation.FilterItems)
+            var filterItems = observations.SelectMany(observation => observation.FilterItems)
                 .Select(item => item.FilterItem)
-                .Distinct()
-                .Include(item => item.FilterGroup.Filter);
+                .Include(item => item.FilterGroup)
+                .ThenInclude(group => group.Filter)
+                .ToList();
+
+            return filterItems.Distinct();
         }
 
         public FilterItem GetTotal(Filter filter)
