@@ -261,12 +261,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     context.Database.Migrate();
                 }*/
                 
-//                using (var context = serviceScope.ServiceProvider.GetService<ApplicationUserDbContext>())
-//                {
-//                    context.Database.SetCommandTimeout(int.MaxValue);
-//                    context.Database.Migrate();
-//                }
-                
+                using (var context = serviceScope.ServiceProvider.GetService<UsersAndRolesDbContext>())
+                {
+                    context.Database.SetCommandTimeout(int.MaxValue);
+                    context.Database.Migrate();
+                }
             }
         }
     }

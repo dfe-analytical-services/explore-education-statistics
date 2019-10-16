@@ -1,10 +1,12 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
@@ -13,15 +15,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     [Authorize]
     public class AccountController : ControllerBase
     {
-        [HttpGet("api/signin")]
-        [AllowAnonymous]
-        public async Task Signin()
+        private readonly UserManager<ApplicationUser> _userManager;
+
+        public AccountController(UserManager<ApplicationUser> userManager)
         {
-            await HttpContext.ChallengeAsync(
-                OpenIdConnectDefaults.AuthenticationScheme,
-                new AuthenticationProperties { RedirectUri = "/" });
+            _userManager = userManager;
         }
-        
+
         [HttpGet("api/signout")]
         public IActionResult Signout()
         {
@@ -35,45 +35,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return Redirect("/signed-out");
         }
         
-        [AllowAnonymous]
+        [Authorize]
         [HttpGet("api/users/mydetails")]
-        public ActionResult<UserDetailsPermissionsViewModel> MyDetails()
+        public async Task<ActionResult<UserDetailsPermissionsViewModel>> MyDetails()
         {
-            // TODO - we need to something cleverer here - we need to 
-            // validate that their AD cookie is still valid, not simply
-            // to check for its existence.  However, this is just in here
-            // temporarily as a stopgap
-            if (User.Identity.IsAuthenticated)
+            var user = await _userManager.GetUserAsync(User);
+            var roles = await _userManager.GetRolesAsync(user);
+
+            // TODO DW - need to store first name and last name in ApplicationUser
+            return new UserDetailsPermissionsViewModel()
             {
-                var email = User.Claims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")?.Value;
-                var givenname = User.Claims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname")?.Value;
-                var surname = User.Claims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname")?.Value;
-
-                // workaround for email being different in azure ad claims
-                if (string.IsNullOrWhiteSpace(email))
-                {
-                    email = User.Claims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn")?.Value;
-                }
-                else if(email.ToLower().Contains("education.gov.uk"))
-                {
-                    // TOOO - temp work around for dfe accounts to get name
-                    var address = email.Split('@').First();
-                    givenname = address.Split('.').First();
-                    surname = address.Split('.').Last();
-                }
-                
-                
-                return new UserDetailsPermissionsViewModel()
-                {
-                    Id = Guid.Parse(User.Claims.FirstOrDefault(x => x.Type == "http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value),
-                    Email = email,
-                    Name = givenname + " " + surname,
-                    Permissions = new [] { "team lead" },
-                };
-            }
-
-            Response.StatusCode = 403;
-            return null;
+                Id = Guid.Parse(user.Id),
+                Email = user.Email,
+                Name = user.NormalizedEmail,
+                Permissions = roles.ToArray(),
+            };
         }
     }
 }
