@@ -18,10 +18,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         [EnumLabelValue("Mayoral Combined Authority", "MCA")]
         Mayoral_Combined_Authority,
 
-        [EnumLabelValue("Multi Academy Trust", "MAT")]
+        [EnumLabelValue("MAT", "MAT")]
         Multi_Academy_Trust,
 
-        [EnumLabelValue("Country", "NAT")] Country,
+        [EnumLabelValue("National", "NAT")] Country,
 
         [EnumLabelValue("Opportunity Area", "OA")]
         Opportunity_Area,

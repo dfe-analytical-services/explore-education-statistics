@@ -9,9 +9,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 {
     public class BoundaryLevelService : AbstractRepository<BoundaryLevel, long>, IBoundaryLevelService
     {
-        public BoundaryLevelService(StatisticsDbContext context, ILogger<BoundaryLevelService> logger)
+        private readonly DataServiceMemoryCache<BoundaryLevel> _cache;
+
+        public BoundaryLevelService(StatisticsDbContext context,
+            DataServiceMemoryCache<BoundaryLevel> cache,
+            ILogger<BoundaryLevelService> logger)
             : base(context, logger)
         {
+            _cache = cache;
         }
 
         private IEnumerable<BoundaryLevel> FindByGeographicLevel(GeographicLevel geographicLevel)
@@ -35,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
         public IEnumerable<BoundaryLevel> FindRelatedByBoundaryLevel(long boundaryLevelId)
         {
-            var boundaryLevel = Find(boundaryLevelId);
+            var boundaryLevel = _cache.GetOrCreate(boundaryLevelId, cacheEntry => Find(boundaryLevelId));
             if (boundaryLevel == null)
             {
                 throw new ArgumentException("Boundary Level does not exist", nameof(boundaryLevelId));

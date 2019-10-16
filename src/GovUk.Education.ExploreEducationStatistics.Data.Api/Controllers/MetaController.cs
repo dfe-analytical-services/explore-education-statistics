@@ -30,6 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         public ActionResult<PublicationSubjectsMetaViewModel> GetSubjectsForLatestRelease(Guid publicationId)
         {
             var viewModel = _publicationMetaService.GetSubjectsForLatestRelease(publicationId);
+
             if (viewModel == null)
             {
                 return NotFound();

@@ -61,6 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var message = new ImportMessage
             {
                 DataFileName = dataFileName,
+                OrigDataFileName = dataFileName,
                 Release = importMessageRelease,
                 BatchNo = 1,
                 NumBatches = 1

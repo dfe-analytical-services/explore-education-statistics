@@ -31,12 +31,12 @@ Select subject "Absence by characteristic"
 
 Select Location Country, England
     [Tags]  HappyPath
-    user opens details dropdown     Country
+    user opens details dropdown     National
     user clicks checkbox    England
     user clicks element     css:#locationFiltersForm-submit
     # Extra timeout until EES-315/316
     user waits until element is visible  xpath://h2[text()="Choose time period"]   90
-    user checks previous table tool step contains  3    Country    England
+    user checks previous table tool step contains  3    National    England
 
 Select Start date and End date
     [Tags]  HappyPath

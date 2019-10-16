@@ -163,7 +163,10 @@ class PublicationReleasePage extends Component<Props> {
                 </ul>
               </Details>
             )}
-            <PageSearchFormWithAnalytics className="govuk-!-margin-top-3 govuk-!-margin-bottom-3" />
+            <PageSearchFormWithAnalytics
+              inputLabel="Search in this release page."
+              className="govuk-!-margin-top-3 govuk-!-margin-bottom-3"
+            />
           </div>
 
           <div className="govuk-grid-column-one-third">

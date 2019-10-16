@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
         public bool IsSubjectForLatestRelease(long subjectId)
         {
-            var subject = Find(subjectId, new List<Expression<Func<Subject, object>>> {subject1 => subject1.Release});
+            var subject = Find(subjectId, new List<Expression<Func<Subject, object>>> {s => s.Release});
             if (subject == null)
             {
                 throw new ArgumentException("Subject does not exist", nameof(subjectId));

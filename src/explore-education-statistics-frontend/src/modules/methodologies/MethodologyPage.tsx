@@ -14,7 +14,6 @@ import MethodologyContent from '@frontend/modules/methodologies/components/Metho
 import MethodologyHeader from '@frontend/modules/methodologies/components/MethodologyHeader';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
-import { parse } from 'date-fns';
 
 interface Props {
   publication: string;
@@ -78,7 +77,7 @@ class MethodologyPage extends Component<Props> {
                 action: 'Print this page link selected',
               }}
             />
-            <PageSearchFormWithAnalytics />
+            <PageSearchFormWithAnalytics inputLabel="Search in this methodology page." />
           </div>
         </div>
 

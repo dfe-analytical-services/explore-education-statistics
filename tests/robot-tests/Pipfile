@@ -9,10 +9,10 @@ azure-storage-blob = "==2.1.0"
 
 [packages]
 robotframework-seleniumlibrary = "==3.3.1"
-robotframework-pabot = "==0.54"
 chromedriver-install = "==0.3"
 requests = "==2.21.0"
 python-dotenv = "==0.10.1"
+robotframework-pabot = "==0.90"
 
 [requires]
 python_version = "3.7"

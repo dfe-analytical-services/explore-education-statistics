@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
 {
@@ -47,6 +48,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
                 Sponsor = Sponsor,
                 Ward = Ward
             };
+        }
+
+        public override string ToString()
+        {
+            return $"{nameof(SubjectId)}: {SubjectId}, " +
+                   $"{nameof(TimePeriod)}: {TimePeriod}, " +
+                   $"{nameof(Filters)}: [{(Filters == null ? string.Empty : string.Join(", ", Filters))}], " +
+                   $"{nameof(BoundaryLevel)}: {BoundaryLevel}, " +
+                   $"{nameof(GeographicLevel)}: {GeographicLevel?.GetEnumValue()}, " +
+                   $"{nameof(Indicators)}: [{(Indicators == null ? string.Empty : string.Join(", ", Indicators))}]";
         }
     }
 }
