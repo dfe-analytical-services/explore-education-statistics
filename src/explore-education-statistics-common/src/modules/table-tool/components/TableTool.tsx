@@ -140,15 +140,11 @@ const TableTool = ({
     ) {
 
       setInitialStep(1);
-      setTableToolState(getInitialState());
-
-      /*{
+      setTableToolState({
         ...tableToolState,
-        validInitialQuery: undefined,
-        createdTable: undefined,
-        tableHeaders: undefined,
+        subjectMeta: getDefaultSubjectMeta(),
+        validInitialQuery: undefined
       });
-       */
 
       currentlyLoadingQuery.current = {
         releaseId,
@@ -164,8 +160,6 @@ const TableTool = ({
             && currentlyLoadingQuery.current.initialTableHeaders ===initialTableHeaders
           ) {
             const {tableHeaders, subjectMeta, subjectId, createdTable, locations, query, initialStep, dateRange, validInitialQuery} = state;
-
-            console.log(locations);
 
             setInitialStep(initialStep);
 

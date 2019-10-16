@@ -85,20 +85,22 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
 
   React.useEffect(() => {
 
-    updateLocationLevels(() =>
-      mapValuesWithKeys<Dictionary<string[]>, FilterOption[]>(
-        formInitialValues.locations,
-        (key: string, value: string[]) => {
-          const oN = (options[key] && options[key].options) || [];
+    const mapped = mapValuesWithKeys<Dictionary<string[]>, FilterOption[]>(
+      formInitialValues.locations,
+      (key: string, value: string[]) => {
+        const oN = (options[key] && options[key].options) || [];
 
-          return value.reduce<FilterOption[]>((v, n) => {
-            const found = oN.find(i => i.value === n);
-            if (found) return [...v, found];
-            return v;
-          }, []);
-        },
-      ),
+        return value.reduce<FilterOption[]>((v, n) => {
+          const found = oN.find(i => i.value === n);
+          if (found) return [...v, found];
+          return v;
+        }, []);
+      },
     );
+
+    console.log(mapped);
+
+    updateLocationLevels(() => mapped);
 
     if (formikRef.current) {
       formikRef.current.setValues(formInitialValues);
