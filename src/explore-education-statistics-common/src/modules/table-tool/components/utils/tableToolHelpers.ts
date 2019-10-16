@@ -370,7 +370,12 @@ export const initialiseFromInitialQuery = async (releaseId?: string, initialQuer
   let finalValidStepNumber = 1;
   let meta: PublicationSubjectMeta;
 
+  const t = Math.random();
+
+  console.log("ENTRY", t);
+
   if (initialQuery) {
+    console.log("IN initialQuery",t);
 
     meta = await tableBuilderService.filterPublicationSubjectMeta(
       initialQuery,
@@ -394,7 +399,6 @@ export const initialiseFromInitialQuery = async (releaseId?: string, initialQuer
       return true;
     });
 
-
     if (finalValidStepNumber === 5) {
 
       newTable = await queryForTable(buildNewQuery, releaseId);
@@ -415,11 +419,14 @@ export const initialiseFromInitialQuery = async (releaseId?: string, initialQuer
     if (finalValidStepNumber > 3) newDateRange = {...buildNewQuery.timePeriod};
 
     newQuery = buildNewQuery;
+
+    console.log("OUT initialQuery",t);
   } else {
     newQuery = undefined;
     meta = getDefaultSubjectMeta();
   }
 
+  console.log("FINAL", t, " = " , finalValidStepNumber);
 
   return {
     query: newQuery,

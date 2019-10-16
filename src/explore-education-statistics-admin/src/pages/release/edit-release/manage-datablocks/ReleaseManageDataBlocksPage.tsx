@@ -25,6 +25,15 @@ const ReleaseManageDataBlocksPage = () => {
   const [selectedDataBlock, setSelectedDataBlock] = React.useState<string>('');
   const [dataBlocks, setDataBlocks] = React.useState<DataBlock[]>([]);
 
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+
+  const [dataBlockData, setDataBlockData] = React.useState<DataBlockData>();
+
+  const [deleteDataBlock, setDeleteDataBlock] = React.useState<DataBlock>();
+
+
+
+
   const updateDataBlocks = (rId: string) => {
     return DataBlocksService.getDataBlocks(rId).then(blocks => {
       setDataBlocks(blocks);
@@ -41,9 +50,6 @@ const ReleaseManageDataBlocksPage = () => {
     value: `${id}`,
   })), [dataBlocks]);
 
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
-
-  const [dataBlockData, setDataBlockData] = React.useState<DataBlockData>();
 
 
   const onDataBlockSave = React.useMemo(() => async (db: DataBlock) => {
@@ -64,8 +70,6 @@ const ReleaseManageDataBlocksPage = () => {
     return newDataBlock;
   }, [releaseId, selectedDataBlock]);
 
-  const [deleteDataBlock, setDeleteDataBlock] = React.useState<DataBlock>();
-
   const onDeleteDataBlock = (db: DataBlock) => {
     setDeleteDataBlock(undefined);
     if (db.id) {
@@ -77,7 +81,7 @@ const ReleaseManageDataBlocksPage = () => {
 
   const unsetIsLoading = React.useCallback(() => setIsLoading(false), []);
 
-  const load = React.useMemo(() => async (dataBlocks: DataBlock[], releaseId: string, selectedDataBlockId: string) => {
+  const load = async (dataBlocks: DataBlock[], releaseId: string, selectedDataBlockId: string) => {
 
     setIsLoading(true);
 
@@ -104,23 +108,32 @@ const ReleaseManageDataBlocksPage = () => {
     };
 
 
-  }, []);
+  };
+
+  const currentlyLoadingDataBlockId = React.useRef<string>();
 
   const doLoad = React.useCallback((selectedDataBlockId : string) => {
 
-    load(dataBlocks, releaseId, selectedDataBlockId)
-      .then(({ dataBlock, request: dataBlockRequest, response: dataBlockResponse }) => {
+    if (currentlyLoadingDataBlockId.current !== selectedDataBlockId) {
 
-        if (dataBlock && dataBlockRequest && dataBlockResponse) {
-          setDataBlockData({dataBlock, dataBlockRequest, dataBlockResponse});
-        } else {
-          setDataBlockData(undefined);
-          setIsLoading(false);
-        }
-      })
-    ;
+      currentlyLoadingDataBlockId.current = selectedDataBlockId;
 
-  },[dataBlocks, load, releaseId]);
+      load(dataBlocks, releaseId, selectedDataBlockId)
+        .then(({dataBlock, request: dataBlockRequest, response: dataBlockResponse}) => {
+
+          if (currentlyLoadingDataBlockId.current === selectedDataBlockId) {
+            if (dataBlock && dataBlockRequest && dataBlockResponse) {
+              setDataBlockData({dataBlock, dataBlockRequest, dataBlockResponse});
+            } else {
+              setDataBlockData(undefined);
+              setIsLoading(false);
+            }
+          }
+        })
+      ;
+    }
+
+  },[dataBlocks, releaseId]);
 
   return (
     <>
