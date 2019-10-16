@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
-using System.Linq.Expressions;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -13,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -58,8 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 CreateIdListType("wardList", query.Ward);
             var filtersListParam = CreateIdListType("filtersList", query.Filters);
 
-            var inner = _context.Query<IdWrapper>().AsNoTracking()
-                .FromSql("EXEC dbo.FilteredObservations " +
+            var inner = _context.Query<IdWrapper>().FromSqlRaw("EXEC dbo.FilteredObservations " +
                          "@subjectId," +
                          "@geographicLevel," +
                          "@timePeriodList," +

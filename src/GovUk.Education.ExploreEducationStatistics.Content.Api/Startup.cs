@@ -16,6 +16,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Swagger;
 
@@ -37,13 +38,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc()
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
+            services.AddMvc(options =>
+                {
+                    options.EnableEndpointRouting = false;
+                })
+                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
                 .AddJsonOptions(options =>
                 {
-                    options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-                    options.SerializerSettings.TypeNameHandling = TypeNameHandling.Auto;
-                    options.SerializerSettings.Converters.Add(new ContentBlockConverter());
+//                    options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+//                    options.SerializerSettings.TypeNameHandling = TypeNameHandling.Auto;
+//                    options.SerializerSettings.Converters.Add(new ContentBlockConverter());
                 });
 
             services.AddDbContext<ApplicationDbContext>(options =>
@@ -60,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddSwaggerGen(swag =>
             {
                 swag.SwaggerDoc("v1",
-                    new Info {Title = "Explore education statistics - Content API", Version = "v1"});
+                    new OpenApiInfo {Title = "Explore education statistics - Content API", Version = "v1"});
             });
 
             services.AddCors();

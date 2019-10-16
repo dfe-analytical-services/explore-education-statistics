@@ -254,12 +254,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
                 .CreateScope())
             {
-                /*
                 using (var context = serviceScope.ServiceProvider.GetService<StatisticsDbContext>())
                 {
                     context.Database.SetCommandTimeout(int.MaxValue);
                     context.Database.Migrate();
-                }*/
+                }
+                
+                using (var context = serviceScope.ServiceProvider.GetService<ApplicationDbContext>())
+                {
+                    context.Database.SetCommandTimeout(int.MaxValue);
+                    context.Database.Migrate();
+                }
                 
                 using (var context = serviceScope.ServiceProvider.GetService<UsersAndRolesDbContext>())
                 {

@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             var indicatorListParam = CreateIdListType("indicatorList", indicators);
             var filterItemListParam = CreateIdListType("filterItemList", filterItems);
 
-            return _context.Footnote.AsNoTracking().FromSql(
+            return _context.Footnote.FromSqlRaw(
                 "EXEC dbo.FilteredFootnotes " +
                 "@subjectId," +
                 "@indicatorList," +
