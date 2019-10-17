@@ -65,6 +65,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public List<Update> Updates { get; set; }
 
         public List<ContentSection> Content { get; set; }
+
+        public Guid? KeyStatisticsId { get; set; }
         
         public DataBlock KeyStatistics { get; set; }
 

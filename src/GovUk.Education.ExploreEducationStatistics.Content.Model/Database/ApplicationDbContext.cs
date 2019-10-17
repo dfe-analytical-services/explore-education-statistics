@@ -1609,6 +1609,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         "Read national statistical summaries, view charts and tables and download data files.",
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
+                    KeyStatisticsId = new Guid("5d1e6b67-26d7-4440-9e77-c0de71a9fc21")
                 },
 
                 // exclusions
@@ -1623,6 +1624,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         "Read national statistical summaries, view charts and tables and download data files.",
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
+                    KeyStatisticsId = new Guid("17a0272b-318d-41f6-bda9-3bd88f78cd3d")
                 },
                 
                 // Secondary and primary schools applications offers
@@ -1637,6 +1639,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                         "Read national statistical summaries, view charts and tables and download data files.",
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     TypeId = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
+                    KeyStatisticsId = new Guid("475738b4-ba10-4c29-a50d-6ca82c10de6e")
                 }
             );
 
@@ -3122,6 +3125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Title = "Pupil absence statistics: methodology",
                     Published = new DateTime(2018, 3, 22),
                     LastUpdated = new DateTime(2019, 6, 26),
+                    Slug = "pupil-absence-in-schools-in-england",
                     Summary =
                         "Find out about the methodology behind pupil absence statistics and data and how and why they're collected and published.",
                     Content = new List<ContentSection>
@@ -3370,6 +3374,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Id = new Guid("8ab41234-cc9d-4b3d-a42c-c9fce7762719"),
                     Title = "Secondary and primary school applications and offers: methodology",
                     Published = new DateTime(2018, 6, 14),
+                    Slug = "secondary-and-primary-schools-applications-and-offers",
                     Summary = "",
                     Content = new List<ContentSection>
                     {
@@ -3464,6 +3469,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     Id = new Guid("c8c911e3-39c1-452b-801f-25bb79d1deb7"),
                     Title = "Pupil exclusion statistics: methodology",
                     Published = new DateTime(2018, 8, 25),
+                    Slug = "permanent-and-fixed-period-exclusions-in-england",
                     Summary = "",
                     Content = new List<ContentSection>
                     {
