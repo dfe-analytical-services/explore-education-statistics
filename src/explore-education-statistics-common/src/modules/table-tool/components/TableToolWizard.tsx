@@ -14,15 +14,13 @@ import LocationFiltersForm, { LocationFiltersFormSubmitHandler } from '@common/m
 import PreviousStepModalConfirm from '@common/modules/table-tool/components/PreviousStepModalConfirm';
 import PublicationForm, { PublicationFormSubmitHandler } from '@common/modules/table-tool/components/PublicationForm';
 import PublicationSubjectForm, { PublicationSubjectFormSubmitHandler } from '@common/modules/table-tool/components/PublicationSubjectForm';
-import TableHeadersForm, { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
-import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
+import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
 import TimePeriodForm, { TimePeriodFormSubmitHandler } from '@common/modules/table-tool/components/TimePeriodForm';
 import Wizard, { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
-import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
-import { Dictionary, KeysRemap } from '@common/types/util';
+import { Dictionary } from '@common/types/util';
 import mapValues from 'lodash/mapValues';
-import React, { createRef, ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 
 import {
   DateRangeState,

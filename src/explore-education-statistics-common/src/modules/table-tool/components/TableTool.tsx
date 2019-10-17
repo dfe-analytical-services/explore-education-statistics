@@ -1,19 +1,10 @@
 /* eslint-disable no-shadow */
-import {
-  PublicationSubjectMeta,
-  TableDataQuery,
-  ThemeMeta,
-} from '@common/modules/full-table/services/tableBuilderService';
-import { LocationFilter } from '@common/modules/full-table/types/filters';
-import { FullTable } from '@common/modules/full-table/types/fullTable';
+import { TableDataQuery, ThemeMeta } from '@common/modules/full-table/services/tableBuilderService';
 import TableHeadersForm, { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
 import TableToolWizard from '@common/modules/table-tool/components/TableToolWizard';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
-import { Dictionary, KeysRemap } from '@common/types/util';
-import React, { createRef, ReactNode } from 'react';
-
-import { DateRangeState } from './utils/tableToolHelpers';
+import React, { createRef } from 'react';
 
 interface Publication {
   id: string;
@@ -21,45 +12,19 @@ interface Publication {
   slug: string;
 }
 
-interface FinalStepProps {
-  publication?: Publication;
-  createdTable: FullTable;
-  query: TableDataQuery;
-  tableHeaders: TableHeadersFormValues;
-}
-
 interface Props {
   themeMeta: ThemeMeta[];
   publicationId?: string;
   releaseId?: string;
-
-  finalStepExtra?: (props: FinalStepProps) => ReactNode;
-  finalStepHeading?: string;
-
   initialQuery?: TableDataQuery;
   initialTableHeaders?: TableHeadersFormValues;
   onInitialQueryCompleted?: () => void;
 }
 
-
-interface TableToolState {
-  query: TableDataQuery | undefined;
-  createdTable: FullTable | undefined;
-  tableHeaders: TableHeadersFormValues | undefined;
-  validInitialQuery: TableDataQuery | undefined;
-  dateRange: DateRangeState;
-  locations: Dictionary<LocationFilter[]>;
-  subjectId: string;
-  subjectMeta: PublicationSubjectMeta;
-}
-
-
 const TableTool = ( {
   themeMeta,
   publicationId,
   releaseId,
-  finalStepExtra,
-  finalStepHeading,
   initialQuery,
   initialTableHeaders,
   onInitialQueryCompleted,
@@ -70,6 +35,7 @@ const TableTool = ( {
   const dataTableRef = createRef<HTMLTableElement>();
 
   return (<TableToolWizard
+    {...props}
     themeMeta={themeMeta}
     publicationId={publicationId}
     releaseId={releaseId}
@@ -80,7 +46,7 @@ const TableTool = ( {
     finalStep={stepProps => (
       <>
         <WizardStepHeading {...stepProps}>
-          {finalStepHeading || 'Explore data'}
+          Explore data
         </WizardStepHeading>
 
         <div className="govuk-!-margin-bottom-4">
@@ -107,17 +73,6 @@ const TableTool = ( {
             />
           )}
         </div>
-
-        {stepProps.createdTable &&
-        stepProps.tableHeaders &&
-        finalStepExtra &&
-        stepProps.query &&
-        finalStepExtra({
-          createdTable: stepProps.createdTable,
-          publication: stepProps.publication,
-          tableHeaders: stepProps.tableHeaders,
-          query: stepProps.query,
-        })}
       </>
     )}
   />);
