@@ -67,26 +67,24 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
   const formikRef = useRef<Formik<FormValues>>(null);
   const formId = 'locationFiltersForm';
 
-  const [locationLevels, updateLocationLevels] = useImmer<Dictionary<{ label: string; value: string }[]>>({});
+  const [formInitialValues, setFormInitialValues] = React.useState<FormValues>({locations: {}});
+  const [initialLocationLevels, setInitialLocationLevels] = React.useState<Dictionary<{ label: string; value: string }[]>>({});
+
+
+  const [locationLevels, updateLocationLevels] = useImmer<Dictionary<{ label: string; value: string }[]>>(initialLocationLevels);
 
   useResetFormOnPreviousStep(formikRef, currentStep, stepNumber, () => {
     updateLocationLevels(() => {
-      return {};
+      return initialLocationLevels;
     });
   });
 
-  const stepHeading = (
-    <WizardStepHeading {...props} fieldsetHeading>
-      Choose locations
-    </WizardStepHeading>
-  );
-
-  const formInitialValues = React.useMemo( () => calculateInitialValues(initialValues,options), [initialValues, options]);
-
   React.useEffect(() => {
 
-    const mapped = mapValuesWithKeys<Dictionary<string[]>, FilterOption[]>(
-      formInitialValues.locations,
+    const newFormInitialValues = calculateInitialValues(initialValues, options);
+
+    const newInitialLocationLevels = mapValuesWithKeys<Dictionary<string[]>, FilterOption[]>(
+      newFormInitialValues.locations,
       (key: string, value: string[]) => {
         const oN = (options[key] && options[key].options) || [];
 
@@ -98,16 +96,29 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
       },
     );
 
-    console.log(mapped);
+    setFormInitialValues(newFormInitialValues);
+    setInitialLocationLevels(newInitialLocationLevels);
+    updateLocationLevels(() => newInitialLocationLevels);
+  }, [initialValues, options, updateLocationLevels]);
 
-    updateLocationLevels(() => mapped);
+
+  const stepHeading = (
+    <WizardStepHeading {...props} fieldsetHeading>
+      Choose locations
+    </WizardStepHeading>
+  );
+
+  // React.useEffect(() => updateLocationLevels(() => initialLocationLevels), [formInitialValues, options]);
+
+/*
+  React.useEffect(() => {
 
     if (formikRef.current) {
       formikRef.current.setValues(formInitialValues);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formInitialValues, options]);
-
+*/
   return (
     <Formik<FormValues>
       enableReinitialize

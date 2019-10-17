@@ -167,9 +167,6 @@ export const mapLocations = (
   selectedLocations: LocationsFormValues,
   locationsMeta: PublicationSubjectMeta['locations'],
 ) => {
-
-  console.log(locationsMeta);
-
   return mapValuesWithKeys(selectedLocations, (locationLevel, locationOptions) =>
     locationOptions
       .map(location =>

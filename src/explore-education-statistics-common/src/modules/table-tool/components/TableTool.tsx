@@ -88,24 +88,28 @@ const TableTool = ({
   const [initialStep, setInitialStep] = React.useState(1);
 
 
-  const getInitialState = () => ({
-    initialStep: 1,
-    subjectId: '',
-    subjectMeta: getDefaultSubjectMeta(),
-    locations: {},
-    dateRange: {},
-    tableHeaders: {
-      columnGroups: [],
-      columns: [],
-      rowGroups: [],
-      rows: [],
-    },
-    createdTable: undefined,
-    query: undefined,
-    validInitialQuery: undefined
-  });
+  const getInitialState = () => {
+    return {
+      initialStep: 1,
+        subjectId: '',
+      subjectMeta: getDefaultSubjectMeta(),
+      locations: {},
+      dateRange: {},
+      tableHeaders: {
+        columnGroups: [],
+          columns: [],
+          rowGroups: [],
+          rows: [],
+      },
+      createdTable: undefined,
+        query: undefined,
+      validInitialQuery: undefined
+    }
+  };
 
-  const [tableToolState, setTableToolState] = React.useState<TableToolState>(getInitialState);
+  const [tableToolState, setTableToolState] = React.useState<TableToolState>(() => {
+    return getInitialState()
+  });
 
   React.useEffect(() => {
     if (releaseId) {
@@ -118,70 +122,47 @@ const TableTool = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [releaseId]);
 
-  const currentlyLoadingQuery = React.useRef<
-    {
-      releaseId?: string,
-      initialQuery?: TableDataQuery,
-      initialTableHeaders?: TableHeadersFormValues
-    }
-    >({
-    releaseId: undefined,
-    initialQuery: undefined,
-    initialTableHeaders: undefined
-    });
 
   React.useEffect(() => {
 
+    console.log("INIT", initialQuery, initialTableHeaders, releaseId);
+    const currentlyLoadingQuery = {releaseId, initialQuery, initialTableHeaders};
+    setInitialStep(1);
+    setTableToolState({
+      ...tableToolState,
+      subjectMeta: getDefaultSubjectMeta(),
+      validInitialQuery: undefined
+    });
 
 
-    if (currentlyLoadingQuery.current.releaseId !== releaseId
-      || currentlyLoadingQuery.current.initialQuery !== initialQuery
-      || currentlyLoadingQuery.current.initialTableHeaders !==initialTableHeaders
-    ) {
+    initialiseFromInitialQuery(releaseId, initialQuery, initialTableHeaders)
+      .then((state) => {
 
-      setInitialStep(1);
-      setTableToolState({
-        ...tableToolState,
-        subjectMeta: getDefaultSubjectMeta(),
-        validInitialQuery: undefined
+        // make sure nothing changed in the component while we were processing the initialisation
+        if (currentlyLoadingQuery.releaseId === releaseId
+          && currentlyLoadingQuery.initialQuery === initialQuery
+          && currentlyLoadingQuery.initialTableHeaders === initialTableHeaders
+        ) {
+          const {tableHeaders, subjectMeta, subjectId, createdTable, locations, query, initialStep, dateRange, validInitialQuery} = state;
+
+          setInitialStep(initialStep);
+
+          setTableToolState(
+            {
+              tableHeaders,
+              subjectMeta,
+              subjectId,
+              createdTable,
+              locations,
+              query,
+              dateRange,
+              validInitialQuery
+            }
+          );
+          if (onInitialQueryCompleted) onInitialQueryCompleted();
+
+        }
       });
-
-      currentlyLoadingQuery.current = {
-        releaseId,
-        initialQuery,
-        initialTableHeaders
-      };
-
-      initialiseFromInitialQuery(releaseId, initialQuery, initialTableHeaders)
-        .then((state) => {
-
-          if (currentlyLoadingQuery.current.releaseId === releaseId
-            && currentlyLoadingQuery.current.initialQuery === initialQuery
-            && currentlyLoadingQuery.current.initialTableHeaders ===initialTableHeaders
-          ) {
-            const {tableHeaders, subjectMeta, subjectId, createdTable, locations, query, initialStep, dateRange, validInitialQuery} = state;
-
-            setInitialStep(initialStep);
-
-            setTableToolState(
-              {
-                tableHeaders,
-                subjectMeta,
-                subjectId,
-                createdTable,
-                locations,
-                query,
-                dateRange,
-                validInitialQuery
-              }
-            );
-
-
-
-            if (onInitialQueryCompleted) onInitialQueryCompleted();
-          }
-        });
-    }
 
   }, [initialQuery, initialTableHeaders, releaseId]);
 
@@ -397,7 +378,7 @@ const TableTool = ({
                         }
                       }}
                     />
-                    {tableToolState.createdTable && tableToolState.tableHeaders &&(
+                    {tableToolState.createdTable && tableToolState.tableHeaders && (
                       <TimePeriodDataTable
                         ref={dataTableRef}
                         fullTable={tableToolState.createdTable}

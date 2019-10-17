@@ -79,7 +79,7 @@ const ReleaseManageDataBlocksPage = () => {
     }
   };
 
-  const unsetIsLoading = React.useCallback(() => setIsLoading(false), []);
+
 
   const load = async (dataBlocks: DataBlock[], releaseId: string, selectedDataBlockId: string) => {
 
@@ -112,6 +112,11 @@ const ReleaseManageDataBlocksPage = () => {
 
   const currentlyLoadingDataBlockId = React.useRef<string>();
 
+  const unsetIsLoading = React.useCallback(() => {
+    setIsLoading(false);
+    currentlyLoadingDataBlockId.current = undefined;
+  }, []);
+
   const doLoad = React.useCallback((selectedDataBlockId : string) => {
 
     if (currentlyLoadingDataBlockId.current !== selectedDataBlockId) {
@@ -127,6 +132,7 @@ const ReleaseManageDataBlocksPage = () => {
             } else {
               setDataBlockData(undefined);
               setIsLoading(false);
+              currentlyLoadingDataBlockId.current = undefined;
             }
           }
         })
