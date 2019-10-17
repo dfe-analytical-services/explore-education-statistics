@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
@@ -12,6 +13,7 @@ using ICSharpCode.SharpZipLib.Zip;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.Azure.Storage.DataMovement;
 using Microsoft.Extensions.Logging;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.ReleaseFileTypes;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
@@ -152,17 +154,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return cloudBlob.Uri.Segments.Last();
         }
 
-        private static string GetZipFilename(PublishReleaseDataMessage message)
+        private static string GetZipFilePath(PublishReleaseDataMessage message)
         {
-            return $"{message.PublicationSlug}_{message.ReleaseSlug}.zip";
+            return $"{Ancillary.GetEnumLabel()}/{message.PublicationSlug}_{message.ReleaseSlug}.zip";
         }
 
         private static CloudBlockBlob CreateBlobForAllFilesZip(CloudBlobDirectory directory,
             PublishReleaseDataMessage message)
         {
-            var blob = directory.GetBlockBlobReference(GetZipFilename(message));
-            blob.Properties.ContentType = "application/zip";
-            blob.Metadata.Add("name", "All data files");
+            var blob = directory.GetBlockBlobReference(GetZipFilePath(message));
+            blob.Properties.ContentType = "application/x-zip-compressed";
+            blob.Metadata.Add("name", "All files");
             return blob;
         }
     }
