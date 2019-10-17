@@ -3,9 +3,9 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.Extensions.Configuration;
 
@@ -22,21 +22,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         public Task<string> DownloadTextAsync(string containerName, string blobName)
         {
-            var blobContainer = GetCloudBlobContainer(containerName);
-            var blob = blobContainer.GetBlockBlobReference(blobName); 
+            var blobContainer = FileStorageUtils.GetCloudBlobContainer(_storageConnectionString, containerName);
+            var blob = blobContainer.GetBlockBlobReference(blobName);
             return blob.DownloadTextAsync();
         }
-        
+
         public bool FileExistsAndIsReleased(string containerName, string blobName)
         {
-            var blobContainer = GetCloudBlobContainer(containerName);
+            var blobContainer = FileStorageUtils.GetCloudBlobContainer(_storageConnectionString, containerName);
             var blob = blobContainer.GetBlockBlobReference(blobName);
             return blob.Exists() && IsFileReleased(blob);
         }
 
         public async Task<FileStreamResult> StreamFile(string containerName, string blobName, string fileName)
         {
-            var blobContainer = GetCloudBlobContainer(containerName);
+            var blobContainer =
+                await FileStorageUtils.GetCloudBlobContainerAsync(_storageConnectionString, containerName);
             var blob = blobContainer.GetBlockBlobReference(blobName);
 
             if (!blob.Exists())
@@ -54,12 +55,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             };
         }
 
-        public async Task UploadFromStreamAsync(string containerName, string blobName, string contentType, string content)
+        public async Task UploadFromStreamAsync(string containerName, string blobName, string contentType,
+            string content)
         {
-            var blobContainer = GetCloudBlobContainer(containerName);
+            var blobContainer =
+                await FileStorageUtils.GetCloudBlobContainerAsync(_storageConnectionString, containerName);
+            
             var blob = blobContainer.GetBlockBlobReference(blobName);
             blob.Properties.ContentType = contentType;
-            
+
             using (Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(content)))
             {
                 await blob.UploadFromStreamAsync(stream);
@@ -84,15 +88,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private static DateTime ParseDateTime(string dateTime)
         {
             return DateTime.ParseExact(dateTime, "o", CultureInfo.InvariantCulture, DateTimeStyles.None);
-        }
-        
-        private CloudBlobContainer GetCloudBlobContainer(string containerName)
-        {
-            var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
-            var blobClient = storageAccount.CreateCloudBlobClient();
-            var blobContainer = blobClient.GetContainerReference(containerName);
-            blobContainer.CreateIfNotExists();
-            return blobContainer;
         }
     }
 }
