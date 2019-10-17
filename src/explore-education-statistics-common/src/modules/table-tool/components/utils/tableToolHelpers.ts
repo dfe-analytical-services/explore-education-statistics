@@ -1,13 +1,25 @@
 import mapValuesWithKeys from '@common/lib/utils/mapValuesWithKeys';
 import tableBuilderService, {
-  FilterOption, IndicatorOption, LocationLevelKeysEnum,
+  FilterOption,
+  IndicatorOption,
+  LocationLevelKeysEnum,
   PublicationSubjectMeta,
   TableDataQuery,
 } from '@common/modules/full-table/services/tableBuilderService';
-import { CategoryFilter, Indicator, LocationFilter, TimePeriodFilter } from '@common/modules/full-table/types/filters';
-import { FullTable, FullTableMeta } from '@common/modules/full-table/types/fullTable';
+import {
+  CategoryFilter,
+  Indicator,
+  LocationFilter,
+  TimePeriodFilter,
+} from '@common/modules/full-table/types/filters';
+import {
+  FullTable,
+  FullTableMeta,
+} from '@common/modules/full-table/types/fullTable';
 import { mapFullTable } from '@common/modules/full-table/utils/mapPermalinks';
-import getDefaultTableHeaderConfig, { TableHeadersConfig } from '@common/modules/full-table/utils/tableHeaders';
+import getDefaultTableHeaderConfig, {
+  TableHeadersConfig,
+} from '@common/modules/full-table/utils/tableHeaders';
 import { FormValues } from '@common/modules/table-tool/components/FiltersForm';
 import { LocationsFormValues } from '@common/modules/table-tool/components/LocationFiltersForm';
 import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
@@ -17,7 +29,6 @@ import { Dictionary } from '@common/types';
 import mapValues from 'lodash/mapValues';
 import { SortableOption } from '@common/modules/table-tool/components/FormSortableList';
 import { DataBlockMetadata } from '@common/services/dataBlockService';
-
 
 export interface DateRangeState {
   startYear?: number;
@@ -39,7 +50,6 @@ const transformTableMetaFiltersToCategoryFilters = (
   );
 };
 
-
 export const reverseMapTableHeadersConfig = (
   { columns, rows, columnGroups, rowGroups }: TableHeadersFormValues,
   fullTableSubjectMeta: FullTableMeta,
@@ -51,12 +61,11 @@ export const reverseMapTableHeadersConfig = (
   let mappedRows: (TimePeriodFilter | Indicator)[] = [];
   let mappedColumns: (TimePeriodFilter | Indicator)[] = [];
 
-  const initialValue = columns[0].value;
+  const initialValue = columns.length > 0 && columns[0].value;
   // rows/columns can only be TimePeriods / Indicators
   if (Number.isNaN(Number(initialValue))) {
     // if NaN then timePeriod
     mappedColumns = columns.map(({ value }) => {
-
       const tp = fullTableSubjectMeta.timePeriodRange.find(
         timePeriod => value === `${timePeriod.year}_${timePeriod.code}`,
       ) as TimePeriodFilter;
@@ -125,7 +134,6 @@ export const reverseMapTableHeadersConfig = (
   };
 };
 
-
 export const createQuery = (
   filters: Dictionary<CategoryFilter[]>,
   indicators: Indicator[],
@@ -167,15 +175,19 @@ export const mapLocations = (
   selectedLocations: LocationsFormValues,
   locationsMeta: PublicationSubjectMeta['locations'],
 ) => {
-  return mapValuesWithKeys(selectedLocations, (locationLevel, locationOptions) =>
-    locationOptions
-      .map(location =>
-        locationsMeta[locationLevel].options.find(
-          option => option.value === location,
+  return mapValuesWithKeys(
+    selectedLocations,
+    (locationLevel, locationOptions) =>
+      locationOptions
+        .map(location =>
+          locationsMeta[locationLevel].options.find(
+            option => option.value === location,
+          ),
+        )
+        .filter(option => typeof option !== 'undefined')
+        .map(
+          option => new LocationFilter(option as FilterOption, locationLevel),
         ),
-      )
-      .filter(option => typeof option !== 'undefined')
-      .map(option => new LocationFilter(option as FilterOption, locationLevel)),
   );
 };
 
@@ -266,15 +278,17 @@ export const tableGeneration = async (
   };
 };
 
-export type OptionalTableDataQuery = { [K in keyof TableDataQuery]?: TableDataQuery[K] } | undefined;
-
+export type OptionalTableDataQuery =
+  | { [K in keyof TableDataQuery]?: TableDataQuery[K] }
+  | undefined;
 
 export const initialiseQuery = (_: TableDataQuery): OptionalTableDataQuery => {
   return {};
 };
 
-export const validateAndPopulateSubject = (initialQuery: TableDataQuery): OptionalTableDataQuery => {
-
+export const validateAndPopulateSubject = (
+  initialQuery: TableDataQuery,
+): OptionalTableDataQuery => {
   if (!initialQuery.subjectId) return undefined;
 
   return {
@@ -282,7 +296,9 @@ export const validateAndPopulateSubject = (initialQuery: TableDataQuery): Option
   };
 };
 
-export const validateAndPopulateLocations = (initialQuery: TableDataQuery): OptionalTableDataQuery => {
+export const validateAndPopulateLocations = (
+  initialQuery: TableDataQuery,
+): OptionalTableDataQuery => {
   const initialLocations: Dictionary<string[]> = Object.entries(
     mapValuesWithKeys(
       LocationLevelKeysEnum,
@@ -301,11 +317,11 @@ export const validateAndPopulateLocations = (initialQuery: TableDataQuery): Opti
   if (allLocations.length === 0) return undefined;
 
   return initialLocations;
-
-
 };
 
-export const validateAndPopulateDateRange = (initialQuery: TableDataQuery): OptionalTableDataQuery => {
+export const validateAndPopulateDateRange = (
+  initialQuery: TableDataQuery,
+): OptionalTableDataQuery => {
   const newDateRange: DateRangeState = {
     ...initialQuery.timePeriod,
   };
@@ -319,13 +335,14 @@ export const validateAndPopulateDateRange = (initialQuery: TableDataQuery): Opti
     return undefined;
   }
 
-
   return {
     timePeriod: initialQuery.timePeriod,
   };
 };
 
-export const validateAndPopulateFiltersAndIndicators = (initialQuery: TableDataQuery): OptionalTableDataQuery => {
+export const validateAndPopulateFiltersAndIndicators = (
+  initialQuery: TableDataQuery,
+): OptionalTableDataQuery => {
   if (
     initialQuery.filters.length === 0 ||
     initialQuery.indicators.length === 0
@@ -358,8 +375,11 @@ export const getDefaultSubjectMeta = () => ({
   filters: {},
 });
 
-export const initialiseFromInitialQuery = async (releaseId?: string, initialQuery?: TableDataQuery, initialTableHeaders?: TableHeadersFormValues) => {
-
+export const initialiseFromInitialQuery = async (
+  releaseId?: string,
+  initialQuery?: TableDataQuery,
+  initialTableHeaders?: TableHeadersFormValues,
+) => {
   let query: TableDataQuery | undefined;
   let createdTable: FullTable | undefined;
 
@@ -372,7 +392,6 @@ export const initialiseFromInitialQuery = async (releaseId?: string, initialQuer
   let subjectMeta: PublicationSubjectMeta;
 
   if (initialQuery) {
-
     subjectMeta = await tableBuilderService.filterPublicationSubjectMeta(
       initialQuery,
     );
@@ -382,7 +401,6 @@ export const initialiseFromInitialQuery = async (releaseId?: string, initialQuer
       filters: [],
       indicators: [],
     };
-
 
     validationFunctions.every((fn, idx) => {
       const q = fn(initialQuery);
@@ -396,27 +414,29 @@ export const initialiseFromInitialQuery = async (releaseId?: string, initialQuer
     });
 
     if (initialStep === 5) {
-
       createdTable = await queryForTable(buildNewQuery, releaseId);
 
       tableHeaders =
-        (initialTableHeaders && reverseMapTableHeadersConfig(initialTableHeaders, createdTable.subjectMeta)) ||
+        (initialTableHeaders &&
+          reverseMapTableHeadersConfig(
+            initialTableHeaders,
+            createdTable.subjectMeta,
+          )) ||
         getDefaultTableHeaderConfig(createdTable.subjectMeta);
     }
-
 
     // eslint-disable-next-line prefer-destructuring
     if (initialStep > 1) subjectId = buildNewQuery.subjectId;
 
-    if (initialStep > 2) locations = mapLocations(
-      getSelectedLocationsForQuery(buildNewQuery),
-      subjectMeta.locations,
-    );
+    if (initialStep > 2)
+      locations = mapLocations(
+        getSelectedLocationsForQuery(buildNewQuery),
+        subjectMeta.locations,
+      );
 
     if (initialStep > 3) dateRange = { ...buildNewQuery.timePeriod };
 
     query = buildNewQuery;
-
   } else {
     query = undefined;
     subjectMeta = getDefaultSubjectMeta();
@@ -433,5 +453,4 @@ export const initialiseFromInitialQuery = async (releaseId?: string, initialQuer
     tableHeaders,
     initialStep,
   };
-
 };

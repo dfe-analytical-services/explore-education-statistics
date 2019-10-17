@@ -1,15 +1,22 @@
 import DataBlockDetailsForm from '@admin/pages/release/edit-release/manage-datablocks/DataBlockDetailsForm';
 import { DataBlock } from '@admin/services/release/edit-release/datablocks/types';
 import TableTool from '@common/modules/table-tool/components/TableTool';
-import { DataBlockRequest, DataBlockResponse } from '@common/services/dataBlockService';
+import {
+  DataBlockRequest,
+  DataBlockResponse,
+} from '@common/services/dataBlockService';
 import React, { createRef } from 'react';
 import TableToolWizard from '@common/modules/table-tool/components/TableToolWizard';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
-import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
+import TableHeadersForm, {
+  TableHeadersFormValues,
+} from '@common/modules/table-tool/components/TableHeadersForm';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
+import { reverseMapTableHeadersConfig } from '@common/modules/table-tool/components/utils/tableToolHelpers';
+import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
 
 interface Props {
-  releaseId: string,
+  releaseId: string;
   dataBlockRequest?: DataBlockRequest;
   dataBlockResponse?: DataBlockResponse;
   dataBlock?: DataBlock;
@@ -25,15 +32,26 @@ const CreateDataBlocks = ({
   onDataBlockSave,
   onTableToolLoaded,
 }: Props) => {
-
   const dataTableRef = createRef<HTMLTableElement>();
 
+  const initialTableHeaders = React.useMemo(
+    () =>
+      (dataBlock &&
+        dataBlock.tables &&
+        dataBlock.tables.length > 0 && {
+          ...dataBlock.tables[0].tableHeaders,
+        }) ||
+      undefined,
+    [dataBlock],
+  );
 
-  const initialTableHeaders = (dataBlock &&
-    dataBlock.tables &&
-    dataBlock.tables.length > 0 &&
-    { ...dataBlock.tables[0].tableHeaders }) ||
-    undefined;
+  const [tableHeaders, setTableHeaders] = React.useState<
+    TableHeadersFormValues | undefined
+  >(initialTableHeaders);
+
+  React.useEffect(() => {
+    setTableHeaders(initialTableHeaders);
+  }, [initialTableHeaders]);
 
   return (
     <div>
@@ -42,9 +60,21 @@ const CreateDataBlocks = ({
           releaseId={releaseId}
           themeMeta={[]}
           initialQuery={initialQuery}
-          initialTableHeaders={initialTableHeaders}
-          onInitialQueryCompleted={onTableToolLoaded}
+          initialTableHeaders={tableHeaders}
+          onInitialQueryCompleted={props => {
+            if (props.createdTable) {
+              setTableHeaders(
+                (props.tableHeaders &&
+                  reverseMapTableHeadersConfig(
+                    props.tableHeaders,
+                    props.createdTable.subjectMeta,
+                  )) ||
+                  getDefaultTableHeaderConfig(props.createdTable.subjectMeta),
+              );
+            }
 
+            if (onTableToolLoaded) onTableToolLoaded();
+          }}
           finalStep={stepProps => (
             <>
               <WizardStepHeading {...stepProps}>
@@ -76,14 +106,14 @@ const CreateDataBlocks = ({
                 )}
               </div>
 
-              { stepProps.query && stepProps.tableHeaders && (
-              <DataBlockDetailsForm
-                query={stepProps.query}
-                tableHeaders={stepProps.tableHeaders}
-                initialDataBlock={dataBlock}
-                releaseId={releaseId}
-                onDataBlockSave={onDataBlockSave}
-              />
+              {stepProps.query && stepProps.tableHeaders && (
+                <DataBlockDetailsForm
+                  query={stepProps.query}
+                  tableHeaders={stepProps.tableHeaders}
+                  initialDataBlock={dataBlock}
+                  releaseId={releaseId}
+                  onDataBlockSave={onDataBlockSave}
+                />
               )}
             </>
           )}

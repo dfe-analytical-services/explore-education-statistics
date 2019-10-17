@@ -1,8 +1,15 @@
 /* eslint-disable no-shadow */
-import { TableDataQuery, ThemeMeta } from '@common/modules/full-table/services/tableBuilderService';
-import TableHeadersForm, { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
+import {
+  TableDataQuery,
+  ThemeMeta,
+} from '@common/modules/full-table/services/tableBuilderService';
+import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
+import TableHeadersForm, {
+  TableHeadersFormValues,
+} from '@common/modules/table-tool/components/TableHeadersForm';
 import TableToolWizard from '@common/modules/table-tool/components/TableToolWizard';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
+import { reverseMapTableHeadersConfig } from '@common/modules/table-tool/components/utils/tableToolHelpers';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import React, { createRef } from 'react';
 
@@ -21,63 +28,74 @@ interface Props {
   onInitialQueryCompleted?: () => void;
 }
 
-const TableTool = ( {
+const TableTool = ({
   themeMeta,
   publicationId,
   releaseId,
   initialQuery,
   initialTableHeaders,
   onInitialQueryCompleted,
-} : Props) => {
-
-
-
+}: Props) => {
   const dataTableRef = createRef<HTMLTableElement>();
 
-  return (<TableToolWizard
-    themeMeta={themeMeta}
-    publicationId={publicationId}
-    releaseId={releaseId}
-    initialQuery={initialQuery}
-    initialTableHeaders={initialTableHeaders}
-    onInitialQueryCompleted={onInitialQueryCompleted}
+  const [tableHeaders, setTableHeaders] = React.useState<
+    TableHeadersFormValues | undefined
+  >(initialTableHeaders);
 
-    finalStep={stepProps => (
-      <>
-        <WizardStepHeading {...stepProps}>
-          Explore data
-        </WizardStepHeading>
+  React.useEffect(() => {
+    setTableHeaders(initialTableHeaders);
+  }, [initialTableHeaders]);
 
-        <div className="govuk-!-margin-bottom-4">
-          <TableHeadersForm
-            initialValues={stepProps.tableHeaders}
-            onSubmit={tableHeaderConfig => {
-              stepProps.updateState({
-                tableHeaders: tableHeaderConfig,
-              });
+  return (
+    <TableToolWizard
+      themeMeta={themeMeta}
+      publicationId={publicationId}
+      releaseId={releaseId}
+      initialQuery={initialQuery}
+      onInitialQueryCompleted={props => {
+        if (props.createdTable) {
+          setTableHeaders(
+            (props.tableHeaders &&
+              reverseMapTableHeadersConfig(
+                props.tableHeaders,
+                props.createdTable.subjectMeta,
+              )) ||
+              getDefaultTableHeaderConfig(props.createdTable.subjectMeta),
+          );
+        }
 
-              if (dataTableRef.current) {
-                dataTableRef.current.scrollIntoView({
-                  behavior: 'smooth',
-                  block: 'start',
-                });
-              }
-            }}
-          />
-          {stepProps.createdTable && stepProps.tableHeaders && (
-            <TimePeriodDataTable
-              ref={dataTableRef}
-              fullTable={stepProps.createdTable}
-              tableHeadersConfig={stepProps.tableHeaders}
+        if (onInitialQueryCompleted) onInitialQueryCompleted();
+      }}
+      finalStep={stepProps => (
+        <>
+          <WizardStepHeading {...stepProps}>Explore data</WizardStepHeading>
+
+          <div className="govuk-!-margin-bottom-4">
+            <TableHeadersForm
+              initialValues={tableHeaders}
+              onSubmit={tableHeaderConfig => {
+                setTableHeaders(tableHeaderConfig);
+
+                if (dataTableRef.current) {
+                  dataTableRef.current.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start',
+                  });
+                }
+              }}
             />
-          )}
-        </div>
-      </>
-    )}
-  />);
-
-
-
+            {stepProps.createdTable && stepProps.tableHeaders && (
+              <TimePeriodDataTable
+                ref={dataTableRef}
+                fullTable={stepProps.createdTable}
+                tableHeadersConfig={stepProps.tableHeaders}
+              />
+            )}
+          </div>
+        </>
+      )}
+    />
+  );
 };
 
 export default TableTool;

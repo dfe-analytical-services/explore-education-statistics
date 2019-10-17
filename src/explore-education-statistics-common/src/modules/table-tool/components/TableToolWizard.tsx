@@ -9,14 +9,26 @@ import tableBuilderService, {
 import { LocationFilter } from '@common/modules/full-table/types/filters';
 import { FullTable } from '@common/modules/full-table/types/fullTable';
 import parseYearCodeTuple from '@common/modules/full-table/utils/TimePeriod';
-import FiltersForm, { FilterFormSubmitHandler } from '@common/modules/table-tool/components/FiltersForm';
-import LocationFiltersForm, { LocationFiltersFormSubmitHandler } from '@common/modules/table-tool/components/LocationFiltersForm';
+import FiltersForm, {
+  FilterFormSubmitHandler,
+} from '@common/modules/table-tool/components/FiltersForm';
+import LocationFiltersForm, {
+  LocationFiltersFormSubmitHandler,
+} from '@common/modules/table-tool/components/LocationFiltersForm';
 import PreviousStepModalConfirm from '@common/modules/table-tool/components/PreviousStepModalConfirm';
-import PublicationForm, { PublicationFormSubmitHandler } from '@common/modules/table-tool/components/PublicationForm';
-import PublicationSubjectForm, { PublicationSubjectFormSubmitHandler } from '@common/modules/table-tool/components/PublicationSubjectForm';
+import PublicationForm, {
+  PublicationFormSubmitHandler,
+} from '@common/modules/table-tool/components/PublicationForm';
+import PublicationSubjectForm, {
+  PublicationSubjectFormSubmitHandler,
+} from '@common/modules/table-tool/components/PublicationSubjectForm';
 import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
-import TimePeriodForm, { TimePeriodFormSubmitHandler } from '@common/modules/table-tool/components/TimePeriodForm';
-import Wizard, { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
+import TimePeriodForm, {
+  TimePeriodFormSubmitHandler,
+} from '@common/modules/table-tool/components/TimePeriodForm';
+import Wizard, {
+  InjectedWizardProps,
+} from '@common/modules/table-tool/components/Wizard';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import { Dictionary } from '@common/types/util';
 import mapValues from 'lodash/mapValues';
@@ -64,33 +76,30 @@ interface Props {
   publicationId?: string;
   releaseId?: string;
 
-  finalStep?: (props: InjectedWizardProps & FinalStepProps) => ReactNode
+  finalStep?: (props: InjectedWizardProps & FinalStepProps) => ReactNode;
   finalStepExtra?: (props: FinalStepProps) => ReactNode;
   finalStepHeading?: string;
 
   initialQuery?: TableDataQuery;
   initialTableHeaders?: TableHeadersFormValues;
-  onInitialQueryCompleted?: () => void;
+  onInitialQueryCompleted?: (props: FinalStepProps) => void;
 }
 
-
 const TableToolWizard = (props: Props) => {
-
   const {
     themeMeta,
-      publicationId,
-      releaseId,
-      finalStep,
-      initialQuery,
-      initialTableHeaders,
-      onInitialQueryCompleted,
+    publicationId,
+    releaseId,
+    finalStep,
+    initialQuery,
+    initialTableHeaders,
+    onInitialQueryCompleted,
   } = props;
 
   const [publication, setPublication] = React.useState<Publication>();
   const [subjects, setSubjects] = React.useState<PublicationSubject[]>([]);
 
   const [initialStep, setInitialStep] = React.useState(1);
-
 
   const getInitialState = () => {
     return {
@@ -111,11 +120,14 @@ const TableToolWizard = (props: Props) => {
     };
   };
 
-  const [tableToolState, setTableToolState] = React.useState<TableToolState>(() => {
-    return getInitialState();
-  });
+  const [tableToolState, setTableToolState] = React.useState<TableToolState>(
+    () => {
+      return getInitialState();
+    },
+  );
 
-  const updateState = (P: PartialState) => setTableToolState({ ...tableToolState, ...P });
+  const updateState = (P: PartialState) =>
+    setTableToolState({ ...tableToolState, ...P });
 
   React.useEffect(() => {
     if (releaseId) {
@@ -128,38 +140,45 @@ const TableToolWizard = (props: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [releaseId]);
 
-
   React.useEffect(() => {
-
-    const currentlyLoadingQuery = { releaseId, initialQuery, initialTableHeaders };
+    const currentlyLoadingQuery = {
+      releaseId,
+      initialQuery,
+      initialTableHeaders,
+    };
     setInitialStep(1);
     setTableToolState({
-      ...tableToolState,
       subjectMeta: getDefaultSubjectMeta(),
+      dateRange: {},
+      locations: {},
+      subjectId: '',
+      query: undefined,
+      tableHeaders: undefined,
+      createdTable: undefined,
       validInitialQuery: undefined,
     });
 
+    initialiseFromInitialQuery(
+      releaseId,
+      initialQuery,
+      initialTableHeaders,
+    ).then(state => {
+      // make sure nothing changed in the component while we were processing the initialisation
+      if (
+        currentlyLoadingQuery.releaseId === releaseId &&
+        currentlyLoadingQuery.initialQuery === initialQuery &&
+        currentlyLoadingQuery.initialTableHeaders === initialTableHeaders
+      ) {
+        const { initialStep } = state;
 
-    initialiseFromInitialQuery(releaseId, initialQuery, initialTableHeaders)
-      .then((state) => {
+        setInitialStep(initialStep);
 
-        // make sure nothing changed in the component while we were processing the initialisation
-        if (currentlyLoadingQuery.releaseId === releaseId
-          && currentlyLoadingQuery.initialQuery === initialQuery
-          && currentlyLoadingQuery.initialTableHeaders === initialTableHeaders
-        ) {
-          const { initialStep } = state;
+        setTableToolState(state);
 
-          setInitialStep(initialStep);
-
-          setTableToolState(
-            state,
-          );
-          if (onInitialQueryCompleted) onInitialQueryCompleted();
-
-        }
-      });
-
+        if (onInitialQueryCompleted)
+          onInitialQueryCompleted({ ...state, updateState });
+      }
+    });
   }, [initialQuery, initialTableHeaders, releaseId]);
 
   const handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
@@ -196,7 +215,6 @@ const TableToolWizard = (props: Props) => {
     });
   };
 
-
   const handleLocationFiltersFormSubmit: LocationFiltersFormSubmitHandler = async ({
     locations: selectedLocations,
   }) => {
@@ -213,9 +231,11 @@ const TableToolWizard = (props: Props) => {
         ...tableToolState.subjectMeta,
         timePeriod: selectedSubjectMeta.timePeriod,
       },
-      locations: mapLocations(selectedLocations, tableToolState.subjectMeta.locations),
+      locations: mapLocations(
+        selectedLocations,
+        tableToolState.subjectMeta.locations,
+      ),
     });
-
   };
 
   const handleTimePeriodFormSubmit: TimePeriodFormSubmitHandler = async values => {
@@ -250,7 +270,6 @@ const TableToolWizard = (props: Props) => {
         endCode,
       },
     });
-
   };
 
   const handleFiltersFormSubmit: FilterFormSubmitHandler = async values => {
@@ -273,7 +292,6 @@ const TableToolWizard = (props: Props) => {
         createdTable: table,
         tableHeaders: generatedTableHeaders,
         query: createdQuery,
-
       };
       setTableToolState(newState);
     }
@@ -343,16 +361,15 @@ const TableToolWizard = (props: Props) => {
                 <FiltersForm
                   {...stepProps}
                   onSubmit={handleFiltersFormSubmit}
-                  initialValues={
-                    tableToolState.validInitialQuery
-                  }
+                  initialValues={tableToolState.validInitialQuery}
                   subjectMeta={tableToolState.subjectMeta}
                 />
               )}
             </WizardStep>
             <WizardStep>
               {stepProps =>
-                finalStep && finalStep({
+                finalStep &&
+                finalStep({
                   ...stepProps,
                   ...tableToolState,
                   updateState,
