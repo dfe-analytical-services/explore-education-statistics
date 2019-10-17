@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services
             return files.OrderBy(f => f.Name);
         }
 
-        public IEnumerable<FileInfo> ListFiles(string publication, string release, ReleaseFileTypes type)
+        private IEnumerable<FileInfo> ListFiles(string publication, string release, ReleaseFileTypes type)
         {
             var blobContainer = FileStorageUtils.GetCloudBlobContainer(_storageConnectionString, ContainerName);
 

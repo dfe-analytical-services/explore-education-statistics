@@ -46,11 +46,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var destinationDirectoryPath = PublicReleaseDirectoryPath(message.PublicationSlug, message.ReleaseSlug);
 
             await CopyDirectoryAsyncAndZipFiles(sourceDirectoryPath, destinationDirectoryPath, privateContainer,
-                publicContainer, message.ReleasePublished);
+                publicContainer, message);
         }
 
         private async Task CopyDirectoryAsyncAndZipFiles(string sourceDirectoryPath, string destinationDirectoryPath,
-            CloudBlobContainer sourceContainer, CloudBlobContainer destinationContainer, DateTime releasePublished)
+            CloudBlobContainer sourceContainer, CloudBlobContainer destinationContainer,
+            PublishReleaseDataMessage message)
         {
             var sourceDirectory = sourceContainer.GetDirectoryReference(sourceDirectoryPath);
             var destinationDirectory = destinationContainer.GetDirectoryReference(destinationDirectoryPath);
@@ -66,17 +67,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             context.FileTransferred += (sender, args) => FileTransferredCallback(sender, args, allFilesTransferred);
             context.FileFailed += FileFailedCallback;
             context.FileSkipped += FileSkippedCallback;
+            context.SetAttributesCallbackAsync += (destination) =>
+                SetAttributesCallbackAsync(destination, message.ReleasePublished);
             context.ShouldTransferCallbackAsync += ShouldTransferCallbackAsync;
-
-            context.SetAttributesCallbackAsync += async destination =>
-            {
-                var releasePublishedString = releasePublished.ToString("o", CultureInfo.InvariantCulture);
-                (destination as CloudBlockBlob)?.Metadata.Add("releasedatetime", releasePublishedString);
-            };
 
             await TransferManager.CopyDirectoryAsync(sourceDirectory, destinationDirectory, true, options, context);
 
-            ZipAllFilesToBlob(allFilesTransferred, destinationDirectory);
+            ZipAllFilesToBlob(allFilesTransferred, destinationDirectory, message);
         }
 
         private void FileTransferredCallback(object sender, TransferEventArgs e, List<CloudBlockBlob> allFilesStream)
@@ -96,6 +93,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _logger.LogInformation("Transfer skips. {0} -> {1}.", e.Source, e.Destination);
         }
 
+        private static async Task SetAttributesCallbackAsync(object destination, DateTime releasePublished)
+        {
+            var releasePublishedString = releasePublished.ToString("o", CultureInfo.InvariantCulture);
+            (destination as CloudBlockBlob)?.Metadata.Add("releasedatetime", releasePublishedString);
+        }
+
         private static async Task<bool> ShouldTransferCallbackAsync(object source, object destination)
         {
             if (source is CloudBlockBlob blob)
@@ -113,9 +116,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return blob.Metadata.ContainsKey(DataFileKey);
         }
 
-        private static async void ZipAllFilesToBlob(IEnumerable<CloudBlockBlob> files, CloudBlobDirectory directory)
+        private static async void ZipAllFilesToBlob(IEnumerable<CloudBlockBlob> files, CloudBlobDirectory directory,
+            PublishReleaseDataMessage message)
         {
-            var cloudBlockBlob = CreateBlobForAllFilesZip(directory);
+            var cloudBlockBlob = CreateBlobForAllFilesZip(directory, message);
             var memoryStream = new MemoryStream();
 
             var zipOutputStream = new ZipOutputStream(memoryStream);
@@ -126,8 +130,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 PutNextZipEntry(zipOutputStream, file);
             }
 
+            var context = new SingleTransferContext();
+            context.SetAttributesCallbackAsync += (destination) =>
+                SetAttributesCallbackAsync(destination, message.ReleasePublished);
+
             zipOutputStream.Finish();
-            await TransferManager.UploadAsync(memoryStream, cloudBlockBlob);
+            await TransferManager.UploadAsync(memoryStream, cloudBlockBlob, new UploadOptions(), context);
 
             zipOutputStream.Close();
         }
@@ -144,10 +152,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return cloudBlob.Uri.Segments.Last();
         }
 
-        private static CloudBlockBlob CreateBlobForAllFilesZip(CloudBlobDirectory directory)
+        private static string GetZipFilename(PublishReleaseDataMessage message)
         {
-            var blob = directory.GetBlockBlobReference("all.zip");
+            return $"{message.PublicationSlug}_{message.ReleaseSlug}.zip";
+        }
+
+        private static CloudBlockBlob CreateBlobForAllFilesZip(CloudBlobDirectory directory,
+            PublishReleaseDataMessage message)
+        {
+            var blob = directory.GetBlockBlobReference(GetZipFilename(message));
             blob.Properties.ContentType = "application/zip";
+            blob.Metadata.Add("name", "All data files");
             return blob;
         }
     }
