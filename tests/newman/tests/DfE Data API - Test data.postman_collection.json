@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "bf704ef9-f2e6-4988-8476-02da0e4d66bf",
+		"_postman_id": "e68fd875-2528-4f18-8a8a-6ea85b1c6200",
 		"name": "DfE Data API - Test data",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -79,7 +79,7 @@
 							"name": "Pupil absence in schools in England",
 							"item": [
 								{
-									"name": "Subject Meta - Absence by characteristic",
+									"name": "Subject Meta - Abs by char",
 									"event": [
 										{
 											"listen": "prerequest",
@@ -274,7 +274,7 @@
 									"response": []
 								},
 								{
-									"name": "Subject Meta - Absence by term",
+									"name": "Subject Meta - Abs by term",
 									"event": [
 										{
 											"listen": "prerequest",
@@ -353,7 +353,7 @@
 									"response": []
 								},
 								{
-									"name": "Subject Meta - Absence for four year olds",
+									"name": "Subject Meta - Abs for four YO",
 									"event": [
 										{
 											"listen": "prerequest",
@@ -409,7 +409,7 @@
 									"response": []
 								},
 								{
-									"name": "Subject Meta - Absence in PRUs",
+									"name": "Subject Meta - Abs in PRUs",
 									"event": [
 										{
 											"listen": "prerequest",
@@ -466,7 +466,7 @@
 									"response": []
 								},
 								{
-									"name": "Subject Meta - Absence number missing at least one session by reason",
+									"name": "Subject Meta - Abs num miss at least one session",
 									"event": [
 										{
 											"listen": "prerequest",
@@ -525,7 +525,7 @@
 									"response": []
 								},
 								{
-									"name": "Subject Meta - Absence rate percent bands",
+									"name": "Subject Meta - Abs rate % bands",
 									"event": [
 										{
 											"listen": "prerequest",
@@ -1432,8 +1432,7 @@
 													"});",
 													"",
 													"pm.test(\"Validate footnotes\", function () {",
-													"    pm.expect(respJson.subjectMeta.footnotes.length).to.be.above(0);",
-													"    //pm.expect(respJson.subjectMeta.footnotes.length).to.equal(13); // Uncomment when id 10 appears!",
+													"    pm.expect(respJson.subjectMeta.footnotes.length).to.equal(13);",
 													"    for(var i = 0; i < respJson.subjectMeta.footnotes.length; i++) {",
 													"        switch(respJson.subjectMeta.footnotes[i].id) {",
 													"            case 1:",
@@ -1463,11 +1462,9 @@
 													"            case 9:",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"The definition of persistent absence changed from the 2015/16 academic year - The information presented for years prior to 2015/16 has been produced using the same methodology in order to allow users to make comparisons on a consistent basis over time.\");",
 													"                break;",
-													"            // 10 should appear! But won't until enrolments_pa_10_exact_percent/enrolments_pa10_exact_percent ",
-													"            // difference is changed in data and then imported",
-													"            //case 10:",
-													"                //pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"The persistent absentee rate is the number of persistent absentees expressed as a percentage of the total number of enrolments.\");",
-													"                //break;",
+													"            case 10:",
+													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"The persistent absentee rate is the number of persistent absentees expressed as a percentage of the total number of enrolments.\");",
+													"                break;",
 													"            case 11:",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Number of enrolments includes pupils on the school roll for at least one session who are aged between 5 and 15, excluding boarders. Some pupils may be counted more than once (if they moved schools during the academic year or are registered in more than one school).\");",
 													"                break;",
@@ -1705,8 +1702,7 @@
 													"});",
 													"",
 													"pm.test(\"Validate footnotes\", function () {",
-													"    pm.expect(respJson.subjectMeta.footnotes.length).to.be.above(0);",
-													"    //pm.expect(respJson.subjectMeta.footnotes.length).to.equal(12); // Uncomment when id 10 appears!",
+													"    pm.expect(respJson.subjectMeta.footnotes.length).to.equal(12);",
 													"    for(var i = 0; i < respJson.subjectMeta.footnotes.length; i++) {",
 													"        switch(respJson.subjectMeta.footnotes[i].id) {",
 													"            case 1:",
@@ -1736,11 +1732,9 @@
 													"            case 9:",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"The definition of persistent absence changed from the 2015/16 academic year - The information presented for years prior to 2015/16 has been produced using the same methodology in order to allow users to make comparisons on a consistent basis over time.\");",
 													"                break;",
-													"            // 10 should appear! But won't until enrolments_pa_10_exact_percent/enrolments_pa10_exact_percent ",
-													"            // difference is changed in data and then imported",
-													"            //case 10:",
-													"                //pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"The persistent absentee rate is the number of persistent absentees expressed as a percentage of the total number of enrolments.\");",
-													"                //break;",
+													"            case 10:",
+													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"The persistent absentee rate is the number of persistent absentees expressed as a percentage of the total number of enrolments.\");",
+													"                break;",
 													"            case 15:",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal('See \"Guide to absence statistics\" for more information on how absence and pupil characteristic data have been linked.');",
 													"                break;",
@@ -1824,8 +1818,7 @@
 													"});",
 													"",
 													"pm.test(\"Validate footnotes\", function () {",
-													"    pm.expect(respJson.subjectMeta.footnotes.length).to.be.above(0);",
-													"    //pm.expect(respJson.subjectMeta.footnotes.length).to.equal(10); // Uncomment when id 10 appears!",
+													"    pm.expect(respJson.subjectMeta.footnotes.length).to.equal(10);",
 													"    for(var i = 0; i < respJson.subjectMeta.footnotes.length; i++) {",
 													"        switch(respJson.subjectMeta.footnotes[i].id) {",
 													"            case 1:",
@@ -1849,11 +1842,9 @@
 													"            case 9:",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"The definition of persistent absence changed from the 2015/16 academic year - The information presented for years prior to 2015/16 has been produced using the same methodology in order to allow users to make comparisons on a consistent basis over time.\");",
 													"                break;",
-													"            // 10 should appear! But won't until enrolments_pa_10_exact_percent/enrolments_pa10_exact_percent ",
-													"            // difference is changed in data and then imported",
-													"            //case 10:",
-													"                //pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"The persistent absentee rate is the number of persistent absentees expressed as a percentage of the total number of enrolments.\");",
-													"                //break;",
+													"            case 10:",
+													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"The persistent absentee rate is the number of persistent absentees expressed as a percentage of the total number of enrolments.\");",
+													"                break;",
 													"            case 15:",
 													"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal('See \"Guide to absence statistics\" for more information on how absence and pupil characteristic data have been linked.');",
 													"                break;",
@@ -2289,7 +2280,7 @@
 							"name": "By geographic level",
 							"item": [
 								{
-									"name": "Tablebuilder - Absence by geographic level - Country - *",
+									"name": "Tablebuilder - Abs by geog - Country - 2006-16",
 									"event": [
 										{
 											"listen": "test",
@@ -2365,7 +2356,7 @@
 									"response": []
 								},
 								{
-									"name": "Tablebuilder - Absence by geographic level - England - 200607 - all schoolTypes",
+									"name": "Tablebuilder - Abs by geog - Eng - 2006 - All schoolTypes",
 									"event": [
 										{
 											"listen": "test",
@@ -2448,7 +2439,7 @@
 									"response": []
 								},
 								{
-									"name": "Tablebuilder - Absence by geographic level - LA - *",
+									"name": "Tablebuilder - Abs by geog - LA - *",
 									"event": [
 										{
 											"listen": "test",
@@ -2524,7 +2515,7 @@
 									"response": []
 								},
 								{
-									"name": "Tablebuilder - Absence by geographic level - Region - *",
+									"name": "Tablebuilder - Abs by geog - Region - *",
 									"event": [
 										{
 											"listen": "test",
@@ -2594,7 +2585,7 @@
 									"response": []
 								},
 								{
-									"name": "Tablebuilder - Absence by geographic level - Inner London",
+									"name": "Tablebuilder - Abs by geog - Inner London",
 									"event": [
 										{
 											"listen": "test",
@@ -2659,7 +2650,7 @@
 									"response": []
 								},
 								{
-									"name": "Tablebuilder - Absence by geographic level - School - Region Inner London",
+									"name": "Tablebuilder - Abs by geog - School - Region Inner London",
 									"event": [
 										{
 											"listen": "test",
@@ -2724,7 +2715,7 @@
 									"response": []
 								},
 								{
-									"name": "Tablebuilder - Absence by geographic level - School - LA Barking and Dagenham",
+									"name": "Tablebuilder - Abs by geog - School - LA Barking and Dagenham",
 									"event": [
 										{
 											"listen": "test",
@@ -2785,7 +2776,7 @@
 									"response": []
 								},
 								{
-									"name": "Tablebuilder - Absence by geographic level - School - Region Inner London - All Schools AND Primary",
+									"name": "Tablebuilder - Abs by geog - School - Region Inner London - All Schools AND Primary",
 									"event": [
 										{
 											"listen": "test",
@@ -2893,7 +2884,7 @@
 							"name": "By term",
 							"item": [
 								{
-									"name": "Tablebuilder - Absence by term - England - * - AY",
+									"name": "Tablebuilder - Abs by term - England - * - AY",
 									"event": [
 										{
 											"listen": "test",
@@ -2945,7 +2936,7 @@
 									"response": []
 								},
 								{
-									"name": "Tablebuilder - Absence by term - England - * - T1,T2,T3",
+									"name": "Tablebuilder - Abs by term - England - * - T1,T2,T3",
 									"event": [
 										{
 											"listen": "test",
@@ -2998,7 +2989,7 @@
 									"response": []
 								},
 								{
-									"name": "Tablebuilder - Absence by term - England - HT6",
+									"name": "Tablebuilder - Abs by term - England - HT6",
 									"event": [
 										{
 											"listen": "test",
@@ -3046,7 +3037,7 @@
 									"response": []
 								},
 								{
-									"name": "Tablebuilder - Absence by term - no geoLevel - Country England, Region Inner London + Outer London, LA City of London + Barking and Dagenham - HT6",
+									"name": "Tablebuilder - Abs by term - no geoLevel - Country England, Region Inner London + Outer London, LA City of London + Barking and Dagenham - HT6",
 									"event": [
 										{
 											"listen": "test",
@@ -3158,7 +3149,7 @@
 									"response": []
 								},
 								{
-									"name": "Tablebuilder - Absence by term - Region - *",
+									"name": "Tablebuilder - Abs by term - Region - *",
 									"event": [
 										{
 											"listen": "test",
@@ -3253,7 +3244,7 @@
 							"name": "For four year olds",
 							"item": [
 								{
-									"name": "Tablebuilder - Absence for four year olds - England - *",
+									"name": "Tablebuilder - Abs for four YO - England - *",
 									"event": [
 										{
 											"listen": "test",
@@ -3306,7 +3297,7 @@
 									"response": []
 								},
 								{
-									"name": "Tablebuilder - Absence for four year olds - School - *",
+									"name": "Tablebuilder - Abs for four YO - School - *",
 									"event": [
 										{
 											"listen": "test",
@@ -3358,7 +3349,7 @@
 									"response": []
 								},
 								{
-									"name": "Tablebuilder - Absence for four year olds England - Secondary, Special",
+									"name": "Tablebuilder - Abs for four YO England - Secondary, Special",
 									"event": [
 										{
 											"listen": "test",
@@ -3445,7 +3436,7 @@
 									"response": []
 								},
 								{
-									"name": "Tablebuilder - Absence for four year olds - Region West Midlands, South East, South West",
+									"name": "Tablebuilder - Abs for four YO - Region West Midlands, South East, South West",
 									"event": [
 										{
 											"listen": "test",
@@ -3544,7 +3535,7 @@
 							"name": "In PRUs",
 							"item": [
 								{
-									"name": "Tablebuilder - Absence in PRUs - England",
+									"name": "Tablebuilder - Abs in PRUs - England",
 									"event": [
 										{
 											"listen": "test",
@@ -3597,7 +3588,7 @@
 									"response": []
 								},
 								{
-									"name": "Tablebuilder - Absence in PRUs - LA Bexley, Buckinghamshire, Derby",
+									"name": "Tablebuilder - Abs in PRUs - LA Bexley, Buckinghamshire, Derby",
 									"event": [
 										{
 											"listen": "test",
@@ -3652,7 +3643,7 @@
 									"response": []
 								},
 								{
-									"name": "Tablebuilder - Absence in PRUs - Region - *",
+									"name": "Tablebuilder - Abs in PRUs - Region - *",
 									"event": [
 										{
 											"listen": "test",
@@ -3700,7 +3691,7 @@
 									"response": []
 								},
 								{
-									"name": "Tablebuilder - Absence in PRUs - LA Bury, Devon + Region East of England",
+									"name": "Tablebuilder - Abs in PRUs - LA Bury, Devon + Region East of England",
 									"event": [
 										{
 											"listen": "test",
@@ -3795,7 +3786,7 @@
 							"name": "Number missing at least one session by reason",
 							"item": [
 								{
-									"name": "Tablebuilder - Absence number missing at least one session by reason - LA - *",
+									"name": "Tablebuilder - Abs num miss at least one session - LA - *",
 									"event": [
 										{
 											"listen": "test",
@@ -3843,7 +3834,7 @@
 									"response": []
 								},
 								{
-									"name": "Tablebuilder - Absence number missing at least one session by reason - Region - *",
+									"name": "Tablebuilder - Abs num miss at least one session - Region - *",
 									"event": [
 										{
 											"listen": "test",
@@ -3937,7 +3928,7 @@
 							"name": "Rate percent bands",
 							"item": [
 								{
-									"name": "Tablebuilder - Absence rate percent bands - Country - *",
+									"name": "Tablebuilder - Abs rate % bands - Country - *",
 									"event": [
 										{
 											"listen": "test",
@@ -4067,7 +4058,7 @@
 							"name": "By characteristic",
 							"item": [
 								{
-									"name": "Data - Absence by characteristic - Country - *",
+									"name": "Data - Abs by char - Country - *",
 									"event": [
 										{
 											"listen": "test",
@@ -4152,7 +4143,7 @@
 									"response": []
 								},
 								{
-									"name": "Data - Absence by characteristic - Country - * - Male, Female AND Primary, Secondary",
+									"name": "Data - Abs by char - Country - * - Male, Female AND Primary, Secondary",
 									"event": [
 										{
 											"listen": "test",
@@ -4237,7 +4228,7 @@
 									"response": []
 								},
 								{
-									"name": "Data - Absence by characteristic - Derbyshire - Male AND Secondary",
+									"name": "Data - Abs by char - Derbyshire - Male AND Secondary",
 									"event": [
 										{
 											"listen": "test",
@@ -4319,7 +4310,7 @@
 									"response": []
 								},
 								{
-									"name": "Data - Absence by characteristic - Wandsworth",
+									"name": "Data - Abs by char - Wandsworth",
 									"event": [
 										{
 											"listen": "test",
@@ -4394,7 +4385,7 @@
 									"response": []
 								},
 								{
-									"name": "Data - Absence by characteristic - Hartlepool",
+									"name": "Data - Abs by char - Hartlepool",
 									"event": [
 										{
 											"listen": "test",
@@ -4487,7 +4478,7 @@
 									"response": []
 								},
 								{
-									"name": "Data - Absence by characteristic - Hartlepool - boundaryLevel 1",
+									"name": "Data - Abs by char - Hartlepool - boundaryLevel 1",
 									"event": [
 										{
 											"listen": "test",
@@ -4566,7 +4557,7 @@
 									"response": []
 								},
 								{
-									"name": "Data - Absence by characteristic - Hartlepool - boundaryLevel 3",
+									"name": "Data - Abs by char - Hartlepool - boundaryLevel 3",
 									"event": [
 										{
 											"listen": "test",
@@ -4644,7 +4635,7 @@
 									"response": []
 								},
 								{
-									"name": "Data - Absence by characteristic - Hartlepool - boundaryLevel 6",
+									"name": "Data - Abs by char - Hartlepool - boundaryLevel 6",
 									"event": [
 										{
 											"listen": "test",
@@ -4723,7 +4714,7 @@
 									"response": []
 								},
 								{
-									"name": "Data - Absence by characteristic - Adur",
+									"name": "Data - Abs by char - Adur",
 									"event": [
 										{
 											"listen": "test",
@@ -4803,7 +4794,7 @@
 									"response": []
 								},
 								{
-									"name": "Data - Absence by characteristic - Adur (LAD) + Wandsworth (LA)",
+									"name": "Data - Abs by char - Adur (LAD) + Wandsworth (LA)",
 									"event": [
 										{
 											"listen": "test",
@@ -4962,7 +4953,7 @@
 			"name": "Permalink",
 			"item": [
 				{
-					"name": "Permalink - Absence by characteristic - create permalink",
+					"name": "Permalink - Abs by char - create permalink",
 					"event": [
 						{
 							"listen": "test",
@@ -5080,7 +5071,7 @@
 					"response": []
 				},
 				{
-					"name": "Permalink - Absence by characteristic - get created permalink",
+					"name": "Permalink - Abs by char - get created permalink",
 					"event": [
 						{
 							"listen": "test",
@@ -5235,7 +5226,7 @@
 			"name": "Fasttrack",
 			"item": [
 				{
-					"name": "Fasttrack - Absence for four year olds - get fasttrack",
+					"name": "Fasttrack - Abs for four YO - get fasttrack",
 					"event": [
 						{
 							"listen": "test",
@@ -5423,19 +5414,19 @@
 			"name": "Download",
 			"item": [
 				{
-					"name": "Download - Absence by term",
+					"name": "Download - Abs by term",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"id": "a8450e2f-c9ab-49e3-ade8-a3a285209058",
 								"exec": [
-									"(pm.environment.get(\"data_api_url\") === \"http://localhost:5000/api\" ? pm.test.skip : pm.test)(\"Status code is 200\", function () { ",
+									"pm.test(\"Status code is 200\", function () { ",
 									"    pm.response.to.have.status(200); ",
 									"});",
 									"",
-									"(pm.environment.get(\"data_api_url\") === \"http://localhost:5000/api\" ? pm.test.skip : pm.test)(\"First line of CSV should be correct\", function () { ",
-									"    pm.expect(pm.response.text()).to.contain(\"time_identifier,time_period,geographic_level,country_code,country_name,region_code,region_name,old_la_code,new_la_code,la_name,school_type,sess_possible,sess_overall,sess_authorised,sess_unauthorised,sess_overall_percent,sess_authorised_percent,sess_unauthorised_percent,sess_auth_illness,sess_auth_appointments,sess_auth_religious,sess_auth_study,sess_auth_traveller,sess_auth_holiday,sess_auth_ext_holiday,sess_auth_excluded,sess_auth_other,sess_auth_totalreasons,sess_unauth_holiday,sess_unauth_late,sess_unauth_other,sess_unauth_noyet,sess_unauth_totalreasons,sess_overall_totalreasons\");",
+									"pm.test(\"First line of CSV should be correct\", function () { ",
+									"    pm.expect(pm.response.text()).to.contain(\"time_identifier,term,time_period,geographic_level,country_code,country_name,region_code,region_name,old_la_code,new_la_code,la_name,school_type,sess_possible,sess_overall,sess_authorised,sess_unauthorised,sess_overall_percent,sess_authorised_percent,sess_unauthorised_percent,sess_auth_illness,sess_auth_appointments,sess_auth_religious,sess_auth_study,sess_auth_traveller,sess_auth_holiday,sess_auth_ext_holiday,sess_auth_excluded,sess_auth_other,sess_auth_totalreasons,sess_unauth_holiday,sess_unauth_late,sess_unauth_other,sess_unauth_noyet,sess_unauth_totalreasons,sess_overall_totalreasons\");",
 									"});"
 								],
 								"type": "text/javascript"
