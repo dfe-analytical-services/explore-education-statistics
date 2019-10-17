@@ -35,7 +35,6 @@ const TableTool = ( {
   const dataTableRef = createRef<HTMLTableElement>();
 
   return (<TableToolWizard
-    {...props}
     themeMeta={themeMeta}
     publicationId={publicationId}
     releaseId={releaseId}
