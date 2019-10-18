@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         public override TableBuilderResultViewModel Query(ObservationQueryContext queryContext, ReleaseId? releaseId = null)
         {
-            var observations = GetObservations(queryContext).AsQueryable();
+            var observations = GetObservations(queryContext, releaseId).AsQueryable();
             if (!observations.Any())
             {
                 return new TableBuilderResultViewModel();
