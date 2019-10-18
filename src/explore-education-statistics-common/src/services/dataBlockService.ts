@@ -1,5 +1,5 @@
 import { dataApi } from '@common/services/api';
-import { Dictionary, PartialRecord } from '@common/types/util';
+import { Dictionary } from '@common/types/util';
 import { Feature, Geometry } from 'geojson';
 import { TableDataQuery } from '@common/modules/full-table/services/tableBuilderService';
 

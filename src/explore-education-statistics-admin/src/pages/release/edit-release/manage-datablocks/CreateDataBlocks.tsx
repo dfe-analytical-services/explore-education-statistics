@@ -1,11 +1,10 @@
 import DataBlockDetailsForm from '@admin/pages/release/edit-release/manage-datablocks/DataBlockDetailsForm';
-import {DataBlock} from '@admin/services/release/edit-release/datablocks/types';
-import TableTool from '@common/modules/table-tool/components/TableTool';
+import { DataBlock } from '@admin/services/release/edit-release/datablocks/types';
 import {
   DataBlockRequest,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
-import React, {createRef} from 'react';
+import React, { createRef } from 'react';
 import TableToolWizard, {
   FinalStepProps,
 } from '@common/modules/table-tool/components/TableToolWizard';
@@ -14,7 +13,7 @@ import TableHeadersForm, {
   TableHeadersFormValues,
 } from '@common/modules/table-tool/components/TableHeadersForm';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
-import {reverseMapTableHeadersConfig} from '@common/modules/table-tool/components/utils/tableToolHelpers';
+import { reverseMapTableHeadersConfig } from '@common/modules/table-tool/components/utils/tableToolHelpers';
 import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
 
@@ -49,14 +48,15 @@ const CreateDataBlocks = ({
     [dataBlock],
   );
 
-  const [tableHeaders, setTableHeaders] = React.useState<TableHeadersFormValues | undefined>(initialTableHeaders);
+  const [tableHeaders, setTableHeaders] = React.useState<
+    TableHeadersFormValues | undefined
+  >(initialTableHeaders);
 
   React.useEffect(() => {
     setTableHeaders(initialTableHeaders);
   }, [initialTableHeaders]);
 
   const queryCompleted = React.useMemo(() => {
-
     const tableHeadersForCB =
       (dataBlock &&
         dataBlock.tables &&
@@ -87,7 +87,7 @@ const CreateDataBlocks = ({
           tableHeadersConfig.columns.length === 0 ||
           tableHeadersConfig.rows.length === 0
         ) {
-          console.error('Invalid value return from headers');
+          // ignore this error
         } else {
           setTableHeaders(headers);
         }
@@ -106,7 +106,7 @@ const CreateDataBlocks = ({
         onTableConfigurationChange={queryCompleted}
         finalStep={finalStepProps => (
           <WizardStep>
-            {wizardStepProps =>(
+            {wizardStepProps => (
               <>
                 <WizardStepHeading {...wizardStepProps}>
                   Configure Data Block
@@ -126,7 +126,6 @@ const CreateDataBlocks = ({
                       }
                     }}
                   />
-                  {console.log(finalStepProps)}
                   {finalStepProps.createdTable && tableHeaders && (
                     <TimePeriodDataTable
                       ref={dataTableRef}
@@ -144,7 +143,6 @@ const CreateDataBlocks = ({
                     releaseId={releaseId}
                     onDataBlockSave={onDataBlockSave}
                   />
-
                 )}
               </>
             )}

@@ -7,12 +7,14 @@ import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableH
 import TableHeadersForm, {
   TableHeadersFormValues,
 } from '@common/modules/table-tool/components/TableHeadersForm';
-import TableToolWizard from '@common/modules/table-tool/components/TableToolWizard';
+import TableToolWizard, {
+  FinalStepProps,
+} from '@common/modules/table-tool/components/TableToolWizard';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
-import {reverseMapTableHeadersConfig} from '@common/modules/table-tool/components/utils/tableToolHelpers';
+import { reverseMapTableHeadersConfig } from '@common/modules/table-tool/components/utils/tableToolHelpers';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
-import React, {createRef} from 'react';
-import WizardStep from "@common/modules/table-tool/components/WizardStep";
+import React, { createRef, ReactNode } from 'react';
+import WizardStep from '@common/modules/table-tool/components/WizardStep';
 
 interface Publication {
   id: string;
@@ -27,6 +29,9 @@ interface Props {
   initialQuery?: TableDataQuery;
   initialTableHeaders?: TableHeadersFormValues;
   onInitialQueryCompleted?: () => void;
+
+  finalStepExtra?: (props: FinalStepProps) => ReactNode;
+  finalStepHeading?: string;
 }
 
 const TableTool = ({
@@ -36,10 +41,14 @@ const TableTool = ({
   initialQuery,
   initialTableHeaders,
   onInitialQueryCompleted,
+  finalStepExtra,
+  finalStepHeading,
 }: Props) => {
   const dataTableRef = createRef<HTMLTableElement>();
 
-  const [tableHeaders, setTableHeaders] = React.useState<TableHeadersFormValues | undefined>(initialTableHeaders);
+  const [tableHeaders, setTableHeaders] = React.useState<
+    TableHeadersFormValues | undefined
+  >(initialTableHeaders);
 
   React.useEffect(() => {
     setTableHeaders(initialTableHeaders);
@@ -59,7 +68,7 @@ const TableTool = ({
                 tableHeaders,
                 props.createdTable.subjectMeta,
               )) ||
-            getDefaultTableHeaderConfig(props.createdTable.subjectMeta),
+              getDefaultTableHeaderConfig(props.createdTable.subjectMeta),
           );
         }
 
@@ -69,7 +78,9 @@ const TableTool = ({
         <WizardStep>
           {wizardStepProps => (
             <>
-              <WizardStepHeading {...wizardStepProps}>Explore data</WizardStepHeading>
+              <WizardStepHeading {...wizardStepProps}>
+                {finalStepHeading || 'Explore data'}
+              </WizardStepHeading>
 
               <div className="govuk-!-margin-bottom-4">
                 <TableHeadersForm
@@ -92,6 +103,17 @@ const TableTool = ({
                     tableHeadersConfig={tableHeaders}
                   />
                 )}
+
+                {finalStepProps.createdTable &&
+                  tableHeaders &&
+                  finalStepExtra &&
+                  finalStepProps.query &&
+                  finalStepExtra({
+                    createdTable: finalStepProps.createdTable,
+                    publication: finalStepProps.publication,
+                    tableHeaders,
+                    query: finalStepProps.query,
+                  })}
               </div>
             </>
           )}
