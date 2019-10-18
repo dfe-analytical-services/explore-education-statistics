@@ -67,24 +67,13 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
   const formikRef = useRef<Formik<FormValues>>(null);
   const formId = 'locationFiltersForm';
 
-  const [formInitialValues, setFormInitialValues] = React.useState<FormValues>({locations: {}});
-  const [initialLocationLevels, setInitialLocationLevels] = React.useState<Dictionary<{ label: string; value: string }[]>>({});
+  const formOptions = React.useMemo(() => options, [options]);
 
+  const formInitialValues = React.useMemo( () => calculateInitialValues(initialValues, options), [initialValues, options]);
 
-  const [locationLevels, updateLocationLevels] = useImmer<Dictionary<{ label: string; value: string }[]>>(initialLocationLevels);
-
-  useResetFormOnPreviousStep(formikRef, currentStep, stepNumber, () => {
-    updateLocationLevels(() => {
-      return initialLocationLevels;
-    });
-  });
-
-  React.useEffect(() => {
-
-    const newFormInitialValues = calculateInitialValues(initialValues, options);
-
-    const newInitialLocationLevels = mapValuesWithKeys<Dictionary<string[]>, FilterOption[]>(
-      newFormInitialValues.locations,
+  const initialLocationLevels = React.useMemo(() => {
+    return  mapValuesWithKeys<Dictionary<string[]>, FilterOption[]>(
+      formInitialValues.locations,
       (key: string, value: string[]) => {
         const oN = (options[key] && options[key].options) || [];
 
@@ -95,11 +84,22 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
         }, []);
       },
     );
+  }, [formInitialValues.locations, options] );
 
-    setFormInitialValues(newFormInitialValues);
-    setInitialLocationLevels(newInitialLocationLevels);
-    updateLocationLevels(() => newInitialLocationLevels);
-  }, [initialValues, options, updateLocationLevels]);
+
+  const [locationLevels, updateLocationLevels] = useImmer<Dictionary<{ label: string; value: string }[]>>(initialLocationLevels);
+
+  React.useEffect(() => {
+    updateLocationLevels(() => initialLocationLevels);
+  }, [initialLocationLevels, updateLocationLevels]);
+
+
+
+  useResetFormOnPreviousStep(formikRef, currentStep, stepNumber, () => {
+    updateLocationLevels(() => {
+      return initialLocationLevels;
+    });
+  });
 
 
   const stepHeading = (
@@ -165,7 +165,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
             >
               <div className="govuk-grid-row">
                 <div className="govuk-grid-column-one-half-from-desktop">
-                  {Object.entries(options).map(([levelKey, level]) => {
+                  {Object.entries(formOptions).map(([levelKey, level]) => {
                     return (
                       <FormFieldCheckboxMenu
                         name={`locations.${levelKey}`}
@@ -223,10 +223,10 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
             {stepHeading}
             <SummaryList noBorder>
               {Object.entries(locationLevels)
-                .filter(([_, levelOptions]) => levelOptions.length > 0)
+                .filter(([levelKey, levelOptions]) => levelOptions.length > 0 && formOptions[levelKey])
                 .map(([levelKey, levelOptions]) => (
                   <SummaryListItem
-                    term={options[levelKey].legend}
+                    term={formOptions[levelKey].legend}
                     key={levelKey}
                     shouldCollapse
                   >

@@ -55,9 +55,9 @@ const TableTool = ({
       onInitialQueryCompleted={props => {
         if (props.createdTable) {
           setTableHeaders(
-            (props.tableHeaders &&
+            (tableHeaders &&
               reverseMapTableHeadersConfig(
-                props.tableHeaders,
+                tableHeaders,
                 props.createdTable.subjectMeta,
               )) ||
               getDefaultTableHeaderConfig(props.createdTable.subjectMeta),
@@ -84,11 +84,11 @@ const TableTool = ({
                 }
               }}
             />
-            {stepProps.createdTable && stepProps.tableHeaders && (
+            {stepProps.createdTable && tableHeaders && (
               <TimePeriodDataTable
                 ref={dataTableRef}
                 fullTable={stepProps.createdTable}
-                tableHeadersConfig={stepProps.tableHeaders}
+                tableHeadersConfig={tableHeaders}
               />
             )}
           </div>

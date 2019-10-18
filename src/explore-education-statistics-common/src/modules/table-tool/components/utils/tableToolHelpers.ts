@@ -123,13 +123,13 @@ export const reverseMapTableHeadersConfig = (
           locationAndFilterGroups[currentIndex].find(
             element => element.value === value,
           ) as LocationFilter | CategoryFilter,
-      );
+      ).filter(_ => _ !== undefined)
     });
 
   return {
-    columns: mappedColumns,
+    columns: mappedColumns.filter( _ => _!==undefined),
     columnGroups: mapOptionGroupsToFilterGroups(columnGroups),
-    rows: mappedRows,
+    rows: mappedRows.filter( _ => _!==undefined),
     rowGroups: mapOptionGroupsToFilterGroups(rowGroups),
   };
 };
@@ -378,12 +378,9 @@ export const getDefaultSubjectMeta = () => ({
 export const initialiseFromInitialQuery = async (
   releaseId?: string,
   initialQuery?: TableDataQuery,
-  initialTableHeaders?: TableHeadersFormValues,
 ) => {
   let query: TableDataQuery | undefined;
   let createdTable: FullTable | undefined;
-
-  let tableHeaders: TableHeadersFormValues | undefined;
 
   let subjectId = '';
   let locations: Dictionary<LocationFilter[]> = {};
@@ -415,14 +412,6 @@ export const initialiseFromInitialQuery = async (
 
     if (initialStep === 5) {
       createdTable = await queryForTable(buildNewQuery, releaseId);
-
-      tableHeaders =
-        (initialTableHeaders &&
-          reverseMapTableHeadersConfig(
-            initialTableHeaders,
-            createdTable.subjectMeta,
-          )) ||
-        getDefaultTableHeaderConfig(createdTable.subjectMeta);
     }
 
     // eslint-disable-next-line prefer-destructuring
@@ -450,7 +439,6 @@ export const initialiseFromInitialQuery = async (
     dateRange,
     subjectMeta,
     createdTable,
-    tableHeaders,
     initialStep,
   };
 };

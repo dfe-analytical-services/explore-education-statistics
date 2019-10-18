@@ -35,6 +35,8 @@ const TableHeadersForm = ({
   }
 }: Props) => {
 
+  const formInitialValues = React.useMemo(() => ({...initialValues}), [initialValues]);
+
   return (
     <Details summary="Re-order table headers">
       <p className="govuk-hint">
@@ -43,7 +45,7 @@ const TableHeadersForm = ({
 
       <Formik<TableHeadersFormValues>
         enableReinitialize
-        initialValues={initialValues}
+        initialValues={formInitialValues}
         validationSchema={Yup.object<TableHeadersFormValues>({
           rowGroups: Yup.array()
             .of(
@@ -52,8 +54,8 @@ const TableHeadersForm = ({
                 .ensure(),
             )
             .min(
-              initialValues.columnGroups.length +
-                initialValues.rowGroups.length >
+              formInitialValues.columnGroups.length +
+              formInitialValues.rowGroups.length >
                 1
                 ? 1
                 : 0,
@@ -66,8 +68,8 @@ const TableHeadersForm = ({
                 .ensure(),
             )
             .min(
-              initialValues.columnGroups.length +
-                initialValues.rowGroups.length >
+              formInitialValues.columnGroups.length +
+              formInitialValues.rowGroups.length >
                 1
                 ? 1
                 : 0,

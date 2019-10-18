@@ -51,7 +51,6 @@ interface Publication {
 interface TableToolState {
   query: TableDataQuery | undefined;
   createdTable: FullTable | undefined;
-  tableHeaders: TableHeadersFormValues | undefined;
   validInitialQuery: TableDataQuery | undefined;
   dateRange: DateRangeState;
   locations: Dictionary<LocationFilter[]>;
@@ -63,12 +62,10 @@ type PartialState = {
   [P in keyof TableToolState]?: TableToolState[P];
 };
 
-interface FinalStepProps {
+export interface FinalStepProps {
   publication?: Publication;
   createdTable?: FullTable;
   query?: TableDataQuery;
-  tableHeaders?: TableHeadersFormValues;
-  updateState: (P: PartialState) => void;
 }
 
 interface Props {
@@ -81,7 +78,6 @@ interface Props {
   finalStepHeading?: string;
 
   initialQuery?: TableDataQuery;
-  initialTableHeaders?: TableHeadersFormValues;
   onInitialQueryCompleted?: (props: FinalStepProps) => void;
 }
 
@@ -92,7 +88,6 @@ const TableToolWizard = (props: Props) => {
     releaseId,
     finalStep,
     initialQuery,
-    initialTableHeaders,
     onInitialQueryCompleted,
   } = props;
 
@@ -108,12 +103,6 @@ const TableToolWizard = (props: Props) => {
       subjectMeta: getDefaultSubjectMeta(),
       locations: {},
       dateRange: {},
-      tableHeaders: {
-        columnGroups: [],
-        columns: [],
-        rowGroups: [],
-        rows: [],
-      },
       createdTable: undefined,
       query: undefined,
       validInitialQuery: undefined,
@@ -144,7 +133,6 @@ const TableToolWizard = (props: Props) => {
     const currentlyLoadingQuery = {
       releaseId,
       initialQuery,
-      initialTableHeaders,
     };
     setInitialStep(1);
     setTableToolState({
@@ -153,7 +141,6 @@ const TableToolWizard = (props: Props) => {
       locations: {},
       subjectId: '',
       query: undefined,
-      tableHeaders: undefined,
       createdTable: undefined,
       validInitialQuery: undefined,
     });
@@ -161,13 +148,11 @@ const TableToolWizard = (props: Props) => {
     initialiseFromInitialQuery(
       releaseId,
       initialQuery,
-      initialTableHeaders,
     ).then(state => {
       // make sure nothing changed in the component while we were processing the initialisation
       if (
         currentlyLoadingQuery.releaseId === releaseId &&
-        currentlyLoadingQuery.initialQuery === initialQuery &&
-        currentlyLoadingQuery.initialTableHeaders === initialTableHeaders
+        currentlyLoadingQuery.initialQuery === initialQuery
       ) {
         const { initialStep } = state;
 
@@ -176,10 +161,10 @@ const TableToolWizard = (props: Props) => {
         setTableToolState(state);
 
         if (onInitialQueryCompleted)
-          onInitialQueryCompleted({ ...state, updateState });
+          onInitialQueryCompleted({ ...state });
       }
     });
-  }, [initialQuery, initialTableHeaders, releaseId]);
+  }, [initialQuery, releaseId]);
 
   const handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
     publicationId: selectedPublicationId,
@@ -371,8 +356,7 @@ const TableToolWizard = (props: Props) => {
                 finalStep &&
                 finalStep({
                   ...stepProps,
-                  ...tableToolState,
-                  updateState,
+                  ...tableToolState
                 })
               }
             </WizardStep>

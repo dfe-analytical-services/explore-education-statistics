@@ -1,22 +1,23 @@
 import DataBlockDetailsForm from '@admin/pages/release/edit-release/manage-datablocks/DataBlockDetailsForm';
-import { DataBlock } from '@admin/services/release/edit-release/datablocks/types';
+import {DataBlock} from '@admin/services/release/edit-release/datablocks/types';
 import TableTool from '@common/modules/table-tool/components/TableTool';
 import {
   DataBlockRequest,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
-import React, { createRef } from 'react';
-import TableToolWizard from '@common/modules/table-tool/components/TableToolWizard';
+import React, {createRef} from 'react';
+import TableToolWizard, { FinalStepProps } from '@common/modules/table-tool/components/TableToolWizard';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import TableHeadersForm, {
   TableHeadersFormValues,
 } from '@common/modules/table-tool/components/TableHeadersForm';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
-import { reverseMapTableHeadersConfig } from '@common/modules/table-tool/components/utils/tableToolHelpers';
+import {reverseMapTableHeadersConfig} from '@common/modules/table-tool/components/utils/tableToolHelpers';
 import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
 
 interface Props {
   releaseId: string;
+
   dataBlockRequest?: DataBlockRequest;
   dataBlockResponse?: DataBlockResponse;
   dataBlock?: DataBlock;
@@ -36,8 +37,7 @@ const CreateDataBlocks = ({
 
   const initialTableHeaders = React.useMemo(
     () =>
-      (dataBlock &&
-        dataBlock.tables &&
+      (dataBlock && dataBlock.tables &&
         dataBlock.tables.length > 0 && {
           ...dataBlock.tables[0].tableHeaders,
         }) ||
@@ -45,80 +45,101 @@ const CreateDataBlocks = ({
     [dataBlock],
   );
 
-  const [tableHeaders, setTableHeaders] = React.useState<
-    TableHeadersFormValues | undefined
-  >(initialTableHeaders);
+  const [tableHeaders, setTableHeaders] = React.useState<TableHeadersFormValues | undefined>(initialTableHeaders);
 
   React.useEffect(() => {
     setTableHeaders(initialTableHeaders);
   }, [initialTableHeaders]);
 
+  const queryCompleted = React.useMemo( () => {
+
+    const tableHeadersForCB = (dataBlock && dataBlock.tables &&
+      dataBlock.tables.length > 0 && {
+        ...dataBlock.tables[0].tableHeaders,
+      }) ||
+      undefined;
+
+    return (props:FinalStepProps) => {
+
+        if (props.createdTable) {
+
+
+          const headers = (tableHeadersForCB &&
+            reverseMapTableHeadersConfig(
+              tableHeadersForCB,
+              props.createdTable.subjectMeta,
+            )) ||
+            getDefaultTableHeaderConfig(props.createdTable.subjectMeta);
+
+          const tableHeadersConfig = {
+            columnGroups: headers.columnGroups,
+            columns: headers.columns.filter(_ => _ !== undefined),
+            rowGroups: headers.rowGroups,
+            rows: headers.rows.filter(_ => _ !== undefined)
+          };
+
+          if (tableHeadersConfig.columns.length === 0 || tableHeadersConfig.rows.length === 0) {
+            console.error("Invalid value return from headers");
+          } else {
+            setTableHeaders(headers);
+          }
+        }
+
+        if (onTableToolLoaded) onTableToolLoaded();
+      }
+
+  }, [dataBlock, onTableToolLoaded]);
+
+
   return (
     <div>
-      {releaseId !== undefined && (
-        <TableToolWizard
-          releaseId={releaseId}
-          themeMeta={[]}
-          initialQuery={initialQuery}
-          initialTableHeaders={tableHeaders}
-          onInitialQueryCompleted={props => {
-            if (props.createdTable) {
-              setTableHeaders(
-                (props.tableHeaders &&
-                  reverseMapTableHeadersConfig(
-                    props.tableHeaders,
-                    props.createdTable.subjectMeta,
-                  )) ||
-                  getDefaultTableHeaderConfig(props.createdTable.subjectMeta),
-              );
-            }
+      <TableToolWizard
+        releaseId={releaseId}
+        themeMeta={[]}
+        initialQuery={initialQuery}
+        onInitialQueryCompleted={queryCompleted}
+        finalStep={stepProps => (
+          <>
+            <WizardStepHeading {...stepProps}>
+              Configure Data Block
+            </WizardStepHeading>
 
-            if (onTableToolLoaded) onTableToolLoaded();
-          }}
-          finalStep={stepProps => (
-            <>
-              <WizardStepHeading {...stepProps}>
-                Configure Data Block
-              </WizardStepHeading>
+            <div className="govuk-!-margin-bottom-4">
+              <TableHeadersForm
+                initialValues={tableHeaders}
+                onSubmit={tableHeaderConfig => {
 
-              <div className="govuk-!-margin-bottom-4">
-                <TableHeadersForm
-                  initialValues={stepProps.tableHeaders}
-                  onSubmit={tableHeaderConfig => {
-                    stepProps.updateState({
-                      tableHeaders: tableHeaderConfig,
+                  setTableHeaders(tableHeaderConfig);
+
+                  if (dataTableRef.current) {
+                    dataTableRef.current.scrollIntoView({
+                      behavior: 'smooth',
+                      block: 'start',
                     });
-
-                    if (dataTableRef.current) {
-                      dataTableRef.current.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start',
-                      });
-                    }
-                  }}
-                />
-                {stepProps.createdTable && stepProps.tableHeaders && (
-                  <TimePeriodDataTable
-                    ref={dataTableRef}
-                    fullTable={stepProps.createdTable}
-                    tableHeadersConfig={stepProps.tableHeaders}
-                  />
-                )}
-              </div>
-
-              {stepProps.query && stepProps.tableHeaders && (
-                <DataBlockDetailsForm
-                  query={stepProps.query}
-                  tableHeaders={stepProps.tableHeaders}
-                  initialDataBlock={dataBlock}
-                  releaseId={releaseId}
-                  onDataBlockSave={onDataBlockSave}
+                  }
+                }}
+              />
+              {stepProps.createdTable && tableHeaders && (
+                <TimePeriodDataTable
+                  ref={dataTableRef}
+                  fullTable={stepProps.createdTable}
+                  tableHeadersConfig={tableHeaders}
                 />
               )}
-            </>
-          )}
-        />
-      )}
+            </div>
+
+            {stepProps.query && tableHeaders && (
+              <DataBlockDetailsForm
+                query={stepProps.query}
+                tableHeaders={tableHeaders}
+                initialDataBlock={dataBlock}
+                releaseId={releaseId}
+                onDataBlockSave={onDataBlockSave}
+              />
+            )}
+          </>
+        )}
+      />
     </div>
   );
 };
