@@ -21,7 +21,7 @@ type Props = {
 
 const Page = ({
   title,
-  caption,
+  caption = '',
   description,
   breadcrumbLabel = '',
   pageMeta,
