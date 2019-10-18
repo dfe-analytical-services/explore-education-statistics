@@ -1,17 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.Extensions.Configuration;
 using MimeTypes;
@@ -21,7 +20,6 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using FileInfo = GovUk.Education.ExploreEducationStatistics.Admin.Models.FileInfo;
 using ReleaseId = System.Guid;
-using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -51,43 +49,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _subjectService = subjectService;
         }
 
-        public async Task<IEnumerable<FileInfo>> ListFilesAsync(Guid releaseId, ReleaseFileTypes type)
+        public async Task<IEnumerable<FileInfo>> ListFilesAsync(ReleaseId releaseId, ReleaseFileTypes type)
         {
             return await ListFilesAsync(releaseId.ToString(), type);
         }
 
-        public async Task<Either<ValidationResult, IEnumerable<FileInfo>>> UploadDataFilesAsync(Guid releaseId,
+        public async Task<Either<ValidationResult, IEnumerable<FileInfo>>> UploadDataFilesAsync(ReleaseId releaseId,
             IFormFile dataFile, IFormFile metadataFile, string name, bool overwrite, string userName)
         {
             var blobContainer = await GetCloudBlobContainer();
-            var dataInfo = new Dictionary<string, string> {{NameKey, name}, {MetaFileKey, metadataFile.FileName}, {UserName, userName}};
+            var dataInfo = new Dictionary<string, string>
+                {{NameKey, name}, {MetaFileKey, metadataFile.FileName}, {UserName, userName}};
             var metaDataInfo = new Dictionary<string, string> {{DataFileKey, dataFile.FileName}, {UserName, userName}};
             return await ValidateDataFilesForUpload(blobContainer, releaseId, dataFile, metadataFile, name, overwrite)
-                .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, dataFile, ReleaseFileTypes.Data, dataInfo, overwrite))
-                .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, metadataFile, ReleaseFileTypes.Data, metaDataInfo, overwrite))
+                .OnSuccess(() =>
+                    UploadFileAsync(blobContainer, releaseId, dataFile, ReleaseFileTypes.Data, dataInfo, overwrite))
+                .OnSuccess(() => UploadFileAsync(blobContainer, releaseId, metadataFile, ReleaseFileTypes.Data,
+                    metaDataInfo, overwrite))
                 .OnSuccess(() => ListFilesAsync(releaseId, ReleaseFileTypes.Data));
         }
 
         // We cannot rely on the normal upload validation as we want this to be an atomic operation for both files.
-        private async Task<Either<ValidationResult,bool>> ValidateDataFilesForUpload(CloudBlobContainer blobContainer, Guid releaseId,
+        private async Task<Either<ValidationResult, bool>> ValidateDataFilesForUpload(CloudBlobContainer blobContainer,
+            ReleaseId releaseId,
             IFormFile dataFile, IFormFile metaFile, string name, bool overwrite)
         {
             if (string.Equals(dataFile.FileName, metaFile.FileName, OrdinalIgnoreCase))
             {
                 return ValidationResult(DataAndMetadataFilesCannotHaveTheSameName);
             }
+
             if (dataFile.Length == 0)
             {
                 return ValidationResult(DataFileCannotBeEmpty);
             }
+
             if (metaFile.Length == 0)
             {
                 return ValidationResult(MetadataFileCannotBeEmpty);
             }
-            
+
             var dataFilePath = AdminReleasePath(releaseId, ReleaseFileTypes.Data, dataFile.FileName);
             var metadataFilePath = AdminReleasePath(releaseId, ReleaseFileTypes.Data, metaFile.FileName);
-            
+
             if (!IsCsvFile(dataFilePath, dataFile.OpenReadStream()))
             {
                 return ValidationResult(DataFileMustBeCsvFile);
@@ -97,7 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 return ValidationResult(MetaFileMustBeCsvFile);
             }
-            
+
             if (!overwrite && blobContainer.GetBlockBlobReference(dataFilePath).Exists())
             {
                 return ValidationResult(CannotOverwriteDataFile);
@@ -110,13 +114,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             if (_subjectService.Exists(releaseId, name))
             {
-                return ValidationResult(SubjectTitleMustBeUnique); 
+                return ValidationResult(SubjectTitleMustBeUnique);
             }
-            
+
             return true;
         }
-        
-        public async Task<Either<ValidationResult, IEnumerable<FileInfo>>> DeleteDataFileAsync(Guid releaseId,
+
+        public async Task<Either<ValidationResult, IEnumerable<FileInfo>>> DeleteDataFileAsync(ReleaseId releaseId,
             string fileName)
         {
             var blobContainer = await GetCloudBlobContainer();
@@ -132,8 +136,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .OnSuccess(() => ListFilesAsync(releaseId, ReleaseFileTypes.Data));
                 });
         }
-        
-        private async static Task<Either<ValidationResult, (string dataFilePath, string metadataFilePath)>> DataPathsForDeletion(CloudBlobContainer blobContainer, Guid releaseId, string fileName)
+
+        private async static Task<Either<ValidationResult, (string dataFilePath, string metadataFilePath)>>
+            DataPathsForDeletion(CloudBlobContainer blobContainer, ReleaseId releaseId, string fileName)
         {
             var dataFilePath = AdminReleasePath(releaseId, ReleaseFileTypes.Data, fileName);
             var dataBlob = blobContainer.GetBlockBlobReference(dataFilePath);
@@ -156,23 +161,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return ValidationResult(UnableToFindMetadataFileToDelete);
             }
 
-            return (dataFilePath : dataFilePath, metadataFilePath : metadataFilePath);
+            return (dataFilePath: dataFilePath, metadataFilePath: metadataFilePath);
         }
 
-        public async Task<Either<ValidationResult, IEnumerable<FileInfo>>> UploadFilesAsync(Guid releaseId,
+        public async Task<Either<ValidationResult, IEnumerable<FileInfo>>> UploadFilesAsync(ReleaseId releaseId,
             IFormFile file, string name, ReleaseFileTypes type, bool overwrite)
         {
             if (type == ReleaseFileTypes.Data)
             {
                 return ValidationResult(CannotUseGenericFunctionToAddDataFile);
             }
+
             var blobContainer = await GetCloudBlobContainer();
             var info = new Dictionary<string, string> {{NameKey, name}};
             return await UploadFileAsync(blobContainer, releaseId, file, type, info, overwrite)
                 .OnSuccess(() => ListFilesAsync(releaseId, type));
         }
 
-        public async Task<Either<ValidationResult, IEnumerable<FileInfo>>> DeleteFileAsync(Guid releaseId,
+        public async Task<Either<ValidationResult, IEnumerable<FileInfo>>> DeleteFileAsync(ReleaseId releaseId,
             ReleaseFileTypes type, string fileName)
         {
             // TODO Are there conditions in which we would not allow deletion?
@@ -208,7 +214,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         private static async Task<Either<ValidationResult, bool>> UploadFileAsync(CloudBlobContainer blobContainer,
-            Guid releaseId, IFormFile file, ReleaseFileTypes type, IDictionary<string, string> metaValues, bool overwrite)
+            ReleaseId releaseId, IFormFile file, ReleaseFileTypes type, IDictionary<string, string> metaValues,
+            bool overwrite)
         {
             var blob = blobContainer.GetBlockBlobReference(AdminReleasePath(releaseId, type, file.FileName));
             if (!overwrite && blob.Exists())
@@ -227,7 +234,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await blob.UploadFromFileAsync(path);
 
             metaValues["NumberOfRows"] = CalculateNumberOfRows(file.OpenReadStream()).ToString();
-            
+
             await AddMetaValuesAsync(blob, metaValues);
             return true;
         }
@@ -247,11 +254,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<CloudBlobContainer> GetCloudBlobContainer()
         {
-            var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
-            var blobClient = storageAccount.CreateCloudBlobClient();
-            var blobContainer = blobClient.GetContainerReference(ContainerName);
-            await blobContainer.CreateIfNotExistsAsync();
-            return blobContainer;
+            return await FileStorageUtils.GetCloudBlobContainerAsync(_storageConnectionString, ContainerName);
         }
 
         private static async Task<string> UploadToTemporaryFile(IFormFile file)
@@ -264,6 +267,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await file.CopyToAsync(stream);
                 }
             }
+
             return path;
         }
 
@@ -284,18 +288,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private static int GetNumberOfRows(CloudBlob blob)
         {
-            return 
+            return
                 blob.Metadata.TryGetValue(NumberOfRows, out var numberOfRows) &&
-                   int.TryParse(numberOfRows, out var numberOfRowsValue)
-                ? numberOfRowsValue
-                : 0;
+                int.TryParse(numberOfRows, out var numberOfRowsValue)
+                    ? numberOfRowsValue
+                    : 0;
         }
 
         private static string GetUserName(CloudBlob blob)
         {
             return blob.Metadata.TryGetValue(UserName, out var name) ? name : "";
         }
-        
+
         private static bool IsBatchedFile(IListBlobItem blobItem, string releaseId)
         {
             return blobItem.Parent.Prefix.Equals(AdminReleaseBatchesDirectoryPath(releaseId));
@@ -329,7 +333,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await blob.SetMetadataAsync();
         }
 
-        public async Task<Either<ValidationResult, FileStreamResult>> StreamFile(Guid releaseId, ReleaseFileTypes type, string fileName)
+        public async Task<Either<ValidationResult, FileStreamResult>> StreamFile(ReleaseId releaseId,
+            ReleaseFileTypes type, string fileName)
         {
             var blobContainer = await GetCloudBlobContainer();
             var blob = blobContainer.GetBlockBlobReference(AdminReleasePath(releaseId, type, fileName));
@@ -348,12 +353,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 FileDownloadName = fileName
             };
         }
+
         private static bool IsCsvFile(string filePath, Stream fileStream)
         {
             if (!filePath.EndsWith(".csv"))
             {
                 return false;
             }
+
             using (var reader = new StreamReader(fileStream))
             {
                 return reader.BaseStream.IsTextFile();

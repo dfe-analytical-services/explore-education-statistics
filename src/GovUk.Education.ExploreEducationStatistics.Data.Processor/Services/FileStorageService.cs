@@ -1,14 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.AspNetCore.Http;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
+using Microsoft.Azure.Storage.Blob;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
@@ -38,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             return new SubjectData(dataBlob, metaBlob, BlobUtils.GetName(dataBlob));
         }
-        
+
         public async Task<Boolean> UploadDataFileAsync(Guid releaseId, IFormFile dataFile, string metaFileName,
             string name)
         {
@@ -58,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         public Task<string> GetLeaseId(CloudBlockBlob cloudBlockBlob)
         {
             return cloudBlockBlob.AcquireLeaseAsync(
-                _minimumAcquireLeaseTimeSpan, 
+                _minimumAcquireLeaseTimeSpan,
                 Guid.NewGuid().ToString());
         }
 
@@ -92,18 +92,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             await blob.SetMetadataAsync();
         }
 
-        private async Task<CloudBlobContainer> GetOrCreateBlobContainer(string storageConnectionString)
+        private static async Task<CloudBlobContainer> GetOrCreateBlobContainer(string storageConnectionString)
         {
-            var storageAccount = CloudStorageAccount.Parse(storageConnectionString);
-            var blobClient = storageAccount.CreateCloudBlobClient();
-            var blobContainer = blobClient.GetContainerReference(ContainerName);
-            await blobContainer.CreateIfNotExistsAsync();
-            var permissions = new BlobContainerPermissions
-            {
-                PublicAccess = BlobContainerPublicAccessType.Blob
-            };
-            await blobContainer.SetPermissionsAsync(permissions);
-            return blobContainer;
+            return await FileStorageUtils.GetCloudBlobContainerAsync(storageConnectionString, ContainerName,
+                new BlobContainerPermissions
+                {
+                    PublicAccess = BlobContainerPublicAccessType.Blob
+                });
         }
     }
 }
