@@ -31,11 +31,12 @@ const TableHeadersForm = ({
     columnGroups: [],
     columns: [],
     rowGroups: [],
-    rows: []
-  }
+    rows: [],
+  },
 }: Props) => {
-
-  const formInitialValues = React.useMemo(() => ({...initialValues}), [initialValues]);
+  const formInitialValues = React.useMemo(() => ({ ...initialValues }), [
+    initialValues,
+  ]);
 
   return (
     <Details summary="Re-order table headers">
@@ -55,7 +56,7 @@ const TableHeadersForm = ({
             )
             .min(
               formInitialValues.columnGroups.length +
-              formInitialValues.rowGroups.length >
+                formInitialValues.rowGroups.length >
                 1
                 ? 1
                 : 0,
@@ -69,7 +70,7 @@ const TableHeadersForm = ({
             )
             .min(
               formInitialValues.columnGroups.length +
-              formInitialValues.rowGroups.length >
+                formInitialValues.rowGroups.length >
                 1
                 ? 1
                 : 0,

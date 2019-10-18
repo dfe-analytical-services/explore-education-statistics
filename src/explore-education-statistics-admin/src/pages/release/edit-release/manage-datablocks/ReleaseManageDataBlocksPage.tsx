@@ -1,5 +1,7 @@
 /* eslint-disable no-shadow */
-import ManageReleaseContext, { ManageRelease } from '@admin/pages/release/ManageReleaseContext';
+import ManageReleaseContext, {
+  ManageRelease,
+} from '@admin/pages/release/ManageReleaseContext';
 import DataBlocksService from '@admin/services/release/edit-release/datablocks/service';
 import { DataBlock } from '@admin/services/release/edit-release/datablocks/types';
 import Button from '@common/components/Button';
@@ -8,13 +10,16 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import DataBlockService, { DataBlockRequest, DataBlockResponse } from '@common/services/dataBlockService';
+import DataBlockService, {
+  DataBlockRequest,
+  DataBlockResponse,
+} from '@common/services/dataBlockService';
 import React, { useContext } from 'react';
 import CreateDataBlocks from './CreateDataBlocks';
 import ViewDataBlocks from './ViewDataBlocks';
 
 interface DataBlockData {
-  dataBlock : DataBlock;
+  dataBlock: DataBlock;
   dataBlockRequest: DataBlockRequest;
   dataBlockResponse: DataBlockResponse;
 }
@@ -31,9 +36,6 @@ const ReleaseManageDataBlocksPage = () => {
 
   const [deleteDataBlock, setDeleteDataBlock] = React.useState<DataBlock>();
 
-
-
-
   const updateDataBlocks = (rId: string) => {
     return DataBlocksService.getDataBlocks(rId).then(blocks => {
       setDataBlocks(blocks);
@@ -41,34 +43,38 @@ const ReleaseManageDataBlocksPage = () => {
   };
 
   React.useEffect(() => {
-    updateDataBlocks(releaseId).then(() => {
-    });
+    updateDataBlocks(releaseId).then(() => {});
   }, [releaseId]);
 
-  const dataBlockOptions = React.useMemo( () => dataBlocks.map(({ heading, id }, index) => ({
-    label: `${heading || index}`,
-    value: `${id}`,
-  })), [dataBlocks]);
+  const dataBlockOptions = React.useMemo(
+    () =>
+      dataBlocks.map(({ heading, id }, index) => ({
+        label: `${heading || index}`,
+        value: `${id}`,
+      })),
+    [dataBlocks],
+  );
 
+  const onDataBlockSave = React.useMemo(
+    () => async (db: DataBlock) => {
+      let newDataBlock;
 
+      if (db.id) {
+        newDataBlock = await DataBlocksService.putDataBlock(db.id, db);
+      } else {
+        newDataBlock = await DataBlocksService.postDataBlock(releaseId, db);
+      }
 
-  const onDataBlockSave = React.useMemo(() => async (db: DataBlock) => {
-    let newDataBlock;
+      if (db.id !== selectedDataBlock) {
+        updateDataBlocks(releaseId).then(() => {
+          setSelectedDataBlock(db.id || '');
+        });
+      }
 
-    if (db.id) {
-      newDataBlock = await DataBlocksService.putDataBlock(db.id, db);
-    } else {
-      newDataBlock = await DataBlocksService.postDataBlock(releaseId, db);
-    }
-
-    if (db.id !== selectedDataBlock) {
-      updateDataBlocks(releaseId).then(() => {
-        setSelectedDataBlock(db.id || '');
-      });
-    }
-
-    return newDataBlock;
-  }, [releaseId, selectedDataBlock]);
+      return newDataBlock;
+    },
+    [releaseId, selectedDataBlock],
+  );
 
   const onDeleteDataBlock = (db: DataBlock) => {
     setDeleteDataBlock(undefined);
@@ -79,10 +85,11 @@ const ReleaseManageDataBlocksPage = () => {
     }
   };
 
-
-
-  const load = async (dataBlocks: DataBlock[], releaseId: string, selectedDataBlockId: string) => {
-
+  const load = async (
+    dataBlocks: DataBlock[],
+    releaseId: string,
+    selectedDataBlockId: string,
+  ) => {
     setIsLoading(true);
 
     if (!selectedDataBlockId) return {};
@@ -106,8 +113,6 @@ const ReleaseManageDataBlocksPage = () => {
         releaseId,
       },
     };
-
-
   };
 
   const currentlyLoadingDataBlockId = React.useRef<string>();
@@ -117,29 +122,36 @@ const ReleaseManageDataBlocksPage = () => {
     currentlyLoadingDataBlockId.current = undefined;
   }, []);
 
-  const doLoad = React.useCallback((selectedDataBlockId : string) => {
+  const doLoad = React.useCallback(
+    (selectedDataBlockId: string) => {
+      if (currentlyLoadingDataBlockId.current !== selectedDataBlockId) {
+        currentlyLoadingDataBlockId.current = selectedDataBlockId;
 
-    if (currentlyLoadingDataBlockId.current !== selectedDataBlockId) {
-
-      currentlyLoadingDataBlockId.current = selectedDataBlockId;
-
-      load(dataBlocks, releaseId, selectedDataBlockId)
-        .then(({dataBlock, request: dataBlockRequest, response: dataBlockResponse}) => {
-
-          if (currentlyLoadingDataBlockId.current === selectedDataBlockId) {
-            if (dataBlock && dataBlockRequest && dataBlockResponse) {
-              setDataBlockData({dataBlock, dataBlockRequest, dataBlockResponse});
-            } else {
-              setDataBlockData(undefined);
-              setIsLoading(false);
-              currentlyLoadingDataBlockId.current = undefined;
+        load(dataBlocks, releaseId, selectedDataBlockId).then(
+          ({
+            dataBlock,
+            request: dataBlockRequest,
+            response: dataBlockResponse,
+          }) => {
+            if (currentlyLoadingDataBlockId.current === selectedDataBlockId) {
+              if (dataBlock && dataBlockRequest && dataBlockResponse) {
+                setDataBlockData({
+                  dataBlock,
+                  dataBlockRequest,
+                  dataBlockResponse,
+                });
+              } else {
+                setDataBlockData(undefined);
+                setIsLoading(false);
+                currentlyLoadingDataBlockId.current = undefined;
+              }
             }
-          }
-        })
-      ;
-    }
-
-  },[dataBlocks, releaseId]);
+          },
+        );
+      }
+    },
+    [dataBlocks, releaseId],
+  );
 
   return (
     <>
@@ -178,7 +190,11 @@ const ReleaseManageDataBlocksPage = () => {
 
           <Tabs id="manageDataBlocks">
             <TabsSection
-              title={dataBlockData && dataBlockData.dataBlock ? 'Update Data source' : 'Create Data source'}
+              title={
+                dataBlockData && dataBlockData.dataBlock
+                  ? 'Update Data source'
+                  : 'Create Data source'
+              }
             >
               <p>Configure the data source for the data block</p>
 
@@ -187,7 +203,9 @@ const ReleaseManageDataBlocksPage = () => {
                   <div className="govuk-!-margin-top-4">
                     <Button
                       type="button"
-                      onClick={() => setDeleteDataBlock(dataBlockData.dataBlock)}
+                      onClick={() =>
+                        setDeleteDataBlock(dataBlockData.dataBlock)
+                      }
                     >
                       Delete this data block
                     </Button>
@@ -218,9 +236,7 @@ const ReleaseManageDataBlocksPage = () => {
             </TabsSection>
             {dataBlockData && (
               <TabsSection title="Configure Content">
-                <ViewDataBlocks
-                  {...dataBlockData}
-                />
+                <ViewDataBlocks {...dataBlockData} />
               </TabsSection>
             )}
           </Tabs>

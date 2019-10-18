@@ -31,7 +31,7 @@ const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
     <Page
       wide
       breadcrumbs={[
-        { name: 'Administrator\'s guide', link: '/documentation' },
+        { name: "Administrator's guide", link: '/documentation' },
         { name: 'Managing data' },
       ]}
     >

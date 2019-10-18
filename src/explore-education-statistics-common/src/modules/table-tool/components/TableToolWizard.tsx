@@ -1,39 +1,26 @@
 /* eslint-disable no-shadow */
-import { ConfirmContextProvider } from '@common/context/ConfirmContext';
+import {ConfirmContextProvider} from '@common/context/ConfirmContext';
 import tableBuilderService, {
   PublicationSubject,
   PublicationSubjectMeta,
   TableDataQuery,
   ThemeMeta,
 } from '@common/modules/full-table/services/tableBuilderService';
-import { LocationFilter } from '@common/modules/full-table/types/filters';
-import { FullTable } from '@common/modules/full-table/types/fullTable';
+import {LocationFilter} from '@common/modules/full-table/types/filters';
+import {FullTable} from '@common/modules/full-table/types/fullTable';
 import parseYearCodeTuple from '@common/modules/full-table/utils/TimePeriod';
-import FiltersForm, {
-  FilterFormSubmitHandler,
-} from '@common/modules/table-tool/components/FiltersForm';
-import LocationFiltersForm, {
-  LocationFiltersFormSubmitHandler,
-} from '@common/modules/table-tool/components/LocationFiltersForm';
+import FiltersForm, {FilterFormSubmitHandler,} from '@common/modules/table-tool/components/FiltersForm';
+import LocationFiltersForm, {LocationFiltersFormSubmitHandler,} from '@common/modules/table-tool/components/LocationFiltersForm';
 import PreviousStepModalConfirm from '@common/modules/table-tool/components/PreviousStepModalConfirm';
-import PublicationForm, {
-  PublicationFormSubmitHandler,
-} from '@common/modules/table-tool/components/PublicationForm';
-import PublicationSubjectForm, {
-  PublicationSubjectFormSubmitHandler,
-} from '@common/modules/table-tool/components/PublicationSubjectForm';
-import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
-import TimePeriodForm, {
-  TimePeriodFormSubmitHandler,
-} from '@common/modules/table-tool/components/TimePeriodForm';
-import Wizard, {
-  InjectedWizardProps,
-} from '@common/modules/table-tool/components/Wizard';
+import PublicationForm, {PublicationFormSubmitHandler,} from '@common/modules/table-tool/components/PublicationForm';
+import PublicationSubjectForm, {PublicationSubjectFormSubmitHandler,} from '@common/modules/table-tool/components/PublicationSubjectForm';
+import TimePeriodForm, {TimePeriodFormSubmitHandler,} from '@common/modules/table-tool/components/TimePeriodForm';
+import Wizard from '@common/modules/table-tool/components/Wizard';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
-import { Dictionary } from '@common/types/util';
+import {Dictionary} from '@common/types/util';
 import mapValues from 'lodash/mapValues';
-import React, { ReactNode } from 'react';
-
+import React, {ReactElement, ReactNode} from 'react';
+import {TableHeadersConfig} from "@common/modules/full-table/utils/tableHeaders";
 import {
   DateRangeState,
   getDefaultSubjectMeta,
@@ -65,6 +52,7 @@ type PartialState = {
 export interface FinalStepProps {
   publication?: Publication;
   createdTable?: FullTable;
+  tableHeadersConfig?: TableHeadersConfig;
   query?: TableDataQuery;
 }
 
@@ -73,12 +61,12 @@ interface Props {
   publicationId?: string;
   releaseId?: string;
 
-  finalStep?: (props: InjectedWizardProps & FinalStepProps) => ReactNode;
+  finalStep?: (props: FinalStepProps) => ReactElement;
   finalStepExtra?: (props: FinalStepProps) => ReactNode;
   finalStepHeading?: string;
 
   initialQuery?: TableDataQuery;
-  onInitialQueryCompleted?: (props: FinalStepProps) => void;
+  onTableConfigurationChange?: (props: FinalStepProps) => void;
 }
 
 const TableToolWizard = (props: Props) => {
@@ -88,7 +76,7 @@ const TableToolWizard = (props: Props) => {
     releaseId,
     finalStep,
     initialQuery,
-    onInitialQueryCompleted,
+    onTableConfigurationChange,
   } = props;
 
   const [publication, setPublication] = React.useState<Publication>();
@@ -145,10 +133,7 @@ const TableToolWizard = (props: Props) => {
       validInitialQuery: undefined,
     });
 
-    initialiseFromInitialQuery(
-      releaseId,
-      initialQuery,
-    ).then(state => {
+    initialiseFromInitialQuery(releaseId, initialQuery).then(state => {
       // make sure nothing changed in the component while we were processing the initialisation
       if (
         currentlyLoadingQuery.releaseId === releaseId &&
@@ -160,8 +145,7 @@ const TableToolWizard = (props: Props) => {
 
         setTableToolState(state);
 
-        if (onInitialQueryCompleted)
-          onInitialQueryCompleted({ ...state });
+        if (onTableConfigurationChange) onTableConfigurationChange({ ...state });
       }
     });
   }, [initialQuery, releaseId]);
@@ -278,6 +262,8 @@ const TableToolWizard = (props: Props) => {
         tableHeaders: generatedTableHeaders,
         query: createdQuery,
       };
+
+      if (onTableConfigurationChange) onTableConfigurationChange(newState);
       setTableToolState(newState);
     }
   };
@@ -351,15 +337,7 @@ const TableToolWizard = (props: Props) => {
                 />
               )}
             </WizardStep>
-            <WizardStep>
-              {stepProps =>
-                finalStep &&
-                finalStep({
-                  ...stepProps,
-                  ...tableToolState
-                })
-              }
-            </WizardStep>
+            { finalStep && finalStep(tableToolState)}
           </Wizard>
 
           <PreviousStepModalConfirm />

@@ -1,6 +1,4 @@
-import {
-  mapFullTable,
-  } from '@admin/pages/release/edit-release/manage-datablocks/tableUtil';
+import { mapFullTable } from '@admin/pages/release/edit-release/manage-datablocks/tableUtil';
 import { DataBlock } from '@admin/services/release/edit-release/datablocks/types';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
@@ -30,7 +28,9 @@ const ViewDataBlocks = ({
   dataBlockRequest,
 }: Props) => {
   // we want to modify this internally as our own data, copying it
-  const [chartBuilderData, setChartBuilderData] = React.useState<DataBlockResponse>(() => {
+  const [chartBuilderData, setChartBuilderData] = React.useState<
+    DataBlockResponse
+  >(() => {
     return { ...dataBlockResponse };
   });
 
@@ -40,7 +40,9 @@ const ViewDataBlocks = ({
   }, [dataBlockResponse]);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [initialConfiguration, setInitialConfiguration] = React.useState<Chart | undefined>();
+  const [initialConfiguration, setInitialConfiguration] = React.useState<
+    Chart | undefined
+  >();
 
   React.useEffect(() => {
     if (dataBlock && dataBlock.charts) {

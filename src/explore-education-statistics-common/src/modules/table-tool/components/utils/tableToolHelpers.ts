@@ -118,18 +118,20 @@ export const reverseMapTableHeadersConfig = (
         options.find(element => element.value === optionGroup[0].value),
       );
 
-      return optionGroup.map(
-        ({ value }) =>
-          locationAndFilterGroups[currentIndex].find(
-            element => element.value === value,
-          ) as LocationFilter | CategoryFilter,
-      ).filter(_ => _ !== undefined)
+      return optionGroup
+        .map(
+          ({ value }) =>
+            locationAndFilterGroups[currentIndex].find(
+              element => element.value === value,
+            ) as LocationFilter | CategoryFilter,
+        )
+        .filter(_ => _ !== undefined);
     });
 
   return {
-    columns: mappedColumns.filter( _ => _!==undefined),
+    columns: mappedColumns.filter(_ => _ !== undefined),
     columnGroups: mapOptionGroupsToFilterGroups(columnGroups),
-    rows: mappedRows.filter( _ => _!==undefined),
+    rows: mappedRows.filter(_ => _ !== undefined),
     rowGroups: mapOptionGroupsToFilterGroups(rowGroups),
   };
 };

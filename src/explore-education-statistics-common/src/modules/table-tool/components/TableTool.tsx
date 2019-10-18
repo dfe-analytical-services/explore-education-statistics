@@ -9,9 +9,10 @@ import TableHeadersForm, {
 } from '@common/modules/table-tool/components/TableHeadersForm';
 import TableToolWizard from '@common/modules/table-tool/components/TableToolWizard';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
-import { reverseMapTableHeadersConfig } from '@common/modules/table-tool/components/utils/tableToolHelpers';
+import {reverseMapTableHeadersConfig} from '@common/modules/table-tool/components/utils/tableToolHelpers';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
-import React, { createRef } from 'react';
+import React, {createRef} from 'react';
+import WizardStep from "@common/modules/table-tool/components/WizardStep";
 
 interface Publication {
   id: string;
@@ -38,9 +39,7 @@ const TableTool = ({
 }: Props) => {
   const dataTableRef = createRef<HTMLTableElement>();
 
-  const [tableHeaders, setTableHeaders] = React.useState<
-    TableHeadersFormValues | undefined
-  >(initialTableHeaders);
+  const [tableHeaders, setTableHeaders] = React.useState<TableHeadersFormValues | undefined>(initialTableHeaders);
 
   React.useEffect(() => {
     setTableHeaders(initialTableHeaders);
@@ -52,7 +51,7 @@ const TableTool = ({
       publicationId={publicationId}
       releaseId={releaseId}
       initialQuery={initialQuery}
-      onInitialQueryCompleted={props => {
+      onTableConfigurationChange={props => {
         if (props.createdTable) {
           setTableHeaders(
             (tableHeaders &&
@@ -60,39 +59,43 @@ const TableTool = ({
                 tableHeaders,
                 props.createdTable.subjectMeta,
               )) ||
-              getDefaultTableHeaderConfig(props.createdTable.subjectMeta),
+            getDefaultTableHeaderConfig(props.createdTable.subjectMeta),
           );
         }
 
         if (onInitialQueryCompleted) onInitialQueryCompleted();
       }}
-      finalStep={stepProps => (
-        <>
-          <WizardStepHeading {...stepProps}>Explore data</WizardStepHeading>
+      finalStep={finalStepProps => (
+        <WizardStep>
+          {wizardStepProps => (
+            <>
+              <WizardStepHeading {...wizardStepProps}>Explore data</WizardStepHeading>
 
-          <div className="govuk-!-margin-bottom-4">
-            <TableHeadersForm
-              initialValues={tableHeaders}
-              onSubmit={tableHeaderConfig => {
-                setTableHeaders(tableHeaderConfig);
+              <div className="govuk-!-margin-bottom-4">
+                <TableHeadersForm
+                  initialValues={tableHeaders}
+                  onSubmit={tableHeaderConfig => {
+                    setTableHeaders(tableHeaderConfig);
 
-                if (dataTableRef.current) {
-                  dataTableRef.current.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start',
-                  });
-                }
-              }}
-            />
-            {stepProps.createdTable && tableHeaders && (
-              <TimePeriodDataTable
-                ref={dataTableRef}
-                fullTable={stepProps.createdTable}
-                tableHeadersConfig={tableHeaders}
-              />
-            )}
-          </div>
-        </>
+                    if (dataTableRef.current) {
+                      dataTableRef.current.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start',
+                      });
+                    }
+                  }}
+                />
+                {finalStepProps.createdTable && tableHeaders && (
+                  <TimePeriodDataTable
+                    ref={dataTableRef}
+                    fullTable={finalStepProps.createdTable}
+                    tableHeadersConfig={tableHeaders}
+                  />
+                )}
+              </div>
+            </>
+          )}
+        </WizardStep>
       )}
     />
   );

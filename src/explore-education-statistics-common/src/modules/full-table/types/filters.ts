@@ -23,8 +23,6 @@ export class CategoryFilter extends Filter {
     super({ value, label });
     this.isTotal = isTotal;
   }
-
-
 }
 
 export class LocationFilter extends Filter {
@@ -34,8 +32,6 @@ export class LocationFilter extends Filter {
     super({ value, label });
     this.level = camelCase(level);
   }
-
-
 }
 
 export class Indicator extends Filter {
@@ -45,7 +41,6 @@ export class Indicator extends Filter {
     super({ value, label });
     this.unit = unit;
   }
-
 }
 
 export class TimePeriodFilter extends Filter {
@@ -59,6 +54,4 @@ export class TimePeriodFilter extends Filter {
     this.code = code;
     this.year = year;
   }
-
-
 }

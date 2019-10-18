@@ -19,8 +19,6 @@ import {
 import mapValuesWithKeys from '@common/lib/utils/mapValuesWithKeys';
 import { Dictionary } from '@common/types/util';
 
-
-
 export const mapFullTable = (
   unmappedFullTable: DataBlockResponse,
 ): FullTable => {

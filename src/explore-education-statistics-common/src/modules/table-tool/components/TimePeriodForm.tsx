@@ -28,7 +28,7 @@ export type TimePeriodFormSubmitHandler = (values: FormValues) => void;
 
 interface Props {
   options: PublicationSubjectMeta['timePeriod']['options'];
-  initialValues?: { timePeriod?: TimePeriodQuery }
+  initialValues?: { timePeriod?: TimePeriodQuery };
   onSubmit: TimePeriodFormSubmitHandler;
 }
 
