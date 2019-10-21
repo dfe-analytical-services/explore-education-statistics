@@ -37,16 +37,25 @@ const CreateDataBlocks = ({
 }: Props) => {
   const dataTableRef = createRef<HTMLTableElement>();
 
-  const initialTableHeaders = React.useMemo(
-    () =>
+  const initialTableHeaders = React.useMemo(() => {
+    const configuredTableHeaders =
       (dataBlock &&
         dataBlock.tables &&
         dataBlock.tables.length > 0 && {
           ...dataBlock.tables[0].tableHeaders,
         }) ||
-      undefined,
-    [dataBlock],
-  );
+      undefined;
+
+    return (
+      (configuredTableHeaders &&
+        configuredTableHeaders.rowGroups !== undefined &&
+        configuredTableHeaders.columnGroups !== undefined &&
+        configuredTableHeaders.columns !== undefined &&
+        configuredTableHeaders.rows !== undefined &&
+        configuredTableHeaders) ||
+      undefined
+    );
+  }, [dataBlock]);
 
   const [tableHeaders, setTableHeaders] = React.useState<
     TableHeadersFormValues | undefined
