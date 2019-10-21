@@ -118,27 +118,6 @@ const ChartBuilder = ({
     [data.metaData],
   );
 
-  /*
-  const [metaData, setMetaData] = React.useState<ChartMetaData>(() => {
-    if (data && data.metaData) {
-      return parseMetaData(data.metaData);
-    }
-    return emptyMetadata;
-  });
-
-  React.useEffect(() => {
-    if (data && data.metaData) {
-      setMetaData(parseMetaData(data.metaData));
-    }
-  }, [data]);
-   */
-
-  /*
-  const [indicatorIds] = React.useState<string[]>(
-    Object.keys(metaData.indicators),
-  );
-   */
-
   const filterIdCombinations = React.useMemo<string[][]>(
     () =>
       Object.values(
@@ -164,6 +143,26 @@ const ChartBuilder = ({
 
   const previousAxesConfiguration = React.useRef<Dictionary<AxisConfiguration>>(
     {},
+  );
+
+  const [chartSaveState, setChartSaveState] = React.useReducer(
+    (
+      state:
+        | {
+            saved?: boolean;
+            error?: boolean;
+          }
+        | undefined,
+    ) => {
+      if (!state) return undefined;
+
+      const { saved, error } = state;
+      return {
+        saved: saved && !error,
+        error,
+      };
+    },
+    undefined,
   );
 
   const [axesConfiguration, realSetAxesConfiguration] = React.useState<
@@ -532,6 +531,16 @@ const ChartBuilder = ({
             }}
           >
             Save chart options
+            {chartSaveState && (
+              <div>
+                {chartSaveState.saved && <span>Chart has been saved</span>}
+                {chartSaveState.error && (
+                  <span>
+                    An error occurred saving the chart, please try again later
+                  </span>
+                )}
+              </div>
+            )}
           </button>
         </>
       )}

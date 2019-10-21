@@ -31,6 +31,7 @@ const ReleaseManageDataBlocksPage = () => {
   const [dataBlocks, setDataBlocks] = React.useState<DataBlock[]>([]);
 
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [isSaving, setIsSaving] = React.useState<boolean>(false);
 
   const [dataBlockData, setDataBlockData] = React.useState<DataBlockData>();
 
@@ -57,6 +58,8 @@ const ReleaseManageDataBlocksPage = () => {
 
   const onDataBlockSave = React.useMemo(
     () => async (db: DataBlock) => {
+      setIsSaving(true);
+
       let newDataBlock;
 
       if (db.id) {
@@ -70,6 +73,8 @@ const ReleaseManageDataBlocksPage = () => {
           setSelectedDataBlock(db.id || '');
         });
       }
+
+      setIsSaving(false);
 
       return newDataBlock;
     },
@@ -179,7 +184,12 @@ const ReleaseManageDataBlocksPage = () => {
       <hr />
 
       <div style={{ position: 'relative' }}>
-        {isLoading && <LoadingSpinner text="Loading Data block" overlay />}
+        {(isLoading || isSaving) && (
+          <LoadingSpinner
+            text={`${isSaving ? 'Saving Data block' : 'Loading Data block'}`}
+            overlay
+          />
+        )}
 
         <div>
           <h2>
@@ -234,9 +244,12 @@ const ReleaseManageDataBlocksPage = () => {
                 />
               </div>
             </TabsSection>
-            {dataBlockData && (
+            {!isLoading && dataBlockData && (
               <TabsSection title="Configure Content">
-                <ViewDataBlocks {...dataBlockData} />
+                <ViewDataBlocks
+                  {...dataBlockData}
+                  onDataBlockSave={onDataBlockSave}
+                />
               </TabsSection>
             )}
           </Tabs>

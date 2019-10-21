@@ -12,7 +12,7 @@ import DataBlockService, {
   DataBlockRerequest,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
-import { Chart } from '@common/services/publicationService';
+import { Chart, ChartType } from '@common/services/publicationService';
 import React from 'react';
 import { reverseMapTableHeadersConfig } from '@common/modules/table-tool/components/utils/tableToolHelpers';
 import ChartBuilder from '@admin/modules/chart-builder/ChartBuilder';
@@ -22,12 +22,14 @@ interface Props {
   dataBlock: DataBlock;
   dataBlockRequest: DataBlockRequest;
   dataBlockResponse: DataBlockResponse;
+  onDataBlockSave: (db: DataBlock) => Promise<DataBlock>;
 }
 
 const ViewDataBlocks = ({
   dataBlock,
   dataBlockResponse,
   dataBlockRequest,
+  onDataBlockSave,
 }: Props) => {
   // we want to modify this internally as our own data, copying it
   const [chartBuilderData, setChartBuilderData] = React.useState<
@@ -77,7 +79,19 @@ const ViewDataBlocks = ({
 
   // eslint-disable-next-line
   const onChartSave = (props: ChartRendererProps) => {
-    // console.log('Saved ', props);
+    const newDataBlock: DataBlock = {
+      ...dataBlock,
+      charts: [
+        {
+          ...props,
+          type: props.type as ChartType,
+        },
+      ],
+    };
+
+    onDataBlockSave(newDataBlock).then(db => {
+      console.log('saved');
+    });
   };
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -102,12 +116,14 @@ const ViewDataBlocks = ({
         </TabsSection>
         <TabsSection title="Create Chart">
           {chartBuilderData ? (
-            <ChartBuilder
-              data={chartBuilderData}
-              onChartSave={onChartSave}
-              initialConfiguration={initialConfiguration}
-              onRequiresDataUpdate={reRequestdata}
-            />
+            <div style={{ position: 'relative' }}>
+              <ChartBuilder
+                data={chartBuilderData}
+                onChartSave={onChartSave}
+                initialConfiguration={initialConfiguration}
+                onRequiresDataUpdate={reRequestdata}
+              />
+            </div>
           ) : (
             <LoadingSpinner />
           )}
