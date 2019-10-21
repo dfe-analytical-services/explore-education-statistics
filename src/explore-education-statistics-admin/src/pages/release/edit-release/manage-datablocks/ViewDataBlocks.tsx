@@ -15,6 +15,8 @@ import DataBlockService, {
 import { Chart } from '@common/services/publicationService';
 import React from 'react';
 import { reverseMapTableHeadersConfig } from '@common/modules/table-tool/components/utils/tableToolHelpers';
+import ChartBuilder from '@admin/modules/chart-builder/ChartBuilder';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 
 interface Props {
   dataBlock: DataBlock;
@@ -98,8 +100,7 @@ const ViewDataBlocks = ({
         <TabsSection title="table">
           {tableData && <TimePeriodDataTable {...tableData} />}
         </TabsSection>
-        {/*
-          <TabsSection title="Create Chart">
+        <TabsSection title="Create Chart">
           {chartBuilderData ? (
             <ChartBuilder
               data={chartBuilderData}
@@ -110,8 +111,7 @@ const ViewDataBlocks = ({
           ) : (
             <LoadingSpinner />
           )}
-          </TabsSection>
-        */}
+        </TabsSection>
       </Tabs>
     </>
   );

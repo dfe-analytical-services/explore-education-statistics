@@ -112,6 +112,13 @@ const ChartBuilder = ({
     ChartDefinition | undefined
   >();
 
+  const indicatorIds = Object.keys(data.metaData.indicators);
+  const metaData = React.useMemo(
+    () => (data.metaData && parseMetaData(data.metaData)) || emptyMetadata,
+    [data.metaData],
+  );
+
+  /*
   const [metaData, setMetaData] = React.useState<ChartMetaData>(() => {
     if (data && data.metaData) {
       return parseMetaData(data.metaData);
@@ -124,22 +131,27 @@ const ChartBuilder = ({
       setMetaData(parseMetaData(data.metaData));
     }
   }, [data]);
+   */
 
+  /*
   const [indicatorIds] = React.useState<string[]>(
     Object.keys(metaData.indicators),
   );
+   */
 
-  const [filterIdCombinations] = React.useState<string[][]>(
-    Object.values(
-      data.result.reduce((filterSet, result) => {
-        const filterIds = Array.from(result.filters);
+  const filterIdCombinations = React.useMemo<string[][]>(
+    () =>
+      Object.values(
+        data.result.reduce((filterSet, result) => {
+          const filterIds = Array.from(result.filters);
 
-        return {
-          ...filterSet,
-          [filterIds.join('_')]: filterIds,
-        };
-      }, {}),
-    ),
+          return {
+            ...filterSet,
+            [filterIds.join('_')]: filterIds,
+          };
+        }, {}),
+      ),
+    [data.result],
   );
 
   const [chartOptions, setChartOptions] = React.useState<ChartOptions>({
