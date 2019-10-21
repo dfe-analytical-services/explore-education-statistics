@@ -14,7 +14,7 @@ import { SortableOption } from './FormSortableList';
 import styles from './TableHeadersForm.module.scss';
 
 interface Props {
-  initialValues: TableHeadersFormValues;
+  initialValues?: TableHeadersFormValues;
   onSubmit: (values: TableHeadersFormValues) => void;
 }
 
@@ -25,8 +25,18 @@ export interface TableHeadersFormValues {
   rows: SortableOption[];
 }
 
-const TableHeadersForm = (props: Props) => {
-  const { onSubmit, initialValues } = props;
+const TableHeadersForm = ({
+  onSubmit,
+  initialValues = {
+    columnGroups: [],
+    columns: [],
+    rowGroups: [],
+    rows: [],
+  },
+}: Props) => {
+  const formInitialValues = React.useMemo(() => ({ ...initialValues }), [
+    initialValues,
+  ]);
 
   return (
     <Details summary="Re-order table headers">
@@ -36,7 +46,7 @@ const TableHeadersForm = (props: Props) => {
 
       <Formik<TableHeadersFormValues>
         enableReinitialize
-        initialValues={initialValues}
+        initialValues={formInitialValues}
         validationSchema={Yup.object<TableHeadersFormValues>({
           rowGroups: Yup.array()
             .of(
@@ -45,8 +55,8 @@ const TableHeadersForm = (props: Props) => {
                 .ensure(),
             )
             .min(
-              initialValues.columnGroups.length +
-                initialValues.rowGroups.length >
+              formInitialValues.columnGroups.length +
+                formInitialValues.rowGroups.length >
                 1
                 ? 1
                 : 0,
@@ -59,8 +69,8 @@ const TableHeadersForm = (props: Props) => {
                 .ensure(),
             )
             .min(
-              initialValues.columnGroups.length +
-                initialValues.rowGroups.length >
+              formInitialValues.columnGroups.length +
+                formInitialValues.rowGroups.length >
                 1
                 ? 1
                 : 0,

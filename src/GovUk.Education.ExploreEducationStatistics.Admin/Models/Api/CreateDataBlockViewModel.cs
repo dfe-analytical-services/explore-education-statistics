@@ -6,6 +6,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
     public class CreateDataBlockViewModel
     {
         public string Heading { get; set; }
+        
+        public string CustomFootnotes { get; set; }
+        
+        public string Name { get; set; }
+        
+        public string Source { get; set; }
 
         public DataBlockRequest DataBlockRequest { get; set; }
 
