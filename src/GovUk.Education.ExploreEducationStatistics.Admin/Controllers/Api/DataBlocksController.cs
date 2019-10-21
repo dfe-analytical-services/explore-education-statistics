@@ -79,12 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         private async Task<ActionResult> CheckReleaseExistsAsync(ReleaseId releaseId, Func<Task<ActionResult>> andThen)
         {
             var release = await _releaseService.GetAsync(releaseId);
-            if (release == null)
-            {
-                return NotFound();
-            }
-
-            return await andThen.Invoke();
+            return release == null ? NotFound() : await andThen.Invoke();
         }
     }
 }
