@@ -18,7 +18,9 @@ const PageMeta = ({
     <Head>
       {/* <!-- Primary Meta Tags --> */}
       <title>
-        {title !== defaultPageTitle ? `${title} – ${defaultPageTitle}` : title}
+        {title && title !== defaultPageTitle
+          ? `${title} – ${defaultPageTitle}`
+          : title}
       </title>
       <meta name="title" content={title} />
       <meta name="description" content={description} />

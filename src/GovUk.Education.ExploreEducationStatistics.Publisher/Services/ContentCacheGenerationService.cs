@@ -1,9 +1,9 @@
 using System;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
-using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -33,7 +33,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _downloadService = downloadService;
             _methodologyService = methodologyService;
 
-            _cloudBlobContainer = GetCloudBlobContainer(config.GetConnectionString("PublicStorage"));
+            _cloudBlobContainer = FileStorageUtils.GetCloudBlobContainer(
+                config.GetConnectionString("PublicStorage"), ContainerName);
         }
 
         public async Task<bool> CleanAndRebuildFullCache()
@@ -178,16 +179,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
 
             return true;
-        }
-
-        private static CloudBlobContainer GetCloudBlobContainer(string connectionString)
-        {
-            var cloudStorageAccount = CloudStorageAccount.Parse(connectionString);
-            var cloudBlobClient = cloudStorageAccount.CreateCloudBlobClient();
-
-            var blobContainer = cloudBlobClient.GetContainerReference(ContainerName);
-            blobContainer.CreateIfNotExists();
-            return blobContainer;
         }
 
         private static JsonSerializerSettings GetJsonSerializerSettings()

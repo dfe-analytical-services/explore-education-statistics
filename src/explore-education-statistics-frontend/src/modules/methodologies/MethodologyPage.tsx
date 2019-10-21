@@ -46,7 +46,7 @@ class MethodologyPage extends Component<Props> {
     return (
       <Page
         title={data.title}
-        seoDescription={data.summary}
+        description={data.summary}
         breadcrumbs={[{ name: 'Methodologies', link: '/methodology' }]}
       >
         <div className="govuk-grid-row">

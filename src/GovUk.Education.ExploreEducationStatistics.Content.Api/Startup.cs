@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Converters;
@@ -70,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddCors();
             
             var cloudStorageAccount = CloudStorageAccount.Parse(Configuration.GetConnectionString("PublicStorage"));
-            services.AddSingleton<CloudBlobClient>(a => cloudStorageAccount.CreateCloudBlobClient());
+            services.AddSingleton(a => cloudStorageAccount.CreateCloudBlobClient());
             
             services.AddTransient<IContentCacheService, ContentCacheService>();
         }
