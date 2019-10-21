@@ -77,20 +77,29 @@ const ViewDataBlocks = ({
     });
   }, [dataBlock.tables, chartBuilderData]);
 
-  // eslint-disable-next-line
   const onChartSave = (props: ChartRendererProps) => {
-    const newDataBlock: DataBlock = {
-      ...dataBlock,
-      charts: [
-        {
-          ...props,
-          type: props.type as ChartType,
-        },
-      ],
+    // copy and strip out redundant data from the properties
+    const chart: Chart = {
+      type: props.type as ChartType,
+      axes: props.axes,
+      fileId: props.fileId,
+      geographicId: props.geographicId,
+      height: props.height,
+      labels: props.labels,
+      legend: props.legend,
+      legendHeight: props.legendHeight,
+      stacked: props.stacked,
+      title: props.title,
+      width: props.width,
     };
 
-    onDataBlockSave(newDataBlock).then(db => {
-      console.log('saved');
+    const newDataBlock: DataBlock = {
+      ...dataBlock,
+      charts: [chart],
+    };
+
+    return onDataBlockSave(newDataBlock).then(() => {
+      return { ...props };
     });
   };
 

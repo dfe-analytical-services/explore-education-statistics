@@ -44,7 +44,9 @@ import styles from './graph-builder.module.scss';
 interface Props {
   data: DataBlockResponse;
   initialConfiguration?: Chart;
-  onChartSave?: (props: ChartRendererProps) => void;
+  onChartSave?: (
+    props: ChartRendererProps,
+  ) => Promise<ChartRendererProps | undefined>;
 
   onRequiresDataUpdate?: (parameters: DataBlockRerequest) => void;
 }
@@ -146,23 +148,13 @@ const ChartBuilder = ({
   );
 
   const [chartSaveState, setChartSaveState] = React.useReducer(
-    (
-      state:
-        | {
-            saved?: boolean;
-            error?: boolean;
-          }
-        | undefined,
-    ) => {
-      if (!state) return undefined;
+    (state, action?: string) => {
+      if (!action) return { saved: false, error: false };
 
-      const { saved, error } = state;
-      return {
-        saved: saved && !error,
-        error,
-      };
+      if (action === 'saved') return { saved: true, error: false };
+      return { saved: true, error: true };
     },
-    undefined,
+    { saved: false, error: false },
   );
 
   const [axesConfiguration, realSetAxesConfiguration] = React.useState<
@@ -179,12 +171,16 @@ const ChartBuilder = ({
   };
 
   const onDataAdded = (addedData: SelectedData) => {
+    setChartSaveState(undefined);
+
     const newDataSetConfig = [...dataSetAndConfiguration, addedData];
 
     setDataSetAndConfiguration(newDataSetConfig);
   };
 
   const onDataRemoved = (removedData: SelectedData, index: number) => {
+    setChartSaveState(undefined);
+
     const newDataSets = [...dataSetAndConfiguration];
 
     newDataSets.splice(index, 1);
@@ -379,9 +375,23 @@ const ChartBuilder = ({
     };
   };
 
+  const saveChart = React.useCallback(async () => {
+    setChartSaveState(undefined);
+    if (renderedChartProps && onChartSave) {
+      try {
+        await onChartSave(renderedChartProps);
+        setChartSaveState('saved');
+      } catch (_) {
+        setChartSaveState('error');
+      }
+    }
+  }, [onChartSave, renderedChartProps]);
+
   // initial chart options set up
   React.useEffect(() => {
     const initial = extractInitialChartOptions(initialConfiguration);
+
+    setChartSaveState(undefined);
 
     setSelectedChartType(
       () => initial && chartTypes.find(({ type }) => type === initial.type),
@@ -417,7 +427,10 @@ const ChartBuilder = ({
     <div className={styles.editor}>
       <ChartTypeSelector
         chartTypes={chartTypes}
-        onSelectChart={setSelectedChartType}
+        onSelectChart={chart => {
+          setChartSaveState(undefined);
+          setSelectedChartType(chart);
+        }}
         selectedChartType={selectedChartType}
       />
       <div className="govuk-!-margin-top-6 govuk-body-s dfe-align--right">
@@ -425,6 +438,7 @@ const ChartBuilder = ({
           href="#"
           onClick={e => {
             e.preventDefault();
+            setChartSaveState(undefined);
             setSelectedChartType(Infographic.definition);
           }}
         >
@@ -465,6 +479,7 @@ const ChartBuilder = ({
                 onDataAdded={onDataAdded}
                 onDataRemoved={onDataRemoved}
                 onDataChanged={(newData: ChartDataSetAndConfiguration[]) => {
+                  setChartSaveState(undefined);
                   setDataSetAndConfiguration([...newData]);
                 }}
                 metaData={metaData}
@@ -481,15 +496,19 @@ const ChartBuilder = ({
             <ChartConfiguration
               selectedChartType={selectedChartType}
               chartOptions={chartOptions}
-              onChange={setChartOptions}
-              onBoundaryLevelChange={boundaryLevel =>
-                onRequiresDataUpdate &&
-                onRequiresDataUpdate({
-                  boundaryLevel: boundaryLevel
-                    ? Number.parseInt(boundaryLevel, 10)
-                    : undefined,
-                })
-              }
+              onChange={chartOptionsValue => {
+                setChartSaveState(undefined);
+                setChartOptions(chartOptionsValue);
+              }}
+              onBoundaryLevelChange={boundaryLevel => {
+                setChartSaveState(undefined);
+                if (onRequiresDataUpdate)
+                  onRequiresDataUpdate({
+                    boundaryLevel: boundaryLevel
+                      ? Number.parseInt(boundaryLevel, 10)
+                      : undefined,
+                  });
+              }}
               meta={metaData}
               data={data}
             />
@@ -507,6 +526,7 @@ const ChartBuilder = ({
                   labels={chartLabels}
                   dataSets={axis.type === 'major' ? majorAxisDataSets : []}
                   onConfigurationChange={updatedConfig => {
+                    setChartSaveState(undefined);
                     setAxesConfiguration({
                       ...axesConfiguration,
                       [key]: updatedConfig,
@@ -521,27 +541,20 @@ const ChartBuilder = ({
 
       {selectedChartType && renderedChartProps && (
         <>
-          <button
-            type="button"
-            className="govuk-button"
-            onClick={() => {
-              if (onChartSave) {
-                onChartSave(renderedChartProps);
-              }
-            }}
-          >
+          <button type="button" className="govuk-button" onClick={saveChart}>
             Save chart options
-            {chartSaveState && (
-              <div>
-                {chartSaveState.saved && <span>Chart has been saved</span>}
-                {chartSaveState.error && (
-                  <span>
-                    An error occurred saving the chart, please try again later
-                  </span>
-                )}
-              </div>
-            )}
           </button>
+
+          {chartSaveState && (
+            <div>
+              {chartSaveState.saved && <span>Chart has been saved</span>}
+              {chartSaveState.error && (
+                <span>
+                  An error occurred saving the chart, please try again later
+                </span>
+              )}
+            </div>
+          )}
         </>
       )}
     </div>
