@@ -63,9 +63,9 @@ const TableTool = ({
       onTableConfigurationChange={props => {
         if (props.createdTable) {
           setTableHeaders(
-            (tableHeaders &&
+            (props.tableHeaders &&
               reverseMapTableHeadersConfig(
-                tableHeaders,
+                props.tableHeaders,
                 props.createdTable.subjectMeta,
               )) ||
               getDefaultTableHeaderConfig(props.createdTable.subjectMeta),
