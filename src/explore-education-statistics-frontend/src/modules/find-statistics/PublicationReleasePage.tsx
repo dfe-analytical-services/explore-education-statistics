@@ -63,7 +63,7 @@ class PublicationReleasePage extends Component<Props> {
       <Page
         title={data.publication.title}
         caption={data.title}
-        seoDescription={data.summary}
+        description={data.summary}
         breadcrumbs={[
           { name: 'Find statistics and data', link: '/find-statistics' },
         ]}
