@@ -65,41 +65,49 @@ export const reverseMapTableHeadersConfig = (
   // rows/columns can only be TimePeriods / Indicators
   if (Number.isNaN(Number(initialValue))) {
     // if NaN then timePeriod
-    mappedColumns = columns.map(({ value }) => {
-      const tp = fullTableSubjectMeta.timePeriodRange.find(
-        timePeriod => value === `${timePeriod.year}_${timePeriod.code}`,
-      ) as TimePeriodFilter;
+    mappedColumns = columns
+      .map(({ value }) => {
+        const tp = fullTableSubjectMeta.timePeriodRange.find(
+          timePeriod => value === `${timePeriod.year}_${timePeriod.code}`,
+        ) as TimePeriodFilter;
 
-      if (tp) {
-        return new TimePeriodFilter(tp);
-      }
-      return tp;
-    });
+        if (tp) {
+          return new TimePeriodFilter(tp);
+        }
+        return tp;
+      })
+      .filter(_ => _ !== undefined);
 
-    mappedRows = rows.map(({ value }) => {
-      const i = fullTableSubjectMeta.indicators.find(
-        indicator => indicator.value === value,
-      ) as Indicator;
-      if (i) return new Indicator(i);
-      return i;
-    });
+    mappedRows = rows
+      .map(({ value }) => {
+        const i = fullTableSubjectMeta.indicators.find(
+          indicator => indicator.value === value,
+        ) as Indicator;
+        if (i) return new Indicator(i);
+        return i;
+      })
+      .filter(_ => _ !== undefined);
   } else {
-    mappedRows = rows.map(({ value }) => {
-      const tp = fullTableSubjectMeta.timePeriodRange.find(
-        timePeriod => value === `${timePeriod.year}_${timePeriod.code}`,
-      ) as TimePeriodFilter;
-      if (tp) {
-        return new TimePeriodFilter(tp);
-      }
-      return tp;
-    });
-    mappedColumns = columns.map(({ value }) => {
-      const i = fullTableSubjectMeta.indicators.find(
-        indicator => indicator.value === value,
-      ) as Indicator;
-      if (i) return new Indicator(i);
-      return i;
-    });
+    mappedRows = rows
+      .map(({ value }) => {
+        const tp = fullTableSubjectMeta.timePeriodRange.find(
+          timePeriod => value === `${timePeriod.year}_${timePeriod.code}`,
+        ) as TimePeriodFilter;
+        if (tp) {
+          return new TimePeriodFilter(tp);
+        }
+        return tp;
+      })
+      .filter(_ => _ !== undefined);
+    mappedColumns = columns
+      .map(({ value }) => {
+        const i = fullTableSubjectMeta.indicators.find(
+          indicator => indicator.value === value,
+        ) as Indicator;
+        if (i) return new Indicator(i);
+        return i;
+      })
+      .filter(_ => _ !== undefined);
   }
 
   // rowGroups/columnGroups can only be filters and locations
@@ -117,6 +125,8 @@ export const reverseMapTableHeadersConfig = (
       const currentIndex = locationAndFilterGroups.findIndex(options =>
         options.find(element => element.value === optionGroup[0].value),
       );
+
+      if (currentIndex === -1) return [];
 
       return optionGroup
         .map(
