@@ -21,8 +21,12 @@ container = client.containers.get('ees-mssql')
 backup_cmds = [
     'rm -rf /tmp/',
     'mkdir tmp',
+    '''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "ALTER DATABASE [content] SET SINGLE_USER WITH ROLLBACK IMMEDIATE"''',
     '''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "BACKUP DATABASE [content] TO DISK = N'/tmp/content.bak' WITH NOFORMAT, NOINIT, NAME = 'content-full', SKIP, NOREWIND, NOUNLOAD, COMPRESSION, STATS = 10"''',
+    '''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "ALTER DATABASE [content] SET MULTI_USER WITH ROLLBACK IMMEDIATE"''',
+    '''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "ALTER DATABASE [statistics] SET SINGLE_USER WITH ROLLBACK IMMEDIATE"''',
     '''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "BACKUP DATABASE [statistics] TO DISK = N'/tmp/statistics.bak' WITH NOFORMAT, NOINIT, NAME = 'statistics-full', SKIP, NOREWIND, NOUNLOAD, COMPRESSION, STATS = 10"''',
+    '''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "ALTER DATABASE [statistics] SET MULTI_USER WITH ROLLBACK IMMEDIATE"''',
 ]
 for cmd in backup_cmds:
     print(container.exec_run(cmd))
