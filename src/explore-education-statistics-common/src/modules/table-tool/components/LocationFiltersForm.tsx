@@ -77,11 +77,12 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
   const initialLocationLevels = React.useMemo(() => {
     return mapValuesWithKeys<Dictionary<string[]>, FilterOption[]>(
       formInitialValues.locations,
-      (key: string, value: string[]) => {
-        const oN = (options[key] && options[key].options) || [];
+      (locationKey: string, locations: string[]) => {
+        const locationOptions =
+          (options[locationKey] && options[locationKey].options) || [];
 
-        return value.reduce<FilterOption[]>((v, n) => {
-          const found = oN.find(i => i.value === n);
+        return locations.reduce<FilterOption[]>((v, n) => {
+          const found = locationOptions.find(i => i.value === n);
           if (found) return [...v, found];
           return v;
         }, []);
@@ -109,17 +110,6 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
     </WizardStepHeading>
   );
 
-  // React.useEffect(() => updateLocationLevels(() => initialLocationLevels), [formInitialValues, options]);
-
-  /*
-  React.useEffect(() => {
-
-    if (formikRef.current) {
-      formikRef.current.setValues(formInitialValues);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formInitialValues, options]);
-*/
   return (
     <Formik<FormValues>
       enableReinitialize

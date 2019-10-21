@@ -121,7 +121,6 @@ const TableToolWizard = (props: Props) => {
           setSubjects(releaseSubjects);
         });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [releaseId]);
 
   React.useEffect(() => {
@@ -156,8 +155,7 @@ const TableToolWizard = (props: Props) => {
           onTableConfigurationChange({ ...state });
       }
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialQuery, releaseId]);
+  }, [initialQuery, onTableConfigurationChange, releaseId]);
 
   const handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
     publicationId: selectedPublicationId,

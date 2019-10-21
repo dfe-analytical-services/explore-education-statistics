@@ -1,16 +1,12 @@
-/* eslint-disable */
-import axios, { AxiosTransformer } from 'axios';
-
 import client from '@admin/services/util/service';
 import { DataBlock } from '@admin/services/release/edit-release/datablocks/types';
 
 import {
   CategoryFilter,
   Indicator,
-  TimePeriodFilter,
   LocationFilter,
+  TimePeriodFilter,
 } from '@common/modules/full-table/types/filters';
-import { Dictionary } from '@common/types/util';
 
 export interface DataBlockService {
   getDataBlocks: (releaseId: string) => Promise<DataBlock[]>;
@@ -30,13 +26,6 @@ type AllowedClasses =
   | typeof Indicator
   | typeof TimePeriodFilter
   | typeof LocationFilter;
-
-const classMap: Dictionary<AllowedClasses> = {
-  CategoryFilter,
-  Indicator,
-  TimePeriodFilter,
-  LocationFilter,
-};
 
 const service: DataBlockService = {
   async getDataBlocks(releaseId: string) {

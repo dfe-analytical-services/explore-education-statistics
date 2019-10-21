@@ -9,13 +9,7 @@ type Props = {
   unvisited?: boolean;
 } & NavLinkProps;
 
-const NavLink = ({
-  children,
-  className,
-  to,
-  // unvisited = false,
-  ...props
-}: Props) => {
+const NavLink = ({ children, className, to, ...props }: Props) => {
   return (
     <RouterNavLink
       {...props}
