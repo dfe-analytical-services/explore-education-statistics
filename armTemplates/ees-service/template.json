@@ -767,6 +767,7 @@
       },
       "properties": {
         "enableNonSslPort": false,
+        "minimumTlsVersion": "1.1",
         "sku": {
           "capacity": "[parameters('redisCacheCapacity')]",
           "family": "[parameters('redisCacheFamily')]",
