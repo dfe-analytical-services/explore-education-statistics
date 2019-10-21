@@ -79,6 +79,16 @@ const BrowseReleasesPage = () => {
       </p>
 
       <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
+        <Link to="/documentation/edit-release">
+          Editing a release and updating release status
+        </Link>
+      </h4>
+      <p className="govuk-caption-m govuk-!-margin-top-1">
+        How to edit a release and update a release’s status - including
+        approving a release for sign-off.{' '}
+      </p>
+
+      <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
         <Link to="/documentation/manage-data-block">
           Managing data blocks and creating tables and charts
         </Link>
