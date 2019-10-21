@@ -625,6 +625,10 @@
             {
               "name": "WEBSITE_RUN_FROM_PACKAGE",
               "value": "1"
+            },
+            {
+              "name": "RedisCacheConnection",
+              "value": "[concat(variables('redisCacheName'),'.redis.cache.windows.net,abortConnect=false,ssl=true,password=', listKeys(resourceId('Microsoft.Cache/Redis', variables('redisCacheName')), '2015-08-01').primaryKey)]"
             }
           ],
           "connectionStrings": [
@@ -658,7 +662,8 @@
       },
       "dependsOn": [
         "[concat('Microsoft.Web/serverfarms/', variables('adminPlanName'))]",
-        "[resourceId('microsoft.insights/components/', variables('adminAppInsights'))]"
+        "[resourceId('microsoft.insights/components/', variables('adminAppInsights'))]",
+        "[concat('Microsoft.Cache/Redis/', variables('redisCacheName'))]"
       ]
     },
     {
