@@ -68,7 +68,6 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
       });
     }
     setSubjectName(initialiseSubjectName(initialSubjectId, options));
-    // eslint-disable-next-line
   }, [options, initialSubjectId]);
 
   return (

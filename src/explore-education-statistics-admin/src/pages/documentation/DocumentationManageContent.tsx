@@ -1,10 +1,9 @@
 import Page from '@admin/components/Page';
 import React from 'react';
-import { RouteChildrenProps } from 'react-router';
 import StepNav from './components/StepByStep';
 import StepNavItem from './components/StepByStepItem';
 
-const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
+const DocumentationManageContent = () => {
   const query = new URLSearchParams(window.location.search);
   const step = Number(query.get('step'));
 

@@ -69,9 +69,8 @@ const ReleaseManageDataBlocksPage = () => {
       }
 
       if (db.id !== selectedDataBlock) {
-        updateDataBlocks(releaseId).then(() => {
-          setSelectedDataBlock(db.id || '');
-        });
+        await updateDataBlocks(releaseId);
+        setSelectedDataBlock(db.id || '');
       }
 
       setIsSaving(false);

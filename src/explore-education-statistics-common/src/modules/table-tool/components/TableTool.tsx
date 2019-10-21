@@ -28,7 +28,6 @@ interface Props {
   releaseId?: string;
   initialQuery?: TableDataQuery;
   initialTableHeaders?: TableHeadersFormValues;
-  onInitialQueryCompleted?: () => void;
 
   finalStepExtra?: (props: FinalStepProps) => ReactNode;
   finalStepHeading?: string;
@@ -40,7 +39,6 @@ const TableTool = ({
   releaseId,
   initialQuery,
   initialTableHeaders,
-  onInitialQueryCompleted,
   finalStepExtra,
   finalStepHeading,
 }: Props) => {
@@ -54,26 +52,26 @@ const TableTool = ({
     setTableHeaders(initialTableHeaders);
   }, [initialTableHeaders]);
 
+  const configurationChange = React.useCallback((props: FinalStepProps) => {
+    if (props.createdTable) {
+      setTableHeaders(
+        (props.tableHeaders &&
+          reverseMapTableHeadersConfig(
+            props.tableHeaders,
+            props.createdTable.subjectMeta,
+          )) ||
+          getDefaultTableHeaderConfig(props.createdTable.subjectMeta),
+      );
+    }
+  }, []);
+
   return (
     <TableToolWizard
       themeMeta={themeMeta}
       publicationId={publicationId}
       releaseId={releaseId}
       initialQuery={initialQuery}
-      onTableConfigurationChange={props => {
-        if (props.createdTable) {
-          setTableHeaders(
-            (props.tableHeaders &&
-              reverseMapTableHeadersConfig(
-                props.tableHeaders,
-                props.createdTable.subjectMeta,
-              )) ||
-              getDefaultTableHeaderConfig(props.createdTable.subjectMeta),
-          );
-        }
-
-        if (onInitialQueryCompleted) onInitialQueryCompleted();
-      }}
+      onTableConfigurationChange={configurationChange}
       finalStep={finalStepProps => (
         <WizardStep>
           {wizardStepProps => (
