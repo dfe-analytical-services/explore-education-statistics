@@ -759,22 +759,7 @@
           "family": "[parameters('redisCacheFamily')]",
           "name": "[parameters('redisCacheSKU')]"
         }
-      },
-      "resources": [
-        {
-          "apiVersion": "2017-05-01-preview",
-          "type": "Microsoft.Cache/redis/providers/diagnosticsettings",
-          "name": "[concat(variables('redisCacheName'), '/Microsoft.Insights/service')]",
-          "location": "[resourceGroup().location]",
-          "dependsOn": [
-            "[concat('Microsoft.Cache/Redis/', variables('redisCacheName'))]"
-          ],
-          "properties": {
-            "status": "ON",
-            "storageAccountName": "[variables('coreStorageAccountName')]"
-          }
-        }
-      ]
+      }
     },
 
     {
