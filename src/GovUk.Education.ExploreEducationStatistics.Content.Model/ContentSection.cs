@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Converters;
 using Newtonsoft.Json;
@@ -73,10 +74,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public Summary Summary { get; set; }
 
         public List<Table> Tables { get; set; }
-
-        public Release Release { get; set; }
-
-        public Guid ReleaseId { get; set; }
 
         public override string Type { get; set; } = "DataBlock";
     }

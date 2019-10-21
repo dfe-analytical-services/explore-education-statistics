@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Converters;
@@ -246,17 +247,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<DataBlock>()
                 .Property(block => block.Heading)
                 .HasColumnName("DataBlock_Heading");
-            
-            modelBuilder.Entity<DataBlock>()
-                .Property(block => block.ReleaseId)
-                .HasColumnName("DataBlock_ReleaseId");
-            
-            modelBuilder.Entity<DataBlock>()
-                .HasOne(block => block.Release)
-                .WithMany()
-                .HasForeignKey(block => block.ReleaseId)
-                .OnDelete(DeleteBehavior.Restrict);
-            
+                        
             modelBuilder.Entity<DataBlock>()
                 .Property(block => block.DataBlockRequest)
                 .HasColumnName("DataBlock_Request");
@@ -1983,7 +1974,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     Id = new Guid("5d1e6b67-26d7-4440-9e77-c0de71a9fc21"),
                     ContentSectionId = null, //KeyStatistics
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = 1,
@@ -2131,7 +2121,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     Id = new Guid("5d3058f2-459e-426a-b0b3-9f60d8629fef"),
                     ContentSectionId = new Guid("8965ef44-5ad7-4ab0-a142-78453d6f40af"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = 1,
@@ -2255,7 +2244,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     Id = new Guid("4a1af98a-ed8a-438e-92d4-d21cca0429f9"),
                     ContentSectionId = new Guid("68e3028c-1291-42b3-9e7c-9be285dac9a1"),
-                    ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = 1,
@@ -2365,7 +2353,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     Id = new Guid("17a0272b-318d-41f6-bda9-3bd88f78cd3d"),
                     ContentSectionId = null, // KeyStatistics
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = 12,
@@ -2502,7 +2489,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     Id = new Guid("dd572e49-87e3-46f5-bb04-e9008573fc91"),
                     ContentSectionId = new Guid("6ed87fd1-81a5-46dc-8841-4598bdae7fee"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                     Heading = "Chart showing permanent exclusions in England",
                     DataBlockRequest = new DataBlockRequest
                     {
@@ -2587,7 +2573,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     Id = new Guid("038093a2-0be3-440b-8b22-8116e34aa616"),
                     ContentSectionId = new Guid("7981db34-afdb-4f84-99e8-bfd43e58f16d"),
-                    ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                     Heading = "Chart showing fixed-period exclusions in England",
                     DataBlockRequest = new DataBlockRequest
                     {
@@ -2676,7 +2661,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     Id = new Guid("475738b4-ba10-4c29-a50d-6ca82c10de6e"),
                     ContentSectionId = null, // KeyStatistics
-                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = 17,
@@ -2756,7 +2740,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     Id = new Guid("52916052-81e3-4b66-80b8-24f8666d9cbf"),
                     ContentSectionId = new Guid("6bfa9b19-25d6-4d45-8008-9447db541795"),
-                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
                     Heading =
                         "Table of Timeseries of key secondary preference rates, England",
                     DataBlockRequest = new DataBlockRequest
@@ -2807,7 +2790,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 {
                     Id = new Guid("a8c408ed-45d8-4690-a9f3-2fb0e86377bf"),
                     ContentSectionId = new Guid("c3eb66d0-ce13-4e68-861d-98bb914d0814"),
-                    ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
                     Heading =
                         "Table showing Timeseries of key primary preference rates, England Entry into academic year",
                     DataBlockRequest = new DataBlockRequest
