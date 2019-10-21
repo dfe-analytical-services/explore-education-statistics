@@ -68,12 +68,12 @@ const CreateDataBlocks = ({
     return (props: FinalStepProps) => {
       if (props.createdTable) {
         const headers =
+          props.tableHeaders ||
           (tableHeadersForCB &&
             reverseMapTableHeadersConfig(
               tableHeadersForCB,
               props.createdTable.subjectMeta,
             )) ||
-          props.tableHeadersConfig ||
           getDefaultTableHeaderConfig(props.createdTable.subjectMeta);
 
         const tableHeadersConfig = {
