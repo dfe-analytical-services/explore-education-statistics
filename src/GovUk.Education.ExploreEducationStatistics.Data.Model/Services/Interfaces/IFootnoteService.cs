@@ -22,6 +22,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
             IEnumerable<long> indicators
         );
 
-        Footnote UpdateFootnote(long id, string content);
+        Footnote UpdateFootnote(long id,
+            string content,
+            IEnumerable<long> filterIds,
+            IEnumerable<long> filterGroupIds,
+            IEnumerable<long> filterItemIds,
+            IEnumerable<long> indicatorIds);
     }
 }

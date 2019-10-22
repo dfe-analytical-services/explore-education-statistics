@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Linq.Expressions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -44,11 +45,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 Content = content
             }).Entity;
 
-            LinkSubject(footnote, subjectId);
-            LinkIndicators(footnote, indicatorIds);
-            LinkFilters(footnote, filterIds);
-            LinkFilterGroups(footnote, filterGroupIds);
-            LinkFilterItems(footnote, filterItemIds);
+            CreateSubjectLink(footnote, subjectId);
+            CreateFilterLinks(footnote, filterIds);
+            CreateFilterGroupLinks(footnote, filterGroupIds);
+            CreateFilterItemLinks(footnote, filterItemIds);
+            CreateIndicatorsLinks(footnote, indicatorIds);
 
             _context.SaveChanges();
             return footnote;
@@ -56,6 +57,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
         public void DeleteFootnote(long id)
         {
+            var footnote = Find(id, new List<Expression<Func<Footnote, object>>>
+            {
+                f => f.Filters, f => f.FilterGroups, f => f.FilterItems, f => f.Indicators, f => f.Subjects
+            });
+            
+            DeleteEntities(footnote.Subjects);
+            DeleteEntities(footnote.Filters);
+            DeleteEntities(footnote.FilterGroups);
+            DeleteEntities(footnote.FilterItems);
+            DeleteEntities(footnote.Indicators);
+
             Remove(id);
             _context.SaveChanges();
         }
@@ -65,11 +77,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             return Find(id);
         }
 
-        public Footnote UpdateFootnote(long id, string content)
+        public Footnote UpdateFootnote(long id,
+            string content,
+            IEnumerable<long> filterIds,
+            IEnumerable<long> filterGroupIds,
+            IEnumerable<long> filterItemIds,
+            IEnumerable<long> indicatorIds)
         {
-            var existing = Find(id);
-            DbSet().Update(existing);
-            existing.Content = content;
+            var footnote = Find(id, new List<Expression<Func<Footnote, object>>>
+            {
+                f => f.Filters, f => f.FilterGroups, f => f.FilterItems, f => f.Indicators
+            });
+
+            DbSet().Update(footnote);
+
+            footnote.Content = content;
+
+            UpdateFilterLinks(footnote, filterIds);
+            UpdateFilterGroupLinks(footnote, filterGroupIds);
+            UpdateFilterItemLinks(footnote, filterItemIds);
+            UpdateIndicatorLinks(footnote, indicatorIds);
+
             _context.SaveChanges();
             return GetFootnote(id);
         }
@@ -95,17 +123,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 filterItemListParam);
         }
 
-        private Subject LinkSubject(Footnote footnote, long subjectId)
+        private Subject CreateSubjectLink(Footnote footnote, long subjectId)
         {
-            var subject = _subjectService.Find(subjectId) ??
+            var subject = _subjectService.Find(subjectId, new List<Expression<Func<Subject, object>>>
+                          {
+                              s => s.Footnotes
+                          }) ??
                           throw new ArgumentException("Subject not found", nameof(subjectId));
 
-            if (subject.Footnotes == null)
-            {
-                subject.Footnotes = new List<SubjectFootnote>();
-            }
+            var links = subject.Footnotes;
+            EnsureInitialised(ref links);
 
-            subject.Footnotes.Add(new SubjectFootnote
+            links.Add(new SubjectFootnote
             {
                 FootnoteId = footnote.Id,
                 SubjectId = subject.Id
@@ -114,88 +143,165 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             return subject;
         }
 
-        private IEnumerable<Indicator> LinkIndicators(Footnote footnote, IEnumerable<long> indicatorIds)
+        private void CreateFilterLinks(Footnote footnote, IEnumerable<long> filterIds)
         {
-            var indicators = _indicatorService.Find(indicatorIds.ToArray());
-
-            foreach (var indicator in indicators)
-            {
-                if (indicator.Footnotes == null)
+            var filters = _filterService.FindMany(filter => filterIds.Contains(filter.Id),
+                new List<Expression<Func<Filter, object>>>
                 {
-                    indicator.Footnotes = new List<IndicatorFootnote>();
-                }
-
-                indicator.Footnotes.Add(new IndicatorFootnote
-                {
-                    FootnoteId = footnote.Id,
-                    IndicatorId = indicator.Id
+                    filter => filter.Footnotes
                 });
-            }
-
-            return indicators;
-        }
-
-        private IEnumerable<Filter> LinkFilters(Footnote footnote, IEnumerable<long> filterIds)
-        {
-            var filters = _filterService.Find(filterIds.ToArray());
 
             foreach (var filter in filters)
             {
-                if (filter.Footnotes == null)
-                {
-                    filter.Footnotes = new List<FilterFootnote>();
-                }
-
-                filter.Footnotes.Add(new FilterFootnote
-                {
-                    FootnoteId = footnote.Id,
-                    FilterId = filter.Id
-                });
+                var links = filter.Footnotes;
+                AddFilterLink(ref links, footnote.Id, filter.Id);
             }
-
-            return filters;
         }
 
-        private IEnumerable<FilterGroup> LinkFilterGroups(Footnote footnote, IEnumerable<long> filterGroupIds)
+        private void CreateFilterGroupLinks(Footnote footnote, IEnumerable<long> filterGroupIds)
         {
-            var filterGroups = _filterGroupService.Find(filterGroupIds.ToArray());
+            var filterGroups = _filterGroupService.FindMany(filter => filterGroupIds.Contains(filter.Id),
+                new List<Expression<Func<FilterGroup, object>>>
+                {
+                    filter => filter.Footnotes
+                });
 
             foreach (var filterGroup in filterGroups)
             {
-                if (filterGroup.Footnotes == null)
-                {
-                    filterGroup.Footnotes = new List<FilterGroupFootnote>();
-                }
-
-                filterGroup.Footnotes.Add(new FilterGroupFootnote
-                {
-                    FootnoteId = footnote.Id,
-                    FilterGroupId = filterGroup.Id
-                });
+                var links = filterGroup.Footnotes;
+                AddFilterGroupLink(ref links, footnote.Id, filterGroup.Id);
             }
-
-            return filterGroups;
         }
 
-        private IEnumerable<FilterItem> LinkFilterItems(Footnote footnote, IEnumerable<long> filterItemIds)
+        private void CreateFilterItemLinks(Footnote footnote, IEnumerable<long> filterItemIds)
         {
-            var filterItems = _filterItemService.Find(filterItemIds.ToArray());
+            var filterItems = _filterItemService.FindMany(filter => filterItemIds.Contains(filter.Id),
+                new List<Expression<Func<FilterItem, object>>>
+                {
+                    filter => filter.Footnotes
+                });
 
             foreach (var filterItem in filterItems)
             {
-                if (filterItem.Footnotes == null)
-                {
-                    filterItem.Footnotes = new List<FilterItemFootnote>();
-                }
-
-                filterItem.Footnotes.Add(new FilterItemFootnote
-                {
-                    FootnoteId = footnote.Id,
-                    FilterItemId = filterItem.Id
-                });
+                var links = filterItem.Footnotes;
+                AddFilterItemLink(ref links, footnote.Id, filterItem.Id);
             }
+        }
 
-            return filterItems;
+        private void CreateIndicatorsLinks(Footnote footnote, IEnumerable<long> indicatorIds)
+        {
+            var indicators = _indicatorService.FindMany(filter => indicatorIds.Contains(filter.Id),
+                new List<Expression<Func<Indicator, object>>>
+                {
+                    filter => filter.Footnotes
+                });
+
+            foreach (var indicator in indicators)
+            {
+                var links = indicator.Footnotes;
+                AddIndicatorLink(ref links, footnote.Id, indicator.Id);
+            }
+        }
+
+        private void UpdateFilterLinks(Footnote footnote, IEnumerable<long> filterIds)
+        {
+            if (!SequencesAreEqualIgnoringOrder(
+                footnote.Filters.Select(link => link.FilterId), filterIds))
+            {
+                footnote.Filters = new List<FilterFootnote>();
+                CreateFilterLinks(footnote, filterIds);
+            }
+        }
+
+        private void UpdateFilterGroupLinks(Footnote footnote, IEnumerable<long> filterGroupIds)
+        {
+            if (!SequencesAreEqualIgnoringOrder(
+                footnote.FilterGroups.Select(link => link.FilterGroupId), filterGroupIds))
+            {
+                footnote.FilterGroups = new List<FilterGroupFootnote>();
+                CreateFilterGroupLinks(footnote, filterGroupIds);
+            }
+        }
+
+        private void UpdateFilterItemLinks(Footnote footnote, IEnumerable<long> filterItemIds)
+        {
+            if (!SequencesAreEqualIgnoringOrder(
+                footnote.FilterItems.Select(link => link.FilterItemId), filterItemIds))
+            {
+                footnote.FilterItems = new List<FilterItemFootnote>();
+                CreateFilterItemLinks(footnote, filterItemIds);
+            }
+        }
+
+        private void UpdateIndicatorLinks(Footnote footnote, IEnumerable<long> indicatorIds)
+        {
+            if (!SequencesAreEqualIgnoringOrder(
+                footnote.Indicators.Select(link => link.IndicatorId), indicatorIds))
+            {
+                footnote.Indicators = new List<IndicatorFootnote>();
+                CreateIndicatorsLinks(footnote, indicatorIds);
+            }
+        }
+
+        private static void AddIndicatorLink(ref ICollection<IndicatorFootnote> links, long footnoteId, long linkId)
+        {
+            EnsureInitialised(ref links);
+            links.Add(new IndicatorFootnote
+            {
+                FootnoteId = footnoteId,
+                IndicatorId = linkId
+            });
+        }
+
+        private static void AddFilterLink(ref ICollection<FilterFootnote> links, long footnoteId, long linkId)
+        {
+            EnsureInitialised(ref links);
+            links.Add(new FilterFootnote
+            {
+                FootnoteId = footnoteId,
+                FilterId = linkId
+            });
+        }
+
+        private static void AddFilterGroupLink(ref ICollection<FilterGroupFootnote> links, long footnoteId, long linkId)
+        {
+            EnsureInitialised(ref links);
+            links.Add(new FilterGroupFootnote
+            {
+                FootnoteId = footnoteId,
+                FilterGroupId = linkId
+            });
+        }
+
+        private static void AddFilterItemLink(ref ICollection<FilterItemFootnote> links, long footnoteId, long linkId)
+        {
+            EnsureInitialised(ref links);
+            links.Add(new FilterItemFootnote
+            {
+                FootnoteId = footnoteId,
+                FilterItemId = linkId
+            });
+        }
+
+        private static void EnsureInitialised<TModel>(ref ICollection<TModel> collection)
+        {
+            if (collection == null)
+            {
+                collection = new List<TModel>();
+            }
+        }
+
+        private void DeleteEntities<T>(IEnumerable<T> entitiesToDelete)
+        {
+            foreach (var t in entitiesToDelete)
+            {
+                _context.Entry(t).State = EntityState.Deleted;
+            }
+        }
+
+        private bool SequencesAreEqualIgnoringOrder(IEnumerable<long> left, IEnumerable<long> right)
+        {
+            return left.OrderBy(id => id).SequenceEqual(right.OrderBy(id => id));
         }
     }
 }

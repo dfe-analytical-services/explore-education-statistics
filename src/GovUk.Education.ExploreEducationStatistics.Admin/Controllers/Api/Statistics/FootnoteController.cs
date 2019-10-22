@@ -46,7 +46,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         [HttpPut("{id}")]
         public ActionResult<FootnoteViewModel> UpdateDataBlockAsync(long id, UpdateFootnoteViewModel footnote)
         {
-            return _mapper.Map<FootnoteViewModel>(_footnoteService.UpdateFootnote(id, footnote.Content));
+            return _mapper.Map<FootnoteViewModel>(_footnoteService.UpdateFootnote(id,
+                footnote.Content,
+                footnote.Filters,
+                footnote.FilterGroups,
+                footnote.FilterItems,
+                footnote.Indicators));
         }
 
         private ActionResult CheckFootnoteExists(long id, Func<ActionResult> andThen)
