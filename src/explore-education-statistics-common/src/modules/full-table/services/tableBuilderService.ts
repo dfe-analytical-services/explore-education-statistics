@@ -1,4 +1,4 @@
-import { Dictionary, PartialRecord } from '@common/types';
+import { Dictionary, PartialRecord, KeysRemap } from '@common/types';
 import { FullTable } from '@common/modules/full-table/types/fullTable.ts';
 import { dataApi } from '@common/services/api';
 
@@ -93,12 +93,30 @@ export type LocationLevelKeys =
   | 'sponsor'
   | 'ward';
 
-interface TimePeriodQuery {
+export interface TimePeriodQuery {
   startYear: number;
   startCode: string;
   endYear: number;
   endCode: string;
 }
+
+export const LocationLevelKeysEnum: KeysRemap<LocationLevelKeys, boolean> = {
+  country: true,
+  institution: true,
+  localAuthority: true,
+  localAuthorityDistrict: true,
+  localEnterprisePartnership: true,
+  mayoralCombinedAuthority: true,
+  multiAcademyTrust: true,
+  opportunityArea: true,
+  parliamentaryConstituency: true,
+  region: true,
+  rscRegion: true,
+  sponsor: true,
+  ward: true,
+};
+
+export const LocationLevelKeysNames = Object.keys(LocationLevelKeysEnum);
 
 export type TableDataQuery = {
   publicationId?: string;

@@ -165,6 +165,45 @@
       "metadata": {
         "description": "Tag Value - Enter the name of the main script (not the parameters file) used to deploy the component. If the component is deployed manually, the value should be N/A"
       }
+    },
+    "redisCacheSKU": {
+      "type": "string",
+      "allowedValues": [
+        "Basic",
+        "Standard",
+        "Premium"
+      ],
+      "defaultValue": "Basic",
+      "metadata": {
+        "description": "The pricing tier of the new Azure Cache for Redis."
+      }
+    },
+    "redisCacheFamily": {
+      "type": "string",
+      "allowedValues": [
+        "C",
+        "P"
+      ],
+      "defaultValue": "C",
+      "metadata": {
+        "description": "The family for the sku."
+      }
+    },
+    "redisCacheCapacity": {
+      "type": "int",
+      "allowedValues": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "defaultValue": 0,
+      "metadata": {
+        "description": "The size of the new Azure Cache for Redis instance. "
+      }
     }
   },
   "variables": {
@@ -177,6 +216,7 @@
     "adminAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-admin')]",
     "adminPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-admin')]",
     "adminAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-admin')]",
+    "redisCacheName": "[concat(parameters('subscription'), '-red-', parameters('environment'), '-admin')]",
     "publicAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-public')]",
     "publicPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-public')]",
     "publicAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-public')]",
@@ -226,7 +266,8 @@
           "dependsOn": [
             "[resourceId('Microsoft.Web/Sites', variables('dataAppName'))]"
           ],
-          "properties": {}
+          "properties": {
+          }
         }
       ],
       "properties": {
@@ -391,7 +432,8 @@
           "dependsOn": [
             "[resourceId('Microsoft.Web/Sites', variables('contentAppName'))]"
           ],
-          "properties": {}
+          "properties": {
+          }
         }
       ],
       "properties": {
@@ -552,7 +594,8 @@
           "dependsOn": [
             "[resourceId('Microsoft.Web/Sites', variables('adminAppName'))]"
           ],
-          "properties": {}
+          "properties": {
+          }
         }
       ],
       "properties": {
@@ -582,6 +625,10 @@
             {
               "name": "WEBSITE_RUN_FROM_PACKAGE",
               "value": "1"
+            },
+            {
+              "name": "RedisCacheConnection",
+              "value": "[concat(variables('redisCacheName'),'.redis.cache.windows.net,abortConnect=false,ssl=true,password=', listKeys(resourceId('Microsoft.Cache/Redis', variables('redisCacheName')), '2015-08-01').primaryKey)]"
             }
           ],
           "connectionStrings": [
@@ -615,7 +662,8 @@
       },
       "dependsOn": [
         "[concat('Microsoft.Web/serverfarms/', variables('adminPlanName'))]",
-        "[resourceId('microsoft.insights/components/', variables('adminAppInsights'))]"
+        "[resourceId('microsoft.insights/components/', variables('adminAppInsights'))]",
+        "[concat('Microsoft.Cache/Redis/', variables('redisCacheName'))]"
       ]
     },
     {
@@ -698,6 +746,36 @@
         "Request_Source": "AzureTfsExtensionAzureProject"
       }
     },
+
+    {
+      "apiVersion": "2018-03-01",
+      "name": "[variables('redisCacheName')]",
+      "type": "Microsoft.Cache/Redis",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Azure redis cache",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "enableNonSslPort": false,
+        "minimumTlsVersion": "1.1",
+        "sku": {
+          "capacity": "[parameters('redisCacheCapacity')]",
+          "family": "[parameters('redisCacheFamily')]",
+          "name": "[parameters('redisCacheSKU')]"
+        }
+      }
+    },
+
     {
       "type": "Microsoft.Web/sites",
       "name": "[variables('publicAppName')]",
@@ -850,7 +928,8 @@
         "accessTier": "Hot",
         "supportsHttpsTrafficOnly": true
       },
-      "dependsOn": [],
+      "dependsOn": [
+      ],
       "sku": {
         "name": "Standard_RAGRS"
       },

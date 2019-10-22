@@ -1,5 +1,5 @@
 *** Settings ***
-Resource    ../libs/library.robot
+Resource    ../../test-libs/common.robot
 
 Force Tags  GeneralPublic
 
@@ -64,15 +64,15 @@ Validate "Related guidance"
     user checks page contains link with text and url  Pupil absence in schools in England: methodology   /methodology/pupil-absence-in-schools-in-england
 
 Validate subject files file type and file unit style
-    [Documentation]  DFE-958
-    [Tags]  HappyPath   NotAgainstLocal
+    [Documentation]  DFE-958   DFE-562
+    [Tags]  HappyPath   NotAgainstLocal   Failing
     user opens details dropdown     Download data files
-    user checks page contains      Absence in PRUs (csv, 141 Kb)
+    user checks page contains      Absence in PRUs (CSV, 141 Kb)
     user closes details dropdown     Download data files
 
 Validate absence_in_prus.csv file can be downloaded
-    [Documentation]  DFE-958
-    [Tags]  HappyPath    NotAgainstLocal
+    [Documentation]  DFE-958   DFE-562
+    [Tags]  HappyPath    NotAgainstLocal  Failing
     user opens details dropdown     Download data files
 
     download file  link:Absence in PRUs     absence_in_prus.csv
