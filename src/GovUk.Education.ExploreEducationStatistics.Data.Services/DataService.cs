@@ -43,7 +43,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             }
 
             var result = observations
-                .Select(observation => _resultBuilder.BuildResult(observation, queryContext.Indicators)).ToList();
+                .Select(observation => _resultBuilder.BuildResult(observation, queryContext.Indicators))
+                .ToList();
 
             _logger.LogTrace("Built Observation results in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
             stopwatch.Restart();

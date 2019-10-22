@@ -63,7 +63,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
         public IQueryable<TEntity> Find(TKey[] ids)
         {
-            return DbSet().FindAll(_context, ids.Cast<object>().ToArray());
+            var idField = typeof(TEntity).GetProperty("Id");
+            
+            var list = ids.ToList();
+            // build lambda expression
+            var parameter = Expression.Parameter(typeof(TEntity), "e");
+            var methodInfo = typeof(List<TKey>).GetMethod("Contains");
+            var body = Expression.Call(Expression.Constant(list, typeof(List<TKey>)), methodInfo, Expression.MakeMemberAccess(parameter, idField));
+            var predicateExpression = Expression.Lambda<Func<TEntity, bool>>(body, parameter);
+
+            // run query
+            return DbSet().Where(predicateExpression);
+            
+//            return DbSet().FindAll(_context, ids.Cast<object>().ToArray());
         }
 
         public IQueryable<TEntity> FindMany(Expression<Func<TEntity, bool>> expression,

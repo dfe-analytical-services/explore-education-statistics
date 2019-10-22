@@ -117,20 +117,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
             _logger.LogTrace("Fetched Observations by id from {Count} batches in {Time} ms", batches.Count(),
                 stopwatch.Elapsed.TotalMilliseconds);
-            stopwatch.Restart();
-
-            // Nullify all of the Observational Unit fields which are empty
-            // Do this here on the set of distinct Locations rather than when building each ObservationViewModel
-            // (since a Location may be referenced by more than one Observation) 
-            result.Select(observation => observation.Location)
-                .Distinct()
-                .ToList()
-                .ForEach(location => location.ReplaceEmptyOwnedTypeValuesWithNull());
-
-            _logger.LogTrace("Nullified all of the empty Observational Unit fields in {Time} ms",
-                stopwatch.Elapsed.TotalMilliseconds);
+            
             stopwatch.Stop();
-
             return result;
         }
 

@@ -23,10 +23,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
         public IEnumerable<FilterItem> GetFilterItemsIncludingFilters(IQueryable<Observation> observations)
         {
-            var filterItems = observations.SelectMany(observation => observation.FilterItems)
-                .Select(item => item.FilterItem)
+            var filterItems = observations
+                .Join(
+                    _context.ObservationFilterItem, 
+                    observation => observation,
+                    observationFilterItem => observationFilterItem.Observation,
+                    (observation, observationFilterItem) => observationFilterItem
+                )
+                .Join(
+                    _context.FilterItem,
+                    observationFilterItem => observationFilterItem.FilterItem,
+                    filterItem => filterItem,
+                    (observationFilterItem, filterItem) => filterItem
+                )
                 .Include(item => item.FilterGroup)
                 .ThenInclude(group => group.Filter)
+//                .Join(
+//                    _context.FilterGroup,
+//                    filterItem => filterItem.FilterGroup,
+//                    filterGroup => filterGroup,
+//                    (filterItem, filterGroup) => filterGroup
+//                )
+//                .Join(
+//                    _context.Filter,
+//                    filterGroup => filterGroup.Filter,
+//                    filter => filter,
+//                    (filterGroup, filter) => filter
+//                )
                 .ToList();
 
             return filterItems.Distinct();

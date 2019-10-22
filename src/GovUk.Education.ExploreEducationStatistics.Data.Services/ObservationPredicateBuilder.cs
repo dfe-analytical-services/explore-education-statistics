@@ -31,16 +31,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
             if (ObservationalUnitExists(query))
             {
-                predicate = predicate.And(ObservationalUnitsPredicate(query));
+                predicate = ObservationalUnitsPredicate(query, predicate);
             }
 
             return predicate;
         }
 
-        private static Expression<Func<Observation, bool>> ObservationalUnitsPredicate(SubjectMetaQueryContext query)
+        private static Expression<Func<Observation, bool>> ObservationalUnitsPredicate(
+            SubjectMetaQueryContext query,
+            Expression<Func<Observation, bool>> predicate
+        )
         {
-            var predicate = PredicateBuilder.False<Observation>();
-
             if (query.Country != null)
             {
                 predicate = predicate.Or(CountryPredicate(query));
@@ -128,8 +129,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private static Expression<Func<Observation, bool>> CountryPredicate(SubjectMetaQueryContext query)
         {
-            return ObservationalUnitPredicate(query, GeographicLevel.Country,
-                observation => query.Country.Contains(observation.Location.Country.Code));
+            Expression<Func<Observation, bool>> expression = observation =>
+                query.Country.Contains(observation.Location.Country.Code);
+
+            return query.GeographicLevel == null 
+                ? expression.And(observation => observation.GeographicLevel == GeographicLevel.Country) 
+                : expression;
         }
 
         private static Expression<Func<Observation, bool>> InstitutionPredicate(SubjectMetaQueryContext query)
@@ -214,15 +219,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private static Expression<Func<Observation, bool>> ObservationalUnitPredicate(SubjectMetaQueryContext query,
             GeographicLevel geographicLevel, Expression<Func<Observation, bool>> expression)
         {
-            var predicate = PredicateBuilder.True<Observation>()
-                .And(expression);
-
-            if (query.GeographicLevel == null)
-            {
-                predicate = predicate.And(observation => observation.GeographicLevel.Equals(geographicLevel));
-            }
-
-            return predicate;
+            return query.GeographicLevel == null 
+                ? expression.And(observation => observation.GeographicLevel.Equals(geographicLevel)) 
+                : expression;
         }
 
         private static IEnumerable<string> GetTimePeriodRange(TimePeriodQuery timePeriod)
