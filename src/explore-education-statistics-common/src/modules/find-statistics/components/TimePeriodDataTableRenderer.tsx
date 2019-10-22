@@ -17,7 +17,7 @@ export interface Props {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const TableRenderer = ({ response, tableHeaders }: Props) => {
+const TimePeriodDataTableRenderer = ({ response, tableHeaders }: Props) => {
   const table = mapDataBlockResponseToFullTable(response);
 
   const usedTableHeaders =
@@ -31,4 +31,4 @@ const TableRenderer = ({ response, tableHeaders }: Props) => {
   );
 };
 
-export default TableRenderer;
+export default TimePeriodDataTableRenderer;

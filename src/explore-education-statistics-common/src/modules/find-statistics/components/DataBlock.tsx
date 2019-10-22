@@ -9,9 +9,9 @@ import DataSource from '@common/modules/find-statistics/components/DataSource';
 import SummaryRenderer, {
   SummaryRendererProps,
 } from '@common/modules/find-statistics/components/SummaryRenderer';
-import TableRenderer, {
+import TimePeriodDataTableRenderer, {
   Props as TableRendererProps,
-} from '@common/modules/find-statistics/components/TableToolRenderer';
+} from '@common/modules/find-statistics/components/TimePeriodDataTableRenderer';
 import DataBlockService, {
   DataBlockData,
   DataBlockRequest,
@@ -189,7 +189,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
 
                   return (
                     <React.Fragment key={key}>
-                      <TableRenderer {...table} />
+                      <TimePeriodDataTableRenderer {...table} />
                       <DataSource />
                       <DownloadDetails />
                     </React.Fragment>
