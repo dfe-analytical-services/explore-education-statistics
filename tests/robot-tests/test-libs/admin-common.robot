@@ -1,5 +1,5 @@
 *** Settings ***
-Resource    ../../libs/library.robot
+Resource    ./library.robot
 
 *** Keywords ***
 User selects theme "${theme}" and topic "${topic}" from the admin dashboard
