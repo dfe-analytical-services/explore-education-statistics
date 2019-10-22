@@ -11,7 +11,7 @@ import SummaryRenderer, {
 } from '@common/modules/find-statistics/components/SummaryRenderer';
 import TableRenderer, {
   Props as TableRendererProps,
-} from '@common/modules/find-statistics/components/TableRenderer';
+} from '@common/modules/find-statistics/components/TableToolRenderer';
 import DataBlockService, {
   DataBlockData,
   DataBlockRequest,
@@ -105,7 +105,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
     const newState: DataBlockState = { isLoading: false, isError: false };
 
     const data: DataBlockData = response;
-    const meta = parseMetaData(response.metaData);
+    const chartMetadata = parseMetaData(response.metaData);
 
     const { charts, summary, tables, heading } = this.props;
 
@@ -114,8 +114,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
         newState.tables = [
           {
             heading,
-            data,
-            meta,
+            response,
             ...tables[0], /// at present only one chart
           },
         ];
@@ -131,7 +130,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
         // @ts-ignore
         const rendererProps: ChartRendererProps = {
           data,
-          meta,
+          meta: chartMetadata,
           ...chart,
         };
 
@@ -143,7 +142,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
       newState.summary = {
         ...summary,
         data,
-        meta,
+        meta: chartMetadata,
       };
     }
     this.setState(newState);
