@@ -60,6 +60,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         {
             return DbSet().Find(id);
         }
+        
+        public async Task<TEntity> FindAsync(TKey id)
+        {
+            return await DbSet().FindAsync(id);
+        }
 
         public IQueryable<TEntity> Find(TKey[] ids)
         {
@@ -86,6 +91,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .OrderByDescending(expression)
                 .Select(expression)
                 .FirstOrDefault();
+        }
+        
+        public TEntity Remove(TKey id)
+        {
+            var entity = Find(id) ?? throw new ArgumentException("Entity not found", nameof(id));
+            return DbSet().Remove(entity).Entity;
+        }
+        
+        public async Task<TEntity> RemoveAsync(TKey id)
+        {
+            var entity = await FindAsync(id) ?? throw new ArgumentException("Entity not found", nameof(id));
+            return DbSet().Remove(entity).Entity;
         }
 
         protected static SqlParameter CreateIdListType(string parameterName, IEnumerable<long> values)
