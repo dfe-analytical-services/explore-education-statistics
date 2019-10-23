@@ -68,6 +68,25 @@ for (dirpath, _, filenames) in os.walk(os.path.join(os.getcwd(), 'backup-data', 
         blob_name = os.path.join(dirpath, filename).split(f'releases{os.sep}', 1)[1]
         block_blob_service.create_blob_from_path('releases', blob_name, file_path, metadata=metadata)
 
+# Delete all files in downloads blob container
+block_blob_service = BlockBlobService(is_emulated=True)
+generator = block_blob_service.list_blobs('downloads')
+for blob in generator:
+    block_blob_service.delete_blob('downloads', blob.name)
+
+# Restore all files to downloads blob container
+for (dirpath, _, filenames) in os.walk(os.path.join(os.getcwd(), 'backup-data', 'downloads')):
+    for filename in filenames:
+        if filename.endswith('.metadata'):
+            continue
+        file_path = os.path.join(dirpath, filename)
+        metadata_file_path = os.path.join(dirpath, filename + '.metadata')
+        with open(metadata_file_path, 'r') as file:
+            metadata = json.loads(file.read())
+        print('metadata', metadata)
+        blob_name = os.path.join(dirpath, filename).split(f'downloads{os.sep}', 1)[1]
+        block_blob_service.create_blob_from_path('downloads', blob_name, file_path, metadata=metadata)
+
 # Restore imports table
 restore_table_cmd = [AzCopy, f'/Source:{os.path.join(os.getcwd(), "backup-data", "imports")}', '/destType:table', f'/Dest:{storage_table_url}/imports', f'/DestKey:{storage_key}', '/Manifest:table-backup.manifest', '/EntityOperation:InsertOrReplace']
 print(subprocess.run(restore_table_cmd))

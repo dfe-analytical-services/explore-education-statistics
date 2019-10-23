@@ -61,19 +61,20 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
     }),
   ];
 
-  React.useEffect(() => {
-    if (formikRef.current) {
-      let start = '';
-      let end = '';
+  const formInitialValues = React.useMemo(() => {
+    let start = '';
+    let end = '';
 
-      if (initialValues && initialValues.timePeriod) {
-        start = `${initialValues.timePeriod.startYear}_${initialValues.timePeriod.startCode}`;
-        end = `${initialValues.timePeriod.endYear}_${initialValues.timePeriod.endCode}`;
-      }
-
-      formikRef.current.setValues({ start, end });
+    if (initialValues && initialValues.timePeriod) {
+      start = `${initialValues.timePeriod.startYear}_${initialValues.timePeriod.startCode}`;
+      end = `${initialValues.timePeriod.endYear}_${initialValues.timePeriod.endCode}`;
     }
-  }, [options, initialValues]);
+
+    return {
+      start,
+      end,
+    };
+  }, [initialValues]);
 
   const getOptionLabel = (optionValue: string) => {
     const matchingOption = timePeriodOptions.find(
@@ -97,10 +98,7 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
         await onSubmit(values);
         goToNextStep();
       }}
-      initialValues={{
-        start: '',
-        end: '',
-      }}
+      initialValues={formInitialValues}
       validationSchema={Yup.object<FormValues>({
         start: Yup.string()
           .required('Start date required')
