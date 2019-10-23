@@ -199,6 +199,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             modelBuilder.Entity<FilterFootnote>()
                 .HasOne(filterFootnote => filterFootnote.Footnote)
                 .WithMany(footnote => footnote.Filters)
+                .HasForeignKey(filterFootnote => filterFootnote.FootnoteId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
         
