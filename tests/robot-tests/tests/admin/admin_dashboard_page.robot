@@ -1,7 +1,7 @@
 *** Settings ***
 Resource    ../../test-libs/common.robot
 
-Force Tags  Admin
+Force Tags  Admin  Local  Dev  Test
 
 Suite Setup       user signs in
 Suite Teardown    user closes the browser
