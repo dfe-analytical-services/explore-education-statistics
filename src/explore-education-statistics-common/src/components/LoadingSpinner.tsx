@@ -7,6 +7,7 @@ interface Props {
   text?: string;
   size?: number;
   inline?: boolean;
+  overlay?: boolean;
 }
 
 const LoadingSpinner = ({
@@ -14,10 +15,15 @@ const LoadingSpinner = ({
   text,
   size = 80,
   inline = false,
+  overlay = false,
 }: Props) => {
   return (
     <div
-      className={classNames(styles.container, inline ? styles.inline : null)}
+      className={classNames({
+        [styles.container]: true,
+        [styles.inline]: inline,
+        [styles.overlay]: overlay,
+      })}
     >
       {text && <p className={styles.text}>{text}</p>}
       <div

@@ -1,6 +1,7 @@
 import { dataApi } from '@common/services/api';
 import { Dictionary } from '@common/types/util';
 import { Feature, Geometry } from 'geojson';
+import { TableDataQuery } from '@common/modules/full-table/services/tableBuilderService';
 
 export enum GeographicLevel {
   Establishment = 'Establishment',
@@ -18,9 +19,10 @@ export enum GeographicLevel {
   RSCRegion = 'RSC_Region',
   School = 'School',
   Ward = 'Ward',
+  Instituation = 'institution',
 }
 
-type TimeIdentifier =
+export type TimeIdentifier =
   | 'AY'
   | 'AYQ1'
   | 'AYQ1Q2'
@@ -104,11 +106,16 @@ export interface DataBlockLocation {
   region?: Region;
   localAuthority?: LocalAuthority;
   localAuthorityDistrict?: LocalAuthorityDistrict;
+
+  // I don't like using any, but it's required here to simplify mapping to the Table Tool, for now
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
 }
 
 export interface Result {
   filters: string[];
   location: DataBlockLocation;
+  geographicLevel: GeographicLevel;
   measures: {
     [key: string]: string;
   };
@@ -126,7 +133,7 @@ export interface DataBlockData {
 
 // --- Meta data
 
-interface LabelValueMetadata {
+export interface LabelValueMetadata {
   label: string;
   value: string;
 }
@@ -208,9 +215,10 @@ export interface DataBlockGeoJsonProperties {
 export type DataBlockGeoJSON = Feature<Geometry, DataBlockGeoJsonProperties>;
 
 export interface DataBlockLocationMetadata {
-  value: string;
-  label: string;
+  level: string;
   geoJson: DataBlockGeoJSON[];
+  label: string;
+  value: string;
 }
 
 // ------------------------------------------
@@ -219,46 +227,73 @@ export interface BoundaryLevel {
   id: number;
   label: string;
 }
+
+export interface DataBlockFilterMeta {
+  label: string;
+  options: LabelValueMetadata[];
+}
+
+export interface DataBlockFilterGroupMeta {
+  totalValue?: string;
+  hint?: string;
+  legend: string;
+  options: Dictionary<DataBlockFilterMeta>;
+}
+
+export interface FootnoteMetadata {
+  id: number;
+  label: string;
+}
+
 export interface DataBlockMetadata {
+  filters: Dictionary<DataBlockFilterGroupMeta>;
   indicators: Dictionary<LabelValueUnitMetadata>;
-  filters: Dictionary<LabelValueMetadata>;
-  timePeriods: Dictionary<LabelValueMetadata>;
   locations: Dictionary<DataBlockLocationMetadata>;
   boundaryLevels?: BoundaryLevel[];
+  timePeriods: Dictionary<TimePeriodOptionMetadata>;
+  publicationName: string;
+  subjectName: string;
+  footnotes: FootnoteMetadata[];
 }
 
 interface DataBlockTimePeriod {
-  startYear: string;
+  startYear: number;
   startCode: TimeIdentifier;
-  endYear: string;
+  endYear: number;
   endCode: TimeIdentifier;
 }
 
-export interface DataBlockRequest {
-  subjectId: number;
-  timePeriod: DataBlockTimePeriod;
-  filters: string[];
-  geographicLevel: GeographicLevel;
-  boundaryLevel?: number;
-  indicators: string[];
-
-  country?: string[];
-  localAuthority?: string[];
-  localAuthorityDistrict?: string[];
-  localEnterprisePartnership?: string[];
-  multiAcademyTrust?: string[];
-  mayoralCombinedAuthority?: string[];
-  opportunityArea?: string[];
-  parliamentaryConstituency?: string[];
-  region?: string[];
-  rscRegion?: string[];
-  sponsor?: string[];
-  ward?: string[];
-}
+type LocationKeys =
+  | 'country'
+  | 'institution'
+  | 'localAuthoriy'
+  | 'localAuthorityDistrict'
+  | 'localEnterprisePartnership'
+  | 'multiAcademyTrust'
+  | 'mayoralCombinedAuthority'
+  | 'opportunityArea'
+  | 'parliamentaryConstituency'
+  | 'region'
+  | 'rscRegion'
+  | 'sponsor'
+  | 'ward';
 
 export interface DataBlockRerequest {
   boundaryLevel?: number;
 }
+
+export type DataBlockRequest = TableDataQuery;
+
+/*
+export type DataBlockRequest = {
+  subjectId: string;
+  timePeriod?: DataBlockTimePeriod;
+  filters: string[];
+  geographicLevel?: GeographicLevel;
+  indicators: string[];
+} & DataBlockRerequest &
+  PartialRecord<LocationKeys, string[]>;
+*/
 
 export interface DataBlockResponse {
   metaData: DataBlockMetadata;
@@ -275,10 +310,13 @@ export interface DataBlockResponse {
 const DataBlockService = {
   async getDataBlockForSubject(
     request: DataBlockRequest,
-  ): Promise<DataBlockResponse> {
-    const response: DataBlockResponse = await dataApi.post('/Data', request);
-
-    return response;
+  ): Promise<DataBlockResponse | undefined> {
+    try {
+      const response: DataBlockResponse = await dataApi.post('/Data', request);
+      return response;
+    } catch (_) {
+      return undefined;
+    }
   },
 };
 

@@ -1,4 +1,3 @@
-import { Polyfilla } from '@admin/services/util/polyfilla';
 import client, { baseURL } from '@admin/services/util/service';
 
 import {
@@ -16,7 +15,7 @@ export interface EditReleaseService {
     releaseId: string,
     request: UploadDataFilesRequest,
   ) => Promise<null>;
-  deleteDataFiles: (releaseId: string, dataFileId: string) => Promise<null>;
+  deleteDataFiles: (releaseId: string, dataFile: DataFile) => Promise<null>;
   createDownloadDataFileLink: (releaseId: string, fileId: string) => string;
   createDownloadDataMetadataFileLink: (
     releaseId: string,
@@ -48,7 +47,9 @@ interface GetFileResponse {
   path: string;
   size: string;
   metaFileName: string;
-  rows?: number;
+  rows: number;
+  userName: string;
+  created: string;
 }
 
 const getFileNameFromPath = (path: string) =>
@@ -57,17 +58,11 @@ const getFileNameFromPath = (path: string) =>
 /**
  * A temporary step to provide a row count to the front end whilst it does not yet exist in the API.
  */
-const dataFilePolyfilla: Polyfilla<GetFileResponse[]> = response =>
-  response.map(file => ({
-    ...file,
-    rows: 777777,
-  }));
 
 const service: EditReleaseService = {
   getReleaseDataFiles(releaseId: string): Promise<DataFile[]> {
     return client
       .get<GetFileResponse[]>(`/release/${releaseId}/data`)
-      .then(dataFilePolyfilla)
       .then(response => {
         const dataFiles = response.filter(file => file.metaFileName.length > 0);
         return dataFiles.map(dataFile => {
@@ -77,7 +72,7 @@ const service: EditReleaseService = {
           return {
             title: dataFile.name,
             filename: getFileNameFromPath(dataFile.path),
-            numberOfRows: dataFile.rows || 0,
+            rows: dataFile.rows || 0,
             fileSize: {
               size: parseInt(dataFile.size.split(' ')[0], 10),
               unit: dataFile.size.split(' ')[1],
@@ -85,6 +80,9 @@ const service: EditReleaseService = {
             metadataFilename: associatedMetadataFile
               ? getFileNameFromPath(associatedMetadataFile.path)
               : '',
+            canDelete: true,
+            userName: dataFile.userName,
+            created: new Date(dataFile.created),
           };
         });
       });
@@ -101,8 +99,10 @@ const service: EditReleaseService = {
       data,
     );
   },
-  deleteDataFiles(releaseId: string, dataFileName: string): Promise<null> {
-    return client.delete<null>(`/release/${releaseId}/data/${dataFileName}`);
+  deleteDataFiles(releaseId: string, dataFile: DataFile): Promise<null> {
+    return client.delete<null>(
+      `/release/${releaseId}/data/${dataFile.filename}/${dataFile.title}`,
+    );
   },
   createDownloadDataFileLink(releaseId: string, fileName: string): string {
     return `${baseURL}release/${releaseId}/data/${fileName}`;

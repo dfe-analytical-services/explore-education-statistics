@@ -12,6 +12,7 @@ import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import handleServerSideValidation, {
   errorCodeToFieldError,
 } from '@common/components/form/util/serverValidationHandler';
+import RelatedInformation from '@common/components/RelatedInformation';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
@@ -95,7 +96,25 @@ const CreatePublicationPage = ({
         },
       ]}
     >
-      <h1 className="govuk-heading-l">Create new publication</h1>
+      <div className="govuk-grid-row">
+        <div className="govuk-grid-column-two-thirds">
+          <h1 className="govuk-heading-xl">
+            <span className="govuk-caption-xl">Topic name here</span>
+            Create new publication
+          </h1>
+        </div>
+        <div className="govuk-grid-column-one-third">
+          <RelatedInformation heading="Help and guidance">
+            <ul className="govuk-list">
+              <li>
+                <Link to="/documentation/create-new-publication" target="blank">
+                  Creating a new publication{' '}
+                </Link>
+              </li>
+            </ul>
+          </RelatedInformation>
+        </div>
+      </div>
       {model && (
         <Formik<FormValues>
           enableReinitialize

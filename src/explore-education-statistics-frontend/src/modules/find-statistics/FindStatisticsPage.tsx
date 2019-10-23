@@ -1,4 +1,4 @@
-import Accordion from '@common/components/Accordion';
+import Accordion, { generateIdList } from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import RelatedInformation from '@common/components/RelatedInformation';
@@ -21,6 +21,8 @@ interface Props {
 }
 
 class FindStatisticsPage extends Component<Props> {
+  private accId: string[] = generateIdList(1);
+
   public static defaultProps = {
     themes: [],
   };
@@ -56,7 +58,7 @@ class FindStatisticsPage extends Component<Props> {
               </li>
             </ul>
 
-            <PageSearchFormWithAnalytics />
+            <PageSearchFormWithAnalytics inputLabel="Search to find the statistics and data you’re looking for." />
           </div>
           <div className="govuk-grid-column-one-third">
             <RelatedInformation>
@@ -75,7 +77,7 @@ class FindStatisticsPage extends Component<Props> {
         </div>
 
         {themes.length > 0 ? (
-          <Accordion id="themes">
+          <Accordion id={this.accId[0]}>
             {themes.map(
               ({
                 id: themeId,

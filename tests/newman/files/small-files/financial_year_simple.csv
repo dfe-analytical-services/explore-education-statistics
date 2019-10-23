@@ -1,0 +1,10 @@
+time_period,time_identifier,geographic_level,country_code,country_name,admission_numbers
+201718,Financial year Q1,National,E92000001,England,712196
+201718,Financial year Q2,National,E92000001,England,768763
+201718,Financial year Q3,National,E92000001,England,825330
+201718,Financial year Q4,National,E92000001,England,881897
+201718,Financial year Q1-2,National,E92000001,England,938464
+201718,Financial year Q1-3,National,E92000001,England,995031
+201718,Financial year Q1-4,National,E92000001,England,1051598
+201718,Financial year Q2-4,National,E92000001,England,1108165
+201718,Financial year Q3-4,National,E92000001,England,1164732

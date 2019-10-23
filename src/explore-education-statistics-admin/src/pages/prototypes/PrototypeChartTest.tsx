@@ -1,4 +1,5 @@
-import ChartBuilder from '@admin/modules/chart-builder/ChartBuilder';
+/* eslint-disable */ // ignoring all errors for this file... it is a prototype file, for testing
+
 import PrototypePage from '@admin/pages/prototypes/components/PrototypePage';
 import { FormSelect } from '@common/components/form';
 import { SelectOption } from '@common/components/form/FormSelect';
@@ -11,6 +12,7 @@ import DataBlockService, {
 } from '@common/services/dataBlockService';
 import { Chart, ChartType } from '@common/services/publicationService';
 import React from 'react';
+import DataBlock from '@common/modules/find-statistics/components/DataBlock';
 
 // @ts-ignore
 const options: ({ json: string; initialOptions?: Chart } & SelectOption)[] = [
@@ -41,8 +43,8 @@ const options: ({ json: string; initialOptions?: Chart } & SelectOption)[] = [
   "region": null
 }
 `,
-    initialOptions: undefined && {
-      type: 'map' as ChartType,
+    initialOptions: {
+      type: 'line' as ChartType,
 
       height: 600,
 
@@ -50,7 +52,7 @@ const options: ({ json: string; initialOptions?: Chart } & SelectOption)[] = [
         '23_1_2_____': {
           label: 'Total unauthorised absence rate',
           name: '23_1_2_____',
-          value: 'erm',
+          value: '23_1_2_____',
           colour: '#00ffff',
           unit: '',
         },
@@ -60,7 +62,7 @@ const options: ({ json: string; initialOptions?: Chart } & SelectOption)[] = [
         major: {
           type: 'major',
           name: 'major',
-          groupBy: 'locations',
+          groupBy: 'timePeriods',
           dataSets: [
             {
               indicator: '23',
@@ -184,9 +186,39 @@ const options: ({ json: string; initialOptions?: Chart } & SelectOption)[] = [
     
 `,
   },
+
+  {
+    label: 'Invalid',
+    value: '3',
+    json: `
+{
+  "subjectId": -1,
+  "geographicLevel": "Local_Authority_District",
+  "timePeriod": {
+    "startYear": "2016",
+    "startCode": "AY",
+    "endYear": "2017",
+    "endCode": "AY"
+  },
+  "filters": [
+    "1",
+    "58"
+  ],
+  "indicators": [
+    "23",
+    "26",
+    "28"
+  ],
+  "country": null,
+  "localAuthority": null,
+  "region": null
+}
+    
+`,
+  },
 ];
 
-const initialState = 1;
+const initialState = 0;
 
 const PrototypeChartTest = () => {
   const [selected, setSelected] = React.useState(`${initialState}`);
@@ -258,6 +290,8 @@ const PrototypeChartTest = () => {
     });
   };
 
+  console.log(options[initialState]);
+
   return (
     <PrototypePage wide>
       <FormSelect
@@ -275,6 +309,7 @@ const PrototypeChartTest = () => {
         }}
       />
 
+      {/*
       {chartBuilderData ? (
         <ChartBuilder
           data={chartBuilderData}
@@ -285,6 +320,13 @@ const PrototypeChartTest = () => {
       ) : (
         <LoadingSpinner />
       )}
+*/}
+      <DataBlock
+        id="test"
+        type="datablock"
+        dataBlockRequest={JSON.parse(options[initialState].json)}
+        charts={[{ ...options[initialState].initialOptions }]}
+      />
     </PrototypePage>
   );
 };

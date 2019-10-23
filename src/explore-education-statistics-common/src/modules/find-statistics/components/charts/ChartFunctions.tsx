@@ -1,6 +1,10 @@
 import {
+  BoundaryLevel,
   DataBlockData,
+  DataBlockLocationMetadata,
   DataBlockMetadata,
+  LabelValueMetadata,
+  LabelValueUnitMetadata,
   Location,
   Result,
 } from '@common/services/dataBlockService';
@@ -13,6 +17,7 @@ import {
   ChartSymbol,
   ChartType,
   DataSetConfiguration,
+  LabelConfiguration,
   ReferenceLine,
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
@@ -53,6 +58,14 @@ export function parseCondensedTimePeriodRange(
   return [range.substring(0, 4), range.substring(4, 6)].join(separator);
 }
 
+export interface ChartMetaData {
+  filters: Dictionary<LabelValueMetadata>;
+  indicators: Dictionary<LabelValueUnitMetadata>;
+  locations: Dictionary<DataBlockLocationMetadata>;
+  boundaryLevels?: BoundaryLevel[];
+  timePeriods: Dictionary<LabelValueMetadata>;
+}
+
 export interface AxesConfiguration {
   major: AxisConfiguration;
   minor?: AxisConfiguration;
@@ -60,10 +73,11 @@ export interface AxesConfiguration {
 
 export interface AbstractChartProps {
   data: DataBlockData;
-  meta: DataBlockMetadata;
+  meta: ChartMetaData;
   title?: string;
   height?: number;
   width?: number;
+  children?: ReactNode[];
 }
 
 export interface ChartProps extends AbstractChartProps {
@@ -346,7 +360,7 @@ function generateNameForAxisConfiguration(
 function getChartDataForAxis(
   dataForAxis: Result[],
   dataSet: ChartDataSet,
-  meta: DataBlockMetadata,
+  meta: ChartMetaData,
   groupBy?: AxisGroupBy,
 ) {
   const source = groupBy && meta[groupBy];
@@ -429,7 +443,7 @@ export function sortChartData(
 export function createDataForAxis(
   axisConfiguration: AxisConfiguration,
   results: Result[],
-  meta: DataBlockMetadata,
+  meta: ChartMetaData,
 ) {
   if (axisConfiguration === undefined || results === undefined) return [];
 
@@ -447,14 +461,14 @@ export function createDataForAxis(
 }
 
 const FindFirstInDictionaries = (
-  metaDataObjects: (Dictionary<DataSetConfiguration> | undefined)[],
+  metaDataObjects: (Dictionary<LabelConfiguration> | undefined)[],
   name: string,
-) => (result: string | undefined, meta?: Dictionary<DataSetConfiguration>) =>
+) => (result: string | undefined, meta?: Dictionary<LabelConfiguration>) =>
   result || (meta && meta[name] && meta[name].label);
 
 export function mapNameToNameLabel(
   keepOriginalValue: boolean = false,
-  ...metaDataObjects: (Dictionary<DataSetConfiguration> | undefined)[]
+  ...metaDataObjects: (Dictionary<LabelConfiguration> | undefined)[]
 ) {
   return ({ name, ...otherdata }: { name: string }) => ({
     ...(keepOriginalValue ? { __name: name } : {}),
@@ -470,7 +484,7 @@ export function mapNameToNameLabel(
 export function createSortedDataForAxis(
   axisConfiguration: AxisConfiguration,
   results: Result[],
-  meta: DataBlockMetadata,
+  meta: ChartMetaData,
   mapFunction: (data: ChartDataB) => ChartDataB = data => data,
 ): ChartDataB[] {
   const chartData: ChartDataB[] = createDataForAxis(
@@ -495,7 +509,7 @@ export function createSortedDataForAxis(
 export function createSortedAndMappedDataForAxis(
   axisConfiguration: AxisConfiguration,
   results: Result[],
-  meta: DataBlockMetadata,
+  meta: ChartMetaData,
   labels: Dictionary<DataSetConfiguration>,
   keepOriginalValue: boolean = false,
 ): ChartDataB[] {
@@ -695,6 +709,38 @@ export function generateMajorAxis(
     axis.tickSpacing,
   );
   return { domain, ticks };
+}
+
+export function parseMetaData(metaData: DataBlockMetadata): ChartMetaData {
+  const allFilters: LabelValueMetadata[] = Object.values(
+    metaData.filters,
+  ).reduce<LabelValueMetadata[]>((filters, { options }) => {
+    return filters.concat(...Object.values(options).map(_ => _.options));
+  }, []);
+
+  return {
+    filters: allFilters.reduce(
+      (f, { label, value }) => ({
+        ...f,
+        [value]: { label, value },
+      }),
+      {},
+    ),
+
+    indicators: metaData.indicators,
+    locations: metaData.locations,
+    boundaryLevels: metaData.boundaryLevels,
+    timePeriods: Object.entries(metaData.timePeriods).reduce(
+      (timePeriods, [value, data]) => ({
+        ...timePeriods,
+        [value]: {
+          ...data,
+          value,
+        },
+      }),
+      {},
+    ),
+  };
 }
 
 export const CustomToolTip = ({ active, payload, label }: TooltipProps) => {

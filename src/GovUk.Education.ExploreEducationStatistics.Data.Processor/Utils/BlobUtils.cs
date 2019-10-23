@@ -1,4 +1,4 @@
-using Microsoft.WindowsAzure.Storage.Blob;
+using Microsoft.Azure.Storage.Blob;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils
 {

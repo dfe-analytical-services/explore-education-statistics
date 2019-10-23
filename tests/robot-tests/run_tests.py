@@ -32,7 +32,7 @@ parser.add_argument("-i", "--interp",
                     help="interpreter to use to run the tests")
 parser.add_argument("-e", "--env",
                     dest="env",
-                    default="dev",
+                    default="test",
                     choices=["local", "dev", "dev02", "dev03", "test", "prod", "ci"],
                     help="the environment to run the tests against")
 parser.add_argument("-f", "--file",
@@ -53,10 +53,10 @@ parser.add_argument("-p", "--profile",
                     dest="profile",
                     action="store_true",
                     help="output profiling information")
-parser.add_argument("--happypath",
-                    dest="happypath",
+parser.add_argument("--ci",
+                    dest="ci",
                     action="store_true",
-                    help="only run happy-path tests")
+                    help="specify that the test are running as part of the CI pipeline")
 parser.add_argument("--chromedriver",
                     dest="chromedriver_version",
                     default="74.0.3729.6",
@@ -83,22 +83,28 @@ implicit_wait = 20
 
 # Set robotArgs
 robotArgs = ["--outputdir", "test-results/", "--exclude", "Failing",
-             "--exclude", "UnderConstruction"]
+             "--exclude", "UnderConstruction", "--exclude", "AltersData"]
 
 if args.tags:
     robotArgs += ["--include", args.tags]
 
-if args.env == "ci":
+if args.ci:
     robotArgs += ["--xunit", "xunit", "-v", "timeout:" + str(timeout), "-v", "implicit_wait:" + str(implicit_wait)]
     # NOTE(mark): Ensure secrets aren't visible in CI logs/reports
     robotArgs += ["--removekeywords", "name:library.user logs into microsoft online"]
     robotArgs += ["--removekeywords", "name:operatingsystem.environment variable should be set"]
 else:
-    if args.env == 'local':
-        robotArgs += ['--exclude', 'NotAgainstLocal']
-    if args.env == 'dev03':
-        robotArgs += ['--exclude', 'NotAgainstProd']
     load_dotenv(os.path.join(os.path.dirname(__file__), '.env.' + args.env))
+
+if args.env == 'local':
+    robotArgs += ['--include', 'Local']
+    robotArgs += ['--exclude', 'NotAgainstLocal']
+if args.env == 'dev':
+    robotArgs += ['--include', 'Dev']
+if args.env == 'test':
+    robotArgs += ['--include', 'Test']
+if args.env in ['dev03', 'prod']:
+    robotArgs += ['--include', 'Prod']
 
 if os.getenv('PUBLIC_URL') is None or os.getenv('ADMIN_URL') is None:
     print("PUBLIC_URL and/or ADMIN_URL are None -- .env.{env} file or pipeline variables needs to be set")

@@ -24,6 +24,7 @@ import {
   Table,
 } from '@common/services/publicationService';
 import React, { Component, MouseEvent, ReactNode } from 'react';
+import { parseMetaData } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import DownloadDetails from './DownloadDetails';
 
 export interface DataBlockProps {
@@ -52,6 +53,7 @@ export interface DataBlockProps {
 
 interface DataBlockState {
   isLoading: boolean;
+  isError: boolean;
   charts?: ChartRendererProps[];
   tables?: TableRendererProps[];
   summary?: SummaryRendererProps;
@@ -64,6 +66,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
 
   public state: DataBlockState = {
     isLoading: false,
+    isError: false,
   };
 
   private query?: DataQuery = undefined;
@@ -71,14 +74,21 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
   public async componentDidMount() {
     const { dataBlockRequest } = this.props;
 
-    this.setState({ isLoading: true });
+    this.setState({ isLoading: true, isError: false });
 
     if (dataBlockRequest) {
       const result = await DataBlockService.getDataBlockForSubject(
         dataBlockRequest,
       );
 
-      this.parseDataResponse(result);
+      if (result) {
+        this.parseDataResponse(result);
+      } else {
+        this.setState({
+          isError: true,
+          isLoading: false,
+        });
+      }
     } else {
       const { dataBlockResponse } = this.props;
       if (dataBlockResponse) {
@@ -92,17 +102,18 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
   }
 
   private parseDataResponse(response: DataBlockResponse): void {
-    const newState: DataBlockState = { isLoading: false };
+    const newState: DataBlockState = { isLoading: false, isError: false };
 
     const data: DataBlockData = response;
-    const meta = response.metaData;
+    const meta = parseMetaData(response.metaData);
 
-    const { charts, summary, tables } = this.props;
+    const { charts, summary, tables, heading } = this.props;
 
     if (response.result.length > 0) {
       if (tables) {
         newState.tables = [
           {
+            heading,
             data,
             meta,
             ...tables[0], /// at present only one chart
@@ -140,7 +151,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
 
   public render() {
     const {
-      heading = '',
+      heading,
       height,
       showTables,
       additionalTabContent,
@@ -148,7 +159,7 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
       onSummaryDetailsToggle,
       id,
     } = this.props;
-    const { charts, summary, tables, isLoading } = this.state;
+    const { charts, summary, tables, isLoading, isError } = this.state;
     return (
       <>
         {heading && <h3>{heading}</h3>}
@@ -157,6 +168,12 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
           <LoadingSpinner text="Loading content..." />
         ) : (
           <Tabs id={id} onToggle={onToggle}>
+            {isError && (
+              <TabsSection id={`${id}-error`} title="Error">
+                An error occurred while loading the data, please try again later
+              </TabsSection>
+            )}
+
             {summary && (
               <TabsSection id={`${id}-summary`} title="Summary">
                 <SummaryRenderer
@@ -191,9 +208,20 @@ class DataBlock extends Component<DataBlockProps, DataBlockState> {
 
                   return (
                     <React.Fragment key={key}>
-                      <ChartRenderer {...chart} height={height} />
-                      <DataSource />
-                      <DownloadDetails />
+                      {chart.data &&
+                      chart.meta &&
+                      chart.data.result.length > 0 ? (
+                        <>
+                          <ChartRenderer {...chart} height={height}>
+                            <DataSource />
+                            <DownloadDetails />
+                          </ChartRenderer>
+                        </>
+                      ) : (
+                        <div>
+                          Unable to render chart, invalid data configured
+                        </div>
+                      )}
                     </React.Fragment>
                   );
                 })}

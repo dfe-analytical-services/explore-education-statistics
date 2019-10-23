@@ -3,7 +3,7 @@ using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta.TableBuilder;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
@@ -18,13 +18,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _filterItemService = filterItemService;
         }
 
-        protected Dictionary<string, TableBuilderFilterMetaViewModel> GetFilters(IQueryable<Observation> observations)
+        protected Dictionary<string, FilterMetaViewModel> GetFilters(IQueryable<Observation> observations)
         {
             return _filterItemService.GetFilterItemsIncludingFilters(observations)
                 .GroupBy(item => item.FilterGroup.Filter, item => item, FilterComparer)
                 .ToDictionary(
                     itemsGroupedByFilter => itemsGroupedByFilter.Key.Label.PascalCase(),
-                    itemsGroupedByFilter => new TableBuilderFilterMetaViewModel
+                    itemsGroupedByFilter => new FilterMetaViewModel
                     {
                         Hint = itemsGroupedByFilter.Key.Hint,
                         Legend = itemsGroupedByFilter.Key.Label,
@@ -32,18 +32,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                             .GroupBy(item => item.FilterGroup, item => item, FilterGroupComparer)
                             .ToDictionary(
                                 itemsGroupedByFilterGroup => itemsGroupedByFilterGroup.Key.Label.PascalCase(),
-                                itemsGroupedByFilterGroup =>
-                                    new TableBuilderFilterItemsMetaViewModel
-                                    {
-                                        Label = itemsGroupedByFilterGroup.Key.Label,
-                                        Options = itemsGroupedByFilterGroup.Select(item => new LabelValue
-                                        {
-                                            Label = item.Label,
-                                            Value = item.Id.ToString()
-                                        })
-                                    }),
+                                itemsGroupedByFilterGroup => BuildFilterItemsViewModel(itemsGroupedByFilterGroup.Key,
+                                    itemsGroupedByFilterGroup)
+                            ),
                         TotalValue = GetTotalValue(itemsGroupedByFilter)
                     });
+        }
+
+        protected static FilterItemsMetaViewModel BuildFilterItemsViewModel(FilterGroup filterGroup,
+            IEnumerable<FilterItem> filterItems)
+        {
+            return new FilterItemsMetaViewModel
+            {
+                Label = filterGroup.Label,
+                Options = filterItems.Select(item => new LabelValue
+                {
+                    Label = item.Label,
+                    Value = item.Id.ToString()
+                })
+            };
         }
 
         private string GetTotalValue(IEnumerable<FilterItem> filterItems)

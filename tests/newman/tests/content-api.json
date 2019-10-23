@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "e7265748-effa-45b5-9924-1c3b6ce2dca2",
+		"_postman_id": "c022135d-54b8-453a-9998-cd009c8b77e3",
 		"name": "Dfe Content API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -48,15 +48,18 @@
 											"    pm.expect(pm.response.json().publication.slug).to.equal(\"pupil-absence-in-schools-in-england\");",
 											"});",
 											"",
-											"(pm.environment.get(\"content_api_url\") === \"http://localhost:5010/api\" ? pm.test.skip : pm.test)(\"Should have correct number of dataFiles\", function () {",
-											"    pm.expect(pm.response.json().dataFiles.length).to.be.above(6) ",
+											"/*",
+											"// EES-562",
+											"(pm.environment.get(\"content_api_url\") === \"http://localhost:5010/api\" ? pm.test.skip : pm.test)(\"Should have correct number of downloadFiles\", function () {",
+											"    pm.expect(pm.response.json().downloadFiles.length).to.be.above(6) ",
 											"});",
 											"",
-											"pm.test(\"All dataFiles should have extension \\\"csv\\\" or \\\"docx\\\"\", function () {",
-											"    for(var i = 0; i < pm.response.json().dataFiles.length; i++) {",
-											"        pm.expect(pm.response.json().dataFiles[i].extension).to.be.oneOf([\"csv\", \"docx\"]); ",
+											"pm.test(\"All downloadFiles should have extension \\\"csv\\\" or \\\"docx\\\"\", function () {",
+											"    for(var i = 0; i < pm.response.json().downloadFiles.length; i++) {",
+											"        pm.expect(pm.response.json().downloadFiles[i].extension).to.be.oneOf([\"csv\", \"docx\"]); ",
 											"    }",
-											"});"
+											"});",
+											"*/"
 										],
 										"type": "text/javascript"
 									}
@@ -132,6 +135,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -167,20 +171,22 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{content_api_url}}/content/release/4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5",
+									"raw": "{{content_api_url}}/content/publication/pupil-absence-in-schools-in-england/2016-17",
 									"host": [
 										"{{content_api_url}}"
 									],
 									"path": [
 										"content",
-										"release",
-										"4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"
+										"publication",
+										"pupil-absence-in-schools-in-england",
+										"2016-17"
 									]
 								}
 							},
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -261,6 +267,8 @@
 									"    pm.expect(foundPupilsAndSchools).to.equal(true);",
 									"});",
 									"",
+									"/*",
+									"// EES-562",
 									"pm.test(\"Pupil absence in schools in England should have correct number of dataFiles\", function() {",
 									"    for(var i = 0; respJson.length; i++) {",
 									"        if(respJson[i].title === \"Pupils and schools\") {",
@@ -268,7 +276,6 @@
 									"                if(respJson[i].topics[j].title === \"Pupil absence\") {",
 									"                    for(var k = 0; respJson[i].topics[j].publications.length; k++) {",
 									"                        if(respJson[i].topics[j].publications[k].title === \"Pupil absence in schools in England\") {",
-									"                            pm.expect(respJson[i].topics[j].publications[k].dataFiles.length).to.equal(8);",
 									"                            pm.expect(respJson[i].topics[j].publications[k].downloadFiles.length).to.equal(8);",
 									"                            return;",
 									"                        }",
@@ -277,7 +284,8 @@
 									"            }",
 									"        }",
 									"    }",
-									"});"
+									"});",
+									"*/"
 								],
 								"type": "text/javascript"
 							}
@@ -299,7 +307,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Methodology",
@@ -395,7 +404,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		}
 	],
 	"event": [
@@ -419,5 +429,6 @@
 				]
 			}
 		}
-	]
+	],
+	"protocolProfileBehavior": {}
 }

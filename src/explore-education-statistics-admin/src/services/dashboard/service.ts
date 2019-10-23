@@ -41,6 +41,7 @@ const service: DashboardService = {
       .get<AdminDashboardPublication[]>('/me/publications', {
         params: { topicId },
       })
+      .then(publications => publications || [])
       .then(publications => publications.map(publicationPolyfilla));
   },
   getDraftReleases(): Promise<AdminDashboardRelease[]> {

@@ -69,6 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<IDataService<ResultWithMetaViewModel>, DataService>();
             services.AddTransient<IPublicationMetaService, PublicationMetaService>();
             services.AddTransient<ISubjectMetaService, SubjectMetaService>();
+            services.AddTransient<IThemeMetaService, ThemeMetaService>();
             services.AddTransient<ITableBuilderResultSubjectMetaService, TableBuilderResultSubjectMetaService>();
             services.AddTransient<ITableBuilderSubjectMetaService, TableBuilderSubjectMetaService>();
             services.AddTransient<IFileStorageService, FileStorageService>();
@@ -87,6 +88,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<ITimePeriodService, TimePeriodService>();
             services.AddTransient<IPermalinkService, PermalinkService>();
             services.AddTransient<IFastTrackService, FastTrackService>();
+            services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
+            services.AddSingleton<DataServiceMemoryCache<GeoJson>, DataServiceMemoryCache<GeoJson>>();
             services.AddTransient<ITableStorageService, TableStorageService>(s => new TableStorageService(Configuration.GetConnectionString("PublicStorage")));
 
             services.AddMvc()
@@ -127,7 +130,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                 c.RoutePrefix = "docs";
             });
 
-            app.UseHttpsRedirection();
+            if (!env.IsDevelopment())
+            {
+                app.UseHttpsRedirection();
+            }
+
             app.UseCors(options => options.WithOrigins("http://localhost:3000","http://localhost:3001","https://localhost:3000","https://localhost:3001").AllowAnyMethod().AllowAnyHeader());
             app.UseMvc();
 

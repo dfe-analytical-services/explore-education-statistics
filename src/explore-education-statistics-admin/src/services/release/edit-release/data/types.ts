@@ -5,8 +5,11 @@ export interface DataFile {
     size: number;
     unit: string;
   };
-  numberOfRows: number;
+  rows: number;
   metadataFilename: string;
+  userName: string;
+  created: Date;
+  canDelete?: boolean;
 }
 
 export interface UploadDataFilesRequest {

@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Authorization;
@@ -13,23 +11,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
     [Authorize]
     public class MetaController : ControllerBase
     {
-        private readonly IPublicationMetaService _publicationMetaService;
+        private readonly IReleaseMetaService _releaseMetaService;
 
-        public MetaController(IPublicationMetaService publicationMetaService)
+        public MetaController(IReleaseMetaService releaseMetaService)
         {
-            _publicationMetaService = publicationMetaService;
+            _releaseMetaService = releaseMetaService;
         }
 
-        [HttpGet("themes")]
-        public ActionResult<IEnumerable<ThemeMetaViewModel>> GetThemes()
+        [HttpGet("release/{releaseId}")]
+        public ActionResult<ReleaseSubjectsMetaViewModel> GetSubjectsForRelease(Guid releaseId)
         {
-            return _publicationMetaService.GetThemes().ToList();
-        }
-        
-        [HttpGet("publication/{publicationId}")]
-        public ActionResult<PublicationSubjectsMetaViewModel> GetPublication(Guid publicationId)
-        {
-            var viewModel = _publicationMetaService.GetPublication(publicationId);
+            var viewModel = _releaseMetaService.GetSubjects(releaseId);
             if (viewModel == null)
             {
                 return NotFound();

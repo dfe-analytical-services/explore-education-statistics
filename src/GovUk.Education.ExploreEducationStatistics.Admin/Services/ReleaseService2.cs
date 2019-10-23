@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using ContentSectionId = System.Guid;
 using PublicationId = System.Guid;
 using ReleaseId = System.Guid;
 
@@ -69,6 +70,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _context.Releases.FirstOrDefaultAsync(x => x.Id == id);
         }
         
+        public async Task<List<ContentSection>> GetContentAsync(ReleaseId id)
+        {
+            return await _context.ContentSections.Where(section => section.ReleaseId == id).ToListAsync();
+        }
+        
         // TODO Authorisation will be required when users are introduced
         public async Task<ReleaseViewModel> GetReleaseForIdAsync(ReleaseId id)
         {
@@ -110,7 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         // TODO Authorisation will be required when users are introduced
-        public async Task<ReleaseSummaryViewModel> GetReleaseSummaryAsync(Guid releaseId)
+        public async Task<ReleaseSummaryViewModel> GetReleaseSummaryAsync(ReleaseId releaseId)
         {
             var release = await _context.Releases
                 .Where(r => r.Id == releaseId)
@@ -142,7 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         // TODO Authorisation will be required when users are introduced
-        public async Task<List<ReleaseViewModel>> GetReleasesForPublicationAsync(Guid publicationId)
+        public async Task<List<ReleaseViewModel>> GetReleasesForPublicationAsync(PublicationId publicationId)
         {
             var release = await _context.Releases
                 .Where(r => r.Publication.Id == publicationId)
@@ -180,11 +186,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             if (releaseId.HasValue)
             {
-                var templateContent = (await GetAsync(releaseId.Value)).Content;
+                var templateContent = await GetContentAsync(releaseId.Value);
                 if (templateContent != null)
                 {
                     return templateContent.Select(c => new ContentSection
                     {
+                        Id = new ContentSectionId(),
+                        ReleaseId = c.ReleaseId,
                         Caption = c.Caption,
                         Heading = c.Heading,
                         Order = c.Order,

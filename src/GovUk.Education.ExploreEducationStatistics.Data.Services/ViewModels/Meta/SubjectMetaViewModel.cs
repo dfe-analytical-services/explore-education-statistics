@@ -1,11 +1,12 @@
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta.TableBuilder;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta
 {
     public class SubjectMetaViewModel
     {
-        public Dictionary<string, LabelValue> Filters { get; set; }
+        public Dictionary<string, FilterMetaViewModel> Filters { get; set; }
 
         public Dictionary<string, IndicatorMetaViewModel> Indicators { get; set; }
 
@@ -14,5 +15,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Me
         public IEnumerable<IdLabel> BoundaryLevels { get; set; }
         
         public Dictionary<string, TimePeriodMetaViewModel> TimePeriods { get; set; }
+        
+        public string PublicationName { get; set; }
+
+        public string SubjectName { get; set; }
+
+        public IEnumerable<FootnoteViewModel> Footnotes { get; set; }
+
     }
 }

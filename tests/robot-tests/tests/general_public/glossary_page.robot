@@ -1,7 +1,7 @@
 *** Settings ***
-Resource    ../libs/library.robot
+Resource    ../../test-libs/common.robot
 
-Force Tags  GeneralPublic
+Force Tags  GeneralPublic  Local  Dev  Test  Prod
 
 Suite Setup       user opens the browser
 Suite Teardown    user closes the browser

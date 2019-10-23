@@ -4,7 +4,6 @@ import { initApplicationInsights } from '@frontend/services/applicationInsightsS
 import BaseApp, { Container, NextAppContext } from 'next/app';
 import Router from 'next/router';
 import React from 'react';
-import Helmet from 'react-helmet';
 import './_app.scss';
 import { CookiesProvider, Cookies } from 'react-cookie';
 import { NextContext } from 'next';
@@ -59,7 +58,6 @@ class App extends BaseApp<Props> {
 
     return (
       <Container>
-        <Helmet titleTemplate="%s - GOV.UK" />
         <CookiesProvider cookies={new Cookies(cookies)}>
           <Component {...pageProps} />
         </CookiesProvider>

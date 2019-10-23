@@ -36,10 +36,16 @@
     "lint:js": "eslint --ext .ts,.tsx,.js,.jsx src",
     "lint:style": "stylelint src/**/*.{scss,css}",
     "start:admin": "cd src/explore-education-statistics-admin && npm start",
+    "start:azure": "cd \"C:\\Program Files (x86)\\Microsoft SDKs\\Azure\\Storage Emulator\" && c:AzureStorageEmulator.exe start -inprocess",
+    "start:docker:db": "cd src && docker-compose up db",
     "start:frontend": "cd src/explore-education-statistics-frontend && npm start",
+    "start:frontend:local": "cd src/explore-education-statistics-frontend && npm run start:local",
+    "start:processor": "cd src/GovUk.Education.ExploreEducationStatistics.Data.Processor && func start --build",
     "test": "lerna run test",
     "test:ci": "lerna run test:ci",
-    "tsc": "lerna run tsc"
+    "tsc": "lerna run tsc",
+    "install:azure-emulator": "curl --output installer.msi -L \"https://go.microsoft.com/fwlink/?linkid=717179&clcid=0x409\" && installer.msi && rm installer.msi",
+    "install:azure-tools": "npm install -g azure-functions-core-tools"
   },
   "husky": {
     "hooks": {

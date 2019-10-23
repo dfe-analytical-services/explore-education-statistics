@@ -1,0 +1,21 @@
+@import '../../../styles/govuk-base';
+
+.figure {
+  margin: 0;
+
+  figcaption {
+    padding-bottom: govuk-spacing(4);
+  }
+}
+
+.container {
+  display: inline-block;
+  max-height: 80vh;
+  overflow: auto;
+  padding-right: govuk-spacing(4);
+  width: 95%;
+
+  &:focus {
+    outline: none;
+  }
+}

@@ -1,4 +1,4 @@
-import Accordion from '@common/components/Accordion';
+import Accordion, { generateIdList } from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
@@ -14,6 +14,8 @@ interface Props {
 }
 
 class MethodologyIndexPage extends Component<Props> {
+  private accId: string[] = generateIdList(1);
+
   public static defaultProps = {
     themes: [],
   };
@@ -40,7 +42,7 @@ class MethodologyIndexPage extends Component<Props> {
               statistics and data and how and why they're collected and
               published.
             </p>
-            <PageSearchFormWithAnalytics />
+            <PageSearchFormWithAnalytics inputLabel="Search to find the methodology behind specific education statistics and data." />
           </div>
           <div className="govuk-grid-column-one-third">
             <RelatedInformation>
@@ -57,7 +59,7 @@ class MethodologyIndexPage extends Component<Props> {
         </div>
 
         {themes.length > 0 ? (
-          <Accordion id="themesMethodology">
+          <Accordion id={this.accId[0]}>
             {themes.map(
               ({
                 id: themeId,

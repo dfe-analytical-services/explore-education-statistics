@@ -1,83 +1,93 @@
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
+using System.Text;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 {
     [Route("api/[controller]")]
     public class ContentController : ControllerBase
     {
-        private readonly IContentService _contentService;
-        private readonly IPublicationService _publicationService;
-        private readonly IReleaseService _releaseService;
+        private readonly IContentCacheService _contentCacheService;
 
-        public ContentController(
-            IContentService contentService,
-            IPublicationService publicationService,
-            IReleaseService releaseService)
+        public ContentController(IContentCacheService contentCacheService)
         {
-            _contentService = contentService;
-            _publicationService = publicationService;
-            _releaseService = releaseService;
+            _contentCacheService = contentCacheService;
         }
 
         // GET api/content/tree
+        /// <response code="204">If the item is null</response>    
         [HttpGet("tree")]
-        public ActionResult<List<ThemeTree>> GetContentTree()
+        [ProducesResponseType(204)]
+        [ProducesResponseType(typeof(List<ThemeTree>), 200)]
+        [Produces("application/json")]
+        public async Task<ActionResult<string>> GetContentTree()
         {
-            var tree = _contentService.GetContentTree();
+            var tree = await _contentCacheService.GetContentTreeAsync();
 
-            if (tree.Any())
+            if (string.IsNullOrWhiteSpace(tree))
             {
-                return tree;
+                return NoContent();
             }
 
-            return NoContent();
+            return Content(tree, "application/json");
         }
 
         // GET api/content/publication/pupil-absence-in-schools-in-england
         [HttpGet("publication/{slug}")]
-        public ActionResult<PublicationViewModel> GetPublication(string slug)
+        [ProducesResponseType(404)]
+        [ProducesResponseType(typeof(PublicationViewModel), 200)]
+        [Produces("application/json")]
+        public async Task<ActionResult<string>> GetPublication(string slug)
         {
-            var publication = _publicationService.GetPublication(slug);
+            var publication = await _contentCacheService.GetPublicationAsync(slug);
 
-            if (publication != null)
+            if (string.IsNullOrWhiteSpace(publication))
             {
-                return publication;
+                return NotFound();
             }
 
-            return NotFound();
+            return Content(publication, "application/json");
         }
 
         // GET api/content/publication/pupil-absence-in-schools-in-england/latest
         [HttpGet("publication/{publicationSlug}/latest")]
-        public ActionResult<ReleaseViewModel> GetLatestRelease(string publicationSlug)
+        [ProducesResponseType(404)]
+        [ProducesResponseType(typeof(ReleaseViewModel), 200)]
+        [Produces("application/json")]
+        public async Task<ActionResult<string>> GetLatestRelease(string publicationSlug)
         {
-            var release = _releaseService.GetLatestRelease(publicationSlug);
+            var release = await _contentCacheService.GetLatestReleaseAsync(publicationSlug);
 
-            if (release != null)
+            if (string.IsNullOrWhiteSpace(release))
             {
-                return release;
+                return NotFound();
             }
 
-            return NotFound();
+            return Content(release, "application/json");
         }
 
-        // GET api/content/release/5
-        [HttpGet("release/{id}")]
-        public ActionResult<ReleaseViewModel> GetRelease(string id)
+        // TODO: this looks like it needs refactoring to return the release view model
+        // GET api/content/publication/pupil-absence-in-schools-in-england/2017-18
+        [HttpGet("publication/{publicationSlug}/{releaseSlug}")]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(typeof(ReleaseViewModel), 200)]
+        [Produces("application/json")]
+        public async Task<ActionResult<string>> GetRelease(string publicationSlug, string releaseSlug)
         {
-            var release = _releaseService.GetRelease(id);
+            var release = await _contentCacheService.GetReleaseAsync(publicationSlug, releaseSlug);
 
-            if (release != null)
+            if (string.IsNullOrWhiteSpace(release))
             {
-                return release;
+                return NotFound();
             }
 
-            return NotFound();
+            return Content(release, "application/json");
         }
     }
 }

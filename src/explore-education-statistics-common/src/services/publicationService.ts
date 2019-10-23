@@ -1,10 +1,11 @@
+import { AxesConfiguration } from '@common/modules/find-statistics/components/charts/ChartFunctions';
+import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
 import {
   DataBlockLocation,
   DataBlockRequest,
 } from '@common/services/dataBlockService';
 import { Dictionary } from '@common/types';
 import { PositionType } from 'recharts';
-import { AxesConfiguration } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import { contentApi } from './api';
 
 export interface Publication {
@@ -90,8 +91,11 @@ export type ChartSymbol =
 
 export type LineStyle = 'solid' | 'dashed' | 'dotted';
 
-export interface DataSetConfiguration {
+export interface LabelConfiguration {
   label: string;
+}
+
+export interface DataSetConfiguration extends LabelConfiguration {
   value: string;
   name?: string;
   unit?: string;
@@ -155,11 +159,13 @@ export interface Chart {
 
 export interface Table {
   indicators: string[];
+  tableHeaders: TableHeadersFormValues;
 }
 
 export interface Summary {
   dataKeys: string[];
   dataSummary: string[];
+  dataDefinition: string[];
   description: { type: string; body: string };
 }
 
@@ -227,7 +233,12 @@ export default {
   getLatestPublicationRelease(publicationSlug: string): Promise<Release> {
     return contentApi.get(`content/publication/${publicationSlug}/latest`);
   },
-  getPublicationRelease(releaseId: string): Promise<Release> {
-    return contentApi.get(`content/release/${releaseId}`);
+  getPublicationRelease(
+    publicationSlug: string,
+    releaseSlug: string,
+  ): Promise<Release> {
+    return contentApi.get(
+      `content/publication/${publicationSlug}/${releaseSlug}`,
+    );
   },
 };

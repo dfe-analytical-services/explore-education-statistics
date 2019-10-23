@@ -1,4 +1,3 @@
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Xunit;
 using Xunit.Abstractions;
 using static GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TimePeriodLabelFormatter;

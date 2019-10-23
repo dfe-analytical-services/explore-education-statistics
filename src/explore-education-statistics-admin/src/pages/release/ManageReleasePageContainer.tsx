@@ -73,7 +73,7 @@ const ManageReleasePageContainer = ({
                 <ul className="govuk-list">
                   <li>
                     <Link
-                      to="/prototypes/documentation/create-new-release"
+                      to="/documentation/create-new-release"
                       target="_blank"
                     >
                       Creating a new release{' '}
@@ -91,7 +91,6 @@ const ManageReleasePageContainer = ({
                   <NavLink
                     key={route.path}
                     to={route.generateLink(publicationId, releaseId)}
-                    activeClassName="app-navigation--current-page"
                   >
                     {route.title}
                   </NavLink>
@@ -100,7 +99,12 @@ const ManageReleasePageContainer = ({
             </ul>
           </nav>
 
-          <ManageReleaseContext.Provider value={{ publication, releaseId }}>
+          <ManageReleaseContext.Provider
+            value={{
+              publication,
+              releaseId,
+            }}
+          >
             {releaseRoutes.manageReleaseRoutes.map(route => (
               <ProtectedRoute
                 exact

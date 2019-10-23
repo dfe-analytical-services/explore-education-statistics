@@ -51,3 +51,9 @@ export type PartialBy<T, K extends keyof T> = OmitStrict<T, K> &
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type PartialRecord<K extends keyof any, T> = { [P in K]?: T };
+
+/**
+ * Remap keys to a different type
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type KeysRemap<T extends keyof any, U> = { [P in T]: U };

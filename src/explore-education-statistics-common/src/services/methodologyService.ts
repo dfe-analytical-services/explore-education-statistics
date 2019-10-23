@@ -23,6 +23,7 @@ export interface Methodology {
   published: string;
   lastUpdated: string;
   summary: string;
+  slug: string;
   publicationId: string;
   publication: Publication;
   content: {

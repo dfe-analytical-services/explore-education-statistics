@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using AutoMapper;
@@ -11,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta.TableBuilder;
+using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
@@ -20,6 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly IFootnoteService _footnoteService;
         private readonly IIndicatorService _indicatorService;
         private readonly ILocationService _locationService;
+        private readonly ILogger _logger;
         private readonly IMapper _mapper;
         private readonly ISubjectService _subjectService;
         private readonly ITimePeriodService _timePeriodService;
@@ -28,6 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             IFootnoteService footnoteService,
             IIndicatorService indicatorService,
             ILocationService locationService,
+            ILogger<TableBuilderResultSubjectMetaService> logger,
             IMapper mapper,
             ISubjectService subjectService,
             ITimePeriodService timePeriodService) : base(filterItemService)
@@ -35,6 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _footnoteService = footnoteService;
             _indicatorService = indicatorService;
             _locationService = locationService;
+            _logger = logger;
             _mapper = mapper;
             _subjectService = subjectService;
             _timePeriodService = timePeriodService;
@@ -50,15 +55,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 throw new ArgumentException("Subject does not exist", nameof(query.SubjectId));
             }
 
+            var stopwatch = Stopwatch.StartNew();
+            stopwatch.Start();
+
+            var filters = GetFilters(observations);
+
+            _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+            stopwatch.Restart();
+
+            var footnotes = GetFootnotes(observations, query);
+
+            _logger.LogTrace("Got Footnotes in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+            stopwatch.Restart();
+
+            var indicators = GetIndicators(query);
+
+            _logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+            stopwatch.Restart();
+
+            var locations = GetObservationalUnits(observations);
+
+            _logger.LogTrace("Got Observational Units in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+            stopwatch.Restart();
+
+            var timePeriodRange = GetTimePeriodRange(observations);
+
+            _logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+            stopwatch.Stop();
+            
             return new TableBuilderResultSubjectMetaViewModel
             {
-                Filters = GetFilters(observations),
-                Footnotes = GetFootnotes(observations, query),
-                Indicators = GetIndicators(query),
-                Locations = GetObservationalUnits(observations),
+                Filters = filters,
+                Footnotes = footnotes,
+                Indicators = indicators,
+                Locations = locations,
                 PublicationName = subject.Release.Publication.Title,
                 SubjectName = subject.Name,
-                TimePeriodRange = GetTimePeriodRange(observations)
+                TimePeriodRange = timePeriodRange
             };
         }
 

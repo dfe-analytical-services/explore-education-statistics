@@ -1,7 +1,7 @@
 *** Settings ***
-Resource    ../libs/library.robot
+Resource    ../../test-libs/common.robot
 
-Force Tags  GeneralPublic
+Force Tags  GeneralPublic  Dev  Test
 
 Suite Setup       user opens the browser
 Suite Teardown    user closes the browser
@@ -26,7 +26,8 @@ Validate Pupils and schools contains correct details components
     user checks accordion section contains text  Pupils and schools   Exclusions
 
 Validate Pupil absence data downloads are available
-    [Tags]  HappyPath   NotAgainstLocal
+    [Documentation]  EES-562
+    [Tags]  HappyPath   NotAgainstLocal   Failing
     environment variable should be set   DATA_API_URL
 
     user opens details dropdown  Pupil absence
@@ -49,25 +50,27 @@ Validate Pupil absence data downloads are available
     user closes details dropdown  Pupil absence
 
 Validate School applications data downloads are available
-    [Tags]  HappyPath   NotAgainstLocal
+    [Documentation]  EES-562
+    [Tags]  HappyPath   NotAgainstLocal   Failing
     user opens details dropdown   School applications
-    user checks details dropdown contains download link  School applications   School applications and offers, 2018
-    user checks page contains link with text and url  School applications and offers, 2018   %{DATA_API_URL}/download/secondary-and-primary-schools-applications-and-offers/2018/data/school_applications_and_offers.csv
+    user checks details dropdown contains download link  School applications   Applications and offers by school phase, 2018
+    user checks page contains link with text and url  Applications and offers by school phase, 2018   %{DATA_API_URL}/download/secondary-and-primary-schools-applications-and-offers/2018/data/school_applications_and_offers.csv
     user closes details dropdown  School applications
 
 Validate Exclusions data downloads are available
-    [Tags]  HappyPath   NotAgainstLocal
+    [Documentation]  EES-562
+    [Tags]  HappyPath   NotAgainstLocal   Failing
     user opens details dropdown  Exclusions
     user checks details dropdown contains download link  Exclusions  Duration of fixed exclusions, 2016/17
     user checks page contains link with text and url  Duration of fixed exclusions, 2016/17   %{DATA_API_URL}/download/permanent-and-fixed-period-exclusions-in-england/2016-17/data/exclusions_duration_of_fixed_exclusions.csv
     user checks details dropdown contains download link  Exclusions  Exclusion metadata, 2016/17
     user checks page contains link with text and url  Exclusion metadata, 2016/17   %{DATA_API_URL}/download/permanent-and-fixed-period-exclusions-in-england/2016-17/data/exclusion_metadata.docx
-    user checks details dropdown contains download link  Exclusions  Exclusion by characteristic, 2016/17
-    user checks page contains link with text and url  Exclusion by characteristic, 2016/17   %{DATA_API_URL}/download/permanent-and-fixed-period-exclusions-in-england/2016-17/data/exclusions_by_characteristic.csv
-    user checks details dropdown contains download link  Exclusions  Exclusion by geographic level, 2016/17
-    user checks page contains link with text and url  Exclusion by geographic level, 2016/17   %{DATA_API_URL}/download/permanent-and-fixed-period-exclusions-in-england/2016-17/data/exclusions_by_geographic_level.csv
-    user checks details dropdown contains download link  Exclusions  Exclusion by reason, 2016/17
-    user checks page contains link with text and url  Exclusion by reason, 2016/17    %{DATA_API_URL}/download/permanent-and-fixed-period-exclusions-in-england/2016-17/data/exclusions_by_reason.csv
+    user checks details dropdown contains download link  Exclusions  Exclusions by characteristic, 2016/17
+    user checks page contains link with text and url  Exclusions by characteristic, 2016/17   %{DATA_API_URL}/download/permanent-and-fixed-period-exclusions-in-england/2016-17/data/exclusions_by_characteristic.csv
+    user checks details dropdown contains download link  Exclusions  Exclusions by geographic level, 2016/17
+    user checks page contains link with text and url  Exclusions by geographic level, 2016/17   %{DATA_API_URL}/download/permanent-and-fixed-period-exclusions-in-england/2016-17/data/exclusions_by_geographic_level.csv
+    user checks details dropdown contains download link  Exclusions  Exclusions by reason, 2016/17
+    user checks page contains link with text and url  Exclusions by reason, 2016/17    %{DATA_API_URL}/download/permanent-and-fixed-period-exclusions-in-england/2016-17/data/exclusions_by_reason.csv
     user checks details dropdown contains download link  Exclusions  Number of fixed exclusions, 2016/17
     user checks page contains link with text and url  Number of fixed exclusions, 2016/17    %{DATA_API_URL}/download/permanent-and-fixed-period-exclusions-in-england/2016-17/data/exclusions_number_of_fixed_exclusions.csv
     user checks details dropdown contains download link  Exclusions  Total days missed due to fixed period exclusions, 2016/17

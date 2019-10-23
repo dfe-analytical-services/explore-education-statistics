@@ -1,4 +1,4 @@
-import Accordion from '@common/components/Accordion';
+import Accordion, { generateIdList } from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import ContentSectionIndex from '@common/components/ContentSectionIndex';
 import FormattedDate from '@common/components/FormattedDate';
@@ -21,6 +21,8 @@ interface Props {
 }
 
 class MethodologyPage extends Component<Props> {
+  private accId: string[] = generateIdList(2);
+
   public static async getInitialProps({
     query,
   }: NextContext<{
@@ -44,12 +46,12 @@ class MethodologyPage extends Component<Props> {
     return (
       <Page
         title={data.title}
-        caption="Methodology"
+        description={data.summary}
         breadcrumbs={[{ name: 'Methodologies', link: '/methodology' }]}
       >
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
-            <dl className="dfe-meta-content govuk-!-margin-0">
+            <dl className="dfe-meta-content govuk-!-margin-top-0">
               <div>
                 <dt className="govuk-caption-m">Published: </dt>
                 <dd data-testid="published-date">
@@ -69,9 +71,13 @@ class MethodologyPage extends Component<Props> {
                 </>
               )}
             </dl>
-          </div>
-          <div className="govuk-grid-column-one-third">
-            <PageSearchFormWithAnalytics />
+            <PrintThisPage
+              analytics={{
+                category: 'Page print',
+                action: 'Print this page link selected',
+              }}
+            />
+            <PageSearchFormWithAnalytics inputLabel="Search in this methodology page." />
           </div>
         </div>
 
@@ -102,7 +108,7 @@ class MethodologyPage extends Component<Props> {
         )}
 
         {data.content && (
-          <Accordion id="contents-sections">
+          <Accordion id={this.accId[0]}>
             {data.content.map(({ heading, caption, order, content }) => {
               return (
                 <AccordionSection
@@ -112,14 +118,14 @@ class MethodologyPage extends Component<Props> {
                 >
                   <MethodologyHeader>
                     <ContentSectionIndex
-                      fromId={`contents-sections-${order}-content`}
+                      fromId={`${this.accId[0]}-${order}-content`}
                     />
                   </MethodologyHeader>
 
                   <MethodologyContent>
                     <ContentBlock
                       content={content}
-                      id={`content_${order}`}
+                      id={`${this.accId[0]}_${order}`}
                       publication={data.publication}
                     />
                   </MethodologyContent>
@@ -133,7 +139,7 @@ class MethodologyPage extends Component<Props> {
           <>
             <h2 className="govuk-heading-l govuk-!-margin-top-9">Annexes</h2>
 
-            <Accordion id="contents-sections">
+            <Accordion id={this.accId[1]}>
               {data.annexes.map(({ heading, caption, order, content }) => {
                 return (
                   <AccordionSection
@@ -143,7 +149,7 @@ class MethodologyPage extends Component<Props> {
                   >
                     <ContentBlock
                       content={content}
-                      id={`content_${order}`}
+                      id={`${this.accId[1]}_${order}`}
                       publication={data.publication}
                     />
                   </AccordionSection>

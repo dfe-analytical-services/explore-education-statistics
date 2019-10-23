@@ -30,6 +30,7 @@ describe('ChartFunctions', () => {
 
   test('createDataForAxis from single indicator', () => {
     const meta = Data.responseData.metaData;
+    const chartMeta = ChartFunctions.parseMetaData(meta);
 
     const minorAxisConfiguration: AxisConfiguration = {
       name: meta.indicators['26'].label,
@@ -41,7 +42,7 @@ describe('ChartFunctions', () => {
     const chartData = ChartFunctions.createDataForAxis(
       minorAxisConfiguration,
       Data.responseData.result,
-      meta,
+      chartMeta,
     );
 
     expect(chartData.sort((a, b) => a.name.localeCompare(b.name))).toEqual([
@@ -70,6 +71,7 @@ describe('ChartFunctions', () => {
 
   test('createDataForAxis can sort by indicator from single indicator', () => {
     const meta = Data.responseData.metaData;
+    const chartMeta = ChartFunctions.parseMetaData(meta);
 
     const axis: AxisConfiguration = {
       name: meta.indicators['99'].label,
@@ -83,7 +85,7 @@ describe('ChartFunctions', () => {
     const chartData = ChartFunctions.createSortedDataForAxis(
       axis,
       Data.responseData.result,
-      meta,
+      chartMeta,
     );
 
     expect(chartData).toEqual([
@@ -112,6 +114,7 @@ describe('ChartFunctions', () => {
 
   test('createDataForAxis from multiple indicators', () => {
     const meta = Data.responseData.metaData;
+    const chartMeta = ChartFunctions.parseMetaData(meta);
 
     const minorAxisConfiguration: AxisConfiguration = {
       name: meta.indicators['26'].label,
@@ -123,7 +126,7 @@ describe('ChartFunctions', () => {
     const chartData = ChartFunctions.createDataForAxis(
       minorAxisConfiguration,
       Data.responseData.result,
-      meta,
+      chartMeta,
     );
 
     expect(chartData.sort((a, b) => a.name.localeCompare(b.name))).toEqual([
@@ -157,6 +160,7 @@ describe('ChartFunctions', () => {
 
   test('createDataForAxis from multiple filters', () => {
     const meta = Data.responseData.metaData;
+    const chartMeta = ChartFunctions.parseMetaData(meta);
 
     const minorAxisConfiguration: AxisConfiguration = {
       name: meta.indicators['26'].label,
@@ -168,7 +172,7 @@ describe('ChartFunctions', () => {
     const chartData = ChartFunctions.createDataForAxis(
       minorAxisConfiguration,
       Data.responseData.result,
-      meta,
+      chartMeta,
     );
 
     expect(chartData.sort((a, b) => a.name.localeCompare(b.name))).toEqual([
@@ -202,6 +206,7 @@ describe('ChartFunctions', () => {
 
   test('createDataForAxis returns full data range if data is missing', () => {
     const meta = Data.responseWithMissingData.metaData;
+    const chartMeta = ChartFunctions.parseMetaData(meta);
 
     const axisConfig: AxisConfiguration = {
       name: meta.indicators['26'].label,
@@ -213,7 +218,7 @@ describe('ChartFunctions', () => {
     const chartData = ChartFunctions.createDataForAxis(
       axisConfig,
       Data.responseWithMissingData.result,
-      meta,
+      chartMeta,
     );
 
     expect(chartData.sort((a, b) => a.name.localeCompare(b.name))).toEqual([
@@ -241,5 +246,19 @@ describe('ChartFunctions', () => {
         '26_1_72_____': '4',
       },
     ]);
+  });
+
+  test('parseMetaData', () => {
+    const meta = Data.responseData.metaData;
+    const chartMeta = ChartFunctions.parseMetaData(meta);
+
+    expect(chartMeta.filters).not.toBeUndefined();
+    expect(chartMeta.indicators).not.toBeUndefined();
+    expect(chartMeta.locations).not.toBeUndefined();
+    expect(chartMeta.timePeriods).not.toBeUndefined();
+
+    expect(chartMeta.filters['1']).not.toBeUndefined();
+    expect(chartMeta.filters['1'].label).toEqual('All pupils');
+    expect(chartMeta.filters['1'].value).toEqual('1');
   });
 });

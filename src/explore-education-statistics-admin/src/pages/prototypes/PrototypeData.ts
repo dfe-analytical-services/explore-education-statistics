@@ -45,22 +45,37 @@ const tables: Dictionary<PrototypeTable> = {
 
 const testResponse: DataBlockResponse = {
   metaData: {
+    publicationName: 'test',
+    subjectName: 'test',
+    footnotes: [],
     filters: {
-      '1': {
-        label: 'All pupils',
-        value: '1',
-      },
-      '72': {
-        label: 'State-funded primary',
-        value: '72',
-      },
-      '73': {
-        label: 'State-funded secondary',
-        value: '73',
-      },
-      '71': {
-        label: 'Special',
-        value: '71',
+      test: {
+        hint: '',
+        legend: '',
+        totalValue: '',
+        options: {
+          test: {
+            label: 'test',
+            options: [
+              {
+                label: 'All pupils',
+                value: '1',
+              },
+              {
+                label: 'State-funded primary',
+                value: '72',
+              },
+              {
+                label: 'State-funded secondary',
+                value: '73',
+              },
+              {
+                label: 'Special',
+                value: '71',
+              },
+            ],
+          },
+        },
       },
     },
     indicators: {
@@ -82,28 +97,34 @@ const testResponse: DataBlockResponse = {
     },
     timePeriods: {
       '2012_HT6': {
+        code: 'HT6',
+        year: 2012,
         label: '2012/2013',
-        value: '2012_HT6',
       },
       '2013_HT6': {
         label: '2013/2014',
-        value: '2013_HT6',
+        year: 2013,
+        code: 'HT6',
       },
       '2014_HT6': {
         label: '2014/2015',
-        value: '2014_HT6',
+        year: 2014,
+        code: 'HT6',
       },
       '2015_HT6': {
         label: '2015/2016',
-        value: '2015_HT6',
+        year: 2015,
+        code: 'HT6',
       },
       '2016_HT6': {
         label: '2016/2017',
-        value: '2016_HT6',
+        year: 2016,
+        code: 'HT6',
       },
     },
     locations: {
       E92000001: {
+        level: GeographicLevel.Country,
         geoJson: [
           {
             type: 'Feature',
@@ -3503,6 +3524,7 @@ const testResponse: DataBlockResponse = {
   geographicLevel: GeographicLevel.Country,
   result: [
     {
+      geographicLevel: GeographicLevel.Country,
       filters: ['1', '72'],
       location: {
         country: {
@@ -3518,6 +3540,7 @@ const testResponse: DataBlockResponse = {
       timePeriod: '2013_HT6',
     },
     {
+      geographicLevel: GeographicLevel.Country,
       filters: ['1', '73'],
       location: {
         country: {
@@ -3533,6 +3556,7 @@ const testResponse: DataBlockResponse = {
       timePeriod: '2013_HT6',
     },
     {
+      geographicLevel: GeographicLevel.Country,
       filters: ['1', '71'],
       location: {
         country: {
@@ -3548,6 +3572,7 @@ const testResponse: DataBlockResponse = {
       timePeriod: '2013_HT6',
     },
     {
+      geographicLevel: GeographicLevel.Country,
       filters: ['1', '71'],
       location: {
         country: {
@@ -3563,6 +3588,7 @@ const testResponse: DataBlockResponse = {
       timePeriod: '2014_HT6',
     },
     {
+      geographicLevel: GeographicLevel.Country,
       filters: ['1', '73'],
       location: {
         country: {
@@ -3578,6 +3604,7 @@ const testResponse: DataBlockResponse = {
       timePeriod: '2012_HT6',
     },
     {
+      geographicLevel: GeographicLevel.Country,
       filters: ['1', '71'],
       location: {
         country: {
@@ -3593,6 +3620,7 @@ const testResponse: DataBlockResponse = {
       timePeriod: '2012_HT6',
     },
     {
+      geographicLevel: GeographicLevel.Country,
       filters: ['1', '72'],
       location: {
         country: {
@@ -3608,6 +3636,7 @@ const testResponse: DataBlockResponse = {
       timePeriod: '2012_HT6',
     },
     {
+      geographicLevel: GeographicLevel.Country,
       filters: ['1', '72'],
       location: {
         country: {
@@ -3623,6 +3652,7 @@ const testResponse: DataBlockResponse = {
       timePeriod: '2015_HT6',
     },
     {
+      geographicLevel: GeographicLevel.Country,
       filters: ['1', '73'],
       location: {
         country: {
@@ -3638,6 +3668,7 @@ const testResponse: DataBlockResponse = {
       timePeriod: '2016_HT6',
     },
     {
+      geographicLevel: GeographicLevel.Country,
       filters: ['1', '72'],
       location: {
         country: {
@@ -3653,6 +3684,7 @@ const testResponse: DataBlockResponse = {
       timePeriod: '2016_HT6',
     },
     {
+      geographicLevel: GeographicLevel.Country,
       filters: ['1', '71'],
       location: {
         country: {
@@ -3668,6 +3700,7 @@ const testResponse: DataBlockResponse = {
       timePeriod: '2016_HT6',
     },
     {
+      geographicLevel: GeographicLevel.Country,
       filters: ['1', '72'],
       location: {
         country: {
@@ -3683,6 +3716,7 @@ const testResponse: DataBlockResponse = {
       timePeriod: '2014_HT6',
     },
     {
+      geographicLevel: GeographicLevel.Country,
       filters: ['1', '73'],
       location: {
         country: {
@@ -3698,6 +3732,7 @@ const testResponse: DataBlockResponse = {
       timePeriod: '2014_HT6',
     },
     {
+      geographicLevel: GeographicLevel.Country,
       filters: ['1', '73'],
       location: {
         country: {
@@ -3713,6 +3748,7 @@ const testResponse: DataBlockResponse = {
       timePeriod: '2015_HT6',
     },
     {
+      geographicLevel: GeographicLevel.Country,
       filters: ['1', '71'],
       location: {
         country: {

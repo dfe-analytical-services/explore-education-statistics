@@ -4,11 +4,11 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
+using Microsoft.Azure.Storage;
+using Microsoft.Azure.Storage.Queue;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Queue;
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
@@ -61,6 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var message = new ImportMessage
             {
                 DataFileName = dataFileName,
+                OrigDataFileName = dataFileName,
                 Release = importMessageRelease,
                 BatchNo = 1,
                 NumBatches = 1

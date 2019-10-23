@@ -2,13 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using Microsoft.Azure.Cosmos.Table;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 {
@@ -49,7 +46,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 PercentageComplete = ((from bool b in new BitArray(import.BatchesProcessed)
                                       where b
                                       select b).Count() * 100) / import.NumBatches,
-                Status = import.Status.GetEnumValue()
+                Status = import.Status.GetEnumValue(),
+                NumberOfRows = import.NumberOfRows,
             };
         }
 
@@ -59,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             var result = await _table.ExecuteAsync(TableOperation.Retrieve<DatafileImport>(
                 releaseId, 
                 dataFileName, 
-                new List<string>(){ "NumBatches", "BatchesProcessed", "Status", "Errors"}));
+                new List<string>(){ "NumBatches", "BatchesProcessed", "Status", "NumberOfRows", "Errors"}));
             
             return result.Result != null ? (DatafileImport) result.Result : new DatafileImport {Status = IStatus.NOT_FOUND};
         }

@@ -1,10 +1,9 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using ReleaseId = System.Guid;
 using PublicationId  = System.Guid;
 
@@ -14,9 +13,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     {
         List<Release> List();
 
-        Release Get(Guid id);
+        Release Get(ReleaseId id);
         
-        Task<Release> GetAsync(Guid id);
+        Task<Release> GetAsync(ReleaseId id);
 
         Release Get(string slug);
 

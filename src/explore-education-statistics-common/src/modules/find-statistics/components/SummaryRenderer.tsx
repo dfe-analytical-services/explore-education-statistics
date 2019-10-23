@@ -1,19 +1,18 @@
+/* eslint-disable react/no-danger */
 import Details, { DetailsToggleHandler } from '@common/components/Details';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import {
-  DataBlockData,
-  DataBlockMetadata,
-  Result,
-} from '@common/services/dataBlockService';
+import { DataBlockData, Result } from '@common/services/dataBlockService';
 import formatPretty from '@common/lib/utils/number/formatPretty';
+import { ChartMetaData } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import styles from './SummaryRenderer.module.scss';
 
 export interface SummaryRendererProps {
   data: DataBlockData;
-  meta: DataBlockMetadata;
+  meta: ChartMetaData;
   dataKeys: string[];
   dataSummary: string[];
+  dataDefinition: string[];
   description: { type: string; body: string };
   onToggle?: DetailsToggleHandler;
 }
@@ -35,12 +34,13 @@ export default function SummaryRenderer({
   data,
   dataKeys,
   dataSummary,
+  dataDefinition,
   onToggle,
 }: SummaryRendererProps) {
   let measures: { [key: string]: string } = {};
 
   if (meta === undefined) {
-    return <div>Invalid data specified</div>;
+    return <div>Unable to render summary, invalid data configured</div>;
   }
 
   if (data) {
@@ -80,22 +80,9 @@ export default function SummaryRenderer({
                 onToggle={onToggle}
                 summary={`Define '${meta.indicators[key].label}'`}
               >
-                <p>
-                  This service is not yet available
-                  {/*
-                  {`${
-                    meta.indicators[key].label
-                  } is the adipisicing elit. Dolorum hic nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.`}
-                  */}
-                </p>
-                {/*
-                <a
-                  className="govuk-details__summary-text"
-                  href={`/glossary#${meta.indicators[key].label}`}
-                >
-                  More &gt;&gt;&gt;
-                </a>
-                */}
+                <div
+                  dangerouslySetInnerHTML={{ __html: dataDefinition[index] }}
+                />
               </Details>
             </div>
           );

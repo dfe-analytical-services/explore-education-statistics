@@ -1,0 +1,23 @@
+@import '~explore-education-statistics-common/src/styles/govuk-base';
+
+:global(.govuk-tag).ragStatusRed {
+  background: $govuk-error-colour;
+}
+
+:global(.govuk-tag).ragStatusAmber {
+  background: govuk-colour('orange');
+}
+
+:global(.govuk-tag).ragStatusGreen {
+  background: govuk-colour('green');
+}
+
+.currentStatusContainer {
+  align-items: center;
+  display: flex;
+}
+
+.errorSummary {
+  margin-bottom: 0 !important;
+  margin-top: 5px;
+}

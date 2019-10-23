@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using ReleaseId = System.Guid;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
@@ -19,11 +20,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _subjectService = subjectService;
         }
 
-        public abstract TResult Query(ObservationQueryContext queryContext);
+        public abstract TResult Query(ObservationQueryContext queryContext, ReleaseId? releaseId = null);
 
-        protected IEnumerable<Observation> GetObservations(ObservationQueryContext queryContext)
+        protected IEnumerable<Observation> GetObservations(ObservationQueryContext queryContext, ReleaseId? releaseId = null)
         {
-            if (!_subjectService.IsSubjectForLatestRelease(queryContext.SubjectId))
+            // If release Id is not specified then verify that the subject id passed exists for the latest release.
+            if ((releaseId == null || releaseId == Guid.Empty) && !_subjectService.IsSubjectForLatestRelease(queryContext.SubjectId))
             {
                 throw new InvalidOperationException("Subject is not for the latest release of this publication");
             }

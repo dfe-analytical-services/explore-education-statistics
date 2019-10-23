@@ -104,6 +104,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IBoundaryLevelService, BoundaryLevelService>();
             services.AddTransient<IDataService<ResultWithMetaViewModel>, DataService>();
             services.AddTransient<IDataService<TableBuilderResultViewModel>, TableBuilderDataService>();
+            services.AddTransient<IFilterService, FilterService>();
+            services.AddTransient<IFilterGroupService, FilterGroupService>();
             services.AddTransient<IFilterItemService, FilterItemService>();
             services.AddTransient<IFootnoteService, FootnoteService>();
             services.AddTransient<IGeoJsonService, GeoJsonService>();
@@ -111,7 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IIndicatorService, IndicatorService>();
             services.AddTransient<ILocationService, LocationService>();
             services.AddTransient<IObservationService, ObservationService>();
-            services.AddTransient<IPublicationMetaService, PublicationMetaService>();
+            services.AddTransient<IReleaseMetaService, ReleaseMetaService>();
             services.AddTransient<IResultBuilder<Observation, ObservationViewModel>, ResultBuilder>();
             services.AddTransient<Data.Model.Services.Interfaces.IReleaseService, Data.Model.Services.ReleaseService>();
             services.AddTransient<ISubjectService, SubjectService>();
@@ -120,7 +122,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<ITableBuilderSubjectMetaService, TableBuilderSubjectMetaService>();
             services.AddTransient<ITableBuilderResultSubjectMetaService, TableBuilderResultSubjectMetaService>();
             services.AddTransient<IImportStatusService, ImportStatusService>();
+            services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
+            services.AddSingleton<DataServiceMemoryCache<GeoJson>, DataServiceMemoryCache<GeoJson>>();
             services.AddTransient<ITableStorageService, TableStorageService>(s => new TableStorageService(Configuration.GetConnectionString("CoreStorage")));
+
+            services.AddTransient<IUserService, UserService>();
 
             services.AddSwaggerGen(c =>
             {

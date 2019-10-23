@@ -8,13 +8,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
     {
         Task UpdateBatchCount(string releaseId, string dataFileName, int batchNo);
 
-        Task UpdateStatus(string releaseId, string dataFileName, IStatus status);
+        Task<bool> UpdateStatus(string releaseId, string dataFileName, IStatus status);
 
         Task FailImport(string releaseId, string dataFileName, List<string> errors);
 
         Task LogErrors(string releaseId, string dataFileName, List<string> errors);
 
-        Task CreateImport(string releaseId, string dataFileName, int numBatches);
+        Task CreateImport(string releaseId, string dataFileName, int numberOfRows, int numBatches);
 
         Task<bool> IsBatchProcessed(string releaseId, string dataFileName, int batchNo);
     }

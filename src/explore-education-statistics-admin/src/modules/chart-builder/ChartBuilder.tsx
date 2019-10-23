@@ -12,6 +12,8 @@ import ChartRenderer, {
 import {
   ChartDefinition,
   generateKeyFromDataSet,
+  parseMetaData,
+  ChartMetaData,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import HorizontalBarBlock from '@common/modules/find-statistics/components/charts/HorizontalBarBlock';
 import LineChartBlock from '@common/modules/find-statistics/components/charts/LineChartBlock';
@@ -42,12 +44,17 @@ import styles from './graph-builder.module.scss';
 interface Props {
   data: DataBlockResponse;
   initialConfiguration?: Chart;
-  onChartSave?: (props: ChartRendererProps) => void;
+  onChartSave?: (
+    props: ChartRendererProps,
+  ) => Promise<ChartRendererProps | undefined>;
 
   onRequiresDataUpdate?: (parameters: DataBlockRerequest) => void;
 }
 
-function getReduceMetaDataForAxis(data: DataBlockResponse) {
+function getReduceMetaDataForAxis(
+  data: DataBlockResponse,
+  metaData: ChartMetaData,
+) {
   return (
     items: Dictionary<DataSetConfiguration>,
     groupName?: string,
@@ -56,9 +63,9 @@ function getReduceMetaDataForAxis(data: DataBlockResponse) {
       return {
         ...items,
         ...data.result.reduce<Dictionary<DataSetConfiguration>>(
-          (moreItems, result) => ({
+          (moreItems, { timePeriod }) => ({
             ...moreItems,
-            [result.timePeriod]: data.metaData.timePeriods[result.timePeriod],
+            [timePeriod]: metaData.timePeriods[timePeriod],
           }),
           {},
         ),
@@ -71,11 +78,12 @@ function getReduceMetaDataForAxis(data: DataBlockResponse) {
 function generateAxesMetaData(
   axes: Dictionary<AxisConfiguration>,
   data: DataBlockResponse,
+  metaData: ChartMetaData,
 ) {
   return Object.values(axes).reduce(
     (allValues, axis) => ({
       ...allValues,
-      ...[axis.groupBy].reduce(getReduceMetaDataForAxis(data), {}),
+      ...[axis.groupBy].reduce(getReduceMetaDataForAxis(data, metaData), {}),
     }),
     {},
   );
@@ -88,6 +96,19 @@ const chartTypes: ChartDefinition[] = [
   MapBlock.definition,
 ];
 
+const emptyMetadata = {
+  timePeriods: {},
+  filters: {},
+  indicators: {},
+  locations: {},
+};
+
+enum SaveState {
+  Unsaved,
+  Error,
+  Saved,
+}
+
 // need a constant reference as there are dependencies on this not changing if it isn't set
 const ChartBuilder = ({
   data,
@@ -99,21 +120,25 @@ const ChartBuilder = ({
     ChartDefinition | undefined
   >();
 
-  const [indicatorIds] = React.useState<string[]>(
-    Object.keys(data.metaData.indicators),
+  const indicatorIds = Object.keys(data.metaData.indicators);
+  const metaData = React.useMemo(
+    () => (data.metaData && parseMetaData(data.metaData)) || emptyMetadata,
+    [data.metaData],
   );
 
-  const [filterIdCombinations] = React.useState<string[][]>(
-    Object.values(
-      data.result.reduce((filterSet, result) => {
-        const filterIds = Array.from(result.filters);
+  const filterIdCombinations = React.useMemo<string[][]>(
+    () =>
+      Object.values(
+        data.result.reduce((filterSet, result) => {
+          const filterIds = Array.from(result.filters);
 
-        return {
-          ...filterSet,
-          [filterIds.join('_')]: filterIds,
-        };
-      }, {}),
-    ),
+          return {
+            ...filterSet,
+            [filterIds.join('_')]: filterIds,
+          };
+        }, {}),
+      ),
+    [data.result],
   );
 
   const [chartOptions, setChartOptions] = React.useState<ChartOptions>({
@@ -127,6 +152,8 @@ const ChartBuilder = ({
   const previousAxesConfiguration = React.useRef<Dictionary<AxisConfiguration>>(
     {},
   );
+
+  const [chartSaveState, setChartSaveState] = React.useState(SaveState.Unsaved);
 
   const [axesConfiguration, realSetAxesConfiguration] = React.useState<
     Dictionary<AxisConfiguration>
@@ -142,12 +169,16 @@ const ChartBuilder = ({
   };
 
   const onDataAdded = (addedData: SelectedData) => {
+    setChartSaveState(SaveState.Unsaved);
+
     const newDataSetConfig = [...dataSetAndConfiguration, addedData];
 
     setDataSetAndConfiguration(newDataSetConfig);
   };
 
   const onDataRemoved = (removedData: SelectedData, index: number) => {
+    setChartSaveState(SaveState.Unsaved);
+
     const newDataSets = [...dataSetAndConfiguration];
 
     newDataSets.splice(index, 1);
@@ -166,9 +197,9 @@ const ChartBuilder = ({
         }),
         {},
       ),
-      ...generateAxesMetaData(axesConfiguration, data),
+      ...generateAxesMetaData(axesConfiguration, data, metaData),
     });
-  }, [dataSetAndConfiguration, axesConfiguration, data]);
+  }, [dataSetAndConfiguration, axesConfiguration, data, metaData]);
 
   const [majorAxisDataSets, setMajorAxisDataSets] = React.useState<
     ChartDataSet[]
@@ -194,7 +225,7 @@ const ChartBuilder = ({
 
         data,
 
-        meta: data.metaData,
+        meta: metaData,
 
         axes: {
           major: {
@@ -219,6 +250,7 @@ const ChartBuilder = ({
     axesConfiguration,
     dataSetAndConfiguration,
     data,
+    metaData,
     chartOptions,
     chartLabels,
     majorAxisDataSets,
@@ -307,6 +339,23 @@ const ChartBuilder = ({
       title: '',
     },
   ) => {
+    let checkLabels = labels;
+
+    if (labels) {
+      checkLabels = Object.keys(labels).reduce<
+        Dictionary<DataSetConfiguration>
+      >(
+        (newLabels, key) => ({
+          ...newLabels,
+          [key]: {
+            ...labels[key],
+            value: labels[key].value || key,
+          },
+        }),
+        {},
+      );
+    }
+
     return {
       type,
       options: {
@@ -320,13 +369,27 @@ const ChartBuilder = ({
         geographicId,
       },
       axes,
-      labels,
+      labels: checkLabels,
     };
   };
+
+  const saveChart = React.useCallback(async () => {
+    setChartSaveState(SaveState.Unsaved);
+    if (renderedChartProps && onChartSave) {
+      try {
+        await onChartSave(renderedChartProps);
+        setChartSaveState(SaveState.Saved);
+      } catch (_) {
+        setChartSaveState(SaveState.Error);
+      }
+    }
+  }, [onChartSave, renderedChartProps]);
 
   // initial chart options set up
   React.useEffect(() => {
     const initial = extractInitialChartOptions(initialConfiguration);
+
+    setChartSaveState(SaveState.Unsaved);
 
     setSelectedChartType(
       () => initial && chartTypes.find(({ type }) => type === initial.type),
@@ -362,7 +425,10 @@ const ChartBuilder = ({
     <div className={styles.editor}>
       <ChartTypeSelector
         chartTypes={chartTypes}
-        onSelectChart={setSelectedChartType}
+        onSelectChart={chart => {
+          setChartSaveState(SaveState.Unsaved);
+          setSelectedChartType(chart);
+        }}
         selectedChartType={selectedChartType}
       />
       <div className="govuk-!-margin-top-6 govuk-body-s dfe-align--right">
@@ -370,6 +436,7 @@ const ChartBuilder = ({
           href="#"
           onClick={e => {
             e.preventDefault();
+            setChartSaveState(SaveState.Unsaved);
             setSelectedChartType(Infographic.definition);
           }}
         >
@@ -410,9 +477,10 @@ const ChartBuilder = ({
                 onDataAdded={onDataAdded}
                 onDataRemoved={onDataRemoved}
                 onDataChanged={(newData: ChartDataSetAndConfiguration[]) => {
+                  setChartSaveState(SaveState.Unsaved);
                   setDataSetAndConfiguration([...newData]);
                 }}
-                metaData={data.metaData}
+                metaData={metaData}
                 indicatorIds={indicatorIds}
                 filterIds={filterIdCombinations}
                 selectedData={dataSetAndConfiguration}
@@ -426,16 +494,20 @@ const ChartBuilder = ({
             <ChartConfiguration
               selectedChartType={selectedChartType}
               chartOptions={chartOptions}
-              onChange={setChartOptions}
-              onBoundaryLevelChange={boundaryLevel =>
-                onRequiresDataUpdate &&
-                onRequiresDataUpdate({
-                  boundaryLevel: boundaryLevel
-                    ? Number.parseInt(boundaryLevel, 10)
-                    : undefined,
-                })
-              }
-              meta={data.metaData}
+              onChange={chartOptionsValue => {
+                setChartSaveState(SaveState.Unsaved);
+                setChartOptions(chartOptionsValue);
+              }}
+              onBoundaryLevelChange={boundaryLevel => {
+                setChartSaveState(SaveState.Unsaved);
+                if (onRequiresDataUpdate)
+                  onRequiresDataUpdate({
+                    boundaryLevel: boundaryLevel
+                      ? Number.parseInt(boundaryLevel, 10)
+                      : undefined,
+                  });
+              }}
+              meta={metaData}
               data={data}
             />
           </TabsSection>
@@ -448,10 +520,11 @@ const ChartBuilder = ({
                   configuration={axis}
                   capabilities={selectedChartType.capabilities}
                   data={data}
-                  meta={data.metaData}
+                  meta={metaData}
                   labels={chartLabels}
                   dataSets={axis.type === 'major' ? majorAxisDataSets : []}
                   onConfigurationChange={updatedConfig => {
+                    setChartSaveState(SaveState.Unsaved);
                     setAxesConfiguration({
                       ...axesConfiguration,
                       [key]: updatedConfig,
@@ -466,17 +539,22 @@ const ChartBuilder = ({
 
       {selectedChartType && renderedChartProps && (
         <>
-          <button
-            type="button"
-            className="govuk-button"
-            onClick={() => {
-              if (onChartSave) {
-                onChartSave(renderedChartProps);
-              }
-            }}
-          >
+          <button type="button" className="govuk-button" onClick={saveChart}>
             Save chart options
           </button>
+
+          {chartSaveState !== SaveState.Unsaved && (
+            <div>
+              {chartSaveState === SaveState.Saved && (
+                <span>Chart has been saved</span>
+              )}
+              {chartSaveState === SaveState.Error && (
+                <span>
+                  An error occurred saving the chart, please try again later
+                </span>
+              )}
+            </div>
+          )}
         </>
       )}
     </div>

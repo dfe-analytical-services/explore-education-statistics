@@ -10,12 +10,10 @@ import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
 import {
   ChartCapabilities,
   ChartDataB,
+  ChartMetaData,
   createSortedAndMappedDataForAxis,
 } from '@common/modules/find-statistics/components/charts/ChartFunctions';
-import {
-  DataBlockData,
-  DataBlockMetadata,
-} from '@common/services/dataBlockService';
+import { DataBlockData } from '@common/services/dataBlockService';
 import {
   AxisConfiguration,
   AxisGroupBy,
@@ -32,7 +30,7 @@ interface Props {
   defaultDataType?: AxisGroupBy;
   configuration: AxisConfiguration;
   data: DataBlockData;
-  meta: DataBlockMetadata;
+  meta: ChartMetaData;
   labels: Dictionary<DataSetConfiguration>;
   capabilities: ChartCapabilities;
   onConfigurationChange: (configuration: AxisConfiguration) => void;
@@ -57,7 +55,7 @@ const getSortOptions = (
 const getAxisLabels = (
   configuration: AxisConfiguration,
   data: DataBlockData,
-  meta: DataBlockMetadata,
+  meta: ChartMetaData,
   labels: Dictionary<DataSetConfiguration>,
   dataSets: ChartDataSet[],
 ): SelectOption[] => {
@@ -234,7 +232,7 @@ const ChartAxisConfiguration = ({
                         onChange={e =>
                           updateAxisConfiguration({ unit: e.target.value })
                         }
-                        value={axisConfiguration.unit}
+                        defaultValue={axisConfiguration.unit}
                       />
                     </React.Fragment>
                   }
@@ -248,7 +246,7 @@ const ChartAxisConfiguration = ({
                   min="0"
                   max="100"
                   label="Size of axis"
-                  value={axisConfiguration.size}
+                  defaultValue={axisConfiguration.size}
                   onChange={e =>
                     updateAxisConfiguration({ size: e.target.value })
                   }
@@ -289,7 +287,7 @@ const ChartAxisConfiguration = ({
                         type="number"
                         width={10}
                         label="Minimum value"
-                        value={axisConfiguration.min}
+                        defaultValue={axisConfiguration.min}
                         onChange={e =>
                           updateAxisConfiguration({ min: e.target.value })
                         }
@@ -302,7 +300,7 @@ const ChartAxisConfiguration = ({
                         type="number"
                         width={10}
                         label="Maximum Value"
-                        value={axisConfiguration.max}
+                        defaultValue={axisConfiguration.max}
                         onChange={e =>
                           updateAxisConfiguration({ max: e.target.value })
                         }
@@ -345,7 +343,7 @@ const ChartAxisConfiguration = ({
                           type="number"
                           width={10}
                           label="Every nth value"
-                          value={axisConfiguration.tickSpacing}
+                          defaultValue={axisConfiguration.tickSpacing}
                           onChange={e =>
                             updateAxisConfiguration({
                               tickSpacing: e.target.value,
@@ -456,7 +454,7 @@ const ChartAxisConfiguration = ({
                           id=""
                           label=""
                           type="text"
-                          value={`${referenceLine.position}`}
+                          defaultValue={`${referenceLine.position}`}
                           onChange={e => {
                             setReferenceLine({
                               ...referenceLine,
@@ -488,7 +486,7 @@ const ChartAxisConfiguration = ({
                         id=""
                         label=""
                         type="text"
-                        value={referenceLine.label}
+                        defaultValue={referenceLine.label}
                         onChange={e => {
                           setReferenceLine({
                             ...referenceLine,

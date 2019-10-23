@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
@@ -10,38 +10,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
     [Route("api/[controller]")]
     public class MethodologyController : ControllerBase
     {
-        private readonly IMethodologyService _service;
-        public MethodologyController(IMethodologyService service)
+        private readonly IContentCacheService _contentCacheService;
+
+        
+        public MethodologyController(IContentCacheService contentCacheService)
         {
-            _service = service;
+            _contentCacheService = contentCacheService;
         }
 
         // GET
+        /// <response code="204">If the item is null</response>    
         [HttpGet("tree")]
-        public ActionResult<List<ThemeTree>> GetMethodologyTree()
+        [ProducesResponseType(typeof(List<ThemeTree>),200)]
+        [ProducesResponseType(204)]
+        [Produces("application/json")]
+        public async Task<ActionResult<string>> GetMethodologyTree()
         {
-            var tree = _service.GetTree();
+            var tree = await _contentCacheService.GetMethodologyTreeAsync();
 
-            if (tree.Any())
+            if (string.IsNullOrWhiteSpace(tree))
             {
-                return tree;
+                return NoContent();
             }
-
-            return NoContent();
+            
+            return Content(tree, "application/json");
         }
         
         // GET api/methodology/name-of-content
         [HttpGet("{slug}")]
-        public ActionResult<Methodology> Get(string slug)
+        [ProducesResponseType(typeof(Methodology), 200)]
+        [ProducesResponseType(404)]
+        [Produces("application/json")]
+        public async Task<ActionResult<string>> Get(string slug)
         {
-            var methodology = _service.Get(slug);
-
-            if (methodology != null)
+            var methodology = await _contentCacheService.GetMethodologyAsync(slug);
+            
+            if (string.IsNullOrWhiteSpace(methodology))
             {
-                return methodology;
+                return NotFound();
             }
             
-            return NotFound();
+            return Content(methodology, "application/json");
         }
     }
 }

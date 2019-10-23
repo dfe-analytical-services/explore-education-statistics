@@ -4,6 +4,7 @@
     "logLevel": {
       "default": "None",
       "Function.Publisher": "Information",
+      "Function.RebuildContentCache": "Information",
       "GovUk.Education.ExploreEducationStatistics.Publisher": "Information"
     }
   }

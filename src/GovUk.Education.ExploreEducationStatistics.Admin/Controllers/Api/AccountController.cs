@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         
         [AllowAnonymous]
         [HttpGet("api/users/mydetails")]
-        public ActionResult<UserDetailsViewModel> MyDetails()
+        public ActionResult<UserDetailsPermissionsViewModel> MyDetails()
         {
             // TODO - we need to something cleverer here - we need to 
             // validate that their AD cookie is still valid, not simply
@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 }
                 
                 
-                return new UserDetailsViewModel()
+                return new UserDetailsPermissionsViewModel()
                 {
                     Id = Guid.Parse(User.Claims.FirstOrDefault(x => x.Type == "http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value),
                     Email = email,

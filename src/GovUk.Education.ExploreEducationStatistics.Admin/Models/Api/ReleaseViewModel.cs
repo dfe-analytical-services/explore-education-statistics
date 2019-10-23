@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -31,6 +30,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         public DateTime? PublishScheduled { get; set; }
 
         public DateTime? Published { get; set; }
+
+        public bool Live => Published != null;
 
         [JsonConverter(typeof(TimeIdentifierJsonConverter))]
         public TimeIdentifier? TimePeriodCoverage { get; set; }

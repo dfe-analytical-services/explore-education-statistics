@@ -9,6 +9,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         public Guid Id { get; set; }
 
         public string Heading { get; set; }
+        
+        public string CustomFootnotes { get; set; }
+        
+        public string Name { get; set; }
+        
+        public string Source { get; set; }
 
         public DataBlockRequest DataBlockRequest { get; set; }
 

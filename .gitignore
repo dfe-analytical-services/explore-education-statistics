@@ -29,9 +29,11 @@ yarn-error.log*
 
 junit.xml
 **/test-results/
+/tests/robot-tests/backup-data
 /tests/robot-tests/webdriver
 /tests/robot-tests/.env.*
 /tests/robot-tests/.pabotsuitenames
+/tests/robot-tests/geckodriver.log
 
 ## Data API Seed CSV data
 

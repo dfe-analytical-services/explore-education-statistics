@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
@@ -36,15 +37,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             {
                 List<IFormFile> files = SplitFile(message, lines, batchSettings.RowsPerBatch);
 
-                // Upload the split data files & send message to process to imports-available queue
-                foreach (var f in files)
+                files.ForEach(async f =>
                 {
-                    var result = _fileStorageService.UploadDataFileAsync(message.Release.Id,
-                        f, BlobUtils.GetMetaFileName(subjectData.DataBlob), BlobUtils.GetName(subjectData.DataBlob)).Result;
+                    await _fileStorageService.UploadDataFileAsync(message.Release.Id,
+                        f, BlobUtils.GetMetaFileName(subjectData.DataBlob), BlobUtils.GetName(subjectData.DataBlob));
 
                     var iMessage = new ImportMessage
                     {
                         DataFileName = f.FileName,
+                        OrigDataFileName = message.DataFileName,
                         Release = message.Release,
                         BatchNo = batchCount++,
                         NumBatches = files.Count,
@@ -52,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     };
 
                     collector.Add(iMessage);
-                }
+                });
             }
             // Else perform any additional validation & pass on file to message queue for import
             else
@@ -88,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 }
                 
                 var f = new FormFile(mStream, 0, mStream.Length, message.DataFileName,
-                    message.DataFileName + "_" + $"{index++:000000}") 
+                    $"{FileStoragePathUtils.BatchesDir}/{message.DataFileName}_{index++:000000}") 
                 {
                     Headers = new HeaderDictionary(),
                     ContentType = "text/csv"

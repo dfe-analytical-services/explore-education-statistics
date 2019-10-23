@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Converters;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Converters;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -99,6 +99,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         dotted
     }
 
+    public enum Legend
+    {
+        none,
+        bottom,
+        top
+    }
+
     // this enum needs these like this as they match what is used in the front end
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public enum LabelPosition
@@ -146,6 +153,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         [JsonConverter(typeof(StringEnumConverter))]
         public LabelPosition LabelPosition;
 
+        public int? Min;
+        public int? Max;
         public string Size;
     }
 
@@ -175,7 +184,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public string Type => "line";
         public int Width;
         public int Height;
-        public bool ShowLegend;
+        
+        [JsonConverter(typeof(StringEnumConverter))]
+        public Legend Legend;
+        
         public Dictionary<string, ChartConfiguration> Labels;
         public Dictionary<string, AxisConfigurationItem> Axes;
     }
@@ -185,7 +197,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public string Type => "horizontalbar";
         public int Width;
         public int Height;
-        public bool ShowLegend;
+        
+        [JsonConverter(typeof(StringEnumConverter))]
+        public Legend Legend;
+        
         public Dictionary<string, ChartConfiguration> Labels;
         public Dictionary<string, AxisConfigurationItem> Axes;
         public bool Stacked;
@@ -199,7 +214,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public bool Stacked;
         public int Width;
         public int Height;
-        public bool ShowLegend;
+        
+        [JsonConverter(typeof(StringEnumConverter))]
+        public Legend Legend;
     }
 
     public class MapChart : IContentBlockChart
@@ -207,7 +224,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public string Type => "map";
         public int Width;
         public int Height;
-        public bool ShowLegend;
         public Dictionary<string, ChartConfiguration> Labels;
         public Dictionary<string, AxisConfigurationItem> Axes;
     }

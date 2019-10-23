@@ -1,5 +1,6 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useState } from 'react';
 import classNames from 'classnames';
+import ButtonText from './ButtonText';
 
 interface Props {
   actions?: ReactNode;
@@ -7,6 +8,9 @@ interface Props {
   term: string;
   detailsNoMargin?: boolean;
   smallKey?: boolean;
+  showActions?: boolean;
+  shouldCollapse?: boolean;
+  collapseAfter?: number;
 }
 
 const SummaryListItem = ({
@@ -15,7 +19,47 @@ const SummaryListItem = ({
   term,
   detailsNoMargin,
   smallKey = false,
+  shouldCollapse = false,
+  collapseAfter = 5,
 }: Props) => {
+  const [collapsed, setCollapsed] = useState<boolean>(shouldCollapse);
+
+  function getCollapsedList() {
+    if (React.Children.count(children) > collapseAfter) {
+      if (collapsed) {
+        return (
+          <>
+            {React.Children.map(children, (child, i) => {
+              if (i >= collapseAfter - 2) {
+                return null;
+              }
+              return child;
+            })}
+            {React.Children.count(children) - (collapseAfter - 2) && (
+              <strong>
+                {`And ${React.Children.count(children) -
+                  (collapseAfter - 2)} more...`}
+                <br />
+              </strong>
+            )}
+            <ButtonText onClick={() => setCollapsed(!collapsed)}>
+              {collapsed ? 'Show All' : 'Collapse List'}
+            </ButtonText>
+          </>
+        );
+      }
+      return (
+        <>
+          {children}
+          <ButtonText onClick={() => setCollapsed(!collapsed)}>
+            {collapsed ? 'Show All' : 'Collapse List'}
+          </ButtonText>
+        </>
+      );
+    }
+    return children;
+  }
+
   return (
     <div className="govuk-summary-list__row">
       <dt
@@ -32,11 +76,10 @@ const SummaryListItem = ({
             'dfe-details-no-margin': detailsNoMargin,
           })}
         >
-          {children}
+          {shouldCollapse ? getCollapsedList() : children}
         </dd>
       )}
       {actions && <dd className="govuk-summary-list__actions">{actions}</dd>}
-      {children && !actions && <dd className="govuk-summary-list__actions" />}
       {!children && !actions && (
         <>
           <dd
