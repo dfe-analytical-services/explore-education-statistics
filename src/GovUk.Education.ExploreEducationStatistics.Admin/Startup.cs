@@ -1,4 +1,8 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Linq.Expressions;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -14,6 +18,8 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -182,6 +188,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+//            using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
+//                .CreateScope())
+//            {
+//                using (var context = serviceScope.ServiceProvider.GetService<StatisticsDbContext>())
+//                {
+//                    var list = new List<TimeIdentifier>() {
+//                        TimeIdentifier.AcademicYear
+//                        }.AsEnumerable();
+//                    
+//                    var asdf = context.
+//                        Observation.
+//                        Where(observation => observation.SubjectId == 1 && 
+//                                             list.Contains(observation.TimeIdentifier)).
+//                        ToList();
+//
+//                    var i = 1;
+//                }
+//            }
+
             UpdateDatabase(app);
             
             if (env.IsDevelopment())

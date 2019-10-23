@@ -76,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             }
 
             var observations = _observationService.FindObservations(query).AsQueryable();
-
+            
             var stopwatch = Stopwatch.StartNew();
             stopwatch.Start();
 

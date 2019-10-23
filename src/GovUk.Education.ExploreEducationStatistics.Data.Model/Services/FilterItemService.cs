@@ -36,23 +36,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                     filterItem => filterItem,
                     (observationFilterItem, filterItem) => filterItem
                 )
+                .Distinct()
                 .Include(item => item.FilterGroup)
                 .ThenInclude(group => group.Filter)
-//                .Join(
-//                    _context.FilterGroup,
-//                    filterItem => filterItem.FilterGroup,
-//                    filterGroup => filterGroup,
-//                    (filterItem, filterGroup) => filterGroup
-//                )
-//                .Join(
-//                    _context.Filter,
-//                    filterGroup => filterGroup.Filter,
-//                    filter => filter,
-//                    (filterGroup, filter) => filter
-//                )
                 .ToList();
 
-            return filterItems.Distinct();
+            return filterItems;
         }
 
         public FilterItem GetTotal(Filter filter)

@@ -2,10 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
+using Microsoft.VisualBasic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
@@ -14,34 +17,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         public static Expression<Func<Observation, bool>> Build(SubjectMetaQueryContext query)
         {
             var predicate = PredicateBuilder.True<Observation>()
-                .And(observation => observation.SubjectId == query.SubjectId);
+                .AndAlso(observation => observation.SubjectId == query.SubjectId);
 
             if (query.TimePeriod != null)
             {
-                // Don't use the observation.GetTimePeriod() extension in the expression here
-                // or string interpolation as it can't be translated
-                predicate = predicate.And(observation => GetTimePeriodRange(query.TimePeriod)
-                    .Contains(observation.Year + "_" + observation.TimeIdentifier));
+                var timePeriodRange = GetTimePeriodRange(query.TimePeriod);
+
+                var subPredicate = PredicateBuilder.False<Observation>();
+                
+                foreach (var tuple in timePeriodRange)
+                {
+                    var year = tuple.Year;
+                    var timeIdentifier = tuple.TimeIdentifier;
+
+                    subPredicate = subPredicate.Or(observation =>
+                        observation.Year == year && observation.TimeIdentifier == timeIdentifier);
+                }
+                
+                predicate = predicate.AndAlso(subPredicate);
             }
 
             if (query.GeographicLevel != null)
             {
-                predicate = predicate.And(observation => observation.GeographicLevel == query.GeographicLevel);
+                predicate = predicate.AndAlso(observation => 
+                    observation.GeographicLevel.Equals(query.GeographicLevel));
             }
 
             if (ObservationalUnitExists(query))
             {
-                predicate = ObservationalUnitsPredicate(query, predicate);
+                predicate = predicate.AndAlso(ObservationalUnitsPredicate(query));
             }
 
             return predicate;
         }
 
         private static Expression<Func<Observation, bool>> ObservationalUnitsPredicate(
-            SubjectMetaQueryContext query,
-            Expression<Func<Observation, bool>> predicate
+            SubjectMetaQueryContext query
         )
         {
+            var predicate = PredicateBuilder.False<Observation>();
+            
             if (query.Country != null)
             {
                 predicate = predicate.Or(CountryPredicate(query));
@@ -133,7 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 query.Country.Contains(observation.Location.Country.Code);
 
             return query.GeographicLevel == null 
-                ? expression.And(observation => observation.GeographicLevel == GeographicLevel.Country) 
+                ? expression.AndAlso(observation => observation.GeographicLevel == GeographicLevel.Country) 
                 : expression;
         }
 
@@ -220,19 +235,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             GeographicLevel geographicLevel, Expression<Func<Observation, bool>> expression)
         {
             return query.GeographicLevel == null 
-                ? expression.And(observation => observation.GeographicLevel.Equals(geographicLevel)) 
+                ? expression.AndAlso(observation => observation.GeographicLevel.Equals(geographicLevel)) 
                 : expression;
         }
 
-        private static IEnumerable<string> GetTimePeriodRange(TimePeriodQuery timePeriod)
+        private static IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriodRange(TimePeriodQuery timePeriod)
         {
             if (timePeriod.StartCode.IsNumberOfTerms() || timePeriod.EndCode.IsNumberOfTerms())
             {
-                return TimePeriodUtil.RangeForNumberOfTerms(timePeriod.StartYear, timePeriod.EndYear)
-                    .Select(tuple => tuple.GetTimePeriod());
+                return TimePeriodUtil.RangeForNumberOfTerms(timePeriod.StartYear, timePeriod.EndYear);
             }
 
-            return TimePeriodUtil.Range(timePeriod).Select(tuple => tuple.GetTimePeriod());
+            return TimePeriodUtil
+                .Range(timePeriod);
         }
     }
 }

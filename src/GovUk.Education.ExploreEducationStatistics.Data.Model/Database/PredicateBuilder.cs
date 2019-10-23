@@ -24,25 +24,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         public static Expression<Func<T, bool>> Or<T>(this Expression<Func<T, bool>> expression1,
             Expression<Func<T, bool>> expression2)
         {
-            return expression1.CombineWithOrElse(expression2);
-                
-//            var invocationExpression =
-//                Expression.Invoke(expression2, expression1.Parameters);
-//            return Expression.Lambda<Func<T, bool>>(
-//                Expression.OrElse(expression1.Body, invocationExpression),
-//                expression1.Parameters);
+            return expression1.CombineWithOr(expression2);
         }
 
         public static Expression<Func<T, bool>> And<T>(this Expression<Func<T, bool>> expression1,
             Expression<Func<T, bool>> expression2)
         {
-            return expression1.CombineWithAndAlso(expression2);
-
-//            var invocationExpression = Expression.Invoke(expression2, expression1.Parameters);
-//            return Expression.Lambda<Func<T, bool>>(
-//                Expression.AndAlso(expression1.Body, invocationExpression),
-//                expression1.Parameters);
+            return expression1.CombineWithAnd(expression2);
         }
+
+        public static Expression<Func<T, bool>> OrElse<T>(this Expression<Func<T, bool>> expression1,
+            Expression<Func<T, bool>> expression2)
+        {
+            return expression1.CombineWithOrElse(expression2);
+        }
+
+        public static Expression<Func<T, bool>> AndAlso<T>(this Expression<Func<T, bool>> expression1,
+            Expression<Func<T, bool>> expression2)
+        {
+            return expression1.CombineWithAndAlso(expression2);
+        }
+        
+        private static Expression<Func<TInput, bool>> CombineWithAnd<TInput>(this Expression<Func<TInput, bool>> func1, Expression<Func<TInput, bool>> func2)
+        {
+            return Expression.Lambda<Func<TInput, bool>>(
+                Expression.And(
+                    func1.Body, new ExpressionParameterReplacer(func2.Parameters, func1.Parameters).Visit(func2.Body)),
+                func1.Parameters);
+        }
+        
         private static Expression<Func<TInput, bool>> CombineWithAndAlso<TInput>(this Expression<Func<TInput, bool>> func1, Expression<Func<TInput, bool>> func2)
         {
             return Expression.Lambda<Func<TInput, bool>>(
@@ -54,10 +64,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         private static Expression<Func<TInput, bool>> CombineWithOrElse<TInput>(this Expression<Func<TInput, bool>> func1, Expression<Func<TInput, bool>> func2)
         {
             return Expression.Lambda<Func<TInput, bool>>(
-                Expression.AndAlso(
+                Expression.OrElse(
                     func1.Body, new ExpressionParameterReplacer(func2.Parameters, func1.Parameters).Visit(func2.Body)),
                 func1.Parameters);
         }
+        
+        private static Expression<Func<TInput, bool>> CombineWithOr<TInput>(this Expression<Func<TInput, bool>> func1, Expression<Func<TInput, bool>> func2)
+        {
+            return Expression.Lambda<Func<TInput, bool>>(
+                Expression.Or(
+                    func1.Body, new ExpressionParameterReplacer(func2.Parameters, func1.Parameters).Visit(func2.Body)),
+                func1.Parameters);
+        }
+
 
         private class ExpressionParameterReplacer : ExpressionVisitor
         {
