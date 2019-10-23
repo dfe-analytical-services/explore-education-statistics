@@ -103,6 +103,12 @@ const emptyMetadata = {
   locations: {},
 };
 
+enum SaveState {
+  Unsaved,
+  Error,
+  Saved,
+}
+
 // need a constant reference as there are dependencies on this not changing if it isn't set
 const ChartBuilder = ({
   data,
@@ -147,15 +153,8 @@ const ChartBuilder = ({
     {},
   );
 
-  const [chartSaveState, setChartSaveState] = React.useReducer(
-    (state, action?: string) => {
-      if (!action) return { saved: false, error: false };
 
-      if (action === 'saved') return { saved: true, error: false };
-      return { saved: true, error: true };
-    },
-    { saved: false, error: false },
-  );
+  const [chartSaveState, setChartSaveState] = React.useState(SaveState.Unsaved);
 
   const [axesConfiguration, realSetAxesConfiguration] = React.useState<
     Dictionary<AxisConfiguration>
@@ -171,7 +170,7 @@ const ChartBuilder = ({
   };
 
   const onDataAdded = (addedData: SelectedData) => {
-    setChartSaveState(undefined);
+    setChartSaveState(SaveState.Unsaved);
 
     const newDataSetConfig = [...dataSetAndConfiguration, addedData];
 
@@ -179,7 +178,7 @@ const ChartBuilder = ({
   };
 
   const onDataRemoved = (removedData: SelectedData, index: number) => {
-    setChartSaveState(undefined);
+    setChartSaveState(SaveState.Unsaved);
 
     const newDataSets = [...dataSetAndConfiguration];
 
@@ -376,13 +375,13 @@ const ChartBuilder = ({
   };
 
   const saveChart = React.useCallback(async () => {
-    setChartSaveState(undefined);
+    setChartSaveState(SaveState.Unsaved);
     if (renderedChartProps && onChartSave) {
       try {
         await onChartSave(renderedChartProps);
-        setChartSaveState('saved');
+        setChartSaveState(SaveState.Saved);
       } catch (_) {
-        setChartSaveState('error');
+        setChartSaveState(SaveState.Error);
       }
     }
   }, [onChartSave, renderedChartProps]);
@@ -391,7 +390,7 @@ const ChartBuilder = ({
   React.useEffect(() => {
     const initial = extractInitialChartOptions(initialConfiguration);
 
-    setChartSaveState(undefined);
+    setChartSaveState(SaveState.Unsaved);
 
     setSelectedChartType(
       () => initial && chartTypes.find(({ type }) => type === initial.type),
@@ -428,7 +427,7 @@ const ChartBuilder = ({
       <ChartTypeSelector
         chartTypes={chartTypes}
         onSelectChart={chart => {
-          setChartSaveState(undefined);
+          setChartSaveState(SaveState.Unsaved);
           setSelectedChartType(chart);
         }}
         selectedChartType={selectedChartType}
@@ -438,7 +437,7 @@ const ChartBuilder = ({
           href="#"
           onClick={e => {
             e.preventDefault();
-            setChartSaveState(undefined);
+            setChartSaveState(SaveState.Unsaved);
             setSelectedChartType(Infographic.definition);
           }}
         >
@@ -479,7 +478,7 @@ const ChartBuilder = ({
                 onDataAdded={onDataAdded}
                 onDataRemoved={onDataRemoved}
                 onDataChanged={(newData: ChartDataSetAndConfiguration[]) => {
-                  setChartSaveState(undefined);
+                  setChartSaveState(SaveState.Unsaved);
                   setDataSetAndConfiguration([...newData]);
                 }}
                 metaData={metaData}
@@ -497,11 +496,11 @@ const ChartBuilder = ({
               selectedChartType={selectedChartType}
               chartOptions={chartOptions}
               onChange={chartOptionsValue => {
-                setChartSaveState(undefined);
+                setChartSaveState(SaveState.Unsaved);
                 setChartOptions(chartOptionsValue);
               }}
               onBoundaryLevelChange={boundaryLevel => {
-                setChartSaveState(undefined);
+                setChartSaveState(SaveState.Unsaved);
                 if (onRequiresDataUpdate)
                   onRequiresDataUpdate({
                     boundaryLevel: boundaryLevel
@@ -526,7 +525,7 @@ const ChartBuilder = ({
                   labels={chartLabels}
                   dataSets={axis.type === 'major' ? majorAxisDataSets : []}
                   onConfigurationChange={updatedConfig => {
-                    setChartSaveState(undefined);
+                    setChartSaveState(SaveState.Unsaved);
                     setAxesConfiguration({
                       ...axesConfiguration,
                       [key]: updatedConfig,
@@ -545,10 +544,12 @@ const ChartBuilder = ({
             Save chart options
           </button>
 
-          {chartSaveState && (
+          {chartSaveState !== SaveState.Unsaved && (
             <div>
-              {chartSaveState.saved && <span>Chart has been saved</span>}
-              {chartSaveState.error && (
+              {chartSaveState === SaveState.Saved && (
+                <span>Chart has been saved</span>
+              )}
+              {chartSaveState === SaveState.Error && (
                 <span>
                   An error occurred saving the chart, please try again later
                 </span>
