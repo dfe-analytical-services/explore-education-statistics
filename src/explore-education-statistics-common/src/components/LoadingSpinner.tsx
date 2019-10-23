@@ -1,5 +1,6 @@
 import classNames from 'classnames';
 import React from 'react';
+import AriaLiveMessage from './AriaLiveMessage';
 import styles from './LoadingSpinner.module.scss';
 
 interface Props {
@@ -8,6 +9,7 @@ interface Props {
   size?: number;
   inline?: boolean;
   overlay?: boolean;
+  srMessage?: string;
 }
 
 const LoadingSpinner = ({
@@ -16,6 +18,7 @@ const LoadingSpinner = ({
   size = 80,
   inline = false,
   overlay = false,
+  srMessage = 'Loading',
 }: Props) => {
   return (
     <div
@@ -34,6 +37,7 @@ const LoadingSpinner = ({
           borderWidth: `${size * 0.15}px`,
         }}
       />
+      <AriaLiveMessage message={srMessage} />
     </div>
   );
 };
