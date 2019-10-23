@@ -157,7 +157,7 @@ const ReleaseManageDataBlocksPage = () => {
       <FormSelect
         id="selectDataBlock"
         name="selectDataBlock"
-        label="Select a existing data block to edit or create a new one"
+        label="Select an existing data block to edit or create a new one"
         onChange={e => {
           setSelectedDataBlock(e.target.value);
 
