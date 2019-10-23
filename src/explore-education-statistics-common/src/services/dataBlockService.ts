@@ -1,6 +1,7 @@
 import { dataApi } from '@common/services/api';
-import { Dictionary, PartialRecord } from '@common/types/util';
+import { Dictionary } from '@common/types/util';
 import { Feature, Geometry } from 'geojson';
+import { TableDataQuery } from '@common/modules/full-table/services/tableBuilderService';
 
 export enum GeographicLevel {
   Establishment = 'Establishment',
@@ -18,6 +19,7 @@ export enum GeographicLevel {
   RSCRegion = 'RSC_Region',
   School = 'School',
   Ward = 'Ward',
+  Instituation = 'institution',
 }
 
 export type TimeIdentifier =
@@ -280,6 +282,9 @@ export interface DataBlockRerequest {
   boundaryLevel?: number;
 }
 
+export type DataBlockRequest = TableDataQuery;
+
+/*
 export type DataBlockRequest = {
   subjectId: string;
   timePeriod?: DataBlockTimePeriod;
@@ -288,6 +293,7 @@ export type DataBlockRequest = {
   indicators: string[];
 } & DataBlockRerequest &
   PartialRecord<LocationKeys, string[]>;
+*/
 
 export interface DataBlockResponse {
   metaData: DataBlockMetadata;

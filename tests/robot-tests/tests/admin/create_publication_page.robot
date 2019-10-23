@@ -1,7 +1,7 @@
 *** Settings ***
-Resource    ./libs/common-keywords.robot
+Resource    ../../test-libs/admin-common.robot
 
-Force Tags  Admin  NotAgainstProd
+Force Tags  Admin  Dev  Test
 
 Suite Setup       user signs in
 Suite Teardown    user closes the browser

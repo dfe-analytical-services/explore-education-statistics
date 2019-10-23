@@ -26,7 +26,7 @@ import imageDataBlockDeleteTable from './images/guidance/guidance-datablocks-del
 import imageDataBlockDeleteChart from './images/guidance/guidance-datablocks-delete-chart.png';
 import imageFootnotesEdit from './images/guidance/guidance-footnotes-edit.jpg';
 
-const DocumentationManageDataBlock = ({ location }: RouteChildrenProps) => {
+const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
   const query = new URLSearchParams(window.location.search);
   const step = Number(query.get('step'));
 

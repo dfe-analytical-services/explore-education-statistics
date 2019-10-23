@@ -103,90 +103,99 @@ class TableToolPage extends Component<Props, State> {
         <TableTool
           publicationId={publicationId}
           themeMeta={themeMeta}
-          finalStepExtra={finalStepProps => (
-            <>
-              <h3>Share your table</h3>
-              <ul className="govuk-list">
-                <li>
-                  {permalinkId ? (
-                    <>
-                      <div>Generated permanent link:</div>
-                      <LinkContainer
-                        url={`${window.location.host}/data-tables/permalink/${permalinkId}`}
-                      />
-                      <div>
-                        <a
-                          className="govuk-link"
-                          href={`/data-tables/permalink/${permalinkId}`}
-                          title="View created table permalink"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          View permanent link
-                        </a>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      {permalinkLoading ? (
-                        <>
-                          Generating permanent link
-                          <LoadingSpinner inline size={19} />
-                        </>
-                      ) : (
-                        <ButtonText
-                          disabled={permalinkLoading}
-                          onClick={() =>
-                            this.handlePermalinkClick(finalStepProps)
-                          }
-                        >
-                          Generate permanent link
-                        </ButtonText>
-                      )}
-                    </>
-                  )}
-                </li>
-              </ul>
-
-              <h3>Additional options</h3>
-
-              {finalStepProps.publication && (
+          finalStepExtra={({
+            publication,
+            query,
+            tableHeaders,
+            createdTable,
+          }) =>
+            createdTable &&
+            tableHeaders &&
+            query && (
+              <>
+                <h3>Share your table</h3>
                 <ul className="govuk-list">
                   <li>
-                    <Link
-                      as={`/find-statistics/${finalStepProps.publication.slug}`}
-                      to={`/find-statistics/publication?publication=${finalStepProps.publication.slug}`}
-                    >
-                      Go to publication
-                    </Link>
-                  </li>
-                  <li>
-                    <DownloadCsvButton
-                      publicationSlug={finalStepProps.publication.slug}
-                      fullTable={finalStepProps.createdTable}
-                    />
-                  </li>
-
-                  <li>
-                    <a href="#api">Access developer API</a>
-                  </li>
-                  <li>
-                    <Link
-                      as={`/methodology/${finalStepProps.publication.slug}`}
-                      to={`/methodology/methodology?publication=${finalStepProps.publication.slug}`}
-                    >
-                      Go to methodology
-                    </Link>
+                    {permalinkId ? (
+                      <>
+                        <div>Generated permanent link:</div>
+                        <LinkContainer
+                          url={`${window.location.host}/data-tables/permalink/${permalinkId}`}
+                        />
+                        <div>
+                          <a
+                            className="govuk-link"
+                            href={`/data-tables/permalink/${permalinkId}`}
+                            title="View created table permalink"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            View permanent link
+                          </a>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        {permalinkLoading ? (
+                          <>
+                            Generating permanent link
+                            <LoadingSpinner inline size={19} />
+                          </>
+                        ) : (
+                          <ButtonText
+                            disabled={permalinkLoading}
+                            onClick={() =>
+                              this.handlePermalinkClick({ query, tableHeaders })
+                            }
+                          >
+                            Generate permanent link
+                          </ButtonText>
+                        )}
+                      </>
+                    )}
                   </li>
                 </ul>
-              )}
-              <p className="govuk-body">
-                If you have a question about the data or methods used to create
-                this table contact the named statistician via the relevant
-                release page.
-              </p>
-            </>
-          )}
+
+                <h3>Additional options</h3>
+
+                {publication && (
+                  <ul className="govuk-list">
+                    <li>
+                      <Link
+                        as={`/find-statistics/${publication.slug}`}
+                        to={`/find-statistics/publication?publication=${publication.slug}`}
+                      >
+                        Go to publication
+                      </Link>
+                    </li>
+                    <li>
+                      <DownloadCsvButton
+                        publicationSlug={publication.slug}
+                        fullTable={createdTable}
+                      />
+                    </li>
+
+                    <li>
+                      <a href="#api">Access developer API</a>
+                    </li>
+                    <li>
+                      <Link
+                        as={`/methodology/${publication.slug}`}
+                        to={`/methodology/methodology?publication=${publication.slug}`}
+                      >
+                        Go to methodology
+                      </Link>
+                    </li>
+                  </ul>
+                )}
+                <p className="govuk-body">
+                  If you have a question about the data or methods used to
+                  create this table contact the named statistician via the
+                  relevant release page.
+                </p>
+              </>
+            )
+          }
         />
       </Page>
     );

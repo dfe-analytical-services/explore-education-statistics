@@ -1,7 +1,7 @@
 *** Settings ***
-Resource    ../libs/library.robot
+Resource    ../../test-libs/common.robot
 
-Force Tags  GeneralPublic
+Force Tags  GeneralPublic  Local  Dev  Test
 
 Suite Setup       user opens the browser
 Suite Teardown    user closes the browser
@@ -64,15 +64,15 @@ Validate "Related guidance"
     user checks page contains link with text and url  Pupil absence in schools in England: methodology   /methodology/pupil-absence-in-schools-in-england
 
 Validate subject files file type and file unit style
-    [Documentation]  DFE-958
-    [Tags]  HappyPath   NotAgainstLocal
+    [Documentation]  DFE-958   DFE-562
+    [Tags]  HappyPath   NotAgainstLocal   Failing
     user opens details dropdown     Download data files
-    user checks page contains      Absence in PRUs (csv, 141 Kb)
+    user checks page contains      Absence in PRUs (CSV, 141 Kb)
     user closes details dropdown     Download data files
 
 Validate absence_in_prus.csv file can be downloaded
-    [Documentation]  DFE-958
-    [Tags]  HappyPath    NotAgainstLocal
+    [Documentation]  DFE-958   DFE-562
+    [Tags]  HappyPath    NotAgainstLocal  Failing
     user opens details dropdown     Download data files
 
     download file  link:Absence in PRUs     absence_in_prus.csv
@@ -82,7 +82,8 @@ Validate absence_in_prus.csv file can be downloaded
 
 Validate Key Statistics data block -- Summary tab
     [Documentation]  DFE-915
-    [Tags]  HappyPath       Failing
+    [Tags]  HappyPath
+    user waits until page contains element   css:#keystats-summary
     user checks key stat tile contents   Overall absence rate         4.7%   Up from 4.6% in 2015/16
     user checks key stat tile contents   Authorised absence rate      3.4%   Similar to previous years
     user checks key stat tile contents   Unauthorised absence rate    1.3%   Up from 1.1% in 2015/16
@@ -109,7 +110,7 @@ Validate accordion sections order
 
 Clicking "Create tables" takes user to Table Tool page with absence publication selected
     [Documentation]  DFE-898
-    [Tags]  HappyPath    Failing
+    [Tags]  HappyPath
     user clicks link    Create tables
     user waits until page contains  Create your own tables online
 

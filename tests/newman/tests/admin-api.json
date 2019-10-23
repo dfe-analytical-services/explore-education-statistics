@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "efdd5e05-84e6-48d2-a347-5c641f2a8fc8",
+		"_postman_id": "ae3aab71-a90b-46e0-9a40-0cfed7f03a29",
 		"name": "DfE Admin API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -1242,6 +1242,490 @@
 											"key": "releaseId",
 											"value": "4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"
 										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Footnotes",
+					"item": [
+						{
+							"name": "Create Footnote for Filters",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+										"exec": [
+											"var respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+											"",
+											"// NOTE: Save the footnote id for use in the next request",
+											"pm.globals.set(\"footnote_for_filters_id\", respJson.id);",
+											"",
+											"pm.test(\"Fields are present\", function () {",
+											"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"label\"));",
+											"});",
+											"",
+											"pm.test(\"label should should be correct\", function () { ",
+											"    pm.expect(respJson.label).to.equal(\"Postman test footnote\"); ",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+										"exec": [
+											"pm.globals.set(\"F_AbsenceRatePercentBands_SchoolType\", \"11\");",
+											"",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Cookie",
+										"type": "text",
+										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"content\": \"Postman test footnote\",\n    \"indicators\": [\n    \t{{IND_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}},\n    \t{{IND_AbsenceFields__NumberOfAuthorisedAbsenceSessions}}\n    ],\n    \"filters\": [\n    \t{{F_AbsenceRatePercentBands_SchoolType}}\n    \t],\n    \"filterGroups\": [],\n    \"filterItems\": [],\n    \"subjectId\": 7\n}"
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/data/footnote",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"data",
+										"footnote"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Footnote for Filters",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+										"exec": [
+											"pm.test(\"Status code is 204\", function () { pm.response.to.have.status(204); });"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Cookie",
+										"type": "text",
+										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+									}
+								],
+								"url": {
+									"raw": "{{admin_api_url}}/data/footnote/{{footnote_for_filters_id}}",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"data",
+										"footnote",
+										"{{footnote_for_filters_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Footnote for Filter Groups",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+										"exec": [
+											"var respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+											"",
+											"// NOTE: Save the footnote id for use in the next request",
+											"pm.globals.set(\"footnote_for_filter_groups_id\", respJson.id);",
+											"",
+											"pm.test(\"Fields are present\", function () {",
+											"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"label\"));",
+											"});",
+											"",
+											"pm.test(\"label should should be correct\", function () { ",
+											"    pm.expect(respJson.label).to.equal(\"Postman test footnote\"); ",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+										"exec": [
+											"pm.globals.set(\"FG_AbsenceRatePercentBands_SchoolType_Default\", \"20\");",
+											"",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Cookie",
+										"type": "text",
+										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"content\": \"Postman test footnote\",\n    \"indicators\": [\n    \t{{IND_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}},\n    \t{{IND_AbsenceFields__NumberOfAuthorisedAbsenceSessions}}\n    ],\n    \"filters\": [],\n    \"filterGroups\": [\n    \t{{FG_AbsenceRatePercentBands_SchoolType_Default}}\n    \t],\n    \"filterItems\": [],\n    \"subjectId\": 7\n}"
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/data/footnote",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"data",
+										"footnote"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Footnote for Filter Groups",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+										"exec": [
+											"pm.test(\"Status code is 204\", function () { pm.response.to.have.status(204); });"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Cookie",
+										"type": "text",
+										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+									}
+								],
+								"url": {
+									"raw": "{{admin_api_url}}/data/footnote/{{footnote_for_filter_groups_id}}",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"data",
+										"footnote",
+										"{{footnote_for_filter_groups_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Footnote for Filter Items",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+										"exec": [
+											"var respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+											"",
+											"// NOTE: Save the footnote id for use in the next request",
+											"pm.globals.set(\"footnote_for_filter_items_id\", respJson.id);",
+											"",
+											"pm.test(\"Fields are present\", function () {",
+											"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"label\"));",
+											"});",
+											"",
+											"pm.test(\"label should should be correct\", function () { ",
+											"    pm.expect(respJson.label).to.equal(\"Postman test footnote\"); ",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+										"exec": [
+											"pm.globals.set(\"FI_AbsenceRatePercentBands_SchoolType_Default_Total\", \"104\");"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Cookie",
+										"type": "text",
+										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"content\": \"Postman test footnote\",\n    \"indicators\": [\n    \t{{IND_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}},\n    \t{{IND_AbsenceFields__NumberOfAuthorisedAbsenceSessions}}\n    ],\n    \"filters\": [],\n    \"filterGroups\": [],\n    \"filterItems\": [\n    \t{{FI_AbsenceRatePercentBands_SchoolType_Default_Total}}\n    \t],\n    \"subjectId\": 7\n}"
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/data/footnote",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"data",
+										"footnote"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Footnote Filter Items",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+										"exec": [
+											"var respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+											"",
+											"pm.test(\"Fields are present\", function () {",
+											"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"label\"));",
+											"});",
+											"",
+											"pm.test(\"id should match request id\", function () {",
+											"    pm.expect(respJson.id).to.equal(pm.globals.get(\"footnote_for_filter_items_id\"));",
+											"});",
+											"",
+											"pm.test(\"label should should be correct\", function () { ",
+											"    pm.expect(respJson.label).to.equal(\"Postman test footnote - Updated\"); ",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+										"exec": [
+											"pm.globals.set(\"FI_AbsenceRatePercentBands_SchoolType_Default_Special\", \"178\");",
+											"pm.globals.set(\"FI_AbsenceRatePercentBands_SchoolType_Default_StateFundedSecondary\", \"179\");",
+											"pm.globals.set(\"FI_AbsenceRatePercentBands_SchoolType_Default_StateFundedPrimary\", \"180\");",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Cookie",
+										"type": "text",
+										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"content\": \"Postman test footnote - Updated\",\n    \"indicators\": [\n    \t{{IND_AbsenceFields__NumberOfOverallAbsenceSessions}}\n    \t],\n    \"filters\": [],\n    \"filterGroups\": [],\n    \"filterItems\": [\n    \t{{FI_AbsenceRatePercentBands_SchoolType_Default_Special}},\n    \t{{FI_AbsenceRatePercentBands_SchoolType_Default_StateFundedSecondary}},\n    \t{{FI_AbsenceRatePercentBands_SchoolType_Default_StateFundedPrimary}}\n    \t]\n}"
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/data/footnote/{{footnote_for_filter_items_id}}",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"data",
+										"footnote",
+										"{{footnote_for_filter_items_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Footnote for Filter Items",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+										"exec": [
+											"pm.test(\"Status code is 204\", function () { pm.response.to.have.status(204); });"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Cookie",
+										"type": "text",
+										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+									}
+								],
+								"url": {
+									"raw": "{{admin_api_url}}/data/footnote/{{footnote_for_filter_items_id}}",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"data",
+										"footnote",
+										"{{footnote_for_filter_items_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Footnote invalid id",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+										"exec": [
+											"pm.test(\"Status code is 404\", function () { pm.response.to.have.status(404); });"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Cookie",
+										"type": "text",
+										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+									}
+								],
+								"url": {
+									"raw": "{{admin_api_url}}/data/footnote/99999",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"data",
+										"footnote",
+										"99999"
 									]
 								}
 							},

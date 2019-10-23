@@ -1,3 +1,17 @@
+[What is this?](#user-content-what-is-this)
+
+[What do I need to install?](#user-content-what-do-i-need-to-install)
+
+[How do I run the tests?](#user-content-how-do-i-run-the-tests)
+
+[How do I backup and restore the test data on my local environment?](#user-content-how-do-i-backup-and-restore-the-test-data-on-my-local-environment)
+
+[Directory structure](#user-content-directory-structure)
+
+[Guidelines for people writing UI tests](#user-content-guidelines-for-people-writing-ui-tests)
+
+[Who should I talk to?](#user-content-who-should-i-talk-to)  
+
 # What is this?
 
 This test framework runs UI tests against the Explore Education Statistics service using Selenium and Robot Framework.
@@ -34,7 +48,7 @@ OR
 python -m pipenv install
 ```
 
-If you intend to run the tests from your local machine, you will also need to create .env files for the relevant environments: ".env.dev", ".env.test", and ".env.dev03". You can copy and rename the .env.example file in the robot-tests directory, replacing the variable values with those for that file's specific environment. The tests rely on these environment variables being set.
+If you intend to run the tests from your local machine, you will also need to create .env files for the relevant environments: ".env.local", ".env.dev", ".env.test", and ".env.dev03". You can copy and rename the .env.example file in the robot-tests directory, replacing the variable values with those for that file's specific environment. The tests rely on these environment variables being set.
 
 
 # How do I run the tests?
@@ -50,7 +64,7 @@ pipenv run python run_tests.py -h
 
 # How do I backup and restore the test data on my local environment?
 
-You can currently only backup and restore data on your local environment using Windows. This is because currently you can only emulate Azure storage tables on Windows.
+You can currently only backup and restore data on your local environment using Windows. This is because currently you can only emulate Azure storage tables on Windows. At the time of writing [Azurite V3 only has support for blobs and queues, not tables](https://github.com/Azure/Azurite).
 
 For the backup and restore scripts to work, you'll need:
 
@@ -74,11 +88,15 @@ To restore:
 pipenv run python restore-local.py
 ```
 
-The backup-local.py script is used to backup the data on your current local environment. This means both the content and statistics databases, the cache and releases blob containers, and the imports storage table. The script assumes you have both the ees-mssql docker container running and a local azure emulator running. The data is saved in the backup-data directory. Be warned that running this script does delete any files that were previously in your backup-data directory.
+You can find the latest backup of the test data on Google Drive -- ask if you need a link.
 
-NOTE: Before you run the backup-local.py script, you will want to put any message into your local `content-cache` queue to regenerate the content cache. If you don't, your backup of the cache will be out of sync with the database backup!
+The scripts deal with the content and statistics databases, the cache, downloads, and releases blob containers, and the imports storage table.
 
-The restore-local.py script takes the data in the backup-data directory and puts it in the content and statistics databases, the cache and releases blob containers, and the imports storage table. Be warned that you will lose any data in your local environment when you run this!
+NOTE: Be warned that the backup script will delete any files that were previously in your backup-data directory!
+
+ANOTHER NOTE: Be warned that the restore script will cause you to lose the data in your local environment!
+
+YET ANOTHER NOTE: Before you run the backup-local.py script, you may need to put a message into your local `content-cache` queue to regenerate the content cache. If you don't, your backup of the cache will be out of sync with the database backup!
 
 
 # Directory structure
@@ -86,7 +104,7 @@ The restore-local.py script takes the data in the backup-data directory and puts
 This section details what the various directories in robot-tests contain.
 
 ### backup-data
-This directory holds backup data for both the MsSQL databases, and the emulated cache blob container, releases blob container and imports table. If you run backup-local.py, the backup is stored here. If you run restore-local.py, it uses the data in this directory to restore to your docker databases and Azure local storage.
+This directory holds backup data for both the MsSQL databases, and the emulated cache/downloads/releases blob containers, and the imports table. If you run backup-local.py, the backup is stored here. If you run restore-local.py, it uses the data in this directory to restore to your docker databases and emulated Azure local storage.
 
 ### scripts
 This directory holds scripts used by run\_tests.py and the CI pipeline.
@@ -100,7 +118,7 @@ This holds the actual robot framework/selenium tests. The tests are themselves o
 ### webdriver
 This holds chromedriver, used by selenium to interact with the browser. If chromedriver isn't present in this directory, it is automatically downloaded when the tests are run. You can explicitly download the chromedriver version of your choice with "--chromedriver <version>". Alternatively, you can manually place the chromedriver of your choice into the webdriver directory.
 
-The run_tests.py only downloads chromedriver if it doesn't already exist. If you wish the run script to download a different version, you'll first have to delete chromedriver from the webdriver directory.
+NOTE: The run_tests.py only downloads chromedriver if it doesn't already exist. If you wish the run script to download a different version, you'll first have to delete chromedriver from the webdriver directory.
 
 If you need to change the chromedriver version used by the CI pipeline, it can be done in `scripts/pipeline-run-rf-tests.sh`. You can check [this repository](https://github.com/microsoft/azure-pipelines-image-generation/tree/master/images) for the version of chrome used on the Azure agent you're using. At the time of writing, the robot tests use the [Ubuntu 1604 image](https://github.com/microsoft/azure-pipelines-image-generation/blob/master/images/linux/Ubuntu1604-README.md)
 
@@ -118,7 +136,7 @@ IntelliJ also allows you use to External Tools to right click on a file and run 
 ### Parallelism / Pabot
 It is essential that the test suites can run in parallel. This might not be the case if one test suite relies on test data that another changes. AND this might cause the tests, when run in parallel, to fail in unpredictable ways, making it difficult to determine what test data is the failure-making culprit.
 
-For this reason, you **MUST** ensure that if you test suite requires test data that will change, that you create test new data. Be careful if scavenging test data from other test suites! Ideally, every test suite will use test data that is only used by those particular tests.
+For this reason, you **MUST** ensure that if you test suite requires test data that will change, that you create test new data to be used specifically with that test. Be careful if scavenging test data from other test suites! Ideally, every test suite will use test data that is only used by those particular tests.
 
 # Who should I talk to?
 

@@ -16,6 +16,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
 
         TEntity Find(TKey id);
 
+        Task<TEntity> FindAsync(TKey id);
+
         IQueryable<TEntity> Find(TKey[] ids);
 
         TEntity Find(TKey id, List<Expression<Func<TEntity, object>>> include);
@@ -26,5 +28,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
         int Max(Expression<Func<TEntity, int>> expression);
         
         long TopWithPredicate(Expression<Func<TEntity, long>> expression, Expression<Func<TEntity, bool>> predicate);
+
+        TEntity Remove(TKey id);
+
+        Task<TEntity> RemoveAsync(TKey id);
     }
 }

@@ -21,8 +21,12 @@ container = client.containers.get('ees-mssql')
 backup_cmds = [
     'rm -rf /tmp/',
     'mkdir tmp',
+    '''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "ALTER DATABASE [content] SET SINGLE_USER WITH ROLLBACK IMMEDIATE"''',
     '''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "BACKUP DATABASE [content] TO DISK = N'/tmp/content.bak' WITH NOFORMAT, NOINIT, NAME = 'content-full', SKIP, NOREWIND, NOUNLOAD, COMPRESSION, STATS = 10"''',
+    '''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "ALTER DATABASE [content] SET MULTI_USER WITH ROLLBACK IMMEDIATE"''',
+    '''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "ALTER DATABASE [statistics] SET SINGLE_USER WITH ROLLBACK IMMEDIATE"''',
     '''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "BACKUP DATABASE [statistics] TO DISK = N'/tmp/statistics.bak' WITH NOFORMAT, NOINIT, NAME = 'statistics-full', SKIP, NOREWIND, NOUNLOAD, COMPRESSION, STATS = 10"''',
+    '''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "ALTER DATABASE [statistics] SET MULTI_USER WITH ROLLBACK IMMEDIATE"''',
 ]
 for cmd in backup_cmds:
     print(container.exec_run(cmd))
@@ -48,25 +52,47 @@ for blob in generator:
     else:
         block_blob_service.get_blob_to_path('cache', blob.name, os.path.join(os.getcwd(), 'backup-data', 'content-cache', blob.name))
 
-# Backup downloads blob container to backup-data/releases
+# Backup releases blob container to backup-data/releases
 os.makedirs(os.path.join('backup-data', 'releases'))
 block_blob_service = BlockBlobService(is_emulated=True)
 generator = block_blob_service.list_blobs('releases')
 for blob in generator:
     if '/' in blob.name:
+        # Save file
         head, tail = os.path.split(blob.name)
         os.makedirs(os.path.join(os.getcwd(), 'backup-data', 'releases', head), exist_ok=True)
         blob_obj = block_blob_service.get_blob_to_path('releases', blob.name, os.path.join(os.getcwd(), 'backup-data', 'releases', head, tail))
+        # Save metadata
         with open(os.path.join(os.getcwd(), 'backup-data', 'releases', head, tail + '.metadata'), 'w') as file:
             file.write(json.dumps(blob_obj.metadata))
     else:
+        # Save file
         blob_obj = block_blob_service.get_blob_to_path('releases', blob.name, os.path.join(os.getcwd(), 'backup-data', 'releases', blob.name))
+        # Save metadata
         with open(os.path.join(os.getcwd(), 'backup-data', 'releases', blob.name + '.metadata'), 'w') as file:
+            file.write(blob_obj.metadata)
+
+# Backup downloads blob container to backup-data/downloads
+os.makedirs(os.path.join('backup-data', 'downloads'))
+block_blob_service = BlockBlobService(is_emulated=True)
+generator = block_blob_service.list_blobs('downloads')
+for blob in generator:
+    if '/' in blob.name:
+        # Save file
+        head, tail = os.path.split(blob.name)
+        os.makedirs(os.path.join(os.getcwd(), 'backup-data', 'downloads', head), exist_ok=True)
+        blob_obj = block_blob_service.get_blob_to_path('downloads', blob.name, os.path.join(os.getcwd(), 'backup-data', 'downloads', head, tail))
+        # Save metadata
+        with open(os.path.join(os.getcwd(), 'backup-data', 'downloads', head, tail + '.metadata'), 'w') as file:
+            file.write(json.dumps(blob_obj.metadata))
+    else:
+        # Save file
+        blob_obj = block_blob_service.get_blob_to_path('downloads', blob.name, os.path.join(os.getcwd(), 'backup-data', 'downloads', blob.name))
+        # Save metadata
+        with open(os.path.join(os.getcwd(), 'backup-data', 'downloads', blob.name + '.metadata'), 'w') as file:
             file.write(blob_obj.metadata)
 
 # Backup imports table to backup-data/imports
 os.makedirs(os.path.join('backup-data', 'imports'))
 backup_table_cmd = [AzCopy, f'/Source:{storage_table_url}/imports', '/sourceType:table', f'/Dest:{os.path.join(os.getcwd(),"backup-data", "imports")}', f'/SourceKey:{storage_key}', '/Manifest:table-backup.manifest']
 print(subprocess.run(backup_table_cmd))
-
-

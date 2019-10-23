@@ -1,14 +1,9 @@
-import React from 'react';
-import { RouteChildrenProps } from 'react-router';
 import Page from '@admin/components/Page';
+import React from 'react';
 import StepNav from './components/StepByStep';
 import StepNavItem from './components/StepByStepItem';
-import imageChoosePublication from './images/guidance/guidance-choose-publication.jpg';
-import imageCreateReleaseButton from './images/guidance/guidance-create-release-button.jpg';
-import imageCreateReleaseNavigation from './images/guidance/guidance-create-release-navigation.jpg';
-import imageSelectTheme from './images/guidance/guidance-select-theme.jpg';
 
-const DocumentationManageContent = ({ location }: RouteChildrenProps) => {
+const DocumentationManageContent = () => {
   const query = new URLSearchParams(window.location.search);
   const step = Number(query.get('step'));
 

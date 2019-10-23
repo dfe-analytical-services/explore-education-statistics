@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "f668864e-b21e-4ceb-8a04-8e8de75d69ed",
+		"_postman_id": "d1e3947e-6421-4dd9-a5a4-2a38ef2a6f5e",
 		"name": "DfE Data API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -6669,13 +6669,16 @@
 							"script": {
 								"id": "a8450e2f-c9ab-49e3-ade8-a3a285209058",
 								"exec": [
+									"/*",
+									"// EES-562",
 									"(pm.environment.get(\"data_api_url\") === \"http://localhost:5000/api\" ? pm.test.skip : pm.test)(\"Status code is 200\", function () { ",
 									"    pm.response.to.have.status(200); ",
 									"});",
 									"",
 									"(pm.environment.get(\"data_api_url\") === \"http://localhost:5000/api\" ? pm.test.skip : pm.test)(\"First line of CSV should be correct\", function () { ",
 									"    pm.expect(pm.response.text()).to.contain(\"time_identifier,time_period,geographic_level,country_code,country_name,region_code,region_name,old_la_code,new_la_code,la_name,school_type,sess_possible,sess_overall,sess_authorised,sess_unauthorised,sess_overall_percent,sess_authorised_percent,sess_unauthorised_percent,sess_auth_illness,sess_auth_appointments,sess_auth_religious,sess_auth_study,sess_auth_traveller,sess_auth_holiday,sess_auth_ext_holiday,sess_auth_excluded,sess_auth_other,sess_auth_totalreasons,sess_unauth_holiday,sess_unauth_late,sess_unauth_other,sess_unauth_noyet,sess_unauth_totalreasons,sess_overall_totalreasons\");",
-									"});"
+									"});",
+									"*/"
 								],
 								"type": "text/javascript"
 							}

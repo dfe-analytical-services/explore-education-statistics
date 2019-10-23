@@ -41,6 +41,10 @@ const Wizard = ({ children, initialStep = 1, id, onStepChange }: Props) => {
     }
   };
 
+  React.useEffect(() => {
+    setCurrentStepState(initialStep);
+  }, [initialStep]);
+
   return (
     <ol className={styles.stepNav}>
       {filteredChildren.map((child, index) => {

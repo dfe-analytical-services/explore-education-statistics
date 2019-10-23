@@ -27,6 +27,7 @@ import AdminDocumentationCreateNewRelease from './pages/documentation/Documentat
 import AdminDocumentationManageContent from './pages/documentation/DocumentationManageContent';
 import AdminDocumentationManageData from './pages/documentation/DocumentationManageData';
 import AdminDocumentationManageDataBlocks from './pages/documentation/DocumentationManageDataBlocks';
+import AdminDocumentationEditRelease from './pages/documentation/DocumentationEditRelease';
 
 import ApiAuthorizationRoutes from './components/api-authorization/ApiAuthorizationRoutes';
 
@@ -237,6 +238,11 @@ function App() {
           exact
           path="/documentation/create-new-release"
           component={AdminDocumentationCreateNewRelease}
+        />
+        <Route
+          exact
+          path="/documentation/edit-release"
+          component={AdminDocumentationEditRelease}
         />
         <Route
           exact

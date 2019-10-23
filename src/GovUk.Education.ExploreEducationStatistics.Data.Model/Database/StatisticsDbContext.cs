@@ -199,7 +199,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             
             modelBuilder.Entity<FilterFootnote>()
                 .HasOne(filterFootnote => filterFootnote.Footnote)
-                .WithMany()
+                .WithMany(footnote => footnote.Filters)
                 .HasForeignKey(filterFootnote => filterFootnote.FootnoteId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
@@ -216,7 +216,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             
             modelBuilder.Entity<FilterGroupFootnote>()
                 .HasOne(filterGroupFootnote => filterGroupFootnote.Footnote)
-                .WithMany()
+                .WithMany(footnote => footnote.FilterGroups)
                 .HasForeignKey(filterGroupFootnote => filterGroupFootnote.FootnoteId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
@@ -233,7 +233,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             
             modelBuilder.Entity<FilterItemFootnote>()
                 .HasOne(filterItemFootnote => filterItemFootnote.Footnote)
-                .WithMany()
+                .WithMany(footnote => footnote.FilterItems)
                 .HasForeignKey(filterItemFootnote => filterItemFootnote.FootnoteId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
@@ -250,7 +250,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 
             modelBuilder.Entity<IndicatorFootnote>()
                 .HasOne(indicatorFootnote => indicatorFootnote.Footnote)
-                .WithMany()
+                .WithMany(footnote => footnote.Indicators)
                 .HasForeignKey(indicatorFootnote => indicatorFootnote.FootnoteId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
@@ -330,7 +330,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 
             modelBuilder.Entity<SubjectFootnote>()
                 .HasOne(subjectFootnote => subjectFootnote.Footnote)
-                .WithMany()
+                .WithMany(footnote => footnote.Subjects)
                 .HasForeignKey(subjectFootnote => subjectFootnote.FootnoteId)
                 .OnDelete(DeleteBehavior.Restrict);
         }

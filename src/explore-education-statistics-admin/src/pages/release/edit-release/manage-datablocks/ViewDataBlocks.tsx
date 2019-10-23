@@ -1,12 +1,8 @@
+import { mapFullTable } from '@admin/pages/release/edit-release/manage-datablocks/tableUtil';
 import { DataBlock } from '@admin/services/release/edit-release/datablocks/types';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import { ChartRendererProps } from '@common/modules/find-statistics/components/ChartRenderer';
-import {
-  Indicator,
-  LocationFilter,
-  TimePeriodFilter,
-} from '@common/modules/full-table/types/filters';
 import { FullTable } from '@common/modules/full-table/types/fullTable';
 import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
 import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
@@ -16,60 +12,41 @@ import DataBlockService, {
   DataBlockRerequest,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
-import { Chart } from '@common/services/publicationService';
+import { Chart, ChartType } from '@common/services/publicationService';
 import React from 'react';
-
-const mapFullTable = (unmappedFullTable: DataBlockResponse): FullTable => {
-  const subjectMeta = unmappedFullTable.metaData || {
-    indicators: {},
-    locations: {},
-    timePeriodRange: {},
-  };
-
-  return {
-    results: unmappedFullTable.result,
-    subjectMeta: {
-      subjectName: '',
-      publicationName: 'Test',
-      footnotes: [],
-      filters: {},
-      ...unmappedFullTable.metaData,
-      indicators: Object.values(subjectMeta.indicators).map(
-        indicator => new Indicator(indicator),
-      ),
-      locations: Object.values(subjectMeta.locations).map(
-        location => new LocationFilter(location, location.level),
-      ),
-      timePeriodRange: Object.values(subjectMeta.timePeriods).map(
-        timePeriod => new TimePeriodFilter(timePeriod),
-      ),
-    },
-  };
-};
+import { reverseMapTableHeadersConfig } from '@common/modules/table-tool/components/utils/tableToolHelpers';
+import ChartBuilder from '@admin/modules/chart-builder/ChartBuilder';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 
 interface Props {
   dataBlock: DataBlock;
   dataBlockRequest: DataBlockRequest;
   dataBlockResponse: DataBlockResponse;
+  onDataBlockSave: (db: DataBlock) => Promise<DataBlock>;
 }
 
 const ViewDataBlocks = ({
   dataBlock,
   dataBlockResponse,
   dataBlockRequest,
+  onDataBlockSave,
 }: Props) => {
+  // we want to modify this internally as our own data, copying it
   const [chartBuilderData, setChartBuilderData] = React.useState<
     DataBlockResponse
-  >(dataBlockResponse);
+  >(() => {
+    return { ...dataBlockResponse };
+  });
+
+  // only update it if the external reference changes
+  React.useEffect(() => {
+    setChartBuilderData({ ...dataBlockResponse });
+  }, [dataBlockResponse]);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [initialConfiguration, setInitialConfiguration] = React.useState<
     Chart | undefined
   >();
-
-  React.useEffect(() => {
-    setChartBuilderData(dataBlockResponse);
-  }, [dataBlockResponse]);
 
   React.useEffect(() => {
     if (dataBlock && dataBlock.charts) {
@@ -78,8 +55,6 @@ const ViewDataBlocks = ({
       });
     }
   }, [dataBlock]);
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
   const [tableData, setTableData] = React.useState<{
     fullTable: FullTable;
@@ -95,13 +70,37 @@ const ViewDataBlocks = ({
 
     setTableData({
       fullTable,
-      tableHeadersConfig,
+      tableHeadersConfig: reverseMapTableHeadersConfig(
+        tableHeadersConfig,
+        fullTable.subjectMeta,
+      ),
     });
   }, [dataBlock.tables, chartBuilderData]);
 
-  // eslint-disable-next-line
   const onChartSave = (props: ChartRendererProps) => {
-    // console.log('Saved ', props);
+    // copy and strip out redundant data from the properties
+    const chart: Chart = {
+      type: props.type as ChartType,
+      axes: props.axes,
+      fileId: props.fileId,
+      geographicId: props.geographicId,
+      height: props.height,
+      labels: props.labels,
+      legend: props.legend,
+      legendHeight: props.legendHeight,
+      stacked: props.stacked,
+      title: props.title,
+      width: props.width,
+    };
+
+    const newDataBlock: DataBlock = {
+      ...dataBlock,
+      charts: [chart],
+    };
+
+    return onDataBlockSave(newDataBlock).then(() => {
+      return { ...props };
+    });
   };
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -113,7 +112,7 @@ const ViewDataBlocks = ({
 
     DataBlockService.getDataBlockForSubject(newRequest).then(response => {
       if (response) {
-        setChartBuilderData(response);
+        setChartBuilderData({ ...response });
       }
     });
   };
@@ -124,20 +123,20 @@ const ViewDataBlocks = ({
         <TabsSection title="table">
           {tableData && <TimePeriodDataTable {...tableData} />}
         </TabsSection>
-        {/*
-          <TabsSection title="Create Chart">
+        <TabsSection title="Create Chart">
           {chartBuilderData ? (
-            <ChartBuilder
-              data={chartBuilderData}
-              onChartSave={onChartSave}
-              initialConfiguration={initialConfiguration}
-              onRequiresDataUpdate={reRequestdata}
-            />
+            <div style={{ position: 'relative' }}>
+              <ChartBuilder
+                data={chartBuilderData}
+                onChartSave={onChartSave}
+                initialConfiguration={initialConfiguration}
+                onRequiresDataUpdate={reRequestdata}
+              />
+            </div>
           ) : (
             <LoadingSpinner />
           )}
-          </TabsSection>
-        */}
+        </TabsSection>
       </Tabs>
     </>
   );

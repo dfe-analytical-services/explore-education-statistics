@@ -23,13 +23,14 @@ interface Props {
   query: TableDataQuery;
   tableHeaders: TableHeadersFormValues;
   releaseId: string;
+  initialDataBlock?: DataBlock;
   onDataBlockSave: (dataBlock: DataBlock) => Promise<DataBlock>;
 }
 
 interface FormValues {
   title: string;
   source: string;
-  footnotes: string;
+  customFootnotes: string;
   name: string;
 }
 
@@ -37,12 +38,22 @@ const DataBlockDetailsForm = ({
   query,
   tableHeaders,
   releaseId,
+  initialDataBlock,
   onDataBlockSave,
 }: Props) => {
+  const formikRef = React.useRef<Formik<FormValues>>(null);
+
   const [blockState, setBlockState] = React.useReducer(
-    (state, { saved, error } = { saved: false, error: false }) => {
-      if (saved) {
-        return { saved: true };
+    (
+      state,
+      { saved, error, updated } = {
+        saved: false,
+        error: false,
+        updated: false,
+      },
+    ) => {
+      if (saved || updated) {
+        return { saved: true, updated };
       }
       if (error) {
         return { error: true };
@@ -58,6 +69,8 @@ const DataBlockDetailsForm = ({
 
   const saveDataBlock = async (values: FormValues) => {
     const dataBlock: DataBlock = {
+      id: initialDataBlock && initialDataBlock.id,
+
       dataBlockRequest: {
         ...query,
         geographicLevel: query.geographicLevel as GeographicLevel,
@@ -69,6 +82,10 @@ const DataBlockDetailsForm = ({
       },
 
       heading: values.title,
+      customFootnotes: values.customFootnotes,
+      name: values.name,
+
+      source: values.source,
       tables: [
         {
           indicators: [],
@@ -79,7 +96,7 @@ const DataBlockDetailsForm = ({
 
     try {
       await onDataBlockSave(dataBlock);
-      setBlockState({ saved: true });
+      setBlockState({ saved: true, updated: initialDataBlock !== undefined });
     } catch (error) {
       setBlockState({ error: true });
     }
@@ -89,16 +106,32 @@ const DataBlockDetailsForm = ({
     title: Yup.string().required('Please enter a title'),
     name: Yup.string().required('Please supply a name'),
     source: Yup.string(),
-    footnotes: Yup.string(),
+    customFootnotes: Yup.string(),
   };
+
+  React.useEffect(() => {
+    const newInitialValues = {
+      title: (initialDataBlock && initialDataBlock.heading) || '',
+      customFootnotes:
+        (initialDataBlock && initialDataBlock.customFootnotes) || '',
+      name: (initialDataBlock && initialDataBlock.name) || '',
+      source: (initialDataBlock && initialDataBlock.source) || '',
+    };
+
+    if (formikRef.current) {
+      formikRef.current.setValues(newInitialValues);
+    }
+  }, [initialDataBlock]);
 
   return (
     <Formik<FormValues>
+      enableReinitialize
+      ref={formikRef}
       initialValues={{
-        title: '',
-        footnotes: '',
-        name: '',
+        customFootnotes: '',
         source: '',
+        name: '',
+        title: '',
       }}
       validationSchema={Yup.object<FormValues>(baseValidationRules)}
       onSubmit={saveDataBlock}
@@ -122,7 +155,7 @@ const DataBlockDetailsForm = ({
 
                   <FormFieldTextArea<FormValues>
                     id="data-block-footnotes"
-                    name="Release footnotes"
+                    name="customFootnotes"
                     label="Footnotes"
                   />
 
@@ -142,7 +175,7 @@ const DataBlockDetailsForm = ({
                     type="submit"
                     className="govuk-!-margin-top-6"
                   >
-                    Save data block
+                    {initialDataBlock ? 'Update Data Block' : 'Save Data Block'}
                   </Button>
                 </FormFieldset>
               </FormGroup>
@@ -153,7 +186,13 @@ const DataBlockDetailsForm = ({
                   later.
                 </div>
               )}
-              {blockState.saved && <div>The Data Block has been saved.</div>}
+              {blockState.saved && (
+                <div>
+                  {blockState.updated
+                    ? 'The Data Block has been updated.'
+                    : 'The Data Block has been saved.'}
+                </div>
+              )}
             </Form>
           </div>
         );

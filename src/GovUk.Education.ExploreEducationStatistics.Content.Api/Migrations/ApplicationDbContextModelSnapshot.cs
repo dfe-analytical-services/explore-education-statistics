@@ -111,20 +111,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ContentSection", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Caption")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Caption");
 
-                    b.Property<string>("Heading")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Heading");
 
-                    b.Property<int>("Order")
-                        .HasColumnType("int");
+                    b.Property<int>("Order");
 
-                    b.Property<Guid>("ReleaseId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<Guid>("ReleaseId");
 
                     b.HasKey("Id");
 
@@ -322,15 +317,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.IContentBlock", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<Guid?>("ContentSectionId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<Guid?>("ContentSectionId");
 
                     b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired();
 
                     b.HasKey("Id");
 
@@ -344,17 +336,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Link", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Description");
 
-                    b.Property<Guid>("PublicationId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<Guid>("PublicationId");
 
-                    b.Property<string>("Url")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Url");
 
                     b.HasKey("Id");
 
@@ -522,30 +510,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Methodology", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Annexes")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Annexes");
 
-                    b.Property<string>("Content")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Content");
 
-                    b.Property<DateTime?>("LastUpdated")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTime?>("LastUpdated");
 
-                    b.Property<DateTime?>("Published")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTime?>("Published");
 
-                    b.Property<string>("Slug")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Slug");
 
-                    b.Property<string>("Summary")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Summary");
 
                     b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired();
 
                     b.HasKey("Id");
 
@@ -587,39 +567,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Publication", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<Guid?>("ContactId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<Guid?>("ContactId");
 
-                    b.Property<string>("DataSource")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("DataSource");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Description");
 
-                    b.Property<string>("LegacyPublicationUrl")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("LegacyPublicationUrl");
 
-                    b.Property<Guid?>("MethodologyId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<Guid?>("MethodologyId");
 
-                    b.Property<DateTime?>("NextUpdate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTime?>("NextUpdate");
 
-                    b.Property<string>("Slug")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Slug");
 
-                    b.Property<string>("Summary")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Summary");
 
                     b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired();
 
-                    b.Property<Guid>("TopicId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<Guid>("TopicId");
 
                     b.HasKey("Id");
 
@@ -1256,50 +1225,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<string>("InternalReleaseNote")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("InternalReleaseNote");
 
-                    b.Property<Guid?>("KeyStatisticsId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<Guid?>("KeyStatisticsId");
 
-                    b.Property<string>("NextReleaseDate")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("NextReleaseDate");
 
-                    b.Property<int>("Order")
-                        .HasColumnType("int");
+                    b.Property<int>("Order");
 
-                    b.Property<Guid>("PublicationId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<Guid>("PublicationId");
 
-                    b.Property<DateTime?>("PublishScheduled")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTime?>("PublishScheduled");
 
-                    b.Property<DateTime?>("Published")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTime?>("Published");
 
-                    b.Property<string>("ReleaseName")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("ReleaseName");
 
-                    b.Property<string>("Slug")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Slug");
 
                     b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired();
 
-                    b.Property<string>("Summary")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Summary");
 
                     b.Property<string>("TimePeriodCoverage")
                         .IsRequired()
-                        .HasColumnType("nvarchar(6)")
                         .HasMaxLength(6);
 
-                    b.Property<Guid?>("TypeId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<Guid?>("TypeId");
 
                     b.HasKey("Id");
 
@@ -1359,11 +1314,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseSummary", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<Guid>("ReleaseId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<Guid>("ReleaseId");
 
                     b.HasKey("Id");
 
@@ -1398,37 +1351,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseSummaryVersion", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTime>("Created");
 
-                    b.Property<string>("NextReleaseDate")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("NextReleaseDate");
 
-                    b.Property<DateTime?>("PublishScheduled")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTime?>("PublishScheduled");
 
-                    b.Property<string>("ReleaseName")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("ReleaseName");
 
-                    b.Property<Guid>("ReleaseSummaryId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<Guid>("ReleaseSummaryId");
 
-                    b.Property<string>("Slug")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Slug");
 
-                    b.Property<string>("Summary")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Summary");
 
                     b.Property<string>("TimePeriodCoverage")
                         .IsRequired()
-                        .HasColumnType("nvarchar(6)")
                         .HasMaxLength(6);
 
-                    b.Property<Guid>("TypeId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<Guid>("TypeId");
 
                     b.HasKey("Id");
 
@@ -1494,12 +1437,10 @@ Find out how and why these statistics are collected and published - [Secondary a
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseType", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired();
 
                     b.HasKey("Id");
 
@@ -1526,18 +1467,14 @@ Find out how and why these statistics are collected and published - [Secondary a
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Theme", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Slug")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Slug");
 
-                    b.Property<string>("Summary")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Summary");
 
                     b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired();
 
                     b.HasKey("Id");
 
@@ -1612,24 +1549,18 @@ Find out how and why these statistics are collected and published - [Secondary a
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Topic", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Description");
 
-                    b.Property<string>("Slug")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Slug");
 
-                    b.Property<string>("Summary")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Summary");
 
-                    b.Property<Guid>("ThemeId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<Guid>("ThemeId");
 
                     b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired();
 
                     b.HasKey("Id");
 
@@ -1955,18 +1886,14 @@ Find out how and why these statistics are collected and published - [Secondary a
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Update", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<DateTime>("On")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTime>("On");
 
                     b.Property<string>("Reason")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired();
 
-                    b.Property<Guid>("ReleaseId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<Guid>("ReleaseId");
 
                     b.HasKey("Id");
 
@@ -2070,6 +1997,10 @@ Find out how and why these statistics are collected and published - [Secondary a
                         .HasColumnName("DataBlock_Heading")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Name");
+
+                    b.Property<string>("Source");
+
                     b.Property<string>("Summary")
                         .HasColumnName("DataBlock_Summary")
                         .HasColumnType("nvarchar(max)");
@@ -2077,6 +2008,7 @@ Find out how and why these statistics are collected and published - [Secondary a
                     b.Property<string>("Tables")
                         .HasColumnName("DataBlock_Tables")
                         .HasColumnType("nvarchar(max)");
+
 
                     b.HasDiscriminator().HasValue("DataBlock");
 
@@ -2087,8 +2019,9 @@ Find out how and why these statistics are collected and published - [Secondary a
                             Type = "DataBlock",
                             Charts = "[{\"Width\":0,\"Height\":0,\"Legend\":\"top\",\"Labels\":{\"23_1_58_____\":{\"Label\":\"Unauthorised absence rate\",\"Value\":null,\"Name\":null,\"Unit\":\"%\",\"Colour\":\"#4763a5\",\"symbol\":\"circle\",\"LineStyle\":\"solid\"},\"26_1_58_____\":{\"Label\":\"Overall absence rate\",\"Value\":null,\"Name\":null,\"Unit\":\"%\",\"Colour\":\"#f5a450\",\"symbol\":\"cross\",\"LineStyle\":\"solid\"},\"28_1_58_____\":{\"Label\":\"Authorised absence rate\",\"Value\":null,\"Name\":null,\"Unit\":\"%\",\"Colour\":\"#005ea5\",\"symbol\":\"diamond\",\"LineStyle\":\"solid\"}},\"Axes\":{\"major\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriods\",\"DataSets\":[{\"Indicator\":\"23\",\"Filters\":[\"1\",\"58\"],\"Location\":null,\"TimePeriod\":null},{\"Indicator\":\"26\",\"Filters\":[\"1\",\"58\"],\"Location\":null,\"TimePeriod\":null},{\"Indicator\":\"28\",\"Filters\":[\"1\",\"58\"],\"Location\":null,\"TimePeriod\":null}],\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"School Year\",\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":null,\"Max\":null,\"Size\":null},\"minor\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriods\",\"DataSets\":null,\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"Absence Rate\",\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":0,\"Max\":null,\"Size\":null}},\"Type\":\"line\"}]",
                             DataBlockRequest = "{\"SubjectId\":1,\"GeographicLevel\":\"Country\",\"TimePeriod\":{\"StartYear\":\"2012\",\"StartCode\":\"AY\",\"EndYear\":\"2016\",\"EndCode\":\"AY\"},\"Filters\":[\"1\",\"58\"],\"Indicators\":[\"23\",\"26\",\"28\"],\"Country\":null,\"LocalAuthority\":null,\"Region\":null}",
+                            ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                             Summary = "{\"dataKeys\":[\"26\",\"28\",\"23\"],\"dataSummary\":[\"Up from 4.6% in 2015/16\",\"Similar to previous years\",\"Up from 1.1% in 2015/16\"],\"dataDefinition\":[\"Total number of all authorised and unauthorised absences from possible school sessions for all pupils. <a href=\\\"/glossary#overall-absence\\\">More >>></a>\",\"Number of authorised absences as a percentage of the overall school population. <a href=\\\"/glossary#authorised-absence\\\">More >>></a>\",\"Number of unauthorised absences as a percentage of the overall school population. <a href=\\\"/glossary#unauthorised-absence\\\">More >>></a>\"],\"description\":{\"Body\":\" * pupils missed on average 8.2 school days\\n * overall and unauthorised absence rates up on 2015/16\\n * unauthorised absence rise due to higher rates of unauthorised holidays\\n * 10% of pupils persistently absent during 2016/17\",\"Type\":\"MarkDownBlock\",\"Id\":\"f928762e-9bd5-4538-a4f0-d7f34b2874e6\",\"ContentSection\":null,\"ContentSectionId\":null}}",
-                            Tables = "[{\"indicators\":[\"23\",\"26\",\"28\"],\"tableHeaders\":null}]"
+                            Tables = "[{\"indicators\":[\"23\",\"26\",\"28\"]}]"
                         },
                         new
                         {
@@ -2097,7 +2030,7 @@ Find out how and why these statistics are collected and published - [Secondary a
                             Type = "DataBlock",
                             Charts = "[{\"Width\":0,\"Height\":0,\"Legend\":\"top\",\"Labels\":{\"23_1_58_____\":{\"Label\":\"Unauthorised absence rate\",\"Value\":null,\"Name\":null,\"Unit\":\"%\",\"Colour\":\"#4763a5\",\"symbol\":\"circle\",\"LineStyle\":\"solid\"},\"26_1_58_____\":{\"Label\":\"Overall absence rate\",\"Value\":null,\"Name\":null,\"Unit\":\"%\",\"Colour\":\"#f5a450\",\"symbol\":\"cross\",\"LineStyle\":\"solid\"},\"28_1_58_____\":{\"Label\":\"Authorised absence rate\",\"Value\":null,\"Name\":null,\"Unit\":\"%\",\"Colour\":\"#005ea5\",\"symbol\":\"diamond\",\"LineStyle\":\"solid\"}},\"Axes\":{\"major\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriods\",\"DataSets\":[{\"Indicator\":\"23\",\"Filters\":[\"1\",\"58\"],\"Location\":null,\"TimePeriod\":null},{\"Indicator\":\"26\",\"Filters\":[\"1\",\"58\"],\"Location\":null,\"TimePeriod\":null},{\"Indicator\":\"28\",\"Filters\":[\"1\",\"58\"],\"Location\":null,\"TimePeriod\":null}],\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"School Year\",\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":null,\"Max\":null,\"Size\":null},\"minor\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriods\",\"DataSets\":null,\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"Absence Rate\",\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":0,\"Max\":null,\"Size\":null}},\"Type\":\"line\"}]",
                             DataBlockRequest = "{\"SubjectId\":1,\"GeographicLevel\":\"Country\",\"TimePeriod\":{\"StartYear\":\"2012\",\"StartCode\":\"AY\",\"EndYear\":\"2016\",\"EndCode\":\"AY\"},\"Filters\":[\"1\",\"58\"],\"Indicators\":[\"23\",\"26\",\"28\"],\"Country\":null,\"LocalAuthority\":null,\"Region\":null}",
-                            Tables = "[{\"indicators\":[\"23\",\"26\",\"28\"],\"tableHeaders\":null}]"
+                            Tables = "[{\"indicators\":[\"23\",\"26\",\"28\"]}]"
                         },
                         new
                         {
@@ -2114,7 +2047,7 @@ Find out how and why these statistics are collected and published - [Secondary a
                             Charts = "[{\"Width\":0,\"Height\":0,\"Legend\":\"top\",\"Labels\":{\"181_461_____\":{\"Label\":\"Fixed period exclusion rate\",\"Value\":null,\"Name\":null,\"Unit\":\"%\",\"Colour\":\"#4763a5\",\"symbol\":\"circle\",\"LineStyle\":\"solid\"},\"183_461_____\":{\"Label\":\"Pupils with one or more exclusion\",\"Value\":null,\"Name\":null,\"Unit\":\"%\",\"Colour\":\"#f5a450\",\"symbol\":\"cross\",\"LineStyle\":\"solid\"}},\"Axes\":{\"major\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriods\",\"DataSets\":[{\"Indicator\":\"181\",\"Filters\":[\"461\"],\"Location\":null,\"TimePeriod\":null},{\"Indicator\":\"183\",\"Filters\":[\"461\"],\"Location\":null,\"TimePeriod\":null}],\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"School Year\",\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":null,\"Max\":null,\"Size\":null},\"minor\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriods\",\"DataSets\":null,\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"Absence Rate\",\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":0,\"Max\":null,\"Size\":null}},\"Type\":\"line\"}]",
                             DataBlockRequest = "{\"SubjectId\":12,\"GeographicLevel\":\"Country\",\"TimePeriod\":{\"StartYear\":\"2012\",\"StartCode\":\"AY\",\"EndYear\":\"2016\",\"EndCode\":\"AY\"},\"Filters\":[\"461\"],\"Indicators\":[\"176\",\"177\",\"178\",\"179\",\"180\",\"181\",\"183\"],\"Country\":null,\"LocalAuthority\":null,\"Region\":null}",
                             Summary = "{\"dataKeys\":[\"179\",\"181\",\"178\"],\"dataSummary\":[\"Up from 0.08% in 2015/16\",\"Up from 4.29% in 2015/16\",\"Up from 6,685 in 2015/16\"],\"dataDefinition\":[\"Number of permanent exclusions as a percentage of the overall school population. <a href=\\\"/glossary#permanent-exclusion\\\">More >>></a>\",\"Number of fixed-period exclusions as a percentage of the overall school population. <a href=\\\"/glossary#permanent-exclusion\\\">More >>></a>\",\"Total number of permanent exclusions within a school year. <a href=\\\"/glossary#permanent-exclusion\\\">More >>></a>\"],\"description\":{\"Body\":\" * overall permanent exclusions rate has increased to 0.10% - up from 0.08% in 2015/16\\n * number of exclusions increased to 7,720 - up from 6,685 in 2015/16\\n * overall fixed-period exclusions rate increased to 4.76% - up from 4.29% in 2015/16\\n * number of exclusions increased to 381,865 - up from 339,360 in 2015/16\\n\",\"Type\":\"MarkDownBlock\",\"Id\":\"132bef6e-c2a3-459d-996e-40f29ed6e74f\",\"ContentSection\":null,\"ContentSectionId\":null}}",
-                            Tables = "[{\"indicators\":[\"179\",\"181\",\"178\"],\"tableHeaders\":null}]"
+                            Tables = "[{\"indicators\":[\"179\",\"181\",\"178\"]}]"
                         },
                         new
                         {
@@ -2124,7 +2057,7 @@ Find out how and why these statistics are collected and published - [Secondary a
                             Charts = "[{\"Width\":0,\"Height\":0,\"Legend\":\"top\",\"Labels\":{\"179_461_____\":{\"Label\":\"Fixed period exclusion rate\",\"Value\":null,\"Name\":null,\"Unit\":\"%\",\"Colour\":\"#4763a5\",\"symbol\":\"circle\",\"LineStyle\":\"solid\"}},\"Axes\":{\"major\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriods\",\"DataSets\":[{\"Indicator\":\"179\",\"Filters\":[\"461\"],\"Location\":null,\"TimePeriod\":null}],\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"School Year\",\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":null,\"Max\":null,\"Size\":null},\"minor\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriods\",\"DataSets\":null,\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"Exclusion Rate\",\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":0,\"Max\":null,\"Size\":null}},\"Type\":\"line\"}]",
                             DataBlockRequest = "{\"SubjectId\":12,\"GeographicLevel\":\"Country\",\"TimePeriod\":{\"StartYear\":\"2012\",\"StartCode\":\"AY\",\"EndYear\":\"2016\",\"EndCode\":\"AY\"},\"Filters\":[\"461\"],\"Indicators\":[\"179\",\"177\",\"178\"],\"Country\":null,\"LocalAuthority\":null,\"Region\":null}",
                             Heading = "Chart showing permanent exclusions in England",
-                            Tables = "[{\"indicators\":[\"177\",\"178\",\"179\"],\"tableHeaders\":null}]"
+                            Tables = "[{\"indicators\":[\"177\",\"178\",\"179\"]}]"
                         },
                         new
                         {
@@ -2134,7 +2067,7 @@ Find out how and why these statistics are collected and published - [Secondary a
                             Charts = "[{\"Width\":0,\"Height\":0,\"Legend\":\"top\",\"Labels\":{\"181_461_____\":{\"Label\":\"Fixed period exclusion rate\",\"Value\":null,\"Name\":null,\"Unit\":\"%\",\"Colour\":\"#4763a5\",\"symbol\":\"circle\",\"LineStyle\":\"solid\"}},\"Axes\":{\"major\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriods\",\"DataSets\":[{\"Indicator\":\"181\",\"Filters\":[\"461\"],\"Location\":null,\"TimePeriod\":null}],\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"School Year\",\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":null,\"Max\":null,\"Size\":null},\"minor\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriods\",\"DataSets\":null,\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"Absence Rate\",\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":0,\"Max\":null,\"Size\":null}},\"Type\":\"line\"}]",
                             DataBlockRequest = "{\"SubjectId\":12,\"GeographicLevel\":\"Country\",\"TimePeriod\":{\"StartYear\":\"2012\",\"StartCode\":\"AY\",\"EndYear\":\"2016\",\"EndCode\":\"AY\"},\"Filters\":[\"461\"],\"Indicators\":[\"181\",\"177\",\"180\"],\"Country\":null,\"LocalAuthority\":null,\"Region\":null}",
                             Heading = "Chart showing fixed-period exclusions in England",
-                            Tables = "[{\"indicators\":[\"177\",\"180\",\"181\"],\"tableHeaders\":null}]"
+                            Tables = "[{\"indicators\":[\"177\",\"180\",\"181\"]}]"
                         },
                         new
                         {
@@ -2142,7 +2075,7 @@ Find out how and why these statistics are collected and published - [Secondary a
                             Type = "DataBlock",
                             DataBlockRequest = "{\"SubjectId\":17,\"GeographicLevel\":\"Country\",\"TimePeriod\":{\"StartYear\":\"2014\",\"StartCode\":\"CY\",\"EndYear\":\"2018\",\"EndCode\":\"CY\"},\"Filters\":[\"575\"],\"Indicators\":[\"211\",\"212\",\"216\",\"217\",\"218\",\"219\",\"220\",\"221\",\"222\"],\"Country\":null,\"LocalAuthority\":null,\"Region\":null}",
                             Summary = "{\"dataKeys\":[\"212\",\"216\",\"217\"],\"dataSummary\":[\"Down from 620,330 in 2017\",\"Down from 558,411 in 2017\",\"Down from 34,792 in 2017\"],\"dataDefinition\":[\"Total number of applications received for places at primary and secondary schools.\",\"Total number of first preferences offered to applicants by schools.\",\"Total number of second preferences offered to applicants by schools.\"],\"description\":{\"Body\":\"* majority of applicants received a preferred offer\\n* percentage of applicants receiving secondary first choice offers decreases as applications increase\\n* slight proportional increase in applicants receiving primary first choice offer as applications decrease\\n\",\"Type\":\"MarkDownBlock\",\"Id\":\"fdcac9d3-dab5-445d-9802-a8af0990efb2\",\"ContentSection\":null,\"ContentSectionId\":null}}",
-                            Tables = "[{\"indicators\":[\"212\",\"211\",\"216\",\"217\",\"218\",\"221\",\"222\"],\"tableHeaders\":null}]"
+                            Tables = "[{\"indicators\":[\"212\",\"211\",\"216\",\"217\",\"218\",\"221\",\"222\"]}]"
                         },
                         new
                         {
@@ -2151,7 +2084,7 @@ Find out how and why these statistics are collected and published - [Secondary a
                             Type = "DataBlock",
                             DataBlockRequest = "{\"SubjectId\":17,\"GeographicLevel\":\"Country\",\"TimePeriod\":{\"StartYear\":\"2014\",\"StartCode\":\"CY\",\"EndYear\":\"2018\",\"EndCode\":\"CY\"},\"Filters\":[\"577\"],\"Indicators\":[\"220\",\"221\",\"222\",\"223\"],\"Country\":null,\"LocalAuthority\":null,\"Region\":null}",
                             Heading = "Table of Timeseries of key secondary preference rates, England",
-                            Tables = "[{\"indicators\":[\"220\",\"221\",\"222\"],\"tableHeaders\":null}]"
+                            Tables = "[{\"indicators\":[\"220\",\"221\",\"222\"]}]"
                         },
                         new
                         {
@@ -2160,7 +2093,7 @@ Find out how and why these statistics are collected and published - [Secondary a
                             Type = "DataBlock",
                             DataBlockRequest = "{\"SubjectId\":17,\"GeographicLevel\":\"Country\",\"TimePeriod\":{\"StartYear\":\"2014\",\"StartCode\":\"CY\",\"EndYear\":\"2018\",\"EndCode\":\"CY\"},\"Filters\":[\"575\"],\"Indicators\":[\"220\",\"221\",\"222\",\"223\"],\"Country\":null,\"LocalAuthority\":null,\"Region\":null}",
                             Heading = "Table showing Timeseries of key primary preference rates, England Entry into academic year",
-                            Tables = "[{\"indicators\":[\"220\",\"221\",\"222\"],\"tableHeaders\":null}]"
+                            Tables = "[{\"indicators\":[\"220\",\"221\",\"222\"]}]"
                         });
                 });
 
@@ -2169,8 +2102,7 @@ Find out how and why these statistics are collected and published - [Secondary a
                     b.HasBaseType("GovUk.Education.ExploreEducationStatistics.Content.Model.IContentBlock");
 
                     b.Property<string>("Body")
-                        .HasColumnName("HtmlBlock_Body")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnName("HtmlBlock_Body");
 
                     b.HasDiscriminator().HasValue("HtmlBlock");
                 });
@@ -2180,12 +2112,10 @@ Find out how and why these statistics are collected and published - [Secondary a
                     b.HasBaseType("GovUk.Education.ExploreEducationStatistics.Content.Model.IContentBlock");
 
                     b.Property<string>("Body")
-                        .HasColumnName("InsetTextBlock_Body")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnName("InsetTextBlock_Body");
 
                     b.Property<string>("Heading")
-                        .HasColumnName("InsetTextBlock_Heading")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnName("InsetTextBlock_Heading");
 
                     b.HasDiscriminator().HasValue("InsetTextBlock");
                 });
@@ -2195,8 +2125,7 @@ Find out how and why these statistics are collected and published - [Secondary a
                     b.HasBaseType("GovUk.Education.ExploreEducationStatistics.Content.Model.IContentBlock");
 
                     b.Property<string>("Body")
-                        .HasColumnName("MarkDownBlock_Body")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnName("MarkDownBlock_Body");
 
                     b.HasDiscriminator().HasValue("MarkDownBlock");
 
@@ -2834,8 +2763,7 @@ As in previous years, at primary level a smaller proportion of offers were made 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", "Release")
                         .WithMany("Content")
                         .HasForeignKey("ReleaseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.IContentBlock", b =>
@@ -2847,11 +2775,10 @@ As in previous years, at primary level a smaller proportion of offers were made 
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Link", b =>
                 {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Publication", null)
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Publication")
                         .WithMany("LegacyReleases")
                         .HasForeignKey("PublicationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Publication", b =>
@@ -2867,8 +2794,7 @@ As in previous years, at primary level a smaller proportion of offers were made 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Topic", "Topic")
                         .WithMany("Publications")
                         .HasForeignKey("TopicId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", b =>
@@ -2880,8 +2806,7 @@ As in previous years, at primary level a smaller proportion of offers were made 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Publication", "Publication")
                         .WithMany("Releases")
                         .HasForeignKey("PublicationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseType", "Type")
                         .WithMany()
@@ -2893,8 +2818,7 @@ As in previous years, at primary level a smaller proportion of offers were made 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", "Release")
                         .WithOne("ReleaseSummary")
                         .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseSummary", "ReleaseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseSummaryVersion", b =>
@@ -2902,14 +2826,12 @@ As in previous years, at primary level a smaller proportion of offers were made 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseSummary", "ReleaseSummary")
                         .WithMany("Versions")
                         .HasForeignKey("ReleaseSummaryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseType", "Type")
                         .WithMany()
                         .HasForeignKey("TypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Topic", b =>
@@ -2917,8 +2839,7 @@ As in previous years, at primary level a smaller proportion of offers were made 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Theme", "Theme")
                         .WithMany("Topics")
                         .HasForeignKey("ThemeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Update", b =>
@@ -2926,8 +2847,15 @@ As in previous years, at primary level a smaller proportion of offers were made 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", "Release")
                         .WithMany("Updates")
                         .HasForeignKey("ReleaseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.DataBlock", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", "Release")
+                        .WithMany()
+                        .HasForeignKey("ReleaseId")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 #pragma warning restore 612, 618
         }
