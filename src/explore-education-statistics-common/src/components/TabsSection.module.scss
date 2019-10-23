@@ -2,7 +2,29 @@
 
 .panel {
   page-break-inside: avoid;
+
   &:focus {
     outline: none;
+  }
+}
+
+@media print {
+  :global(.govuk-tabs__list) {
+    list-style: none;
+  }
+
+  :global(.govuk-tabs__list-teim) {
+    display: block;
+  }
+
+  :global(.govuk-tabs__panel) {
+    display: block !important;
+  }
+
+  :global(.govuk-tabs__tab) {
+    background: none !important;
+    border: 0 !important;
+    color: govuk-colour('black') !important;
+    float: none !important;
   }
 }
