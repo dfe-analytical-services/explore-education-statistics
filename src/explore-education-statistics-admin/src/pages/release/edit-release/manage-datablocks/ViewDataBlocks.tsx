@@ -12,20 +12,24 @@ import DataBlockService, {
   DataBlockRerequest,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
-import { Chart } from '@common/services/publicationService';
+import { Chart, ChartType } from '@common/services/publicationService';
 import React from 'react';
 import { reverseMapTableHeadersConfig } from '@common/modules/table-tool/components/utils/tableToolHelpers';
+import ChartBuilder from '@admin/modules/chart-builder/ChartBuilder';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 
 interface Props {
   dataBlock: DataBlock;
   dataBlockRequest: DataBlockRequest;
   dataBlockResponse: DataBlockResponse;
+  onDataBlockSave: (db: DataBlock) => Promise<DataBlock>;
 }
 
 const ViewDataBlocks = ({
   dataBlock,
   dataBlockResponse,
   dataBlockRequest,
+  onDataBlockSave,
 }: Props) => {
   // we want to modify this internally as our own data, copying it
   const [chartBuilderData, setChartBuilderData] = React.useState<
@@ -73,9 +77,30 @@ const ViewDataBlocks = ({
     });
   }, [dataBlock.tables, chartBuilderData]);
 
-  // eslint-disable-next-line
   const onChartSave = (props: ChartRendererProps) => {
-    // console.log('Saved ', props);
+    // copy and strip out redundant data from the properties
+    const chart: Chart = {
+      type: props.type as ChartType,
+      axes: props.axes,
+      fileId: props.fileId,
+      geographicId: props.geographicId,
+      height: props.height,
+      labels: props.labels,
+      legend: props.legend,
+      legendHeight: props.legendHeight,
+      stacked: props.stacked,
+      title: props.title,
+      width: props.width,
+    };
+
+    const newDataBlock: DataBlock = {
+      ...dataBlock,
+      charts: [chart],
+    };
+
+    return onDataBlockSave(newDataBlock).then(() => {
+      return { ...props };
+    });
   };
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -98,20 +123,20 @@ const ViewDataBlocks = ({
         <TabsSection title="table">
           {tableData && <TimePeriodDataTable {...tableData} />}
         </TabsSection>
-        {/*
-          <TabsSection title="Create Chart">
+        <TabsSection title="Create Chart">
           {chartBuilderData ? (
-            <ChartBuilder
-              data={chartBuilderData}
-              onChartSave={onChartSave}
-              initialConfiguration={initialConfiguration}
-              onRequiresDataUpdate={reRequestdata}
-            />
+            <div style={{ position: 'relative' }}>
+              <ChartBuilder
+                data={chartBuilderData}
+                onChartSave={onChartSave}
+                initialConfiguration={initialConfiguration}
+                onRequiresDataUpdate={reRequestdata}
+              />
+            </div>
           ) : (
             <LoadingSpinner />
           )}
-          </TabsSection>
-        */}
+        </TabsSection>
       </Tabs>
     </>
   );
