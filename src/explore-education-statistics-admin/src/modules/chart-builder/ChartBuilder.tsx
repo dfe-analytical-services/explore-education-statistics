@@ -153,7 +153,6 @@ const ChartBuilder = ({
     {},
   );
 
-
   const [chartSaveState, setChartSaveState] = React.useState(SaveState.Unsaved);
 
   const [axesConfiguration, realSetAxesConfiguration] = React.useState<
