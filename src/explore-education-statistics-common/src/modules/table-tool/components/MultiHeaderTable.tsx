@@ -11,6 +11,57 @@ interface Props {
   rows: string[][];
 }
 
+interface SpanInfo {
+  heading: string,
+  count: number,
+  start: number
+}
+
+export const generateHeaderSpanInfo = (groups: string[][]) => {
+
+  const maxLength = groups.reduce((curMaxLength: number, group) => curMaxLength < group.length ? group.length : curMaxLength, 0);
+
+  return groups.reduce<SpanInfo[][]>((headers: SpanInfo[][], groupHeadings: string[], groupIndex: number) => {
+
+    const g = groupHeadings.reduce<SpanInfo[]>((groupInfo, nextHeading, rowIndex) => {
+
+      const previousHeading = groupInfo.length > 0 ? groupInfo[groupInfo.length - 1] : undefined;
+
+      if (previousHeading) {
+
+        if (nextHeading && previousHeading.heading !== nextHeading) {
+
+          const updatedPrevious = {
+            ...previousHeading,
+            count: rowIndex - previousHeading.start,
+          };
+
+          return [...groupInfo.slice(0, -1),
+            updatedPrevious,
+            {
+              heading: nextHeading,
+              count: maxLength - rowIndex,
+              start: updatedPrevious.start + updatedPrevious.count,
+            }];
+        }
+
+        return groupInfo;
+      }
+
+      return [{ heading: nextHeading, count: maxLength, start: rowIndex }];
+    }, []);
+
+    return [...headers, g];
+  }, []);
+
+};
+
+export const generateHeaders = (headers: SpanInfo[][]) => {
+  const numberOfRows = headers[0].reduce( (length,{count}) => length+count, 0);
+
+  console.log(numberOfRows);
+};
+
 const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
   ({ ariaLabelledBy, className, columnHeaders, rowHeaders, rows }, ref) => {
     const getSpan = (groups: string[][], groupIndex: number) => {
@@ -19,10 +70,12 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
         .reduce((total, row) => total * row.length, 1);
     };
 
+
     const totalColumns = getSpan(columnHeaders, -1);
 
     const firstColSpan = getSpan(columnHeaders, 0);
     const firstRowSpan = getSpan(rowHeaders, 0);
+
 
     return (
       <table
@@ -60,7 +113,7 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
                           'govuk-table__header--center': isColGroup,
                           [styles.borderBottom]: !isColGroup,
                           [styles.borderRight]:
-                            columnIndex === columns.length - 1 || isColGroup,
+                          columnIndex === columns.length - 1 || isColGroup,
                         })}
                         colSpan={colSpan}
                         scope={isColGroup ? 'colgroup' : 'col'}
@@ -80,9 +133,12 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
           {rowHeaders
             .reduce<ReactElement[][]>(
               (acc, headerGroup, headerGroupIndex) =>
+
                 acc.flatMap((row, rowIndex) =>
+
                   headerGroup.map((header, index) => {
                     const rowSpan = getSpan(rowHeaders, headerGroupIndex);
+
                     const isRowGroup =
                       headerGroupIndex !== rowHeaders.length - 1;
 
@@ -95,7 +151,7 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
                           'govuk-table__cell--center': isRowGroup,
                           [styles.borderRight]: !isRowGroup,
                           [styles.borderBottom]:
-                            isRowGroup || index === headerGroup.length - 1,
+                          isRowGroup || index === headerGroup.length - 1,
                         })}
                         rowSpan={rowSpan}
                         scope={isRowGroup ? 'rowgroup' : 'row'}
@@ -125,9 +181,9 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
                         key={cellIndex}
                         className={classNames('govuk-table__cell--numeric', {
                           [styles.borderRight]:
-                            (cellIndex + 1) % firstColSpan === 0,
+                          (cellIndex + 1) % firstColSpan === 0,
                           [styles.borderBottom]:
-                            (rowIndex + 1) % firstRowSpan === 0,
+                          (rowIndex + 1) % firstRowSpan === 0,
                         })}
                       >
                         {cell}

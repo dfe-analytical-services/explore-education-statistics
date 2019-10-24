@@ -34,8 +34,6 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
       );
     }
 
-    console.log(tableHeadersConfig);
-
     const columnHeaders: string[][] = [
       ...tableHeadersConfig.columnGroups.map(colGroup =>
         colGroup.map(group => group.label),
@@ -43,9 +41,18 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
       tableHeadersConfig.columns.map(column => column.label),
     ];
 
+    // @ts-ignore
     const rowHeaders: string[][] = [
-      ...tableHeadersConfig.rowGroups.map(rowGroup =>
-        rowGroup.map(group => group.label),
+      ...tableHeadersConfig.rowGroups.flatMap(rowGroup =>
+        rowGroup.reduce<[
+          (string | undefined)[],
+          string []
+          ]>(([a,b], group) => (
+          [
+            group.filterGroup && [...a, group.filterGroup] || a,
+            [...b, group.label]
+          ]
+        ), [[], []]).filter( ary => ary.length > 0)
       ),
       tableHeadersConfig.rows.map(row => row.label),
     ];

@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from 'react-testing-library';
-import MultiHeaderTable from '../MultiHeaderTable';
+import MultiHeaderTable, { generateHeaderSpanInfo, generateHeaders } from '../MultiHeaderTable';
 
 describe('MultiHeaderTable', () => {
   test('renders 2x2 table correctly', () => {
@@ -170,5 +170,152 @@ describe('MultiHeaderTable', () => {
     );
 
     expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('generateHeaderSpanInfo', () => {
+
+    const groups = [
+      [
+        'England',
+      ],
+      [
+        'Total',
+        'Gender male',
+        'Gender female',
+        'FSM eligible',
+        'FSM not eligible',
+        'FSM unclassified',
+        'SEN provision No identified SEN',
+        'SEN provision statement or EHCP',
+        'SEN provision SEN Support',
+        'SEN provision Unclassified',
+        'SEN provision statement',
+        'SEN provision SEN without statement',
+      ],
+      [
+        'Authorised absence rate',
+      ],
+    ];
+
+    const generated = generateHeaderSpanInfo(groups);
+
+    console.log(generated);
+
+    expect(generated)
+      .toStrictEqual([
+        [{ heading: 'England', count: 12, start: 0 }],
+        [
+          { heading: 'Total', count: 1, start: 0 },
+          { heading: 'Gender male', count: 1, start: 1 },
+          { heading: 'Gender female', count: 1, start: 2 },
+          { heading: 'FSM eligible', count: 1, start: 3 },
+          { heading: 'FSM not eligible', count: 1, start: 4 },
+          { heading: 'FSM unclassified', count: 1, start: 5 },
+          { heading: 'SEN provision No identified SEN', count: 1, start: 6 },
+          { heading: 'SEN provision statement or EHCP', count: 1, start: 7 },
+          { heading: 'SEN provision SEN Support', count: 1, start: 8 },
+          { heading: 'SEN provision Unclassified', count: 1, start: 9 },
+          { heading: 'SEN provision statement', count: 1, start: 10 },
+          { heading: 'SEN provision SEN without statement', count: 1, start: 11 },
+        ],
+        [{ heading: 'Authorised absence rate', count: 12, start: 0 }]]);
+
+
+  });
+
+  test('generateHeaderSpanInfo2', () => {
+
+    const groups = [
+      [
+        'England',
+      ],
+      [
+        'Total',
+        'Gender',
+        'Gender',
+        'FSM',
+        'FSM',
+        'FSM',
+        'SEN provision',
+        'SEN provision',
+        'SEN provision',
+        'SEN provision',
+        'SEN provision',
+        'SEN provision',
+      ],
+      [
+        'Total',
+        'Gender male',
+        'Gender female',
+        'FSM eligible',
+        'FSM not eligible',
+        'FSM unclassified',
+        'SEN provision No identified SEN',
+        'SEN provision statement or EHCP',
+        'SEN provision SEN Support',
+        'SEN provision Unclassified',
+        'SEN provision statement',
+        'SEN provision SEN without statement',
+      ],
+      [
+        'Authorised absence rate',
+      ],
+    ];
+
+    const generated = generateHeaderSpanInfo(groups);
+
+    expect(generated)
+      .toStrictEqual([
+        [{ heading: 'England', count: 12, start: 0 }],
+        [{ heading: 'Total', count: 1, start: 0 },
+          { heading: 'Gender', count: 2, start: 1 },
+          { heading: 'FSM', count: 3, start: 3 },
+          { heading: 'SEN provision', count: 6, start: 6 }],
+        [
+          { heading: 'Total', count: 1, start: 0 },
+          { heading: 'Gender male', count: 1, start: 1 },
+          { heading: 'Gender female', count: 1, start: 2 },
+          { heading: 'FSM eligible', count: 1, start: 3 },
+          { heading: 'FSM not eligible', count: 1, start: 4 },
+          { heading: 'FSM unclassified', count: 1, start: 5 },
+          { heading: 'SEN provision No identified SEN', count: 1, start: 6 },
+          { heading: 'SEN provision statement or EHCP', count: 1, start: 7 },
+          { heading: 'SEN provision SEN Support', count: 1, start: 8 },
+          { heading: 'SEN provision Unclassified', count: 1, start: 9 },
+          { heading: 'SEN provision statement', count: 1, start: 10 },
+          { heading: 'SEN provision SEN without statement', count: 1, start: 11 },
+        ],
+        [{ heading: 'Authorised absence rate', count: 12, start: 0 }]]);
+
+
+  });
+
+  test('generateHeaders', () => {
+
+    const headers = [
+      [{ heading: 'England', count: 12, start: 0 }],
+      [{ heading: 'Total', count: 1, start: 0 },
+        { heading: 'Gender', count: 2, start: 1 },
+        { heading: 'FSM', count: 3, start: 3 },
+        { heading: 'SEN provision', count: 6, start: 6 }],
+      [
+        { heading: 'Total', count: 1, start: 0 },
+        { heading: 'Gender male', count: 1, start: 1 },
+        { heading: 'Gender female', count: 1, start: 2 },
+        { heading: 'FSM eligible', count: 1, start: 3 },
+        { heading: 'FSM not eligible', count: 1, start: 4 },
+        { heading: 'FSM unclassified', count: 1, start: 5 },
+        { heading: 'SEN provision No identified SEN', count: 1, start: 6 },
+        { heading: 'SEN provision statement or EHCP', count: 1, start: 7 },
+        { heading: 'SEN provision SEN Support', count: 1, start: 8 },
+        { heading: 'SEN provision Unclassified', count: 1, start: 9 },
+        { heading: 'SEN provision statement', count: 1, start: 10 },
+        { heading: 'SEN provision SEN without statement', count: 1, start: 11 },
+      ],
+      [{ heading: 'Authorised absence rate', count: 12, start: 0 }],
+    ];
+
+
+    const result = generateHeaders(headers);
   });
 });
