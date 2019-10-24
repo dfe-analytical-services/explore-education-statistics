@@ -26,6 +26,10 @@ const DocumentationGlossary = () => {
 
           <Accordion id="a-z">
             <AccordionSection heading="A">
+              <h3>&amp;</h3>
+              <p>
+                See <a href="#ampersand">Ampersand</a>
+              </p>
               <h3 id="a42-a42s">A*, A*s</h3>
               <p>
                 The top 123 grade in GCSEs and A levels. Use the symbol * not
@@ -37,22 +41,44 @@ const DocumentationGlossary = () => {
                 Abbreviations and acronyms
               </h3>
               <p>
-                The first time you use an abbreviation or acronym explain it in
-                full on each page unless it’s well known, like UK, DVLA, US, EU,
-                VAT and MP. This includes government departments or schemes.
-                Then refer to it by initials, and use{' '}
-                <a href="https://www.gov.uk/guidance/how-to-publish-on-gov-uk/markdown#acronyms">
-                  acronym Markdown
-                </a>{' '}
-                so the full explanation is available as hover text.
+                Use abbreviations and acronyms for organisations and terms that
+                are well-known and appear frequently.
               </p>
               <p>
-                If you think an acronym is well known, please provide evidence
-                that 80% of the UK population will understand and commonly use
-                it. Evidence can be from search analytics or testing of a
-                representative sample.
+                This includes government departments or schemes. For example,
+                DfE, GCSEs, ONS, SEN, UK.
               </p>
-              <p>Do not use full stops in abbreviations: BBC, not B.B.C.</p>
+              <p>
+                For less well-known abbreviations and acronyms, write the name
+                or term out in full the first time you use it, followed by the
+                abbreviation in brackets.
+              </p>
+              <p>
+                After that, use the abbreviation. Acronyms need to be written
+                out in full again the first instance in each section of your
+                article or page.
+              </p>
+              <p>
+                For example, ‘The Labour Force Survey (LFS) is a continuous
+                survey. Users of the LFS…’
+              </p>
+              <p>Do not use full stops or italics in abbreviations.</p>
+              <p>
+                If you think an acronym is well-known provide evidence that 80%
+                of your users will understand and commonly use it. Evidence can
+                be from search analytics or testing of a representative sample.
+              </p>
+              <p>
+                As per{' '}
+                <a href="#abbreviations-and-acronyms">
+                  GDS style guide - Abbreviations and acronyms
+                </a>{' '}
+                and{' '}
+                <a href="https://style.ons.gov.uk/category/house-style/language-and-spelling/#abbreviations">
+                  ONS style guide - Abbreviations
+                </a>
+                .
+              </p>
               <h3 id="the-academies-programme">the academies programme</h3>
               <p>Lower case.</p>
               <h3 id="academy">academy</h3>
@@ -74,38 +100,99 @@ const DocumentationGlossary = () => {
               </p>
               <h3 id="active-voice">Active voice</h3>
               <p>
-                Use the active rather than passive voice. This will help us
+                Use the active rather than passive voice. This will help your
                 write concise, clear content.
+              </p>
+              <p>
+                Use active verbs and not passive verbs. Active verbs are when
+                the sentence’s subject does something.
+              </p>
+              <p>
+                Passive verbs are when the sentence’s subject has something done
+                to it.
+              </p>
+              <p>For example:</p>
+              <ul className="govuk-list govuk-list--bullet">
+                <li>
+                  ‘The policy encourages schools to…’ and ‘The statistics show a
+                  trend…’
+                </li>
+                <h4>NOT</h4>
+                <li>
+                  ‘Firms are encouraged by the policy to…’ and ‘A trend is shown
+                  by the statistics…’
+                </li>
+              </ul>
+              <p>
+                As per{' '}
+                <a href="https://style.ons.gov.uk/category/writing-for-the-web/tone-and-voice/">
+                  ONS style guide - Tone and voice
+                </a>
               </p>
               <h3 id="addressing-the-user">Addressing the user</h3>
               <p>
-                Address the user as ‘you’ where possible. Content on the site
-                often makes a direct appeal to citizens and businesses to get
-                involved or take action: ‘You can contact HMRC by phone and
-                email’ or ‘Pay your car tax’, for example.
+                Address the user as ‘you’ where possible as this makes your
+                content more conversational and engaging.
               </p>
               <h3 id="ages">ages</h3>
               <p>
-                Do not use hyphens in ages unless to avoid confusion, although
-                it’s always best to write in a way that avoids ambiguity. For
-                example, ‘a class of 15 16-year-old students took the A level
-                course’ can be written as ‘15 students aged 16 took the A level
-                course’.
+                Use the format ‘aged [age] years’. For example, aged nine years.
+              </p>
+              <p>
+                Use the format ‘aged [age] to [age] years’. For example, aged 10
+                to 11 years.
+              </p>
+              <p>
+                Include the months or weeks for ages under a year. For example,
+                aged nine weeks.
+              </p>
+              <p>
+                If you refer to ages as “‘age]-year-old’, include the hyphens.
+                For example, 24-year-old or 16- to 24-year-old men.
+              </p>
+              <p>
+                Write decades as an age as numerals. For example, women in their
+                40s.
+              </p>
+              <p>
+                Limits for age restrictions should use ‘aged [age] years and
+                over’ or ‘aged under [age] years. Don’t use the plus sign. For
+                example:
+              </p>
+              <ul className="govuk-list govuk-list--bullet">
+                <li>aged 75 years and over</li>
+                <li>aged under 18 years</li>
+              </ul>
+              <p>
+                As per
+                <a href="https://style.ons.gov.uk/category/house-style/numbers/#ages">
+                  ONS style guide - Ages
+                </a>
+                .
               </p>
               <h3 id="ampersand">Ampersand</h3>
               <p>
-                Use 'and' rather than &amp;, unless it’s a department’s logo
-                image or a company’s name as it appears on the{' '}
-                <a rel="external" href="https://beta.companieshouse.gov.uk/">
-                  Companies House
-                </a>{' '}
-                register.
+                Use 'and' rather than & unless it’s in an organisation’s logo
+                image or official name.
+              </p>
+              <p>
+                The reason is that ‘and’ is easier to read. Some people with
+                lower literacy levels also find ampersands harder to understand.
+              </p>
+              <p>
+                As per{' '}
+                <a href="https://www.gov.uk/guidance/content-design/writing-for-gov-uk#ampersands-can-be-hard-to-understand">
+                  GDS style guidance - Ampersands can be hard to understand
+                </a>
+                .
               </p>
               <h3 id="applied-general-qualifications">
                 applied general qualifications
               </h3>
               <p>Lower case.</p>
               <h3 id="apprenticeship-programme">apprenticeship programme</h3>
+              <p>Lower case.</p>
+              <h3 id="autumn-census">autumn census</h3>
               <p>Lower case.</p>
             </AccordionSection>
             <AccordionSection heading="B">
@@ -115,54 +202,32 @@ const DocumentationGlossary = () => {
               </p>
               <h3 id="baseline">baseline</h3>
               <p>One word, lower case.</p>
+              <h3 id="billions">Billions</h3>
+              <p>
+                See <a href="#millions-and-billions">Millions and billions</a>.
+              </p>
               <h3 id="bold">bold</h3>
               <p>
-                Only use bold to refer to text from interfaces in technical
-                documentation or instructions.
-              </p>
-              <p>
-                You can use bold to explain what field a user needs to fill in
-                on a form, or what button they need to select. For example:
-                “Select <strong>Continue</strong>. The{' '}
-                <strong>Verify Certificate</strong> window opens.”
-              </p>
-              <p>
-                Use bold sparingly - using too much will make it difficult for
+                Use bold sparingly as using it too much makes it difficult for
                 users to know which parts of your content they need to pay the
                 most attention to.
               </p>
               <p>
-                Do not use bold in other situations, for example to emphasise
-                text.
+                Before using bold, see if you can emphasise using your content
+                in other ways by using bullets or subheadings.
               </p>
-              <p>To emphasise words or phrases, you can:</p>
-              <ul>
-                <li>front-load sentences</li>
-                <li>use headings</li>
-                <li>
-                  use{' '}
-                  <a href="/guidance/style-guide/a-to-z-of-gov-uk-style#bullet-points-steps">
-                    bullets
-                  </a>
-                </li>
-              </ul>
               <h3 id="borough-council">borough council</h3>
               <p>Lower case even in a name: Northampton borough council.</p>
               <h3 id="brackets">Brackets</h3>
-              <p>
-                Use (round brackets), not [square brackets]. The only acceptable
-                use of square brackets is for explanatory notes in reported
-                speech:
-              </p>
-              <p>“Thank you [Foreign Minister] Mr Smith.”</p>
+              <p>Use (round brackets), not [square brackets]. </p>
               <p>
                 Do not use round brackets to refer to something that could
                 either be singular or plural, like ‘Check which document(s) you
-                need to send to DVLA.’
+                need to send to DfE.’
               </p>
               <p>
-                Always use the plural instead, as this will cover each
-                possibility: ‘Check which documents you need to send to DVLA.’
+                Always use the plural instead as this covers each possibility.
+                For example ‘Check which documents you need to send to DfE.’
               </p>
               <h3 id="britain">Britain</h3>
               <p>
@@ -170,10 +235,11 @@ const DocumentationGlossary = () => {
               </p>
               <h3 id="btec-national-diploma">BTEC National Diploma</h3>
               <p>Upper case.</p>
-              <h3 id="bullet-points-steps">Bullet points and steps</h3>
+              <h3 id="bullet-points">Bullet points</h3>
               <p>
-                You can use bullet points to make text easier to read. Make sure
-                that:
+                Use bullet points to emphasise and make you content easier to
+                read. However, the content needs to be structured so it’s
+                suitable for use in a bulleted list so make sure:
               </p>
               <ul>
                 <li>you always use a lead-in line</li>
@@ -193,161 +259,47 @@ const DocumentationGlossary = () => {
               </ul>
               <p>
                 Bullets should normally form a complete sentence following from
-                the lead text. But it’s sometimes necessary to add a short
-                phrase to clarify whether all or some of the points apply. For
-                example, ‘You can only register a pension scheme that is (one of
-                the following):’
+                the lead text.
               </p>
-              <h4 id="steps">Steps</h4>
               <p>
-                Use numbered steps instead of bullet points to guide a user
-                through a process. You do not need a lead-in line and you can
-                use links and downloads (with{' '}
-                <a href="https://www.gov.uk/guidance/how-to-publish-on-gov-uk/markdown#numbered-list">
-                  appropriate Markdown
+                As per{' '}
+                <a href="https://www.gov.uk/guidance/style-guide/a-to-z-of-gov-uk-style#bullet-points-steps ">
+                  GDS style guide - Bullet points and steps
                 </a>
-                ) in steps. Steps end in a full stop because each should be a
-                complete sentence.
+                .
               </p>
             </AccordionSection>
             <AccordionSection heading="C">
               <h3 id="c-of-e">C of E</h3>
               <p>For Church of England when referring to school names.</p>
+              <h3 id="cannot">cannot</h3>
+              <p>Do not contract. Do not use ‘can’t’.</p>
+              <p>
+                See also <a href="#contractions">Contractions</a>.
+              </p>
               <h3 id="capitalisation">Capitalisation</h3>
               <p>
-                DO NOT USE BLOCK CAPITALS FOR LARGE AMOUNTS OF TEXT AS IT’S
-                QUITE HARD TO READ.
-              </p>
-              <p>
                 Always use lower case, even in page titles. The exceptions to
-                this are proper nouns, and:
+                this are proper nouns.
               </p>
-              <ul>
-                <li>
-                  departments (specific government departments - see below)
-                </li>
-                <li>the Civil Service, with lower case for ‘the’</li>
-                <li>
-                  job titles, ministers’ role titles: Minister for Housing, Home
-                  Secretary
-                </li>
-                <li>
-                  titles like Mr, Mrs, Dr, the Duke of Cambridge (the duke at
-                  second mention); Pope Francis, but the pope
-                </li>
-                <li>Rt Hon (no full stops)</li>
-                <li>buildings</li>
-                <li>place names</li>
-                <li>brand names</li>
-                <li>faculties, departments, institutes and schools</li>
-                <li>
-                  names of groups, directorates and organisations: Knowledge and
-                  Innovation Group
-                </li>
-                <li>Parliament, the House</li>
-                <li>
-                  titles of specific acts or bills: Housing Reform Bill (but use
-                  ‘the act’ or ‘the bill’ after the first time you use the full
-                  act or bill title)
-                </li>
-                <li>
-                  names of specific, named government schemes known to people
-                  outside government: Right to Buy, Queen’s Awards for
-                  Enterprise
-                </li>
-                <li>
-                  specific select committees: Public Administration Select
-                  Committee
-                </li>
-                <li>header cells in tables: Annual profits</li>
-                <li>
-                  titles of books (and within single quotes), for example, ‘The
-                  Study Skills Handbook’
-                </li>
-                <li>World War 1 and World War 2 (note caps and numbers)</li>
-              </ul>
-              <p>Do not capitalise:</p>
-              <ul>
-                <li>
-                  government - see{' '}
-                  <a href="https://www.gov.uk/guidance/style-guide/a-to-z-of-gov-uk-style#government">
-                    government
-                  </a>
-                </li>
-                <li>
-                  minister, never Minister, unless part of a specific job title,
-                  like Minister for the Cabinet Office
-                </li>
-                <li>
-                  department or ministry - never Department or Ministry, unless
-                  referring to a specific one: Ministry of Justice, for example
-                </li>
-                <li>
-                  white paper, green paper, command paper, House of Commons
-                  paper
-                </li>
-                <li>
-                  budget, autumn statement, spring statement, unless referring
-                  to and using the full name of a specific statement - for
-                  example, “2016 Budget”
-                </li>
-                <li>
-                  sections or schedules within specific named acts, regulations
-                  or orders
-                </li>
-                <li>
-                  director general (no hyphen), deputy director, director,
-                  unless in a specific job title
-                </li>
-                <li>
-                  group and directorate, unless referring to a specific group or
-                  directorate: the Commercial Directorate, for example
-                </li>
-                <li>departmental board, executive board, the board</li>
-                <li>
-                  policy themes like sustainable communities, promoting economic
-                  growth, local enterprise zones
-                </li>
-                <li>
-                  general mention of select committees (but do cap specific ones
-                  - see above)
-                </li>
-                <li>the military</li>
-              </ul>
-              <h4 id="capitals-for-government-departments">
-                Capitals for government departments
-              </h4>
               <p>
-                Use the following conventions for government departments. A
-                department using an ampersand in its logo image is fine but use
-                ‘and’ when writing in full text.
+                For a full list of what you ‘do’ and ‘do not’ cap up -{' '}
+                <a href="https://www.gov.uk/guidance/style-guide/a-to-z-of-gov-uk-style#capitalisation">
+                  GDS style guide Capitalisation
+                </a>
+                .
               </p>
-              <ul>
-                <li>Attorney General’s Office (AGO)</li>
-                <li>Cabinet Office (CO)</li>
-                <li>
-                  Department for Business, Energy and Industrial Strategy (BEIS)
-                </li>
-                <li>Department for Digital, Culture, Media and Sport (DCMS)</li>
-                <li>Department for Education (DfE)</li>
-                <li>
-                  Department for Environment, Food and Rural Affairs (Defra)
-                </li>
-                <li>Department for Exiting the European Union (DExEU)</li>
-                <li>Department for International Development (DFID)</li>
-                <li>Department for International Trade (DIT)</li>
-                <li>Department for Transport (DfT)</li>
-                <li>Department for Work and Pensions (DWP)</li>
-                <li>Department of Health and Social Care (DHSC)</li>
-                <li>Foreign and Commonwealth Office (FCO)</li>
-                <li>HM Treasury (HMT)</li>
-                <li>Home Office (HO)</li>
-                <li>Ministry of Defence (MOD)</li>
-                <li>
-                  Ministry of Housing, Communities and Local Government (MHCLG)
-                </li>
-                <li>Ministry of Justice (MOJ)</li>
-              </ul>
+              <p>
+                Capital letters are reputed to be 13 to 18% harder for users to
+                read. So we try to avoid them.
+              </p>
+              <p>
+                As per{' '}
+                <a href="https://www.gov.uk/guidance/content-design/writing-for-gov-uk#capital-letters-are-harder-to-read">
+                  GDS style guidance - Capitals are harder to read
+                </a>
+                .
+              </p>
               <h3 id="care-worker">care worker</h3>
               <p>Two words. Lower case.</p>
               <h3 id="chair-of-governors">chair of governors</h3>
@@ -361,22 +313,14 @@ const DocumentationGlossary = () => {
               </p>
               <h3 id="childcare">childcare</h3>
               <p>Lower case.</p>
-              <h3 id="children-in-need">Children in Need</h3>
-              <p>
-                Upper case for the BBC fundraising event, lower case for
-                children in need census.
-              </p>
+              <h3 id="children-in-need">children in need</h3>
+              <p>Lower case.</p>
               <h3 id="civil-service">Civil Service</h3>
               <p>Upper case.</p>
               <h3 id="civil-servants">civil servants</h3>
               <p>Lower case.</p>
               <h3 id="classwork">classwork</h3>
               <p>One word.</p>
-              <h3 id="click">click</h3>
-              <p>
-                Don’t use “click” when talking about user interfaces because not
-                all users click. Use “select”.
-              </p>
               <h3 id="code-of-practice">code of practice</h3>
               <p>Lower case.</p>
               <h3 id="community-voluntary-and-foundation-schools">
@@ -384,24 +328,17 @@ const DocumentationGlossary = () => {
               </h3>
               <p>Lower case.</p>
               <h3 id="contractions">Contractions</h3>
-              <p>Use contractions like you’re and we’ll.</p>
-              <p>Avoid:</p>
-              <ul>
-                <li>
-                  negative contractions like can’t and don’t - many users find
-                  them harder to read, or misread them as the opposite of what
-                  they say
-                </li>
-                <li>
-                  should’ve, could’ve, would’ve, they’ve - these can be hard to
-                  read
-                </li>
-              </ul>
               <p>
-                <a href="https://www.gov.uk/guidance/content-design/writing-for-gov-uk#contractions">
-                  Read more about contractions
-                </a>
-                .
+                Use contractions as they make your content more conversational
+                and engaging.
+              </p>
+              <p>
+                Avoid can’t and don’t as many users find these hard to read or
+                misread them as the opposite of what they say.
+              </p>
+              <p>
+                Also avoid should’ve, could’ve, would’ve and they’ve as these
+                can be hard to read.
               </p>
               <h3 id="co-operation">co-operation</h3>
               <p>Hyphenated.</p>
@@ -433,8 +370,13 @@ const DocumentationGlossary = () => {
             </AccordionSection>
             <AccordionSection heading="D">
               <h3 id="data">data</h3>
+              <p>Treat as a singular noun.</p>
               <p>
-                Treat as a singular noun: The data is stored on a secure server.
+                As per{' '}
+                <a href="https://www.gov.uk/guidance/style-guide/a-to-z-of-gov-uk-style#data">
+                  GDS style guide - data
+                </a>
+                .
               </p>
               <h3 id="data-centre">data centre</h3>
               <p>Not “datacentre”.</p>
@@ -443,41 +385,62 @@ const DocumentationGlossary = () => {
               <h3 id="data-store">data store</h3>
               <p>Not “datastore”.</p>
               <h3 id="dates">Dates</h3>
-              <ul>
-                <li>use upper case for months: January, February</li>
-                <li>
-                  do not use a comma between the month and year: 4 June 2017
-                </li>
-                <li>
-                  when space is an issue - in tables or publication titles, for
-                  example - you can use truncated months: Jan, Feb
-                </li>
-                <li>
-                  we use ‘to’ in date ranges - not hyphens, en rules or em
-                  dashes. For example:
-                  <ul>
-                    <li>tax year 2011 to 2012</li>
-                    <li>
-                      Monday to Friday, 9am to 5pm (put different days on a new
-                      line, do not separate with a comma)
-                    </li>
-                    <li>10 November to 21 December</li>
-                  </ul>
-                </li>
-                <li>
-                  do not use quarter for dates, use the months: ‘department
-                  expenses, Jan to Mar 2013’
-                </li>
-                <li>
-                  when referring to today (as in a news article) include the
-                  date: ‘The minister announced today (14 June 2012) that…’
-                </li>
-              </ul>
               <p>
-                <a href="https://www.gov.uk/guidance/content-design/writing-for-gov-uk#date-ranges">
-                  Read more about dates
+                Use the format ‘[Date] [Month] [Year]’ (depending on what
+                information you have) written out with no commas. No ‘st’, ‘nd’,
+                ‘rd’ and ‘th’.
+              </p>
+              <p>For example, 12 March 2019</p>
+              <p>Use upper case for months: January, February.</p>
+              <p>Do not use a comma between the month and year: 4 June 2017.</p>
+              <p>
+                When space is an issue - in tables or publication titles, for
+                example - you can use truncated months: Jan, Feb.
+              </p>
+              <p>
+                As per{' '}
+                <a href="https://www.gov.uk/guidance/style-guide/a-to-z-of-gov-uk-style#dates">
+                  GDS style guide - Dates
+                </a>{' '}
+                and{' '}
+                <a href="https://style.ons.gov.uk/category/house-style/numbers/#dates">
+                  ONS style guide - Dates
                 </a>
-                .
+              </p>
+              <h3 id="date-ranges-and-spans">Date ranges and spans</h3>
+              <p>
+                Use ‘to’ instead of a dash or slash in date ranges. ‘To’ is
+                quicker to read than a dash, and it’s easier for screen readers.
+              </p>
+              <p>
+                Always explain what date ranges represent. For example, academic
+                year 2013 to 2014 or September 2013 to July 2014.
+              </p>
+              <p>
+                Use the format ‘[date] to [date]’. If using months, repeat the
+                year after each month if the period spans years.
+              </p>
+              <p>
+                For example, 2018 to 2019, July to September 2019 pr July 2018
+                to September 2019
+              </p>
+              <p>
+                For a period between two dates, use the format ‘between [date]
+                and [date]’.
+              </p>
+              <p>
+                For example, between 2010 and 2019 or between July and September
+                2019.
+              </p>
+              <p>
+                As per{' '}
+                <a href="https://www.gov.uk/guidance/content-design/writing-for-gov-uk#date-ranges">
+                  GDS style guide - Dates
+                </a>{' '}
+                and{' '}
+                <a href="https://style.ons.gov.uk/category/house-style/numbers/#dates">
+                  ONS style guide - Dates
+                </a>
               </p>
               <h3 id="daycare-trust">Daycare Trust</h3>
               <p>Two words. Upper case.</p>
@@ -501,6 +464,11 @@ const DocumentationGlossary = () => {
               <p>Lower case. No hyphen.</p>
               <h3 id="district-council">district council</h3>
               <p>Lower case even in a name, like Warwick district council.</p>
+              <h3 id="do-not">do not</h3>
+              <p>Do not contract. Do not use ‘don’t’.</p>
+              <p>
+                See also <a href="#contractions">Contractions</a>.
+              </p>
             </AccordionSection>
             <AccordionSection heading="E">
               <h3 id="early-years">early years</h3>
@@ -523,29 +491,35 @@ const DocumentationGlossary = () => {
               <p>A performance measure linked to GCSEs. Upper case E and B.</p>
               <h3 id="eco-schools">eco-schools</h3>
               <p>Hyphenated.</p>
-              <h3 id="eg-etc-and-ie">eg, etc and ie</h3>
+              <h3 id="eg">eg</h3>
               <p>
-                eg can sometimes be read aloud as ‘egg’ by screen reading
-                software. Instead use ‘for example’ or ‘such as’ or ‘like’ or
-                ‘including’ - whichever works best in the specific context.
+                Do not use as can sometimes be read aloud as ‘egg’ by screen
+                reading software.
               </p>
               <p>
-                etc can usually be avoided. Try using ‘for example’ or ‘such as’
-                or ‘like’ or ‘including’. Never use etc at the end of a list
-                starting with these words.
+                Use ‘for example’ or ‘such as’ or ‘like’ or ‘including’ -
+                whichever works best in the specific context.
               </p>
               <p>
-                ie - used to clarify a sentence - is not always well understood.
-                Try (re)writing sentences to avoid the need to use it. If that
-                is not possible, use an alternative such as ‘meaning’ or ‘that
-                is’.
+                As per{' '}
+                <a href="https://www.gov.uk/guidance/style-guide/a-to-z-of-gov-uk-style#eg-etc-and-ie">
+                  GDS style guide - eg, etc and ie
+                </a>
+                .
               </p>
               <h3 id="email">email</h3>
               <p>One word.</p>
               <h3 id="email-addresses">Email addresses</h3>
               <p>
-                Write email addresses in full, in lower case and as active
-                links. Do not include any other words in the link text.
+                Write in full, in lower case and as active links. Do not include
+                any other words in the email’s link text.
+              </p>
+              <p>
+                As per{' '}
+                <a href="https://www.gov.uk/guidance/style-guide/a-to-z-of-gov-uk-style#email-addresses">
+                  GDS style guide - Email addresses
+                </a>
+                .
               </p>
               <h3 id="enrol">enrol</h3>
               <p>Lower case.</p>
@@ -553,6 +527,21 @@ const DocumentationGlossary = () => {
               <p>Lower case.</p>
               <h3 id="enrolment">enrolment</h3>
               <p>Lower case.</p>
+              <h3 id="etc">Etc</h3>
+              <p>
+                Try to avoid and use ‘for example’ or ‘such as’ or ‘like’ or
+                ‘including’ as per ‘eg’ above.
+              </p>
+              <p>
+                Never use etc at the end of a list starting with these words.
+              </p>
+              <p>
+                As per{' '}
+                <a href="https://www.gov.uk/guidance/style-guide/a-to-z-of-gov-uk-style#eg-etc-and-ie">
+                  GDS style guide - eg, etc and ie
+                </a>
+                .
+              </p>
               <h3 id="european-commission">European Commission</h3>
               <p>
                 Leave unabbreviated to distinguish from the European Community.
@@ -569,12 +558,10 @@ const DocumentationGlossary = () => {
               <p>EC should be used when it’s EC directives, EC Sales List.</p>
               <h3 id="euros-the-euro">euros, the euro</h3>
               <p>Lower case.</p>
-              <h3 id="etc">etc</h3>
-              <p>
-                See <a href="#eg-etc-ie">eg, etc and ie</a>
-              </p>
               <h3 id="excel-spreadsheet">Excel spreadsheet</h3>
               <p>Upper case because Excel is a brand name.</p>
+              <h3 id="exclusions">Exclusions</h3>
+              <p>Lower case</p>
               <h3 id="executive-director">executive director</h3>
               <p>
                 Lower case in text. Upper case in titles: Spencer Tracy,
@@ -588,12 +575,17 @@ const DocumentationGlossary = () => {
                 FAQs (frequently asked questions)
               </h3>
               <p>
-                Do not use FAQs. If you write content by starting with user
-                needs, you will not need to use FAQs.
+                Do not use FAQs in any published releases. If you write content
+                by starting with user needs, you will not need to use FAQs.
               </p>
               <p>
-                <a href="https://www.gov.uk/guidance/content-design/writing-for-gov-uk#dont-use-faqs">
-                  Read more about FAQs
+                As per
+                <a href="https://www.gov.uk/guidance/style-guide/a-to-z-of-gov-uk-style#faqs-frequently-asked-questions">
+                  GDS style guide - FAQs
+                </a>
+                and
+                <a href="https://www.gov.uk/guidance/content-design/writing-for-gov-uk#do-not-use-faqs">
+                  GDS style guidance - Do not use FAQs
                 </a>
                 .
               </p>
@@ -614,6 +606,11 @@ const DocumentationGlossary = () => {
               </p>
               <h3 id="fixed-period-exclusions">fixed-period exclusions</h3>
               <p>Hyphenated.</p>
+              <h3 id="for-example">for example</h3>
+              <p>Use as an alternative to eg.</p>
+              <p>
+                See also <a href="#eg">eg</a>.
+              </p>
               <h3 id="foundation-degrees">foundation degrees</h3>
               <p>Lower case.</p>
               <h3 id="foundation-schools">foundation schools</h3>
@@ -639,6 +636,32 @@ const DocumentationGlossary = () => {
               <p>
                 You can make a Freedom of Information (FOI) request, but not a
                 request under the FOI Act.
+              </p>
+              <h3 id="front-loading">Front-loading</h3>
+              <p>
+                Front-loading means putting the most important words and
+                information at the beginning of your content whether that’s a
+                heading, sentence or subheading.
+              </p>
+              <p>
+                Doing this makes it easier and quicker for people to read and
+                understand your content and the faster users can consume your
+                content - the happier they’ll be.
+              </p>
+              <p>
+                The earlier the most important words appear, the better. For
+                example, which of these headings is quicker to understand?
+              </p>
+              <ul className="govuk-list govuk-list--bullet">
+                <li>What are the facts about education statistics?</li>
+                <p className="govuk-!-font-size-19 govuk-!-font-weight-bold">
+                  OR
+                </p>
+                <li>Education statistics: the facts</li>
+              </ul>
+              <p>
+                Front-loading content can take some getting used to but it will
+                help you create clearer, more concise content.
               </p>
               <h3 id="funding-agreement">funding agreement</h3>
               <p>Lower case.</p>
@@ -776,21 +799,28 @@ const DocumentationGlossary = () => {
                 for advice on hyphenation.
               </p>
               <p>
-                Use ‘to’ for{' '}
-                <a href="https://www.gov.uk/guidance/style-guide/a-to-z-of-gov-uk-style#times">
-                  time
-                </a>{' '}
-                and{' '}
-                <a href="https://www.gov.uk/guidance/style-guide/a-to-z-of-gov-uk-style#dates">
-                  date ranges
-                </a>
-                , not hyphens.
+                Use ‘to’ for <a href="#time">time</a> and{' '}
+                <a href="#date-ranges-and-spans">date ranges and spans</a> - not
+                hyphens.
               </p>
             </AccordionSection>
             <AccordionSection heading="I">
               <h3 id="ie">ie</h3>
               <p>
-                See <a href="#eg-etc-and-ie">eg, etc and ie</a>
+                Try (re)writing sentences to avoid the need to use it. If that
+                is not possible, use an alternative such as ‘meaning’ or ‘that
+                is’.{' '}
+              </p>
+              <p>
+                Can be used within service content to save space but write
+                without including full stops. For example, ie NOT i.e.
+              </p>
+              <p>
+                As per{' '}
+                <a href="https://www.gov.uk/guidance/style-guide/a-to-z-of-gov-uk-style#eg-etc-and-ie">
+                  GDS style guide - eg, etc and ie
+                </a>
+                .
               </p>
               <h3 id="independent-schools-adjudicator">
                 independent schools adjudicator
@@ -815,6 +845,36 @@ const DocumentationGlossary = () => {
               </p>
             </AccordionSection>
             <AccordionSection heading="J">
+              <h3 id="jargon">Jargon</h3>
+              <p>
+                Do not use jargon. We want to introduce education statistics to
+                new people so we need to write for a non-expert audience.{' '}
+              </p>
+              <p>
+                Research has also proven that even experts do not have time or
+                want to wade through jargon on web pages.{' '}
+              </p>
+              <p>
+                Instead, they want information quickly and easily - just like
+                everyone else.{' '}
+              </p>
+              <p>
+                So by not using jargon, you’re not ‘dumbing down’. You’re
+                actually ‘opening up’ to all your levels of users.
+              </p>
+              <p>
+                However, there will be times when you need to introduce users to
+                a new concept, phrase or term.
+              </p>
+              <p>
+                In these cases, provide them with a short contextual explanation
+                the first time you mention it within content and then use a
+                ‘glossary’ link to explain things in greater depth.
+              </p>
+              <p>
+                Alternatively, you can provide users with a link to a full
+                explanation in a methodology document.
+              </p>
               <h3 id="job-titles">Job titles</h3>
               <p>
                 Specific job titles and ministers’ role titles are upper case:
@@ -830,10 +890,16 @@ const DocumentationGlossary = () => {
             </AccordionSection>
             <AccordionSection heading="K">
               <div>
-                <h3 id="kanban">kanban</h3>
+                <h3 id="key-indicators">Key indicators</h3>
                 <p>
-                  Upper case when referring to The Kanban Method, otherwise
-                  lower case.
+                  Our research has shown you should aim to add up to a maximum
+                  of 6 key indicators within the ‘Headline facts and figures’
+                  section of a release.
+                </p>
+                <p>
+                  You’ll also need to add content to the ‘Guidance title’ and
+                  ‘Guidance text’ text boxes within the Admin system to explain
+                  what each key indicator means.
                 </p>
                 <h3 id="key-stage">key stage</h3>
                 <p>Lower case and numeral: key stage 4.</p>
@@ -844,26 +910,6 @@ const DocumentationGlossary = () => {
               <p>Lower case even when it’s ‘the law’.</p>
               <h3 id="legal-aid">legal aid</h3>
               <p>Lower case.</p>
-              <h3 id="legal-content">Legal content</h3>
-              <p>
-                Legal content can still be written in plain English. It’s
-                important that users understand content and that we present
-                complicated information simply.
-              </p>
-              <p>
-                If you have to publish legal jargon, it will be a publication so
-                write a plain English summary.
-              </p>
-              <p>
-                Where evidence shows there’s a clear user need for including a
-                legal term (like bona vacantia), always explain it in plain
-                English.
-              </p>
-              <p>
-                <a href="https://www.gov.uk/guidance/content-design/writing-for-gov-uk#legal-content">
-                  Read more about writing legal content
-                </a>
-              </p>
               <h3 id="legislative-competence-order">
                 legislative competence order
               </h3>
@@ -882,21 +928,23 @@ const DocumentationGlossary = () => {
               <h3 id="links">Links</h3>
               <p>
                 Front-load your link text with the relevant terms and make them
-                active and specific. Always link to online services first. Offer
-                offline alternatives afterwards, when possible.
+                active and specific.
+              </p>
+              <p>
+                Always link to online services first and offer offline
+                alternatives afterwards.
+              </p>
+              <p>
+                As per{' '}
+                <a href="https://www.gov.uk/guidance/style-guide/a-to-z-of-gov-uk-style#links">
+                  GDS style guide - Links
+                </a>
+                .
               </p>
               <h3 id="lists">Lists</h3>
               <p>
                 Lists should be bulleted to make them easier to read.{' '}
-                <a href="https://www.gov.uk/guidance/style-guide/a-to-z-of-gov-uk-style#bullet-points-steps">
-                  See bullets and steps
-                </a>
-                .
-              </p>
-              <p>
-                Very long lists can be written as a paragraph with a lead-in
-                sentence if it looks better: ‘The following countries are in the
-                EU: Spain, France, Italy…’
+                <a href="#bullet-points">See Bullet points</a>.
               </p>
               <h3 id="local-authority">local authority</h3>
               <p>Lower case. Do not use LA.</p>
@@ -914,12 +962,6 @@ const DocumentationGlossary = () => {
               <p>Lower case.</p>
               <p>
                 Use local council, instead of local authority where possible.
-              </p>
-              <h3 id="log-book">log book</h3>
-              <p>Two words.</p>
-              <h3 id="log-in">log in</h3>
-              <p>
-                See <a href="#sign-in-or-log-in">sign in or log in</a>.
               </p>
               <h3 id="looked-after-children">looked-after children</h3>
               <p>Hyphenated.</p>
@@ -950,34 +992,13 @@ const DocumentationGlossary = () => {
                 Write out decimal fractions as numerals. Use the same number
                 format for a sequence: 0.75 and 0.45
               </p>
-              <h3 id="measurements">Measurements</h3>
-              <p>Use numerals and spell out measurements at first mention.</p>
-              <p>
-                Do not use a space between the numeral and abbreviated
-                measurement: 3,500kg not 3,500 kg.
-              </p>
-              <p>
-                <a href="#">Contact the BAU team</a> if you need to follow
-                different conventions, for example you’re writing just for
-                scientists or engineers.
-              </p>
-              <p>
-                Abbreviating kilograms to kg is fine - you do not need to spell
-                it out.
-              </p>
-              <p>
-                If the measurement is more than one word, like kilometres per
-                hour, then spell it out the first time it’s used with the
-                abbreviation. From then on, abbreviate. If it’s only mentioned
-                once, do not abbreviate.
-              </p>
               <h3 id="metadata">metadata</h3>
               <p>Not “meta data”.</p>
-              <h3 id="metaphors">metaphors</h3>
-              <p>
-                See <a href="#words-to-avoid">words to avoid</a>
-              </p>
-              <h3 id="millions">Millions</h3>
+              <h3 id="middle-deemed-secondary-schools">
+                middle-deemed secondary schools
+              </h3>
+              <p>Lower case. Hyphenated.</p>
+              <h3 id="millions-and-billions">Millions and billions</h3>
               <p>Always use million in money (and billion): £138 million.</p>
               <p>Use millions in phrases: millions of people.</p>
               <p>
@@ -1050,6 +1071,15 @@ const DocumentationGlossary = () => {
               <p>Lower case.</p>
               <h3 id="national-scholarship-fund">national scholarship fund</h3>
               <p>Lower case.</p>
+              <h3 id="national-statistics">National Statistics</h3>
+              <p>
+                Upper case National Statistics for the official statistics
+                quality mark.{' '}
+              </p>
+              <p>
+                Lower case for anything else, including statistics that are
+                national in scope.
+              </p>
               <h3 id="newly-qualified-teacher">newly qualified teacher</h3>
               <p>Lower case.</p>
               <h3 id="the-north-the-north-of-england">
@@ -1061,40 +1091,79 @@ const DocumentationGlossary = () => {
               <h3 id="north-wales">north Wales</h3>
               <p>Not a specific region of the UK.</p>
               <h3 id="numbers">Numbers</h3>
+              <p>Write all numbers 10 and over as numerals, up to 999,999.</p>
               <p>
-                Use ‘one’ unless you’re talking about a step, a point in a list
-                or another situation where using the numeral makes more sense:
-                ‘in point 1 of the design instructions’, for example. Or this:
+                Write numbers one to nine as words unless they are technical or
+                precise, such as dates, figure or table titles, or relate
+                directly to the statistics being presented.
               </p>
-              <p>You’ll be shown 14 clips that feature everyday road scenes.</p>
-              <p>There will be:</p>
-              <ul>
-                <li>1 developing hazard in 13 clips</li>
-                <li>2 developing hazards in the other clip</li>
+              <p>For example:</p>
+              <ul className="govuk-list govuk-list--bullet">
+                <li>On the one hand…</li>
+                <li>This is the most effective of the two measures…</li>
+                <li>7 March 2017</li>
+                <li>1,000</li>
+                <li>Figure 1</li>
               </ul>
               <p>
-                Write all other numbers in numerals (including 2 to 9) except
-                where it’s part of a common expression like ‘one or two of them’
-                where numerals would look strange.
+                Where a range crosses the 10 boundary, use numerals. For
+                example, 9 to 12 respondents, not nine to 12 respondents.
               </p>
               <p>
-                If a number starts a sentence, write it out in full
-                (Thirty-four, for example) except where it starts a title or
-                subheading.
-              </p>
-              <p>For numerals over 999 - insert a comma for clarity: 9,000</p>
-              <p>Spell out common fractions like one-half.</p>
-              <p>Use a % sign for percentages: 50%</p>
-              <p>Use a 0 where there’s no digit before the decimal point.</p>
-              <p>Use ‘500 to 900’ and not ‘500-900’ (except in tables).</p>
-              <p>Use MB for anything over 1MB: 4MB not 4096KB.</p>
-              <p>Use KB for anything under 1MB: 569KB not 0.55MB.</p>
-              <p>
-                Keep it as accurate as possible and up to 2 decimal places:
-                4.03MB.
+                Write out rankings first to ninth, then use numerals. Do not use
+                superscript for ‘st’, ‘nd’, ‘rd’ and ‘th’. For example, first or
+                10th.
               </p>
               <p>
-                Addresses: use ‘to’ in address ranges: 49 to 53 Cherry Street.
+                A sequence of numbers should use the same format for both, which
+                should follow the higher number. For example, 6th out of 12. Do
+                not use abbreviations of ‘numbers’, such as ‘no’ or ‘nos’. They
+                can be read incorrectly.
+              </p>
+              <p>
+                Use commas after every three decimal places in numbers of four
+                digits or more - never spaces. Years should have no punctuation.
+                For example:
+              </p>
+              <ul className="govuk-list govuk-list--bullet">
+                <li>100,000</li>
+                <li>2,548</li>
+                <li>1995</li>
+              </ul>
+              <p>Avoid writing sets of numbers together. For example:</p>
+              <ul className="govuk-list govuk-list--bullet">
+                <li>‘In 1961 just over 2,500 births were recorded.’</li>
+                <p className="govuk-!-font-size-19 govuk-!-font-weight-bold">
+                  NOT
+                </p>
+                <li>‘In 1961 2,543 births were recorded.’</li>
+              </ul>
+              <p>
+                Use a 0 where there’s no digit before the decimal point in a
+                number. For example, 0.6%.
+              </p>
+              <p>
+                Do not start a sentence with a numeral. Rearrange the sentence
+                accordingly. For example:
+              </p>
+              <ul className="govuk-list govuk-list--bullet">
+                <li>‘There are 10 million pupils in school in England.’</li>
+                <p className="govuk-!-font-size-19 govuk-!-font-weight-bold">
+                  NOT
+                </p>
+                <li>‘10 million pupils go to school in England.’</li>
+              </ul>
+              <p>
+                Do not use a hyphen to indicate a range of numbers - use ‘to’
+                instead. For example, ‘Around 150 to 200 pupils attended the
+                school’.
+              </p>
+              <p>
+                As per{' '}
+                <a href="https://style.ons.gov.uk/category/house-style/numbers/#writing-numbers">
+                  ONS style guide - Writing numbers
+                </a>
+                .
               </p>
               <h4 id="ordinal-numbers">Ordinal numbers</h4>
               <p>
@@ -1148,6 +1217,35 @@ const DocumentationGlossary = () => {
               <p>Lower case. Hyphenated.</p>
             </AccordionSection>
             <AccordionSection heading="P">
+              <h3 id="page-length">Page length</h3>
+              <p>There is no minimum or maximum page length for a release.</p>
+              <p>However, research has shown:</p>
+              <ul className="govuk-list govuk-list--bullet">
+                <li>people only read 20 to 28% of web pages anyway</li>
+                <li>
+                  that the pressure on people to understand increases for every
+                  100 words added to web pages
+                </li>
+              </ul>
+              <p>
+                This means the quicker you get to the point, the greater chance
+                users have of understanding the content you’ve created.
+              </p>
+              <p>
+                We suggest you limit your word count per section of your release
+                to 250 words with an absolute maximum of 400 words if you have a
+                lot of information to put across.
+              </p>
+              <p>
+                In cases where your word count rises about 250 words - make sure
+                you use bullets and subheadings to break up your content and
+                make it easier to read and understand.
+              </p>
+              <p>
+                Alternatively, see if you can break up long sections like these
+                into 2 different sections by grouping the content into
+                like-minded themes and topics.
+              </p>
               <h3 id="paper-b">Paper B</h3>
               <p>In national curriculum tests.</p>
               <h3 id="parliament">Parliament</h3>
@@ -1156,22 +1254,25 @@ const DocumentationGlossary = () => {
               <p>
                 Parliamentary is upper case and committees is in lower case.
               </p>
+              <h3 id="parliamentary-questions">parliamentary questions</h3>
+              <p>Lower case.</p>
               <h3 id="pathfinder">pathfinder</h3>
               <p>Lower case.</p>
               <h3 id="pdf">PDF</h3>
               <p>Upper case. No need to explain the acronym.</p>
-              <h3 id="penalty">penalty</h3>
-              <p>
-                See the entry for{' '}
-                <a href="/guidance/style-guide/a-to-z-of-gov-uk-style#fine">
-                  ‘fine’
-                </a>
-                .
-              </p>
               <h3 id="per-cent">Per cent</h3>
               <p>
-                Use per cent not percent. Percentage is one word. Always use %
-                with a number.
+                <p>
+                  Two words and NOT percent. Always use % with a number.
+                  Percentage is one word.
+                </p>
+                <p>
+                  As per{' '}
+                  <a href="https://www.gov.uk/guidance/style-guide/a-to-z-of-gov-uk-style#per-cent">
+                    GDS style guide - per cent
+                  </a>
+                  .
+                </p>
               </p>
               <h3 id="performance-management">performance management</h3>
               <p>Lower case.</p>
@@ -1181,26 +1282,23 @@ const DocumentationGlossary = () => {
               <p>You can write in full or use the initials.</p>
               <h3 id="plain-english">plain English</h3>
               <p>
-                Lower case plain and upper case English unless in a title: the
-                Plain English Campaign.
+                Do not use formal or long words when easy or short ones will do.
               </p>
               <p>
-                All content on explore ediucation statistics should be written
-                in{' '}
-                <a href="https://www.gov.uk/guidance/content-design/writing-for-gov-uk#plain-english">
-                  plain English
-                </a>
-                . You should also make sure you use language your audience will
-                understand - check which{' '}
-                <a href="https://www.gov.uk/guidance/style-guide/a-to-z-of-gov-uk-style#words-to-avoid">
-                  words you should avoid
-                </a>
-                .
+                Users have a primary set of vocabulary of 5,000 common words
+                which most use every day so try and use these to get your point
+                across.
+              </p>
+              <p>
+                See
+                <a href="#words-to-avoid">words to avoid</a>.
               </p>
               <h3 id="policy-note">policy note</h3>
               <p>Lower case.</p>
               <h3 id="policy-statement">policy statement</h3>
               <p>Lower case.</p>
+              <h3 id="postcode">postcode</h3>
+              <p>All one word.</p>
               <h3 id="powerpoint-presentation">PowerPoint presentation</h3>
               <p>Upper case because PowerPoint is a brand name.</p>
               <h3 id="pre-school">pre-school</h3>
@@ -1219,6 +1317,23 @@ const DocumentationGlossary = () => {
               <p>Lower case.</p>
               <h3 id="pupil-premium">pupil premium</h3>
               <p>Lower case.</p>
+              <h3 id="punctuation">Punctuation</h3>
+              <p>
+                Stick to using familiar punctuation like commas, dashes and full
+                stops.
+              </p>
+              <p>
+                This is because most people do not know how to use little-used
+                punctuation such as square brackets and semicolons.
+              </p>
+              <p>
+                Using more complicated punctuation slows people down and this in
+                turn makes your content harder to understand.
+              </p>
+              <p>
+                Simple and familiar punctuation aids a user’s reading speed and
+                comprehension.
+              </p>
               <h3 id="pupil-referral-unit">pupil referral unit</h3>
               <p>Lower case.</p>
             </AccordionSection>
@@ -1243,20 +1358,10 @@ const DocumentationGlossary = () => {
               </ul>
               <h4 id="double-quotes">Double quotes</h4>
               <p>Use double quotes in body text for direct quotations.</p>
-              <h4 id="block-quotes">Block quotes</h4>
-              <p>
-                Use the{' '}
-                <a href="https://www.gov.uk/guidance/how-to-publish-on-gov-uk/markdown#blockquotes">
-                  block quote Markdown
-                </a>{' '}
-                for quotes longer than a few sentences.
-              </p>
             </AccordionSection>
             <AccordionSection heading="S">
               <h3 id="same-sex-schools">same-sex schools</h3>
               <p>Hyphenated.</p>
-              <h3 id="sat-nav">sat nav</h3>
-              <p>Two words, lower case.</p>
               <h3 id="sats">SATs</h3>
               <p>
                 <a href="#national-curriculum-tests">
@@ -1272,6 +1377,8 @@ const DocumentationGlossary = () => {
               <h3 id="school-and-college-performance-tables">
                 school and college performance tables
               </h3>
+              <p>Lower case.</p>
+              <h3 id="school-census">school census</h3>
               <p>Lower case.</p>
               <h3 id="school-improvement-plan">school improvement plan</h3>
               <p>Lower case.</p>
@@ -1317,14 +1424,27 @@ const DocumentationGlossary = () => {
               </p>
               <h3 id="sentence-length">Sentence length</h3>
               <p>
-                Do not use long sentences. Check sentences with more than 25
-                words to see if you can split them to make them clearer.
+                Do not use long sentences. Sentences should be no longer than 25
+                words.
               </p>
               <p>
-                <a href="https://www.gov.uk/guidance/content-design/writing-for-gov-uk#short-sentences">
-                  Read more about short sentences
+                If they’re any longer then they need to be divided into two.
+              </p>
+              <p>
+                Say what you need to say once, clearly and keep sentences to one
+                or two tightly-connected thoughts.
+              </p>
+              <p>If you have another thought - put it in another sentence.</p>
+              <p>
+                As per{' '}
+                <a href="https://style.ons.gov.uk/category/writing-for-the-web/structuring-content/#sentences">
+                  ONS style guide - Sentences
                 </a>
                 .
+              </p>
+              <h3 id="short-sentences">Short sentences</h3>
+              <p>
+                See <a href="#sentence-length">Sentence length</a>.
               </p>
               <h3 id="sign-in-or-log-in">sign in or log in</h3>
               <p>
@@ -1334,6 +1454,10 @@ const DocumentationGlossary = () => {
               <p>
                 Do not use login as a noun - say what the user actually needs to
                 enter (like username, password, National Insurance number).
+              </p>
+              <h3 id="simple-language">Simple language</h3>
+              <p>
+                See <a href="#plain-english">plain English</a>.
               </p>
               <h3 id="to-19-bursary-fund">16 to 19 Bursary Fund</h3>
               <p>
@@ -1355,8 +1479,15 @@ const DocumentationGlossary = () => {
               <p>Lower case.</p>
               <h3 id="south-east-south-west">south-east, south-west</h3>
               <p>Lower case, hyphenated.</p>
+              <h3 id="spads">SpAds</h3>
+              <p>
+                Not SPADs which stands for ‘signals passed at danger’ which is a
+                government transport term.{' '}
+              </p>
               <h3 id="spaces">spaces</h3>
               <p>One space after a full stop, not 2.</p>
+              <h3 id="special-advisers">special advisers</h3>
+              <p>Lower case.</p>
               <h3 id="special-educational-needsspecial-educational-needs-and-disabilities-send">
                 special educational needs/special educational needs and
                 disabilities (SEN/D)
@@ -1382,31 +1513,14 @@ const DocumentationGlossary = () => {
                 plans. Lower case in other contexts: we are conducting a
                 spending review.
               </p>
+              <h3 id="spring-census">spring census</h3>
+              <p>Lower case.</p>
               <h3 id="standards-of-conduct">standards of conduct</h3>
               <p>Lower case.</p>
               <h3 id="statement-of-send">statement of SEND</h3>
               <p>Lower case.</p>
               <h3 id="statistical-first-release">statistical first release</h3>
               <p>Lower case.</p>
-              <h3 id="statistics">Statistics</h3>
-              <p>
-                Read{' '}
-                <a rel="external" href="http://style.ons.gov.uk">
-                  Style.ONS
-                </a>{' '}
-                to find out how to write about statistics. This has been
-                produced by the Office for National Statistics for all members
-                of the Government Statistical Service.
-              </p>
-              <p>
-                Upper case National Statistics for the official statistics
-                quality mark. Lower case for anything else, including statistics
-                that are national in scope.
-              </p>
-              <h3 id="steps-1">steps</h3>
-              <p>
-                See <a href="#bullet-points-steps">Bullet points and steps</a>
-              </p>
               <h3 id="strategic-national-framework-on-xxx">
                 strategic national framework on XXX
               </h3>
@@ -1422,6 +1536,22 @@ const DocumentationGlossary = () => {
               <p>Lower case.</p>
               <h3 id="study-programme">study programme</h3>
               <p>Lower case.</p>
+              <h3 id="subheadings">Subheadings</h3>
+              <p>
+                Using subheadings to break up your content on a web pages makes
+                it much easier for people to take in the information it
+                contains,
+              </p>
+              <p>
+                They help because by telling a story across your page and people
+                use them to predict in seconds what information is on any
+                particular part of your page.
+              </p>
+              <p>
+                Subheadings make reading content easier by acting as markers
+                which people can return to if they need to re-read something to
+                aid their understanding.
+              </p>
               <h3 id="summaries">Summaries</h3>
               <p>Summaries should:</p>
               <ul>
@@ -1434,6 +1564,8 @@ const DocumentationGlossary = () => {
                 summary of consultation responses
               </h3>
               <p>All lower case.</p>
+              <h3 id="summer-census">summer census</h3>
+              <p>Lower case.</p>
               <h3 id="summer-school">summer school</h3>
               <p>Lower case.</p>
               <h3 id="sure-start-programme">Sure Start programme</h3>
@@ -1523,17 +1655,6 @@ const DocumentationGlossary = () => {
                 Tuesday 14 June” can be read in two ways (the end of Monday 13,
                 or end of Tuesday 14).
               </p>
-              <h3 id="titles">Titles</h3>
-              <p>Page titles should:</p>
-              <ul>
-                <li>be 65 characters or less</li>
-                <li>be unique, clear and descriptive</li>
-                <li>be front-loaded and optimised for search</li>
-                <li>use a colon to break up longer titles</li>
-                <li>not contain dashes or slashes</li>
-                <li>not have a full stop at the end</li>
-                <li>not use acronyms unless they are well-known, like EU</li>
-              </ul>
               <h3 id="town-council">town council</h3>
               <p>Lower case, even when part of a name: Swanage town council.</p>
               <h3 id="training-schools">training schools</h3>
@@ -1658,12 +1779,6 @@ const DocumentationGlossary = () => {
                 With all of these words you can generally replace them by
                 breaking the term into what you’re actually doing. Be open and
                 specific.
-              </p>
-              <p>
-                <a href="https://www.gov.uk/guidance/content-design/writing-for-gov-uk#plain-english">
-                  Read more about plain English and words to avoid
-                </a>
-                .
               </p>
               <h3 id="written-ministerial-statement-written-statement">
                 written ministerial statement, written statement
