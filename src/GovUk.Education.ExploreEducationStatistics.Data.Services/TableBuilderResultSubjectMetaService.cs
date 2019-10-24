@@ -58,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             var stopwatch = Stopwatch.StartNew();
             stopwatch.Start();
 
-            var filters = GetFilters(observations);
+            var filters = GetFilters2(observations);
 
             _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
             stopwatch.Restart();

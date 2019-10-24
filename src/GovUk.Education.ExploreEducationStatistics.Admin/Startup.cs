@@ -189,25 +189,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-//            using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
-//                .CreateScope())
-//            {
-//                using (var context = serviceScope.ServiceProvider.GetService<StatisticsDbContext>())
-//                {
-//                    var list = new List<TimeIdentifier>() {
-//                        TimeIdentifier.AcademicYear
-//                        }.AsEnumerable();
-//                    
-//                    var asdf = context.
-//                        Observation.
-//                        Where(observation => observation.SubjectId == 1 && 
-//                                             list.Contains(observation.TimeIdentifier)).
-//                        ToList();
-//
-//                    var i = 1;
-//                }
-//            }
-
             UpdateDatabase(app);
             
             if (env.IsDevelopment())

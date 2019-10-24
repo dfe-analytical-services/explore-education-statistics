@@ -125,7 +125,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         public IEnumerable<Observation> FindObservations(SubjectMetaQueryContext query)
         {
-            return DbSet().AsNoTracking().Where(ObservationPredicateBuilder.Build(query));
+            return DbSet()
+                .AsNoTracking()
+                .Include(observation => observation.FilterItems)
+                .ThenInclude(filterItem => filterItem.FilterItem)
+                .ThenInclude(filterItem => filterItem.FilterGroup)
+                .ThenInclude(filterGroup => filterGroup.Filter)
+                .Where(ObservationPredicateBuilder.Build(query));
         }
 
         private static SqlParameter CreateTimePeriodListType(string parameterName,

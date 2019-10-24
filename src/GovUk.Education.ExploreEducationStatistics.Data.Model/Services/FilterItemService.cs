@@ -15,33 +15,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         {
         }
 
-        public IEnumerable<FilterItem> GetFilterItems(IQueryable<Observation> observations)
-        {
-            return observations.SelectMany(observation => observation.FilterItems)
-                .Select(item => item.FilterItem).Distinct();
-        }
-
         public IEnumerable<FilterItem> GetFilterItemsIncludingFilters(IQueryable<Observation> observations)
         {
             var filterItems = observations
-                .Join(
-                    _context.ObservationFilterItem, 
-                    observation => observation,
-                    observationFilterItem => observationFilterItem.Observation,
-                    (observation, observationFilterItem) => observationFilterItem
-                )
-                .Join(
-                    _context.FilterItem,
-                    observationFilterItem => observationFilterItem.FilterItem,
-                    filterItem => filterItem,
-                    (observationFilterItem, filterItem) => filterItem
-                )
-                .Distinct()
-                .Include(item => item.FilterGroup)
-                .ThenInclude(group => group.Filter)
+                .SelectMany(observation => observation.FilterItems)
+                .Select(item => item.FilterItem)
                 .ToList();
 
-            return filterItems;
+            return filterItems.Distinct();
         }
 
         public FilterItem GetTotal(Filter filter)
