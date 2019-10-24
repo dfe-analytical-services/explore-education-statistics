@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import times from 'lodash/times';
-import React, { forwardRef, ReactElement } from 'react';
+import React, {forwardRef, ReactElement} from 'react';
 import styles from './MultiHeaderTable.module.scss';
 
 interface Props {
@@ -19,36 +19,36 @@ interface SpanInfo {
 
 export const generateHeaderSpanInfo = (groups: string[][]) => {
 
+  console.log(groups);
+
   const maxLength = groups.reduce((curMaxLength: number, group) => curMaxLength < group.length ? group.length : curMaxLength, 0);
 
   return groups.reduce<SpanInfo[][]>((headers: SpanInfo[][], groupHeadings: string[], groupIndex: number) => {
 
     const g = groupHeadings.reduce<SpanInfo[]>((groupInfo, nextHeading, rowIndex) => {
 
-      const previousHeading = groupInfo.length > 0 ? groupInfo[groupInfo.length - 1] : undefined;
-
-      if (previousHeading) {
-
-        if (nextHeading && previousHeading.heading !== nextHeading) {
-
-          const updatedPrevious = {
-            ...previousHeading,
-            count: rowIndex - previousHeading.start,
-          };
-
-          return [...groupInfo.slice(0, -1),
-            updatedPrevious,
-            {
-              heading: nextHeading,
-              count: maxLength - rowIndex,
-              start: updatedPrevious.start + updatedPrevious.count,
-            }];
-        }
-
-        return groupInfo;
+      if (groupInfo.length === 0) {
+        return [{heading: nextHeading, count: maxLength, start: rowIndex}];
       }
 
-      return [{ heading: nextHeading, count: maxLength, start: rowIndex }];
+      const previousHeading = groupInfo[groupInfo.length - 1];
+
+      if (nextHeading && previousHeading.heading !== nextHeading) {
+
+        return [...groupInfo.slice(0, -1),
+          {
+            ...previousHeading,
+            count: rowIndex - previousHeading.start,
+          },
+          {
+            heading: nextHeading,
+            count: maxLength - rowIndex,
+            start: rowIndex,
+          }];
+      }
+
+      return groupInfo;
+
     }, []);
 
     return [...headers, g];
@@ -56,14 +56,20 @@ export const generateHeaderSpanInfo = (groups: string[][]) => {
 
 };
 
-export const generateHeaders = (headers: SpanInfo[][]) => {
-  const numberOfRows = headers[0].reduce( (length,{count}) => length+count, 0);
+export const generateHeaders = (headers: SpanInfo[][]): SpanInfo[][] => {
+  const numberOfRows = headers[0].reduce((length, {count}) => length + count, 0);
 
-  console.log(numberOfRows);
+  const rowColumnsReversed = headers.map(column => [...column].reverse());
+
+  const h = [...Array(numberOfRows)].map((_, i) =>
+    rowColumnsReversed.map(rowColumn => rowColumn.find(({start}) => start === i)).filter(cell => !!cell)
+  );
+
+  return h as SpanInfo[][];
 };
 
 const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
-  ({ ariaLabelledBy, className, columnHeaders, rowHeaders, rows }, ref) => {
+  ({ariaLabelledBy, className, columnHeaders, rowHeaders, rows}, ref) => {
     const getSpan = (groups: string[][], groupIndex: number) => {
       return groups
         .slice(groupIndex + 1)
@@ -130,69 +136,94 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
         </thead>
 
         <tbody>
-          {rowHeaders
-            .reduce<ReactElement[][]>(
-              (acc, headerGroup, headerGroupIndex) =>
+          {
 
-                acc.flatMap((row, rowIndex) =>
+            generateHeaders(generateHeaderSpanInfo(rowHeaders))
+              .reduce<ReactElement[][]>((agg, group, headerGroupIndex) => {
 
-                  headerGroup.map((header, index) => {
-                    const rowSpan = getSpan(rowHeaders, headerGroupIndex);
+                  console.log(group);
 
-                    const isRowGroup =
-                      headerGroupIndex !== rowHeaders.length - 1;
-
-                    const headerCell = (
+                  return [...agg,
+                    group.map((column, rowIndex) => (
                       <th
                         // eslint-disable-next-line react/no-array-index-key
-                        key={`${rowIndex}_${headerGroupIndex}_${index}`}
-                        className={classNames({
-                          'govuk-table__cell--numeric': !isRowGroup,
-                          'govuk-table__cell--center': isRowGroup,
-                          [styles.borderRight]: !isRowGroup,
-                          [styles.borderBottom]:
-                          isRowGroup || index === headerGroup.length - 1,
-                        })}
-                        rowSpan={rowSpan}
-                        scope={isRowGroup ? 'rowgroup' : 'row'}
+                        key={`${rowIndex}_${headerGroupIndex}`}
+                        className={classNames({})}
+                        rowSpan={column.count}
+                        scope={column.count > 1 ? 'rowgroup' : 'row'}
                       >
-                        {header}
+                        {column.heading}
                       </th>
-                    );
+                    ))
+                  ]
+                }, []
+              )
+/*
+            rowHeaders
+              .reduce<ReactElement[][]>(
+                (acc, headerGroup, headerGroupIndex) =>
 
-                    if (index === 0) {
-                      return [...row, headerCell];
-                    }
+                  acc.flatMap((row, rowIndex) =>
 
-                    return [...row.slice(headerGroupIndex), headerCell];
-                  }),
-                ),
-              [[]],
-            )
-            .map((headerCells, rowIndex) => {
-              return (
-                // eslint-disable-next-line react/no-array-index-key
-                <tr key={rowIndex}>
-                  {headerCells}
-                  <>
-                    {rows[rowIndex].map((cell, cellIndex) => (
-                      <td
-                        // eslint-disable-next-line react/no-array-index-key
-                        key={cellIndex}
-                        className={classNames('govuk-table__cell--numeric', {
-                          [styles.borderRight]:
-                          (cellIndex + 1) % firstColSpan === 0,
-                          [styles.borderBottom]:
-                          (rowIndex + 1) % firstRowSpan === 0,
-                        })}
-                      >
-                        {cell}
-                      </td>
-                    ))}
-                  </>
-                </tr>
-              );
-            })}
+                    headerGroup.map((header, index) => {
+                      const rowSpan = getSpan(rowHeaders, headerGroupIndex);
+
+                      const isRowGroup =
+                        headerGroupIndex !== rowHeaders.length - 1;
+
+                      const headerCell = (
+                        <th
+                          // eslint-disable-next-line react/no-array-index-key
+                          key={`${rowIndex}_${headerGroupIndex}_${index}`}
+                          className={classNames({
+                            'govuk-table__cell--numeric': !isRowGroup,
+                            'govuk-table__cell--center': isRowGroup,
+                            [styles.borderRight]: !isRowGroup,
+                            [styles.borderBottom]:
+                            isRowGroup || index === headerGroup.length - 1,
+                          })}
+                          rowSpan={rowSpan}
+                          scope={isRowGroup ? 'rowgroup' : 'row'}
+                        >
+                          {header}
+                        </th>
+                      );
+
+                      if (index === 0) {
+                        return [...row, headerCell];
+                      }
+
+                      return [...row.slice(headerGroupIndex), headerCell];
+                    }),
+                  ),
+                [[]],
+              )
+
+ */
+              .map((headerCells, rowIndex) => {
+                return (
+                  // eslint-disable-next-line react/no-array-index-key
+                  <tr key={rowIndex}>
+                    {headerCells}
+                    <>
+                      {rows[rowIndex].map((cell, cellIndex) => (
+                        <td
+                          // eslint-disable-next-line react/no-array-index-key
+                          key={cellIndex}
+                          className={classNames('govuk-table__cell--numeric', {
+                            [styles.borderRight]:
+                            (cellIndex + 1) % firstColSpan === 0,
+                            [styles.borderBottom]:
+                            (rowIndex + 1) % firstRowSpan === 0,
+                          })}
+                        >
+                          {cell}
+                        </td>
+                      ))}
+                    </>
+                  </tr>
+                );
+              })}
         </tbody>
       </table>
     );
