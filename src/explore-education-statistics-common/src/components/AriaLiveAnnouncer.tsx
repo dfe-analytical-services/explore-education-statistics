@@ -4,40 +4,69 @@ interface Props {
   children: ReactNode;
 }
 
+export interface LiveMessage {
+  id: string;
+  type: 'polite' | 'assertive';
+  message: string;
+}
+
 export const AriaLiveContext = React.createContext({
-  announceAssertive: (message: string) => {
-    console.warn(message, "AriaLiveAnnounce hasn't wrapped the app");
+  announceMessage: (liveMessage: LiveMessage) => {
+    // eslint-disable-next-line no-console
+    console.warn(
+      liveMessage.message,
+      "AriaLiveAnnounce hasn't wrapped the app",
+    );
   },
-  announcePolite: (message: string) => {
-    console.warn(message, "AriaLiveAnnounce hasn't wrapped the app");
+  removeMessage: (messageId: string) => {
+    // eslint-disable-next-line no-console
+    console.warn(messageId, "AriaLiveAnnounce hasn't wrapped the app");
   },
 });
 
 const AriaLiveAnnouncer = ({ children }: Props) => {
-  const [assertiveMessage, setAssertiveMessage] = useState<
-    string | undefined
-  >();
-  const [politeMessage, setPoliteMessage] = useState<string | undefined>();
+  const [messageList, setMessageList] = useState<LiveMessage[]>([]);
+
+  const announceMessage = (liveMessage: LiveMessage) => {
+    setMessageList([...messageList, liveMessage]);
+  };
+  const removeMessage = (messageId: string) => {
+    setMessageList([
+      ...messageList.filter(message => message.id !== messageId),
+    ]);
+  };
 
   return (
     <AriaLiveContext.Provider
       value={{
-        announceAssertive: message => {
-          alert(message);
-          setAssertiveMessage(message);
-        },
-        announcePolite: message => {
-          alert(message);
-          setPoliteMessage(message);
-        },
+        announceMessage,
+        removeMessage,
       }}
     >
       {children}
-      <div aria-live="assertive" className="govuk-visually-hidden">
-        {assertiveMessage}
+      <div
+        aria-live="assertive"
+        aria-atomic="false"
+        aria-relevant="additions"
+        className="govuk-visually-hidden"
+      >
+        {messageList
+          .filter(message => message.type === 'assertive')
+          .map(({ message, id }) => (
+            <p key={id}>{message}</p>
+          ))}
       </div>
-      <div aria-live="polite" className="govuk-visually-hidden">
-        {politeMessage}
+      <div
+        aria-live="polite"
+        aria-atomic="false"
+        aria-relevant="additions"
+        className="govuk-visually-hidden"
+      >
+        {messageList
+          .filter(message => message.type === 'polite')
+          .map(({ message, id }) => (
+            <p key={id}>{message}</p>
+          ))}
       </div>
     </AriaLiveContext.Provider>
   );

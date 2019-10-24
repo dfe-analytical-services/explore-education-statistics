@@ -1,30 +1,62 @@
-/**
- * Consumes the AriaLiveAnnouncer context to be able to send messages that will be read to screenreaders
- */
+import React, { useEffect, useState } from 'react';
+import uuidv4 from 'uuid/v4';
+import {
+  AriaLiveContext,
+  LiveMessage,
+} from '@common/components/AriaLiveAnnouncer';
 
-import React from 'react';
-import { AriaLiveContext } from '@common/components/AriaLiveAnnouncer';
-
-interface Props {
+interface AriaLiveProps {
   message: string;
   setting?: 'polite' | 'assertive';
 }
 
-const AriaLiveMessage = ({ message, setting = 'polite' }: Props) => {
-  // send message to announcer
+const AriaLiveMessage = ({ message, setting = 'polite' }: AriaLiveProps) => {
+  const [messageId] = useState<string>(uuidv4());
+  const [messageSent, setMessageSent] = useState<boolean>(false);
 
   return (
     <AriaLiveContext.Consumer>
       {context => {
-        if (setting === 'polite') {
-          context.announcePolite(message);
-        } else {
-          context.announceAssertive(message);
-        }
-        return null;
+        return (
+          <Message
+            announceMessage={context.announceMessage}
+            removeMessage={context.removeMessage}
+            liveMessage={{ message, type: setting, id: messageId }}
+            messageSent={messageSent}
+            setMessageSent={setMessageSent}
+          />
+        );
       }}
     </AriaLiveContext.Consumer>
   );
+};
+
+interface LiveMessageProps {
+  announceMessage: (liveMessage: LiveMessage) => void;
+  removeMessage: (messageId: string) => void;
+  liveMessage: LiveMessage;
+  messageSent: boolean;
+  setMessageSent: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const Message = ({
+  announceMessage,
+  removeMessage,
+  liveMessage,
+  messageSent,
+  setMessageSent,
+}: LiveMessageProps) => {
+  useEffect(() => {
+    if (!messageSent) {
+      announceMessage(liveMessage);
+      setMessageSent(true);
+    }
+
+    return function cleanup() {
+      removeMessage(liveMessage.id);
+    };
+  });
+  return null;
 };
 
 export default AriaLiveMessage;

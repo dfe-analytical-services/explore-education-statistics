@@ -9,7 +9,7 @@ interface Props {
   size?: number;
   inline?: boolean;
   overlay?: boolean;
-  srMessage?: string;
+  screenReaderMessage?: string;
 }
 
 const LoadingSpinner = ({
@@ -18,27 +18,30 @@ const LoadingSpinner = ({
   size = 80,
   inline = false,
   overlay = false,
-  srMessage = 'Loading',
+  screenReaderMessage = 'The page is loading.',
 }: Props) => {
   return (
-    <div
-      className={classNames({
-        [styles.container]: true,
-        [styles.inline]: inline,
-        [styles.overlay]: overlay,
-      })}
-    >
-      {text && <p className={styles.text}>{text}</p>}
+    <>
       <div
-        className={classNames(styles.spinner, className)}
-        style={{
-          height: `${size}px`,
-          width: `${size}px`,
-          borderWidth: `${size * 0.15}px`,
-        }}
-      />
-      <AriaLiveMessage message={srMessage} />
-    </div>
+        className={classNames({
+          [styles.container]: true,
+          [styles.inline]: inline,
+          [styles.overlay]: overlay,
+        })}
+      >
+        {text && <p className={styles.text}>{text}</p>}
+        <div
+          className={classNames(styles.spinner, className)}
+          style={{
+            height: `${size}px`,
+            width: `${size}px`,
+            borderWidth: `${size * 0.15}px`,
+          }}
+        />
+      </div>
+      {screenReaderMessage ||
+        (text && <AriaLiveMessage message={screenReaderMessage || text} />)}
+    </>
   );
 };
 
