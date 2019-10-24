@@ -8,6 +8,7 @@ import {
   LocationFilter,
 } from '@common/modules/full-table/types/filters';
 import { FullTableMeta } from '../types/fullTable';
+import { transformTableMetaFiltersToCategoryFilters } from '@common/modules/table-tool/components/utils/tableToolHelpers';
 
 export interface TableHeadersConfig {
   columns: (Indicator | TimePeriodFilter)[];
@@ -23,7 +24,7 @@ const removeSiblinglessTotalRows = (
     return filter.length > 1 || !filter[0].isTotal;
   });
 };
-
+/*
 export const transformTableMetaFiltersToCategoryFilters = (
   filters: FullTableMeta['filters'],
 ): Dictionary<CategoryFilter[]> => {
@@ -36,6 +37,8 @@ export const transformTableMetaFiltersToCategoryFilters = (
       ),
   );
 };
+
+ */
 
 const getDefaultTableHeaderConfig = (fullTableMeta: FullTableMeta) => {
   const { indicators, filters, locations, timePeriodRange } = fullTableMeta;

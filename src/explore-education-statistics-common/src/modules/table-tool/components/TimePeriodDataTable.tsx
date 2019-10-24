@@ -34,6 +34,8 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
       );
     }
 
+    console.log(tableHeadersConfig);
+
     const columnHeaders: string[][] = [
       ...tableHeadersConfig.columnGroups.map(colGroup =>
         colGroup.map(group => group.label),

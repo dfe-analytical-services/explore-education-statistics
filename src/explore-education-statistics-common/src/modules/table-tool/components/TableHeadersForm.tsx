@@ -18,11 +18,15 @@ interface Props {
   onSubmit: (values: TableHeadersFormValues) => void;
 }
 
+export interface SortableOptionWithGroup extends SortableOption {
+  filterGroup?: string;
+}
+
 export interface TableHeadersFormValues {
-  columnGroups: SortableOption[][];
-  columns: SortableOption[];
-  rowGroups: SortableOption[][];
-  rows: SortableOption[];
+  columnGroups: SortableOptionWithGroup[][];
+  columns: SortableOptionWithGroup[];
+  rowGroups: SortableOptionWithGroup[][];
+  rows: SortableOptionWithGroup[];
 }
 
 const TableHeadersForm = ({
@@ -51,7 +55,7 @@ const TableHeadersForm = ({
           rowGroups: Yup.array()
             .of(
               Yup.array()
-                .of<SortableOption>(Yup.object())
+                .of<SortableOptionWithGroup>(Yup.object())
                 .ensure(),
             )
             .min(
@@ -65,7 +69,7 @@ const TableHeadersForm = ({
           columnGroups: Yup.array()
             .of(
               Yup.array()
-                .of<SortableOption>(Yup.object())
+                .of<SortableOptionWithGroup>(Yup.object())
                 .ensure(),
             )
             .min(
@@ -77,10 +81,10 @@ const TableHeadersForm = ({
               'Must have at least one column group',
             ),
           columns: Yup.array()
-            .of<SortableOption>(Yup.object())
+            .of<SortableOptionWithGroup>(Yup.object())
             .ensure(),
           rows: Yup.array()
-            .of<SortableOption>(Yup.object())
+            .of<SortableOptionWithGroup>(Yup.object())
             .ensure(),
         })}
         onSubmit={onSubmit}

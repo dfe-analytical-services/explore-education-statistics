@@ -12,10 +12,10 @@ import {
   SortableOption,
 } from '../services/permalinkService';
 import {
-  transformTableMetaFiltersToCategoryFilters,
   TableHeadersConfig,
 } from './tableHeaders';
 import { FullTableMeta, FullTable } from '../types/fullTable';
+import { transformTableMetaFiltersToCategoryFilters } from '@common/modules/table-tool/components/utils/tableToolHelpers';
 
 const reverseMapTableHeadersConfig = (
   { columns, rows, columnGroups, rowGroups }: UnmappedTableHeadersConfig,
