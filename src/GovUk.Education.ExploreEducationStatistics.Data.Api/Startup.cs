@@ -20,6 +20,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Swagger;
@@ -39,12 +40,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc(config =>
+            services.AddMvc(options =>
             {
-                config.RespectBrowserAcceptHeader = true;
-                config.ReturnHttpNotAcceptable = true;
-                config.Conventions.Add(new CommaSeparatedQueryStringConvention());
-            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+                options.RespectBrowserAcceptHeader = true;
+                options.ReturnHttpNotAcceptable = true;
+                options.Conventions.Add(new CommaSeparatedQueryStringConvention());
+                options.EnableEndpointRouting = false;
+                
+            })
+                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
+                .AddNewtonsoftJson(options => {
+                    options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+                });
 
             services.AddDbContext<StatisticsDbContext>(options =>
                 options
@@ -92,17 +99,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddSingleton<DataServiceMemoryCache<GeoJson>, DataServiceMemoryCache<GeoJson>>();
             services.AddTransient<ITableStorageService, TableStorageService>(s => new TableStorageService(Configuration.GetConnectionString("PublicStorage")));
 
-            services.AddMvc()
-                .AddNewtonsoftJson(options => {
-                    options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
-                });
-            
             services.AddCors();
             services.AddAutoMapper(typeof(Startup).Assembly);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             UpdateDatabase(app);
 
