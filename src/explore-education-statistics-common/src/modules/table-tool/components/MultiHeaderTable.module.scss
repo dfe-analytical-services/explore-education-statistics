@@ -2,21 +2,21 @@
 
 $border-width: 1px;
 
-.borderLeft {
-  border-left: $border-width solid govuk-colour('black') !important;
+/*.borderLeft {
+  border-left: 0 solid govuk-colour('black') !important;
 }
 
 .borderRight {
-  border-right: $border-width solid govuk-colour('black') !important;
-}
+  border-right: 0 solid govuk-colour('black') !important;
+}*/
 
 .borderBottom {
-  border-bottom: $border-width solid govuk-colour('black') !important;
+  border-bottom: $border-width solid $govuk-border-colour !important;
 }
 
 .table {
   border-collapse: separate;
-  width: auto;
+  //width: auto;
 
   th:last-child,
   td:last-child {
