@@ -20,6 +20,7 @@
     "@types/react-leaflet": "^2.2.1",
     "@types/react-test-renderer": "^16.8.2",
     "@types/recharts": "^1.1.17",
+    "@types/uuid": "^3.4.5",
     "@types/yup": "^0.26.21",
     "@typescript-eslint/eslint-plugin": "^1.11.0",
     "@typescript-eslint/parser": "^1.11.0",
@@ -142,5 +143,8 @@
   },
   "jest-junit": {
     "ancestorSeparator": " › "
+  },
+  "dependencies": {
+    "uuid": "^3.3.3"
   }
 }
