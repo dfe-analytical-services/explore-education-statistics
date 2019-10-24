@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Tools.Con
             var controller = new HomeController();
 
             // Act
-            var result = await controller.Index();
+            var result = controller.Index();
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
