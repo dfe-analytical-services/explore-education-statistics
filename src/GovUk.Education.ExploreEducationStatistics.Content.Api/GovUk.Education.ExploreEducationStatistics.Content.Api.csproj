@@ -7,41 +7,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Folder Include="Migrations" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <Content Include="Migrations\*.sql">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
-    </ItemGroup>
-    
-    <ItemGroup>
-        <Content Include="Migrations\Html\Pupil_Absence_Statistics\*.html">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Content Include="Migrations\Html\Pupil_Exclusion_Statistics\*.html">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Content Include="Migrations\Html\Secondary_And_Primary_School_Applications_And_Offers\*.html">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
-    </ItemGroup>
-    
-    <ItemGroup>
         <PackageReference Include="MediaTypeMap" Version="2.1.0" />
         <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.6.1" />
         <PackageReference Include="Microsoft.Azure.Storage.Queue" Version="10.0.3" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.0.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.0.0" />
         <PackageReference Include="Microsoft.Azure.Storage.Blob" Version="10.0.3" />
-        <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.0.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0-rc4" />
     </ItemGroup>

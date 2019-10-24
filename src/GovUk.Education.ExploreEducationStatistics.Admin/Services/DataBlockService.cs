@@ -15,12 +15,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class DataBlockService : IDataBlockService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ContentDbContext _context;
         private readonly IReleaseService _releaseService;
         private readonly IMapper _mapper;
 
         public DataBlockService(
-            ApplicationDbContext context,
+            ContentDbContext context,
             IReleaseService releaseService,
             IMapper mapper)
         {

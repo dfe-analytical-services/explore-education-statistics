@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class ReleaseService2 : IReleaseService2
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ContentDbContext _context;
 
         // TODO this can bee added to MappingProfiles when the fields are moved from the release object
         private static readonly IMapper _mapper = new MapperConfiguration(cfg =>
@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             cfg.CreateMap<ReleaseSummary, ReleaseSummaryViewModel>();
         }).CreateMapper();
 
-        public ReleaseService2(ApplicationDbContext context)
+        public ReleaseService2(ContentDbContext context)
         {
             _context = context;
         }

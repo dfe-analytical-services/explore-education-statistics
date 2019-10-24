@@ -109,13 +109,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Service
         {
             new DataBlock
             {
-                Id = new Guid("4b3eba44-c9d9-455e-b4fd-a5d0d61b9c62"),
-                ReleaseId = new Guid("62ac9e2b-a0c3-42aa-9a10-d833777ad379")
+                Id = new Guid("4b3eba44-c9d9-455e-b4fd-a5d0d61b9c62")
             },
             new DataBlock
             {
-                Id = new Guid("dd7c0651-8a75-4996-95c6-42fc4b82b3f8"),
-                ReleaseId = new Guid("22c52d89-88c0-44b5-96c4-042f1bde6ddd"),
+                Id = new Guid("dd7c0651-8a75-4996-95c6-42fc4b82b3f8")
             }
         };
 
@@ -129,20 +127,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Service
         [Fact]
         public void GetLatest_ReturnsA_WithARelease()
         {
-            var builder = new DbContextOptionsBuilder<ApplicationDbContext>();
+            var builder = new DbContextOptionsBuilder<ContentDbContext>();
             builder.UseInMemoryDatabase(databaseName: "FindLatestPublication");
             var options = builder.Options;
 
             var fileStorageService = new Mock<IFileStorageService>();
 
-            using (var context = new ApplicationDbContext(options))
+            using (var context = new ContentDbContext(options))
             {
                 context.AddRange(Publications);
                 context.AddRange(Releases);
                 context.SaveChanges();
             }
 
-            using (var context = new ApplicationDbContext(options))
+            using (var context = new ContentDbContext(options))
             {
                 var service = new ReleaseService(context, fileStorageService.Object, _mapper);
 
@@ -155,13 +153,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Service
         [Fact]
         public void GetId_ReturnsA_WithATheme()
         {
-            var builder = new DbContextOptionsBuilder<ApplicationDbContext>();
+            var builder = new DbContextOptionsBuilder<ContentDbContext>();
             builder.UseInMemoryDatabase("ReleaseTheme");
             var options = builder.Options;
 
             var fileStorageService = new Mock<IFileStorageService>();
 
-            using (var context = new ApplicationDbContext(options))
+            using (var context = new ContentDbContext(options))
             {
                 context.AddRange(Publications);
                 context.AddRange(Releases);
@@ -170,7 +168,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Service
                 context.SaveChanges();
             }
 
-            using (var context = new ApplicationDbContext(options))
+            using (var context = new ContentDbContext(options))
             {
                 var service = new ReleaseService(context, fileStorageService.Object, _mapper);
 

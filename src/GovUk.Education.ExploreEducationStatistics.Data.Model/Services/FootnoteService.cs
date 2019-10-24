@@ -123,7 +123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 filterItemListParam);
         }
 
-        private Subject CreateSubjectLink(Footnote footnote, long subjectId)
+        private void CreateSubjectLink(Footnote footnote, long subjectId)
         {
             var subject = _subjectService.Find(subjectId, new List<Expression<Func<Subject, object>>>
                           {
@@ -139,8 +139,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 FootnoteId = footnote.Id,
                 SubjectId = subject.Id
             });
-
-            return subject;
         }
 
         private void CreateFilterLinks(Footnote footnote, IEnumerable<long> filterIds)

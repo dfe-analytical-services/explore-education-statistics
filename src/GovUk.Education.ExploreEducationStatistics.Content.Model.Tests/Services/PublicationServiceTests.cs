@@ -14,14 +14,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Service
         [Fact]
         public void GetId_ReturnsA_Publication()
         {
-            var builder = new DbContextOptionsBuilder<ApplicationDbContext>();
+            var builder = new DbContextOptionsBuilder<ContentDbContext>();
             builder.UseInMemoryDatabase(databaseName: "FindPublication");
             var options = builder.Options;
             var config = new MapperConfiguration(cfg => { cfg.CreateMap<PublicationViewModel, Publication>(); });
 
             var mapper = config.CreateMapper();
 
-            using (var context = new ApplicationDbContext(options))
+            using (var context = new ContentDbContext(options))
             {
                 var publications = new List<Publication>
                 {
@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Service
                 context.SaveChanges();
             }
 
-            using (var context = new ApplicationDbContext(options))
+            using (var context = new ContentDbContext(options))
             {
                 var service = new PublicationService(context, mapper);
 
