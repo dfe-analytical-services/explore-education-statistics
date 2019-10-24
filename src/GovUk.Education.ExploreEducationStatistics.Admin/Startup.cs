@@ -21,6 +21,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -34,6 +35,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Swagger;
@@ -65,17 +67,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("roles");
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("role");
             
-            services.AddAuthentication()
-                .AddOpenIdConnect(options =>
-                {
-                    options.ClientId = "3b7bd910-fd37-40a2-9808-e69b1b031152";
-                    options.Authority = "https://login.microsoftonline.com/dc4138fb-2e79-4aee-a57a-7cb149dab136/";
-                    options.CallbackPath = "/signin-oidc";
-                    options.ResponseType = "code id_token";
-                    options.Resource = "https://graph.microsoft.com/";
-                    options.ClientSecret = "s2BXNc9meOF8BxUn9ZIQpGmJBjiL/-=@";
-                    options.TokenValidationParameters.RoleClaimType = "role";
-                })
+            services
+                .AddAuthentication()
+                .AddOpenIdConnect(options => Configuration.GetSection("OpenIdConnect").Bind(options))
                 .AddIdentityServerJwt();
 
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
@@ -134,6 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 {
                     options.ApiResources[0].UserClaims.Add("role");
                 })
+                // TODO DW - this should be conditional based upon whether or not we're in dev mode
                 .AddDeveloperSigningCredential();
 
             // In production, the React files will be served from this directory
