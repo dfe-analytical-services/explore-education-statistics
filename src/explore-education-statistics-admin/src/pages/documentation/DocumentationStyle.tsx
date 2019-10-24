@@ -100,7 +100,7 @@ const DocumentationGlossary = () => {
               </p>
               <h3 id="active-voice">Active voice</h3>
               <p>
-                Use the active rather than passive voice. This will help your
+                Use the active rather than passive voice. This will help you
                 write concise, clear content.
               </p>
               <p>
@@ -117,7 +117,9 @@ const DocumentationGlossary = () => {
                   ‘The policy encourages schools to…’ and ‘The statistics show a
                   trend…’
                 </li>
-                <h4>NOT</h4>
+                <p className="govuk-!-font-size-19 govuk-!-font-weight-bold">
+                  NOT
+                </p>
                 <li>
                   ‘Firms are encouraged by the policy to…’ and ‘A trend is shown
                   by the statistics…’
@@ -147,7 +149,7 @@ const DocumentationGlossary = () => {
                 aged nine weeks.
               </p>
               <p>
-                If you refer to ages as “‘age]-year-old’, include the hyphens.
+                If you refer to ages as “‘[age]-year-old’, include the hyphens.
                 For example, 24-year-old or 16- to 24-year-old men.
               </p>
               <p>
@@ -421,7 +423,7 @@ const DocumentationGlossary = () => {
                 year after each month if the period spans years.
               </p>
               <p>
-                For example, 2018 to 2019, July to September 2019 pr July 2018
+                For example, 2018 to 2019, July to September 2019 or July 2018
                 to September 2019
               </p>
               <p>
@@ -794,7 +796,7 @@ const DocumentationGlossary = () => {
                   rel="external"
                   href="https://www.theguardian.com/guardian-observer-style-guide-h"
                 >
-                  The Guardian style guide{' '}
+                  The Guardian style guide
                 </a>{' '}
                 for advice on hyphenation.
               </p>
@@ -809,7 +811,7 @@ const DocumentationGlossary = () => {
               <p>
                 Try (re)writing sentences to avoid the need to use it. If that
                 is not possible, use an alternative such as ‘meaning’ or ‘that
-                is’.{' '}
+                is’.
               </p>
               <p>
                 Can be used within service content to save space but write
@@ -848,15 +850,15 @@ const DocumentationGlossary = () => {
               <h3 id="jargon">Jargon</h3>
               <p>
                 Do not use jargon. We want to introduce education statistics to
-                new people so we need to write for a non-expert audience.{' '}
+                new people so we need to write for a non-expert audience.
               </p>
               <p>
                 Research has also proven that even experts do not have time or
-                want to wade through jargon on web pages.{' '}
+                want to wade through jargon on web pages.
               </p>
               <p>
                 Instead, they want information quickly and easily - just like
-                everyone else.{' '}
+                everyone else.
               </p>
               <p>
                 So by not using jargon, you’re not ‘dumbing down’. You’re
@@ -942,9 +944,9 @@ const DocumentationGlossary = () => {
                 .
               </p>
               <h3 id="lists">Lists</h3>
+              <p>Lists should be bulleted to make them easier to read.</p>
               <p>
-                Lists should be bulleted to make them easier to read.{' '}
-                <a href="#bullet-points">See Bullet points</a>.
+                <a href="#bullet-points">See Bullet points</a>
               </p>
               <h3 id="local-authority">local authority</h3>
               <p>Lower case. Do not use LA.</p>
@@ -1074,7 +1076,7 @@ const DocumentationGlossary = () => {
               <h3 id="national-statistics">National Statistics</h3>
               <p>
                 Upper case National Statistics for the official statistics
-                quality mark.{' '}
+                quality mark.
               </p>
               <p>
                 Lower case for anything else, including statistics that are
@@ -1262,17 +1264,15 @@ const DocumentationGlossary = () => {
               <p>Upper case. No need to explain the acronym.</p>
               <h3 id="per-cent">Per cent</h3>
               <p>
-                <p>
-                  Two words and NOT percent. Always use % with a number.
-                  Percentage is one word.
-                </p>
-                <p>
-                  As per{' '}
-                  <a href="https://www.gov.uk/guidance/style-guide/a-to-z-of-gov-uk-style#per-cent">
-                    GDS style guide - per cent
-                  </a>
-                  .
-                </p>
+                Two words and NOT percent. Always use % with a number.
+                Percentage is one word.
+              </p>
+              <p>
+                As per{' '}
+                <a href="https://www.gov.uk/guidance/style-guide/a-to-z-of-gov-uk-style#per-cent">
+                  GDS style guide - per cent
+                </a>
+                .
               </p>
               <h3 id="performance-management">performance management</h3>
               <p>Lower case.</p>
@@ -1291,7 +1291,7 @@ const DocumentationGlossary = () => {
               </p>
               <p>
                 See
-                <a href="#words-to-avoid">words to avoid</a>.
+                <a href="#words-to-avoid">Words to avoid</a>.
               </p>
               <h3 id="policy-note">policy note</h3>
               <p>Lower case.</p>
@@ -1482,7 +1482,7 @@ const DocumentationGlossary = () => {
               <h3 id="spads">SpAds</h3>
               <p>
                 Not SPADs which stands for ‘signals passed at danger’ which is a
-                government transport term.{' '}
+                government transport term.
               </p>
               <h3 id="spaces">spaces</h3>
               <p>One space after a full stop, not 2.</p>
@@ -1540,12 +1540,12 @@ const DocumentationGlossary = () => {
               <p>
                 Using subheadings to break up your content on a web pages makes
                 it much easier for people to take in the information it
-                contains,
+                contains.
               </p>
               <p>
-                They help because by telling a story across your page and people
-                use them to predict in seconds what information is on any
-                particular part of your page.
+                They help by telling a story across your page and people use
+                them to predict in seconds what information is on any particular
+                part of your page.
               </p>
               <p>
                 Subheadings make reading content easier by acting as markers
