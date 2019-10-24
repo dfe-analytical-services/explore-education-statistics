@@ -13,11 +13,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Service
         [Fact]
         public void MethodologyService_Get_Methodology_By_Id()
         {
-            var builder = new DbContextOptionsBuilder<ApplicationDbContext>();
+            var builder = new DbContextOptionsBuilder<ContentDbContext>();
             builder.UseInMemoryDatabase(databaseName: "GetById");
             var options = builder.Options;
 
-            using (var context = new ApplicationDbContext(options))
+            using (var context = new ContentDbContext(options))
             {
                 var publications = new List<Publication>
                 {
@@ -38,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Service
                 context.SaveChanges();
             }
 
-            using (var context = new ApplicationDbContext(options))
+            using (var context = new ContentDbContext(options))
             {
                 var service = new MethodologyService(context);
 
@@ -52,11 +52,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Service
         [Fact]
         public void MethodologyService_Get_Methodology_By_Id_Not_Found()
         {
-            var builder = new DbContextOptionsBuilder<ApplicationDbContext>();
+            var builder = new DbContextOptionsBuilder<ContentDbContext>();
             builder.UseInMemoryDatabase(databaseName: "GetById_Fail");
             var options = builder.Options;
 
-            using (var context = new ApplicationDbContext(options))
+            using (var context = new ContentDbContext(options))
             {
                 var publications = new List<Publication>
                 {
@@ -83,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Service
                 context.SaveChanges();
             }
 
-            using (var context = new ApplicationDbContext(options))
+            using (var context = new ContentDbContext(options))
             {
                 var service = new MethodologyService(context);
 
@@ -96,11 +96,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Service
         [Fact (Skip = "Bug with in memory database")]
         public void MethodologyService_GetTree()
         {
-            var builder = new DbContextOptionsBuilder<ApplicationDbContext>();
+            var builder = new DbContextOptionsBuilder<ContentDbContext>();
             builder.UseInMemoryDatabase(databaseName: "GetTree");
             var options = builder.Options;
 
-            using (var context = new ApplicationDbContext(options))
+            using (var context = new ContentDbContext(options))
             {
                 
                 var methodologies = new List<Methodology>
@@ -174,7 +174,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Service
                 context.SaveChanges();
             }
 
-            using (var context = new ApplicationDbContext(options))
+            using (var context = new ContentDbContext(options))
             {
                 var service = new MethodologyService(context);
 

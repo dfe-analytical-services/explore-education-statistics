@@ -19,10 +19,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class ReleaseService : IReleaseService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ContentDbContext _context;
         private readonly IMapper _mapper;
 
-        public ReleaseService(ApplicationDbContext context, IMapper mapper)
+        public ReleaseService(ContentDbContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;

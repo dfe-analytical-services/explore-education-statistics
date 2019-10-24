@@ -2,15 +2,13 @@
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.0</TargetFramework>
-
         <IsPackable>false</IsPackable>
-
         <RootNamespace>GovUk.Education.ExploreEducationStatistics.Content.Model.Tests</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="AutoMapper" Version="9.0.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.0.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.1.0-preview1.19506.2" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.3.0" />
         <PackageReference Include="Moq" Version="4.13.1" />
         <PackageReference Include="xunit" Version="2.4.1" />

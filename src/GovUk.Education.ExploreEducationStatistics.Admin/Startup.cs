@@ -98,7 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     .EnableSensitiveDataLogging()
             );
 
-            services.AddDbContext<ApplicationDbContext>(options =>
+            services.AddDbContext<ContentDbContext>(options =>
                 options
                     .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
                         builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
@@ -266,7 +266,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     context.Database.Migrate();
                 }
                 
-                using (var context = serviceScope.ServiceProvider.GetService<ApplicationDbContext>())
+                using (var context = serviceScope.ServiceProvider.GetService<ContentDbContext>())
                 {
                     context.Database.SetCommandTimeout(int.MaxValue);
                     context.Database.Migrate();

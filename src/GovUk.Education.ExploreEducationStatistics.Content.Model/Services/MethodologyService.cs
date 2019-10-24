@@ -10,10 +10,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services
 {
     public class MethodologyService : IMethodologyService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ContentDbContext _context;
 
         public MethodologyService(
-            ApplicationDbContext context)
+            ContentDbContext context)
         {
             _context = context;
         }

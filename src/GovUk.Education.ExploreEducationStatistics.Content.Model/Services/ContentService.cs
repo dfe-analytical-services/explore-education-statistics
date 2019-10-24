@@ -8,10 +8,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services
 {
     public class ContentService : IContentService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ContentDbContext _context;
 
         public ContentService(
-            ApplicationDbContext context)
+            ContentDbContext context)
         {
             _context = context;
         }

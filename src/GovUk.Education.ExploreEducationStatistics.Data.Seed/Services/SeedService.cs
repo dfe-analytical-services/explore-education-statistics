@@ -4,7 +4,6 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Seed.Extensions;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Queue;
 using Microsoft.Extensions.Configuration;

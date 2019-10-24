@@ -13,10 +13,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Tools.Controlle
     [Authorize]
     public class PublishingController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ContentDbContext _context;
         private readonly IPublishingService _publishingService;
 
-        public PublishingController(ApplicationDbContext context, IPublishingService publishingService)
+        public PublishingController(ContentDbContext context, IPublishingService publishingService)
         {
             _context = context;
             _publishingService = publishingService;

@@ -11,11 +11,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services
 {
     public class ReleaseService : IReleaseService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ContentDbContext _context;
         private readonly IFileStorageService _fileStorageService;
         private readonly IMapper _mapper;
 
-        public ReleaseService(ApplicationDbContext context, IFileStorageService fileStorageService, IMapper mapper)
+        public ReleaseService(ContentDbContext context, IFileStorageService fileStorageService, IMapper mapper)
         {
             _context = context;
             _fileStorageService = fileStorageService;

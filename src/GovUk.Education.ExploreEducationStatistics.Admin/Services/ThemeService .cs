@@ -9,9 +9,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class ThemeService : IThemeService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ContentDbContext _context;
 
-        public ThemeService(ApplicationDbContext context)
+        public ThemeService(ContentDbContext context)
         {
             _context = context;
         }

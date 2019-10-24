@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
             builder.Services
                 .AddAutoMapper(typeof(Startup).Assembly)
                 .AddMemoryCache()
-                .AddDbContext<ApplicationDbContext>(options =>
+                .AddDbContext<ContentDbContext>(options =>
                     options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("ContentDb")))
                 .AddScoped<IFileStorageService, FileStorageService>()
                 .AddScoped<IFileStorageServiceContentModel, FileStorageServiceContentModel>()

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Converters;
 using Newtonsoft.Json;

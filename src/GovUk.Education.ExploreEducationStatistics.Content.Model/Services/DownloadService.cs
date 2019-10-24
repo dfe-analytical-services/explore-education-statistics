@@ -10,12 +10,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services
 {
     public class DownloadService : IDownloadService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ContentDbContext _context;
         private readonly IFileStorageService _fileStorageService;
         private readonly ILogger _logger;
         private readonly IMapper _mapper;
 
-        public DownloadService(ApplicationDbContext context,
+        public DownloadService(ContentDbContext context,
             IFileStorageService fileStorageService,
             ILogger<DownloadService> logger, IMapper mapper)
         {

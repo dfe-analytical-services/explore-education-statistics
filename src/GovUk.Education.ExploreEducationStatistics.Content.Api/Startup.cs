@@ -3,7 +3,6 @@ using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Converters;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -11,14 +10,13 @@ using Microsoft.AspNetCore.Rewrite;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.Azure.Storage.Queue;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
-using Swashbuckle.AspNetCore.Swagger;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api
 {
@@ -50,13 +48,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                         options.SerializerSettings.Converters.Add(new ContentBlockConverter());
                     });
 
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options
-                    .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
-                        builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
-                    .EnableSensitiveDataLogging()
-            );
-
             // Adds Brotli and Gzip compressing
             services.AddResponseCompression();
             
@@ -78,8 +69,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            UpdateDatabase(app);
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -109,19 +98,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             var option = new RewriteOptions();
             option.AddRedirect("^$", "docs");
             app.UseRewriter(option);
-        }
-
-        private static void UpdateDatabase(IApplicationBuilder app)
-        {
-            using (var serviceScope = app.ApplicationServices
-                .GetRequiredService<IServiceScopeFactory>()
-                .CreateScope())
-            {
-                using (var context = serviceScope.ServiceProvider.GetService<ApplicationDbContext>())
-                {
-                    context.Database.Migrate();
-                }
-            }
         }
 
         // TODO: this should only be used in development, adds the required message to the content-cache queue

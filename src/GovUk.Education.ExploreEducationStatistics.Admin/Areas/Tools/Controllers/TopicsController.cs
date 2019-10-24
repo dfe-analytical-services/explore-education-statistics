@@ -15,9 +15,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Tools.Controlle
     [ApiExplorerSettings(IgnoreApi=true)]
     public class TopicsController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ContentDbContext _context;
 
-        public TopicsController(ApplicationDbContext context)
+        public TopicsController(ContentDbContext context)
         {
             _context = context;
         }

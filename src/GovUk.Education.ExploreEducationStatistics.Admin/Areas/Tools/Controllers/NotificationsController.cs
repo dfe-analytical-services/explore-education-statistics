@@ -13,10 +13,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Tools.Controlle
     [Authorize]
     public class NotificationsController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ContentDbContext _context;
         private readonly INotificationsService _notificationsService;
 
-        public NotificationsController(ApplicationDbContext context,
+        public NotificationsController(ContentDbContext context,
             INotificationsService notificationsService)
         {
             _context = context;
