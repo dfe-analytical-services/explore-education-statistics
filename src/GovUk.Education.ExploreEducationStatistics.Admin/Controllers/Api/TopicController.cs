@@ -13,8 +13,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     public class TopicController : ControllerBase
     {
         private ITopicService _topicService;
-        
-        public TopicController(ITopicService topicService) {}
+
+        public TopicController(ITopicService topicService)
+        {
+            _topicService = topicService;
+        }
         
         
         [HttpGet("topic/{topicId}/")]
