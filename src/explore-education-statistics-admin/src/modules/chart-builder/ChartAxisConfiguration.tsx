@@ -287,7 +287,11 @@ const ChartAxisConfiguration = ({
                         type="number"
                         width={10}
                         label="Minimum value"
-                        defaultValue={axisConfiguration.min}
+                        defaultValue={
+                          Object.keys(axisConfiguration).indexOf('min') > -1
+                            ? axisConfiguration.min
+                            : '27'
+                        }
                         onChange={e =>
                           updateAxisConfiguration({ min: e.target.value })
                         }
