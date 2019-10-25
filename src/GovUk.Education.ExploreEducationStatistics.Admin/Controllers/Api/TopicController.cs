@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         
         
         [HttpGet("topic/{topicId}/")]
-        public async Task<ActionResult<Topic>> GetDataBlocksAsync(Guid topicId)
+        public async Task<ActionResult<Topic>> GetTopicAsync(Guid topicId)
         {
             var topic = await _topicService.GetTopicAsync(topicId);
 
