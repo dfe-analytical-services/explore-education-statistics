@@ -2,13 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
-using Microsoft.VisualBasic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
@@ -40,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             if (query.GeographicLevel != null)
             {
                 predicate = predicate.AndAlso(observation => 
-                    observation.GeographicLevel.Equals(query.GeographicLevel));
+                    observation.GeographicLevel == query.GeographicLevel);
             }
 
             if (ObservationalUnitExists(query))
@@ -144,12 +142,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private static Expression<Func<Observation, bool>> CountryPredicate(SubjectMetaQueryContext query)
         {
-            Expression<Func<Observation, bool>> expression = observation =>
-                query.Country.Contains(observation.Location.Country.Code);
-
-            return query.GeographicLevel == null 
-                ? expression.AndAlso(observation => observation.GeographicLevel == GeographicLevel.Country) 
-                : expression;
+            return ObservationalUnitPredicate(query, GeographicLevel.Country,
+                observation => query.Country.Contains(observation.Location.Country.Code));
         }
 
         private static Expression<Func<Observation, bool>> InstitutionPredicate(SubjectMetaQueryContext query)
@@ -235,7 +229,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             GeographicLevel geographicLevel, Expression<Func<Observation, bool>> expression)
         {
             return query.GeographicLevel == null 
-                ? expression.AndAlso(observation => observation.GeographicLevel.Equals(geographicLevel)) 
+                ? expression.AndAlso(observation => observation.GeographicLevel == geographicLevel) 
                 : expression;
         }
 
