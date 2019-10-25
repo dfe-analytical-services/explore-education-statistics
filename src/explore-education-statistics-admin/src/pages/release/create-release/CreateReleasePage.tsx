@@ -1,3 +1,4 @@
+import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import ReleaseSummaryForm, {
   EditFormValues,
@@ -17,6 +18,7 @@ import Yup from '@common/lib/validation/yup';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import { ObjectSchemaDefinition } from 'yup';
+import RelatedInformation from '@common/components/RelatedInformation';
 
 interface MatchProps {
   publicationId: string;
@@ -59,6 +61,30 @@ const CreateReleasePage = ({
         },
       ]}
     >
+      <div className="govuk-grid-row">
+        <div className="govuk-grid-column-two-thirds">
+          <h1 className="govuk-heading-xl">
+            <span className="govuk-caption-xl">Topic name here</span>
+            Create new release
+          </h1>
+        </div>
+        <div className="govuk-grid-column-one-third">
+          <RelatedInformation heading="Help and guidance">
+            <ul className="govuk-list">
+              <li>
+                <Link to="/documentation/create-new-release" target="blank">
+                  Creating a new release{' '}
+                </Link>
+              </li>
+              <li>
+                <Link to="/documentation/edit-release" target="blank">
+                  Editing a release and updating release status{' '}
+                </Link>
+              </li>
+            </ul>
+          </RelatedInformation>
+        </div>
+      </div>
       <ReleaseSummaryForm<FormValues>
         submitButtonText="Create new release"
         initialValuesSupplier={(
