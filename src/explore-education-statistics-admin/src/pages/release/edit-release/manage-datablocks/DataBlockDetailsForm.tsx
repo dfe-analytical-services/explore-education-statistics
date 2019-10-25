@@ -175,7 +175,7 @@ const DataBlockDetailsForm = ({
                     type="submit"
                     className="govuk-!-margin-top-6"
                   >
-                    {initialDataBlock ? 'Update Data Block' : 'Save Data Block'}
+                    {initialDataBlock ? 'Update data block' : 'Save data block'}
                   </Button>
                 </FormFieldset>
               </FormGroup>

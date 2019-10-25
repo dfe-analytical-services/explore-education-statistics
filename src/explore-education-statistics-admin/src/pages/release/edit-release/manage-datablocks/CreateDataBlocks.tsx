@@ -118,7 +118,7 @@ const CreateDataBlocks = ({
             {wizardStepProps => (
               <>
                 <WizardStepHeading {...wizardStepProps}>
-                  Configure Data Block
+                  Configure data block
                 </WizardStepHeading>
 
                 <div className="govuk-!-margin-bottom-4">
