@@ -1479,7 +1479,7 @@ const DocumentationGlossary = () => {
               <p>Lower case.</p>
               <h3 id="south-east-south-west">south-east, south-west</h3>
               <p>Lower case, hyphenated.</p>
-              <h3 id="spads">SpAds</h3>
+              <h3 id="spads">SPAds</h3>
               <p>
                 Not SPADs which stands for ‘signals passed at danger’ which is a
                 government transport term.
