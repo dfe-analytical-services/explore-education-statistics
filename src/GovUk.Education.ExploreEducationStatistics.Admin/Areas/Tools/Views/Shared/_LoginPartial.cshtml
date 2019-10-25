@@ -2,13 +2,12 @@
 
 @if (User.Identity.IsAuthenticated)
 {
-    var email = User.Claims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")?.Value;
+    var email = User.Claims.FirstOrDefault(x => x.Type == "email")?.Value;
     var givenname = User.Claims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname")?.Value;
     var surname = User.Claims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname")?.Value;
-
-                
+    
     // TOOO - temp work around for dfe accounts to get name
-    if (email.ToLower().Contains("education.gov.uk"))
+    if (email != null && email.ToLower().Contains("education.gov.uk"))
     {
         var address = email.Split('@').First();
         givenname = address.Split('.').First();
