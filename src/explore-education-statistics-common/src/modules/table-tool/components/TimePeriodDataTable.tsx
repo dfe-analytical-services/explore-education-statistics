@@ -1,5 +1,5 @@
 import last from 'lodash/last';
-import React, { memo, forwardRef } from 'react';
+import React, {memo, forwardRef} from 'react';
 import camelCase from 'lodash/camelCase';
 import cartesian from '@common/lib/utils/cartesian';
 import formatPretty from '@common/lib/utils/number/formatPretty';
@@ -10,10 +10,10 @@ import {
   LocationFilter,
   TimePeriodFilter,
 } from '@common/modules/full-table/types/filters';
-import { FullTable } from '@common/modules/full-table/types/fullTable';
+import {FullTable} from '@common/modules/full-table/types/fullTable';
 import DataTableCaption from './DataTableCaption';
 import FixedMultiHeaderDataTable from './FixedMultiHeaderDataTable';
-import { TableHeadersFormValues } from './TableHeadersForm';
+import {TableHeadersFormValues} from './TableHeadersForm';
 
 interface Props {
   fullTable: FullTable;
@@ -22,8 +22,8 @@ interface Props {
 
 const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
   (props: Props, dataTableRef) => {
-    const { fullTable, tableHeadersConfig } = props;
-    const { subjectMeta, results } = fullTable;
+    const {fullTable, tableHeadersConfig} = props;
+    const {subjectMeta, results} = fullTable;
 
     if (results.length === 0) {
       return (
@@ -41,18 +41,15 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
       tableHeadersConfig.columns.map(column => column.label),
     ];
 
-    // @ts-ignore
+
     const rowHeaders: string[][] = [
       ...tableHeadersConfig.rowGroups.flatMap(rowGroup =>
-        rowGroup.reduce<[
-          (string | undefined)[],
-          string []
-          ]>(([a,b], group) => (
+        rowGroup.reduce<[string[], string []]>(([a, b], group) => (
           [
             group.filterGroup && [...a, group.filterGroup] || a,
             [...b, group.label]
           ]
-        ), [[], []]).filter( ary => ary.length > 0)
+        ), [[], []]).filter(ary => ary.length > 0)
       ),
       tableHeadersConfig.rows.map(row => row.label),
     ];

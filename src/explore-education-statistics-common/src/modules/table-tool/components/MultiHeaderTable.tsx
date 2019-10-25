@@ -14,47 +14,58 @@ interface Props {
 interface SpanInfo {
   heading: string,
   count: number,
-  start: number
+  start: number,
+  isRowGroup: boolean,
+  isLastInGroup: boolean
 }
 
-export const generateHeaderSpanInfo = (groups: string[][]) => {
+const reduceGroupSpanInfo = (overallHeaderLength: number, isRowGroup: boolean, isLastInGroup: boolean) =>
+  (spanInfo: SpanInfo[], nextHeading: string, rowIndex: number) => {
 
-  console.log(groups);
 
-  const maxLength = groups.reduce((curMaxLength: number, group) => curMaxLength < group.length ? group.length : curMaxLength, 0);
+    if (spanInfo.length === 0) {
+      return [{heading: nextHeading, count: overallHeaderLength, start: rowIndex, isRowGroup, isLastInGroup}];
+    }
 
-  return groups.reduce<SpanInfo[][]>((headers: SpanInfo[][], groupHeadings: string[], groupIndex: number) => {
+    const previousHeading = spanInfo[spanInfo.length - 1];
 
-    const g = groupHeadings.reduce<SpanInfo[]>((groupInfo, nextHeading, rowIndex) => {
+    if (nextHeading && previousHeading.heading !== nextHeading) {
 
-      if (groupInfo.length === 0) {
-        return [{heading: nextHeading, count: maxLength, start: rowIndex}];
-      }
+      return [...spanInfo.slice(0, -1),
+        {
+          ...previousHeading,
+          count: rowIndex - previousHeading.start,
+        },
+        {
+          heading: nextHeading,
+          count: overallHeaderLength - rowIndex,
+          start: rowIndex,
+          isRowGroup,
+          isLastInGroup
+        }];
+    }
 
-      const previousHeading = groupInfo[groupInfo.length - 1];
+    return spanInfo;
 
-      if (nextHeading && previousHeading.heading !== nextHeading) {
+  };
 
-        return [...groupInfo.slice(0, -1),
-          {
-            ...previousHeading,
-            count: rowIndex - previousHeading.start,
-          },
-          {
-            heading: nextHeading,
-            count: maxLength - rowIndex,
-            start: rowIndex,
-          }];
-      }
+export const generateHeaderSpanInfo = (headerGroups: string[][], isRowGroup: boolean, isLastInGroup: boolean) => {
 
-      return groupInfo;
+  const overallHeaderLength = headerGroups.reduce((curMaxLength: number, group) => curMaxLength < group.length ? group.length : curMaxLength, 0);
 
-    }, []);
-
-    return [...headers, g];
-  }, []);
+  return headerGroups.reduce<SpanInfo[][]>((headerSpanInfo: SpanInfo[][], headingsForGroup: string[], groupIndex: number) => (
+    [
+      ...headerSpanInfo,
+      headingsForGroup.reduce<SpanInfo[]>(
+        reduceGroupSpanInfo(overallHeaderLength,
+          isRowGroup || groupIndex === headingsForGroup.length -1,
+          isLastInGroup
+      ), [])
+    ]
+  ), []);
 
 };
+
 
 export const generateHeaders = (headers: SpanInfo[][]): SpanInfo[][] => {
   const numberOfRows = headers[0].reduce((length, {count}) => length + count, 0);
@@ -67,6 +78,45 @@ export const generateHeaders = (headers: SpanInfo[][]): SpanInfo[][] => {
 
   return h as SpanInfo[][];
 };
+
+export const iDontKnow = (groups: string[][]): SpanInfo[][] => {
+
+  const groupsWithoutIndicators = [...groups];
+  const indicators = groupsWithoutIndicators.pop() as string[];
+  const numberOfColGroups = groupsWithoutIndicators.reduce((curMaxLength: number, group) => curMaxLength < group.length ? group.length : curMaxLength, 0);
+
+  const numberOfIndicators = indicators.length;
+
+  const spanInfo = generateHeaderSpanInfo(groupsWithoutIndicators, true, false);
+
+  const scaledSpanInfo = spanInfo.map(
+    group => group.map(
+      heading => (
+        {
+          ...heading,
+          count: heading.count * numberOfIndicators,
+          start: heading.start * numberOfIndicators,
+        }
+      )
+    )
+  );
+
+  const repeatedIndicators = ([] as string[]).concat(...[...Array(numberOfColGroups)].map(_ => indicators));
+  const indicatorSpanInfo =
+    generateHeaderSpanInfo([repeatedIndicators], false, false)
+      .reduce<SpanInfo[][]>( (indicatorSpanGroups, indicatorSpanGroup) =>
+        ([...indicatorSpanGroups,
+          indicatorSpanGroup.map( (span, index) => ({...span, isLastInGroup: span.isLastInGroup || (index % numberOfIndicators === numberOfIndicators-1)}))
+      ]), [])
+  ;
+
+  const combinedSpanInfo = [...scaledSpanInfo, ...indicatorSpanInfo];
+
+
+  console.log(combinedSpanInfo);
+
+  return combinedSpanInfo;
+}
 
 const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
   ({ariaLabelledBy, className, columnHeaders, rowHeaders, rows}, ref) => {
@@ -138,7 +188,7 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
         <tbody>
           {
 
-            generateHeaders(generateHeaderSpanInfo(rowHeaders))
+            generateHeaders(iDontKnow(rowHeaders))
               .reduce<ReactElement[][]>((agg, group, headerGroupIndex) => {
 
                   console.log(group);
@@ -148,9 +198,15 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
                       <th
                         // eslint-disable-next-line react/no-array-index-key
                         key={`${rowIndex}_${headerGroupIndex}`}
-                        className={classNames({})}
+                        className={classNames({
+                          'govuk-table__cell--numeric': !column.isRowGroup,
+                          'govuk-table__cell--center': column.isRowGroup,
+                          [styles.borderRight]: !column.isRowGroup,
+                          [styles.borderBottom]:
+                          column.isRowGroup || column.isLastInGroup
+                        })}
                         rowSpan={column.count}
-                        scope={column.count > 1 ? 'rowgroup' : 'row'}
+                        scope={column.isRowGroup  ? 'rowgroup' : 'row'}
                       >
                         {column.heading}
                       </th>
@@ -158,48 +214,48 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
                   ]
                 }, []
               )
-/*
-            rowHeaders
-              .reduce<ReactElement[][]>(
-                (acc, headerGroup, headerGroupIndex) =>
+              /*
+                          rowHeaders
+                            .reduce<ReactElement[][]>(
+                              (acc, headerGroup, headerGroupIndex) =>
 
-                  acc.flatMap((row, rowIndex) =>
+                                acc.flatMap((row, rowIndex) =>
 
-                    headerGroup.map((header, index) => {
-                      const rowSpan = getSpan(rowHeaders, headerGroupIndex);
+                                  headerGroup.map((header, index) => {
+                                    const rowSpan = getSpan(rowHeaders, headerGroupIndex);
 
-                      const isRowGroup =
-                        headerGroupIndex !== rowHeaders.length - 1;
+                                    const isRowGroup =
+                                      headerGroupIndex !== rowHeaders.length - 1;
 
-                      const headerCell = (
-                        <th
-                          // eslint-disable-next-line react/no-array-index-key
-                          key={`${rowIndex}_${headerGroupIndex}_${index}`}
-                          className={classNames({
-                            'govuk-table__cell--numeric': !isRowGroup,
-                            'govuk-table__cell--center': isRowGroup,
-                            [styles.borderRight]: !isRowGroup,
-                            [styles.borderBottom]:
-                            isRowGroup || index === headerGroup.length - 1,
-                          })}
-                          rowSpan={rowSpan}
-                          scope={isRowGroup ? 'rowgroup' : 'row'}
-                        >
-                          {header}
-                        </th>
-                      );
+                                    const headerCell = (
+                                      <th
+                                        // eslint-disable-next-line react/no-array-index-key
+                                        key={`${rowIndex}_${headerGroupIndex}_${index}`}
+                                        className={classNames({
+                                          'govuk-table__cell--numeric': !isRowGroup,
+                                          'govuk-table__cell--center': isRowGroup,
+                                          [styles.borderRight]: !isRowGroup,
+                                          [styles.borderBottom]:
+                                          isRowGroup || index === headerGroup.length - 1,
+                                        })}
+                                        rowSpan={rowSpan}
+                                        scope={isRowGroup ? 'rowgroup' : 'row'}
+                                      >
+                                        {header}
+                                      </th>
+                                    );
 
-                      if (index === 0) {
-                        return [...row, headerCell];
-                      }
+                                    if (index === 0) {
+                                      return [...row, headerCell];
+                                    }
 
-                      return [...row.slice(headerGroupIndex), headerCell];
-                    }),
-                  ),
-                [[]],
-              )
+                                    return [...row.slice(headerGroupIndex), headerCell];
+                                  }),
+                                ),
+                              [[]],
+                            )
+*/
 
- */
               .map((headerCells, rowIndex) => {
                 return (
                   // eslint-disable-next-line react/no-array-index-key
