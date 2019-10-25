@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Tools.Controllers
 {
@@ -25,8 +26,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Tools.Controlle
 
         public ActionResult NotifySubscribers()
         {
-            ViewData["PublicationId"] = new SelectList(_context.Releases.GroupBy(release => release.Publication)
-                .Select(releases => releases.Key).OrderBy(r => r.Title), "Id", "Title");
+            var publications = _context.Releases.Select(release => release.Publication).Distinct()
+                .OrderBy(publication => publication.Title);
+
+            ViewData["PublicationId"] = new SelectList(publications, "Id", "Title");
 
             return View();
         }

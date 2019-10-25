@@ -24,7 +24,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Tools.Controlle
 
         public ActionResult PublishReleaseData()
         {
-            ViewData["ReleaseId"] = new SelectList(_context.Releases.OrderBy(r => r.Title), "Id", "Title");
+            var releases = _context.Releases.ToList().OrderBy(release => release.Title);
+            ViewData["ReleaseId"] = new SelectList(releases, "Id", "Title");
             return View();
         }
 
