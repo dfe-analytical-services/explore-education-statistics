@@ -83,7 +83,7 @@ Validate absence_in_prus.csv file can be downloaded
 Validate Key Statistics data block -- Summary tab
     [Documentation]  DFE-915
     [Tags]  HappyPath
-    user waits until page contains element   css:#keystats-summary
+    user waits until page contains element   css:#keystats-summary    90
     user checks key stat tile contents   Overall absence rate         4.7%   Up from 4.6% in 2015/16
     user checks key stat tile contents   Authorised absence rate      3.4%   Similar to previous years
     user checks key stat tile contents   Unauthorised absence rate    1.3%   Up from 1.1% in 2015/16
