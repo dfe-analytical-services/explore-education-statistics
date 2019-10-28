@@ -2,11 +2,13 @@ import { IdTitlePair } from '@admin/services/common/types';
 import { CreateReleaseRequest } from '@admin/services/release/create-release/types';
 import { ReleaseSummaryDetails } from '@admin/services/release/types';
 import client from '@admin/services/util/service';
+import { Publication } from '@common/services/publicationService';
 
 export interface ReleaseSummaryService {
   getTemplateRelease: (
     publicationId: string,
   ) => Promise<IdTitlePair | undefined>;
+  getPublication: (publicationId: string) => Promise<Publication>;
   createRelease: (
     createRequest: CreateReleaseRequest,
   ) => Promise<ReleaseSummaryDetails>;
@@ -34,6 +36,9 @@ const service: ReleaseSummaryService = {
             title: release.title,
           },
       );
+  },
+  getPublication(publicationId: string): Promise<Publication> {
+    return client.get<Publication>(`publications/${publicationId}/`);
   },
   createRelease(
     createRequest: CreateReleaseRequest,
