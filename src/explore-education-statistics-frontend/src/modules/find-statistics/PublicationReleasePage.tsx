@@ -176,7 +176,7 @@ class PublicationReleasePage extends Component<Props> {
               }}
             />
             <RelatedAside>
-              <h3>About these statistics</h3>
+              <h2 className="govuk-heading-m">About these statistics</h2>
 
               <dl className="dfe-meta-content">
                 <dt className="govuk-caption-m">For {data.coverageTitle}: </dt>
