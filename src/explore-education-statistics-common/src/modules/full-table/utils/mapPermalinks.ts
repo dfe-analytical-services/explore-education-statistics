@@ -5,17 +5,17 @@ import {
   TimePeriodFilter,
 } from '../types/filters';
 import {
-  UnmappedTableHeadersConfig,
-  UnmappedFullTable,
-  UnmappedPermalink,
   Permalink,
   SortableOption,
+  UnmappedFullTable,
+  UnmappedPermalink,
+  UnmappedTableHeadersConfig,
 } from '../services/permalinkService';
 import {
-  transformTableMetaFiltersToCategoryFilters,
   TableHeadersConfig,
+  transformTableMetaFiltersToCategoryFilters,
 } from './tableHeaders';
-import { FullTableMeta, FullTable } from '../types/fullTable';
+import { FullTable, FullTableMeta } from '../types/fullTable';
 
 const reverseMapTableHeadersConfig = (
   { columns, rows, columnGroups, rowGroups }: UnmappedTableHeadersConfig,
