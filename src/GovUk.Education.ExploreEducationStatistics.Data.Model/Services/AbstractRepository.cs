@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             return _context.Set<TEntity>();
         }
 
-        public Task<int> Count()
+        public Task<int> CountAsync()
         {
             return DbSet().CountAsync();
         }
