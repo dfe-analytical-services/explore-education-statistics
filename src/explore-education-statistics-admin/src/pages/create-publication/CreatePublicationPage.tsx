@@ -20,6 +20,7 @@ import { FormikProps } from 'formik';
 import orderBy from 'lodash/orderBy';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
+import { Topic } from '@admin/services/edit-publication/types';
 
 interface MatchProps {
   topicId: string;
@@ -43,6 +44,7 @@ const serverSideValidationHandler = handleServerSideValidation(
 interface CreatePublicationModel {
   methodologies: IdTitlePair[];
   contacts: ContactDetails[];
+  topic: Topic;
 }
 
 const CreatePublicationPage = ({
@@ -57,10 +59,12 @@ const CreatePublicationPage = ({
     Promise.all([
       service.getMethodologies(),
       service.getPublicationAndReleaseContacts(),
-    ]).then(([methodologies, contacts]) => {
+      service.getTopic(topicId),
+    ]).then(([methodologies, contacts, topic]) => {
       setModel({
         methodologies,
         contacts,
+        topic,
       });
     });
   }, []);
@@ -99,7 +103,9 @@ const CreatePublicationPage = ({
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <h1 className="govuk-heading-xl">
-            <span className="govuk-caption-xl">Topic name here</span>
+            <span className="govuk-caption-xl">
+              {model && model.topic.title}
+            </span>
             Create new publication
           </h1>
         </div>
