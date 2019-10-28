@@ -165,11 +165,9 @@ const MyPublicationsTab = () => {
             </div>
           )}
           <Link
-            to={{
-              pathname: publicationRoutes.createPublication.generateLink(
-                selectedThemeAndTopic.topic.id,
-              ),
-            }}
+            to={publicationRoutes.createPublication.generateLink(
+              selectedThemeAndTopic.topic.id,
+            )}
             className="govuk-button"
           >
             Create new publication
