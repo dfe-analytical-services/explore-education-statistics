@@ -1,5 +1,5 @@
 *** Settings ***
-Resource    ../../test-libs/admin-common.robot
+Resource    ../libs/admin-common.robot
 
 Force Tags  Admin
 
