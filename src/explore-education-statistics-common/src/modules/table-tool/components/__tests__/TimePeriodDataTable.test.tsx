@@ -1,5 +1,5 @@
 import {SortableOptionWithGroup} from "@common/modules/table-tool/components/TableHeadersForm";
-import {createRowGroups} from "@common/modules/table-tool/components/TimePeriodDataTable";
+import {createRowGroups, createIgnoreRowGroups} from "@common/modules/table-tool/components/TimePeriodDataTable";
 
 describe('MultiHeaderTable', () => {
   test("createRowGroups", () => {
@@ -24,6 +24,10 @@ describe('MultiHeaderTable', () => {
     const rows = createRowGroups(options);
 
     console.log(rows);
+
+    const rowIgnore = createIgnoreRowGroups(options);
+
+    console.log(rowIgnore);
 
   });
 });

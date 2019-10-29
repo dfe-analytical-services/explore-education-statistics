@@ -143,12 +143,23 @@ const generateRepeatedSpanInfo = (group: string[], numberOfRepetitions: number):
 export const generateSpan2 = (headerGroups: string[][], ignoreRow: boolean[] = []): string[][] => {
 
   const aggrigatedDuplication = headerGroups.reduce<{ final: string[][], total: number }>(({final, total}, groups, index) => {
+
+    const length = index> 0 && ignoreRow[index-1] ? 1: groups.length;
+
+    const newTotal = total * ( ignoreRow[index] ? 1 : groups.length );
+
+
+    const expandedFinal = final.map( finalRow =>
+      ([] as string[]).concat(...finalRow.map( cell => ([...Array(length)].map(() => cell))))
+    );
+
+
     const newFinal: string[][] = [
-      ...final,
+      ...expandedFinal,
       ([] as string[]).concat(...[...Array(total)].map(() => groups))
     ];
 
-    const newTotal = total * ( ignoreRow[index] ? 1 : groups.length );
+
 
     return {final: newFinal, total: newTotal};
 
@@ -161,12 +172,13 @@ export const generateSpan2 = (headerGroups: string[][], ignoreRow: boolean[] = [
 
 
 export const generateSpanInfoFromGroups = (groups: string[][], ignoreRowHeaders: boolean[]): SpanInfo[][] => {
-  const groups2 = generateSpan2(groups, ignoreRowHeaders);
+  const groups2 = [...groups];
+  const finalGroup = groups2.pop() as string[];
+
+  const groupsWithoutIndicators = generateSpan2(groups2, ignoreRowHeaders);
 
   console.log(groups, ignoreRowHeaders, groups2);
 
-  const groupsWithoutIndicators = [...groups2];
-  const finalGroup = groupsWithoutIndicators.pop() as string[];
   const maxNumberOfGroups = groupsWithoutIndicators.reduce((curMaxLength: number, group) => curMaxLength < group.length ? group.length : curMaxLength, 0);
 
   const numberInFinalGroup = finalGroup.length;

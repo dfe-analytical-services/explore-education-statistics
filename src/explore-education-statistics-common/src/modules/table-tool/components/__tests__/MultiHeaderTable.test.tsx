@@ -8,7 +8,7 @@ import MultiHeaderTable, {
   generateSpan2
 } from '../MultiHeaderTable';
 import {SortableOptionWithGroup} from "@common/modules/table-tool/components/TableHeadersForm";
-import {createRowGroups} from "@common/modules/table-tool/components/TimePeriodDataTable";
+import {createIgnoreRowGroups, createRowGroups} from "@common/modules/table-tool/components/TimePeriodDataTable";
 
 describe('MultiHeaderTable', () => {
   test('renders 2x2 table correctly', () => {
@@ -196,7 +196,7 @@ describe('MultiHeaderTable', () => {
       ],
     ];
 
-    const generated = generateSpanInfoFromGroups(groups);
+    const generated = generateSpanInfoFromGroups(groups, [false, true,false]);
 
     expect(generated)
       .toStrictEqual(
@@ -247,19 +247,19 @@ describe('MultiHeaderTable', () => {
 
     const groups = [
       [
-        '1',
-        '2',
+        'R1'
       ],
       [
-        '',
-        'A',
+        'R2-CG1',
+        'R2-CG1',
       ],
       [
-        '-'
+        'R2-H1',
+        'R2-H2'
       ],
     ];
 
-    const generated = generateSpanInfoFromGroups(groups);
+    const generated = generateSpanInfoFromGroups(groups, [false,true,false]);
 
     console.log(generated);
     /*
@@ -301,18 +301,18 @@ describe('MultiHeaderTable', () => {
           [ { heading: 'B', count: 1, start: 1 } ] ]
       );
 
-  })
+  });
 
   test("full", () => {
     const options: SortableOptionWithGroup[][] = [
       [
-        {label: "1", value: "1"},
-        {label: "2", value: "2"},
+        {label: "Eng", value: "1"},
+        {label: "Sco", value: "2"},
       ],
       [
-        {label: "A", value: "A", filterGroup: "A"},
-        {label: "Q", value: "Q", filterGroup: "Q"},
-        {label: "W", value: "W", filterGroup: "Q"},
+        {label: "Def", value: "A", filterGroup: "Def"},
+        {label: "Ln1", value: "Q", filterGroup: "Lan"},
+        {label: "Ln2", value: "W", filterGroup: "Lan"},
       ]
 
     ];
@@ -320,17 +320,27 @@ describe('MultiHeaderTable', () => {
     const rows = [
       ...createRowGroups(options),
       [
-        "I",
-        "J",
-        "K",
+        "In1",
+        "In2",
+        "In3",
       ]
       ];
 
     console.log(rows);
 
-    const aggregated = generateSpan2(rows, [false,true,false,false]);
+    const ignoreRows = createIgnoreRowGroups(options);
 
-    console.log(aggregated.map(_ => _.join("")));
+    console.log(ignoreRows);
+
+    const aggregated = generateSpan2(rows, ignoreRows);
+
+    console.log(aggregated.map(_ => _.join(",")));
+
+    const spanInfo = generateSpanInfoFromGroups(rows, ignoreRows);
+
+    console.log(spanInfo);
+
+    expect(true).toBe(true);
 
     // console.log( aggregated.map( g => g.map( gg => gg.heading )));
   })
