@@ -46,13 +46,13 @@ Navigate to Manage data tab
 Verify file uploaded details
     [Tags]  HappyPath
     user waits until page contains element    xpath://*[@id="dataFileUploadForm"]/dl[1]
-    file number contains xpath  1   //dt[text()="Subject title"]/../dd/h4[text()="All Geographies"]
-    file number contains xpath  1   //dt[text()="Data file"]/../dd/a[text()="upload-file-test.csv"]
-    file number contains xpath  1   //dt[text()="Filesize"]/../dd[.="15 Kb"]
-    file number contains xpath  1   //dt[text()="Number of rows"]/../dd[text()="161"]
-    file number contains xpath  1   //dt[text()="Metadata file"]/../dd/a[text()="upload-file-test.meta.csv"]
-    file number contains xpath  1   //dt[text()="Uploaded by"]/../dd/a[text()="EESADMIN.User1@azurehiveitco.onmicrosoft.com"]
+    data csv number contains xpath  1   //dt[text()="Subject title"]/../dd/h4[text()="All Geographies"]
+    data csv number contains xpath  1   //dt[text()="Data file"]/../dd/a[text()="upload-file-test.csv"]
+    data csv number contains xpath  1   //dt[text()="Filesize"]/../dd[.="15 Kb"]
+    data csv number contains xpath  1   //dt[text()="Number of rows"]/../dd[text()="161"]
+    data csv number contains xpath  1   //dt[text()="Metadata file"]/../dd/a[text()="upload-file-test.meta.csv"]
+    data csv number contains xpath  1   //dt[text()="Uploaded by"]/../dd/a[text()="EESADMIN.User1@azurehiveitco.onmicrosoft.com"]
     ${date}=  get datetime  %d/%m/%Y
-    file number contains xpath  1   //dt[text()="Date Uploaded"]/../dd[contains(text(), "${date}")]
-    file number contains xpath  1   //dt[text()="Status"]/../dd//strong[text()="Complete"]
-    file number contains xpath  1   //dt[text()="Actions"]/../dd/a[text()="Delete files"]
+    data csv number contains xpath  1   //dt[text()="Date Uploaded"]/../dd[contains(text(), "${date}")]
+    data csv number contains xpath  1   //dt[text()="Status"]/../dd//strong[text()="Complete"]
+    data csv number contains xpath  1   //dt[text()="Actions"]/../dd/a[text()="Delete files"]
