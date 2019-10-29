@@ -1,4 +1,4 @@
-@import '~govuk-frontend/components/table/table';
+@import '~govuk-frontend/govuk/components/table/table';
 
 /* stylelint-disable scss/at-extend-no-missing-placeholder */
 .govuk-table {
@@ -29,5 +29,5 @@
 }
 
 .govuk-table__row--striped {
-  background: govuk-colour('grey-4');
+  background: govuk-colour('light-grey');
 }

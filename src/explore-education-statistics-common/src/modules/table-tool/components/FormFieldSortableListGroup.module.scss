@@ -1,13 +1,13 @@
 @import '../../../styles/govuk-base';
 
 .groupsFieldset {
-  border: 4px solid govuk-colour('grey-3');
+  border: 4px solid govuk-colour('light-grey');
   padding: govuk-spacing(2);
   width: 100%;
 }
 
 .isDraggingOver {
-  background-color: govuk-colour('grey-4');
+  background-color: govuk-colour('light-grey');
   border-color: $govuk-focus-colour;
 }
 
@@ -37,14 +37,17 @@
 }
 
 .list {
-  @include govuk-focusable;
-
-  background: govuk-colour('grey-3');
+  background: govuk-colour('light-grey');
   display: block;
   padding: govuk-spacing(2);
 
+  &:focus {
+    border: $govuk-focus-width solid #000;
+    outline: $govuk-focus-colour solid $govuk-focus-width;
+  }
+
   &:hover {
-    background: govuk-colour('grey-2');
+    background: govuk-colour('mid-grey');
 
     // Fallback if grab is unsupported
     cursor: move;

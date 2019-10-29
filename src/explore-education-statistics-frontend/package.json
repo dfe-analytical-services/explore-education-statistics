@@ -21,7 +21,7 @@
     "express-basic-auth": "^1.1.6",
     "file-saver": "^2.0.2",
     "formik": "^1.5.7",
-    "govuk-frontend": "^2.13.0",
+    "govuk-frontend": "^3.3.0",
     "helmet": "^3.16.0",
     "immer": "^3.1.3",
     "leaflet": "^1.5.1",
