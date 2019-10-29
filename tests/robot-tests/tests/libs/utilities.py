@@ -5,6 +5,11 @@ from selenium.common.exceptions import NoSuchElementException
 sl = BuiltIn().get_library_instance('SeleniumLibrary')
 import os
 import re
+from datetime import datetime
+
+def get_datetime(strf):
+  now = datetime.now()
+  return now.strftime(strf)
 
 def cookie_should_not_exist(name):
   for cookie in sl.driver.get_cookies():
@@ -310,13 +315,33 @@ def user_reorders_table_headers(drag_selector, drop_selector):
   action.release().perform()
 
 def capture_large_screenshot():
-    currentWindow = sl.get_window_size()
-    page_height = sl._current_browser().execute_script("return document.documentElement.scrollHeight;")
+  currentWindow = sl.get_window_size()
+  page_height = sl._current_browser().execute_script("return document.documentElement.scrollHeight;")
 
-    page_width = currentWindow[0]
-    original_height = currentWindow[1]
+  page_width = currentWindow[0]
+  original_height = currentWindow[1]
 
-    sl.set_window_size(page_width, page_height)
-    warn("Capturing a screenshot at URL " + sl.get_location())
-    sl.capture_page_screenshot()
-    sl.set_window_size(page_width, original_height)
+  sl.set_window_size(page_width, page_height)
+  warn("Capturing a screenshot at URL " + sl.get_location())
+  sl.capture_page_screenshot()
+  sl.set_window_size(page_width, original_height)
+
+def data_csv_number_contains_xpath(num, xpath):
+  try:
+    elem = sl.driver.find_element_by_xpath(f'//*[@id="dataFileUploadForm"]/dl[{num}]')
+  except:
+    raise AssertionError(f'Cannot find data file number "{num}"')
+  try:
+    elem.find_element_by_xpath(xpath)
+  except:
+    raise AssertionError(f'Cannot find data file number "{num} with xpath {xpath}')
+
+def data_file_number_contains_xpath(num, xpath):
+  try:
+    elem = sl.driver.find_element_by_xpath(f'//*[@id="fileUploadForm"]/dl[{num}]')
+  except:
+    raise AssertionError(f'Cannot find data file number "{num}"')
+  try:
+    elem.find_element_by_xpath(xpath)
+  except:
+    raise AssertionError(f'Cannot find data file number "{num} with xpath {xpath}')
