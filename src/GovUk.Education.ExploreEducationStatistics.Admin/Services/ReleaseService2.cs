@@ -162,9 +162,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             PublicationId publicationId, ReleaseId? releaseId = null)
         {
             var slugMatches = _context.Releases
+                .Include(r => r.ReleaseSummary)
+                .ThenInclude(rs => rs.Versions)
                 .Where(r => r.PublicationId == publicationId && r.ReleaseSummary.ReleaseId != releaseId)
                 .Select(r => r.ReleaseSummary)
-                .Include(rs => rs.Versions)
                 .ToList() // Required as the following operation are not expressible in sql as they query computed fields
                 .Any(rs => rs.Current.Slug == slug);
             if (slugMatches)
