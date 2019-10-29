@@ -284,17 +284,6 @@ export interface DataBlockRerequest {
 
 export type DataBlockRequest = TableDataQuery;
 
-/*
-export type DataBlockRequest = {
-  subjectId: string;
-  timePeriod?: DataBlockTimePeriod;
-  filters: string[];
-  geographicLevel?: GeographicLevel;
-  indicators: string[];
-} & DataBlockRerequest &
-  PartialRecord<LocationKeys, string[]>;
-*/
-
 export interface DataBlockResponse {
   metaData: DataBlockMetadata;
 
