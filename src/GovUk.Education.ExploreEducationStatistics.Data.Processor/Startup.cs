@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
         public override void Configure(IFunctionsHostBuilder builder)
         {
             builder.Services
-                .AddAutoMapper()
+                .AddAutoMapper(typeof(Startup).Assembly)
                 .AddDbContext<StatisticsDbContext>(options =>
                     options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("StatisticsDb"),
                         providerOptions => providerOptions.EnableRetryOnFailure()))
