@@ -13,12 +13,60 @@ import {
 import {FullTable} from '@common/modules/full-table/types/fullTable';
 import DataTableCaption from './DataTableCaption';
 import FixedMultiHeaderDataTable from './FixedMultiHeaderDataTable';
-import {TableHeadersFormValues} from './TableHeadersForm';
+import {SortableOptionWithGroup, TableHeadersFormValues} from './TableHeadersForm';
 
 interface Props {
   fullTable: FullTable;
   tableHeadersConfig: TableHeadersFormValues;
 }
+
+export const createRowGroups = (rowGroups: SortableOptionWithGroup[][]) : string[][] => {
+  return rowGroups.flatMap(rowGroup =>
+
+    rowGroup.reduce<[string[], string[]]>(([b, c], group) => (
+      [
+        group.filterGroup && [...b, group.filterGroup || ''] || b ,
+        [...c, group.label]
+      ]
+    ), [[], []])
+/*
+      .map((filters,mapIndex) => {
+          if (mapIndex === 0) {
+            return filters.map((filterGroup, index, ary) => {
+              if (index === filters.length-1 || filterGroup === ary[index+1]) return filterGroup;
+              return '';
+            });
+          }
+          return filters;
+        })
+*/
+      .filter(ary => ary.length > 0)
+  );
+}
+
+export const createIgnoreRowGroups = (rowGroups: SortableOptionWithGroup[][]) : boolean[] => {
+  return rowGroups.flatMap(rowGroup =>
+
+    rowGroup.reduce<[boolean[], boolean[]]>(([b, c], group) => (
+      [
+        group.filterGroup && [...b, true] || b,
+        [...c, false]
+      ]
+    ), [[], []])
+    /*
+          .map((filters,mapIndex) => {
+              if (mapIndex === 0) {
+                return filters.map((filterGroup, index, ary) => {
+                  if (index === filters.length-1 || filterGroup === ary[index+1]) return filterGroup;
+                  return '';
+                });
+              }
+              return filters;
+            })
+    */
+      .filter(ary => ary.length > 0)
+  ).map(group => group.includes(true));
+};
 
 const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
   (props: Props, dataTableRef) => {
@@ -41,17 +89,14 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
       tableHeadersConfig.columns.map(column => column.label),
     ];
 
-
     const rowHeaders: string[][] = [
-      ...tableHeadersConfig.rowGroups.flatMap(rowGroup =>
-        rowGroup.reduce<[string[], string []]>(([a, b], group) => (
-          [
-            group.filterGroup && [...a, group.filterGroup] || a,
-            [...b, group.label]
-          ]
-        ), [[], []]).filter(ary => ary.length > 0)
-      ),
+      ...createRowGroups(tableHeadersConfig.rowGroups),
       tableHeadersConfig.rows.map(row => row.label),
+    ];
+
+    const ignoreRowHeaders: boolean[] = [
+      ...createIgnoreRowGroups(tableHeadersConfig.rowGroups),
+      false
     ];
 
     const rowHeadersCartesian = cartesian(
@@ -127,6 +172,7 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
         caption={<DataTableCaption {...subjectMeta} id="dataTableCaption" />}
         columnHeaders={columnHeaders}
         rowHeaders={rowHeaders}
+        ignoreRowHeaders={ignoreRowHeaders}
         rows={rows}
         ref={dataTableRef}
         footnotes={subjectMeta.footnotes}

@@ -1,6 +1,14 @@
 import React from 'react';
 import {render} from 'react-testing-library';
-import MultiHeaderTable, {generateHeaderSpanInfo, generateHeaders, iDontKnow} from '../MultiHeaderTable';
+import MultiHeaderTable, {
+  generateHeaderSpanInfo,
+  transposeSpanInfoMatrix,
+  generateSpanInfoFromGroups,
+  SpanInfo,
+  generateSpan2
+} from '../MultiHeaderTable';
+import {SortableOptionWithGroup} from "@common/modules/table-tool/components/TableHeadersForm";
+import {createRowGroups} from "@common/modules/table-tool/components/TimePeriodDataTable";
 
 describe('MultiHeaderTable', () => {
   test('renders 2x2 table correctly', () => {
@@ -172,16 +180,15 @@ describe('MultiHeaderTable', () => {
     expect(container.innerHTML).toMatchSnapshot();
   });
 
-  test('generateHeaderSpanInfo', () => {
+  test('generateSpanInfoFromGroups', () => {
 
     const groups = [
       [
-        'A',
-      ],
-      [
         '1',
         '2',
-        '3',
+      ],
+      [
+        'A',
       ],
       [
         'X',
@@ -189,83 +196,143 @@ describe('MultiHeaderTable', () => {
       ],
     ];
 
-    const generated = generateHeaderSpanInfo(groups);
-
-    console.log(generated);
+    const generated = generateSpanInfoFromGroups(groups);
 
     expect(generated)
-      .toStrictEqual([[{heading: 'A', count: 3, start: 0}],
-        [{heading: '1', count: 1, start: 0},
-          {heading: '2', count: 1, start: 1},
-          {heading: '3', count: 1, start: 2}],
-        [{heading: 'X', count: 1, start: 0},
-          {heading: 'Y', count: 2, start: 1}]])
-
+      .toStrictEqual(
+    [ [ { heading: '1',
+          count: 2,
+          start: 0,
+          isRowGroup: true,
+          isLastInGroup: false },
+        { heading: '2',
+          count: 2,
+          start: 2,
+          isRowGroup: true,
+          isLastInGroup: false } ],
+      [ { heading: 'A',
+          count: 2,
+          start: 0,
+          isRowGroup: true,
+          isLastInGroup: false },
+        { heading: 'A',
+          count: 2,
+          start: 2,
+          isRowGroup: true,
+          isLastInGroup: false } ],
+      [ { heading: 'X',
+          count: 1,
+          start: 0,
+          isRowGroup: false,
+          isLastInGroup: false },
+        { heading: 'Y',
+          count: 1,
+          start: 1,
+          isRowGroup: false,
+          isLastInGroup: true },
+        { heading: 'X',
+          count: 1,
+          start: 2,
+          isRowGroup: false,
+          isLastInGroup: false },
+        { heading: 'Y',
+          count: 1,
+          start: 3,
+          isRowGroup: false,
+          isLastInGroup: true } ] ]
+          )
   });
 
-
-  test('generateHeaders', () => {
-
-    const headers = [
-      [{heading: 'England', count: 12, start: 0}],
-      [{heading: 'Total', count: 1, start: 0},
-        {heading: 'Gender', count: 2, start: 1},
-        {heading: 'FSM', count: 3, start: 3},
-        {heading: 'SEN provision', count: 6, start: 6}],
-      [
-        {heading: 'Total', count: 1, start: 0},
-        {heading: 'Gender male', count: 1, start: 1},
-        {heading: 'Gender female', count: 1, start: 2},
-        {heading: 'FSM eligible', count: 1, start: 3},
-        {heading: 'FSM not eligible', count: 1, start: 4},
-        {heading: 'FSM unclassified', count: 1, start: 5},
-        {heading: 'SEN provision No identified SEN', count: 1, start: 6},
-        {heading: 'SEN provision statement or EHCP', count: 1, start: 7},
-        {heading: 'SEN provision SEN Support', count: 1, start: 8},
-        {heading: 'SEN provision Unclassified', count: 1, start: 9},
-        {heading: 'SEN provision statement', count: 1, start: 10},
-        {heading: 'SEN provision SEN without statement', count: 1, start: 11},
-      ],
-      [{heading: 'Authorised absence rate', count: 12, start: 0}],
-    ];
-
-
-    const result = generateHeaders(headers);
-  });
-
-  test('iDontKnow', () => {
+  test('generateSpanInfoFromGroups2', () => {
 
     const groups = [
       [
         '1',
         '2',
-        '3',
       ],
       [
+        '',
         'A',
       ],
       [
-        'X',
-        'Y',
-        'Z',
-        'W'
+        '-'
       ],
     ];
 
-    const generated = iDontKnow(groups);
+    const generated = generateSpanInfoFromGroups(groups);
+
+    console.log(generated);
     /*
-
-    console.log(generated);
-
     expect(generated)
-      .toStrictEqual([[{heading: 'A', count: 3, start: 0}],
-        [{heading: '1', count: 1, start: 0},
-          {heading: '2', count: 1, start: 1},
-          {heading: '3', count: 1, start: 2}],
-        [{heading: 'X', count: 1, start: 0},
-          {heading: 'Y', count: 2, start: 1}]])
-   */
+      .toStrictEqual(
+
+      )
+
+     */
   });
 
+  test("transposeSpanInfoMatrix", () => {
+
+    const source = [
+      [{
+        heading: "A",
+        count: 1,
+        start:0
+      },
+        {
+          heading: "B",
+          count: 1,
+          start:1
+        }],
+      [{
+        heading: "X",
+        count: 2,
+        start:0
+      }],
+
+    ] as SpanInfo[][];
+
+    const transposed = transposeSpanInfoMatrix(source);
+
+    expect(transposed)
+      .toStrictEqual(
+        [ [ { heading: 'A', count: 1, start: 0 },
+          { heading: 'X', count: 2, start: 0 } ],
+          [ { heading: 'B', count: 1, start: 1 } ] ]
+      );
+
+  })
+
+  test("full", () => {
+    const options: SortableOptionWithGroup[][] = [
+      [
+        {label: "1", value: "1"},
+        {label: "2", value: "2"},
+      ],
+      [
+        {label: "A", value: "A", filterGroup: "A"},
+        {label: "Q", value: "Q", filterGroup: "Q"},
+        {label: "W", value: "W", filterGroup: "Q"},
+      ]
+
+    ];
+
+    const rows = [
+      ...createRowGroups(options),
+      [
+        "I",
+        "J",
+        "K",
+      ]
+      ];
+
+    console.log(rows);
+
+    const aggregated = generateSpan2(rows, [false,true,false,false]);
+
+    console.log(aggregated.map(_ => _.join("")));
+
+    // console.log( aggregated.map( g => g.map( gg => gg.heading )));
+  })
 
 });

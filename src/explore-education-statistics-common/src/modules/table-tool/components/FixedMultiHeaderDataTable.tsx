@@ -12,6 +12,7 @@ interface Props {
   innerRef?: Ref<HTMLElement>;
   columnHeaders: string[][];
   rowHeaders: string[][];
+  ignoreRowHeaders?: boolean[];
   rows: string[][];
   footnotes?: FullTableMeta['footnotes'];
 }
