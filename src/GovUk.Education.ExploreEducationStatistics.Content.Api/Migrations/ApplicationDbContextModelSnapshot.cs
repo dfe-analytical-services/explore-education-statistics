@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.6-servicing-10079")
+                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -1983,14 +1983,20 @@ Find out how and why these statistics are collected and published - [Secondary a
                     b.Property<string>("Charts")
                         .HasColumnName("DataBlock_Charts");
 
+                    b.Property<string>("CustomFootnotes");
+
                     b.Property<string>("DataBlockRequest")
                         .HasColumnName("DataBlock_Request");
 
                     b.Property<string>("Heading")
                         .HasColumnName("DataBlock_Heading");
 
+                    b.Property<string>("Name");
+
                     b.Property<Guid>("ReleaseId")
                         .HasColumnName("DataBlock_ReleaseId");
+
+                    b.Property<string>("Source");
 
                     b.Property<string>("Summary")
                         .HasColumnName("DataBlock_Summary");
@@ -2011,7 +2017,7 @@ Find out how and why these statistics are collected and published - [Secondary a
                             DataBlockRequest = "{\"SubjectId\":1,\"GeographicLevel\":\"Country\",\"TimePeriod\":{\"StartYear\":\"2012\",\"StartCode\":\"AY\",\"EndYear\":\"2016\",\"EndCode\":\"AY\"},\"Filters\":[\"1\",\"58\"],\"Indicators\":[\"23\",\"26\",\"28\"],\"Country\":null,\"LocalAuthority\":null,\"Region\":null}",
                             ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
                             Summary = "{\"dataKeys\":[\"26\",\"28\",\"23\"],\"dataSummary\":[\"Up from 4.6% in 2015/16\",\"Similar to previous years\",\"Up from 1.1% in 2015/16\"],\"dataDefinition\":[\"Total number of all authorised and unauthorised absences from possible school sessions for all pupils. <a href=\\\"/glossary#overall-absence\\\">More >>></a>\",\"Number of authorised absences as a percentage of the overall school population. <a href=\\\"/glossary#authorised-absence\\\">More >>></a>\",\"Number of unauthorised absences as a percentage of the overall school population. <a href=\\\"/glossary#unauthorised-absence\\\">More >>></a>\"],\"description\":{\"Body\":\" * pupils missed on average 8.2 school days\\n * overall and unauthorised absence rates up on 2015/16\\n * unauthorised absence rise due to higher rates of unauthorised holidays\\n * 10% of pupils persistently absent during 2016/17\",\"Type\":\"MarkDownBlock\",\"Id\":\"f928762e-9bd5-4538-a4f0-d7f34b2874e6\",\"ContentSection\":null,\"ContentSectionId\":null}}",
-                            Tables = "[{\"indicators\":[\"23\",\"26\",\"28\"]}]"
+                            Tables = "[{\"indicators\":[\"23\",\"26\",\"28\"],\"tableHeaders\":null}]"
                         },
                         new
                         {
@@ -2021,7 +2027,7 @@ Find out how and why these statistics are collected and published - [Secondary a
                             Charts = "[{\"Width\":0,\"Height\":0,\"Legend\":\"top\",\"Labels\":{\"23_1_58_____\":{\"Label\":\"Unauthorised absence rate\",\"Value\":null,\"Name\":null,\"Unit\":\"%\",\"Colour\":\"#4763a5\",\"symbol\":\"circle\",\"LineStyle\":\"solid\"},\"26_1_58_____\":{\"Label\":\"Overall absence rate\",\"Value\":null,\"Name\":null,\"Unit\":\"%\",\"Colour\":\"#f5a450\",\"symbol\":\"cross\",\"LineStyle\":\"solid\"},\"28_1_58_____\":{\"Label\":\"Authorised absence rate\",\"Value\":null,\"Name\":null,\"Unit\":\"%\",\"Colour\":\"#005ea5\",\"symbol\":\"diamond\",\"LineStyle\":\"solid\"}},\"Axes\":{\"major\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriods\",\"DataSets\":[{\"Indicator\":\"23\",\"Filters\":[\"1\",\"58\"],\"Location\":null,\"TimePeriod\":null},{\"Indicator\":\"26\",\"Filters\":[\"1\",\"58\"],\"Location\":null,\"TimePeriod\":null},{\"Indicator\":\"28\",\"Filters\":[\"1\",\"58\"],\"Location\":null,\"TimePeriod\":null}],\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"School Year\",\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":null,\"Max\":null,\"Size\":null},\"minor\":{\"Name\":null,\"Type\":\"major\",\"GroupBy\":\"timePeriods\",\"DataSets\":null,\"ReferenceLines\":null,\"Visible\":true,\"Title\":\"Absence Rate\",\"ShowGrid\":true,\"LabelPosition\":\"axis\",\"Min\":0,\"Max\":null,\"Size\":null}},\"Type\":\"line\"}]",
                             DataBlockRequest = "{\"SubjectId\":1,\"GeographicLevel\":\"Country\",\"TimePeriod\":{\"StartYear\":\"2012\",\"StartCode\":\"AY\",\"EndYear\":\"2016\",\"EndCode\":\"AY\"},\"Filters\":[\"1\",\"58\"],\"Indicators\":[\"23\",\"26\",\"28\"],\"Country\":null,\"LocalAuthority\":null,\"Region\":null}",
                             ReleaseId = new Guid("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"),
-                            Tables = "[{\"indicators\":[\"23\",\"26\",\"28\"]}]"
+                            Tables = "[{\"indicators\":[\"23\",\"26\",\"28\"],\"tableHeaders\":null}]"
                         },
                         new
                         {
@@ -2040,7 +2046,7 @@ Find out how and why these statistics are collected and published - [Secondary a
                             DataBlockRequest = "{\"SubjectId\":12,\"GeographicLevel\":\"Country\",\"TimePeriod\":{\"StartYear\":\"2012\",\"StartCode\":\"AY\",\"EndYear\":\"2016\",\"EndCode\":\"AY\"},\"Filters\":[\"461\"],\"Indicators\":[\"176\",\"177\",\"178\",\"179\",\"180\",\"181\",\"183\"],\"Country\":null,\"LocalAuthority\":null,\"Region\":null}",
                             ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
                             Summary = "{\"dataKeys\":[\"179\",\"181\",\"178\"],\"dataSummary\":[\"Up from 0.08% in 2015/16\",\"Up from 4.29% in 2015/16\",\"Up from 6,685 in 2015/16\"],\"dataDefinition\":[\"Number of permanent exclusions as a percentage of the overall school population. <a href=\\\"/glossary#permanent-exclusion\\\">More >>></a>\",\"Number of fixed-period exclusions as a percentage of the overall school population. <a href=\\\"/glossary#permanent-exclusion\\\">More >>></a>\",\"Total number of permanent exclusions within a school year. <a href=\\\"/glossary#permanent-exclusion\\\">More >>></a>\"],\"description\":{\"Body\":\" * overall permanent exclusions rate has increased to 0.10% - up from 0.08% in 2015/16\\n * number of exclusions increased to 7,720 - up from 6,685 in 2015/16\\n * overall fixed-period exclusions rate increased to 4.76% - up from 4.29% in 2015/16\\n * number of exclusions increased to 381,865 - up from 339,360 in 2015/16\\n\",\"Type\":\"MarkDownBlock\",\"Id\":\"132bef6e-c2a3-459d-996e-40f29ed6e74f\",\"ContentSection\":null,\"ContentSectionId\":null}}",
-                            Tables = "[{\"indicators\":[\"179\",\"181\",\"178\"]}]"
+                            Tables = "[{\"indicators\":[\"179\",\"181\",\"178\"],\"tableHeaders\":null}]"
                         },
                         new
                         {
@@ -2051,7 +2057,7 @@ Find out how and why these statistics are collected and published - [Secondary a
                             DataBlockRequest = "{\"SubjectId\":12,\"GeographicLevel\":\"Country\",\"TimePeriod\":{\"StartYear\":\"2012\",\"StartCode\":\"AY\",\"EndYear\":\"2016\",\"EndCode\":\"AY\"},\"Filters\":[\"461\"],\"Indicators\":[\"179\",\"177\",\"178\"],\"Country\":null,\"LocalAuthority\":null,\"Region\":null}",
                             Heading = "Chart showing permanent exclusions in England",
                             ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
-                            Tables = "[{\"indicators\":[\"177\",\"178\",\"179\"]}]"
+                            Tables = "[{\"indicators\":[\"177\",\"178\",\"179\"],\"tableHeaders\":null}]"
                         },
                         new
                         {
@@ -2062,7 +2068,7 @@ Find out how and why these statistics are collected and published - [Secondary a
                             DataBlockRequest = "{\"SubjectId\":12,\"GeographicLevel\":\"Country\",\"TimePeriod\":{\"StartYear\":\"2012\",\"StartCode\":\"AY\",\"EndYear\":\"2016\",\"EndCode\":\"AY\"},\"Filters\":[\"461\"],\"Indicators\":[\"181\",\"177\",\"180\"],\"Country\":null,\"LocalAuthority\":null,\"Region\":null}",
                             Heading = "Chart showing fixed-period exclusions in England",
                             ReleaseId = new Guid("e7774a74-1f62-4b76-b9b5-84f14dac7278"),
-                            Tables = "[{\"indicators\":[\"177\",\"180\",\"181\"]}]"
+                            Tables = "[{\"indicators\":[\"177\",\"180\",\"181\"],\"tableHeaders\":null}]"
                         },
                         new
                         {
@@ -2071,7 +2077,7 @@ Find out how and why these statistics are collected and published - [Secondary a
                             DataBlockRequest = "{\"SubjectId\":17,\"GeographicLevel\":\"Country\",\"TimePeriod\":{\"StartYear\":\"2014\",\"StartCode\":\"CY\",\"EndYear\":\"2018\",\"EndCode\":\"CY\"},\"Filters\":[\"575\"],\"Indicators\":[\"211\",\"212\",\"216\",\"217\",\"218\",\"219\",\"220\",\"221\",\"222\"],\"Country\":null,\"LocalAuthority\":null,\"Region\":null}",
                             ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
                             Summary = "{\"dataKeys\":[\"212\",\"216\",\"217\"],\"dataSummary\":[\"Down from 620,330 in 2017\",\"Down from 558,411 in 2017\",\"Down from 34,792 in 2017\"],\"dataDefinition\":[\"Total number of applications received for places at primary and secondary schools.\",\"Total number of first preferences offered to applicants by schools.\",\"Total number of second preferences offered to applicants by schools.\"],\"description\":{\"Body\":\"* majority of applicants received a preferred offer\\n* percentage of applicants receiving secondary first choice offers decreases as applications increase\\n* slight proportional increase in applicants receiving primary first choice offer as applications decrease\\n\",\"Type\":\"MarkDownBlock\",\"Id\":\"fdcac9d3-dab5-445d-9802-a8af0990efb2\",\"ContentSection\":null,\"ContentSectionId\":null}}",
-                            Tables = "[{\"indicators\":[\"212\",\"211\",\"216\",\"217\",\"218\",\"221\",\"222\"]}]"
+                            Tables = "[{\"indicators\":[\"212\",\"211\",\"216\",\"217\",\"218\",\"221\",\"222\"],\"tableHeaders\":null}]"
                         },
                         new
                         {
@@ -2081,7 +2087,7 @@ Find out how and why these statistics are collected and published - [Secondary a
                             DataBlockRequest = "{\"SubjectId\":17,\"GeographicLevel\":\"Country\",\"TimePeriod\":{\"StartYear\":\"2014\",\"StartCode\":\"CY\",\"EndYear\":\"2018\",\"EndCode\":\"CY\"},\"Filters\":[\"577\"],\"Indicators\":[\"220\",\"221\",\"222\",\"223\"],\"Country\":null,\"LocalAuthority\":null,\"Region\":null}",
                             Heading = "Table of Timeseries of key secondary preference rates, England",
                             ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
-                            Tables = "[{\"indicators\":[\"220\",\"221\",\"222\"]}]"
+                            Tables = "[{\"indicators\":[\"220\",\"221\",\"222\"],\"tableHeaders\":null}]"
                         },
                         new
                         {
@@ -2091,7 +2097,7 @@ Find out how and why these statistics are collected and published - [Secondary a
                             DataBlockRequest = "{\"SubjectId\":17,\"GeographicLevel\":\"Country\",\"TimePeriod\":{\"StartYear\":\"2014\",\"StartCode\":\"CY\",\"EndYear\":\"2018\",\"EndCode\":\"CY\"},\"Filters\":[\"575\"],\"Indicators\":[\"220\",\"221\",\"222\",\"223\"],\"Country\":null,\"LocalAuthority\":null,\"Region\":null}",
                             Heading = "Table showing Timeseries of key primary preference rates, England Entry into academic year",
                             ReleaseId = new Guid("63227211-7cb3-408c-b5c2-40d3d7cb2717"),
-                            Tables = "[{\"indicators\":[\"220\",\"221\",\"222\"]}]"
+                            Tables = "[{\"indicators\":[\"220\",\"221\",\"222\"],\"tableHeaders\":null}]"
                         });
                 });
 

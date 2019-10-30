@@ -58,7 +58,7 @@ class FindStatisticsPage extends Component<Props> {
               </li>
             </ul>
 
-            <PageSearchFormWithAnalytics />
+            <PageSearchFormWithAnalytics inputLabel="Search to find the statistics and data you’re looking for." />
           </div>
           <div className="govuk-grid-column-one-third">
             <RelatedInformation>

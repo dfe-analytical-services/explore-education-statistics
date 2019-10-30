@@ -14,7 +14,6 @@ import MethodologyContent from '@frontend/modules/methodologies/components/Metho
 import MethodologyHeader from '@frontend/modules/methodologies/components/MethodologyHeader';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
-import { parse } from 'date-fns';
 
 interface Props {
   publication: string;
@@ -47,7 +46,7 @@ class MethodologyPage extends Component<Props> {
     return (
       <Page
         title={data.title}
-        seoDescription={data.summary}
+        description={data.summary}
         breadcrumbs={[{ name: 'Methodologies', link: '/methodology' }]}
       >
         <div className="govuk-grid-row">
@@ -72,7 +71,13 @@ class MethodologyPage extends Component<Props> {
                 </>
               )}
             </dl>
-            <PageSearchFormWithAnalytics />
+            <PrintThisPage
+              analytics={{
+                category: 'Page print',
+                action: 'Print this page link selected',
+              }}
+            />
+            <PageSearchFormWithAnalytics inputLabel="Search in this methodology page." />
           </div>
         </div>
 

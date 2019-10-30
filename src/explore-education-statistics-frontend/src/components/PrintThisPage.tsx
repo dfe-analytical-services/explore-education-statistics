@@ -4,6 +4,7 @@ import {
   AnalyticProps,
   logEvent,
 } from '@frontend/services/googleAnalyticsService';
+import styles from './PrintThisPage.module.scss';
 
 const PrintThisPage = ({ analytics, ...props }: AnalyticProps) => {
   const openPrint = () => {
@@ -14,8 +15,19 @@ const PrintThisPage = ({ analytics, ...props }: AnalyticProps) => {
   };
 
   return (
-    <div className={classNames('govuk-!-margin-top-6', 'dfe-print-hidden')}>
-      <a {...props} href="#" onClick={() => openPrint()}>
+    <div
+      className={classNames(
+        'govuk-!-margin-top-6',
+        'dfe-print-hidden',
+        styles.mobileHidden,
+      )}
+    >
+      <a
+        className="govuk-button govuk-button--secondary"
+        {...props}
+        href="#"
+        onClick={() => openPrint()}
+      >
         Print this page
       </a>
     </div>

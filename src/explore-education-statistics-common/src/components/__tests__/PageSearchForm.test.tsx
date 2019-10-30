@@ -7,13 +7,15 @@ import React from 'react';
 import { fireEvent, render, wait } from 'react-testing-library';
 import PageSearchForm from '../PageSearchForm';
 
+const labelText = 'Find on this page';
+
 describe('PageSearchForm', () => {
   test('does not render results if input is less than default 3 characters', () => {
     jest.useFakeTimers();
 
     const { container, getByLabelText } = render(
       <div>
-        <PageSearchForm />
+        <PageSearchForm inputLabel={labelText} />
 
         <div>
           <p>Not me</p>
@@ -44,7 +46,7 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    fireEvent.change(getByLabelText('Find on this page'), {
+    fireEvent.change(getByLabelText(labelText), {
       target: {
         value: 'To',
       },
@@ -64,7 +66,7 @@ describe('PageSearchForm', () => {
 
     const { container, getByLabelText } = render(
       <div>
-        <PageSearchForm minInput={5} />
+        <PageSearchForm inputLabel={labelText} minInput={5} />
 
         <div>
           <p>Not me</p>
@@ -95,7 +97,7 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    fireEvent.change(getByLabelText('Find on this page'), {
+    fireEvent.change(getByLabelText(labelText), {
       target: {
         value: 'Test',
       },
@@ -115,7 +117,7 @@ describe('PageSearchForm', () => {
 
     const { container, getByLabelText } = render(
       <div>
-        <PageSearchForm />
+        <PageSearchForm inputLabel={labelText} />
 
         <div>
           <p>Not me</p>
@@ -146,7 +148,7 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    fireEvent.change(getByLabelText('Find on this page'), {
+    fireEvent.change(getByLabelText(labelText), {
       target: {
         value: 'TEST',
       },
@@ -170,7 +172,7 @@ describe('PageSearchForm', () => {
 
     const { container, getByLabelText } = render(
       <div>
-        <PageSearchForm minInput={5} />
+        <PageSearchForm inputLabel={labelText} minInput={5} />
 
         <div>
           <p>Not me</p>
@@ -201,7 +203,7 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    fireEvent.change(getByLabelText('Find on this page'), {
+    fireEvent.change(getByLabelText(labelText), {
       target: {
         value: 'TE',
       },
@@ -225,7 +227,7 @@ describe('PageSearchForm', () => {
 
     const { container, getByLabelText } = render(
       <div>
-        <PageSearchForm />
+        <PageSearchForm inputLabel={labelText} />
 
         <div>
           <p>Not me</p>
@@ -256,7 +258,7 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    fireEvent.change(getByLabelText('Find on this page'), {
+    fireEvent.change(getByLabelText(labelText), {
       target: {
         value: 'Test',
       },
@@ -285,7 +287,10 @@ describe('PageSearchForm', () => {
 
     const { container, getByLabelText } = render(
       <div>
-        <PageSearchForm elementSelectors={['.target-1', '.target-2 p']} />
+        <PageSearchForm
+          inputLabel={labelText}
+          elementSelectors={['.target-1', '.target-2 p']}
+        />
 
         <div>
           <p>Test</p>
@@ -317,7 +322,7 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    fireEvent.change(getByLabelText('Find on this page'), {
+    fireEvent.change(getByLabelText(labelText), {
       target: {
         value: 'Test',
       },
@@ -343,7 +348,7 @@ describe('PageSearchForm', () => {
 
     const { container, getByLabelText } = render(
       <div>
-        <PageSearchForm />
+        <PageSearchForm inputLabel={labelText} />
 
         <div>
           <h2>Section 1</h2>
@@ -361,7 +366,7 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    fireEvent.change(getByLabelText('Find on this page'), {
+    fireEvent.change(getByLabelText(labelText), {
       target: {
         value: 'Test',
       },
@@ -389,7 +394,7 @@ describe('PageSearchForm', () => {
 
     const { container, getByLabelText } = render(
       <div>
-        <PageSearchForm />
+        <PageSearchForm inputLabel={labelText} />
 
         <h2>Section 1</h2>
 
@@ -404,7 +409,7 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    fireEvent.change(getByLabelText('Find on this page'), {
+    fireEvent.change(getByLabelText(labelText), {
       target: {
         value: 'Test',
       },
@@ -430,7 +435,7 @@ describe('PageSearchForm', () => {
 
     const { container, getByLabelText } = render(
       <div>
-        <PageSearchForm />
+        <PageSearchForm inputLabel={labelText} />
 
         <h2>Section 1</h2>
 
@@ -451,7 +456,7 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    fireEvent.change(getByLabelText('Find on this page'), {
+    fireEvent.change(getByLabelText(labelText), {
       target: {
         value: 'Test',
       },
@@ -486,11 +491,11 @@ describe('PageSearchForm', () => {
         <h2>Section 1</h2>
         <p id="target">Test</p>
 
-        <PageSearchForm />
+        <PageSearchForm inputLabel={labelText} />
       </div>,
     );
 
-    fireEvent.change(getByLabelText('Find on this page'), {
+    fireEvent.change(getByLabelText(labelText), {
       target: {
         value: 'Test',
       },
@@ -516,11 +521,11 @@ describe('PageSearchForm', () => {
         <h2>Section 1</h2>
         <p id="target">Test</p>
 
-        <PageSearchForm />
+        <PageSearchForm inputLabel={labelText} />
       </div>,
     );
 
-    fireEvent.change(getByLabelText('Find on this page'), {
+    fireEvent.change(getByLabelText(labelText), {
       target: {
         value: 'Test',
       },
@@ -552,13 +557,13 @@ describe('PageSearchForm', () => {
           </AccordionSection>
         </Accordion>
 
-        <PageSearchForm />
+        <PageSearchForm inputLabel={labelText} />
       </div>,
     );
 
     await wait();
 
-    fireEvent.change(getByLabelText('Find on this page'), {
+    fireEvent.change(getByLabelText(labelText), {
       target: {
         value: 'Test',
       },
@@ -588,13 +593,13 @@ describe('PageSearchForm', () => {
           <p id="target">Test</p>
         </Details>
 
-        <PageSearchForm />
+        <PageSearchForm inputLabel={labelText} />
       </div>,
     );
 
     await wait();
 
-    fireEvent.change(getByLabelText('Find on this page'), {
+    fireEvent.change(getByLabelText(labelText), {
       target: {
         value: 'Test',
       },
@@ -627,13 +632,13 @@ describe('PageSearchForm', () => {
           </TabsSection>
         </Tabs>
 
-        <PageSearchForm />
+        <PageSearchForm inputLabel={labelText} />
       </div>,
     );
 
     await wait();
 
-    fireEvent.change(getByLabelText('Find on this page'), {
+    fireEvent.change(getByLabelText(labelText), {
       target: {
         value: 'Test',
       },
@@ -677,13 +682,13 @@ describe('PageSearchForm', () => {
           </AccordionSection>
         </Accordion>
 
-        <PageSearchForm />
+        <PageSearchForm inputLabel={labelText} />
       </div>,
     );
 
     await wait();
 
-    fireEvent.change(getByLabelText('Find on this page'), {
+    fireEvent.change(getByLabelText(labelText), {
       target: {
         value: 'Test',
       },

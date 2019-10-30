@@ -10,9 +10,9 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.Azure.Cosmos.Table;
+using Microsoft.Azure.Storage;
+using Microsoft.Azure.Storage.Blob;
 using Microsoft.Extensions.Logging;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
 using Newtonsoft.Json;
 using StorageException = Microsoft.WindowsAzure.Storage.StorageException;
 
@@ -69,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
         }
 
-        public async Task UpdateStatus(string releaseId, string dataFileName, IStatus status)
+        public async Task<bool> UpdateStatus(string releaseId, string dataFileName, IStatus status)
         {
             // Note that optimistic locking applies to azure table so to avoid concurrency issue acquire a lease on the block blob 
             var cloudBlockBlob = _fileStorageService.GetCloudBlockBlob(releaseId, dataFileName);
@@ -78,6 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             try
             {
                 var import = await GetImport(releaseId, dataFileName);
+                if (import.Status == IStatus.FAILED) return false;
                 import.Status = status;
                 await _table.ExecuteAsync(TableOperation.InsertOrReplace(import));
             }
@@ -85,6 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             {
                 await cloudBlockBlob.ReleaseLeaseAsync(AccessCondition.GenerateLeaseCondition(leaseId));
             }
+            return true;
         }
 
         public async Task FailImport(string releaseId, string dataFileName, List<string> errors)

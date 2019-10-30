@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
 {
@@ -22,5 +23,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Query
         public IEnumerable<string> RscRegion { get; set; }
         public IEnumerable<string> Sponsor { get; set; }
         public IEnumerable<string> Ward { get; set; }
+
+        public override string ToString()
+        {
+            return $"{nameof(SubjectId)}: {SubjectId}, " +
+                   $"{nameof(TimePeriod)}: {TimePeriod}, " +
+                   $"{nameof(BoundaryLevel)}: {BoundaryLevel}, " +
+                   $"{nameof(GeographicLevel)}: {GeographicLevel?.GetEnumValue()}, " +
+                   $"{nameof(Indicators)}: [{(Indicators == null ? string.Empty : string.Join(", ", Indicators))}]";
+        }
     }
 }

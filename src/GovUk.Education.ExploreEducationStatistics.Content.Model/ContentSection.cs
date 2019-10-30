@@ -65,6 +65,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     public class DataBlock : IContentBlock
     {
         public string Heading { get; set; }
+        
+        public string CustomFootnotes { get; set; }
+        
+        public string Name { get; set; }
+        
+        public string Source { get; set; }
 
         public DataBlockRequest DataBlockRequest { get; set; }
 
@@ -109,9 +115,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
     public class TableOption
     {
-        public string _class { get; set; }
-        public string _construct { get; set; }
-        
         public string label { get; set; }
         public string value { get; set; }
     }

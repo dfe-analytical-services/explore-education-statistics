@@ -1,7 +1,7 @@
 *** Settings ***
-Resource    ../libs/library.robot
+Resource    ../libs/common.robot
 
-Force Tags  GeneralPublic
+Force Tags  GeneralPublic  Local  Dev  Test
 
 Suite Setup       user opens the browser
 Suite Teardown    user closes the browser
@@ -26,17 +26,17 @@ Select subject "Absence by characteristic"
     [Tags]  HappyPath
     user selects radio   Absence by characteristic
     user clicks element   css:#publicationSubjectForm-submit
-    # Extra timeout until EES-234
-    user waits until element is visible  xpath://h2[text()="Choose locations"]   90
+    user waits until element is visible  xpath://h2[text()="Choose locations"]
     user checks previous table tool step contains  2    Subject     Absence by characteristic
 
 Select Location Country, England
     [Tags]  HappyPath
-    user opens details dropdown     Country
+    user opens details dropdown     National
     user clicks checkbox    England
     user clicks element     css:#locationFiltersForm-submit
-    user waits until element is visible  xpath://h2[text()="Choose time period"]
-    user checks previous table tool step contains  3    Country    England
+    # Extra timeout until EES-315/316
+    user waits until element is visible  xpath://h2[text()="Choose time period"]   90
+    user checks previous table tool step contains  3    National    England
 
 Select Start date and End date
     [Tags]  HappyPath

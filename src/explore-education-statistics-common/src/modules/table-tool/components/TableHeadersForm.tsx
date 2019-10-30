@@ -14,7 +14,7 @@ import { SortableOption } from './FormSortableList';
 import styles from './TableHeadersForm.module.scss';
 
 interface Props {
-  initialValues: TableHeadersFormValues;
+  initialValues?: TableHeadersFormValues;
   onSubmit: (values: TableHeadersFormValues) => void;
 }
 
@@ -25,18 +25,34 @@ export interface TableHeadersFormValues {
   rows: SortableOption[];
 }
 
-const TableHeadersForm = (props: Props) => {
-  const { onSubmit, initialValues } = props;
+const TableHeadersForm = ({
+  onSubmit,
+  initialValues = {
+    columnGroups: [],
+    columns: [],
+    rowGroups: [],
+    rows: [],
+  },
+}: Props) => {
+  const formInitialValues = React.useMemo(() => ({ ...initialValues }), [
+    initialValues,
+  ]);
 
   return (
     <Details summary="Re-order table headers">
       <p className="govuk-hint">
-        Drag and drop the options below to re-order the table headers.
+        Drag and drop the options below to re-order the table headers. For
+        keyboard users, select and deselect a draggable item with space and use
+        the arrow keys to move a selected item.
       </p>
-
+      <div className="govuk-visually-hidden">
+        To move a draggable item, select and deselect the item with space and
+        use the arrow keys to move a selected item. If you are using a screen
+        reader disable scan mode.
+      </div>
       <Formik<TableHeadersFormValues>
         enableReinitialize
-        initialValues={initialValues}
+        initialValues={formInitialValues}
         validationSchema={Yup.object<TableHeadersFormValues>({
           rowGroups: Yup.array()
             .of(
@@ -45,8 +61,8 @@ const TableHeadersForm = (props: Props) => {
                 .ensure(),
             )
             .min(
-              initialValues.columnGroups.length +
-                initialValues.rowGroups.length >
+              formInitialValues.columnGroups.length +
+                formInitialValues.rowGroups.length >
                 1
                 ? 1
                 : 0,
@@ -59,8 +75,8 @@ const TableHeadersForm = (props: Props) => {
                 .ensure(),
             )
             .min(
-              initialValues.columnGroups.length +
-                initialValues.rowGroups.length >
+              formInitialValues.columnGroups.length +
+                formInitialValues.rowGroups.length >
                 1
                 ? 1
                 : 0,

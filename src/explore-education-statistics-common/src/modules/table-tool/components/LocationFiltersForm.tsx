@@ -2,30 +2,56 @@ import { Form, FormFieldset, Formik } from '@common/components/form';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
-import { PublicationSubjectMeta } from '@common/modules/full-table/services/tableBuilderService';
+import {
+  FilterOption,
+  PublicationSubjectMeta,
+} from '@common/modules/full-table/services/tableBuilderService';
 import { Dictionary } from '@common/types/util';
 import useResetFormOnPreviousStep from '@common/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
 import { FormikProps } from 'formik';
 import sortBy from 'lodash/sortBy';
 import React, { useRef } from 'react';
 import { useImmer } from 'use-immer';
+import mapValuesWithKeys from '@common/lib/utils/mapValuesWithKeys';
 import FormFieldCheckboxMenu from './FormFieldCheckboxMenu';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
 
+export type LocationsFormValues = Dictionary<string[]>;
+
 interface FormValues {
-  locations: {
-    [level: string]: string[];
-  };
+  locations: LocationsFormValues;
 }
 
 export type LocationFiltersFormSubmitHandler = (values: FormValues) => void;
 
 interface Props {
   options: PublicationSubjectMeta['locations'];
+  initialValues?: Dictionary<string[] | undefined>;
   onSubmit: LocationFiltersFormSubmitHandler;
 }
+
+export const calculateInitialValues = (
+  initial: Dictionary<string[] | undefined> | undefined,
+  opts: PublicationSubjectMeta['locations'],
+): FormValues => {
+  const initialNotUndef = initial || {};
+
+  return {
+    locations: Object.entries(opts).reduce((acc, [level, levelOptions]) => {
+      const initialLevel = initialNotUndef[level] || [];
+      return {
+        ...acc,
+        [level]: initialLevel.filter(
+          initialId =>
+            levelOptions.options.find(({ value }) => value === initialId) !==
+            undefined,
+        ),
+      };
+    }, {}),
+  };
+};
 
 const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
   const {
@@ -35,18 +61,46 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
     goToNextStep,
     currentStep,
     stepNumber,
+    initialValues,
   } = props;
 
   const formikRef = useRef<Formik<FormValues>>(null);
   const formId = 'locationFiltersForm';
 
+  const formOptions = React.useMemo(() => options, [options]);
+
+  const formInitialValues = React.useMemo(
+    () => calculateInitialValues(initialValues, options),
+    [initialValues, options],
+  );
+
+  const initialLocationLevels = React.useMemo(() => {
+    return mapValuesWithKeys<Dictionary<string[]>, FilterOption[]>(
+      formInitialValues.locations,
+      (locationKey: string, locations: string[]) => {
+        const locationOptions =
+          (options[locationKey] && options[locationKey].options) || [];
+
+        return locations.reduce<FilterOption[]>((v, n) => {
+          const found = locationOptions.find(i => i.value === n);
+          if (found) return [...v, found];
+          return v;
+        }, []);
+      },
+    );
+  }, [formInitialValues.locations, options]);
+
   const [locationLevels, updateLocationLevels] = useImmer<
     Dictionary<{ label: string; value: string }[]>
-  >({});
+  >(initialLocationLevels);
+
+  React.useEffect(() => {
+    updateLocationLevels(() => initialLocationLevels);
+  }, [initialLocationLevels, updateLocationLevels]);
 
   useResetFormOnPreviousStep(formikRef, currentStep, stepNumber, () => {
     updateLocationLevels(() => {
-      return {};
+      return initialLocationLevels;
     });
   });
 
@@ -78,14 +132,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
         await onSubmit({ locations });
         goToNextStep();
       }}
-      initialValues={{
-        locations: Object.keys(options).reduce((acc, level) => {
-          return {
-            ...acc,
-            [level]: [],
-          };
-        }, {}),
-      }}
+      initialValues={formInitialValues}
       validationSchema={Yup.object<FormValues>({
         locations: Yup.mixed().test(
           'required',
@@ -109,7 +156,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
             >
               <div className="govuk-grid-row">
                 <div className="govuk-grid-column-one-half-from-desktop">
-                  {Object.entries(options).map(([levelKey, level]) => {
+                  {Object.entries(formOptions).map(([levelKey, level]) => {
                     return (
                       <FormFieldCheckboxMenu
                         name={`locations.${levelKey}`}
@@ -118,9 +165,11 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
                         id={`${formId}-levels-${levelKey}`}
                         legend={level.legend}
                         legendHidden
-                        selectAll={false}
                         onAllChange={() => {
                           updateLocationLevels(draft => {
+                            if (!draft[levelKey]) {
+                              draft[levelKey] = [];
+                            }
                             draft[levelKey] =
                               draft[levelKey].length < level.options.length
                                 ? level.options
@@ -165,11 +214,15 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
             {stepHeading}
             <SummaryList noBorder>
               {Object.entries(locationLevels)
-                .filter(([_, levelOptions]) => levelOptions.length > 0)
+                .filter(
+                  ([levelKey, levelOptions]) =>
+                    levelOptions.length > 0 && formOptions[levelKey],
+                )
                 .map(([levelKey, levelOptions]) => (
                   <SummaryListItem
-                    term={options[levelKey].legend}
+                    term={formOptions[levelKey].legend}
                     key={levelKey}
+                    shouldCollapse
                   >
                     {sortBy(levelOptions, ['label']).map(level => (
                       <React.Fragment key={level.value}>

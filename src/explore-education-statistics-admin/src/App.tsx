@@ -19,6 +19,7 @@ import { LoginContext } from './components/Login';
 import AdminDashboardPage from './pages/admin-dashboard/AdminDashboardPage';
 import IndexPage from './pages/IndexPage';
 
+import AdminDocumentationContentDesignStandards from './pages/documentation/DocumentationDesignStandards';
 import AdminDocumentationGlossary from './pages/documentation/DocumentationGlossary';
 import AdminDocumentationStyle from './pages/documentation/DocumentationStyle';
 import AdminDocumentationHome from './pages/documentation/DocumentationHome';
@@ -26,6 +27,8 @@ import AdminDocumentationUsingDashboard from './pages/documentation/Documentatio
 import AdminDocumentationCreateNewRelease from './pages/documentation/DocumentationCreateNewRelease';
 import AdminDocumentationManageContent from './pages/documentation/DocumentationManageContent';
 import AdminDocumentationManageData from './pages/documentation/DocumentationManageData';
+import AdminDocumentationManageDataBlocks from './pages/documentation/DocumentationManageDataBlocks';
+import AdminDocumentationEditRelease from './pages/documentation/DocumentationEditRelease';
 
 import PrototypeAdminDashboard from './pages/prototypes/PrototypeAdminDashboard';
 import PrototypeChartTest from './pages/prototypes/PrototypeChartTest';
@@ -214,6 +217,11 @@ function App() {
         />
         <Route
           exact
+          path="/documentation/content-design-standards-guide"
+          component={AdminDocumentationContentDesignStandards}
+        />
+        <Route
+          exact
           path="/documentation/glossary"
           component={AdminDocumentationGlossary}
         />
@@ -234,6 +242,11 @@ function App() {
         />
         <Route
           exact
+          path="/documentation/edit-release"
+          component={AdminDocumentationEditRelease}
+        />
+        <Route
+          exact
           path="/documentation/manage-content"
           component={AdminDocumentationManageContent}
         />
@@ -241,6 +254,11 @@ function App() {
           exact
           path="/documentation/manage-data"
           component={AdminDocumentationManageData}
+        />
+        <Route
+          exact
+          path="/documentation/manage-data-block"
+          component={AdminDocumentationManageDataBlocks}
         />
         <Route
           exact

@@ -7,15 +7,21 @@ export interface PageMetaProps {
   imgUrl?: string;
 }
 
+const defaultPageTitle = 'Explore education statistics – GOV.UK';
+
 const PageMeta = ({
-  title = 'Explore education statistics',
+  title = defaultPageTitle,
   description = 'Find, download and explore official Department for Education (DfE) statistics and data in England.',
   imgUrl,
 }: PageMetaProps) => {
   return (
     <Head>
       {/* <!-- Primary Meta Tags --> */}
-      <title>{title}</title>
+      <title>
+        {title && title !== defaultPageTitle
+          ? `${title} – ${defaultPageTitle}`
+          : title}
+      </title>
       <meta name="title" content={title} />
       <meta name="description" content={description} />
       <meta name="theme-color" content="#0b0c0c" />

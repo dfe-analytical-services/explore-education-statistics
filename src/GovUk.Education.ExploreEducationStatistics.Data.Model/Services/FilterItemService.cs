@@ -23,10 +23,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
         public IEnumerable<FilterItem> GetFilterItemsIncludingFilters(IQueryable<Observation> observations)
         {
-            return observations.SelectMany(observation => observation.FilterItems)
+            var filterItems = observations.SelectMany(observation => observation.FilterItems)
                 .Select(item => item.FilterItem)
-                .Distinct()
-                .Include(item => item.FilterGroup.Filter);
+                .Include(item => item.FilterGroup)
+                .ThenInclude(group => group.Filter)
+                .ToList();
+
+            return filterItems.Distinct();
+        }
+
+        public FilterItem GetTotal(Filter filter)
+        {
+            return GetTotalGroup(filter)?.FilterItems.FirstOrDefault(IsFilterItemTotal);
         }
 
         public FilterItem GetTotal(IEnumerable<FilterItem> filterItems)
@@ -37,10 +45,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         private static IEnumerable<FilterItem> GetTotalGroup(IEnumerable<FilterItem> filterItems)
         {
             var itemsGroupedByFilterGroup = filterItems.GroupBy(item => item.FilterGroup).ToList();
-            //Return the group if there is only one, otherwise the 'Total' group if it exists
+
+            // Return the group if there is only one, otherwise the 'Total' group if it exists
             return itemsGroupedByFilterGroup.Count == 1
                 ? itemsGroupedByFilterGroup.First()
                 : itemsGroupedByFilterGroup.FirstOrDefault(items => IsFilterGroupTotal(items.Key));
+        }
+
+        private static FilterGroup GetTotalGroup(Filter filter)
+        {
+            var filterGroups = filter.FilterGroups;
+
+            // Return the group if there is only one, otherwise the 'Total' group if it exists
+            return filterGroups.Count() == 1
+                ? filterGroups.First()
+                : filterGroups.FirstOrDefault(IsFilterGroupTotal);
         }
 
         private static bool IsFilterItemTotal(FilterItem item)

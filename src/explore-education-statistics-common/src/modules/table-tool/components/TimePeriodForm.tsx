@@ -8,7 +8,10 @@ import { SelectOption } from '@common/components/form/FormSelect';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Yup from '@common/lib/validation/yup';
-import { PublicationSubjectMeta } from '@common/modules/full-table/services/tableBuilderService';
+import {
+  PublicationSubjectMeta,
+  TimePeriodQuery,
+} from '@common/modules/full-table/services/tableBuilderService';
 import useResetFormOnPreviousStep from '@common/modules/table-tool/components/hooks/useResetFormOnPreviousStep';
 import { FormikProps } from 'formik';
 import React, { useRef } from 'react';
@@ -25,6 +28,7 @@ export type TimePeriodFormSubmitHandler = (values: FormValues) => void;
 
 interface Props {
   options: PublicationSubjectMeta['timePeriod']['options'];
+  initialValues?: { timePeriod?: TimePeriodQuery };
   onSubmit: TimePeriodFormSubmitHandler;
 }
 
@@ -36,6 +40,7 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
     goToNextStep,
     currentStep,
     stepNumber,
+    initialValues = { timePeriod: undefined },
   } = props;
 
   const formikRef = useRef<Formik<FormValues>>(null);
@@ -55,6 +60,21 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
       };
     }),
   ];
+
+  const formInitialValues = React.useMemo(() => {
+    let start = '';
+    let end = '';
+
+    if (initialValues && initialValues.timePeriod) {
+      start = `${initialValues.timePeriod.startYear}_${initialValues.timePeriod.startCode}`;
+      end = `${initialValues.timePeriod.endYear}_${initialValues.timePeriod.endCode}`;
+    }
+
+    return {
+      start,
+      end,
+    };
+  }, [initialValues]);
 
   const getOptionLabel = (optionValue: string) => {
     const matchingOption = timePeriodOptions.find(
@@ -78,10 +98,7 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
         await onSubmit(values);
         goToNextStep();
       }}
-      initialValues={{
-        start: '',
-        end: '',
-      }}
+      initialValues={formInitialValues}
       validationSchema={Yup.object<FormValues>({
         start: Yup.string()
           .required('Start date required')

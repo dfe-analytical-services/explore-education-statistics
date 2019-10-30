@@ -22,8 +22,12 @@ export type PublicationSubjectFormSubmitHandler = (values: {
 interface Props {
   onSubmit: PublicationSubjectFormSubmitHandler;
   options: PublicationSubject[];
-  subjectId?: string;
+  initialValues?: { subjectId?: string };
 }
+const initialiseSubjectName = (
+  sid: string,
+  options: PublicationSubject[],
+): string => (options.find(({ id }) => sid === id) || { label: '' }).label;
 
 const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
   const {
@@ -33,10 +37,11 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
     goToNextStep,
     currentStep,
     stepNumber,
-    subjectId: initialSubjectId = '',
+    initialValues: { subjectId: initialSubjectId = '' } = {},
   } = props;
-  const [subjectName, setSubjectName] = useState(
-    (options.find(({ id }) => initialSubjectId === id) || { label: '' }).label,
+
+  const [subjectName, setSubjectName] = useState(() =>
+    initialiseSubjectName(initialSubjectId, options),
   );
 
   const formikRef = useRef<Formik<FormValues>>(null);
@@ -55,6 +60,15 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
   const initialValues = {
     subjectId: initialSubjectId,
   };
+
+  React.useEffect(() => {
+    if (formikRef.current) {
+      formikRef.current.setValues({
+        subjectId: `${initialSubjectId}`,
+      });
+    }
+    setSubjectName(initialiseSubjectName(initialSubjectId, options));
+  }, [options, initialSubjectId]);
 
   return (
     <Formik<FormValues>
@@ -77,6 +91,7 @@ const PublicationSubjectForm = (props: Props & InjectedWizardProps) => {
             <FormFieldRadioGroup<FormValues>
               name="subjectId"
               legend={stepHeading}
+              legendSize="l"
               options={options.map(option => ({
                 label: option.label,
                 value: `${option.id}`,

@@ -42,7 +42,7 @@ class MethodologyIndexPage extends Component<Props> {
               statistics and data and how and why they're collected and
               published.
             </p>
-            <PageSearchFormWithAnalytics />
+            <PageSearchFormWithAnalytics inputLabel="Search to find the methodology behind specific education statistics and data." />
           </div>
           <div className="govuk-grid-column-one-third">
             <RelatedInformation>

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import ErrorPrefixPageTitle from './ErrorPrefixPageTitle';
 
 export interface ErrorSummaryMessage {
   id: string;
@@ -59,6 +60,8 @@ const ErrorSummary = ({
       <h2 className="govuk-error-summary__title" id={idTitle}>
         {title}
       </h2>
+
+      <ErrorPrefixPageTitle />
 
       <div className="govuk-error-summary__body">
         <ul className="govuk-list govuk-error-summary__list">

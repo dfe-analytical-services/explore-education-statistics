@@ -61,6 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
                 messages.Add(new ImportMessage
                 {
                     DataFileName = dataFileName,
+                    OrigDataFileName = dataFileName,
                     Release = importMessageRelease,
                     BatchNo = 1,
                     NumBatches = 1
@@ -94,6 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Seed.Services
             var message = new ImportMessage
             {
                 DataFileName = dataFileName,
+                OrigDataFileName = dataFileName,
                 Release = importMessageRelease,
                 BatchNo = 1,
                 NumBatches = 1,

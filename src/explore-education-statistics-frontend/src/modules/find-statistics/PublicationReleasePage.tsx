@@ -19,7 +19,6 @@ import classNames from 'classnames';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { parse } from 'date-fns';
 import ContentBlock from './components/ContentBlock';
 import styles from './PublicationReleasePage.module.scss';
 
@@ -63,7 +62,7 @@ class PublicationReleasePage extends Component<Props> {
       <Page
         title={data.publication.title}
         caption={data.title}
-        seoDescription={data.summary}
+        description={data.summary}
         breadcrumbs={[
           { name: 'Find statistics and data', link: '/find-statistics' },
         ]}
@@ -163,12 +162,21 @@ class PublicationReleasePage extends Component<Props> {
                 </ul>
               </Details>
             )}
-            <PageSearchFormWithAnalytics className="govuk-!-margin-top-3 govuk-!-margin-bottom-3" />
+            <PageSearchFormWithAnalytics
+              inputLabel="Search in this release page."
+              className="govuk-!-margin-top-3 govuk-!-margin-bottom-3"
+            />
           </div>
 
           <div className="govuk-grid-column-one-third">
+            <PrintThisPage
+              analytics={{
+                category: 'Page print',
+                action: 'Print this page link selected',
+              }}
+            />
             <RelatedAside>
-              <h3>About these statistics</h3>
+              <h2 className="govuk-heading-m">About these statistics</h2>
 
               <dl className="dfe-meta-content">
                 <dt className="govuk-caption-m">For {data.coverageTitle}: </dt>

@@ -1,5 +1,5 @@
 *** Settings ***
-Resource    ../libs/library.robot
+Resource    ../libs/common.robot
 
 Force Tags  GeneralPublic   UnderConstruction
 

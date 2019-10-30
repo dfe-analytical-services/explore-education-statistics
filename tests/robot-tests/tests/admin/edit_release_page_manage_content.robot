@@ -1,7 +1,7 @@
 *** Settings ***
-Resource    ./libs/common-keywords.robot
+Resource    ../libs/admin-common.robot
 
-Force Tags  Admin  NotAgainstProd  AltersData
+Force Tags  Admin  Dev  Test  AltersData
 
 Suite Setup       user signs in
 Suite Teardown    user closes the browser

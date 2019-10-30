@@ -336,7 +336,9 @@ describe('DownloadCsvButton', () => {
 
     jest.spyOn(Papa, 'unparse');
 
-    fireEvent.click(getByText('Download underlying data (.csv)'));
+    fireEvent.click(
+      getByText('Download the underlying data of this table (CSV)'),
+    );
 
     const csv = (Papa.unparse as jest.Mock).mock.calls[0][0];
 
@@ -372,7 +374,9 @@ describe('DownloadCsvButton', () => {
 
     jest.spyOn(Papa, 'unparse');
 
-    fireEvent.click(getByText('Download underlying data (.csv)'));
+    fireEvent.click(
+      getByText('Download the underlying data of this table (CSV)'),
+    );
 
     const csv = (Papa.unparse as jest.Mock).mock.calls[0][0];
 
@@ -408,7 +412,9 @@ describe('DownloadCsvButton', () => {
 
     jest.spyOn(Papa, 'unparse');
 
-    fireEvent.click(getByText('Download underlying data (.csv)'));
+    fireEvent.click(
+      getByText('Download the underlying data of this table (CSV)'),
+    );
 
     const csv = (Papa.unparse as jest.Mock).mock.calls[0][0];
 

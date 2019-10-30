@@ -1,7 +1,7 @@
 *** Settings ***
-Resource    ../libs/library.robot
+Resource    ../libs/common.robot
 
-Force Tags  GeneralPublic
+Force Tags  GeneralPublic  Local  Dev  Test  Prod
 
 Suite Setup       user opens the browser
 Suite Teardown    user closes the browser
@@ -129,17 +129,6 @@ Validate Help and support page
     user checks element count is x  css:[data-testid="breadcrumbs--list"] li     2
     user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(1)   Home
     user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(2)   Help and support
-
-#Validate Sitemap page
-#    [Tags]  HappyPath
-#    user clicks link    Sitemap
-#    user waits until page contains heading  Sitemap
-#
-#    user checks url contains    %{PUBLIC_URL}/sitemap
-#
-#    user checks element count is x  css:[data-testid="breadcrumbs--list"] li     2
-#    user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(1)   Home
-#    user checks element should contain  css:[data-testid="breadcrumbs--list"] li:nth-child(2)   Sitemap
 
 Validate Feedback page
     [Tags]  HappyPath

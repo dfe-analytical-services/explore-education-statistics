@@ -8,10 +8,13 @@ import classNames from 'classnames';
 import styles from '@admin/pages/release/edit-release/data/ReleaseDataUploadsSection.module.scss';
 import SummaryListItem from '@common/components/SummaryListItem';
 import { DataFile } from '@admin/services/release/edit-release/data/types';
+import LoadingSpinner from '@common/components/LoadingSpinner';
+import Details from '@common/components/Details';
 
 interface State {
   isFetching: boolean;
   current?: ImportStatus | undefined;
+  running: boolean;
   errorMessage: string;
 }
 
@@ -42,6 +45,7 @@ class ImporterStatus extends Component<Props> {
   public state = {
     isFetching: true,
     current: undefined,
+    running: false,
   };
 
   private intervalId?: NodeJS.Timeout;
@@ -97,6 +101,9 @@ class ImporterStatus extends Component<Props> {
           this.setState({
             current: importStatus,
             isFetching: false,
+            running: 'NOT_FOUND,RUNNING_PHASE_1, RUNNING_PHASE_2'.match(
+              importStatus.status,
+            ),
           }),
       )
       .catch(
@@ -105,6 +112,7 @@ class ImporterStatus extends Component<Props> {
           this.setState({
             current: null,
             isFetching: false,
+            running: false,
           }),
       )
       .finally(() => {
@@ -128,19 +136,44 @@ class ImporterStatus extends Component<Props> {
   }
 
   public render() {
-    const { current } = this.state;
+    const { current, running } = this.state;
     const currentStatus: ImportStatus = (current as unknown) as ImportStatus;
 
     return (
       <SummaryListItem term="Status">
-        <strong
-          className={classNames(
-            'govuk-tag',
-            currentStatus && this.getImportStatusClass(currentStatus.status),
-          )}
-        >
-          {currentStatus && getImportStatusLabel(currentStatus.status)}
-        </strong>
+        <div>
+          <div className={styles.currentStatusContainer}>
+            <strong
+              className={classNames(
+                'govuk-!-margin-right-1',
+                'govuk-tag',
+                currentStatus &&
+                  this.getImportStatusClass(currentStatus.status),
+              )}
+            >
+              {currentStatus && getImportStatusLabel(currentStatus.status)}
+            </strong>
+            {running && (
+              <>
+                <LoadingSpinner inline size={22} />{' '}
+                <span className="govuk-visually-hidden">
+                  Currently processing data
+                </span>
+              </>
+            )}
+          </div>
+          {currentStatus &&
+            currentStatus.errors &&
+            currentStatus.errors.length > 0 && (
+              <Details className={styles.errorSummary} summary="See Errors">
+                <ul>
+                  {currentStatus.errors.map((error, index) => (
+                    <li key={index.toString()}>{error}</li>
+                  ))}
+                </ul>
+              </Details>
+            )}
+        </div>
       </SummaryListItem>
     );
   }
