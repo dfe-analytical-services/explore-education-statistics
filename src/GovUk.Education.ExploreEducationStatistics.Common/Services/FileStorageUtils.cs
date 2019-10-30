@@ -23,6 +23,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             Tb
         }
         
+        private const string NameKey = "name";
+        
         public static async Task<CloudBlobContainer> GetCloudBlobContainerAsync(string storageConnectionString,
             string containerName, BlobContainerPermissions permissions = null)
         {
@@ -85,19 +87,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return result;
         }
         
-        private static string GetExtension(CloudBlob blob)
+        public static string GetExtension(CloudBlob blob)
         {
             var contentType = blob.Properties.ContentType;
             contentType = contentType.Replace("; charset=utf-8", "");
             return MimeTypeMap.GetExtension(contentType).TrimStart('.');
         }
         
-        private static string GetName(CloudBlob blob)
+        public static string GetName(CloudBlob blob)
         {
-            return blob.Metadata.TryGetValue("name", out var name) ? name : "Unknown file name";
+            return blob.Metadata.TryGetValue(NameKey, out var name) ? name : string.Empty;
         }
 
-        private static string GetSize(CloudBlob blob)
+        public static string GetSize(CloudBlob blob)
         {
             var fileSize = blob.Properties.Length;
             var unit = FileSizeUnit.B;
@@ -110,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return $"{fileSize:0.##} {unit}";
         }
         
-        private static bool IsFileReleased(CloudBlob blob)
+        public static bool IsFileReleased(CloudBlob blob)
         {
             if (!blob.Exists())
             {
