@@ -20,26 +20,22 @@ interface Props {
   tableHeadersConfig: TableHeadersFormValues;
 }
 
+const selectFilterGroup = (group?: string) : string => {
+  if (group) {
+    if (group !== 'Default') return group;
+  }
+  return '';
+};
+
 export const createRowGroups = (rowGroups: SortableOptionWithGroup[][]) : string[][] => {
   return rowGroups.flatMap(rowGroup =>
 
     rowGroup.reduce<[string[], string[]]>(([b, c], group) => (
       [
-        group.filterGroup && [...b, group.filterGroup || ''] || b ,
+        group.filterGroup && [...b, selectFilterGroup(group.filterGroup )] || b ,
         [...c, group.label]
       ]
     ), [[], []])
-/*
-      .map((filters,mapIndex) => {
-          if (mapIndex === 0) {
-            return filters.map((filterGroup, index, ary) => {
-              if (index === filters.length-1 || filterGroup === ary[index+1]) return filterGroup;
-              return '';
-            });
-          }
-          return filters;
-        })
-*/
       .filter(ary => ary.length > 0)
   );
 }
@@ -53,17 +49,7 @@ export const createIgnoreRowGroups = (rowGroups: SortableOptionWithGroup[][]) : 
         [...c, false]
       ]
     ), [[], []])
-    /*
-          .map((filters,mapIndex) => {
-              if (mapIndex === 0) {
-                return filters.map((filterGroup, index, ary) => {
-                  if (index === filters.length-1 || filterGroup === ary[index+1]) return filterGroup;
-                  return '';
-                });
-              }
-              return filters;
-            })
-    */
+
       .filter(ary => ary.length > 0)
   ).map(group => group.includes(true));
 };
@@ -94,7 +80,7 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
       tableHeadersConfig.rows.map(row => row.label),
     ];
 
-    const ignoreRowHeaders: boolean[] = [
+    const rowHeaderIsGroup: boolean[] = [
       ...createIgnoreRowGroups(tableHeadersConfig.rowGroups),
       false
     ];
@@ -172,7 +158,7 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
         caption={<DataTableCaption {...subjectMeta} id="dataTableCaption" />}
         columnHeaders={columnHeaders}
         rowHeaders={rowHeaders}
-        ignoreRowHeaders={ignoreRowHeaders}
+        rowHeaderIsGroup={rowHeaderIsGroup}
         rows={rows}
         ref={dataTableRef}
         footnotes={subjectMeta.footnotes}

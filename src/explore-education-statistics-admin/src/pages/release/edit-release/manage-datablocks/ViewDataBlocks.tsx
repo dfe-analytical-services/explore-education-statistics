@@ -65,7 +65,7 @@ const ViewDataBlocks = ({
     const table = dataBlock.tables;
     const fullTable = mapFullTable(chartBuilderData);
     const tableHeadersConfig =
-      (table && table[0].tableHeaders) ||
+      (table && table.length>0 && table[0].tableHeaders) ||
       getDefaultTableHeaderConfig(fullTable.subjectMeta);
 
     setTableData({

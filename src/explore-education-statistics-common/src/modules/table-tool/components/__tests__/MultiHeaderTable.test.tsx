@@ -1,17 +1,13 @@
 import React from 'react';
-import { render } from 'react-testing-library';
+import {render} from 'react-testing-library';
+import {SortableOptionWithGroup} from '@common/modules/table-tool/components/TableHeadersForm';
+import {createIgnoreRowGroups, createRowGroups,} from '@common/modules/table-tool/components/TimePeriodDataTable';
 import MultiHeaderTable, {
-  generateHeaderSpanInfo,
-  transposeSpanInfoMatrix,
-  generateSpanInfoFromGroups,
-  SpanInfo,
   generateAggregatedGroups,
+  generateHeaderSpanInfo, generateSpanInfoFromGroups,
+  SpanInfo,
+  transposeSpanInfoMatrix,
 } from '../MultiHeaderTable';
-import { SortableOptionWithGroup } from '@common/modules/table-tool/components/TableHeadersForm';
-import {
-  createIgnoreRowGroups,
-  createRowGroups,
-} from '@common/modules/table-tool/components/TimePeriodDataTable';
 
 describe('MultiHeaderTable', () => {
   test('renders 2x2 table correctly', () => {
@@ -183,91 +179,6 @@ describe('MultiHeaderTable', () => {
     expect(container.innerHTML).toMatchSnapshot();
   });
 
-  test('generateSpanInfoFromGroups', () => {
-    const groups = [['1', '2'], ['A'], ['X', 'Y']];
-
-    const generated = generateSpanInfoFromGroups(groups, [false, true, false]);
-
-    expect(generated).toStrictEqual([
-      [
-        {
-          heading: '1',
-          count: 2,
-          start: 0,
-          isRowGroup: true,
-          isLastInGroup: false,
-        },
-        {
-          heading: '2',
-          count: 2,
-          start: 2,
-          isRowGroup: true,
-          isLastInGroup: false,
-        },
-      ],
-      [
-        {
-          heading: 'A',
-          count: 2,
-          start: 0,
-          isRowGroup: true,
-          isLastInGroup: false,
-        },
-        {
-          heading: 'A',
-          count: 2,
-          start: 2,
-          isRowGroup: true,
-          isLastInGroup: false,
-        },
-      ],
-      [
-        {
-          heading: 'X',
-          count: 1,
-          start: 0,
-          isRowGroup: false,
-          isLastInGroup: false,
-        },
-        {
-          heading: 'Y',
-          count: 1,
-          start: 1,
-          isRowGroup: false,
-          isLastInGroup: true,
-        },
-        {
-          heading: 'X',
-          count: 1,
-          start: 2,
-          isRowGroup: false,
-          isLastInGroup: false,
-        },
-        {
-          heading: 'Y',
-          count: 1,
-          start: 3,
-          isRowGroup: false,
-          isLastInGroup: true,
-        },
-      ],
-    ]);
-  });
-
-  test('generateSpanInfoFromGroups2', () => {
-    const groups = [['R1'], ['R2-CG1', 'R2-CG1'], ['R2-H1', 'R2-H2']];
-
-    const generated = generateSpanInfoFromGroups(groups, [false, true, false]);
-
-    console.log(generated);
-    /*
-    expect(generated)
-      .toStrictEqual(
-
-      )
-
-     */
-  });
 
   test('transposeSpanInfoMatrix', () => {
     const source = [
@@ -315,19 +226,13 @@ describe('MultiHeaderTable', () => {
 
     const rows = [...createRowGroups(options), ['In1', 'In2', 'In3']];
 
-    console.log(rows);
-
     const ignoreRows = createIgnoreRowGroups(options);
-
-    console.log(ignoreRows);
 
     const aggregated = generateAggregatedGroups(rows, ignoreRows);
 
-    console.log(aggregated.map(_ => _.join(',')));
+    console.log(aggregated);
 
-    const spanInfo = generateHeaderSpanInfo(aggregated, true, false);
-
-    // const spanInfo = generateSpanInfoFromGroups(rows, ignoreRows);
+    const spanInfo = generateHeaderSpanInfo(aggregated);
 
     console.log(spanInfo);
 
@@ -335,4 +240,16 @@ describe('MultiHeaderTable', () => {
 
     // console.log( aggregated.map( g => g.map( gg => gg.heading )));
   });
+
+  test("generateHeaderSpanInfo", () => {
+
+    const data=[["1","2"],["3","4"],["5","6"]];
+
+    const result = generateSpanInfoFromGroups(data, [false, false, false]);
+
+    console.log(result);
+
+    console.log(transposeSpanInfoMatrix(result));
+
+  })
 });
