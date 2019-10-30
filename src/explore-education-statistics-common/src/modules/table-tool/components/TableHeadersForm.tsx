@@ -41,9 +41,15 @@ const TableHeadersForm = ({
   return (
     <Details summary="Re-order table headers">
       <p className="govuk-hint">
-        Drag and drop the options below to re-order the table headers.
+        Drag and drop the options below to re-order the table headers. For
+        keyboard users select the draggable item with space and use the arrow
+        keys to move the item accordingly.
       </p>
-
+      <div className="govuk-visually-hidden">
+        To move a draggable item select the item with space and use the arrow
+        keys to move the item accordingly. If you are using a screen reader
+        disable scan mode.
+      </div>
       <Formik<TableHeadersFormValues>
         enableReinitialize
         initialValues={formInitialValues}
