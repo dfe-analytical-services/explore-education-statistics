@@ -1,11 +1,10 @@
 import Link from '@admin/components/Link';
-import { LoginContext } from '@admin/components/Login';
-import NavLink from '@admin/components/NavLink';
+import {LoginContext} from '@admin/components/Login';
 import loginService from '@admin/services/sign-in/service';
-import { Authentication } from '@admin/services/sign-in/types';
+import {Authentication} from '@admin/services/sign-in/types';
 import classNames from 'classnames';
 import logo from 'govuk-frontend/assets/images/govuk-logotype-crown.png';
-import React, { useContext } from 'react';
+import React, {useContext} from 'react';
 
 interface Props {
   wide?: boolean;

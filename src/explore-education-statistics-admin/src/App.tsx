@@ -1,39 +1,37 @@
-import { ApplicationPaths } from '@admin/components/api-authorization/ApiAuthorizationConstants';
+import {ApplicationPaths} from '@admin/components/api-authorization/ApiAuthorizationConstants';
 import AuthorizeRoute from '@admin/components/api-authorization/AuthorizeRoute';
 import CreatePublicationPage from '@admin/pages/create-publication/CreatePublicationPage';
 import CreateReleasePage from '@admin/pages/release/create-release/CreateReleasePage';
 import ManageReleasePageContainer from '@admin/pages/release/ManageReleasePageContainer';
 import SignedOutPage from '@admin/pages/sign-in/SignedOutPage';
-import SignInPage from '@admin/pages/sign-in/SignInPage';
 import dashboardRoutes from '@admin/routes/dashboard/routes';
 import publicationRoutes from '@admin/routes/edit-publication/routes';
 import releaseRoutes from '@admin/routes/edit-release/routes';
 import PrototypeLoginService from '@admin/services/PrototypeLoginService';
 import React from 'react';
-import { Route } from 'react-router';
-import { BrowserRouter } from 'react-router-dom';
+import {Route} from 'react-router';
+import {BrowserRouter} from 'react-router-dom';
 
 import './App.scss';
 
-import { LoginContext } from './components/Login';
+import ApiAuthorizationRoutes from './components/api-authorization/ApiAuthorizationRoutes';
+
+import {LoginContext} from './components/Login';
 import AdminDashboardPage from './pages/admin-dashboard/AdminDashboardPage';
-import IndexPage from './pages/IndexPage';
+import AdminDocumentationCreateNewRelease from './pages/documentation/DocumentationCreateNewRelease';
+import AdminDocumentationEditRelease from './pages/documentation/DocumentationEditRelease';
 
 import AdminDocumentationGlossary from './pages/documentation/DocumentationGlossary';
-import AdminDocumentationStyle from './pages/documentation/DocumentationStyle';
 import AdminDocumentationHome from './pages/documentation/DocumentationHome';
-import AdminDocumentationUsingDashboard from './pages/documentation/DocumentationUsingDashboard';
-import AdminDocumentationCreateNewRelease from './pages/documentation/DocumentationCreateNewRelease';
 import AdminDocumentationManageContent from './pages/documentation/DocumentationManageContent';
 import AdminDocumentationManageData from './pages/documentation/DocumentationManageData';
 import AdminDocumentationManageDataBlocks from './pages/documentation/DocumentationManageDataBlocks';
-import AdminDocumentationEditRelease from './pages/documentation/DocumentationEditRelease';
-
-import ApiAuthorizationRoutes from './components/api-authorization/ApiAuthorizationRoutes';
+import AdminDocumentationStyle from './pages/documentation/DocumentationStyle';
+import AdminDocumentationUsingDashboard from './pages/documentation/DocumentationUsingDashboard';
+import IndexPage from './pages/IndexPage';
 
 import PrototypeAdminDashboard from './pages/prototypes/PrototypeAdminDashboard';
 import PrototypeChartTest from './pages/prototypes/PrototypeChartTest';
-import PrototypeTableTool from './pages/prototypes/PrototypeTableTool';
 import AdminDocumentationCreateNewPublication from './pages/prototypes/PrototypeDocumentationCreateNewPublication';
 import PublicationAssignMethodology from './pages/prototypes/PrototypePublicationPageAssignMethodology';
 import PublicationConfirmNew from './pages/prototypes/PrototypePublicationPageConfirmNew';
@@ -41,7 +39,8 @@ import PublicationConfirmNew from './pages/prototypes/PrototypePublicationPageCo
 import PublicationCreateNew from './pages/prototypes/PrototypePublicationPageCreateNew';
 
 import PublicationEditPage from './pages/prototypes/PrototypePublicationPageEditAbsence';
-import PublicationEditUnresolvedComments from './pages/prototypes/PrototypePublicationPageEditAbsenceUnresolvedComments';
+import PublicationEditUnresolvedComments
+  from './pages/prototypes/PrototypePublicationPageEditAbsenceUnresolvedComments';
 import PublicationEditNew from './pages/prototypes/PrototypePublicationPageEditNew';
 import PublicationCreateNewAbsenceConfig from './pages/prototypes/PrototypePublicationPageNewAbsenceConfig';
 import PublicationCreateNewAbsenceConfigEdit from './pages/prototypes/PrototypePublicationPageNewAbsenceConfigEdit';
@@ -54,6 +53,7 @@ import PublicationCreateNewAbsenceViewTables from './pages/prototypes/PrototypeP
 import PublicationReviewPage from './pages/prototypes/PrototypePublicationPageReviewAbsence';
 import ReleaseCreateNew from './pages/prototypes/PrototypeReleasePageCreateNew';
 import PrototypesIndexPage from './pages/prototypes/PrototypesIndexPage';
+import PrototypeTableTool from './pages/prototypes/PrototypeTableTool';
 
 function App() {
   return (
