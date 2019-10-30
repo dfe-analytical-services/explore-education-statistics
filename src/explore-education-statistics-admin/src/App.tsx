@@ -1,3 +1,4 @@
+import {ApplicationPaths} from "@admin/components/api-authorization/ApiAuthorizationConstants";
 import AuthorizeRoute from '@admin/components/api-authorization/AuthorizeRoute';
 import CreatePublicationPage from '@admin/pages/create-publication/CreatePublicationPage';
 import CreateReleasePage from '@admin/pages/release/create-release/CreateReleasePage';
@@ -7,7 +8,6 @@ import SignInPage from '@admin/pages/sign-in/SignInPage';
 import dashboardRoutes from '@admin/routes/dashboard/routes';
 import publicationRoutes from '@admin/routes/edit-publication/routes';
 import releaseRoutes from '@admin/routes/edit-release/routes';
-import signInRoutes from '@admin/routes/sign-in/routes';
 import PrototypeLoginService from '@admin/services/PrototypeLoginService';
 import React from 'react';
 import { Route } from 'react-router';
@@ -68,16 +68,18 @@ function App() {
         component={AdminDashboardPage}
       />
 
-      <Route
+      <AuthorizeRoute
         exact
-        path={signInRoutes.signIn}
+        path={ApplicationPaths.Login}
         component={SignInPage}
+        renderIfNotAuthenticated
       />
 
-      <Route
+      <AuthorizeRoute
         exact
-        path={signInRoutes.signedOut}
+        path={ApplicationPaths.LoggedOut}
         component={SignedOutPage}
+        renderIfNotAuthenticated
       />
 
       <AuthorizeRoute

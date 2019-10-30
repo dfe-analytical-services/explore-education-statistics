@@ -48,24 +48,29 @@ export class Login extends Component {
   }
 
   render() {
-    const action = this.props.action;
-    const { message } = this.state;
+    // HIVE
+    // Commented out the rendering of the Login processing messages below so that they do not appear
+    // during login
 
-    if (!!message) {
-      return <div>{message}</div>;
-    } else {
-      switch (action) {
-        case LoginActions.Login:
-          return <div>Processing login</div>;
-        case LoginActions.LoginCallback:
-          return <div>Processing login callback</div>;
-        case LoginActions.Profile:
-        case LoginActions.Register:
-          return <div></div>;
-        default:
-          throw new Error(`Invalid action '${action}'`);
-      }
-    }
+    // const action = this.props.action;
+    // const { message } = this.state;
+    //
+    // if (!!message) {
+    //   return <div>{message}</div>;
+    // } else {
+    //   switch (action) {
+    //     case LoginActions.Login:
+    //       return <div>Processing login</div>;
+    //     case LoginActions.LoginCallback:
+    //       return <div>Processing login callback</div>;
+    //     case LoginActions.Profile:
+    //     case LoginActions.Register:
+    //       return <div></div>;
+    //     default:
+    //       throw new Error(`Invalid action '${action}'`);
+    //   }
+    // }
+      return null;
   }
 
   async login(returnUrl) {

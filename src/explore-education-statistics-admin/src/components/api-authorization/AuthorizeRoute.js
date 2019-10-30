@@ -35,10 +35,10 @@ export default class AuthorizeRoute extends Component {
         if (!ready) {
             return <div></div>;
         } else {
-            const { component: Component, ...rest } = this.props;
+            const { component: Component, renderIfNotAuthenticated, ...rest } = this.props;
             return <Route {...rest}
                 render={(props) => {
-                    if (user) {
+                    if (user || renderIfNotAuthenticated) {
                         return (
                             // HIVE
                             // added LoginContext tags here to surround Component to allow users to be available as a
