@@ -336,7 +336,9 @@ describe('MultiHeaderTable', () => {
 
     console.log(aggregated.map(_ => _.join(",")));
 
-    const spanInfo = generateSpanInfoFromGroups(rows, ignoreRows);
+    const spanInfo = generateHeaderSpanInfo(aggregated, true, false);
+
+    // const spanInfo = generateSpanInfoFromGroups(rows, ignoreRows);
 
     console.log(spanInfo);
 

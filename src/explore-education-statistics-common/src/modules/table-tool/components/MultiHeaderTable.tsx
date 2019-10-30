@@ -172,14 +172,20 @@ export const generateSpan2 = (headerGroups: string[][], ignoreRow: boolean[] = [
 
 
 export const generateSpanInfoFromGroups = (groups: string[][], ignoreRowHeaders: boolean[]): SpanInfo[][] => {
+
+  const aggregated = generateSpan2(groups, ignoreRowHeaders);
+  return generateHeaderSpanInfo(aggregated, false, false);
+
+  /*
+
   const groups2 = [...groups];
   const finalGroup = groups2.pop() as string[];
 
-  const groupsWithoutIndicators = generateSpan2(groups2, ignoreRowHeaders);
+  const scaledAndRepeatedGroups = generateSpan2(groups2, ignoreRowHeaders);
 
   console.log(groups, ignoreRowHeaders, groups2);
 
-  const maxNumberOfGroups = groupsWithoutIndicators.reduce((curMaxLength: number, group) => curMaxLength < group.length ? group.length : curMaxLength, 0);
+  const maxNumberOfGroups = scaledAndRepeatedGroups.reduce((curMaxLength: number, group) => curMaxLength < group.length ? group.length : curMaxLength, 0);
 
   const numberInFinalGroup = finalGroup.length;
 
@@ -187,11 +193,13 @@ export const generateSpanInfoFromGroups = (groups: string[][], ignoreRowHeaders:
 
   const scaledSpanInfo = scaleSpanInfo(
     repeatSusequentGroups(
-      generateHeaderSpanInfo(groupsWithoutIndicators, true, false)
+      generateHeaderSpanInfo(scaledAndRepeatedGroups, true, false)
     ), numberInFinalGroup);
 
   const finalGroupSpanInfo = generateHeaderSpanInfo([finalGroup], false, false);
   return [...scaledSpanInfo, ...finalGroupSpanInfo];
+
+   */
 };
 
 
