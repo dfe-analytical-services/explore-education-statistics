@@ -3,10 +3,17 @@ import { RouteChildrenProps } from 'react-router';
 import Page from '@admin/components/Page';
 import StepNav from './components/StepByStep';
 import StepNavItem from './components/StepByStepItem';
-import imageChoosePublication from './images/guidance/guidance-choose-publication.jpg';
+import imageChoosePublication from './images/guidance/guidance-choose-publication.png';
 import imageCreateReleaseButton from './images/guidance/guidance-create-release-button.jpg';
+import imageCreateReleaseEditSummary from './images/guidance/guidance-create-release-edit-summary.png';
 import imageCreateReleaseNavigation from './images/guidance/guidance-create-release-navigation.jpg';
-import imageSelectTheme from './images/guidance/guidance-select-theme.jpg';
+import imageCreateReleaseDataTab from './images/guidance/guidance-data-tab.jpg';
+import imageCreateReleaseFootnotesTab from './images/guidance/guidance-footnotes-tab.jpg';
+import imageCreateReleaseFileTab from './images/guidance/guidance-file-tab.jpg';
+import imageCreateReleaseDatablockCreate from './images/guidance/guidance-datablocks-create.png';
+import imageCreateReleaseDatablockSaved from './images/guidance/guidance-datablocks-delete.png';
+import imageCreateReleaseManageContent from './images/guidance/guidance-manage-content.png';
+import imageSelectTheme from './images/guidance/guidance-select-theme.png';
 
 const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
   const query = new URLSearchParams(window.location.search);
@@ -37,74 +44,83 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
           <ul className="govuk-list govuk-list--bullet">
             <li>
               data is in the required csv format set out in our{' '}
-              <a href="https://drive.google.com/open?id=15h7FWsdK7gqgYA1oM4YESvW8_sx4bgob">
+              <a href="https://drive.google.com/file/d/15h7FWsdK7gqgYA1oM4YESvW8_sx4bgob/view">
                 Data standards guide
               </a>
             </li>
             <li>
               content is written and formatted to the standards set out in our{' '}
-              <a href="https://drive.google.com/open?id=1Z1D7bxLVXAZEp855LSiR7b40ayWeVWaMOCuixItBVDo">
+              <a href="./content-design-standards-guide">
                 Content design standards guide
               </a>{' '}
-              and{' '}
-              <a href="https://eesadminprototype.z33.web.core.windows.net/prototypes/documentation/style-guide">
-                Content design style guide
-              </a>
+              and <a href="style-guide">Content design style guide</a>
             </li>
           </ul>
           <StepNav>
             <StepNavItem
               stepNumber={1}
-              stepHeading="Choose a publication"
+              stepHeading="Create a new release"
               open={step === 1}
             >
               <p>
                 Anyone can create a new release under their assigned list of
                 publications.
               </p>
-              <h3>Do</h3>
               <p>
-                1. Under the 'Manage publications and releases' tab on your
-                administration dashboard, select the publication where you want
-                to create your release.
-              </p>
-              <img
-                src={imageChoosePublication}
-                className="govuk-!-width-three-quarters"
-                alt="Choose a publication"
-              />
-              <p>
-                2. If you have access to a long list of publications, use the
-                ‘Select theme’ and ‘Select topic’ dropdowns to find a
-                publication.
-              </p>
-              <img
-                src={imageSelectTheme}
-                className="govuk-!-width-three-quarters"
-                alt=""
-              />
-            </StepNavItem>
-            <StepNavItem
-              stepNumber={2}
-              stepHeading="Create a new release"
-              open={step === 2}
-            >
-              <p>
-                Once you’ve created a new release you’ll become its ‘Primary
-                analyst / Author’ and (along with members of your ‘Production
-                team’) be responsible for putting it together within the admin
-                system.
+                Once you’ve created a new release you and the members of your
+                ‘Production team’ will be responsible for putting the release
+                together via the admin system.
               </p>
               <h3>Do</h3>
-              <p>
-                Under the publication you’ve chosen, select the green 'Create
-                new release' button.
-              </p>
-              <img
-                src={imageCreateReleaseButton}
-                className="govuk-!-width-three-quarters"
-                alt=""
-              />
+
+              <ul className="govuk-list govuk-list--number dfe-guidance-list">
+                <li>
+                  <h4 className="govuk-heading-s">
+                    Under the 'Manage publications and releases' tab on your
+                    administration dashboard, select the publication where you
+                    want to create your release.
+                  </h4>
+                  <img
+                    src={imageChoosePublication}
+                    className="govuk-!-width-three-quarters"
+                    alt="Choose a publication"
+                  />
+                </li>
+                <li>
+                  <h4 className="govuk-heading-s">
+                    If you have access to a long list of publications, use the
+                    ‘Select theme’ and ‘Select topic’ dropdowns to find a
+                    publication.
+                  </h4>
+                  <img
+                    src={imageSelectTheme}
+                    className="govuk-!-width-three-quarters"
+                    alt=""
+                  />
+                </li>
+                <li>
+                  <h4 className="govuk-heading-s">
+                    Under the publication you’ve chosen, select the green
+                    'Create new release' button.
+                  </h4>
+                  <img
+                    src={imageCreateReleaseButton}
+                    className="govuk-!-width-three-quarters"
+                    alt=""
+                  />
+                </li>
+                <li>
+                  <h4 className="govuk-heading-s">
+                    Use the following tabs across the top of the page to create
+                    your release.
+                  </h4>
+                  <img
+                    src={imageCreateReleaseNavigation}
+                    className="govuk-!-width-three-quarters"
+                    alt=""
+                  />
+                </li>
+              </ul>
               <h3>Don't</h3>
               <p>
                 Don’t worry if you haven't got all the data, files and content
@@ -114,15 +130,75 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                 You can come back and add these later using the various tabs at
                 the top of the page.
               </p>
-              <img
-                src={imageCreateReleaseNavigation}
-                className="govuk-!-width-three-quarters"
-                alt=""
-              />
               <h3>Help and support</h3>
               <p>
                 If you can't find the publication where you want to create your
-                release contact:{' '}
+                release or created a release in error and want to delete it
+                contact:{' '}
+              </p>
+              <h4>Explore education statistics team </h4>
+              <p>
+                Email <br />
+                <a href="mailto:explore.statistics@education.gov.uk">
+                  explore.statistics@education.gov.uk
+                </a>
+              </p>
+            </StepNavItem>
+            <StepNavItem
+              stepNumber={2}
+              stepHeading="Release summary"
+              open={step === 2}
+            >
+              <p>
+                The details you enter will be used to identify your release and
+                help users find your statistics and data.
+              </p>
+              <h3>Do</h3>
+              <p>
+                Use the main ‘Release summary’ tab across the top of your page
+                to make sure you:
+              </p>
+              <ul className="govuk-list govuk-list--bullet">
+                <li>
+                  set the scheduled publish date for your release - you can’t
+                  create a release without one
+                </li>
+                <li>
+                  check all your release summary details are correct - including
+                  the members of your ‘Production team’ so they can help create
+                  and review your release
+                </li>
+              </ul>
+              <p>
+                To update details (including the scheduled publish date) - use
+                the ‘Edit release summary’ link.
+              </p>
+              <img
+                src={imageCreateReleaseEditSummary}
+                className="govuk-!-width-three-quarters"
+                alt=""
+              />
+              <p>
+                If you need to add or remove members of your ‘Production Team’
+                or individual details need updating contact:
+              </p>
+              <h4>Explore education statistics team </h4>
+              <p>
+                Email <br />
+                <a href="mailto:explore.statistics@education.gov.uk">
+                  explore.statistics@education.gov.uk
+                </a>
+              </p>
+              <h3>Don't</h3>
+              <p>
+                Don’t worry if you can't provide an 'Expected next release
+                date'. You can come back and add it later.
+              </p>
+
+              <h3>Help and support</h3>
+              <p>
+                If you have any issues about details listed in the release
+                summary contact:
               </p>
               <h3>Explore education statistics team </h3>
               <p>
@@ -134,38 +210,273 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
             </StepNavItem>
             <StepNavItem
               stepNumber={3}
-              stepHeading="Release summary"
+              stepHeading="Manage data"
               open={step === 3}
             >
-              <p>Write standard html here</p>
+              <p>
+                Users will be able to access and download any data and files you
+                upload to your release.
+              </p>
+              <h3>Before you start</h3>
+              <p>
+                Make sure your data is in the required csv format set out in our{' '}
+                <a href="https://drive.google.com/open?id=15h7FWsdK7gqgYA1oM4YESvW8_sx4bgob">
+                  Underlying data standards guide
+                </a>
+                .
+              </p>
+              <p>
+                If your data doesn’t meet these standards, you won’t be able to
+                upload it to your release.
+              </p>
+              <p>
+                Any footnotes you add under the ‘Manage data’ tab will appear
+                when users use your data to create tables using the ‘table tool’
+                in the live service.
+              </p>
+              <h3>Do</h3>
+              <ul className="govuk-list govuk-list--number dfe-guidance-list">
+                <li>
+                  <h4 className="govuk-heading-s">
+                    To upload any data - select the ‘Data uploads’ tab under the
+                    main ‘Manage data’ tab across the top of the page.
+                  </h4>
+                  <img
+                    src={imageCreateReleaseDataTab}
+                    className="govuk-!-width-three-quarters"
+                    alt=""
+                  />
+                </li>
+                <li>
+                  <h4 className="govuk-heading-s">
+                    To add footnotes to your data - use the ‘Footnotes’ tab.
+                  </h4>
+                  <img
+                    src={imageCreateReleaseFootnotesTab}
+                    className="govuk-!-width-three-quarters"
+                    alt=""
+                  />
+                </li>
+                <li>
+                  <h4 className="govuk-heading-s">
+                    To upload any files you want to users to view within or
+                    download from your release (for example, infographics or
+                    images of more complex tables) - use the ‘File uploads’ tab.
+                  </h4>
+                  <img
+                    src={imageCreateReleaseFileTab}
+                    className="govuk-!-width-three-quarters"
+                    alt=""
+                  />
+                </li>
+              </ul>
+              <h3>Don't</h3>
+              <p>
+                Don’t upload any sensitive data or files. Only upload data and
+                files which are suitable for the public domain.
+              </p>
+              <p>
+                Don’t worry if you haven't got all the data and files to
+                complete your release. You can come back and add more later.
+              </p>
+              <h3>Help and support</h3>
+              <p>
+                If you have any issues uploading data and files to your release,
+                adding footnotes to data or questions about data standards
+                contact:
+              </p>
+              <h3>Explore education statistics team </h3>
+              <p>
+                Email <br />
+                <a href="mailto:explore.statistics@education.gov.uk">
+                  explore.statistics@education.gov.uk
+                </a>
+              </p>
+              <h3>Next steps</h3>
+              <p>
+                For detailed guidance on how to upload data and files and add
+                footnotes to your release -{' '}
+                <a href="./manage-data">Managing data: step by step.</a>
+              </p>
             </StepNavItem>
             <StepNavItem
               stepNumber={4}
-              stepHeading="Manage data"
+              stepHeading="Manage data blocks"
               open={step === 4}
             >
-              <p>Write standard html here</p>
+              <p>
+                You need to create data blocks so you can create tables and
+                charts for your release.
+              </p>
+              <h3>Before you start</h3>
+              <p>
+                Make sure your data has uploaded and been processed before you
+                try and create any data blocks under the ‘Manage data blocks’
+                tab.
+              </p>
+              <div className="govuk-warning-text">
+                <span className="govuk-warning-text__icon" aria-hidden="true">
+                  !
+                </span>
+                <strong className="govuk-warning-text__text">
+                  <span className="govuk-warning-text__assistive">Warning</span>
+                  You can’t create data blocks, tables and charts for your
+                  release until your data has been uploaded and processed.
+                </strong>
+              </div>
+              <p>
+                The service will let you know when your data has been processed.
+              </p>
+              <h3>Do</h3>
+              <ul className="govuk-list govuk-list--number dfe-guidance-list">
+                <li>
+                  <h4 className="govuk-heading-s">
+                    To start the process of creating a data block so you can
+                    then create tables and charts - select the ‘Create data
+                    blocks’ tab under the main ‘Manage data blocks’ tab across
+                    the top of the page.
+                  </h4>
+                  <img
+                    src={imageCreateReleaseDatablockCreate}
+                    className="govuk-!-width-three-quarters"
+                    alt="Choose a publication"
+                  />
+                </li>
+                <li>
+                  <h4 className="govuk-heading-s">
+                    To view the tables and charts you’ve already created and
+                    saved for your release - use the ‘View saved tables and
+                    charts’ tab.
+                  </h4>
+                  <img
+                    src={imageCreateReleaseDatablockSaved}
+                    className="govuk-!-width-three-quarters"
+                    alt="Choose a publication"
+                  />
+                </li>
+              </ul>
+              <h3>Don't</h3>
+              <p>
+                Don’t worry if you haven't uploaded all the data to create the
+                data blocks, tables and charts you need to complete your
+                release.
+              </p>
+              <p>
+                You can upload more later under the ‘Manage data’ tab. For
+                detailed guidance on how to add data to your release -{' '}
+                <a href="./manage-data">Managing data: step by step</a>.
+              </p>
+              <h3>Help and support</h3>
+              <p>
+                If you have any issues creating data blocks, tables and charts
+                contact:
+              </p>
+              <h3>Explore education statistics team </h3>
+              <p>
+                Email <br />
+                <a href="mailto:explore.statistics@education.gov.uk">
+                  explore.statistics@education.gov.uk
+                </a>
+              </p>
+              <h3>Next steps</h3>
+              <p>
+                For detailed guidance on how to create data blocks, tables and
+                charts for your release -{' '}
+                <a href="./manage-data-block">
+                  Managing data blocks and creating tables and charts: step by
+                  step
+                </a>
+                .
+              </p>
+              <p>
+                For detailed guidance on how to configure charts for your
+                release -{' '}
+                <a href="./manage-data-block">Configure charts: step by step</a>
+                .
+              </p>
             </StepNavItem>
             <StepNavItem
               stepNumber={5}
-              stepHeading="Manage data blocks"
+              stepHeading="Manage content"
               open={step === 5}
             >
-              <p>Write standard html here</p>
+              <p>
+                Make sure your content is written and formatted to the standards
+                set out in our{' '}
+                <a href="./content-design-standards-guide">
+                  Content design standards guide
+                </a>{' '}
+                and <a href="style-guide">Content design style guide</a>{' '}
+              </p>
+              <p>
+                Make sure you familiarise yourself with these standards to make
+                sure your release allows users to simply and quickly understand
+                your statistics and data.
+              </p>
+              <h3>Before you start</h3>
+              <p>
+                Make sure you and your Production team have decided and
+                understand who’s responsible for managing (ie creating and
+                editing) the different sections of your release.
+              </p>
+              <h3>Do</h3>
+              <p>
+                To create and edit any content and add and view comments - under
+                the main ‘Manage content’ tab across the top of the page, select
+                the ‘Add / view comments and edit content’ radio button.
+              </p>
+              <img
+                src={imageCreateReleaseManageContent}
+                className="govuk-!-width-three-quarters"
+                alt=""
+              />
+              <h3>Don't</h3>
+              <p>
+                Don’t worry if you haven't got all the content to complete your
+                release. You can come back and add it later.
+              </p>
+              <h3>Help and support</h3>
+              <p>
+                If you have any issues creating, editing and updating content or
+                adding, viewing and resolving comments contact:
+              </p>
+              <h3>Explore education statistics team </h3>
+              <p>
+                Email <br />
+                <a href="mailto:explore.statistics@education.gov.uk">
+                  explore.statistics@education.gov.uk
+                </a>
+              </p>
+              <h3>Next steps</h3>
+              <p>
+                For detailed guidance on how to view and edit content and add,
+                view and resolve comments-{' '}
+                <a href="./manage-content">Managing content: step by step</a>.
+              </p>
             </StepNavItem>
             <StepNavItem
               stepNumber={6}
-              stepHeading="Manage content"
+              stepHeading="Update release status"
               open={step === 6}
             >
-              <p>Write standard html here</p>
-            </StepNavItem>
-            <StepNavItem
-              stepNumber={7}
-              stepHeading="Update release status"
-              open={step === 7}
-            >
-              <p>Write standard html here</p>
+              <p>
+                Once a release has been created it automatically moves into ‘In
+                draft’ status.
+              </p>
+              <p>
+                If you and the members of your ‘Production team’ are happy with
+                the content of your release, discuss whether to update its
+                status to ‘Ready for sign-off’ and approve it for sign-off and
+                ‘Higher review’.
+              </p>
+              <h3>Next steps</h3>
+              <p>
+                For detailed guidance on how to update release status -{' '}
+                <a href="./edit-release">
+                  Editing a release and updating release status: step by step
+                </a>
+                .
+              </p>
             </StepNavItem>
           </StepNav>
         </div>
