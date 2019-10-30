@@ -2,13 +2,12 @@ import Link from '@admin/components/Link';
 import NavLink from '@admin/components/NavLink';
 import Page from '@admin/components/Page';
 import PreviousNextLinks from '@admin/components/PreviousNextLinks';
-import ProtectedRoute from '@admin/components/ProtectedRoute';
-import releaseRoutes, { viewRoutes } from '@admin/routes/edit-release/routes';
+import releaseRoutes, {viewRoutes} from '@admin/routes/edit-release/routes';
 import service from '@admin/services/common/service';
-import { BasicPublicationDetails } from '@admin/services/common/types';
-import React, { useEffect, useState } from 'react';
-import { RouteComponentProps } from 'react-router';
+import {BasicPublicationDetails} from '@admin/services/common/types';
 import RelatedInformation from '@common/components/RelatedInformation';
+import React, {useEffect, useState} from 'react';
+import {Route, RouteComponentProps} from 'react-router';
 import ManageReleaseContext from './ManageReleaseContext';
 
 interface MatchProps {
@@ -106,7 +105,7 @@ const ManageReleasePageContainer = ({
             }}
           >
             {releaseRoutes.manageReleaseRoutes.map(route => (
-              <ProtectedRoute
+              <Route
                 exact
                 key={route.path}
                 path={route.path}

@@ -54,25 +54,30 @@ export class Logout extends Component {
   }
 
   render() {
-    const { isReady, message } = this.state;
-    if (!isReady) {
-      return <div></div>;
-    }
-    if (!!message) {
-      return <div>{message}</div>;
-    } else {
-      const action = this.props.action;
-      switch (action) {
-        case LogoutActions.Logout:
-          return <div>Processing logout</div>;
-        case LogoutActions.LogoutCallback:
-          return <div>Processing logout callback</div>;
-        case LogoutActions.LoggedOut:
-          return <div>{message}</div>;
-        default:
-          throw new Error(`Invalid action '${action}'`);
-      }
-    }
+    // HIVE
+    // Commented out the rendering of the Login processing messages below so that they do not appear
+    // during login
+
+    // const { isReady, message } = this.state;
+    // if (!isReady) {
+    //   return <div></div>;
+    // }
+    // if (!!message) {
+    //   return <div>{message}</div>;
+    // } else {
+    //   const action = this.props.action;
+    //   switch (action) {
+    //     case LogoutActions.Logout:
+    //       return <div>Processing logout</div>;
+    //     case LogoutActions.LogoutCallback:
+    //       return <div>Processing logout callback</div>;
+    //     case LogoutActions.LoggedOut:
+    //       return <div>{message}</div>;
+    //     default:
+    //       throw new Error(`Invalid action '${action}'`);
+    //   }
+    // }
+      return null;
   }
 
   async logout(returnUrl) {

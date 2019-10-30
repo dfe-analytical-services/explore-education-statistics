@@ -1,6 +1,7 @@
 import ButtonLink from '@admin/components/ButtonLink';
 import Link from '@admin/components/Link';
 import { LoginContext } from '@admin/components/Login';
+import NavLink from "@admin/components/NavLink";
 import Page from '@admin/components/Page';
 import ReleasesTab from '@admin/pages/admin-dashboard/components/ReleasesByStatusTab';
 import { summaryRoute } from '@admin/routes/edit-release/routes';
@@ -77,12 +78,14 @@ const AdminDashboardPage = () => {
                 {user ? user.name : ''}{' '}
                 <span className="govuk-body-s">
                   Not you?{' '}
-                  <a
-                    className="govuk-link"
-                    href={loginService.getSignOutLink()}
-                  >
-                    Sign out
-                  </a>
+                  <li className="govuk-header__navigation-item">
+                    <Link
+                      className="govuk-link"
+                      to={loginService.getSignOutLink()}
+                    >
+                      Sign out
+                    </Link>
+                  </li>
                 </span>
               </h1>
             </div>
