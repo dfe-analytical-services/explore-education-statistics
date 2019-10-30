@@ -1,9 +1,9 @@
 using Xunit;
 using Xunit.Abstractions;
-using static GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TimePeriodLabelFormatter;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.TimePeriodLabelFormatter;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
+namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 {
     public class TimePeriodLabelFormatterTests
     {

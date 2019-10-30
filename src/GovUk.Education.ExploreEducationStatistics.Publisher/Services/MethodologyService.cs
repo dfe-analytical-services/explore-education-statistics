@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services
+namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
     public class MethodologyService : IMethodologyService
     {
@@ -17,11 +17,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services
             _context = context;
         }
 
-        public Methodology Get(Guid id)
-        {
-            return _context.Methodologies.FirstOrDefault(p => p.Id == id);
-        }
-        
         public IEnumerable<Methodology> Get()
         {
             return _context.Methodologies.ToList();

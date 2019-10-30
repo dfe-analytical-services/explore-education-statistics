@@ -1,28 +1,21 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels;
-using Microsoft.Extensions.Logging;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services
+namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
     public class DownloadService : IDownloadService
     {
         private readonly ContentDbContext _context;
         private readonly IFileStorageService _fileStorageService;
-        private readonly ILogger _logger;
-        private readonly IMapper _mapper;
 
         public DownloadService(ContentDbContext context,
-            IFileStorageService fileStorageService,
-            ILogger<DownloadService> logger, IMapper mapper)
+            IFileStorageService fileStorageService)
         {
             _context = context;
             _fileStorageService = fileStorageService;
-            _logger = logger;
-            _mapper = mapper;
         }
 
         public IEnumerable<ThemeTree> GetDownloadTree()

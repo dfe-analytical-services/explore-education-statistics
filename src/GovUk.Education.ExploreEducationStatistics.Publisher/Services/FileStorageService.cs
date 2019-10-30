@@ -15,6 +15,7 @@ using Microsoft.Azure.Storage.DataMovement;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.ReleaseFileTypes;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
+using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -49,6 +50,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             await CopyDirectoryAsyncAndZipFiles(sourceDirectoryPath, destinationDirectoryPath, privateContainer,
                 publicContainer, message);
+        }
+
+        public IEnumerable<FileInfo> ListPublicFiles(string publication, string release)
+        {
+            return FileStorageUtils.ListPublicFiles(_publicStorageConnectionString, PublicContainerName, publication,
+                release);
         }
 
         private async Task CopyDirectoryAsyncAndZipFiles(string sourceDirectoryPath, string destinationDirectoryPath,
