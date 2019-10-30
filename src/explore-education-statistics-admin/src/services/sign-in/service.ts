@@ -1,6 +1,6 @@
-import {ApplicationPaths} from '@admin/components/api-authorization/ApiAuthorizationConstants';
+import { ApplicationPaths } from '@admin/components/api-authorization/ApiAuthorizationConstants';
 import authService from '@admin/components/api-authorization/AuthorizeService';
-import {User} from '@admin/services/sign-in/types';
+import { User } from '@admin/services/sign-in/types';
 import client from '@admin/services/util/service';
 
 export interface LoginService {
@@ -10,7 +10,7 @@ export interface LoginService {
     pathname: string;
     state: {
       local: boolean;
-    }
+    };
   };
 }
 
@@ -28,7 +28,7 @@ const service: LoginService = {
     pathname: ApplicationPaths.LogOut,
     state: {
       local: true,
-    }
+    },
   }),
 };
 
