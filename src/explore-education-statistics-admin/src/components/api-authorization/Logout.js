@@ -77,7 +77,7 @@ export class Logout extends Component {
     //       throw new Error(`Invalid action '${action}'`);
     //   }
     // }
-      return null;
+    return null;
   }
 
   async logout(returnUrl) {

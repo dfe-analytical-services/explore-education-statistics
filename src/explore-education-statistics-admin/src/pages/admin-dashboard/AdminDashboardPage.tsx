@@ -1,7 +1,7 @@
 import ButtonLink from '@admin/components/ButtonLink';
 import Link from '@admin/components/Link';
 import { LoginContext } from '@admin/components/Login';
-import NavLink from "@admin/components/NavLink";
+import NavLink from '@admin/components/NavLink';
 import Page from '@admin/components/Page';
 import ReleasesTab from '@admin/pages/admin-dashboard/components/ReleasesByStatusTab';
 import { summaryRoute } from '@admin/routes/edit-release/routes';
