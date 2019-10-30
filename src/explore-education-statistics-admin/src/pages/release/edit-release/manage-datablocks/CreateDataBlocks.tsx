@@ -1,13 +1,20 @@
 import DataBlockDetailsForm from '@admin/pages/release/edit-release/manage-datablocks/DataBlockDetailsForm';
 import { DataBlock } from '@admin/services/release/edit-release/datablocks/types';
 import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
-import TableHeadersForm, { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
-import TableToolWizard, { FinalStepProps } from '@common/modules/table-tool/components/TableToolWizard';
+import TableHeadersForm, {
+  TableHeadersFormValues,
+} from '@common/modules/table-tool/components/TableHeadersForm';
+import TableToolWizard, {
+  FinalStepProps,
+} from '@common/modules/table-tool/components/TableToolWizard';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import { reverseMapTableHeadersConfig } from '@common/modules/table-tool/components/utils/tableToolHelpers';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
-import { DataBlockRequest, DataBlockResponse } from '@common/services/dataBlockService';
+import {
+  DataBlockRequest,
+  DataBlockResponse,
+} from '@common/services/dataBlockService';
 import React, { createRef } from 'react';
 
 interface Props {
@@ -111,7 +118,7 @@ const CreateDataBlocks = ({
             {wizardStepProps => (
               <>
                 <WizardStepHeading {...wizardStepProps}>
-                  Configure Data Block
+                  Configure data block
                 </WizardStepHeading>
 
                 <div className="govuk-!-margin-bottom-4">

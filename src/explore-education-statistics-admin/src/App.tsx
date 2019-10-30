@@ -19,6 +19,7 @@ import { LoginContext } from './components/Login';
 import AdminDashboardPage from './pages/admin-dashboard/AdminDashboardPage';
 import IndexPage from './pages/IndexPage';
 
+import AdminDocumentationContentDesignStandards from './pages/documentation/DocumentationDesignStandards';
 import AdminDocumentationGlossary from './pages/documentation/DocumentationGlossary';
 import AdminDocumentationStyle from './pages/documentation/DocumentationStyle';
 import AdminDocumentationHome from './pages/documentation/DocumentationHome';
@@ -213,6 +214,11 @@ function App() {
           exact
           path="/documentation/"
           component={AdminDocumentationHome}
+        />
+        <Route
+          exact
+          path="/documentation/content-design-standards-guide"
+          component={AdminDocumentationContentDesignStandards}
         />
         <Route
           exact

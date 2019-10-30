@@ -42,10 +42,3 @@ User fills in form
     user enters text into element  css:[id="nextReleaseDate.month"]  10
     user enters text into element  css:[id="nextReleaseDate.year"]  2030
     user clicks element  xpath://label[text()="National Statistics"]
-
-Check if data has been submitted
-    [Tags]  HappyPath  AltersData
-    user clicks element   xpath://button[text()="Create new release"]
-    user waits until page contains element  xpath://span[text()="Edit release"]
-    user waits until page contains element  xpath://h2[text()="Release summary"]
-

@@ -1,3 +1,4 @@
+import { transformTableMetaFiltersToCategoryFilters } from '@common/modules/table-tool/components/utils/tableToolHelpers';
 import {
   CategoryFilter,
   Indicator,
@@ -5,17 +6,14 @@ import {
   TimePeriodFilter,
 } from '../types/filters';
 import {
-  UnmappedTableHeadersConfig,
-  UnmappedFullTable,
-  UnmappedPermalink,
   Permalink,
   SortableOption,
+  UnmappedFullTable,
+  UnmappedPermalink,
+  UnmappedTableHeadersConfig,
 } from '../services/permalinkService';
-import {
-  TableHeadersConfig,
-} from './tableHeaders';
-import { FullTableMeta, FullTable } from '../types/fullTable';
-import { transformTableMetaFiltersToCategoryFilters } from '@common/modules/table-tool/components/utils/tableToolHelpers';
+import { TableHeadersConfig } from './tableHeaders';
+import { FullTable, FullTableMeta } from '../types/fullTable';
 
 const reverseMapTableHeadersConfig = (
   { columns, rows, columnGroups, rowGroups }: UnmappedTableHeadersConfig,

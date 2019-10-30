@@ -17,6 +17,17 @@ const BrowseReleasesPage = () => {
       <div className="govuk-grid-row govuk-!-margin-bottom-9">
         <div className="govuk-grid-column-one-third">
           <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
+            <Link to="/documentation/content-design-standards-guide">
+              Content design standards guide
+            </Link>
+          </h4>
+          <p className="govuk-caption-m govuk-!-margin-top-1">
+            How to create clear and consistent content to tell people a clear
+            story so they can understand our statistics and data.
+          </p>
+        </div>
+        <div className="govuk-grid-column-one-third">
+          <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
             <Link to="/documentation/style-guide">Style guide</Link>
           </h4>
           <p className="govuk-caption-m govuk-!-margin-top-1">

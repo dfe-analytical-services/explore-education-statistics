@@ -43,9 +43,9 @@ export const transformTableMetaFiltersToCategoryFilters = (
   return mapValuesWithKeys(filters, (filterKey, filterValue) =>
     Object.values(filterValue.options)
       .flatMap(options => {
-        return options.options.map( option => ({
+        return options.options.map(option => ({
           ...option,
-          filterGroup: options.label
+          filterGroup: options.label,
         }));
       })
       .map(
@@ -88,7 +88,7 @@ export const reverseMapTableHeadersConfig = (
         const i = fullTableSubjectMeta.indicators.find(
           indicator => indicator.value === value,
         ) as Indicator;
-        if (i) return new Indicator({...i});
+        if (i) return new Indicator({ ...i });
         return i;
       })
       .filter(_ => _ !== undefined);
@@ -407,10 +407,6 @@ export const initialiseFromInitialQuery = async (
   let subjectMeta: PublicationSubjectMeta;
 
   if (initialQuery) {
-    subjectMeta = await tableBuilderService.filterPublicationSubjectMeta(
-      initialQuery,
-    );
-
     let buildNewQuery: TableDataQuery = {
       subjectId: '',
       filters: [],
@@ -431,6 +427,14 @@ export const initialiseFromInitialQuery = async (
     if (initialStep === 5) {
       createdTable = await queryForTable(buildNewQuery, releaseId);
     }
+
+    const queryForEntireSubject = {
+      subjectId: initialQuery.subjectId,
+    };
+
+    subjectMeta = await tableBuilderService.filterPublicationSubjectMeta(
+      queryForEntireSubject,
+    );
 
     // eslint-disable-next-line prefer-destructuring
     if (initialStep > 1) subjectId = buildNewQuery.subjectId;
