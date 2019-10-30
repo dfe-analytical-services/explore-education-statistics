@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services
+namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
     public class ContentService : IContentService
     {

@@ -2,7 +2,7 @@ using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using Newtonsoft.Json;
 using static System.String;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PartialDate;
