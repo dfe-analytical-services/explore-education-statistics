@@ -91,7 +91,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         {
             var footnote = Find(id, new List<Expression<Func<Footnote, object>>>
             {
-                f => f.Filters, f => f.FilterGroups, f => f.FilterItems, f => f.Indicators
+                f => f.Filters,
+                f => f.FilterGroups,
+                f => f.FilterItems,
+                f => f.Indicators,
+                f => f.Subjects
             });
 
             DbSet().Update(footnote);
