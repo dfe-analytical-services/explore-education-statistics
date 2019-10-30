@@ -5,7 +5,7 @@ function PrivacyNoticePage() {
   return (
     <Page title="Privacy notice">
       <div>
-        <h3>Who we are</h3>
+        <h2 className="govuk-heading-m">Who we are</h2>
         <p>
           The explore education statistics service is operated by the Department
           for Education (DfE).
@@ -17,7 +17,7 @@ function PrivacyNoticePage() {
         </p>
       </div>
       <div>
-        <h3>How we'll use your information</h3>
+        <h2 className="govuk-heading-m">How we'll use your information</h2>
         <p>
           We receive your personal data when you sign up and subscribe to
           receive notifications about the explore education statistics service.
@@ -33,14 +33,18 @@ function PrivacyNoticePage() {
         </p>
       </div>
       <div>
-        <h3>The nature of your personal data we'll be using</h3>
+        <h2 className="govuk-heading-m">
+          The nature of your personal data we'll be using
+        </h2>
         <p>
           In terms of your personal data, we’ll be using your email address to
           send you notifications about the service.
         </p>
       </div>
       <div>
-        <h3>Why our use of your personal data is lawful</h3>
+        <h2 className="govuk-heading-m">
+          Why our use of your personal data is lawful
+        </h2>
         <p>
           In order for our use of your personal data to be lawful, we need to
           meet 1 (or more) conditions in the data protection legislation.
@@ -52,7 +56,9 @@ function PrivacyNoticePage() {
         </p>
       </div>
       <div>
-        <h3>Who we’ll make your personal data available to</h3>
+        <h2 className="govuk-heading-m">
+          Who we’ll make your personal data available to
+        </h2>
         <p>
           We sometimes need to make personal data available to other
           organisations.
@@ -76,7 +82,7 @@ function PrivacyNoticePage() {
         </p>
       </div>
       <div>
-        <h3>Where your data is stored</h3>
+        <h2 className="govuk-heading-m">Where your data is stored</h2>
         <p>
           We store your data on secure servers in the{' '}
           <a href="https://www.gov.uk/eu-eea">European Economic Area (EEA)</a>.
@@ -84,7 +90,9 @@ function PrivacyNoticePage() {
         </p>
       </div>
       <div>
-        <h3>How long we'll keep your personal data</h3>
+        <h2 className="govuk-heading-m">
+          How long we'll keep your personal data
+        </h2>
         <p>
           We’ll only keep your personal data for as long as we need it for the
           purpose of sending you notifications, after which your personal data
@@ -99,7 +107,7 @@ function PrivacyNoticePage() {
         </p>
       </div>
       <div>
-        <h3>Your data protection rights</h3>
+        <h2 className="govuk-heading-m">Your data protection rights</h2>
         <p>Under certain circumstances, you have the right to:</p>
         <ul>
           <li>ask us for access to information about you that we hold</li>
@@ -141,7 +149,9 @@ function PrivacyNoticePage() {
         </p>
       </div>
       <div>
-        <h3>Withdrawal of consent and the right to lodge a complaint</h3>
+        <h2 className="govuk-heading-m">
+          Withdrawal of consent and the right to lodge a complaint
+        </h2>
         <p>
           Where we’re processing your personal data with your consent - you have
           the right to withdraw that consent.
@@ -164,7 +174,7 @@ function PrivacyNoticePage() {
         </p>
       </div>
       <div>
-        <h3>Last updated</h3>
+        <h2 className="govuk-heading-m">Last updated</h2>
         <p>
           We may need to update this privacy notice periodically so we recommend
           you revisit from time to time. This version was last updated on
@@ -172,7 +182,7 @@ function PrivacyNoticePage() {
         </p>
       </div>
       <div>
-        <h3>Contact information</h3>
+        <h2 className="govuk-heading-m">Contact information</h2>
         <p>
           If you have any questions about how your personal information will be
           used contact the explore education statistics service at

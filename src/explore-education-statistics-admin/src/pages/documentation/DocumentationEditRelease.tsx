@@ -69,7 +69,9 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                 If you need to edit a ‘Live’ release (ie a release which has
                 been published on the service) contact:
               </p>
-              <h4>Explore education statistics team </h4>
+              <h3 className="govuk-heading-m">
+                Explore education statistics team{' '}
+              </h3>
               <p>
                 Email <br />
                 <a href="mailto:explore.statistics@education.gov.uk">
