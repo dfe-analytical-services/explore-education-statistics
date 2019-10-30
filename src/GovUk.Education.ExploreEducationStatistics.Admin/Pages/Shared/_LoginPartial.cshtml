@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Identity
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
+@model GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.Account.LoginModel
 
 @{
     string returnUrl = null;
@@ -12,8 +13,6 @@
     }
 }
 
-
-                                    
 @if (SignInManager.IsSignedIn(User))
 {
     <li class="nav-item">
@@ -31,6 +30,22 @@ else
         <a class="govuk-header__link" href="/documentation">Administrators' guide</a>
     </li>
     <li class="govuk-header__navigation-item">
-        <a class="govuk-header__link" asp-area="Identity" asp-page="/Account/Login"asp-route-returnUrl="@returnUrl">Sign-in</a>
+        <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
+            <div>
+                <p>
+                    @foreach (var provider in Model.ExternalLogins)
+                    {
+                        <button
+                            type="submit"
+                            class="govuk-header__link"
+                            name="provider"
+                            value="@provider.Name"
+                            title="Log in using your @provider.DisplayName account">
+                            Sign-in
+                        </button>
+                    }
+                </p>
+            </div>
+        </form>
     </li>
 }

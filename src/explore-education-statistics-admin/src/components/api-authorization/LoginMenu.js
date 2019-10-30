@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { Component, Fragment } from 'react';
 import { NavItem, NavLink } from 'reactstrap';
 import { Link } from 'react-router-dom';
@@ -84,3 +85,4 @@ export class LoginMenu extends Component {
     );
   }
 }
+/* eslint-enable */
