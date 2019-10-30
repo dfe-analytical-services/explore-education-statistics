@@ -106,50 +106,6 @@ def user_checks_update_exists(date, text_starts_with):
         raise AssertionError(f'No update on "{date}" found starting with text "{text_starts_with}"')
 
 # Table tool
-def user_selects_start_date(start_date):
-    sl.select_from_list_by_label('css:#timePeriodForm-start', start_date)
-
-def user_selects_end_date(end_date):
-    sl.select_from_list_by_label('css:#timePeriodForm-end', end_date)
-
-def user_clicks_indicator_checkbox(subheading_label, indicator_label):
-    sl.driver.find_element_by_xpath(f'//*[@id="filtersForm-indicators"]//legend[text()="{subheading_label}"]/..//label[text()="{indicator_label}"]').click()
-
-def user_clicks_category_checkbox(subheading_label, category_label):
-    sl.driver.find_element_by_xpath(f'//legend[text()="{subheading_label}"]/..//label[text()="{category_label}"]').click()
-
-def user_clicks_select_all_for_category(category_label):
-    sl.driver.find_element_by_xpath(f'//legend[text()="{category_label}"]/..//button[contains(text(),"Select")]').click()
-
-def user_checks_results_table_column_heading_contains(row, column, expected):
-    elem = sl.driver.find_element_by_xpath(f'//table/thead/tr[{row}]/th[{column}]')
-    if expected not in elem.text:
-        raise AssertionError(f'"{expected}" not found in th tag in results table thead row {row}, column {column}. Found text "{elem.text}".')
-
-def user_checks_results_table_row_heading_contains(row, column, expected):
-    elem = sl.driver.find_element_by_xpath(f'//table/tbody/tr[{row}]/th[{column}]')
-    if expected not in elem.text:
-        raise AssertionError(f'"{expected}" not found in th tag in results table tbody row {row}, column {column}. Found text "{elem.text}".')
-
-def user_checks_results_table_cell_contains(row, column, expected):
-    elem = sl.driver.find_element_by_xpath(f'//table/tbody/tr[{row}]/td[{column}]')
-    if expected not in elem.text:
-        raise AssertionError(f'"{expected}" not found in td tag in results table tbody row {row}, column {column}. Found text "{elem.text}".')
-
-def user_checks_previous_table_tool_step_contains(step, key, value):
-    try:
-        sl.wait_until_page_contains_element(f'xpath://*[@id="tableTool-steps-step-{step}"]//*[text()="Go to this step"]')
-        sl.driver.find_element_by_xpath(f'//*[@id="tableTool-steps-step-{step}"]//*[text()="Go to this step"]')
-    except:
-        sl.capture_page_screenshot()
-        raise AssertionError(f'Previous step wasn\'t found!')
-
-    try:
-        sl.driver.find_element_by_xpath(f'.//*[@id="tableTool-steps-step-{step}"]//dt[text()="{key}"]/../dd[text()="{value}"]')
-    except:
-        sl.capture_page_screenshot()
-        raise AssertionError(f'Element "#tableTool-steps-step-{step}" containing "{key}" and "{value}" not found!')
-
 def user_checks_generated_permalink_is_valid():
     elem = sl.driver.find_element_by_css_selector('[class^="dfe-LinkContainer-module__linkSelect"]')
     url_without_http = re.sub(r'https?://', '', os.environ['PUBLIC_URL'])
