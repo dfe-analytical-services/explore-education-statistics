@@ -15,20 +15,17 @@
 
 @if (SignInManager.IsSignedIn(User))
 {
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity.Name!</a>
+    <li class="govuk-header__navigation-item">
+            <a class="govuk-header__link" href="/documentation">Administrators' guide</a>
     </li>
-    <li class="nav-item">
+    <li class="govuk-header__navigation-item">
         <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="/">
-            <button type="submit" class="nav-link btn btn-link text-dark">Sign out</button>
+            <button type="submit" class="govuk-header__link">Sign out</button>
         </form>
     </li>
 }
 else
 {
-    <li class="govuk-header__navigation-item">
-        <a class="govuk-header__link" href="/documentation">Administrators' guide</a>
-    </li>
     <li class="govuk-header__navigation-item">
         <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
             <div>
