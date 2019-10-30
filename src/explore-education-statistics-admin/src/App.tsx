@@ -1,4 +1,4 @@
-import {ApplicationPaths} from "@admin/components/api-authorization/ApiAuthorizationConstants";
+import { ApplicationPaths } from '@admin/components/api-authorization/ApiAuthorizationConstants';
 import AuthorizeRoute from '@admin/components/api-authorization/AuthorizeRoute';
 import CreatePublicationPage from '@admin/pages/create-publication/CreatePublicationPage';
 import CreateReleasePage from '@admin/pages/release/create-release/CreateReleasePage';

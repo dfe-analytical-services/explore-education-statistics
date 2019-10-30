@@ -1,11 +1,11 @@
-import Link from "@admin/components/Link";
-import {LoginContext} from '@admin/components/Login';
-import NavLink from "@admin/components/NavLink";
+import Link from '@admin/components/Link';
+import { LoginContext } from '@admin/components/Login';
+import NavLink from '@admin/components/NavLink';
 import loginService from '@admin/services/sign-in/service';
-import {Authentication} from '@admin/services/sign-in/types';
+import { Authentication } from '@admin/services/sign-in/types';
 import classNames from 'classnames';
 import logo from 'govuk-frontend/assets/images/govuk-logotype-crown.png';
-import React, {useContext} from 'react';
+import React, { useContext } from 'react';
 
 interface Props {
   wide?: boolean;
@@ -94,10 +94,7 @@ const LoggedInLinks = ({ user }: Authentication) => (
       </a>
     </li>
     <li className="govuk-header__navigation-item">
-      <Link
-        className="govuk-header__link"
-        to={loginService.getSignOutLink()}
-      >
+      <Link className="govuk-header__link" to={loginService.getSignOutLink()}>
         Sign out
       </Link>
     </li>

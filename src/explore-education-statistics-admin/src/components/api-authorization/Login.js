@@ -70,7 +70,7 @@ export class Login extends Component {
     //       throw new Error(`Invalid action '${action}'`);
     //   }
     // }
-      return null;
+    return null;
   }
 
   async login(returnUrl) {
