@@ -27,4 +27,13 @@
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </None>
   </ItemGroup>
+
+  <!-- TODO EES-591 Temporary fix for error Microsoft.Data.SqlClient is not supported on this platform -->
+  <!-- TODO See https://github.com/Azure/Azure-Functions/issues/1370 -->
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="copy $(OutDir)$(ProjectName).deps.json $(OutDir)bin\function.deps.json" />
+  </Target>
+  <Target Name="PostPublish" BeforeTargets="Publish">
+    <Exec Command="copy $(PublishDir)$(ProjectName).deps.json $(PublishDir)bin\function.deps.json" />
+  </Target>
 </Project>
