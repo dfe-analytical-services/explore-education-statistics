@@ -66,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             if (result.IsLeft)
             {
                 ValidationUtils.AddErrors(ModelState, result.Left);
-                return ValidationProblem();
+                return ValidationProblem(new ValidationProblemDetails(ModelState));
             }
 
             return result.Right;
