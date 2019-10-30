@@ -1,4 +1,4 @@
-import ProtectedRoute from '@admin/components/ProtectedRoute';
+import AuthorizeRoute from '@admin/components/api-authorization/AuthorizeRoute';
 import CreatePublicationPage from '@admin/pages/create-publication/CreatePublicationPage';
 import CreateReleasePage from '@admin/pages/release/create-release/CreateReleasePage';
 import ManageReleasePageContainer from '@admin/pages/release/ManageReleasePageContainer';
@@ -62,39 +62,37 @@ function App() {
 
       <ApiAuthorizationRoutes />
 
-      <ProtectedRoute
+      <AuthorizeRoute
         exact
         path={dashboardRoutes.adminDashboard}
         component={AdminDashboardPage}
       />
 
-      <ProtectedRoute
+      <Route
         exact
         path={signInRoutes.signIn}
         component={SignInPage}
-        redirectIfNotLoggedIn={false}
       />
 
-      <ProtectedRoute
+      <Route
         exact
-        path={signInRoutes.signOut}
+        path={signInRoutes.signedOut}
         component={SignedOutPage}
-        redirectIfNotLoggedIn={false}
       />
 
-      <ProtectedRoute
+      <AuthorizeRoute
         exact
         path={publicationRoutes.createPublication.route}
         component={CreatePublicationPage}
       />
 
-      <ProtectedRoute
+      <AuthorizeRoute
         exact
         path={releaseRoutes.createReleaseRoute.route}
         component={CreateReleasePage}
       />
 
-      <Route
+      <AuthorizeRoute
         path="/publication/:publicationId/release/:releaseId"
         component={ManageReleasePageContainer}
       />
