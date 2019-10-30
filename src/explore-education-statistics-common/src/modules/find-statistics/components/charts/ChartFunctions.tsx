@@ -38,7 +38,7 @@ import {
 export const colours: string[] = [
   '#4763a5',
   '#f5a450',
-  '#005ea5',
+  '#1d70b8',
   '#800080',
   '#C0C0C0',
 ];
