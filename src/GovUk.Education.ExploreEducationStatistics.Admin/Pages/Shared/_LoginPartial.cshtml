@@ -2,16 +2,6 @@
 @using Microsoft.AspNetCore.Identity
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
-@model GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.Account.LoginModel
-
-@{
-    string returnUrl = null;
-    var query = ViewContext.HttpContext.Request.Query;
-    if (query.ContainsKey("returnUrl"))
-    {
-        returnUrl = query["returnUrl"];
-    }
-}
 
 @if (SignInManager.IsSignedIn(User))
 {
@@ -21,28 +11,6 @@
     <li class="govuk-header__navigation-item">
         <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="/">
             <button type="submit" class="govuk-header__link">Sign out</button>
-        </form>
-    </li>
-}
-else
-{
-    <li class="govuk-header__navigation-item">
-        <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-            <div>
-                <p>
-                    @foreach (var provider in Model.ExternalLogins)
-                    {
-                        <button
-                            type="submit"
-                            class="govuk-header__link"
-                            name="provider"
-                            value="@provider.Name"
-                            title="Log in using your @provider.DisplayName account">
-                            Sign-in
-                        </button>
-                    }
-                </p>
-            </div>
         </form>
     </li>
 }

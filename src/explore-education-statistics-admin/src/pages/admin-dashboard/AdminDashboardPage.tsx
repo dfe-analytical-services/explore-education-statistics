@@ -1,23 +1,22 @@
 import ButtonLink from '@admin/components/ButtonLink';
 import Link from '@admin/components/Link';
-import { LoginContext } from '@admin/components/Login';
-import NavLink from '@admin/components/NavLink';
+import {LoginContext} from '@admin/components/Login';
 import Page from '@admin/components/Page';
 import ReleasesTab from '@admin/pages/admin-dashboard/components/ReleasesByStatusTab';
-import { summaryRoute } from '@admin/routes/edit-release/routes';
-import { UserDetails } from '@admin/services/common/types';
+import {summaryRoute} from '@admin/routes/edit-release/routes';
+import {UserDetails} from '@admin/services/common/types';
 import dashboardService from '@admin/services/dashboard/service';
-import { AdminDashboardRelease } from '@admin/services/dashboard/types';
+import {AdminDashboardRelease} from '@admin/services/dashboard/types';
 import loginService from '@admin/services/sign-in/service';
 import FormFieldset from '@common/components/form/FormFieldset';
 import FormSelect from '@common/components/form/FormSelect';
 import RelatedInformation from '@common/components/RelatedInformation';
+import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import { Dictionary } from '@common/types';
-import React, { useContext, useEffect, useState } from 'react';
-import SummaryList from '@common/components/SummaryList';
+import {Dictionary} from '@common/types';
+import React, {useContext, useEffect, useState} from 'react';
 import MyPublicationsTab from './components/MyPublicationsTab';
 
 interface Model {
