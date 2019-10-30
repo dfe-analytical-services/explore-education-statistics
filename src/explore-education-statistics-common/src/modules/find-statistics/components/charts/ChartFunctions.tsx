@@ -670,13 +670,28 @@ function calculateMajorTicks(
   return undefined;
 }
 
-function getNiceMaxValue(max: number) {
+function getNiceMaxValue(maxValue: number) {
+  if (maxValue === 0) {
+    return 0;
+  }
+
+  const maxIsLessThanOne = Math.abs(maxValue) < 1;
+  let max = maxValue;
+  if (maxIsLessThanOne) {
+    max = maxValue * 100;
+  }
+
   const numberOf0s = 10 ** Math.floor(Math.log10(Math.abs(max)));
   const maxReducedToLessThan10 = Math.ceil(max / numberOf0s);
-  if (maxReducedToLessThan10 % 2) {
-    return maxReducedToLessThan10 + 1 * numberOf0s;
+
+  if (maxReducedToLessThan10 % 2 && maxReducedToLessThan10 % 5) {
+    return maxIsLessThanOne
+      ? ((maxReducedToLessThan10 + 1) * numberOf0s) / 100
+      : (maxReducedToLessThan10 + 1) * numberOf0s;
   }
-  return maxReducedToLessThan10 * numberOf0s;
+  return maxIsLessThanOne
+    ? (maxReducedToLessThan10 * numberOf0s) / 100
+    : maxReducedToLessThan10 * numberOf0s;
 }
 
 export function generateMinorAxis(
