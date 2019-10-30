@@ -670,6 +670,15 @@ function calculateMajorTicks(
   return undefined;
 }
 
+function getNiceMaxValue(max: number) {
+  const numberOf0s = 10 ** Math.floor(Math.log10(Math.abs(max)));
+  const maxReducedToLessThan10 = Math.ceil(max / numberOf0s);
+  if (maxReducedToLessThan10 % 2) {
+    return maxReducedToLessThan10 + 1 * numberOf0s;
+  }
+  return maxReducedToLessThan10 * numberOf0s;
+}
+
 export function generateMinorAxis(
   chartData: ChartDataB[],
   axis: AxisConfiguration,
@@ -677,7 +686,7 @@ export function generateMinorAxis(
   const { min, max } = calculateDataRange(chartData);
 
   const axisMin = parseNumberOrDefault(axis.min, min);
-  const axisMax = parseNumberOrDefault(axis.max, max);
+  const axisMax = parseNumberOrDefault(axis.max, getNiceMaxValue(max));
 
   const domain: [AxisDomain, AxisDomain] = [axisMin, axisMax];
 
