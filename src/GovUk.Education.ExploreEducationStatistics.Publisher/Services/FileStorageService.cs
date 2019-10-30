@@ -72,9 +72,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             context.SetAttributesCallbackAsync += (destination) =>
                 SetAttributesCallbackAsync(destination, message.ReleasePublished);
             context.ShouldTransferCallbackAsync += ShouldTransferCallbackAsync;
-
-            await TransferManager.CopyDirectoryAsync(sourceDirectory, destinationDirectory, true, options, context);
-
+            
+            await TransferManager.CopyDirectoryAsync(sourceDirectory, destinationDirectory, CopyMethod.ServiceSideAsyncCopy, options, context);
+            
             ZipAllFilesToBlob(allFilesTransferred, destinationDirectory, message);
         }
 

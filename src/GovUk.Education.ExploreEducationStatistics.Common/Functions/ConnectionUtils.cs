@@ -14,13 +14,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Functions
 
         public static string GetAzureStorageConnectionString(string name)
         {
-            return ConnectionUtils.GetConnectionString(name,
+            return GetConnectionString(name,
                 $"{ConnectionTypeValues[ConnectionTypes.AZURE_STORAGE]}");
         }
         
         public static string GetAzureSqlConnectionString(string name)
         {
-            return ConnectionUtils.GetConnectionString(name,
+            return GetConnectionString(name,
                 $"{ConnectionTypeValues[ConnectionTypes.AZURE_SQL]}");
         }
         

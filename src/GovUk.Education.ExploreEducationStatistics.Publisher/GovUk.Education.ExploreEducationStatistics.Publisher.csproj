@@ -7,7 +7,7 @@
     <PackageReference Include="AutoMapper" Version="9.0.0" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.0.0" />
-    <PackageReference Include="Microsoft.Azure.Storage.DataMovement" Version="0.11.0" />
+    <PackageReference Include="Microsoft.Azure.Storage.DataMovement" Version="1.1.0" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Storage" Version="3.0.10" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.0.0" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.30-beta2" />
