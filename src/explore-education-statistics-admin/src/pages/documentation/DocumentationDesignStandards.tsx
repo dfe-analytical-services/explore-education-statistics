@@ -67,9 +67,9 @@ const DocumentationDesignStandards = () => {
                 on. This in turn leads to frustrated users who cannot find what
                 they need or complete the tasks they want to do.
               </p>
-              <h4 id="behaviour-analytics-and-feedback">
+              <h3 id="behaviour-analytics-and-feedback">
                 Behaviour, analytics and feedback
-              </h4>
+              </h3>
               <p>
                 However, we can avoid this by creating and formatting content
                 within releases based on user behaviour, analytics and feedback.
@@ -93,9 +93,9 @@ const DocumentationDesignStandards = () => {
                   understand and easy to read
                 </li>
               </ul>
-              <h4 id="sound-principles-and-research">
+              <h3 id="sound-principles-and-research">
                 Sound principles and research
-              </h4>
+              </h3>
               <p>
                 There’s more than one way to present content to people and the
                 decisions about how we present it to them have to be carefully
@@ -127,7 +127,7 @@ const DocumentationDesignStandards = () => {
                 gained (and continue to gain) through carrying out hours of user
                 research.
               </p>
-              <h4 id="meet-peoples-needs">Meet people’s needs</h4>
+              <h3 id="meet-peoples-needs">Meet people’s needs</h3>
               <p>
                 Do not add all the information and content you can to a release.
                 Instead, only include what you people need to know to complete
@@ -144,7 +144,7 @@ const DocumentationDesignStandards = () => {
                 <li>informative</li>
                 <li>clear and to the point</li>
               </ul>
-              <h4 id="quick-and-easy-steps">Quick and easy steps</h4>
+              <h3 id="quick-and-easy-steps">Quick and easy steps</h3>
               <p>
                 Creating good content for explore education statistics should
                 mean people can take the following steps and quickly and easily
@@ -168,9 +168,9 @@ const DocumentationDesignStandards = () => {
                 quickly, complete their task and leave without having to think
                 about it too much.
               </p>
-              <h4 id="easy-to-read-and-understand">
+              <h3 id="easy-to-read-and-understand">
                 Easy to read and understand{' '}
-              </h4>
+              </h3>
               <p>
                 Good online content is easy to read and understand and we know
                 from the research we’ve carried out that our service this means:
@@ -234,7 +234,7 @@ const DocumentationDesignStandards = () => {
                 expertise tend to have the most to read. They do not have time
                 to read through pages of complicated content.
               </p>
-              <h4 id="plain-english">Plain English</h4>
+              <h3 id="plain-english">Plain English</h3>
               <p>
                 This does not mean you cannot use technical terms in your
                 content. It just means you need to explain what they mean the
@@ -279,9 +279,9 @@ const DocumentationDesignStandards = () => {
                   they’ll use to search for content
                 </li>
               </ul>
-              <h4 id="the-explore-education-statistics-audience">
+              <h3 id="the-explore-education-statistics-audience">
                 The explore education statistics audience
-              </h4>
+              </h3>
               <p>
                 Our audience is potentially anyone living in the UK who needs to
                 find statistics, data and information about education.{' '}
@@ -330,7 +330,7 @@ const DocumentationDesignStandards = () => {
                 The best way to do this is by using common words and working
                 with natural reading behaviour.
               </p>
-              <h4 id="commoon-words">Common words</h4>
+              <h3 id="commoon-words">Common words</h3>
               <p>
                 By the time someone is 5 or 6 years old, they’ll use 2,500 to
                 5,000 common words.{' '}
@@ -344,7 +344,7 @@ const DocumentationDesignStandards = () => {
                 around 15,000 words (divided between a set of 5,000 primary and
                 10,000 secondary words) which they use every day.
               </p>
-              <h4 id="reading-skills">Reading skills</h4>
+              <h3 id="reading-skills">Reading skills</h3>
               <p>
                 People quickly learn to read the 5,000 common words (their
                 primary set) they use most). They then stop reading these words
@@ -364,7 +364,7 @@ const DocumentationDesignStandards = () => {
                 This means people do not need to read every word to understand
                 what is written.
               </p>
-              <h4 id="reading-web-pages">Reading web pages</h4>
+              <h3 id="reading-web-pages">Reading web pages</h3>
               <p>
                 People read very differently online than they do on paper. They
                 do not necessarily read top to bottom or even from word to word.
@@ -383,7 +383,7 @@ const DocumentationDesignStandards = () => {
                 . They look across the top, then down the side, reading further
                 across when they find what they need.
               </p>
-              <h4 id="what-does-this-mean">What does this mean?</h4>
+              <h3 id="what-does-this-mean">What does this mean?</h3>
               <p>
                 This means, if we use the right words and put the most important
                 first and in the right places - we can create good content for
@@ -414,16 +414,16 @@ const DocumentationDesignStandards = () => {
                 guidance on anything outlined within this section refer to the
                 links in the following ‘Help and support’ section of contact:{' '}
               </p>
-              <h4>Explore education statistics team </h4>
+              <h3>Explore education statistics team </h3>
               <p>
                 Email <br />
                 <a href="mailto:explore.statistics@education.gov.uk">
                   explore.statistics@education.gov.uk
                 </a>
               </p>
-              <h4 id="write-to-standards-and-the-style-guide">
+              <h3 id="write-to-standards-and-the-style-guide">
                 Write to standards and the style guide
-              </h4>
+              </h3>
               <p>
                 It’s important to read, familiarise yourself with and then
                 consistently refer to the guidelines set out in this guide and
@@ -486,9 +486,9 @@ const DocumentationDesignStandards = () => {
                   </a>
                 </li>
               </ul>
-              <h4 id="using-the-inverted-pyramid-style">
+              <h3 id="using-the-inverted-pyramid-style">
                 Using the inverted pyramid style
-              </h4>
+              </h3>
               <p>
                 Writing in what is known as an ‘inverted pyramid style’ will
                 help focus your content on your essential message.
@@ -537,7 +537,7 @@ const DocumentationDesignStandards = () => {
                 2 sentences of your content and take away the information you
                 think your user needs and requires from your content.
               </p>
-              <h4 id="do-not-duplicate-content">Do not duplicate content</h4>
+              <h3 id="do-not-duplicate-content">Do not duplicate content</h3>
               <p>
                 Do not repeat content which already exists. If the content
                 you’re looking to create has already been written elsewhere then
@@ -548,9 +548,9 @@ const DocumentationDesignStandards = () => {
                 readily do with the service as it’s no longer confined by the
                 flatter structure of the existing PDF format.
               </p>
-              <h4 id="avoid-redundant-introductory-words">
+              <h3 id="avoid-redundant-introductory-words">
                 Avoid redundant introductory words
-              </h4>
+              </h3>
               <p>
                 These do not tend to give the user any more information than
                 what they would already assume from reading the title of your
@@ -566,9 +566,9 @@ const DocumentationDesignStandards = () => {
                 down your word count to and help you create clear and concise
                 content.
               </p>
-              <h4 id="plan-organise-and-question-your-content">
+              <h3 id="plan-organise-and-question-your-content">
                 Plan, organise and question your content
-              </h4>
+              </h3>
               <p>
                 Break up and group your content into different topics and
                 organise them under common headings.
@@ -607,9 +607,9 @@ const DocumentationDesignStandards = () => {
                 <li>Does it have the right tone and flow?</li>
                 <li>Do I need to add any subheadings?</li>
               </ul>
-              <h4 id="write-your-content-alongside-someone-else">
+              <h3 id="write-your-content-alongside-someone-else">
                 Write your content alongside someone else
-              </h4>
+              </h3>
               <p>
                 Consider writing your content alongside a colleague in front of
                 the same computer or on a piece of paper.
@@ -624,7 +624,7 @@ const DocumentationDesignStandards = () => {
                 find a quiet place where you can work together without
                 interruption so you can get the most out of your time together.
               </p>
-              <h4 id="organise-a-peer-review">Organise a peer review </h4>
+              <h3 id="organise-a-peer-review">Organise a peer review </h3>
               <p>
                 A peer review is an opportunity for other people to comment on
                 your content.
@@ -688,9 +688,9 @@ const DocumentationDesignStandards = () => {
                 </a>
                 .
               </p>
-              <h4 id="write-like-you-would-speak">
+              <h3 id="write-like-you-would-speak">
                 Write like you would speak
-              </h4>
+              </h3>
               <p>
                 Good web writing should read like a face-to-face or telephone
                 conversation which answers people's direct questions and let’s
@@ -776,7 +776,7 @@ const DocumentationDesignStandards = () => {
                 If you have any questions about the content design standards or
                 the Style guide contact:{' '}
               </p>
-              <h4>Explore education statistics team </h4>
+              <h3>Explore education statistics team </h3>
               <p>
                 Email <br />
                 <a href="mailto:explore.statistics@education.gov.uk">
@@ -794,7 +794,7 @@ const DocumentationDesignStandards = () => {
                 Help us make it better by emailing your feedback on what you
                 think is confusing, inaccurate or missing to:
               </p>
-              <h4>Explore education statistics team </h4>
+              <h3>Explore education statistics team </h3>
               <p>
                 Email <br />
                 <a href="mailto:explore.statistics@education.gov.uk">
