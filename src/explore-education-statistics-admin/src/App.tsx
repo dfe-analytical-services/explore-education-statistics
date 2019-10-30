@@ -70,13 +70,6 @@ function App() {
 
       <AuthorizeRoute
         exact
-        path={ApplicationPaths.Login}
-        component={SignInPage}
-        renderIfNotAuthenticated
-      />
-
-      <AuthorizeRoute
-        exact
         path={ApplicationPaths.LoggedOut}
         component={SignedOutPage}
         renderIfNotAuthenticated

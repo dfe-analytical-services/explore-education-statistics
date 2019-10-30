@@ -12,25 +12,25 @@
     }
 }
 
-<ul class="navbar-nav">
-    @if (SignInManager.IsSignedIn(User))
-    {
-        <li class="nav-item">
-            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity.Name!</a>
-        </li>
-        <li class="nav-item">
-            <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="/">
-                <button type="submit" class="nav-link btn btn-link text-dark">Logout</button>
-            </form>
-        </li>
-    }
-    else
-    {
-        <li class="nav-item">
-            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register" asp-route-returnUrl="@returnUrl">Register</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login"asp-route-returnUrl="@returnUrl">Login</a>
-        </li>
-    }
-</ul>
+
+                                    
+@if (SignInManager.IsSignedIn(User))
+{
+    <li class="nav-item">
+        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity.Name!</a>
+    </li>
+    <li class="nav-item">
+        <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="/">
+            <button type="submit" class="nav-link btn btn-link text-dark">Sign out</button>
+        </form>
+    </li>
+}
+else
+{
+    <li class="govuk-header__navigation-item">
+        <a class="govuk-header__link" href="/documentation">Administrators' guide</a>
+    </li>
+    <li class="govuk-header__navigation-item">
+        <a class="govuk-header__link" asp-area="Identity" asp-page="/Account/Login"asp-route-returnUrl="@returnUrl">Sign-in</a>
+    </li>
+}
