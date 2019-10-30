@@ -1,6 +1,6 @@
 *** Settings ***
 Resource    ./common.robot
-Library     admin-utilities.py
+Library     public-utilities.py
 
 *** Keywords ***
 User selects theme "${theme}" and topic "${topic}" from the admin dashboard
