@@ -25,15 +25,15 @@ import AdminDocumentationStyle from './pages/documentation/DocumentationStyle';
 import AdminDocumentationHome from './pages/documentation/DocumentationHome';
 import AdminDocumentationUsingDashboard from './pages/documentation/DocumentationUsingDashboard';
 import AdminDocumentationCreateNewRelease from './pages/documentation/DocumentationCreateNewRelease';
+import AdminDocumentationCreateNewPublication from './pages/documentation/DocumentationCreateNewPublication';
 import AdminDocumentationManageContent from './pages/documentation/DocumentationManageContent';
 import AdminDocumentationManageData from './pages/documentation/DocumentationManageData';
 import AdminDocumentationManageDataBlocks from './pages/documentation/DocumentationManageDataBlocks';
-import AdminDocumentationEditRelease from './pages/documentation/DocumentationEditRelease';
 
+import AdminDocumentationEditRelease from './pages/documentation/DocumentationEditRelease';
 import PrototypeAdminDashboard from './pages/prototypes/PrototypeAdminDashboard';
 import PrototypeChartTest from './pages/prototypes/PrototypeChartTest';
 import PrototypeTableTool from './pages/prototypes/PrototypeTableTool';
-import AdminDocumentationCreateNewPublication from './pages/prototypes/PrototypeDocumentationCreateNewPublication';
 import PublicationAssignMethodology from './pages/prototypes/PrototypePublicationPageAssignMethodology';
 import PublicationConfirmNew from './pages/prototypes/PrototypePublicationPageConfirmNew';
 
@@ -242,6 +242,11 @@ function App() {
         />
         <Route
           exact
+          path="/documentation/create-new-publication"
+          component={AdminDocumentationCreateNewPublication}
+        />
+        <Route
+          exact
           path="/documentation/edit-release"
           component={AdminDocumentationEditRelease}
         />
@@ -259,11 +264,6 @@ function App() {
           exact
           path="/documentation/manage-data-block"
           component={AdminDocumentationManageDataBlocks}
-        />
-        <Route
-          exact
-          path="/prototypes/documentation/create-new-publication"
-          component={AdminDocumentationCreateNewPublication}
         />
       </LoginContext.Provider>
     </BrowserRouter>
