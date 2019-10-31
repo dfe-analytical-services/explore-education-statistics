@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import times from 'lodash/times';
-import React, {forwardRef, ReactElement} from 'react';
+import React, { forwardRef, ReactElement } from 'react';
 import styles from './MultiHeaderTable.module.scss';
 
 interface Props {
@@ -18,20 +18,23 @@ export interface SpanInfo {
   start: number;
   isRowGroup: boolean;
 }
+
 export type RowHeaderType = string | undefined;
 
-const generateSpanInfoForSingleGroup = (headingsForGroup:RowHeaderType[], overallHeaderLength : number, isRowGroup: boolean) => {
+const generateSpanInfoForSingleGroup = (
+  headingsForGroup: RowHeaderType[],
+  overallHeaderLength: number,
+  isRowGroup: boolean,
+) => {
   return headingsForGroup.reduce<SpanInfo[]>(
-
     (spanInfo: SpanInfo[], nextHeading: RowHeaderType, rowIndex: number) => {
-
       if (spanInfo.length === 0) {
         return [
           {
             heading: nextHeading || '',
             count: overallHeaderLength,
             start: rowIndex,
-            isRowGroup
+            isRowGroup,
           },
         ];
       }
@@ -56,13 +59,11 @@ const generateSpanInfoForSingleGroup = (headingsForGroup:RowHeaderType[], overal
         },
       ];
     },
-    []
+    [],
   );
 };
 
-export const generateHeaderSpanInfo = (
-  headerGroups: RowHeaderType[][],
-) => {
+export const generateHeaderSpanInfo = (headerGroups: RowHeaderType[][]) => {
   const overallHeaderLength = headerGroups.reduce(
     (curMaxLength: number, group) =>
       curMaxLength < group.length ? group.length : curMaxLength,
@@ -76,7 +77,11 @@ export const generateHeaderSpanInfo = (
       groupIndex: number,
     ) => [
       ...headerSpanInfo,
-      generateSpanInfoForSingleGroup(headingsForGroup, overallHeaderLength,groupIndex < headerGroups.length - 1, )
+      generateSpanInfoForSingleGroup(
+        headingsForGroup,
+        overallHeaderLength,
+        groupIndex < headerGroups.length - 1,
+      ),
     ],
     [],
   );
@@ -86,7 +91,7 @@ export const transposeSpanInfoMatrix = (
   headers: SpanInfo[][],
 ): SpanInfo[][] => {
   const lengthOfRow = headers[0].reduce(
-    (length, {count}) => length + count,
+    (length, { count }) => length + count,
     0,
   );
 
@@ -94,11 +99,10 @@ export const transposeSpanInfoMatrix = (
 
   return [...Array(lengthOfRow)].map((_, currentRow) =>
     rowColumnsReversed
-      .map(rowColumn => rowColumn.find(({start}) => start === currentRow))
+      .map(rowColumn => rowColumn.find(({ start }) => start === currentRow))
       .filter(cell => !!cell),
   ) as SpanInfo[][];
 };
-
 
 export const generateAggregatedGroups = (
   headerGroups: RowHeaderType[][],
@@ -108,14 +112,16 @@ export const generateAggregatedGroups = (
     finalGroups: RowHeaderType[][];
     total: number;
   }>(
-    ({finalGroups, total}, groups, index) => {
+    ({ finalGroups, total }, groups, index) => {
       const numberOfTimesToRepeat =
         index > 0 && headerIsGroup[index - 1] ? 1 : groups.length;
 
       const expandedPreviousGroups = finalGroups.map(finalRow =>
         ([] as RowHeaderType[]).concat(
           ...finalRow.map(cell =>
-            [...Array(numberOfTimesToRepeat)].map((_, idx) => idx === 0 ? cell : undefined),
+            [...Array(numberOfTimesToRepeat)].map((_, idx) =>
+              idx === 0 ? cell : undefined,
+            ),
           ),
         ),
       );
@@ -123,12 +129,14 @@ export const generateAggregatedGroups = (
       return {
         finalGroups: [
           ...expandedPreviousGroups,
-          ([] as RowHeaderType[]).concat(...[...Array(total)].map(() => groups)),
+          ([] as RowHeaderType[]).concat(
+            ...[...Array(total)].map(() => groups),
+          ),
         ],
         total: total * (headerIsGroup[index] ? 1 : groups.length),
       };
     },
-    {finalGroups: [], total: 1},
+    { finalGroups: [], total: 1 },
   );
 
   return aggrigatedDuplication.finalGroups;
@@ -139,14 +147,12 @@ export const generateSpanInfoFromGroups = (
   rowHeaderIsGroup: boolean[],
 ): SpanInfo[][] => {
 
-  console.log(groups, rowHeaderIsGroup);
-
   return generateHeaderSpanInfo(
-    generateAggregatedGroups(groups, rowHeaderIsGroup)
+    generateAggregatedGroups(groups, rowHeaderIsGroup),
   );
 };
 
-export const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
+const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
   (
     {
       ariaLabelledBy,
@@ -233,7 +239,7 @@ export const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
                     className={classNames({
                       'govuk-table__cell--numeric': !column.isRowGroup,
                       'govuk-table__cell--center': column.isRowGroup,
-                      [styles.borderBottom]: column.isRowGroup ,
+                      [styles.borderBottom]: column.isRowGroup,
                     })}
                     rowSpan={column.count}
                     scope={column.isRowGroup ? 'rowgroup' : 'row'}

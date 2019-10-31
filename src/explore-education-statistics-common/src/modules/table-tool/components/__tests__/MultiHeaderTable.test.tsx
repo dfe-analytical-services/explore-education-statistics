@@ -1,10 +1,8 @@
 import React from 'react';
 import { render } from 'react-testing-library';
-import { SortableOptionWithGroup } from '@common/modules/table-tool/components/TableHeadersForm';
-import { createIgnoreRowGroups, createRowGroups } from '@common/modules/table-tool/components/TimePeriodDataTable';
 import MultiHeaderTable, {
   generateAggregatedGroups,
-  generateHeaderSpanInfo, generateSpanInfoFromGroups,
+  generateSpanInfoFromGroups,
   SpanInfo,
   transposeSpanInfoMatrix,
 } from '../MultiHeaderTable';
@@ -179,7 +177,6 @@ describe('MultiHeaderTable', () => {
     expect(container.innerHTML).toMatchSnapshot();
   });
 
-
   test('transposeSpanInfoMatrix', () => {
     const source = [
       [
@@ -214,93 +211,55 @@ describe('MultiHeaderTable', () => {
     ]);
   });
 
-  test('full', () => {
-    const options: SortableOptionWithGroup[][] = [
-      [{ label: 'Eng', value: '1' }, { label: 'Sco', value: '2' }],
-      [
-        { label: 'Def', value: 'A', filterGroup: 'Def' },
-        { label: 'Ln1', value: 'Q', filterGroup: 'Lan' },
-        { label: 'Ln2', value: 'W', filterGroup: 'Lan' },
-      ],
+  test('generateAggregatedGroups', () => {
+    const data = [
+      ['England'],
+      ['Total', 'Gender', undefined],
+      ['Total', 'Gender male', 'Gender female'],
+      ['auth'],
     ];
-
-    const rows = [...createRowGroups(options), ['In1', 'In2', 'In3']];
-
-    const ignoreRows = createIgnoreRowGroups(options);
-
-    const aggregated = generateAggregatedGroups(rows, ignoreRows);
-
-    console.log(aggregated);
-
-    const spanInfo = generateHeaderSpanInfo(aggregated);
-
-    console.log(spanInfo);
-
-    expect(true).toBe(true);
-
-    // console.log( aggregated.map( g => g.map( gg => gg.heading )));
-  });
-
-  test('generateHeaderSpanInfo', () => {
-
-    const data = [['1', '2'], ['3', '4'], ['5', '6']];
-
-    const result = generateSpanInfoFromGroups(data, [false, false, false]);
-
-    console.log(result);
-
-    console.log(transposeSpanInfoMatrix(result));
-
-  });
-
-  test("generateAggregatedGroups", () => {
-    const data = [['England'], ['Total', 'Gender', undefined], ['Total', 'Gender male', 'Gender female'], ['auth']];
 
     const result = generateAggregatedGroups(data, [false, true, false, false]);
 
-    expect(result)
-      .toStrictEqual(
-
-        [
-          [ 'England', undefined, undefined ],
-          [ 'Total', 'Gender', undefined ],
-          [ 'Total', 'Gender male', 'Gender female' ],
-          [ 'auth', 'auth', 'auth' ]
-        ]
-
-      )
-
+    expect(result).toStrictEqual([
+      ['England', undefined, undefined],
+      ['Total', 'Gender', undefined],
+      ['Total', 'Gender male', 'Gender female'],
+      ['auth', 'auth', 'auth'],
+    ]);
   });
 
   test('generateHeaderSpanInfo singular', () => {
+    const data = [
+      ['England'],
+      ['Total', 'Gender', undefined],
+      ['Total', 'Gender male', 'Gender female'],
+      ['auth'],
+    ];
 
-    const data = [['England'], ['Total', 'Gender', undefined], ['Total', 'Gender male', 'Gender female'], ['auth']];
+    const result = generateSpanInfoFromGroups(data, [
+      false,
+      true,
+      false,
+      false,
+    ]);
 
-    const result = generateSpanInfoFromGroups(data, [false, true, false, false]);
-
-    expect(result)
-      .toStrictEqual(
-        [
-          [
-            { heading: 'England', count: 3, start: 0, isRowGroup: true },
-          ],
-          [
-            { heading: 'Total', count: 1, start: 0, isRowGroup: true },
-            { heading: 'Gender', count: 2, start: 1, isRowGroup: true },
-          ],
-          [
-            { heading: 'Total', count: 1, start: 0, isRowGroup: true },
-            { heading: 'Gender male', count: 1, start: 1, isRowGroup: true },
-            { heading: 'Gender female', count: 1, start: 2, isRowGroup: true },
-          ],
-          [
-            { heading: 'auth', count: 1, start: 0, isRowGroup: false },
-            { heading: 'auth', count: 1, start: 1, isRowGroup: false },
-            { heading: 'auth', count: 1, start: 2, isRowGroup: false },
-          ],
-        ]);
-
+    expect(result).toStrictEqual([
+      [{ heading: 'England', count: 3, start: 0, isRowGroup: true }],
+      [
+        { heading: 'Total', count: 1, start: 0, isRowGroup: true },
+        { heading: 'Gender', count: 2, start: 1, isRowGroup: true },
+      ],
+      [
+        { heading: 'Total', count: 1, start: 0, isRowGroup: true },
+        { heading: 'Gender male', count: 1, start: 1, isRowGroup: true },
+        { heading: 'Gender female', count: 1, start: 2, isRowGroup: true },
+      ],
+      [
+        { heading: 'auth', count: 1, start: 0, isRowGroup: false },
+        { heading: 'auth', count: 1, start: 1, isRowGroup: false },
+        { heading: 'auth', count: 1, start: 2, isRowGroup: false },
+      ],
+    ]);
   });
-
-
 });

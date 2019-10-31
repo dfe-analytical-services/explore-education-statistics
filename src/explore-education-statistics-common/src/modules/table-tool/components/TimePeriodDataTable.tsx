@@ -1,27 +1,25 @@
-import { RowHeaderType } from '@common/modules/table-tool/components/MultiHeaderTable';
-import last from 'lodash/last';
-import React, {memo, forwardRef} from 'react';
-import camelCase from 'lodash/camelCase';
+import WarningMessage from '@common/components/WarningMessage';
 import cartesian from '@common/lib/utils/cartesian';
 import formatPretty from '@common/lib/utils/number/formatPretty';
-import WarningMessage from '@common/components/WarningMessage';
-import {
-  CategoryFilter,
-  Indicator,
-  LocationFilter,
-  TimePeriodFilter,
-} from '@common/modules/full-table/types/filters';
-import {FullTable} from '@common/modules/full-table/types/fullTable';
+import { CategoryFilter, Indicator, LocationFilter, TimePeriodFilter } from '@common/modules/full-table/types/filters';
+import { FullTable } from '@common/modules/full-table/types/fullTable';
+import { RowHeaderType } from '@common/modules/table-tool/components/MultiHeaderTable';
+import camelCase from 'lodash/camelCase';
+import last from 'lodash/last';
+import React, { forwardRef, memo } from 'react';
 import DataTableCaption from './DataTableCaption';
 import FixedMultiHeaderDataTable from './FixedMultiHeaderDataTable';
-import {SortableOptionWithGroup, TableHeadersFormValues} from './TableHeadersForm';
+import { SortableOptionWithGroup, TableHeadersFormValues } from './TableHeadersForm';
 
 interface Props {
   fullTable: FullTable;
   tableHeadersConfig: TableHeadersFormValues;
 }
 
-const selectFilterGroup = (group?: string, previousGroup?: string) : RowHeaderType  => {
+const selectFilterGroup = (
+  group?: string,
+  previousGroup?: string,
+): RowHeaderType => {
   if (group) {
     if (group === previousGroup) return undefined;
     if (group !== 'Default') return group;
@@ -29,37 +27,58 @@ const selectFilterGroup = (group?: string, previousGroup?: string) : RowHeaderTy
   return '';
 };
 
-export const createRowGroups = (rowGroups: SortableOptionWithGroup[][]) : RowHeaderType[][] => {
+export const createRowGroups = (
+  rowGroups: SortableOptionWithGroup[][],
+): RowHeaderType[][] => {
   return rowGroups.flatMap(rowGroup =>
-
-    rowGroup.reduce<[RowHeaderType[], RowHeaderType[]]>(([b, c], group, index) => (
-      [
-        group.filterGroup && [...b, selectFilterGroup(group.filterGroup, index>0 && rowGroup[index-1].filterGroup || undefined)]  || b,
-        [...c, group.label]
-      ]
-    ), [[], []])
-      .filter(ary => ary.length > 0 && ary.filter( cell => !!cell).join("").length > 0)
+    rowGroup
+      .reduce<[RowHeaderType[], RowHeaderType[]]>(
+        ([b, c], group, index) => [
+          (group.filterGroup && [
+            ...b,
+            selectFilterGroup(
+              group.filterGroup,
+              (index > 0 && rowGroup[index - 1].filterGroup) || undefined,
+            ),
+          ]) ||
+            b,
+          [...c, group.label],
+        ],
+        [[], []],
+      )
+      .filter(
+        ary => ary.length > 0 && ary.filter(cell => !!cell).join('').length > 0,
+      ),
   );
 };
 
-export const createIgnoreRowGroups = (rowGroups: SortableOptionWithGroup[][]) : boolean[] => {
-  return rowGroups.flatMap(rowGroup =>
+export const createIgnoreRowGroups = (
+  rowGroups: SortableOptionWithGroup[][],
+): boolean[] => {
+  return rowGroups
+    .flatMap(rowGroup =>
+      rowGroup
+        .reduce<[boolean[], boolean[]]>(
+          ([b, c], group, index) => [
+            (selectFilterGroup(
+              group.filterGroup,
+              (index > 0 && rowGroup[index - 1].filterGroup) || undefined,
+            ) && [...b, true]) ||
+              b,
+            [...c, false],
+          ],
+          [[], []],
+        )
 
-    rowGroup.reduce<[boolean[], boolean[]]>(([b, c], group, index) => (
-      [
-        selectFilterGroup(group.filterGroup, index>0 && rowGroup[index-1].filterGroup || undefined) && [...b, true] || b,
-        [...c, false]
-      ]
-    ), [[], []])
-
-      .filter(ary => ary.length > 0)
-  ).map(group => group.includes(true));
+        .filter(ary => ary.length > 0),
+    )
+    .map(group => group.includes(true));
 };
 
 const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
   (props: Props, dataTableRef) => {
-    const {fullTable, tableHeadersConfig} = props;
-    const {subjectMeta, results} = fullTable;
+    const { fullTable, tableHeadersConfig } = props;
+    const { subjectMeta, results } = fullTable;
 
     if (results.length === 0) {
       return (
@@ -84,7 +103,7 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
 
     const rowHeaderIsGroup: boolean[] = [
       ...createIgnoreRowGroups(tableHeadersConfig.rowGroups),
-      false
+      false,
     ];
 
     const rowHeadersCartesian = cartesian(

@@ -1,16 +1,11 @@
 import ButtonText from '@common/components/ButtonText';
 import cartesian from '@common/lib/utils/cartesian';
-import {
-  CategoryFilter,
-  LocationFilter,
-  TimePeriodFilter,
-  Filter,
-} from '@common/modules/full-table/types/filters';
+import { CategoryFilter, Filter, LocationFilter, TimePeriodFilter } from '@common/modules/full-table/types/filters';
+import { FullTable } from '@common/modules/full-table/types/fullTable';
+import { transformTableMetaFiltersToCategoryFilters } from '@common/modules/table-tool/components/utils/tableToolHelpers';
 import { saveAs } from 'file-saver';
 import Papa from 'papaparse';
 import React from 'react';
-import { transformTableMetaFiltersToCategoryFilters } from '@common/modules/full-table/utils/tableHeaders';
-import { FullTable } from '@common/modules/full-table/types/fullTable';
 
 interface Props {
   publicationSlug: string;

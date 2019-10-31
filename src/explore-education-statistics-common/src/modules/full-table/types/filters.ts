@@ -22,7 +22,10 @@ export abstract class Filter {
 export class CategoryFilter extends Filter {
   public readonly isTotal: boolean;
 
-  public constructor({ value, label, filterGroup }: FilterOption, isTotal = false) {
+  public constructor(
+    { value, label, filterGroup }: FilterOption,
+    isTotal = false,
+  ) {
     super({ value, label, filterGroup });
     this.isTotal = isTotal;
   }
@@ -31,7 +34,10 @@ export class CategoryFilter extends Filter {
 export class LocationFilter extends Filter {
   public readonly level: string;
 
-  public constructor({ value, label, filterGroup}: FilterOption, level: string) {
+  public constructor(
+    { value, label, filterGroup }: FilterOption,
+    level: string,
+  ) {
     super({ value, label, filterGroup });
     this.level = camelCase(level);
   }

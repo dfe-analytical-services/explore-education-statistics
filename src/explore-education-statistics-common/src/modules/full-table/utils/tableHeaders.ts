@@ -1,14 +1,8 @@
-import sortBy from 'lodash/sortBy';
-import { Dictionary } from '@common/types/util';
-import mapValuesWithKeys from '@common/lib/utils/mapValuesWithKeys';
-import {
-  CategoryFilter,
-  Indicator,
-  TimePeriodFilter,
-  LocationFilter,
-} from '@common/modules/full-table/types/filters';
-import { FullTableMeta } from '../types/fullTable';
+import { CategoryFilter, Indicator, LocationFilter, TimePeriodFilter } from '@common/modules/full-table/types/filters';
 import { transformTableMetaFiltersToCategoryFilters } from '@common/modules/table-tool/components/utils/tableToolHelpers';
+import { Dictionary } from '@common/types/util';
+import sortBy from 'lodash/sortBy';
+import { FullTableMeta } from '../types/fullTable';
 
 export interface TableHeadersConfig {
   columns: (Indicator | TimePeriodFilter)[];
@@ -24,21 +18,6 @@ const removeSiblinglessTotalRows = (
     return filter.length > 1 || !filter[0].isTotal;
   });
 };
-/*
-export const transformTableMetaFiltersToCategoryFilters = (
-  filters: FullTableMeta['filters'],
-): Dictionary<CategoryFilter[]> => {
-  return mapValuesWithKeys(filters, (filterKey, filterValue) =>
-    Object.values(filterValue.options)
-      .flatMap(options => options.options)
-      .map(
-        filter =>
-          new CategoryFilter(filter, filter.value === filterValue.totalValue),
-      ),
-  );
-};
-
- */
 
 const getDefaultTableHeaderConfig = (fullTableMeta: FullTableMeta) => {
   const { indicators, filters, locations, timePeriodRange } = fullTableMeta;

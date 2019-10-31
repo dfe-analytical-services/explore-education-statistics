@@ -1,8 +1,8 @@
-import React, { forwardRef, ReactNode, Ref, useRef, useEffect } from 'react';
-import Footnote from '@common/modules/table-tool/components/Footnote';
 import { FullTableMeta } from '@common/modules/full-table/types/fullTable';
-import MultiHeaderTable, {  RowHeaderType } from './MultiHeaderTable';
+import Footnote from '@common/modules/table-tool/components/Footnote';
+import React, { forwardRef, ReactNode, Ref, useEffect, useRef } from 'react';
 import styles from './FixedMultiHeaderDataTable.module.scss';
+import MultiHeaderTable, { RowHeaderType } from './MultiHeaderTable';
 
 const mobileWidth = 1024;
 
