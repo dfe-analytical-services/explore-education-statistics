@@ -1,3 +1,4 @@
+import { RowHeaderType } from '@common/modules/table-tool/components/MultiHeaderTable';
 import last from 'lodash/last';
 import React, {memo, forwardRef} from 'react';
 import camelCase from 'lodash/camelCase';
@@ -20,32 +21,33 @@ interface Props {
   tableHeadersConfig: TableHeadersFormValues;
 }
 
-const selectFilterGroup = (group?: string) : string => {
+const selectFilterGroup = (group?: string, previousGroup?: string) : RowHeaderType  => {
   if (group) {
+    if (group === previousGroup) return undefined;
     if (group !== 'Default') return group;
   }
   return '';
 };
 
-export const createRowGroups = (rowGroups: SortableOptionWithGroup[][]) : string[][] => {
+export const createRowGroups = (rowGroups: SortableOptionWithGroup[][]) : RowHeaderType[][] => {
   return rowGroups.flatMap(rowGroup =>
 
-    rowGroup.reduce<[string[], string[]]>(([b, c], group) => (
+    rowGroup.reduce<[RowHeaderType[], RowHeaderType[]]>(([b, c], group, index) => (
       [
-        group.filterGroup && [...b, selectFilterGroup(group.filterGroup )] || b ,
+        group.filterGroup && [...b, selectFilterGroup(group.filterGroup, index>0 && rowGroup[index-1].filterGroup || undefined)]  || b,
         [...c, group.label]
       ]
     ), [[], []])
-      .filter(ary => ary.length > 0)
+      .filter(ary => ary.length > 0 && ary.filter( cell => !!cell).join("").length > 0)
   );
-}
+};
 
 export const createIgnoreRowGroups = (rowGroups: SortableOptionWithGroup[][]) : boolean[] => {
   return rowGroups.flatMap(rowGroup =>
 
-    rowGroup.reduce<[boolean[], boolean[]]>(([b, c], group) => (
+    rowGroup.reduce<[boolean[], boolean[]]>(([b, c], group, index) => (
       [
-        group.filterGroup && [...b, true] || b,
+        selectFilterGroup(group.filterGroup, index>0 && rowGroup[index-1].filterGroup || undefined) && [...b, true] || b,
         [...c, false]
       ]
     ), [[], []])
@@ -75,7 +77,7 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
       tableHeadersConfig.columns.map(column => column.label),
     ];
 
-    const rowHeaders: string[][] = [
+    const rowHeaders: RowHeaderType[][] = [
       ...createRowGroups(tableHeadersConfig.rowGroups),
       tableHeadersConfig.rows.map(row => row.label),
     ];

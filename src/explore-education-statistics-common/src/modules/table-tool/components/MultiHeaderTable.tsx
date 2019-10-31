@@ -7,7 +7,7 @@ interface Props {
   ariaLabelledBy?: string;
   className?: string;
   columnHeaders: string[][];
-  rowHeaders: string[][];
+  rowHeaders: RowHeaderType[][];
   rowHeaderIsGroup?: boolean[];
   rows: string[][];
 }
@@ -18,12 +18,12 @@ export interface SpanInfo {
   start: number;
   isRowGroup: boolean;
 }
-type OptString = string | undefined;
+export type RowHeaderType = string | undefined;
 
-const generateSpanInfoForSingleGroup = (headingsForGroup:OptString[], overallHeaderLength : number, isRowGroup: boolean) => {
+const generateSpanInfoForSingleGroup = (headingsForGroup:RowHeaderType[], overallHeaderLength : number, isRowGroup: boolean) => {
   return headingsForGroup.reduce<SpanInfo[]>(
 
-    (spanInfo: SpanInfo[], nextHeading: OptString, rowIndex: number) => {
+    (spanInfo: SpanInfo[], nextHeading: RowHeaderType, rowIndex: number) => {
 
       if (spanInfo.length === 0) {
         return [
@@ -61,7 +61,7 @@ const generateSpanInfoForSingleGroup = (headingsForGroup:OptString[], overallHea
 };
 
 export const generateHeaderSpanInfo = (
-  headerGroups: OptString[][],
+  headerGroups: RowHeaderType[][],
 ) => {
   const overallHeaderLength = headerGroups.reduce(
     (curMaxLength: number, group) =>
@@ -72,7 +72,7 @@ export const generateHeaderSpanInfo = (
   return headerGroups.reduce<SpanInfo[][]>(
     (
       headerSpanInfo: SpanInfo[][],
-      headingsForGroup: OptString[],
+      headingsForGroup: RowHeaderType[],
       groupIndex: number,
     ) => [
       ...headerSpanInfo,
@@ -101,11 +101,11 @@ export const transposeSpanInfoMatrix = (
 
 
 export const generateAggregatedGroups = (
-  headerGroups: string[][],
+  headerGroups: RowHeaderType[][],
   headerIsGroup: boolean[] = [],
-): (OptString)[][] => {
+): (RowHeaderType)[][] => {
   const aggrigatedDuplication = headerGroups.reduce<{
-    finalGroups: OptString[][];
+    finalGroups: RowHeaderType[][];
     total: number;
   }>(
     ({finalGroups, total}, groups, index) => {
@@ -113,7 +113,7 @@ export const generateAggregatedGroups = (
         index > 0 && headerIsGroup[index - 1] ? 1 : groups.length;
 
       const expandedPreviousGroups = finalGroups.map(finalRow =>
-        ([] as OptString[]).concat(
+        ([] as RowHeaderType[]).concat(
           ...finalRow.map(cell =>
             [...Array(numberOfTimesToRepeat)].map((_, idx) => idx === 0 ? cell : undefined),
           ),
@@ -123,7 +123,7 @@ export const generateAggregatedGroups = (
       return {
         finalGroups: [
           ...expandedPreviousGroups,
-          ([] as OptString[]).concat(...[...Array(total)].map(() => groups)),
+          ([] as RowHeaderType[]).concat(...[...Array(total)].map(() => groups)),
         ],
         total: total * (headerIsGroup[index] ? 1 : groups.length),
       };
@@ -135,15 +135,18 @@ export const generateAggregatedGroups = (
 };
 
 export const generateSpanInfoFromGroups = (
-  groups: string[][],
+  groups: RowHeaderType[][],
   rowHeaderIsGroup: boolean[],
 ): SpanInfo[][] => {
+
+  console.log(groups, rowHeaderIsGroup);
+
   return generateHeaderSpanInfo(
     generateAggregatedGroups(groups, rowHeaderIsGroup)
   );
 };
 
-const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
+export const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
   (
     {
       ariaLabelledBy,
@@ -155,7 +158,7 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
     },
     ref,
   ) => {
-    const getSpan = (groups: string[][], groupIndex: number) => {
+    const getSpan = (groups: RowHeaderType[][], groupIndex: number) => {
       return groups
         .slice(groupIndex + 1)
         .reduce((total, row) => total * row.length, 1);

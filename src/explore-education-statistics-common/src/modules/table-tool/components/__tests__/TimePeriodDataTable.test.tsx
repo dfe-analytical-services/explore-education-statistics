@@ -1,33 +1,72 @@
-import {SortableOptionWithGroup} from "@common/modules/table-tool/components/TableHeadersForm";
-import {createRowGroups, createIgnoreRowGroups} from "@common/modules/table-tool/components/TimePeriodDataTable";
+import { SortableOptionWithGroup } from '@common/modules/table-tool/components/TableHeadersForm';
+import { createRowGroups, createIgnoreRowGroups } from '@common/modules/table-tool/components/TimePeriodDataTable';
 
 describe('MultiHeaderTable', () => {
-  test("createRowGroups", () => {
 
-    const options: SortableOptionWithGroup[][] = [
+  test('createRowGroups 1', () => {
+    const data = [
+      [{ 'value': 'E92000001', 'label': 'England', 'level': '6' }],
+      [{
+        'value': '1',
+        'label': 'Total',
+        'filterGroup': 'Total',
+        'isTotal': true,
+      },
+        {
+          'value': '53',
+          'label': 'Gender male',
+          'filterGroup': 'Gender',
+          'isTotal': false,
+        },
+        {
+          'value': '52',
+          'label': 'Gender female',
+          'filterGroup': 'Gender',
+          'isTotal': false,
+        }]];
+
+    const result = createRowGroups(data);
+
+    expect(result)
+      .toStrictEqual([['England'],
+        ['Total', 'Gender', undefined],
+        ['Total', 'Gender male', 'Gender female']]);
+
+  });
+
+  test('createRowGroups 2', () => {
+    const data = [
+      [{ 'value': 'E92000001', 'label': 'England', 'level': '6' }],
       [
-        {label: "1", value: "1", filterGroup: "default"},
-        {label: "2", value: "2", filterGroup: "default"},
-        {label: "3", value: "3", filterGroup: "default"},
-        {label: "4", value: "4", filterGroup: "default"},
+
+        {
+          'value': '53',
+          'label': 'Gender male',
+          'filterGroup': 'Gender',
+          'isTotal': false,
+        },
+        {
+          'value': '52',
+          'label': 'Gender female',
+          'filterGroup': 'Gender',
+          'isTotal': false,
+        },
+
+        {
+          'value': '1',
+          'label': 'Total',
+          'filterGroup': 'Total',
+          'isTotal': true,
+        },
       ],
-      [
-        {label: "A", value: "A", filterGroup: "total"},
-        {label: "Q", value: "Q", filterGroup: "Q"},
-        {label: "W", value: "W", filterGroup: "Q"},
-        {label: "Z", value: "Z", filterGroup: "Z"},
-        {label: "X", value: "X", filterGroup: "Z"},
-      ]
-
     ];
 
-    const rows = createRowGroups(options);
+    const result = createRowGroups(data);
 
-    console.log(rows);
-
-    const rowIgnore = createIgnoreRowGroups(options);
-
-    console.log(rowIgnore);
+    expect(result)
+      .toStrictEqual([['England'],
+        ['Gender', 'Gender', 'Total'],
+        ['Gender male', 'Gender female', 'Total']]);
 
   });
 });

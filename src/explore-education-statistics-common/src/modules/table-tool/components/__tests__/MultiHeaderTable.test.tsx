@@ -1,7 +1,7 @@
 import React from 'react';
-import {render} from 'react-testing-library';
-import {SortableOptionWithGroup} from '@common/modules/table-tool/components/TableHeadersForm';
-import {createIgnoreRowGroups, createRowGroups,} from '@common/modules/table-tool/components/TimePeriodDataTable';
+import { render } from 'react-testing-library';
+import { SortableOptionWithGroup } from '@common/modules/table-tool/components/TableHeadersForm';
+import { createIgnoreRowGroups, createRowGroups } from '@common/modules/table-tool/components/TimePeriodDataTable';
 import MultiHeaderTable, {
   generateAggregatedGroups,
   generateHeaderSpanInfo, generateSpanInfoFromGroups,
@@ -241,9 +241,9 @@ describe('MultiHeaderTable', () => {
     // console.log( aggregated.map( g => g.map( gg => gg.heading )));
   });
 
-  test("generateHeaderSpanInfo", () => {
+  test('generateHeaderSpanInfo', () => {
 
-    const data=[["1","2"],["3","4"],["5","6"]];
+    const data = [['1', '2'], ['3', '4'], ['5', '6']];
 
     const result = generateSpanInfoFromGroups(data, [false, false, false]);
 
@@ -251,5 +251,56 @@ describe('MultiHeaderTable', () => {
 
     console.log(transposeSpanInfoMatrix(result));
 
-  })
+  });
+
+  test("generateAggregatedGroups", () => {
+    const data = [['England'], ['Total', 'Gender', undefined], ['Total', 'Gender male', 'Gender female'], ['auth']];
+
+    const result = generateAggregatedGroups(data, [false, true, false, false]);
+
+    expect(result)
+      .toStrictEqual(
+
+        [
+          [ 'England', undefined, undefined ],
+          [ 'Total', 'Gender', undefined ],
+          [ 'Total', 'Gender male', 'Gender female' ],
+          [ 'auth', 'auth', 'auth' ]
+        ]
+
+      )
+
+  });
+
+  test('generateHeaderSpanInfo singular', () => {
+
+    const data = [['England'], ['Total', 'Gender', undefined], ['Total', 'Gender male', 'Gender female'], ['auth']];
+
+    const result = generateSpanInfoFromGroups(data, [false, true, false, false]);
+
+    expect(result)
+      .toStrictEqual(
+        [
+          [
+            { heading: 'England', count: 3, start: 0, isRowGroup: true },
+          ],
+          [
+            { heading: 'Total', count: 1, start: 0, isRowGroup: true },
+            { heading: 'Gender', count: 2, start: 1, isRowGroup: true },
+          ],
+          [
+            { heading: 'Total', count: 1, start: 0, isRowGroup: true },
+            { heading: 'Gender male', count: 1, start: 1, isRowGroup: true },
+            { heading: 'Gender female', count: 1, start: 2, isRowGroup: true },
+          ],
+          [
+            { heading: 'auth', count: 1, start: 0, isRowGroup: false },
+            { heading: 'auth', count: 1, start: 1, isRowGroup: false },
+            { heading: 'auth', count: 1, start: 2, isRowGroup: false },
+          ],
+        ]);
+
+  });
+
+
 });

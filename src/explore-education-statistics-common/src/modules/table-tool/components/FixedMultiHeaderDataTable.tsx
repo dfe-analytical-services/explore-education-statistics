@@ -1,7 +1,7 @@
 import React, { forwardRef, ReactNode, Ref, useRef, useEffect } from 'react';
 import Footnote from '@common/modules/table-tool/components/Footnote';
 import { FullTableMeta } from '@common/modules/full-table/types/fullTable';
-import MultiHeaderTable from './MultiHeaderTable';
+import MultiHeaderTable, {  RowHeaderType } from './MultiHeaderTable';
 import styles from './FixedMultiHeaderDataTable.module.scss';
 
 const mobileWidth = 1024;
@@ -11,7 +11,7 @@ interface Props {
   captionId?: string;
   innerRef?: Ref<HTMLElement>;
   columnHeaders: string[][];
-  rowHeaders: string[][];
+  rowHeaders: RowHeaderType[][];
   rowHeaderIsGroup?: boolean[];
   rows: string[][];
   footnotes?: FullTableMeta['footnotes'];
