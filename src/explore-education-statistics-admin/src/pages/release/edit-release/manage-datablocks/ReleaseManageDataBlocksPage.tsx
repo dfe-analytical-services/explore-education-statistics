@@ -66,6 +66,10 @@ const ReleaseManageDataBlocksPage = () => {
 
       if (db.id) {
         newDataBlock = await DataBlocksService.putDataBlock(db.id, db);
+        setDataBlocks([
+          ...dataBlocks.filter(db => db.id !== selectedDataBlock),
+          newDataBlock,
+        ]);
       } else {
         newDataBlock = await DataBlocksService.postDataBlock(releaseId, db);
         setDataBlocks([...dataBlocks, newDataBlock]);
