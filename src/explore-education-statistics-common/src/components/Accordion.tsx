@@ -118,6 +118,7 @@ const Accordion = ({ children, id, onToggleAll, onToggle }: AccordionProps) => {
       id={id}
       ref={ref}
       role="none"
+      data-module="govuk-accordion"
     >
       {isMounted && (
         <div className="govuk-accordion__controls">
