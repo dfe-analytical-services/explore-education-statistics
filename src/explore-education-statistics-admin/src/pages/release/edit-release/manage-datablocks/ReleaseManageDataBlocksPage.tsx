@@ -49,8 +49,8 @@ const ReleaseManageDataBlocksPage = () => {
 
   const dataBlockOptions = React.useMemo(
     () =>
-      dataBlocks.map(({ heading, id }, index) => ({
-        label: `${heading || index}`,
+      dataBlocks.map(({ name, id }, index) => ({
+        label: `${name || index}`,
         value: `${id}`,
       })),
     [dataBlocks],
