@@ -1,7 +1,12 @@
 import WarningMessage from '@common/components/WarningMessage';
 import cartesian from '@common/lib/utils/cartesian';
 import formatPretty from '@common/lib/utils/number/formatPretty';
-import { CategoryFilter, Indicator, LocationFilter, TimePeriodFilter } from '@common/modules/full-table/types/filters';
+import {
+  CategoryFilter,
+  Indicator,
+  LocationFilter,
+  TimePeriodFilter,
+} from '@common/modules/full-table/types/filters';
 import { FullTable } from '@common/modules/full-table/types/fullTable';
 import { RowHeaderType } from '@common/modules/table-tool/components/MultiHeaderTable';
 import camelCase from 'lodash/camelCase';
@@ -9,7 +14,10 @@ import last from 'lodash/last';
 import React, { forwardRef, memo } from 'react';
 import DataTableCaption from './DataTableCaption';
 import FixedMultiHeaderDataTable from './FixedMultiHeaderDataTable';
-import { SortableOptionWithGroup, TableHeadersFormValues } from './TableHeadersForm';
+import {
+  SortableOptionWithGroup,
+  TableHeadersFormValues,
+} from './TableHeadersForm';
 
 interface Props {
   fullTable: FullTable;

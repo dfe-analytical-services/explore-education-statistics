@@ -1,6 +1,11 @@
 import ButtonText from '@common/components/ButtonText';
 import cartesian from '@common/lib/utils/cartesian';
-import { CategoryFilter, Filter, LocationFilter, TimePeriodFilter } from '@common/modules/full-table/types/filters';
+import {
+  CategoryFilter,
+  Filter,
+  LocationFilter,
+  TimePeriodFilter,
+} from '@common/modules/full-table/types/filters';
 import { FullTable } from '@common/modules/full-table/types/fullTable';
 import { transformTableMetaFiltersToCategoryFilters } from '@common/modules/table-tool/components/utils/tableToolHelpers';
 import { saveAs } from 'file-saver';

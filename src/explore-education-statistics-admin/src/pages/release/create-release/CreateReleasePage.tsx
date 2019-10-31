@@ -1,26 +1,19 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
-import ReleaseSummaryForm, {
-  EditFormValues,
-} from '@admin/pages/release/summary/ReleaseSummaryForm';
+import ReleaseSummaryForm, { EditFormValues } from '@admin/pages/release/summary/ReleaseSummaryForm';
 import { assembleCreateReleaseRequestFromForm } from '@admin/pages/release/util/releaseSummaryUtil';
 import dashboardRoutes from '@admin/routes/dashboard/routes';
 import { summaryRoute } from '@admin/routes/edit-release/routes';
-import {
-  ContactDetails,
-  emptyDayMonthYear,
-  IdTitlePair,
-  TimePeriodCoverageGroup,
-} from '@admin/services/common/types';
+import { emptyDayMonthYear, IdTitlePair, TimePeriodCoverageGroup } from '@admin/services/common/types';
 import service from '@admin/services/release/create-release/service';
 import { CreateReleaseRequest } from '@admin/services/release/create-release/types';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
+import RelatedInformation from '@common/components/RelatedInformation';
 import Yup from '@common/lib/validation/yup';
+import { Publication } from '@common/services/publicationService';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import { ObjectSchemaDefinition } from 'yup';
-import RelatedInformation from '@common/components/RelatedInformation';
-import { Publication } from '@common/services/publicationService';
 
 interface MatchProps {
   publicationId: string;

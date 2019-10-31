@@ -146,7 +146,6 @@ export const generateSpanInfoFromGroups = (
   groups: RowHeaderType[][],
   rowHeaderIsGroup: boolean[],
 ): SpanInfo[][] => {
-
   return generateHeaderSpanInfo(
     generateAggregatedGroups(groups, rowHeaderIsGroup),
   );
@@ -262,9 +261,9 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
                         key={cellIndex}
                         className={classNames('govuk-table__cell--numeric', {
                           [styles.borderRight]:
-                          (cellIndex + 1) % firstColSpan === 0,
+                            (cellIndex + 1) % firstColSpan === 0,
                           [styles.borderBottom]:
-                          (rowIndex + 1) % firstRowSpan === 0,
+                            (rowIndex + 1) % firstRowSpan === 0,
                         })}
                       >
                         {cell}
