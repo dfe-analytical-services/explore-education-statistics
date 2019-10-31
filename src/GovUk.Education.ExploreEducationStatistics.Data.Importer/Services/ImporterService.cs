@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using EFCore.BulkExtensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -23,10 +22,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         private readonly StatisticsDbContext _context;
         private readonly ILogger<ImporterService> _logger;
 
-        private int _importCount;
-
-        private static readonly Regex regexTimePeriod = new Regex(@"^[0-9]{4}$", RegexOptions.Compiled);
-        
         private enum Columns
         {
             SCHOOL_COLS,
@@ -120,7 +115,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
         public void ImportFiltersLocationsAndSchools(List<string> lines, SubjectMeta subjectMeta, Subject subject)
         {
-            _importCount = 0;
             var headers = lines.First().Split(',').ToList();
             lines.RemoveAt(0);
             lines.ToList().ForEach(line =>
@@ -131,7 +125,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
         public void ImportObservations(List<string> lines, Subject subject, SubjectMeta subjectMeta, int batchNo, int rowsPerBatch)
         {
-            _importCount = 0;
             var headers = lines.First().Split(',').ToList();
             lines.RemoveAt(0);
             var observations = GetObservations(lines, headers, subject, subjectMeta, batchNo, rowsPerBatch).ToList();

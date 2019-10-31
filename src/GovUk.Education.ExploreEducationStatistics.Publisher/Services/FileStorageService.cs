@@ -102,7 +102,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _logger.LogInformation("Transfer skips. {0} -> {1}.", e.Source, e.Destination);
         }
 
+#pragma warning disable 1998
         private static async Task SetAttributesCallbackAsync(object destination, DateTime releasePublished)
+#pragma warning restore 1998
         {
             var releasePublishedString = releasePublished.ToString("o", CultureInfo.InvariantCulture);
             (destination as CloudBlockBlob)?.Metadata.Add("releasedatetime", releasePublishedString);

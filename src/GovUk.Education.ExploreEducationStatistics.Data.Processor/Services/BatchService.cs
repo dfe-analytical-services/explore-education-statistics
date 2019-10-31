@@ -151,8 +151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 }
                 catch (StorageException se)
                 {
-                    var response = se.RequestInformation.HttpStatusCode;
-                    if (response != null && (response == (int) HttpStatusCode.Conflict))
+                    if (se.RequestInformation.HttpStatusCode == (int) HttpStatusCode.Conflict)
                     {
                         // A Conflict has been found, lease is being used by another process
                         // wait and try again.
