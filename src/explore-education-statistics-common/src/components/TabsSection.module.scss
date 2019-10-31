@@ -1,5 +1,9 @@
 @import '../styles/govuk-base';
 
+.hidden {
+  display: none;
+}
+
 .panel {
   page-break-inside: avoid;
 

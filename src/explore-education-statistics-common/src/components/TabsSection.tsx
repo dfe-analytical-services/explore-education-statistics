@@ -11,7 +11,7 @@ import styles from './TabsSection.module.scss';
 
 export const classes = {
   panel: 'govuk-tabs__panel',
-  panelHidden: 'govuk-tabs__panel--hidden',
+  panelHidden: styles.hidden,
 };
 
 export interface TabsSectionProps {
