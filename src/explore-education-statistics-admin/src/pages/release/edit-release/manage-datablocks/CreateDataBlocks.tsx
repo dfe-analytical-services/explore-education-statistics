@@ -16,6 +16,7 @@ import TimePeriodDataTable from '@common/modules/table-tool/components/TimePerio
 import { reverseMapTableHeadersConfig } from '@common/modules/table-tool/components/utils/tableToolHelpers';
 import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
+import { generateTableTitle } from '@common/modules/table-tool/components/DataTableCaption';
 
 interface Props {
   releaseId: string;
@@ -146,6 +147,14 @@ const CreateDataBlocks = ({
 
                 {finalStepProps.query && tableHeaders && (
                   <DataBlockDetailsForm
+                    initialValues={{
+                      title:
+                        finalStepProps && finalStepProps.createdTable
+                          ? generateTableTitle(
+                              finalStepProps.createdTable.subjectMeta,
+                            )
+                          : undefined,
+                    }}
                     query={finalStepProps.query}
                     tableHeaders={tableHeaders}
                     initialDataBlock={dataBlock}
