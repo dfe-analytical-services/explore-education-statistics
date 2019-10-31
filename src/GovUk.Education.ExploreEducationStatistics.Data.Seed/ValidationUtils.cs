@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Web.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using static GovUk.Education.ExploreEducationStatistics.Data.Seed.ValidationErrorMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Seed
