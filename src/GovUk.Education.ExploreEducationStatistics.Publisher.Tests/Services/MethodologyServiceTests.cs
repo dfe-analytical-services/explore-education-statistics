@@ -101,7 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal("Theme A", result.FirstOrDefault().Title);
                 Assert.Single(result.FirstOrDefault().Topics);
                 Assert.Equal("Topic A", result.FirstOrDefault().Topics.FirstOrDefault().Title);
-                Assert.Equal(1, result.FirstOrDefault().Topics.FirstOrDefault().Publications.Count());
+                Assert.Single(result.FirstOrDefault().Topics.FirstOrDefault().Publications);
             }
         }
     }

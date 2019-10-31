@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
-using MimeTypes;
+using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 {
@@ -89,9 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         
         public static string GetExtension(CloudBlob blob)
         {
-            var contentType = blob.Properties.ContentType;
-            contentType = contentType.Replace("; charset=utf-8", "");
-            return MimeTypeMap.GetExtension(contentType).TrimStart('.');
+            return Path.GetExtension(blob.Name).TrimStart('.');
         }
         
         public static string GetName(CloudBlob blob)
