@@ -27,8 +27,10 @@ interface DataBlockData {
 const ReleaseManageDataBlocksPage = () => {
   const { releaseId } = useContext(ManageReleaseContext) as ManageRelease;
 
-  const [selectedDataBlock, setSelectedDataBlock] = React.useState<string>('');
   const [dataBlocks, setDataBlocks] = React.useState<DataBlock[]>([]);
+  const [selectedDataBlock, setSelectedDataBlock] = React.useState<
+    DataBlock['id']
+  >('');
 
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [isSaving, setIsSaving] = React.useState<boolean>(false);
@@ -66,11 +68,12 @@ const ReleaseManageDataBlocksPage = () => {
         newDataBlock = await DataBlocksService.putDataBlock(db.id, db);
       } else {
         newDataBlock = await DataBlocksService.postDataBlock(releaseId, db);
+        setDataBlocks([...dataBlocks, newDataBlock]);
       }
 
       if (db.id !== selectedDataBlock) {
         await updateDataBlocks(releaseId);
-        setSelectedDataBlock(db.id || '');
+        setSelectedDataBlock(newDataBlock.id || '');
       }
 
       setIsSaving(false);
@@ -127,7 +130,14 @@ const ReleaseManageDataBlocksPage = () => {
   }, []);
 
   const doLoad = React.useCallback(
-    (selectedDataBlockId: string) => {
+    (selectedDataBlockId: string | undefined) => {
+      if (!selectedDataBlockId) {
+        setDataBlockData(undefined);
+        setIsLoading(false);
+        currentlyLoadingDataBlockId.current = undefined;
+        return;
+      }
+
       if (currentlyLoadingDataBlockId.current !== selectedDataBlockId) {
         currentlyLoadingDataBlockId.current = selectedDataBlockId;
 
@@ -157,6 +167,10 @@ const ReleaseManageDataBlocksPage = () => {
     [dataBlocks, releaseId],
   );
 
+  React.useEffect(() => {
+    doLoad(selectedDataBlock);
+  }, [selectedDataBlock]);
+
   return (
     <>
       <FormSelect
@@ -165,8 +179,6 @@ const ReleaseManageDataBlocksPage = () => {
         label="Select an existing data block to edit or create a new one"
         onChange={e => {
           setSelectedDataBlock(e.target.value);
-
-          doLoad(e.target.value);
         }}
         order={[]}
         optGroups={{
@@ -178,6 +190,7 @@ const ReleaseManageDataBlocksPage = () => {
           ],
           'Edit existing': dataBlockOptions,
         }}
+        value={selectedDataBlock}
       />
 
       <hr />
