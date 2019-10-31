@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 CreateIdListType("wardList", query.Ward);
             var filtersListParam = CreateIdListType("filtersList", query.Filters);
 
-            var inner = _context.Query<IdWrapper>().FromSqlRaw("EXEC dbo.FilteredObservations " +
+            var inner = _context.Set<IdWrapper>().FromSqlRaw("EXEC dbo.FilteredObservations " +
                                                                "@subjectId," +
                                                                "@geographicLevel," +
                                                                "@timePeriodList," +
