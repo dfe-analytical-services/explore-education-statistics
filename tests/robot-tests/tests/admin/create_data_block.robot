@@ -33,11 +33,12 @@ Validate release summary tab has correct details
     user checks summary list item "Next release expected" should be "04 April 2031"
     user checks summary list item "Release type" should be "Ad Hoc"
 
-Navigate to Manage data tab, check Absence in PRUs is uploaded
+Navigate to Manage data tab, check subjects are there
     [Tags]  HappyPath
     user clicks element  xpath://li/a[text()="Manage data"]
     user waits until page contains element   xpath://legend[text()="Add new data to release"]
     data csv number contains xpath  1   //dt[text()="Subject title"]/../dd/h4[text()="Absence in PRUs"]
+    data csv number contains xpath  2   //dt[text()="Subject title"]/../dd/h4[text()="Absence rate percent bands"]
 
 Navigate to Manage data blocks tab
     [Tags]  HappyPath
@@ -74,9 +75,9 @@ Select Time Period 2014/15 - 2014/15
 
 Select indicators
     [Tags]  HappyPath
-    user clicks indicator checkbox  Absence fields   Authorised absence rate
-    user clicks indicator checkbox  Absence fields   Overall absence rate
-    user clicks indicator checkbox  Absence fields   Unauthorised absence rate
+    user clicks subheaded indicator checkbox  Absence fields   Authorised absence rate
+    user clicks subheaded indicator checkbox  Absence fields   Overall absence rate
+    user clicks subheaded indicator checkbox  Absence fields   Unauthorised absence rate
 
 Create table
     [Tags]  HappyPath
@@ -142,9 +143,9 @@ Refresh page, select new data block, verify selections
     user checks previous table tool step contains  2   Local Authority   Bedford
     user checks previous table tool step contains  3   Start date    2014/15
     user checks previous table tool step contains  3   End date      2014/15
-    user checks indicator checkbox is selected  Absence fields   Authorised absence rate
-    user checks indicator checkbox is selected  Absence fields   Overall absence rate
-    user checks indicator checkbox is selected  Absence fields   Unauthorised absence rate
+    user checks subheaded indicator checkbox is selected  Absence fields   Authorised absence rate
+    user checks subheaded indicator checkbox is selected  Absence fields   Overall absence rate
+    user checks subheaded indicator checkbox is selected  Absence fields   Unauthorised absence rate
     user checks category checkbox is selected   School type   Pupil Referral Unit
 
     user checks results table column heading contains  1  1  Pupil Referral Unit

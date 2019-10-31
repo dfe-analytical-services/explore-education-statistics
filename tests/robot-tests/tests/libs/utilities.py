@@ -159,11 +159,19 @@ def user_selects_start_date(start_date):
 def user_selects_end_date(end_date):
   sl.select_from_list_by_label('css:#timePeriodForm-end', end_date)
 
-def user_clicks_indicator_checkbox(subheading_label, indicator_label):
+def user_clicks_indicator_checkbox(indicator_label):
+  sl.driver.find_element_by_xpath(
+    f'//*[@id="filtersForm-indicators"]//label[contains(text(),"{indicator_label}")]').click()
+
+def user_clicks_subheaded_indicator_checkbox(subheading_label, indicator_label):
   sl.driver.find_element_by_xpath(
     f'//*[@id="filtersForm-indicators"]//legend[text()="{subheading_label}"]/..//label[text()="{indicator_label}"]').click()
 
-def user_checks_indicator_checkbox_is_selected(subheading_label, indicator_label):
+def user_checks_indicator_checkbox_is_selected(indicator_label):
+  sl.checkbox_should_be_selected(
+    f'xpath://*[@id="filtersForm-indicators"]//label[contains(text(), "{indicator_label}")]/../input')
+
+def user_checks_subheaded_indicator_checkbox_is_selected(subheading_label, indicator_label):
   sl.checkbox_should_be_selected(
     f'xpath://*[@id="filtersForm-indicators"]//legend[text()="{subheading_label}"]/..//label[text()="{indicator_label}"]/../input')
 
@@ -194,7 +202,17 @@ def user_checks_results_table_cell_contains(row, column, expected):
     raise AssertionError(
       f'"{expected}" not found in td tag in results table tbody row {row}, column {column}. Found text "{elem.text}".')
 
+def user_checks_list_contains_label(list_locator, label):
+  labels = sl.get_list_items(list_locator)
+  if label not in labels:
+    raise AssertionError(f'"{label}" wasn\'t found amongst list items "{labels}" from locator "{list_locator}"')
+
 def user_checks_list_does_not_contain_label(list_locator, label):
   labels = sl.get_list_items(list_locator)
   if label in labels:
     raise AssertionError(f'"{label}" was found amongst list items "{labels}" from locator "{list_locator}"')
+
+def user_checks_selected_list_label(list_locator, label):
+  selected_label = sl.get_selected_list_label(list_locator)
+  if selected_label != label:
+    raise AssertionError(f'Selected label "{selected_label}" didn\'t match label "{label} for list "{list_Locator}"')
