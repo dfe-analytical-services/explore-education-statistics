@@ -41,12 +41,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             try
             {
                 var trees = await UpdateTrees();
-
                 var publications = await UpdatePublicationsAndReleases();
-
                 var methodologies = await UpdateMethodologies();
 
-                return trees && methodologies && publications;
+                return trees && publications && methodologies;
             }
             catch (Exception ex)
             {

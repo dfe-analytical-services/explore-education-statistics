@@ -18,9 +18,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public IEnumerable<Publication> ListPublicationsWithPublishedReleases()
         {
-            // TODO: sort this to only be live releases
-            return _context.Publications.Where(x => x.Releases.Any(r => r.Live)).Include(p => p.Releases).ToList();
-//            return _context.Publications.Where(x => x.Releases.Any(r => r.Live)).Include(p => p.Releases.Where(r => r.Live)).ToList();
+            return _context.Publications
+                // TODO: Only include releases that are live rather than all releases
+                .Include(p => p.Releases)
+                .ToList()
+                .Where(publication => publication.Releases.Any(release => release.Live));
         }
     }
 }
