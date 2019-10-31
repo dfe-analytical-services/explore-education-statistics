@@ -41,7 +41,7 @@ class FormRadioGroup extends PureComponent<FormRadioGroupProps> {
 
   public componentDidMount(): void {
     if (this.ref.current) {
-      import('govuk-frontend/components/radios/radios').then(
+      import('govuk-frontend/govuk/components/radios/radios').then(
         ({ default: GovUkRadios }) => {
           new GovUkRadios(this.ref.current).init();
         },

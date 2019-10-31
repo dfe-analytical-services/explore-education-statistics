@@ -25,7 +25,7 @@ const ErrorSummary = ({
   const [prevErrors, setPrevErrors] = useState(0);
 
   useEffect(() => {
-    import('govuk-frontend/components/error-summary/error-summary').then(
+    import('govuk-frontend/govuk/components/error-summary/error-summary').then(
       ({ default: GovUkErrorSummary }) => {
         new GovUkErrorSummary(ref.current).init();
       },

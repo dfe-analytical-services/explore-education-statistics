@@ -103,7 +103,7 @@ const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
         </div>
         {footnotes.length > 0 && (
           <>
-            <h3>Footnotes</h3>
+            <h2 className="govuk-heading-m">Footnotes</h2>
             <Footnote content={footnotes} />
           </>
         )}

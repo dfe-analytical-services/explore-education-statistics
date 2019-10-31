@@ -284,7 +284,7 @@ describe('HorzontalBarBlock', () => {
 
     const { container } = render(<Chart {...propsWithTicks} />);
 
-    expectTicks(container, 'x', '-3', '1', '5', '10');
+    expectTicks(container, 'x', '-3', '3', '9', '20');
   });
 
   test('Can limit range of minor ticks to start and end', () => {
@@ -302,7 +302,7 @@ describe('HorzontalBarBlock', () => {
 
     const { container } = render(<Chart {...propsWithTicks} />);
 
-    expectTicks(container, 'x', '-3', '10');
+    expectTicks(container, 'x', '-3', '20');
   });
 
   test('Can limit range of minor ticks to custom', () => {

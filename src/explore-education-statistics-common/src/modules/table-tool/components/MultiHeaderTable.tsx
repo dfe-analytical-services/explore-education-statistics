@@ -238,6 +238,7 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, Props>(
                     key={`${rowIndex}_${headerGroupIndex}`}
                     className={classNames({
                       'govuk-table__cell--numeric': !column.isRowGroup,
+                      [styles.cellVerticalMiddle]: !column.isRowGroup,
                       'govuk-table__cell--center': column.isRowGroup,
                       [styles.borderBottom]: column.isRowGroup,
                     })}

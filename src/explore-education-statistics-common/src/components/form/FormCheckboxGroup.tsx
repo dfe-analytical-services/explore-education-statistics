@@ -64,7 +64,7 @@ export class BaseFormCheckboxGroup extends PureComponent<
 
   public componentDidMount(): void {
     if (this.ref.current) {
-      import('govuk-frontend/components/checkboxes/checkboxes').then(
+      import('govuk-frontend/govuk/components/checkboxes/checkboxes').then(
         ({ default: GovUkCheckboxes }) => {
           if (this.ref.current) {
             new GovUkCheckboxes(this.ref.current).init();
