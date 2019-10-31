@@ -51,7 +51,7 @@ exports[`MultiHeaderTable renders 2x2 table correctly 1`] = `
   </thead>
   <tbody>
     <tr>
-      <th class="govuk-table__cell--center borderBottom"
+      <th class="cellVerticalMiddle borderBottom"
           rowspan="2"
           scope="rowgroup"
       >
@@ -97,7 +97,7 @@ exports[`MultiHeaderTable renders 2x2 table correctly 1`] = `
       </td>
     </tr>
     <tr>
-      <th class="govuk-table__cell--center borderBottom"
+      <th class="cellVerticalMiddle borderBottom"
           rowspan="2"
           scope="rowgroup"
       >
@@ -247,13 +247,13 @@ exports[`MultiHeaderTable renders 2x2x2 table correctly 1`] = `
   </thead>
   <tbody>
     <tr>
-      <th class="govuk-table__cell--center borderBottom"
+      <th class="cellVerticalMiddle borderBottom"
           rowspan="4"
           scope="rowgroup"
       >
         1
       </th>
-      <th class="govuk-table__cell--center borderBottom"
+      <th class="cellVerticalMiddle borderBottom"
           rowspan="2"
           scope="rowgroup"
       >
@@ -323,7 +323,7 @@ exports[`MultiHeaderTable renders 2x2x2 table correctly 1`] = `
       </td>
     </tr>
     <tr>
-      <th class="govuk-table__cell--center borderBottom"
+      <th class="cellVerticalMiddle borderBottom"
           rowspan="2"
           scope="rowgroup"
       >
@@ -393,13 +393,13 @@ exports[`MultiHeaderTable renders 2x2x2 table correctly 1`] = `
       </td>
     </tr>
     <tr>
-      <th class="govuk-table__cell--center borderBottom"
+      <th class="cellVerticalMiddle borderBottom"
           rowspan="4"
           scope="rowgroup"
       >
         2
       </th>
-      <th class="govuk-table__cell--center borderBottom"
+      <th class="cellVerticalMiddle borderBottom"
           rowspan="2"
           scope="rowgroup"
       >
@@ -469,7 +469,7 @@ exports[`MultiHeaderTable renders 2x2x2 table correctly 1`] = `
       </td>
     </tr>
     <tr>
-      <th class="govuk-table__cell--center borderBottom"
+      <th class="cellVerticalMiddle borderBottom"
           rowspan="2"
           scope="rowgroup"
       >
