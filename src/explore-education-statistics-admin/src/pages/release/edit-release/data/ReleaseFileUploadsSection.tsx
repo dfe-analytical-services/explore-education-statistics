@@ -84,36 +84,6 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
       render={(form: FormikProps<FormValues>) => {
         return (
           <Form id={formId} submitValidationHandler={handleServerValidation}>
-            {files &&
-              files.map(file => (
-                <SummaryList key={file.filename}>
-                  <SummaryListItem term="Name">{file.title}</SummaryListItem>
-                  <SummaryListItem term="File">
-                    <a
-                      href={service.createDownloadAncillaryFileLink(
-                        releaseId,
-                        file.filename,
-                      )}
-                    >
-                      {file.filename}
-                    </a>
-                  </SummaryListItem>
-                  <SummaryListItem term="Filesize">
-                    {file.fileSize.size.toLocaleString()} {file.fileSize.unit}
-                  </SummaryListItem>
-                  <SummaryListItem
-                    term="Actions"
-                    actions={
-                      <Link
-                        to="#"
-                        onClick={() => setDeleteFileName(file.filename)}
-                      >
-                        Delete file
-                      </Link>
-                    }
-                  />
-                </SummaryList>
-              ))}
             <FormFieldset
               id={`${formId}-allFieldsFieldset`}
               legend="Upload file"
@@ -122,6 +92,7 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
                 id={`${formId}-name`}
                 name="name"
                 label="Name"
+                width={20}
               />
 
               <FormFieldFileSelector<FormValues>
@@ -133,15 +104,54 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
               />
             </FormFieldset>
 
-            <Button type="submit" className="govuk-!-margin-top-6">
+            <Button
+              type="submit"
+              className="govuk-button govuk-!-margin-right-6"
+            >
               Upload file
             </Button>
 
-            <div className="govuk-!-margin-top-6">
-              <Link to={dataRoute.generateLink(publicationId, releaseId)}>
-                Cancel
-              </Link>
-            </div>
+            <Link
+              to="#"
+              className="govuk-button govuk-button--secondary"
+              onClick={() => resetPage(form)}
+            >
+              Cancel
+            </Link>
+            {files &&
+              files.map(file => (
+                <>
+                  <hr />
+                  <h2 className="govuk-heading-m">Uploaded files</h2>
+                  <SummaryList key={file.filename}>
+                    <SummaryListItem term="Name">{file.title}</SummaryListItem>
+                    <SummaryListItem term="File">
+                      <a
+                        href={service.createDownloadAncillaryFileLink(
+                          releaseId,
+                          file.filename,
+                        )}
+                      >
+                        {file.filename}
+                      </a>
+                    </SummaryListItem>
+                    <SummaryListItem term="Filesize">
+                      {file.fileSize.size.toLocaleString()} {file.fileSize.unit}
+                    </SummaryListItem>
+                    <SummaryListItem
+                      term="Actions"
+                      actions={
+                        <Link
+                          to="#"
+                          onClick={() => setDeleteFileName(file.filename)}
+                        >
+                          Delete file
+                        </Link>
+                      }
+                    />
+                  </SummaryList>
+                </>
+              ))}
 
             <ModalConfirm
               mounted={deleteFileName != null && deleteFileName.length > 0}

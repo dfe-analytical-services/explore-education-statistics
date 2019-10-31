@@ -163,66 +163,6 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
       render={(form: FormikProps<FormValues>) => {
         return (
           <Form id={formId} submitValidationHandler={handleServerValidation}>
-            {dataFiles.map(dataFile => (
-              <SummaryList
-                key={dataFile.filename}
-                additionalClassName="govuk-!-margin-bottom-9"
-              >
-                <SummaryListItem term="Subject title">
-                  <h4 className="govuk-heading-m">{dataFile.title}</h4>
-                </SummaryListItem>
-                <SummaryListItem term="Data file">
-                  <a
-                    href={service.createDownloadDataFileLink(
-                      releaseId,
-                      dataFile.filename,
-                    )}
-                  >
-                    {dataFile.filename}
-                  </a>
-                </SummaryListItem>
-                <SummaryListItem term="Filesize">
-                  {dataFile.fileSize.size.toLocaleString()}{' '}
-                  {dataFile.fileSize.unit}
-                </SummaryListItem>
-                <SummaryListItem term="Number of rows">
-                  {dataFile.rows.toLocaleString()}
-                </SummaryListItem>
-                <SummaryListItem term="Metadata file">
-                  <a
-                    href={service.createDownloadDataMetadataFileLink(
-                      releaseId,
-                      dataFile.metadataFilename,
-                    )}
-                  >
-                    {dataFile.metadataFilename}
-                  </a>
-                </SummaryListItem>
-                <ImporterStatus
-                  releaseId={releaseId}
-                  dataFile={dataFile}
-                  onStatusChangeHandler={statusChangeHandler}
-                />
-                <SummaryListItem term="Uploaded by">
-                  <a href={`mailto:${dataFile.userName}`}>
-                    {dataFile.userName}
-                  </a>
-                </SummaryListItem>
-                <SummaryListItem term="Date Uploaded">
-                  {format(dataFile.created, 'd/M/yyyy HH:mm')}
-                </SummaryListItem>
-                {dataFile.canDelete && (
-                  <SummaryListItem
-                    term="Actions"
-                    actions={
-                      <Link to="#" onClick={() => setDeleteDataFile(dataFile)}>
-                        Delete files
-                      </Link>
-                    }
-                  />
-                )}
-              </SummaryList>
-            ))}
             <FormFieldset
               id={`${formId}-allFieldsFieldset`}
               legend="Add new data to release"
@@ -231,6 +171,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                 id={`${formId}-subjectTitle`}
                 name="subjectTitle"
                 label="Subject title"
+                width={20}
               />
 
               <FormFieldFileSelector<FormValues>
@@ -249,15 +190,88 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
               />
             </FormFieldset>
 
-            <Button type="submit" className="govuk-!-margin-top-6">
+            <Button
+              type="submit"
+              className="govuk-button govuk-!-margin-right-6"
+            >
               Upload data files
             </Button>
+            <Link
+              to="#"
+              className="govuk-button govuk-button--secondary"
+              onClick={() => resetPage(form)}
+            >
+              Cancel
+            </Link>
 
-            <div className="govuk-!-margin-top-6">
-              <Link to="#" onClick={() => resetPage(form)}>
-                Cancel
-              </Link>
-            </div>
+            {dataFiles.map(dataFile => (
+              <>
+                <hr />
+                <h2 className="govuk-heading-m">Uploaded data files</h2>
+                <SummaryList
+                  key={dataFile.filename}
+                  additionalClassName="govuk-!-margin-bottom-9"
+                >
+                  <SummaryListItem term="Subject title">
+                    <h4 className="govuk-heading-m">{dataFile.title}</h4>
+                  </SummaryListItem>
+                  <SummaryListItem term="Data file">
+                    <a
+                      href={service.createDownloadDataFileLink(
+                        releaseId,
+                        dataFile.filename,
+                      )}
+                    >
+                      {dataFile.filename}
+                    </a>
+                  </SummaryListItem>
+                  <SummaryListItem term="Metadata file">
+                    <a
+                      href={service.createDownloadDataMetadataFileLink(
+                        releaseId,
+                        dataFile.metadataFilename,
+                      )}
+                    >
+                      {dataFile.metadataFilename}
+                    </a>
+                  </SummaryListItem>
+                  <SummaryListItem term="Filesize">
+                    {dataFile.fileSize.size.toLocaleString()}{' '}
+                    {dataFile.fileSize.unit}
+                  </SummaryListItem>
+                  <SummaryListItem term="Number of rows">
+                    {dataFile.rows.toLocaleString()}
+                  </SummaryListItem>
+
+                  <ImporterStatus
+                    releaseId={releaseId}
+                    dataFile={dataFile}
+                    onStatusChangeHandler={statusChangeHandler}
+                  />
+                  <SummaryListItem term="Uploaded by">
+                    <a href={`mailto:${dataFile.userName}`}>
+                      {dataFile.userName}
+                    </a>
+                  </SummaryListItem>
+                  <SummaryListItem term="Date Uploaded">
+                    {format(dataFile.created, 'd/M/yyyy HH:mm')}
+                  </SummaryListItem>
+                  {dataFile.canDelete && (
+                    <SummaryListItem
+                      term="Actions"
+                      actions={
+                        <Link
+                          to="#"
+                          onClick={() => setDeleteDataFile(dataFile)}
+                        >
+                          Delete files
+                        </Link>
+                      }
+                    />
+                  )}
+                </SummaryList>
+              </>
+            ))}
 
             <ModalConfirm
               mounted={deleteDataFile && deleteDataFile.title.length > 0}
