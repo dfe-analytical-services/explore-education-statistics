@@ -35,6 +35,13 @@ const selectFilterGroup = (
   return '';
 };
 
+export const createColumnGroups = (columnGroups: SortableOptionWithGroup[][]): string[][] => {
+
+  return columnGroups.map(colGroup =>
+    colGroup.map(group => group.label),
+  );
+};
+
 export const createRowGroups = (
   rowGroups: SortableOptionWithGroup[][],
 ): RowHeaderType[][] => {
@@ -49,7 +56,7 @@ export const createRowGroups = (
               (index > 0 && rowGroup[index - 1].filterGroup) || undefined,
             ),
           ]) ||
-            b,
+          b,
           [...c, group.label],
         ],
         [[], []],
@@ -72,7 +79,7 @@ export const createIgnoreRowGroups = (
               group.filterGroup,
               (index > 0 && rowGroup[index - 1].filterGroup) || undefined,
             ) && [...b, true]) ||
-              b,
+            b,
             [...c, false],
           ],
           [[], []],
@@ -98,13 +105,12 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
     }
 
     const columnHeaders: string[][] = [
-      ...tableHeadersConfig.columnGroups.map(colGroup =>
-        colGroup.map(group => group.label),
-      ),
+      ...createColumnGroups(tableHeadersConfig.columnGroups),
       tableHeadersConfig.columns.map(column => column.label),
     ];
 
     const rowHeaders: RowHeaderType[][] = [
+
       ...createRowGroups(tableHeadersConfig.rowGroups),
       tableHeadersConfig.rows.map(row => row.label),
     ];
