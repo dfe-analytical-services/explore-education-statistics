@@ -1,5 +1,5 @@
 *** Settings ***
-Resource    ../libs/common.robot
+Resource    ../libs/public-common.robot
 
 Force Tags  GeneralPublic  Local  Dev  Test
 
