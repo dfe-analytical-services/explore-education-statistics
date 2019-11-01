@@ -204,73 +204,73 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
               Cancel
             </Link>
 
-            {dataFiles.map(dataFile => (
+            {dataFiles.length > 0 && (
               <>
                 <hr />
                 <h2 className="govuk-heading-m">Uploaded data files</h2>
-                <SummaryList
-                  key={dataFile.filename}
-                  additionalClassName="govuk-!-margin-bottom-9"
-                >
-                  <SummaryListItem term="Subject title">
-                    <h4 className="govuk-heading-m">{dataFile.title}</h4>
-                  </SummaryListItem>
-                  <SummaryListItem term="Data file">
-                    <a
-                      href={service.createDownloadDataFileLink(
-                        releaseId,
-                        dataFile.filename,
-                      )}
-                    >
-                      {dataFile.filename}
-                    </a>
-                  </SummaryListItem>
-                  <SummaryListItem term="Metadata file">
-                    <a
-                      href={service.createDownloadDataMetadataFileLink(
-                        releaseId,
-                        dataFile.metadataFilename,
-                      )}
-                    >
-                      {dataFile.metadataFilename}
-                    </a>
-                  </SummaryListItem>
-                  <SummaryListItem term="Filesize">
-                    {dataFile.fileSize.size.toLocaleString()}{' '}
-                    {dataFile.fileSize.unit}
-                  </SummaryListItem>
-                  <SummaryListItem term="Number of rows">
-                    {dataFile.rows.toLocaleString()}
-                  </SummaryListItem>
-
-                  <ImporterStatus
-                    releaseId={releaseId}
-                    dataFile={dataFile}
-                    onStatusChangeHandler={statusChangeHandler}
-                  />
-                  <SummaryListItem term="Uploaded by">
-                    <a href={`mailto:${dataFile.userName}`}>
-                      {dataFile.userName}
-                    </a>
-                  </SummaryListItem>
-                  <SummaryListItem term="Date Uploaded">
-                    {format(dataFile.created, 'd/M/yyyy HH:mm')}
-                  </SummaryListItem>
-                  {dataFile.canDelete && (
-                    <SummaryListItem
-                      term="Actions"
-                      actions={
-                        <Link
-                          to="#"
-                          onClick={() => setDeleteDataFile(dataFile)}
-                        >
-                          Delete files
-                        </Link>
-                      }
-                    />
-                  )}
-                </SummaryList>
               </>
+            )}
+
+            {dataFiles.map(dataFile => (
+              <SummaryList
+                key={dataFile.filename}
+                additionalClassName="govuk-!-margin-bottom-9"
+              >
+                <SummaryListItem term="Subject title">
+                  <h4 className="govuk-heading-m">{dataFile.title}</h4>
+                </SummaryListItem>
+                <SummaryListItem term="Data file">
+                  <a
+                    href={service.createDownloadDataFileLink(
+                      releaseId,
+                      dataFile.filename,
+                    )}
+                  >
+                    {dataFile.filename}
+                  </a>
+                </SummaryListItem>
+                <SummaryListItem term="Metadata file">
+                  <a
+                    href={service.createDownloadDataMetadataFileLink(
+                      releaseId,
+                      dataFile.metadataFilename,
+                    )}
+                  >
+                    {dataFile.metadataFilename}
+                  </a>
+                </SummaryListItem>
+                <SummaryListItem term="Filesize">
+                  {dataFile.fileSize.size.toLocaleString()}{' '}
+                  {dataFile.fileSize.unit}
+                </SummaryListItem>
+                <SummaryListItem term="Number of rows">
+                  {dataFile.rows.toLocaleString()}
+                </SummaryListItem>
+
+                <ImporterStatus
+                  releaseId={releaseId}
+                  dataFile={dataFile}
+                  onStatusChangeHandler={statusChangeHandler}
+                />
+                <SummaryListItem term="Uploaded by">
+                  <a href={`mailto:${dataFile.userName}`}>
+                    {dataFile.userName}
+                  </a>
+                </SummaryListItem>
+                <SummaryListItem term="Date Uploaded">
+                  {format(dataFile.created, 'd/M/yyyy HH:mm')}
+                </SummaryListItem>
+                {dataFile.canDelete && (
+                  <SummaryListItem
+                    term="Actions"
+                    actions={
+                      <Link to="#" onClick={() => setDeleteDataFile(dataFile)}>
+                        Delete files
+                      </Link>
+                    }
+                  />
+                )}
+              </SummaryList>
             ))}
 
             <ModalConfirm

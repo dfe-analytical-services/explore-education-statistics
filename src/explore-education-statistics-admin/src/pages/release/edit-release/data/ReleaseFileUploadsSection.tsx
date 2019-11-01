@@ -118,39 +118,43 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
             >
               Cancel
             </Link>
+            {files && (
+              <>
+                <hr />
+                <h2 className="govuk-heading-m">Uploaded files</h2>
+              </>
+            )}
             {files &&
               files.map(file => (
-                <>
-                  <hr />
-                  <h2 className="govuk-heading-m">Uploaded files</h2>
-                  <SummaryList key={file.filename}>
-                    <SummaryListItem term="Name">{file.title}</SummaryListItem>
-                    <SummaryListItem term="File">
-                      <a
-                        href={service.createDownloadAncillaryFileLink(
-                          releaseId,
-                          file.filename,
-                        )}
+                <SummaryList key={file.filename}>
+                  <SummaryListItem term="Name">
+                    <h4 className="govuk-heading-m">{file.title}</h4>
+                  </SummaryListItem>
+                  <SummaryListItem term="File">
+                    <a
+                      href={service.createDownloadAncillaryFileLink(
+                        releaseId,
+                        file.filename,
+                      )}
+                    >
+                      {file.filename}
+                    </a>
+                  </SummaryListItem>
+                  <SummaryListItem term="Filesize">
+                    {file.fileSize.size.toLocaleString()} {file.fileSize.unit}
+                  </SummaryListItem>
+                  <SummaryListItem
+                    term="Actions"
+                    actions={
+                      <Link
+                        to="#"
+                        onClick={() => setDeleteFileName(file.filename)}
                       >
-                        {file.filename}
-                      </a>
-                    </SummaryListItem>
-                    <SummaryListItem term="Filesize">
-                      {file.fileSize.size.toLocaleString()} {file.fileSize.unit}
-                    </SummaryListItem>
-                    <SummaryListItem
-                      term="Actions"
-                      actions={
-                        <Link
-                          to="#"
-                          onClick={() => setDeleteFileName(file.filename)}
-                        >
-                          Delete file
-                        </Link>
-                      }
-                    />
-                  </SummaryList>
-                </>
+                        Delete file
+                      </Link>
+                    }
+                  />
+                </SummaryList>
               ))}
 
             <ModalConfirm
