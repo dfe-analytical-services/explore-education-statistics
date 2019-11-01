@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
     [ExcludeFromCodeCoverage]
     public partial class StoreTimePeriodCoverageAsEnumValueOnRelease : Migration
     {
-        private const string MigrationsPath = "Migrations/";
+        private const string MigrationsPath = "Migrations/ContentMigrations/";
         
         protected override void Up(MigrationBuilder migrationBuilder)
         {
