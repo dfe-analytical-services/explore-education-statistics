@@ -5,7 +5,7 @@
     var email = User.Claims.FirstOrDefault(x => x.Type == "email")?.Value;
     var givenname = User.Claims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname")?.Value;
     var surname = User.Claims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname")?.Value;
-    
+
     // TOOO - temp work around for dfe accounts to get name
     if (email != null && email.ToLower().Contains("education.gov.uk"))
     {
@@ -13,17 +13,19 @@
         givenname = address.Split('.').First();
         surname = address.Split('.').Last();
     }
-    
+
     <button type="button" role="button" class="govuk-header__menu-button js-header-toggle" aria-controls="navigation" aria-label="Show or hide Top Level Navigation">Menu</button>
     <nav>
         <ul id="navigation" class="govuk-header__navigation " aria-label="Top Level Navigation">
             <li class="govuk-header__navigation-item">
+                <a class="govuk-header__link" href="/documentation">Administrators' guide</a>
+            </li>
+            <li class="govuk-header__navigation-item">
                 <a class="govuk-header__link">@givenname @surname</a>
             </li>
             <li class="govuk-header__navigation-item">
-                <a class="govuk-header__link" asp-area="AzureAD" asp-controller="Account" asp-action="SignOut">Sign out</a>
+                <a href="/authentication/logout" class="govuk-header__link">Sign out</a>
             </li>
         </ul>
     </nav>
 }
-
