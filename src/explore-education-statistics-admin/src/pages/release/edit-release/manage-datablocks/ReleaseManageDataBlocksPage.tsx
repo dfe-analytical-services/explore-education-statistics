@@ -20,7 +20,6 @@ import ViewDataBlocks from './ViewDataBlocks';
 
 interface DataBlockData {
   dataBlock: DataBlock;
-  dataBlockRequest: DataBlockRequest;
   dataBlockResponse: DataBlockResponse;
 }
 
@@ -146,16 +145,11 @@ const ReleaseManageDataBlocksPage = () => {
         currentlyLoadingDataBlockId.current = selectedDataBlockId;
 
         load(dataBlocks, releaseId, selectedDataBlockId).then(
-          ({
-            dataBlock,
-            request: dataBlockRequest,
-            response: dataBlockResponse,
-          }) => {
+          ({ dataBlock, response: dataBlockResponse }) => {
             if (currentlyLoadingDataBlockId.current === selectedDataBlockId) {
-              if (dataBlock && dataBlockRequest && dataBlockResponse) {
+              if (dataBlock && dataBlockResponse) {
                 setDataBlockData({
                   dataBlock,
-                  dataBlockRequest,
                   dataBlockResponse,
                 });
               } else {
