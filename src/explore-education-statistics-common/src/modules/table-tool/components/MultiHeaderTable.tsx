@@ -1,6 +1,6 @@
 import classNames from 'classnames';
-import React, {forwardRef, ReactElement} from 'react';
-import {times} from 'lodash';
+import React, { forwardRef, ReactElement } from 'react';
+import { times } from 'lodash';
 import styles from './MultiHeaderTable.module.scss';
 
 export type RowHeaderType = string | undefined;
