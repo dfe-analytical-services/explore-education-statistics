@@ -39,6 +39,7 @@ const FormFieldSortableListGroup = <T extends Dictionary<SortableOption[][]>>({
                   id={`sortableListGroup-${name}`}
                   legend={legend}
                   error={getError(name)}
+                  legendSize="m"
                 >
                   <div className={styles.listsContainer}>
                     {form.values[name].length === 0 && (

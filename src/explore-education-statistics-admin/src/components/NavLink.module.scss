@@ -5,6 +5,5 @@
 }
 
 .app-navigation--current-page:global(.govuk-link):focus {
-  background: govuk-colour('white');
-  color: $govuk-link-colour;
+  border-bottom: 0;
 }
