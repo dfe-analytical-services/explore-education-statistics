@@ -10,7 +10,8 @@ interface Props {
   caption: ReactNode;
   captionId?: string;
   innerRef?: Ref<HTMLElement>;
-  columnHeaders: string[][];
+  columnHeaders: RowHeaderType[][];
+  columnHeaderIsGroup?: boolean[];
   rowHeaders: RowHeaderType[][];
   rowHeaderIsGroup?: boolean[];
   rows: string[][];

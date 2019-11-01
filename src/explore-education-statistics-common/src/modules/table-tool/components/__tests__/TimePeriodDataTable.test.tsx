@@ -1,7 +1,7 @@
-import { createRowGroups } from '@common/modules/table-tool/components/TimePeriodDataTable';
+import { createHeadersFromGroups } from '@common/modules/table-tool/components/TimePeriodDataTable';
 
 describe('MultiHeaderTable', () => {
-  test('createRowGroups 1', () => {
+  test('createHeadersFromGroups 1', () => {
     const data = [
       [{ value: 'E92000001', label: 'England', level: '6' }],
       [
@@ -26,7 +26,7 @@ describe('MultiHeaderTable', () => {
       ],
     ];
 
-    const result = createRowGroups(data);
+    const result = createHeadersFromGroups(data);
 
     expect(result).toStrictEqual([
       ['England'],
@@ -35,7 +35,7 @@ describe('MultiHeaderTable', () => {
     ]);
   });
 
-  test('createRowGroups 2', () => {
+  test('createHeadersFromGroups 2', () => {
     const data = [
       [{ value: 'E92000001', label: 'England', level: '6' }],
       [
@@ -61,7 +61,7 @@ describe('MultiHeaderTable', () => {
       ],
     ];
 
-    const result = createRowGroups(data);
+    const result = createHeadersFromGroups(data);
 
     expect(result).toStrictEqual([
       ['England'],

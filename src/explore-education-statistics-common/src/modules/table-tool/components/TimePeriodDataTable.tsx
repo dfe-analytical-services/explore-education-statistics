@@ -35,17 +35,10 @@ const selectFilterGroup = (
   return '';
 };
 
-export const createColumnGroups = (columnGroups: SortableOptionWithGroup[][]): string[][] => {
-
-  return columnGroups.map(colGroup =>
-    colGroup.map(group => group.label),
-  );
-};
-
-export const createRowGroups = (
-  rowGroups: SortableOptionWithGroup[][],
+export const createHeadersFromGroups = (
+  groups: SortableOptionWithGroup[][],
 ): RowHeaderType[][] => {
-  return rowGroups.flatMap(rowGroup =>
+  return groups.flatMap(rowGroup =>
     rowGroup
       .reduce<[RowHeaderType[], RowHeaderType[]]>(
         ([b, c], group, index) => [
@@ -56,7 +49,7 @@ export const createRowGroups = (
               (index > 0 && rowGroup[index - 1].filterGroup) || undefined,
             ),
           ]) ||
-          b,
+            b,
           [...c, group.label],
         ],
         [[], []],
@@ -67,10 +60,10 @@ export const createRowGroups = (
   );
 };
 
-export const createIgnoreRowGroups = (
-  rowGroups: SortableOptionWithGroup[][],
+export const createHeaderIgnoreFromGroups = (
+  groups: SortableOptionWithGroup[][],
 ): boolean[] => {
-  return rowGroups
+  return groups
     .flatMap(rowGroup =>
       rowGroup
         .reduce<[boolean[], boolean[]]>(
@@ -79,7 +72,7 @@ export const createIgnoreRowGroups = (
               group.filterGroup,
               (index > 0 && rowGroup[index - 1].filterGroup) || undefined,
             ) && [...b, true]) ||
-            b,
+              b,
             [...c, false],
           ],
           [[], []],
@@ -104,19 +97,23 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
       );
     }
 
-    const columnHeaders: string[][] = [
-      ...createColumnGroups(tableHeadersConfig.columnGroups),
+    const columnHeaders: RowHeaderType[][] = [
+      ...createHeadersFromGroups(tableHeadersConfig.columnGroups),
       tableHeadersConfig.columns.map(column => column.label),
     ];
 
-    const rowHeaders: RowHeaderType[][] = [
+    const columnHeaderIsGroup: boolean[] = [
+      ...createHeaderIgnoreFromGroups(tableHeadersConfig.columnGroups),
+      false,
+    ];
 
-      ...createRowGroups(tableHeadersConfig.rowGroups),
+    const rowHeaders: RowHeaderType[][] = [
+      ...createHeadersFromGroups(tableHeadersConfig.rowGroups),
       tableHeadersConfig.rows.map(row => row.label),
     ];
 
     const rowHeaderIsGroup: boolean[] = [
-      ...createIgnoreRowGroups(tableHeadersConfig.rowGroups),
+      ...createHeaderIgnoreFromGroups(tableHeadersConfig.rowGroups),
       false,
     ];
 
@@ -192,6 +189,7 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
       <FixedMultiHeaderDataTable
         caption={<DataTableCaption {...subjectMeta} id="dataTableCaption" />}
         columnHeaders={columnHeaders}
+        columnHeaderIsGroup={columnHeaderIsGroup}
         rowHeaders={rowHeaders}
         rowHeaderIsGroup={rowHeaderIsGroup}
         rows={rows}
