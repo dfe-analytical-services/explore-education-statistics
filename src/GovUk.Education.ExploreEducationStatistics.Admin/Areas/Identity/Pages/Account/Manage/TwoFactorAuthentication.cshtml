@@ -5,7 +5,7 @@
     ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
 }
 
-<partial name="_StatusMessage" for="StatusMessage" />
+<partial name="_StatusMessage" for="StatusMessage"/>
 <h4 class="govuk-heading-m">@ViewData["Title"]</h4>
 @if (Model.Is2faEnabled)
 {
@@ -37,8 +37,11 @@
             <button type="submit" class="btn btn-primary">Forget this browser</button>
         </form>
     }
-    <a asp-page="./Disable2fa" class="btn btn-primary">Disable 2FA</a>
-    <a asp-page="./GenerateRecoveryCodes" class="btn btn-primary">Reset recovery codes</a>
+    <p class="govuk-body">
+        <a asp-page="./Disable2fa" class="govuk-link">Disable 2FA</a>
+        <br/>
+        <a asp-page="./GenerateRecoveryCodes" class="govuk-link">Reset recovery codes</a>
+    </p>
 }
 
 <h5 class="govuk-heading-s">Authenticator app</h5>
@@ -53,5 +56,5 @@ else
 }
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+    <partial name="_ValidationScriptsPartial"/>
 }
