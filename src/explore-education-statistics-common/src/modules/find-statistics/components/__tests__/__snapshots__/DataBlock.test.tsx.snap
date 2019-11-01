@@ -29,7 +29,7 @@ exports[`DataBlock renders map instead of chart 1`] = `
             Select data to view
           </label>
           <select
-            class="govuk-select select"
+            class="govuk-select"
             id="selectedIndicator"
             name="selectedIndicator"
           >
@@ -60,7 +60,7 @@ exports[`DataBlock renders map instead of chart 1`] = `
             Select a location
           </label>
           <select
-            class="govuk-select select"
+            class="govuk-select"
             id="selectedLocation"
             name="selectedLocation"
           >
