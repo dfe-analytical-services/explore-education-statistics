@@ -6,10 +6,10 @@
 }
 
 <partial name="_StatusMessage" for="StatusMessage" />
-<h4>@ViewData["Title"]</h4>
+<h4 class="govuk-heading-m">@ViewData["Title"]</h4>
 <div>
-    <p>To use an authenticator app go through the following steps:</p>
-    <ol class="list">
+    <p class="govuk-body">To use an authenticator app go through the following steps:</p>
+    <ol class="govuk-list govuk-list--number">
         <li>
             <p>
                 Download a two-factor authenticator app like Microsoft Authenticator for
@@ -35,12 +35,12 @@
             <div class="row">
                 <div class="col-md-6">
                     <form id="send-code" method="post">
-                        <div class="form-group">
-                            <label asp-for="Input.Code" class="control-label">Verification Code</label>
-                            <input asp-for="Input.Code" class="form-control" autocomplete="off" />
+                        <div class="govuk-form-group">
+                            <label asp-for="Input.Code" class="govuk-label">Verification Code</label>
+                            <input asp-for="Input.Code" class="govuk-input" autocomplete="off" />
                             <span asp-validation-for="Input.Code" class="text-danger"></span>
                         </div>
-                        <button type="submit" class="btn btn-primary">Verify</button>
+                        <button type="submit" class="govuk-button">Verify</button>
                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     </form>
                 </div>

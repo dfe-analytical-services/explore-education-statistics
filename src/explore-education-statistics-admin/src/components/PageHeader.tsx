@@ -88,7 +88,7 @@ const PageHeader = ({ wide }: Props) => {
 const LoggedInLinks = ({ user }: Authentication) => (
   <>
     <li className="govuk-header__navigation-item">
-      <a className="govuk-header__link" href="#">
+      <a className="govuk-header__link" href="/identity/account/manage">
         {user ? user.name : ''}
       </a>
     </li>

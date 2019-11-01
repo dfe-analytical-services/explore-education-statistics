@@ -1,17 +1,21 @@
 ﻿@{
-    Layout = "/Areas/Identity/Pages/_Layout.cshtml";
+    Layout = "/Pages/Shared/_Layout.cshtml";
 }
 
-<h1>Manage your account</h1>
+<h1></h1>
+
+
+<h1 class="govuk-heading-l">
+    <span class="govuk-caption-l">Manage your account</span>
+    Change your account settings
+</h1>
 
 <div>
-    <h4>Change your account settings</h4>
-    <hr />
-    <div class="row">
-        <div class="col-md-3">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-third">
             <partial name="_ManageNav" />
         </div>
-        <div class="col-md-9">
+        <div class="govuk-grid-column-two-thirds">
             @RenderBody()
         </div>
     </div>

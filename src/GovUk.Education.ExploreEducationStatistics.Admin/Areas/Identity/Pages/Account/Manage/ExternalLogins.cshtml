@@ -8,14 +8,14 @@
 <partial name="_StatusMessage" for="StatusMessage" />
 @if (Model.CurrentLogins?.Count > 0)
 {
-    <h4>Registered Logins</h4>
-    <table class="table">
-        <tbody>
+    <h4 class="govuk-heading-m">Registered Logins</h4>
+    <table class="govuk-table">
+        <tbody class="govuk-table__body">
             @foreach (var login in Model.CurrentLogins)
             {
-                <tr>
-                    <td>@login.ProviderDisplayName</td>
-                    <td>
+                <tr class="govuk-table__row">
+                    <td class="govuk-table__cell">@login.ProviderDisplayName</td>
+                    <td class="govuk-table__cell">
                         @if (Model.ShowRemoveButton)
                         {
                             <form id="remove-login" asp-page-handler="RemoveLogin" method="post">
