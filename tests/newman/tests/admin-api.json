@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "66976cdb-5375-4592-b495-cd7f635a9e10",
+		"_postman_id": "e74d8d31-2119-43e7-9514-676887a85822",
 		"name": "DfE Admin API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -1728,9 +1728,6 @@
 									"",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 									"",
-									"/* TODO EES-3 absence_by_characteristic.csv has been imported but",
-									"the import status table was only added after the last seed of test data. Waiting for data reseed.",
-									"",
 									"pm.test(\"Status should be complete\", function () {",
 									"    pm.expect(respJson.status).to.equal(\"COMPLETE\");",
 									"    pm.expect(respJson.percentageComplete).to.equal(100);",
@@ -1738,19 +1735,6 @@
 									"",
 									"pm.test(\"There should be no errors\", function () {",
 									"    pm.expect(pm.response.to.have.jsonBody(\"errors\", \"\"));",
-									"});",
-									"*/",
-									"",
-									"pm.test(\"Status should be not found\", function () {",
-									"    pm.expect(respJson.status).to.equal(\"NOT_FOUND\");",
-									"});",
-									"",
-									"pm.test(\"Percentage complete should be zero\", function () {",
-									"    pm.expect(respJson.percentageComplete).to.equal(0);",
-									"});",
-									"",
-									"pm.test(\"There should be no errors field\", function () {",
-									"pm.expect(pm.response.to.not.have.jsonBody(\"errors\"));",
 									"});"
 								],
 								"type": "text/javascript"
