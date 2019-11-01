@@ -6,11 +6,12 @@
 @if (SignInManager.IsSignedIn(User))
 {
     <li class="govuk-header__navigation-item">
-            <a class="govuk-header__link" href="/documentation">Administrators' guide</a>
+        <a class="govuk-header__link" href="/documentation">Administrators' guide</a>
     </li>
     <li class="govuk-header__navigation-item">
-        <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="/">
-            <button type="submit" class="govuk-header__link">Sign out</button>
-        </form>
+        <a href="/identity/account/manage/" class="govuk-header__link">@User.Identity.Name</a>
+    </li>
+    <li class="govuk-header__navigation-item">
+        <a href="/authentication/logout" class="govuk-header__link">Sign out</a>
     </li>
 }
