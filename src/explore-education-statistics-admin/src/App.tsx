@@ -95,6 +95,62 @@ function App() {
       {/* Prototype Routes */}
       <Route exact path="/index" component={IndexPage} />
 
+      <AuthorizeRoute
+        exact
+        path="/documentation/"
+        component={AdminDocumentationHome}
+      />
+      <AuthorizeRoute
+        exact
+        path="/documentation/content-design-standards-guide"
+        component={AdminDocumentationContentDesignStandards}
+      />
+      <AuthorizeRoute
+        exact
+        path="/documentation/glossary"
+        component={AdminDocumentationGlossary}
+      />
+      <AuthorizeRoute
+        exact
+        path="/documentation/style-guide"
+        component={AdminDocumentationStyle}
+      />
+      <AuthorizeRoute
+        exact
+        path="/documentation/using-dashboard"
+        component={AdminDocumentationUsingDashboard}
+      />
+      <AuthorizeRoute
+        exact
+        path="/documentation/create-new-release"
+        component={AdminDocumentationCreateNewRelease}
+      />
+      <AuthorizeRoute
+        exact
+        path="/documentation/edit-release"
+        component={AdminDocumentationEditRelease}
+      />
+      <AuthorizeRoute
+        exact
+        path="/documentation/manage-content"
+        component={AdminDocumentationManageContent}
+      />
+      <AuthorizeRoute
+        exact
+        path="/documentation/manage-data"
+        component={AdminDocumentationManageData}
+      />
+      <AuthorizeRoute
+        exact
+        path="/documentation/manage-data-block"
+        component={AdminDocumentationManageDataBlocks}
+      />
+      <AuthorizeRoute
+        exact
+        path="/prototypes/documentation/create-new-publication"
+        component={AdminDocumentationCreateNewPublication}
+      />
+
       <LoginContext.Provider value={PrototypeLoginService.login()}>
         <Route exact path="/prototypes/" component={PrototypesIndexPage} />
 
@@ -206,61 +262,6 @@ function App() {
           exact
           path="/prototypes/publication-create-new-absence-status"
           component={PublicationCreateNewAbsenceStatus}
-        />
-        <Route
-          exact
-          path="/documentation/"
-          component={AdminDocumentationHome}
-        />
-        <Route
-          exact
-          path="/documentation/content-design-standards-guide"
-          component={AdminDocumentationContentDesignStandards}
-        />
-        <Route
-          exact
-          path="/documentation/glossary"
-          component={AdminDocumentationGlossary}
-        />
-        <Route
-          exact
-          path="/documentation/style-guide"
-          component={AdminDocumentationStyle}
-        />
-        <Route
-          exact
-          path="/documentation/using-dashboard"
-          component={AdminDocumentationUsingDashboard}
-        />
-        <Route
-          exact
-          path="/documentation/create-new-release"
-          component={AdminDocumentationCreateNewRelease}
-        />
-        <Route
-          exact
-          path="/documentation/edit-release"
-          component={AdminDocumentationEditRelease}
-        />
-        <Route
-          exact
-          path="/documentation/manage-content"
-          component={AdminDocumentationManageContent}
-        />
-        <Route
-          exact
-          path="/documentation/manage-data"
-          component={AdminDocumentationManageData}
-        />
-        <Route
-          exact
-          path="/documentation/manage-data-block"
-          component={AdminDocumentationManageDataBlocks}
-        />
-        <Route
-          exact
-          path="/prototypes/documentation/create-new-publication"
-          component={AdminDocumentationCreateNewPublication}
         />
       </LoginContext.Provider>
     </BrowserRouter>
