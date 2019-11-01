@@ -1,5 +1,5 @@
 *** Settings ***
-Resource    ../libs/common.robot
+Resource    ../libs/public-common.robot
 
 Force Tags  GeneralPublic  Local  Dev  Test
 
@@ -49,9 +49,9 @@ Select Start date and End date
 
 Select Indicators
     [Tags]  HappyPath
-    user clicks indicator checkbox   Absence fields        Authorised absence rate
-    user clicks indicator checkbox   Absence fields        Overall absence rate
-    user clicks indicator checkbox   Absence fields        Unauthorised absence rate
+    user clicks subheaded indicator checkbox   Absence fields        Authorised absence rate
+    user clicks subheaded indicator checkbox   Absence fields        Overall absence rate
+    user clicks subheaded indicator checkbox   Absence fields        Unauthorised absence rate
 
 Select Characteristics
     [Tags]   HappyPath
