@@ -1,6 +1,6 @@
 import DataBlockDetailsForm from '@admin/pages/release/edit-release/manage-datablocks/DataBlockDetailsForm';
-import { DataBlock } from '@admin/services/release/edit-release/datablocks/types';
 import {
+  DataBlock,
   DataBlockRequest,
   DataBlockResponse,
 } from '@common/services/dataBlockService';

@@ -1,5 +1,4 @@
 import { mapFullTable } from '@admin/pages/release/edit-release/manage-datablocks/tableUtil';
-import { DataBlock } from '@admin/services/release/edit-release/datablocks/types';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import { ChartRendererProps } from '@common/modules/find-statistics/components/ChartRenderer';
@@ -8,6 +7,7 @@ import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableH
 import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import DataBlockService, {
+  DataBlock,
   DataBlockRequest,
   DataBlockRerequest,
   DataBlockResponse,

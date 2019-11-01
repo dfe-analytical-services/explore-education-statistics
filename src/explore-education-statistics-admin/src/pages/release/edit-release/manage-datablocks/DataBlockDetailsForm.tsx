@@ -1,4 +1,3 @@
-import { DataBlock } from '@admin/services/release/edit-release/datablocks/types';
 import Button from '@common/components/Button';
 import {
   Form,
@@ -12,6 +11,7 @@ import Yup from '@common/lib/validation/yup';
 import { TableDataQuery } from '@common/modules/full-table/services/tableBuilderService';
 import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
 import {
+  DataBlock,
   GeographicLevel,
   TimeIdentifier,
 } from '@common/services/dataBlockService';

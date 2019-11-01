@@ -3,7 +3,6 @@ import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
 import DataBlocksService from '@admin/services/release/edit-release/datablocks/service';
-import { DataBlock } from '@admin/services/release/edit-release/datablocks/types';
 import Button from '@common/components/Button';
 import { FormSelect } from '@common/components/form';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -11,6 +10,7 @@ import ModalConfirm from '@common/components/ModalConfirm';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import DataBlockService, {
+  DataBlock,
   DataBlockRequest,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
@@ -210,7 +210,7 @@ const ReleaseManageDataBlocksPage = () => {
         <div>
           <h2>
             {dataBlockData && dataBlockData.dataBlock
-              ? dataBlockData.dataBlock.heading || 'title not set'
+              ? dataBlockData.dataBlock.name || 'title not set'
               : 'Create new data block'}
           </h2>
 
