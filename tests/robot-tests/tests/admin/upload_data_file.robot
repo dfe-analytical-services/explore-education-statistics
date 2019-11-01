@@ -33,26 +33,26 @@ Validate release summary tab has correct details
     user checks summary list item "Next release expected" should be "01 January 2031"
     user checks summary list item "Release type" should be "Ad Hoc"
 
-Navigate to Manage data tab
+Navigate to Manage data tab, File uploads
     [Tags]  HappyPath
     user clicks element  xpath://li/a[text()="Manage data"]
     user waits until page contains element   xpath://legend[text()="Add new data to release"]
-    user checks page does not contain element    xpath://*[@id="dataFileUploadForm"]/dl[1]
-    user enters text into element   css:#dataFileUploadForm-subjectTitle   All Geographies
-    choose file  css:#dataFileUploadForm-dataFile  ${CURDIR}${/}files${/}upload-file-test.csv
-    choose file  css:#dataFileUploadForm-metadataFile  ${CURDIR}${/}files${/}upload-file-test.meta.csv
-    user clicks button  Upload data files
+    user clicks element   css:#file-upload-tab
+    user waits until page contains element   xpath://legend[text()="Upload file"]
+    user checks page does not contain element    xpath://*[@id="fileUploadForm"]/dl[1]
+    user enters text into element   css:#fileUploadForm-name   DfE logo
+    choose file  css:#fileUploadForm-file  ${CURDIR}${/}files${/}dfe-logo.jpg
+    user clicks button  Upload file
 
 Verify file uploaded details
     [Tags]  HappyPath
-    user waits until page contains element    xpath://*[@id="dataFileUploadForm"]/dl[1]
-    data csv number contains xpath  1   //dt[text()="Subject title"]/../dd/h4[text()="All Geographies"]
-    data csv number contains xpath  1   //dt[text()="Data file"]/../dd/a[text()="upload-file-test.csv"]
-    data csv number contains xpath  1   //dt[text()="Filesize"]/../dd[.="15 Kb"]
-    data csv number contains xpath  1   //dt[text()="Number of rows"]/../dd[text()="161"]
-    data csv number contains xpath  1   //dt[text()="Metadata file"]/../dd/a[text()="upload-file-test.meta.csv"]
-    data csv number contains xpath  1   //dt[text()="Uploaded by"]/../dd/a[text()="EESADMIN.User1@azurehiveitco.onmicrosoft.com"]
-    ${date}=  get datetime  %d/%m/%Y
-    data csv number contains xpath  1   //dt[text()="Date Uploaded"]/../dd[contains(text(), "${date}")]
-    data csv number contains xpath  1   //dt[text()="Status"]/../dd//strong[text()="Complete"]
-    data csv number contains xpath  1   //dt[text()="Actions"]/../dd/a[text()="Delete files"]
+    user waits until page contains element    xpath://*[@id="fileUploadForm"]/dl[1]
+    data file number contains xpath  1   //dt[text()="Name"]/../dd[text()="DfE logo"]
+    data file number contains xpath  1   //dt[text()="File"]/../dd/a[text()="dfe-logo.jpg"]
+    data file number contains xpath  1   //dt[text()="Filesize"]/../dd[.="5 Kb"]
+    #data file number contains xpath  1   //dt[text()="Uploaded by"]/../dd/a[text()="EESADMIN.User1@azurehiveitco.onmicrosoft.com"]
+    #${date}=  get datetime  %d/%m/%Y
+    #data file number contains xpath  1   //dt[text()="Date Uploaded"]/../dd[contains(text(), "${date}")]
+    #data file number contains xpath  1   //dt[text()="Status"]/../dd//strong[text()="Complete"]
+    data file number contains xpath  1   //dt[text()="Actions"]/../dd/a[text()="Delete file"]
+

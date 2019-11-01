@@ -1,6 +1,6 @@
 *** Settings ***
 Resource    ./common.robot
-Library     admin-utilities.py
+Library     public-utilities.py
 
 *** Keywords ***
 User selects theme "${theme}" and topic "${topic}" from the admin dashboard
@@ -9,8 +9,8 @@ User selects theme "${theme}" and topic "${topic}" from the admin dashboard
     user checks element contains  css:#my-publications-tab  Manage publications and releases
     user selects from list by label  css:#selectTheme  ${theme}
     user selects from list by label  css:#selectTopic  ${topic}
-    user waits until page contains element  xpath://h2[text()="${theme}"]
-    user waits until page contains element  xpath://h3[text()="${topic}"]
+    user checks page contains element  xpath://h2[text()="${theme}"]
+    user checks page contains element  xpath://h3[text()="${topic}"]
 
 User creates a new release for publication "${publication}" for start year "${startYear}"
     ${startYearNumber} =  Convert to Integer  ${startYear}
