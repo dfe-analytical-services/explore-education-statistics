@@ -1,4 +1,4 @@
-import {ApplicationPaths} from '@admin/components/api-authorization/ApiAuthorizationConstants';
+import { ApplicationPaths } from '@admin/components/api-authorization/ApiAuthorizationConstants';
 import AuthorizeRoute from '@admin/components/api-authorization/AuthorizeRoute';
 import CreatePublicationPage from '@admin/pages/create-publication/CreatePublicationPage';
 import CreateReleasePage from '@admin/pages/release/create-release/CreateReleasePage';
@@ -9,18 +9,19 @@ import publicationRoutes from '@admin/routes/edit-publication/routes';
 import releaseRoutes from '@admin/routes/edit-release/routes';
 import PrototypeLoginService from '@admin/services/PrototypeLoginService';
 import React from 'react';
-import {Route} from 'react-router';
-import {BrowserRouter} from 'react-router-dom';
+import { Route } from 'react-router';
+import { BrowserRouter } from 'react-router-dom';
 
 import './App.scss';
 
 import ApiAuthorizationRoutes from './components/api-authorization/ApiAuthorizationRoutes';
 
-import {LoginContext} from './components/Login';
+import { LoginContext } from './components/Login';
 import AdminDashboardPage from './pages/admin-dashboard/AdminDashboardPage';
 import AdminDocumentationCreateNewRelease from './pages/documentation/DocumentationCreateNewRelease';
 import AdminDocumentationEditRelease from './pages/documentation/DocumentationEditRelease';
 
+import AdminDocumentationContentDesignStandards from './pages/documentation/DocumentationDesignStandards';
 import AdminDocumentationGlossary from './pages/documentation/DocumentationGlossary';
 import AdminDocumentationHome from './pages/documentation/DocumentationHome';
 import AdminDocumentationManageContent from './pages/documentation/DocumentationManageContent';
@@ -39,8 +40,7 @@ import PublicationConfirmNew from './pages/prototypes/PrototypePublicationPageCo
 import PublicationCreateNew from './pages/prototypes/PrototypePublicationPageCreateNew';
 
 import PublicationEditPage from './pages/prototypes/PrototypePublicationPageEditAbsence';
-import PublicationEditUnresolvedComments
-  from './pages/prototypes/PrototypePublicationPageEditAbsenceUnresolvedComments';
+import PublicationEditUnresolvedComments from './pages/prototypes/PrototypePublicationPageEditAbsenceUnresolvedComments';
 import PublicationEditNew from './pages/prototypes/PrototypePublicationPageEditNew';
 import PublicationCreateNewAbsenceConfig from './pages/prototypes/PrototypePublicationPageNewAbsenceConfig';
 import PublicationCreateNewAbsenceConfigEdit from './pages/prototypes/PrototypePublicationPageNewAbsenceConfigEdit';
@@ -211,6 +211,11 @@ function App() {
           exact
           path="/documentation/"
           component={AdminDocumentationHome}
+        />
+        <Route
+          exact
+          path="/documentation/content-design-standards-guide"
+          component={AdminDocumentationContentDesignStandards}
         />
         <Route
           exact

@@ -401,10 +401,6 @@ export const initialiseFromInitialQuery = async (
   let subjectMeta: PublicationSubjectMeta;
 
   if (initialQuery) {
-    subjectMeta = await tableBuilderService.filterPublicationSubjectMeta(
-      initialQuery,
-    );
-
     let buildNewQuery: TableDataQuery = {
       subjectId: '',
       filters: [],
@@ -425,6 +421,14 @@ export const initialiseFromInitialQuery = async (
     if (initialStep === 5) {
       createdTable = await queryForTable(buildNewQuery, releaseId);
     }
+
+    const queryForEntireSubject = {
+      subjectId: initialQuery.subjectId,
+    };
+
+    subjectMeta = await tableBuilderService.filterPublicationSubjectMeta(
+      queryForEntireSubject,
+    );
 
     // eslint-disable-next-line prefer-destructuring
     if (initialStep > 1) subjectId = buildNewQuery.subjectId;

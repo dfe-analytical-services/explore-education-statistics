@@ -276,7 +276,7 @@ const ChartBuilder = ({
 
             [axisDefinition.type]: {
               referenceLines: [],
-              min: '',
+              min: '0',
               max: '',
               tickSpacing: '',
               unit: '',

@@ -170,9 +170,9 @@ const ReleaseManageDataBlocksPage = () => {
         }}
         order={[]}
         optGroups={{
-          'Create Data Block': [
+          'Create data block': [
             {
-              label: 'Create new Data Block',
+              label: 'Create new data block',
               value: '',
             },
           ],
@@ -185,7 +185,7 @@ const ReleaseManageDataBlocksPage = () => {
       <div style={{ position: 'relative' }}>
         {(isLoading || isSaving) && (
           <LoadingSpinner
-            text={`${isSaving ? 'Saving Data block' : 'Loading Data block'}`}
+            text={`${isSaving ? 'Saving data block' : 'Loading data block'}`}
             overlay
           />
         )}
@@ -194,15 +194,15 @@ const ReleaseManageDataBlocksPage = () => {
           <h2>
             {dataBlockData && dataBlockData.dataBlock
               ? dataBlockData.dataBlock.heading || 'title not set'
-              : 'Create new Data Block'}
+              : 'Create new data block'}
           </h2>
 
           <Tabs id="manageDataBlocks">
             <TabsSection
               title={
                 dataBlockData && dataBlockData.dataBlock
-                  ? 'Update Data source'
-                  : 'Create Data source'
+                  ? 'Update data source'
+                  : 'Create data source'
               }
             >
               <p>Configure the data source for the data block</p>
@@ -224,13 +224,13 @@ const ReleaseManageDataBlocksPage = () => {
 
               {deleteDataBlock && (
                 <ModalConfirm
-                  title="Delete Data Block"
+                  title="Delete data block"
                   mounted={deleteDataBlock !== undefined}
                   onConfirm={() => onDeleteDataBlock(deleteDataBlock)}
                   onExit={() => setDeleteDataBlock(undefined)}
                   onCancel={() => setDeleteDataBlock(undefined)}
                 >
-                  <p>Are you sure you wish to delete this Data Block?</p>
+                  <p>Are you sure you wish to delete this data block?</p>
                 </ModalConfirm>
               )}
 
@@ -244,7 +244,7 @@ const ReleaseManageDataBlocksPage = () => {
               </div>
             </TabsSection>
             {!isLoading && dataBlockData && (
-              <TabsSection title="Configure Content">
+              <TabsSection title="Configure content">
                 <ViewDataBlocks
                   {...dataBlockData}
                   onDataBlockSave={onDataBlockSave}

@@ -20,6 +20,7 @@
     "@types/react-leaflet": "^2.2.1",
     "@types/react-test-renderer": "^16.8.2",
     "@types/recharts": "^1.1.17",
+    "@types/uuid": "^3.4.5",
     "@types/yup": "^0.26.21",
     "@typescript-eslint/eslint-plugin": "^1.11.0",
     "@typescript-eslint/parser": "^1.11.0",
@@ -39,7 +40,7 @@
     "file-saver": "^2.0.2",
     "formik": "^1.5.7",
     "geojson": "^0.5.0",
-    "govuk-frontend": "^2.13.0",
+    "govuk-frontend": "^3.3.0",
     "identity-obj-proxy": "^3.0.0",
     "immer": "^3.1.3",
     "intersection-observer": "^0.7.0",
@@ -142,5 +143,8 @@
   },
   "jest-junit": {
     "ancestorSeparator": " › "
+  },
+  "dependencies": {
+    "uuid": "^3.3.3"
   }
 }

@@ -1,3 +1,4 @@
+import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import ReleaseSummaryForm, {
   EditFormValues,
@@ -17,6 +18,8 @@ import Yup from '@common/lib/validation/yup';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import { ObjectSchemaDefinition } from 'yup';
+import RelatedInformation from '@common/components/RelatedInformation';
+import { Publication } from '@common/services/publicationService';
 
 interface MatchProps {
   publicationId: string;
@@ -26,16 +29,29 @@ export type FormValues = {
   templateReleaseId: string;
 } & EditFormValues;
 
+interface TemplateReleaseModel {
+  templateRelease: IdTitlePair | undefined;
+  publication: Publication;
+}
+
 const CreateReleasePage = ({
   match,
   history,
 }: RouteComponentProps<MatchProps>) => {
   const { publicationId } = match.params;
 
-  const [templateRelease, setTemplateRelease] = useState<IdTitlePair>();
+  const [model, setModel] = useState<TemplateReleaseModel>();
 
   useEffect(() => {
-    service.getTemplateRelease(publicationId).then(setTemplateRelease);
+    Promise.all([
+      service.getTemplateRelease(publicationId),
+      service.getPublication(publicationId),
+    ]).then(([templateRelease, publication]) => {
+      setModel({
+        templateRelease,
+        publication,
+      });
+    });
   }, [publicationId]);
 
   const submitHandler = async (values: FormValues) => {
@@ -59,6 +75,32 @@ const CreateReleasePage = ({
         },
       ]}
     >
+      <div className="govuk-grid-row">
+        <div className="govuk-grid-column-two-thirds">
+          <h1 className="govuk-heading-xl">
+            <span className="govuk-caption-xl">
+              {model && model.publication.title}
+            </span>
+            Create new release
+          </h1>
+        </div>
+        <div className="govuk-grid-column-one-third">
+          <RelatedInformation heading="Help and guidance">
+            <ul className="govuk-list">
+              <li>
+                <Link to="/documentation/create-new-release" target="blank">
+                  Creating a new release{' '}
+                </Link>
+              </li>
+              <li>
+                <Link to="/documentation/edit-release" target="blank">
+                  Editing a release and updating release status{' '}
+                </Link>
+              </li>
+            </ul>
+          </RelatedInformation>
+        </div>
+      </div>
       <ReleaseSummaryForm<FormValues>
         submitButtonText="Create new release"
         initialValuesSupplier={(
@@ -76,14 +118,15 @@ const CreateReleasePage = ({
           baseValidationRules: ObjectSchemaDefinition<EditFormValues>,
         ): ObjectSchemaDefinition<FormValues> => ({
           ...baseValidationRules,
-          templateReleaseId: templateRelease
-            ? Yup.string().required('Choose a template')
-            : Yup.string(),
+          templateReleaseId:
+            model && model.templateRelease
+              ? Yup.string().required('Choose a template')
+              : Yup.string(),
         })}
         onSubmitHandler={submitHandler}
         onCancelHandler={cancelHandler}
         additionalFields={
-          templateRelease && (
+          model && (
             <FormFieldRadioGroup<FormValues>
               id="releaseSummaryForm-templateReleaseId"
               legend="Select template"
@@ -94,8 +137,9 @@ const CreateReleasePage = ({
                   value: 'new',
                 },
                 {
-                  label: `Copy existing template (${templateRelease.title})`,
-                  value: `${templateRelease.id}`,
+                  label: `Copy existing template (${model.templateRelease &&
+                    model.templateRelease.title})`,
+                  value: `${model.templateRelease && model.templateRelease.id}`,
                 },
               ]}
             />
