@@ -1,7 +1,6 @@
 import DataBlockDetailsForm from '@admin/pages/release/edit-release/manage-datablocks/DataBlockDetailsForm';
 import {
   DataBlock,
-  DataBlockRequest,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
 import React, { createRef } from 'react';
@@ -20,18 +19,17 @@ import { generateTableTitle } from '@common/modules/table-tool/components/DataTa
 
 interface Props {
   releaseId: string;
-
-  dataBlockRequest?: DataBlockRequest;
-  dataBlockResponse?: DataBlockResponse;
   dataBlock?: DataBlock;
-
-  onDataBlockSave: (dataBlock: DataBlock) => Promise<DataBlock>;
+  dataBlockResponse?: DataBlockResponse;
+  onDataBlockSave: (
+    dataBlock: DataBlock,
+    newDataBlockResponse?: TableToolState,
+  ) => Promise<DataBlock>;
   onTableToolLoaded?: () => void;
 }
 
 const CreateDataBlocks = ({
   releaseId,
-  dataBlockRequest: initialQuery,
   dataBlock,
   onDataBlockSave,
   onTableToolLoaded,
@@ -112,7 +110,7 @@ const CreateDataBlocks = ({
       <TableToolWizard
         releaseId={releaseId}
         themeMeta={[]}
-        initialQuery={initialQuery}
+        initialQuery={dataBlock ? dataBlock.dataBlockRequest : undefined}
         onTableConfigurationChange={queryCompleted}
         finalStep={finalStepProps => (
           <WizardStep>
