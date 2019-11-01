@@ -36,10 +36,10 @@ DECLARE
     @paramDefinition NVARCHAR(2000),
     @sqlString NVARCHAR(2000) = N'SELECT o.id ' +
                                 'FROM Observation o ' +
-                                'JOIN ObservationFilterItem ofi ON o.Id = ofi.ObservationId ' +
                                 'JOIN Location l ON o.LocationId = l.Id ' +
-                                'WHERE o.SubjectId = @subjectId ' +
-                                'AND ofi.FilterItemId IN (SELECT id FROM @filterItemList) '
+                                'LEFT JOIN ObservationFilterItem ofi ON o.Id = ofi.ObservationId ' +
+                                'AND ofi.FilterItemId IN (SELECT id FROM @filterItemList) ' +
+                                'WHERE o.SubjectId = @subjectId '
     IF (@geographicLevel IS NOT NULL)
         SET @sqlString = @sqlString + N'AND o.GeographicLevel = @geographicLevel '
     IF (@timePeriodCount > 0)
