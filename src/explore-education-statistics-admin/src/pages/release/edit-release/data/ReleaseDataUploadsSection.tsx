@@ -239,7 +239,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                     {dataFile.metadataFilename}
                   </a>
                 </SummaryListItem>
-                <SummaryListItem term="Filesize">
+                <SummaryListItem term="Data file size">
                   {dataFile.fileSize.size.toLocaleString()}{' '}
                   {dataFile.fileSize.unit}
                 </SummaryListItem>
@@ -257,7 +257,7 @@ const ReleaseDataUploadsSection = ({ publicationId, releaseId }: Props) => {
                     {dataFile.userName}
                   </a>
                 </SummaryListItem>
-                <SummaryListItem term="Date Uploaded">
+                <SummaryListItem term="Date uploaded">
                   {format(dataFile.created, 'd/M/yyyy HH:mm')}
                 </SummaryListItem>
                 {dataFile.canDelete && (
