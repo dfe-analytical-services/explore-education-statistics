@@ -8,7 +8,10 @@ pr: [ 'master' ]
 jobs:
   - job: 'Backend'
     pool:
-      vmImage: 'ubuntu-16.04'
+      name: Hosted Windows 2019 with VS2019
+      demands:
+      - npm
+      - azureps
     steps:
       - task: UseDotNet@2
         displayName: 'Install .NET Core 2.1.x SDK'
