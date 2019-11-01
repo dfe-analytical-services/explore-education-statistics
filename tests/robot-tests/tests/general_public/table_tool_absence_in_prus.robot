@@ -1,7 +1,7 @@
 *** Settings ***
-Resource    ../../test-libs/common.robot
+Resource    ../libs/public-common.robot
 
-Force Tags  GeneralPublic   Dev  Test
+Force Tags  GeneralPublic  Dev  Test
 
 Suite Setup       user opens the browser
 Suite Teardown    user closes the browser
@@ -48,7 +48,7 @@ Select Start date and End date
 
 Select Indicators
     [Tags]  HappyPath
-    user clicks indicator checkbox   Absence fields        Number of schools
+    user clicks subheaded indicator checkbox   Absence fields        Number of schools
 
 Create table
     [Tags]  HappyPath
@@ -115,8 +115,8 @@ Select start and end date again
 
 Select indicators again
     [Tags]   HappyPath
-    user clicks indicator checkbox  Absence fields   Number of pupil enrolments
-    user clicks indicator checkbox  Absence fields   Number of sessions possible
+    user clicks subheaded indicator checkbox  Absence fields   Number of pupil enrolments
+    user clicks subheaded indicator checkbox  Absence fields   Number of sessions possible
 
 Create table again
     [Tags]   HappyPath

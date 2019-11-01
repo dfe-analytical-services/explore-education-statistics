@@ -3,7 +3,7 @@ import { LoginContext } from '@admin/components/Login';
 import loginService from '@admin/services/sign-in/service';
 import { Authentication } from '@admin/services/sign-in/types';
 import classNames from 'classnames';
-import logo from 'govuk-frontend/assets/images/govuk-logotype-crown.png';
+import logo from 'govuk-frontend/govuk/assets/images/govuk-logotype-crown.png';
 import React, { useContext } from 'react';
 
 interface Props {

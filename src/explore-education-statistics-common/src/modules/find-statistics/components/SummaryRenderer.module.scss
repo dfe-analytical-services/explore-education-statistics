@@ -1,5 +1,17 @@
 @import '../../../../src/styles/govuk-base';
 
+@mixin print-block() {
+  @media print {
+    display: block !important;
+  }
+}
+
+@mixin print-black-text() {
+  @media print {
+    color: govuk-colour('black');
+  }
+}
+
 .keyStatsContainer {
   display: flex;
   flex-wrap: wrap;
@@ -7,14 +19,13 @@
 }
 
 .keyStatTile {
+  @include print-block;
+
   display: flex;
   flex: 1 0 32.3%;
   flex-direction: column;
   margin: 0.5% 0.5% 0;
   max-width: 32.3;
-  @media print {
-    display: block;
-  }
 
   @include govuk-media-query($until: tablet) {
     flex: 0 0 100%;
@@ -23,6 +34,8 @@
   }
 
   .keyStat {
+    @include print-block;
+
     background: $govuk-brand-colour;
     color: govuk-colour('white');
     flex: 1 0 auto;
@@ -35,34 +48,27 @@
     @media print {
       background: none;
       border-left: 4px solid $govuk-brand-colour;
-      display: block;
     }
   }
 
   .keyStat :global(.govuk-heading-s) {
+    @include print-black-text;
     color: govuk-colour('white');
     margin: 0;
     padding: 0;
-    @media print {
-      color: govuk-colour('black');
-    }
   }
 
   .keyStat :global(.govuk-heading-xl) {
+    @include print-black-text;
     color: govuk-colour('white');
     margin: 0;
     padding: 0;
-    @media print {
-      color: govuk-colour('black');
-    }
   }
 
   .keyStat :global(.govuk-body-s) {
+    @include print-black-text;
     color: govuk-colour('white');
     margin: 0 0 0.5rem;
-    @media print {
-      color: govuk-colour('black');
-    }
   }
 
   details {

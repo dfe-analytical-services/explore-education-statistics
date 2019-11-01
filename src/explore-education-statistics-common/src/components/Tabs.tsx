@@ -52,7 +52,9 @@ const Tabs = ({ children, id, onToggle }: Props) => {
 
           return (
             <li
-              className="govuk-tabs__list-item"
+              className={classNames('govuk-tabs__list-item', {
+                'govuk-tabs__list-item--selected': selectedTabIndex === index,
+              })}
               key={sectionId}
               role="presentation"
             >
@@ -60,9 +62,7 @@ const Tabs = ({ children, id, onToggle }: Props) => {
                 aria-controls={onMedia(sectionId)}
                 aria-selected={onMedia(selectedTabIndex === index)}
                 role={onMedia('tab')}
-                className={classNames('govuk-tabs__tab', {
-                  'govuk-tabs__tab--selected': selectedTabIndex === index,
-                })}
+                className="govuk-tabs__tab"
                 href={`#${sectionId}`}
                 id={`${sectionId}-tab`}
                 ref={(element: HTMLAnchorElement) => tabElements.push(element)}

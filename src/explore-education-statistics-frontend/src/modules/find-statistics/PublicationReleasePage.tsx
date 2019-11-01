@@ -176,7 +176,7 @@ class PublicationReleasePage extends Component<Props> {
               }}
             />
             <RelatedAside>
-              <h3>About these statistics</h3>
+              <h2 className="govuk-heading-m">About these statistics</h2>
 
               <dl className="dfe-meta-content">
                 <dt className="govuk-caption-m">For {data.coverageTitle}: </dt>
@@ -334,7 +334,7 @@ class PublicationReleasePage extends Component<Props> {
             <p className="govuk-body">
               The{' '}
               <a href="https://www.statisticsauthority.gov.uk/">
-                United Kindgom Statistics Authority
+                United Kingdom Statistics Authority
               </a>{' '}
               designated these statistics as National Statistics in accordance
               with the{' '}

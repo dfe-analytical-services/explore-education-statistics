@@ -1,5 +1,5 @@
 *** Settings ***
-Resource    ../../test-libs/admin-common.robot
+Resource    ../libs/admin-common.robot
 
 Force Tags  Admin  Dev  Test
 
@@ -10,6 +10,7 @@ Suite Teardown    user closes the browser
 Verify correct data is shown when theme and topic is shown
     [Tags]   HappyPath
     user selects theme "Test Theme" and topic "Automated Test Topic" from the admin dashboard
+
     user checks page contains accordion  Automated Test Publication for Create Release
     user opens accordion section  Automated Test Publication for Create Release
     user checks accordion section contains text  Automated Test Publication for Create Release    Methodology
@@ -19,7 +20,7 @@ User clicks create new release
     [Tags]  HappyPath
     user waits until page contains element  css:[data-testid="Create new release link for Automated Test Publication for Create Release"]
     user clicks element  css:[data-testid="Create new release link for Automated Test Publication for Create Release"]
-   
+
 Check page has correct fields
     [Tags]  HappyPath
     user waits until page contains element  css:#releaseSummaryForm-timePeriodCoverage
@@ -42,10 +43,3 @@ User fills in form
     user enters text into element  css:[id="nextReleaseDate.month"]  10
     user enters text into element  css:[id="nextReleaseDate.year"]  2030
     user clicks element  xpath://label[text()="National Statistics"]
-
-Check if data has been submitted
-    [Tags]  HappyPath  AltersData
-    user clicks element   xpath://button[text()="Create new release"]
-    user waits until page contains element  xpath://span[text()="Edit release"]
-    user waits until page contains element  xpath://h2[text()="Release summary"]
-

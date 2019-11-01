@@ -58,8 +58,8 @@ exports[`LineChartBlock renders basic chart correctly 1`] = `
               x1="90"
               x2="900"
               y="10"
-              y1="190"
-              y2="190"
+              y1="202.17391304347825"
+              y2="202.17391304347825"
             />
             <line
               fill="none"
@@ -71,8 +71,8 @@ exports[`LineChartBlock renders basic chart correctly 1`] = `
               x1="90"
               x2="900"
               y="10"
-              y1="110"
-              y2="110"
+              y1="134.34782608695653"
+              y2="134.34782608695653"
             />
             <line
               fill="none"
@@ -211,8 +211,8 @@ exports[`LineChartBlock renders basic chart correctly 1`] = `
                 x1="84"
                 x2="90"
                 y="10"
-                y1="190"
-                y2="190"
+                y1="202.17391304347825"
+                y2="202.17391304347825"
               />
               <text
                 class="recharts-text recharts-cartesian-axis-tick-value"
@@ -222,13 +222,13 @@ exports[`LineChartBlock renders basic chart correctly 1`] = `
                 text-anchor="end"
                 width="60"
                 x="82"
-                y="190"
+                y="202.17391304347825"
               >
                 <tspan
                   dy="0.355em"
                   x="82"
                 >
-                  1
+                  3
                 </tspan>
               </text>
             </g>
@@ -245,8 +245,8 @@ exports[`LineChartBlock renders basic chart correctly 1`] = `
                 x1="84"
                 x2="90"
                 y="10"
-                y1="110"
-                y2="110"
+                y1="134.34782608695653"
+                y2="134.34782608695653"
               />
               <text
                 class="recharts-text recharts-cartesian-axis-tick-value"
@@ -256,13 +256,13 @@ exports[`LineChartBlock renders basic chart correctly 1`] = `
                 text-anchor="end"
                 width="60"
                 x="82"
-                y="110"
+                y="134.34782608695653"
               >
                 <tspan
                   dy="0.355em"
                   x="82"
                 >
-                  5
+                  9
                 </tspan>
               </text>
             </g>
@@ -296,7 +296,7 @@ exports[`LineChartBlock renders basic chart correctly 1`] = `
                   dy="0.355em"
                   x="82"
                 >
-                  10
+                  20
                 </tspan>
               </text>
             </g>
@@ -396,7 +396,7 @@ exports[`LineChartBlock renders basic chart correctly 1`] = `
         >
           <path
             class="recharts-curve recharts-line-curve"
-            d="M110,150L880,270"
+            d="M110,202.17391304347825L880,270"
             fill="none"
             height="260"
             stroke="#ff0000"
@@ -412,7 +412,7 @@ exports[`LineChartBlock renders basic chart correctly 1`] = `
         >
           <path
             class="recharts-curve recharts-line-curve"
-            d="M110,10L880,130"
+            d="M110,123.04347826086956L880,190.8695652173913"
             fill="none"
             height="260"
             stroke="#00ff00"
@@ -428,7 +428,7 @@ exports[`LineChartBlock renders basic chart correctly 1`] = `
         >
           <path
             class="recharts-curve recharts-line-curve"
-            d="M110,110L880,190"
+            d="M110,179.56521739130434L880,224.7826086956522"
             fill="none"
             height="260"
             stroke="#0000ff"

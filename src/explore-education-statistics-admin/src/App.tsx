@@ -21,6 +21,7 @@ import AdminDashboardPage from './pages/admin-dashboard/AdminDashboardPage';
 import AdminDocumentationCreateNewRelease from './pages/documentation/DocumentationCreateNewRelease';
 import AdminDocumentationEditRelease from './pages/documentation/DocumentationEditRelease';
 
+import AdminDocumentationContentDesignStandards from './pages/documentation/DocumentationDesignStandards';
 import AdminDocumentationGlossary from './pages/documentation/DocumentationGlossary';
 import AdminDocumentationHome from './pages/documentation/DocumentationHome';
 import AdminDocumentationManageContent from './pages/documentation/DocumentationManageContent';
@@ -210,6 +211,11 @@ function App() {
           exact
           path="/documentation/"
           component={AdminDocumentationHome}
+        />
+        <Route
+          exact
+          path="/documentation/content-design-standards-guide"
+          component={AdminDocumentationContentDesignStandards}
         />
         <Route
           exact

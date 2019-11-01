@@ -84,6 +84,21 @@ const DocumentationGlossary = () => {
                 involved or take action: ‘You can contact HMRC by phone and
                 email’ or ‘Pay your car tax’, for example.
               </p>
+              <h3 id="admin-champions">Admin Champions</h3>
+              <p>
+                Name of the group of DfE Statistics staff helping to develop and
+                ‘champion’ the functions and processes of the Admin system
+                across DfE Statistics.
+              </p>
+              <p>
+                See also <a href="#admin-system">Admin system</a>.
+              </p>
+              <h3 id="admin-system">Admin system</h3>
+              <p>
+                Term describing the publishing system used to manage data and
+                content and publish the latest ‘releases’ of statistics and data
+                on explore education statistics.
+              </p>
               <h3 id="ages">ages</h3>
               <p>
                 Do not use hyphens in ages unless to avoid confusion, although
@@ -101,12 +116,49 @@ const DocumentationGlossary = () => {
                 </a>{' '}
                 register.
               </p>
+              <h3 id="analysts">analysts</h3>
+              <p>Users who use but don’t produce statistics.</p>
+              <h3 id="api">API (or APIs)</h3>
+              <p>
+                Technical applications or software which allow external or
+                internal applications, services or systems to access the data or
+                features of another application, service or system.
+              </p>
+              <p>
+                For example, a data API for explore education statistics would
+                allow other applications, services or systems outside of our
+                service to access the data used explore education statistics.
+              </p>
+              <p>
+                See also{' '}
+                <a href="#explore-education-statistics">
+                  explore education statistics
+                </a>
+                .
+              </p>
               <h3 id="applied-general-qualifications">
                 applied general qualifications
               </h3>
               <p>Lower case.</p>
               <h3 id="apprenticeship-programme">apprenticeship programme</h3>
               <p>Lower case.</p>
+              <h3 id="approved-for-release">Approved for release</h3>
+              <p>
+                Term describing the release status of a release once it’s been
+                signed-off by a Responsible Statistician.
+              </p>
+              <p>
+                See also <a href="#release-status">Release status</a>.
+              </p>
+              <p>
+                See also{' '}
+                <a href="#responsible-statistician">Responsible Statistician</a>
+                .
+              </p>
+              <h3 id="author">Author</h3>
+              <p>
+                See <a href="#primary-analyst">Primary Analyst</a>.
+              </p>
             </AccordionSection>
             <AccordionSection heading="B">
               <h3 id="banned-words">Banned words</h3>
@@ -359,6 +411,11 @@ const DocumentationGlossary = () => {
                 Lower case in text. Upper case in titles: Spencer Tracy,
                 Chairman, GDS.
               </p>
+              <h3 id="charts">Charts</h3>
+              <p>
+                Term referring to the chart functionality available within the
+                Admin system and on explore education statistics.
+              </p>
               <h3 id="childcare">childcare</h3>
               <p>Lower case.</p>
               <h3 id="children-in-need">Children in Need</h3>
@@ -383,6 +440,13 @@ const DocumentationGlossary = () => {
                 community, voluntary and foundation schools
               </h3>
               <p>Lower case.</p>
+              <h3 id="content-design-champions">Content Design Champions</h3>
+              <p>
+                Name of the group of DfE Statistics staff helping to develop and
+                ‘champion’ the creation of good quality content across DfE
+                Statistics so users can quickly and easily understand the
+                statistical commentary on explore education statistics.
+              </p>
               <h3 id="contractions">Contractions</h3>
               <p>Use contractions like you’re and we’ll.</p>
               <p>Avoid:</p>
@@ -434,10 +498,39 @@ const DocumentationGlossary = () => {
             <AccordionSection heading="D">
               <h3 id="data">data</h3>
               <p>
-                Treat as a singular noun: The data is stored on a secure server.
+                Term describing the machine readable data files uploaded to the
+                service which drive the table and chart tools and can be
+                downloaded by users.
+              </p>
+              <h3 id="data-blocks">Data blocks</h3>
+              <p>
+                Term referring to the functionality which filters the data used
+                to create tables and charts within the Admin system and on
+                explore education statistics.
               </p>
               <h3 id="data-centre">data centre</h3>
               <p>Not “datacentre”.</p>
+              <h3 id="data-champions">Data Champions</h3>
+              <p>
+                Name of the group of DfE Statistics staff helping to develop and
+                ‘champion’ the correct use of data across DfE Statistics and
+                produce consistent machine readable data files for explore
+                education statistics and its users.
+              </p>
+              <h3 id="data-dissemination-project">
+                Data Dissemination Project
+              </h3>
+              <p>
+                Alternative internal name for the project before explore
+                education statistics.
+              </p>
+              <p>
+                See{' '}
+                <a href="#explore-education-statistics">
+                  explore education statistics
+                </a>
+                .
+              </p>
               <h3 id="data-set">data set</h3>
               <p>Not “dataset”.</p>
               <h3 id="data-store">data store</h3>
@@ -488,6 +581,20 @@ const DocumentationGlossary = () => {
                 Lower case except when in the title: the Department of Health
                 and Social Care.
               </p>
+              <h3 id="dfe-data-dissemination-project">
+                DFE Data Dissemination Project
+              </h3>
+              <p>
+                Official internal name for the project building explore
+                education statistics.
+              </p>
+              <p>
+                See{' '}
+                <a href="#explore-education-statistics">
+                  explore education statistics
+                </a>
+                .
+              </p>
               <h3 id="diploma">diploma</h3>
               <p>
                 Lower case unless part of a title like Edexcel L2 Diploma in IT.
@@ -501,6 +608,24 @@ const DocumentationGlossary = () => {
               <p>Lower case. No hyphen.</p>
               <h3 id="district-council">district council</h3>
               <p>Lower case even in a name, like Warwick district council.</p>
+              <h3 id="dissemination-platform">Dissemination platform</h3>
+              <p>Alternative internal name for explore education statistics.</p>
+              <p>
+                See{' '}
+                <a href="#explore-education-statistics">
+                  explore education statistics
+                </a>
+                .
+              </p>
+              <h3 id="dissemination-tool">Dissemination tool</h3>
+              <p>Alternative internal name for explore education statistics.</p>
+              <p>
+                See{' '}
+                <a href="#explore-education-statistics">
+                  explore education statistics
+                </a>
+                .
+              </p>
             </AccordionSection>
             <AccordionSection heading="E">
               <h3 id="early-years">early years</h3>
@@ -580,6 +705,33 @@ const DocumentationGlossary = () => {
                 Lower case in text. Upper case in titles: Spencer Tracy,
                 Executive Director, GDS.
               </p>
+              <h3 id="explore-education-statistics">
+                explore education statistics
+              </h3>
+              <p>
+                Official GDS styled name (hence the lower case format) for the
+                Explore education statistics service which is used and displayed
+                on the live online service.
+              </p>
+              <p>
+                Should be used to refer to the service in wider GOV.UK and
+                governmental circles.
+              </p>
+              <h3 id="explore-education-statistics-service">
+                Explore education statistics service
+              </h3>
+              <p>
+                Alternative full internal internal name for explore education
+                statistics.
+              </p>
+              <p>
+                See{' '}
+                <a href="#explore-education-statistics">
+                  explore education statistics
+                </a>
+                .
+              </p>
+
               <h3 id="extra-curricular">extra-curricular</h3>
               <p>Hyphenated</p>
             </AccordionSection>
@@ -614,6 +766,17 @@ const DocumentationGlossary = () => {
               </p>
               <h3 id="fixed-period-exclusions">fixed-period exclusions</h3>
               <p>Hyphenated.</p>
+              <h3 id="footnotes">Footnotes</h3>
+              <p>
+                Term referring to the functionality which adds technical
+                footnotes to data within the Admin system and then dynamically
+                displays them for users on explore education statistics when
+                they use the table tool.
+              </p>
+              <p>
+                See also
+                <a href="#release-footnotes">Release footnotes</a>.
+              </p>
               <h3 id="foundation-degrees">foundation degrees</h3>
               <p>Lower case.</p>
               <h3 id="foundation-schools">foundation schools</h3>
@@ -649,6 +812,36 @@ const DocumentationGlossary = () => {
               <h3 id="gcse-gcses">GCSE, GCSEs</h3>
               <p>
                 No full stops between the initials. No apostrophe in the plural.
+              </p>
+              <h3 id="gds">GDS</h3>
+              <p>
+                See{' '}
+                <a href="#government-digital-service-gds">
+                  Government Digital Service (GDS)
+                </a>
+                .
+              </p>
+              <h3 id="gds-assessment">GDS assessment</h3>
+              <p>
+                All government and public facing digital transactional services
+                (including explore education statistics) must pass an assessment
+                run by GDS in order to finally go live to the public and become
+                an ‘official’ online government service.
+              </p>
+              <ul>
+                <p>
+                  Services are assessed at each of the following phases of
+                  development:
+                </p>
+                <li>at the end of alpha</li>
+                <li>
+                  at the end of private beta - before its public beta launch
+                </li>
+                <li>at the end of beta - before it goes live</li>
+              </ul>
+              <p>
+                If a service doesn’t pass an assessment, it will need to get
+                reassessed before it can start the next stage.
               </p>
               <h3 id="general-election">general election</h3>
               <p>Lower case.</p>
@@ -693,6 +886,57 @@ const DocumentationGlossary = () => {
               <p>Lower case.</p>
               <h3 id="governor">governor</h3>
               <p>Lower case.</p>
+              <h3 id="govuk">GOV.UK</h3>
+              <p>
+                Domain name and term referring to the UK government website for
+                finding government services and information which is maintained
+                by the Government Digital Service (GDS).
+              </p>
+              <p>Also, widely used as an alternative name to refer to GDS.</p>
+              <p>
+                See{' '}
+                <a href="#government-digital-service-gds">
+                  Government Digital Service (GDS)
+                </a>
+                .
+              </p>
+              <h3 id="dotgov">.GOV (ie dotGOV)</h3>
+              <p>
+                Term referring to the domain name and to refer to the UK
+                government website for finding government services and
+                information which is maintained by the Government Digital
+                Service (GDS).
+              </p>
+              <p>
+                See also{' '}
+                <a href="#government-digital-service-gds">
+                  Government Digital Service (GDS)
+                </a>
+                .
+              </p>
+              <h3 id="government-digital-service">
+                Government Digital Service (GDS)
+              </h3>
+              <p>
+                Government department leading digital transformation across UK
+                government and responsible for the digital standards which the
+                DfE Data Dissemination Project and explore education statistics
+                has to meet.
+              </p>
+              <p>
+                See also{' '}
+                <a href="#dfe-data-dissemination-project">
+                  DfE Data Dissemination Project
+                </a>
+                .
+              </p>
+              <p>
+                See also{' '}
+                <a href="#explore-education-statistics">
+                  explore education statistics
+                </a>
+                .
+              </p>
               <h3 id="grammar-school">grammar school</h3>
               <p>
                 Lower case unless part of a school name: The Manchester Grammar
@@ -746,6 +990,27 @@ const DocumentationGlossary = () => {
               <p>Hyphenated.</p>
               <h3 id="higher-education-he">higher education (HE)</h3>
               <p>Lower case.</p>
+              <h3>higher review</h3>
+              <ul className="govuk-list govuk-list--bullet">
+                <p>
+                  Generic term describing the release status of a release once
+                  it’s been reviewed, approved for sign-off and its release
+                  status updated to one of the following:
+                </p>
+                <li>Ready for sign-off</li>
+                <li>Approved for release</li>
+                <li>In pre-release</li>
+              </ul>
+              <p>
+                See also{' '}
+                <a href="#approved-for-release">Approved for release</a>.
+              </p>
+              <p>
+                See also <a href="#in-pre-release">In pre-release</a> .
+              </p>
+              <p>
+                See also <a href="#ready-for-sign-off">Ready for sign-off</a> .
+              </p>
               <h3 id="home-school-agreement">home-school agreement</h3>
               <p>Hyphenated.</p>
               <h3 id="hyphenation">Hyphenation</h3>
@@ -792,6 +1057,27 @@ const DocumentationGlossary = () => {
               <p>
                 See <a href="#eg-etc-and-ie">eg, etc and ie</a>
               </p>
+              <h3 id="in-draft">In draft</h3>
+              <p>
+                Term describing the release status of a release once it’s been
+                initially created and is being worked on by a Primary Analyst
+                and other Production team members.
+              </p>
+              <p>
+                See also <a href="#release-status">Release status</a>.
+              </p>
+              <h3 id="in-pre-release">In pre-release</h3>
+              <p>
+                Term describing the release status of a release once it’s been
+                approved for sign-off by a Responsible Statistician and enters
+                the Pre-release process.
+              </p>
+              <p>
+                See also <a href="#pre-release-process">Pre-release process</a>.
+              </p>
+              <p>
+                See also <a href="#release-status">Release status</a>.
+              </p>
               <h3 id="independent-schools-adjudicator">
                 independent schools adjudicator
               </h3>
@@ -804,6 +1090,19 @@ const DocumentationGlossary = () => {
               <p>Lower case.</p>
               <h3 id="inset-day">inset day</h3>
               <p>Lower case.</p>
+              <h3 id="internal-release-notes">Internal release notes</h3>
+              <p>
+                Term referring to the functionality which adds internal notes to
+                releases within the Admin system to explain how a release has
+                been updated.
+              </p>
+              <p>
+                These notes are then displayed to a release’s Production team
+                members to update them about the status of the release.
+              </p>
+              <p>
+                See also <a href="#release-notes">Release notes</a>.
+              </p>
               <h3 id="international-baccalaureate">
                 International Baccalaureate
               </h3>
@@ -898,6 +1197,15 @@ const DocumentationGlossary = () => {
                 sentence if it looks better: ‘The following countries are in the
                 EU: Spain, France, Italy…’
               </p>
+              <h3 id="live">Live</h3>
+              <p>
+                Term describing the release status of a release once it’s gone
+                through the pre-release process, been published and is ‘live’ on
+                explore education statistics.
+              </p>
+              <p>
+                See also <a href="#release-status">Release status</a>.
+              </p>
               <h3 id="local-authority">local authority</h3>
               <p>Lower case. Do not use LA.</p>
               <p>
@@ -984,6 +1292,18 @@ const DocumentationGlossary = () => {
                 But do not use £0.xx million for amounts less than £1 million.
               </p>
               <p>Do not abbreviate million to m.</p>
+              <h3 id="minimum-viable-product-mvp">
+                minimum viable product (MVP)
+              </h3>
+              <p>
+                Term describing the end-product of the beta stage of the DfE
+                Data Dissemination Project.{' '}
+              </p>
+              <p>
+                Essentially, an online version of explore education statistics
+                with enough features to satisfy early customers and to provide
+                feedback for its future development as a service.
+              </p>
               <h3 id="minister">minister</h3>
               <p>
                 Use upper case for the full title, like Minister for Overseas
@@ -1030,6 +1350,14 @@ const DocumentationGlossary = () => {
               <p>Hyphenated.</p>
               <h3 id="multilingual">multilingual</h3>
               <p>One word.</p>
+              <h3 id="mvp">MVP</h3>
+              <p>
+                See{' '}
+                <a href="#minimum-viable-product-mvp">
+                  minimum viable product (MVP)
+                </a>
+                .
+              </p>
             </AccordionSection>
             <AccordionSection heading="N">
               <h3 id="na">N/A</h3>
@@ -1144,6 +1472,17 @@ const DocumentationGlossary = () => {
               <p>
                 Use local council, instead of local authority, where possible.
               </p>
+              <h3 id="other-production-team-member">
+                Other production team member
+              </h3>
+              <p>
+                Role of person within a ‘Production team’ who may be responsible
+                for reviewing or collaborating on creating section of a release
+                for explore education statistics.
+              </p>
+              <p>
+                See also <a href="#production-team">Production team</a>.
+              </p>
               <h3 id="overseas-trained-teacher">overseas-trained teacher</h3>
               <p>Lower case. Hyphenated.</p>
             </AccordionSection>
@@ -1205,8 +1544,47 @@ const DocumentationGlossary = () => {
               <p>Upper case because PowerPoint is a brand name.</p>
               <h3 id="pre-school">pre-school</h3>
               <p>Hyphenated.</p>
+              <h3 id="primary-analyst">Primary Analyst</h3>
+              <p>
+                Role of person (ie main primary analyst / statistician) within a
+                ‘Production team’ who’s responsible for setting up and creating
+                a release on explore education statistics.
+              </p>
+              <p>
+                See also <a href="#production-team">Production team</a>.
+              </p>
               <h3 id="prime-minister">Prime Minister</h3>
-              <p>Use Prime Minister Theresa May and the Prime Minister.</p>
+              <p>Use Prime Minister Boris Johnson and the Prime Minister.</p>
+              <h3 id="production-team">Production team</h3>
+              <p>
+                Group of people with roles who are responsible for creating and
+                publishing a release on explore education statistics.
+              </p>
+              <ul className="govuk-list govuk-list--bullet">
+                <p>Made up of the following roles: </p>
+                <li>Other production team member</li>
+                <li>Primary Analyst</li>
+                <li>Responsible Statistician</li>
+                <li>Team Leader</li>
+              </ul>
+              <p>
+                See also{' '}
+                <a href="#other-production-team-membe">
+                  Other production team member
+                </a>
+                .
+              </p>
+              <p>
+                See also <a href="#primary-analyst">Primary Analyst</a>.
+              </p>
+              <p>
+                See also{' '}
+                <a href="#responsible-statistician">Responsible Statistician</a>
+                .
+              </p>
+              <p>
+                See also <a href="#team-leader">Team Leader</a>.
+              </p>
               <h3 id="programme">programme</h3>
               <p>
                 Lower case: Troubled Families programme, Sure Start programme.
@@ -1217,6 +1595,20 @@ const DocumentationGlossary = () => {
               <p>Lower case.</p>
               <h3 id="public-sector">public sector</h3>
               <p>Lower case.</p>
+              <h3 id="publications">Publications</h3>
+              <p>
+                Internal name for the high-level category of statistics and data
+                which contain releases within the admin system.
+              </p>
+              <p>Only a Team Leader can create a new publication.</p>
+              <p>
+                Should only be used as a term internally as research has shown
+                users have no understanding of what a ‘publication’ refers to.
+              </p>
+              <p>
+                Therefore, should not be used within published content on the
+                service.
+              </p>
               <h3 id="pupil-premium">pupil premium</h3>
               <p>Lower case.</p>
               <h3 id="pupil-referral-unit">pupil referral unit</h3>
@@ -1250,6 +1642,100 @@ const DocumentationGlossary = () => {
                   block quote Markdown
                 </a>{' '}
                 for quotes longer than a few sentences.
+              </p>
+            </AccordionSection>
+            <AccordionSection heading="R">
+              <h3 id="ready-for-sign-off">Ready for sign-off</h3>
+              <p>
+                Term describing the release status of a release once it’s been
+                reviewed by the members of a Production team and is ready for
+                sign-off by a Responsible Statistician.
+              </p>
+              <p>
+                See also <a href="#release-status">Release status</a>
+              </p>
+              <p>
+                See also{' '}
+                <a href="#responsible-statistician">Responsible Statistician</a>
+              </p>
+              <h3 id="release">release</h3>
+              <p>
+                Internal name for the service end product, created by a
+                ‘Production team’ to publish the latest ‘release’ of statistics
+                and data on the service.
+              </p>
+              <p>
+                Should only be used as a term internally as research has shown
+                users have no understanding of what a ‘release’ refers to.
+              </p>
+              <p>
+                Therefore, should not be used as a noun within published content
+                on the service.
+              </p>
+              <p>
+                Instead, a ‘release’ should only be used as a verb to describe
+                the latest ‘release’ of statistics and data to be published on
+                the service.
+              </p>
+              <h3 id="release-footnotes">Release footnotes</h3>
+              <p>
+                Term referring to the functionality which adds specific
+                user-friendly footnotes to tables and charts within the Admin
+                system and then displays them for users within releases on
+                explore education statistics.
+              </p>
+              <p>
+                See also <a href="#footnotes">Footnotes</a>.
+              </p>
+              <h3 id="release-notes">Release notes</h3>
+              <p>
+                Term referring to the functionality which adds user-friendly
+                notes to releases within the Admin system to explain how a
+                release’s content or data has been updated.
+              </p>
+              <p>
+                These notes are then time-stamped and displayed to users under
+                the ‘About these statistics’ section of a published release on
+                explore education statistics for transparency purposes.
+              </p>
+              <p>
+                See also{' '}
+                <a href="#internal-release-notes">Internal release notes</a>.
+              </p>
+              <h3 id="release-status">Release status</h3>
+              <p>
+                Catch-all term describing the status of a release within the
+                publishing process including:{' '}
+              </p>
+              <ul className="govuk-list govuk-list--bullet">
+                <li>In draft</li>
+                <li>Ready for sign-off</li>
+                <li>Approved for release</li>
+                <li>In pre-release</li>
+                <li>Live</li>
+              </ul>
+              <h3 id="reproducible-analytical-pipelines-rap">
+                Reproducible Analytical Pipelines (RAP)
+              </h3>
+              <p>
+                An automated statistical release which can be easily reproduced,
+                tested, and audited without using a manual or semi-manual
+                processes.
+              </p>
+              <h3 id="responsible-statistician">Responsible Statistician</h3>
+              <p>
+                Role of person (ie Grade 6 or above) within a ‘Production team’
+                responsible for signing-off a release once it’s been passed for
+                higher review by a Primary Analyst or Team Leader.
+              </p>
+              <p>
+                see also <a href="#primary-analyst">higher review</a>.
+              </p>
+              <p>
+                see also <a href="#primary-analyst">Primary Analyst</a>.
+              </p>
+              <p>
+                see also <a href="#production-team">Production team</a>.
               </p>
             </AccordionSection>
             <AccordionSection heading="S">
@@ -1384,6 +1870,18 @@ const DocumentationGlossary = () => {
               </p>
               <h3 id="standards-of-conduct">standards of conduct</h3>
               <p>Lower case.</p>
+              <h3 id="start-page">start page</h3>
+              <p>
+                Official GDS web page design pattern used as starting point for
+                any digital service including explore education statistics.
+              </p>
+              <p>
+                See{' '}
+                <a href="https://design-system.service.gov.uk/patterns/start-pages/ ">
+                  GOV.UK Design System: Start pages
+                </a>
+                .
+              </p>
               <h3 id="statement-of-send">statement of SEND</h3>
               <p>Lower case.</p>
               <h3 id="statistical-first-release">statistical first release</h3>
@@ -1399,9 +1897,42 @@ const DocumentationGlossary = () => {
                 of the Government Statistical Service.
               </p>
               <p>
+                Term describing the content published on explore education
+                statistics which interprets and provides a commentary on and
+                summary of its related data.
+              </p>
+              <p>
+                External name for the service end product, created by a
+                ‘Production team’ when it publishes the latest ‘release’ of
+                ‘statistics and data’ on the service.
+              </p>
+              <p>
+                Should be used externally as a noun to refer to what is
+                published for users on explore education statistics.
+              </p>
+              <p>
+                Research has shown users understand what ‘statistics’ refers to
+                in comparison to the former interchangeable use or ‘publication’
+                and ‘release’ for the same end product.
+              </p>
+              <p>
                 Upper case National Statistics for the official statistics
                 quality mark. Lower case for anything else, including statistics
                 that are national in scope.
+              </p>
+              <h3 id="statistics-modernisation-team">
+                Statistics Modernisation Team
+              </h3>
+              <p>
+                Official internal name of the team behind the project building
+                explore education statistics.
+              </p>
+              <p>
+                See{' '}
+                <a href="#explore-education-statistics">
+                  explore education statistics
+                </a>
+                .
               </p>
               <h3 id="steps-1">steps</h3>
               <p>
@@ -1445,6 +1976,11 @@ const DocumentationGlossary = () => {
             <AccordionSection heading="T">
               <h3 id="t-level">T level</h3>
               <p>No hyphen. Lower case level.</p>
+              <h3 id="tables">Tables</h3>
+              <p>
+                Term referring to the table functionality available within the
+                Admin system and on explore education statistics.
+              </p>
               <h3 id="tax-credits">tax credits</h3>
               <p>
                 Lower case and plural. Working Tax Credit and Child Tax Credit
@@ -1457,6 +1993,19 @@ const DocumentationGlossary = () => {
               <h3 id="team">team</h3>
               <p>
                 Lower case: youth offending team, Behavioural Insights team.
+              </p>
+              <h3 id="team-leader">Team leader</h3>
+              <p>
+                Role of person (ie team leader of main primary analyst /
+                statistician) within a ‘Production team’ responsible for
+                creating new publications and with a focus on clearing releases
+                so they’re ready for higher review.
+              </p>
+              <p>
+                See also <a href="#primary-analyst">higher review</a>.
+              </p>
+              <p>
+                See also <a href="#production-team">Production team</a>.
               </p>
               <h3 id="teamwork">teamwork</h3>
               <p>Lower case. One word.</p>
@@ -1499,6 +2048,45 @@ const DocumentationGlossary = () => {
                 When a number is memorable, group the numbers into easily
                 remembered units: 0800 80 70 60.
               </p>
+              <h3 id="the-explore-education-statistics-service">
+                The Explore education statistics service
+              </h3>
+              <p>
+                Alternative and full generic internal name for explore education
+                statistics.
+              </p>
+              <p>
+                See{' '}
+                <a href="#explore-education-statistics">
+                  explore education statistics
+                </a>
+                .
+              </p>
+              <h3 id="themes">Themes</h3>
+              <p>
+                Categorical term for the high-level primary collection of
+                publications within the admin system. The parent of its related
+                admin system ‘topics’.
+              </p>
+              <p>
+                For example, ‘Pupils and schools’ is the parent theme of the
+                ‘Admission appeals’, ‘Exclusions’ and ‘Pupil absence’ topics.
+              </p>
+              <p>
+                See also<a href="#topics">topics</a>.
+              </p>
+              <h3 id="the-service">the service</h3>
+              <p>
+                Alternative generic internal name for explore education
+                statistics.
+              </p>
+              <p>
+                See{' '}
+                <a href="#explore-education-statistics">
+                  explore education statistics
+                </a>
+                .
+              </p>
               <h3 id="threshold-assessment">threshold assessment</h3>
               <p>Lower case.</p>
               <h3 id="times">Times</h3>
@@ -1534,6 +2122,19 @@ const DocumentationGlossary = () => {
                 <li>not have a full stop at the end</li>
                 <li>not use acronyms unless they are well-known, like EU</li>
               </ul>
+              <h3 id="topics">Topics</h3>
+              <p>
+                Categorical term for the high-level secondary collection of
+                publications within the admin system. The child of a related
+                admin system ‘theme’.
+              </p>
+              <p>
+                For example, ‘Admission appeals’, ‘Exclusions’ and ‘Pupil
+                absence’ are the child topics of the ‘Pupils and schools’ theme.
+              </p>
+              <p>
+                See also <a href="#themes">themes</a>.
+              </p>
               <h3 id="town-council">town council</h3>
               <p>Lower case, even when part of a name: Swanage town council.</p>
               <h3 id="training-schools">training schools</h3>
@@ -1552,6 +2153,11 @@ const DocumentationGlossary = () => {
               <p>Never HM government.</p>
               <h3 id="underachiever">underachiever</h3>
               <p>One word.</p>
+              <h3 id="underlying-data">Underlying Data</h3>
+              <p>Alternative internal name for data.</p>
+              <p>
+                See <a href="#data">data</a>.
+              </p>
               <h3 id="underperforming">underperforming</h3>
               <p>One word.</p>
               <h3 id="unique-pupil-number">unique pupil number</h3>
@@ -1560,6 +2166,8 @@ const DocumentationGlossary = () => {
                 university technical college
               </h3>
               <p>Lower case.</p>
+              <h3 id="users">users</h3>
+              <p>General name for anyone who uses the service.</p>
             </AccordionSection>
             <AccordionSection heading="V">
               <h3 id="voluntary-aided-schools-voluntary-controlled-schools">

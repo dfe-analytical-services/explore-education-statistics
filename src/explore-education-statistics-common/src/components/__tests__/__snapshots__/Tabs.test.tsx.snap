@@ -5,10 +5,10 @@ exports[`Tabs renders multiple tabs correctly 1`] = `
   <ul class="govuk-tabs__list"
       role="tablist"
   >
-    <li class="govuk-tabs__list-item"
+    <li class="govuk-tabs__list-item govuk-tabs__list-item--selected"
         role="presentation"
     >
-      <a class="govuk-tabs__tab govuk-tabs__tab--selected"
+      <a class="govuk-tabs__tab"
          href="#test-tabs-1"
          id="test-tabs-1-tab"
          aria-controls="test-tabs-1"
@@ -67,10 +67,10 @@ exports[`Tabs renders single tab correctly 1`] = `
   <ul class="govuk-tabs__list"
       role="tablist"
   >
-    <li class="govuk-tabs__list-item"
+    <li class="govuk-tabs__list-item govuk-tabs__list-item--selected"
         role="presentation"
     >
-      <a class="govuk-tabs__tab govuk-tabs__tab--selected"
+      <a class="govuk-tabs__tab"
          href="#test-tabs-1"
          id="test-tabs-1-tab"
          aria-controls="test-tabs-1"

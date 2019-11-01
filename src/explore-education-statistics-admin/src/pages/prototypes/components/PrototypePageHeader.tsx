@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import logo from 'govuk-frontend/assets/images/govuk-logotype-crown.png';
+import logo from 'govuk-frontend/govuk/assets/images/govuk-logotype-crown.png';
 import React from 'react';
 import { LoginContext } from '@admin/components/Login';
 
