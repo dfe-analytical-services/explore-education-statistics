@@ -20,7 +20,6 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 
 interface Props {
   dataBlock: DataBlock;
-  dataBlockRequest: DataBlockRequest;
   dataBlockResponse: DataBlockResponse;
   onDataBlockSave: (db: DataBlock) => Promise<DataBlock>;
 }
@@ -28,7 +27,6 @@ interface Props {
 const ViewDataBlocks = ({
   dataBlock,
   dataBlockResponse,
-  dataBlockRequest,
   onDataBlockSave,
 }: Props) => {
   // we want to modify this internally as our own data, copying it
@@ -106,7 +104,7 @@ const ViewDataBlocks = ({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const reRequestdata = (reRequest: DataBlockRerequest) => {
     const newRequest = {
-      ...dataBlockRequest,
+      ...dataBlock.dataBlockRequest,
       ...reRequest,
     };
 

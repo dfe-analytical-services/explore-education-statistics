@@ -6,6 +6,7 @@ import {
 import React, { createRef } from 'react';
 import TableToolWizard, {
   FinalStepProps,
+  TableToolState,
 } from '@common/modules/table-tool/components/TableToolWizard';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import TableHeadersForm, {
@@ -92,11 +93,9 @@ const CreateDataBlocks = ({
         };
 
         if (
-          tableHeadersConfig.columns.length === 0 ||
-          tableHeadersConfig.rows.length === 0
+          tableHeadersConfig.columns.length !== 0 &&
+          tableHeadersConfig.rows.length !== 0
         ) {
-          // ignore this error
-        } else {
           setTableHeaders(headers);
         }
       }
@@ -157,7 +156,7 @@ const CreateDataBlocks = ({
                     tableHeaders={tableHeaders}
                     initialDataBlock={dataBlock}
                     releaseId={releaseId}
-                    onDataBlockSave={onDataBlockSave}
+                    onDataBlockSave={db => onDataBlockSave(db)}
                   />
                 )}
               </>
