@@ -9,7 +9,7 @@ describe('Tabs', () => {
   test('renders single tab correctly', () => {
     const { container, getAllByText } = render(
       <Tabs id="test-tabs">
-        <TabsSection title="Tab 1">
+        <TabsSection title="Tab 1" isTitleVisible>
           <p>Test section 1 content</p>
         </TabsSection>
       </Tabs>,
@@ -20,7 +20,25 @@ describe('Tabs', () => {
     expect(container.innerHTML).toMatchSnapshot();
   });
 
-  test('renders multiple tabs correctly', () => {
+  test('renders multiple tabs correctly with titles', () => {
+    const { container, getAllByText } = render(
+      <Tabs id="test-tabs">
+        <TabsSection title="Tab 1" isTitleVisible>
+          <p>Test section 1 content</p>
+        </TabsSection>
+        <TabsSection title="Tab 2" isTitleVisible>
+          <p>Test section 2 content</p>
+        </TabsSection>
+      </Tabs>,
+    );
+
+    expect(getAllByText('Tab 1')[0]).toHaveAttribute('aria-selected', 'true');
+    expect(getAllByText('Tab 2')[0]).toHaveAttribute('aria-selected', 'false');
+
+    expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('renders multiple tabs correctly without titles', () => {
     const { container, getAllByText } = render(
       <Tabs id="test-tabs">
         <TabsSection title="Tab 1">
@@ -71,10 +89,10 @@ describe('Tabs', () => {
   test('setting `headingTag` changes section heading size', () => {
     const { container } = render(
       <Tabs id="test-tabs">
-        <TabsSection title="Tab 1">
+        <TabsSection title="Tab 1" isTitleVisible>
           <p>Test section 1 content</p>
         </TabsSection>
-        <TabsSection title="Tab 2" headingTag="h2">
+        <TabsSection title="Tab 2" isTitleVisible headingTag="h2">
           <p>Test section 2 content</p>
         </TabsSection>
       </Tabs>,
@@ -90,10 +108,10 @@ describe('Tabs', () => {
   test('does not immediately render lazy tab section', () => {
     const { queryByText } = render(
       <Tabs id="test-tabs">
-        <TabsSection title="Tab 1">
+        <TabsSection title="Tab 1" isTitleVisible>
           <p>Test section 1 content</p>
         </TabsSection>
-        <TabsSection title="Tab 2" lazy>
+        <TabsSection title="Tab 2" isTitleVisible lazy>
           <p>Test section 2 content</p>
         </TabsSection>
       </Tabs>,
