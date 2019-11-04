@@ -50,14 +50,14 @@ jobs:
           projects: '**/GovUk.Education.ExploreEducationStatistics.Data.Api.csproj'
           arguments: '--self-contained true -r win-x86 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/public-api'
           zipAfterPublish: True
-      # - task: 'DotNetCoreCLI@2'
-      #   displayName: 'Publish Content API'
-      #   inputs:
-      #     command: 'publish'
-      #     publishWebProjects: false
-      #     projects: '**/GovUk.Education.ExploreEducationStatistics.Content.Api.csproj'
-      #     arguments: '--self-contained true -r win-x86 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/public-api'
-      #     zipAfterPublish: True
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Publish Content API'
+        inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: '**/GovUk.Education.ExploreEducationStatistics.Content.Api.csproj'
+          arguments: '--self-contained true -r win-x86 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/public-api'
+          zipAfterPublish: True
       - task: 'PublishPipelineArtifact@0'
         displayName: 'Publish Pipeline Artifact'
         inputs:
