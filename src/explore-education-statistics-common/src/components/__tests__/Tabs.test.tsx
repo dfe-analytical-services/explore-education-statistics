@@ -2,8 +2,9 @@ import React from 'react';
 import { fireEvent, render } from 'react-testing-library';
 import Tabs from '../Tabs';
 import TabsSection from '../TabsSection';
+import styles from '../TabsSection.module.scss';
 
-const hiddenSectionClass = 'govuk-tabs__panel--hidden';
+const hiddenSectionClass = styles.hidden;
 
 describe('Tabs', () => {
   test('renders single tab correctly', () => {
