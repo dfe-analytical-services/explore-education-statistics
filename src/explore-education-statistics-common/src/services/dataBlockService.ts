@@ -117,9 +117,7 @@ export interface Result {
   filters: string[];
   location: DataBlockLocation;
   geographicLevel: GeographicLevel;
-  measures: {
-    [key: string]: string;
-  };
+  measures: Dictionary<string>;
   timePeriod: string;
 }
 
