@@ -33,7 +33,7 @@ jobs:
       - task: 'DotNetCoreCLI@2'
         displayName: 'Build'
         inputs:
-          projects: '!**/GovUk.*[Tt]ests/*.csproj'
+          projects: '**/GovUk.*[Tt]ests/*.csproj'
           arguments: '--configuration $(BuildConfiguration)'
       - task: 'DotNetCoreCLI@2'
         displayName: 'Test'
@@ -43,18 +43,26 @@ jobs:
           arguments: '--configuration $(BuildConfiguration)'
 
       - task: 'DotNetCoreCLI@2'
-        displayName: 'Publish'
+        displayName: 'Publish Data API'
         inputs:
           command: 'publish'
           publishWebProjects: false
-          projects: '!**/GovUk.*[Tt]ests/*.csproj'
-          arguments: '--self-contained true -r win-x86 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
+          projects: '**/GovUk.Education.ExploreEducationStatistics.Data.Api.csproj'
+          arguments: '--self-contained true -r win-x86 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/public-api'
+          zipAfterPublish: True
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Publish Content API'
+        inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: '**/GovUk.Education.ExploreEducationStatistics.Content.Api.csproj'
+          arguments: '--self-contained true -r win-x86 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/public-api'
           zipAfterPublish: True
       - task: 'PublishPipelineArtifact@0'
         displayName: 'Publish Pipeline Artifact'
         inputs:
-          artifactName: 'backend'
-          targetPath: '$(Build.ArtifactStagingDirectory)'
+          artifactName: 'public-api'
+          targetPath: '$(Build.ArtifactStagingDirectory)/public-api'
   - job: 'Admin'
     pool:
       name: Hosted Windows 2019 with VS2019
