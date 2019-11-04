@@ -70,7 +70,7 @@ jobs:
         inputs:
           command: 'publish'
           publishWebProjects: false
-          projects: '**/GovUk.Education.ExploreEducationStatistics.Notifier.Api.csproj'
+          projects: '**/GovUk.Education.ExploreEducationStatistics.Notifier.csproj'
           arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/notifier'
           zipAfterPublish: True
       - task: 'PublishPipelineArtifact@0'
@@ -84,7 +84,7 @@ jobs:
         inputs:
           command: 'publish'
           publishWebProjects: false
-          projects: '**/GovUk.Education.ExploreEducationStatistics.Publisher.Api.csproj'
+          projects: '**/GovUk.Education.ExploreEducationStatistics.Publisher.csproj'
           arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/publisher'
           zipAfterPublish: True
       - task: 'PublishPipelineArtifact@0'
@@ -249,11 +249,11 @@ jobs:
         inputs:
           artifactName: 'newman-tests'
           targetPath: 'tests/newman'
-      - task: PublishPipelineArtifact@0
-        displayName: 'Publish AzureADCookie script'
-        inputs:
-          artifactName: 'azure-ad-cookie-script'
-          targetPath: 'useful-scripts/azure-ad-cookie'
+      # - task: PublishPipelineArtifact@0
+      #   displayName: 'Publish AzureADCookie script'
+      #   inputs:
+      #     artifactName: 'azure-ad-cookie-script'
+      #     targetPath: 'useful-scripts/azure-ad-cookie'
       - task: 'PublishPipelineArtifact@0'
         displayName: 'Publish ARM templates'
         inputs:
