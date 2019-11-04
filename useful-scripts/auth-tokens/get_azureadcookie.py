@@ -66,20 +66,10 @@ driver.find_element_by_xpath('//input[@value="No"]').click()
 
 wait_until_page_contains_xpath(driver, '//span[text()="Welcome"]')
 
-identity_cookie = None
-for cookie in driver.get_cookies():
-    if cookie['name'] == ".AspNetCore.Identity.Application":
-        identity_cookie = cookie['value']
-        break
-assert identity_cookie is not None, "Couldn't find cookie '.AspNetCore.Identity.Application'"
-
-jwt = driver.execute_script("return JSON.parse(window.localStorage.getItem('GovUk.Education.ExploreEducationStatistics.Adminuser:https://localhost:5021:GovUk.Education.ExploreEducationStatistics.Admin')).access_token")
+jwt = driver.execute_script(f"return JSON.parse(window.localStorage.getItem('GovUk.Education.ExploreEducationStatistics.Adminuser:{args.url}:GovUk.Education.ExploreEducationStatistics.Admin')).access_token")
+assert jwt is not None, f"Couldn't find JWT 'GovUk.Education.ExploreEducationStatistics.Adminuser:{args.url}:GovUk.Education.ExploreEducationStatistics.Admin'"
 
 driver.close()
-
-f = open('azure_ad_cookie', 'w')
-f.write(identity_cookie)
-f.close()
 
 f = open('jwt', 'w')
 f.write(jwt)
