@@ -6,7 +6,7 @@ exports[`FormSelect renders correctly with required props 1`] = `
 >
   Test select
 </label>
-<select class="govuk-select select"
+<select class="govuk-select"
         id="test-select"
         name="testSelect"
 >
@@ -31,7 +31,7 @@ exports[`FormSelect renders with error message 1`] = `
 <span class="govuk-error-message">
   Something went wrong
 </span>
-<select class="govuk-select select govuk-select--error"
+<select class="govuk-select govuk-select--error"
         id="test-select"
         name="testSelect"
 >

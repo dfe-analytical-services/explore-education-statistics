@@ -84,7 +84,9 @@ const AccordionSection = ({
           ),
         )}
         {caption && (
-          <span className="govuk-accordion__section-summary">{caption}</span>
+          <div className="govuk-accordion__section-summary govuk-body">
+            {caption}
+          </div>
         )}
       </div>
 
