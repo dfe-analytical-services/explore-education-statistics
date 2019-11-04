@@ -1,5 +1,5 @@
 *** Settings ***
-Resource    ../libs/common.robot
+Resource    ../libs/public-common.robot
 
 Force Tags  GeneralPublic  Local  Dev  Test  Prod
 
@@ -72,6 +72,7 @@ Enable google analytics
     [Tags]  HappyPath    NotAgainstLocal
     user reloads page
 
+    user waits until page does not contain  Your cookie settings were saved
     user clicks element   css:#googleAnalytics-on
     user clicks element   xpath://button[text()="Save changes"]
     user waits until page contains   Your cookie settings were saved

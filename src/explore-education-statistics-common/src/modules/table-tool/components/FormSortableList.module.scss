@@ -1,24 +1,26 @@
 @import '../../../styles/govuk-base';
 
 .listDraggingOver {
-  background: govuk-colour('grey-4');
+  background: govuk-colour('light-grey');
   outline: $govuk-focus-width solid $govuk-focus-colour;
   outline-offset: 0;
 }
 
 .optionRow {
-  @include govuk-focusable;
-
   background: #fff;
-  border-bottom: 1px solid govuk-colour('grey-2');
+  border-bottom: 1px solid govuk-colour('mid-grey');
   padding: govuk-spacing(2);
   user-select: none;
 
   &:hover {
-    background: govuk-colour('grey-4');
+    background: govuk-colour('light-grey');
     // Fallback if grab is unsupported
     cursor: move;
     cursor: grab;
+  }
+  &:focus {
+    border: $govuk-focus-width solid #000;
+    outline: $govuk-focus-colour solid $govuk-focus-width;
   }
 }
 

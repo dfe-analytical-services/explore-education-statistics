@@ -110,6 +110,10 @@ user waits until page contains element
   [Arguments]    ${element}        ${wait}=${timeout}
   wait until page contains element  ${element}   timeout=${wait}
 
+user waits until page does not contain
+  [Arguments]    ${pageText}
+  wait until page does not contain   ${pageText}
+
 user waits until page does not contain element
   [Arguments]    ${element}
   wait until page does not contain element  ${element}
