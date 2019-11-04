@@ -65,7 +65,7 @@ function getReduceMetaDataForAxis(
         ...data.result.reduce<Dictionary<DataSetConfiguration>>(
           (moreItems, { timePeriod }) => ({
             ...moreItems,
-            [timePeriod]: metaData.timePeriods[timePeriod],
+            [timePeriod]: metaData.timePeriod[timePeriod],
           }),
           {},
         ),
@@ -97,7 +97,7 @@ const chartTypes: ChartDefinition[] = [
 ];
 
 const emptyMetadata = {
-  timePeriods: {},
+  timePeriod: {},
   filters: {},
   indicators: {},
   locations: {},

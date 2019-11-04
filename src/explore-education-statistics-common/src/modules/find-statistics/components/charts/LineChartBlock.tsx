@@ -219,7 +219,7 @@ const definition: ChartDefinition = {
       id: 'xaxis',
       title: 'X Axis',
       type: 'major',
-      defaultDataType: 'timePeriods',
+      defaultDataType: 'timePeriod',
     },
     {
       id: 'yaxis',

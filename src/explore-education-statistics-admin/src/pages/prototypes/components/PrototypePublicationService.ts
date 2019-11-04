@@ -550,7 +550,7 @@ export default class PrototypePublicationService {
               major: {
                 name: 'major',
                 type: 'major',
-                groupBy: 'timePeriods',
+                groupBy: 'timePeriod',
                 dataSets: [
                   { indicator: '23', filters: ['1', '2'] },
                   { indicator: '26', filters: ['1', '2'] },

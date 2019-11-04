@@ -26316,7 +26316,7 @@ Object {
     },
     "publicationName": "test",
     "subjectName": "test",
-    "timePeriods": Object {
+    "timePeriod": Object {
       "2014_HT6": Object {
         "code": "HT6",
         "label": "2014/15",

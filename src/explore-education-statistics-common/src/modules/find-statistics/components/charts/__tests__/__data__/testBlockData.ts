@@ -467,7 +467,7 @@ const AbstractChartProps: ChartProps = {
     major: {
       name: '23',
       type: 'major',
-      groupBy: 'timePeriods',
+      groupBy: 'timePeriod',
       dataSets: [
         {
           indicator: '23',
@@ -498,8 +498,8 @@ const AbstractChartProps2: ChartProps = {
   data: data2,
   meta: {
     ...chartMetaData,
-    timePeriods: {
-      ...chartMetaData.timePeriods,
+    timePeriod: {
+      ...chartMetaData.timePeriod,
       '2016_HT6': {
         label: '2016/17',
         value: '2016_HT6',
@@ -535,7 +535,7 @@ const AbstractChartProps2: ChartProps = {
     major: {
       name: '23',
       type: 'major',
-      groupBy: 'timePeriods',
+      groupBy: 'timePeriod',
       dataSets: [
         {
           indicator: '23',
@@ -593,7 +593,7 @@ const AbstractMultipleChartProps: ChartProps = {
     major: {
       name: '23',
       type: 'major',
-      groupBy: 'timePeriods',
+      groupBy: 'timePeriod',
       dataSets: [
         {
           indicator: '23',
@@ -652,11 +652,11 @@ const AbstractLargeDataChartProps: ChartProps = {
 
   labels: {
     '2014_AY': {
-      label: AbstractLargeDataChartPropsMeta.timePeriods['2014_AY'].label,
+      label: AbstractLargeDataChartPropsMeta.timePeriod['2014_AY'].label,
       value: '2014_AY',
     },
     '2015_AY': {
-      label: AbstractLargeDataChartPropsMeta.timePeriods['2015_AY'].label,
+      label: AbstractLargeDataChartPropsMeta.timePeriod['2015_AY'].label,
       value: '2015_AY',
     },
     '23_1_2_____': {
@@ -722,13 +722,13 @@ const AbstractLargeDataChartProps_smaller_datasets: ChartProps = {
   labels: {
     '2014_AY': {
       label:
-        AbstractLargeDataChartProps_smaller_datasetsMeta.timePeriods['2014_AY']
+        AbstractLargeDataChartProps_smaller_datasetsMeta.timePeriod['2014_AY']
           .label,
       value: '2014_AY',
     },
     '2015_AY': {
       label:
-        AbstractLargeDataChartProps_smaller_datasetsMeta.timePeriods['2015_AY']
+        AbstractLargeDataChartProps_smaller_datasetsMeta.timePeriod['2015_AY']
           .label,
       value: '2015_AY',
     },
@@ -792,7 +792,7 @@ const AbstractMissingDataChartProps: ChartProps = {
 
   meta: {
     ...chartMetaData,
-    timePeriods: {
+    timePeriod: {
       '2013_HT6': {
         label: '2013/14',
         value: '2013_HT6',
@@ -837,7 +837,7 @@ const AbstractMissingDataChartProps: ChartProps = {
     major: {
       name: '23',
       type: 'major',
-      groupBy: 'timePeriods',
+      groupBy: 'timePeriod',
       dataSets: [
         {
           indicator: '23',

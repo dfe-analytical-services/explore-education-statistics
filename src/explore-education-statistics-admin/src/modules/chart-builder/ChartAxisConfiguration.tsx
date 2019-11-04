@@ -191,7 +191,7 @@ const ChartAxisConfiguration = ({
                     options={[
                       {
                         label: 'Time periods',
-                        value: 'timePeriods' as AxisGroupBy,
+                        value: 'timePeriod' as AxisGroupBy,
                       },
                       {
                         label: 'Locations',

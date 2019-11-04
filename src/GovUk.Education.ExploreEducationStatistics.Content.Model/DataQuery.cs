@@ -95,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public enum AxisGroupBy
     {
-        timePeriods,
+        timePeriod,
         locations,
         filters,
         indicators
