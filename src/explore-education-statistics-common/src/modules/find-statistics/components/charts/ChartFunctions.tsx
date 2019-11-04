@@ -754,7 +754,7 @@ export function parseMetaData(metaData: DataBlockMetadata): ChartMetaData {
     indicators: metaData.indicators,
     locations: metaData.locations,
     boundaryLevels: metaData.boundaryLevels,
-    timePeriods: Object.entries(metaData.timePeriods).reduce(
+    timePeriods: Object.entries(metaData.timePeriod).reduce(
       (timePeriods, [value, data]) => ({
         ...timePeriods,
         [value]: {

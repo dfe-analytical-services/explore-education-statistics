@@ -225,11 +225,14 @@ function getFeatureElementById(
     if (selectedFeature) {
       const selectedLayer: Path = selectedFeature.properties.layer as Path;
 
-      return {
-        element: selectedLayer.getElement(),
-        layer: selectedLayer,
-        feature: selectedFeature,
-      };
+      if (selectedLayer) {
+
+        return {
+          element: selectedLayer.getElement(),
+          layer: selectedLayer,
+          feature: selectedFeature,
+        };
+      }
     }
   }
 
