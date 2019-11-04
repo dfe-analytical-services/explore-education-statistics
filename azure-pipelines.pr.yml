@@ -48,7 +48,7 @@ jobs:
           command: 'publish'
           publishWebProjects: false
           projects: '**/GovUk.*/*.csproj'
-          arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
+          arguments: '--self-contained true -r win-x86 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
           zipAfterPublish: True
       - task: 'PublishPipelineArtifact@0'
         displayName: 'Publish Pipeline Artifact'
@@ -124,7 +124,7 @@ jobs:
           command: 'publish'
           publishWebProjects: false
           projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.csproj'
-          arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
+          arguments: '--self-contained true -r win-x86 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
       - task: 'PublishPipelineArtifact@0'
         displayName: 'Publish Pipeline Artifact'
         inputs:
