@@ -33,8 +33,7 @@ jobs:
       - task: 'DotNetCoreCLI@2'
         displayName: 'Build'
         inputs:
-          projects: '**/GovUk.Education.ExploreEducationStatistics.Data.csproj' '**/GovUk.Education.ExploreEducationStatistics.Content.csproj'  '**/GovUk.Education.ExploreEducationStatistics.Data.Processor.csproj' '**/GovUk.Education.ExploreEducationStatistics.Publisher.csproj' '**/GovUk.Education.ExploreEducationStatistics.Notifier.csproj' 
-          projects: '**/GovUk.*/*csproj'
+          projects: '**/GovUk.*/*csproj !**/GovUk.*/*Tests.csproj'
           arguments: '--configuration $(BuildConfiguration)'
       - task: 'DotNetCoreCLI@2'
         displayName: 'Test'
@@ -48,7 +47,7 @@ jobs:
         inputs:
           command: 'publish'
           publishWebProjects: false
-          projects: '**/GovUk.Education.ExploreEducationStatistics.Data.csproj' '**/GovUk.Education.ExploreEducationStatistics.Content.csproj'  '**/GovUk.Education.ExploreEducationStatistics.Data.Processor.csproj' '**/GovUk.Education.ExploreEducationStatistics.Publisher.csproj' '**/GovUk.Education.ExploreEducationStatistics.Notifier.csproj' 
+          projects: '**/GovUk.*/*csproj !**/GovUk.*/*Tests.csproj'
           arguments: '--self-contained true -r win-x86 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
           zipAfterPublish: True
       - task: 'PublishPipelineArtifact@0'
