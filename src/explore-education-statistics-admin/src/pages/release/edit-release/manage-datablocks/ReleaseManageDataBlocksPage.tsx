@@ -56,35 +56,6 @@ const ReleaseManageDataBlocksPage = () => {
     [dataBlocks],
   );
 
-  const onDataBlockSave = React.useMemo(
-    () => async (db: DataBlock) => {
-      setIsSaving(true);
-
-      let newDataBlock;
-
-      if (db.id) {
-        newDataBlock = await DataBlocksService.putDataBlock(db.id, db);
-        setDataBlocks([
-          ...dataBlocks.filter(db => db.id !== selectedDataBlock),
-          newDataBlock,
-        ]);
-      } else {
-        newDataBlock = await DataBlocksService.postDataBlock(releaseId, db);
-        setDataBlocks([...dataBlocks, newDataBlock]);
-      }
-
-      if (db.id !== selectedDataBlock) {
-        await updateDataBlocks(releaseId);
-        setSelectedDataBlock(newDataBlock.id || '');
-      }
-
-      setIsSaving(false);
-
-      return newDataBlock;
-    },
-    [releaseId, selectedDataBlock],
-  );
-
   const onDeleteDataBlock = (db: DataBlock) => {
     setDeleteDataBlock(undefined);
     if (db.id) {
@@ -132,7 +103,10 @@ const ReleaseManageDataBlocksPage = () => {
   }, []);
 
   const doLoad = React.useCallback(
-    (selectedDataBlockId: string | undefined) => {
+    (
+      selectedDataBlockId: string | undefined,
+      newDataBlocksList?: DataBlock[],
+    ) => {
       if (!selectedDataBlockId) {
         setDataBlockData(undefined);
         setIsLoading(false);
@@ -143,25 +117,56 @@ const ReleaseManageDataBlocksPage = () => {
       if (currentlyLoadingDataBlockId.current !== selectedDataBlockId) {
         currentlyLoadingDataBlockId.current = selectedDataBlockId;
 
-        load(dataBlocks, releaseId, selectedDataBlockId).then(
-          ({ dataBlock, response: dataBlockResponse }) => {
-            if (currentlyLoadingDataBlockId.current === selectedDataBlockId) {
-              if (dataBlock && dataBlockResponse) {
-                setDataBlockData({
-                  dataBlock,
-                  dataBlockResponse,
-                });
-              } else {
-                setDataBlockData(undefined);
-                setIsLoading(false);
-                currentlyLoadingDataBlockId.current = undefined;
-              }
+        load(
+          newDataBlocksList || dataBlocks,
+          releaseId,
+          selectedDataBlockId,
+        ).then(({ dataBlock, response: dataBlockResponse }) => {
+          if (currentlyLoadingDataBlockId.current === selectedDataBlockId) {
+            if (dataBlock && dataBlockResponse) {
+              setDataBlockData({
+                dataBlock,
+                dataBlockResponse,
+              });
+            } else {
+              setDataBlockData(undefined);
+              setIsLoading(false);
+              currentlyLoadingDataBlockId.current = undefined;
             }
-          },
-        );
+          }
+        });
       }
     },
     [dataBlocks, releaseId],
+  );
+
+  const onDataBlockSave = React.useMemo(
+    () => async (db: DataBlock) => {
+      setIsSaving(true);
+
+      let newDataBlock;
+      let newDataBlocksList;
+
+      if (db.id) {
+        newDataBlock = await DataBlocksService.putDataBlock(db.id, db);
+        newDataBlocksList = [
+          ...dataBlocks.filter(db => db.id !== selectedDataBlock),
+          newDataBlock,
+        ];
+      } else {
+        newDataBlock = await DataBlocksService.postDataBlock(releaseId, db);
+        newDataBlocksList = [...dataBlocks, newDataBlock];
+      }
+      setDataBlocks(newDataBlocksList);
+
+      setSelectedDataBlock(newDataBlock.id || '');
+      doLoad(selectedDataBlock, newDataBlocksList);
+
+      setIsSaving(false);
+
+      return newDataBlock;
+    },
+    [releaseId, selectedDataBlock],
   );
 
   React.useEffect(() => {
