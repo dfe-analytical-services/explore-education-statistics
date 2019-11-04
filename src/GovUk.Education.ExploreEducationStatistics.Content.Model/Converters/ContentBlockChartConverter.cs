@@ -17,33 +17,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Converters
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            var jsonObject = JObject.Load(reader);
-            var contentBlock = default(IContentBlockChart);
-            
-            var type = jsonObject["Type"] ?? jsonObject["type"];
-            
-            switch (type.Value<string>())
+            try
             {
-                case "line":
-                    contentBlock = new LineChart();
-                    break;
-                case "horizontalbar":
-                    contentBlock = new HorizontalBarChart();
-                    break;
-                case "verticalbar":
-                    contentBlock = new VerticalBarChart();
-                    break;
-                case "map":
-                    contentBlock = new MapChart();
-                    break;
-            }
+                var jsonObject = JObject.Load(reader);
+                var contentBlock = default(IContentBlockChart);
 
-            if (contentBlock != null)
+                var type = jsonObject["Type"] ?? jsonObject["type"];
+
+                switch (type.Value<string>())
+                {
+                    case "line":
+                        contentBlock = new LineChart();
+                        break;
+                    case "horizontalbar":
+                        contentBlock = new HorizontalBarChart();
+                        break;
+                    case "verticalbar":
+                        contentBlock = new VerticalBarChart();
+                        break;
+                    case "map":
+                        contentBlock = new MapChart();
+                        break;
+                    case "infographic":
+                        contentBlock = new InfographicChart();
+                        break;
+                }
+
+                if (contentBlock != null)
+                {
+                    serializer.Populate(jsonObject.CreateReader(), contentBlock);
+                }
+
+                return contentBlock;
+            }
+            catch (Exception e)
             {
-                serializer.Populate(jsonObject.CreateReader(), contentBlock);
+                return null;
             }
-
-            return contentBlock;
         }
  
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)

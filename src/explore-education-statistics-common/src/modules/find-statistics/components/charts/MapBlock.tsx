@@ -226,7 +226,6 @@ function getFeatureElementById(
       const selectedLayer: Path = selectedFeature.properties.layer as Path;
 
       if (selectedLayer) {
-
         return {
           element: selectedLayer.getElement(),
           layer: selectedLayer,

@@ -326,7 +326,10 @@ function generateNameForAxisConfiguration(
     case 'indicators':
       return `${dataSet.indicator}`;
     case 'filters':
-      return result.filters.join('_');
+      return generateKeyFromDataSet(
+        { ...dataSet, filters: result.filters },
+        groupBy,
+      );
     case 'locations':
       if (
         result.location.localAuthorityDistrict &&
@@ -522,6 +525,8 @@ export function createSortedAndMappedDataForAxis(
       labels,
       meta.timePeriods,
       meta.locations,
+      meta.filters,
+      meta.indicators,
     ),
   );
 }

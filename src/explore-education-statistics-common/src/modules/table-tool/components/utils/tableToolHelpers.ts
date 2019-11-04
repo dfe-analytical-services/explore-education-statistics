@@ -4,7 +4,8 @@ import tableBuilderService, {
   IndicatorOption,
   LocationLevelKeysEnum,
   PublicationSubjectMeta,
-  TableDataQuery, TimeIdentifier,
+  TableDataQuery,
+  TimeIdentifier,
 } from '@common/modules/full-table/services/tableBuilderService';
 import {
   CategoryFilter,

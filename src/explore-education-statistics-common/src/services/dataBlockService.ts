@@ -1,13 +1,13 @@
-import {dataApi} from '@common/services/api';
-import {Dictionary, PartialRecord} from '@common/types/util';
-import {Feature, Geometry} from 'geojson';
+import { dataApi } from '@common/services/api';
+import { Dictionary, PartialRecord } from '@common/types/util';
+import { Feature, Geometry } from 'geojson';
 import {
-  FilterOption, GroupedFilterOptions,
-  IndicatorOption, LocationLevelKeys,
-  PublicationSubject, PublicationSubjectMeta,
+  FilterOption,
+  IndicatorOption,
+  LocationLevelKeys,
+  PublicationSubjectMeta,
   TableDataQuery,
-  TimeIdentifier,
-  TimePeriodOption
+  TimePeriodOption,
 } from '@common/modules/full-table/services/tableBuilderService';
 
 export enum GeographicLevel {
@@ -40,7 +40,8 @@ export interface LocalAuthority extends Location {
   old_code: string;
 }
 
-export interface DataBlockLocation extends PartialRecord<LocationLevelKeys, Location> {
+export interface DataBlockLocation
+  extends PartialRecord<LocationLevelKeys, Location> {
   localAuthority?: LocalAuthority;
 
   // I don't like using any, but it's required here to simplify mapping to the Table Tool, for now

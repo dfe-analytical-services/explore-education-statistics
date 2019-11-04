@@ -9,11 +9,12 @@ import {
 } from '@common/components/form';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import Yup from '@common/lib/validation/yup';
-import { TableDataQuery, TimeIdentifier } from '@common/modules/full-table/services/tableBuilderService';
-import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
 import {
-  GeographicLevel
-} from '@common/services/dataBlockService';
+  TableDataQuery,
+  TimeIdentifier,
+} from '@common/modules/full-table/services/tableBuilderService';
+import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
+import { GeographicLevel } from '@common/services/dataBlockService';
 import { FormikProps } from 'formik';
 import React from 'react';
 import { ObjectSchemaDefinition } from 'yup';
