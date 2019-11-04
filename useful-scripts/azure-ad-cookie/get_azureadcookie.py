@@ -5,9 +5,9 @@ from selenium import webdriver
 import chromedriver_install as cdi
 
 parser = argparse.ArgumentParser(prog="python get_azureadcookie.py", 
-                                 description="To get the .AspNetCore.AzureADCookie")
+                                 description="To get the authentication tokens for using the admin service")
 parser.add_argument(dest="url",
-                    help="URL of environment you wish to get AzureADCookie for")
+                    help="URL of environment you wish to get authentication tokens for")
 parser.add_argument(dest="email",
                     help="Email address to login using")
 parser.add_argument(dest="password",
@@ -44,8 +44,8 @@ chrome_options.add_argument('--disable-gpu')
 driver = webdriver.Chrome(options=chrome_options)
 driver.get(args.url)
 
-wait_until_page_contains_xpath(driver, '//a[text()="Sign-in"]')
-driver.find_element_by_xpath('//a[text()="Sign-in"]').click()
+wait_until_page_contains_xpath(driver, '//button[contains(text(), "Sign-in")]')
+driver.find_element_by_xpath('//button[contains(text(), "Sign-in")]').click()
 
 wait_until_page_contains_xpath(driver, '//div[text()="Sign in"]')
 time.sleep(1)
@@ -64,15 +64,23 @@ wait_until_page_contains_xpath(driver, '//input[@value="No"]')
 time.sleep(1)
 driver.find_element_by_xpath('//input[@value="No"]').click()
 
-azure_ad_cookie = None
+wait_until_page_contains_xpath(driver, '//span[text()="Welcome"]')
+
+identity_cookie = None
 for cookie in driver.get_cookies():
-    if cookie['name'] == ".AspNetCore.AzureADCookie":
-        azure_ad_cookie = cookie['value']
+    if cookie['name'] == ".AspNetCore.Identity.Application":
+        identity_cookie = cookie['value']
         break
-assert azure_ad_cookie is not None, "Couldn't find cookie '.AspNetCore.AzureADCookie'"
+assert identity_cookie is not None, "Couldn't find cookie '.AspNetCore.Identity.Application'"
+
+jwt = driver.execute_script("return JSON.parse(window.localStorage.getItem('GovUk.Education.ExploreEducationStatistics.Adminuser:https://localhost:5021:GovUk.Education.ExploreEducationStatistics.Admin')).access_token")
 
 driver.close()
 
 f = open('azure_ad_cookie', 'w')
-f.write(azure_ad_cookie)
+f.write(identity_cookie)
+f.close()
+
+f = open('jwt', 'w')
+f.write(jwt)
 f.close()
