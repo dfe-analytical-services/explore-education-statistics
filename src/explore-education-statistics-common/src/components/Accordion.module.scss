@@ -11,8 +11,12 @@
   }
 }
 
-:global(.govuk-accordion__section-header) h2 {
-  color: inherit;
+:global(.govuk-accordion__section-header) {
+  h2,
+  h3 {
+    color: inherit;
+    font-size: inherit;
+  }
 }
 
 .section {
