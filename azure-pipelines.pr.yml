@@ -33,7 +33,7 @@ jobs:
       - task: 'DotNetCoreCLI@2'
         displayName: 'Build'
         inputs:
-          projects: '**/GovUk.*/*csproj'
+          projects: '!**/GovUk.*[Tt]ests/*.csproj'
           arguments: '--configuration $(BuildConfiguration)'
       - task: 'DotNetCoreCLI@2'
         displayName: 'Test'
@@ -47,8 +47,8 @@ jobs:
         inputs:
           command: 'publish'
           publishWebProjects: false
-          projects: '**/GovUk.*/*.csproj'
-          arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
+          projects: '!**/GovUk.*[Tt]ests/*.csproj'
+          arguments: '--self-contained true -r win-x86 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
           zipAfterPublish: True
       - task: 'PublishPipelineArtifact@0'
         displayName: 'Publish Pipeline Artifact'
@@ -124,7 +124,7 @@ jobs:
           command: 'publish'
           publishWebProjects: false
           projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.csproj'
-          arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
+          arguments: '--self-contained true -r win-x86 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
       - task: 'PublishPipelineArtifact@0'
         displayName: 'Publish Pipeline Artifact'
         inputs:
@@ -197,3 +197,27 @@ jobs:
           testResultsFiles: '**/junit.xml'
           searchFolder: './src'
           testRunTitle: 'Frontend Jest tests'
+  - job: 'MiscellaneousArtifacts'
+    pool:
+      vmImage: 'ubuntu-16.04'
+    steps:
+      - task: PublishPipelineArtifact@0
+        displayName: 'Publish Robot tests'
+        inputs:
+          artifactName: 'robot-tests'
+          targetPath: 'tests/robot-tests'
+      - task: PublishPipelineArtifact@0
+        displayName: 'Publish Newman tests'
+        inputs:
+          artifactName: 'newman-tests'
+          targetPath: 'tests/newman'
+      - task: PublishPipelineArtifact@0
+        displayName: 'Publish AzureADCookie script'
+        inputs:
+          artifactName: 'azure-ad-cookie-script'
+          targetPath: 'useful-scripts/azure-ad-cookie'
+      - task: 'PublishPipelineArtifact@0'
+        displayName: 'Publish ARM templates'
+        inputs:
+          artifactName: 'arm-templates'
+          targetPath: 'armTemplates'
