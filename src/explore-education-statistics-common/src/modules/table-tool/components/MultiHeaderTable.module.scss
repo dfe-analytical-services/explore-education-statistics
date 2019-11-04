@@ -43,10 +43,10 @@ $border-width: 1px;
   }
 }
 
-.cellVerticalMiddle {
-  vertical-align: middle !important;
+:global(.govuk-table) .cellVerticalMiddle {
+  vertical-align: middle;
 }
 
-.cellHorizontalMiddle {
-  text-align-last: center !important;
+:global(.govuk-table) .cellHorizontalMiddle {
+  text-align: center;
 }

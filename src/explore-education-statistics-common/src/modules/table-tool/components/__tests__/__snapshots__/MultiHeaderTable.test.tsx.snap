@@ -9,13 +9,13 @@ exports[`MultiHeaderTable renders 2x2 table correctly 1`] = `
           class="borderBottom borderRight"
       >
       </td>
-      <th class="govuk-table__header--center borderRight"
+      <th class="cellHorizontalMiddle borderRight"
           colspan="2"
           scope="colgroup"
       >
         A
       </th>
-      <th class="govuk-table__header--center borderRight"
+      <th class="cellHorizontalMiddle borderRight"
           colspan="2"
           scope="colgroup"
       >
@@ -155,13 +155,13 @@ exports[`MultiHeaderTable renders 2x2x2 table correctly 1`] = `
           class="borderBottom borderRight"
       >
       </td>
-      <th class="govuk-table__header--center borderRight"
+      <th class="cellHorizontalMiddle borderRight"
           colspan="4"
           scope="colgroup"
       >
         A
       </th>
-      <th class="govuk-table__header--center borderRight"
+      <th class="cellHorizontalMiddle borderRight"
           colspan="4"
           scope="colgroup"
       >
@@ -169,25 +169,25 @@ exports[`MultiHeaderTable renders 2x2x2 table correctly 1`] = `
       </th>
     </tr>
     <tr>
-      <th class="govuk-table__header--center borderRight"
+      <th class="cellHorizontalMiddle borderRight"
           colspan="2"
           scope="colgroup"
       >
         C
       </th>
-      <th class="govuk-table__header--center borderRight"
+      <th class="cellHorizontalMiddle borderRight"
           colspan="2"
           scope="colgroup"
       >
         D
       </th>
-      <th class="govuk-table__header--center borderRight"
+      <th class="cellHorizontalMiddle borderRight"
           colspan="2"
           scope="colgroup"
       >
         C
       </th>
-      <th class="govuk-table__header--center borderRight"
+      <th class="cellHorizontalMiddle borderRight"
           colspan="2"
           scope="colgroup"
       >
