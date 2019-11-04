@@ -95,7 +95,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var release = await _context.Releases
                 .Where(r => r.Id == releaseId)
-                .HydrateReleaseForReleaseViewModel()
+                .Include(r => r.ReleaseSummary)
+                .ThenInclude(summary => summary.Versions)
                 .FirstOrDefaultAsync();
             return _mapper.Map<ReleaseSummaryViewModel>(release.ReleaseSummary);
         }
@@ -110,7 +111,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var release = await _context.Releases
                         .Where(r => r.Id == model.Id)
-                        .HydrateReleaseForReleaseViewModel()
+                        .Include(r => r.ReleaseSummary)
+                        .ThenInclude(summary => summary.Versions)
                         .FirstOrDefaultAsync();
                     
                     var newSummary = _mapper.Map<ReleaseSummaryVersion>(model);
@@ -206,12 +208,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             // The contact
             // The type
             return values.Include(r => r.Publication)
-                .Include(r => r.Publication.Releases) // Back refs required to work out latest
-                .Include(r => r.Publication.Contact)
-                .Include(r => r.Type)
-                .Include(r => r.ReleaseSummary)
-                .ThenInclude(r => r.Versions)
-                .ThenInclude(v => v.Type);
+                .ThenInclude(publication => publication.Releases) // Back refs required to work out latest
+                .Include(r => r.Publication)
+                .ThenInclude(publication => publication.Contact)
+                .Include(r => r.Type);
         }
     }
 }
