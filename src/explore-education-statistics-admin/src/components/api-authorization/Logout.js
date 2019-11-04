@@ -1,4 +1,9 @@
 /* eslint-disable */
+/* Code originally from the api-authorization folder from running
+  "dotnet new react -o <output_directory_name> -au Individual".
+
+  Amendments to the original file are marked within this file with the word "HIVE".
+*/
 import React from 'react';
 import { Component } from 'react';
 import authService from './AuthorizeService';

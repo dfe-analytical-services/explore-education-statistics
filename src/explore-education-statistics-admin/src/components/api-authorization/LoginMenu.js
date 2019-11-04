@@ -1,4 +1,7 @@
 /* eslint-disable */
+/* Code originally from the api-authorization folder from running
+  "dotnet new react -o <output_directory_name> -au Individual"
+*/
 import React, { Component, Fragment } from 'react';
 import { NavItem, NavLink } from 'reactstrap';
 import { Link } from 'react-router-dom';
