@@ -1,3 +1,4 @@
+import AriaLiveAnnouncer from '@common/components/AriaLiveAnnouncer';
 import { logPageView } from '@frontend/services/googleAnalyticsService';
 import { initHotJar } from '@frontend/services/hotjarService';
 import { initApplicationInsights } from '@frontend/services/applicationInsightsService';
@@ -58,9 +59,11 @@ class App extends BaseApp<Props> {
 
     return (
       <Container>
-        <CookiesProvider cookies={new Cookies(cookies)}>
-          <Component {...pageProps} />
-        </CookiesProvider>
+        <AriaLiveAnnouncer>
+          <CookiesProvider cookies={new Cookies(cookies)}>
+            <Component {...pageProps} />
+          </CookiesProvider>
+        </AriaLiveAnnouncer>
       </Container>
     );
   }

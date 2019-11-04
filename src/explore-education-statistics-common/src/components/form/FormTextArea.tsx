@@ -28,6 +28,7 @@ const FormTextArea = ({
   hint,
   id,
   label,
+  rows,
   additionalClass,
   ...props
 }: FormTextAreaProps) => {
@@ -48,6 +49,7 @@ const FormTextArea = ({
           [additionalClass || '']: additionalClass,
         })}
         id={id}
+        rows={rows || 5}
       />
     </>
   );

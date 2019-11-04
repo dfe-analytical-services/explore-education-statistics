@@ -20,6 +20,7 @@ export interface FormTextInputProps {
   onKeyPress?: KeyboardEventHandler<HTMLInputElement>;
   onClick?: MouseEventHandler<HTMLInputElement>;
   width?: 20 | 10 | 5 | 4 | 3 | 2;
+  percentageWidth?: string;
   value?: string;
   defaultValue?: string;
   min?: string;
@@ -33,6 +34,7 @@ const FormTextInput = ({
   id,
   label,
   width,
+  percentageWidth,
   type = 'text',
   ...props
 }: FormTextInputProps) => {
@@ -63,6 +65,7 @@ const FormTextInput = ({
           'govuk-input': type !== 'file',
           'govuk-file-upload': type === 'file',
           [`govuk-input--width-${width}`]: width !== undefined,
+          [`govuk-!-width-${percentageWidth}`]: percentageWidth !== undefined,
         })}
         id={id}
         type={type}
