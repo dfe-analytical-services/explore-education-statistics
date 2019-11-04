@@ -84,10 +84,52 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
       render={(form: FormikProps<FormValues>) => {
         return (
           <Form id={formId} submitValidationHandler={handleServerValidation}>
+            <FormFieldset
+              id={`${formId}-allFieldsFieldset`}
+              legend="Upload file"
+            >
+              <FormFieldTextInput<FormValues>
+                id={`${formId}-name`}
+                name="name"
+                label="Name"
+                width={20}
+              />
+
+              <FormFieldFileSelector<FormValues>
+                id={`${formId}-file`}
+                name="file"
+                label="Upload file"
+                formGroupClass="govuk-!-margin-top-6"
+                form={form}
+              />
+            </FormFieldset>
+
+            <Button
+              type="submit"
+              className="govuk-button govuk-!-margin-right-6"
+            >
+              Upload file
+            </Button>
+
+            <Link
+              to="#"
+              className="govuk-button govuk-button--secondary"
+              onClick={() => resetPage(form)}
+            >
+              Cancel
+            </Link>
+            {files && (
+              <>
+                <hr />
+                <h2 className="govuk-heading-m">Uploaded files</h2>
+              </>
+            )}
             {files &&
               files.map(file => (
                 <SummaryList key={file.filename}>
-                  <SummaryListItem term="Name">{file.title}</SummaryListItem>
+                  <SummaryListItem term="Name">
+                    <h4 className="govuk-heading-m">{file.title}</h4>
+                  </SummaryListItem>
                   <SummaryListItem term="File">
                     <a
                       href={service.createDownloadAncillaryFileLink(
@@ -114,34 +156,6 @@ const ReleaseFileUploadsSection = ({ publicationId, releaseId }: Props) => {
                   />
                 </SummaryList>
               ))}
-            <FormFieldset
-              id={`${formId}-allFieldsFieldset`}
-              legend="Upload file"
-            >
-              <FormFieldTextInput<FormValues>
-                id={`${formId}-name`}
-                name="name"
-                label="Name"
-              />
-
-              <FormFieldFileSelector<FormValues>
-                id={`${formId}-file`}
-                name="file"
-                label="Upload file"
-                formGroupClass="govuk-!-margin-top-6"
-                form={form}
-              />
-            </FormFieldset>
-
-            <Button type="submit" className="govuk-!-margin-top-6">
-              Upload file
-            </Button>
-
-            <div className="govuk-!-margin-top-6">
-              <Link to={dataRoute.generateLink(publicationId, releaseId)}>
-                Cancel
-              </Link>
-            </div>
 
             <ModalConfirm
               mounted={deleteFileName != null && deleteFileName.length > 0}

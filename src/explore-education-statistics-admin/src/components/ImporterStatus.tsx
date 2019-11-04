@@ -155,10 +155,11 @@ class ImporterStatus extends Component<Props> {
             </strong>
             {running && (
               <>
-                <LoadingSpinner inline size={22} />{' '}
-                <span className="govuk-visually-hidden">
-                  Currently processing data
-                </span>
+                <LoadingSpinner
+                  inline
+                  size={22}
+                  screenReaderMessage="Currently processing data"
+                />{' '}
               </>
             )}
           </div>
