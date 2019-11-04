@@ -46,7 +46,7 @@ interface Publication {
   slug: string;
 }
 
-interface TableToolState {
+export interface TableToolState {
   query: TableDataQuery | undefined;
   createdTable: FullTable | undefined;
   validInitialQuery: TableDataQuery | undefined;
