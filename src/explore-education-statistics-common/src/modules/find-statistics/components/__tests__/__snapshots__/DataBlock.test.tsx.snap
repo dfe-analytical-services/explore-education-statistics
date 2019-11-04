@@ -8,6 +8,7 @@ exports[`DataBlock renders map instead of chart 1`] = `
   role="tabpanel"
   tabindex="-1"
 >
+  
   <div
     class="govuk-grid-row"
   >
@@ -314,6 +315,7 @@ exports[`DataBlock renders summary 1`] = `
   role="tabpanel"
   tabindex="-1"
 >
+  
   <div
     class="keyStatsContainer"
   >

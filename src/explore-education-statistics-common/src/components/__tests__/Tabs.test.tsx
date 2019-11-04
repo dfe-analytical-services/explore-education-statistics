@@ -9,7 +9,7 @@ describe('Tabs', () => {
   test('renders single tab correctly', () => {
     const { container, getAllByText } = render(
       <Tabs id="test-tabs">
-        <TabsSection title="Tab 1" isTitleVisible>
+        <TabsSection title="Tab 1" headingTitle="Tab 1">
           <p>Test section 1 content</p>
         </TabsSection>
       </Tabs>,
@@ -23,10 +23,10 @@ describe('Tabs', () => {
   test('renders multiple tabs correctly with titles', () => {
     const { container, getAllByText } = render(
       <Tabs id="test-tabs">
-        <TabsSection title="Tab 1" isTitleVisible>
+        <TabsSection title="Tab 1" headingTitle="Tab 1">
           <p>Test section 1 content</p>
         </TabsSection>
-        <TabsSection title="Tab 2" isTitleVisible>
+        <TabsSection title="Tab 2" headingTitle="Tab 2">
           <p>Test section 2 content</p>
         </TabsSection>
       </Tabs>,
@@ -89,10 +89,10 @@ describe('Tabs', () => {
   test('setting `headingTag` changes section heading size', () => {
     const { container } = render(
       <Tabs id="test-tabs">
-        <TabsSection title="Tab 1" isTitleVisible>
+        <TabsSection title="Tab 1" headingTitle="Tab 1">
           <p>Test section 1 content</p>
         </TabsSection>
-        <TabsSection title="Tab 2" isTitleVisible headingTag="h2">
+        <TabsSection title="Tab 2" headingTitle="Tab 2" headingTag="h2">
           <p>Test section 2 content</p>
         </TabsSection>
       </Tabs>,
@@ -108,10 +108,10 @@ describe('Tabs', () => {
   test('does not immediately render lazy tab section', () => {
     const { queryByText } = render(
       <Tabs id="test-tabs">
-        <TabsSection title="Tab 1" isTitleVisible>
+        <TabsSection title="Tab 1" headingTitle="Tab 1">
           <p>Test section 1 content</p>
         </TabsSection>
-        <TabsSection title="Tab 2" isTitleVisible lazy>
+        <TabsSection title="Tab 2" headingTitle="Tab 2" lazy>
           <p>Test section 2 content</p>
         </TabsSection>
       </Tabs>,
