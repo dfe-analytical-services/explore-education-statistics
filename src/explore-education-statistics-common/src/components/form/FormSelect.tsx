@@ -57,7 +57,7 @@ const FormSelect = ({
       </label>
       {error && <ErrorMessage>{error}</ErrorMessage>}
       <select
-        className={classNames('govuk-select', styles.select, className, {
+        className={classNames('govuk-select', className, {
           'govuk-select--error': !!error,
         })}
         id={id}

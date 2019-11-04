@@ -98,10 +98,6 @@ describe('DataBlock', () => {
       container.querySelectorAll('section.govuk-tabs__panel'),
     ).toHaveLength(1);
 
-    expect(
-      container.querySelector('section.govuk-tabs__panel h3'),
-    ).toHaveTextContent('Charts');
-
     expect(container.querySelectorAll('.recharts-bar')).toHaveLength(3);
   });
 
@@ -173,10 +169,6 @@ describe('DataBlock', () => {
     expect(
       container.querySelectorAll('section.govuk-tabs__panel'),
     ).toHaveLength(1);
-
-    expect(
-      container.querySelector('section.govuk-tabs__panel h3'),
-    ).toHaveTextContent('Charts');
 
     expect(container.querySelectorAll('.recharts-bar')).toHaveLength(3);
   });

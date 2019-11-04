@@ -11,6 +11,10 @@
   }
 }
 
+:global(.govuk-accordion__section-header) h2 {
+  color: inherit;
+}
+
 .section {
   page-break-inside: avoid;
 }
