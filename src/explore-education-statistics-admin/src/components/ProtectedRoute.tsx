@@ -1,7 +1,7 @@
-import {LoginContext} from "@admin/components/Login";
+import { LoginContext } from '@admin/components/Login';
 import signInService from '@admin/services/sign-in/service';
-import React, { useContext} from "react";
-import {Redirect, Route, RouteProps} from "react-router";
+import React, { useContext } from 'react';
+import { Redirect, Route, RouteProps } from 'react-router';
 
 interface ProtectedRouteProps extends RouteProps {
   redirectIfNotLoggedIn?: boolean;
@@ -12,7 +12,6 @@ const AuthenticationCheckingComponent = ({
   redirectIfNotLoggedIn,
   ...props
 }: ProtectedRouteProps) => {
-
   const { user } = useContext(LoginContext);
 
   if (!component) {
@@ -46,7 +45,6 @@ const ProtectedRoute = ({
   redirectIfNotLoggedIn = true,
   ...rest
 }: ProtectedRouteProps) => {
-
   const routeComponent = (props: any) => (
     <AuthenticationCheckingComponent
       component={component}

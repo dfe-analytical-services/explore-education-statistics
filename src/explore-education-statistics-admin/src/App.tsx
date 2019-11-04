@@ -1,6 +1,6 @@
-import {ApplicationPaths} from '@admin/components/api-authorization/ApiAuthorizationConstants';
-import ProtectedRoute from "@admin/components/ProtectedRoute";
-import ProtectedRoutes from "@admin/components/ProtectedRoutes";
+import { ApplicationPaths } from '@admin/components/api-authorization/ApiAuthorizationConstants';
+import ProtectedRoute from '@admin/components/ProtectedRoute';
+import ProtectedRoutes from '@admin/components/ProtectedRoutes';
 import CreatePublicationPage from '@admin/pages/create-publication/CreatePublicationPage';
 import CreateReleasePage from '@admin/pages/release/create-release/CreateReleasePage';
 import ManageReleasePageContainer from '@admin/pages/release/ManageReleasePageContainer';
@@ -10,14 +10,14 @@ import publicationRoutes from '@admin/routes/edit-publication/routes';
 import releaseRoutes from '@admin/routes/edit-release/routes';
 import PrototypeLoginService from '@admin/services/PrototypeLoginService';
 import React from 'react';
-import {Route} from 'react-router';
-import {BrowserRouter} from 'react-router-dom';
+import { Route } from 'react-router';
+import { BrowserRouter } from 'react-router-dom';
 
 import './App.scss';
 
 import ApiAuthorizationRoutes from './components/api-authorization/ApiAuthorizationRoutes';
 
-import {LoginContext} from './components/Login';
+import { LoginContext } from './components/Login';
 import AdminDashboardPage from './pages/admin-dashboard/AdminDashboardPage';
 import AdminDocumentationCreateNewRelease from './pages/documentation/DocumentationCreateNewRelease';
 
@@ -41,8 +41,7 @@ import PublicationConfirmNew from './pages/prototypes/PrototypePublicationPageCo
 import PublicationCreateNew from './pages/prototypes/PrototypePublicationPageCreateNew';
 
 import PublicationEditPage from './pages/prototypes/PrototypePublicationPageEditAbsence';
-import PublicationEditUnresolvedComments
-  from './pages/prototypes/PrototypePublicationPageEditAbsenceUnresolvedComments';
+import PublicationEditUnresolvedComments from './pages/prototypes/PrototypePublicationPageEditAbsenceUnresolvedComments';
 import PublicationEditNew from './pages/prototypes/PrototypePublicationPageEditNew';
 import PublicationCreateNewAbsenceConfig from './pages/prototypes/PrototypePublicationPageNewAbsenceConfig';
 import PublicationCreateNewAbsenceConfigEdit from './pages/prototypes/PrototypePublicationPageNewAbsenceConfigEdit';
