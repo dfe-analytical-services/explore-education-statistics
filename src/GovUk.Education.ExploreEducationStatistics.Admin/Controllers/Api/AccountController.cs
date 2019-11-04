@@ -3,8 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -35,7 +33,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return Redirect("/signed-out");
         }
         
-        [Authorize]
         [HttpGet("api/users/mydetails")]
         public async Task<ActionResult<UserDetailsPermissionsViewModel>> MyDetails()
         {

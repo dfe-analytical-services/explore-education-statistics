@@ -1,4 +1,7 @@
 /* eslint-disable */
+/* Code originally from the api-authorization folder from running
+  "dotnet new react -o <output_directory_name> -au Individual"
+*/
 import React, { Component, Fragment } from 'react';
 import { Route } from 'react-router';
 import { Login } from './Login';

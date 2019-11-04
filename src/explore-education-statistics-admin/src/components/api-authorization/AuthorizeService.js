@@ -1,4 +1,7 @@
 /* eslint-disable */
+/* Code originally from the api-authorization folder from running
+  "dotnet new react -o <output_directory_name> -au Individual"
+*/
 import { UserManager, WebStorageStateStore } from 'oidc-client';
 import { ApplicationPaths, ApplicationName } from './ApiAuthorizationConstants';
 
