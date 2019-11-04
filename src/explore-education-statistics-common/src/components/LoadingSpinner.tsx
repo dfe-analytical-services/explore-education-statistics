@@ -39,8 +39,7 @@ const LoadingSpinner = ({
           }}
         />
       </div>
-      {screenReaderMessage ||
-        (text && <AriaLiveMessage message={screenReaderMessage || text} />)}
+      {text || <AriaLiveMessage message={screenReaderMessage} />}
     </>
   );
 };

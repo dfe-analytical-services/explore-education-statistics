@@ -15,15 +15,15 @@ declare module 'govuk-frontend' {
   export function initAll(): void;
 }
 
-declare module 'govuk-frontend/components/accordion/accordion' {
+declare module 'govuk-frontend/govuk/components/accordion/accordion' {
   export default GovUkModule;
 }
 
-declare module 'govuk-frontend/components/checkboxes/checkboxes' {
+declare module 'govuk-frontend/govuk/components/checkboxes/checkboxes' {
   export default GovUkModule;
 }
 
-declare module 'govuk-frontend/components/details/details' {
+declare module 'govuk-frontend/govuk/components/details/details' {
   export class Details extends GovUkModule {
     public setAttributes(): void;
   }
@@ -31,15 +31,15 @@ declare module 'govuk-frontend/components/details/details' {
   export default Details;
 }
 
-declare module 'govuk-frontend/components/error-summary/error-summary' {
+declare module 'govuk-frontend/govuk/components/error-summary/error-summary' {
   export default GovUkModule;
 }
 
-declare module 'govuk-frontend/components/radios/radios' {
+declare module 'govuk-frontend/govuk/components/radios/radios' {
   export default GovUkModule;
 }
 
-declare module 'govuk-frontend/components/tabs/tabs' {
+declare module 'govuk-frontend/govuk/components/tabs/tabs' {
   export default GovUkModule;
 }
 
