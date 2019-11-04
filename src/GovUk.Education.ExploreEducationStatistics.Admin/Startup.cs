@@ -99,9 +99,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     // This config gets the logged in user's local Roles added to the HttpContext User principal for
                     // authorization checking purposes
                     options.ApiResources[0].UserClaims.Add("role");
-                });
+                })
                 // TODO DW - this should be conditional based upon whether or not we're in dev mode
-                //.AddDeveloperSigningCredential();
+                .AddDeveloperSigningCredential(persistKey: false);
             
             services
                 .AddAuthentication()
