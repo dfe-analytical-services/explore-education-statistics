@@ -245,7 +245,7 @@ export const getIndicatorsForTableGeneration = (
 export const queryForTable = async (
   query: TableDataQuery,
   releaseId?: string,
-): Promise<UnmappedFullTable> => {
+): Promise<FullTable> => {
   if (releaseId) {
     return tableBuilderService.getTableDataForRelease(query, releaseId);
   }
