@@ -93,6 +93,20 @@ jobs:
           artifactName: 'publisher'
           targetPath: '$(Build.ArtifactStagingDirectory)/publisher'
 
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Publish Processor Function'
+        inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: '**/GovUk.Education.ExploreEducationStatistics.Data.Processor.csproj'
+          arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/processor'
+          zipAfterPublish: True
+      - task: 'PublishPipelineArtifact@0'
+        displayName: 'Publish Processor Artifacts'
+        inputs:
+          artifactName: 'processor'
+          targetPath: '$(Build.ArtifactStagingDirectory)/processor'
+
   - job: 'Admin'
     pool:
       name: Hosted Windows 2019 with VS2019
