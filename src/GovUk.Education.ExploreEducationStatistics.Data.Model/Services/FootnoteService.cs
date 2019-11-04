@@ -122,7 +122,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 indicatorListParam,
                 filterItemListParam);
         }
-
+        
+        public IEnumerable<Footnote> GetFootnotes(Guid releaseId)
+        {
+            return _context.SubjectFootnote
+                .Where(footnote => footnote.Subject.ReleaseId == releaseId)
+                .Select(footnote => footnote.Footnote)
+                .Distinct()
+                .Include(footnote => footnote.Filters)
+                .Include(footnote => footnote.FilterGroups)
+                .Include(footnote => footnote.FilterItems)
+                .Include(footnote => footnote.Indicators)
+                .Include(footnote => footnote.Subjects)
+                .ToList();
+        }
+        
         private Subject CreateSubjectLink(Footnote footnote, long subjectId)
         {
             var subject = _subjectService.Find(subjectId, new List<Expression<Func<Subject, object>>>
