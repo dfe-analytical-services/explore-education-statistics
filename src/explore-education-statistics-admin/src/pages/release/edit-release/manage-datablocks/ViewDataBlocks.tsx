@@ -8,7 +8,6 @@ import { TableHeadersFormValues } from '@common/modules/table-tool/components/Ta
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import DataBlockService, {
   DataBlock,
-  DataBlockRequest,
   DataBlockRerequest,
   DataBlockResponse,
 } from '@common/services/dataBlockService';

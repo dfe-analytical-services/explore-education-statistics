@@ -30,7 +30,6 @@ import { Dictionary } from '@common/types';
 import mapValues from 'lodash/mapValues';
 import { SortableOption } from '@common/modules/table-tool/components/FormSortableList';
 import { DataBlockMetadata } from '@common/services/dataBlockService';
-import { UnmappedFullTable } from '@common/modules/full-table/services/permalinkService';
 
 export interface DateRangeState {
   startYear?: number;

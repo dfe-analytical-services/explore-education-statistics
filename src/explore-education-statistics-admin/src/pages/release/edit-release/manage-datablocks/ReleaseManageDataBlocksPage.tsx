@@ -104,8 +104,9 @@ const ReleaseManageDataBlocksPage = () => {
 
   const doLoad = React.useCallback(
     (
+      releaseId: string,
       selectedDataBlockId: string | undefined,
-      newDataBlocksList?: DataBlock[],
+      dataBlocks: DataBlock[],
     ) => {
       if (!selectedDataBlockId) {
         setDataBlockData(undefined);
@@ -117,27 +118,25 @@ const ReleaseManageDataBlocksPage = () => {
       if (currentlyLoadingDataBlockId.current !== selectedDataBlockId) {
         currentlyLoadingDataBlockId.current = selectedDataBlockId;
 
-        load(
-          newDataBlocksList || dataBlocks,
-          releaseId,
-          selectedDataBlockId,
-        ).then(({ dataBlock, response: dataBlockResponse }) => {
-          if (currentlyLoadingDataBlockId.current === selectedDataBlockId) {
-            if (dataBlock && dataBlockResponse) {
-              setDataBlockData({
-                dataBlock,
-                dataBlockResponse,
-              });
-            } else {
-              setDataBlockData(undefined);
-              setIsLoading(false);
-              currentlyLoadingDataBlockId.current = undefined;
+        load(dataBlocks, releaseId, selectedDataBlockId).then(
+          ({ dataBlock, response: dataBlockResponse }) => {
+            if (currentlyLoadingDataBlockId.current === selectedDataBlockId) {
+              if (dataBlock && dataBlockResponse) {
+                setDataBlockData({
+                  dataBlock,
+                  dataBlockResponse,
+                });
+              } else {
+                setDataBlockData(undefined);
+                setIsLoading(false);
+                currentlyLoadingDataBlockId.current = undefined;
+              }
             }
-          }
-        });
+          },
+        );
       }
     },
-    [dataBlocks, releaseId],
+    [],
   );
 
   const onDataBlockSave = React.useMemo(
@@ -160,18 +159,18 @@ const ReleaseManageDataBlocksPage = () => {
       setDataBlocks(newDataBlocksList);
 
       setSelectedDataBlock(newDataBlock.id || '');
-      doLoad(selectedDataBlock, newDataBlocksList);
+      doLoad(releaseId, selectedDataBlock, newDataBlocksList);
 
       setIsSaving(false);
 
       return newDataBlock;
     },
-    [releaseId, selectedDataBlock],
+    [dataBlocks, doLoad, releaseId, selectedDataBlock],
   );
 
   React.useEffect(() => {
-    doLoad(selectedDataBlock);
-  }, [selectedDataBlock]);
+    doLoad(releaseId, selectedDataBlock, dataBlocks);
+  }, [releaseId, dataBlocks, doLoad, selectedDataBlock]);
 
   return (
     <>
