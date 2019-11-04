@@ -58,11 +58,41 @@ jobs:
           projects: '**/GovUk.Education.ExploreEducationStatistics.Content.Api.csproj'
           arguments: '--self-contained true -r win-x86 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/public-api'
           zipAfterPublish: True
+
       - task: 'PublishPipelineArtifact@0'
-        displayName: 'Publish Pipeline Artifact'
+        displayName: 'Publish Public APIs Artifacts'
         inputs:
           artifactName: 'public-api'
           targetPath: '$(Build.ArtifactStagingDirectory)/public-api'
+
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Publish Notifier Function'
+        inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: '**/GovUk.Education.ExploreEducationStatistics.Notifier.Api.csproj'
+          arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/notifier'
+          zipAfterPublish: True
+      - task: 'PublishPipelineArtifact@0'
+        displayName: 'Publish Notifier Artifacts'
+        inputs:
+          artifactName: 'notifier'
+          targetPath: '$(Build.ArtifactStagingDirectory)/notifier'
+
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Publish Publisher Function'
+        inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: '**/GovUk.Education.ExploreEducationStatistics.Publisher.Api.csproj'
+          arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/publisher'
+          zipAfterPublish: True
+      - task: 'PublishPipelineArtifact@0'
+        displayName: 'Publish Publisher Artifacts'
+        inputs:
+          artifactName: 'publisher'
+          targetPath: '$(Build.ArtifactStagingDirectory)/publisher'
+
   - job: 'Admin'
     pool:
       name: Hosted Windows 2019 with VS2019
