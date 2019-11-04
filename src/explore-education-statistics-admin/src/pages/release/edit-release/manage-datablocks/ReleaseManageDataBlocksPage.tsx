@@ -11,7 +11,6 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import DataBlockService, {
   DataBlock,
-  DataBlockRequest,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
 import React, { useContext } from 'react';
