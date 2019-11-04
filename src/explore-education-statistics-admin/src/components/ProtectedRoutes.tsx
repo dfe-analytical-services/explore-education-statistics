@@ -2,7 +2,7 @@ import authService from '@admin/components/api-authorization/AuthorizeService';
 import { LoginContext } from '@admin/components/Login';
 import loginService from '@admin/services/sign-in/service';
 import { Authentication, User } from '@admin/services/sign-in/types';
-import React, {ReactNode, useCallback, useEffect, useState} from 'react';
+import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 
 interface Props {
   children: ReactNode;
@@ -20,7 +20,6 @@ const ProtectedRoutes = ({ children }: Props) => {
   });
 
   const populateAuthenticationState = useCallback(async () => {
-
     const authenticated = await authService.isAuthenticated();
 
     if (authenticated) {
@@ -55,8 +54,9 @@ const ProtectedRoutes = ({ children }: Props) => {
   }, [populateAuthenticationState]);
 
   const handleLoad = useCallback(async () => {
-
-    const subscriptionId = authService.subscribe(handleAuthenticationStateChanged);
+    const subscriptionId = authService.subscribe(
+      handleAuthenticationStateChanged,
+    );
 
     populateAuthenticationState();
 
