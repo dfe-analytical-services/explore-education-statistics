@@ -1,26 +1,20 @@
-import { mapFullTable } from '@admin/pages/release/edit-release/manage-datablocks/tableUtil';
-import { DataBlock } from '@admin/services/release/edit-release/datablocks/types';
+import {mapFullTable} from '@admin/pages/release/edit-release/manage-datablocks/tableUtil';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import { ChartRendererProps } from '@common/modules/find-statistics/components/ChartRenderer';
-import { FullTable } from '@common/modules/full-table/types/fullTable';
+import {ChartRendererProps} from '@common/modules/find-statistics/components/ChartRenderer';
+import {FullTable} from '@common/modules/full-table/types/fullTable';
 import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
-import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
+import {TableHeadersFormValues} from '@common/modules/table-tool/components/TableHeadersForm';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
-import DataBlockService, {
-  DataBlockRequest,
-  DataBlockRerequest,
-  DataBlockResponse,
-} from '@common/services/dataBlockService';
-import { Chart, ChartType } from '@common/services/publicationService';
+import DataBlockService, {DataBlock, DataBlockRerequest, DataBlockResponse,} from '@common/services/dataBlockService';
+import {Chart, ChartType} from '@common/services/publicationService';
 import React from 'react';
-import { reverseMapTableHeadersConfig } from '@common/modules/table-tool/components/utils/tableToolHelpers';
+import {reverseMapTableHeadersConfig} from '@common/modules/table-tool/components/utils/tableToolHelpers';
 import ChartBuilder from '@admin/modules/chart-builder/ChartBuilder';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 
 interface Props {
   dataBlock: DataBlock;
-  dataBlockRequest: DataBlockRequest;
   dataBlockResponse: DataBlockResponse;
   onDataBlockSave: (db: DataBlock) => Promise<DataBlock>;
 }
@@ -28,7 +22,6 @@ interface Props {
 const ViewDataBlocks = ({
   dataBlock,
   dataBlockResponse,
-  dataBlockRequest,
   onDataBlockSave,
 }: Props) => {
   // we want to modify this internally as our own data, copying it
@@ -106,7 +99,7 @@ const ViewDataBlocks = ({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const reRequestdata = (reRequest: DataBlockRerequest) => {
     const newRequest = {
-      ...dataBlockRequest,
+      ...dataBlock.dataBlockRequest,
       ...reRequest,
     };
 

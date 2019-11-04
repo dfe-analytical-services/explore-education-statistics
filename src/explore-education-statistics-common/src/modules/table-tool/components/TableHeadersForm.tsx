@@ -219,6 +219,7 @@ const TableHeadersForm = ({
                                     name="rows"
                                     id="sort-rows"
                                     legend="Rows"
+                                    legendSize="s"
                                   />
                                 </div>
                               )}
@@ -238,6 +239,7 @@ const TableHeadersForm = ({
                                     name="columns"
                                     id="sort-columns"
                                     legend="Columns"
+                                    legendSize="s"
                                   />
                                 </div>
                               )}

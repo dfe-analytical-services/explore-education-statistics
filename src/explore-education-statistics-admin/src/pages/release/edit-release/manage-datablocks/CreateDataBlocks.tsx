@@ -1,36 +1,36 @@
 import DataBlockDetailsForm from '@admin/pages/release/edit-release/manage-datablocks/DataBlockDetailsForm';
-import { DataBlock } from '@admin/services/release/edit-release/datablocks/types';
-import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
-import TableHeadersForm, {
-  TableHeadersFormValues,
-} from '@common/modules/table-tool/components/TableHeadersForm';
-import TableToolWizard, {
-  FinalStepProps,
-} from '@common/modules/table-tool/components/TableToolWizard';
-import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
-import { reverseMapTableHeadersConfig } from '@common/modules/table-tool/components/utils/tableToolHelpers';
-import WizardStep from '@common/modules/table-tool/components/WizardStep';
-import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import {
-  DataBlockRequest,
+  DataBlock,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
 import React, { createRef } from 'react';
+import TableToolWizard, {
+  FinalStepProps,
+  TableToolState,
+} from '@common/modules/table-tool/components/TableToolWizard';
+import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
+import TableHeadersForm, {
+  TableHeadersFormValues,
+} from '@common/modules/table-tool/components/TableHeadersForm';
+import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
+import { reverseMapTableHeadersConfig } from '@common/modules/table-tool/components/utils/tableToolHelpers';
+import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
+import WizardStep from '@common/modules/table-tool/components/WizardStep';
+import { generateTableTitle } from '@common/modules/table-tool/components/DataTableCaption';
 
 interface Props {
   releaseId: string;
-
-  dataBlockRequest?: DataBlockRequest;
-  dataBlockResponse?: DataBlockResponse;
   dataBlock?: DataBlock;
-
-  onDataBlockSave: (dataBlock: DataBlock) => Promise<DataBlock>;
+  dataBlockResponse?: DataBlockResponse;
+  onDataBlockSave: (
+    dataBlock: DataBlock,
+    newDataBlockResponse?: TableToolState,
+  ) => Promise<DataBlock>;
   onTableToolLoaded?: () => void;
 }
 
 const CreateDataBlocks = ({
   releaseId,
-  dataBlockRequest: initialQuery,
   dataBlock,
   onDataBlockSave,
   onTableToolLoaded,
@@ -93,11 +93,9 @@ const CreateDataBlocks = ({
         };
 
         if (
-          tableHeadersConfig.columns.length === 0 ||
-          tableHeadersConfig.rows.length === 0
+          tableHeadersConfig.columns.length !== 0 &&
+          tableHeadersConfig.rows.length !== 0
         ) {
-          // ignore this error
-        } else {
           setTableHeaders(headers);
         }
       }
@@ -111,7 +109,7 @@ const CreateDataBlocks = ({
       <TableToolWizard
         releaseId={releaseId}
         themeMeta={[]}
-        initialQuery={initialQuery}
+        initialQuery={dataBlock ? dataBlock.dataBlockRequest : undefined}
         onTableConfigurationChange={queryCompleted}
         finalStep={finalStepProps => (
           <WizardStep>
@@ -146,11 +144,19 @@ const CreateDataBlocks = ({
 
                 {finalStepProps.query && tableHeaders && (
                   <DataBlockDetailsForm
+                    initialValues={{
+                      title:
+                        finalStepProps && finalStepProps.createdTable
+                          ? generateTableTitle(
+                              finalStepProps.createdTable.subjectMeta,
+                            )
+                          : undefined,
+                    }}
                     query={finalStepProps.query}
                     tableHeaders={tableHeaders}
                     initialDataBlock={dataBlock}
                     releaseId={releaseId}
-                    onDataBlockSave={onDataBlockSave}
+                    onDataBlockSave={db => onDataBlockSave(db)}
                   />
                 )}
               </>
