@@ -1,6 +1,6 @@
 import {ApplicationPaths} from '@admin/components/api-authorization/ApiAuthorizationConstants';
-import ProtectedRoute from "@admin/components/ProtectedRoute";
-import ProtectedRoutes from "@admin/components/ProtectedRoutes";
+import ProtectedRoute from '@admin/components/ProtectedRoute';
+import ProtectedRoutes from '@admin/components/ProtectedRoutes';
 import CreatePublicationPage from '@admin/pages/create-publication/CreatePublicationPage';
 import CreateReleasePage from '@admin/pages/release/create-release/CreateReleasePage';
 import ManageReleasePageContainer from '@admin/pages/release/ManageReleasePageContainer';
@@ -69,6 +69,12 @@ function App() {
           exact
           path={dashboardRoutes.adminDashboard}
           component={AdminDashboardPage}
+        />
+        <ProtectedRoute
+          exact
+          path={ApplicationPaths.LoggedOut}
+          component={SignedOutPage}
+          redirectIfNotLoggedIn={false}
         />
         <ProtectedRoute
           exact
