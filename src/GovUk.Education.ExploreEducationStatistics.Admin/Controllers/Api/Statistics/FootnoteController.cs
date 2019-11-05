@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.Statistics;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
@@ -17,16 +18,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
     [Authorize]
     public class FootnoteController : ControllerBase
     {
+        private readonly IFilterService _filterService;
         private readonly IFootnoteService _footnoteService;
         private readonly IIndicatorGroupService _indicatorGroupService;
         private readonly IReleaseMetaService _releaseMetaService;
         private readonly IMapper _mapper;
 
-        public FootnoteController(IFootnoteService footnoteService,
+        public FootnoteController(IFilterService filterService,
+            IFootnoteService footnoteService,
             IIndicatorGroupService indicatorGroupService,
             IReleaseMetaService releaseMetaService,
             IMapper mapper)
         {
+            _filterService = filterService;
             _footnoteService = footnoteService;
             _indicatorGroupService = indicatorGroupService;
             _releaseMetaService = releaseMetaService;
@@ -58,14 +62,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         public ActionResult<FootnotesViewModel> GetFootnotes(Guid releaseId)
         {
             var footnotes = _footnoteService.GetFootnotes(releaseId).ToList();
-            var subjects = _releaseMetaService.GetSubjects(releaseId).ToDictionary(subject => subject.Id, subject => 
+            var subjects = _releaseMetaService.GetSubjects(releaseId).ToDictionary(subject => subject.Id, subject =>
                 new FootnotesSubjectMetaViewModel
-            {
-                Indicators = GetIndicators(subject.Id),
-                SubjectId = subject.Id,
-                SubjectName = subject.Label
-            });
-            
+                {
+                    Filters = GetFilters(subject.Id),
+                    Indicators = GetIndicators(subject.Id),
+                    SubjectId = subject.Id,
+                    SubjectName = subject.Label
+                });
+
             return new FootnotesViewModel
             {
                 Footnotes = _mapper.Map<IEnumerable<FootnoteViewModel>>(footnotes),
@@ -90,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             var footnote = _footnoteService.GetFootnote(id);
             return footnote == null ? NotFound() : andThen.Invoke();
         }
-        
+
         private Dictionary<string, IndicatorsMetaViewModel> GetIndicators(long subjectId)
         {
             return _indicatorGroupService.GetIndicatorGroups(subjectId).ToDictionary(
@@ -101,6 +106,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                     Options = _mapper.Map<IEnumerable<IndicatorMetaViewModel>>(group.Indicators)
                 }
             );
+        }
+
+        // TODO copied from TableBuilderSubjectMetaService#GetFilters (optimisation for getting all filters for subject id)
+        private Dictionary<string, FilterMetaViewModel> GetFilters(long subjectId)
+        {
+            return _filterService.GetFiltersIncludingItems(subjectId)
+                .ToDictionary(
+                    filter => filter.Label.PascalCase(),
+                    filter => new FilterMetaViewModel
+                    {
+                        Hint = filter.Hint,
+                        Legend = filter.Label,
+                        Options = filter.FilterGroups.ToDictionary(
+                            filterGroup => filterGroup.Label.PascalCase(),
+                            filterGroup => BuildFilterItemsViewModel(filterGroup, filterGroup.FilterItems)),
+                        //TotalValue = GetTotalValue(filter)
+                    });
+        }
+
+        // TODO copied from AbstractTableBuidlerSubjectMetaService
+        private static FilterItemsMetaViewModel BuildFilterItemsViewModel(FilterGroup filterGroup,
+            IEnumerable<FilterItem> filterItems)
+        {
+            return new FilterItemsMetaViewModel
+            {
+                Label = filterGroup.Label,
+                Options = filterItems.Select(item => new LabelValue
+                {
+                    Label = item.Label,
+                    Value = item.Id.ToString()
+                })
+            };
         }
     }
 }
