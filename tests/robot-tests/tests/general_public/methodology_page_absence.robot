@@ -19,12 +19,12 @@ Navigate to Pupil absence in schools in England methodology page
 Should only be one link to absence methodology page
     [Documentation]  DFE-1359
     [Tags]  HappyPath
-    ${count}=  get element count  xpath://a[text()="Pupil absence statistics: methodology"]
+    ${count}=  get element count  xpath://ul/h3[text()="Pupil absence statistics: methodology"]
     should be true   ${count} == 1
 
 User navigates to absence methodology page
     [Tags]  HappyPath
-    user clicks link    Pupil absence statistics: methodology
+    user clicks element     xpath://ul/h3[text()="Pupil absence statistics: methodology"]/../div/a[text()="View methodology"]
     user waits until page contains heading   Pupil absence statistics: methodology
 
 Validate Published date, Last updated date
