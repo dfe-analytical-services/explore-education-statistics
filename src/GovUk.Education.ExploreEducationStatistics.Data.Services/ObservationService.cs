@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             var sponsorListParam = CreateIdListType("sponsorList", query.Sponsor);
             var wardListParam =
                 CreateIdListType("wardList", query.Ward);
-            var filtersListParam = CreateIdListType("filtersList", query.Filters);
+            var filterItemListParam = CreateIdListType("filterItemList", query.Filters);
 
             var inner = _context.Query<IdWrapper>().AsNoTracking()
                 .FromSql("EXEC dbo.FilteredObservations " +
@@ -76,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                          "@rscRegionsList," +
                          "@sponsorList," +
                          "@wardList," +
-                         "@filtersList",
+                         "@filterItemList",
                     subjectIdParam,
                     geographicLevelParam,
                     timePeriodListParam,
@@ -93,7 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     rscRegionListParam,
                     sponsorListParam,
                     wardListParam,
-                    filtersListParam);
+                    filterItemListParam);
 
             _logger.LogTrace("Executed inner stored procedure in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
             stopwatch.Restart();
