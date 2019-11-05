@@ -446,25 +446,27 @@ const ChartBuilder = ({
 
       {selectedChartType && (
         <Details summary="Chart preview" open>
-          {renderedChartProps === undefined ? (
-            <div
-              className={classnames(styles.preview)}
-              style={{
-                width: chartOptions.width && `${chartOptions.width}px`,
-                height: chartOptions.height && `${chartOptions.height}px`,
-              }}
-            >
-              {selectedChartType.axes.length > 0 ? (
-                <span>Add data to view a preview of the chart</span>
-              ) : (
-                <span>
-                  Configure the {selectedChartType.name} to view a preview
-                </span>
-              )}
-            </div>
-          ) : (
-            <ChartRenderer {...renderedChartProps} />
-          )}
+          <div className="govuk-width-container">
+            {renderedChartProps === undefined ? (
+              <div
+                className={classnames(styles.preview)}
+                style={{
+                  width: chartOptions.width && `${chartOptions.width}px`,
+                  height: chartOptions.height && `${chartOptions.height}px`,
+                }}
+              >
+                {selectedChartType.axes.length > 0 ? (
+                  <span>Add data to view a preview of the chart</span>
+                ) : (
+                  <span>
+                    Configure the {selectedChartType.name} to view a preview
+                  </span>
+                )}
+              </div>
+            ) : (
+              <ChartRenderer {...renderedChartProps} />
+            )}
+          </div>
         </Details>
       )}
 

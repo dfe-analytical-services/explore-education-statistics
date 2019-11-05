@@ -1,16 +1,42 @@
 .recharts-legend-wrapper ul {
-  align-content: center;
   display: flex;
+  flex-direction: row;
   flex-wrap: wrap;
-  height: 100%;
+  font-size: 1.1rem;
   justify-content: center;
 
   li {
-    align-self: flex-start;
-    flex-shrink: 1;
-    margin: 0 !important;
-    max-width: 32%;
-    padding: 0 10px 0 0;
+    box-sizing: border-box;
+    display: flex !important;
+    justify-content: center;
+    padding-right: 20px;
+    text-align: left;
+  }
+}
+
+.recharts-tooltip-wrapper {
+  font-size: 1rem;
+  max-width: 350px;
+  padding: 0;
+
+  .recharts-tooltip-item-list {
+    white-space: normal;
+  }
+
+  .recharts-tooltip-item-list li {
+    margin: 0;
+    padding: 0;
+    white-space: wrap;
+  }
+
+  .recharts-tooltip-item {
+    color: #000 !important;
+  }
+
+  .recharts-tooltip-label,
+  .recharts-tooltip-item-value,
+  .recharts-tooltip-item-unit {
+    font-weight: bold;
   }
 }
 
