@@ -32,7 +32,6 @@ const TabsSection = forwardRef<HTMLElement, TabsSectionProps>(
     {
       children,
       id,
-      title,
       headingTitle = '',
       headingTag = 'h3',
       ...restProps
