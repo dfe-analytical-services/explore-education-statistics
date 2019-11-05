@@ -1,5 +1,10 @@
+import {
+  Footnote,
+  FootnoteMeta,
+} from '@admin/services/release/edit-release/footnotes/types';
+import footnotesService from '@admin/services/release/edit-release/footnotes/service';
 import React from 'react';
-import { FootnoteMeta, Footnote } from '.';
+import Button from '@common/components/Button';
 import FootnoteForm, { FootnoteFormControls } from './FootnoteForm';
 
 interface Props {
@@ -59,12 +64,19 @@ const FootnotesList = ({
               ))}
             </td>
             <td>
-              <button
+              <Button
                 type="button"
+                className="govuk-button govuk-!-margin-right-3 govuk-!-margin-bottom-0"
                 onClick={() => footnoteFormControls.edit(footnote)}
               >
-                edit
-              </button>
+                Edit
+              </Button>
+              <Button
+                className="govuk-button govuk-button--secondary govuk-!-margin-bottom-0"
+                onClick={() => footnotesService.deleteFootnote(footnote.id)}
+              >
+                Delete
+              </Button>
             </td>
           </>
         )}

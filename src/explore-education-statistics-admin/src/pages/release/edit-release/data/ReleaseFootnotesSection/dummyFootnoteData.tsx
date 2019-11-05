@@ -1,4 +1,7 @@
-import { FootnoteMeta, Footnote } from '.';
+import {
+  Footnote,
+  FootnoteMeta,
+} from '@admin/services/release/edit-release/footnotes/types';
 
 export const dummyFootnoteMeta: FootnoteMeta = {
   0: {

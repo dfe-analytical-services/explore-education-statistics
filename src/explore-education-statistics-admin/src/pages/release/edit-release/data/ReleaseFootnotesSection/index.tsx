@@ -1,5 +1,10 @@
+import {
+  Footnote,
+  FootnoteMeta,
+  FootnoteProps,
+} from '@admin/services/release/edit-release/footnotes/types';
+import footnotesService from '@admin/services/release/edit-release/footnotes/service';
 import React, { useEffect, useState } from 'react';
-import { PublicationSubjectMeta } from '@common/modules/full-table/services/tableBuilderService';
 import FootnotesList from './FootnotesList';
 import FootnoteForm, { FootnoteFormConfig } from './FootnoteForm';
 import { dummyFootnoteMeta, dummyFootnotes } from './dummyFootnoteData';
@@ -7,25 +12,6 @@ import { dummyFootnoteMeta, dummyFootnotes } from './dummyFootnoteData';
 interface Props {
   publicationId: string;
   releaseId: string;
-}
-
-export interface FootnoteMeta {
-  [key: number /* subjectId */]: {
-    subjectId: number;
-    subjectName: string;
-    indicators: PublicationSubjectMeta['indicators'];
-    filters: PublicationSubjectMeta['filters'];
-  };
-}
-
-export interface Footnote {
-  id?: string;
-  content: string;
-  subjects?: number[];
-  indicators?: number[];
-  filterGroups?: number[];
-  filters?: number[];
-  filterItems?: number[];
 }
 
 const ReleaseFootnotesSection = ({ publicationId, releaseId }: Props) => {
@@ -47,11 +33,13 @@ const ReleaseFootnotesSection = ({ publicationId, releaseId }: Props) => {
       _setFootnoteForm({ state: 'edit', footnote });
     },
     cancel: () => _setFootnoteForm({ state: 'cancel' }),
-    save: (footnote: Footnote, footnoteId?: string) => {
+    save: (footnote: FootnoteProps, footnoteId?: string) => {
       console.log(
         `updating footnote: ${footnoteId} with ${JSON.stringify(footnote)}`,
       );
+      _setFootnoteForm({ state: 'cancel' });
     },
+    delete: footnotesService.deleteFootnote,
   };
 
   return (
