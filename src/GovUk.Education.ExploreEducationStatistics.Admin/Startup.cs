@@ -1,4 +1,5 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
@@ -101,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     options.ApiResources[0].UserClaims.Add("role");
                 })
                 // TODO DW - this should be conditional based upon whether or not we're in dev mode
-                .AddDeveloperSigningCredential(persistKey: false);
+                .AddDeveloperSigningCredential();
             
             services
                 .AddAuthentication()
