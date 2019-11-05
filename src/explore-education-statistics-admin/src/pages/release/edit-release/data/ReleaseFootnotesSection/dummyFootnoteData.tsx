@@ -22,7 +22,14 @@ export const dummyFootnoteMeta: FootnoteMeta = {
 
 export const dummyFootnotes: Footnote[] = [
   {
+    id: '0',
     content: 'My first footnote for subject0 :)',
     subjects: [0],
+  },
+  {
+    id: '1',
+    content: 'A Footnote',
+    indicators: [0, 1],
+    filters: [2, 3],
   },
 ];

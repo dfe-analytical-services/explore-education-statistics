@@ -47,12 +47,11 @@ const ReleaseFootnotesSection = ({ publicationId, releaseId }: Props) => {
       _setFootnoteForm({ state: 'edit', footnote });
     },
     cancel: () => _setFootnoteForm({ state: 'cancel' }),
-  };
-
-  const saveFootnote = (footnote: Footnote, footnoteId?: string) => {
-    console.log(
-      `updating footnote: ${footnoteId} with ${JSON.stringify(footnote)}`,
-    );
+    save: (footnote: Footnote, footnoteId?: string) => {
+      console.log(
+        `updating footnote: ${footnoteId} with ${JSON.stringify(footnote)}`,
+      );
+    },
   };
 
   return (
@@ -60,15 +59,17 @@ const ReleaseFootnotesSection = ({ publicationId, releaseId }: Props) => {
       <h2>Footnotes</h2>
       <FootnoteForm
         {...footnoteForm}
+        footnote={undefined}
         onOpen={footnoteFormControls.create}
         onCancel={footnoteFormControls.cancel}
-        onSubmit={saveFootnote}
+        onSubmit={footnoteFormControls.save}
+        isFirst={!footnotes.length}
       />
       {footnoteMeta && (
         <FootnotesList
           footnotes={footnotes}
           footnoteMeta={footnoteMeta}
-          {...footnoteFormControls}
+          footnoteFormControls={footnoteFormControls}
         />
       )}
     </>
