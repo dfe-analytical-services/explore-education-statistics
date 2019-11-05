@@ -12,10 +12,6 @@
     <Content Include="Migrations\ContentMigrations\*.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Remove="tempkey.rsa" />
-    <Content Include="tempkey.rsa">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   
   <ItemGroup>

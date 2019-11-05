@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "e74d8d31-2119-43e7-9514-676887a85822",
+		"_postman_id": "a86847a9-f8e5-4cc9-a242-f27fdfcdc196",
 		"name": "DfE Admin API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -43,13 +43,7 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/contacts",
 							"host": [
@@ -119,13 +113,7 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/meta/timeidentifiers",
 							"host": [
@@ -173,13 +161,7 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/meta/releasetypes",
 							"host": [
@@ -231,13 +213,7 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/methodologies",
 							"host": [
@@ -275,13 +251,7 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/topic/77941B7D-BBD6-4069-9107-565AF89E2DEC/methodologies",
 							"host": [
@@ -346,13 +316,7 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/me/themes",
 							"host": [
@@ -453,13 +417,7 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/publications/cbbd299f-8297-44bc-92ac-558bcf51f8ad",
 							"host": [
@@ -542,13 +500,7 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/me/publications?topicId=67C249DE-1CCA-446E-8CCB-DCDAC542F460",
 							"host": [
@@ -623,13 +575,7 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/me/publications?topicId=1a9636e4-29d5-4c90-8c07-f41db8dd019c",
 							"host": [
@@ -750,13 +696,7 @@
 									],
 									"request": {
 										"method": "GET",
-										"header": [
-											{
-												"key": "Cookie",
-												"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-												"type": "text"
-											}
-										],
+										"header": [],
 										"url": {
 											"raw": "{{admin_api_url}}/data/meta/subject/1",
 											"host": [
@@ -856,11 +796,6 @@
 												"name": "Content-Type",
 												"type": "text",
 												"value": "application/json"
-											},
-											{
-												"key": "Cookie",
-												"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-												"type": "text"
 											}
 										],
 										"body": {
@@ -925,13 +860,7 @@
 									],
 									"request": {
 										"method": "GET",
-										"header": [
-											{
-												"key": "Cookie",
-												"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-												"type": "text"
-											}
-										],
+										"header": [],
 										"url": {
 											"raw": "{{admin_api_url}}/data/meta/release/4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5",
 											"host": [
@@ -987,40 +916,40 @@
 											"    for(var i = 0; i < respJson.subjectMeta.footnotes.length; i++) {",
 											"        switch(respJson.subjectMeta.footnotes[i].id) {",
 											"            case 1:",
-											"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"State-funded primary schools include all primary academies, including free schools.\");",
+											"                pm.expect(respJson.subjectMeta.footnotes[i].content).to.equal(\"State-funded primary schools include all primary academies, including free schools.\");",
 											"                break;",
 											"            case 2:",
-											"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"State-funded secondary schools include city technology colleges and all secondary academies, including all-through academies and free schools.\");",
+											"                pm.expect(respJson.subjectMeta.footnotes[i].content).to.equal(\"State-funded secondary schools include city technology colleges and all secondary academies, including all-through academies and free schools.\");",
 											"                break;",
 											"            case 3:",
-											"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Special schools include maintained special schools, non-maintained special schools and special academies.  Excludes general hospital schools, independent special schools and independent schools approved for SEN pupils.\");",
+											"                pm.expect(respJson.subjectMeta.footnotes[i].content).to.equal(\"Special schools include maintained special schools, non-maintained special schools and special academies.  Excludes general hospital schools, independent special schools and independent schools approved for SEN pupils.\");",
 											"                break;",
 											"            case 4:",
-											"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Totals may not appear to equal the sum of component parts because numbers have been rounded to the nearest 5.\");",
+											"                pm.expect(respJson.subjectMeta.footnotes[i].content).to.equal(\"Totals may not appear to equal the sum of component parts because numbers have been rounded to the nearest 5.\");",
 											"                break;",
 											"            case 5:",
-											"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"x - 1 or 2 enrolments, or a percentage based on 1 or 2 enrolments.\");",
+											"                pm.expect(respJson.subjectMeta.footnotes[i].content).to.equal(\"x - 1 or 2 enrolments, or a percentage based on 1 or 2 enrolments.\");",
 											"                break;",
 											"            case 6:",
-											"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"There may be discrepancies between totals and the sum of constituent parts  as national and regional totals and totals across school types have been rounded to the nearest 5.\");",
+											"                pm.expect(respJson.subjectMeta.footnotes[i].content).to.equal(\"There may be discrepancies between totals and the sum of constituent parts  as national and regional totals and totals across school types have been rounded to the nearest 5.\");",
 											"                break;",
 											"            case 7:",
-											"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Absence rates are the number of absence sessions expressed as a percentage of the total number of possible sessions.\");",
+											"                pm.expect(respJson.subjectMeta.footnotes[i].content).to.equal(\"Absence rates are the number of absence sessions expressed as a percentage of the total number of possible sessions.\");",
 											"                break;",
 											"            case 8:",
-											"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Pupil enrolments missing 10 percent or more of their own possible sessions (due to authorised or unauthorised absence) are classified as persistent absentees.\");",
+											"                pm.expect(respJson.subjectMeta.footnotes[i].content).to.equal(\"Pupil enrolments missing 10 percent or more of their own possible sessions (due to authorised or unauthorised absence) are classified as persistent absentees.\");",
 											"                break;",
 											"            case 9:",
-											"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"The definition of persistent absence changed from the 2015/16 academic year - The information presented for years prior to 2015/16 has been produced using the same methodology in order to allow users to make comparisons on a consistent basis over time.\");",
+											"                pm.expect(respJson.subjectMeta.footnotes[i].content).to.equal(\"The definition of persistent absence changed from the 2015/16 academic year - The information presented for years prior to 2015/16 has been produced using the same methodology in order to allow users to make comparisons on a consistent basis over time.\");",
 											"                break;",
 											"            case 10:",
-											"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"The persistent absentee rate is the number of persistent absentees expressed as a percentage of the total number of enrolments.\");",
+											"                pm.expect(respJson.subjectMeta.footnotes[i].content).to.equal(\"The persistent absentee rate is the number of persistent absentees expressed as a percentage of the total number of enrolments.\");",
 											"                break;",
 											"            case 15:",
-											"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal('See \"Guide to absence statistics\" for more information on how absence and pupil characteristic data have been linked.');",
+											"                pm.expect(respJson.subjectMeta.footnotes[i].content).to.equal('See \"Guide to absence statistics\" for more information on how absence and pupil characteristic data have been linked.');",
 											"                break;",
 											"            case 16:",
-											"                pm.expect(respJson.subjectMeta.footnotes[i].label).to.equal(\"Figures for pupils with unclassified or missing characteristics information should be interpreted with caution.\");",
+											"                pm.expect(respJson.subjectMeta.footnotes[i].content).to.equal(\"Figures for pupils with unclassified or missing characteristics information should be interpreted with caution.\");",
 											"                break;",
 											"            default:",
 											"                pm.expect(true).to.equal(false, `Didn't expect this footnote to appear!, id: \"${respJson.subjectMeta.footnotes[i].id}\"`)",
@@ -1067,11 +996,6 @@
 										"name": "Content-Type",
 										"type": "text",
 										"value": "application/json"
-									},
-									{
-										"key": "Cookie",
-										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-										"type": "text"
 									}
 								],
 								"body": {
@@ -1178,11 +1102,6 @@
 										"name": "Content-Type",
 										"type": "text",
 										"value": "application/json"
-									},
-									{
-										"key": "Cookie",
-										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-										"type": "text"
 									}
 								],
 								"body": {
@@ -1232,11 +1151,11 @@
 											"",
 											"pm.test(\"Fields are present\", function () {",
 											"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"label\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"content\"));",
 											"});",
 											"",
-											"pm.test(\"label should should be correct\", function () { ",
-											"    pm.expect(respJson.label).to.equal(\"Postman test footnote\"); ",
+											"pm.test(\"content should should be correct\", function () { ",
+											"    pm.expect(respJson.content).to.equal(\"Postman test footnote\"); ",
 											"});"
 										],
 										"type": "text/javascript"
@@ -1258,11 +1177,6 @@
 							"request": {
 								"method": "POST",
 								"header": [
-									{
-										"key": "Cookie",
-										"type": "text",
-										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-									},
 									{
 										"key": "Content-Type",
 										"name": "Content-Type",
@@ -1313,13 +1227,7 @@
 							],
 							"request": {
 								"method": "DELETE",
-								"header": [
-									{
-										"key": "Cookie",
-										"type": "text",
-										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-									}
-								],
+								"header": [],
 								"url": {
 									"raw": "{{admin_api_url}}/data/footnote/{{footnote_for_filters_id}}",
 									"host": [
@@ -1351,11 +1259,11 @@
 											"",
 											"pm.test(\"Fields are present\", function () {",
 											"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"label\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"content\"));",
 											"});",
 											"",
-											"pm.test(\"label should should be correct\", function () { ",
-											"    pm.expect(respJson.label).to.equal(\"Postman test footnote\"); ",
+											"pm.test(\"content should should be correct\", function () { ",
+											"    pm.expect(respJson.content).to.equal(\"Postman test footnote\"); ",
 											"});"
 										],
 										"type": "text/javascript"
@@ -1375,11 +1283,6 @@
 							"request": {
 								"method": "POST",
 								"header": [
-									{
-										"key": "Cookie",
-										"type": "text",
-										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-									},
 									{
 										"key": "Content-Type",
 										"name": "Content-Type",
@@ -1430,13 +1333,7 @@
 							],
 							"request": {
 								"method": "DELETE",
-								"header": [
-									{
-										"key": "Cookie",
-										"type": "text",
-										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-									}
-								],
+								"header": [],
 								"url": {
 									"raw": "{{admin_api_url}}/data/footnote/{{footnote_for_filter_groups_id}}",
 									"host": [
@@ -1468,11 +1365,11 @@
 											"",
 											"pm.test(\"Fields are present\", function () {",
 											"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"label\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"content\"));",
 											"});",
 											"",
-											"pm.test(\"label should should be correct\", function () { ",
-											"    pm.expect(respJson.label).to.equal(\"Postman test footnote\"); ",
+											"pm.test(\"content should should be correct\", function () { ",
+											"    pm.expect(respJson.content).to.equal(\"Postman test footnote\"); ",
 											"});"
 										],
 										"type": "text/javascript"
@@ -1492,11 +1389,6 @@
 							"request": {
 								"method": "POST",
 								"header": [
-									{
-										"key": "Cookie",
-										"type": "text",
-										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-									},
 									{
 										"key": "Content-Type",
 										"name": "Content-Type",
@@ -1535,15 +1427,15 @@
 											"",
 											"pm.test(\"Fields are present\", function () {",
 											"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"label\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"content\"));",
 											"});",
 											"",
 											"pm.test(\"id should match request id\", function () {",
 											"    pm.expect(respJson.id).to.equal(pm.globals.get(\"footnote_for_filter_items_id\"));",
 											"});",
 											"",
-											"pm.test(\"label should should be correct\", function () { ",
-											"    pm.expect(respJson.label).to.equal(\"Postman test footnote - Updated\"); ",
+											"pm.test(\"content should should be correct\", function () { ",
+											"    pm.expect(respJson.content).to.equal(\"Postman test footnote - Updated\"); ",
 											"});"
 										],
 										"type": "text/javascript"
@@ -1563,11 +1455,6 @@
 							"request": {
 								"method": "PUT",
 								"header": [
-									{
-										"key": "Cookie",
-										"type": "text",
-										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-									},
 									{
 										"key": "Content-Type",
 										"name": "Content-Type",
@@ -1619,13 +1506,7 @@
 							],
 							"request": {
 								"method": "DELETE",
-								"header": [
-									{
-										"key": "Cookie",
-										"type": "text",
-										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-									}
-								],
+								"header": [],
 								"url": {
 									"raw": "{{admin_api_url}}/data/footnote/{{footnote_for_filter_items_id}}",
 									"host": [
@@ -1666,13 +1547,7 @@
 							],
 							"request": {
 								"method": "DELETE",
-								"header": [
-									{
-										"key": "Cookie",
-										"type": "text",
-										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-									}
-								],
+								"header": [],
 								"url": {
 									"raw": "{{admin_api_url}}/data/footnote/99999",
 									"host": [
@@ -1756,13 +1631,7 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/release/4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5/data/absence_by_characteristic.csv/import/status",
 							"host": [
@@ -1820,13 +1689,7 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/release/228f8aaf-e438-4155-8912-983943a88989/data/expected_not_found.csv/import/status",
 							"host": [
@@ -1912,13 +1775,7 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/releases/scheduled",
 							"host": [
@@ -1991,13 +1848,7 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/releases/draft",
 							"host": [
@@ -2058,13 +1909,7 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/releases/E7774A74-1F62-4B76-B9B5-84F14DAC7278/summary/",
 							"host": [
@@ -2128,11 +1973,6 @@
 					"request": {
 						"method": "PUT",
 						"header": [
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-							},
 							{
 								"key": "Content-Type",
 								"name": "Content-Type",
@@ -2210,11 +2050,6 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-							},
-							{
 								"key": "Content-Type",
 								"name": "Content-Type",
 								"value": "application/json",
@@ -2291,11 +2126,6 @@
 								"name": "Content-Type",
 								"value": "application/json",
 								"type": "text"
-							},
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
 							}
 						],
 						"body": {
@@ -2365,11 +2195,6 @@
 								"name": "Content-Type",
 								"value": "application/json",
 								"type": "text"
-							},
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
 							}
 						],
 						"body": {
@@ -2425,11 +2250,6 @@
 								"key": "Content-Type",
 								"name": "Content-Type",
 								"value": "application/json",
-								"type": "text"
-							},
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
 								"type": "text"
 							}
 						],
@@ -2498,13 +2318,7 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/release/85d43d6f-ec91-452d-aba2-03303ab4363a/data",
 							"host": [
@@ -2523,13 +2337,7 @@
 					"name": "Delete data file",
 					"request": {
 						"method": "DELETE",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"body": {
 							"mode": "raw",
 							"raw": ""
@@ -2582,13 +2390,7 @@
 					],
 					"request": {
 						"method": "POST",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"body": {
 							"mode": "formdata",
 							"formdata": [
@@ -2649,13 +2451,7 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/release/85d43d6f-ec91-452d-aba2-03303ab4363a/ancillary?name=test",
 							"host": [
@@ -2680,13 +2476,7 @@
 					"name": "Delete ancillary file",
 					"request": {
 						"method": "DELETE",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"body": {
 							"mode": "raw",
 							"raw": ""
@@ -2736,13 +2526,7 @@
 					],
 					"request": {
 						"method": "POST",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"body": {
 							"mode": "formdata",
 							"formdata": [
@@ -2803,13 +2587,7 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/release/85d43d6f-ec91-452d-aba2-03303ab4363a/chart",
 							"host": [
@@ -2828,13 +2606,7 @@
 					"name": "Delete chart file",
 					"request": {
 						"method": "DELETE",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"body": {
 							"mode": "raw",
 							"raw": ""
@@ -2904,13 +2676,7 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/datablocks/",
 							"host": [
@@ -2974,11 +2740,6 @@
 					"request": {
 						"method": "POST",
 						"header": [
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-							},
 							{
 								"key": "Content-Type",
 								"name": "Content-Type",
@@ -3048,13 +2809,7 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/datablocks/{{datablock_id}}",
 							"host": [
@@ -3114,11 +2869,6 @@
 						"method": "PUT",
 						"header": [
 							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-							},
-							{
 								"key": "Content-Type",
 								"name": "Content-Type",
 								"value": "application/json",
@@ -3168,13 +2918,7 @@
 					],
 					"request": {
 						"method": "DELETE",
-						"header": [
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/datablocks/{{datablock_id}}",
 							"host": [
@@ -3214,13 +2958,7 @@
 					],
 					"request": {
 						"method": "DELETE",
-						"header": [
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{admin_api_url}}/datablocks/815c6a6d-fbad-4f76-a226-13b7e1602f7e",
 							"host": [
@@ -3276,11 +3014,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -3354,11 +3087,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -3414,11 +3142,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -3492,11 +3215,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -3552,11 +3270,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -3630,11 +3343,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -3690,11 +3398,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -3768,11 +3471,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -3828,11 +3526,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -3906,11 +3599,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -3966,11 +3654,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -4044,11 +3727,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -4104,11 +3782,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -4182,11 +3855,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -4242,11 +3910,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -4320,11 +3983,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -4380,11 +4038,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -4458,11 +4111,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -4518,11 +4166,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -4596,11 +4239,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -4656,11 +4294,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -4734,11 +4367,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -4794,11 +4422,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -4872,11 +4495,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -4932,11 +4550,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -5010,11 +4623,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -5070,11 +4678,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -5148,11 +4751,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -5208,11 +4806,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -5286,11 +4879,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -5326,11 +4914,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -5378,11 +4961,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -5412,11 +4990,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -5464,11 +5037,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -5498,11 +5066,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -5550,11 +5113,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -5584,11 +5142,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -5636,11 +5189,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -5670,11 +5218,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -5722,11 +5265,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -5756,11 +5294,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -5808,11 +5341,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -5842,11 +5370,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -5894,11 +5417,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -5928,11 +5446,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -5980,11 +5493,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -6014,11 +5522,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -6066,11 +5569,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -6100,11 +5598,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -6152,11 +5645,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -6186,11 +5674,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -6238,11 +5721,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -6272,11 +5750,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -6324,11 +5797,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -6358,11 +5826,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -6410,11 +5873,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -6444,11 +5902,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -6496,11 +5949,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -6530,11 +5978,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -6582,11 +6025,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -6616,11 +6054,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -6668,11 +6101,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -6702,11 +6130,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -6754,11 +6177,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -6788,11 +6206,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -6840,11 +6253,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -6874,11 +6282,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -6926,11 +6329,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -6960,11 +6358,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -7012,11 +6405,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -7046,11 +6434,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -7098,11 +6481,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -7132,11 +6510,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -7184,11 +6557,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -7218,11 +6586,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -7270,11 +6633,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -7304,11 +6662,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -7356,11 +6709,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -7390,11 +6738,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -7442,11 +6785,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -7476,11 +6814,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -7528,11 +6861,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -7562,11 +6890,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -7614,11 +6937,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -7648,11 +6966,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -7700,11 +7013,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -7734,11 +7042,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -7786,11 +7089,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -7820,11 +7118,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -7872,11 +7165,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -7906,11 +7194,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -7958,11 +7241,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -7992,11 +7270,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -8044,11 +7317,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -8078,11 +7346,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -8130,11 +7393,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -8164,11 +7422,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -8216,11 +7469,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -8250,11 +7498,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -8302,11 +7545,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -8336,11 +7574,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -8388,11 +7621,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -8422,11 +7650,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -8474,11 +7697,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -8508,11 +7726,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -8560,11 +7773,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -8594,11 +7802,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -8646,11 +7849,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -8680,11 +7878,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -8732,11 +7925,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -8766,11 +7954,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -8818,11 +8001,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -8852,11 +8030,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -8904,11 +8077,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -8938,11 +8106,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"body": {
@@ -8990,11 +8153,6 @@
 								"name": "Content-Type",
 								"type": "text",
 								"value": "application/json"
-							},
-							{
-								"key": "Cookie",
-								"type": "text",
-								"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 							}
 						],
 						"url": {
@@ -9018,6 +8176,16 @@
 			"protocolProfileBehavior": {}
 		}
 	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{jwt}}",
+				"type": "string"
+			}
+		]
+	},
 	"event": [
 		{
 			"listen": "prerequest",
