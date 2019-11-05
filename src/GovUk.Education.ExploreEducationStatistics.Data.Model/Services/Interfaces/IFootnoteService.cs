@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
             IEnumerable<long> filterGroupIds,
             IEnumerable<long> filterItemIds,
             IEnumerable<long> indicatorIds,
-            long subjectId);
+            IEnumerable<long> subjectIds);
 
         void DeleteFootnote(long id);
 
@@ -30,6 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
             IEnumerable<long> filterIds,
             IEnumerable<long> filterGroupIds,
             IEnumerable<long> filterItemIds,
-            IEnumerable<long> indicatorIds);
+            IEnumerable<long> indicatorIds,
+            IEnumerable<long> subjectIds);
     }
 }
