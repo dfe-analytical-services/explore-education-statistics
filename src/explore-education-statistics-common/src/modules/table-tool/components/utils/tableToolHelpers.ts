@@ -6,19 +6,29 @@ import tableBuilderService, {
   PublicationSubjectMeta,
   TableDataQuery,
 } from '@common/modules/full-table/services/tableBuilderService';
-import {CategoryFilter, Indicator, LocationFilter, TimePeriodFilter,} from '@common/modules/full-table/types/filters';
-import {FullTable, FullTableMeta,} from '@common/modules/full-table/types/fullTable';
-import {mapFullTable} from '@common/modules/full-table/utils/mapPermalinks';
-import getDefaultTableHeaderConfig, {TableHeadersConfig,} from '@common/modules/full-table/utils/tableHeaders';
-import {FormValues} from '@common/modules/table-tool/components/FiltersForm';
-import {LocationsFormValues} from '@common/modules/table-tool/components/LocationFiltersForm';
-import {TableHeadersFormValues} from '@common/modules/table-tool/components/TableHeadersForm';
+import {
+  CategoryFilter,
+  Indicator,
+  LocationFilter,
+  TimePeriodFilter,
+} from '@common/modules/full-table/types/filters';
+import {
+  FullTable,
+  FullTableMeta,
+} from '@common/modules/full-table/types/fullTable';
+import { mapFullTable } from '@common/modules/full-table/utils/mapPermalinks';
+import getDefaultTableHeaderConfig, {
+  TableHeadersConfig,
+} from '@common/modules/full-table/utils/tableHeaders';
+import { FormValues } from '@common/modules/table-tool/components/FiltersForm';
+import { LocationsFormValues } from '@common/modules/table-tool/components/LocationFiltersForm';
+import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
 import mapOptionValues from '@common/modules/table-tool/components/utils/mapOptionValues';
-import {Dictionary} from '@common/types';
+import { Dictionary } from '@common/types';
 
 import mapValues from 'lodash/mapValues';
-import {SortableOption} from '@common/modules/table-tool/components/FormSortableList';
-import {DataBlockMetadata} from '@common/services/dataBlockService';
+import { SortableOption } from '@common/modules/table-tool/components/FormSortableList';
+import { DataBlockMetadata } from '@common/services/dataBlockService';
 
 export interface DateRangeState {
   startYear?: number;

@@ -1,15 +1,19 @@
-import {mapFullTable} from '@admin/pages/release/edit-release/manage-datablocks/tableUtil';
+import { mapFullTable } from '@admin/pages/release/edit-release/manage-datablocks/tableUtil';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import {ChartRendererProps} from '@common/modules/find-statistics/components/ChartRenderer';
-import {FullTable} from '@common/modules/full-table/types/fullTable';
+import { ChartRendererProps } from '@common/modules/find-statistics/components/ChartRenderer';
+import { FullTable } from '@common/modules/full-table/types/fullTable';
 import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
-import {TableHeadersFormValues} from '@common/modules/table-tool/components/TableHeadersForm';
+import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
-import DataBlockService, {DataBlock, DataBlockRerequest, DataBlockResponse,} from '@common/services/dataBlockService';
-import {Chart, ChartType} from '@common/services/publicationService';
+import DataBlockService, {
+  DataBlock,
+  DataBlockRerequest,
+  DataBlockResponse,
+} from '@common/services/dataBlockService';
+import { Chart, ChartType } from '@common/services/publicationService';
 import React from 'react';
-import {reverseMapTableHeadersConfig} from '@common/modules/table-tool/components/utils/tableToolHelpers';
+import { reverseMapTableHeadersConfig } from '@common/modules/table-tool/components/utils/tableToolHelpers';
 import ChartBuilder from '@admin/modules/chart-builder/ChartBuilder';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 
