@@ -1,23 +1,24 @@
-import Accordion, {generateIdList} from '@common/components/Accordion';
+import Accordion, { generateIdList } from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import RelatedAside from '@common/components/RelatedAside';
 import DataBlockWithAnalytics from '@frontend/components/DataBlockWithAnalytics';
-import {baseUrl} from '@common/services/api';
+import { baseUrl } from '@common/services/api';
 import publicationService, {
-  Release, ReleaseType,
+  Release,
+  ReleaseType,
 } from '@common/services/publicationService';
 import ButtonLink from '@frontend/components/ButtonLink';
 import AccordionWithAnalytics from '@frontend/components/AccordionWithAnalytics';
-import {logEvent} from '@frontend/services/googleAnalyticsService';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PrintThisPage from '@frontend/components/PrintThisPage';
 import classNames from 'classnames';
-import {NextContext} from 'next';
-import React, {Component} from 'react';
+import { NextContext } from 'next';
+import React, { Component } from 'react';
 import ReactMarkdown from 'react-markdown';
 import ContentBlock from './components/ContentBlock';
 import styles from './PublicationReleasePage.module.scss';
@@ -37,7 +38,7 @@ class PublicationReleasePage extends Component<Props> {
     publication: string;
     release: string;
   }>) {
-    const {publication, release} = query;
+    const { publication, release } = query;
 
     const request = release
       ? publicationService.getPublicationRelease(publication, release)
@@ -53,7 +54,7 @@ class PublicationReleasePage extends Component<Props> {
   }
 
   public render() {
-    const {data} = this.props;
+    const { data } = this.props;
 
     const releaseCount =
       data.publication.releases.length + data.publication.legacyReleases.length;
@@ -64,7 +65,7 @@ class PublicationReleasePage extends Component<Props> {
         caption={data.title}
         description={data.summary}
         breadcrumbs={[
-          {name: 'Find statistics and data', link: '/find-statistics'},
+          { name: 'Find statistics and data', link: '/find-statistics' },
         ]}
       >
         <div className={classNames('govuk-grid-row', styles.releaseIntro)}>
@@ -120,14 +121,15 @@ class PublicationReleasePage extends Component<Props> {
                 </Link>
               </div>
               <div className="govuk-grid-column-one-quarter">
-                {data.type && data.type.title === ReleaseType.NationalStatistics && (
-                  <img
-                    src="/static/images/UKSA-quality-mark.jpg"
-                    alt="UK statistics authority quality mark"
-                    height="120"
-                    width="120"
-                  />
-                )}
+                {data.type &&
+                  data.type.title === ReleaseType.NationalStatistics && (
+                    <img
+                      src="/static/images/UKSA-quality-mark.jpg"
+                      alt="UK statistics authority quality mark"
+                      height="120"
+                      width="120"
+                    />
+                  )}
               </div>
             </div>
 
@@ -145,7 +147,7 @@ class PublicationReleasePage extends Component<Props> {
                 }
               >
                 <ul className="govuk-list govuk-list--bullet">
-                  {data.downloadFiles.map(({extension, name, path, size}) => (
+                  {data.downloadFiles.map(({ extension, name, path, size }) => (
                     <li key={path}>
                       <Link
                         to={`${baseUrl.data}/download/${path}`}
@@ -200,7 +202,7 @@ class PublicationReleasePage extends Component<Props> {
                     <ul className="govuk-list">
                       {[
                         ...data.publication.releases.map(
-                          ({id, slug, releaseName}) => [
+                          ({ id, slug, releaseName }) => [
                             releaseName,
                             <li key={id} data-testid="previous-release-item">
                               <Link
@@ -212,7 +214,7 @@ class PublicationReleasePage extends Component<Props> {
                           ],
                         ),
                         ...data.publication.legacyReleases.map(
-                          ({id, description, url}) => [
+                          ({ id, description, url }) => [
                             description,
                             <li key={id} data-testid="previous-release-item">
                               <a href={url}>{description}</a>
@@ -285,7 +287,7 @@ class PublicationReleasePage extends Component<Props> {
 
         {data.content.length > 0 && (
           <Accordion id={this.accId[0]}>
-            {data.content.map(({heading, caption, order, content}) => {
+            {data.content.map(({ heading, caption, order, content }) => {
               return (
                 <AccordionSection
                   heading={heading}
@@ -370,9 +372,7 @@ class PublicationReleasePage extends Component<Props> {
               <p className="govuk-body">
                 Find out more about the standards we follow to produce these
                 statistics through our{' '}
-                <a
-                  href="https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education"
-                >
+                <a href="https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education">
                   Standards for official statistics published by DfE
                 </a>{' '}
                 guidance.
