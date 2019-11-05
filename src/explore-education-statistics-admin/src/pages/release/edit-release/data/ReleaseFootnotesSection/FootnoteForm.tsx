@@ -1,6 +1,12 @@
+import {
+  Footnote,
+  FootnoteProps,
+} from '@admin/services/release/edit-release/footnotes/types';
+import Link from '@admin/components/Link';
+import Button from '@common/components/Button';
 import React from 'react';
-import { Footnote } from '.';
-import { dummyFootnotes, dummyFootnoteMeta } from './dummyFootnoteData';
+import { dummyFootnotes } from './dummyFootnoteData';
+import styles from './FootnoteForm.module.scss';
 
 export interface FootnoteFormConfig {
   state: 'create' | 'edit' | 'cancel';
@@ -32,21 +38,27 @@ const FootnoteForm = ({
 }: Props) => {
   const renderNewForm = () => {
     return state !== 'create' ? (
-      <button type="button" onClick={onOpen}>
+      <Button type="button" className="govuk-button" onClick={onOpen}>
         Add {!isFirst && ` another `}footnote
-      </button>
+      </Button>
     ) : (
-      <>
-        newfootnote form
-        <button type="button" onClick={onCancel}>
-          cancel
-        </button>
-        {onSubmit && (
-          <button type="button" onClick={() => onSubmit(dummyFootnotes[0])}>
-            submit
-          </button>
-        )}
-      </>
+      <div className={styles.container}>
+        <h4>Create new footnote</h4>
+        <Button
+          type="submit"
+          className="govuk-button govuk-!-margin-right-6"
+          onClick={() => onSubmit && onSubmit(dummyFootnotes[0])}
+        >
+          Create Footnote
+        </Button>
+        <Link
+          to="#"
+          className="govuk-button govuk-button--secondary"
+          onClick={onCancel}
+        >
+          Cancel
+        </Link>
+      </div>
     );
   };
 
@@ -55,20 +67,25 @@ const FootnoteForm = ({
       return null;
     }
     return (
-      <>
-        edittfootnote form
-        <button type="button" onClick={onCancel}>
-          cancel
-        </button>
-        {onSubmit && (
-          <button
-            type="button"
-            onClick={() => onSubmit(dummyFootnotes[0], dummyFootnotes[0].id)}
-          >
-            Update
-          </button>
-        )}
-      </>
+      <td colSpan={5} className="govuk-body-m">
+        <h4>Edit footnote</h4>
+        <Button
+          type="submit"
+          className="govuk-button govuk-!-margin-right-6"
+          onClick={() =>
+            onSubmit && onSubmit(dummyFootnotes[0], dummyFootnotes[0].id)
+          }
+        >
+          Update Footnote
+        </Button>
+        <Link
+          to="#"
+          className="govuk-button govuk-button--secondary"
+          onClick={onCancel}
+        >
+          Cancel
+        </Link>
+      </td>
     );
   };
 
