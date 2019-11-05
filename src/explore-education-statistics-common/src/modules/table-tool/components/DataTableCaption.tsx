@@ -4,22 +4,19 @@ import {
   TimePeriodFilter,
 } from '@common/modules/full-table/types/filters';
 import React from 'react';
+import { FullTableMeta } from '@common/modules/full-table/types/fullTable';
 
-interface Props {
-  id: string;
-  timePeriodRange: TimePeriodFilter[];
-  locations: LocationFilter[];
-  subjectName: string;
-  publicationName: string;
-}
-
-const DataTableCaption = ({
-  id = 'dataTableCaption',
+export function generateTableTitle({
   timePeriodRange,
   locations,
   subjectName,
   publicationName,
-}: Props) => {
+}: {
+  timePeriodRange: FullTableMeta['timePeriodRange'];
+  locations: FullTableMeta['locations'];
+  subjectName: FullTableMeta['subjectName'];
+  publicationName: FullTableMeta['publicationName'];
+}) {
   let timePeriodString = '';
 
   if (timePeriodRange.length > 0) {
@@ -36,7 +33,30 @@ const DataTableCaption = ({
     locations.map(location => location.label),
   )}`;
 
-  const caption = `Table showing '${subjectName}' from '${publicationName}'${locationsString}${timePeriodString}`;
+  return `Table showing '${subjectName}' from '${publicationName}'${locationsString}${timePeriodString}`;
+}
+
+interface Props {
+  id: string;
+  timePeriodRange: TimePeriodFilter[];
+  locations: LocationFilter[];
+  subjectName: string;
+  publicationName: string;
+}
+
+const DataTableCaption = ({
+  id = 'dataTableCaption',
+  timePeriodRange,
+  locations,
+  subjectName,
+  publicationName,
+}: Props) => {
+  const caption = generateTableTitle({
+    timePeriodRange,
+    locations,
+    subjectName,
+    publicationName,
+  });
 
   return (
     <>

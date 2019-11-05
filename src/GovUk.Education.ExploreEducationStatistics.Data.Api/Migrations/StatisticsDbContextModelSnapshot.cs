@@ -511,7 +511,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                         .IsRequired();
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Footnote", "Footnote")
-                        .WithMany()
+                        .WithMany("Filters")
                         .HasForeignKey("FootnoteId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -535,7 +535,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                         .IsRequired();
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Footnote", "Footnote")
-                        .WithMany()
+                        .WithMany("FilterGroups")
                         .HasForeignKey("FootnoteId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -559,7 +559,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                         .IsRequired();
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Footnote", "Footnote")
-                        .WithMany()
+                        .WithMany("FilterItems")
                         .HasForeignKey("FootnoteId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -577,7 +577,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.IndicatorFootnote", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Footnote", "Footnote")
-                        .WithMany()
+                        .WithMany("Indicators")
                         .HasForeignKey("FootnoteId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -968,7 +968,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.SubjectFootnote", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Footnote", "Footnote")
-                        .WithMany()
+                        .WithMany("Subjects")
                         .HasForeignKey("FootnoteId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();

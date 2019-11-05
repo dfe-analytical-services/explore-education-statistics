@@ -2,6 +2,7 @@ import { dataApi } from '@common/services/api';
 import { Dictionary } from '@common/types/util';
 import { Feature, Geometry } from 'geojson';
 import { TableDataQuery } from '@common/modules/full-table/services/tableBuilderService';
+import { Table, Chart, Summary } from '@common/services/publicationService';
 
 export enum GeographicLevel {
   Establishment = 'Establishment',
@@ -116,9 +117,7 @@ export interface Result {
   filters: string[];
   location: DataBlockLocation;
   geographicLevel: GeographicLevel;
-  measures: {
-    [key: string]: string;
-  };
+  measures: Dictionary<string>;
   timePeriod: string;
 }
 
@@ -282,18 +281,24 @@ export interface DataBlockRerequest {
   boundaryLevel?: number;
 }
 
+export interface DataBlock {
+  id?: string;
+
+  heading?: string;
+  customFootnotes?: string;
+  name?: string;
+  source?: string;
+
+  dataBlockRequest: DataBlockRequest;
+  charts?: Chart[];
+  tables?: Table[];
+  summary?: Summary;
+}
+
 export type DataBlockRequest = TableDataQuery;
 
-export interface DataBlockResponse {
+export interface DataBlockResponse extends DataBlockData {
   metaData: DataBlockMetadata;
-
-  publicationId: string;
-  releaseId: string;
-  subjectId: number;
-  releaseDate: Date;
-  geographicLevel: GeographicLevel;
-
-  result: Result[];
 }
 
 const DataBlockService = {

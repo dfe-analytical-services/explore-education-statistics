@@ -1,5 +1,5 @@
 import client from '@admin/services/util/service';
-import { DataBlock } from '@admin/services/release/edit-release/datablocks/types';
+import { DataBlock } from '@common/services/dataBlockService';
 
 import {
   CategoryFilter,

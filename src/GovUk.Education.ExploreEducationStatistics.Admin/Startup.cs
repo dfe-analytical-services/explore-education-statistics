@@ -1,4 +1,5 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
@@ -53,33 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
-
-            // remove default Microsoft remapping of the name of the OpenID "roles" claim mapping
-            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("roles");
-            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("role");
             
-            services
-                .AddAuthentication()
-                .AddOpenIdConnect(options => Configuration.GetSection("OpenIdConnect").Bind(options))
-                .AddIdentityServerJwt();
-
-            services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
-
-            services.AddAutoMapper(typeof(Startup).Assembly);
-            services.AddMvc(options =>
-                {
-                    var policy = new AuthorizationPolicyBuilder()
-                        .RequireAuthenticatedUser()
-                        .Build();
-                    options.Filters.Add(new AuthorizeFilter(policy));
-                    options.EnableEndpointRouting = false;
-                })
-                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
-                .AddNewtonsoftJson(options =>
-                    {
-                        options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
-                    });
-
             services.AddDbContext<UsersAndRolesDbContext>(options =>
                 options
                     .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
@@ -101,6 +76,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     .EnableSensitiveDataLogging()
             );
             
+            // remove default Microsoft remapping of the name of the OpenID "roles" claim mapping
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("roles");
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("role");
+
             services
                 .AddDefaultIdentity<ApplicationUser>()
                 .AddRoles<IdentityRole>()
@@ -117,14 +96,54 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 })
                 .AddApiAuthorization<ApplicationUser, UsersAndRolesDbContext>(options =>
                 {
+                    // This config gets the logged in user's local Roles added to the HttpContext User principal for
+                    // authorization checking purposes
                     options.ApiResources[0].UserClaims.Add("role");
                 })
                 // TODO DW - this should be conditional based upon whether or not we're in dev mode
-                .AddDeveloperSigningCredential();
+                .AddDeveloperSigningCredential(persistKey: false);
+            
+            services
+                .AddAuthentication()
+                .AddOpenIdConnect(options => Configuration.GetSection("OpenIdConnect").Bind(options))
+                .AddIdentityServerJwt();
+
+            // This configuration has to occur after the AddAuthentication() block as it is otherwise overridden.
+            // This config tells UserManager to expect the logged in user's id to be in a Claim called
+            // "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier" rather than "sub" (because
+            // this Claim is renamed via the DefaultInboundClaimTypeMap earlier in the login process).
+            //
+            // It doesn't seem to be possible to remove the renaming (via
+            // JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("sub")) because seom mechanism earlier in the 
+            // authentication process requires it to be in the Claim named
+            // "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier.
+            services.Configure<IdentityOptions>(options =>
+            {
+                options.ClaimsIdentity.UserIdClaimType = ClaimTypes.NameIdentifier;
+            });
+
+            services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
+
+            services.AddAutoMapper(typeof(Startup).Assembly);
+            services.AddMvc(options =>
+                {
+                    var policy = new AuthorizationPolicyBuilder()
+                        .RequireAuthenticatedUser()
+                        .Build();
+                    options.Filters.Add(new AuthorizeFilter(policy));
+                    options.EnableEndpointRouting = false;
+                })
+                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
+                .AddNewtonsoftJson(options =>
+                    {
+                        options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+                    });
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration => { configuration.RootPath = "wwwroot"; });
 
+            services.AddApplicationInsightsTelemetry();
+            
             services.AddTransient<IFileStorageService, FileStorageService>();
             services.AddTransient<IImportService, ImportService>();
             services.AddTransient<INotificationsService, NotificationsService>();
@@ -135,7 +154,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IMetaService, MetaService>();
             services.AddTransient<IContactService, ContactService>();
             services.AddTransient<IReleaseService, ReleaseService>();
-            services.AddTransient<IReleaseService2, ReleaseService2>();
             services.AddTransient<IMethodologyService, MethodologyService>();
             services.AddTransient<IDataBlockService, DataBlockService>();
             services.AddTransient<IPreReleaseService, PreReleaseService>();
@@ -216,6 +234,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             app.UseAuthentication();
             app.UseIdentityServer();
+            app.UseAuthorization();
 
             app.UseMvc(routes =>
             {

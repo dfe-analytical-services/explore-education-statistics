@@ -1,3 +1,7 @@
+/* eslint-disable */
+/* Code originally from the api-authorization folder from running
+  "dotnet new react -o <output_directory_name> -au Individual"
+*/
 export const ApplicationName =
   'GovUk.Education.ExploreEducationStatistics.Admin';
 
@@ -37,3 +41,4 @@ export const ApplicationPaths = {
   IdentityRegisterPath: '/Identity/Account/Register',
   IdentityManagePath: '/Identity/Account/Manage',
 };
+/* eslint-enable */

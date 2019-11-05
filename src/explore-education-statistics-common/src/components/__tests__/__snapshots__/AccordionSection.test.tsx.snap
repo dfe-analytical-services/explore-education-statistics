@@ -50,9 +50,9 @@ exports[`AccordionSection renders with caption 1`] = `
         </span>
       </button>
     </h2>
-    <span class="govuk-accordion__section-summary">
+    <div class="govuk-accordion__section-summary govuk-body">
       Some caption text
-    </span>
+    </div>
   </div>
   <div class="govuk-accordion__section-content">
     <p>

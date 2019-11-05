@@ -55,51 +55,52 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             var sponsorListParam = CreateIdListType("sponsorList", query.Sponsor);
             var wardListParam =
                 CreateIdListType("wardList", query.Ward);
-            var filtersListParam = CreateIdListType("filtersList", query.Filters);
+            var filterItemListParam = CreateIdListType("filterItemList", query.Filters);
 
-            var inner = _context.Set<IdWrapper>().FromSqlRaw("EXEC dbo.FilteredObservations " +
-                                                               "@subjectId," +
-                                                               "@geographicLevel," +
-                                                               "@timePeriodList," +
-                                                               "@countriesList," +
-                                                               "@institutionList," +
-                                                               "@localAuthorityList," +
-                                                               "@localAuthorityDistrictList," +
-                                                               "@localEnterprisePartnershipList," +
-                                                               "@mayoralCombinedAuthorityList," +
-                                                               "@multiAcademyTrustList," +
-                                                               "@opportunityAreaList," +
-                                                               "@parliamentaryConstituencyList," +
-                                                               "@regionsList," +
-                                                               "@rscRegionsList," +
-                                                               "@sponsorList," +
-                                                               "@wardList," +
-                                                               "@filtersList",
-                subjectIdParam,
-                geographicLevelParam,
-                timePeriodListParam,
-                countriesListParam,
-                institutionListParam,
-                localAuthorityListParam,
-                localAuthorityDistrictListParam,
-                localEnterprisePartnershipListParam,
-                mayoralCombinedAuthorityListParam,
-                multiAcademyTrustListParam,
-                opportunityAreaListParam,
-                parliamentaryConstituencyListParam,
-                regionsListParam,
-                rscRegionListParam,
-                sponsorListParam,
-                wardListParam,
-                filtersListParam);
+            var inner = _context
+                .Set<IdWrapper>()
+                .FromSqlRaw("EXEC dbo.FilteredObservations " +
+                         "@subjectId," +
+                         "@geographicLevel," +
+                         "@timePeriodList," +
+                         "@countriesList," +
+                         "@institutionList," +
+                         "@localAuthorityList," +
+                         "@localAuthorityDistrictList," +
+                         "@localEnterprisePartnershipList," +
+                         "@mayoralCombinedAuthorityList," +
+                         "@multiAcademyTrustList," +
+                         "@opportunityAreaList," +
+                         "@parliamentaryConstituencyList," +
+                         "@regionsList," +
+                         "@rscRegionsList," +
+                         "@sponsorList," +
+                         "@wardList," +
+                         "@filterItemList",
+                    subjectIdParam,
+                    geographicLevelParam,
+                    timePeriodListParam,
+                    countriesListParam,
+                    institutionListParam,
+                    localAuthorityListParam,
+                    localAuthorityDistrictListParam,
+                    localEnterprisePartnershipListParam,
+                    mayoralCombinedAuthorityListParam,
+                    multiAcademyTrustListParam,
+                    opportunityAreaListParam,
+                    parliamentaryConstituencyListParam,
+                    regionsListParam,
+                    rscRegionListParam,
+                    sponsorListParam,
+                    wardListParam,
+                    filterItemListParam);
 
             _logger.LogTrace("Executed inner stored procedure in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
             stopwatch.Restart();
 
             var ids = inner.Select(obs => obs.Id).ToArray();
 
-            _logger.LogTrace("Fetched Observation id's from inner result in {Time} ms",
-                stopwatch.Elapsed.TotalMilliseconds);
+            _logger.LogTrace("Fetched Observation id's from inner result in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
             stopwatch.Restart();
 
             var batches = ids.Batch(10000);
@@ -118,8 +119,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
             _logger.LogTrace("Fetched Observations by id from {Count} batches in {Time} ms", batches.Count(),
                 stopwatch.Elapsed.TotalMilliseconds);
-
             stopwatch.Stop();
+
             return result;
         }
 

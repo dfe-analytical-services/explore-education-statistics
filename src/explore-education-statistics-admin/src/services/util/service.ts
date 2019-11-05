@@ -1,4 +1,4 @@
-import Client from '@common/services/api/Client';
+import AdminClient from '@admin/services/api/AdminClient';
 import { commaSeparated } from '@common/services/util/paramSerializers';
 import axios from 'axios';
 
@@ -14,6 +14,6 @@ axiosInstance.interceptors.response.use(
   error => Promise.reject(error.response),
 );
 
-const client = new Client(axiosInstance);
+const client = new AdminClient(axiosInstance);
 
 export default client;

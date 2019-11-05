@@ -33,8 +33,8 @@ begin
 
 	declare @wardsList IdListVarcharType
 
-	declare @filterList IdListIntegerType
-	insert @filterList values (83), (86)
+	declare @filterItemList IdListIntegerType
+	insert @filterItemList values (83), (86)
 
 	declare @result int
 	exec
@@ -55,5 +55,5 @@ begin
 			@rscRegionsList,
 			@sponsorList,
 			@wardsList,
-			@filterList
+			@filterItemList
 end

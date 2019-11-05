@@ -1,5 +1,6 @@
 import { ApplicationPaths } from '@admin/components/api-authorization/ApiAuthorizationConstants';
-import AuthorizeRoute from '@admin/components/api-authorization/AuthorizeRoute';
+import ProtectedRoute from '@admin/components/ProtectedRoute';
+import ProtectedRoutes from '@admin/components/ProtectedRoutes';
 import CreatePublicationPage from '@admin/pages/create-publication/CreatePublicationPage';
 import CreateReleasePage from '@admin/pages/release/create-release/CreateReleasePage';
 import ManageReleasePageContainer from '@admin/pages/release/ManageReleasePageContainer';
@@ -19,9 +20,9 @@ import ApiAuthorizationRoutes from './components/api-authorization/ApiAuthorizat
 import { LoginContext } from './components/Login';
 import AdminDashboardPage from './pages/admin-dashboard/AdminDashboardPage';
 import AdminDocumentationCreateNewRelease from './pages/documentation/DocumentationCreateNewRelease';
-import AdminDocumentationEditRelease from './pages/documentation/DocumentationEditRelease';
 
 import AdminDocumentationContentDesignStandards from './pages/documentation/DocumentationDesignStandards';
+import AdminDocumentationEditRelease from './pages/documentation/DocumentationEditRelease';
 import AdminDocumentationGlossary from './pages/documentation/DocumentationGlossary';
 import AdminDocumentationHome from './pages/documentation/DocumentationHome';
 import AdminDocumentationManageContent from './pages/documentation/DocumentationManageContent';
@@ -62,94 +63,91 @@ function App() {
 
       <ApiAuthorizationRoutes />
 
-      <AuthorizeRoute
-        exact
-        path={dashboardRoutes.adminDashboard}
-        component={AdminDashboardPage}
-      />
-
-      <AuthorizeRoute
-        exact
-        path={ApplicationPaths.LoggedOut}
-        component={SignedOutPage}
-        renderIfNotAuthenticated
-      />
-
-      <AuthorizeRoute
-        exact
-        path={publicationRoutes.createPublication.route}
-        component={CreatePublicationPage}
-      />
-
-      <AuthorizeRoute
-        exact
-        path={releaseRoutes.createReleaseRoute.route}
-        component={CreateReleasePage}
-      />
-
-      <AuthorizeRoute
-        path="/publication/:publicationId/release/:releaseId"
-        component={ManageReleasePageContainer}
-      />
+      <ProtectedRoutes>
+        <ProtectedRoute
+          exact
+          path={dashboardRoutes.adminDashboard}
+          component={AdminDashboardPage}
+        />
+        <ProtectedRoute
+          exact
+          path={ApplicationPaths.LoggedOut}
+          component={SignedOutPage}
+          redirectIfNotLoggedIn={false}
+        />
+        <ProtectedRoute
+          exact
+          path={publicationRoutes.createPublication.route}
+          component={CreatePublicationPage}
+        />
+        <ProtectedRoute
+          exact
+          path={releaseRoutes.createReleaseRoute.route}
+          component={CreateReleasePage}
+        />
+        <ProtectedRoute
+          path="/publication/:publicationId/release/:releaseId"
+          component={ManageReleasePageContainer}
+        />
+        <ProtectedRoute
+          exact
+          path="/documentation/"
+          component={AdminDocumentationHome}
+        />
+        <ProtectedRoute
+          exact
+          path="/documentation/content-design-standards-guide"
+          component={AdminDocumentationContentDesignStandards}
+        />
+        <ProtectedRoute
+          exact
+          path="/documentation/glossary"
+          component={AdminDocumentationGlossary}
+        />
+        <ProtectedRoute
+          exact
+          path="/documentation/style-guide"
+          component={AdminDocumentationStyle}
+        />
+        <ProtectedRoute
+          exact
+          path="/documentation/using-dashboard"
+          component={AdminDocumentationUsingDashboard}
+        />
+        <ProtectedRoute
+          exact
+          path="/documentation/create-new-release"
+          component={AdminDocumentationCreateNewRelease}
+        />
+        <ProtectedRoute
+          exact
+          path="/documentation/edit-release"
+          component={AdminDocumentationEditRelease}
+        />
+        <ProtectedRoute
+          exact
+          path="/documentation/manage-content"
+          component={AdminDocumentationManageContent}
+        />
+        <ProtectedRoute
+          exact
+          path="/documentation/manage-data"
+          component={AdminDocumentationManageData}
+        />
+        <ProtectedRoute
+          exact
+          path="/documentation/manage-data-block"
+          component={AdminDocumentationManageDataBlocks}
+        />
+        <ProtectedRoute
+          exact
+          path="/prototypes/documentation/create-new-publication"
+          component={AdminDocumentationCreateNewPublication}
+        />
+      </ProtectedRoutes>
 
       {/* Prototype Routes */}
       <Route exact path="/index" component={IndexPage} />
-
-      <AuthorizeRoute
-        exact
-        path="/documentation/"
-        component={AdminDocumentationHome}
-      />
-      <AuthorizeRoute
-        exact
-        path="/documentation/content-design-standards-guide"
-        component={AdminDocumentationContentDesignStandards}
-      />
-      <AuthorizeRoute
-        exact
-        path="/documentation/glossary"
-        component={AdminDocumentationGlossary}
-      />
-      <AuthorizeRoute
-        exact
-        path="/documentation/style-guide"
-        component={AdminDocumentationStyle}
-      />
-      <AuthorizeRoute
-        exact
-        path="/documentation/using-dashboard"
-        component={AdminDocumentationUsingDashboard}
-      />
-      <AuthorizeRoute
-        exact
-        path="/documentation/create-new-release"
-        component={AdminDocumentationCreateNewRelease}
-      />
-      <AuthorizeRoute
-        exact
-        path="/documentation/edit-release"
-        component={AdminDocumentationEditRelease}
-      />
-      <AuthorizeRoute
-        exact
-        path="/documentation/manage-content"
-        component={AdminDocumentationManageContent}
-      />
-      <AuthorizeRoute
-        exact
-        path="/documentation/manage-data"
-        component={AdminDocumentationManageData}
-      />
-      <AuthorizeRoute
-        exact
-        path="/documentation/manage-data-block"
-        component={AdminDocumentationManageDataBlocks}
-      />
-      <AuthorizeRoute
-        exact
-        path="/prototypes/documentation/create-new-publication"
-        component={AdminDocumentationCreateNewPublication}
-      />
 
       <LoginContext.Provider value={PrototypeLoginService.login()}>
         <Route exact path="/prototypes/" component={PrototypesIndexPage} />

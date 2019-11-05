@@ -1,14 +1,15 @@
 /* eslint-disable */
+/* Code originally from the api-authorization folder from running
+  "dotnet new react -o <output_directory_name> -au Individual"
+*/
 import React from 'react';
 import { Component } from 'react';
 import { Route, Redirect } from 'react-router-dom';
-import { LoginContext } from '../Login';
 import {
   ApplicationPaths,
   QueryParameterNames,
 } from './ApiAuthorizationConstants';
 import authService from './AuthorizeService';
-import loginService from '@admin/services/sign-in/service';
 
 export default class AuthorizeRoute extends Component {
   constructor(props) {
@@ -16,10 +17,7 @@ export default class AuthorizeRoute extends Component {
 
     this.state = {
       ready: false,
-      // HIVE
-      // swapped "authenticated" for "user" here to support adding user profile in a Context for components
-      // further down in the component hierarchy
-      user: undefined,
+      authenticated: false,
     };
   }
 
@@ -35,33 +33,20 @@ export default class AuthorizeRoute extends Component {
   }
 
   render() {
-    const { ready, user } = this.state;
+    const { ready, authenticated } = this.state;
     const redirectUrl = `${ApplicationPaths.Login}?${
       QueryParameterNames.ReturnUrl
     }=${encodeURI(window.location.href)}`;
     if (!ready) {
       return <div></div>;
     } else {
-      const {
-        component: Component,
-        renderIfNotAuthenticated,
-        ...rest
-      } = this.props;
+      const { component: Component, ...rest } = this.props;
       return (
         <Route
           {...rest}
           render={props => {
-            if (user || renderIfNotAuthenticated) {
-              return (
-                // HIVE
-                // added LoginContext tags here to surround Component to allow users to be available as a
-                // Context further down in the component hierarchy
-                <>
-                  <LoginContext.Provider value={{ user }}>
-                    <Component {...props} />
-                  </LoginContext.Provider>
-                </>
-              );
+            if (authenticated) {
+              return <Component {...props} />;
             } else {
               return <Redirect to={redirectUrl} />;
             }
@@ -73,21 +58,11 @@ export default class AuthorizeRoute extends Component {
 
   async populateAuthenticationState() {
     const authenticated = await authService.isAuthenticated();
-
-    if (authenticated) {
-      // HIVE
-      // calling our own service to retrieve user details from our own User domain model
-      await loginService
-        .getUserDetails()
-        .then(user => this.setState({ ready: true, user }))
-        .catch(() => this.setState({ ready: false, user: undefined }));
-    } else {
-      this.setState({ ready: true, user: undefined });
-    }
+    this.setState({ ready: true, authenticated });
   }
 
   async authenticationChanged() {
-    this.setState({ ready: false, user: undefined });
+    this.setState({ ready: false, authenticated: false });
     await this.populateAuthenticationState();
   }
 }
