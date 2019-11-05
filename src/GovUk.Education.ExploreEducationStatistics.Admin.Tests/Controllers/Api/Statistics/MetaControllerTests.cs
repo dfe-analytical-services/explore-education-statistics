@@ -1,4 +1,6 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics;
+﻿using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
@@ -19,7 +21,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var releaseMetaService = new Mock<IReleaseMetaService>();
 
             releaseMetaService.Setup(s => s.GetSubjects(_releaseId))
-                .Returns(new ReleaseSubjectsMetaViewModel());
+                .Returns(new List<IdLabel>
+                {
+                    new IdLabel
+                    {
+                        Id = 1,
+                        Label = "Absence by characteristic"
+                    }
+                });
 
             _controller = new MetaController(releaseMetaService.Object);
         }
