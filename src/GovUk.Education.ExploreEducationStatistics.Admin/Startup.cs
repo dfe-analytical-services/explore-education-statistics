@@ -102,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     options.ApiResources[0].UserClaims.Add("role");
                 })
                 // TODO DW - this should be conditional based upon whether or not we're in dev mode
-                .AddDeveloperSigningCredential();
+                .AddSigningCredentials();
             
             services
                 .AddAuthentication()
