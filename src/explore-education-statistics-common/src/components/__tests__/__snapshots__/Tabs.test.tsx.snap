@@ -46,7 +46,7 @@ exports[`Tabs renders multiple tabs correctly with titles 1`] = `
       Test section 1 content
     </p>
   </section>
-  <section class="govuk-tabs__panel dfe-content-overflow panel hidden"
+  <section class="govuk-tabs__panel dfe-content-overflow panel govuk-visually-hidden"
            id="test-tabs-2"
            aria-labelledby="test-tabs-2-tab"
            role="tabpanel"
@@ -105,7 +105,7 @@ exports[`Tabs renders multiple tabs correctly without titles 1`] = `
       Test section 1 content
     </p>
   </section>
-  <section class="govuk-tabs__panel dfe-content-overflow panel hidden"
+  <section class="govuk-tabs__panel dfe-content-overflow panel govuk-visually-hidden"
            id="test-tabs-2"
            aria-labelledby="test-tabs-2-tab"
            role="tabpanel"
