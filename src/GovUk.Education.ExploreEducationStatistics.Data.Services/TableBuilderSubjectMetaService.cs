@@ -150,11 +150,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return BuildObservationalUnitsViewModels(observationalUnits);
         }
 
-        private Dictionary<string, TableBuilderIndicatorsMetaViewModel> GetIndicators(long subjectId)
+        private Dictionary<string, IndicatorsMetaViewModel> GetIndicators(long subjectId)
         {
             return _indicatorGroupService.GetIndicatorGroups(subjectId).ToDictionary(
                 group => group.Label.PascalCase(),
-                group => new TableBuilderIndicatorsMetaViewModel
+                group => new IndicatorsMetaViewModel
                 {
                     Label = group.Label,
                     Options = _mapper.Map<IEnumerable<IndicatorMetaViewModel>>(group.Indicators)
