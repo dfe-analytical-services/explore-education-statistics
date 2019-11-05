@@ -24,7 +24,7 @@ const ModalConfirm = ({
   title,
 }: Props) => {
   return (
-    <Modal title={title} onExit={onExit} mounted={mounted}>
+    <Modal focusDialog title={title} onExit={onExit} mounted={mounted}>
       {children}
 
       <Button onClick={onConfirm}>{confirmText}</Button>
