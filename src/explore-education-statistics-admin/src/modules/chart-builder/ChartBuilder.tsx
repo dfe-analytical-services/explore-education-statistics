@@ -474,7 +474,9 @@ const ChartBuilder = ({
         <Tabs id="ChartTabs">
           {selectedChartType.data.length > 0 && (
             <TabsSection title="Data">
-              <p>Add data from the existing dataset to the chart</p>
+              <h2 className="govuk-heading-m">
+                Add data from the existing dataset to the chart
+              </h2>
               <ChartDataSelector
                 onDataAdded={onDataAdded}
                 onDataRemoved={onDataRemoved}
@@ -492,7 +494,8 @@ const ChartBuilder = ({
             </TabsSection>
           )}
 
-          <TabsSection title="Chart Configuration">
+          <TabsSection title="Chart configuration">
+            <h2 className="govuk-heading-m">Chart configuration</h2>
             <ChartConfiguration
               selectedChartType={selectedChartType}
               chartOptions={chartOptions}
