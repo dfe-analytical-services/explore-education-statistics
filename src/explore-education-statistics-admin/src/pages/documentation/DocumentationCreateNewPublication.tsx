@@ -3,10 +3,11 @@ import { RouteChildrenProps } from 'react-router';
 import Page from '@admin/components/Page';
 import StepNav from './components/StepByStep';
 import StepNavItem from './components/StepByStepItem';
-import imageChoosePublication from './images/guidance/guidance-choose-publication.jpg';
-import imageCreateReleaseButton from './images/guidance/guidance-create-release-button.jpg';
-import imageCreateReleaseNavigation from './images/guidance/guidance-create-release-navigation.jpg';
-import imageSelectTheme from './images/guidance/guidance-select-theme.jpg';
+import imageCreatePublication from './images/guidance/guidance-publication-create.png';
+import imageContactPublication from './images/guidance/guidance-publication-contact.png';
+import imageProductionTeamPublication from './images/guidance/guidance-publication-production-team.png';
+import imageEditDeletePublication from './images/guidance/guidance-publication-edit-delete.png';
+import imageCreateReleasePublication from './images/guidance/guidance-publication-create-release.png';
 
 const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
   const query = new URLSearchParams(window.location.search);
@@ -53,62 +54,16 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                 Under the 'Manage publications and releases' tab, select the
                 green 'Create new publication' button.
               </p>
-
               <img
-                src={imageChoosePublication}
+                src={imageCreatePublication}
                 className="govuk-!-width-three-quarters"
                 alt="Choose a publication"
               />
-              <p>
-                2. If you have access to a long list of publications, use the
-                ‘Select theme’ and ‘Select topic’ dropdowns to find a
-                publication.
-              </p>
-              <img
-                src={imageSelectTheme}
-                className="govuk-!-width-three-quarters"
-                alt=""
-              />
-            </StepNavItem>
-            <StepNavItem
-              stepNumber={2}
-              stepHeading="Create a new release"
-              open={step === 2}
-            >
-              <p>
-                Once you’ve created a new release you’ll become its ‘Primary
-                analyst / Author’ and (along with members of your ‘Production
-                team’) be responsible for putting it together within the admin
-                system.
-              </p>
-              <h3>Do</h3>
-              <p>
-                Under the publication you’ve chosen, select the green 'Create
-                new release' button.
-              </p>
-              <img
-                src={imageCreateReleaseButton}
-                className="govuk-!-width-three-quarters"
-                alt=""
-              />
-              <h3>Don't</h3>
-              <p>
-                Don’t worry if you haven't got all the data, files and content
-                to complete your release.
-              </p>
-              <p>
-                You can come back and add these later using the various tabs at
-                the top of the page.
-              </p>
-              <img
-                src={imageCreateReleaseNavigation}
-                className="govuk-!-width-three-quarters"
-                alt=""
-              />
               <h3>Help and support</h3>
               <p>
-                If you can't find the publication where you want to create your
-                release contact:{' '}
+                If you can’t see the green 'Create new publication' button or
+                have any issues or questions about creating a new publication
+                contact:{' '}
               </p>
               <h3>Explore education statistics team </h3>
               <p>
@@ -119,39 +74,175 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
               </p>
             </StepNavItem>
             <StepNavItem
+              stepNumber={2}
+              stepHeading="Choose a methodology"
+              open={step === 2}
+            >
+              <p>
+                You’ll need to link your publication to a methodology before it
+                goes live.
+              </p>
+              <h3>Help and support</h3>
+              <p>
+                If you can’t find the methodology you’re looking for or have any
+                questions about creating a new methodology contact:{' '}
+              </p>
+              <h3>Explore education statistics team </h3>
+              <p>
+                Email <br />
+                <a href="mailto:explore.statistics@education.gov.uk">
+                  explore.statistics@education.gov.uk
+                </a>
+              </p>
+
+              <h3>Next steps</h3>
+              <p>
+                For detailed guidance on how to add a methodology to and create
+                a methodology for your release -{' '}
+                <a href="https://docs.google.com/document/d/1QhND0vsawE2moPFW5TgJvMto-dJ9DnOSsBHk7_9Ixho/edit?usp=sharing">
+                  Adding and creating a methodology: step by step
+                </a>
+              </p>
+            </StepNavItem>
+            <StepNavItem
               stepNumber={3}
-              stepHeading="Release summary"
+              stepHeading="Choose a contact"
               open={step === 3}
             >
-              <p>Write standard html here</p>
+              <p>
+                According to ONS and GSS standards, all publications (and their
+                related releases) must include relevant contact details which
+                users can use if they have any queries about your statistics and
+                data:{' '}
+              </p>
+              <ul className="govuk-list govuk-list--bullet">
+                <li>
+                  <a href="https://gss.civilservice.gov.uk/wp-content/uploads/2018/11/Writing-about-statistics-Edition-2.0-October-2018-1.pdf">
+                    GSS - Writing about statistics: Guidance for producers
+                  </a>{' '}
+                  - Page 20
+                </li>
+                <li>
+                  <a href="https://style.ons.gov.uk/category/writing-for-the-web/gov-uk-release-calendar/#contact-details">
+                    ONS - Writing for the web guidance
+                  </a>
+                </li>
+              </ul>
+              <p>
+                You must choose a contact for your publication. Their name and
+                contact details will then appear as the nominated and main point
+                of contact for data and methodology enquiries for the
+                publication and all its related releases.
+              </p>
+              <img
+                src={imageContactPublication}
+                className="govuk-!-width-three-quarters"
+                alt="Choose a contact"
+              />
+              <h3>Help and support</h3>
+              <p>
+                If you can’t find the contact you’re looking for or the details
+                are incorrect and need updating contact:
+              </p>
+              <h3>Explore education statistics team </h3>
+              <p>
+                Email <br />
+                <a href="mailto:explore.statistics@education.gov.uk">
+                  explore.statistics@education.gov.uk
+                </a>
+              </p>
             </StepNavItem>
             <StepNavItem
               stepNumber={4}
-              stepHeading="Manage data"
+              stepHeading="Check your Production team"
               open={step === 4}
             >
-              <p>Write standard html here</p>
+              <p>
+                All publications will be assigned a ‘Production team’ under the
+                following roles:{' '}
+              </p>
+              <ul className="govuk-list govuk-list--bullet">
+                <li>Responsible statistician</li>
+                <li>Team leader</li>
+                <li>Primary analyst</li>
+              </ul>
+              <p>
+                The members of this team will be responsible for putting
+                together the publication’s related releases within the admin
+                system.
+              </p>
+              <h3>Do</h3>
+              <p>
+                Make sure you check the listed members of your production team
+                are correct.
+              </p>
+              <img
+                src={imageProductionTeamPublication}
+                className="govuk-!-width-three-quarters"
+                alt="Check your Production team"
+              />
+              <h3>Help and support</h3>
+              <p>
+                If you need to add or remove members of your ‘Production Team’
+                or individual details need updating contact:
+              </p>
+              <h3>Explore education statistics team </h3>
+              <p>
+                Email <br />
+                <a href="mailto:explore.statistics@education.gov.uk">
+                  explore.statistics@education.gov.uk
+                </a>
+              </p>
             </StepNavItem>
             <StepNavItem
               stepNumber={5}
-              stepHeading="Manage data blocks"
+              stepHeading="Edit and delete a publication"
               open={step === 5}
             >
-              <p>Write standard html here</p>
+              <p>
+                To edit any of the publication details you’ve entered (including
+                the publication title) - use the ‘Edit publication details’
+                link.
+              </p>
+              <img
+                src={imageEditDeletePublication}
+                className="govuk-!-width-three-quarters"
+                alt="Edit and delete a publication"
+              />
+              <p>If you need to delete a publication contact:</p>
+              <p>
+                Email <br />
+                <a href="mailto:explore.statistics@education.gov.uk">
+                  explore.statistics@education.gov.uk
+                </a>
+              </p>
             </StepNavItem>
             <StepNavItem
               stepNumber={6}
-              stepHeading="Manage content"
+              stepHeading="Next steps - create a new release"
               open={step === 6}
             >
-              <p>Write standard html here</p>
-            </StepNavItem>
-            <StepNavItem
-              stepNumber={7}
-              stepHeading="Update release status"
-              open={step === 7}
-            >
-              <p>Write standard html here</p>
+              <p>
+                Once you’ve created your publication you and any members of your
+                ‘Production team’ can start creating its related releases.
+              </p>
+              <p>
+                Under the 'Manage publications and releases' tab, select the
+                name of the publication you’ve just created which will include
+                the wording 'Create new release'.
+              </p>
+              <img
+                src={imageCreateReleasePublication}
+                className="govuk-!-width-three-quarters"
+                alt="Create a new release"
+              />
+              <h3>Next steps</h3>
+              <p>
+                For detailed guidance on how to create a new release -{' '}
+                <a href="/documentation/create-new-release">
+                  Creating a new release: step by step
+                </a>
+              </p>
             </StepNavItem>
           </StepNav>
         </div>
