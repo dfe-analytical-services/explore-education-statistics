@@ -12,7 +12,13 @@ function MethodologyList({ publications }: Props) {
       {publications.length > 0 ? (
         publications.map(({ title, slug }) => (
           <>
-            <Link to={`/methodology/${slug}`}>{title}</Link>{' '}
+            <h3 className="govuk-heading-s govuk-!-margin-bottom-0">{title}</h3>
+            <div className="govuk-!-margin-bottom-1">
+              <Link to={`/methodology/${slug}`}>
+                View methodology
+                <span className="govuk-visually-hidden">for {title}</span>
+              </Link>
+            </div>
           </>
         ))
       ) : (

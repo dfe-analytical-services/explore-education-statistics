@@ -1,4 +1,3 @@
-import { DataBlock } from '@admin/services/release/edit-release/datablocks/types';
 import Button from '@common/components/Button';
 import {
   Form,
@@ -12,6 +11,7 @@ import Yup from '@common/lib/validation/yup';
 import { TableDataQuery } from '@common/modules/full-table/services/tableBuilderService';
 import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
 import {
+  DataBlock,
   GeographicLevel,
   TimeIdentifier,
 } from '@common/services/dataBlockService';
@@ -20,6 +20,7 @@ import React from 'react';
 import { ObjectSchemaDefinition } from 'yup';
 
 interface Props {
+  initialValues: { title?: string };
   query: TableDataQuery;
   tableHeaders: TableHeadersFormValues;
   releaseId: string;
@@ -35,6 +36,7 @@ interface FormValues {
 }
 
 const DataBlockDetailsForm = ({
+  initialValues,
   query,
   tableHeaders,
   releaseId,
@@ -111,7 +113,10 @@ const DataBlockDetailsForm = ({
 
   React.useEffect(() => {
     const newInitialValues = {
-      title: (initialDataBlock && initialDataBlock.heading) || '',
+      title:
+        (initialDataBlock && initialDataBlock.heading) ||
+        initialValues.title ||
+        '',
       customFootnotes:
         (initialDataBlock && initialDataBlock.customFootnotes) || '',
       name: (initialDataBlock && initialDataBlock.name) || '',
@@ -121,7 +126,7 @@ const DataBlockDetailsForm = ({
     if (formikRef.current) {
       formikRef.current.setValues(newInitialValues);
     }
-  }, [initialDataBlock]);
+  }, [initialDataBlock, initialValues]);
 
   return (
     <Formik<FormValues>

@@ -44,8 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(TimeIdentifier.AcademicYear, result.Result.Right.TimePeriodCoverage);
             }
         }
-
-
+        
         [Fact]
         public void CreateReleaseWithTemplate()
         {
@@ -137,7 +136,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
-
         [Fact]
         public async void LatestReleaseCorrectlyReported()
         {
@@ -188,7 +186,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
-
         [Fact]
         public async void EditReleaseSummary()
         {
@@ -218,21 +215,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         new Release
                         {
                             Id = releaseId,
-                            TypeId = addHocReleaseTypeId
+                            TypeId = addHocReleaseTypeId,
+                            ReleaseSummary = new ReleaseSummary()
+                            {
+                                Id = new Guid("0071f344-4b99-4010-ab2f-62bf7b0035b0"),
+                                Versions = new List<ReleaseSummaryVersion>() {
+                                    new ReleaseSummaryVersion()
+                                    {    
+                                        Id = new Guid("25f43cba-faee-4b0a-a9d4-a3d114a5f6df"),
+                                        Created = DateTime.Now,
+                                        Summary = "",
+                                        TypeId = addHocReleaseTypeId,
+                                    }
+                                }
+                            }
                         }
                     }
                 });
                 context.SaveChanges();
             }
-
-
+            
             var publishScheduledEdited = DateTime.Now.AddDays(1);
             var nextReleaseDateEdited = new PartialDate {Day = "1", Month = "1", Year = "2040"};
             var typeEditedId = officialStatisticsReleaseTypeId;
             const string releaseNameEdited = "2035";
             const TimeIdentifier timePeriodCoverageEdited = TimeIdentifier.March;
-
-
+            
             using (var context = InMemoryApplicationDbContext("LatestReleaseCorrectlyReported"))
             {
                 // Method under test 
@@ -255,8 +263,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(timePeriodCoverageEdited, edited.Right.TimePeriodCoverage);
             }
         }
-
-
+        
         [Fact]
         public async void GetReleaseSummaryAsync()
         {
@@ -276,16 +283,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Title = "Ad Hoc"
                     },
                 });
-                context.Add(
-                    new Release
+
+                context.Add(new Publication
+                {
+                    Id = new Guid("f7da23e2-304a-4b47-a8f5-dba28a554de9"),
+                    Releases = new List<Release>
                     {
-                        Id = releaseId,
-                        TypeId = addHocReleaseTypeId,
-                        TimePeriodCoverage = TimeIdentifier.January,
-                        PublishScheduled = publishScheduled,
-                        NextReleaseDate = nextReleaseDate,
-                        ReleaseName = releaseName
-                    });
+                        new Release
+                        {
+                            Id = releaseId,
+                            TypeId = addHocReleaseTypeId,
+                            TimePeriodCoverage = TimeIdentifier.January,
+                            PublishScheduled = publishScheduled,
+                            NextReleaseDate = nextReleaseDate,
+                            ReleaseName = releaseName,
+                            ReleaseSummary = new ReleaseSummary()
+                            {
+                                Id = new Guid("0071f344-4b99-4010-ab2f-62bf7b0035b0"),
+                                Versions = new List<ReleaseSummaryVersion>() {
+                                    new ReleaseSummaryVersion()
+                                    {    
+                                        Id = new Guid("25f43cba-faee-4b0a-a9d4-a3d114a5f6df"),
+                                        Created = DateTime.Now,
+                                        Summary = "",
+                                        TypeId = addHocReleaseTypeId,
+                                        PublishScheduled = publishScheduled,
+                                        NextReleaseDate = nextReleaseDate,
+                                        ReleaseName = releaseName,
+                                        TimePeriodCoverage = timePeriodCoverage
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
                 context.SaveChanges();
             }
 
@@ -302,8 +333,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(timePeriodCoverage, summary.TimePeriodCoverage);
             }
         }
-
-
+        
         [Fact]
         public async void GetReleasesForPublicationAsync()
         {

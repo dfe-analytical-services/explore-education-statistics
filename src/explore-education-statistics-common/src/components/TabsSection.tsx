@@ -23,7 +23,7 @@ export interface TabsSectionProps {
    */
   lazy?: boolean;
   title: string;
-  isTitleVisible?: boolean;
+  headingTitle?: string;
   headingTag?: 'h2' | 'h3' | 'h4';
 }
 
@@ -33,7 +33,7 @@ const TabsSection = forwardRef<HTMLElement, TabsSectionProps>(
       children,
       id,
       title,
-      isTitleVisible = false,
+      headingTitle = '',
       headingTag = 'h3',
       ...restProps
     }: TabsSectionProps,
@@ -62,7 +62,7 @@ const TabsSection = forwardRef<HTMLElement, TabsSectionProps>(
         role={onMedia('tabpanel')}
         tabIndex={onMedia(-1)}
       >
-        {isTitleVisible && createElement(headingTag, { children: title })}
+        {headingTitle && createElement(headingTag, { children: headingTitle })}
         {children}
       </section>
     );
