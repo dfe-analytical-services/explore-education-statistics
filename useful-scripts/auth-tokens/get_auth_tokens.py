@@ -4,7 +4,7 @@ import argparse
 from selenium import webdriver
 import chromedriver_install as cdi
 
-parser = argparse.ArgumentParser(prog="python get_azureadcookie.py", 
+parser = argparse.ArgumentParser(prog="python get_auth_tokens.py",
                                  description="To get the authentication tokens for using the admin service")
 parser.add_argument(dest="url",
                     help="URL of environment you wish to get authentication tokens for")
