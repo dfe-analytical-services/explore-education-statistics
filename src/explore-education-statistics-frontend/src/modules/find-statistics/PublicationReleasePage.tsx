@@ -1,23 +1,23 @@
-import Accordion, { generateIdList } from '@common/components/Accordion';
+import Accordion, {generateIdList} from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import RelatedAside from '@common/components/RelatedAside';
 import DataBlockWithAnalytics from '@frontend/components/DataBlockWithAnalytics';
-import { baseUrl } from '@common/services/api';
+import {baseUrl} from '@common/services/api';
 import publicationService, {
-  Release,
+  Release, ReleaseType,
 } from '@common/services/publicationService';
 import ButtonLink from '@frontend/components/ButtonLink';
 import AccordionWithAnalytics from '@frontend/components/AccordionWithAnalytics';
-import { logEvent } from '@frontend/services/googleAnalyticsService';
+import {logEvent} from '@frontend/services/googleAnalyticsService';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PrintThisPage from '@frontend/components/PrintThisPage';
 import classNames from 'classnames';
-import { NextContext } from 'next';
-import React, { Component } from 'react';
+import {NextContext} from 'next';
+import React, {Component} from 'react';
 import ReactMarkdown from 'react-markdown';
 import ContentBlock from './components/ContentBlock';
 import styles from './PublicationReleasePage.module.scss';
@@ -37,7 +37,7 @@ class PublicationReleasePage extends Component<Props> {
     publication: string;
     release: string;
   }>) {
-    const { publication, release } = query;
+    const {publication, release} = query;
 
     const request = release
       ? publicationService.getPublicationRelease(publication, release)
@@ -53,7 +53,7 @@ class PublicationReleasePage extends Component<Props> {
   }
 
   public render() {
-    const { data } = this.props;
+    const {data} = this.props;
 
     const releaseCount =
       data.publication.releases.length + data.publication.legacyReleases.length;
@@ -64,7 +64,7 @@ class PublicationReleasePage extends Component<Props> {
         caption={data.title}
         description={data.summary}
         breadcrumbs={[
-          { name: 'Find statistics and data', link: '/find-statistics' },
+          {name: 'Find statistics and data', link: '/find-statistics'},
         ]}
       >
         <div className={classNames('govuk-grid-row', styles.releaseIntro)}>
@@ -89,14 +89,14 @@ class PublicationReleasePage extends Component<Props> {
                   </Link>
                 )}
                 <dl className="dfe-meta-content govuk-!-margin-top-3 govuk-!-margin-bottom-1">
-                  <dt className="govuk-caption-m">Published: </dt>
+                  <dt className="govuk-caption-m">Published:</dt>
                   <dd data-testid="published-date">
                     <strong>
                       <FormattedDate>{data.published}</FormattedDate>{' '}
                     </strong>
                   </dd>
                   <div>
-                    <dt className="govuk-caption-m">Next update: </dt>
+                    <dt className="govuk-caption-m">Next update:</dt>
                     <dd data-testid="next-update">
                       <strong>
                         <FormattedDate format="MMMM yyyy">
@@ -120,12 +120,14 @@ class PublicationReleasePage extends Component<Props> {
                 </Link>
               </div>
               <div className="govuk-grid-column-one-quarter">
-                <img
-                  src="/static/images/UKSA-quality-mark.jpg"
-                  alt="UK statistics authority quality mark"
-                  height="120"
-                  width="120"
-                />
+                {data.type && data.type.title === ReleaseType.NationalStatistics && (
+                  <img
+                    src="/static/images/UKSA-quality-mark.jpg"
+                    alt="UK statistics authority quality mark"
+                    height="120"
+                    width="120"
+                  />
+                )}
               </div>
             </div>
 
@@ -143,7 +145,7 @@ class PublicationReleasePage extends Component<Props> {
                 }
               >
                 <ul className="govuk-list govuk-list--bullet">
-                  {data.downloadFiles.map(({ extension, name, path, size }) => (
+                  {data.downloadFiles.map(({extension, name, path, size}) => (
                     <li key={path}>
                       <Link
                         to={`${baseUrl.data}/download/${path}`}
@@ -179,7 +181,7 @@ class PublicationReleasePage extends Component<Props> {
               <h2 className="govuk-heading-m">About these statistics</h2>
 
               <dl className="dfe-meta-content">
-                <dt className="govuk-caption-m">For {data.coverageTitle}: </dt>
+                <dt className="govuk-caption-m">For {data.coverageTitle}:</dt>
                 <dd data-testid="release-name">
                   <strong>{data.yearTitle}</strong>
                 </dd>
@@ -198,7 +200,7 @@ class PublicationReleasePage extends Component<Props> {
                     <ul className="govuk-list">
                       {[
                         ...data.publication.releases.map(
-                          ({ id, slug, releaseName }) => [
+                          ({id, slug, releaseName}) => [
                             releaseName,
                             <li key={id} data-testid="previous-release-item">
                               <Link
@@ -210,7 +212,7 @@ class PublicationReleasePage extends Component<Props> {
                           ],
                         ),
                         ...data.publication.legacyReleases.map(
-                          ({ id, description, url }) => [
+                          ({id, description, url}) => [
                             description,
                             <li key={id} data-testid="previous-release-item">
                               <a href={url}>{description}</a>
@@ -227,7 +229,7 @@ class PublicationReleasePage extends Component<Props> {
                 </dd>
               </dl>
               <dl className="dfe-meta-content">
-                <dt className="govuk-caption-m">Last updated: </dt>
+                <dt className="govuk-caption-m">Last updated:</dt>
                 <dd data-testid="last-updated">
                   <strong>
                     <FormattedDate>{data.updates[0].on}</FormattedDate>
@@ -283,7 +285,7 @@ class PublicationReleasePage extends Component<Props> {
 
         {data.content.length > 0 && (
           <Accordion id={this.accId[0]}>
-            {data.content.map(({ heading, caption, order, content }) => {
+            {data.content.map(({heading, caption, order, content}) => {
               return (
                 <AccordionSection
                   heading={heading}
@@ -330,49 +332,53 @@ class PublicationReleasePage extends Component<Props> {
               guidance.
             </p>
           </AccordionSection>
-          <AccordionSection heading="National Statistics" headingTag="h3">
-            <p className="govuk-body">
-              The{' '}
-              <a href="https://www.statisticsauthority.gov.uk/">
-                United Kingdom Statistics Authority
-              </a>{' '}
-              designated these statistics as National Statistics in accordance
-              with the{' '}
-              <a href="https://www.legislation.gov.uk/ukpga/2007/18/contents">
-                Statistics and Registration Service Act 2007
-              </a>{' '}
-              and signifying compliance with the Code of Practice for
-              Statistics.
-            </p>
-            <p className="govuk-body">
-              Designation signifying their compliance with the authority's{' '}
-              <a href="https://www.statisticsauthority.gov.uk/code-of-practice/the-code/">
-                Code of Practice for Statistics
-              </a>{' '}
-              which broadly means these statistics are:
-            </p>
-            <ul className="govuk-list govuk-list--bullet">
-              <li>
-                managed impartially and objectively in the public interest
-              </li>
-              <li>meet identified user needs</li>
-              <li>produced according to sound methods</li>
-              <li>well explained and readily accessible</li>
-            </ul>
-            <p className="govuk-body">
-              Once designated as National Statistics it's a statutory
-              requirement for statistics to follow and comply with the Code of
-              Practice for Statistics to be observed.
-            </p>
-            <p className="govuk-body">
-              Find out more about the standards we follow to produce these
-              statistics through our{' '}
-              <a href="https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education">
-                Standards for official statistics published by DfE
-              </a>{' '}
-              guidance.
-            </p>
-          </AccordionSection>
+          {data.type && data.type.title === ReleaseType.NationalStatistics && (
+            <AccordionSection heading="National Statistics" headingTag="h3">
+              <p className="govuk-body">
+                The{' '}
+                <a href="https://www.statisticsauthority.gov.uk/">
+                  United Kingdom Statistics Authority
+                </a>{' '}
+                designated these statistics as National Statistics in accordance
+                with the{' '}
+                <a href="https://www.legislation.gov.uk/ukpga/2007/18/contents">
+                  Statistics and Registration Service Act 2007
+                </a>{' '}
+                and signifying compliance with the Code of Practice for
+                Statistics.
+              </p>
+              <p className="govuk-body">
+                Designation signifying their compliance with the authority's{' '}
+                <a href="https://www.statisticsauthority.gov.uk/code-of-practice/the-code/">
+                  Code of Practice for Statistics
+                </a>{' '}
+                which broadly means these statistics are:
+              </p>
+              <ul className="govuk-list govuk-list--bullet">
+                <li>
+                  managed impartially and objectively in the public interest
+                </li>
+                <li>meet identified user needs</li>
+                <li>produced according to sound methods</li>
+                <li>well explained and readily accessible</li>
+              </ul>
+              <p className="govuk-body">
+                Once designated as National Statistics it's a statutory
+                requirement for statistics to follow and comply with the Code of
+                Practice for Statistics to be observed.
+              </p>
+              <p className="govuk-body">
+                Find out more about the standards we follow to produce these
+                statistics through our{' '}
+                <a
+                  href="https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education"
+                >
+                  Standards for official statistics published by DfE
+                </a>{' '}
+                guidance.
+              </p>
+            </AccordionSection>
+          )}
           <AccordionSection heading="Contact us" headingTag="h3">
             <p>
               If you have a specific enquiry about{' '}
