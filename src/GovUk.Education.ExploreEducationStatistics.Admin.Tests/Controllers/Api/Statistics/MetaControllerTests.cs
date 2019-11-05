@@ -23,11 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             releaseMetaService.Setup(s => s.GetSubjects(_releaseId))
                 .Returns(new List<IdLabel>
                 {
-                    new IdLabel
-                    {
-                        Id = 1,
-                        Label = "Absence by characteristic"
-                    }
+                    new IdLabel(1, "Absence by characteristic")
                 });
 
             _controller = new MetaController(releaseMetaService.Object);
