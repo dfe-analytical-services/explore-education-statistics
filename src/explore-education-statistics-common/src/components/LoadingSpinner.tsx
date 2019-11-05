@@ -29,7 +29,7 @@ const LoadingSpinner = ({
           [styles.overlay]: overlay,
         })}
       >
-        {text && <p className={styles.text}>{text}</p>}
+        {text || <AriaLiveMessage message={screenReaderMessage} />}
         <div
           className={classNames(styles.spinner, className)}
           style={{
@@ -39,7 +39,6 @@ const LoadingSpinner = ({
           }}
         />
       </div>
-      {text || <AriaLiveMessage message={screenReaderMessage} />}
     </>
   );
 };
