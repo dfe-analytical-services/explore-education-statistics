@@ -95,11 +95,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             return footnote == null ? NotFound() : andThen.Invoke();
         }
 
-        private Dictionary<long, IndicatorsMetaViewModel2> GetIndicators(long subjectId)
+        private Dictionary<long, FootnotesIndicatorsMetaViewModel> GetIndicators(long subjectId)
         {
             return _indicatorGroupService.GetIndicatorGroups(subjectId).ToDictionary(
                 group => group.Id,
-                group => new IndicatorsMetaViewModel2
+                group => new FootnotesIndicatorsMetaViewModel
                 {
                     Label = group.Label,
                     Options = group.Indicators.ToDictionary(
@@ -109,12 +109,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             );
         }
 
-        private Dictionary<long, FilterMetaViewModel2> GetFilters(long subjectId)
+        private Dictionary<long, FootnotesFilterMetaViewModel> GetFilters(long subjectId)
         {
             return _filterService.GetFiltersIncludingItems(subjectId)
                 .ToDictionary(
                     filter => filter.Id,
-                    filter => new FilterMetaViewModel2
+                    filter => new FootnotesFilterMetaViewModel
                     {
                         Hint = filter.Hint,
                         Legend = filter.Label,
@@ -124,10 +124,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                     });
         }
 
-        private static FilterItemsMetaViewModel2 BuildFilterItemsViewModel(FilterGroup filterGroup,
+        private static FootnotesFilterItemsMetaViewModel BuildFilterItemsViewModel(FilterGroup filterGroup,
             IEnumerable<FilterItem> filterItems)
         {
-            return new FilterItemsMetaViewModel2
+            return new FootnotesFilterItemsMetaViewModel
             {
                 Label = filterGroup.Label,
                 Options = filterItems.ToDictionary(
