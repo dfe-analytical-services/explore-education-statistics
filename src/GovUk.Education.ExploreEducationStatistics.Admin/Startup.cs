@@ -100,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 .AddApiAuthorization<ApplicationUser, UsersAndRolesDbContext>()
                 .AddProfileService<ApplicationUserProfileService>()
                 // TODO DW - this should be conditional based upon whether or not we're in dev mode
-                .AddDeveloperSigningCredential(persistKey: false);
+                .AddSigningCredentials();
             
             services
                 .AddAuthentication()

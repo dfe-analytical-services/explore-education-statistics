@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "b0064122-bcbb-4b7c-9af0-c5ca38894687",
+		"_postman_id": "798671ae-7fc9-4bce-ac4d-0e6ddc35b846",
 		"name": "DfE Admin API - Test data",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -1044,11 +1044,11 @@
 											"",
 											"pm.test(\"Fields are present\", function () {",
 											"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"label\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"content\"));",
 											"});",
 											"",
-											"pm.test(\"label should should be correct\", function () { ",
-											"    pm.expect(respJson.label).to.equal(\"Admin API test footnote 1\"); ",
+											"pm.test(\"content should should be correct\", function () { ",
+											"    pm.expect(respJson.content).to.equal(\"Admin API test footnote 1\"); ",
 											"});"
 										],
 										"type": "text/javascript"
@@ -1150,11 +1150,11 @@
 											"",
 											"pm.test(\"Fields are present\", function () {",
 											"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"label\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"content\"));",
 											"});",
 											"",
-											"pm.test(\"label should should be correct\", function () { ",
-											"    pm.expect(respJson.label).to.equal(\"Admin API test footnote 2\"); ",
+											"pm.test(\"content should should be correct\", function () { ",
+											"    pm.expect(respJson.content).to.equal(\"Admin API test footnote 2\"); ",
 											"});"
 										],
 										"type": "text/javascript"
@@ -1256,11 +1256,11 @@
 											"",
 											"pm.test(\"Fields are present\", function () {",
 											"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"label\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"content\"));",
 											"});",
 											"",
-											"pm.test(\"label should should be correct\", function () { ",
-											"    pm.expect(respJson.label).to.equal(\"Admin API test footnote 3\"); ",
+											"pm.test(\"content should should be correct\", function () { ",
+											"    pm.expect(respJson.content).to.equal(\"Admin API test footnote 3\"); ",
 											"});"
 										],
 										"type": "text/javascript"
@@ -1318,15 +1318,15 @@
 											"",
 											"pm.test(\"Fields are present\", function () {",
 											"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"label\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"content\"));",
 											"});",
 											"",
 											"pm.test(\"id should match request id\", function () {",
 											"    pm.expect(respJson.id).to.equal(pm.globals.get(\"create_footnote_filter_items_id\"));",
 											"});",
 											"",
-											"pm.test(\"label should should be correct\", function () { ",
-											"    pm.expect(respJson.label).to.equal(\"Admin API test footnote 3 - Updated\"); ",
+											"pm.test(\"content should should be correct\", function () { ",
+											"    pm.expect(respJson.content).to.equal(\"Admin API test footnote 3 - Updated\"); ",
 											"});"
 										],
 										"type": "text/javascript"
