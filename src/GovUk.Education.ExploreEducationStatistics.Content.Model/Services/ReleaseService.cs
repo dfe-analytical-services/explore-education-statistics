@@ -25,6 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services
         public ReleaseViewModel GetRelease(Guid id)
         {
             var release = _context.Releases
+                .Include(r => r.Type)
                 .Include(r => r.Content)
                 .ThenInclude(section => section.Content)
                 .Include(r => r.KeyStatistics)
@@ -66,6 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services
         public ReleaseViewModel GetLatestRelease(Guid id)
         {
             var release = _context.Releases
+                .Include(r => r.Type)
                 .Include(r => r.Content)
                 .ThenInclude(section => section.Content)
                 .Include(r => r.KeyStatistics)

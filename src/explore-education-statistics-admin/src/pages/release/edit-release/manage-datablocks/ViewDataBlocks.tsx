@@ -8,7 +8,6 @@ import { TableHeadersFormValues } from '@common/modules/table-tool/components/Ta
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import DataBlockService, {
   DataBlock,
-  DataBlockRequest,
   DataBlockRerequest,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
@@ -63,7 +62,7 @@ const ViewDataBlocks = ({
     const table = dataBlock.tables;
     const fullTable = mapFullTable(chartBuilderData);
     const tableHeadersConfig =
-      (table && table[0].tableHeaders) ||
+      (table && table.length > 0 && table[0].tableHeaders) ||
       getDefaultTableHeaderConfig(fullTable.subjectMeta);
 
     setTableData({
