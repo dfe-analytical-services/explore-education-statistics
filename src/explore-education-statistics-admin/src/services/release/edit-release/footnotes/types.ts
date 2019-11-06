@@ -4,7 +4,16 @@ export interface FootnoteMeta {
     subjectName: string;
     indicators: {
       [key: number]: {
-        //indicator props
+        //indicator "group"
+        label: string;
+        options: {
+          [key: number]: {
+            //indicator "item"
+            label: string;
+            unit: string;
+            value: string;
+          };
+        };
       };
     };
     filters: {
@@ -28,6 +37,13 @@ export interface FootnoteMeta {
       };
     };
   };
+}
+
+export interface FootnoteMetaMap {
+  filterItemsToFilterGroups: { [key: number]: number };
+  filterGroupsToFilters: { [key: number]: number };
+  filtersToSubject: { [key: number]: number };
+  indicatorsToSubject: { [key: number]: number };
 }
 
 export interface FootnoteProps {

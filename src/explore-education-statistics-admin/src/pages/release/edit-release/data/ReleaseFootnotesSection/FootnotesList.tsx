@@ -1,6 +1,7 @@
 import {
   Footnote,
   FootnoteMeta,
+  FootnoteMetaMap,
 } from '@admin/services/release/edit-release/footnotes/types';
 import footnotesService from '@admin/services/release/edit-release/footnotes/service';
 import React from 'react';
@@ -10,6 +11,7 @@ import FootnoteForm, { FootnoteFormControls } from './FootnoteForm';
 
 interface Props {
   footnoteMeta: FootnoteMeta;
+  footnoteMetaMap: FootnoteMetaMap;
   footnotes: Footnote[];
   footnoteFormControls: FootnoteFormControls;
 }
@@ -17,6 +19,7 @@ interface Props {
 const FootnotesList = ({
   footnotes,
   footnoteMeta,
+  footnoteMetaMap,
   footnoteFormControls,
 }: Props) => {
   if (footnotes.length === 0) {
@@ -53,6 +56,7 @@ const FootnotesList = ({
             state={footnoteForm.state}
             footnote={footnote}
             footnoteMeta={footnoteMeta}
+            footnoteMetaMap={footnoteMetaMap}
             onOpen={() => {}}
             onCancel={footnoteFormControls.cancel}
             onSubmit={footnoteFormControls.save}
