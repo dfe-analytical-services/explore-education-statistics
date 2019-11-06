@@ -186,7 +186,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddSingleton<DataServiceMemoryCache<GeoJson>, DataServiceMemoryCache<GeoJson>>();
             services.AddTransient<ITableStorageService, TableStorageService>(s => new TableStorageService(Configuration.GetConnectionString("CoreStorage")));
 
-            services.AddTransient<IUserService, UserService>();
             services.AddTransient<IProfileService, ApplicationUserProfileService>();
             
             services.AddSwaggerGen(c =>
