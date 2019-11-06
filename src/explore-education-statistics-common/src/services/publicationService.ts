@@ -185,6 +185,12 @@ export interface ContentBlock {
   summary?: Summary;
 }
 
+export enum ReleaseType {
+  AdHoc = 'Ad Hoc',
+  NationalStatistics = 'National Statistics',
+  OfficialStatistics = 'Official Statistics',
+}
+
 export interface AbstractRelease<ContentBlockType> {
   id: string;
   title: string;
@@ -197,6 +203,10 @@ export interface AbstractRelease<ContentBlockType> {
   publicationId: string;
   publication: Publication;
   latestRelease: boolean;
+  type: {
+    id: string;
+    title: ReleaseType;
+  };
   updates: {
     id: string;
     releaseId: string;
@@ -210,7 +220,7 @@ export interface AbstractRelease<ContentBlockType> {
     content: ContentBlockType[];
   }[];
   keyStatistics: ContentBlockType;
-  dataFiles: {
+  dataFiles?: {
     extension: string;
     name: string;
     path: string;
