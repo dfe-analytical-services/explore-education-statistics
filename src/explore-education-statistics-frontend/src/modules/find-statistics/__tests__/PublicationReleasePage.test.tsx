@@ -1,8 +1,8 @@
 import React from 'react';
-import {render} from 'react-testing-library';
+import { render } from 'react-testing-library';
 
 import PublicationReleasePage from '@frontend/modules/find-statistics/PublicationReleasePage';
-import {Release} from '@common/services/publicationService';
+import { Release } from '@common/services/publicationService';
 import OfficialStats from './__data__/content.api.response.official.stats.json';
 import NationalStats from './__data__/content.api.response.national.stats.json';
 
