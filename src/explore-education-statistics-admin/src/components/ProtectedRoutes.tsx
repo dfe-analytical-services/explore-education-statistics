@@ -1,6 +1,5 @@
 import authService from '@admin/components/api-authorization/AuthorizeService';
 import { LoginContext } from '@admin/components/Login';
-import loginService from '@admin/services/sign-in/service';
 import { Authentication, User } from '@admin/services/sign-in/types';
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 
@@ -13,6 +12,12 @@ interface State {
   user?: User;
 }
 
+/**
+ * A component that surrounds all authentication-aware Routes and provides the logged-in user details
+ *
+ * @param children
+ * @constructor
+ */
 const ProtectedRoutes = ({ children }: Props) => {
   const [authState, setAuthState] = useState<State>({
     ready: false,
@@ -26,11 +31,12 @@ const ProtectedRoutes = ({ children }: Props) => {
       await authService
         .getUser()
         .then(userProfile => {
-
           const user: User = {
             id: userProfile.sub,
             name: userProfile.given_name,
-            permissions: userProfile.role ? (userProfile.role as string).split(',') : [],
+            permissions: userProfile.role
+              ? (userProfile.role as string).split(',')
+              : [],
           };
 
           setAuthState({
