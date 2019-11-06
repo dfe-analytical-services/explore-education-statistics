@@ -131,7 +131,7 @@ const ViewDataBlocks = ({
               />
             </div>
           ) : (
-            <LoadingSpinner />
+            <LoadingSpinner text="Creating chart" />
           )}
         </TabsSection>
       </Tabs>

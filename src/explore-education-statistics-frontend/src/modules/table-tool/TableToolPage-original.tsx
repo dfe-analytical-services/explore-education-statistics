@@ -479,7 +479,11 @@ class TableToolPage extends Component<Props, State> {
                                   {permalinkLoading ? (
                                     <>
                                       Generating permanent link
-                                      <LoadingSpinner inline size={19} />
+                                      <LoadingSpinner
+                                        text="Generating permanent link"
+                                        inline
+                                        size={19}
+                                      />
                                     </>
                                   ) : (
                                     <ButtonText
