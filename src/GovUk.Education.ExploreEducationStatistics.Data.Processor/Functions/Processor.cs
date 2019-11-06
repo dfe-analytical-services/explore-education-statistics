@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
         }
 
         [FunctionName("ProcessUploads")]
-        public void ProcessUploads(
+        public async void ProcessUploads(
             [QueueTrigger("imports-pending")]
             ImportMessage message,
             ILogger logger,
@@ -62,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                 try
                 {
                     var subjectData = ProcessSubject(message);
-                    _splitFileService.SplitDataFile(collector, message, subjectData, batchSettings);
+                    await _splitFileService.SplitDataFile(collector, message, subjectData, batchSettings);
                 }
                 catch (Exception e)
                 {
@@ -79,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
         }
         
         [FunctionName("ProcessUploadsSequentially")]
-        public void ProcessUploadsSequentially(
+        public async void ProcessUploadsSequentially(
             [QueueTrigger("imports-pending-sequential")]
             ImportMessage[] messages,
             ILogger logger,
@@ -106,7 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                     logger.LogInformation($"Re-seeding for : Datafile: {message.DataFileName}");
                     ProcessSubject(message);
                     var subjectData = _fileStorageService.GetSubjectData(message).Result;
-                    _splitFileService.SplitDataFile(collector, message, subjectData, batchSettings);
+                    await _splitFileService.SplitDataFile(collector, message, subjectData, batchSettings);
                     logger.LogInformation($"First pass COMPLETE for : Datafile: {message.DataFileName}");
                 }
             }
