@@ -24,12 +24,11 @@ const LoadingSpinner = ({
     <>
       <div
         className={classNames({
+          [styles.noInlineFlex]: size >= 80 || !inline,
           [styles.container]: true,
-          [styles.inline]: inline,
           [styles.overlay]: overlay,
         })}
       >
-        {text && <p className={styles.text}>{text}</p>}
         <div
           className={classNames(styles.spinner, className)}
           style={{
@@ -38,8 +37,8 @@ const LoadingSpinner = ({
             borderWidth: `${size * 0.15}px`,
           }}
         />
+        {text || <AriaLiveMessage message={screenReaderMessage} />}
       </div>
-      {text || <AriaLiveMessage message={screenReaderMessage} />}
     </>
   );
 };

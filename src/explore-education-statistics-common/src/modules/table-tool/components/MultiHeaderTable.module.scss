@@ -1,6 +1,6 @@
 @import '../../../styles/govuk-base';
 
-$border-width: 2px;
+$border-width: 1px;
 
 /*.borderLeft {
   border-left: 0 solid govuk-colour('black') !important;
@@ -45,5 +45,12 @@ $border-width: 2px;
 }
 
 :global(.govuk-table) .cellHorizontalMiddle {
+  background: govuk-colour('light-grey');
+  border-bottom: 1px solid $govuk-border-colour;
+  border-right: 1px solid $govuk-border-colour;
   text-align: center;
+
+  &:last-child {
+    border-right: 0;
+  }
 }
