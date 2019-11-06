@@ -2,8 +2,10 @@ import {
   Footnote,
   FootnoteMeta,
   FootnoteProps,
+  FootnoteMetaMap,
 } from '@admin/services/release/edit-release/footnotes/types';
 import footnotesService from '@admin/services/release/edit-release/footnotes/service';
+import { generateFootnoteMetaMap } from '@admin/services/release/edit-release/footnotes/util';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import React, { useEffect, useState } from 'react';
 import FootnotesList from './FootnotesList';
@@ -21,10 +23,12 @@ const ReleaseFootnotesSection = ({ publicationId, releaseId }: Props) => {
   const [footnoteForm, _setFootnoteForm] = useState<FootnoteFormConfig>({
     state: 'cancel',
   });
+  const [footnoteMetaMap, setFootnoteMetaMap] = useState<FootnoteMetaMap>();
 
   useEffect(() => {
     setFootnoteMeta(dummyFootnoteMeta);
     setFootnotes(dummyFootnotes);
+    setFootnoteMetaMap(generateFootnoteMetaMap(dummyFootnoteMeta));
   }, [publicationId, releaseId]);
 
   const footnoteFormControls = {
@@ -46,7 +50,7 @@ const ReleaseFootnotesSection = ({ publicationId, releaseId }: Props) => {
   return (
     <>
       <h2>Footnotes</h2>
-      {!footnoteMeta ? (
+      {!footnoteMeta || !footnoteMetaMap ? (
         <LoadingSpinner />
       ) : (
         <>
@@ -58,11 +62,13 @@ const ReleaseFootnotesSection = ({ publicationId, releaseId }: Props) => {
             onSubmit={footnoteFormControls.save}
             isFirst={!footnotes.length}
             footnoteMeta={footnoteMeta}
+            footnoteMetaMap={footnoteMetaMap}
           />
           {footnoteMeta && (
             <FootnotesList
               footnotes={footnotes}
               footnoteMeta={footnoteMeta}
+              footnoteMetaMap={footnoteMetaMap}
               footnoteFormControls={footnoteFormControls}
             />
           )}
