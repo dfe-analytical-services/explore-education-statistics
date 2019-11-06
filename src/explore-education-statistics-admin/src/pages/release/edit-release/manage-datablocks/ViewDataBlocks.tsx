@@ -117,8 +117,10 @@ const ViewDataBlocks = ({
   return (
     <>
       <Tabs id="editDataBlockSections">
-        <TabsSection title="table">
-          {tableData && <TimePeriodDataTable {...tableData} />}
+        <TabsSection title="Table">
+          <div className="govuk-width-container">
+            {tableData && <TimePeriodDataTable {...tableData} />}
+          </div>
         </TabsSection>
         <TabsSection title="Create Chart">
           {chartBuilderData ? (
