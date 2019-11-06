@@ -120,8 +120,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                         Legend = filter.Label,
                         Options = filter.FilterGroups.ToDictionary(
                             filterGroup => filterGroup.Label.PascalCase(),
-                            filterGroup => BuildFilterItemsViewModel(filterGroup, filterGroup.FilterItems)),
-                        //TotalValue = GetTotalValue(filter)
+                            filterGroup => BuildFilterItemsViewModel(filterGroup, filterGroup.FilterItems))
                     });
         }
 

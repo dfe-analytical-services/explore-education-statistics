@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public long SubjectId { get; set; }
         public ICollection<Indicator> Indicators { get; set; }
 
-        private IndicatorGroup()
+        public IndicatorGroup()
         {
         }
 
