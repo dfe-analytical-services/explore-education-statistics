@@ -9,13 +9,18 @@ export interface FootnoteMeta {
     };
     filters: {
       [key: number]: {
-        //filter props
+        //filter
+        hint: string;
+        legend: string;
         options: {
           [key: number]: {
-            //filterGroup props
+            label: string;
+            //filterGroup
             options: {
               [key: number]: {
-                //filterItem props
+                //filterItem
+                label: string;
+                value: string;
               };
             };
           };
