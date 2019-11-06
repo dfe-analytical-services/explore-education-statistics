@@ -3,7 +3,7 @@ import { fireEvent, render } from 'react-testing-library';
 import Tabs from '../Tabs';
 import TabsSection from '../TabsSection';
 
-const hiddenSectionClass = 'govuk-tabs__panel--hidden';
+const hiddenSectionClass = 'govuk-visually-hidden';
 
 describe('Tabs', () => {
   test('renders single tab correctly', () => {

@@ -8,7 +8,6 @@ import React, {
   ReactNode,
 } from 'react';
 import ErrorMessage from '../ErrorMessage';
-import styles from './FormSelect.module.scss';
 
 export type SelectChangeEventHandler = ChangeEventHandler<HTMLSelectElement>;
 
