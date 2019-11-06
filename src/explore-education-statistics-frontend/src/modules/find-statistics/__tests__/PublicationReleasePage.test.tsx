@@ -39,7 +39,6 @@ describe('PublicationReleasePage', () => {
       />,
     );
 
-    // @ts-ignore
     const elements = [
       // @ts-ignore
       ...container.querySelectorAll(
