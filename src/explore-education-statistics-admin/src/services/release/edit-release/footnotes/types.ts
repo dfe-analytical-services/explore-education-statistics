@@ -1,11 +1,27 @@
-import { PublicationSubjectMeta } from '@common/modules/full-table/services/tableBuilderService';
-
 export interface FootnoteMeta {
   [key: number /* subjectId */]: {
     subjectId: number;
     subjectName: string;
-    indicators: PublicationSubjectMeta['indicators'];
-    filters: PublicationSubjectMeta['filters'];
+    indicators: {
+      [key: number]: {
+        //indicator props
+      };
+    };
+    filters: {
+      [key: number]: {
+        //filter props
+        options: {
+          [key: number]: {
+            //filterGroup props
+            options: {
+              [key: number]: {
+                //filterItem props
+              };
+            };
+          };
+        };
+      };
+    };
   };
 }
 
@@ -19,5 +35,5 @@ export interface FootnoteProps {
 }
 
 export interface Footnote extends FootnoteProps {
-  id: string;
+  id: number;
 }

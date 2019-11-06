@@ -1,6 +1,7 @@
 import {
   Footnote,
   FootnoteProps,
+  FootnoteMeta,
 } from '@admin/services/release/edit-release/footnotes/types';
 // import footnoteFormValidation from '@admin/services/release/edit-release/footnotes/util';
 import Link from '@admin/components/Link';
@@ -8,9 +9,8 @@ import Button from '@common/components/Button';
 import { Formik, Form, FormFieldset } from '@common/components/form';
 import Yup from '@common/lib/validation/yup';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
-import React, { ReactNode } from 'react';
+import React from 'react';
 import { FormikProps } from 'formik';
-import { dummyFootnotes } from './dummyFootnoteData';
 import styles from './FootnoteForm.module.scss';
 
 export interface FootnoteFormConfig {
@@ -19,10 +19,11 @@ export interface FootnoteFormConfig {
 }
 
 interface Props extends FootnoteFormConfig {
+  footnoteMeta: FootnoteMeta;
   isFirst?: boolean;
   onOpen: () => void;
   onCancel: () => void;
-  onSubmit?: (values: FootnoteProps, id?: string) => void;
+  onSubmit?: (values: FootnoteProps, id?: number) => void;
 }
 
 export interface FootnoteFormControls {
@@ -30,7 +31,7 @@ export interface FootnoteFormControls {
   create: () => void;
   edit: (footnote: Footnote) => void;
   cancel: () => void;
-  save: (footnote: FootnoteProps, footnoteId?: string | undefined) => void;
+  save: (footnote: FootnoteProps, footnoteId?: number | undefined) => void;
 }
 
 const FootnoteForm = ({
@@ -40,15 +41,17 @@ const FootnoteForm = ({
   onOpen,
   onCancel,
   onSubmit,
+  footnoteMeta,
 }: Props) => {
-  const renderForm = (confirmControls: ReactNode) => {
-    const formId = (footnote && footnote.id) || 'new-footnote';
+  const renderForm = () => {
+    const formId = `${(footnote && footnote.id) || 'create'}-footnote-form`;
+
     return (
       <Formik<FootnoteProps>
         initialValues={footnote || { content: '' }}
-        validationSchema={{
+        validationSchema={Yup.object<FootnoteProps>({
           content: Yup.string().required('Footnote content must be added.'),
-        }}
+        })}
         onSubmit={values => {
           return (
             onSubmit && onSubmit(values, footnote ? footnote.id : undefined)
@@ -60,6 +63,7 @@ const FootnoteForm = ({
               <FormFieldset
                 id={`${formId}-allFieldsFieldset`}
                 legend={!footnote ? 'Create new footnote' : 'Edit footnote'}
+                legendHidden
               >
                 <FormFieldTextArea<FootnoteProps>
                   id={`${formId}-content`}
@@ -67,38 +71,33 @@ const FootnoteForm = ({
                   label="Footnote"
                 />
               </FormFieldset>
-              {confirmControls}
+              <Button
+                type="submit"
+                className="govuk-button govuk-!-margin-right-3"
+              >
+                {!footnote ? 'Create' : 'Update'} Footnote
+              </Button>
+              <Link
+                to="#"
+                className="govuk-button govuk-button--secondary"
+                onClick={onCancel}
+              >
+                Cancel
+              </Link>
             </Form>
           );
         }}
       />
     );
   };
+
   const renderNewForm = () => {
     return state !== 'create' ? (
       <Button type="button" className="govuk-button" onClick={onOpen}>
         Add {!isFirst && ` another `}footnote
       </Button>
     ) : (
-      <div className={styles.container}>
-        {renderForm(
-          <>
-            <Button
-              type="submit"
-              className="govuk-button govuk-!-margin-right-3"
-            >
-              Create Footnote
-            </Button>
-            <Link
-              to="#"
-              className="govuk-button govuk-button--secondary"
-              onClick={onCancel}
-            >
-              Cancel
-            </Link>
-          </>,
-        )}
-      </div>
+      <div className={styles.container}>{renderForm()}</div>
     );
   };
 
@@ -108,26 +107,7 @@ const FootnoteForm = ({
     }
     return (
       <td colSpan={5} className="govuk-body-m">
-        {renderForm(
-          <>
-            <Button
-              type="submit"
-              className="govuk-button govuk-!-margin-right-3"
-              onClick={() =>
-                onSubmit && onSubmit(dummyFootnotes[0], dummyFootnotes[0].id)
-              }
-            >
-              Update Footnote
-            </Button>
-            <Link
-              to="#"
-              className="govuk-button govuk-button--secondary"
-              onClick={onCancel}
-            >
-              Cancel
-            </Link>
-          </>,
-        )}
+        {renderForm()}
       </td>
     );
   };

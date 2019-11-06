@@ -1,6 +1,7 @@
 import React, { ReactNode, useState } from 'react';
 import classNames from 'classnames';
 import ButtonText from './ButtonText';
+import CollapsibleList from './CollapsibleList';
 
 interface Props {
   actions?: ReactNode;
@@ -22,44 +23,6 @@ const SummaryListItem = ({
   shouldCollapse = false,
   collapseAfter = 5,
 }: Props) => {
-  const [collapsed, setCollapsed] = useState<boolean>(shouldCollapse);
-
-  function getCollapsedList() {
-    if (React.Children.count(children) > collapseAfter) {
-      if (collapsed) {
-        return (
-          <>
-            {React.Children.map(children, (child, i) => {
-              if (i >= collapseAfter - 2) {
-                return null;
-              }
-              return child;
-            })}
-            {React.Children.count(children) - (collapseAfter - 2) && (
-              <strong>
-                {`And ${React.Children.count(children) -
-                  (collapseAfter - 2)} more...`}
-                <br />
-              </strong>
-            )}
-            <ButtonText onClick={() => setCollapsed(!collapsed)}>
-              {collapsed ? 'Show All' : 'Collapse List'}
-            </ButtonText>
-          </>
-        );
-      }
-      return (
-        <>
-          {children}
-          <ButtonText onClick={() => setCollapsed(!collapsed)}>
-            {collapsed ? 'Show All' : 'Collapse List'}
-          </ButtonText>
-        </>
-      );
-    }
-    return children;
-  }
-
   return (
     <div className="govuk-summary-list__row">
       <dt
@@ -76,7 +39,13 @@ const SummaryListItem = ({
             'dfe-details-no-margin': detailsNoMargin,
           })}
         >
-          {shouldCollapse ? getCollapsedList() : children}
+          {shouldCollapse && children ? (
+            <CollapsibleList collapseAfter={collapseAfter}>
+              {children}
+            </CollapsibleList>
+          ) : (
+            children
+          )}
         </dd>
       )}
       {actions && <dd className="govuk-summary-list__actions">{actions}</dd>}

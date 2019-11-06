@@ -4,6 +4,7 @@ import {
   FootnoteProps,
 } from '@admin/services/release/edit-release/footnotes/types';
 import footnotesService from '@admin/services/release/edit-release/footnotes/service';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import React, { useEffect, useState } from 'react';
 import FootnotesList from './FootnotesList';
 import FootnoteForm, { FootnoteFormConfig } from './FootnoteForm';
@@ -33,7 +34,7 @@ const ReleaseFootnotesSection = ({ publicationId, releaseId }: Props) => {
       _setFootnoteForm({ state: 'edit', footnote });
     },
     cancel: () => _setFootnoteForm({ state: 'cancel' }),
-    save: (footnote: FootnoteProps, footnoteId?: string) => {
+    save: (footnote: FootnoteProps, footnoteId?: number) => {
       console.log(
         `updating footnote: ${footnoteId} with ${JSON.stringify(footnote)}`,
       );
@@ -45,20 +46,27 @@ const ReleaseFootnotesSection = ({ publicationId, releaseId }: Props) => {
   return (
     <>
       <h2>Footnotes</h2>
-      <FootnoteForm
-        {...footnoteForm}
-        footnote={undefined}
-        onOpen={footnoteFormControls.create}
-        onCancel={footnoteFormControls.cancel}
-        onSubmit={footnoteFormControls.save}
-        isFirst={!footnotes.length}
-      />
-      {footnoteMeta && (
-        <FootnotesList
-          footnotes={footnotes}
-          footnoteMeta={footnoteMeta}
-          footnoteFormControls={footnoteFormControls}
-        />
+      {!footnoteMeta ? (
+        <LoadingSpinner />
+      ) : (
+        <>
+          <FootnoteForm
+            {...footnoteForm}
+            footnote={undefined}
+            onOpen={footnoteFormControls.create}
+            onCancel={footnoteFormControls.cancel}
+            onSubmit={footnoteFormControls.save}
+            isFirst={!footnotes.length}
+            footnoteMeta={footnoteMeta}
+          />
+          {footnoteMeta && (
+            <FootnotesList
+              footnotes={footnotes}
+              footnoteMeta={footnoteMeta}
+              footnoteFormControls={footnoteFormControls}
+            />
+          )}
+        </>
       )}
     </>
   );

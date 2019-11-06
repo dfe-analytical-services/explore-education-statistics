@@ -5,6 +5,7 @@ import {
 import footnotesService from '@admin/services/release/edit-release/footnotes/service';
 import React from 'react';
 import Button from '@common/components/Button';
+import CollapsibleList from '@common/components/CollapsibleList';
 import FootnoteForm, { FootnoteFormControls } from './FootnoteForm';
 
 interface Props {
@@ -21,6 +22,16 @@ const FootnotesList = ({
   if (footnotes.length === 0) {
     return null;
   }
+
+  const renderItems = (items: number[]) => {
+    return (
+      <CollapsibleList>
+        {items.map(item => (
+          <li key={item}>{item}</li>
+        ))}
+      </CollapsibleList>
+    );
+  };
 
   const renderFootnoteRow = (footnote: Footnote) => {
     const {
@@ -41,6 +52,7 @@ const FootnotesList = ({
           <FootnoteForm
             state={footnoteForm.state}
             footnote={footnote}
+            footnoteMeta={footnoteMeta}
             onOpen={() => {}}
             onCancel={footnoteFormControls.cancel}
             onSubmit={footnoteFormControls.save}
@@ -48,21 +60,9 @@ const FootnotesList = ({
         ) : (
           <>
             <td>{content}</td>
-            <td>
-              {subjects.map(subject => (
-                <li key={subject}>{subject}</li>
-              ))}
-            </td>
-            <td>
-              {indicators.map(indicator => (
-                <li key={indicator}>{indicator}</li>
-              ))}
-            </td>
-            <td>
-              {filters.map(filter => (
-                <li key={filter}>{filter}</li>
-              ))}
-            </td>
+            <td>{renderItems(subjects)}</td>
+            <td>{renderItems(indicators)}</td>
+            <td>{renderItems(filters)}</td>
             <td>
               <Button
                 type="button"
