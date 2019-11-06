@@ -1,12 +1,10 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using IdentityModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -52,6 +50,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
             [Required]
             [EmailAddress]
             public string Email { get; set; }
+            
+            [Required]
+            public string FirstName { get; set; }
+            
+            [Required]
+            public string LastName { get; set; }
         }
 
         public IActionResult OnGetAsync()
@@ -98,13 +102,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                 // If the user does not have an account, then ask the user to create an account.
                 ReturnUrl = returnUrl;
                 LoginProvider = info.LoginProvider;
-                if (info.Principal.HasClaim(c => c.Type == ClaimTypes.Email))
+                var firstName = info.Principal.FindFirstValue(ClaimTypes.GivenName);
+                var lastName = info.Principal.FindFirstValue(ClaimTypes.Surname);
+
+                if (firstName == null && lastName == null)
                 {
-                    Input = new InputModel
+                    var nameClaim = info.Principal.FindFirstValue(JwtClaimTypes.Name);
+
+                    if (nameClaim.IndexOf(' ') > 0)
                     {
-                        Email = info.Principal.FindFirstValue(ClaimTypes.Email)
-                    };
+                        firstName = nameClaim.Substring(0, nameClaim.IndexOf(' '));
+                        lastName = nameClaim.Substring(nameClaim.IndexOf(' ') + 1);
+                    }
+                    else
+                    {
+                        firstName = nameClaim;
+                        lastName = "";
+                    }
+
                 }
+                Input = new InputModel
+                {
+                    Email = info.Principal.FindFirstValue(ClaimTypes.Email),
+                    FirstName = firstName,
+                    LastName = lastName
+                };
                 return Page();
             }
         }
@@ -122,7 +144,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
 
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email };
+                var user = new ApplicationUser
+                {
+                    UserName = Input.Email, 
+                    Email = Input.Email,
+                    FirstName = Input.FirstName,
+                    LastName = Input.LastName
+                };
                 var result = await _userManager.CreateAsync(user);
                 if (result.Succeeded)
                 {
