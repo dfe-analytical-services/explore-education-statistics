@@ -2,8 +2,8 @@
 
 .container {
   align-items: center;
-  display: flex;
-  flex-direction: column;
+  display: inline-flex;
+  flex-direction: row;
   justify-content: center;
   margin-bottom: govuk-spacing(2);
 }
@@ -15,6 +15,7 @@
   border-style: solid;
   border-top-color: govuk-colour('blue');
   display: block;
+  margin-right: govuk-spacing(2);
 }
 
 .inline {
@@ -42,4 +43,8 @@
 
 .text {
   margin-top: 0;
+}
+
+.noInlineFlex {
+  display: flex;
 }
