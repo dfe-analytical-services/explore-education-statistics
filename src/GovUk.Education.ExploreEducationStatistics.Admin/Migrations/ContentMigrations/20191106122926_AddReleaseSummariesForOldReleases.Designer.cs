@@ -7,9 +7,9 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
-    [DbContext(typeof(ApplicationDbContext))]
+    [DbContext(typeof(ContentDbContext))]
     [Migration("20191106122926_AddReleaseSummariesForOldReleases")]
     partial class AddReleaseSummariesForOldReleases
     {
@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
+                .HasAnnotation("ProductVersion", "2.2.6-servicing-10079")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
