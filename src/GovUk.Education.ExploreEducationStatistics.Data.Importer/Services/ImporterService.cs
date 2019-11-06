@@ -207,7 +207,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             )
         {
             // In order to "Preserve Order" of the bulk insertion need to assign a temp id which cannot exist in db
-            var lastId = _context.Observation.Select(x => x.Id).DefaultIfEmpty(1).Max() + 1;
+            // N.B. original code : "_context.Observation.Select(x => x.Id).DefaultIfEmpty(1).Max() + 1" appears to broken in core 3.0
+            var o = _context.Observation.OrderByDescending(x => x.Id)
+                .FirstOrDefault();
+            var lastId = o?.Id + 1 ?? 1;
+            
             return lines.Select((line, i) =>
             {
                 var csvRowNum = ((batchNo - 1) * rowsPerBatch) + i + 2;
