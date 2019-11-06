@@ -32,8 +32,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             
             // add role and profile info to JWT claims
             context.IssuedClaims.AddRange(roleClaims);
-            context.IssuedClaims.Add(new Claim(ClaimTypes.GivenName, user.FirstName));
-            context.IssuedClaims.Add(new Claim(ClaimTypes.Surname, user.LastName));
+            context.IssuedClaims.Add(new Claim(JwtClaimTypes.GivenName, user.FirstName));
+            context.IssuedClaims.Add(new Claim(JwtClaimTypes.FamilyName, user.LastName));
         }
 
         public Task IsActiveAsync(IsActiveContext context)

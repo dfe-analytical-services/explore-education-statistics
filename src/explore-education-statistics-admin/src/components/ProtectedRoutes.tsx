@@ -23,9 +23,16 @@ const ProtectedRoutes = ({ children }: Props) => {
     const authenticated = await authService.isAuthenticated();
 
     if (authenticated) {
-      await loginService
-        .getUserDetails()
-        .then(user => {
+      await authService
+        .getUser()
+        .then(userProfile => {
+
+          const user: User = {
+            id: userProfile.sub,
+            name: userProfile.given_name,
+            permissions: userProfile.role ? (userProfile.role as string).split(',') : [],
+          };
+
           setAuthState({
             ready: true,
             user,
