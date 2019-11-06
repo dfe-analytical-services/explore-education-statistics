@@ -5,7 +5,6 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.Statistics;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Authorization;
@@ -96,46 +95,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             return footnote == null ? NotFound() : andThen.Invoke();
         }
 
-        private Dictionary<string, IndicatorsMetaViewModel> GetIndicators(long subjectId)
+        private Dictionary<long, IndicatorsMetaViewModel2> GetIndicators(long subjectId)
         {
             return _indicatorGroupService.GetIndicatorGroups(subjectId).ToDictionary(
-                group => group.Label.PascalCase(),
-                group => new IndicatorsMetaViewModel
+                group => group.Id,
+                group => new IndicatorsMetaViewModel2
                 {
                     Label = group.Label,
-                    Options = _mapper.Map<IEnumerable<IndicatorMetaViewModel>>(group.Indicators)
+                    Options = group.Indicators.ToDictionary(
+                        indicator => indicator.Id,
+                        indicator => _mapper.Map<IndicatorMetaViewModel>(indicator))
                 }
             );
         }
 
-        // TODO copied from TableBuilderSubjectMetaService#GetFilters (optimisation for getting all filters for subject id)
-        private Dictionary<string, FilterMetaViewModel> GetFilters(long subjectId)
+        private Dictionary<long, FilterMetaViewModel2> GetFilters(long subjectId)
         {
             return _filterService.GetFiltersIncludingItems(subjectId)
                 .ToDictionary(
-                    filter => filter.Label.PascalCase(),
-                    filter => new FilterMetaViewModel
+                    filter => filter.Id,
+                    filter => new FilterMetaViewModel2
                     {
                         Hint = filter.Hint,
                         Legend = filter.Label,
                         Options = filter.FilterGroups.ToDictionary(
-                            filterGroup => filterGroup.Label.PascalCase(),
+                            filterGroup => filterGroup.Id,
                             filterGroup => BuildFilterItemsViewModel(filterGroup, filterGroup.FilterItems))
                     });
         }
 
-        // TODO copied from AbstractTableBuidlerSubjectMetaService
-        private static FilterItemsMetaViewModel BuildFilterItemsViewModel(FilterGroup filterGroup,
+        private static FilterItemsMetaViewModel2 BuildFilterItemsViewModel(FilterGroup filterGroup,
             IEnumerable<FilterItem> filterItems)
         {
-            return new FilterItemsMetaViewModel
+            return new FilterItemsMetaViewModel2
             {
                 Label = filterGroup.Label,
-                Options = filterItems.Select(item => new LabelValue
-                {
-                    Label = item.Label,
-                    Value = item.Id.ToString()
-                })
+                Options = filterItems.ToDictionary(
+                    item => item.Id,
+                    item => new LabelValue
+                    {
+                        Label = item.Label,
+                        Value = item.Id.ToString()
+                    })
             };
         }
     }

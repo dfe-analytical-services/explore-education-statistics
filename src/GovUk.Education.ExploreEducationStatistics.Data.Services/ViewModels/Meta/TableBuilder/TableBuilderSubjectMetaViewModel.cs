@@ -6,7 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Me
     {
         public Dictionary<string, FilterMetaViewModel> Filters { get; set; }
 
-        public Dictionary<string, IndicatorsMetaViewModel> Indicators { get; set; }
+        public Dictionary<string, TableBuilderIndicatorsMetaViewModel> Indicators { get; set; }
 
         public Dictionary<string, TableBuilderObservationalUnitsMetaViewModel> Locations { get; set; }
 

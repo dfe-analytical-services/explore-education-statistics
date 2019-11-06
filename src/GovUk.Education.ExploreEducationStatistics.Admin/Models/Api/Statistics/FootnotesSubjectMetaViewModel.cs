@@ -5,12 +5,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.Statistics
 {
     public class FootnotesSubjectMetaViewModel
     {
-        public Dictionary<string, FilterMetaViewModel> Filters { get; set; }
-        
-        public Dictionary<string, IndicatorsMetaViewModel> Indicators { get; set; }
-        
+        public Dictionary<long, FilterMetaViewModel2> Filters { get; set; }
+
+        public Dictionary<long, IndicatorsMetaViewModel2> Indicators { get; set; }
+
         public long SubjectId { get; set; }
-        
+
         public string SubjectName { get; set; }
     }
 }
