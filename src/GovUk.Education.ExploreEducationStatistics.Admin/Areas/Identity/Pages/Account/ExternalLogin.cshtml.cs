@@ -119,7 +119,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                         firstName = nameClaim;
                         lastName = "";
                     }
-
                 }
                 Input = new InputModel
                 {

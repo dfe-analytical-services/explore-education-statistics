@@ -1,20 +1,39 @@
+using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using IdentityModel;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
+using Microsoft.AspNetCore.Identity;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class ApplicationUserProfileService : IProfileService
     {
-        Task IProfileService.GetProfileDataAsync(ProfileDataRequestContext context)
-        {
-            // get role claims from ClaimsPrincipal 
-            var roleClaims = context.Subject.FindAll(JwtClaimTypes.Role);
+        private readonly UserManager<ApplicationUser> _userManager;
 
-            // add role claims to the generated JWT
+        public ApplicationUserProfileService(UserManager<ApplicationUser> userManager)
+        {
+            _userManager = userManager;
+        }
+
+        async Task IProfileService.GetProfileDataAsync(ProfileDataRequestContext context)
+        {
+            // 2 different calls to this endpoint (one to generate the JWT, the other to retrieve user information
+            // as per the OpenId /userinfo endpoint) provide different ID claims for which we need to look up our user
+            var userId = context.Subject.FindFirst(claim => 
+                claim.Type == JwtClaimTypes.Subject || 
+                claim.Type == ClaimTypes.NameIdentifier).Value;
+            
+            var user = await _userManager.FindByIdAsync(userId);
+            var roles = await _userManager.GetRolesAsync(user);
+            var roleClaims = roles.Select(role => new Claim(JwtClaimTypes.Role, role));
+            
+            // add role and profile info to JWT claims
             context.IssuedClaims.AddRange(roleClaims);
-            return Task.CompletedTask;
+            context.IssuedClaims.Add(new Claim(ClaimTypes.GivenName, user.FirstName));
+            context.IssuedClaims.Add(new Claim(ClaimTypes.Surname, user.LastName));
         }
 
         public Task IsActiveAsync(IsActiveContext context)

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
@@ -104,11 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             
             services
                 .AddAuthentication()
-                .AddOpenIdConnect(options =>
-                {
-                    Configuration.GetSection("OpenIdConnect").Bind(options);
-                    options.GetClaimsFromUserInfoEndpoint = true;
-                })
+                .AddOpenIdConnect(options => Configuration.GetSection("OpenIdConnect").Bind(options))
                 .AddIdentityServerJwt();
 
             // This configuration has to occur after the AddAuthentication() block as it is otherwise overridden.
