@@ -1,5 +1,5 @@
 *** Settings ***
-Resource    ../libs/common.robot
+Resource    ../libs/public-common.robot
 
 Force Tags  GeneralPublic  Local  Dev  Test
 
@@ -24,7 +24,8 @@ Should only be one link to absence methodology page
 
 User navigates to absence methodology page
     [Tags]  HappyPath
-    user clicks element     xpath://ul/h3[text()="Pupil absence statistics: methodology"]/../div/a[text()="View methodology"]
+    user checks page contains methodology link   Pupil absence   Pupil absence statistics: methodology     /methodology/pupil-absence-in-schools-in-england
+    user clicks methodology link   Pupil absence   Pupil absence statistics: methodology
     user waits until page contains heading   Pupil absence statistics: methodology
 
 Validate Published date, Last updated date

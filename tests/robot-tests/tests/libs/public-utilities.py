@@ -1,5 +1,6 @@
 from robot.libraries.BuiltIn import BuiltIn
 from selenium.webdriver.common.action_chains  import ActionChains
+from selenium.common.exceptions import NoSuchElementException
 sl = BuiltIn().get_library_instance('SeleniumLibrary')
 import os
 import re
@@ -121,6 +122,23 @@ def user_checks_page_contains_methodology_link(topic, methodology, link_url):
         sl.driver.find_element_by_xpath(f'//h3[text()="{methodology}"]/..//a[text()="View methodology" and @href="{link_url}"]')
     except:
         raise AssertionError(f'View methodology link for "{methodology}" should be linking to "{link_url}"!')
+
+def user_clicks_methodology_link(topic, methodology):
+    try:
+        sl.driver.find_element_by_xpath(f'//summary/span[text()="{topic}"]')
+    except:
+        raise AssertionError(f'Cannot find theme "{topic}" on page')
+
+    try:
+        elem = sl.driver.find_element_by_xpath(f'//summary/span[text()="{topic}"]/../..//h3[text()="{methodology}"]')
+    except:
+        raise AssertionError(f'Topic "{topic}" doesn\'t contain methodology "{methodology}"!')
+
+    try:
+        sl.driver.find_element_by_xpath(f'//h3[text()="{methodology}"]/..//a[text()="View methodology"]').click()
+    except:
+        raise AssertionError(f'Cannot click "View methodology" link for "{methodology}"!')
+
 
 # Table tool
 def user_checks_generated_permalink_is_valid():
