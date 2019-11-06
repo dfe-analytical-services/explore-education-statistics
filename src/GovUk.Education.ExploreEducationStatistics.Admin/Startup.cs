@@ -111,9 +111,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             // this Claim is renamed via the DefaultInboundClaimTypeMap earlier in the login process).
             //
             // It doesn't seem to be possible to remove the renaming (via
-            // JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("sub")) because seom mechanism earlier in the 
+            // JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("sub")) because some mechanism earlier in the 
             // authentication process requires it to be in the Claim named
-            // "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier.
+            // "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier" rather than "sub".
             services.Configure<IdentityOptions>(options =>
             {
                 options.ClaimsIdentity.UserIdClaimType = ClaimTypes.NameIdentifier;
