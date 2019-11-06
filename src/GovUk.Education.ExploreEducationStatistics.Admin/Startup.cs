@@ -1,4 +1,6 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
@@ -15,6 +17,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
+using IdentityServer4.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -94,18 +97,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     options.Events.RaiseFailureEvents = true;
                     options.Events.RaiseSuccessEvents = true;
                 })
-                .AddApiAuthorization<ApplicationUser, UsersAndRolesDbContext>(options =>
-                {
-                    // This config gets the logged in user's local Roles added to the HttpContext User principal for
-                    // authorization checking purposes
-                    options.ApiResources[0].UserClaims.Add("role");
-                })
+                .AddApiAuthorization<ApplicationUser, UsersAndRolesDbContext>()
+                .AddProfileService<ApplicationUserProfileService>()
                 // TODO DW - this should be conditional based upon whether or not we're in dev mode
-                .AddDeveloperSigningCredential(persistKey: false);
+                .AddSigningCredentials();
             
             services
                 .AddAuthentication()
-                .AddOpenIdConnect(options => Configuration.GetSection("OpenIdConnect").Bind(options))
+                .AddOpenIdConnect(options =>
+                {
+                    Configuration.GetSection("OpenIdConnect").Bind(options);
+                    options.GetClaimsFromUserInfoEndpoint = true;
+                })
                 .AddIdentityServerJwt();
 
             // This configuration has to occur after the AddAuthentication() block as it is otherwise overridden.
@@ -182,6 +185,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
             services.AddSingleton<DataServiceMemoryCache<GeoJson>, DataServiceMemoryCache<GeoJson>>();
             services.AddTransient<ITableStorageService, TableStorageService>(s => new TableStorageService(Configuration.GetConnectionString("CoreStorage")));
+
+            services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IProfileService, ApplicationUserProfileService>();
             
             services.AddSwaggerGen(c =>
             {
