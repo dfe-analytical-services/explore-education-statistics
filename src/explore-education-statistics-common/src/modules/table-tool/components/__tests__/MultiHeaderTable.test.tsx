@@ -1,6 +1,11 @@
 import React from 'react';
 import { render } from 'react-testing-library';
-import MultiHeaderTable from '../MultiHeaderTable';
+import MultiHeaderTable, {
+  generateAggregatedGroups,
+  generateSpanInfoFromHeaders,
+  SpanInfo,
+  transposeSpanColumnsToRows,
+} from '../MultiHeaderTable';
 
 describe('MultiHeaderTable', () => {
   test('renders 2x2 table correctly', () => {
@@ -167,6 +172,176 @@ describe('MultiHeaderTable', () => {
     );
     expect(container.querySelectorAll('tbody tr:nth-child(8) td')).toHaveLength(
       8,
+    );
+
+    expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('transposeSpanInfoMatrix', () => {
+    const source = [
+      [
+        {
+          heading: 'A',
+          count: 1,
+          start: 0,
+        },
+        {
+          heading: 'B',
+          count: 1,
+          start: 1,
+        },
+      ],
+      [
+        {
+          heading: 'X',
+          count: 2,
+          start: 0,
+        },
+      ],
+    ] as SpanInfo[][];
+
+    const transposed = transposeSpanColumnsToRows(source);
+
+    expect(transposed).toStrictEqual([
+      [
+        { heading: 'A', count: 1, start: 0 },
+        { heading: 'X', count: 2, start: 0 },
+      ],
+      [{ heading: 'B', count: 1, start: 1 }],
+    ]);
+  });
+
+  test('generateAggregatedGroups', () => {
+    const data = [
+      ['England'],
+      ['Total', 'Gender', undefined],
+      ['Total', 'Gender male', 'Gender female'],
+      ['auth'],
+    ];
+
+    const result = generateAggregatedGroups(data, [false, true, false, false]);
+
+    expect(result).toStrictEqual([
+      ['England', undefined, undefined],
+      ['Total', 'Gender', undefined],
+      ['Total', 'Gender male', 'Gender female'],
+      ['auth', 'auth', 'auth'],
+    ]);
+  });
+
+  test('generateSpanInfoFromHeaders', () => {
+    const data = [
+      ['England'],
+      ['Total', 'Gender', undefined],
+      ['Total', 'Gender male', 'Gender female'],
+      ['auth'],
+    ];
+
+    const result = generateSpanInfoFromHeaders(data, [
+      false,
+      true,
+      false,
+      false,
+    ]);
+
+    expect(result).toStrictEqual([
+      [{ heading: 'England', count: 3, start: 0, isGroup: true }],
+      [
+        { heading: 'Total', count: 1, start: 0, isGroup: true },
+        { heading: 'Gender', count: 2, start: 1, isGroup: true },
+      ],
+      [
+        { heading: 'Total', count: 1, start: 0, isGroup: true },
+        { heading: 'Gender male', count: 1, start: 1, isGroup: true },
+        { heading: 'Gender female', count: 1, start: 2, isGroup: true },
+      ],
+      [
+        { heading: 'auth', count: 1, start: 0, isGroup: false },
+        { heading: 'auth', count: 1, start: 1, isGroup: false },
+        { heading: 'auth', count: 1, start: 2, isGroup: false },
+      ],
+    ]);
+  });
+
+  test('renders 2x2 with row group table correctly', () => {
+    const { container } = render(
+      <MultiHeaderTable
+        columnHeaders={[['A', 'B'], ['C', 'D']]}
+        rowHeaders={[['1', '2'], [undefined, '4']]}
+        rowHeaderIsGroup={[true, false]}
+        rows={[
+          ['AC13', 'AD13', 'BC13', 'BD13'],
+          ['AC14', 'AD14', 'BC14', 'BD14'],
+        ]}
+      />,
+    );
+
+    expect(container.querySelectorAll('thead tr')).toHaveLength(2);
+
+    expect(
+      container.querySelectorAll('thead tr:nth-child(1) th[scope="colgroup"]'),
+    ).toHaveLength(2);
+    expect(
+      container.querySelectorAll('thead tr:nth-child(2) th[scope="col"]'),
+    ).toHaveLength(4);
+
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(2);
+
+    expect(
+      container.querySelectorAll('tbody tr:nth-child(1) th[rowspan="2"]'),
+    ).toBeDefined();
+
+    expect(container.querySelectorAll('tbody tr:nth-child(1) td')).toHaveLength(
+      4,
+    );
+    expect(container.querySelectorAll('tbody tr:nth-child(2) td')).toHaveLength(
+      4,
+    );
+
+    expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('renders 2x2 with column group table correctly', () => {
+    const { container } = render(
+      <MultiHeaderTable
+        columnHeaders={[['A', undefined], ['C', 'D']]}
+        columnHeaderIsGroup={[true, false]}
+        rowHeaders={[['1', '2'], ['3', '4']]}
+        rows={[
+          ['AC13', 'AD13'],
+          ['AC14', 'AD14'],
+          ['AC23', 'AD23'],
+          ['AC24', 'AD24'],
+        ]}
+      />,
+    );
+
+    expect(container.querySelectorAll('thead tr')).toHaveLength(2);
+
+    expect(
+      container.querySelectorAll('thead tr:nth-child(1) th[scope="colgroup"]'),
+    ).toHaveLength(1);
+    expect(
+      container.querySelectorAll('thead tr:nth-child(2) th[scope="col"]'),
+    ).toHaveLength(2);
+
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(4);
+
+    expect(
+      container.querySelectorAll('tbody tr:nth-child(1) th[rowspan="2"]'),
+    ).toBeDefined();
+
+    expect(container.querySelectorAll('tbody tr:nth-child(1) td')).toHaveLength(
+      2,
+    );
+    expect(container.querySelectorAll('tbody tr:nth-child(2) td')).toHaveLength(
+      2,
+    );
+    expect(container.querySelectorAll('tbody tr:nth-child(3) td')).toHaveLength(
+      2,
+    );
+    expect(container.querySelectorAll('tbody tr:nth-child(4) td')).toHaveLength(
+      2,
     );
 
     expect(container.innerHTML).toMatchSnapshot();

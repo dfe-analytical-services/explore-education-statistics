@@ -121,6 +121,11 @@ function App() {
         />
         <ProtectedRoute
           exact
+          path="/documentation/create-new-publication"
+          component={AdminDocumentationCreateNewPublication}
+        />
+        <ProtectedRoute
+          exact
           path="/documentation/edit-release"
           component={AdminDocumentationEditRelease}
         />
@@ -138,11 +143,6 @@ function App() {
           exact
           path="/documentation/manage-data-block"
           component={AdminDocumentationManageDataBlocks}
-        />
-        <ProtectedRoute
-          exact
-          path="/prototypes/documentation/create-new-publication"
-          component={AdminDocumentationCreateNewPublication}
         />
       </ProtectedRoutes>
 

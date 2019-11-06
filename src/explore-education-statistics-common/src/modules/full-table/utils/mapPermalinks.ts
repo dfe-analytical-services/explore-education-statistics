@@ -1,3 +1,4 @@
+import { transformTableMetaFiltersToCategoryFilters } from '@common/modules/table-tool/components/utils/tableToolHelpers';
 import {
   CategoryFilter,
   Indicator,
@@ -11,10 +12,7 @@ import {
   UnmappedPermalink,
   UnmappedTableHeadersConfig,
 } from '../services/permalinkService';
-import {
-  TableHeadersConfig,
-  transformTableMetaFiltersToCategoryFilters,
-} from './tableHeaders';
+import { TableHeadersConfig } from './tableHeaders';
 import { FullTable, FullTableMeta } from '../types/fullTable';
 
 const reverseMapTableHeadersConfig = (

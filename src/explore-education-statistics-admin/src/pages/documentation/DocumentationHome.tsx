@@ -80,6 +80,16 @@ const BrowseReleasesPage = () => {
       </p>
 
       <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
+        <Link to="/documentation/create-new-publication">
+          Creating a new publication
+        </Link>
+      </h3>
+      <p className="govuk-caption-m govuk-!-margin-top-1">
+        How to create a new publication - including adding a methodology and
+        contact details.
+      </p>
+
+      <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
         <Link to="/documentation/create-new-release">
           Creating a new release
         </Link>

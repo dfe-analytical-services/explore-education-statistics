@@ -29,7 +29,6 @@ import { Dictionary } from '@common/types';
 import mapValues from 'lodash/mapValues';
 import { SortableOption } from '@common/modules/table-tool/components/FormSortableList';
 import { DataBlockMetadata } from '@common/services/dataBlockService';
-import { UnmappedFullTable } from '@common/modules/full-table/services/permalinkService';
 
 export interface DateRangeState {
   startYear?: number;
@@ -38,12 +37,17 @@ export interface DateRangeState {
   endCode?: string;
 }
 
-const transformTableMetaFiltersToCategoryFilters = (
-  filters: DataBlockMetadata['filters'],
+export const transformTableMetaFiltersToCategoryFilters = (
+  filters: DataBlockMetadata['filters'] | FullTableMeta['filters'],
 ): Dictionary<CategoryFilter[]> => {
   return mapValuesWithKeys(filters, (filterKey, filterValue) =>
     Object.values(filterValue.options)
-      .flatMap(options => options.options)
+      .flatMap(options => {
+        return options.options.map(option => ({
+          ...option,
+          filterGroup: options.label,
+        }));
+      })
       .map(
         filter =>
           new CategoryFilter(filter, filter.value === filterValue.totalValue),
@@ -84,7 +88,7 @@ export const reverseMapTableHeadersConfig = (
         const i = fullTableSubjectMeta.indicators.find(
           indicator => indicator.value === value,
         ) as Indicator;
-        if (i) return new Indicator(i);
+        if (i) return new Indicator({ ...i });
         return i;
       })
       .filter(_ => _ !== undefined);
@@ -282,6 +286,7 @@ export const tableGeneration = async (
 
   const unmappedCreatedTable = await queryForTable(query, releaseId);
   const table = mapFullTable(unmappedCreatedTable);
+
   const tableHeaders = getDefaultTableHeaderConfig(table.subjectMeta);
 
   return {

@@ -18,6 +18,10 @@
   caption {
     @extend .govuk-table__caption;
   }
+
+  .govuk-table__header--center {
+    text-align: center;
+  }
 }
 
 .govuk-table__row--striped {
