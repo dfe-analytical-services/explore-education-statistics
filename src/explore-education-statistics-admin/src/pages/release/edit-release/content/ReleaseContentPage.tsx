@@ -1,16 +1,25 @@
+import Link from '@admin/components/Link';
 import BasicReleaseSummary from '@admin/pages/release/edit-release/content/components/BasicReleaseSummary';
+import EditableMarkdownRenderer from '@admin/pages/release/edit-release/content/components/EditableMarkdownRenderer';
+import EditableTextRenderer from '@admin/pages/release/edit-release/content/components/EditableTextRenderer';
+import PrintThisPage from '@admin/pages/release/edit-release/content/components/PrintThisPage';
 import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
 import { getTimePeriodCoverageDateRangeStringShort } from '@admin/pages/release/util/releaseSummaryUtil';
+import { BasicPublicationDetails } from '@admin/services/common/types';
 import { Comment } from '@admin/services/dashboard/types';
-import releaseService from '@admin/services/release/edit-release/summary/service';
+import releaseSummaryService from '@admin/services/release/edit-release/summary/service';
+import releaseContentService from '@admin/services/release/edit-release/content/service';
 import { ReleaseSummaryDetails } from '@admin/services/release/types';
 import FormFieldset from '@common/components/form/FormFieldset';
 import FormRadioGroup from '@common/components/form/FormRadioGroup';
 import WarningMessage from '@common/components/WarningMessage';
 import classNames from 'classnames';
 import React, { useContext, useEffect, useState } from 'react';
+import PublicationReleaseContent from '@common/modules/find-statistics/PublicationReleaseContent';
+import { AbstractRelease, ContentBlock } from '@common/services/publicationService';
+import PageSearchForm from '@common/components/PageSearchForm';
 
 type PageMode = 'edit' | 'preview';
 
@@ -27,8 +36,10 @@ const ReleaseContentPage = () => {
     ManageReleaseContext,
   ) as ManageRelease;
 
+  const [release, setRelease] = useState<AbstractRelease<ContentBlock>>();
+
   useEffect(() => {
-    releaseService.getReleaseSummaryDetails(releaseId).then(releaseSummary => {
+    releaseSummaryService.getReleaseSummaryDetails(releaseId).then(releaseSummary => {
       const unresolvedComments: Comment[] = [
         {
           message: 'Please resolve this.\nThank you.',
@@ -48,8 +59,46 @@ const ReleaseContentPage = () => {
         releaseSummary,
       });
     });
+
+    releaseContentService.getRelease(releaseId).then(releaseData => {
+
+      const populatedData : AbstractRelease<ContentBlock> = {
+        ...releaseData,
+        updates: [
+          {
+            id: "",
+            on: "",
+            reason: "",
+            releaseId: ""
+          }
+        ],
+        publication: {
+          ...publication,
+          slug: '',
+          description: '',
+          dataSource: '',
+          summary: '',
+          releases: [],
+          legacyReleases: [],
+          topic: {
+            theme: {
+              title: ''
+            }
+          },
+          nextUpdate: '',
+          contact: {
+            contactName: '',
+            contactTelNo: '',
+            teamEmail: '',
+            teamName: ''
+          }
+        }
+      };
+      setRelease(populatedData);
+    });
   }, [releaseId]);
 
+  // @ts-ignore
   return (
     <>
       {model && (
@@ -117,6 +166,17 @@ const ReleaseContentPage = () => {
                 </div>
               </div>
             </div>
+            {release && (
+              <PublicationReleaseContent
+                data={release}
+                styles={{}}
+                TextRenderer={EditableTextRenderer}
+                MarkdownRenderer={EditableMarkdownRenderer}
+                Link={Link}
+                PrintThisPage={PrintThisPage}
+                SearchForm={PageSearchForm}
+              />
+            )}
           </div>
         </>
       )}
