@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -191,7 +192,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var releaseId = new Guid("02c73027-3e06-4495-82a4-62b778c005a9");
             var addHocReleaseTypeId = new Guid("f3800c32-1e1c-4d42-8165-d1bcb3c8b47c");
-            var officialStatisticsReleaseTypeId = new Guid("fdc4dd4c-85f7-49dd-87a4-e04446bc606f");
+            var officialStatisticsReleaseType = new ReleaseType
+            {
+                Id = new Guid("fdc4dd4c-85f7-49dd-87a4-e04446bc606f"),
+                Title = "Official Statistics"
+            };
+
             using (var context = InMemoryApplicationDbContext("LatestReleaseCorrectlyReported"))
             {
                 context.AddRange(new List<ReleaseType>
@@ -201,11 +207,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Id = addHocReleaseTypeId,
                         Title = "Ad Hoc"
                     },
-                    new ReleaseType
-                    {
-                        Id = officialStatisticsReleaseTypeId,
-                        Title = "Official Statistics"
-                    }
+                    officialStatisticsReleaseType
                 });
                 context.Add(new Publication
                 {
@@ -237,7 +239,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             
             var publishScheduledEdited = DateTime.Now.AddDays(1);
             var nextReleaseDateEdited = new PartialDate {Day = "1", Month = "1", Year = "2040"};
-            var typeEditedId = officialStatisticsReleaseTypeId;
+            var typeEdited = officialStatisticsReleaseType;
             const string releaseNameEdited = "2035";
             const TimeIdentifier timePeriodCoverageEdited = TimeIdentifier.March;
             
@@ -246,19 +248,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Method under test 
                 var edited = await new ReleaseService(context, MapperForProfile<MappingProfiles>())
                     .EditReleaseSummaryAsync(
-                        new ReleaseSummaryViewModel
+                        releaseId,
+                        new UpdateReleaseSummaryRequest
                         {
-                            Id = releaseId,
                             PublishScheduled = publishScheduledEdited,
                             NextReleaseDate = nextReleaseDateEdited,
-                            TypeId = typeEditedId,
+                            Type = typeEdited,
                             ReleaseName = releaseNameEdited,
                             TimePeriodCoverage = timePeriodCoverageEdited
                         });
 
                 Assert.Equal(publishScheduledEdited, edited.Right.PublishScheduled);
                 Assert.Equal(nextReleaseDateEdited, edited.Right.NextReleaseDate);
-                Assert.Equal(typeEditedId, edited.Right.TypeId);
+                Assert.Equal(typeEdited, edited.Right.Type);
                 Assert.Equal(releaseNameEdited, edited.Right.ReleaseName);
                 Assert.Equal(timePeriodCoverageEdited, edited.Right.TimePeriodCoverage);
             }
@@ -268,7 +270,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async void GetReleaseSummaryAsync()
         {
             var releaseId = new Guid("5cf345d4-7f7b-425c-8267-de785cfc040b");
-            var addHocReleaseTypeId = new Guid("19b024dc-339c-4e2c-b2ca-b55e5c509ad2");
+            var adhocReleaseType = new ReleaseType
+            {
+                Id = new Guid("19b024dc-339c-4e2c-b2ca-b55e5c509ad2"),
+                Title = "Ad Hoc"
+            };
             var publishScheduled = DateTime.Now.AddDays(1);
             var nextReleaseDate = new PartialDate {Day = "1", Month = "1", Year = "2040"};
             const string releaseName = "2035";
@@ -277,11 +283,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 context.AddRange(new List<ReleaseType>
                 {
-                    new ReleaseType
-                    {
-                        Id = addHocReleaseTypeId,
-                        Title = "Ad Hoc"
-                    },
+                    adhocReleaseType,
                 });
 
                 context.Add(new Publication
@@ -292,7 +294,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         new Release
                         {
                             Id = releaseId,
-                            TypeId = addHocReleaseTypeId,
+                            TypeId = adhocReleaseType.Id,
+                            Type = adhocReleaseType,
                             TimePeriodCoverage = TimeIdentifier.January,
                             PublishScheduled = publishScheduled,
                             NextReleaseDate = nextReleaseDate,
@@ -306,7 +309,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                         Id = new Guid("25f43cba-faee-4b0a-a9d4-a3d114a5f6df"),
                                         Created = DateTime.Now,
                                         Summary = "",
-                                        TypeId = addHocReleaseTypeId,
+                                        TypeId = adhocReleaseType.Id,
+                                        Type = adhocReleaseType,
                                         PublishScheduled = publishScheduled,
                                         NextReleaseDate = nextReleaseDate,
                                         ReleaseName = releaseName,
@@ -328,7 +332,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(publishScheduled, summary.PublishScheduled);
                 Assert.Equal(nextReleaseDate, summary.NextReleaseDate);
-                Assert.Equal(addHocReleaseTypeId, summary.TypeId);
+                Assert.Equal(adhocReleaseType, summary.Type);
                 Assert.Equal(releaseName, summary.ReleaseName);
                 Assert.Equal(timePeriodCoverage, summary.TimePeriodCoverage);
             }

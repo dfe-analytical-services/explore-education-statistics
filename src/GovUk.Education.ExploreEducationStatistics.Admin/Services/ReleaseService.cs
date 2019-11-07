@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -97,32 +98,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Where(r => r.Id == releaseId)
                 .Include(r => r.ReleaseSummary)
                 .ThenInclude(summary => summary.Versions)
+                .Include(summary => summary.Type)
                 .FirstOrDefaultAsync();
             return _mapper.Map<ReleaseSummaryViewModel>(release.ReleaseSummary);
         }
 
         // TODO Authorisation will be required when users are introduced
         public async Task<Either<ValidationResult, ReleaseViewModel>> EditReleaseSummaryAsync(
-            ReleaseSummaryViewModel model)
+            Guid releaseId, UpdateReleaseSummaryRequest request)
         {
-            var publication = await GetAsync(model.Id);
-            return await ValidateReleaseSlugUniqueToPublication(model.Slug, publication.Id, model.Id)
+            var publication = await GetAsync(releaseId);
+            return await ValidateReleaseSlugUniqueToPublication(request.Slug, publication.Id, releaseId)
                 .OnSuccess(async () =>
                 {
                     var release = await _context.Releases
-                        .Where(r => r.Id == model.Id)
+                        .Where(r => r.Id == releaseId)
                         .Include(r => r.ReleaseSummary)
                         .ThenInclude(summary => summary.Versions)
                         .FirstOrDefaultAsync();
+
+                    release.Slug = request.Slug;
+                    release.TypeId = request.Type.Id;
+                    release.PublishScheduled = request.PublishScheduled;
+                    release.ReleaseName = request.ReleaseName;
+                    release.NextReleaseDate = request.NextReleaseDate;
+                    release.TimePeriodCoverage = request.TimePeriodCoverage;
                     
-                    var newSummary = _mapper.Map<ReleaseSummaryVersion>(model);
-                    newSummary.Created = DateTime.Now;
-                    newSummary.Summary = release.ReleaseSummary.Current.Summary;
-                    _mapper.Map(model, release);
-                    release.ReleaseSummary.Versions.Add(newSummary);
+                    var newSummaryVersion = new ReleaseSummaryVersion()
+                    {
+                        Slug = request.Slug,
+                        TypeId = request.Type.Id,
+                        PublishScheduled = request.PublishScheduled,
+                        ReleaseName = request.ReleaseName,
+                        NextReleaseDate = request.NextReleaseDate,
+                        TimePeriodCoverage = request.TimePeriodCoverage,
+                        Created = DateTime.Now,
+                        Summary = release.ReleaseSummary.Current.Summary
+                    };
+                    
+                    release.ReleaseSummary.Versions.Add(newSummaryVersion);
                     _context.Update(release);
                     await _context.SaveChangesAsync();
-                    return await GetReleaseForIdAsync(model.Id);
+                    return await GetReleaseForIdAsync(releaseId);
                 });
         }
 
