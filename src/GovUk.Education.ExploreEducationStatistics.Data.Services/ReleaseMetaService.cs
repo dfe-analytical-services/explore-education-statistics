@@ -4,7 +4,6 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
@@ -21,16 +20,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _mapper = mapper;
         }
 
-        public ReleaseSubjectsMetaViewModel GetSubjects(Guid releaseId)
+        public IEnumerable<IdLabel> GetSubjects(Guid releaseId)
         {
-            var subjectMetaViewModels = _mapper.Map<IEnumerable<IdLabel>>(
+            return _mapper.Map<IEnumerable<IdLabel>>(
                 _subjectService.FindMany(subject => subject.Release.Id == releaseId));
-
-            return new ReleaseSubjectsMetaViewModel
-            {
-                ReleaseId = releaseId,
-                Subjects = subjectMetaViewModels
-            };
         }
     }
 }
