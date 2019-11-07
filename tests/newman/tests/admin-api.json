@@ -1112,8 +1112,6 @@
 									"script": {
 										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
 										"exec": [
-											"// EES-598",
-											"/*",
 											"var respJson = pm.response.json();",
 											"",
 											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -1153,8 +1151,7 @@
 											"           return geoLevel === \"Local_Authority\" || geoLevel === \"Local_Authority_District\"; ",
 											"        });",
 											"    }",
-											"});",
-											"*/"
+											"});"
 										],
 										"type": "text/javascript"
 									}
@@ -9050,7 +9047,12 @@
 					"pm.globals.set(\"1I_AbsenceFields__OverallAbsenceRate\", \"26\");",
 					"pm.globals.set(\"1I_AbsenceFields__AuthorisedAbsenceRate\", \"28\");",
 					"pm.globals.set(\"1I_AbsenceFields__PercentageOfPersistentAbsentees\", \"30\");",
-					"pm.globals.set(\"1I_AbsenceFields__NumberOfPersistentAbsentees\", \"31\");"
+					"pm.globals.set(\"1I_AbsenceFields__NumberOfPersistentAbsentees\", \"31\");",
+					"pm.globals.set(\"1I_AbsenceForPersistentAbsentees__NumberOfAuthorisedAbsenceSessionsForPersistentAbsentees\", \"6\");",
+					"pm.globals.set(\"1I_AbsenceByReason__NumberOfUnauthorisedReasonsSessions\", \"7\");",
+					"pm.globals.set(\"1I_AbsenceByReason__NumberOfUnauthorisedOtherSessions\", \"8\");",
+					"pm.globals.set(\"1I_AbsenceByReason__NumberOfNoReasonYetSessions\", \"9\");",
+					"pm.globals.set(\"1I_AbsenceByReason__NumberOfLateSessions\", \"10\");"
 				]
 			}
 		},
