@@ -529,6 +529,16 @@ const MapBlock = ({
     }
   };
 
+  const findLocationBySelectedLocation = () => {
+    const chosenLocation = majorOptions.find(location => {
+      return location.value === selectedLocation;
+    });
+    if (chosenLocation) {
+      return chosenLocation.label;
+    }
+    return '';
+  };
+
   // reset the GeoJson layer if the geometry is changed, updating the component doesn't do it once it's rendered
   React.useEffect(() => {
     if (geoJsonRef.current) {
@@ -612,6 +622,8 @@ const MapBlock = ({
             <h3 className="govuk-heading-s">
               Key to {labels[selectedDataSetKey].label}
             </h3>
+            {selectedLocation}
+            <p>{findLocationBySelectedLocation()}</p>
             <dl className="govuk-list">
               {legend &&
                 legend.map(({ min, max, idx, minValue }) => (
