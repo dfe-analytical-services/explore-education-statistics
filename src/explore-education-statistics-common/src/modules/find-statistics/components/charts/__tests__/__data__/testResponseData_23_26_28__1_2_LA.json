@@ -40048,7 +40048,7 @@
         "label": "Counties and Unitary Authorities December 2018 Boundaries EW BUC"
       }
     ],
-    "timePeriods": {
+    "timePeriod": {
       "2012_AY": {
         "code": "AY",
         "label": "2012/13",

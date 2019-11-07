@@ -5,6 +5,7 @@ import tableBuilderService, {
   LocationLevelKeysEnum,
   PublicationSubjectMeta,
   TableDataQuery,
+  TimeIdentifier,
 } from '@common/modules/full-table/services/tableBuilderService';
 import {
   CategoryFilter,
@@ -32,9 +33,9 @@ import { DataBlockMetadata } from '@common/services/dataBlockService';
 
 export interface DateRangeState {
   startYear?: number;
-  startCode?: string;
+  startCode?: TimeIdentifier;
   endYear?: number;
-  endCode?: string;
+  endCode?: TimeIdentifier;
 }
 
 export const transformTableMetaFiltersToCategoryFilters = (

@@ -104,11 +104,7 @@ export interface DataSetConfiguration extends LabelConfiguration {
   lineStyle?: LineStyle;
 }
 
-export type AxisGroupBy =
-  | 'timePeriods'
-  | 'locations'
-  | 'filters'
-  | 'indicators';
+export type AxisGroupBy = 'timePeriod' | 'locations' | 'filters' | 'indicators';
 
 export type AxisType = 'major' | 'minor';
 

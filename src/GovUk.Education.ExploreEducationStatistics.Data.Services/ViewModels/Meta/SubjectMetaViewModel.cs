@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Me
         
         public IEnumerable<IdLabel> BoundaryLevels { get; set; }
         
-        public Dictionary<string, TimePeriodMetaViewModel> TimePeriods { get; set; }
+        public Dictionary<string, TimePeriodMetaViewModel> TimePeriod { get; set; }
         
         public string PublicationName { get; set; }
 

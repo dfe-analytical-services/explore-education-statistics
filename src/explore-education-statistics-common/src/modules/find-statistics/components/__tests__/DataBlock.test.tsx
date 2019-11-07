@@ -70,7 +70,7 @@ describe('DataBlock', () => {
               major: {
                 name: 'major',
                 type: 'major',
-                groupBy: 'timePeriods',
+                groupBy: 'timePeriod',
                 dataSets: [
                   { indicator: '23', filters: ['1', '2'] },
                   { indicator: '26', filters: ['1', '2'] },
@@ -142,7 +142,7 @@ describe('DataBlock', () => {
               major: {
                 name: 'major',
                 type: 'major',
-                groupBy: 'timePeriods',
+                groupBy: 'timePeriod',
                 dataSets: [
                   { indicator: '23', filters: ['1', '2'] },
                   { indicator: '26', filters: ['1', '2'] },
