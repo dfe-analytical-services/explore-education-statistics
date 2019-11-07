@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "dd673076-5b4e-4105-b883-2d11db6c5105",
+		"_postman_id": "6a31aa16-3a9e-42a6-a5e7-238f04f8d254",
 		"name": "DfE Admin API - Test data",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -42,6 +42,9 @@
 						}
 					],
 					"request": {
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "GET",
 						"header": [
 							{
@@ -1875,8 +1878,8 @@
 											"    pm.expect(pm.response.to.not.have.jsonBody(\"internalReleaseNote\"));",
 											"});",
 											"",
-											"pm.test(\"id should match request id\", function () {",
-											"    pm.expect(respJson.id).to.equal(\"4ed49316-40da-466a-e3b7-08d7530f4f8b\");",
+											"pm.test(\"id should match summary id\", function () {",
+											"    pm.expect(respJson.id).to.equal(\"5cabe4fc-2f51-40d6-b0d2-93bcdd71ef6d\");",
 											"});",
 											"",
 											"pm.test(\"typeId should should be correct\", function () { ",
@@ -1954,7 +1957,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
+										"id": "961c91bf-6ef1-44c7-bda5-19eaa63860da",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -1972,8 +1975,8 @@
 											"    pm.expect(pm.response.to.have.jsonBody(\"internalReleaseNote\"));",
 											"});",
 											"",
-											"pm.test(\"id should match request id\", function () {",
-											"    pm.expect(respJson.id).to.equal(\"4ed49316-40da-466a-e3b7-08d7530f4f8b\");",
+											"pm.test(\"id should match summary id\", function () {",
+											"    pm.expect(respJson.id).to.equal(\"5cabe4fc-2f51-40d6-b0d2-93bcdd71ef6d\");",
 											"});",
 											"",
 											"pm.test(\"typeId should should be correct\", function () { ",
@@ -2017,7 +2020,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "dbde4b62-47dd-4c3d-93dc-5e01ec3f8231",
+										"id": "92f7cf83-26e5-4145-9580-b5ebfe524a7c",
 										"exec": [
 											""
 										],
@@ -2082,8 +2085,8 @@
 											"    pm.expect(pm.response.to.have.jsonBody(\"internalReleaseNote\"));",
 											"});",
 											"",
-											"pm.test(\"id should match request id\", function () {",
-											"    pm.expect(respJson.id).to.equal(\"4ed49316-40da-466a-e3b7-08d7530f4f8b\");",
+											"pm.test(\"id should match summary id\", function () {",
+											"    pm.expect(respJson.id).to.equal(\"5cabe4fc-2f51-40d6-b0d2-93bcdd71ef6d\");",
 											"});",
 											"",
 											"pm.test(\"typeId should should be correct\", function () { ",
@@ -2344,8 +2347,8 @@
 											"    pm.expect(pm.response.to.have.jsonBody(\"internalReleaseNote\"));",
 											"});",
 											"",
-											"pm.test(\"id should match request id\", function () {",
-											"    pm.expect(respJson.id).to.equal(\"4ed49316-40da-466a-e3b7-08d7530f4f8b\");",
+											"pm.test(\"id should match summary id\", function () {",
+											"    pm.expect(respJson.id).to.equal(\"5cabe4fc-2f51-40d6-b0d2-93bcdd71ef6d\");",
 											"});",
 											"",
 											"pm.test(\"typeId should should be correct\", function () { ",
@@ -2454,8 +2457,8 @@
 											"    pm.expect(pm.response.to.have.jsonBody(\"internalReleaseNote\"));",
 											"});",
 											"",
-											"pm.test(\"id should match request id\", function () {",
-											"    pm.expect(respJson.id).to.equal(\"4ed49316-40da-466a-e3b7-08d7530f4f8b\");",
+											"pm.test(\"id should match summary id\", function () {",
+											"    pm.expect(respJson.id).to.equal(\"5cabe4fc-2f51-40d6-b0d2-93bcdd71ef6d\");",
 											"});",
 											"",
 											"pm.test(\"typeId should should be correct\", function () { ",
@@ -2555,8 +2558,8 @@
 											"    pm.expect(pm.response.to.have.jsonBody(\"internalReleaseNote\"));",
 											"});",
 											"",
-											"pm.test(\"id should match request id\", function () {",
-											"    pm.expect(respJson.id).to.equal(\"4ed49316-40da-466a-e3b7-08d7530f4f8b\");",
+											"pm.test(\"id should match summary id\", function () {",
+											"    pm.expect(respJson.id).to.equal(\"5cabe4fc-2f51-40d6-b0d2-93bcdd71ef6d\");",
 											"});",
 											"",
 											"pm.test(\"typeId should should be correct\", function () { ",
@@ -2665,8 +2668,8 @@
 											"    pm.expect(pm.response.to.have.jsonBody(\"internalReleaseNote\"));",
 											"});",
 											"",
-											"pm.test(\"id should match request id\", function () {",
-											"    pm.expect(respJson.id).to.equal(\"4ed49316-40da-466a-e3b7-08d7530f4f8b\");",
+											"pm.test(\"id should match summary id\", function () {",
+											"    pm.expect(respJson.id).to.equal(\"5cabe4fc-2f51-40d6-b0d2-93bcdd71ef6d\");",
 											"});",
 											"",
 											"pm.test(\"typeId should should be correct\", function () { ",
