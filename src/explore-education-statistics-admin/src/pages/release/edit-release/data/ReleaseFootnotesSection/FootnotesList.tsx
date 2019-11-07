@@ -1,7 +1,7 @@
 import {
   Footnote,
   FootnoteMeta,
-  FootnoteMetaMap,
+  FootnoteMetaGetters,
 } from '@admin/services/release/edit-release/footnotes/types';
 import footnotesService from '@admin/services/release/edit-release/footnotes/service';
 import React from 'react';
@@ -11,7 +11,7 @@ import FootnoteForm, { FootnoteFormControls } from './FootnoteForm';
 
 interface Props {
   footnoteMeta: FootnoteMeta;
-  footnoteMetaMap: FootnoteMetaMap;
+  footnoteMetaGetters: FootnoteMetaGetters;
   footnotes: Footnote[];
   footnoteFormControls: FootnoteFormControls;
 }
@@ -19,18 +19,18 @@ interface Props {
 const FootnotesList = ({
   footnotes,
   footnoteMeta,
-  footnoteMetaMap,
+  footnoteMetaGetters,
   footnoteFormControls,
 }: Props) => {
   if (footnotes.length === 0) {
     return null;
   }
 
-  const renderItems = (items: number[]) => {
+  const renderItems = (items: { label: string; value: number }[]) => {
     return (
       <CollapsibleList>
         {items.map(item => (
-          <li key={item}>{item}</li>
+          <li key={item.value}>{item.label}</li>
         ))}
       </CollapsibleList>
     );
@@ -56,7 +56,7 @@ const FootnotesList = ({
             state={footnoteForm.state}
             footnote={footnote}
             footnoteMeta={footnoteMeta}
-            footnoteMetaMap={footnoteMetaMap}
+            footnoteMetaGetters={footnoteMetaGetters}
             onOpen={() => {}}
             onCancel={footnoteFormControls.cancel}
             onSubmit={footnoteFormControls.save}
@@ -64,9 +64,17 @@ const FootnotesList = ({
         ) : (
           <>
             <td>{content}</td>
-            <td>{renderItems(subjects)}</td>
-            <td>{renderItems(indicators)}</td>
-            <td>{renderItems(filters)}</td>
+            <td>{renderItems(subjects.map(footnoteMetaGetters.getSubject))}</td>
+            <td>
+              {renderItems(indicators.map(footnoteMetaGetters.getIndicator))}
+            </td>
+            <td>
+              {renderItems([
+                ...filters.map(footnoteMetaGetters.getFilter),
+                ...filterGroups.map(footnoteMetaGetters.getFilterGroup),
+                ...filterItems.map(footnoteMetaGetters.getFilterItem),
+              ])}
+            </td>
             <td>
               <Button
                 type="button"
