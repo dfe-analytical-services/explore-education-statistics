@@ -32,12 +32,14 @@ export interface Publication {
       title: string;
     };
   };
-  contact: {
-    teamName: string;
-    teamEmail: string;
-    contactName: string;
-    contactTelNo: string;
-  };
+  contact: PublicationContact;
+}
+
+export interface PublicationContact {
+  teamName: string;
+  teamEmail: string;
+  contactName: string;
+  contactTelNo: string;
 }
 
 export interface DataQuery {

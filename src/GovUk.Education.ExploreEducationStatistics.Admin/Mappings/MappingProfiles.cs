@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.Statistics;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Publication = GovUk.Education.ExploreEducationStatistics.Content.Model.Publication;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
@@ -19,7 +19,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
         {
             CreateMap<Footnote, FootnoteViewModel>();
 
-            CreateMap<Release, Data.Processor.Model.Release>();
+            CreateMap<IndicatorFootnote, long>().ConvertUsing(footnote => footnote.IndicatorId);
+            CreateMap<FilterFootnote, long>().ConvertUsing(footnote => footnote.FilterId);
+            CreateMap<FilterGroupFootnote, long>().ConvertUsing(footnote => footnote.FilterGroupId);
+            CreateMap<FilterItemFootnote, long>().ConvertUsing(footnote => footnote.FilterItemId);
+            CreateMap<SubjectFootnote, long>().ConvertUsing(footnote => footnote.SubjectId);
+            
+            CreateMap<Release, Data.Processor.Model.Release>().ForMember(dest => dest.Title,
+                opts => opts.MapFrom(release => release.ReleaseName));
             
             CreateMap<Release, ReleaseViewModel>()
                 .ForMember(
