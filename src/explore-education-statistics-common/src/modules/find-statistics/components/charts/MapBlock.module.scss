@@ -1,3 +1,5 @@
+@import '../../../../../src/styles/govuk-base';
+
 .map {
   background-color: #f8f8fc;
 
@@ -23,5 +25,45 @@
   span {
     display: inline-block;
     width: 16px;
+  }
+}
+
+.mapContainer {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 0.5%;
+}
+
+.mapControls {
+  display: flex;
+  flex: 0 0 32.3%;
+  flex-direction: column;
+  margin: 0.5% 0.5% 0;
+  max-width: 32.3%;
+  @media print {
+    display: block;
+  }
+  @include govuk-media-query($until: tablet) {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
+
+.mapKey {
+  @include govuk-media-query($until: tablet) {
+    display: none;
+  }
+}
+
+.mapView {
+  display: flex;
+  flex: 1 0 64.6%;
+  flex-direction: column;
+  margin: 0.5% 0.5% 0;
+  @media print {
+    display: block;
+  }
+  @include govuk-media-query($until: tablet) {
+    display: none;
   }
 }

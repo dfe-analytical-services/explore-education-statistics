@@ -3,7 +3,6 @@ import { SelectOption } from '@common/components/form/FormSelect';
 import {
   ChartDataB,
   ChartDefinition,
-  ChartMetaData,
   ChartProps,
   createSortedAndMappedDataForAxis,
   generateKeyFromDataSet,
@@ -12,6 +11,7 @@ import {
 import {
   DataBlockData,
   DataBlockGeoJsonProperties,
+  DataBlockMetadata,
 } from '@common/services/dataBlockService';
 import {
   AxisConfiguration,
@@ -29,6 +29,7 @@ import 'leaflet/dist/leaflet.css';
 import React from 'react';
 import { GeoJSON, LatLngBounds, Map } from 'react-leaflet';
 import styles from './MapBlock.module.scss';
+import stylesIndicators from '../SummaryRenderer.module.scss';
 
 type MapBlockProperties = DataBlockGeoJsonProperties & {
   scaledData: number;
@@ -69,7 +70,7 @@ interface MapClickEvent extends LeafletMouseEvent {
 // <editor-fold desc=" Static functions">
 function getLocationsForDataSet(
   data: DataBlockData,
-  meta: ChartMetaData,
+  meta: DataBlockMetadata,
   chartData: ChartDataB[],
 ) {
   const allLocationIds = chartData.map(({ __name }) => __name);
@@ -95,7 +96,7 @@ function getLocationsForDataSet(
 }
 
 function getGeometryForOptions(
-  meta: ChartMetaData,
+  meta: DataBlockMetadata,
   selectedDataSet: DataSetConfiguration,
   sourceData: ChartDataB[],
   min: number,
@@ -143,7 +144,7 @@ function calculateMinAndScaleForSourceData(sourceData: ChartDataB[]) {
 }
 
 function generateGeometryAndLegendForSelectedOptions(
-  meta: ChartMetaData,
+  meta: DataBlockMetadata,
   labels: Dictionary<DataSetConfiguration>,
   chartData: ChartDataB[],
   selectedDataSet: string,
@@ -225,13 +226,11 @@ function getFeatureElementById(
     if (selectedFeature) {
       const selectedLayer: Path = selectedFeature.properties.layer as Path;
 
-      if (selectedLayer) {
-        return {
-          element: selectedLayer.getElement(),
-          layer: selectedLayer,
-          feature: selectedFeature,
-        };
-      }
+      return {
+        element: selectedLayer.getElement(),
+        layer: selectedLayer,
+        feature: selectedFeature,
+      };
     }
   }
 
@@ -293,7 +292,6 @@ const MapBlock = ({
   height,
   labels,
   axes,
-  children,
 }: MapProps) => {
   const mapRef = React.createRef<Map>();
   const geoJsonRef = React.createRef<GeoJSON>();
@@ -547,133 +545,133 @@ const MapBlock = ({
     axisMajor === undefined ||
     axisMajor.dataSets === undefined
   )
-    return <div>Unable to render map, map incorrectly configured</div>;
+    return <div>An error occurred</div>;
 
   return (
-    <div className="govuk-grid-row" ref={container}>
-      <div
-        className={classNames('govuk-grid-column-one-third')}
-        aria-live="assertive"
-      >
-        <form>
-          <div className="govuk-form-group govuk-!-margin-bottom-6">
-            <FormSelect
-              name="selectedIndicator"
-              id="selectedIndicator"
-              label="Select data to view"
-              value={selectedDataSetKey}
-              onChange={e => setSelectedDataSetKey(e.currentTarget.value)}
-              options={dataSetOptions}
-              order={[]}
-            />
-          </div>
+    <>
+      <div className={styles.mapContainer} ref={container}>
+        <div className={styles.mapControls} aria-live="assertive">
+          <form>
+            <div className="govuk-form-group govuk-!-margin-bottom-6">
+              <FormSelect
+                name="selectedIndicator"
+                id="selectedIndicator"
+                label="Select data to view"
+                value={selectedDataSetKey}
+                onChange={e => setSelectedDataSetKey(e.currentTarget.value)}
+                options={dataSetOptions}
+                order={[]}
+              />
+            </div>
 
-          <div className="govuk-form-group govuk-!-margin-bottom-6">
-            <FormSelect
-              name="selectedLocation"
-              id="selectedLocation"
-              label="Select a location"
-              value={selectedLocation}
-              onChange={e => updateSelectedLocation(e.currentTarget.value)}
-              options={majorOptions}
-              order={[]}
-            />
-          </div>
-        </form>
+            <div className="govuk-form-group govuk-!-margin-bottom-6">
+              <FormSelect
+                name="selectedLocation"
+                id="selectedLocation"
+                label="Select a location"
+                value={selectedLocation}
+                onChange={e => updateSelectedLocation(e.currentTarget.value)}
+                options={majorOptions}
+                order={[]}
+              />
+            </div>
+          </form>
 
-        {results.length > 0 && (
-          <div>
+          {selectedDataSetKey && labels && labels[selectedDataSetKey] && (
+            <div className={styles.mapKey}>
+              <h3 className="govuk-heading-s">
+                Key to {labels[selectedDataSetKey].label}
+              </h3>
+              <dl className="govuk-list">
+                {legend &&
+                  legend.map(({ min, max, idx, minValue }) => (
+                    <dd className={styles.legend} key={idx}>
+                      <span
+                        className={styles[`rate${idx}`]}
+                        style={{
+                          backgroundColor: calculateColour({
+                            scaledData: minValue,
+                            color: labels[selectedDataSetKey].colour,
+                          }),
+                        }}
+                      >
+                        &nbsp;
+                      </span>{' '}
+                      {min}
+                      {labels[selectedDataSetKey].unit}&nbsp; to {max}
+                      {labels[selectedDataSetKey].unit}{' '}
+                    </dd>
+                  ))}
+              </dl>
+            </div>
+          )}
+        </div>
+
+        <div className={styles.mapView}>
+          {geometry && ukGeometry && (
+            <Map
+              ref={mapRef}
+              style={{
+                width: (width && `${width}px`) || '100%',
+                height: `${height || 600}px`,
+              }}
+              className={classNames(styles.map, 'dfe-print-break-avoid')}
+              center={position}
+              zoom={6.5}
+            >
+              <GeoJSON data={ukGeometry} className={styles.uk} ref={ukRef} />
+
+              <GeoJSON
+                ref={geoJsonRef}
+                data={geometry}
+                onEachFeature={(feature, layer) =>
+                  onEachFeatureCallback.current &&
+                  onEachFeatureCallback.current(feature, layer)
+                }
+                style={(feature?: MapFeature): PathOptions => ({
+                  fillColor:
+                    feature &&
+                    feature.properties &&
+                    calculateColour(feature.properties),
+                  className: classNames({
+                    [styles.selected]:
+                      feature && feature.id === selectedLocation,
+                  }),
+                })}
+                onclick={onClick}
+              />
+            </Map>
+          )}
+        </div>
+      </div>
+
+      {results.length > 0 && (
+        <>
+          <hr />
+          {selectedLocation}
+          <div className={classNames(stylesIndicators.keyStatsContainer)}>
             {results.map(result => (
-              <div
-                key={result.id}
-                className="dfe-dash-tiles__tile govuk-!-margin-bottom-6"
-              >
-                <h3 className="govuk-heading-m dfe-dash-tiles__heading">
-                  {labels[result.id].label}
-                </h3>
-                <p
-                  className="govuk-heading-xl govuk-!-margin-bottom-2"
-                  aria-label={labels[result.id].label}
-                >
-                  <span>{` ${result.value}${labels[result.id].unit} `}</span>
-                </p>
-                {/*
+              <div key={result.id} className={stylesIndicators.keyStatTile}>
+                <div className={stylesIndicators.keyStat}>
+                  <h3 className="govuk-heading-s">{labels[result.id].label}</h3>
+                  <p
+                    className="govuk-heading-xl govuk-!-margin-bottom-2"
+                    aria-label={labels[result.id].label}
+                  >
+                    <span>{` ${result.value}${labels[result.id].unit} `}</span>
+                  </p>
+                  {/*
                 <Details summary={`What is ${labels[result.id].label}?`}>
                   Description for {labels[result.id].label}
                 </Details>
 */}
+                </div>
               </div>
             ))}
           </div>
-        )}
-
-        {selectedDataSetKey && labels && labels[selectedDataSetKey] && (
-          <div>
-            <h3 className="govuk-heading-s">
-              Key to {labels[selectedDataSetKey].label}
-            </h3>
-            <dl className="govuk-list">
-              {legend &&
-                legend.map(({ min, max, idx, minValue }) => (
-                  <dd className={styles.legend} key={idx}>
-                    <span
-                      className={styles[`rate${idx}`]}
-                      style={{
-                        backgroundColor: calculateColour({
-                          scaledData: minValue,
-                          color: labels[selectedDataSetKey].colour,
-                        }),
-                      }}
-                    >
-                      &nbsp;
-                    </span>{' '}
-                    {min}
-                    {labels[selectedDataSetKey].unit}&nbsp; to {max}
-                    {labels[selectedDataSetKey].unit}{' '}
-                  </dd>
-                ))}
-            </dl>
-          </div>
-        )}
-      </div>
-
-      <div className={classNames('govuk-grid-column-two-thirds')}>
-        {geometry && ukGeometry && (
-          <Map
-            ref={mapRef}
-            style={{
-              width: (width && `${width}px`) || '100%',
-              height: `${height || 600}px`,
-            }}
-            className={classNames(styles.map, 'dfe-print-break-avoid')}
-            center={position}
-            zoom={6.5}
-          >
-            <GeoJSON data={ukGeometry} className={styles.uk} ref={ukRef} />
-
-            <GeoJSON
-              ref={geoJsonRef}
-              data={geometry}
-              onEachFeature={(feature, layer) =>
-                onEachFeatureCallback.current &&
-                onEachFeatureCallback.current(feature, layer)
-              }
-              style={(feature?: MapFeature): PathOptions => ({
-                fillColor:
-                  feature &&
-                  feature.properties &&
-                  calculateColour(feature.properties),
-                className: classNames({
-                  [styles.selected]: feature && feature.id === selectedLocation,
-                }),
-              })}
-              onclick={onClick}
-            />
-          </Map>
-        )}
-      </div>
-      {children}
-    </div>
+        </>
+      )}
+    </>
   );
 };
 
