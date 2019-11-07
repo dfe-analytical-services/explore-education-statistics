@@ -9,7 +9,7 @@ import imageDataChooseFile from './images/guidance/guidance-data-choose-file.jpg
 import imageDataChooseMetaFile from './images/guidance/guidance-data-choose-meta-file.jpg';
 import imageDataTitle from './images/guidance/guidance-data-title.jpg';
 import imageDataUpload from './images/guidance/guidance-data-upload.jpg';
-import imageDataCurrentData from './images/guidance/guidance-data-current-data.jpg';
+import imageDataCurrentData from './images/guidance/guidance-data-current-data.png';
 import imageDataActions from './images/guidance/guidance-data-actions.jpg';
 import imageFootnotesTab from './images/guidance/guidance-footnotes-tab.jpg';
 import imageFootnotesConfig from './images/guidance/guidance-footnotes-config.jpg';
