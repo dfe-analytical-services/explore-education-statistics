@@ -118,7 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .FirstOrDefaultAsync();
 
                     release.Slug = request.Slug;
-                    release.TypeId = request.Type.Id;
+                    release.TypeId = request.TypeId;
                     release.PublishScheduled = request.PublishScheduled;
                     release.ReleaseName = request.ReleaseName;
                     release.NextReleaseDate = request.NextReleaseDate;
@@ -127,7 +127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var newSummaryVersion = new ReleaseSummaryVersion()
                     {
                         Slug = request.Slug,
-                        TypeId = request.Type.Id,
+                        TypeId = request.TypeId,
                         PublishScheduled = request.PublishScheduled,
                         ReleaseName = request.ReleaseName,
                         NextReleaseDate = request.NextReleaseDate,

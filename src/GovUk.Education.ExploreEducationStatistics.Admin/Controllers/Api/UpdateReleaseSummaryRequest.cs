@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     public class UpdateReleaseSummaryRequest
     {
         [Required]
-        public ReleaseType Type { get; set; }
+        public Guid TypeId { get; set; }
         
         [JsonConverter(typeof(TimeIdentifierJsonConverter))]
         [Required]

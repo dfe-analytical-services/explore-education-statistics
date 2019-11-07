@@ -253,7 +253,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         {
                             PublishScheduled = publishScheduledEdited,
                             NextReleaseDate = nextReleaseDateEdited,
-                            Type = typeEdited,
+                            TypeId = typeEdited.Id,
                             ReleaseName = releaseNameEdited,
                             TimePeriodCoverage = timePeriodCoverageEdited
                         });

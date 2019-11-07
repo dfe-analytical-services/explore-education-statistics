@@ -17,11 +17,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
     {
         public MappingProfiles()
         {
-            CreateMap<Footnote, FootnoteViewModel>().ForMember(dest => dest.Label,
-                opts => opts.MapFrom(footnote => footnote.Content));
-            
-            CreateMap<Release, Data.Processor.Model.Release>().ForMember(dest => dest.Title,
-                opts => opts.MapFrom(release => release.ReleaseName));
+            CreateMap<Footnote, FootnoteViewModel>();
+
+            CreateMap<Release, Data.Processor.Model.Release>();
             
             CreateMap<Release, ReleaseViewModel>()
                 .ForMember(
