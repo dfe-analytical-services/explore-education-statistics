@@ -46,6 +46,14 @@ export interface FootnoteMetaMap {
   indicatorsToSubject: { [key: number]: number };
 }
 
+export interface FootnoteMetaGetters {
+  getFilterItem: (id: number) => { label: string; value: number };
+  getFilterGroup: (id: number) => { label: string; value: number };
+  getFilter: (id: number) => { label: string; value: number };
+  getIndicator: (id: number) => { label: string; value: number };
+  getSubject: (id: number) => { label: string; value: number };
+}
+
 export interface FootnoteProps {
   content: string;
   subjects?: number[];

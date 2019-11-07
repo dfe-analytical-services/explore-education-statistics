@@ -2,7 +2,7 @@ import {
   Footnote,
   FootnoteProps,
   FootnoteMeta,
-  FootnoteMetaMap,
+  FootnoteMetaGetters,
 } from '@admin/services/release/edit-release/footnotes/types';
 // import footnoteFormValidation from '@admin/services/release/edit-release/footnotes/util';
 import Link from '@admin/components/Link';
@@ -21,7 +21,7 @@ export interface FootnoteFormConfig {
 
 interface Props extends FootnoteFormConfig {
   footnoteMeta: FootnoteMeta;
-  footnoteMetaMap: FootnoteMetaMap;
+  footnoteMetaGetters: FootnoteMetaGetters;
   isFirst?: boolean;
   onOpen: () => void;
   onCancel: () => void;
