@@ -296,7 +296,9 @@ exports[`DataBlock renders map instead of chart 1`] = `
         </div>
       </div>
     </div>
-    <div>
+    <div
+      class="govuk-!-margin-top-6"
+    >
       <p
         class="govuk-body-s"
       >

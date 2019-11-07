@@ -5,6 +5,7 @@ import { dataApi } from '@common/services/api';
 export interface FilterOption {
   label: string;
   value: string;
+  filterGroup?: string;
 }
 
 export interface IndicatorOption extends FilterOption {

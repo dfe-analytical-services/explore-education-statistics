@@ -5,7 +5,6 @@ import permalinkService, {
 import { mapPermalink } from '@common/modules/full-table/utils/mapPermalinks';
 import ButtonLink from '@frontend/components/ButtonLink';
 import Page from '@frontend/components/Page';
-import PrintThisPage from '@frontend/components/PrintThisPage';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
 import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableHeaders';
@@ -90,12 +89,6 @@ class PermalinkPage extends Component<Props> {
         <ButtonLink prefetch as="/data-tables/" href="/data-tables">
           Create tables
         </ButtonLink>
-        <PrintThisPage
-          analytics={{
-            category: 'Page print',
-            action: 'Print this page link selected',
-          }}
-        />
       </Page>
     );
   }

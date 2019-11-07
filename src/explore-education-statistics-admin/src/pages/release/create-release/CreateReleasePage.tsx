@@ -7,7 +7,6 @@ import { assembleCreateReleaseRequestFromForm } from '@admin/pages/release/util/
 import dashboardRoutes from '@admin/routes/dashboard/routes';
 import { summaryRoute } from '@admin/routes/edit-release/routes';
 import {
-  ContactDetails,
   emptyDayMonthYear,
   IdTitlePair,
   TimePeriodCoverageGroup,
@@ -15,12 +14,12 @@ import {
 import service from '@admin/services/release/create-release/service';
 import { CreateReleaseRequest } from '@admin/services/release/create-release/types';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
+import RelatedInformation from '@common/components/RelatedInformation';
 import Yup from '@common/lib/validation/yup';
+import { Publication } from '@common/services/publicationService';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import { ObjectSchemaDefinition } from 'yup';
-import RelatedInformation from '@common/components/RelatedInformation';
-import { Publication } from '@common/services/publicationService';
 
 interface MatchProps {
   publicationId: string;

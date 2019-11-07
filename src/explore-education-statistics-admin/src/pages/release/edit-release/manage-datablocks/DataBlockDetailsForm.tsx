@@ -156,11 +156,12 @@ const DataBlockDetailsForm = ({
 
                   <hr />
 
-                  <FormFieldTextInput<FormValues>
+                  <FormFieldTextArea<FormValues>
                     id="data-block-title"
                     name="title"
                     label="Table title"
-                    percentageWidth="two-thirds"
+                    additionalClass="govuk-!-width-two-thirds"
+                    rows={2}
                   />
 
                   <FormFieldTextInput<FormValues>

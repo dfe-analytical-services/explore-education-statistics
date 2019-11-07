@@ -227,8 +227,10 @@ const ChartAxisConfiguration = ({
                     <React.Fragment>
                       <FormTextInput
                         id={`${id}_unit`}
-                        label="Override displayed unit (leave blank to use default from metadata)"
+                        label="Override displayed unit"
                         name="unit"
+                        hint="Leave blank to set default from metadata"
+                        width={10}
                         onChange={e =>
                           updateAxisConfiguration({ unit: e.target.value })
                         }
@@ -245,7 +247,8 @@ const ChartAxisConfiguration = ({
                   type="number"
                   min="0"
                   max="100"
-                  label="Size of axis"
+                  label="Size of axis (px)"
+                  width={3}
                   defaultValue={axisConfiguration.size}
                   onChange={e =>
                     updateAxisConfiguration({ size: e.target.value })
@@ -276,9 +279,11 @@ const ChartAxisConfiguration = ({
                 <FormFieldset
                   id="axis_range"
                   legend="Axis range"
-                  legendSize="s"
+                  legendSize="m"
                 >
-                  <p>Leaving these blank will set it to 'auto'</p>
+                  <p className="govuk-hint">
+                    Leaving these values blank will set them to 'auto'
+                  </p>
                   <div className={styles.axisRange}>
                     <FormGroup className={styles.formGroup}>
                       <FormTextInput
@@ -318,7 +323,7 @@ const ChartAxisConfiguration = ({
                   id={`${id}_tick_type`}
                   name="tick_Type"
                   legend="Tick display type"
-                  legendSize="s"
+                  legendSize="m"
                   value={axisConfiguration.tickConfig}
                   onChange={e => {
                     updateAxisConfiguration({ tickConfig: e.target.value });
@@ -360,51 +365,67 @@ const ChartAxisConfiguration = ({
 
             {axisConfiguration.type === 'major' && (
               <React.Fragment>
-                <FormFieldset id={`${id}sort_order_set`} legend="Sorting">
-                  <FormSelect
-                    id={`${id}_sort_by`}
-                    name="sort_by"
-                    label="Sort data by"
-                    order={[]}
-                    value={axisConfiguration.sortBy}
-                    onChange={e => {
-                      updateAxisConfiguration({ sortBy: e.target.value });
-                    }}
-                    options={sortOptions}
-                  />
-                  <FormCheckbox
-                    id={`${id}_sort_asc`}
-                    name="sort_asc"
-                    label="Sort Ascending"
-                    value="asc"
-                    defaultChecked={axisConfiguration.sortAsc}
-                    onChange={e => {
-                      updateAxisConfiguration({ sortAsc: e.target.checked });
-                    }}
-                  />
+                <FormFieldset
+                  id={`${id}sort_order_set`}
+                  legend="Sorting"
+                  legendSize="m"
+                >
+                  <FormGroup>
+                    <FormSelect
+                      id={`${id}_sort_by`}
+                      name="sort_by"
+                      label="Sort data by"
+                      order={[]}
+                      value={axisConfiguration.sortBy}
+                      onChange={e => {
+                        updateAxisConfiguration({ sortBy: e.target.value });
+                      }}
+                      options={sortOptions}
+                    />
+                  </FormGroup>
+                  <FormGroup>
+                    <FormCheckbox
+                      id={`${id}_sort_asc`}
+                      name="sort_asc"
+                      label="Sort Ascending"
+                      value="asc"
+                      defaultChecked={axisConfiguration.sortAsc}
+                      onChange={e => {
+                        updateAxisConfiguration({ sortAsc: e.target.checked });
+                      }}
+                    />
+                  </FormGroup>
                 </FormFieldset>
 
                 <hr />
 
-                <FormFieldset id={`${id}sort_order_set`} legend="Limiting data">
-                  <FormSelect
-                    id={`${id}dataRangeMin`}
-                    label="Minimum"
-                    name="minimum"
-                    value={dataRangeMin}
-                    options={limitOptions}
-                    order={[]}
-                    onChange={e => updateDataRangeMin(e.target.value)}
-                  />
-                  <FormSelect
-                    id={`${id}dataRangeMin`}
-                    label="Maximum"
-                    name="maximum"
-                    value={dataRangeMax}
-                    options={limitOptions}
-                    order={[]}
-                    onChange={e => updateDataRangeMax(e.target.value)}
-                  />
+                <FormFieldset
+                  id={`${id}sort_order_set`}
+                  legend="Limiting data"
+                  legendSize="m"
+                >
+                  <FormGroup>
+                    <FormSelect
+                      id={`${id}dataRangeMin`}
+                      label="Minimum"
+                      name="minimum"
+                      value={dataRangeMin}
+                      options={limitOptions}
+                      order={[]}
+                      onChange={e => updateDataRangeMin(e.target.value)}
+                    />
+                  </FormGroup>
+                  <FormGroup>
+                    <FormSelect
+                      id={`${id}dataRangeMin`}
+                      label="Maximum"
+                      name="maximum"
+                      value={dataRangeMax}
+                      options={limitOptions}
+                      order={[]}
+                      onChange={e => updateDataRangeMax(e.target.value)}
+                    />
+                  </FormGroup>
                 </FormFieldset>
 
                 <hr />
@@ -413,7 +434,7 @@ const ChartAxisConfiguration = ({
 
             {capabilities.hasReferenceLines && (
               <table className="govuk-table">
-                <caption className="govuk-caption-m">Reference lines</caption>
+                <caption className="govuk-heading-m">Reference lines</caption>
                 <thead>
                   <tr>
                     <th>Position</th>

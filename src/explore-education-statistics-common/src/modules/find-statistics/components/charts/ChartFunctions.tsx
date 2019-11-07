@@ -776,7 +776,7 @@ export const CustomToolTip = ({ active, payload, label }: TooltipProps) => {
   if (active) {
     return (
       <div className="graph-tooltip">
-        <p>{label}</p>
+        <p className="govuk-!-font-weight-bold">{label}</p>
         {payload &&
           payload
             .sort((a, b) => {
@@ -790,7 +790,8 @@ export const CustomToolTip = ({ active, payload, label }: TooltipProps) => {
               return (
                 // eslint-disable-next-line react/no-array-index-key
                 <p key={index}>
-                  {`${payload[index].name} : ${payload[index].value}`}
+                  {payload[index].name} :{' '}
+                  <strong> {payload[index].value}</strong>
                 </p>
               );
             })}

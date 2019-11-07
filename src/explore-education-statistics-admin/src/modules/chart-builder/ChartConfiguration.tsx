@@ -199,13 +199,13 @@ const ChartConfiguration = ({
         </>
       )}
       <div className={styles.axesOptions}>
-        <FormGroup className={styles.formGroup}>
+        <FormGroup className={styles.formGroupWide}>
           <FormTextInput
             id="chart-title"
             name="chart-title"
             label="Chart title"
             value={chartOptions.title}
-            width={20}
+            percentageWidth="three-quarters"
             onChange={e => {
               updateChartOptions({
                 ...chartOptions,
@@ -231,75 +231,85 @@ const ChartConfiguration = ({
           )}
         </FormGroup>
         {selectedChartType.capabilities.hasLegend && (
-          <FormGroup className={styles.formGroup}>
-            <FormSelect
-              id="legend-position"
-              name="legend-position"
-              value={chartOptions.legend}
-              label="Legend Position"
-              options={[
-                { label: 'Top', value: 'top' },
-                { label: 'Bottom', value: 'bottom' },
-                { label: 'None', value: 'none' },
-              ]}
-              order={[]}
-              onChange={e => {
-                updateChartOptions({
-                  ...chartOptions,
-                  // @ts-ignore
-                  legend: e.target.value,
-                });
-              }}
-            />
-            {chartOptions.legend !== 'none' && (
-              <FormTextInput
-                id="legend-height"
-                name="legend-height"
-                label="Legend Height (blank for automatic)"
-                value={chartOptions.legendHeight}
-                width={5}
+          <div className={styles.formGroup}>
+            <FormGroup>
+              <FormSelect
+                id="legend-position"
+                name="legend-position"
+                value={chartOptions.legend}
+                label="Legend position"
+                options={[
+                  { label: 'Top', value: 'top' },
+                  { label: 'Bottom', value: 'bottom' },
+                  { label: 'None', value: 'none' },
+                ]}
+                order={[]}
                 onChange={e => {
                   updateChartOptions({
                     ...chartOptions,
-                    legendHeight: e.target.value,
+                    // @ts-ignore
+                    legend: e.target.value,
                   });
                 }}
               />
+            </FormGroup>
+            {chartOptions.legend !== 'none' && (
+              <FormGroup>
+                <FormTextInput
+                  id="legend-height"
+                  name="legend-height"
+                  label="Legend height (px)"
+                  hint="Leave blank to set automatically"
+                  value={chartOptions.legendHeight}
+                  width={5}
+                  onChange={e => {
+                    updateChartOptions({
+                      ...chartOptions,
+                      legendHeight: e.target.value,
+                    });
+                  }}
+                />
+              </FormGroup>
             )}
-          </FormGroup>
+          </div>
         )}
 
         {selectedChartType.capabilities.canSize && (
-          <FormGroup className={styles.formGroup}>
-            <FormTextInput
-              id="chart-height"
-              name="chart-height"
-              label="Chart Height"
-              value={chartHeight}
-              width={5}
-              onChange={e => {
-                setChartHeight(e.target.value);
-                updateChartOptions({
-                  ...chartOptions,
-                  height: parseInt(e.target.value, 10) || undefined,
-                });
-              }}
-            />
-            <FormTextInput
-              id="chart-width"
-              name="chart-width"
-              label="Chart Width (blank to fill)"
-              value={chartWidth}
-              width={5}
-              onChange={e => {
-                setChartWidth(e.target.value);
-                updateChartOptions({
-                  ...chartOptions,
-                  width: parseInt(e.target.value, 10) || undefined,
-                });
-              }}
-            />
-          </FormGroup>
+          <div className={styles.formGroup}>
+            <FormGroup>
+              <FormTextInput
+                id="chart-height"
+                name="chart-height"
+                label="Chart height (px)"
+                value={chartHeight}
+                width={5}
+                onChange={e => {
+                  setChartHeight(e.target.value);
+                  updateChartOptions({
+                    ...chartOptions,
+                    height: parseInt(e.target.value, 10) || undefined,
+                  });
+                }}
+              />
+            </FormGroup>
+            <FormGroup>
+              <FormTextInput
+                id="chart-width"
+                name="chart-width"
+                label="Chart width (px)"
+                hint="Leave blank to set as full width"
+                value={chartWidth}
+                width={5}
+                onChange={e => {
+                  setChartWidth(e.target.value);
+                  updateChartOptions({
+                    ...chartOptions,
+                    width: parseInt(e.target.value, 10) || undefined,
+                  });
+                }}
+              />
+            </FormGroup>
+          </div>
         )}
 
         {selectedChartType.type === 'map' && meta.boundaryLevels && (

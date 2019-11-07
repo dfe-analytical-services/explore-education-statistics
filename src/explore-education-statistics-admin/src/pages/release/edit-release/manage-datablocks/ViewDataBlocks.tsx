@@ -62,7 +62,7 @@ const ViewDataBlocks = ({
     const table = dataBlock.tables;
     const fullTable = mapFullTable(chartBuilderData);
     const tableHeadersConfig =
-      (table && table[0].tableHeaders) ||
+      (table && table.length > 0 && table[0].tableHeaders) ||
       getDefaultTableHeaderConfig(fullTable.subjectMeta);
 
     setTableData({
@@ -117,8 +117,10 @@ const ViewDataBlocks = ({
   return (
     <>
       <Tabs id="editDataBlockSections">
-        <TabsSection title="table">
-          {tableData && <TimePeriodDataTable {...tableData} />}
+        <TabsSection title="Table">
+          <div className="govuk-width-container">
+            {tableData && <TimePeriodDataTable {...tableData} />}
+          </div>
         </TabsSection>
         <TabsSection title="Create Chart">
           {chartBuilderData ? (
@@ -131,7 +133,7 @@ const ViewDataBlocks = ({
               />
             </div>
           ) : (
-            <LoadingSpinner />
+            <LoadingSpinner text="Creating chart" />
           )}
         </TabsSection>
       </Tabs>

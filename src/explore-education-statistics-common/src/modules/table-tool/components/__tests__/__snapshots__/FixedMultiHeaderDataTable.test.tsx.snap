@@ -13,14 +13,14 @@ exports[`FixedMultiHeaderDataTable renders underlying table 1`] = `
         rowspan="2"
       />
       <th
-        class="cellHorizontalMiddle borderRight"
+        class="cellHorizontalMiddle"
         colspan="2"
         scope="colgroup"
       >
         Col group A
       </th>
       <th
-        class="cellHorizontalMiddle borderRight"
+        class="cellHorizontalMiddle"
         colspan="2"
         scope="colgroup"
       >
@@ -36,7 +36,7 @@ exports[`FixedMultiHeaderDataTable renders underlying table 1`] = `
         Col group C
       </th>
       <th
-        class="govuk-table__header--numeric borderBottom borderRight"
+        class="govuk-table__header--numeric borderBottom"
         colspan="1"
         scope="col"
       >
@@ -50,7 +50,7 @@ exports[`FixedMultiHeaderDataTable renders underlying table 1`] = `
         Col group C
       </th>
       <th
-        class="govuk-table__header--numeric borderBottom borderRight"
+        class="govuk-table__header--numeric borderBottom"
         colspan="1"
         scope="col"
       >
@@ -61,36 +61,36 @@ exports[`FixedMultiHeaderDataTable renders underlying table 1`] = `
   <tbody>
     <tr>
       <th
-        class="govuk-table__cell--numeric borderRight"
+        class="govuk-table__cell--numeric"
         rowspan="1"
         scope="row"
       >
         Row group A
       </th>
       <td
-        class="govuk-table__cell--numeric borderBottom"
+        class="govuk-table__cell--numeric"
       >
         1
       </td>
       <td
-        class="govuk-table__cell--numeric borderRight borderBottom"
+        class="govuk-table__cell--numeric"
       >
         2
       </td>
       <td
-        class="govuk-table__cell--numeric borderBottom"
+        class="govuk-table__cell--numeric"
       >
         3
       </td>
       <td
-        class="govuk-table__cell--numeric borderRight borderBottom"
+        class="govuk-table__cell--numeric"
       >
         4
       </td>
     </tr>
     <tr>
       <th
-        class="govuk-table__cell--numeric borderRight borderBottom"
+        class="govuk-table__cell--numeric"
         rowspan="1"
         scope="row"
       >
@@ -102,7 +102,7 @@ exports[`FixedMultiHeaderDataTable renders underlying table 1`] = `
         5
       </td>
       <td
-        class="govuk-table__cell--numeric borderRight borderBottom"
+        class="govuk-table__cell--numeric borderBottom"
       >
         6
       </td>
@@ -112,7 +112,7 @@ exports[`FixedMultiHeaderDataTable renders underlying table 1`] = `
         7
       </td>
       <td
-        class="govuk-table__cell--numeric borderRight borderBottom"
+        class="govuk-table__cell--numeric borderBottom"
       >
         8
       </td>

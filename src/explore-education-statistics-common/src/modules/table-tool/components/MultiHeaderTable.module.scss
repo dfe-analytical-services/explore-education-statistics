@@ -5,10 +5,7 @@ $border-width: 1px;
 /*.borderLeft {
   border-left: 0 solid govuk-colour('black') !important;
 }
-
-.borderRight {
-  border-right: 0 solid govuk-colour('black') !important;
-}*/
+*/
 
 .borderBottom {
   border-bottom: $border-width solid $govuk-border-colour !important;
@@ -48,5 +45,12 @@ $border-width: 1px;
 }
 
 :global(.govuk-table) .cellHorizontalMiddle {
+  background: govuk-colour('light-grey');
+  border-bottom: 1px solid $govuk-border-colour;
+  border-right: 1px solid $govuk-border-colour;
   text-align: center;
+
+  &:last-child {
+    border-right: 0;
+  }
 }
