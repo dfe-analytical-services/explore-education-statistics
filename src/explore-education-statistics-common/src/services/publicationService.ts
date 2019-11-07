@@ -32,12 +32,14 @@ export interface Publication {
       title: string;
     };
   };
-  contact: {
-    teamName: string;
-    teamEmail: string;
-    contactName: string;
-    contactTelNo: string;
-  };
+  contact: PublicationContact;
+}
+
+export interface PublicationContact {
+  teamName: string;
+  teamEmail: string;
+  contactName: string;
+  contactTelNo: string;
 }
 
 export interface DataQuery {
@@ -104,11 +106,7 @@ export interface DataSetConfiguration extends LabelConfiguration {
   lineStyle?: LineStyle;
 }
 
-export type AxisGroupBy =
-  | 'timePeriods'
-  | 'locations'
-  | 'filters'
-  | 'indicators';
+export type AxisGroupBy = 'timePeriod' | 'locations' | 'filters' | 'indicators';
 
 export type AxisType = 'major' | 'minor';
 

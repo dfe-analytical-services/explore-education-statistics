@@ -11,7 +11,7 @@ import publicationService, {
   ReleaseType,
 } from '@common/services/publicationService';
 import ButtonLink from '@frontend/components/ButtonLink';
-import AccordionWithAnalytics from '@frontend/components/AccordionWithAnalytics';
+import HelpAndSupport from '@frontend/modules/find-statistics/PublicationReleaseHelpAndSupportSection';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
@@ -311,113 +311,15 @@ class PublicationReleasePage extends Component<Props> {
             })}
           </Accordion>
         )}
-        <h2
-          className="govuk-heading-m govuk-!-margin-top-9"
-          data-testid="extra-information"
-        >
-          Help and support
-        </h2>
-        <AccordionWithAnalytics
+
+        <HelpAndSupport
+          accordionId={this.accId[1]}
           publicationTitle={data.publication.title}
-          id={this.accId[1]}
-        >
-          <AccordionSection
-            heading={`${data.publication.title}: methodology`}
-            caption="Find out how and why we collect, process and publish these statistics"
-            headingTag="h3"
-          >
-            <p>
-              Read our{' '}
-              <Link to={`/methodology/${data.publication.slug}`}>
-                {`${data.publication.title}: methodology`}
-              </Link>{' '}
-              guidance.
-            </p>
-          </AccordionSection>
-          {data.type && data.type.title === ReleaseType.NationalStatistics && (
-            <AccordionSection heading="National Statistics" headingTag="h3">
-              <p className="govuk-body">
-                The{' '}
-                <a href="https://www.statisticsauthority.gov.uk/">
-                  United Kingdom Statistics Authority
-                </a>{' '}
-                designated these statistics as National Statistics in accordance
-                with the{' '}
-                <a href="https://www.legislation.gov.uk/ukpga/2007/18/contents">
-                  Statistics and Registration Service Act 2007
-                </a>{' '}
-                and signifying compliance with the Code of Practice for
-                Statistics.
-              </p>
-              <p className="govuk-body">
-                Designation signifying their compliance with the authority's{' '}
-                <a href="https://www.statisticsauthority.gov.uk/code-of-practice/the-code/">
-                  Code of Practice for Statistics
-                </a>{' '}
-                which broadly means these statistics are:
-              </p>
-              <ul className="govuk-list govuk-list--bullet">
-                <li>
-                  managed impartially and objectively in the public interest
-                </li>
-                <li>meet identified user needs</li>
-                <li>produced according to sound methods</li>
-                <li>well explained and readily accessible</li>
-              </ul>
-              <p className="govuk-body">
-                Once designated as National Statistics it's a statutory
-                requirement for statistics to follow and comply with the Code of
-                Practice for Statistics to be observed.
-              </p>
-              <p className="govuk-body">
-                Find out more about the standards we follow to produce these
-                statistics through our{' '}
-                <a href="https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education">
-                  Standards for official statistics published by DfE
-                </a>{' '}
-                guidance.
-              </p>
-            </AccordionSection>
-          )}
-          <AccordionSection heading="Contact us" headingTag="h3">
-            <p>
-              If you have a specific enquiry about{' '}
-              {data.publication.topic.theme.title} statistics and data:
-            </p>
-            <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
-              {data.publication.contact.teamName}
-            </h4>
-            <p className="govuk-!-margin-top-0">
-              Email <br />
-              <a href={`mailto:${data.publication.contact.teamEmail}`}>
-                {data.publication.contact.teamEmail}
-              </a>
-            </p>
-            <p>
-              Telephone: {data.publication.contact.contactName} <br />{' '}
-              {data.publication.contact.contactTelNo}
-            </p>
-            <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
-              Press office
-            </h4>
-            <p className="govuk-!-margin-top-0">If you have a media enquiry:</p>
-            <p>
-              Telephone <br />
-              020 7925 6789
-            </p>
-            <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
-              Public enquiries
-            </h4>
-            <p className="govuk-!-margin-top-0">
-              If you have a general enquiry about the Department for Education
-              (DfE) or education:
-            </p>
-            <p>
-              Telephone <br />
-              037 0000 2288
-            </p>
-          </AccordionSection>
-        </AccordionWithAnalytics>
+          methodologyUrl={`/methodology/${data.publication.slug}`}
+          themeTitle={data.publication.topic.theme.title}
+          publicationContact={data.publication.contact}
+        />
+
         <h2 className="govuk-heading-m govuk-!-margin-top-9">
           Create your own tables online
         </h2>

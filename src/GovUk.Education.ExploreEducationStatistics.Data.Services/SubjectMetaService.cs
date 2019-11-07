@@ -91,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _logger.LogTrace("Got Boundary Level Options in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
             stopwatch.Restart();
 
-            var timePeriods = GetTimePeriods(observations);
+            var timePeriod = GetTimePeriod(observations);
 
             _logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
             stopwatch.Restart();
@@ -109,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 BoundaryLevels = boundaryLevels,
                 PublicationName = subject.Release.Publication.Title,
                 SubjectName = subject.Name,
-                TimePeriods = timePeriods,
+                TimePeriod = timePeriod,
                 Footnotes = footnotes
             };
         }
@@ -156,7 +156,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return boundaryLevels.Select(level => _mapper.Map<IdLabel>(level));
         }
 
-        private Dictionary<string, TimePeriodMetaViewModel> GetTimePeriods(IQueryable<Observation> observations)
+        private Dictionary<string, TimePeriodMetaViewModel> GetTimePeriod(IQueryable<Observation> observations)
         {
             return _timePeriodService.GetTimePeriods(observations).ToDictionary(
                 tuple => tuple.GetTimePeriod(),

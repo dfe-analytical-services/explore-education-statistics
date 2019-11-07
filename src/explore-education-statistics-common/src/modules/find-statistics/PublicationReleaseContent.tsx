@@ -6,7 +6,7 @@ import { baseUrl } from '@common/services/api';
 import { AbstractRelease, Publication, Release, ReleaseType } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import classNames from 'classnames';
-import {LocationDescriptor} from 'history';
+import { LocationDescriptor } from 'history';
 import React, { AnchorHTMLAttributes, PropsWithChildren, ReactNode } from 'react';
 
 interface RendererProps {
@@ -36,7 +36,7 @@ type PrintThisPageProps = {
   analytics?: unknown;
 } & AnchorHTMLAttributes<HTMLAnchorElement>;
 
-  type LinkTypeProps = PropsWithChildren<LinkProps> & { children: ReactNode};
+type LinkTypeProps = PropsWithChildren<LinkProps> & { children: ReactNode };
 type TextRendererType = React.ComponentType<TextRendererProps>
 type MarkdownRendererType = React.ComponentType<MarkdownRendererProps>
 type LinkType = React.ComponentType<LinkProps>;
@@ -52,10 +52,11 @@ interface Props {
   SearchForm: typeof PageSearchForm;
   PrintThisPage: PrintThisPageType;
   Link: LinkType;
-  logEvent?: (...params : string[]) => void
+  logEvent?: (...params: string[]) => void
 }
 
-const nullLogEvent = () => {};
+const nullLogEvent = () => {
+};
 
 const PublicationReleaseContent = ({
   data,
@@ -65,7 +66,7 @@ const PublicationReleaseContent = ({
   SearchForm,
   PrintThisPage,
   Link,
-  logEvent = nullLogEvent
+  logEvent = nullLogEvent,
 }: Props) => {
 
   const releaseCount = data.publication.releases ?

@@ -3456,7 +3456,7 @@ const responseData: DataBlockResponse = {
         value: 'E92000001',
       },
     },
-    timePeriods: {
+    timePeriod: {
       '2012_HT6': {
         label: '2012/2013',
         year: 2012,

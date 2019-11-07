@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public long FilterGroupId { get; set; }
         public ICollection<FilterItemFootnote> Footnotes { get; set; }
 
-        private FilterItem()
+        public FilterItem()
         {
         }
 

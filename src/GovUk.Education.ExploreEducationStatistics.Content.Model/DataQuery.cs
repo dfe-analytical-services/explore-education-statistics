@@ -27,10 +27,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public TimePeriod TimePeriod;
         public List<string> Filters;
         public List<string> Indicators;
-
+        
         public List<string> Country;
+        public List<string> Institution;
         public List<string> LocalAuthority;
+        public List<string> LocalAuthorityDistrict;
+        public List<string> LocalEnterprisePartnership;
+        public List<string> MultiAcademyTrust;
+        public List<string> MayoralCombinedAuthority;
+        public List<string> OpportunityArea;
+        public List<string> ParliamentaryConstituency;
         public List<string> Region;
+        public List<string> RscRegion;
+        public List<string> Sponsor;
+        public List<string> Ward;
     }
 
     public class TimePeriod
@@ -51,7 +61,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     public interface IContentBlockChart
     {
         string Type { get; }
-    }
+        string Title { get; set; }
+        int Height { get; set; }
+        int Width { get; set; }
+}
 
     public class ChartDataSet
     {
@@ -64,16 +77,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     public class ChartDataLocation
     {
         public Country Country;
-        public Region Region;
+        public Institution Institution;
         public LocalAuthority LocalAuthority;
         public LocalAuthorityDistrict LocalAuthorityDistrict;
+        public LocalEnterprisePartnership LocalEnterprisePartnership;
+        public Mat MultiAcademyTrust;
+        public MayoralCombinedAuthority MayoralCombinedAuthority;
+        public OpportunityArea OpportunityArea;
+        public ParliamentaryConstituency ParliamentaryConstituency;
+        public Region Region;
+        public RscRegion RscRegion;
+        public Sponsor Sponsor;
+        public Ward Ward;
     }
 
     // this enum needs these like this as they match what is used in the front end
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public enum AxisGroupBy
     {
-        timePeriods,
+        timePeriod,
         locations,
         filters,
         indicators
@@ -92,13 +114,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         wye
     }
 
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public enum LineStyle
     {
         solid,
         dashed,
         dotted
     }
-
+    
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public enum Legend
     {
         none,
@@ -164,6 +188,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public string Position;
     }
 
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public class ChartConfiguration
     {
         public string Label;
@@ -182,9 +207,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     public class LineChart : IContentBlockChart
     {
         public string Type => "line";
-        public int Width;
-        public int Height;
-        
+        public string Title { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
+
         [JsonConverter(typeof(StringEnumConverter))]
         public Legend Legend;
         
@@ -195,8 +221,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     public class HorizontalBarChart : IContentBlockChart
     {
         public string Type => "horizontalbar";
-        public int Width;
-        public int Height;
+        public string Title { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
         
         [JsonConverter(typeof(StringEnumConverter))]
         public Legend Legend;
@@ -212,8 +239,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public Dictionary<string, ChartConfiguration> Labels;
         public Dictionary<string, AxisConfigurationItem> Axes;
         public bool Stacked;
-        public int Width;
-        public int Height;
+        public string Title { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
         
         [JsonConverter(typeof(StringEnumConverter))]
         public Legend Legend;
@@ -222,9 +250,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     public class MapChart : IContentBlockChart
     {
         public string Type => "map";
-        public int Width;
-        public int Height;
+        public string Title { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
         public Dictionary<string, ChartConfiguration> Labels;
         public Dictionary<string, AxisConfigurationItem> Axes;
+    }
+
+    public class InfographicChart : IContentBlockChart
+    {
+        public string Type => "infographic";
+        public string Title { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
+        
+        public string ReleaseId;
+        public string FileId;
     }
 }

@@ -188,13 +188,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPut("releases/{releaseId}/summary")]
-        public async Task<ActionResult<ReleaseViewModel>> UpdateReleaseSummaryAsync(ReleaseSummaryViewModel model,
+        public async Task<ActionResult<ReleaseViewModel>> UpdateReleaseSummaryAsync(UpdateReleaseSummaryRequest request,
             ReleaseId releaseId)
         {
             return await CheckReleaseExistsAsync(releaseId, () =>
             {
-                model.Id = releaseId;
-                return _releaseService.EditReleaseSummaryAsync(model);
+                return _releaseService.EditReleaseSummaryAsync(releaseId, request);
             });
         }
 
