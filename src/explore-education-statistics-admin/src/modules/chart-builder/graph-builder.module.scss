@@ -74,7 +74,6 @@
 
 .chartAxesConfiguration {
   box-sizing: border-box;
-  padding: 0 2em;
   width: 100%;
 }
 
@@ -139,6 +138,13 @@
 .formGroup {
   flex-basis: 30%;
   min-width: 30%;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.formGroupWide {
+  flex-basis: 100%;
+  min-width: 100%;
   padding-left: 5px;
   padding-right: 5px;
 }

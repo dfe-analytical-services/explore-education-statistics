@@ -134,11 +134,13 @@ const CreateDataBlocks = ({
                     }}
                   />
                   {finalStepProps.createdTable && tableHeaders && (
-                    <TimePeriodDataTable
-                      ref={dataTableRef}
-                      fullTable={finalStepProps.createdTable}
-                      tableHeadersConfig={tableHeaders}
-                    />
+                    <div className="govuk-width-container">
+                      <TimePeriodDataTable
+                        ref={dataTableRef}
+                        fullTable={finalStepProps.createdTable}
+                        tableHeadersConfig={tableHeaders}
+                      />
+                    </div>
                   )}
                 </div>
 
