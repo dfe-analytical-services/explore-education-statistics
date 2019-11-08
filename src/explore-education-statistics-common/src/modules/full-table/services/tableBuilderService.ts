@@ -5,6 +5,7 @@ import { dataApi } from '@common/services/api';
 export interface FilterOption {
   label: string;
   value: string;
+  filterGroup?: string;
 }
 
 export interface IndicatorOption extends FilterOption {
@@ -93,11 +94,76 @@ export type LocationLevelKeys =
   | 'sponsor'
   | 'ward';
 
+export type TimeIdentifier =
+  | 'AY'
+  | 'AYQ1'
+  | 'AYQ1Q2'
+  | 'AYQ1Q3'
+  | 'AYQ1Q4'
+  | 'AYQ2'
+  | 'AYQ2Q3'
+  | 'AYQ2Q4'
+  | 'AYQ3'
+  | 'AYQ3Q4'
+  | 'AYQ4'
+  | 'CY'
+  | 'CYQ1'
+  | 'CYQ1Q2'
+  | 'CYQ1Q3'
+  | 'CYQ1Q4'
+  | 'CYQ2'
+  | 'CYQ2Q3'
+  | 'CYQ2Q4'
+  | 'CYQ3'
+  | 'CYQ3Q4'
+  | 'CYQ4'
+  | 'FY'
+  | 'FYQ1'
+  | 'FYQ1Q2'
+  | 'FYQ1Q3'
+  | 'FYQ1Q4'
+  | 'FYQ2'
+  | 'FYQ2Q3'
+  | 'FYQ2Q4'
+  | 'FYQ3'
+  | 'FYQ3Q4'
+  | 'FYQ4'
+  | 'TY'
+  | 'TYQ1'
+  | 'TYQ1Q2'
+  | 'TYQ1Q3'
+  | 'TYQ1Q4'
+  | 'TYQ2'
+  | 'TYQ2Q3'
+  | 'TYQ2Q4'
+  | 'TYQ3'
+  | 'TYQ3Q4'
+  | 'TYQ4'
+  | 'HT5'
+  | 'HT6'
+  | 'EOM'
+  | 'T1'
+  | 'T1T2'
+  | 'T2'
+  | 'T3'
+  | 'M1'
+  | 'M2'
+  | 'M3'
+  | 'M4'
+  | 'M5'
+  | 'M6'
+  | 'M7'
+  | 'M8'
+  | 'M9'
+  | 'M10'
+  | 'M11'
+  | 'M12';
+
 export interface TimePeriodQuery {
   startYear: number;
-  startCode: string;
+  startCode: TimeIdentifier;
   endYear: number;
-  endCode: string;
+  endCode: TimeIdentifier;
 }
 
 export const LocationLevelKeysEnum: KeysRemap<LocationLevelKeys, boolean> = {

@@ -1,8 +1,8 @@
-import React, { forwardRef, ReactNode, Ref, useRef, useEffect } from 'react';
-import Footnote from '@common/modules/table-tool/components/Footnote';
 import { FullTableMeta } from '@common/modules/full-table/types/fullTable';
-import MultiHeaderTable from './MultiHeaderTable';
+import Footnote from '@common/modules/table-tool/components/Footnote';
+import React, { forwardRef, ReactNode, Ref, useEffect, useRef } from 'react';
 import styles from './FixedMultiHeaderDataTable.module.scss';
+import MultiHeaderTable, { RowHeaderType } from './MultiHeaderTable';
 
 const mobileWidth = 1024;
 
@@ -10,8 +10,10 @@ interface Props {
   caption: ReactNode;
   captionId?: string;
   innerRef?: Ref<HTMLElement>;
-  columnHeaders: string[][];
-  rowHeaders: string[][];
+  columnHeaders: RowHeaderType[][];
+  columnHeaderIsGroup?: boolean[];
+  rowHeaders: RowHeaderType[][];
+  rowHeaderIsGroup?: boolean[];
   rows: string[][];
   footnotes?: FullTableMeta['footnotes'];
 }
@@ -102,7 +104,7 @@ const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
         </div>
         {footnotes.length > 0 && (
           <>
-            <h3>Footnotes</h3>
+            <h2 className="govuk-heading-m">Footnotes</h2>
             <Footnote content={footnotes} />
           </>
         )}

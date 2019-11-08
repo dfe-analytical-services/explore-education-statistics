@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "dd673076-5b4e-4105-b883-2d11db6c5105",
+		"_postman_id": "6a31aa16-3a9e-42a6-a5e7-238f04f8d254",
 		"name": "DfE Admin API - Test data",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -42,6 +42,9 @@
 						}
 					],
 					"request": {
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "GET",
 						"header": [
 							{
@@ -662,15 +665,14 @@
 							"name": "Subject",
 							"item": [
 								{
-									"name": "Subject Meta - Absence by characteristic Copy",
+									"name": "Subject Meta - Absence by characteristic",
 									"event": [
 										{
 											"listen": "prerequest",
 											"script": {
 												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
 												"exec": [
-													"pm.globals.set(\"FILT_Char__Total\", \"1\");",
-													"pm.globals.set(\"FILT_SchoolType__Total\", \"58\");"
+													""
 												],
 												"type": "text/javascript"
 											}
@@ -703,8 +705,8 @@
 													"});",
 													"",
 													"pm.test(\"totalValues should be correct\", function () {",
-													"    pm.expect(respJson.filters.Characteristic.totalValue).to.equal(pm.globals.get('FILT_Char__Total'));",
-													"    pm.expect(respJson.filters.SchoolType.totalValue).to.equal(pm.globals.get('FILT_SchoolType__Total'));",
+													"    pm.expect(respJson.filters.Characteristic.totalValue).to.equal(pm.globals.get('1F_Char__Total'));",
+													"    pm.expect(respJson.filters.SchoolType.totalValue).to.equal(pm.globals.get('1F_SchoolType__Total'));",
 													"    pm.expect(respJson.filters.YearBreakdown.totalValue).to.equal(\"\");",
 													"});",
 													"",
@@ -754,8 +756,8 @@
 										"header": [
 											{
 												"key": "Cookie",
-												"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}",
-												"type": "text"
+												"type": "text",
+												"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
 											}
 										],
 										"url": {
@@ -897,7 +899,7 @@
 											"script": {
 												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
 												"exec": [
-													"pm.variables.set('publication_id', 'cbbd299f-8297-44bc-92ac-558bcf51f8ad')"
+													""
 												],
 												"type": "text/javascript"
 											}
@@ -983,8 +985,7 @@
 											"});",
 											"",
 											"pm.test(\"Validate footnotes\", function () {",
-											"    pm.expect(respJson.subjectMeta.footnotes.length).to.be.above(0);",
-											"    //pm.expect(respJson.subjectMeta.footnotes.length).to.equal(12); // Uncomment when id 10 appears!",
+											"    pm.expect(respJson.subjectMeta.footnotes.length).to.equal(12);",
 											"    for(var i = 0; i < respJson.subjectMeta.footnotes.length; i++) {",
 											"        switch(respJson.subjectMeta.footnotes[i].id) {",
 											"            case 1:",
@@ -1054,26 +1055,7 @@
 									"script": {
 										"id": "462e277e-a7ce-4584-b95d-89ed1786d5f5",
 										"exec": [
-											"pm.globals.set(\"FILT_Char__Total\", \"1\");",
-											"pm.globals.set(\"FILT_Char__GenderMale\", \"53\");",
-											"pm.globals.set(\"FILT_Char__GenderFemale\", \"52\");",
-											"pm.globals.set(\"FILT_SchoolType__Total\", \"58\");",
-											"pm.globals.set(\"FILT_SchoolType__StateFundedPrimary\", \"57\");",
-											"pm.globals.set(\"FILT_SchoolType__StateFundedSecondary\", \"56\");",
-											"pm.globals.set(\"FILT_SchoolType__Special\", \"55\");",
-											"pm.globals.set(\"FILT_Char__FSMEligible\", \"18\");",
-											"pm.globals.set(\"FILT_Char__FSMNotEligible\", \"10\");",
-											"pm.globals.set(\"FILT_Char__FSMUnclassified\", \"8\");",
-											"pm.globals.set(\"FILT_Char__EthMinor_Irish\", \"50\");",
-											"pm.globals.set(\"FILT_YearBreakdown__SixHalfTerms\", \"54\");",
-											"",
-											"pm.globals.set(\"IND_AbsenceFields__NumberOfPupilEnrolments\", \"1\");",
-											"pm.globals.set(\"IND_AbsenceFields__NumberOfSessionsPossible\", \"25\");",
-											"pm.globals.set(\"IND_AbsenceFields__UnauthorisedAbsenceRate\", \"23\");",
-											"pm.globals.set(\"IND_AbsenceFields__OverallAbsenceRate\", \"26\");",
-											"pm.globals.set(\"IND_AbsenceFields__AuthorisedAbsenceRate\", \"28\");",
-											"pm.globals.set(\"IND_AbsenceFields__PercentageOfPersistentAbsentees\", \"30\");",
-											"pm.globals.set(\"IND_AbsenceFields__NumberOfPersistentAbsentees\", \"31\");"
+											""
 										],
 										"type": "text/javascript"
 									}
@@ -1096,7 +1078,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"subjectId\": 1,\n    \"country\": [\n    \t\"E92000001\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2014,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__GenderMale}}, {{FILT_Char__GenderFemale}}\n    ],\n    \"indicators\": [\n    \t{{IND_AbsenceFields__UnauthorisedAbsenceRate}}, \n        {{IND_AbsenceFields__OverallAbsenceRate}}, \n        {{IND_AbsenceFields__AuthorisedAbsenceRate}},\n        {{IND_AbsenceFields__PercentageOfPersistentAbsentees}},\n        {{IND_AbsenceFields__NumberOfPersistentAbsentees}}\n    ]\n}"
+									"raw": "{\n    \"subjectId\": 1,\n    \"country\": [\n    \t\"E92000001\"\n    ],\n    \"timePeriod\": {\n    \t\"startYear\": 2014,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2014,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{1F_Char__GenderMale}}, {{1F_Char__GenderFemale}}\n    ],\n    \"indicators\": [\n    \t{{1I_AbsenceFields__UnauthorisedAbsenceRate}}, \n        {{1I_AbsenceFields__OverallAbsenceRate}}, \n        {{1I_AbsenceFields__AuthorisedAbsenceRate}},\n        {{1I_AbsenceFields__PercentageOfPersistentAbsentees}},\n        {{1I_AbsenceFields__NumberOfPersistentAbsentees}}\n    ]\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/data/tablebuilder?releaseId=4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5",
@@ -1112,6 +1094,483 @@
 											"key": "releaseId",
 											"value": "4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5"
 										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Footnotes",
+					"item": [
+						{
+							"name": "Create Footnote for Filters",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+										"exec": [
+											"var respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+											"",
+											"// NOTE: Save the footnote id for use in the next request",
+											"pm.globals.set(\"create_footnote_filter_id\", respJson.id);",
+											"",
+											"pm.test(\"Fields are present\", function () {",
+											"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"label\"));",
+											"});",
+											"",
+											"pm.test(\"label should should be correct\", function () { ",
+											"    pm.expect(respJson.label).to.equal(\"Admin API test footnote 1\"); ",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Cookie",
+										"type": "text",
+										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"content\": \"Admin API test footnote 1\",\n    \"indicators\": [\n    \t{{7I_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}},\n    \t{{7I_AbsenceFields__NumberOfAuthorisedAbsenceSessions}}\n    ],\n    \"filters\": [\n    \t{{7F_AbsenceRatePercentBands_SchoolType}}\n    \t],\n    \"filterGroups\": [],\n    \"filterItems\": [],\n    \"subjectId\": 7\n}"
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/data/footnote",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"data",
+										"footnote"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Footnote for Filters",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+										"exec": [
+											"pm.test(\"Status code is 204\", function () { pm.response.to.have.status(204); });"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Cookie",
+										"type": "text",
+										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+									}
+								],
+								"url": {
+									"raw": "{{admin_api_url}}/data/footnote/{{create_footnote_filter_id}}",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"data",
+										"footnote",
+										"{{create_footnote_filter_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Footnote for Filter Groups",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+										"exec": [
+											"var respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+											"",
+											"// NOTE: Save the footnote id for use in the next request",
+											"pm.globals.set(\"create_footnote_filter_groups_id\", respJson.id);",
+											"",
+											"pm.test(\"Fields are present\", function () {",
+											"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"label\"));",
+											"});",
+											"",
+											"pm.test(\"label should should be correct\", function () { ",
+											"    pm.expect(respJson.label).to.equal(\"Admin API test footnote 2\"); ",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Cookie",
+										"type": "text",
+										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"content\": \"Admin API test footnote 2\",\n    \"indicators\": [\n    \t{{7I_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}},\n    \t{{7I_AbsenceFields__NumberOfAuthorisedAbsenceSessions}}\n    ],\n    \"filters\": [],\n    \"filterGroups\": [\n    \t{{7FG_AbsenceRatePercentBands_SchoolType_Default}}\n    \t],\n    \"filterItems\": [],\n    \"subjectId\": 7\n}"
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/data/footnote",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"data",
+										"footnote"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Footnote for Filter Groups",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+										"exec": [
+											"pm.test(\"Status code is 204\", function () { pm.response.to.have.status(204); });"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Cookie",
+										"type": "text",
+										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+									}
+								],
+								"url": {
+									"raw": "{{admin_api_url}}/data/footnote/{{create_footnote_filter_groups_id}}",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"data",
+										"footnote",
+										"{{create_footnote_filter_groups_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Footnote for Filter Items",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+										"exec": [
+											"var respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+											"",
+											"// NOTE: Save the footnote id for use in the next request",
+											"pm.globals.set(\"create_footnote_filter_items_id\", respJson.id);",
+											"",
+											"pm.test(\"Fields are present\", function () {",
+											"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"label\"));",
+											"});",
+											"",
+											"pm.test(\"label should should be correct\", function () { ",
+											"    pm.expect(respJson.label).to.equal(\"Admin API test footnote 3\"); ",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Cookie",
+										"type": "text",
+										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"content\": \"Admin API test footnote 3\",\n    \"indicators\": [\n    \t{{7I_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}},\n    \t{{7I_AbsenceFields__NumberOfAuthorisedAbsenceSessions}}\n    ],\n    \"filters\": [],\n    \"filterGroups\": [],\n    \"filterItems\": [\n    \t{{7FI_AbsenceRatePercentBands_SchoolType_Default_Total}}\n    \t],\n    \"subjectId\": 7\n}"
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/data/footnote",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"data",
+										"footnote"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Footnote Filter Items",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+										"exec": [
+											"var respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+											"",
+											"pm.test(\"Fields are present\", function () {",
+											"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"label\"));",
+											"});",
+											"",
+											"pm.test(\"id should match request id\", function () {",
+											"    pm.expect(respJson.id).to.equal(pm.globals.get(\"create_footnote_filter_items_id\"));",
+											"});",
+											"",
+											"pm.test(\"label should should be correct\", function () { ",
+											"    pm.expect(respJson.label).to.equal(\"Admin API test footnote 3 - Updated\"); ",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Cookie",
+										"type": "text",
+										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"content\": \"Admin API test footnote 3 - Updated\",\n    \"indicators\": [\n    \t{{7I_AbsenceFields__NumberOfOverallAbsenceSessions}}\n    \t],\n    \"filters\": [],\n    \"filterGroups\": [],\n    \"filterItems\": [\n    \t{{7FI_AbsenceRatePercentBands_SchoolType_Default_Special}},\n    \t{{7FI_AbsenceRatePercentBands_SchoolType_Default_StateFundedSecondary}},\n    \t{{7FI_AbsenceRatePercentBands_SchoolType_Default_StateFundedPrimary}}\n    \t]\n}"
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/data/footnote/{{create_footnote_filter_items_id}}",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"data",
+										"footnote",
+										"{{create_footnote_filter_items_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Footnote for Filter Items",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+										"exec": [
+											"pm.test(\"Status code is 204\", function () { pm.response.to.have.status(204); });"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Cookie",
+										"type": "text",
+										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+									}
+								],
+								"url": {
+									"raw": "{{admin_api_url}}/data/footnote/{{create_footnote_filter_items_id}}",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"data",
+										"footnote",
+										"{{create_footnote_filter_items_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Footnote invalid id",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
+										"exec": [
+											"pm.test(\"Status code is 404\", function () { pm.response.to.have.status(404); });"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Cookie",
+										"type": "text",
+										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+									}
+								],
+								"url": {
+									"raw": "{{admin_api_url}}/data/footnote/99999",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"data",
+										"footnote",
+										"99999"
 									]
 								}
 							},
@@ -1181,29 +1640,7 @@
 									"script": {
 										"id": "1098d84e-671d-465d-adfa-8c1d009ac73a",
 										"exec": [
-											"pm.globals.set(\"FILT_Char__Total\", \"1\");",
-											"pm.globals.set(\"FILT_Char__GenderMale\", \"53\");",
-											"pm.globals.set(\"FILT_Char__GenderFemale\", \"52\");",
-											"pm.globals.set(\"FILT_SchoolType__StateFundedPrimary\", \"57\");",
-											"pm.globals.set(\"FILT_SchoolType__StateFundedSecondary\", \"56\");",
-											"pm.globals.set(\"FILT_SchoolType__Special\", \"55\");",
-											"pm.globals.set(\"FILT_Char__FSMEligible\", \"18\");",
-											"pm.globals.set(\"FILT_Char__FSMNotEligible\", \"10\");",
-											"pm.globals.set(\"FILT_Char__FSMUnclassified\", \"8\");",
-											"pm.globals.set(\"FILT_Char__EthMinor_Irish\", \"50\");",
-											"",
-											"pm.globals.set(\"IND_AbsenceFields__NumberOfPupilEnrolments\", \"1\");",
-											"pm.globals.set(\"IND_AbsenceFields__NumberOfSessionsPossible\", \"25\");",
-											"pm.globals.set(\"IND_AbsenceFields__UnauthorisedAbsenceRate\", \"23\");",
-											"pm.globals.set(\"IND_AbsenceFields__OverallAbsenceRate\", \"26\");",
-											"pm.globals.set(\"IND_AbsenceFields__AuthorisedAbsenceRate\", \"28\");",
-											"pm.globals.set(\"IND_AbsenceFields__PercentageOfPersistentAbsentees\", \"30\");",
-											"pm.globals.set(\"IND_AbsenceFields__NumberOfPersistentAbsentees\", \"31\");",
-											"pm.globals.set(\"IND_AbsenceForPersistentAbsentees__NumberOfAuthorisedAbsenceSessionsForPersistentAbsentees\", \"6\");",
-											"pm.globals.set(\"IND_AbsenceByReason__NumberOfUnauthorisedReasonsSessions\", \"7\");",
-											"pm.globals.set(\"IND_AbsenceByReason__NumberOfUnauthorisedOtherSessions\", \"8\");",
-											"pm.globals.set(\"IND_AbsenceByReason__NumberOfNoReasonYetSessions\", \"9\");",
-											"pm.globals.set(\"IND_AbsenceByReason__NumberOfLateSessions\", \"10\");"
+											""
 										],
 										"type": "text/javascript"
 									}
@@ -1226,7 +1663,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"subjectId\": 1,\n    \"localAuthority\": [\"E09000032\"],\n    \"localAuthorityDistrict\": [\"E07000223\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2015,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{FILT_Char__FSMEligible}}, \n        {{FILT_Char__FSMNotEligible}}, \n        {{FILT_Char__FSMUnclassified}}\n    ],\n    \"indicators\": [\n    \t{{IND_AbsenceForPersistentAbsentees__NumberOfAuthorisedAbsenceSessionsForPersistentAbsentees}},\n    \t{{IND_AbsenceByReason__NumberOfUnauthorisedReasonsSessions}},\n    \t{{IND_AbsenceByReason__NumberOfUnauthorisedOtherSessions}},\n    \t{{IND_AbsenceByReason__NumberOfNoReasonYetSessions}},\n    \t{{IND_AbsenceByReason__NumberOfLateSessions}}\n    ]\n}"
+									"raw": "{\n    \"subjectId\": 1,\n    \"localAuthority\": [\"E09000032\"],\n    \"localAuthorityDistrict\": [\"E07000223\"],\n    \"timePeriod\": {\n    \t\"startYear\": 2015,\n    \t\"startCode\": \"AY\",\n    \t\"endYear\": 2016,\n    \t\"endCode\": \"AY\"\n    },\n    \"filters\" : [\n        {{1F_Char__FSMEligible}}, \n        {{1F_Char__FSMNotEligible}}, \n        {{1F_Char__FSMUnclassified}}\n    ],\n    \"indicators\": [\n    \t{{1I_AbsenceForPersistentAbsentees__NumberOfAuthorisedAbsenceSessionsForPersistentAbsentees}},\n    \t{{1I_AbsenceByReason__NumberOfUnauthorisedReasonsSessions}},\n    \t{{1I_AbsenceByReason__NumberOfUnauthorisedOtherSessions}},\n    \t{{1I_AbsenceByReason__NumberOfNoReasonYetSessions}},\n    \t{{1I_AbsenceByReason__NumberOfLateSessions}}\n    ]\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/data/data?releaseId=4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5",
@@ -1441,8 +1878,8 @@
 											"    pm.expect(pm.response.to.not.have.jsonBody(\"internalReleaseNote\"));",
 											"});",
 											"",
-											"pm.test(\"id should match request id\", function () {",
-											"    pm.expect(respJson.id).to.equal(\"4ed49316-40da-466a-e3b7-08d7530f4f8b\");",
+											"pm.test(\"id should match summary id\", function () {",
+											"    pm.expect(respJson.id).to.equal(\"5cabe4fc-2f51-40d6-b0d2-93bcdd71ef6d\");",
 											"});",
 											"",
 											"pm.test(\"typeId should should be correct\", function () { ",
@@ -1520,7 +1957,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c06ee174-3e90-44b8-b9a8-32283e7dde7c",
+										"id": "961c91bf-6ef1-44c7-bda5-19eaa63860da",
 										"exec": [
 											"var respJson = pm.response.json();",
 											"",
@@ -1538,8 +1975,8 @@
 											"    pm.expect(pm.response.to.have.jsonBody(\"internalReleaseNote\"));",
 											"});",
 											"",
-											"pm.test(\"id should match request id\", function () {",
-											"    pm.expect(respJson.id).to.equal(\"4ed49316-40da-466a-e3b7-08d7530f4f8b\");",
+											"pm.test(\"id should match summary id\", function () {",
+											"    pm.expect(respJson.id).to.equal(\"5cabe4fc-2f51-40d6-b0d2-93bcdd71ef6d\");",
 											"});",
 											"",
 											"pm.test(\"typeId should should be correct\", function () { ",
@@ -1583,7 +2020,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "dbde4b62-47dd-4c3d-93dc-5e01ec3f8231",
+										"id": "92f7cf83-26e5-4145-9580-b5ebfe524a7c",
 										"exec": [
 											""
 										],
@@ -1648,8 +2085,8 @@
 											"    pm.expect(pm.response.to.have.jsonBody(\"internalReleaseNote\"));",
 											"});",
 											"",
-											"pm.test(\"id should match request id\", function () {",
-											"    pm.expect(respJson.id).to.equal(\"4ed49316-40da-466a-e3b7-08d7530f4f8b\");",
+											"pm.test(\"id should match summary id\", function () {",
+											"    pm.expect(respJson.id).to.equal(\"5cabe4fc-2f51-40d6-b0d2-93bcdd71ef6d\");",
 											"});",
 											"",
 											"pm.test(\"typeId should should be correct\", function () { ",
@@ -1910,8 +2347,8 @@
 											"    pm.expect(pm.response.to.have.jsonBody(\"internalReleaseNote\"));",
 											"});",
 											"",
-											"pm.test(\"id should match request id\", function () {",
-											"    pm.expect(respJson.id).to.equal(\"4ed49316-40da-466a-e3b7-08d7530f4f8b\");",
+											"pm.test(\"id should match summary id\", function () {",
+											"    pm.expect(respJson.id).to.equal(\"5cabe4fc-2f51-40d6-b0d2-93bcdd71ef6d\");",
 											"});",
 											"",
 											"pm.test(\"typeId should should be correct\", function () { ",
@@ -2020,8 +2457,8 @@
 											"    pm.expect(pm.response.to.have.jsonBody(\"internalReleaseNote\"));",
 											"});",
 											"",
-											"pm.test(\"id should match request id\", function () {",
-											"    pm.expect(respJson.id).to.equal(\"4ed49316-40da-466a-e3b7-08d7530f4f8b\");",
+											"pm.test(\"id should match summary id\", function () {",
+											"    pm.expect(respJson.id).to.equal(\"5cabe4fc-2f51-40d6-b0d2-93bcdd71ef6d\");",
 											"});",
 											"",
 											"pm.test(\"typeId should should be correct\", function () { ",
@@ -2121,8 +2558,8 @@
 											"    pm.expect(pm.response.to.have.jsonBody(\"internalReleaseNote\"));",
 											"});",
 											"",
-											"pm.test(\"id should match request id\", function () {",
-											"    pm.expect(respJson.id).to.equal(\"4ed49316-40da-466a-e3b7-08d7530f4f8b\");",
+											"pm.test(\"id should match summary id\", function () {",
+											"    pm.expect(respJson.id).to.equal(\"5cabe4fc-2f51-40d6-b0d2-93bcdd71ef6d\");",
 											"});",
 											"",
 											"pm.test(\"typeId should should be correct\", function () { ",
@@ -2231,8 +2668,8 @@
 											"    pm.expect(pm.response.to.have.jsonBody(\"internalReleaseNote\"));",
 											"});",
 											"",
-											"pm.test(\"id should match request id\", function () {",
-											"    pm.expect(respJson.id).to.equal(\"4ed49316-40da-466a-e3b7-08d7530f4f8b\");",
+											"pm.test(\"id should match summary id\", function () {",
+											"    pm.expect(respJson.id).to.equal(\"5cabe4fc-2f51-40d6-b0d2-93bcdd71ef6d\");",
 											"});",
 											"",
 											"pm.test(\"typeId should should be correct\", function () { ",
@@ -10743,6 +11180,48 @@
 				"id": "6464fc17-e41b-4120-9ac9-00c93234437a",
 				"type": "text/javascript",
 				"exec": [
+					"pm.globals.set(\"1F_Char__Total\", \"1\");",
+					"pm.globals.set(\"1F_Char__GenderMale\", \"53\");",
+					"pm.globals.set(\"1F_Char__GenderFemale\", \"52\");",
+					"pm.globals.set(\"1F_SchoolType__Total\", \"58\");",
+					"pm.globals.set(\"1F_SchoolType__StateFundedPrimary\", \"57\");",
+					"pm.globals.set(\"1F_SchoolType__StateFundedSecondary\", \"56\");",
+					"pm.globals.set(\"1F_SchoolType__Special\", \"55\");",
+					"pm.globals.set(\"1F_Char__FSMEligible\", \"18\");",
+					"pm.globals.set(\"1F_Char__FSMNotEligible\", \"10\");",
+					"pm.globals.set(\"1F_Char__FSMUnclassified\", \"8\");",
+					"pm.globals.set(\"1F_Char__EthMinor_Irish\", \"50\");",
+					"pm.globals.set(\"1F_YearBreakdown__SixHalfTerms\", \"54\");",
+					"",
+					"pm.globals.set(\"1I_AbsenceFields__NumberOfPupilEnrolments\", \"1\");",
+					"pm.globals.set(\"1I_AbsenceFields__UnauthorisedAbsenceRate\", \"23\");",
+					"pm.globals.set(\"1I_AbsenceFields__NumberOfSessionsPossible\", \"25\");",
+					"pm.globals.set(\"1I_AbsenceFields__OverallAbsenceRate\", \"26\");",
+					"pm.globals.set(\"1I_AbsenceFields__AuthorisedAbsenceRate\", \"28\");",
+					"pm.globals.set(\"1I_AbsenceFields__PercentageOfPersistentAbsentees\", \"30\");",
+					"pm.globals.set(\"1I_AbsenceFields__NumberOfPersistentAbsentees\", \"31\");",
+					"pm.globals.set(\"1I_AbsenceForPersistentAbsentees__NumberOfAuthorisedAbsenceSessionsForPersistentAbsentees\", \"6\");",
+					"pm.globals.set(\"1I_AbsenceByReason__NumberOfUnauthorisedReasonsSessions\", \"7\");",
+					"pm.globals.set(\"1I_AbsenceByReason__NumberOfUnauthorisedOtherSessions\", \"8\");",
+					"pm.globals.set(\"1I_AbsenceByReason__NumberOfNoReasonYetSessions\", \"9\");",
+					"pm.globals.set(\"1I_AbsenceByReason__NumberOfLateSessions\", \"10\");",
+					"",
+					"pm.globals.set(\"7F_AbsenceRatePercentBands_SchoolType\", \"11\");",
+					"pm.globals.set(\"7FG_AbsenceRatePercentBands_SchoolType_Default\", \"20\");",
+					"pm.globals.set(\"7FI_AbsenceRatePercentBands_SchoolType_Default_Total\", \"104\");",
+					"pm.globals.set(\"7FI_AbsenceRatePercentBands_SchoolType_Default_Special\", \"178\");",
+					"pm.globals.set(\"7FI_AbsenceRatePercentBands_SchoolType_Default_StateFundedSecondary\", \"179\");",
+					"pm.globals.set(\"7FI_AbsenceRatePercentBands_SchoolType_Default_StateFundedPrimary\", \"180\");",
+					"pm.globals.set(\"7I_AbsenceFields__NumberOfOverallAbsenceSessions\", \"140\");",
+					"pm.globals.set(\"7I_AbsenceFields__NumberOfAuthorisedAbsenceSessions\", \"142\");",
+					"pm.globals.set(\"7I_AbsenceFields__NumberOfUnauthorisedAbsenceSessions\", \"144\");",
+					"",
+					"",
+					"",
+					"",
+					"",
+					"",
+					"",
 					""
 				]
 			}

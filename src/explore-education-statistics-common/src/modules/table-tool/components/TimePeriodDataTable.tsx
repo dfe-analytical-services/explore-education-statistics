@@ -1,9 +1,6 @@
-import last from 'lodash/last';
-import React, { memo, forwardRef } from 'react';
-import camelCase from 'lodash/camelCase';
+import WarningMessage from '@common/components/WarningMessage';
 import cartesian from '@common/lib/utils/cartesian';
 import formatPretty from '@common/lib/utils/number/formatPretty';
-import WarningMessage from '@common/components/WarningMessage';
 import {
   CategoryFilter,
   Indicator,
@@ -11,14 +8,80 @@ import {
   TimePeriodFilter,
 } from '@common/modules/full-table/types/filters';
 import { FullTable } from '@common/modules/full-table/types/fullTable';
+import { RowHeaderType } from '@common/modules/table-tool/components/MultiHeaderTable';
+import camelCase from 'lodash/camelCase';
+import last from 'lodash/last';
+import React, { forwardRef, memo } from 'react';
 import DataTableCaption from './DataTableCaption';
 import FixedMultiHeaderDataTable from './FixedMultiHeaderDataTable';
-import { TableHeadersFormValues } from './TableHeadersForm';
+import {
+  SortableOptionWithGroup,
+  TableHeadersFormValues,
+} from './TableHeadersForm';
 
 interface Props {
   fullTable: FullTable;
   tableHeadersConfig: TableHeadersFormValues;
 }
+
+const selectFilterGroup = (
+  group?: string,
+  previousGroup?: string,
+): RowHeaderType => {
+  if (group) {
+    if (group === previousGroup) return undefined;
+    if (group !== 'Default') return group;
+  }
+  return '';
+};
+
+export const createHeadersFromGroups = (
+  groups: SortableOptionWithGroup[][],
+): RowHeaderType[][] => {
+  return groups.flatMap(rowGroup =>
+    rowGroup
+      .reduce<[RowHeaderType[], RowHeaderType[]]>(
+        ([b, c], group, index) => [
+          (group.filterGroup && [
+            ...b,
+            selectFilterGroup(
+              group.filterGroup,
+              (index > 0 && rowGroup[index - 1].filterGroup) || undefined,
+            ),
+          ]) ||
+            b,
+          [...c, group.label],
+        ],
+        [[], []],
+      )
+      .filter(
+        ary => ary.length > 0 && ary.filter(cell => !!cell).join('').length > 0,
+      ),
+  );
+};
+
+export const createHeaderIgnoreFromGroups = (
+  groups: SortableOptionWithGroup[][],
+): boolean[] => {
+  return groups
+    .flatMap(rowGroup =>
+      rowGroup
+        .reduce<[boolean[], boolean[]]>(
+          ([b, c], group, index) => [
+            (selectFilterGroup(
+              group.filterGroup,
+              (index > 0 && rowGroup[index - 1].filterGroup) || undefined,
+            ) && [...b, true]) ||
+              b,
+            [...c, false],
+          ],
+          [[], []],
+        )
+
+        .filter(ary => ary.length > 0),
+    )
+    .map(group => group.includes(true));
+};
 
 const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
   (props: Props, dataTableRef) => {
@@ -34,18 +97,24 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
       );
     }
 
-    const columnHeaders: string[][] = [
-      ...tableHeadersConfig.columnGroups.map(colGroup =>
-        colGroup.map(group => group.label),
-      ),
+    const columnHeaders: RowHeaderType[][] = [
+      ...createHeadersFromGroups(tableHeadersConfig.columnGroups),
       tableHeadersConfig.columns.map(column => column.label),
     ];
 
-    const rowHeaders: string[][] = [
-      ...tableHeadersConfig.rowGroups.map(rowGroup =>
-        rowGroup.map(group => group.label),
-      ),
+    const columnHeaderIsGroup: boolean[] = [
+      ...createHeaderIgnoreFromGroups(tableHeadersConfig.columnGroups),
+      false,
+    ];
+
+    const rowHeaders: RowHeaderType[][] = [
+      ...createHeadersFromGroups(tableHeadersConfig.rowGroups),
       tableHeadersConfig.rows.map(row => row.label),
+    ];
+
+    const rowHeaderIsGroup: boolean[] = [
+      ...createHeaderIgnoreFromGroups(tableHeadersConfig.rowGroups),
+      false,
     ];
 
     const rowHeadersCartesian = cartesian(
@@ -120,7 +189,9 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
       <FixedMultiHeaderDataTable
         caption={<DataTableCaption {...subjectMeta} id="dataTableCaption" />}
         columnHeaders={columnHeaders}
+        columnHeaderIsGroup={columnHeaderIsGroup}
         rowHeaders={rowHeaders}
+        rowHeaderIsGroup={rowHeaderIsGroup}
         rows={rows}
         ref={dataTableRef}
         footnotes={subjectMeta.footnotes}

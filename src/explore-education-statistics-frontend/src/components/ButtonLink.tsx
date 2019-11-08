@@ -13,10 +13,11 @@ const ButtonLink = ({
   disabled = false,
   to,
   href,
+  prefetch,
   ...props
 }: Props) => {
   return (
-    <Link {...props} href={href || to}>
+    <Link {...props} prefetch={prefetch} href={href || to}>
       <a
         {...props}
         className={classNames(

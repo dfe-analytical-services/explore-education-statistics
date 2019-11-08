@@ -78,8 +78,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             
             services.AddDbContext<StatisticsDbContext>(options =>
                 options
-                    .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"),
-                        builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
+                    .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"), 
+                        builder => builder.MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model"))
                     .EnableSensitiveDataLogging()
                     .ConfigureWarnings(builder => builder.Ignore(RelationalEventId.ValueConversionSqlLiteralWarning))
             );
@@ -92,11 +92,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<INotificationsService, NotificationsService>();
             services.AddTransient<IPublishingService, PublishingService>();
             services.AddTransient<IThemeService, ThemeService>();
+            services.AddTransient<ITopicService, TopicService>();
             services.AddTransient<IPublicationService, PublicationService>();
             services.AddTransient<IMetaService, MetaService>();
             services.AddTransient<IContactService, ContactService>();
             services.AddTransient<IReleaseService, ReleaseService>();
-            services.AddTransient<IReleaseService2, ReleaseService2>();
             services.AddTransient<IMethodologyService, MethodologyService>();
             services.AddTransient<IDataBlockService, DataBlockService>();
             services.AddTransient<IPreReleaseService, PreReleaseService>();

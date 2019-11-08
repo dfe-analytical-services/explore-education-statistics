@@ -547,7 +547,7 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                 Once you’ve created the data blocks, tables and charts you can
                 add them to your release along with the rest of your content.
               </p>
-              <h4>Next steps</h4>
+              <h3>Next steps</h3>
               <p>
                 For detailed guidance on how to view and edit content and add,
                 view and resolve comments -{' '}

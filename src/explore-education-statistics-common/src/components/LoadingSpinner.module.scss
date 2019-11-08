@@ -2,19 +2,19 @@
 
 .container {
   align-items: center;
-  display: flex;
-  flex-direction: column;
+  display: inline-flex;
+  flex-direction: row;
   justify-content: center;
-  margin-bottom: govuk-spacing(2);
 }
 
 .spinner {
   animation: spin 2s linear infinite;
-  border-color: govuk-colour('grey-4');
+  border-color: govuk-colour('light-grey');
   border-radius: 50%;
   border-style: solid;
   border-top-color: govuk-colour('blue');
   display: block;
+  margin-right: govuk-spacing(2);
 }
 
 .inline {
@@ -42,4 +42,8 @@
 
 .text {
   margin-top: 0;
+}
+
+.noInlineFlex {
+  display: flex;
 }

@@ -1,13 +1,21 @@
 :global(.js-enabled) {
   .accordionPrint :global(.govuk-accordion__controls) {
     @media print {
-      display: none;
+      display: none !important;
     }
   }
   .accordionPrint :global(.govuk-accordion__section-content) {
     @media print {
-      display: block;
+      display: block !important;
     }
+  }
+}
+
+:global(.govuk-accordion__section-header) {
+  h2,
+  h3 {
+    color: inherit;
+    font-size: inherit;
   }
 }
 

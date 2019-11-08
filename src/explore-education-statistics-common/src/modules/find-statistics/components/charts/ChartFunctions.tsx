@@ -38,7 +38,7 @@ import {
 export const colours: string[] = [
   '#4763a5',
   '#f5a450',
-  '#005ea5',
+  '#1d70b8',
   '#800080',
   '#C0C0C0',
 ];
@@ -63,7 +63,7 @@ export interface ChartMetaData {
   indicators: Dictionary<LabelValueUnitMetadata>;
   locations: Dictionary<DataBlockLocationMetadata>;
   boundaryLevels?: BoundaryLevel[];
-  timePeriods: Dictionary<LabelValueMetadata>;
+  timePeriod: Dictionary<LabelValueMetadata>;
 }
 
 export interface AxesConfiguration {
@@ -311,7 +311,7 @@ export function generateKeyFromDataSet(
 
     ...joinedLocations,
 
-    (ignoringField !== 'timePeriods' && timePeriod) || '',
+    (ignoringField !== 'timePeriod' && timePeriod) || '',
   ].join('_');
 }
 
@@ -321,12 +321,15 @@ function generateNameForAxisConfiguration(
   groupBy?: AxisGroupBy,
 ): string {
   switch (groupBy) {
-    case 'timePeriods':
+    case 'timePeriod':
       return result.timePeriod;
     case 'indicators':
       return `${dataSet.indicator}`;
     case 'filters':
-      return result.filters.join('_');
+      return generateKeyFromDataSet(
+        { ...dataSet, filters: result.filters },
+        groupBy,
+      );
     case 'locations':
       if (
         result.location.localAuthorityDistrict &&
@@ -520,8 +523,10 @@ export function createSortedAndMappedDataForAxis(
     mapNameToNameLabel(
       keepOriginalValue,
       labels,
-      meta.timePeriods,
+      meta.timePeriod,
       meta.locations,
+      meta.filters,
+      meta.indicators,
     ),
   );
 }
@@ -670,6 +675,30 @@ function calculateMajorTicks(
   return undefined;
 }
 
+function getNiceMaxValue(maxValue: number) {
+  if (maxValue === 0) {
+    return 0;
+  }
+
+  const maxIsLessThanOne = Math.abs(maxValue) < 1;
+  let max = maxValue;
+  if (maxIsLessThanOne) {
+    max = maxValue * 100;
+  }
+
+  const numberOf0s = 10 ** Math.floor(Math.log10(Math.abs(max)));
+  const maxReducedToLessThan10 = Math.ceil(max / numberOf0s);
+
+  if (maxReducedToLessThan10 % 2 && maxReducedToLessThan10 % 5) {
+    return maxIsLessThanOne
+      ? ((maxReducedToLessThan10 + 1) * numberOf0s) / 100
+      : (maxReducedToLessThan10 + 1) * numberOf0s;
+  }
+  return maxIsLessThanOne
+    ? (maxReducedToLessThan10 * numberOf0s) / 100
+    : maxReducedToLessThan10 * numberOf0s;
+}
+
 export function generateMinorAxis(
   chartData: ChartDataB[],
   axis: AxisConfiguration,
@@ -677,7 +706,7 @@ export function generateMinorAxis(
   const { min, max } = calculateDataRange(chartData);
 
   const axisMin = parseNumberOrDefault(axis.min, min);
-  const axisMax = parseNumberOrDefault(axis.max, max);
+  const axisMax = parseNumberOrDefault(axis.max, getNiceMaxValue(max));
 
   const domain: [AxisDomain, AxisDomain] = [axisMin, axisMax];
 
@@ -730,9 +759,9 @@ export function parseMetaData(metaData: DataBlockMetadata): ChartMetaData {
     indicators: metaData.indicators,
     locations: metaData.locations,
     boundaryLevels: metaData.boundaryLevels,
-    timePeriods: Object.entries(metaData.timePeriods).reduce(
-      (timePeriods, [value, data]) => ({
-        ...timePeriods,
+    timePeriod: Object.entries(metaData.timePeriod).reduce(
+      (timePeriod, [value, data]) => ({
+        ...timePeriod,
         [value]: {
           ...data,
           value,
@@ -747,7 +776,7 @@ export const CustomToolTip = ({ active, payload, label }: TooltipProps) => {
   if (active) {
     return (
       <div className="graph-tooltip">
-        <p>{label}</p>
+        <p className="govuk-!-font-weight-bold">{label}</p>
         {payload &&
           payload
             .sort((a, b) => {
@@ -761,7 +790,8 @@ export const CustomToolTip = ({ active, payload, label }: TooltipProps) => {
               return (
                 // eslint-disable-next-line react/no-array-index-key
                 <p key={index}>
-                  {`${payload[index].name} : ${payload[index].value}`}
+                  {payload[index].name} :{' '}
+                  <strong> {payload[index].value}</strong>
                 </p>
               );
             })}

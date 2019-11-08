@@ -1,4 +1,3 @@
-import { DataBlock } from '@admin/services/release/edit-release/datablocks/types';
 import Button from '@common/components/Button';
 import {
   Form,
@@ -9,17 +8,18 @@ import {
 } from '@common/components/form';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import Yup from '@common/lib/validation/yup';
-import { TableDataQuery } from '@common/modules/full-table/services/tableBuilderService';
-import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
 import {
-  GeographicLevel,
+  TableDataQuery,
   TimeIdentifier,
-} from '@common/services/dataBlockService';
+} from '@common/modules/full-table/services/tableBuilderService';
+import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
+import { DataBlock, GeographicLevel } from '@common/services/dataBlockService';
 import { FormikProps } from 'formik';
 import React from 'react';
 import { ObjectSchemaDefinition } from 'yup';
 
 interface Props {
+  initialValues: { title?: string };
   query: TableDataQuery;
   tableHeaders: TableHeadersFormValues;
   releaseId: string;
@@ -35,6 +35,7 @@ interface FormValues {
 }
 
 const DataBlockDetailsForm = ({
+  initialValues,
   query,
   tableHeaders,
   releaseId,
@@ -111,7 +112,10 @@ const DataBlockDetailsForm = ({
 
   React.useEffect(() => {
     const newInitialValues = {
-      title: (initialDataBlock && initialDataBlock.heading) || '',
+      title:
+        (initialDataBlock && initialDataBlock.heading) ||
+        initialValues.title ||
+        '',
       customFootnotes:
         (initialDataBlock && initialDataBlock.customFootnotes) || '',
       name: (initialDataBlock && initialDataBlock.name) || '',
@@ -121,7 +125,7 @@ const DataBlockDetailsForm = ({
     if (formikRef.current) {
       formikRef.current.setValues(newInitialValues);
     }
-  }, [initialDataBlock]);
+  }, [initialDataBlock, initialValues]);
 
   return (
     <Formik<FormValues>
@@ -142,32 +146,36 @@ const DataBlockDetailsForm = ({
               <FormGroup>
                 <FormFieldset id="details" legend="Data block details">
                   <FormFieldTextInput<FormValues>
+                    id="data-block-name"
+                    name="name"
+                    label="Data block name"
+                    hint=" Name and save your datablock before viewing it under the
+                    'View data blocks' tab at the top of this page."
+                    percentageWidth="one-half"
+                  />
+
+                  <hr />
+
+                  <FormFieldTextArea<FormValues>
                     id="data-block-title"
                     name="title"
-                    label="Data block title"
+                    label="Table title"
+                    additionalClass="govuk-!-width-two-thirds"
+                    rows={2}
                   />
 
                   <FormFieldTextInput<FormValues>
                     id="data-block-source"
                     name="source"
                     label="Source"
+                    percentageWidth="two-thirds"
                   />
 
                   <FormFieldTextArea<FormValues>
                     id="data-block-footnotes"
                     name="customFootnotes"
                     label="Footnotes"
-                  />
-
-                  <p>
-                    Name and save your datablock before viewing it under the
-                    'View data blocks' tab at the top of this page.
-                  </p>
-
-                  <FormFieldTextInput<FormValues>
-                    id="data-block-name"
-                    name="name"
-                    label="Data block name"
+                    additionalClass="govuk-!-width-two-thirds"
                   />
 
                   <Button
@@ -175,7 +183,7 @@ const DataBlockDetailsForm = ({
                     type="submit"
                     className="govuk-!-margin-top-6"
                   >
-                    {initialDataBlock ? 'Update Data Block' : 'Save Data Block'}
+                    {initialDataBlock ? 'Update data block' : 'Save data block'}
                   </Button>
                 </FormFieldset>
               </FormGroup>

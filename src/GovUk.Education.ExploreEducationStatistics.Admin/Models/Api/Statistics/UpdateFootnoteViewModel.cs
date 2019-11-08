@@ -9,5 +9,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.Statistics
         public IEnumerable<long> FilterGroups { get; set; }
         public IEnumerable<long> FilterItems { get; set; }
         public IEnumerable<long> Indicators { get; set; }
+        public IEnumerable<long> Subjects { get; set; }
     }
 }

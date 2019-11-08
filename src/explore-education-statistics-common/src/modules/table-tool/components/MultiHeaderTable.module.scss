@@ -1,22 +1,19 @@
 @import '../../../styles/govuk-base';
 
-$border-width: 4px;
+$border-width: 1px;
 
-.borderLeft {
-  border-left: $border-width solid govuk-colour('black') !important;
+/*.borderLeft {
+  border-left: 0 solid govuk-colour('black') !important;
 }
-
-.borderRight {
-  border-right: $border-width solid govuk-colour('black') !important;
-}
+*/
 
 .borderBottom {
-  border-bottom: $border-width solid govuk-colour('black') !important;
+  border-bottom: $border-width solid $govuk-border-colour !important;
 }
 
 .table {
   border-collapse: separate;
-  width: auto;
+  //width: auto;
 
   th:last-child,
   td:last-child {
@@ -38,6 +35,22 @@ $border-width: 4px;
   tbody th {
     background: #fff;
     position: relative;
+    text-align: left !important;
     z-index: 1;
+  }
+}
+
+:global(.govuk-table) .cellVerticalMiddle {
+  vertical-align: middle;
+}
+
+:global(.govuk-table) .cellHorizontalMiddle {
+  background: govuk-colour('light-grey');
+  border-bottom: 1px solid $govuk-border-colour;
+  border-right: 1px solid $govuk-border-colour;
+  text-align: center;
+
+  &:last-child {
+    border-right: 0;
   }
 }

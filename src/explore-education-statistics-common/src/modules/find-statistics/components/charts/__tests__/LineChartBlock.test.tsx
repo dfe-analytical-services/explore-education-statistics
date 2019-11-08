@@ -294,7 +294,7 @@ describe('LineChartBlock', () => {
 
     const { container } = render(<Chart {...propsWithTicks} />);
 
-    expectTicks(container, 'y', '-3', '1', '5', '10');
+    expectTicks(container, 'y', '-3', '3', '9', '20');
   });
 
   test('Can limit range of minor ticks to start and end', () => {
@@ -312,7 +312,7 @@ describe('LineChartBlock', () => {
 
     const { container } = render(<Chart {...propsWithTicks} />);
 
-    expectTicks(container, 'y', '-3', '10');
+    expectTicks(container, 'y', '-3', '20');
   });
 
   test('Can limit range of minor ticks to custom', () => {

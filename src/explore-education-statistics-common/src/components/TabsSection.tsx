@@ -11,7 +11,7 @@ import styles from './TabsSection.module.scss';
 
 export const classes = {
   panel: 'govuk-tabs__panel',
-  panelHidden: 'govuk-tabs__panel--hidden',
+  panelHidden: 'govuk-visually-hidden',
 };
 
 export interface TabsSectionProps {
@@ -23,12 +23,19 @@ export interface TabsSectionProps {
    */
   lazy?: boolean;
   title: string;
+  headingTitle?: string;
   headingTag?: 'h2' | 'h3' | 'h4';
 }
 
 const TabsSection = forwardRef<HTMLElement, TabsSectionProps>(
   (
-    { children, id, title, headingTag = 'h3', ...restProps }: TabsSectionProps,
+    {
+      children,
+      id,
+      headingTitle = '',
+      headingTag = 'h3',
+      ...restProps
+    }: TabsSectionProps,
     ref,
   ) => {
     const { onMedia } = useDesktopMedia();
@@ -54,7 +61,7 @@ const TabsSection = forwardRef<HTMLElement, TabsSectionProps>(
         role={onMedia('tabpanel')}
         tabIndex={onMedia(-1)}
       >
-        {createElement(headingTag, { children: title })}
+        {headingTitle && createElement(headingTag, { children: headingTitle })}
         {children}
       </section>
     );

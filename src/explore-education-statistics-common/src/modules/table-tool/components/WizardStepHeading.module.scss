@@ -29,13 +29,16 @@ $step-padding-top: govuk-spacing(6);
 
 .stepEnabled {
   .stepButton {
-    @include govuk-focusable;
-
     cursor: pointer;
   }
 
   .stepButton:hover {
     color: $govuk-link-hover-colour;
+  }
+
+  .stepButton:focus {
+    border: $govuk-focus-width solid #000;
+    outline: $govuk-focus-colour solid $govuk-focus-width;
   }
 
   .stepButton:hover .toggleText {

@@ -20,9 +20,9 @@ interface Props {
 }
 
 const colours: string[] = [
-  '#b10e1e',
-  '#006435',
-  '#005ea5',
+  '#d4351c',
+  '#00703c',
+  '#1d70b8',
   '#800080',
   '#C0C0C0',
 ];

@@ -1,14 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Tabs renders multiple tabs correctly 1`] = `
+exports[`Tabs renders multiple tabs correctly with titles 1`] = `
 <div class="govuk-tabs">
   <ul class="govuk-tabs__list"
       role="tablist"
   >
-    <li class="govuk-tabs__list-item"
+    <li class="govuk-tabs__list-item govuk-tabs__list-item--selected"
         role="presentation"
     >
-      <a class="govuk-tabs__tab govuk-tabs__tab--selected"
+      <a class="govuk-tabs__tab"
          href="#test-tabs-1"
          id="test-tabs-1-tab"
          aria-controls="test-tabs-1"
@@ -46,7 +46,7 @@ exports[`Tabs renders multiple tabs correctly 1`] = `
       Test section 1 content
     </p>
   </section>
-  <section class="govuk-tabs__panel dfe-content-overflow panel govuk-tabs__panel--hidden"
+  <section class="govuk-tabs__panel dfe-content-overflow panel govuk-visually-hidden"
            id="test-tabs-2"
            aria-labelledby="test-tabs-2-tab"
            role="tabpanel"
@@ -62,15 +62,71 @@ exports[`Tabs renders multiple tabs correctly 1`] = `
 </div>
 `;
 
+exports[`Tabs renders multiple tabs correctly without titles 1`] = `
+<div class="govuk-tabs">
+  <ul class="govuk-tabs__list"
+      role="tablist"
+  >
+    <li class="govuk-tabs__list-item govuk-tabs__list-item--selected"
+        role="presentation"
+    >
+      <a class="govuk-tabs__tab"
+         href="#test-tabs-1"
+         id="test-tabs-1-tab"
+         aria-controls="test-tabs-1"
+         aria-selected="true"
+         role="tab"
+      >
+        Tab 1
+      </a>
+    </li>
+    <li class="govuk-tabs__list-item"
+        role="presentation"
+    >
+      <a class="govuk-tabs__tab"
+         href="#test-tabs-2"
+         id="test-tabs-2-tab"
+         tabindex="-1"
+         aria-controls="test-tabs-2"
+         aria-selected="false"
+         role="tab"
+      >
+        Tab 2
+      </a>
+    </li>
+  </ul>
+  <section class="govuk-tabs__panel dfe-content-overflow panel"
+           id="test-tabs-1"
+           aria-labelledby="test-tabs-1-tab"
+           role="tabpanel"
+           tabindex="-1"
+  >
+    <p>
+      Test section 1 content
+    </p>
+  </section>
+  <section class="govuk-tabs__panel dfe-content-overflow panel govuk-visually-hidden"
+           id="test-tabs-2"
+           aria-labelledby="test-tabs-2-tab"
+           role="tabpanel"
+           tabindex="-1"
+  >
+    <p>
+      Test section 2 content
+    </p>
+  </section>
+</div>
+`;
+
 exports[`Tabs renders single tab correctly 1`] = `
 <div class="govuk-tabs">
   <ul class="govuk-tabs__list"
       role="tablist"
   >
-    <li class="govuk-tabs__list-item"
+    <li class="govuk-tabs__list-item govuk-tabs__list-item--selected"
         role="presentation"
     >
-      <a class="govuk-tabs__tab govuk-tabs__tab--selected"
+      <a class="govuk-tabs__tab"
          href="#test-tabs-1"
          id="test-tabs-1-tab"
          aria-controls="test-tabs-1"

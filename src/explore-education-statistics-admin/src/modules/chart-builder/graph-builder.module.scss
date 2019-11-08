@@ -16,7 +16,7 @@
   }
 
   &.selected {
-    background-color: #005ea5;
+    background-color: #1d70b8;
     color: #fff;
   }
 }
@@ -74,7 +74,6 @@
 
 .chartAxesConfiguration {
   box-sizing: border-box;
-  padding: 0 2em;
   width: 100%;
 }
 
@@ -110,7 +109,7 @@
 }
 
 .selectedData {
-  border-bottom: 1px solid #bfc1c3;
+  border-bottom: 1px solid #b1b4b6;
   margin-bottom: 1em;
 }
 
@@ -139,6 +138,13 @@
 .formGroup {
   flex-basis: 30%;
   min-width: 30%;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.formGroupWide {
+  flex-basis: 100%;
+  min-width: 100%;
   padding-left: 5px;
   padding-right: 5px;
 }

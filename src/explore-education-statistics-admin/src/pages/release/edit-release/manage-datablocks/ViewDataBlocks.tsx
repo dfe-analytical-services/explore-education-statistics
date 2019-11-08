@@ -1,5 +1,4 @@
 import { mapFullTable } from '@admin/pages/release/edit-release/manage-datablocks/tableUtil';
-import { DataBlock } from '@admin/services/release/edit-release/datablocks/types';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import { ChartRendererProps } from '@common/modules/find-statistics/components/ChartRenderer';
@@ -8,7 +7,7 @@ import getDefaultTableHeaderConfig from '@common/modules/full-table/utils/tableH
 import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import DataBlockService, {
-  DataBlockRequest,
+  DataBlock,
   DataBlockRerequest,
   DataBlockResponse,
 } from '@common/services/dataBlockService';
@@ -20,7 +19,6 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 
 interface Props {
   dataBlock: DataBlock;
-  dataBlockRequest: DataBlockRequest;
   dataBlockResponse: DataBlockResponse;
   onDataBlockSave: (db: DataBlock) => Promise<DataBlock>;
 }
@@ -28,7 +26,6 @@ interface Props {
 const ViewDataBlocks = ({
   dataBlock,
   dataBlockResponse,
-  dataBlockRequest,
   onDataBlockSave,
 }: Props) => {
   // we want to modify this internally as our own data, copying it
@@ -65,7 +62,7 @@ const ViewDataBlocks = ({
     const table = dataBlock.tables;
     const fullTable = mapFullTable(chartBuilderData);
     const tableHeadersConfig =
-      (table && table[0].tableHeaders) ||
+      (table && table.length > 0 && table[0].tableHeaders) ||
       getDefaultTableHeaderConfig(fullTable.subjectMeta);
 
     setTableData({
@@ -106,7 +103,7 @@ const ViewDataBlocks = ({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const reRequestdata = (reRequest: DataBlockRerequest) => {
     const newRequest = {
-      ...dataBlockRequest,
+      ...dataBlock.dataBlockRequest,
       ...reRequest,
     };
 
@@ -120,8 +117,10 @@ const ViewDataBlocks = ({
   return (
     <>
       <Tabs id="editDataBlockSections">
-        <TabsSection title="table">
-          {tableData && <TimePeriodDataTable {...tableData} />}
+        <TabsSection title="Table">
+          <div className="govuk-width-container">
+            {tableData && <TimePeriodDataTable {...tableData} />}
+          </div>
         </TabsSection>
         <TabsSection title="Create Chart">
           {chartBuilderData ? (
@@ -134,7 +133,7 @@ const ViewDataBlocks = ({
               />
             </div>
           ) : (
-            <LoadingSpinner />
+            <LoadingSpinner text="Creating chart" />
           )}
         </TabsSection>
       </Tabs>
