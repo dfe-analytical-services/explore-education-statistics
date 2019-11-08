@@ -215,7 +215,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             app.UseCsp(opts => opts
                 .BlockAllMixedContent()
                 .StyleSources(s => s.Self())
-                .StyleSources(s => s.UnsafeInline())
+                .StyleSources(s => s
+                    .CustomSources(" https://cdnjs.cloudflare.com")
+                    .UnsafeInline())
                 .FontSources(s => s.Self())
                 .FormActions(s => s
                     .CustomSources("https://login.microsoftonline.com")
