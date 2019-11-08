@@ -607,6 +607,16 @@ export const dummyFootnotes: Footnote[] = [
     id: 1,
     content:
       'State-funded primary schools include all primary academies, including free schools.',
+    indicators: [1],
+    filters: [1],
+    filterGroups: [2],
+    filterItems: [3],
+    subjects: [1],
+  },
+  /*   {
+    id: 1,
+    content:
+      'State-funded primary schools include all primary academies, including free schools.',
     indicators: [],
     filters: [],
     filterGroups: [],
@@ -672,5 +682,5 @@ export const dummyFootnotes: Footnote[] = [
     filterGroups: [],
     filterItems: [],
     subjects: [1, 2, 3, 4, 5, 6, 7],
-  },
+  }, */
 ];

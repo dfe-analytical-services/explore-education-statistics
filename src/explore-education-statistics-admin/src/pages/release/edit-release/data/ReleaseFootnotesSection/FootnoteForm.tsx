@@ -3,14 +3,25 @@ import {
   FootnoteProps,
   FootnoteMeta,
   FootnoteMetaGetters,
+  FootnoteSubjectMeta,
 } from '@admin/services/release/edit-release/footnotes/types';
 // import footnoteFormValidation from '@admin/services/release/edit-release/footnotes/util';
 import Link from '@admin/components/Link';
 import Button from '@common/components/Button';
-import { Formik, Form, FormFieldset } from '@common/components/form';
+import {
+  Formik,
+  Form,
+  FormFieldset,
+  FormFieldCheckboxSearchSubGroups,
+} from '@common/components/form';
 import Yup from '@common/lib/validation/yup';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
+import createErrorHelper from '@common/lib/validation/createErrorHelper';
+import FormFieldCheckboxGroupsMenu from '@common/modules/table-tool/components/FormFieldCheckboxGroupsMenu';
+import { FormValues } from '@common/modules/table-tool/components/FiltersForm';
+import CollapsibleList from '@common/components/CollapsibleList';
 import React from 'react';
+import camelCase from 'lodash/camelCase';
 import { FormikProps } from 'formik';
 import styles from './FootnoteForm.module.scss';
 
@@ -60,13 +71,94 @@ const FootnoteForm = ({
           );
         }}
         render={(form: FormikProps<FootnoteProps>) => {
+          const { getError } = createErrorHelper(form);
           return (
             <Form id={formId}>
+              <p>Select either one or multiple subject areas from below</p>
+              <div className="govuk-grid-row govuk-heading-s govuk-!-margin-bottom-0">
+                <div className="govuk-grid-column-one-third">Subject</div>
+                <div className="govuk-grid-column-one-third">Indicator</div>
+                <div className="govuk-grid-column-one-third">Filter</div>
+              </div>
+              <hr className="govuk-!-margin-top-1 govuk-!-margin-bottom-2" />
               <FormFieldset
                 id={`${formId}-allFieldsFieldset`}
                 legend={!footnote ? 'Create new footnote' : 'Edit footnote'}
                 legendHidden
               >
+                {Object.entries(footnoteMeta).map(
+                  ([subjectMetaId, subjectMeta]: [
+                    string,
+                    FootnoteSubjectMeta,
+                  ]) => (
+                    <>
+                      <div key={subjectMetaId} className="govuk-grid-row">
+                        <div className="govuk-grid-column-one-third">
+                          {subjectMeta.subjectName}
+                        </div>
+                        <div className="govuk-grid-column-one-third">
+                          <FormFieldCheckboxGroupsMenu<FormValues>
+                            name="indicators"
+                            id={`${formId}-indicators`}
+                            legend="Indicators"
+                            legendHidden
+                            error={getError('indicators')}
+                            selectAll
+                            options={Object.entries(subjectMeta.indicators).map(
+                              ([indicatorGroupId, indicatorGroup]) => {
+                                return {
+                                  legend: indicatorGroup.label,
+                                  options: Object.values(
+                                    indicatorGroup.options,
+                                  ),
+                                };
+                              },
+                            )}
+                          />
+                        </div>
+                        <div className="govuk-grid-column-one-third">
+                          <FormFieldset
+                            id={`${formId}-filters`}
+                            legend="Categories"
+                            legendHidden
+                            error={getError('filters')}
+                          >
+                            <CollapsibleList collapseAfter={5}>
+                              {Object.entries(subjectMeta.filters).map(
+                                ([filterId, filter]) => {
+                                  const filterName = `filters.${filter.legend}`;
+
+                                  return (
+                                    <FormFieldCheckboxGroupsMenu<FormValues>
+                                      key={filterId}
+                                      name={filterName}
+                                      id={`${formId}-${camelCase(filterName)}`}
+                                      legend={filter.legend}
+                                      hint={filter.hint}
+                                      error={getError(filterName)}
+                                      selectAll
+                                      options={Object.entries(
+                                        filter.options,
+                                      ).map(([filterGroupId, filterGroup]) => {
+                                        return {
+                                          legend: filterGroup.label,
+                                          options: Object.values(
+                                            filterGroup.options,
+                                          ),
+                                        };
+                                      })}
+                                    />
+                                  );
+                                },
+                              )}
+                            </CollapsibleList>
+                          </FormFieldset>
+                        </div>
+                      </div>
+                      <hr className="govuk-!-margin-0 govuk-!-margin-bottom-2" />
+                    </>
+                  ),
+                )}
                 <FormFieldTextArea<FootnoteProps>
                   id={`${formId}-content`}
                   name="content"

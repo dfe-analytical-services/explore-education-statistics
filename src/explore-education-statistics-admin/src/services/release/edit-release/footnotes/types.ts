@@ -1,42 +1,43 @@
-export interface FootnoteMeta {
-  [key: number /* subjectId */]: {
-    subjectId: number;
-    subjectName: string;
-    indicators: {
-      [key: number]: {
-        //indicator "group"
-        label: string;
-        options: {
-          [key: number]: {
-            //indicator "item"
-            label: string;
-            unit: string;
-            value: string;
-          };
+export interface FootnoteSubjectMeta {
+  subjectId: number;
+  subjectName: string;
+  indicators: {
+    [key: number]: {
+      //indicator "group"
+      label: string;
+      options: {
+        [key: number]: {
+          //indicator "item"
+          label: string;
+          unit: string;
+          value: string;
         };
       };
     };
-    filters: {
-      [key: number]: {
-        //filter
-        hint: string;
-        legend: string;
-        options: {
-          [key: number]: {
-            label: string;
-            //filterGroup
-            options: {
-              [key: number]: {
-                //filterItem
-                label: string;
-                value: string;
-              };
+  };
+  filters: {
+    [key: number]: {
+      //filter
+      hint: string;
+      legend: string;
+      options: {
+        [key: number]: {
+          label: string;
+          //filterGroup
+          options: {
+            [key: number]: {
+              //filterItem
+              label: string;
+              value: string;
             };
           };
         };
       };
     };
   };
+}
+export interface FootnoteMeta {
+  [key: number /* subjectId */]: FootnoteSubjectMeta;
 }
 
 export interface FootnoteMetaMap {
