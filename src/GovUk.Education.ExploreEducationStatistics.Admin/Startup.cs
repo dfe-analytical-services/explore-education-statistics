@@ -109,16 +109,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 .AddOpenIdConnect(options => Configuration.GetSection("OpenIdConnect").Bind(options))
                 .AddIdentityServerJwt();
 
-            services.Configure<JwtBearerOptions>(
-                IdentityServerJwtConstants.IdentityServerJwtBearerScheme,
-                options =>
-                {
-                    options.TokenValidationParameters = new TokenValidationParameters{
-                        ValidateIssuerSigningKey = false,
-                        ValidateIssuer = false
-                    };
-                });
-            
             // This configuration has to occur after the AddAuthentication() block as it is otherwise overridden.
             // This config tells UserManager to expect the logged in user's id to be in a Claim called
             // "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier" rather than "sub" (because
