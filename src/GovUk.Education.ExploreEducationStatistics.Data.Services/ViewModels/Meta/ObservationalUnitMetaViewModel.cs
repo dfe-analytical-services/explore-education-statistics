@@ -1,9 +1,9 @@
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
+
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta
 {
-    public class ObservationalUnitMetaViewModel
+    public class ObservationalUnitMetaViewModel : LabelValue
     {
-        public string Label { get; set; }
         public string Level { get; set; }
-        public string Value { get; set; }
     }
 }

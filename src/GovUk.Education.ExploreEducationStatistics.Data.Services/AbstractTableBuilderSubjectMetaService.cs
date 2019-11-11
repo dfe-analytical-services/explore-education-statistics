@@ -91,5 +91,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 return obj.Id.GetHashCode();
             }
         }
+        
+        protected static IEnumerable<T> TransformDuplicateObservationalUnitsWithUniqueLabels<T>(
+            IEnumerable<T> viewModels) where T : LabelValue
+        {
+            return viewModels
+                .GroupBy(model => model.Label)
+                .SelectMany(grouping =>
+                {
+                    if (grouping.Count() > 1)
+                    {
+                        foreach (var model in grouping)
+                        {
+                            model.Label += $" ({model.Value})";
+                        }
+                    }
+
+                    return grouping;
+                });
+        }
     }
 }
