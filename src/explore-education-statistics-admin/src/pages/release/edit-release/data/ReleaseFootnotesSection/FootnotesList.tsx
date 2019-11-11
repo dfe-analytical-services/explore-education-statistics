@@ -39,12 +39,12 @@ const FootnotesList = ({
   const renderFootnoteRow = (footnote: Footnote) => {
     const {
       id,
-      content = '',
-      subjects = [],
-      indicators = [],
-      filters = [],
-      filterGroups = [],
-      filterItems = [],
+      content,
+      subjects,
+      indicators,
+      filters,
+      filterGroups,
+      filterItems,
     } = footnote;
     const { footnoteForm } = footnoteFormControls;
     return (

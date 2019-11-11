@@ -5,7 +5,7 @@ import {
   FootnoteMetaGetters,
   FootnoteSubjectMeta,
 } from '@admin/services/release/edit-release/footnotes/types';
-// import footnoteFormValidation from '@admin/services/release/edit-release/footnotes/util';
+import footnoteFormValidation from '@admin/services/release/edit-release/footnotes/util';
 import Link from '@admin/components/Link';
 import Button from '@common/components/Button';
 import {
@@ -62,16 +62,27 @@ const FootnoteForm = ({
 
     return (
       <Formik<FootnoteProps>
+        // @ts-ignore
         initialValues={
-          footnote || {
-            content: '',
-            subjects: [],
-            indicators: [],
-            filters: [],
-            filterGroups: [],
-            filterItems: [],
-          }
+          footnote
+            ? {
+                content: footnote.content,
+                subjects: footnote.subjects.map(e => `${e}`),
+                indicators: footnote.indicators.map(e => `${e}`),
+                filters: footnote.filters.map(e => `${e}`),
+                filterGroups: footnote.filterGroups.map(e => `${e}`),
+                filterItems: footnote.filterItems.map(e => `${e}`),
+              }
+            : {
+                content: '',
+                subjects: [],
+                indicators: [],
+                filters: [],
+                filterGroups: [],
+                filterItems: [],
+              }
         }
+        validateOnBlur={false}
         validationSchema={Yup.object({
           content: Yup.string().required('Footnote content must be added.'),
         })}
@@ -83,7 +94,7 @@ const FootnoteForm = ({
         render={(form: FormikProps<FootnoteProps>) => {
           const { getError } = createErrorHelper(form);
           return (
-            <Form id={formId}>
+            <Form {...form} id={formId}>
               <p>Select either one or multiple subject areas from below</p>
               <div className="govuk-grid-row govuk-heading-s govuk-!-margin-bottom-0">
                 <div className="govuk-grid-column-one-third">Subject</div>
@@ -106,7 +117,7 @@ const FootnoteForm = ({
                         <div className="govuk-grid-column-one-third">
                           <FormFieldCheckboxGroup
                             name="subjects"
-                            id={`${formId}-subjects-formFieldSet`}
+                            id={`${formId}-subjects`}
                             legend="Subject"
                             legendHidden
                             error={getError('subjects')}
@@ -121,7 +132,7 @@ const FootnoteForm = ({
                         <div className="govuk-grid-column-one-third">
                           <FormFieldCheckboxGroupsMenu<FormValues>
                             name="indicators"
-                            id={`${formId}-indicators`}
+                            id="indicators"
                             legend="Indicators"
                             legendHidden
                             error={getError('indicators')}

@@ -1,9 +1,4 @@
-import {
-  FootnoteProps,
-  FootnoteMeta,
-  FootnoteMetaMap,
-  FootnoteMetaGetters,
-} from './types';
+import { FootnoteProps, FootnoteMeta, FootnoteMetaGetters } from './types';
 
 const footnoteFormValidation = (values: FootnoteProps) => {
   return 'atleast one filter must be selected';
