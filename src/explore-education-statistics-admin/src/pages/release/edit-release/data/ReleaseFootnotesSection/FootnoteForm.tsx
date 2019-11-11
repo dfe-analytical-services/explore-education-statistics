@@ -13,6 +13,7 @@ import {
   Form,
   FormFieldset,
   FormFieldCheckboxGroup,
+  FormGroup,
 } from '@common/components/form';
 import Yup from '@common/lib/validation/yup';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
@@ -82,7 +83,7 @@ const FootnoteForm = ({
                 filterItems: [],
               }
         }
-        validateOnBlur={false}
+        validate={footnoteFormValidation}
         validationSchema={Yup.object({
           content: Yup.string().required('Footnote content must be added.'),
         })}
@@ -106,6 +107,7 @@ const FootnoteForm = ({
                 id={`${formId}-allFieldsFieldset`}
                 legend={!footnote ? 'Create new footnote' : 'Edit footnote'}
                 legendHidden
+                error={getError('subjects')}
               >
                 {Object.entries(footnoteMeta).map(
                   ([subjectMetaId, subjectMeta]: [
@@ -120,7 +122,7 @@ const FootnoteForm = ({
                             id={`${formId}-subjects`}
                             legend="Subject"
                             legendHidden
-                            error={getError('subjects')}
+                            showError={false}
                             options={[
                               {
                                 label: subjectMeta.subjectName,
@@ -192,12 +194,12 @@ const FootnoteForm = ({
                     </div>
                   ),
                 )}
-                <FormFieldTextArea<FootnoteProps>
-                  id={`${formId}-content`}
-                  name="content"
-                  label="Footnote"
-                />
               </FormFieldset>
+              <FormFieldTextArea<FootnoteProps>
+                id={`${formId}-content`}
+                name="content"
+                label="Footnote"
+              />
               <Button
                 type="submit"
                 className="govuk-button govuk-!-margin-right-3"

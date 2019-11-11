@@ -1,7 +1,21 @@
 import { FootnoteProps, FootnoteMeta, FootnoteMetaGetters } from './types';
 
-const footnoteFormValidation = (values: FootnoteProps) => {
-  return 'atleast one filter must be selected';
+const footnoteFormValidation = ({
+  subjects,
+  indicators,
+  filters,
+  filterGroups,
+  filterItems,
+}: FootnoteProps) => {
+  const errors: { [key: string]: any } = {};
+  const atLeastOneOption =
+    [...subjects, ...indicators, ...filters, ...filterGroups, ...filterItems]
+      .length === 0 &&
+    'At least one Subject, Indicator or Filter must be selected';
+  if (atLeastOneOption) {
+    errors.subjects = atLeastOneOption;
+  }
+  return errors;
 };
 
 export const generateFootnoteMetaMap = (
