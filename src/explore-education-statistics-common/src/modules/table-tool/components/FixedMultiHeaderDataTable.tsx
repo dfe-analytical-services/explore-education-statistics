@@ -65,10 +65,11 @@ const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
         <figcaption>{caption}</figcaption>
 
         <div
+          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+          tabIndex={0}
           className={styles.container}
           ref={containerRef}
           role="region"
-          tabIndex={-1}
           onScroll={event => {
             const { scrollLeft, scrollTop } = event.currentTarget;
 

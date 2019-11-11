@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "ffa619c2-5e7f-408e-b64b-a4aec014f39c",
+		"_postman_id": "c022135d-54b8-453a-9998-cd009c8b77e3",
 		"name": "Dfe Content API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -40,7 +40,7 @@
 											"    pm.expect(pm.response.to.have.jsonBody(\"coverageTitle\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"yearTitle\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"published\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"lastestRelease\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"latestRelease\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"type.id\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"slug\"));",
 											"    pm.expect(pm.response.to.have.jsonBody(\"summary\"));",

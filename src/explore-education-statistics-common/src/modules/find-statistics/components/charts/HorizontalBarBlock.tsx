@@ -59,7 +59,7 @@ export default class HorizontalBarBlock extends Component<HorizontalBarProps> {
         id: 'major',
         title: 'Y Axis',
         type: 'major',
-        defaultDataType: 'timePeriods',
+        defaultDataType: 'timePeriod',
       },
       {
         id: 'minor',

@@ -63,7 +63,7 @@ export interface ChartMetaData {
   indicators: Dictionary<LabelValueUnitMetadata>;
   locations: Dictionary<DataBlockLocationMetadata>;
   boundaryLevels?: BoundaryLevel[];
-  timePeriods: Dictionary<LabelValueMetadata>;
+  timePeriod: Dictionary<LabelValueMetadata>;
 }
 
 export interface AxesConfiguration {
@@ -311,7 +311,7 @@ export function generateKeyFromDataSet(
 
     ...joinedLocations,
 
-    (ignoringField !== 'timePeriods' && timePeriod) || '',
+    (ignoringField !== 'timePeriod' && timePeriod) || '',
   ].join('_');
 }
 
@@ -321,12 +321,15 @@ function generateNameForAxisConfiguration(
   groupBy?: AxisGroupBy,
 ): string {
   switch (groupBy) {
-    case 'timePeriods':
+    case 'timePeriod':
       return result.timePeriod;
     case 'indicators':
       return `${dataSet.indicator}`;
     case 'filters':
-      return result.filters.join('_');
+      return generateKeyFromDataSet(
+        { ...dataSet, filters: result.filters },
+        groupBy,
+      );
     case 'locations':
       if (
         result.location.localAuthorityDistrict &&
@@ -520,8 +523,10 @@ export function createSortedAndMappedDataForAxis(
     mapNameToNameLabel(
       keepOriginalValue,
       labels,
-      meta.timePeriods,
+      meta.timePeriod,
       meta.locations,
+      meta.filters,
+      meta.indicators,
     ),
   );
 }
@@ -754,9 +759,9 @@ export function parseMetaData(metaData: DataBlockMetadata): ChartMetaData {
     indicators: metaData.indicators,
     locations: metaData.locations,
     boundaryLevels: metaData.boundaryLevels,
-    timePeriods: Object.entries(metaData.timePeriods).reduce(
-      (timePeriods, [value, data]) => ({
-        ...timePeriods,
+    timePeriod: Object.entries(metaData.timePeriod).reduce(
+      (timePeriod, [value, data]) => ({
+        ...timePeriod,
         [value]: {
           ...data,
           value,
@@ -771,7 +776,7 @@ export const CustomToolTip = ({ active, payload, label }: TooltipProps) => {
   if (active) {
     return (
       <div className="graph-tooltip">
-        <p>{label}</p>
+        <p className="govuk-!-font-weight-bold">{label}</p>
         {payload &&
           payload
             .sort((a, b) => {
@@ -785,7 +790,8 @@ export const CustomToolTip = ({ active, payload, label }: TooltipProps) => {
               return (
                 // eslint-disable-next-line react/no-array-index-key
                 <p key={index}>
-                  {`${payload[index].name} : ${payload[index].value}`}
+                  {payload[index].name} :{' '}
+                  <strong> {payload[index].value}</strong>
                 </p>
               );
             })}

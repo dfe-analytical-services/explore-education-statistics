@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public ICollection<FilterItem> FilterItems { get; set; }
         public ICollection<FilterGroupFootnote> Footnotes { get; set; }
 
-        private FilterGroup()
+        public FilterGroup()
         {
         }
 

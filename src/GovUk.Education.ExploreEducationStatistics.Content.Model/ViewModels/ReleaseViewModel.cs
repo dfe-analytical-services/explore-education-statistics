@@ -20,6 +20,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.ViewModels
         public DateTime? Published { get; set; }
 
         public bool LatestRelease { get; set; }
+        
+        public ReleaseType Type { get; set; }
 
         public string Slug { get; set; }
 

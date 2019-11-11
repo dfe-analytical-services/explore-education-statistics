@@ -95,7 +95,7 @@ const testResponse: DataBlockResponse = {
         value: '28',
       },
     },
-    timePeriods: {
+    timePeriod: {
       '2012_HT6': {
         code: 'HT6',
         year: 2012,

@@ -38,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             IEnumerable<long> filterGroupIds,
             IEnumerable<long> filterItemIds,
             IEnumerable<long> indicatorIds,
-            long subjectId)
+            IEnumerable<long> subjectIds)
         {
             var footnote = DbSet().Add(new Footnote
             {
@@ -49,8 +49,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 Indicators = new List<IndicatorFootnote>(),
                 Subjects = new List<SubjectFootnote>()
             }).Entity;
-            
-            CreateSubjectLink(footnote, subjectId);
+
+            CreateSubjectLinks(footnote, subjectIds);
             CreateFilterLinks(footnote, filterIds);
             CreateFilterGroupLinks(footnote, filterGroupIds);
             CreateFilterItemLinks(footnote, filterItemIds);
@@ -87,7 +87,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             IEnumerable<long> filterIds,
             IEnumerable<long> filterGroupIds,
             IEnumerable<long> filterItemIds,
-            IEnumerable<long> indicatorIds)
+            IEnumerable<long> indicatorIds,
+            IEnumerable<long> subjectIds)
         {
             var footnote = Find(id, new List<Expression<Func<Footnote, object>>>
             {
@@ -106,6 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             UpdateFilterGroupLinks(footnote, filterGroupIds);
             UpdateFilterItemLinks(footnote, filterItemIds);
             UpdateIndicatorLinks(footnote, indicatorIds);
+            UpdateSubjectLinks(footnote, subjectIds);
 
             _context.SaveChanges();
             return GetFootnote(id);
@@ -122,7 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             var indicatorListParam = CreateIdListType("indicatorList", indicators);
             var filterItemListParam = CreateIdListType("filterItemList", filterItems);
 
-            return _context.Footnote.FromSqlRaw(
+            return _context.Footnote.AsNoTracking().FromSqlRaw(
                 "EXEC dbo.FilteredFootnotes " +
                 "@subjectId," +
                 "@indicatorList," +
@@ -131,20 +133,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 indicatorListParam,
                 filterItemListParam);
         }
-
-        private void CreateSubjectLink(Footnote footnote, long subjectId)
+        
+        public IEnumerable<Footnote> GetFootnotes(Guid releaseId)
         {
-            var subject = _subjectService.Find(subjectId, new List<Expression<Func<Subject, object>>>
-                          {
-                              s => s.Footnotes
-                          }) ??
-                          throw new ArgumentException("Subject not found", nameof(subjectId));
+            return _context.SubjectFootnote
+                .Where(footnote => footnote.Subject.ReleaseId == releaseId)
+                .Select(footnote => footnote.Footnote)
+                .Distinct()
+                .Include(footnote => footnote.Filters)
+                .Include(footnote => footnote.FilterGroups)
+                .Include(footnote => footnote.FilterItems)
+                .Include(footnote => footnote.Indicators)
+                .Include(footnote => footnote.Subjects)
+                .ToList();
+        }
+        
+        private void CreateSubjectLinks(Footnote footnote, IEnumerable<long> subjectIds)
+        {
+            var subjects = _subjectService.FindMany(subject => subjectIds.Contains(subject.Id),
+                new List<Expression<Func<Subject, object>>>
+                {
+                    s => s.Footnotes
+                });
 
-            footnote.Subjects.Add(new SubjectFootnote
+            var links = footnote.Subjects;
+            foreach (var subject in subjects)
             {
-                FootnoteId = footnote.Id,
-                SubjectId = subject.Id
-            });
+                AddSubjectLink(ref links, footnote.Id, subject.Id);
+            }
         }
 
         private void CreateFilterLinks(Footnote footnote, IEnumerable<long> filterIds)
@@ -164,7 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
         private void CreateFilterGroupLinks(Footnote footnote, IEnumerable<long> filterGroupIds)
         {
-            var filterGroups = _filterGroupService.FindMany(filter => filterGroupIds.Contains(filter.Id),
+            var filterGroups = _filterGroupService.FindMany(filterGroup => filterGroupIds.Contains(filterGroup.Id),
                 new List<Expression<Func<FilterGroup, object>>>
                 {
                     filter => filter.Footnotes
@@ -179,7 +195,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
         private void CreateFilterItemLinks(Footnote footnote, IEnumerable<long> filterItemIds)
         {
-            var filterItems = _filterItemService.FindMany(filter => filterItemIds.Contains(filter.Id),
+            var filterItems = _filterItemService.FindMany(filterItem => filterItemIds.Contains(filterItem.Id),
                 new List<Expression<Func<FilterItem, object>>>
                 {
                     filter => filter.Footnotes
@@ -194,7 +210,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
         private void CreateIndicatorsLinks(Footnote footnote, IEnumerable<long> indicatorIds)
         {
-            var indicators = _indicatorService.FindMany(filter => indicatorIds.Contains(filter.Id),
+            var indicators = _indicatorService.FindMany(indicator => indicatorIds.Contains(indicator.Id),
                 new List<Expression<Func<Indicator, object>>>
                 {
                     filter => filter.Footnotes
@@ -247,6 +263,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             }
         }
 
+        private void UpdateSubjectLinks(Footnote footnote, IEnumerable<long> subjectIds)
+        {
+            if (!SequencesAreEqualIgnoringOrder(
+                footnote.Subjects.Select(link => link.SubjectId), subjectIds))
+            {
+                footnote.Subjects = new List<SubjectFootnote>();
+                CreateSubjectLinks(footnote, subjectIds);
+            }
+        }
+
         private static void AddIndicatorLink(ref ICollection<IndicatorFootnote> links, long footnoteId, long linkId)
         {
             links.Add(new IndicatorFootnote
@@ -280,6 +306,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             {
                 FootnoteId = footnoteId,
                 FilterItemId = linkId
+            });
+        }
+
+        private static void AddSubjectLink(ref ICollection<SubjectFootnote> links, long footnoteId, long subjectId)
+        {
+            links.Add(new SubjectFootnote
+            {
+                FootnoteId = footnoteId,
+                SubjectId = subjectId
             });
         }
 

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -10,11 +11,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
             IEnumerable<long> filterGroupIds,
             IEnumerable<long> filterItemIds,
             IEnumerable<long> indicatorIds,
-            long subjectId);
+            IEnumerable<long> subjectIds);
 
         void DeleteFootnote(long id);
 
         Footnote GetFootnote(long id);
+
+        IEnumerable<Footnote> GetFootnotes(Guid releaseId);
 
         IEnumerable<Footnote> GetFootnotes(
             long subjectId,
@@ -27,6 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfa
             IEnumerable<long> filterIds,
             IEnumerable<long> filterGroupIds,
             IEnumerable<long> filterItemIds,
-            IEnumerable<long> indicatorIds);
+            IEnumerable<long> indicatorIds,
+            IEnumerable<long> subjectIds);
     }
 }

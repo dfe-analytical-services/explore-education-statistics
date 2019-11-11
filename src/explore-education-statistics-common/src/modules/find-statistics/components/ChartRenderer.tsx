@@ -57,7 +57,7 @@ function ChartRenderer(props: ChartRendererProps) {
   if (data && meta && data.result.length > 0) {
     return (
       <>
-        {title && <h3>{title}</h3>}
+        {title && <h3 className="govuk-heading-s">{title}</h3>}
         <ChartTypeRenderer {...props} />
       </>
     );

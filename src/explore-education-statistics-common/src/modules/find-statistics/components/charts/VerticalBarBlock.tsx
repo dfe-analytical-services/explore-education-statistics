@@ -59,7 +59,7 @@ export default class VerticalBarBlock extends Component<VerticalBarProps> {
         id: 'major',
         title: 'X Axis',
         type: 'major',
-        defaultDataType: 'timePeriods',
+        defaultDataType: 'timePeriod',
       },
       {
         id: 'minor',
