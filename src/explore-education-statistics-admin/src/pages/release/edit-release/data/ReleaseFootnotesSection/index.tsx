@@ -10,7 +10,6 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import React, { useEffect, useState } from 'react';
 import FootnotesList from './FootnotesList';
 import FootnoteForm, { FootnoteFormConfig } from './FootnoteForm';
-import { dummyFootnoteMeta, dummyFootnotes } from './dummyFootnoteData';
 
 interface Props {
   publicationId: string;
@@ -18,6 +17,7 @@ interface Props {
 }
 
 const ReleaseFootnotesSection = ({ publicationId, releaseId }: Props) => {
+  const [loading, setLoading] = useState<boolean>(true);
   const [footnoteMeta, setFootnoteMeta] = useState<FootnoteMeta>();
   const [footnotes, setFootnotes] = useState<Footnote[]>([]);
   const [footnoteForm, _setFootnoteForm] = useState<FootnoteFormConfig>({
@@ -27,10 +27,20 @@ const ReleaseFootnotesSection = ({ publicationId, releaseId }: Props) => {
     FootnoteMetaGetters
   >();
 
+  function getFootnoteData() {
+    setLoading(true);
+    footnotesService
+      .getReleaseFootnoteData(releaseId)
+      .then(({ meta, footnotes: footnotesList }) => {
+        setFootnoteMeta(meta);
+        setFootnotes(footnotesList);
+        setFootnoteMetaGetters(generateFootnoteMetaMap(meta));
+        setLoading(false);
+      });
+  }
+
   useEffect(() => {
-    setFootnoteMeta(dummyFootnoteMeta);
-    setFootnotes(dummyFootnotes);
-    setFootnoteMetaGetters(generateFootnoteMetaMap(dummyFootnoteMeta));
+    getFootnoteData();
   }, [publicationId, releaseId]);
 
   const footnoteFormControls = {
@@ -41,18 +51,25 @@ const ReleaseFootnotesSection = ({ publicationId, releaseId }: Props) => {
     },
     cancel: () => _setFootnoteForm({ state: 'cancel' }),
     save: (footnote: FootnoteProps, footnoteId?: number) => {
-      console.log(
-        `updating footnote: ${footnoteId} with ${JSON.stringify(footnote)}`,
-      );
+      if (footnoteId) {
+        footnotesService.updateFootnote(footnoteId, footnote);
+      }
+      footnotesService
+        .createFootnote(footnote)
+        .then((newFootnote: Footnote) => {
+          setFootnotes([...footnotes, newFootnote]);
+        });
       _setFootnoteForm({ state: 'cancel' });
     },
-    delete: footnotesService.deleteFootnote,
+    delete: (footnoteId: number) => {
+      footnotesService.deleteFootnote(footnoteId).then(getFootnoteData);
+    },
   };
 
   return (
     <>
       <h2>Footnotes</h2>
-      {!footnoteMeta || !footnoteMetaGetters ? (
+      {loading || !footnoteMeta || !footnoteMetaGetters ? (
         <LoadingSpinner />
       ) : (
         <>
@@ -62,7 +79,7 @@ const ReleaseFootnotesSection = ({ publicationId, releaseId }: Props) => {
             onOpen={footnoteFormControls.create}
             onCancel={footnoteFormControls.cancel}
             onSubmit={footnoteFormControls.save}
-            isFirst={!footnotes.length}
+            isFirst={footnotes && footnotes.length === 0}
             footnoteMeta={footnoteMeta}
             footnoteMetaGetters={footnoteMetaGetters}
           />

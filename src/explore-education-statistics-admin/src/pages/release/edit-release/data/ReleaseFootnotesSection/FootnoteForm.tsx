@@ -12,7 +12,7 @@ import {
   Formik,
   Form,
   FormFieldset,
-  FormFieldCheckboxSearchSubGroups,
+  FormFieldCheckboxGroup,
 } from '@common/components/form';
 import Yup from '@common/lib/validation/yup';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
@@ -61,11 +61,21 @@ const FootnoteForm = ({
 
     return (
       <Formik<FootnoteProps>
-        initialValues={footnote || { content: '' }}
-        validationSchema={Yup.object<FootnoteProps>({
+        initialValues={
+          footnote || {
+            content: '',
+            subjects: [],
+            indicators: [],
+            filters: [],
+            filterGroups: [],
+            filterItems: [],
+          }
+        }
+        validationSchema={Yup.object({
           content: Yup.string().required('Footnote content must be added.'),
         })}
         onSubmit={values => {
+          console.log(values);
           return (
             onSubmit && onSubmit(values, footnote ? footnote.id : undefined)
           );
@@ -91,10 +101,22 @@ const FootnoteForm = ({
                     string,
                     FootnoteSubjectMeta,
                   ]) => (
-                    <>
+                    <div key={subjectMetaId}>
                       <div key={subjectMetaId} className="govuk-grid-row">
                         <div className="govuk-grid-column-one-third">
-                          {subjectMeta.subjectName}
+                          <FormFieldCheckboxGroup
+                            name="subjects"
+                            id={`${formId}-subjects-formFieldSet`}
+                            legend="Subject"
+                            legendHidden
+                            error={getError('subjects')}
+                            options={[
+                              {
+                                label: subjectMeta.subjectName,
+                                value: `${subjectMeta.subjectId}`,
+                              },
+                            ]}
+                          />
                         </div>
                         <div className="govuk-grid-column-one-third">
                           <FormFieldCheckboxGroupsMenu<FormValues>
@@ -126,7 +148,7 @@ const FootnoteForm = ({
                             <CollapsibleList collapseAfter={5}>
                               {Object.entries(subjectMeta.filters).map(
                                 ([filterId, filter]) => {
-                                  const filterName = `filters.${filter.legend}`;
+                                  const filterName = `filterItems`;
 
                                   return (
                                     <FormFieldCheckboxGroupsMenu<FormValues>
@@ -156,7 +178,7 @@ const FootnoteForm = ({
                         </div>
                       </div>
                       <hr className="govuk-!-margin-0 govuk-!-margin-bottom-2" />
-                    </>
+                    </div>
                   ),
                 )}
                 <FormFieldTextArea<FootnoteProps>

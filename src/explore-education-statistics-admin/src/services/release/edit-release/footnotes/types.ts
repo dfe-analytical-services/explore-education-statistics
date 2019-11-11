@@ -57,11 +57,11 @@ export interface FootnoteMetaGetters {
 
 export interface FootnoteProps {
   content: string;
-  subjects?: number[];
-  indicators?: number[];
-  filterGroups?: number[];
-  filters?: number[];
-  filterItems?: number[];
+  subjects: number[];
+  indicators: number[];
+  filterGroups: number[];
+  filters: number[];
+  filterItems: number[];
 }
 
 export interface Footnote extends FootnoteProps {
