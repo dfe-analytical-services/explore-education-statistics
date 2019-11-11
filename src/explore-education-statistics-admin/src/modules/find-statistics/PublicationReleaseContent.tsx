@@ -3,14 +3,13 @@ import FormattedDate from '@common/components/FormattedDate';
 import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
 import {baseUrl} from '@common/services/api';
-import {Release, ReleaseType, AbstractRelease} from '@common/services/publicationService';
+import {AbstractRelease, ReleaseType} from '@common/services/publicationService';
 import {Dictionary} from '@common/types';
 import classNames from 'classnames';
 import React from 'react';
 import {ReleaseSummaryDetails} from '@admin/services/release/types';
 import BasicReleaseSummary from "@admin/modules/find-statistics/components/BasicReleaseSummary";
-import {AccordionProps, generateIdList} from '@common/components/Accordion';
-import {AccordionSectionProps} from '@common/components/AccordionSection';
+import {generateIdList} from '@common/components/Accordion';
 import {BasicPublicationDetails} from 'src/services/common/types';
 import {getTimePeriodCoverageDateRangeStringShort} from "@admin/pages/release/util/releaseSummaryUtil";
 import {MarkdownRendererProps} from "@admin/modules/find-statistics/components/EditableMarkdownRenderer";
@@ -19,6 +18,8 @@ import {PrintThisPageProps} from "@admin/modules/find-statistics/components/Prin
 import {Props as LinkProps} from 'src/components/Link';
 import {DataBlockProps} from '@common/modules/find-statistics/components/DataBlock';
 import {EditableContentBlock} from 'src/services/publicationService';
+import {EditableAccordionProps} from "@admin/components/EditableAccordion";
+import {EditableAccordionSectionProps} from "@admin/components/EditableAccordionSection";
 import {Props as ContentBlockProps} from './components/EditableContentBlock';
 
 export interface RendererProps {
@@ -31,8 +32,8 @@ type MarkdownRendererType = React.ComponentType<MarkdownRendererProps>
 type LinkType = React.ComponentType<LinkProps & { analytics?: unknown }>;
 type PrintThisPageType = React.ComponentType<PrintThisPageProps>
 type DataBlockType = React.ComponentType<DataBlockProps>;
-type AccordionType = React.ComponentType<AccordionProps>;
-type AccordionSectionType = React.ComponentType<AccordionSectionProps>;
+type AccordionType = React.ComponentType<EditableAccordionProps>;
+type AccordionSectionType = React.ComponentType<EditableAccordionSectionProps>;
 type ContentBlockType = React.ComponentType<ContentBlockProps>;
 
 export interface ComponentTypes {
@@ -253,17 +254,16 @@ const PublicationReleaseContent = ({
         Headline facts and figures - {release.yearTitle}
       </h2>
 
-      {release.keyStatistics && (
-        <DataBlock {...release.keyStatistics} id="keystats" />
-      )}
+      <DataBlock {...release.keyStatistics} id="keystats" />
 
       {/* <editor-fold desc="Content blocks"> */}
 
       {release.content.length > 0 && (
         <Accordion id={accId[0]}>
-          {release.content.map(({heading, caption, order, content}) => {
+          {release.content.map(({heading, caption, order, content}, index) => {
             return (
               <AccordionSection
+                index={index}
                 heading={heading}
                 caption={caption}
                 key={order}

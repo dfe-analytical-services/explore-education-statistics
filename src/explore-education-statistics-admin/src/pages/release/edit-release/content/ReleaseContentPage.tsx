@@ -24,6 +24,9 @@ import {EditableContentBlock} from "@admin/services/publicationService";
 import {EditableContentBlock as EditableContentBlockComponent} from '@admin/modules/find-statistics/components/EditableContentBlock';
 import DataBlock from '@common/modules/find-statistics/components/DataBlock';
 import ContentBlock from '@common/modules/find-statistics/components/ContentBlock';
+import EditableDataBlock from '@admin/modules/find-statistics/components/EditableDataBlock';
+import EditableAccordion from "@admin/components/EditableAccordion";
+import EditableAccordionSection from "@admin/components/EditableAccordionSection";
 import PrintThisPage from '../../../../modules/find-statistics/components/PrintThisPage';
 
 type PageMode = 'edit' | 'preview';
@@ -47,10 +50,10 @@ const PageModeComponentTypes: PageModeComponentTypesType = {
     Link,
     PrintThisPage,
     SearchForm: PageSearchForm,
-    Accordion,
-    AccordionSection,
+    Accordion: EditableAccordion,
+    AccordionSection: EditableAccordionSection,
     ContentBlock: EditableContentBlockComponent,
-    DataBlock
+    DataBlock: EditableDataBlock
   },
   'preview': {
     TextRenderer: EditableTextRenderer,
@@ -102,7 +105,12 @@ const ReleaseContentPage = () => {
         content: [{
           type: 'HtmlBlock',
           body: "This is a test",
-          comments: []
+          comments: [{
+            name: "A user",
+            time: new Date(),
+            comment: "A comment",
+            state: "open"
+          }]
         }]
       };
 
@@ -115,12 +123,12 @@ const ReleaseContentPage = () => {
             ...block,
             comments: []
           }))
-        })) || [contentBlock]
+        })) || [contentBlock, contentBlock]
       };
 
       const release: AbstractRelease<EditableContentBlock> = {
         ...releaseDataAsEditable,
-        summary: "Hello",
+        summary: "This is the summary ..... ",
         updates: [
           {
             id: '',
