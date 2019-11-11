@@ -15,8 +15,6 @@ const ReleaseDataPage = () => {
 
   return (
     <>
-      <h3>Data uploads</h3>
-
       <Tabs id="dataUploadTab">
         <TabsSection id="data-upload" title="Data uploads">
           <ReleaseDataUploadsSection
