@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     public partial class UpdateChartDataBlock : Migration
     {

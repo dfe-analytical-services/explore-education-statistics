@@ -7,9 +7,9 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
-    [DbContext(typeof(ApplicationDbContext))]
+    [DbContext(typeof(ContentDbContext))]
     [Migration("20191104143549_UpdateChartDataBlock")]
     partial class UpdateChartDataBlock
     {
