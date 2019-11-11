@@ -16,7 +16,7 @@ const service = {
   async updateFootnote(id: number, footnote: FootnoteProps | Footnote) {
     return client.put(`/data/footnote/${id}`, footnote);
   },
-  async deleteFootnote(id: number) {
+  async deleteFootnote(id: number): Promise<void> {
     return client.delete(`/data/footnote/${id}`);
   },
 };

@@ -44,7 +44,8 @@ export interface FootnoteFormControls {
   create: () => void;
   edit: (footnote: Footnote) => void;
   cancel: () => void;
-  save: (footnote: FootnoteProps, footnoteId?: number | undefined) => void;
+  save: (footnote: FootnoteProps, footnoteId?: number) => void;
+  delete: (footnoteId: number) => void;
 }
 
 const FootnoteForm = ({
@@ -75,7 +76,6 @@ const FootnoteForm = ({
           content: Yup.string().required('Footnote content must be added.'),
         })}
         onSubmit={values => {
-          console.log(values);
           return (
             onSubmit && onSubmit(values, footnote ? footnote.id : undefined)
           );
