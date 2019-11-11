@@ -2,13 +2,13 @@ import classNames from 'classnames';
 import React, { ReactNode } from 'react';
 import { Link as RouterLink, LinkProps } from 'react-router-dom';
 
-type Props = {
+export type Props = {
   children: ReactNode;
   className?: string;
   unvisited?: boolean;
 } & LinkProps;
 
-const Link = ({
+export const Link = ({
   children,
   className,
   to,

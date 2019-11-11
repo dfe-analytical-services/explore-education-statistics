@@ -1,10 +1,14 @@
 import React from 'react';
-import { TextRendererProps } from '@admin/modules/find-statistics/PublicationReleaseContent';
+import {FormTextInputProps} from '@common/components/form/FormTextInput';
+import {RendererProps} from '../PublicationReleaseContent';
 
-const EditableTextRenderer = ({ children }: TextRendererProps) => {
+
+export type TextRendererProps = RendererProps & FormTextInputProps;
+
+const EditableTextRenderer = ({value}: TextRendererProps) => {
   return (
     <>
-      {children}
+      {value}
     </>
   );
 };

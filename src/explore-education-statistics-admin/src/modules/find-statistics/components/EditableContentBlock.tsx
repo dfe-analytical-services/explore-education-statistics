@@ -1,20 +1,21 @@
-import { ContentBlock } from '@common/services/publicationService';
+import { ContentBlock, Publication } from '@common/services/publicationService';
 import React, { Component } from 'react';
 import { EditableRelease } from '@admin/services/publicationService';
+import { ContentBlockProps } from '@common/modules/find-statistics/components/ContentBlock';
 import EditableContentSubBlockRenderer from './EditableContentSubBlockRenderer';
 import AddComment from '../../../pages/prototypes/components/PrototypeEditableContentAddComment';
 import ResolveComment from '../../../pages/prototypes/components/PrototypeEditableContentResolveComment';
 
-interface Props {
+export interface Props extends ContentBlockProps {
   content: EditableRelease['content'][0]['content'];
-  id?: string;
+
   editable?: boolean;
   reviewing?: boolean;
   resolveComments?: boolean;
   onContentChange?: (block: ContentBlock, content: string) => void;
 }
 
-class EditableContentBlock extends Component<Props> {
+export class EditableContentBlock extends Component<Props> {
   public render() {
     const {
       content,

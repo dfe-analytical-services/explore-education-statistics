@@ -3,63 +3,57 @@ import FormattedDate from '@common/components/FormattedDate';
 import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
 import {baseUrl} from '@common/services/api';
-import {Release, ReleaseType} from '@common/services/publicationService';
+import {Release, ReleaseType, AbstractRelease} from '@common/services/publicationService';
 import {Dictionary} from '@common/types';
 import classNames from 'classnames';
-import React, {AnchorHTMLAttributes, PropsWithChildren, ReactNode} from 'react';
-import {LocationDescriptor} from 'history';
+import React from 'react';
 import {ReleaseSummaryDetails} from '@admin/services/release/types';
 import BasicReleaseSummary from "@admin/modules/find-statistics/components/BasicReleaseSummary";
-import Accordion from '@common/components/Accordion';
-import AccordionSection from '@common/components/AccordionSection';
+import {AccordionProps, generateIdList} from '@common/components/Accordion';
+import {AccordionSectionProps} from '@common/components/AccordionSection';
 import {BasicPublicationDetails} from 'src/services/common/types';
 import {getTimePeriodCoverageDateRangeStringShort} from "@admin/pages/release/util/releaseSummaryUtil";
+import {MarkdownRendererProps} from "@admin/modules/find-statistics/components/EditableMarkdownRenderer";
+import {TextRendererProps} from "@admin/modules/find-statistics/components/EditableTextRenderer";
+import {PrintThisPageProps} from "@admin/modules/find-statistics/components/PrintThisPage";
+import {Props as LinkProps} from 'src/components/Link';
+import {DataBlockProps} from '@common/modules/find-statistics/components/DataBlock';
+import {EditableContentBlock} from 'src/services/publicationService';
+import {Props as ContentBlockProps} from './components/EditableContentBlock';
 
-interface RendererProps {
-  releaseId: string;
+export interface RendererProps {
+  contentId?: string;
+  releaseId?: string;
 }
 
-export interface TextRendererProps extends RendererProps {
-  children: React.ReactNode | React.ReactNode[]
-}
-
-export interface MarkdownRendererProps extends RendererProps {
-  source: string;
-}
-
-export type LinkProps = {
-  children: ReactNode;
-  as?: string;
-
-  className?: string;
-  prefetch?: boolean;
-  to: LocationDescriptor;
-  unvisited?: boolean;
-  analytics?: unknown;
-} & AnchorHTMLAttributes<HTMLAnchorElement>;
-
-type PrintThisPageProps = {
-  analytics?: unknown;
-} & AnchorHTMLAttributes<HTMLAnchorElement>;
-
-type LinkTypeProps = PropsWithChildren<LinkProps> & { children: ReactNode };
 type TextRendererType = React.ComponentType<TextRendererProps>
 type MarkdownRendererType = React.ComponentType<MarkdownRendererProps>
-type LinkType = React.ComponentType<LinkProps>;
+type LinkType = React.ComponentType<LinkProps & { analytics?: unknown }>;
 type PrintThisPageType = React.ComponentType<PrintThisPageProps>
+type DataBlockType = React.ComponentType<DataBlockProps>;
+type AccordionType = React.ComponentType<AccordionProps>;
+type AccordionSectionType = React.ComponentType<AccordionSectionProps>;
+type ContentBlockType = React.ComponentType<ContentBlockProps>;
 
-interface Props {
-  basicPublication: BasicPublicationDetails,
-  release: Release,
-  releaseSummary: ReleaseSummaryDetails,
-  styles: Dictionary<string>
-
-  // SummaryRenderer: React.ComponentType<{ release: ReleaseType }>;
+export interface ComponentTypes {
   TextRenderer: TextRendererType;
   MarkdownRenderer: MarkdownRendererType;
   SearchForm: typeof PageSearchForm;
   PrintThisPage: PrintThisPageType;
   Link: LinkType;
+  DataBlock: DataBlockType;
+  Accordion: AccordionType;
+  AccordionSection: AccordionSectionType;
+  ContentBlock: ContentBlockType;
+}
+
+interface Props extends ComponentTypes {
+  basicPublication: BasicPublicationDetails,
+  release: AbstractRelease<EditableContentBlock>,
+  releaseSummary: ReleaseSummaryDetails,
+  styles: Dictionary<string>
+
+
   logEvent?: (...params: string[]) => void
 }
 
@@ -76,8 +70,14 @@ const PublicationReleaseContent = ({
   SearchForm,
   PrintThisPage,
   Link,
+  DataBlock,
+  Accordion,
+  AccordionSection,
+  ContentBlock,
   logEvent = nullLogEvent,
 }: Props) => {
+
+  const accId: string[] = generateIdList(2);
 
   const releaseCount = release.publication.releases.length + release.publication.legacyReleases.length;
   const {publication} = release;
@@ -102,7 +102,7 @@ const PublicationReleaseContent = ({
             <BasicReleaseSummary release={releaseSummary} />
           </div>
 
-          <MarkdownRenderer releaseId={releaseSummary.id} source={release.summary} />
+          <MarkdownRenderer contentId="" releaseId={releaseSummary.id} source={release.summary} />
 
           {release.downloadFiles && (
             <Details
@@ -249,13 +249,46 @@ const PublicationReleaseContent = ({
 
       <hr />
 
+      <h2 className="dfe-print-break-before">
+        Headline facts and figures - {release.yearTitle}
+      </h2>
 
+      {release.keyStatistics && (
+        <DataBlock {...release.keyStatistics} id="keystats" />
+      )}
+
+      {/* <editor-fold desc="Content blocks"> */}
+
+      {release.content.length > 0 && (
+        <Accordion id={accId[0]}>
+          {release.content.map(({heading, caption, order, content}) => {
+            return (
+              <AccordionSection
+                heading={heading}
+                caption={caption}
+                key={order}
+              >
+                <ContentBlock
+                  content={content}
+                  id={`content_${order}`}
+                  publication={release.publication}
+                />
+              </AccordionSection>
+            );
+          })}
+        </Accordion>
+      )}
+
+      {/* </editor-fold> */}
+
+      {/* <editor-fold desc="Help and support"> */}
       <h2
         className="govuk-heading-m govuk-!-margin-top-9"
         data-testid="extra-information"
       >
         Help and support
       </h2>
+
       <Accordion
         // publicationTitle={publication.title}
         id="static-content-section"
@@ -374,7 +407,7 @@ const PublicationReleaseContent = ({
           </p>
         </AccordionSection>
       </Accordion>
-
+      {/* </editor-fold> */}
 
     </>
   );

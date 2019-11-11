@@ -1,10 +1,23 @@
 import React from 'react';
-import { TextRendererProps, MarkdownRendererProps } from '@admin/modules/find-statistics/PublicationReleaseContent';
-import ReactMarkdown from 'react-markdown';
+import {RendererProps} from '@admin/modules/find-statistics/PublicationReleaseContent';
+import ReactMarkdown, {ReactMarkdownProps} from 'react-markdown';
+import WysiwygEditor from "@admin/components/WysiwygEditor";
+import marked from "marked";
 
-const EditableMarkdownRenderer = ({ source }: MarkdownRendererProps) => {
+export type MarkdownRendererProps = RendererProps & ReactMarkdownProps;
+
+
+const EditableMarkdownRenderer = ({source}: MarkdownRendererProps) => {
   return (
-    <ReactMarkdown className="govuk-body" source={source} />
+    <>
+      <WysiwygEditor
+        content={marked(source || '')}
+        editable
+        onContentChange={(ss) => {
+          console.log(ss);
+        }}
+      />
+    </>
   );
 };
 
