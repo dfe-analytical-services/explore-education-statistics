@@ -34,7 +34,12 @@ const findThemeById = (
 const findTopicById = (topicId: string, theme: ThemeAndTopicsIdsAndTitles) =>
   theme.topics.find(topic => topic.id === topicId) || theme.topics[0];
 
-const MyPublicationsTab = () => {
+export interface Props {
+  themePropId?: string;
+  topicPropId?: string;
+}
+
+const MyPublicationsTab = ({ themePropId, topicPropId }: Props) => {
   const [myPublications, setMyPublications] = useState<
     AdminDashboardPublication[]
   >();
@@ -118,9 +123,14 @@ const MyPublicationsTab = () => {
                   label: theme.title,
                   value: theme.id,
                 }))}
-                value={selectedThemeAndTopic.theme.id}
+                value={themePropId || selectedThemeAndTopic.theme.id}
                 onChange={event => {
                   onThemeChange(event.target.value, themes);
+                  window.history.replaceState(
+                    '',
+                    '',
+                    `/dashboard/${selectedThemeAndTopic.theme.id}`,
+                  );
                 }}
               />
             </div>
@@ -133,11 +143,16 @@ const MyPublicationsTab = () => {
                   label: topic.title,
                   value: topic.id,
                 }))}
-                value={selectedThemeAndTopic.topic.id}
+                value={topicPropId || selectedThemeAndTopic.topic.id}
                 onChange={event => {
                   onTopicChange(
                     event.target.value,
                     selectedThemeAndTopic.theme,
+                  );
+                  window.history.replaceState(
+                    '',
+                    '',
+                    `/dashboard/${selectedThemeAndTopic.theme.id}/${selectedThemeAndTopic.topic.id}`,
                   );
                 }}
               />
