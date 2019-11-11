@@ -78,8 +78,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             
             services.AddDbContext<StatisticsDbContext>(options =>
                 options
-                    .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"), 
-                        builder => builder.MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model"))
+                    .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"),
+                        builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
                     .EnableSensitiveDataLogging()
                     .ConfigureWarnings(builder => builder.Ignore(RelationalEventId.ValueConversionSqlLiteralWarning))
             );
