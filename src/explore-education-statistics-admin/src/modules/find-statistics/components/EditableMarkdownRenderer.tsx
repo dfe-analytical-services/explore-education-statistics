@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextRendererProps, MarkdownRendererProps } from '@common/modules/find-statistics/PublicationReleaseContent';
+import { TextRendererProps, MarkdownRendererProps } from '@admin/modules/find-statistics/PublicationReleaseContent';
 import ReactMarkdown from 'react-markdown';
 
 const EditableMarkdownRenderer = ({ source }: MarkdownRendererProps) => {

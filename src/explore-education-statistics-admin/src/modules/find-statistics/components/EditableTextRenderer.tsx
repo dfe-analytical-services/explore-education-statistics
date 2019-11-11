@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextRendererProps } from '@common/modules/find-statistics/PublicationReleaseContent';
+import { TextRendererProps } from '@admin/modules/find-statistics/PublicationReleaseContent';
 
 const EditableTextRenderer = ({ children }: TextRendererProps) => {
   return (
