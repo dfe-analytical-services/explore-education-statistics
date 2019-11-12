@@ -1,4 +1,4 @@
-import { FormSelect } from '@common/components/form';
+import { FormSelect, FormGroup, FormFieldset } from '@common/components/form';
 import { SelectOption } from '@common/components/form/FormSelect';
 import {
   ChartDataB,
@@ -76,7 +76,7 @@ function getLocationsForDataSet(
   const allLocationIds = chartData.map(({ __name }) => __name);
 
   return [
-    { label: 'select...', value: '' },
+    { label: 'Select...', value: '' },
     ...allLocationIds.reduce(
       (locations: { label: string; value: string }[], next: string) => {
         const { label, value } = (meta.locations || {})[next];
@@ -562,31 +562,39 @@ const MapBlock = ({
 
   return (
     <>
-      <form className="govuk-grid-row">
-        <div className="govuk-grid-column-two-thirds govuk-form-group govuk-!-margin-bottom-6">
-          <FormSelect
-            name="selectedIndicator"
-            id="selectedIndicator"
-            label="Select data to view"
-            value={selectedDataSetKey}
-            onChange={e => setSelectedDataSetKey(e.currentTarget.value)}
-            options={dataSetOptions}
-            order={[]}
-            className="govuk-!-width-full"
-          />
-        </div>
+      <form>
+        <FormFieldset
+          id="data-and-location"
+          legend="Select data and location to view indicators"
+          legendHidden
+        >
+          <div className={styles.mapContainer}>
+            <FormGroup className={styles.mapIndicator}>
+              <FormSelect
+                name="selectedIndicator"
+                id="selectedIndicator"
+                label="1. Select data to view"
+                value={selectedDataSetKey}
+                onChange={e => setSelectedDataSetKey(e.currentTarget.value)}
+                options={dataSetOptions}
+                order={[]}
+                className="govuk-!-width-full"
+              />
+            </FormGroup>
 
-        <div className="govuk-grid-column-one-third govuk-form-group govuk-!-margin-bottom-6">
-          <FormSelect
-            name="selectedLocation"
-            id="selectedLocation"
-            label="Select a location"
-            value={selectedLocation}
-            onChange={e => updateSelectedLocation(e.currentTarget.value)}
-            options={majorOptions}
-            order={[]}
-          />
-        </div>
+            <FormGroup className={styles.mapLocation}>
+              <FormSelect
+                name="selectedLocation"
+                id="selectedLocation"
+                label="2. Select a location"
+                value={selectedLocation}
+                onChange={e => updateSelectedLocation(e.currentTarget.value)}
+                options={majorOptions}
+                order={[]}
+              />
+            </FormGroup>
+          </div>
+        </FormFieldset>
       </form>
       <div className={styles.mapContainer} ref={container}>
         <div className={styles.mapView}>
@@ -659,7 +667,7 @@ const MapBlock = ({
 
       {results.length > 0 && (
         <>
-          <h3 className="govuk-heading-m">
+          <h3 className="govuk-heading-m govuk-!-margin-left-1 govuk-!-margin-bottom-0">
             {findLocationBySelectedLocation()}
           </h3>
           <div className={classNames(stylesIndicators.keyStatsContainer)}>
