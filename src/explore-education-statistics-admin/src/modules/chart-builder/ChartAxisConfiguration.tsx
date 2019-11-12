@@ -348,7 +348,7 @@ const ChartAxisConfiguration = ({
                           type="number"
                           width={10}
                           label="Every nth value"
-                          defaultValue={axisConfiguration.tickSpacing}
+                          defaultValue="1"
                           onChange={e =>
                             updateAxisConfiguration({
                               tickSpacing: e.target.value,
