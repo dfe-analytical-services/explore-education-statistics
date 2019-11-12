@@ -72,6 +72,7 @@ function App() {
 
         <Redirect exact strict from="/" to="/dashboard" />
       </Switch>
+
       <ProtectedRoute
         exact
         path={signInRoutes.signIn}
