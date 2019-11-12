@@ -59,7 +59,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<CreateReleaseViewModel, Release>();
             
             CreateMap<CreateReleaseViewModel, ReleaseSummaryVersion>().ForMember(r => r.Id, m => m.Ignore());
-            CreateMap<ReleaseSummary, ReleaseSummaryViewModel>();
+            CreateMap<ReleaseSummaryViewModel, ReleaseSummaryVersion>().ForMember(r => r.Id, m => m.Ignore());
+
+            CreateMap<ReleaseSummary, ReleaseSummaryViewModel>()
+                .ForMember(model => model.InternalReleaseNote,
+                    m => m.MapFrom(summary => summary.Release.InternalReleaseNote))
+                .ForMember(model => model.Status,
+                    m => m.MapFrom(summary => summary.Release.Status));
 
             CreateMap<Methodology, MethodologyViewModel>();
 

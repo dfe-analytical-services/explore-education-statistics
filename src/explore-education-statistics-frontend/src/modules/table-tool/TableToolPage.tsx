@@ -160,7 +160,6 @@ class TableToolPage extends Component<Props, State> {
                 </ul>
 
                 <h3>Additional options</h3>
-
                 {publication && (
                   <ul className="govuk-list">
                     <li>
