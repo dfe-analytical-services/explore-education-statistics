@@ -10,7 +10,7 @@ interface ButtonLinkProps {
 let RealButtonLink: React.ComponentType<ButtonLinkProps>;
 export type ButtonLinkType = typeof RealButtonLink;
 
-export function SetRealButtonLink(buttonLink: ButtonLinkType) {
+export function SetCommonButtonLink(buttonLink: ButtonLinkType) {
   RealButtonLink = buttonLink;
   return RealButtonLink;
 }

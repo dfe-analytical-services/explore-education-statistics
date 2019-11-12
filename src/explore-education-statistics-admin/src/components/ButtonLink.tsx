@@ -3,7 +3,7 @@ import React, { ReactNode } from 'react';
 import { Link as RouterLink, LinkProps } from 'react-router-dom';
 
 import {
-  SetRealButtonLink,
+  SetCommonButtonLink,
   ButtonLinkType,
 } from '@common/components/ButtonLink';
 
@@ -42,6 +42,6 @@ const ButtonLink = ({
   );
 };
 
-SetRealButtonLink(ButtonLink as ButtonLinkType);
+SetCommonButtonLink(ButtonLink as ButtonLinkType);
 
 export default ButtonLink;
