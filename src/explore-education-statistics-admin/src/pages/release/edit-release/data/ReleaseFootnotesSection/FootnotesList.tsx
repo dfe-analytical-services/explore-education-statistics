@@ -3,11 +3,13 @@ import {
   FootnoteMeta,
   FootnoteMetaGetters,
 } from '@admin/services/release/edit-release/footnotes/types';
+import classNames from 'classnames';
 import footnotesService from '@admin/services/release/edit-release/footnotes/service';
 import React from 'react';
 import Button from '@common/components/Button';
 import CollapsibleList from '@common/components/CollapsibleList';
 import FootnoteForm, { FootnoteFormControls } from './FootnoteForm';
+import styles from './FootnotesList.module.scss';
 
 interface Props {
   footnoteMeta: FootnoteMeta;
@@ -97,7 +99,7 @@ const FootnotesList = ({
   };
 
   return (
-    <table className="govuk-table">
+    <table className={classNames('govuk-table', styles.footnoteTable)}>
       <thead>
         <tr>
           <th>Footnote</th>
