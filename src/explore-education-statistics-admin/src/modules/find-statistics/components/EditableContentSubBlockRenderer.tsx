@@ -1,11 +1,11 @@
 import PrototypeEditableContent from '@admin/pages/prototypes/components/PrototypeEditableContent';
 import PrototypeExampleTableList from '@admin/pages/prototypes/components/PrototypeAdminExampleTableList';
-import {ContentBlock} from '@common/services/publicationService';
+import { ContentBlock } from '@common/services/publicationService';
 import marked from 'marked';
 import React from 'react';
 // import { Draggable } from 'react-beautiful-dnd';
 import DataBlock from '@common/modules/find-statistics/components/DataBlock';
-import WysiwygEditor from "@admin/components/WysiwygEditor";
+import WysiwygEditor from '@admin/components/WysiwygEditor';
 
 interface Props {
   block: ContentBlock;
@@ -16,9 +16,11 @@ interface Props {
 }
 
 function EditableContentSubBlockRenderer({
-  block, editable, onContentChange, id
+  block,
+  editable,
+  onContentChange,
+  id,
 }: Props) {
-
   switch (block.type) {
     case 'MarkDownBlock':
       return (
@@ -72,13 +74,9 @@ function EditableContentSubBlockRenderer({
         </div>
       );
     case 'HtmlBlock':
-      return (
-        <WysiwygEditor editable content={block.body} />
-      );
+      return <WysiwygEditor editable content={block.body} />;
     default:
-      return (
-        <div>Unable to edit content type {block.type}</div>
-      );
+      return <div>Unable to edit content type {block.type}</div>;
   }
 }
 

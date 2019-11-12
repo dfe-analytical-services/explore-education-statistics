@@ -1,19 +1,19 @@
+import WysiwygEditor from '@admin/components/WysiwygEditor';
+import { RendererProps } from '@admin/modules/find-statistics/PublicationReleaseContent';
+import marked from 'marked';
 import React from 'react';
-import {RendererProps} from '@admin/modules/find-statistics/PublicationReleaseContent';
-import ReactMarkdown, {ReactMarkdownProps} from 'react-markdown';
-import WysiwygEditor from "@admin/components/WysiwygEditor";
-import marked from "marked";
+import { ReactMarkdownProps } from 'react-markdown';
 
 export type MarkdownRendererProps = RendererProps & ReactMarkdownProps;
 
-
-const EditableMarkdownRenderer = ({source}: MarkdownRendererProps) => {
+const EditableMarkdownRenderer = ({ source }: MarkdownRendererProps) => {
   return (
     <>
       <WysiwygEditor
         content={marked(source || '')}
         editable
-        onContentChange={(ss) => {
+        onContentChange={ss => {
+          // eslint-disable-next-line no-console
           console.log(ss);
         }}
       />

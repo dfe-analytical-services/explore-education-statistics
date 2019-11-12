@@ -1,36 +1,36 @@
+import { EditableAccordionProps } from '@admin/components/EditableAccordion';
+import { EditableAccordionSectionProps } from '@admin/components/EditableAccordionSection';
+import { Props as LinkProps } from '@admin/components/Link';
+import BasicReleaseSummary from '@admin/modules/find-statistics/components/BasicReleaseSummary';
+import { MarkdownRendererProps } from '@admin/modules/find-statistics/components/EditableMarkdownRenderer';
+import { TextRendererProps } from '@admin/modules/find-statistics/components/EditableTextRenderer';
+import { PrintThisPageProps } from '@admin/modules/find-statistics/components/PrintThisPage';
+import { getTimePeriodCoverageDateRangeStringShort } from '@admin/pages/release/util/releaseSummaryUtil';
+import { BasicPublicationDetails } from '@admin/services/common/types';
+import { EditableContentBlock } from '@admin/services/publicationService';
+import { ReleaseSummaryDetails } from '@admin/services/release/types';
+import { generateIdList } from '@common/components/Accordion';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
-import {baseUrl} from '@common/services/api';
-import {AbstractRelease, ReleaseType} from '@common/services/publicationService';
-import {Dictionary} from '@common/types';
+import { DataBlockProps } from '@common/modules/find-statistics/components/DataBlock';
+import { baseUrl } from '@common/services/api';
+import { AbstractRelease, ReleaseType } from '@common/services/publicationService';
+import { Dictionary } from '@common/types';
 import classNames from 'classnames';
 import React from 'react';
-import {ReleaseSummaryDetails} from '@admin/services/release/types';
-import BasicReleaseSummary from "@admin/modules/find-statistics/components/BasicReleaseSummary";
-import {generateIdList} from '@common/components/Accordion';
-import {BasicPublicationDetails} from 'src/services/common/types';
-import {getTimePeriodCoverageDateRangeStringShort} from "@admin/pages/release/util/releaseSummaryUtil";
-import {MarkdownRendererProps} from "@admin/modules/find-statistics/components/EditableMarkdownRenderer";
-import {TextRendererProps} from "@admin/modules/find-statistics/components/EditableTextRenderer";
-import {PrintThisPageProps} from "@admin/modules/find-statistics/components/PrintThisPage";
-import {Props as LinkProps} from 'src/components/Link';
-import {DataBlockProps} from '@common/modules/find-statistics/components/DataBlock';
-import {EditableContentBlock} from 'src/services/publicationService';
-import {EditableAccordionProps} from "@admin/components/EditableAccordion";
-import {EditableAccordionSectionProps} from "@admin/components/EditableAccordionSection";
-import {Props as ContentBlockProps} from './components/EditableContentBlock';
+import { Props as ContentBlockProps } from './components/EditableContentBlock';
 
 export interface RendererProps {
   contentId?: string;
   releaseId?: string;
 }
 
-type TextRendererType = React.ComponentType<TextRendererProps>
-type MarkdownRendererType = React.ComponentType<MarkdownRendererProps>
+type TextRendererType = React.ComponentType<TextRendererProps>;
+type MarkdownRendererType = React.ComponentType<MarkdownRendererProps>;
 type LinkType = React.ComponentType<LinkProps & { analytics?: unknown }>;
-type PrintThisPageType = React.ComponentType<PrintThisPageProps>
+type PrintThisPageType = React.ComponentType<PrintThisPageProps>;
 type DataBlockType = React.ComponentType<DataBlockProps>;
 type AccordionType = React.ComponentType<EditableAccordionProps>;
 type AccordionSectionType = React.ComponentType<EditableAccordionSectionProps>;
@@ -49,13 +49,12 @@ export interface ComponentTypes {
 }
 
 interface Props extends ComponentTypes {
-  basicPublication: BasicPublicationDetails,
-  release: AbstractRelease<EditableContentBlock>,
-  releaseSummary: ReleaseSummaryDetails,
-  styles: Dictionary<string>
+  basicPublication: BasicPublicationDetails;
+  release: AbstractRelease<EditableContentBlock>;
+  releaseSummary: ReleaseSummaryDetails;
+  styles: Dictionary<string>;
 
-
-  logEvent?: (...params: string[]) => void
+  logEvent?: (...params: string[]) => void;
 }
 
 const nullLogEvent = () => {
@@ -77,12 +76,12 @@ const PublicationReleaseContent = ({
   ContentBlock,
   logEvent = nullLogEvent,
 }: Props) => {
-
   const accId: string[] = generateIdList(2);
 
-  const releaseCount = release.publication.releases.length + release.publication.legacyReleases.length;
-  const {publication} = release;
-
+  const releaseCount =
+    release.publication.releases.length +
+    release.publication.legacyReleases.length;
+  const { publication } = release;
 
   return (
     <>
@@ -103,7 +102,11 @@ const PublicationReleaseContent = ({
             <BasicReleaseSummary release={releaseSummary} />
           </div>
 
-          <MarkdownRenderer contentId="" releaseId={releaseSummary.id} source={release.summary} />
+          <MarkdownRenderer
+            contentId=""
+            releaseId={releaseSummary.id}
+            source={release.summary}
+          />
 
           {release.downloadFiles && (
             <Details
@@ -118,26 +121,29 @@ const PublicationReleaseContent = ({
               }
             >
               <ul className="govuk-list govuk-list--bullet">
-                {release.downloadFiles.map(({extension, name, path, size}) => (
-                  <li key={path}>
-                    <Link
-                      to={`${baseUrl.data}/download/${path}`}
-                      className="govuk-link"
-                      analytics={{
-                        category: 'Downloads',
-                        action: `Release page ${name} file downloaded`,
-                        label: `File URL: /api/download/${path}`,
-                      }}
-                    >
-                      {name}
-                    </Link>
-                    {` (${extension}, ${size})`}
-                  </li>
-                ))}
+                {release.downloadFiles.map(
+                  ({ extension, name, path, size }) => (
+                    <li key={path}>
+                      <Link
+                        to={`${baseUrl.data}/download/${path}`}
+                        className="govuk-link"
+                        analytics={{
+                          category: 'Downloads',
+                          action: `Release page ${name} file downloaded`,
+                          label: `File URL: /api/download/${path}`,
+                        }}
+                      >
+                        {name}
+                      </Link>
+                      {` (${extension}, ${size})`}
+                    </li>
+                  ),
+                )}
               </ul>
             </Details>
           )}
           <SearchForm
+            id="search-form"
             inputLabel="Search in this release page."
             className="govuk-!-margin-top-3 govuk-!-margin-bottom-3"
           />
@@ -173,7 +179,7 @@ const PublicationReleaseContent = ({
                   <ul className="govuk-list">
                     {[
                       ...release.publication.releases.map(
-                        ({id, slug, releaseName}) => [
+                        ({ id, slug, releaseName }) => [
                           releaseName,
                           <li key={id} data-testid="previous-release-item">
                             <Link
@@ -185,7 +191,7 @@ const PublicationReleaseContent = ({
                         ],
                       ),
                       ...release.publication.legacyReleases.map(
-                        ({id, description, url}) => [
+                        ({ id, description, url }) => [
                           description,
                           <li key={id} data-testid="previous-release-item">
                             <a href={url}>{description}</a>
@@ -260,22 +266,24 @@ const PublicationReleaseContent = ({
 
       {release.content.length > 0 && (
         <Accordion id={accId[0]}>
-          {release.content.map(({heading, caption, order, content}, index) => {
-            return (
-              <AccordionSection
-                index={index}
-                heading={heading}
-                caption={caption}
-                key={order}
-              >
-                <ContentBlock
-                  content={content}
-                  id={`content_${order}`}
-                  publication={release.publication}
-                />
-              </AccordionSection>
-            );
-          })}
+          {release.content.map(
+            ({ heading, caption, order, content }, index) => {
+              return (
+                <AccordionSection
+                  index={index}
+                  heading={heading}
+                  caption={caption}
+                  key={order}
+                >
+                  <ContentBlock
+                    content={content}
+                    id={`content_${order}`}
+                    publication={release.publication}
+                  />
+                </AccordionSection>
+              );
+            },
+          )}
         </Accordion>
       )}
 
@@ -307,19 +315,15 @@ const PublicationReleaseContent = ({
           </p>
         </AccordionSection>
         {releaseSummary.type &&
-        releaseSummary.type.title ===
-        ReleaseType.NationalStatistics && (
-          <AccordionSection
-            heading="National Statistics"
-            headingTag="h3"
-          >
+        releaseSummary.type.title === ReleaseType.NationalStatistics && (
+          <AccordionSection heading="National Statistics" headingTag="h3">
             <p className="govuk-body">
               The{' '}
               <a href="https://www.statisticsauthority.gov.uk/">
                 United Kingdom Statistics Authority
               </a>{' '}
-              designated these statistics as National Statistics in
-              accordance with the{' '}
+              designated these statistics as National Statistics in accordance
+              with the{' '}
               <a href="https://www.legislation.gov.uk/ukpga/2007/18/contents">
                 Statistics and Registration Service Act 2007
               </a>{' '}
@@ -327,8 +331,7 @@ const PublicationReleaseContent = ({
               Statistics.
             </p>
             <p className="govuk-body">
-              Designation signifying their compliance with the
-              authority's{' '}
+              Designation signifying their compliance with the authority's{' '}
               <a href="https://www.statisticsauthority.gov.uk/code-of-practice/the-code/">
                 Code of Practice for Statistics
               </a>{' '}
@@ -336,8 +339,7 @@ const PublicationReleaseContent = ({
             </p>
             <ul className="govuk-list govuk-list--bullet">
               <li>
-                managed impartially and objectively in the public
-                interest
+                managed impartially and objectively in the public interest
               </li>
               <li>meet identified user needs</li>
               <li>produced according to sound methods</li>
@@ -345,15 +347,13 @@ const PublicationReleaseContent = ({
             </ul>
             <p className="govuk-body">
               Once designated as National Statistics it's a statutory
-              requirement for statistics to follow and comply with the
-              Code of Practice for Statistics to be observed.
+              requirement for statistics to follow and comply with the Code of
+              Practice for Statistics to be observed.
             </p>
             <p className="govuk-body">
-              Find out more about the standards we follow to produce
-              these statistics through our{' '}
-              <a
-                href="https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education"
-              >
+              Find out more about the standards we follow to produce these
+              statistics through our{' '}
+              <a href="https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education">
                 Standards for official statistics published by DfE
               </a>{' '}
               guidance.
@@ -387,9 +387,7 @@ const PublicationReleaseContent = ({
           <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
             Press office
           </h4>
-          <p className="govuk-!-margin-top-0">
-            If you have a media enquiry:
-          </p>
+          <p className="govuk-!-margin-top-0">If you have a media enquiry:</p>
           <p>
             Telephone <br />
             020 7925 6789
@@ -398,8 +396,8 @@ const PublicationReleaseContent = ({
             Public enquiries
           </h4>
           <p className="govuk-!-margin-top-0">
-            If you have a general enquiry about the Department for
-            Education (DfE) or education:
+            If you have a general enquiry about the Department for Education
+            (DfE) or education:
           </p>
           <p>
             Telephone <br />
@@ -408,10 +406,8 @@ const PublicationReleaseContent = ({
         </AccordionSection>
       </Accordion>
       {/* </editor-fold> */}
-
     </>
   );
-
 };
 
 export default PublicationReleaseContent;

@@ -1,10 +1,10 @@
-import { ContentBlock, Publication } from '@common/services/publicationService';
-import React, { Component } from 'react';
 import { EditableRelease } from '@admin/services/publicationService';
 import { ContentBlockProps } from '@common/modules/find-statistics/components/ContentBlock';
-import EditableContentSubBlockRenderer from './EditableContentSubBlockRenderer';
+import { ContentBlock } from '@common/services/publicationService';
+import React, { Component } from 'react';
 import AddComment from '../../../pages/prototypes/components/PrototypeEditableContentAddComment';
 import ResolveComment from '../../../pages/prototypes/components/PrototypeEditableContentResolveComment';
+import EditableContentSubBlockRenderer from './EditableContentSubBlockRenderer';
 
 export interface Props extends ContentBlockProps {
   content: EditableRelease['content'][0]['content'];
@@ -15,7 +15,7 @@ export interface Props extends ContentBlockProps {
   onContentChange?: (block: ContentBlock, content: string) => void;
 }
 
-export class EditableContentBlock extends Component<Props> {
+class EditableContentBlock extends Component<Props> {
   public render() {
     const {
       content,

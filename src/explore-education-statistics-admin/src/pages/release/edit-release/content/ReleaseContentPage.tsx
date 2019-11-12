@@ -1,32 +1,36 @@
 // eslint-disable-next-line import/no-named-as-default
 import Link from '@admin/components/Link';
 import EditableTextRenderer from '@admin/modules/find-statistics/components/EditableTextRenderer';
-import ManageReleaseContext, {ManageRelease} from '@admin/pages/release/ManageReleaseContext';
+import ManageReleaseContext, {
+  ManageRelease,
+} from '@admin/pages/release/ManageReleaseContext';
 import commonService from '@admin/services/common/service';
-import {IdTitlePair} from '@admin/services/common/types';
-import {Comment} from '@admin/services/dashboard/types';
+import { IdTitlePair } from '@admin/services/common/types';
+import { Comment } from '@admin/services/dashboard/types';
 import releaseContentService from '@admin/services/release/edit-release/content/service';
 import releaseSummaryService from '@admin/services/release/edit-release/summary/service';
-import {ReleaseSummaryDetails} from '@admin/services/release/types';
+import { ReleaseSummaryDetails } from '@admin/services/release/types';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import FormFieldset from '@common/components/form/FormFieldset';
 import FormRadioGroup from '@common/components/form/FormRadioGroup';
 import WarningMessage from '@common/components/WarningMessage';
-import {AbstractRelease} from '@common/services/publicationService';
+import { AbstractRelease } from '@common/services/publicationService';
 import classNames from 'classnames';
-import React, {useContext, useEffect, useState} from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import PageSearchForm from '@common/components/PageSearchForm';
-import PublicationReleaseContent, {ComponentTypes} from "@admin/modules/find-statistics/PublicationReleaseContent";
-import ReactMarkdown from "react-markdown";
+import PublicationReleaseContent, {
+  ComponentTypes,
+} from '@admin/modules/find-statistics/PublicationReleaseContent';
+import ReactMarkdown from 'react-markdown';
 import EditableMarkdownRenderer from '@admin/modules/find-statistics/components/EditableMarkdownRenderer';
-import {EditableContentBlock} from "@admin/services/publicationService";
-import {EditableContentBlock as EditableContentBlockComponent} from '@admin/modules/find-statistics/components/EditableContentBlock';
+import { EditableContentBlock } from '@admin/services/publicationService';
+import EditableContentBlockComponent from '@admin/modules/find-statistics/components/EditableContentBlock';
 import DataBlock from '@common/modules/find-statistics/components/DataBlock';
 import ContentBlock from '@common/modules/find-statistics/components/ContentBlock';
 import EditableDataBlock from '@admin/modules/find-statistics/components/EditableDataBlock';
-import EditableAccordion from "@admin/components/EditableAccordion";
-import EditableAccordionSection from "@admin/components/EditableAccordionSection";
+import EditableAccordion from '@admin/components/EditableAccordion';
+import EditableAccordionSection from '@admin/components/EditableAccordionSection';
 import PrintThisPage from '../../../../modules/find-statistics/components/PrintThisPage';
 
 type PageMode = 'edit' | 'preview';
@@ -44,7 +48,7 @@ type PageModeComponentTypesType = {
 };
 
 const PageModeComponentTypes: PageModeComponentTypesType = {
-  'edit': {
+  edit: {
     TextRenderer: EditableTextRenderer,
     MarkdownRenderer: EditableMarkdownRenderer,
     Link,
@@ -53,9 +57,9 @@ const PageModeComponentTypes: PageModeComponentTypesType = {
     Accordion: EditableAccordion,
     AccordionSection: EditableAccordionSection,
     ContentBlock: EditableContentBlockComponent,
-    DataBlock: EditableDataBlock
+    DataBlock: EditableDataBlock,
   },
-  'preview': {
+  preview: {
     TextRenderer: EditableTextRenderer,
     MarkdownRenderer: ReactMarkdown,
     Link,
@@ -64,14 +68,14 @@ const PageModeComponentTypes: PageModeComponentTypesType = {
     Accordion,
     AccordionSection,
     ContentBlock,
-    DataBlock
-  }
+    DataBlock,
+  },
 };
 
 const ReleaseContentPage = () => {
   const [model, setModel] = useState<Model>();
 
-  const {releaseId, publication} = useContext(
+  const { releaseId, publication } = useContext(
     ManageReleaseContext,
   ) as ManageRelease;
 
@@ -81,7 +85,6 @@ const ReleaseContentPage = () => {
       commonService.getBasicThemeDetails(publication.themeId),
       releaseContentService.getRelease(releaseId),
     ]).then(([releaseSummary, theme, releaseData]) => {
-
       // <editor-fold desc="TODO - content population">
 
       const unresolvedComments: Comment[] = [
@@ -97,38 +100,42 @@ const ReleaseContentPage = () => {
         },
       ];
 
-
       const contentBlock = {
         order: 0,
-        heading: "test",
-        caption: "test",
-        content: [{
-          type: 'HtmlBlock',
-          body: "This is a test",
-          comments: [{
-            name: "A user",
-            time: new Date(),
-            comment: "A comment",
-            state: "open"
-          }]
-        }]
+        heading: 'test',
+        caption: 'test',
+        content: [
+          {
+            type: 'HtmlBlock',
+            body: 'This is a test',
+            comments: [
+              {
+                name: 'A user',
+                time: new Date(),
+                comment: 'A comment',
+                state: 'open',
+              },
+            ],
+          },
+        ],
       };
 
       const releaseDataAsEditable = {
         ...releaseData,
         keyStatistics: releaseData.keyStatistics as EditableContentBlock,
-        content: releaseData.content && releaseData.content.map(section => ({
-          ...section,
-          content: section.content.map<EditableContentBlock>(block => ({
-            ...block,
-            comments: []
-          }))
-        })) || [contentBlock, contentBlock]
+        content: (releaseData.content &&
+          releaseData.content.map(section => ({
+            ...section,
+            content: section.content.map<EditableContentBlock>(block => ({
+              ...block,
+              comments: [],
+            })),
+          }))) || [contentBlock, contentBlock],
       };
 
       const release: AbstractRelease<EditableContentBlock> = {
         ...releaseDataAsEditable,
-        summary: "This is the summary ..... ",
+        summary: 'This is the summary ..... ',
         updates: [
           {
             id: '',
@@ -146,7 +153,7 @@ const ReleaseContentPage = () => {
           releases: [],
           legacyReleases: [],
           topic: {
-            theme
+            theme,
           },
           nextUpdate: '',
           contact: {
@@ -168,9 +175,7 @@ const ReleaseContentPage = () => {
         release,
       });
     });
-
-
-  }, [releaseId, publication.themeId]);
+  }, [releaseId, publication.themeId, publication]);
 
   return (
     <>
@@ -221,8 +226,6 @@ const ReleaseContentPage = () => {
             })}
           >
             <div className={model.pageMode === 'edit' ? 'page-editing' : ''}>
-
-
               <PublicationReleaseContent
                 basicPublication={publication}
                 release={model.release}

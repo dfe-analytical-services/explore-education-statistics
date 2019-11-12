@@ -1,4 +1,4 @@
-import React, {AnchorHTMLAttributes} from 'react';
+import React, { AnchorHTMLAttributes } from 'react';
 import classNames from 'classnames';
 import styles from './PrintThisPage.module.scss';
 
@@ -6,7 +6,7 @@ export type PrintThisPageProps = {
   analytics?: unknown;
 } & AnchorHTMLAttributes<HTMLAnchorElement>;
 
-const PrintThisPage = ({...props}) => {
+const PrintThisPage = ({ ...props }) => {
   const openPrint = () => {
     window.print();
   };

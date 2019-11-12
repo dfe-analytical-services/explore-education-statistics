@@ -1,32 +1,23 @@
 import React, { ReactNode } from 'react';
 
-
-interface LinkAdminProps {
-  children: ReactNode;
-  to: string;
-}
-
-interface LinkFrontEndProps {
+interface ButtonLinkProps {
   children: ReactNode;
   to?: string;
   as: string;
   href: string;
 }
 
-export type ButtonLinkProps = (LinkAdminProps | LinkFrontEndProps);
-
-let RealButtonLink : React.ComponentType<{}>;
+let RealButtonLink: React.ComponentType<ButtonLinkProps>;
 export type ButtonLinkType = typeof RealButtonLink;
 
-export function SetRealButtonLink<T>(buttonLink : T) {
+export function SetRealButtonLink(buttonLink: ButtonLinkType) {
   RealButtonLink = buttonLink;
   return RealButtonLink;
-};
+}
 
 const ButtonLink = (props: ButtonLinkProps) => {
-  return (
-    <RealButtonLink {...props} />
-  );
+  const { children } = props;
+  return <RealButtonLink {...props}>{children}</RealButtonLink>;
 };
 
 export default ButtonLink;

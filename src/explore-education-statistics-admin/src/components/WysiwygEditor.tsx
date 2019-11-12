@@ -1,12 +1,11 @@
-import styles from "@admin/pages/prototypes/components/PrototypeEditableContent.module.scss";
-import React, {ChangeEvent, createRef, ReactNode} from "react";
-
+import styles from '@admin/pages/prototypes/components/PrototypeEditableContent.module.scss';
 // No types generated for ckeditor 5 for react
 // @ts-ignore
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 // @ts-ignore
 import CKEditor from '@ckeditor/ckeditor5-react';
-import classnames from "classnames";
+import classnames from 'classnames';
+import React, { ChangeEvent } from 'react';
 
 interface Props {
   editable?: boolean;
@@ -17,16 +16,10 @@ interface Props {
 }
 
 const WysiwygEditor = ({
-
   editable,
-  reviewing,
-  resolveComments,
   content,
-  onContentChange
-
+  onContentChange,
 }: Props) => {
-
-  const ref = createRef<HTMLDivElement>();
 
   const [editing, setEditing] = React.useState(false);
   const [saved, setSaved] = React.useState(false);
@@ -45,21 +38,25 @@ const WysiwygEditor = ({
     <div>
       {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/interactive-supports-focus */}
       <div
-        role='button'
+        role="button"
         className={classnames({
           [styles.editableContentEditing]: editable && editing,
           [styles.editableContent]: editable && !editing,
-          [styles.unsaved]: editable && !saved
+          [styles.unsaved]: editable && !saved,
         })}
         onClick={() => {
-          if (!editing) setEditing(editable === true)
+          if (!editing) setEditing(editable === true);
         }}
         tabIndex={undefined}
       >
         {editable && (
           <div className={styles.editableButton}>
             {editing ? (
-              <button className="govuk-button" onClick={() => save()} type="button">
+              <button
+                className="govuk-button"
+                onClick={() => save()}
+                type="button"
+              >
                 Save
               </button>
             ) : (
@@ -72,7 +69,7 @@ const WysiwygEditor = ({
           </div>
         )}
 
-        {(editable && editing) ? (
+        {editable && editing ? (
           <CKEditor
             editor={ClassicEditor}
             data={content}
@@ -86,14 +83,13 @@ const WysiwygEditor = ({
         ) : (
           <div
             // eslint-disable-next-line react/no-danger
-            dangerouslySetInnerHTML={{__html: content}}
+            dangerouslySetInnerHTML={{ __html: content }}
             className="govuk-!-padding-left-1 govuk-!-padding-right-1"
           />
         )}
       </div>
     </div>
   );
-
 };
 
 export default WysiwygEditor;

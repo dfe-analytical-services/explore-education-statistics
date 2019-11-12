@@ -1,7 +1,8 @@
+import { AccordionSectionProps } from '@common/components/AccordionSection';
 import GoToTopLink from '@common/components/GoToTopLink';
 import classNames from 'classnames';
-import React, { createElement, createRef, ReactNode, useState } from 'react';
-import AccordionSection, { AccordionSectionProps } from '@common/components/AccordionSection';
+import React, { createElement, createRef, useState } from 'react';
+
 // import PrototypeEditableContent from "@admin/pages/prototypes/components/PrototypeEditableContent";
 
 export interface EditableAccordionSectionProps extends AccordionSectionProps {

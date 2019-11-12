@@ -2,7 +2,10 @@ import classNames from 'classnames';
 import React, { ReactNode } from 'react';
 import { Link as RouterLink, LinkProps } from 'react-router-dom';
 
-import { SetRealButtonLink } from '@common/components/ButtonLink';
+import {
+  SetRealButtonLink,
+  ButtonLinkType,
+} from '@common/components/ButtonLink';
 
 type Props = {
   children: ReactNode;
@@ -39,7 +42,6 @@ const ButtonLink = ({
   );
 };
 
-
-SetRealButtonLink(ButtonLink);
+SetRealButtonLink(ButtonLink as ButtonLinkType);
 
 export default ButtonLink;
