@@ -15,12 +15,7 @@ interface Props {
   onContentChange?: (content: string) => void;
 }
 
-const WysiwygEditor = ({
-  editable,
-  content,
-  onContentChange,
-}: Props) => {
-
+const WysiwygEditor = ({ editable, content, onContentChange }: Props) => {
   const [editing, setEditing] = React.useState(false);
   const [saved, setSaved] = React.useState(false);
   const [temporaryContent, setTemporaryContent] = React.useState(content);

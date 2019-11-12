@@ -16,7 +16,10 @@ import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
 import { DataBlockProps } from '@common/modules/find-statistics/components/DataBlock';
 import { baseUrl } from '@common/services/api';
-import { AbstractRelease, ReleaseType } from '@common/services/publicationService';
+import {
+  AbstractRelease,
+  ReleaseType,
+} from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import classNames from 'classnames';
 import React from 'react';
@@ -57,8 +60,7 @@ interface Props extends ComponentTypes {
   logEvent?: (...params: string[]) => void;
 }
 
-const nullLogEvent = () => {
-};
+const nullLogEvent = () => {};
 
 const PublicationReleaseContent = ({
   basicPublication,
@@ -315,51 +317,51 @@ const PublicationReleaseContent = ({
           </p>
         </AccordionSection>
         {releaseSummary.type &&
-        releaseSummary.type.title === ReleaseType.NationalStatistics && (
-          <AccordionSection heading="National Statistics" headingTag="h3">
-            <p className="govuk-body">
-              The{' '}
-              <a href="https://www.statisticsauthority.gov.uk/">
-                United Kingdom Statistics Authority
-              </a>{' '}
-              designated these statistics as National Statistics in accordance
-              with the{' '}
-              <a href="https://www.legislation.gov.uk/ukpga/2007/18/contents">
-                Statistics and Registration Service Act 2007
-              </a>{' '}
-              and signifying compliance with the Code of Practice for
-              Statistics.
-            </p>
-            <p className="govuk-body">
-              Designation signifying their compliance with the authority's{' '}
-              <a href="https://www.statisticsauthority.gov.uk/code-of-practice/the-code/">
-                Code of Practice for Statistics
-              </a>{' '}
-              which broadly means these statistics are:
-            </p>
-            <ul className="govuk-list govuk-list--bullet">
-              <li>
-                managed impartially and objectively in the public interest
-              </li>
-              <li>meet identified user needs</li>
-              <li>produced according to sound methods</li>
-              <li>well explained and readily accessible</li>
-            </ul>
-            <p className="govuk-body">
-              Once designated as National Statistics it's a statutory
-              requirement for statistics to follow and comply with the Code of
-              Practice for Statistics to be observed.
-            </p>
-            <p className="govuk-body">
-              Find out more about the standards we follow to produce these
-              statistics through our{' '}
-              <a href="https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education">
-                Standards for official statistics published by DfE
-              </a>{' '}
-              guidance.
-            </p>
-          </AccordionSection>
-        )}
+          releaseSummary.type.title === ReleaseType.NationalStatistics && (
+            <AccordionSection heading="National Statistics" headingTag="h3">
+              <p className="govuk-body">
+                The{' '}
+                <a href="https://www.statisticsauthority.gov.uk/">
+                  United Kingdom Statistics Authority
+                </a>{' '}
+                designated these statistics as National Statistics in accordance
+                with the{' '}
+                <a href="https://www.legislation.gov.uk/ukpga/2007/18/contents">
+                  Statistics and Registration Service Act 2007
+                </a>{' '}
+                and signifying compliance with the Code of Practice for
+                Statistics.
+              </p>
+              <p className="govuk-body">
+                Designation signifying their compliance with the authority's{' '}
+                <a href="https://www.statisticsauthority.gov.uk/code-of-practice/the-code/">
+                  Code of Practice for Statistics
+                </a>{' '}
+                which broadly means these statistics are:
+              </p>
+              <ul className="govuk-list govuk-list--bullet">
+                <li>
+                  managed impartially and objectively in the public interest
+                </li>
+                <li>meet identified user needs</li>
+                <li>produced according to sound methods</li>
+                <li>well explained and readily accessible</li>
+              </ul>
+              <p className="govuk-body">
+                Once designated as National Statistics it's a statutory
+                requirement for statistics to follow and comply with the Code of
+                Practice for Statistics to be observed.
+              </p>
+              <p className="govuk-body">
+                Find out more about the standards we follow to produce these
+                statistics through our{' '}
+                <a href="https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education">
+                  Standards for official statistics published by DfE
+                </a>{' '}
+                guidance.
+              </p>
+            </AccordionSection>
+          )}
         <AccordionSection heading="Contact us" headingTag="h3">
           <p>
             If you have a specific enquiry about {publication.topic.theme.title}{' '}

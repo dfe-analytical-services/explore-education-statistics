@@ -319,6 +319,7 @@ class PublicationReleasePage extends Component<Props> {
           methodologyUrl={`/methodology/${data.publication.slug}`}
           themeTitle={data.publication.topic.theme.title}
           publicationContact={data.publication.contact}
+          releaseType={data.type.title}
         />
 
         <h2 className="govuk-heading-m govuk-!-margin-top-9">
