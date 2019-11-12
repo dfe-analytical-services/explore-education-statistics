@@ -17,8 +17,8 @@
     },
     "GovUk.Education.ExploreStatistics.Admin": {
       "commandName": "Project",
-      "launchBrowser": true,
-      "applicationUrl": "https://localhost:5021;http://localhost:5020",
+      "launchBrowser": false,
+      "applicationUrl": "https://localhost:3001;http://localhost:3021",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

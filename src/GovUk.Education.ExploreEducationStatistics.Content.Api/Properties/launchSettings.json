@@ -19,7 +19,7 @@
     },
     "GovUK.Education.ExploreEducationStatistics.Content.Api": {
       "commandName": "Project",
-      "launchBrowser": true,
+      "launchBrowser": false,
       "launchUrl": "",
       "applicationUrl": "https://localhost:5011;http://localhost:5010",
       "environmentVariables": {

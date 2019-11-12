@@ -1,16 +1,24 @@
 import React, { ReactNode } from 'react';
 
-export interface ButtonLinkProps {
+
+interface LinkAdminProps {
   children: ReactNode;
-  as: string;
-  href: string;
-  [key:string]: any;
+  to: string;
 }
 
-let RealButtonLink : React.ComponentType<ButtonLinkProps>;
+interface LinkFrontEndProps {
+  children: ReactNode;
+  to?: string;
+  as: string;
+  href: string;
+}
+
+export type ButtonLinkProps = (LinkAdminProps | LinkFrontEndProps);
+
+let RealButtonLink : React.ComponentType<{}>;
 export type ButtonLinkType = typeof RealButtonLink;
 
-export const SetRealButtonLink = (buttonLink : ButtonLinkType) => {
+export function SetRealButtonLink<T>(buttonLink : T) {
   RealButtonLink = buttonLink;
   return RealButtonLink;
 };
