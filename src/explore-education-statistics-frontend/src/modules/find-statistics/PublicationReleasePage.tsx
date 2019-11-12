@@ -20,7 +20,7 @@ import classNames from 'classnames';
 import { NextContext } from 'next';
 import React, { Component } from 'react';
 import ReactMarkdown from 'react-markdown';
-import ContentBlock from './components/ContentBlock';
+import ContentBlock from '@common/modules/find-statistics/components/ContentBlock';
 import styles from './PublicationReleasePage.module.scss';
 
 interface Props {

@@ -1,6 +1,6 @@
 import DataBlock from '@common/modules/find-statistics/components/DataBlock';
 import { ContentBlock, Publication } from '@common/services/publicationService';
-import ButtonLink from '@frontend/components/ButtonLink';
+import ButtonLink from '@common/components/ButtonLink';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 

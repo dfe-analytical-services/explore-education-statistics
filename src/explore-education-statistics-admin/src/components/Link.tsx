@@ -8,7 +8,7 @@ export type Props = {
   unvisited?: boolean;
 } & LinkProps;
 
-export const Link = ({
+const Link = ({
   children,
   className,
   to,
