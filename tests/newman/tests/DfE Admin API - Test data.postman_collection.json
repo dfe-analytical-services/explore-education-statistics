@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "6a31aa16-3a9e-42a6-a5e7-238f04f8d254",
+		"_postman_id": "162462e0-afd5-4590-8ce4-acd4c7f5d0c5",
 		"name": "DfE Admin API - Test data",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -1123,11 +1123,16 @@
 											"",
 											"pm.test(\"Fields are present\", function () {",
 											"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"label\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"content\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"indicators\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"filters\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"filterGroups\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"filterItems\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"subjects\"));",
 											"});",
 											"",
-											"pm.test(\"label should should be correct\", function () { ",
-											"    pm.expect(respJson.label).to.equal(\"Admin API test footnote 1\"); ",
+											"pm.test(\"content should should be correct\", function () { ",
+											"    pm.expect(respJson.content).to.equal(\"Admin API test footnote 1\"); ",
 											"});"
 										],
 										"type": "text/javascript"
@@ -1161,7 +1166,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"content\": \"Admin API test footnote 1\",\n    \"indicators\": [\n    \t{{7I_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}},\n    \t{{7I_AbsenceFields__NumberOfAuthorisedAbsenceSessions}}\n    ],\n    \"filters\": [\n    \t{{7F_AbsenceRatePercentBands_SchoolType}}\n    \t],\n    \"filterGroups\": [],\n    \"filterItems\": [],\n    \"subjectId\": 7\n}"
+									"raw": "{\n    \"content\": \"Admin API test footnote 1\",\n    \"indicators\": [\n    \t{{7I_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}},\n    \t{{7I_AbsenceFields__NumberOfAuthorisedAbsenceSessions}}\n    ],\n    \"filters\": [\n    \t{{7F_AbsenceRatePercentBands_SchoolType}}\n    \t],\n    \"filterGroups\": [],\n    \"filterItems\": [],\n    \"subjects\": [7]\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/data/footnote",
@@ -1240,11 +1245,11 @@
 											"",
 											"pm.test(\"Fields are present\", function () {",
 											"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"label\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"content\"));",
 											"});",
 											"",
-											"pm.test(\"label should should be correct\", function () { ",
-											"    pm.expect(respJson.label).to.equal(\"Admin API test footnote 2\"); ",
+											"pm.test(\"content should should be correct\", function () { ",
+											"    pm.expect(respJson.content).to.equal(\"Admin API test footnote 2\"); ",
 											"});"
 										],
 										"type": "text/javascript"
@@ -1278,7 +1283,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"content\": \"Admin API test footnote 2\",\n    \"indicators\": [\n    \t{{7I_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}},\n    \t{{7I_AbsenceFields__NumberOfAuthorisedAbsenceSessions}}\n    ],\n    \"filters\": [],\n    \"filterGroups\": [\n    \t{{7FG_AbsenceRatePercentBands_SchoolType_Default}}\n    \t],\n    \"filterItems\": [],\n    \"subjectId\": 7\n}"
+									"raw": "{\n    \"content\": \"Admin API test footnote 2\",\n    \"indicators\": [\n    \t{{7I_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}},\n    \t{{7I_AbsenceFields__NumberOfAuthorisedAbsenceSessions}}\n    ],\n    \"filters\": [],\n    \"filterGroups\": [\n    \t{{7FG_AbsenceRatePercentBands_SchoolType_Default}}\n    \t],\n    \"filterItems\": [],\n    \"subjects\": [7]\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/data/footnote",
@@ -1357,11 +1362,11 @@
 											"",
 											"pm.test(\"Fields are present\", function () {",
 											"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"label\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"content\"));",
 											"});",
 											"",
-											"pm.test(\"label should should be correct\", function () { ",
-											"    pm.expect(respJson.label).to.equal(\"Admin API test footnote 3\"); ",
+											"pm.test(\"content should should be correct\", function () { ",
+											"    pm.expect(respJson.content).to.equal(\"Admin API test footnote 3\"); ",
 											"});"
 										],
 										"type": "text/javascript"
@@ -1395,7 +1400,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"content\": \"Admin API test footnote 3\",\n    \"indicators\": [\n    \t{{7I_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}},\n    \t{{7I_AbsenceFields__NumberOfAuthorisedAbsenceSessions}}\n    ],\n    \"filters\": [],\n    \"filterGroups\": [],\n    \"filterItems\": [\n    \t{{7FI_AbsenceRatePercentBands_SchoolType_Default_Total}}\n    \t],\n    \"subjectId\": 7\n}"
+									"raw": "{\n    \"content\": \"Admin API test footnote 3\",\n    \"indicators\": [\n    \t{{7I_AbsenceFields__NumberOfUnauthorisedAbsenceSessions}},\n    \t{{7I_AbsenceFields__NumberOfAuthorisedAbsenceSessions}}\n    ],\n    \"filters\": [],\n    \"filterGroups\": [],\n    \"filterItems\": [\n    \t{{7FI_AbsenceRatePercentBands_SchoolType_Default_Total}}\n    \t],\n    \"subjects\": [7]\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/data/footnote",
@@ -1424,15 +1429,15 @@
 											"",
 											"pm.test(\"Fields are present\", function () {",
 											"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"label\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"content\"));",
 											"});",
 											"",
 											"pm.test(\"id should match request id\", function () {",
 											"    pm.expect(respJson.id).to.equal(pm.globals.get(\"create_footnote_filter_items_id\"));",
 											"});",
 											"",
-											"pm.test(\"label should should be correct\", function () { ",
-											"    pm.expect(respJson.label).to.equal(\"Admin API test footnote 3 - Updated\"); ",
+											"pm.test(\"content should should be correct\", function () { ",
+											"    pm.expect(respJson.content).to.equal(\"Admin API test footnote 3 - Updated\");",
 											"});"
 										],
 										"type": "text/javascript"
@@ -1466,7 +1471,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"content\": \"Admin API test footnote 3 - Updated\",\n    \"indicators\": [\n    \t{{7I_AbsenceFields__NumberOfOverallAbsenceSessions}}\n    \t],\n    \"filters\": [],\n    \"filterGroups\": [],\n    \"filterItems\": [\n    \t{{7FI_AbsenceRatePercentBands_SchoolType_Default_Special}},\n    \t{{7FI_AbsenceRatePercentBands_SchoolType_Default_StateFundedSecondary}},\n    \t{{7FI_AbsenceRatePercentBands_SchoolType_Default_StateFundedPrimary}}\n    \t]\n}"
+									"raw": "{\n    \"content\": \"Admin API test footnote 3 - Updated\",\n    \"indicators\": [\n    \t{{7I_AbsenceFields__NumberOfOverallAbsenceSessions}}\n    ],\n    \"filters\": [],\n    \"filterGroups\": [],\n    \"filterItems\": [\n    \t{{7FI_AbsenceRatePercentBands_SchoolType_Default_Special}},\n    \t{{7FI_AbsenceRatePercentBands_SchoolType_Default_StateFundedSecondary}},\n    \t{{7FI_AbsenceRatePercentBands_SchoolType_Default_StateFundedPrimary}}\n    ],\n    subjects: [7]\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/data/footnote/{{create_footnote_filter_items_id}}",
