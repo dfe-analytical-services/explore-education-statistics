@@ -32,10 +32,7 @@ interface MatchProps {
   topicId: string;
 }
 
-const AdminDashboardPage = ({
-  match,
-  location,
-}: RouteComponentProps<MatchProps>) => {
+const AdminDashboardPage = ({ match }: RouteComponentProps<MatchProps>) => {
   const { user } = useContext(LoginContext);
   const { themeId, topicId } = match.params;
   const [model, setModel] = useState<Model>();
