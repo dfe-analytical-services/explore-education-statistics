@@ -10,7 +10,7 @@ import releaseRoutes from '@admin/routes/edit-release/routes';
 import signInRoutes from '@admin/routes/sign-in/routes';
 import PrototypeLoginService from '@admin/services/PrototypeLoginService';
 import React from 'react';
-import { Route } from 'react-router';
+import { Redirect, Route, Switch } from 'react-router';
 import { BrowserRouter } from 'react-router-dom';
 
 import './App.scss';
@@ -58,11 +58,20 @@ function App() {
   return (
     <BrowserRouter>
       {/* Non-Prototype Routes*/}
-      <ProtectedRoute
-        exact
-        path={dashboardRoutes.adminDashboard}
-        component={AdminDashboardPage}
-      />
+      <Switch>
+        <ProtectedRoute
+          exact
+          path={dashboardRoutes.adminDashboard}
+          component={AdminDashboardPage}
+        />
+
+        <ProtectedRoute
+          path={dashboardRoutes.adminDashboardThemeTopic}
+          component={AdminDashboardPage}
+        />
+
+        <Redirect exact strict from="/" to="/dashboard" />
+      </Switch>
 
       <ProtectedRoute
         exact
