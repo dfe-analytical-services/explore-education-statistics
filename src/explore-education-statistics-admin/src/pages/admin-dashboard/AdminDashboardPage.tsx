@@ -16,6 +16,7 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import { Dictionary } from '@common/types';
 import React, { useContext, useEffect, useState } from 'react';
+import { RouteComponentProps } from 'react-router';
 import SummaryList from '@common/components/SummaryList';
 import MyPublicationsTab from './components/MyPublicationsTab';
 
@@ -26,9 +27,14 @@ interface Model {
   preReleaseContactsByScheduledRelease: Dictionary<UserDetails[]>;
 }
 
-const AdminDashboardPage = () => {
-  const { user } = useContext(LoginContext);
+interface MatchProps {
+  themeId: string;
+  topicId: string;
+}
 
+const AdminDashboardPage = ({ match }: RouteComponentProps<MatchProps>) => {
+  const { user } = useContext(LoginContext);
+  const { themeId, topicId } = match.params;
   const [model, setModel] = useState<Model>();
 
   useEffect(() => {
@@ -111,7 +117,7 @@ const AdminDashboardPage = () => {
               id="my-publications"
               title="Manage publications and releases"
             >
-              <MyPublicationsTab />
+              <MyPublicationsTab themePropId={themeId} topicPropId={topicId} />
             </TabsSection>
             <TabsSection
               id="draft-releases"

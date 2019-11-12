@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "98c8731e-d4e7-4066-88c7-df75833f27a2",
+		"_postman_id": "bab82b99-ca8b-45bc-b52d-3ccc99902d13",
 		"name": "DfE Admin API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -1112,8 +1112,6 @@
 									"script": {
 										"id": "fa8ea708-fc9c-4520-8df9-a388dd26508d",
 										"exec": [
-											"// EES-598",
-											"/*",
 											"var respJson = pm.response.json();",
 											"",
 											"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
@@ -1153,8 +1151,7 @@
 											"           return geoLevel === \"Local_Authority\" || geoLevel === \"Local_Authority_District\"; ",
 											"        });",
 											"    }",
-											"});",
-											"*/"
+											"});"
 										],
 										"type": "text/javascript"
 									}
@@ -1232,11 +1229,11 @@
 											"",
 											"pm.test(\"Fields are present\", function () {",
 											"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"label\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"content\"));",
 											"});",
 											"",
-											"pm.test(\"label should should be correct\", function () { ",
-											"    pm.expect(respJson.label).to.equal(\"Postman test footnote\"); ",
+											"pm.test(\"content should should be correct\", function () { ",
+											"    pm.expect(respJson.content).to.equal(\"Postman test footnote\"); ",
 											"});"
 										],
 										"type": "text/javascript"
@@ -1272,7 +1269,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"content\": \"Postman test footnote\",\n    \"indicators\": [\n    \t{{1I_AbsenceFields__UnauthorisedAbsenceRate}},\n    \t{{1I_AbsenceFields__AuthorisedAbsenceRate}}\n    ],\n    \"filters\": [\n    \t{{1FILT_SchoolType}}\n    \t],\n    \"filterGroups\": [],\n    \"filterItems\": [],\n    \"subjectId\": 1\n}"
+									"raw": "{\n    \"content\": \"Postman test footnote\",\n    \"indicators\": [\n    \t{{1I_AbsenceFields__UnauthorisedAbsenceRate}},\n    \t{{1I_AbsenceFields__AuthorisedAbsenceRate}}\n    ],\n    \"filters\": [\n    \t{{1FILT_SchoolType}}\n    \t],\n    \"filterGroups\": [],\n    \"filterItems\": [],\n    \"subjects\": [1]\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/data/footnote",
@@ -1351,11 +1348,11 @@
 											"",
 											"pm.test(\"Fields are present\", function () {",
 											"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"label\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"content\"));",
 											"});",
 											"",
-											"pm.test(\"label should should be correct\", function () { ",
-											"    pm.expect(respJson.label).to.equal(\"Postman test footnote\"); ",
+											"pm.test(\"content should should be correct\", function () { ",
+											"    pm.expect(respJson.content).to.equal(\"Postman test footnote\"); ",
 											"});"
 										],
 										"type": "text/javascript"
@@ -1389,7 +1386,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"content\": \"Postman test footnote\",\n    \"indicators\": [\n    \t{{1I_AbsenceFields__UnauthorisedAbsenceRate}},\n    \t{{1I_AbsenceFields__AuthorisedAbsenceRate}}\n    ],\n    \"filters\": [],\n    \"filterGroups\": [\n    \t{{1FG_SchoolType_Default}}\n    \t],\n    \"filterItems\": [],\n    \"subjectId\": 1\n}"
+									"raw": "{\n    \"content\": \"Postman test footnote\",\n    \"indicators\": [\n    \t{{1I_AbsenceFields__UnauthorisedAbsenceRate}},\n    \t{{1I_AbsenceFields__AuthorisedAbsenceRate}}\n    ],\n    \"filters\": [],\n    \"filterGroups\": [\n    \t{{1FG_SchoolType_Default}}\n    \t],\n    \"filterItems\": [],\n    \"subjects\": [1]\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/data/footnote",
@@ -1468,11 +1465,11 @@
 											"",
 											"pm.test(\"Fields are present\", function () {",
 											"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"label\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"content\"));",
 											"});",
 											"",
-											"pm.test(\"label should should be correct\", function () { ",
-											"    pm.expect(respJson.label).to.equal(\"Postman test footnote\"); ",
+											"pm.test(\"content should should be correct\", function () { ",
+											"    pm.expect(respJson.content).to.equal(\"Postman test footnote\"); ",
 											"});"
 										],
 										"type": "text/javascript"
@@ -1506,7 +1503,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"content\": \"Postman test footnote\",\n    \"indicators\": [\n    \t{{1I_AbsenceFields__UnauthorisedAbsenceRate}},\n    \t{{1I_AbsenceFields__AuthorisedAbsenceRate}}\n    ],\n    \"filters\": [],\n    \"filterGroups\": [],\n    \"filterItems\": [\n    \t{{1F_SchoolType__Total}}\n    ],\n    \"subjectId\": 1\n}"
+									"raw": "{\n    \"content\": \"Postman test footnote\",\n    \"indicators\": [\n    \t{{1I_AbsenceFields__UnauthorisedAbsenceRate}},\n    \t{{1I_AbsenceFields__AuthorisedAbsenceRate}}\n    ],\n    \"filters\": [],\n    \"filterGroups\": [],\n    \"filterItems\": [\n    \t{{1F_SchoolType__Total}}\n    ],\n    \"subjects\": [1]\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/data/footnote",
@@ -1535,15 +1532,15 @@
 											"",
 											"pm.test(\"Fields are present\", function () {",
 											"    pm.expect(pm.response.to.have.jsonBody(\"id\"));",
-											"    pm.expect(pm.response.to.have.jsonBody(\"label\"));",
+											"    pm.expect(pm.response.to.have.jsonBody(\"content\"));",
 											"});",
 											"",
 											"pm.test(\"id should match request id\", function () {",
 											"    pm.expect(respJson.id).to.equal(pm.globals.get(\"footnote_for_filter_items_id\"));",
 											"});",
 											"",
-											"pm.test(\"label should should be correct\", function () { ",
-											"    pm.expect(respJson.label).to.equal(\"Postman test footnote - Updated\"); ",
+											"pm.test(\"content should should be correct\", function () { ",
+											"    pm.expect(respJson.content).to.equal(\"Postman test footnote - Updated\"); ",
 											"});"
 										],
 										"type": "text/javascript"
@@ -1577,7 +1574,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"content\": \"Postman test footnote - Updated\",\n    \"indicators\": [\n    \t{{1I_AbsenceFields__OverallAbsenceRate}}\n    \t],\n    \"filters\": [],\n    \"filterGroups\": [],\n    \"filterItems\": [\n    \t{{1F_SchoolType__StateFundedPrimary}},\n    \t{{1F_SchoolType__StateFundedSecondary}},\n    \t{{1F_SchoolType__Special}}\n    \t]\n}"
+									"raw": "{\n    \"content\": \"Postman test footnote - Updated\",\n    \"indicators\": [\n    \t{{1I_AbsenceFields__OverallAbsenceRate}}\n    ],\n    \"filters\": [],\n    \"filterGroups\": [],\n    \"filterItems\": [\n    \t{{1F_SchoolType__StateFundedPrimary}},\n    \t{{1F_SchoolType__StateFundedSecondary}},\n    \t{{1F_SchoolType__Special}}\n    ],\n    \"subjects\": [1]\n}"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/data/footnote/{{footnote_for_filter_items_id}}",
@@ -1731,10 +1728,13 @@
 									"",
 									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
 									"",
+									"/*",
+									"// EES-644",
 									"pm.test(\"Status should be complete\", function () {",
 									"    pm.expect(respJson.status).to.equal(\"COMPLETE\");",
 									"    pm.expect(respJson.percentageComplete).to.equal(100);",
 									"});",
+									"*/",
 									"",
 									"pm.test(\"There should be no errors\", function () {",
 									"    pm.expect(pm.response.to.have.jsonBody(\"errors\", \"\"));",
@@ -9047,7 +9047,12 @@
 					"pm.globals.set(\"1I_AbsenceFields__OverallAbsenceRate\", \"26\");",
 					"pm.globals.set(\"1I_AbsenceFields__AuthorisedAbsenceRate\", \"28\");",
 					"pm.globals.set(\"1I_AbsenceFields__PercentageOfPersistentAbsentees\", \"30\");",
-					"pm.globals.set(\"1I_AbsenceFields__NumberOfPersistentAbsentees\", \"31\");"
+					"pm.globals.set(\"1I_AbsenceFields__NumberOfPersistentAbsentees\", \"31\");",
+					"pm.globals.set(\"1I_AbsenceForPersistentAbsentees__NumberOfAuthorisedAbsenceSessionsForPersistentAbsentees\", \"6\");",
+					"pm.globals.set(\"1I_AbsenceByReason__NumberOfUnauthorisedReasonsSessions\", \"7\");",
+					"pm.globals.set(\"1I_AbsenceByReason__NumberOfUnauthorisedOtherSessions\", \"8\");",
+					"pm.globals.set(\"1I_AbsenceByReason__NumberOfNoReasonYetSessions\", \"9\");",
+					"pm.globals.set(\"1I_AbsenceByReason__NumberOfLateSessions\", \"10\");"
 				]
 			}
 		},
