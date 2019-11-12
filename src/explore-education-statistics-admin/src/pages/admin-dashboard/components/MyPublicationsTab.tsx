@@ -54,7 +54,7 @@ const MyPublicationsTab = ({ themePropId, topicPropId }: Props) => {
   const onThemeChange = (
     themeId: string,
     availableThemes: ThemeAndTopicsIdsAndTitles[],
-  ) =>
+  ) => {
     setSelectedThemeAndTopic({
       theme: findThemeById(themeId, availableThemes),
       topic: orderBy(
@@ -62,15 +62,17 @@ const MyPublicationsTab = ({ themePropId, topicPropId }: Props) => {
         topic => topic.title,
       )[0],
     });
+  };
 
   const onTopicChange = (
     topicId: string,
     selectedTheme: ThemeAndTopicsIdsAndTitles,
-  ) =>
+  ) => {
     setSelectedThemeAndTopic({
       theme: selectedTheme,
       topic: findTopicById(topicId, selectedTheme),
     });
+  };
 
   useEffect(() => {
     dashboardService
@@ -86,14 +88,35 @@ const MyPublicationsTab = ({ themePropId, topicPropId }: Props) => {
         theme: themes[0],
         topic: orderBy(themes[0].topics, topic => topic.title)[0],
       });
+      if (themePropId && topicPropId) {
+        const theme = themes.find(function findTheme(t) {
+          return t.id === themePropId;
+        });
+
+        const topic =
+          theme &&
+          theme.topics.find(function findTopic(t) {
+            return t.id === topicPropId;
+          });
+
+        if (theme && topic) {
+          setSelectedThemeAndTopic({ theme, topic });
+        }
+      }
     }
-  }, [themes]);
+  }, [themes, topicPropId, themePropId]);
 
   useEffect(() => {
     if (selectedThemeAndTopic) {
       dashboardService
         .getMyPublicationsByTopic(selectedThemeAndTopic.topic.id)
         .then(setMyPublications);
+
+      window.history.replaceState(
+        '',
+        '',
+        `/dashboard/${selectedThemeAndTopic.theme.id}/${selectedThemeAndTopic.topic.id}`,
+      );
     }
   }, [selectedThemeAndTopic]);
 
@@ -123,14 +146,9 @@ const MyPublicationsTab = ({ themePropId, topicPropId }: Props) => {
                   label: theme.title,
                   value: theme.id,
                 }))}
-                value={themePropId || selectedThemeAndTopic.theme.id}
+                value={selectedThemeAndTopic.theme.id}
                 onChange={event => {
                   onThemeChange(event.target.value, themes);
-                  window.history.replaceState(
-                    '',
-                    '',
-                    `/dashboard/${selectedThemeAndTopic.theme.id}`,
-                  );
                 }}
               />
             </div>
@@ -143,16 +161,11 @@ const MyPublicationsTab = ({ themePropId, topicPropId }: Props) => {
                   label: topic.title,
                   value: topic.id,
                 }))}
-                value={topicPropId || selectedThemeAndTopic.topic.id}
+                value={selectedThemeAndTopic.topic.id}
                 onChange={event => {
                   onTopicChange(
                     event.target.value,
                     selectedThemeAndTopic.theme,
-                  );
-                  window.history.replaceState(
-                    '',
-                    '',
-                    `/dashboard/${selectedThemeAndTopic.theme.id}/${selectedThemeAndTopic.topic.id}`,
                   );
                 }}
               />
