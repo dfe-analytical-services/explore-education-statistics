@@ -94,11 +94,13 @@ const TableTool = ({
                     }
                   }}
                 />
-                {finalStepProps.createdTable && tableHeaders && (
+                {finalStepProps.createdTable && 
+                finalStepProps.tableHeaders &&
+                tableHeaders && (
                   <TimePeriodDataTable
                     ref={dataTableRef}
                     fullTable={finalStepProps.createdTable}
-                    tableHeadersConfig={tableHeaders}
+                    tableHeadersConfig={finalStepProps.tableHeaders}
                   />
                 )}
 
