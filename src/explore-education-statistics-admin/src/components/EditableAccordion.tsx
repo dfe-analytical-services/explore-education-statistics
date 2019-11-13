@@ -1,13 +1,12 @@
+import { AccordionProps } from '@common/components/Accordion';
 import isComponentType from '@common/lib/type-guards/components/isComponentType';
-import React, { cloneElement, Component, createRef, ReactNode } from 'react';
+import React, { cloneElement, Component, createRef } from 'react';
 import EditableAccordionSection, {
   EditableAccordionSectionProps,
 } from './EditableAccordionSection';
 
-export interface EditableAccordionProps {
-  children: ReactNode;
-  id: string;
-  index: number;
+export interface EditableAccordionProps extends AccordionProps {
+  index?: number;
 }
 
 interface State {

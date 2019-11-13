@@ -8,6 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Me
     {
         [JsonConverter(typeof(StringEnumConverter))]
         public GeographicLevel Level { get; set; }
+
         public dynamic GeoJson { get; set; }
     }
 }

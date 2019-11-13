@@ -165,7 +165,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private Dictionary<string, TableBuilderObservationalUnitsMetaViewModel> BuildObservationalUnitsViewModels(
             Dictionary<GeographicLevel, IEnumerable<IObservationalUnit>> observationalUnits)
         {
-            return observationalUnits.ToDictionary(
+            var viewModels = observationalUnits.ToDictionary(
                 pair => pair.Key.ToString().CamelCase(),
                 pair => new TableBuilderObservationalUnitsMetaViewModel
                 {
@@ -173,6 +173,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     Legend = pair.Key.GetEnumLabel(),
                     Options = _mapper.Map<IEnumerable<LabelValue>>(pair.Value)
                 });
+
+            foreach (var (_, viewModel) in viewModels)
+            {
+                viewModel.Options = TransformDuplicateObservationalUnitsWithUniqueLabels(viewModel.Options);
+            }
+
+            return viewModels;
         }
 
         private static TableBuilderTimePeriodsMetaViewModel BuildTimePeriodsViewModels(

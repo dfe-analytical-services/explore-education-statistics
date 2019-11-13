@@ -1,5 +1,4 @@
 import Link from '@admin/components/Link';
-import { dataRoute } from '@admin/routes/edit-release/routes';
 import service from '@admin/services/release/edit-release/data/service';
 import { AncillaryFile } from '@admin/services/release/edit-release/data/types';
 import Button from '@common/components/Button';

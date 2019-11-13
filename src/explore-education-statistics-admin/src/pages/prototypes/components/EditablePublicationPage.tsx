@@ -171,6 +171,7 @@ class EditablePublicationPage extends Component<Props, State> {
                 onContentChange={(block, newContent) => {
                   block.body = newContent;
                 }}
+                publication={data.publication}
               />
             </EditableAccordionSection>
           ))}

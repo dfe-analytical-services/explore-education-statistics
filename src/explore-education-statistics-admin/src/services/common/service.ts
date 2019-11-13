@@ -9,6 +9,7 @@ export interface CommonService {
   getBasicPublicationDetails(
     publicationId: string,
   ): Promise<BasicPublicationDetails>;
+  getBasicThemeDetails(themeId: string): Promise<IdTitlePair>;
   getReleaseTypes(): Promise<IdTitlePair[]>;
   getTimePeriodCoverageGroups(): Promise<TimePeriodCoverageGroup[]>;
 }
@@ -20,6 +21,9 @@ const service: CommonService = {
     return client.get<BasicPublicationDetails>(
       `/publications/${publicationId}`,
     );
+  },
+  getBasicThemeDetails(themeId: string): Promise<IdTitlePair> {
+    return client.get<IdTitlePair>(`theme/${themeId}/summary`);
   },
   getReleaseTypes(): Promise<IdTitlePair[]> {
     return client.get<IdTitlePair[]>('/meta/releasetypes');

@@ -55,7 +55,7 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
               timePeriodCoverageCode:
                 releaseSummaryDetails.timePeriodCoverage.value,
               timePeriodCoverageStartYear: releaseSummaryDetails.releaseName.toString(),
-              releaseTypeId: releaseSummaryDetails.typeId,
+              releaseTypeId: releaseSummaryDetails.type.id,
               scheduledPublishDate: dayMonthYearValuesToInputs(
                 dateToDayMonthYear(
                   new Date(releaseSummaryDetails.publishScheduled),

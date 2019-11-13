@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "bab82b99-ca8b-45bc-b52d-3ccc99902d13",
+		"_postman_id": "90eb0249-5913-4394-afa0-6c45131b3638",
 		"name": "DfE Admin API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -2034,7 +2034,7 @@
 									"    pm.expect(pm.response.to.have.jsonBody(\"status\"));",
 									"});",
 									"",
-									"pm.test(\"id should match request id\", function () {",
+									"pm.test(\"id should match release summary id (rather than release id)\", function () {",
 									"    pm.expect(respJson.id).to.equal(\"06c45b1e-533d-4c95-900b-62beb4620f59\");",
 									"});",
 									"",
@@ -2101,14 +2101,12 @@
 									"    pm.expect(pm.response.to.have.jsonBody(\"releaseName\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"slug\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"status\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"internalReleaseNote\"));",
 									"});",
 									"",
-									"pm.test(\"id should match request id\", function () {",
-									"    pm.expect(respJson.id).to.equal(\"e7774a74-1f62-4b76-b9b5-84f14dac7278\");",
-									"});",
-									"",
-									"pm.test(\"typeId should should be correct\", function () { ",
-									"    pm.expect(respJson.typeId).to.equal(\"9d333457-9132-4e55-ae78-c55cb3673d7c\"); ",
+									"pm.test(\"Status and Internal Release Note should be correct\", function () { ",
+									"   pm.expect(respJson.status).to.equal(\"Approved\");",
+									"   pm.expect(respJson.internalReleaseNote).to.equal(\"Test Note\");",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2142,7 +2140,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"releaseStatus\": \"Draft\",\n\t\"internalReleaseNote\": \"Test Note\"\n}"
+							"raw": "{\n\t\"releaseStatus\": \"Approved\",\n\t\"internalReleaseNote\": \"Test Note\"\n}"
 						},
 						"url": {
 							"raw": "{{admin_api_url}}/releases/E7774A74-1F62-4B76-B9B5-84F14DAC7278/status",
