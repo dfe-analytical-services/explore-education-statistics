@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
@@ -67,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
               * Duplicates where the values are the same but the labels are different.
                 These don't need any action.
             */
-            
+
             var case1 = viewModels
                 .GroupBy(model => (model.Value, model.Label))
                 .Where(grouping => grouping.Count() > 1)
@@ -82,10 +82,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             {
                 if (case1.Contains(value))
                 {
-                    // TODO EES-204 Append geographic level
-                    value.Label += "";
-                } 
-                
+                    if (value is ObservationalUnitMetaViewModel observationalUnitMetaViewModel)
+                    {
+                        observationalUnitMetaViewModel.Label +=
+                            $" ({observationalUnitMetaViewModel.Level.GetEnumLabel()})";
+                    }
+                }
+
                 if (case2.Contains(value))
                 {
                     value.Label += $" ({value.Value})";
