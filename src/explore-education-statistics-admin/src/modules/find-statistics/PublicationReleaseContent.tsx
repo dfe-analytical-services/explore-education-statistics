@@ -1,29 +1,27 @@
-import { EditableAccordionProps } from '@admin/components/EditableAccordion';
-import { EditableAccordionSectionProps } from '@admin/components/EditableAccordionSection';
-import { LinkProps } from '@admin/components/Link';
+import {EditableAccordionProps} from '@admin/components/EditableAccordion';
+import {EditableAccordionSectionProps} from '@admin/components/EditableAccordionSection';
+import {LinkProps} from '@admin/components/Link';
 import BasicReleaseSummary from '@admin/modules/find-statistics/components/BasicReleaseSummary';
-import { MarkdownRendererProps } from '@admin/modules/find-statistics/components/EditableMarkdownRenderer';
-import { TextRendererProps } from '@admin/modules/find-statistics/components/EditableTextRenderer';
-import { PrintThisPageProps } from '@admin/modules/find-statistics/components/PrintThisPage';
-import { getTimePeriodCoverageDateRangeStringShort } from '@admin/pages/release/util/releaseSummaryUtil';
-import { BasicPublicationDetails } from '@admin/services/common/types';
-import { EditableContentBlock } from '@admin/services/publicationService';
-import { ReleaseSummaryDetails } from '@admin/services/release/types';
-import { generateIdList } from '@common/components/Accordion';
+import {MarkdownRendererProps} from '@admin/modules/find-statistics/components/EditableMarkdownRenderer';
+import {TextRendererProps} from '@admin/modules/find-statistics/components/EditableTextRenderer';
+import {PrintThisPageProps} from '@admin/modules/find-statistics/components/PrintThisPage';
+import {getTimePeriodCoverageDateRangeStringShort} from '@admin/pages/release/util/releaseSummaryUtil';
+import {BasicPublicationDetails} from '@admin/services/common/types';
+import {EditableContentBlock} from '@admin/services/publicationService';
+import {ReleaseSummaryDetails} from '@admin/services/release/types';
+import {generateIdList} from '@common/components/Accordion';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
-import { DataBlockProps } from '@common/modules/find-statistics/components/DataBlock';
-import { baseUrl } from '@common/services/api';
-import {
-  AbstractRelease,
-  ReleaseType,
-} from '@common/services/publicationService';
-import { Dictionary } from '@common/types';
+import {DataBlockProps} from '@common/modules/find-statistics/components/DataBlock';
+import {baseUrl} from '@common/services/api';
+import {AbstractRelease, ReleaseType,} from '@common/services/publicationService';
+import {Dictionary} from '@common/types';
 import classNames from 'classnames';
 import React from 'react';
-import { Props as ContentBlockProps } from './components/EditableContentBlock';
+import {EditingContext} from '@common/modules/find-statistics/util/editableComponentWrapper';
+import {Props as ContentBlockProps} from './components/EditableContentBlock';
 
 export interface RendererProps {
   contentId?: string;
@@ -62,6 +60,8 @@ interface Props extends ComponentTypes {
 
 const nullLogEvent = () => {};
 
+
+
 const PublicationReleaseContent = ({
   basicPublication,
   release,
@@ -80,13 +80,15 @@ const PublicationReleaseContent = ({
 }: Props) => {
   const accId: string[] = generateIdList(2);
 
+
+
   const releaseCount =
     release.publication.releases.length +
     release.publication.legacyReleases.length;
   const { publication } = release;
 
   return (
-    <>
+    <EditingContext.Provider value={{isEditing: true}}>
       <h1 className="govuk-heading-l">
         <span className="govuk-caption-l">
           {releaseSummary.timePeriodCoverage.label}{' '}
@@ -408,7 +410,7 @@ const PublicationReleaseContent = ({
         </AccordionSection>
       </Accordion>
       {/* </editor-fold> */}
-    </>
+    </EditingContext.Provider>
   );
 };
 
