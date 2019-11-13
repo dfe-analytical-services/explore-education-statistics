@@ -1,4 +1,4 @@
-import { DayMonthYearValues } from '@admin/services/common/types';
+import { DayMonthYearValues, IdTitlePair } from '@admin/services/common/types';
 import { ReleaseStatus } from '@admin/services/dashboard/types';
 
 export interface ReleaseSummaryDetails {
@@ -8,7 +8,7 @@ export interface ReleaseSummaryDetails {
     label: string;
   };
   releaseName: string;
-  typeId: string;
+  type: IdTitlePair;
   publishScheduled: string;
   nextReleaseDate?: DayMonthYearValues;
   status: ReleaseStatus;

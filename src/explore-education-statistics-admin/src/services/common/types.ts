@@ -39,6 +39,8 @@ export interface BasicPublicationDetails {
   id: string;
   title: string;
   contact?: ContactDetails;
+  methodologyId?: string;
+  themeId: string;
 }
 
 export interface DayMonthYearValues {

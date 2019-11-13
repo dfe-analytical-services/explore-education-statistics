@@ -5,20 +5,15 @@ using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using static System.String;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.NamingUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Api.Services.TimePeriodLabelFormatter;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
-    public class ReleaseSummaryViewModel
+    public class UpdateReleaseSummaryRequest
     {
-        
-        public Guid Id { get; set; }
-        
         [Required]
-        public ReleaseType Type { get; set; }
+        public Guid TypeId { get; set; }
         
         [JsonConverter(typeof(TimeIdentifierJsonConverter))]
         [Required]
@@ -28,20 +23,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         
         [PartialDateValidator]
         public PartialDate NextReleaseDate { get; set; }
-     
+        
         [RegularExpression(@"^([0-9]{4})?$")]
         public string ReleaseName { get; set; }
         
-        private string _slug;
         public string Slug
         {
-            get => IsNullOrEmpty(_slug) ? SlugFromTitle(Format(ReleaseName, TimePeriodCoverage)) : _slug;
-            set => _slug = value; 
+            get => SlugFromTitle(Format(ReleaseName, TimePeriodCoverage));
         }
-        
-        [JsonConverter(typeof(StringEnumConverter))]
-        public ReleaseStatus Status { get; set; }
-
-        public string InternalReleaseNote { get; set; }
     }
 }

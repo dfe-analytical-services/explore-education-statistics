@@ -3,7 +3,6 @@ import ManageReleaseContext, {
   ManageRelease,
 } from '@admin/pages/release/ManageReleaseContext';
 import {
-  getSelectedReleaseType,
   getSelectedTimePeriodCoverageLabel,
   getTimePeriodCoverageDateRangeStringLong,
 } from '@admin/pages/release/util/releaseSummaryUtil';
@@ -94,12 +93,7 @@ const ReleaseSummaryPage = () => {
               )}
             </SummaryListItem>
             <SummaryListItem term="Release type">
-              {
-                getSelectedReleaseType(
-                  model.releaseSummaryDetails.typeId,
-                  model.releaseTypes,
-                ).title
-              }
+              {model.releaseSummaryDetails.type.title}
             </SummaryListItem>
           </SummaryList>
           <div className="dfe-align--right">

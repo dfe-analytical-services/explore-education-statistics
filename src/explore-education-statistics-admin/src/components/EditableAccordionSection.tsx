@@ -1,23 +1,12 @@
+import { AccordionSectionProps } from '@common/components/AccordionSection';
 import GoToTopLink from '@common/components/GoToTopLink';
 import classNames from 'classnames';
-import React, { createElement, createRef, ReactNode, useState } from 'react';
+import React, { createElement, createRef, useState } from 'react';
+
 // import PrototypeEditableContent from "@admin/pages/prototypes/components/PrototypeEditableContent";
 
-export interface EditableAccordionSectionProps {
-  caption?: string;
-  children: ReactNode;
-  className?: string;
-  contentId?: string;
-  goToTop?: boolean;
-  heading: string;
-  headingId?: string;
-  // Only for accessibility/semantic markup,
-  // does not change the actual styling
-  headingTag?: 'h2' | 'h3' | 'h4';
-  id?: string;
-  open?: boolean;
-  onToggle?: (open: boolean) => void;
-  index: number;
+export interface EditableAccordionSectionProps extends AccordionSectionProps {
+  index?: number;
   droppableIndex?: number;
 }
 
