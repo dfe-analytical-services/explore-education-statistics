@@ -1,40 +1,39 @@
-import { ApplicationPaths } from '@admin/components/api-authorization/ApiAuthorizationConstants';
 import ProtectedRoute from '@admin/components/ProtectedRoute';
-import ProtectedRoutes from '@admin/components/ProtectedRoutes';
 import CreatePublicationPage from '@admin/pages/create-publication/CreatePublicationPage';
 import CreateReleasePage from '@admin/pages/release/create-release/CreateReleasePage';
 import ManageReleasePageContainer from '@admin/pages/release/ManageReleasePageContainer';
 import SignedOutPage from '@admin/pages/sign-in/SignedOutPage';
+import SignInPage from '@admin/pages/sign-in/SignInPage';
 import dashboardRoutes from '@admin/routes/dashboard/routes';
 import publicationRoutes from '@admin/routes/edit-publication/routes';
 import releaseRoutes from '@admin/routes/edit-release/routes';
+import signInRoutes from '@admin/routes/sign-in/routes';
 import PrototypeLoginService from '@admin/services/PrototypeLoginService';
 import React from 'react';
-import { Route } from 'react-router';
+import { Redirect, Route, Switch } from 'react-router';
 import { BrowserRouter } from 'react-router-dom';
 
 import './App.scss';
 
-import ApiAuthorizationRoutes from './components/api-authorization/ApiAuthorizationRoutes';
-
 import { LoginContext } from './components/Login';
 import AdminDashboardPage from './pages/admin-dashboard/AdminDashboardPage';
-import AdminDocumentationCreateNewRelease from './pages/documentation/DocumentationCreateNewRelease';
+import IndexPage from './pages/IndexPage';
 
 import AdminDocumentationContentDesignStandards from './pages/documentation/DocumentationDesignStandards';
-import AdminDocumentationEditRelease from './pages/documentation/DocumentationEditRelease';
 import AdminDocumentationGlossary from './pages/documentation/DocumentationGlossary';
+import AdminDocumentationStyle from './pages/documentation/DocumentationStyle';
 import AdminDocumentationHome from './pages/documentation/DocumentationHome';
+import AdminDocumentationUsingDashboard from './pages/documentation/DocumentationUsingDashboard';
+import AdminDocumentationCreateNewRelease from './pages/documentation/DocumentationCreateNewRelease';
+import AdminDocumentationCreateNewPublication from './pages/documentation/DocumentationCreateNewPublication';
 import AdminDocumentationManageContent from './pages/documentation/DocumentationManageContent';
 import AdminDocumentationManageData from './pages/documentation/DocumentationManageData';
 import AdminDocumentationManageDataBlocks from './pages/documentation/DocumentationManageDataBlocks';
-import AdminDocumentationStyle from './pages/documentation/DocumentationStyle';
-import AdminDocumentationUsingDashboard from './pages/documentation/DocumentationUsingDashboard';
-import IndexPage from './pages/IndexPage';
 
+import AdminDocumentationEditRelease from './pages/documentation/DocumentationEditRelease';
 import PrototypeAdminDashboard from './pages/prototypes/PrototypeAdminDashboard';
 import PrototypeChartTest from './pages/prototypes/PrototypeChartTest';
-import AdminDocumentationCreateNewPublication from './pages/prototypes/PrototypeDocumentationCreateNewPublication';
+import PrototypeTableTool from './pages/prototypes/PrototypeTableTool';
 import PublicationAssignMethodology from './pages/prototypes/PrototypePublicationPageAssignMethodology';
 import PublicationConfirmNew from './pages/prototypes/PrototypePublicationPageConfirmNew';
 
@@ -54,97 +53,56 @@ import PublicationCreateNewAbsenceViewTables from './pages/prototypes/PrototypeP
 import PublicationReviewPage from './pages/prototypes/PrototypePublicationPageReviewAbsence';
 import ReleaseCreateNew from './pages/prototypes/PrototypeReleasePageCreateNew';
 import PrototypesIndexPage from './pages/prototypes/PrototypesIndexPage';
-import PrototypeTableTool from './pages/prototypes/PrototypeTableTool';
 
 function App() {
   return (
     <BrowserRouter>
       {/* Non-Prototype Routes*/}
-
-      <ApiAuthorizationRoutes />
-
-      <ProtectedRoutes>
+      <Switch>
         <ProtectedRoute
           exact
           path={dashboardRoutes.adminDashboard}
           component={AdminDashboardPage}
         />
+
         <ProtectedRoute
-          exact
-          path={ApplicationPaths.LoggedOut}
-          component={SignedOutPage}
-          redirectIfNotLoggedIn={false}
+          path={dashboardRoutes.adminDashboardThemeTopic}
+          component={AdminDashboardPage}
         />
-        <ProtectedRoute
-          exact
-          path={publicationRoutes.createPublication.route}
-          component={CreatePublicationPage}
-        />
-        <ProtectedRoute
-          exact
-          path={releaseRoutes.createReleaseRoute.route}
-          component={CreateReleasePage}
-        />
-        <ProtectedRoute
-          path="/publication/:publicationId/release/:releaseId"
-          component={ManageReleasePageContainer}
-        />
-        <ProtectedRoute
-          exact
-          path="/documentation/"
-          component={AdminDocumentationHome}
-        />
-        <ProtectedRoute
-          exact
-          path="/documentation/content-design-standards-guide"
-          component={AdminDocumentationContentDesignStandards}
-        />
-        <ProtectedRoute
-          exact
-          path="/documentation/glossary"
-          component={AdminDocumentationGlossary}
-        />
-        <ProtectedRoute
-          exact
-          path="/documentation/style-guide"
-          component={AdminDocumentationStyle}
-        />
-        <ProtectedRoute
-          exact
-          path="/documentation/using-dashboard"
-          component={AdminDocumentationUsingDashboard}
-        />
-        <ProtectedRoute
-          exact
-          path="/documentation/create-new-release"
-          component={AdminDocumentationCreateNewRelease}
-        />
-        <ProtectedRoute
-          exact
-          path="/documentation/create-new-publication"
-          component={AdminDocumentationCreateNewPublication}
-        />
-        <ProtectedRoute
-          exact
-          path="/documentation/edit-release"
-          component={AdminDocumentationEditRelease}
-        />
-        <ProtectedRoute
-          exact
-          path="/documentation/manage-content"
-          component={AdminDocumentationManageContent}
-        />
-        <ProtectedRoute
-          exact
-          path="/documentation/manage-data"
-          component={AdminDocumentationManageData}
-        />
-        <ProtectedRoute
-          exact
-          path="/documentation/manage-data-block"
-          component={AdminDocumentationManageDataBlocks}
-        />
-      </ProtectedRoutes>
+
+        <Redirect exact strict from="/" to="/dashboard" />
+      </Switch>
+
+      <ProtectedRoute
+        exact
+        path={signInRoutes.signIn}
+        component={SignInPage}
+        redirectIfNotLoggedIn={false}
+      />
+
+      <ProtectedRoute
+        exact
+        path={signInRoutes.signOut}
+        component={SignedOutPage}
+        redirectIfNotLoggedIn={false}
+      />
+
+      <ProtectedRoute
+        exact
+        path={publicationRoutes.createPublication.route}
+        component={CreatePublicationPage}
+      />
+
+      <ProtectedRoute
+        exact
+        path={releaseRoutes.createReleaseRoute.route}
+        component={CreateReleasePage}
+      />
+
+      <Route
+        path="/publication/:publicationId/release/:releaseId"
+        component={ManageReleasePageContainer}
+      />
 
       {/* Prototype Routes */}
       <Route exact path="/index" component={IndexPage} />
@@ -260,6 +218,61 @@ function App() {
           exact
           path="/prototypes/publication-create-new-absence-status"
           component={PublicationCreateNewAbsenceStatus}
+        />
+        <Route
+          exact
+          path="/documentation/"
+          component={AdminDocumentationHome}
+        />
+        <Route
+          exact
+          path="/documentation/content-design-standards-guide"
+          component={AdminDocumentationContentDesignStandards}
+        />
+        <Route
+          exact
+          path="/documentation/glossary"
+          component={AdminDocumentationGlossary}
+        />
+        <Route
+          exact
+          path="/documentation/style-guide"
+          component={AdminDocumentationStyle}
+        />
+        <Route
+          exact
+          path="/documentation/using-dashboard"
+          component={AdminDocumentationUsingDashboard}
+        />
+        <Route
+          exact
+          path="/documentation/create-new-release"
+          component={AdminDocumentationCreateNewRelease}
+        />
+        <Route
+          exact
+          path="/documentation/create-new-publication"
+          component={AdminDocumentationCreateNewPublication}
+        />
+        <Route
+          exact
+          path="/documentation/edit-release"
+          component={AdminDocumentationEditRelease}
+        />
+        <Route
+          exact
+          path="/documentation/manage-content"
+          component={AdminDocumentationManageContent}
+        />
+        <Route
+          exact
+          path="/documentation/manage-data"
+          component={AdminDocumentationManageData}
+        />
+        <Route
+          exact
+          path="/documentation/manage-data-block"
+          component={AdminDocumentationManageDataBlocks}
         />
       </LoginContext.Provider>
     </BrowserRouter>
