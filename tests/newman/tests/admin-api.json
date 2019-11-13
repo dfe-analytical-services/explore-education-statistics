@@ -2105,7 +2105,7 @@
 									"});",
 									"",
 									"pm.test(\"Status and Internal Release Note should be correct\", function () { ",
-									"   pm.expect(respJson.status).to.equal(\"Draft\");",
+									"   pm.expect(respJson.status).to.equal(\"Approved\");",
 									"   pm.expect(respJson.internalReleaseNote).to.equal(\"Test Note\");",
 									"});"
 								],
@@ -2140,7 +2140,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"releaseStatus\": \"Draft\",\n\t\"internalReleaseNote\": \"Test Note\"\n}"
+							"raw": "{\n\t\"releaseStatus\": \"Approved\",\n\t\"internalReleaseNote\": \"Test Note\"\n}"
 						},
 						"url": {
 							"raw": "{{admin_api_url}}/releases/E7774A74-1F62-4B76-B9B5-84F14DAC7278/status",
