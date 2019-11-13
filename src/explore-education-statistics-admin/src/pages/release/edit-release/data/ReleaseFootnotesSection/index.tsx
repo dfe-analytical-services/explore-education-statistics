@@ -52,6 +52,7 @@ const ReleaseFootnotesSection = ({ publicationId, releaseId }: Props) => {
     cancel: () => _setFootnoteForm({ state: 'cancel' }),
     save: (footnote: FootnoteProps, footnoteId?: number) => {
       if (footnoteId) {
+        setLoading(true);
         footnotesService.updateFootnote(footnoteId, footnote).then(() => {
           const index = footnotes.findIndex((searchElement: Footnote) => {
             return footnoteId === searchElement.id;
@@ -63,13 +64,16 @@ const ReleaseFootnotesSection = ({ publicationId, releaseId }: Props) => {
               id: footnoteId,
             };
             setFootnotes(updatedFootnotes);
+            setLoading(false);
           }
         });
       } else {
+        setLoading(true);
         footnotesService
           .createFootnote(footnote)
           .then((newFootnote: Footnote) => {
             setFootnotes([...footnotes, newFootnote]);
+            setLoading(false);
           });
       }
       _setFootnoteForm({ state: 'cancel' });
