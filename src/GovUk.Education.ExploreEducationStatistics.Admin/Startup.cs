@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
-            
+
             services.AddDbContext<UsersAndRolesDbContext>(options =>
                 options
                     .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
@@ -73,14 +73,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                         builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
                     .EnableSensitiveDataLogging()
             );
-            
+
             services.AddDbContext<StatisticsDbContext>(options =>
                 options
-                    .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"), 
+                    .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"),
                         builder => builder.MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model"))
                     .EnableSensitiveDataLogging()
             );
-            
+
             // remove default Microsoft remapping of the name of the OpenID "roles" claim mapping
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("roles");
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("role");
@@ -103,7 +103,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 .AddProfileService<ApplicationUserProfileService>()
                 // TODO DW - this should be conditional based upon whether or not we're in dev mode
                 .AddSigningCredentials();
-            
+
+            services.Configure<JwtBearerOptions>(
+                IdentityServerJwtConstants.IdentityServerJwtBearerScheme,
+                options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = false,
+                        ValidateIssuer = false,
+                    };
+                });
+
             services
                 .AddAuthentication()
                 .AddOpenIdConnect(options => Configuration.GetSection("OpenIdConnect").Bind(options))
@@ -136,15 +147,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
                 .AddNewtonsoftJson(options =>
-                    {
-                        options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
-                    });
+                {
+                    options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+                });
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration => { configuration.RootPath = "wwwroot"; });
 
             services.AddApplicationInsightsTelemetry();
-            
+
             services.AddTransient<IFileStorageService, FileStorageService>();
             services.AddTransient<IImportService, ImportService>();
             services.AddTransient<INotificationsService, NotificationsService>();
@@ -158,7 +169,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IMethodologyService, MethodologyService>();
             services.AddTransient<IDataBlockService, DataBlockService>();
             services.AddTransient<IPreReleaseService, PreReleaseService>();
-            
+
             services.AddTransient<IBoundaryLevelService, BoundaryLevelService>();
             services.AddTransient<IDataService<ResultWithMetaViewModel>, DataService>();
             services.AddTransient<IDataService<TableBuilderResultViewModel>, TableBuilderDataService>();
@@ -182,13 +193,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IImportStatusService, ImportStatusService>();
             services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
             services.AddSingleton<DataServiceMemoryCache<GeoJson>, DataServiceMemoryCache<GeoJson>>();
-            services.AddTransient<ITableStorageService, TableStorageService>(s => new TableStorageService(Configuration.GetConnectionString("CoreStorage")));
+            services.AddTransient<ITableStorageService, TableStorageService>(s =>
+                new TableStorageService(Configuration.GetConnectionString("CoreStorage")));
 
             services.AddTransient<IProfileService, ApplicationUserProfileService>();
-            
+
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Explore education statistics - Admin API", Version = "v1" });
+                c.SwaggerDoc("v1",
+                    new OpenApiInfo {Title = "Explore education statistics - Admin API", Version = "v1"});
             });
         }
 
@@ -196,7 +209,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             UpdateDatabase(app);
-            
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -244,7 +257,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 routes.MapRoute(
                     name: "Areas",
                     template: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
-                
+
                 routes.MapRoute(
                     name: "default",
                     template: "{controller}/{action=Index}/{id?}");
@@ -266,7 +279,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 }
             });
         }
-        
+
         private static void UpdateDatabase(IApplicationBuilder app)
         {
             using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
@@ -277,13 +290,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     context.Database.SetCommandTimeout(int.MaxValue);
                     context.Database.Migrate();
                 }
-                
+
                 using (var context = serviceScope.ServiceProvider.GetService<ContentDbContext>())
                 {
                     context.Database.SetCommandTimeout(int.MaxValue);
                     context.Database.Migrate();
                 }
-                
+
                 using (var context = serviceScope.ServiceProvider.GetService<UsersAndRolesDbContext>())
                 {
                     context.Database.SetCommandTimeout(int.MaxValue);
