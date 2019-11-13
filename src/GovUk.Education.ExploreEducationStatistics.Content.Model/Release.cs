@@ -100,7 +100,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
                 }
             }
         }
-        
-        public List<ReleaseUserGroup> UserGroups { get; set; }
     }
 }
