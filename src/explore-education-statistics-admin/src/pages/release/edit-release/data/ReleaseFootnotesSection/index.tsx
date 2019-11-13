@@ -93,7 +93,7 @@ const ReleaseFootnotesSection = ({ publicationId, releaseId }: Props) => {
       <h2>Footnotes</h2>
       {!hasSufficientData && (
         <p>
-          Before footnoets can be created, relevant data files need to be
+          Before footnotes can be created, relevant data files need to be
           uploaded. That can be done in the{' '}
           <Link to="#data-upload">Data uploads section</Link>.
         </p>
