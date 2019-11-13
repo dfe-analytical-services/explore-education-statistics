@@ -87,7 +87,7 @@ const FootnotesList = ({
               </Button>
               <Button
                 className="govuk-button govuk-button--secondary govuk-!-margin-bottom-0"
-                onClick={() => footnoteFormControls.delete(footnote.id)}
+                onClick={() => footnoteFormControls.delete(footnote)}
               >
                 Delete
               </Button>

@@ -7,6 +7,7 @@ import {
 import footnotesService from '@admin/services/release/edit-release/footnotes/service';
 import { generateFootnoteMetaMap } from '@admin/services/release/edit-release/footnotes/util';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import ModalConfirm from '@common/components/ModalConfirm';
 import React, { useEffect, useState } from 'react';
 import FootnotesList from './FootnotesList';
 import FootnoteForm, { FootnoteFormConfig } from './FootnoteForm';
@@ -25,6 +26,9 @@ const ReleaseFootnotesSection = ({ publicationId, releaseId }: Props) => {
   });
   const [footnoteMetaGetters, setFootnoteMetaGetters] = useState<
     FootnoteMetaGetters
+  >();
+  const [footnoteToBeDeleted, setFootnoteToBeDeleted] = useState<
+    Footnote | undefined
   >();
 
   function getFootnoteData() {
@@ -78,9 +82,7 @@ const ReleaseFootnotesSection = ({ publicationId, releaseId }: Props) => {
       }
       _setFootnoteForm({ state: 'cancel' });
     },
-    delete: (footnoteId: number) => {
-      footnotesService.deleteFootnote(footnoteId).then(getFootnoteData);
-    },
+    delete: setFootnoteToBeDeleted,
   };
 
   return (
@@ -101,12 +103,30 @@ const ReleaseFootnotesSection = ({ publicationId, releaseId }: Props) => {
             footnoteMetaGetters={footnoteMetaGetters}
           />
           {footnoteMeta && (
-            <FootnotesList
-              footnotes={footnotes}
-              footnoteMeta={footnoteMeta}
-              footnoteMetaGetters={footnoteMetaGetters}
-              footnoteFormControls={footnoteFormControls}
-            />
+            <>
+              <FootnotesList
+                footnotes={footnotes}
+                footnoteMeta={footnoteMeta}
+                footnoteMetaGetters={footnoteMetaGetters}
+                footnoteFormControls={footnoteFormControls}
+              />
+              {typeof footnoteToBeDeleted !== 'undefined' && (
+                <ModalConfirm
+                  title="Confirm deletion of footnote"
+                  onExit={() => setFootnoteToBeDeleted(undefined)}
+                  onCancel={() => setFootnoteToBeDeleted(undefined)}
+                  onConfirm={() => {
+                    footnotesService
+                      .deleteFootnote((footnoteToBeDeleted as Footnote).id)
+                      .then(() => setFootnoteToBeDeleted(undefined))
+                      .then(getFootnoteData);
+                  }}
+                >
+                  The footnote:
+                  <p>{(footnoteToBeDeleted as Footnote).content}</p>
+                </ModalConfirm>
+              )}
+            </>
           )}
         </>
       )}
