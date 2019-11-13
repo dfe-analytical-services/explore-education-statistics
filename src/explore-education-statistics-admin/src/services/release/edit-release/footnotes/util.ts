@@ -69,7 +69,7 @@ export const generateFootnoteMetaMap = (
     itemType: 'subject' | 'indicator' | 'filter',
   ) => {
     //@ts-ignore
-    if (ids.indexOf(undefined) + 1 || ids.length === 0) {
+    if (ids.includes(undefined) || ids.length === 0) {
       return {
         label: 'A problem occurred',
         value: -1,
