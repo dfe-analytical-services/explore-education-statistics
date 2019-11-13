@@ -1,5 +1,5 @@
-import {EditableAccordionProps} from '@admin/components/EditableAccordion';
-import {EditableAccordionSectionProps} from '@admin/components/EditableAccordionSection';
+import Accordion from '@admin/components/EditableAccordion';
+import AccordionSection from '@admin/components/EditableAccordionSection';
 import {LinkProps} from '@admin/components/Link';
 import BasicReleaseSummary from '@admin/modules/find-statistics/components/BasicReleaseSummary';
 import {MarkdownRendererProps} from '@admin/modules/find-statistics/components/EditableMarkdownRenderer';
@@ -20,8 +20,9 @@ import {AbstractRelease, ReleaseType,} from '@common/services/publicationService
 import {Dictionary} from '@common/types';
 import classNames from 'classnames';
 import React from 'react';
-import {EditingContext} from '@common/modules/find-statistics/util/editableComponentWrapper';
+import {EditingContext} from '@common/modules/find-statistics/util/wrapEditableComponent';
 import {Props as ContentBlockProps} from './components/EditableContentBlock';
+
 
 export interface RendererProps {
   contentId?: string;
@@ -33,8 +34,6 @@ type MarkdownRendererType = React.ComponentType<MarkdownRendererProps>;
 type LinkType = React.ComponentType<LinkProps & { analytics?: unknown }>;
 type PrintThisPageType = React.ComponentType<PrintThisPageProps>;
 type DataBlockType = React.ComponentType<DataBlockProps>;
-type AccordionType = React.ComponentType<EditableAccordionProps>;
-type AccordionSectionType = React.ComponentType<EditableAccordionSectionProps>;
 type ContentBlockType = React.ComponentType<ContentBlockProps>;
 
 export interface ComponentTypes {
@@ -44,12 +43,11 @@ export interface ComponentTypes {
   PrintThisPage: PrintThisPageType;
   Link: LinkType;
   DataBlock: DataBlockType;
-  Accordion: AccordionType;
-  AccordionSection: AccordionSectionType;
   ContentBlock: ContentBlockType;
 }
 
 interface Props extends ComponentTypes {
+  editing: boolean;
   basicPublication: BasicPublicationDetails;
   release: AbstractRelease<EditableContentBlock>;
   releaseSummary: ReleaseSummaryDetails;
@@ -58,11 +56,12 @@ interface Props extends ComponentTypes {
   logEvent?: (...params: string[]) => void;
 }
 
-const nullLogEvent = () => {};
-
+const nullLogEvent = () => {
+};
 
 
 const PublicationReleaseContent = ({
+  editing = true,
   basicPublication,
   release,
   releaseSummary,
@@ -73,22 +72,19 @@ const PublicationReleaseContent = ({
   PrintThisPage,
   Link,
   DataBlock,
-  Accordion,
-  AccordionSection,
   ContentBlock,
   logEvent = nullLogEvent,
 }: Props) => {
   const accId: string[] = generateIdList(2);
 
 
-
   const releaseCount =
     release.publication.releases.length +
     release.publication.legacyReleases.length;
-  const { publication } = release;
+  const {publication} = release;
 
   return (
-    <EditingContext.Provider value={{isEditing: true}}>
+    <EditingContext.Provider value={{isEditing: false}}>
       <h1 className="govuk-heading-l">
         <span className="govuk-caption-l">
           {releaseSummary.timePeriodCoverage.label}{' '}
@@ -126,7 +122,7 @@ const PublicationReleaseContent = ({
             >
               <ul className="govuk-list govuk-list--bullet">
                 {release.downloadFiles.map(
-                  ({ extension, name, path, size }) => (
+                  ({extension, name, path, size}) => (
                     <li key={path}>
                       <Link
                         to={`${baseUrl.data}/download/${path}`}
@@ -183,7 +179,7 @@ const PublicationReleaseContent = ({
                   <ul className="govuk-list">
                     {[
                       ...release.publication.releases.map(
-                        ({ id, slug, releaseName }) => [
+                        ({id, slug, releaseName}) => [
                           releaseName,
                           <li key={id} data-testid="previous-release-item">
                             <Link
@@ -195,7 +191,7 @@ const PublicationReleaseContent = ({
                         ],
                       ),
                       ...release.publication.legacyReleases.map(
-                        ({ id, description, url }) => [
+                        ({id, description, url}) => [
                           description,
                           <li key={id} data-testid="previous-release-item">
                             <a href={url}>{description}</a>
@@ -268,10 +264,12 @@ const PublicationReleaseContent = ({
 
       {/* <editor-fold desc="Content blocks"> */}
 
+      {console.log(release.content)}
+
       {release.content.length > 0 && (
         <Accordion id={accId[0]}>
           {release.content.map(
-            ({ heading, caption, order, content }, index) => {
+            ({heading, caption, order, content}, index) => {
               return (
                 <AccordionSection
                   index={index}
@@ -319,51 +317,53 @@ const PublicationReleaseContent = ({
           </p>
         </AccordionSection>
         {releaseSummary.type &&
-          releaseSummary.type.title === ReleaseType.NationalStatistics && (
-            <AccordionSection heading="National Statistics" headingTag="h3">
-              <p className="govuk-body">
-                The{' '}
-                <a href="https://www.statisticsauthority.gov.uk/">
-                  United Kingdom Statistics Authority
-                </a>{' '}
-                designated these statistics as National Statistics in accordance
-                with the{' '}
-                <a href="https://www.legislation.gov.uk/ukpga/2007/18/contents">
-                  Statistics and Registration Service Act 2007
-                </a>{' '}
-                and signifying compliance with the Code of Practice for
-                Statistics.
-              </p>
-              <p className="govuk-body">
-                Designation signifying their compliance with the authority's{' '}
-                <a href="https://www.statisticsauthority.gov.uk/code-of-practice/the-code/">
-                  Code of Practice for Statistics
-                </a>{' '}
-                which broadly means these statistics are:
-              </p>
-              <ul className="govuk-list govuk-list--bullet">
-                <li>
-                  managed impartially and objectively in the public interest
-                </li>
-                <li>meet identified user needs</li>
-                <li>produced according to sound methods</li>
-                <li>well explained and readily accessible</li>
-              </ul>
-              <p className="govuk-body">
-                Once designated as National Statistics it's a statutory
-                requirement for statistics to follow and comply with the Code of
-                Practice for Statistics to be observed.
-              </p>
-              <p className="govuk-body">
-                Find out more about the standards we follow to produce these
-                statistics through our{' '}
-                <a href="https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education">
-                  Standards for official statistics published by DfE
-                </a>{' '}
-                guidance.
-              </p>
-            </AccordionSection>
-          )}
+        releaseSummary.type.title === ReleaseType.NationalStatistics && (
+          <AccordionSection heading="National Statistics" headingTag="h3">
+            <p className="govuk-body">
+              The{' '}
+              <a href="https://www.statisticsauthority.gov.uk/">
+                United Kingdom Statistics Authority
+              </a>{' '}
+              designated these statistics as National Statistics in accordance
+              with the{' '}
+              <a href="https://www.legislation.gov.uk/ukpga/2007/18/contents">
+                Statistics and Registration Service Act 2007
+              </a>{' '}
+              and signifying compliance with the Code of Practice for
+              Statistics.
+            </p>
+            <p className="govuk-body">
+              Designation signifying their compliance with the authority's{' '}
+              <a href="https://www.statisticsauthority.gov.uk/code-of-practice/the-code/">
+                Code of Practice for Statistics
+              </a>{' '}
+              which broadly means these statistics are:
+            </p>
+            <ul className="govuk-list govuk-list--bullet">
+              <li>
+                managed impartially and objectively in the public interest
+              </li>
+              <li>meet identified user needs</li>
+              <li>produced according to sound methods</li>
+              <li>well explained and readily accessible</li>
+            </ul>
+            <p className="govuk-body">
+              Once designated as National Statistics it's a statutory
+              requirement for statistics to follow and comply with the Code of
+              Practice for Statistics to be observed.
+            </p>
+            <p className="govuk-body">
+              Find out more about the standards we follow to produce these
+              statistics through our{' '}
+              <a
+                href="https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education"
+              >
+                Standards for official statistics published by DfE
+              </a>{' '}
+              guidance.
+            </p>
+          </AccordionSection>
+        )}
         <AccordionSection heading="Contact us" headingTag="h3">
           <p>
             If you have a specific enquiry about {publication.topic.theme.title}{' '}

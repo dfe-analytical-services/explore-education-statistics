@@ -2,11 +2,11 @@ import useMounted from '@common/hooks/useMounted';
 import isComponentType from '@common/lib/type-guards/components/isComponentType';
 import classNames from 'classnames';
 import React, {
-  cloneElement,
+  cloneElement, ComponentType,
   ReactComponentElement,
   ReactNode,
   useEffect,
-  useRef,
+  useRef, WeakValidationMap,
 } from 'react';
 import { useImmer } from 'use-immer';
 import styles from './Accordion.module.scss';
@@ -14,6 +14,7 @@ import AccordionSection, {
   accordionSectionClasses,
   AccordionSectionProps,
 } from './AccordionSection';
+import {isWrapped} from "@common/modules/find-statistics/util/wrapEditableComponent";
 
 export interface AccordionProps {
   children: ReactNode;
@@ -22,17 +23,22 @@ export interface AccordionProps {
   onToggle?: (accordionSection: { id: string; title: string }) => void;
 }
 
+
+
 export function generateIdList(count: number) {
   return new Array(count).fill('content-section-').map((id, n) => id + (n + 1));
 }
 
 const Accordion = ({ children, id, onToggleAll, onToggle }: AccordionProps) => {
+
   const ref = useRef<HTMLDivElement>(null);
 
   const [openSections, updateOpenSections] = useImmer<boolean[]>([]);
 
-  const sections = React.Children.toArray(children).filter(child =>
-    isComponentType(child, AccordionSection),
+  const sections = React.Children.toArray(children).filter(child => {
+      console.log(isWrapped(child, AccordionSection));
+      return isComponentType(child, AccordionSection);
+    }
   ) as ReactComponentElement<typeof AccordionSection>[];
 
   const getSectionIds = (
@@ -170,6 +176,7 @@ const Accordion = ({ children, id, onToggleAll, onToggle }: AccordionProps) => {
           },
         });
       })}
+
     </div>
   );
 };
