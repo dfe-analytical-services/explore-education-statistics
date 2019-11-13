@@ -1,10 +1,11 @@
 ﻿using System;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
+using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces
 {
     public interface IReleaseMetaService
     {
-        ReleaseSubjectsMetaViewModel GetSubjects(Guid releaseId);
+        IEnumerable<IdLabel> GetSubjects(Guid releaseId);
     }
 }

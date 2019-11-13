@@ -8,13 +8,12 @@ import {
 } from '@common/components/form';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import Yup from '@common/lib/validation/yup';
-import { TableDataQuery } from '@common/modules/full-table/services/tableBuilderService';
-import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
 import {
-  DataBlock,
-  GeographicLevel,
+  TableDataQuery,
   TimeIdentifier,
-} from '@common/services/dataBlockService';
+} from '@common/modules/full-table/services/tableBuilderService';
+import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
+import { DataBlock, GeographicLevel } from '@common/services/dataBlockService';
 import { FormikProps } from 'formik';
 import React from 'react';
 import { ObjectSchemaDefinition } from 'yup';
@@ -157,11 +156,12 @@ const DataBlockDetailsForm = ({
 
                   <hr />
 
-                  <FormFieldTextInput<FormValues>
+                  <FormFieldTextArea<FormValues>
                     id="data-block-title"
                     name="title"
                     label="Table title"
-                    percentageWidth="two-thirds"
+                    additionalClass="govuk-!-width-two-thirds"
+                    rows={2}
                   />
 
                   <FormFieldTextInput<FormValues>

@@ -65,7 +65,7 @@ function getReduceMetaDataForAxis(
         ...data.result.reduce<Dictionary<DataSetConfiguration>>(
           (moreItems, { timePeriod }) => ({
             ...moreItems,
-            [timePeriod]: metaData.timePeriods[timePeriod],
+            [timePeriod]: metaData.timePeriod[timePeriod],
           }),
           {},
         ),
@@ -97,7 +97,7 @@ const chartTypes: ChartDefinition[] = [
 ];
 
 const emptyMetadata = {
-  timePeriods: {},
+  timePeriod: {},
   filters: {},
   indicators: {},
   locations: {},
@@ -446,25 +446,27 @@ const ChartBuilder = ({
 
       {selectedChartType && (
         <Details summary="Chart preview" open>
-          {renderedChartProps === undefined ? (
-            <div
-              className={classnames(styles.preview)}
-              style={{
-                width: chartOptions.width && `${chartOptions.width}px`,
-                height: chartOptions.height && `${chartOptions.height}px`,
-              }}
-            >
-              {selectedChartType.axes.length > 0 ? (
-                <span>Add data to view a preview of the chart</span>
-              ) : (
-                <span>
-                  Configure the {selectedChartType.name} to view a preview
-                </span>
-              )}
-            </div>
-          ) : (
-            <ChartRenderer {...renderedChartProps} />
-          )}
+          <div className="govuk-width-container">
+            {renderedChartProps === undefined ? (
+              <div
+                className={classnames(styles.preview)}
+                style={{
+                  width: chartOptions.width && `${chartOptions.width}px`,
+                  height: chartOptions.height && `${chartOptions.height}px`,
+                }}
+              >
+                {selectedChartType.axes.length > 0 ? (
+                  <span>Add data to view a preview of the chart</span>
+                ) : (
+                  <span>
+                    Configure the {selectedChartType.name} to view a preview
+                  </span>
+                )}
+              </div>
+            ) : (
+              <ChartRenderer {...renderedChartProps} />
+            )}
+          </div>
         </Details>
       )}
 
@@ -472,7 +474,9 @@ const ChartBuilder = ({
         <Tabs id="ChartTabs">
           {selectedChartType.data.length > 0 && (
             <TabsSection title="Data">
-              <p>Add data from the existing dataset to the chart</p>
+              <h2 className="govuk-heading-m">
+                Add data from the existing dataset to the chart
+              </h2>
               <ChartDataSelector
                 onDataAdded={onDataAdded}
                 onDataRemoved={onDataRemoved}
@@ -490,7 +494,8 @@ const ChartBuilder = ({
             </TabsSection>
           )}
 
-          <TabsSection title="Chart Configuration">
+          <TabsSection title="Chart configuration">
+            <h2 className="govuk-heading-m">Chart configuration</h2>
             <ChartConfiguration
               selectedChartType={selectedChartType}
               chartOptions={chartOptions}

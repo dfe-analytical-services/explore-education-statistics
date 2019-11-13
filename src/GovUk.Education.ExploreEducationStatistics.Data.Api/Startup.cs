@@ -54,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddDbContext<StatisticsDbContext>(options =>
                 options
                     .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"),
-                        builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
+                        builder => builder.MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model"))
                     .EnableSensitiveDataLogging()
             );
 

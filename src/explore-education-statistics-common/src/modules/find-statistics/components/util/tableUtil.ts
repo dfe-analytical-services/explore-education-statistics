@@ -29,7 +29,7 @@ export const mapDataBlockResponseToFullTable = (
       locations: Object.values(subjectMeta.locations).map(
         location => new LocationFilter(location, location.level),
       ),
-      timePeriodRange: Object.values(subjectMeta.timePeriods).map(
+      timePeriodRange: Object.values(subjectMeta.timePeriod).map(
         timePeriod => new TimePeriodFilter(timePeriod),
       ),
     },

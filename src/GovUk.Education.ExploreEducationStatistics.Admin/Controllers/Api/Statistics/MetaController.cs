@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Authorization;
@@ -21,13 +22,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         [HttpGet("release/{releaseId}")]
         public ActionResult<ReleaseSubjectsMetaViewModel> GetSubjectsForRelease(Guid releaseId)
         {
-            var viewModel = _releaseMetaService.GetSubjects(releaseId);
-            if (viewModel == null)
+            var subjects = _releaseMetaService.GetSubjects(releaseId).ToList();
+            if (!subjects.Any())
             {
                 return NotFound();
             }
-
-            return viewModel;
+            
+            return new ReleaseSubjectsMetaViewModel
+            {
+                ReleaseId = releaseId,
+                Subjects = subjects
+            };
         }
     }
 }

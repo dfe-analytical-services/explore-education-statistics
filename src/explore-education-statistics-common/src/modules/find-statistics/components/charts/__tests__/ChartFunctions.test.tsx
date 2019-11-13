@@ -35,7 +35,7 @@ describe('ChartFunctions', () => {
     const minorAxisConfiguration: AxisConfiguration = {
       name: meta.indicators['26'].label,
       type: 'major',
-      groupBy: 'timePeriods',
+      groupBy: 'timePeriod',
       dataSets: [dataSet26_1_72],
     };
 
@@ -76,7 +76,7 @@ describe('ChartFunctions', () => {
     const axis: AxisConfiguration = {
       name: meta.indicators['99'].label,
       type: 'major',
-      groupBy: 'timePeriods',
+      groupBy: 'timePeriod',
       sortBy: '99_1_72_____',
       sortAsc: true,
       dataSets: [dataSet99_1_72],
@@ -119,7 +119,7 @@ describe('ChartFunctions', () => {
     const minorAxisConfiguration: AxisConfiguration = {
       name: meta.indicators['26'].label,
       type: 'major',
-      groupBy: 'timePeriods',
+      groupBy: 'timePeriod',
       dataSets: [dataSet26_1_72, dataSet23_1_72],
     };
 
@@ -165,7 +165,7 @@ describe('ChartFunctions', () => {
     const minorAxisConfiguration: AxisConfiguration = {
       name: meta.indicators['26'].label,
       type: 'major',
-      groupBy: 'timePeriods',
+      groupBy: 'timePeriod',
       dataSets: [dataSet26_1_71, dataSet26_1_72],
     };
 
@@ -211,7 +211,7 @@ describe('ChartFunctions', () => {
     const axisConfig: AxisConfiguration = {
       name: meta.indicators['26'].label,
       type: 'major',
-      groupBy: 'timePeriods',
+      groupBy: 'timePeriod',
       dataSets: [dataSet26_1_71, dataSet26_1_72],
     };
 
@@ -255,7 +255,7 @@ describe('ChartFunctions', () => {
     expect(chartMeta.filters).not.toBeUndefined();
     expect(chartMeta.indicators).not.toBeUndefined();
     expect(chartMeta.locations).not.toBeUndefined();
-    expect(chartMeta.timePeriods).not.toBeUndefined();
+    expect(chartMeta.timePeriod).not.toBeUndefined();
 
     expect(chartMeta.filters['1']).not.toBeUndefined();
     expect(chartMeta.filters['1'].label).toEqual('All pupils');

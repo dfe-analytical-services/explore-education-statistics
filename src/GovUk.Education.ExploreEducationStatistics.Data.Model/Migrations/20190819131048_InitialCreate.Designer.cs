@@ -4,18 +4,20 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
+namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 {
     [DbContext(typeof(StatisticsDbContext))]
-    partial class StatisticsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190819131048_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.0-preview1.19506.2")
+                .HasAnnotation("ProductVersion", "2.2.3-servicing-35854")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -23,18 +25,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Label")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Label");
 
                     b.Property<string>("Level")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired();
 
-                    b.Property<DateTime>("Published")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTime>("Published");
 
                     b.HasKey("Id");
 
@@ -45,20 +43,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Hint")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Hint");
 
-                    b.Property<string>("Label")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Label");
 
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<string>("Name");
 
-                    b.Property<long>("SubjectId")
-                        .HasColumnType("bigint");
+                    b.Property<long>("SubjectId");
 
                     b.HasKey("Id");
 
@@ -71,11 +64,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterFootnote", b =>
                 {
-                    b.Property<long>("FilterId")
-                        .HasColumnType("bigint");
+                    b.Property<long>("FilterId");
 
-                    b.Property<long>("FootnoteId")
-                        .HasColumnType("bigint");
+                    b.Property<long>("FootnoteId");
 
                     b.HasKey("FilterId", "FootnoteId");
 
@@ -88,14 +79,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<long>("FilterId")
-                        .HasColumnType("bigint");
+                    b.Property<long>("FilterId");
 
-                    b.Property<string>("Label")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Label");
 
                     b.HasKey("Id");
 
@@ -106,11 +94,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterGroupFootnote", b =>
                 {
-                    b.Property<long>("FilterGroupId")
-                        .HasColumnType("bigint");
+                    b.Property<long>("FilterGroupId");
 
-                    b.Property<long>("FootnoteId")
-                        .HasColumnType("bigint");
+                    b.Property<long>("FootnoteId");
 
                     b.HasKey("FilterGroupId", "FootnoteId");
 
@@ -123,14 +109,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<long>("FilterGroupId")
-                        .HasColumnType("bigint");
+                    b.Property<long>("FilterGroupId");
 
-                    b.Property<string>("Label")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Label");
 
                     b.HasKey("Id");
 
@@ -141,11 +124,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterItemFootnote", b =>
                 {
-                    b.Property<long>("FilterItemId")
-                        .HasColumnType("bigint");
+                    b.Property<long>("FilterItemId");
 
-                    b.Property<long>("FootnoteId")
-                        .HasColumnType("bigint");
+                    b.Property<long>("FootnoteId");
 
                     b.HasKey("FilterItemId", "FootnoteId");
 
@@ -158,44 +139,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Content")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Content");
 
                     b.HasKey("Id");
 
                     b.ToTable("Footnote");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.IdWrapper", b =>
-                {
-                    b.Property<long>("Id")
-                        .HasColumnType("bigint");
-
-                    b.ToTable("IdWrapper");
-                });
-
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Indicator", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<long>("IndicatorGroupId")
-                        .HasColumnType("bigint");
+                    b.Property<long>("IndicatorGroupId");
 
-                    b.Property<string>("Label")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Label");
 
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<string>("Name");
 
                     b.Property<string>("Unit")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired();
 
                     b.HasKey("Id");
 
@@ -208,11 +174,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.IndicatorFootnote", b =>
                 {
-                    b.Property<long>("IndicatorId")
-                        .HasColumnType("bigint");
+                    b.Property<long>("IndicatorId");
 
-                    b.Property<long>("FootnoteId")
-                        .HasColumnType("bigint");
+                    b.Property<long>("FootnoteId");
 
                     b.HasKey("IndicatorId", "FootnoteId");
 
@@ -225,14 +189,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Label")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Label");
 
-                    b.Property<long>("SubjectId")
-                        .HasColumnType("bigint");
+                    b.Property<long>("SubjectId");
 
                     b.HasKey("Id");
 
@@ -245,7 +206,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.HasKey("Id");
@@ -257,39 +217,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<long>("CsvRow")
-                        .HasColumnType("bigint");
 
                     b.Property<string>("GeographicLevel")
                         .IsRequired()
-                        .HasColumnType("nvarchar(6)")
                         .HasMaxLength(6);
 
-                    b.Property<long>("LocationId")
-                        .HasColumnType("bigint");
+                    b.Property<long>("LocationId");
 
-                    b.Property<string>("Measures")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Measures");
 
-                    b.Property<string>("ProviderUrn")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<string>("ProviderUrn");
 
-                    b.Property<string>("SchoolLaEstab")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<string>("SchoolLaEstab");
 
-                    b.Property<long>("SubjectId")
-                        .HasColumnType("bigint");
+                    b.Property<long>("SubjectId");
 
                     b.Property<string>("TimeIdentifier")
                         .IsRequired()
-                        .HasColumnType("nvarchar(6)")
                         .HasMaxLength(6);
 
-                    b.Property<int>("Year")
-                        .HasColumnType("int");
+                    b.Property<int>("Year");
 
                     b.HasKey("Id");
 
@@ -312,11 +260,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.ObservationFilterItem", b =>
                 {
-                    b.Property<long>("ObservationId")
-                        .HasColumnType("bigint");
+                    b.Property<long>("ObservationId");
 
-                    b.Property<long>("FilterItemId")
-                        .HasColumnType("bigint");
+                    b.Property<long>("FilterItemId");
 
                     b.HasKey("ObservationId", "FilterItemId");
 
@@ -328,16 +274,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Provider", b =>
                 {
                     b.Property<string>("Urn")
-                        .HasColumnType("nvarchar(450)");
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Name");
 
-                    b.Property<string>("Ukprn")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Ukprn");
 
-                    b.Property<string>("Upin")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Upin");
 
                     b.HasKey("Urn");
 
@@ -347,17 +290,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Publication", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Slug")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Slug");
 
-                    b.Property<string>("Title")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Title");
 
-                    b.Property<Guid>("TopicId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<Guid>("TopicId");
 
                     b.HasKey("Id");
 
@@ -369,20 +308,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Release", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<Guid>("PublicationId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<Guid>("PublicationId");
 
-                    b.Property<DateTime>("ReleaseDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTime>("ReleaseDate");
 
-                    b.Property<string>("Slug")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Slug");
 
-                    b.Property<string>("Title")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Title");
 
                     b.HasKey("Id");
 
@@ -394,25 +328,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.School", b =>
                 {
                     b.Property<string>("LaEstab")
-                        .HasColumnType("nvarchar(450)");
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<string>("AcademyOpenDate")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("AcademyOpenDate");
 
-                    b.Property<string>("AcademyType")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("AcademyType");
 
-                    b.Property<string>("Estab")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Estab");
 
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Name");
 
-                    b.Property<string>("Postcode")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Postcode");
 
-                    b.Property<string>("Urn")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Urn");
 
                     b.HasKey("LaEstab");
 
@@ -423,14 +351,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Name");
 
-                    b.Property<Guid>("ReleaseId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<Guid>("ReleaseId");
 
                     b.HasKey("Id");
 
@@ -441,11 +366,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.SubjectFootnote", b =>
                 {
-                    b.Property<long>("SubjectId")
-                        .HasColumnType("bigint");
+                    b.Property<long>("SubjectId");
 
-                    b.Property<long>("FootnoteId")
-                        .HasColumnType("bigint");
+                    b.Property<long>("FootnoteId");
 
                     b.HasKey("SubjectId", "FootnoteId");
 
@@ -457,14 +380,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Theme", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Slug")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Slug");
 
-                    b.Property<string>("Title")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Title");
 
                     b.HasKey("Id");
 
@@ -474,17 +394,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Topic", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Slug")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Slug");
 
-                    b.Property<Guid>("ThemeId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<Guid>("ThemeId");
 
-                    b.Property<string>("Title")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Title");
 
                     b.HasKey("Id");
 
@@ -498,8 +414,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Subject", "Subject")
                         .WithMany()
                         .HasForeignKey("SubjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterFootnote", b =>
@@ -507,14 +422,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Filter", "Filter")
                         .WithMany("Footnotes")
                         .HasForeignKey("FilterId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Footnote", "Footnote")
-                        .WithMany("Filters")
+                        .WithMany()
                         .HasForeignKey("FootnoteId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterGroup", b =>
@@ -522,8 +435,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Filter", "Filter")
                         .WithMany("FilterGroups")
                         .HasForeignKey("FilterId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterGroupFootnote", b =>
@@ -531,14 +443,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterGroup", "FilterGroup")
                         .WithMany("Footnotes")
                         .HasForeignKey("FilterGroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Footnote", "Footnote")
-                        .WithMany("FilterGroups")
+                        .WithMany()
                         .HasForeignKey("FootnoteId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterItem", b =>
@@ -546,8 +456,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterGroup", "FilterGroup")
                         .WithMany("FilterItems")
                         .HasForeignKey("FilterGroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterItemFootnote", b =>
@@ -555,14 +464,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterItem", "FilterItem")
                         .WithMany("Footnotes")
                         .HasForeignKey("FilterItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Footnote", "Footnote")
-                        .WithMany("FilterItems")
+                        .WithMany()
                         .HasForeignKey("FootnoteId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Indicator", b =>
@@ -570,23 +477,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.IndicatorGroup", "IndicatorGroup")
                         .WithMany("Indicators")
                         .HasForeignKey("IndicatorGroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.IndicatorFootnote", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Footnote", "Footnote")
-                        .WithMany("Indicators")
+                        .WithMany()
                         .HasForeignKey("FootnoteId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Indicator", "Indicator")
                         .WithMany("Footnotes")
                         .HasForeignKey("IndicatorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.IndicatorGroup", b =>
@@ -594,8 +498,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Subject", "Subject")
                         .WithMany()
                         .HasForeignKey("SubjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Location", b =>
@@ -604,14 +507,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                         {
                             b1.Property<long>("LocationId")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("bigint")
                                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                            b1.Property<string>("Code")
-                                .HasColumnType("nvarchar(450)");
+                            b1.Property<string>("Code");
 
-                            b1.Property<string>("Name")
-                                .HasColumnType("nvarchar(max)");
+                            b1.Property<string>("Name");
 
                             b1.HasKey("LocationId");
 
@@ -619,22 +519,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
                             b1.ToTable("Location");
 
-                            b1.WithOwner()
-                                .HasForeignKey("LocationId");
+                            b1.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Location")
+                                .WithOne("Country")
+                                .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Data.Model.Country", "LocationId")
+                                .OnDelete(DeleteBehavior.Cascade);
                         });
 
                     b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Institution", "Institution", b1 =>
                         {
                             b1.Property<long>("LocationId")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("bigint")
                                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                            b1.Property<string>("Code")
-                                .HasColumnType("nvarchar(450)");
+                            b1.Property<string>("Code");
 
-                            b1.Property<string>("Name")
-                                .HasColumnType("nvarchar(max)");
+                            b1.Property<string>("Name");
 
                             b1.HasKey("LocationId");
 
@@ -642,25 +541,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
                             b1.ToTable("Location");
 
-                            b1.WithOwner()
-                                .HasForeignKey("LocationId");
+                            b1.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Location")
+                                .WithOne("Institution")
+                                .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Data.Model.Institution", "LocationId")
+                                .OnDelete(DeleteBehavior.Cascade);
                         });
 
                     b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.LocalAuthority", "LocalAuthority", b1 =>
                         {
                             b1.Property<long>("LocationId")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("bigint")
                                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                            b1.Property<string>("Code")
-                                .HasColumnType("nvarchar(450)");
+                            b1.Property<string>("Code");
 
-                            b1.Property<string>("Name")
-                                .HasColumnType("nvarchar(max)");
+                            b1.Property<string>("Name");
 
-                            b1.Property<string>("Old_Code")
-                                .HasColumnType("nvarchar(max)");
+                            b1.Property<string>("Old_Code");
 
                             b1.HasKey("LocationId");
 
@@ -668,22 +565,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
                             b1.ToTable("Location");
 
-                            b1.WithOwner()
-                                .HasForeignKey("LocationId");
+                            b1.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Location")
+                                .WithOne("LocalAuthority")
+                                .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Data.Model.LocalAuthority", "LocationId")
+                                .OnDelete(DeleteBehavior.Cascade);
                         });
 
                     b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.LocalAuthorityDistrict", "LocalAuthorityDistrict", b1 =>
                         {
                             b1.Property<long>("LocationId")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("bigint")
                                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                            b1.Property<string>("Code")
-                                .HasColumnType("nvarchar(450)");
+                            b1.Property<string>("Code");
 
-                            b1.Property<string>("Name")
-                                .HasColumnType("nvarchar(max)");
+                            b1.Property<string>("Name");
 
                             b1.HasKey("LocationId");
 
@@ -691,22 +587,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
                             b1.ToTable("Location");
 
-                            b1.WithOwner()
-                                .HasForeignKey("LocationId");
+                            b1.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Location")
+                                .WithOne("LocalAuthorityDistrict")
+                                .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Data.Model.LocalAuthorityDistrict", "LocationId")
+                                .OnDelete(DeleteBehavior.Cascade);
                         });
 
                     b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.LocalEnterprisePartnership", "LocalEnterprisePartnership", b1 =>
                         {
                             b1.Property<long>("LocationId")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("bigint")
                                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                            b1.Property<string>("Code")
-                                .HasColumnType("nvarchar(450)");
+                            b1.Property<string>("Code");
 
-                            b1.Property<string>("Name")
-                                .HasColumnType("nvarchar(max)");
+                            b1.Property<string>("Name");
 
                             b1.HasKey("LocationId");
 
@@ -714,22 +609,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
                             b1.ToTable("Location");
 
-                            b1.WithOwner()
-                                .HasForeignKey("LocationId");
+                            b1.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Location")
+                                .WithOne("LocalEnterprisePartnership")
+                                .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Data.Model.LocalEnterprisePartnership", "LocationId")
+                                .OnDelete(DeleteBehavior.Cascade);
                         });
 
                     b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Mat", "MultiAcademyTrust", b1 =>
                         {
                             b1.Property<long>("LocationId")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("bigint")
                                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                            b1.Property<string>("Code")
-                                .HasColumnType("nvarchar(450)");
+                            b1.Property<string>("Code");
 
-                            b1.Property<string>("Name")
-                                .HasColumnType("nvarchar(max)");
+                            b1.Property<string>("Name");
 
                             b1.HasKey("LocationId");
 
@@ -737,22 +631,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
                             b1.ToTable("Location");
 
-                            b1.WithOwner()
-                                .HasForeignKey("LocationId");
+                            b1.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Location")
+                                .WithOne("MultiAcademyTrust")
+                                .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Data.Model.Mat", "LocationId")
+                                .OnDelete(DeleteBehavior.Cascade);
                         });
 
                     b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.MayoralCombinedAuthority", "MayoralCombinedAuthority", b1 =>
                         {
                             b1.Property<long>("LocationId")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("bigint")
                                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                            b1.Property<string>("Code")
-                                .HasColumnType("nvarchar(450)");
+                            b1.Property<string>("Code");
 
-                            b1.Property<string>("Name")
-                                .HasColumnType("nvarchar(max)");
+                            b1.Property<string>("Name");
 
                             b1.HasKey("LocationId");
 
@@ -760,22 +653,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
                             b1.ToTable("Location");
 
-                            b1.WithOwner()
-                                .HasForeignKey("LocationId");
+                            b1.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Location")
+                                .WithOne("MayoralCombinedAuthority")
+                                .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Data.Model.MayoralCombinedAuthority", "LocationId")
+                                .OnDelete(DeleteBehavior.Cascade);
                         });
 
                     b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.OpportunityArea", "OpportunityArea", b1 =>
                         {
                             b1.Property<long>("LocationId")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("bigint")
                                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                            b1.Property<string>("Code")
-                                .HasColumnType("nvarchar(450)");
+                            b1.Property<string>("Code");
 
-                            b1.Property<string>("Name")
-                                .HasColumnType("nvarchar(max)");
+                            b1.Property<string>("Name");
 
                             b1.HasKey("LocationId");
 
@@ -783,22 +675,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
                             b1.ToTable("Location");
 
-                            b1.WithOwner()
-                                .HasForeignKey("LocationId");
+                            b1.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Location")
+                                .WithOne("OpportunityArea")
+                                .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Data.Model.OpportunityArea", "LocationId")
+                                .OnDelete(DeleteBehavior.Cascade);
                         });
 
                     b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.ParliamentaryConstituency", "ParliamentaryConstituency", b1 =>
                         {
                             b1.Property<long>("LocationId")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("bigint")
                                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                            b1.Property<string>("Code")
-                                .HasColumnType("nvarchar(450)");
+                            b1.Property<string>("Code");
 
-                            b1.Property<string>("Name")
-                                .HasColumnType("nvarchar(max)");
+                            b1.Property<string>("Name");
 
                             b1.HasKey("LocationId");
 
@@ -806,22 +697,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
                             b1.ToTable("Location");
 
-                            b1.WithOwner()
-                                .HasForeignKey("LocationId");
+                            b1.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Location")
+                                .WithOne("ParliamentaryConstituency")
+                                .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Data.Model.ParliamentaryConstituency", "LocationId")
+                                .OnDelete(DeleteBehavior.Cascade);
                         });
 
                     b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Region", "Region", b1 =>
                         {
                             b1.Property<long>("LocationId")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("bigint")
                                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                            b1.Property<string>("Code")
-                                .HasColumnType("nvarchar(450)");
+                            b1.Property<string>("Code");
 
-                            b1.Property<string>("Name")
-                                .HasColumnType("nvarchar(max)");
+                            b1.Property<string>("Name");
 
                             b1.HasKey("LocationId");
 
@@ -829,19 +719,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
                             b1.ToTable("Location");
 
-                            b1.WithOwner()
-                                .HasForeignKey("LocationId");
+                            b1.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Location")
+                                .WithOne("Region")
+                                .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Data.Model.Region", "LocationId")
+                                .OnDelete(DeleteBehavior.Cascade);
                         });
 
                     b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.RscRegion", "RscRegion", b1 =>
                         {
                             b1.Property<long>("LocationId")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("bigint")
                                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                            b1.Property<string>("Code")
-                                .HasColumnType("nvarchar(450)");
+                            b1.Property<string>("Code");
 
                             b1.HasKey("LocationId");
 
@@ -849,22 +739,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
                             b1.ToTable("Location");
 
-                            b1.WithOwner()
-                                .HasForeignKey("LocationId");
+                            b1.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Location")
+                                .WithOne("RscRegion")
+                                .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Data.Model.RscRegion", "LocationId")
+                                .OnDelete(DeleteBehavior.Cascade);
                         });
 
                     b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Sponsor", "Sponsor", b1 =>
                         {
                             b1.Property<long>("LocationId")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("bigint")
                                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                            b1.Property<string>("Code")
-                                .HasColumnType("nvarchar(450)");
+                            b1.Property<string>("Code");
 
-                            b1.Property<string>("Name")
-                                .HasColumnType("nvarchar(max)");
+                            b1.Property<string>("Name");
 
                             b1.HasKey("LocationId");
 
@@ -872,22 +761,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
                             b1.ToTable("Location");
 
-                            b1.WithOwner()
-                                .HasForeignKey("LocationId");
+                            b1.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Location")
+                                .WithOne("Sponsor")
+                                .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Data.Model.Sponsor", "LocationId")
+                                .OnDelete(DeleteBehavior.Cascade);
                         });
 
                     b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Ward", "Ward", b1 =>
                         {
                             b1.Property<long>("LocationId")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("bigint")
                                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                            b1.Property<string>("Code")
-                                .HasColumnType("nvarchar(450)");
+                            b1.Property<string>("Code");
 
-                            b1.Property<string>("Name")
-                                .HasColumnType("nvarchar(max)");
+                            b1.Property<string>("Name");
 
                             b1.HasKey("LocationId");
 
@@ -895,8 +783,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
                             b1.ToTable("Location");
 
-                            b1.WithOwner()
-                                .HasForeignKey("LocationId");
+                            b1.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Location")
+                                .WithOne("Ward")
+                                .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Data.Model.Ward", "LocationId")
+                                .OnDelete(DeleteBehavior.Cascade);
                         });
                 });
 
@@ -905,8 +795,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Location", "Location")
                         .WithMany("Observations")
                         .HasForeignKey("LocationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Provider", "Provider")
                         .WithMany("Observations")
@@ -919,8 +808,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Subject", "Subject")
                         .WithMany("Observations")
                         .HasForeignKey("SubjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.ObservationFilterItem", b =>
@@ -928,14 +816,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterItem", "FilterItem")
                         .WithMany()
                         .HasForeignKey("FilterItemId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Observation", "Observation")
                         .WithMany("FilterItems")
                         .HasForeignKey("ObservationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Publication", b =>
@@ -943,8 +829,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Topic", "Topic")
                         .WithMany("Publications")
                         .HasForeignKey("TopicId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Release", b =>
@@ -952,8 +837,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Publication", "Publication")
                         .WithMany("Releases")
                         .HasForeignKey("PublicationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Subject", b =>
@@ -961,23 +845,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Release", "Release")
                         .WithMany("Subjects")
                         .HasForeignKey("ReleaseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.SubjectFootnote", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Footnote", "Footnote")
-                        .WithMany("Subjects")
+                        .WithMany()
                         .HasForeignKey("FootnoteId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Subject", "Subject")
                         .WithMany("Footnotes")
                         .HasForeignKey("SubjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Topic", b =>
@@ -985,8 +866,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Theme", "Theme")
                         .WithMany("Topics")
                         .HasForeignKey("ThemeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }

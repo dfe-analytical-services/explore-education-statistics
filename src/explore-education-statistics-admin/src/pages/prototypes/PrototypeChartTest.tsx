@@ -62,7 +62,7 @@ const options: ({ json: string; initialOptions?: Chart } & SelectOption)[] = [
         major: {
           type: 'major',
           name: 'major',
-          groupBy: 'timePeriods',
+          groupBy: 'timePeriod',
           dataSets: [
             {
               indicator: '23',

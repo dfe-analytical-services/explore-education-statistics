@@ -2046,7 +2046,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             {
                                 ["major"] = new AxisConfigurationItem
                                 {
-                                    GroupBy = AxisGroupBy.timePeriods,
+                                    GroupBy = AxisGroupBy.timePeriod,
                                     DataSets = new List<ChartDataSet>
                                     {
                                         new ChartDataSet
@@ -2163,7 +2163,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             {
                                 ["major"] = new AxisConfigurationItem
                                 {
-                                    GroupBy = AxisGroupBy.timePeriods,
+                                    GroupBy = AxisGroupBy.timePeriod,
                                     DataSets = new List<ChartDataSet>
                                     {
                                         new ChartDataSet
@@ -2275,7 +2275,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             {
                                 ["major"] = new AxisConfigurationItem
                                 {
-                                    GroupBy = AxisGroupBy.timePeriods,
+                                    GroupBy = AxisGroupBy.timePeriod,
                                     DataSets = new List<ChartDataSet>
                                     {
                                         new ChartDataSet
@@ -2430,7 +2430,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             {
                                 ["major"] = new AxisConfigurationItem
                                 {
-                                    GroupBy = AxisGroupBy.timePeriods,
+                                    GroupBy = AxisGroupBy.timePeriod,
                                     DataSets = new List<ChartDataSet>
                                     {
                                         new ChartDataSet
@@ -2531,7 +2531,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             {
                                 ["major"] = new AxisConfigurationItem
                                 {
-                                    GroupBy = AxisGroupBy.timePeriods,
+                                    GroupBy = AxisGroupBy.timePeriod,
                                     DataSets = new List<ChartDataSet>
                                     {
                                         new ChartDataSet
@@ -2616,7 +2616,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                             {
                                 ["major"] = new AxisConfigurationItem
                                 {
-                                    GroupBy = AxisGroupBy.timePeriods,
+                                    GroupBy = AxisGroupBy.timePeriod,
                                     DataSets = new List<ChartDataSet>
                                     {
                                         new ChartDataSet

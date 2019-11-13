@@ -7,11 +7,11 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
+namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 {
     [DbContext(typeof(StatisticsDbContext))]
-    [Migration("20191101153547_Ees263UpdateFilteredObservationsStoredProc")]
-    partial class Ees263UpdateFilteredObservationsStoredProc
+    [Migration("20191008162516_UpdateFilteredObservationsStoredProc")]
+    partial class UpdateFilteredObservationsStoredProc
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -427,7 +427,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Footnote", "Footnote")
-                        .WithMany("Filters")
+                        .WithMany()
                         .HasForeignKey("FootnoteId")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
@@ -448,7 +448,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Footnote", "Footnote")
-                        .WithMany("FilterGroups")
+                        .WithMany()
                         .HasForeignKey("FootnoteId")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
@@ -469,7 +469,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Footnote", "Footnote")
-                        .WithMany("FilterItems")
+                        .WithMany()
                         .HasForeignKey("FootnoteId")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
@@ -485,7 +485,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.IndicatorFootnote", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Footnote", "Footnote")
-                        .WithMany("Indicators")
+                        .WithMany()
                         .HasForeignKey("FootnoteId")
                         .OnDelete(DeleteBehavior.Restrict);
 
@@ -853,7 +853,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.SubjectFootnote", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Footnote", "Footnote")
-                        .WithMany("Subjects")
+                        .WithMany()
                         .HasForeignKey("FootnoteId")
                         .OnDelete(DeleteBehavior.Restrict);
 
