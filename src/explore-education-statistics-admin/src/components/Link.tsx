@@ -1,12 +1,15 @@
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
-import { Link as RouterLink, LinkProps } from 'react-router-dom';
+import {
+  Link as RouterLink,
+  LinkProps as RouterLinkProps,
+} from 'react-router-dom';
 
-export type Props = {
+export type LinkProps = {
   children: ReactNode;
   className?: string;
   unvisited?: boolean;
-} & LinkProps;
+} & RouterLinkProps;
 
 const Link = ({
   children,
@@ -14,7 +17,7 @@ const Link = ({
   to,
   unvisited = false,
   ...props
-}: Props) => {
+}: LinkProps) => {
   return (
     <RouterLink
       {...props}

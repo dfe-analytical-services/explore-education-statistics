@@ -1,6 +1,6 @@
 import { EditableAccordionProps } from '@admin/components/EditableAccordion';
 import { EditableAccordionSectionProps } from '@admin/components/EditableAccordionSection';
-import { Props as LinkProps } from '@admin/components/Link';
+import { LinkProps } from '@admin/components/Link';
 import BasicReleaseSummary from '@admin/modules/find-statistics/components/BasicReleaseSummary';
 import { MarkdownRendererProps } from '@admin/modules/find-statistics/components/EditableMarkdownRenderer';
 import { TextRendererProps } from '@admin/modules/find-statistics/components/EditableTextRenderer';
