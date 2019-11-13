@@ -1,4 +1,5 @@
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Data.Importer.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.EntityFrameworkCore;
@@ -8,14 +9,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 {
     public class ImporterSchoolService : BaseImporterService
     {
-        private readonly StatisticsDbContext _context;
-
-        public ImporterSchoolService(ImporterMemoryCache cache, StatisticsDbContext context) : base(cache)
+        public ImporterSchoolService(ImporterMemoryCache cache) : base(cache)
         {
-            _context = context;
         }
 
-        public School Find(School source)
+        public School Find(School source, StatisticsDbContext context)
         {
             if (source?.LaEstab == null)
             {
@@ -29,13 +27,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 return school;
             }
 
-            school = LookupOrCreateSchool(source);
+            school = LookupOrCreateSchool(source, context);
             GetCache().Set(cacheKey, source);
 
             return school;
         }
 
-        private School LookupOrCreateSchool(School school)
+        private School LookupOrCreateSchool(School school, StatisticsDbContext context)
         {
             var cacheKey = GetSchoolCacheKey(school.LaEstab);
             if (GetCache().TryGetValue(cacheKey, out School schoolOut))
@@ -43,8 +41,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 return schoolOut;
             }
             
-            school = _context.School.AsNoTracking()
-                     .FirstOrDefault(s => s.LaEstab == school.LaEstab) ?? _context.School.Add(school).Entity;
+            school = context.School.AsNoTracking()
+                     .FirstOrDefault(s => s.LaEstab == school.LaEstab) ?? context.School.Add(school).Entity;
             
             return school;
         }

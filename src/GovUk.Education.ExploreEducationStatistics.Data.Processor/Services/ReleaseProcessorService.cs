@@ -1,5 +1,6 @@
 using System.Linq;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Data.Importer.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
@@ -17,45 +18,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
     public class ReleaseProcessorService : IReleaseProcessorService
     {
         private readonly ILogger<IReleaseProcessorService> _logger;
-        private readonly StatisticsDbContext _context;
         private readonly IMapper _mapper;
-        
+
         public ReleaseProcessorService(
             ILogger<IReleaseProcessorService> logger,
-            StatisticsDbContext context,
+            //StatisticsDbContext context,
             IMapper mapper)
         {
             _logger = logger;
-            _context = context;
             _mapper = mapper;
         }
 
-        public Subject CreateOrUpdateRelease(SubjectData subjectData, ImportMessage message)
+        public Subject CreateOrUpdateRelease(SubjectData subjectData, ImportMessage message, StatisticsDbContext context)
         {
-            var release = CreateOrUpdateRelease(message);
-            return RemoveAndCreateSubject(subjectData.Name, release);
+            var release = CreateOrUpdateRelease(message, context);
+            var subject = RemoveAndCreateSubject(subjectData.Name, release, context);
+            context.SaveChanges();
+            return subject;
         }
 
-        private Subject RemoveAndCreateSubject(string name, Release release)
+        private Subject RemoveAndCreateSubject(string name, Release release, StatisticsDbContext context)
         {
-            var subject = _context.Subject
+            var subject = context.Subject
                 .FirstOrDefault(s => s.Name.Equals(name) && s.ReleaseId == release.Id);
             
             // If the subject exists then this must be a reload of the same release/subject so delete & re-create.
 
             if (subject != null)
             {
-                _context.Subject.Remove(subject);
+                context.Subject.Remove(subject);
             }
 
-            subject = _context.Subject.Add(new Subject(name, release)).Entity;
+            subject = context.Subject.Add(new Subject(name, release)).Entity;
 
             return subject;
         }
         
-        private Release CreateOrUpdateRelease(ImportMessage message)
+        private Release CreateOrUpdateRelease(ImportMessage message, StatisticsDbContext context)
         {
-            var release = _context.Release
+            var release = context.Release
                 .Include(r => r.Publication)
                 .ThenInclude(p => p.Topic)
                 .ThenInclude(t => t.Theme)
@@ -69,18 +70,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     ReleaseDate = message.Release.ReleaseDate,
                     Title = message.Release.Title,
                     Slug = message.Release.Slug,
-                    Publication = CreateOrUpdatePublication(message)
+                    Publication = CreateOrUpdatePublication(message, context)
                 };
-                return _context.Release.Add(release).Entity;
+                return context.Release.Add(release).Entity;
             }
 
             release = _mapper.Map(message.Release, release);
-            return _context.Release.Update(release).Entity;
+            return context.Release.Update(release).Entity;
         }
 
-        private Publication CreateOrUpdatePublication(ImportMessage message)
+        private Publication CreateOrUpdatePublication(ImportMessage message, StatisticsDbContext context)
         {
-            var publication = _context.Publication
+            var publication = context.Publication
                 .Include(p => p.Topic)
                 .ThenInclude(t => t.Theme)
                 .FirstOrDefault(p => p.Id.Equals(message.Release.Publication.Id));
@@ -92,18 +93,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     Id = message.Release.Publication.Id,
                     Title = message.Release.Publication.Title,
                     Slug = message.Release.Publication.Slug,
-                    Topic = CreateOrUpdateTopic(message)
+                    Topic = CreateOrUpdateTopic(message, context)
                 };
-                return _context.Publication.Add(publication).Entity;
+                return context.Publication.Add(publication).Entity;
             }
 
             publication = _mapper.Map(message.Release.Publication, publication);
-            return _context.Publication.Update(publication).Entity;
+            return context.Publication.Update(publication).Entity;
         }
         
-        private Topic CreateOrUpdateTopic(ImportMessage message)
+        private Topic CreateOrUpdateTopic(ImportMessage message, StatisticsDbContext context)
         {
-            var topic = _context.Topic
+            var topic = context.Topic
                 .Include(p => p.Theme)
                 .FirstOrDefault(t => t.Id.Equals(message.Release.Publication.Topic.Id));
 
@@ -114,28 +115,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     Id = message.Release.Publication.Topic.Id,
                     Title = message.Release.Publication.Topic.Title,
                     Slug = message.Release.Publication.Topic.Slug,
-                    Theme = CreateOrUpdateTheme(message)
+                    Theme = CreateOrUpdateTheme(message, context)
                 };
-                return _context.Topic.Add(topic).Entity;
+                return context.Topic.Add(topic).Entity;
             }
 
             topic = _mapper.Map(message.Release.Publication.Topic, topic);
-            return _context.Topic.Update(topic).Entity;
+            return context.Topic.Update(topic).Entity;
         }
 
-        private Theme CreateOrUpdateTheme(ImportMessage message)
+        private Theme CreateOrUpdateTheme(ImportMessage message, StatisticsDbContext context)
         {
-            var theme = _context.Theme
+            var theme = context.Theme
                 .FirstOrDefault(t => t.Id.Equals(message.Release.Publication.Topic.Theme.Id));
 
             if (theme == null)
             {
                 theme = _mapper.Map<Theme>(message.Release.Publication.Topic.Theme);
-                return _context.Theme.Add(theme).Entity;
+                return context.Theme.Add(theme).Entity;
             }
 
             theme = _mapper.Map(message.Release.Publication.Topic.Theme, theme);
-            return _context.Theme.Update(theme).Entity;
+            return context.Theme.Update(theme).Entity;
         }
     }
 }

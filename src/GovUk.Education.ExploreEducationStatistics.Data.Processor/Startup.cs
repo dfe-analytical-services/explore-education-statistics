@@ -22,9 +22,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
         {
             builder.Services
                 .AddAutoMapper(typeof(Startup).Assembly)
-                .AddDbContext<StatisticsDbContext>(options =>
-                    options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("StatisticsDb"),
-                        providerOptions => providerOptions.EnableRetryOnFailure()))
+//                .AddDbContext<StatisticsDbContext>(options =>
+//                    options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("StatisticsDb"),
+//                        providerOptions => providerOptions.EnableRetryOnFailure()))
                 .AddTransient<IFileStorageService, FileStorageService>(s => new FileStorageService(ConnectionUtils.GetAzureStorageConnectionString("CoreStorage")))
                 .AddTransient<IFileImportService, FileImportService>()
                 .AddTransient<ImporterSchoolService>()

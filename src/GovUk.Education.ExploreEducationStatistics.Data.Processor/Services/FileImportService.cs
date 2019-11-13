@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Importer.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
@@ -17,30 +18,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
     public class FileImportService : IFileImportService
     {
-        private readonly StatisticsDbContext _context;
         private readonly IFileStorageService _fileStorageService;
         private readonly IImporterService _importerService;
         private readonly IBatchService _batchService;
         private readonly ILogger<IFileImportService> _logger;
 
         public FileImportService(
-            StatisticsDbContext context,
             IFileStorageService fileStorageService,
             IImporterService importerService,
             IBatchService batchService,
             ILogger<IFileImportService> logger)
         {
-            _context = context;
             _fileStorageService = fileStorageService;
             _importerService = importerService;
             _batchService = batchService;
             _logger = logger;
         }
 
-        public async Task ImportObservations(ImportMessage message)
+        public async Task ImportObservations(ImportMessage message, StatisticsDbContext context)
         {
             var subjectData = _fileStorageService.GetSubjectData(message).Result;
-            var subject = GetSubject(message, subjectData.Name);
+            var subject = GetSubject(message, subjectData.Name, context);
             var releaseId = message.Release.Id.ToString();
 
             if (await _batchService.IsBatchProcessed(releaseId, message.OrigDataFileName, message.BatchNo))
@@ -61,9 +59,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     _importerService.ImportObservations(
                         batch,
                         subject,
-                        _importerService.GetMeta(metaLines, subject),
+                        _importerService.GetMeta(metaLines, subject, context),
                         message.BatchNo,
-                        message.RowsPerBatch
+                        message.RowsPerBatch,
+                        context
                     );
 
                     // If the batch size is > 1 i.e. The file was split into batches
@@ -95,22 +94,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
         }
         
-        public void ImportFiltersLocationsAndSchools(ImportMessage message)
+        public void ImportFiltersLocationsAndSchools(ImportMessage message, StatisticsDbContext context)
         {
             var subjectData = _fileStorageService.GetSubjectData(message).Result;
             var batch = subjectData.GetCsvLines().ToList();
             var metaLines = subjectData.GetMetaLines().ToList();
-            var subject = GetSubject(message, subjectData.Name);
+            var subject = GetSubject(message, subjectData.Name, context);
             
             _importerService.ImportFiltersLocationsAndSchools(
                 batch,
-                _importerService.GetMeta(metaLines, subject),
-                subject);
+                _importerService.GetMeta(metaLines, subject, context),
+                subject,
+                context);
+
+            context.SaveChanges();
         }
 
-        private Subject GetSubject(ImportMessage message, string subjectName)
+        private Subject GetSubject(ImportMessage message, string subjectName, StatisticsDbContext context)
         {
-            return _context.Subject
+            return context.Subject
                 .Include(s => s.Release)
                 .ThenInclude(r => r.Publication)
                 .ThenInclude(p => p.Topic)

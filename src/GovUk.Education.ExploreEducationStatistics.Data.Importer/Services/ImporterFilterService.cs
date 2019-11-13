@@ -1,4 +1,5 @@
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Data.Importer.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.EntityFrameworkCore;
@@ -8,20 +9,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 {
     public class ImporterFilterService : BaseImporterService
     {
-        private readonly StatisticsDbContext _context;
-
-        public ImporterFilterService(ImporterMemoryCache cache, StatisticsDbContext context) : base(cache)
+        public ImporterFilterService(ImporterMemoryCache cache) : base(cache)
         {
-            _context = context;
         }
 
-        public FilterItem Find(string filterItemLabel, string filterGroupLabel, Filter filter)
+        public FilterItem Find(string filterItemLabel, string filterGroupLabel, Filter filter, StatisticsDbContext context)
         {
-            var filterGroup = LookupOrCreateFilterGroup(filter, filterGroupLabel);
-            return LookupOrCreateFilterItem(filterGroup, filterItemLabel);
+            var filterGroup = LookupOrCreateFilterGroup(filter, filterGroupLabel, context);
+            return LookupOrCreateFilterItem(filterGroup, filterItemLabel, context);
         }
 
-        private FilterItem LookupOrCreateFilterItem(FilterGroup filterGroup, string label)
+        private FilterItem LookupOrCreateFilterItem(FilterGroup filterGroup, string label, StatisticsDbContext context)
         {
             if (string.IsNullOrWhiteSpace(label))
             {
@@ -34,15 +32,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 return filterItem;
             }
             
-            filterItem = _context.FilterItem.AsNoTracking().FirstOrDefault(fi => fi.FilterGroupId == filterGroup.Id && fi.Label == label) 
-                         ??_context.FilterItem.Add(new FilterItem(label, filterGroup)).Entity;
+            filterItem = context.FilterItem.AsNoTracking().FirstOrDefault(fi => fi.FilterGroupId == filterGroup.Id && fi.Label == label) 
+                         ?? context.FilterItem.Add(new FilterItem(label, filterGroup)).Entity;
             
             GetCache().Set(cacheKey, filterItem);
             
             return filterItem;
         }
 
-        private FilterGroup LookupOrCreateFilterGroup(Filter filter, string label)
+        private FilterGroup LookupOrCreateFilterGroup(Filter filter, string label, StatisticsDbContext context)
         {
             if (string.IsNullOrWhiteSpace(label))
             {
@@ -55,9 +53,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 return filterGroup;
             }
             
-            filterGroup = _context.FilterGroup.AsNoTracking()
+            filterGroup = context.FilterGroup.AsNoTracking()
                           .FirstOrDefault(fg => fg.FilterId == filter.Id && fg.Label == label) 
-                          ?? _context.FilterGroup.Add(new FilterGroup(filter, label)).Entity;
+                          ?? context.FilterGroup.Add(new FilterGroup(filter, label)).Entity;
             
             GetCache().Set(cacheKey, filterGroup);
             

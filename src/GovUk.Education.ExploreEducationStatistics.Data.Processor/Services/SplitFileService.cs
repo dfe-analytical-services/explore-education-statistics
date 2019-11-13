@@ -31,29 +31,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             var lines = subjectData.GetCsvLines();
 
-            if (lines.Count() > batchSettings.RowsPerBatch + 1)
+            var csvLines = lines.ToList();
+            if (csvLines.Count() > batchSettings.RowsPerBatch + 1)
             {
-                await SplitFiles(message, lines, batchSettings.RowsPerBatch, subjectData, collector);
+                var result = await SplitFiles(message, csvLines, batchSettings.RowsPerBatch, subjectData);
+                foreach (var m in result)
+                {
+                    collector.Add(m);
+                }
             }
             // Else perform any additional validation & pass on file to message queue for import
             else
             {
+                message.RowsPerBatch = batchSettings.RowsPerBatch;
                 collector.Add(message); 
             }
         }
         
-        private async Task SplitFiles(
+        private async Task<List<ImportMessage>> SplitFiles(
             ImportMessage message,
             IEnumerable<string> csvLines,
             int rowsPerBatch,
-            SubjectData subjectData,
-            ICollector<ImportMessage> collector)
+            SubjectData subjectData)
         {
-            var header = csvLines.First();
-            var batches = csvLines.Skip(1).Batch(rowsPerBatch);
+            var enumerable = csvLines.ToList();
+            var header = enumerable.First();
+            var batches = enumerable.Skip(1).Batch(rowsPerBatch);
             var index = 1;
             var batchCount = 1;
-            var numBatches = GetNumBatches(csvLines.Count(), rowsPerBatch);
+            var numBatches = GetNumBatches(enumerable.Count(), rowsPerBatch);
+            var messages = new List<ImportMessage>();
 
             foreach (var batch in batches)
             {
@@ -79,8 +86,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     fileName,
                     "text/csv"
                     );
-                
-                var iMessage = new ImportMessage
+
+                messages.Add(new ImportMessage
                 {
                     DataFileName = fileName,
                     OrigDataFileName = message.DataFileName,
@@ -88,10 +95,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     BatchNo = batchCount++,
                     NumBatches = numBatches,
                     RowsPerBatch = rowsPerBatch
-                };
-
-                collector.Add(iMessage);
+                });
             }
+
+            return messages;
         }
         public static int GetNumBatches(int rows, int rowsPerBatch) {
             return (int)Math.Ceiling(rows / (double)rowsPerBatch);

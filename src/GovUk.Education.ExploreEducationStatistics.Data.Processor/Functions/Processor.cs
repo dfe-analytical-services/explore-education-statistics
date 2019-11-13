@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Importer.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
@@ -22,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
         private readonly ISplitFileService _splitFileService;
         private readonly IImporterService _importerService;
         private readonly IBatchService _batchService;
-        private readonly StatisticsDbContext _context;
+        //private readonly StatisticsDbContext _context;
         private readonly IValidatorService _validatorService;
         
         public Processor(
@@ -32,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             ISplitFileService splitFileService,
             IImporterService importerService,
             IBatchService batchService,
-            StatisticsDbContext context,
+            //StatisticsDbContext context,
             IValidatorService validatorService
         )
         {
@@ -43,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             _importerService = importerService;
             _batchService = batchService;
             _validatorService = validatorService;
-            _context = context;
+            //_context = context;
         }
 
         [FunctionName("ProcessUploads")]
@@ -79,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
         }
         
         [FunctionName("ProcessUploadsSequentially")]
-        public async void ProcessUploadsSequentially(
+        public void ProcessUploadsSequentially(
             [QueueTrigger("imports-pending-sequential")]
             ImportMessage[] messages,
             ILogger logger,
@@ -106,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                     logger.LogInformation($"Re-seeding for : Datafile: {message.DataFileName}");
                     ProcessSubject(message);
                     var subjectData = _fileStorageService.GetSubjectData(message).Result;
-                    await _splitFileService.SplitDataFile(collector, message, subjectData, batchSettings);
+                    _splitFileService.SplitDataFile(collector, message, subjectData, batchSettings).Wait();
                     logger.LogInformation($"First pass COMPLETE for : Datafile: {message.DataFileName}");
                 }
             }
@@ -123,24 +124,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             ImportMessage message,
             ILogger logger)
         {
-            _fileImportService.ImportObservations(message).Wait();
+            StatisticsDbContext context = DbUtils.CreateDbContext();
+            _fileImportService.ImportObservations(message, context).Wait();
         }
 
         private SubjectData ProcessSubject(ImportMessage message)
         {
-            var subjectData = _fileStorageService.GetSubjectData(message).Result;
-            var subject =_releaseProcessorService.CreateOrUpdateRelease(subjectData, message);
+            StatisticsDbContext context = DbUtils.CreateDbContext();
             
-            SaveChanges();
-
-            _importerService.ImportMeta(subjectData.GetMetaLines().ToList(), subject);
-                
-            SaveChanges();
-                
-            _fileImportService.ImportFiltersLocationsAndSchools(message);
-
-            SaveChanges();
-
+            var subjectData = _fileStorageService.GetSubjectData(message).Result;
+            var subject =_releaseProcessorService.CreateOrUpdateRelease(subjectData, message, context);
+            
+            _importerService.ImportMeta(subjectData.GetMetaLines().ToList(), subject, context);
+            
+            _fileImportService.ImportFiltersLocationsAndSchools(message, context);
+            
             return subjectData;
         }
 
@@ -178,11 +176,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             return true;
         }
 
-        private void SaveChanges()
-        {
-            _context.SaveChanges();
-        }
-        
         private static IConfigurationRoot LoadAppSettings(ExecutionContext context)
         {
             return new ConfigurationBuilder()
