@@ -178,7 +178,7 @@ jobs:
           projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.csproj'
           arguments: '--self-contained true -r win-x86 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
       - task: 'PublishPipelineArtifact@0'
-        displayName: 'Publish Pipeline Artifact'
+        displayName: 'Publish Admin Artifact'
         inputs:
           artifactName: 'Admin'
           targetPath: '$(Build.ArtifactStagingDirectory)'
