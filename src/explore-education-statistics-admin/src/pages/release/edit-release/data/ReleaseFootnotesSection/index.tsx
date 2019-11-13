@@ -30,6 +30,7 @@ const ReleaseFootnotesSection = ({ publicationId, releaseId }: Props) => {
   const [footnoteToBeDeleted, setFootnoteToBeDeleted] = useState<
     Footnote | undefined
   >();
+  const [hasSufficientData, setHasSufficientData] = useState<boolean>(true);
 
   function getFootnoteData() {
     setLoading(true);
@@ -37,6 +38,7 @@ const ReleaseFootnotesSection = ({ publicationId, releaseId }: Props) => {
       .getReleaseFootnoteData(releaseId)
       .then(({ meta, footnotes: footnotesList }) => {
         setFootnoteMeta(meta);
+        setHasSufficientData(!!Object.keys(meta).length);
         setFootnotes(footnotesList);
         setFootnoteMetaGetters(generateFootnoteMetaMap(meta));
         setLoading(false);
@@ -88,9 +90,14 @@ const ReleaseFootnotesSection = ({ publicationId, releaseId }: Props) => {
   return (
     <>
       <h2>Footnotes</h2>
-      {loading || !footnoteMeta || !footnoteMetaGetters ? (
-        <LoadingSpinner />
-      ) : (
+      {!hasSufficientData && (
+        <p>
+          Before you can create footnotes, you will need to upload some relevant
+          data files. You can do that in the Data uploads section
+        </p>
+      )}
+      {loading && <LoadingSpinner />}
+      {!loading && hasSufficientData && footnoteMeta && footnoteMetaGetters && (
         <>
           <FootnoteForm
             {...footnoteForm}
@@ -123,7 +130,9 @@ const ReleaseFootnotesSection = ({ publicationId, releaseId }: Props) => {
                   }}
                 >
                   The footnote:
-                  <p>{(footnoteToBeDeleted as Footnote).content}</p>
+                  <p className="govuk-inset-text">
+                    {(footnoteToBeDeleted as Footnote).content}
+                  </p>
                 </ModalConfirm>
               )}
             </>
