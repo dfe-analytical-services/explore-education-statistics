@@ -1,10 +1,9 @@
-import { EditableAccordionProps } from '@admin/components/EditableAccordion';
-import { EditableAccordionSectionProps } from '@admin/components/EditableAccordionSection';
-import { LinkProps } from '@admin/components/Link';
+import Accordion from '@admin/components/EditableAccordion';
+import AccordionSection from '@admin/components/EditableAccordionSection';
+import Link from '@admin/components/Link';
 import BasicReleaseSummary from '@admin/modules/find-statistics/components/BasicReleaseSummary';
-import { MarkdownRendererProps } from '@admin/modules/find-statistics/components/EditableMarkdownRenderer';
-import { TextRendererProps } from '@admin/modules/find-statistics/components/EditableTextRenderer';
-import { PrintThisPageProps } from '@admin/modules/find-statistics/components/PrintThisPage';
+import MarkdownRenderer from '@admin/modules/find-statistics/components/EditableMarkdownRenderer';
+import PrintThisPage from '@admin/modules/find-statistics/components/PrintThisPage';
 import { getTimePeriodCoverageDateRangeStringShort } from '@admin/pages/release/util/releaseSummaryUtil';
 import { BasicPublicationDetails } from '@admin/services/common/types';
 import { EditableContentBlock } from '@admin/services/publicationService';
@@ -14,7 +13,6 @@ import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
-import { DataBlockProps } from '@common/modules/find-statistics/components/DataBlock';
 import { baseUrl } from '@common/services/api';
 import {
   AbstractRelease,
@@ -23,35 +21,17 @@ import {
 import { Dictionary } from '@common/types';
 import classNames from 'classnames';
 import React from 'react';
-import { Props as ContentBlockProps } from './components/EditableContentBlock';
+import { EditingContext } from '@common/modules/find-statistics/util/wrapEditableComponent';
+import DataBlock from '@admin/modules/find-statistics/components/EditableDataBlock';
+import ContentBlock from '@admin/modules/find-statistics/components/EditableContentBlock';
 
 export interface RendererProps {
   contentId?: string;
   releaseId?: string;
 }
 
-type TextRendererType = React.ComponentType<TextRendererProps>;
-type MarkdownRendererType = React.ComponentType<MarkdownRendererProps>;
-type LinkType = React.ComponentType<LinkProps & { analytics?: unknown }>;
-type PrintThisPageType = React.ComponentType<PrintThisPageProps>;
-type DataBlockType = React.ComponentType<DataBlockProps>;
-type AccordionType = React.ComponentType<EditableAccordionProps>;
-type AccordionSectionType = React.ComponentType<EditableAccordionSectionProps>;
-type ContentBlockType = React.ComponentType<ContentBlockProps>;
-
-export interface ComponentTypes {
-  TextRenderer: TextRendererType;
-  MarkdownRenderer: MarkdownRendererType;
-  SearchForm: typeof PageSearchForm;
-  PrintThisPage: PrintThisPageType;
-  Link: LinkType;
-  DataBlock: DataBlockType;
-  Accordion: AccordionType;
-  AccordionSection: AccordionSectionType;
-  ContentBlock: ContentBlockType;
-}
-
-interface Props extends ComponentTypes {
+interface Props {
+  editing: boolean;
   basicPublication: BasicPublicationDetails;
   release: AbstractRelease<EditableContentBlock>;
   releaseSummary: ReleaseSummaryDetails;
@@ -63,19 +43,11 @@ interface Props extends ComponentTypes {
 const nullLogEvent = () => {};
 
 const PublicationReleaseContent = ({
+  editing = true,
   basicPublication,
   release,
   releaseSummary,
   styles,
-  TextRenderer,
-  MarkdownRenderer,
-  SearchForm,
-  PrintThisPage,
-  Link,
-  DataBlock,
-  Accordion,
-  AccordionSection,
-  ContentBlock,
   logEvent = nullLogEvent,
 }: Props) => {
   const accId: string[] = generateIdList(2);
@@ -86,7 +58,7 @@ const PublicationReleaseContent = ({
   const { publication } = release;
 
   return (
-    <>
+    <EditingContext.Provider value={{ isEditing: editing }}>
       <h1 className="govuk-heading-l">
         <span className="govuk-caption-l">
           {releaseSummary.timePeriodCoverage.label}{' '}
@@ -129,11 +101,6 @@ const PublicationReleaseContent = ({
                       <Link
                         to={`${baseUrl.data}/download/${path}`}
                         className="govuk-link"
-                        analytics={{
-                          category: 'Downloads',
-                          action: `Release page ${name} file downloaded`,
-                          label: `File URL: /api/download/${path}`,
-                        }}
                       >
                         {name}
                       </Link>
@@ -144,7 +111,7 @@ const PublicationReleaseContent = ({
               </ul>
             </Details>
           )}
-          <SearchForm
+          <PageSearchForm
             id="search-form"
             inputLabel="Search in this release page."
             className="govuk-!-margin-top-3 govuk-!-margin-bottom-3"
@@ -408,7 +375,7 @@ const PublicationReleaseContent = ({
         </AccordionSection>
       </Accordion>
       {/* </editor-fold> */}
-    </>
+    </EditingContext.Provider>
   );
 };
 
