@@ -1,32 +1,25 @@
-import React, {ComponentType, ReactComponentElement, ReactElement, useContext, WeakValidationMap} from "react";
+import React, { ComponentType, useContext } from 'react';
 
 export interface ReleaseContentContext {
-  isEditing: boolean
+  isEditing: boolean;
 }
 
-export const EditingContext = React.createContext<ReleaseContentContext>({isEditing: true});
+export const EditingContext = React.createContext<ReleaseContentContext>({
+  isEditing: true,
+});
 
-
-
-const wrapEditableComponent = <EditableProps, RenderProps>(
+const wrapEditableComponent = <EditableProps extends RenderProps, RenderProps>(
   EditableComponent: ComponentType<EditableProps>,
-  RenderComponent: ComponentType<RenderProps>
+  RenderComponent: ComponentType<RenderProps>,
 ) => {
-
-  const wrapper= function WrappedEditableComponent(props: EditableProps | RenderProps) {
-    const {isEditing} = useContext(EditingContext);
-    return isEditing ?
+  return function WrappedEditableComponent(props: EditableProps | RenderProps) {
+    const { isEditing } = useContext(EditingContext);
+    return isEditing ? (
       <EditableComponent {...(props as EditableProps)} />
-      :
+    ) : (
       <RenderComponent {...(props as RenderProps)} />
+    );
   };
-
-  wrapper.editable = EditableComponent.name;
-  wrapper.renderer = RenderComponent.name;
-
-  return wrapper;
 };
-
-
 
 export default wrapEditableComponent;

@@ -1,29 +1,21 @@
 // eslint-disable-next-line import/no-named-as-default
-import Link from '@admin/components/Link';
-import EditableTextRenderer from '@admin/modules/find-statistics/components/EditableTextRenderer';
-import ManageReleaseContext, {ManageRelease,} from '@admin/pages/release/ManageReleaseContext';
+import ManageReleaseContext, {
+  ManageRelease,
+} from '@admin/pages/release/ManageReleaseContext';
 import commonService from '@admin/services/common/service';
-import {IdTitlePair} from '@admin/services/common/types';
-import {Comment} from '@admin/services/dashboard/types';
+import { IdTitlePair } from '@admin/services/common/types';
+import { Comment } from '@admin/services/dashboard/types';
 import releaseContentService from '@admin/services/release/edit-release/content/service';
 import releaseSummaryService from '@admin/services/release/edit-release/summary/service';
-import {ReleaseSummaryDetails} from '@admin/services/release/types';
+import { ReleaseSummaryDetails } from '@admin/services/release/types';
 import FormFieldset from '@common/components/form/FormFieldset';
 import FormRadioGroup from '@common/components/form/FormRadioGroup';
 import WarningMessage from '@common/components/WarningMessage';
-import {AbstractRelease} from '@common/services/publicationService';
+import { AbstractRelease } from '@common/services/publicationService';
 import classNames from 'classnames';
-import React, {useContext, useEffect, useState} from 'react';
-import PageSearchForm from '@common/components/PageSearchForm';
-import PublicationReleaseContent, {ComponentTypes,} from '@admin/modules/find-statistics/PublicationReleaseContent';
-import ReactMarkdown from 'react-markdown';
-import EditableMarkdownRenderer from '@admin/modules/find-statistics/components/EditableMarkdownRenderer';
-import {EditableContentBlock} from '@admin/services/publicationService';
-import EditableContentBlockComponent from '@admin/modules/find-statistics/components/EditableContentBlock';
-import DataBlock from '@common/modules/find-statistics/components/DataBlock';
-import ContentBlock from '@common/modules/find-statistics/components/ContentBlock';
-import EditableDataBlock from '@admin/modules/find-statistics/components/EditableDataBlock';
-import PrintThisPage from '../../../../modules/find-statistics/components/PrintThisPage';
+import React, { useContext, useEffect, useState } from 'react';
+import PublicationReleaseContent from '@admin/modules/find-statistics/PublicationReleaseContent';
+import { EditableContentBlock } from '@admin/services/publicationService';
 
 type PageMode = 'edit' | 'preview';
 
@@ -35,35 +27,10 @@ interface Model {
   release: AbstractRelease<EditableContentBlock>;
 }
 
-type PageModeComponentTypesType = {
-  [key in PageMode]: ComponentTypes;
-};
-
-const PageModeComponentTypes: PageModeComponentTypesType = {
-  edit: {
-    TextRenderer: EditableTextRenderer,
-    MarkdownRenderer: EditableMarkdownRenderer,
-    Link,
-    PrintThisPage,
-    SearchForm: PageSearchForm,
-    ContentBlock: EditableContentBlockComponent,
-    DataBlock: EditableDataBlock,
-  },
-  preview: {
-    TextRenderer: EditableTextRenderer,
-    MarkdownRenderer: ReactMarkdown,
-    Link,
-    PrintThisPage,
-    SearchForm: PageSearchForm,
-    ContentBlock,
-    DataBlock,
-  },
-};
-
 const ReleaseContentPage = () => {
   const [model, setModel] = useState<Model>();
 
-  const {releaseId, publication} = useContext(
+  const { releaseId, publication } = useContext(
     ManageReleaseContext,
   ) as ManageRelease;
 
@@ -108,22 +75,21 @@ const ReleaseContentPage = () => {
         ],
       };
 
-      const contentBlocks = [
-        contentBlock,
-        {...contentBlock, order:1}
-      ];
+      const contentBlocks = [contentBlock, { ...contentBlock, order: 1 }];
 
       const releaseDataAsEditable = {
         ...releaseData,
         keyStatistics: releaseData.keyStatistics as EditableContentBlock,
-        content: (releaseData.content &&
-          releaseData.content.map(section => ({
-            ...section,
-            content: section.content.map<EditableContentBlock>(block => ({
-              ...block,
-              comments: [],
-            })),
-          }))) || contentBlocks
+        content:
+          (releaseData.content &&
+            releaseData.content.map(section => ({
+              ...section,
+              content: section.content.map<EditableContentBlock>(block => ({
+                ...block,
+                comments: [],
+              })),
+            }))) ||
+          contentBlocks,
       };
 
       const release: AbstractRelease<EditableContentBlock> = {
@@ -225,7 +191,6 @@ const ReleaseContentPage = () => {
                 release={model.release}
                 releaseSummary={model.releaseSummary}
                 styles={{}}
-                {...PageModeComponentTypes[model.pageMode]}
               />
             </div>
           </div>

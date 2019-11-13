@@ -1,8 +1,10 @@
-import Accordion, {AccordionProps} from '@common/components/Accordion';
+import Accordion, { AccordionProps } from '@common/components/Accordion';
 import isComponentType from '@common/lib/type-guards/components/isComponentType';
-import React, {cloneElement, Component, createRef} from 'react';
+import React, { cloneElement, Component, createRef } from 'react';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
-import EditableAccordionSection, {EditableAccordionSectionProps,} from './EditableAccordionSection';
+import EditableAccordionSection, {
+  EditableAccordionSectionProps,
+} from './EditableAccordionSection';
 
 export interface EditableAccordionProps extends AccordionProps {
   index?: number;
