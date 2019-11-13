@@ -8,13 +8,12 @@ import React, {
   useEffect,
   useRef, WeakValidationMap,
 } from 'react';
-import { useImmer } from 'use-immer';
+import {useImmer} from 'use-immer';
 import styles from './Accordion.module.scss';
-import AccordionSection, {
+import {
   accordionSectionClasses,
   AccordionSectionProps,
 } from './AccordionSection';
-import {isWrapped} from "@common/modules/find-statistics/util/wrapEditableComponent";
 
 export interface AccordionProps {
   children: ReactNode;
@@ -24,22 +23,17 @@ export interface AccordionProps {
 }
 
 
-
 export function generateIdList(count: number) {
   return new Array(count).fill('content-section-').map((id, n) => id + (n + 1));
 }
 
-const Accordion = ({ children, id, onToggleAll, onToggle }: AccordionProps) => {
+const Accordion = ({children, id, onToggleAll, onToggle}: AccordionProps) => {
 
   const ref = useRef<HTMLDivElement>(null);
 
   const [openSections, updateOpenSections] = useImmer<boolean[]>([]);
 
-  const sections = React.Children.toArray(children).filter(child => {
-      console.log(isWrapped(child, AccordionSection));
-      return isComponentType(child, AccordionSection);
-    }
-  ) as ReactComponentElement<typeof AccordionSection>[];
+  const sections = React.Children.toArray(children) as ReactComponentElement<ComponentType<AccordionSectionProps>>[];
 
   const getSectionIds = (
     sectionProps: AccordionSectionProps,
@@ -60,7 +54,7 @@ const Accordion = ({ children, id, onToggleAll, onToggle }: AccordionProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [children, updateOpenSections]);
 
-  const { isMounted } = useMounted(() => {
+  const {isMounted} = useMounted(() => {
     const goToHash = () => {
       if (ref.current && window.location.hash) {
         let locationHashEl: HTMLElement | null = null;
@@ -84,7 +78,7 @@ const Accordion = ({ children, id, onToggleAll, onToggle }: AccordionProps) => {
             if (contentEl) {
               updateOpenSections(draft => {
                 const openIndex = sections.findIndex((section, index) => {
-                  const { contentId, headingId } = getSectionIds(
+                  const {contentId, headingId} = getSectionIds(
                     section.props,
                     index,
                   );
@@ -149,7 +143,7 @@ const Accordion = ({ children, id, onToggleAll, onToggle }: AccordionProps) => {
       )}
 
       {sections.map((section, index) => {
-        const { headingId, contentId } = getSectionIds(section.props, index);
+        const {headingId, contentId} = getSectionIds(section.props, index);
 
         const isSectionOpen = isAllOpen || openSections[index];
 

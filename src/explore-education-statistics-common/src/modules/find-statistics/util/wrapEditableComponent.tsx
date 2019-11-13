@@ -27,26 +27,6 @@ const wrapEditableComponent = <EditableProps, RenderProps>(
   return wrapper;
 };
 
-export function isWrapped<P>(
-  value: unknown,
-  componentType: ComponentType<P>,
-): value is ReactComponentElement<ComponentType<P>, P> {
-
-  if (!value) {
-    return false;
-  }
-
-  const element = value as ReactElement;
-
-  if (typeof element.type === 'function') {
-    // @ts-ignore
-    if (element.type.name === "WrappedEditableComponent") {
-      console.log(componentType);
-    }
-  }
-
-  return false;
-}
 
 
 export default wrapEditableComponent;
