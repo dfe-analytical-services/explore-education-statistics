@@ -6,6 +6,7 @@ import {
 } from '@admin/services/release/edit-release/footnotes/types';
 import footnotesService from '@admin/services/release/edit-release/footnotes/service';
 import { generateFootnoteMetaMap } from '@admin/services/release/edit-release/footnotes/util';
+import Link from '@admin/components/Link';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import React, { useEffect, useState } from 'react';
@@ -93,7 +94,8 @@ const ReleaseFootnotesSection = ({ publicationId, releaseId }: Props) => {
       {!hasSufficientData && (
         <p>
           Before you can create footnotes, you will need to upload some relevant
-          data files. You can do that in the Data uploads section
+          data files. You can do that in the{' '}
+          <Link to="#data-upload">Data uploads section</Link>.
         </p>
       )}
       {loading && <LoadingSpinner />}
