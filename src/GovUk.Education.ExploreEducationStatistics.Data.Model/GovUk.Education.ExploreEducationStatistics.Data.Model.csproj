@@ -11,6 +11,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Migrations" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Migrations\*.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  
+  <ItemGroup>
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common\GovUk.Education.ExploreEducationStatistics.Common.csproj" />
   </ItemGroup>
 

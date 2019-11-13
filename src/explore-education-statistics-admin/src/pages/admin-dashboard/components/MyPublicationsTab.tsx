@@ -34,7 +34,12 @@ const findThemeById = (
 const findTopicById = (topicId: string, theme: ThemeAndTopicsIdsAndTitles) =>
   theme.topics.find(topic => topic.id === topicId) || theme.topics[0];
 
-const MyPublicationsTab = () => {
+export interface Props {
+  themePropId?: string;
+  topicPropId?: string;
+}
+
+const MyPublicationsTab = ({ themePropId, topicPropId }: Props) => {
   const [myPublications, setMyPublications] = useState<
     AdminDashboardPublication[]
   >();
@@ -49,7 +54,7 @@ const MyPublicationsTab = () => {
   const onThemeChange = (
     themeId: string,
     availableThemes: ThemeAndTopicsIdsAndTitles[],
-  ) =>
+  ) => {
     setSelectedThemeAndTopic({
       theme: findThemeById(themeId, availableThemes),
       topic: orderBy(
@@ -57,15 +62,17 @@ const MyPublicationsTab = () => {
         topic => topic.title,
       )[0],
     });
+  };
 
   const onTopicChange = (
     topicId: string,
     selectedTheme: ThemeAndTopicsIdsAndTitles,
-  ) =>
+  ) => {
     setSelectedThemeAndTopic({
       theme: selectedTheme,
       topic: findTopicById(topicId, selectedTheme),
     });
+  };
 
   useEffect(() => {
     dashboardService
@@ -81,14 +88,35 @@ const MyPublicationsTab = () => {
         theme: themes[0],
         topic: orderBy(themes[0].topics, topic => topic.title)[0],
       });
+      if (themePropId && topicPropId) {
+        const theme = themes.find(function findTheme(t) {
+          return t.id === themePropId;
+        });
+
+        const topic =
+          theme &&
+          theme.topics.find(function findTopic(t) {
+            return t.id === topicPropId;
+          });
+
+        if (theme && topic) {
+          setSelectedThemeAndTopic({ theme, topic });
+        }
+      }
     }
-  }, [themes]);
+  }, [themes, topicPropId, themePropId]);
 
   useEffect(() => {
     if (selectedThemeAndTopic) {
       dashboardService
         .getMyPublicationsByTopic(selectedThemeAndTopic.topic.id)
         .then(setMyPublications);
+
+      window.history.replaceState(
+        '',
+        '',
+        `/dashboard/${selectedThemeAndTopic.theme.id}/${selectedThemeAndTopic.topic.id}`,
+      );
     }
   }, [selectedThemeAndTopic]);
 
