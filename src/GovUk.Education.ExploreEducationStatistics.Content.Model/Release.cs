@@ -100,5 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
                 }
             }
         }
+        
+        public List<BasicLink> RelatedInformation { get; set; }
     }
 }
