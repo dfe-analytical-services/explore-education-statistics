@@ -3,10 +3,8 @@ import AccordionSection, {
 } from '@common/components/AccordionSection';
 import GoToTopLink from '@common/components/GoToTopLink';
 import classNames from 'classnames';
-import React, { createElement, createRef, useState } from 'react';
+import React, {createElement, createRef, useState} from 'react';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
-
-// import PrototypeEditableContent from "@admin/pages/prototypes/components/PrototypeEditableContent";
 
 export interface EditableAccordionSectionProps extends AccordionSectionProps {
   index?: number;

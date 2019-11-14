@@ -1,41 +1,98 @@
-import Accordion, { AccordionProps } from '@common/components/Accordion';
+import Accordion, {AccordionProps} from '@common/components/Accordion';
 import isComponentType from '@common/lib/type-guards/components/isComponentType';
-import React, { cloneElement, Component, createRef } from 'react';
+import React, {cloneElement, ComponentClass, createRef, ReactElement, ReactNode} from 'react';
 import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
-import EditableAccordionSection, {
-  EditableAccordionSectionProps,
-} from './EditableAccordionSection';
+import {DragDropContext, Draggable, Droppable, DropResult} from "react-beautiful-dnd";
+import EditableAccordionSection, {EditableAccordionSectionProps,} from './EditableAccordionSection';
 
 export interface EditableAccordionProps extends AccordionProps {
   index?: number;
+  canReorder?: boolean;
 }
 
 interface State {
   openAll: boolean;
 }
 
-class EditableAccordion extends Component<EditableAccordionProps, State> {
-  private ref = createRef<HTMLDivElement>();
+interface DroppableAccordionProps {
+  id: string,
+  isReordering: boolean,
+  children: ReactNode
+}
 
-  public state = {
-    openAll: false,
-  };
-
-  public componentDidMount(): void {
-    this.goToHash();
-    window.addEventListener('hashchange', this.goToHash);
+const DroppableAccordion = ({
+  id,
+  isReordering,
+  children
+}: DroppableAccordionProps) => {
+  if (isReordering) {
+    return (
+      <Droppable droppableId={id} type="accordion">
+        {droppableProvided => (
+          <div
+            {...droppableProvided.droppableProps}
+            ref={droppableProvided.innerRef}
+          >
+            {children}
+          </div>
+        )}
+      </Droppable>
+    );
   }
 
-  public componentWillUnmount(): void {
-    window.removeEventListener('hashchange', this.goToHash);
+  return <>{children}</>
+
+};
+
+interface DraggableAccordionSectionProps {
+  id: string,
+  isReordering: boolean,
+  children: ReactNode,
+  index: number
+}
+
+const DraggableAccordionSection = ({
+  id,
+  isReordering,
+  children,
+  index
+}: DraggableAccordionSectionProps) => {
+  if (isReordering) {
+    return (
+      <Draggable draggableId={id} type="section" index={index}>
+        {draggableProvided => (
+          <div
+            {...draggableProvided.draggableProps}
+            ref={draggableProvided.innerRef}
+          >
+            <span
+              className="drag-handle"
+              {...draggableProvided.dragHandleProps}
+            />
+            {children}
+          </div>
+        )}
+      </Draggable>
+    );
   }
 
-  private goToHash = () => {
-    // this.setState({ hash: window.location.hash });
+  return <>{children}</>
+};
 
-    if (this.ref.current && window.location.hash) {
+const EditableAccordion = ({
+  children,
+  id,
+  index,
+  canReorder
+}: EditableAccordionProps) => {
+  const ref = createRef<HTMLDivElement>();
+  const [openAll, setOpenAll] = React.useState(false);
+  const [isReordering, setIsReordering] = React.useState(false);
+
+  const goToHash = React.useCallback(() => {
+    if (ref.current && window.location.hash) {
       try {
-        const anchor = this.ref.current.querySelector(
+        const anchor = ref.current.querySelector(
           window.location.hash,
         ) as HTMLButtonElement;
 
@@ -46,47 +103,83 @@ class EditableAccordion extends Component<EditableAccordionProps, State> {
         // ignoring any errors
       }
     }
+  }, [ref])
+
+  React.useEffect(() => {
+    window.addEventListener('hashchange', goToHash);
+
+    return () => {
+      window.removeEventListener('hashchange', goToHash);
+    }
+  }, [goToHash]);
+
+
+  const toggleAll = () => {
+    setOpenAll(!openAll);
   };
 
-  private toggleAll() {
-    const { openAll } = this.state;
+  const reorder = () => {
+    setIsReordering(true);
+  };
 
-    this.setState({
-      openAll: !openAll,
-    });
-  }
+  const onDragEnd = (result: DropResult) => {
 
-  public render() {
-    const { children, id, index } = this.props;
+  };
 
-    return (
-      <div className="govuk-accordion" ref={this.ref} id={id}>
-        <div className="govuk-accordion__controls">
-          <button
-            type="button"
-            className="govuk-accordion__open-all"
-            aria-expanded="false"
-            onClick={() => this.toggleAll()}
-          >
-            Open all<span className="govuk-visually-hidden"> sections</span>
-          </button>
+  return (
+    <DragDropContext onDragEnd={onDragEnd}>
+      <DroppableAccordion id={id} isReordering={isReordering}>
+        <div className="govuk-accordion" ref={ref} id={id}>
+          <div className="govuk-accordion__controls">
+            {canReorder && (
+              <button
+                type="button"
+                aria-expanded="false"
+                onClick={() => reorder()}
+              >
+                Reorder<span className="govuk-visually-hidden"> sections</span>
+              </button>
+
+            )}
+            <button
+              type="button"
+              className="govuk-accordion__open-all"
+              aria-expanded="false"
+              onClick={() => toggleAll()}
+            >
+              Open all<span className="govuk-visually-hidden"> sections</span>
+            </button>
+          </div>
+          {React.Children.map(children, (child, thisIndex) => {
+
+            if (child) {
+              const section = child as ReactElement<EditableAccordionSectionProps>;
+
+              const key = `section_${thisIndex}`;
+
+              return (
+                <DraggableAccordionSection
+                  id={key}
+                  key={key}
+                  index={thisIndex}
+                  isReordering={isReordering}
+                >
+                  {cloneElement<EditableAccordionSectionProps>(section, {
+                    index: thisIndex,
+                    droppableIndex: index,
+                    open: openAll,
+                  })
+                  }
+                </DraggableAccordionSection>
+              );
+            }
+
+            return undefined;
+          })}
         </div>
-        {React.Children.map(children, (child, thisIndex) => {
-          if (isComponentType(child, EditableAccordionSection)) {
-            const { openAll } = this.state;
-
-            return cloneElement<EditableAccordionSectionProps>(child, {
-              index: thisIndex,
-              droppableIndex: index,
-              open: openAll,
-            });
-          }
-
-          return child;
-        })}
-      </div>
-    );
-  }
-}
+      </DroppableAccordion>
+    </DragDropContext>
+  );
+};
 
 export default wrapEditableComponent(EditableAccordion, Accordion);
