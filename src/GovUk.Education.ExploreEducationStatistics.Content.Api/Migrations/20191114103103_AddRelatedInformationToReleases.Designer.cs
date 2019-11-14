@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20191113102937_AddRelatedInformationToReleases")]
+    [Migration("20191114103103_AddRelatedInformationToReleases")]
     partial class AddRelatedInformationToReleases
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
