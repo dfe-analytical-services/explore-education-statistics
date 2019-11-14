@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.Statistics;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Publication = GovUk.Education.ExploreEducationStatistics.Content.Model.Publication;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
+using ReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.ReleaseViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 {
@@ -74,6 +76,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<DataBlock, DataBlockViewModel>();
             CreateMap<CreateDataBlockViewModel, DataBlock>();
             CreateMap<UpdateDataBlockViewModel, DataBlock>();
+
+            CreateMap<Release, ViewModels.ManageContent.ReleaseViewModel>()
+                .ForMember(dest => dest.Contact, 
+                    m => m.MapFrom(r => r.Publication.Contact))
+                .ForMember(
+                    dest => dest.PublicationTitle,
+                    m => m.MapFrom(r => r.Publication.Title));
+
         }
     }
 }
