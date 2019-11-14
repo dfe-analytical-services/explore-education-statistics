@@ -39,8 +39,11 @@ const ReleaseContentPage = () => {
       releaseSummaryService.getReleaseSummaryDetails(releaseId),
       commonService.getBasicThemeDetails(publication.themeId),
       releaseContentService.getRelease(releaseId),
-    ]).then(([releaseSummary, theme, releaseData]) => {
+      releaseContentService.getContent(releaseId),
+    ]).then(([releaseSummary, theme, releaseData, releaseContent]) => {
       // <editor-fold desc="TODO - content population">
+
+      console.log(releaseContent);
 
       const unresolvedComments: Comment[] = [
         {
@@ -84,10 +87,13 @@ const ReleaseContentPage = () => {
           (releaseData.content &&
             releaseData.content.map(section => ({
               ...section,
-              content: section.content.map<EditableContentBlock>(block => ({
-                ...block,
-                comments: [],
-              })),
+              content: section.content.map<EditableContentBlock>(
+                (block, index) => ({
+                  ...block,
+                  id: `${index}`,
+                  comments: [],
+                }),
+              ),
             }))) ||
           contentBlocks,
       };
