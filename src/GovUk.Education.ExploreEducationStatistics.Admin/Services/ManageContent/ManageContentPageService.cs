@@ -36,10 +36,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         
         private static IQueryable<Release> HydrateReleaseForReleaseViewModel(IQueryable<Release> values)
         {
-            // Require publication / release / contact / type graph to be able to work out:
-            // If the release is the latest
-            // The contact
-            // The type
             return values
                 .Include(r => r.Publication)
                 .ThenInclude(publication => publication.Contact)
