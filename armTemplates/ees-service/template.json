@@ -204,6 +204,15 @@
       "metadata": {
         "description": "The size of the new Azure Cache for Redis instance. "
       }
+    },
+    "adminUri" : {
+      "type": "string"
+    },
+    "openIdConnectClientId": {
+      "type": "string"
+    },
+    "openIdConnectClientSecret": {
+      "type": "string"
     }
   },
   "variables": {
@@ -634,6 +643,25 @@
               "name": "ASPNETCORE_DETAILEDERRORS",
               "value": "true"
             },
+
+            {
+              "name": "IdentityServer:IssuerUri",
+              "value": "[concat('CN=', parameters('adminUri'))]"
+            },
+            {
+              "name": "IdentityServer:Key:Name",
+              "value": "[concat('CN=', parameters('adminUri'))]"
+            },
+
+            {
+              "name": "OpenIdConnect:ClientId",
+              "value": "parameters('openIdConnectClientId')"
+            },
+            {
+              "name": "OpenIdConnect:ClientSecret",
+              "value": "parameters('openIdConnectClientSecret')"
+            },
+
             {
               "name": "RedisCacheConnection",
               "value": "[concat(variables('redisCacheName'),'.redis.cache.windows.net,abortConnect=false,ssl=true,password=', listKeys(resourceId('Microsoft.Cache/Redis', variables('redisCacheName')), '2015-08-01').primaryKey)]"
