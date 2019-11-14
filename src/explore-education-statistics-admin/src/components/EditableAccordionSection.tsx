@@ -1,7 +1,10 @@
-import { AccordionSectionProps } from '@common/components/AccordionSection';
+import AccordionSection, {
+  AccordionSectionProps,
+} from '@common/components/AccordionSection';
 import GoToTopLink from '@common/components/GoToTopLink';
 import classNames from 'classnames';
 import React, { createElement, createRef, useState } from 'react';
+import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 
 // import PrototypeEditableContent from "@admin/pages/prototypes/components/PrototypeEditableContent";
 
@@ -78,4 +81,7 @@ const EditableAccordionSection = ({
   );
 };
 
-export default EditableAccordionSection;
+export default wrapEditableComponent(
+  EditableAccordionSection,
+  AccordionSection,
+);

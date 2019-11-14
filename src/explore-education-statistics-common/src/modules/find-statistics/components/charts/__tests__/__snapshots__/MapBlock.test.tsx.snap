@@ -2,177 +2,93 @@
 
 exports[`MapBlock renders 1`] = `
 <div>
+  <form>
+    <div
+      class="govuk-form-group"
+    >
+      <fieldset
+        class="govuk-fieldset"
+        id="data-and-location"
+      >
+        <legend
+          class="govuk-fieldset__legend govuk-fieldset__legend--l govuk-visually-hidden"
+        >
+          Select data and location to view indicators
+        </legend>
+        <div
+          class="mapContainer"
+        >
+          <div
+            class="govuk-form-group mapIndicator"
+          >
+            <label
+              class="govuk-label"
+              for="selectedIndicator"
+            >
+              1. Select data to view
+            </label>
+            <select
+              class="govuk-select govuk-!-width-full"
+              id="selectedIndicator"
+              name="selectedIndicator"
+            >
+              <option
+                value="23_1_2_____"
+              >
+                Unauthorised absence rate
+              </option>
+              <option
+                value="26_1_2_____"
+              >
+                Overall absence rate
+              </option>
+              <option
+                value="28_1_2_____"
+              >
+                Authorised absence rate
+              </option>
+            </select>
+          </div>
+          <div
+            class="govuk-form-group mapLocation"
+          >
+            <label
+              class="govuk-label"
+              for="selectedLocation"
+            >
+              2. Select a location
+            </label>
+            <select
+              class="govuk-select"
+              id="selectedLocation"
+              name="selectedLocation"
+            >
+              <option
+                value=""
+              >
+                Select...
+              </option>
+              <option
+                value="E92000001"
+              >
+                England
+              </option>
+              <option
+                value="S92000001"
+              >
+                Scotland
+              </option>
+            </select>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+  </form>
   <div
-    class="govuk-grid-row"
+    class="mapContainer"
   >
     <div
-      aria-live="assertive"
-      class="govuk-grid-column-one-third"
-    >
-      <form>
-        <div
-          class="govuk-form-group govuk-!-margin-bottom-6"
-        >
-          <label
-            class="govuk-label"
-            for="selectedIndicator"
-          >
-            Select data to view
-          </label>
-          <select
-            class="govuk-select"
-            id="selectedIndicator"
-            name="selectedIndicator"
-          >
-            <option
-              value="23_1_2_____"
-            >
-              Unauthorised absence rate
-            </option>
-            <option
-              value="26_1_2_____"
-            >
-              Overall absence rate
-            </option>
-            <option
-              value="28_1_2_____"
-            >
-              Authorised absence rate
-            </option>
-          </select>
-        </div>
-        <div
-          class="govuk-form-group govuk-!-margin-bottom-6"
-        >
-          <label
-            class="govuk-label"
-            for="selectedLocation"
-          >
-            Select a location
-          </label>
-          <select
-            class="govuk-select"
-            id="selectedLocation"
-            name="selectedLocation"
-          >
-            <option
-              value=""
-            >
-              select...
-            </option>
-            <option
-              value="E92000001"
-            >
-              England
-            </option>
-            <option
-              value="S92000001"
-            >
-              Scotland
-            </option>
-          </select>
-        </div>
-      </form>
-      <div>
-        <h3
-          class="govuk-heading-s"
-        >
-          Key to 
-          Unauthorised absence rate
-        </h3>
-        <dl
-          class="govuk-list"
-        >
-          <dd
-            class="legend"
-          >
-            <span
-              class="rate0"
-              style="background-color: rgb(63, 0, 0);"
-            >
-               
-            </span>
-             
-            3.0
-            %
-              to 
-            3.3
-            %
-             
-          </dd>
-          <dd
-            class="legend"
-          >
-            <span
-              class="rate1"
-              style="background-color: rgb(111, 0, 0);"
-            >
-               
-            </span>
-             
-            3.3
-            %
-              to 
-            3.5
-            %
-             
-          </dd>
-          <dd
-            class="legend"
-          >
-            <span
-              class="rate2"
-              style="background-color: rgb(159, 0, 0);"
-            >
-               
-            </span>
-             
-            3.5
-            %
-              to 
-            3.8
-            %
-             
-          </dd>
-          <dd
-            class="legend"
-          >
-            <span
-              class="rate3"
-              style="background-color: rgb(207, 0, 0);"
-            >
-               
-            </span>
-             
-            3.8
-            %
-              to 
-            4.0
-            %
-             
-          </dd>
-          <dd
-            class="legend"
-          >
-            <span
-              class="rate4"
-              style="background-color: rgb(255, 0, 0);"
-            >
-               
-            </span>
-             
-            4.0
-            %
-              to 
-            4.3
-            %
-             
-          </dd>
-        </dl>
-      </div>
-    </div>
-    <div
-      class="govuk-grid-column-two-thirds"
+      class="mapView"
     >
       <div
         class="map dfe-print-break-avoid leaflet-container leaflet-grab leaflet-touch-drag"
@@ -299,6 +215,110 @@ exports[`MapBlock renders 1`] = `
             </div>
           </div>
         </div>
+      </div>
+    </div>
+    <div
+      aria-live="assertive"
+      class="mapControls"
+    >
+      <div
+        class="mapKey"
+      >
+        <h3
+          class="govuk-heading-s"
+        >
+          Key to 
+          Unauthorised absence rate
+        </h3>
+        <dl
+          class="govuk-list"
+        >
+          <dd
+            class="legend"
+          >
+            <span
+              class="rate0"
+              style="background-color: rgb(63, 0, 0);"
+            >
+               
+            </span>
+             
+            3.0
+            %
+              to 
+            3.3
+            %
+             
+          </dd>
+          <dd
+            class="legend"
+          >
+            <span
+              class="rate1"
+              style="background-color: rgb(111, 0, 0);"
+            >
+               
+            </span>
+             
+            3.3
+            %
+              to 
+            3.5
+            %
+             
+          </dd>
+          <dd
+            class="legend"
+          >
+            <span
+              class="rate2"
+              style="background-color: rgb(159, 0, 0);"
+            >
+               
+            </span>
+             
+            3.5
+            %
+              to 
+            3.8
+            %
+             
+          </dd>
+          <dd
+            class="legend"
+          >
+            <span
+              class="rate3"
+              style="background-color: rgb(207, 0, 0);"
+            >
+               
+            </span>
+             
+            3.8
+            %
+              to 
+            4.0
+            %
+             
+          </dd>
+          <dd
+            class="legend"
+          >
+            <span
+              class="rate4"
+              style="background-color: rgb(255, 0, 0);"
+            >
+               
+            </span>
+             
+            4.0
+            %
+              to 
+            4.3
+            %
+             
+          </dd>
+        </dl>
       </div>
     </div>
   </div>
