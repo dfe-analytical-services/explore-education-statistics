@@ -1,0 +1,17 @@
+
+.dragContainer {
+}
+
+.dragHandle {
+  position: absolute;
+  right: 64px;
+  &:before {
+    color: #999;
+    content: '\2630';
+    font-size: 2.25rem;
+    height: 2.25rem;
+    position: absolute;
+    width: 2.25rem;
+  }
+
+}

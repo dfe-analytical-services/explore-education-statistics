@@ -5,6 +5,8 @@ import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEdit
 import {DragDropContext, Draggable, Droppable, DropResult} from "react-beautiful-dnd";
 import EditableAccordionSection, {EditableAccordionSectionProps,} from './EditableAccordionSection';
 
+import styles from './EditableAccordion.module.scss';
+
 export interface EditableAccordionProps extends AccordionProps {
   index?: number;
   canReorder?: boolean;
@@ -25,6 +27,7 @@ const DroppableAccordion = ({
   isReordering,
   children
 }: DroppableAccordionProps) => {
+
   if (isReordering) {
     return (
       <Droppable droppableId={id} type="accordion">
@@ -34,7 +37,11 @@ const DroppableAccordion = ({
             ref={droppableProvided.innerRef}
           >
             {children}
+
+            {droppableProvided.placeholder}
           </div>
+
+
         )}
       </Droppable>
     );
@@ -47,16 +54,19 @@ const DroppableAccordion = ({
 interface DraggableAccordionSectionProps {
   id: string,
   isReordering: boolean,
-  children: ReactNode,
-  index: number
+  index: number,
+  openAll: boolean,
+  section: ReactElement<EditableAccordionSectionProps>
 }
 
 const DraggableAccordionSection = ({
   id,
   isReordering,
-  children,
-  index
+  index,
+  openAll,
+  section
 }: DraggableAccordionSectionProps) => {
+
   if (isReordering) {
     return (
       <Draggable draggableId={id} type="section" index={index}>
@@ -64,19 +74,30 @@ const DraggableAccordionSection = ({
           <div
             {...draggableProvided.draggableProps}
             ref={draggableProvided.innerRef}
+            className={styles.dragContainer}
           >
-            <span
-              className="drag-handle"
-              {...draggableProvided.dragHandleProps}
-            />
-            {children}
+            {cloneElement<EditableAccordionSectionProps>(section, {
+              index,
+              droppableIndex: index,
+              open: openAll,
+              headingButtons: (
+                <span
+                  className={styles.dragHandle}
+                  {...draggableProvided.dragHandleProps}
+                />
+              )
+            })}
           </div>
         )}
       </Draggable>
     );
   }
 
-  return <>{children}</>
+  return cloneElement<EditableAccordionSectionProps>(section, {
+    index,
+    droppableIndex: index,
+    open: openAll,
+  });
 };
 
 const EditableAccordion = ({
@@ -163,14 +184,9 @@ const EditableAccordion = ({
                   key={key}
                   index={thisIndex}
                   isReordering={isReordering}
-                >
-                  {cloneElement<EditableAccordionSectionProps>(section, {
-                    index: thisIndex,
-                    droppableIndex: index,
-                    open: openAll,
-                  })
-                  }
-                </DraggableAccordionSection>
+                  section={section}
+                  openAll={openAll}
+                />
               );
             }
 
