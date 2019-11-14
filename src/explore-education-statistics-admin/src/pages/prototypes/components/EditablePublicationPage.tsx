@@ -26,6 +26,7 @@ import {
 } from '@common/components/form';
 import AddComment from '@admin/pages/prototypes/components/PrototypeEditableContentAddComment';
 import ResolveComment from '@admin/pages/prototypes/components/PrototypeEditableContentResolveComment';
+import { ContentBlockType } from '@common/services/publicationService';
 
 interface State {
   reordering: boolean;
@@ -105,7 +106,8 @@ class EditablePublicationPage extends Component<Props, State> {
         caption: '',
         content: [
           {
-            type: 'MarkDownBlock',
+            id: '0',
+            type: 'MarkDownBlock' as ContentBlockType,
             body: 'editable',
             comments: [],
           },
