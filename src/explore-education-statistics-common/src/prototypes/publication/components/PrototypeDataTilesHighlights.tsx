@@ -39,9 +39,23 @@ const KeyIndicator = ({
         <>
           <form>
             <legend className="govuk-heading-s">
-              Key indicator {indicatorOrder}
+              TEST Key indicator {indicatorOrder}
             </legend>
             <div className={styles.keyStat}>
+              <select
+                className="govuk-select govuk-!-width-full"
+                name={`data-keystat-${indicatorOrder}`}
+                id={`data-keystat-${indicatorOrder}`}
+              >
+                <option value={indicator} selected>
+                  {indicator}
+                </option>
+                <option value="Authorised absence">Authorised abence</option>
+                <option value="Unauthorised absence">
+                  Unauthorised abence
+                </option>
+                <option value="Overall absence">Overall abence</option>
+              </select>
               <label htmlFor={`key-indicator-${indicatorOrder}`}>
                 Indicator
               </label>
