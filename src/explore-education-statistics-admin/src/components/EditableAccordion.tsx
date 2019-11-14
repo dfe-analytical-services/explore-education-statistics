@@ -78,8 +78,8 @@ const DraggableAccordionSection = ({
           >
             {cloneElement<EditableAccordionSectionProps>(section, {
               index,
-              droppableIndex: index,
-              open: openAll,
+              open: false,
+              canToggle: false,
               headingButtons: (
                 <span
                   className={styles.dragHandle}
@@ -95,7 +95,6 @@ const DraggableAccordionSection = ({
 
   return cloneElement<EditableAccordionSectionProps>(section, {
     index,
-    droppableIndex: index,
     open: openAll,
   });
 };
@@ -140,11 +139,11 @@ const EditableAccordion = ({
   };
 
   const reorder = () => {
-    setIsReordering(true);
+    setIsReordering(!isReordering);
   };
 
   const onDragEnd = (result: DropResult) => {
-
+    console.log(result);
   };
 
   return (

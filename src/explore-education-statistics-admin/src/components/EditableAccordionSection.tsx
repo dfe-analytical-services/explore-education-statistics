@@ -8,8 +8,8 @@ import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEdit
 
 export interface EditableAccordionSectionProps extends AccordionSectionProps {
   index?: number;
-  droppableIndex?: number;
-  headingButtons?: ReactNode | ReactNode[]
+  headingButtons?: ReactNode | ReactNode[];
+  canToggle?: boolean
 }
 
 const EditableAccordionSection = ({
@@ -22,6 +22,7 @@ const EditableAccordionSection = ({
   headingButtons,
   headingId,
   headingTag = 'h2',
+  canToggle = true,
   open = false,
   onToggle,
 }: EditableAccordionSectionProps) => {
@@ -38,7 +39,7 @@ const EditableAccordionSection = ({
     <div
       ref={target}
       onClick={() => {
-        if (onToggle) {
+        if (canToggle && onToggle) {
           onToggle(isOpen);
         }
       }}
@@ -53,7 +54,7 @@ const EditableAccordionSection = ({
           {
             className: 'govuk-accordion__section-heading',
             onClick: () => {
-              if (target.current) {
+              if (canToggle && target.current) {
                 setIsOpen(!isOpen);
               }
             },
@@ -62,7 +63,7 @@ const EditableAccordionSection = ({
             {heading}
           </span>,
           headingButtons,
-          <span className="govuk-accordion__icon" />,
+          canToggle && (<span className="govuk-accordion__icon" />),
         )}
         {caption && (
           <span className="govuk-accordion__section-summary">{caption}</span>
