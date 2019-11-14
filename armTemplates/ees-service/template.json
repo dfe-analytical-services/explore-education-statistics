@@ -655,11 +655,11 @@
 
             {
               "name": "OpenIdConnect:ClientId",
-              "value": "parameters('openIdConnectClientId')"
+              "value": "[parameters('openIdConnectClientId')]"
             },
             {
               "name": "OpenIdConnect:ClientSecret",
-              "value": "parameters('openIdConnectClientSecret')"
+              "value": "[parameters('openIdConnectClientSecret')]"
             },
 
             {
