@@ -53,56 +53,59 @@ import PublicationCreateNewAbsenceViewTables from './pages/prototypes/PrototypeP
 import PublicationReviewPage from './pages/prototypes/PrototypePublicationPageReviewAbsence';
 import ReleaseCreateNew from './pages/prototypes/PrototypeReleasePageCreateNew';
 import PrototypesIndexPage from './pages/prototypes/PrototypesIndexPage';
+import TopLevelState from './components/TopLevelState';
 
 function App() {
   return (
     <BrowserRouter>
-      {/* Non-Prototype Routes*/}
-      <Switch>
+      <TopLevelState>
+        {/* Non-Prototype Routes*/}
+        <Switch>
+          <ProtectedRoute
+            exact
+            path={dashboardRoutes.adminDashboard}
+            component={AdminDashboardPage}
+          />
+
+          <ProtectedRoute
+            path={dashboardRoutes.adminDashboardThemeTopic}
+            component={AdminDashboardPage}
+          />
+
+          <Redirect exact strict from="/" to="/dashboard" />
+        </Switch>
+
         <ProtectedRoute
           exact
-          path={dashboardRoutes.adminDashboard}
-          component={AdminDashboardPage}
+          path={signInRoutes.signIn}
+          component={SignInPage}
+          redirectIfNotLoggedIn={false}
         />
 
         <ProtectedRoute
-          path={dashboardRoutes.adminDashboardThemeTopic}
-          component={AdminDashboardPage}
+          exact
+          path={signInRoutes.signOut}
+          component={SignedOutPage}
+          redirectIfNotLoggedIn={false}
         />
 
-        <Redirect exact strict from="/" to="/dashboard" />
-      </Switch>
+        <ProtectedRoute
+          exact
+          path={publicationRoutes.createPublication.route}
+          component={CreatePublicationPage}
+        />
 
-      <ProtectedRoute
-        exact
-        path={signInRoutes.signIn}
-        component={SignInPage}
-        redirectIfNotLoggedIn={false}
-      />
+        <ProtectedRoute
+          exact
+          path={releaseRoutes.createReleaseRoute.route}
+          component={CreateReleasePage}
+        />
 
-      <ProtectedRoute
-        exact
-        path={signInRoutes.signOut}
-        component={SignedOutPage}
-        redirectIfNotLoggedIn={false}
-      />
-
-      <ProtectedRoute
-        exact
-        path={publicationRoutes.createPublication.route}
-        component={CreatePublicationPage}
-      />
-
-      <ProtectedRoute
-        exact
-        path={releaseRoutes.createReleaseRoute.route}
-        component={CreateReleasePage}
-      />
-
-      <Route
-        path="/publication/:publicationId/release/:releaseId"
-        component={ManageReleasePageContainer}
-      />
+        <Route
+          path="/publication/:publicationId/release/:releaseId"
+          component={ManageReleasePageContainer}
+        />
+      </TopLevelState>
 
       {/* Prototype Routes */}
       <Route exact path="/index" component={IndexPage} />
