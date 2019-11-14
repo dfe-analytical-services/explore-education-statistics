@@ -1,8 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 
@@ -25,53 +23,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
                 // with a single property.
                 errors.AddModelError(string.Empty, result.ErrorMessage);
             }
-        }
-
-        public static Either<ValidationResult, R> HandleValidationErrors<T, R>(
-            Func<Either<ValidationResult, T>> validationErrorAction,
-            Func<T, Either<ValidationResult, R>> successAction)
-        {
-            var validationResult = validationErrorAction.Invoke();
-
-            return validationResult.IsRight 
-                ? successAction.Invoke(validationResult.Right) 
-                : validationResult.Left;
-        }
-
-        public static async Task<Either<ValidationResult, R>> HandleValidationErrorsAsync<T, R>(
-            Func<Task<Either<ValidationResult, T>>> validationErrorAction,
-            Func<T, R> successAction)
-        {
-            var validationResult = await validationErrorAction.Invoke();
-
-            return validationResult.IsRight 
-                ? new Either<ValidationResult, R>(successAction.Invoke(validationResult.Right)) 
-                : validationResult.Left;
-        }
-
-        public static async Task<Either<ValidationResult, R>> HandleValidationErrorsAsync<T, R>(
-            Func<Task<Either<ValidationResult, T>>> validationErrorAction,
-            Func<T, Task<R>> successAction)
-        {
-            var validationResult = await validationErrorAction.Invoke();
-
-            return validationResult.IsRight 
-                ? new Either<ValidationResult, R>(await successAction.Invoke(validationResult.Right)) 
-                : validationResult.Left;
-        }
-
-        public static async Task<Either<ValidationResult, R>> HandleValidationErrorsAsync<T, R>(
-            Func<Task<Either<ValidationResult, T>>> validationErrorAction,
-            Func<T, Task<Either<ValidationResult, R>>> successAction)
-        {
-            var validationResult = await validationErrorAction.Invoke();
-
-            if (validationResult.IsLeft)
-            {
-                return validationResult.Left;
-            }
-
-            return await successAction.Invoke(validationResult.Right);
         }
 
         public static ValidationResult ValidationResult(ValidationErrorMessages message)
@@ -110,10 +61,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
                     return new ValidationResult("META_FILE_MUST_BE_A_CSV_FILE");
                 case SubjectTitleMustBeUnique: 
                     return new ValidationResult("SUBJECT_TITLE_MUST_BE_UNIQUE");
-                case ReleaseNotFound:
-                    return new ValidationResult("RELEASE_NOT_FOUND");
-                case RelatedInformationItemNotFound:
-                    return new ValidationResult("RELATED_INFORMATION_ITEM_NOT_FOUND");
                 default:
                     throw new ArgumentOutOfRangeException(nameof(message), message, null);
             }
@@ -137,8 +84,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         DataAndMetadataFilesCannotHaveTheSameName,
         DataFileMustBeCsvFile,
         MetaFileMustBeCsvFile,
-        SubjectTitleMustBeUnique,
-        ReleaseNotFound,
-        RelatedInformationItemNotFound
+        SubjectTitleMustBeUnique
     }
 }

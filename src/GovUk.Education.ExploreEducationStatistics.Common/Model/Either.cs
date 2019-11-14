@@ -21,8 +21,6 @@ public class Either<Tl, Tr> {
                 
         public bool IsLeft { get; }
 
-        public bool IsRight => !IsLeft;
-
         public Tl Left => IsLeft ? _left : throw new ArgumentException("Calling Left on a Right");
 
         public Tr Right => !IsLeft ? _right : throw new ArgumentException("Calling Right on a Left");
