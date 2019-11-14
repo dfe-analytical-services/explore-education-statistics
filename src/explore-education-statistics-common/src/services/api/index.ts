@@ -10,15 +10,18 @@ export const baseUrl = {
   function: process.env.FUNCTION_API_BASE_URL,
 };
 
-// @ts-ignore
-const axiosConfigurer: AxiosConfigurer =
-  typeof window !== 'undefined' && window.AxiosConfigurer
-    ? // @ts-ignore
-      window.AxiosConfigurer
-    : instance => instance;
+const configureAxios = (axiosInstance: AxiosInstance) => {
+  // @ts-ignore
+  if (typeof window !== 'undefined' && window.AxiosConfigurer) {
+    // @ts-ignore
+    return window.AxiosConfigurer(axiosInstance);
+  }
+
+  return axiosInstance;
+};
 
 export const contentApi = new Client(
-  axiosConfigurer(
+  configureAxios(
     axios.create({
       baseURL: `${baseUrl.content}/`,
       paramsSerializer: commaSeparated,
@@ -27,7 +30,7 @@ export const contentApi = new Client(
 );
 
 export const dataApi = new Client(
-  axiosConfigurer(
+  configureAxios(
     axios.create({
       baseURL: `${baseUrl.data}/`,
       paramsSerializer: commaSeparated,
@@ -36,7 +39,7 @@ export const dataApi = new Client(
 );
 
 export const functionApi = new Client(
-  axiosConfigurer(
+  configureAxios(
     axios.create({
       baseURL: `${baseUrl.function}/`,
       paramsSerializer: commaSeparated,
