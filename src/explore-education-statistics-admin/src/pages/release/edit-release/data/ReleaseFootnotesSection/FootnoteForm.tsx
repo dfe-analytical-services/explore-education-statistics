@@ -46,7 +46,7 @@ export interface FootnoteFormControls {
   edit: (footnote: Footnote) => void;
   cancel: () => void;
   save: (footnote: FootnoteProps, footnoteId?: number) => void;
-  delete: (footnoteId: number) => void;
+  delete: (footnote: Footnote) => void;
 }
 
 const FootnoteForm = ({
