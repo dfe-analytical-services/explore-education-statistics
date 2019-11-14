@@ -8,7 +8,7 @@ import * as serviceWorker from './serviceWorker';
 process.env.APP_ROOT_ID = 'root';
 
 // @ts-ignore
-window.AxiosConfigurer = axiosConfigurer;
+window.axiosConfigurer = axiosConfigurer;
 
 import('./App').then(({ default: App }) => {
   ReactDOM.render(<App />, document.getElementById('root'));

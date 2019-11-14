@@ -12,9 +12,9 @@ export const baseUrl = {
 
 const configureAxios = (axiosInstance: AxiosInstance) => {
   // @ts-ignore
-  if (typeof window !== 'undefined' && window.AxiosConfigurer) {
+  if (typeof window !== 'undefined' && window.axiosConfigurer) {
     // @ts-ignore
-    return window.AxiosConfigurer(axiosInstance);
+    return window.axiosConfigurer(axiosInstance);
   }
 
   return axiosInstance;
