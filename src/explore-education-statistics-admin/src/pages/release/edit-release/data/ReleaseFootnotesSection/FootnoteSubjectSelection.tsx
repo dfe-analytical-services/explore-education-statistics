@@ -1,0 +1,177 @@
+import {
+  Footnote,
+  FootnoteMetaGetters,
+} from '@admin/services/release/edit-release/footnotes/types';
+import React, { ReactNode } from 'react';
+
+interface Props {
+  subjectId: number;
+  subject: Footnote['subjects'][number];
+  footnoteMetaGetters: FootnoteMetaGetters;
+}
+
+interface Item {
+  id: number;
+  label: string;
+  selected: boolean;
+}
+
+interface Selection extends Item {
+  indicatorGroups: {
+    id: number;
+    label: string;
+    selected: boolean;
+    indicators: Item[];
+  }[];
+  filters: {
+    id: number;
+    label: string;
+    selected: boolean;
+    filterGroups: {
+      id: number;
+      label: string;
+      selected: boolean;
+      filterItems: Item[];
+    }[];
+  }[];
+}
+
+const FootnoteSubjectSelection = ({
+  subjectId,
+  subject,
+  footnoteMetaGetters,
+}: Props) => {
+  const {
+    getSubject,
+    getIndicatorGroup,
+    getIndicator,
+    getFilter,
+    getFilterGroup,
+    getFilterItem,
+  } = footnoteMetaGetters;
+
+  const selectedOption = { id: -1, label: '(All)', selected: false };
+
+  function getIndicatorGroups(): Selection['indicatorGroups'] {
+    if (subject.selected) {
+      return [{ ...selectedOption, indicators: [] }];
+    }
+    return Object.entries(subject.indicatorGroups).map(
+      ([indicatorGroupid, indicatorGroup]) => {
+        return {
+          id: Number(indicatorGroupid),
+          label: getIndicatorGroup(Number(indicatorGroupid)).label,
+          selected: indicatorGroup.selected,
+          indicators: indicatorGroup.selected
+            ? [selectedOption]
+            : indicatorGroup.indicators.map(indicatorId => {
+                return {
+                  id: Number(indicatorId),
+                  label: getIndicator(indicatorId).label,
+                  selected: true,
+                };
+              }),
+        };
+      },
+    );
+  }
+
+  function getFilters(): Selection['filters'] {
+    if (subject.selected) {
+      return [{ ...selectedOption, filterGroups: [] }];
+    }
+    return Object.entries(subject.filters).map(([filterId, filter]) => {
+      return {
+        id: Number(filterId),
+        label: getFilter(Number(filterId)).label,
+        selected: filter.selected,
+        filterGroups: filter.selected
+          ? [{ ...selectedOption, filterItems: [] }]
+          : Object.entries(filter.filterGroups).map(
+              ([filterGroupId, filterGroup]) => {
+                return {
+                  id: Number(filterGroupId),
+                  label: getFilterGroup(Number(filterGroupId)).label,
+                  selected: filterGroup.selected,
+                  filterItems: filterGroup.selected
+                    ? [selectedOption]
+                    : filterGroup.filterItems.map(filterItemId => {
+                        return {
+                          id: Number(filterItemId),
+                          label: getFilterItem(filterItemId).label,
+                          selected: true,
+                        };
+                      }),
+                };
+              },
+            ),
+      };
+    });
+  }
+
+  const subjectSelect: Selection = {
+    id: subjectId,
+    label: getSubject(subjectId).label,
+    selected: subject.selected,
+    indicatorGroups: getIndicatorGroups(),
+    filters: getFilters(),
+  };
+
+  function renderItem({ id, selected, label }: Item, children?: ReactNode) {
+    return (
+      <li key={id}>
+        {selected ? <strong>{label}</strong> : label}
+        {children}
+      </li>
+    );
+  }
+
+  return (
+    <tr key={subjectId}>
+      <td>{renderItem(subjectSelect)}</td>
+      <td>
+        <ul className="govuk-!-margin-top-0">
+          {subjectSelect.indicatorGroups.map(indicatorGroup => {
+            return renderItem(
+              indicatorGroup,
+              indicatorGroup.indicators ? (
+                <ul className="govuk-!-margin-top-0">
+                  {indicatorGroup.indicators.map(indicator => {
+                    return renderItem(indicator);
+                  })}
+                </ul>
+              ) : null,
+            );
+          })}
+        </ul>
+      </td>
+      <td>
+        <ul className="govuk-!-margin-top-0">
+          {subjectSelect.filters.map(filter => {
+            return renderItem(
+              filter,
+              filter.filterGroups ? (
+                <ul className="govuk-!-margin-top-0">
+                  {filter.filterGroups.map(filterGroup => {
+                    return renderItem(
+                      filterGroup,
+                      filterGroup.filterItems.length ? (
+                        <ul>
+                          {filterGroup.filterItems.map(filterItem => {
+                            return renderItem(filterItem);
+                          })}
+                        </ul>
+                      ) : null,
+                    );
+                  })}
+                </ul>
+              ) : null,
+            );
+          })}
+        </ul>
+      </td>
+    </tr>
+  );
+};
+
+export default FootnoteSubjectSelection;

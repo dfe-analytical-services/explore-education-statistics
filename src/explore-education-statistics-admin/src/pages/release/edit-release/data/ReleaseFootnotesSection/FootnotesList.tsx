@@ -3,13 +3,13 @@ import {
   FootnoteMeta,
   FootnoteMetaGetters,
 } from '@admin/services/release/edit-release/footnotes/types';
-import classNames from 'classnames';
-import footnotesService from '@admin/services/release/edit-release/footnotes/service';
 import React from 'react';
+import classNames from 'classnames';
 import Button from '@common/components/Button';
-import CollapsibleList from '@common/components/CollapsibleList';
+import Details from '@common/components/Details';
 import FootnoteForm, { FootnoteFormControls } from './FootnoteForm';
 import styles from './FootnotesList.module.scss';
+import FootnoteSubjectSelection from './FootnoteSubjectSelection';
 
 interface Props {
   footnoteMeta: FootnoteMeta;
@@ -28,29 +28,11 @@ const FootnotesList = ({
     return null;
   }
 
-  const renderItems = (items: { label: string; value: number }[]) => {
-    return (
-      <CollapsibleList>
-        {items.map(item => (
-          <li key={item.value}>{item.label}</li>
-        ))}
-      </CollapsibleList>
-    );
-  };
-
   const renderFootnoteRow = (footnote: Footnote) => {
-    const {
-      id,
-      content,
-      subjects,
-      indicators,
-      filters,
-      filterGroups,
-      filterItems,
-    } = footnote;
+    const { id, content } = footnote;
     const { footnoteForm } = footnoteFormControls;
     return (
-      <tr key={id}>
+      <div key={id} className={styles.itemContainer}>
         {footnoteForm.state === 'edit' &&
         footnoteForm.footnote &&
         footnoteForm.footnote.id === id ? (
@@ -65,53 +47,64 @@ const FootnotesList = ({
           />
         ) : (
           <>
-            <td>{content}</td>
-            <td>{renderItems(subjects.map(footnoteMetaGetters.getSubject))}</td>
-            <td>
-              {renderItems(indicators.map(footnoteMetaGetters.getIndicator))}
-            </td>
-            <td>
-              {renderItems([
-                ...filters.map(footnoteMetaGetters.getFilter),
-                ...filterGroups.map(footnoteMetaGetters.getFilterGroup),
-                ...filterItems.map(footnoteMetaGetters.getFilterItem),
-              ])}
-            </td>
-            <td>
-              <Button
-                type="button"
-                className="govuk-button govuk-!-margin-right-3 govuk-!-margin-bottom-0"
-                onClick={() => footnoteFormControls.edit(footnote)}
+            <div className={styles.row}>
+              <div className={styles.row__footnoteContent}>{content}</div>
+              <div>
+                <Button
+                  type="button"
+                  className="govuk-button govuk-!-margin-right-3 govuk-!-margin-bottom-0"
+                  onClick={() => footnoteFormControls.edit(footnote)}
+                >
+                  Edit
+                </Button>
+                <Button
+                  className="govuk-button govuk-button--secondary govuk-!-margin-bottom-0"
+                  onClick={() => footnoteFormControls.delete(footnote)}
+                >
+                  Delete
+                </Button>
+              </div>
+            </div>
+            <Details
+              summary="See matching criteria"
+              className="govuk-!-margin-0"
+            >
+              <table
+                className={classNames(
+                  'govuk-table',
+                  styles.footnoteSelectionTable,
+                )}
               >
-                Edit
-              </Button>
-              <Button
-                className="govuk-button govuk-button--secondary govuk-!-margin-bottom-0"
-                onClick={() => footnoteFormControls.delete(footnote)}
-              >
-                Delete
-              </Button>
-            </td>
+                <thead>
+                  <tr>
+                    <th>Subjects</th>
+                    <th>Indicators</th>
+                    <th>Filters</th>
+                  </tr>
+                </thead>
+                <tbody className="govuk-body-s">
+                  {Object.entries(footnote.subjects).map(
+                    ([subjectId, selection]) => {
+                      return (
+                        <FootnoteSubjectSelection
+                          key={subjectId}
+                          subjectId={Number(subjectId)}
+                          subject={selection}
+                          footnoteMetaGetters={footnoteMetaGetters}
+                        />
+                      );
+                    },
+                  )}
+                </tbody>
+              </table>
+            </Details>
           </>
         )}
-      </tr>
+      </div>
     );
   };
 
-  return (
-    <table className={classNames('govuk-table', styles.footnoteTable)}>
-      <thead>
-        <tr>
-          <th>Footnote</th>
-          <th>Subjects</th>
-          <th>Indicators</th>
-          <th>Filters</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody className="govuk-body-s">{footnotes.map(renderFootnoteRow)}</tbody>
-    </table>
-  );
+  return <div>{footnotes.map(renderFootnoteRow)}</div>;
 };
 
 export default FootnotesList;

@@ -12,6 +12,7 @@ import ModalConfirm from '@common/components/ModalConfirm';
 import React, { useEffect, useState } from 'react';
 import FootnotesList from './FootnotesList';
 import FootnoteForm, { FootnoteFormConfig } from './FootnoteForm';
+import { dummyFootnotes, dummyFootnoteMeta } from './dummyFootnoteData';
 
 interface Props {
   publicationId: string;
@@ -34,16 +35,22 @@ const ReleaseFootnotesSection = ({ publicationId, releaseId }: Props) => {
   const [hasSufficientData, setHasSufficientData] = useState<boolean>(true);
 
   function getFootnoteData() {
-    setLoading(true);
-    footnotesService
-      .getReleaseFootnoteData(releaseId)
-      .then(({ meta, footnotes: footnotesList }) => {
-        setFootnoteMeta(meta);
-        setHasSufficientData(!!Object.keys(meta).length);
-        setFootnotes(footnotesList);
-        setFootnoteMetaGetters(generateFootnoteMetaMap(meta));
-        setLoading(false);
-      });
+    // setLoading(true);
+    // footnotesService
+    //   .getReleaseFootnoteData(releaseId)
+    //   .then(({ meta, footnotes: footnotesList }) => {
+    //     setFootnoteMeta(meta);
+    //     setHasSufficientData(!!Object.keys(meta).length);
+    //     setFootnotes(footnotesList);
+    //     setFootnoteMetaGetters(generateFootnoteMetaMap(meta));
+    //     setLoading(false);
+    //   });
+
+    setFootnoteMetaGetters(generateFootnoteMetaMap(dummyFootnoteMeta));
+    setHasSufficientData(!!Object.keys(dummyFootnoteMeta).length);
+    setFootnoteMeta(dummyFootnoteMeta);
+    setFootnotes(dummyFootnotes);
+    setLoading(false);
   }
 
   useEffect(() => {

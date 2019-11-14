@@ -1,17 +1,10 @@
 import { FootnoteProps, FootnoteMeta, FootnoteMetaGetters } from './types';
 
-const footnoteFormValidation = ({
-  subjects,
-  indicators,
-  filters,
-  filterGroups,
-  filterItems,
-}: FootnoteProps) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+const footnoteFormValidation = ({ subjects }: FootnoteProps) => {
   const errors: { [key: string]: any } = {};
   const atLeastOneOption =
-    [...subjects, ...indicators, ...filters, ...filterGroups, ...filterItems]
-      .length === 0 &&
+    // [...subjects, ...indicators, ...filters, ...filterGroups, ...filterItems]
+    //   .length === 0 &&
     'At least one Subject, Indicator or Filter must be selected';
   if (atLeastOneOption) {
     errors.subjects = atLeastOneOption;
@@ -125,6 +118,31 @@ export const generateFootnoteMetaMap = (
     };
   };
 
+  const getSubject = (subjectId: number) => {
+    return getItem([subjectId], 'subject');
+  };
+  const getIndicatorGroup = (indicatorId: number) => {
+    const subjectId = indicatorsToSubject[indicatorId];
+
+    return getItem([subjectId, indicatorId], 'indicator');
+  };
+  const getIndicator = (indicatorItemId: number) => {
+    const indicatorId = indicatorItemsToIndicators[indicatorItemId];
+    const subjectId = indicatorsToSubject[indicatorId];
+
+    return getItem([subjectId, indicatorId, indicatorItemId], 'indicator');
+  };
+  const getFilter = (filterId: number) => {
+    const subjectId = filtersToSubject[filterId];
+
+    return getItem([subjectId, filterId], 'filter');
+  };
+  const getFilterGroup = (filterGroupId: number) => {
+    const filterId = filterGroupsToFilters[filterGroupId];
+    const subjectId = filtersToSubject[filterId];
+
+    return getItem([subjectId, filterId, filterGroupId], 'filter');
+  };
   const getFilterItem = (filterItemId: number) => {
     const filterGroupId = filterItemsToFilterGroups[filterItemId];
     const filterId = filterGroupsToFilters[filterGroupId];
@@ -135,33 +153,14 @@ export const generateFootnoteMetaMap = (
       'filter',
     );
   };
-  const getFilterGroup = (filterGroupId: number) => {
-    const filterId = filterGroupsToFilters[filterGroupId];
-    const subjectId = filtersToSubject[filterId];
-
-    return getItem([subjectId, filterId, filterGroupId], 'filter');
-  };
-  const getFilter = (filterId: number) => {
-    const subjectId = filtersToSubject[filterId];
-
-    return getItem([subjectId, filterId], 'filter');
-  };
-  const getIndicator = (indicatorItemId: number) => {
-    const indicatorId = indicatorItemsToIndicators[indicatorItemId];
-    const subjectId = indicatorsToSubject[indicatorId];
-
-    return getItem([subjectId, indicatorId, indicatorItemId], 'indicator');
-  };
-  const getSubject = (subjectId: number) => {
-    return getItem([subjectId], 'subject');
-  };
 
   return {
-    getFilterItem,
-    getFilterGroup,
-    getFilter,
-    getIndicator,
     getSubject,
+    getIndicatorGroup,
+    getIndicator,
+    getFilter,
+    getFilterGroup,
+    getFilterItem,
   };
 };
 

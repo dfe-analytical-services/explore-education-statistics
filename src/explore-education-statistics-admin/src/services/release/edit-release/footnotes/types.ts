@@ -49,20 +49,38 @@ export interface FootnoteMetaMap {
 }
 
 export interface FootnoteMetaGetters {
-  getFilterItem: (id: number) => { label: string; value: number };
-  getFilterGroup: (id: number) => { label: string; value: number };
-  getFilter: (id: number) => { label: string; value: number };
-  getIndicator: (id: number) => { label: string; value: number };
   getSubject: (id: number) => { label: string; value: number };
+  getIndicatorGroup: (id: number) => { label: string; value: number };
+  getIndicator: (id: number) => { label: string; value: number };
+  getFilter: (id: number) => { label: string; value: number };
+  getFilterGroup: (id: number) => { label: string; value: number };
+  getFilterItem: (id: number) => { label: string; value: number };
 }
 
 export interface FootnoteProps {
   content: string;
-  subjects: number[];
-  indicators: number[];
-  filterGroups: number[];
-  filters: number[];
-  filterItems: number[];
+  subjects: {
+    [key: number]: {
+      selected: boolean;
+      indicatorGroups: {
+        [key: number]: {
+          selected: boolean;
+          indicators: number[];
+        };
+      };
+      filters: {
+        [key: number]: {
+          selected: boolean;
+          filterGroups: {
+            [key: number]: {
+              selected: boolean;
+              filterItems: number[];
+            };
+          };
+        };
+      };
+    };
+  };
 }
 
 export interface Footnote extends FootnoteProps {

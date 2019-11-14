@@ -13,7 +13,6 @@ import {
   Form,
   FormFieldset,
   FormFieldCheckboxGroup,
-  FormGroup,
 } from '@common/components/form';
 import Yup from '@common/lib/validation/yup';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
@@ -65,23 +64,10 @@ const FootnoteForm = ({
       <Formik<FootnoteProps>
         // @ts-ignore
         initialValues={
-          footnote
-            ? {
-                content: footnote.content,
-                subjects: footnote.subjects.map(e => `${e}`),
-                indicators: footnote.indicators.map(e => `${e}`),
-                filters: footnote.filters.map(e => `${e}`),
-                filterGroups: footnote.filterGroups.map(e => `${e}`),
-                filterItems: footnote.filterItems.map(e => `${e}`),
-              }
-            : {
-                content: '',
-                subjects: [],
-                indicators: [],
-                filters: [],
-                filterGroups: [],
-                filterItems: [],
-              }
+          footnote || {
+            content: '',
+            subjects: {},
+          }
         }
         validate={footnoteFormValidation}
         validationSchema={Yup.object({
@@ -139,8 +125,8 @@ const FootnoteForm = ({
                             legendHidden
                             error={getError('indicators')}
                             selectAll
-                            options={Object.entries(subjectMeta.indicators).map(
-                              ([indicatorGroupId, indicatorGroup]) => {
+                            options={Object.values(subjectMeta.indicators).map(
+                              indicatorGroup => {
                                 return {
                                   legend: indicatorGroup.label,
                                   options: Object.values(
@@ -172,9 +158,9 @@ const FootnoteForm = ({
                                       hint={filter.hint}
                                       error={getError(filterName)}
                                       selectAll
-                                      options={Object.entries(
+                                      options={Object.values(
                                         filter.options,
-                                      ).map(([filterGroupId, filterGroup]) => {
+                                      ).map(filterGroup => {
                                         return {
                                           legend: filterGroup.label,
                                           options: Object.values(

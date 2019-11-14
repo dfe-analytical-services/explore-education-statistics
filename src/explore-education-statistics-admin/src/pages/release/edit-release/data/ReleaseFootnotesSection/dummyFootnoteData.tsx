@@ -5,6 +5,8 @@ import {
 
 export const dummyFootnoteMeta: FootnoteMeta = {
   '1': {
+    subjectId: 1,
+    subjectName: 'Absence by characteristic',
     filters: {
       1: {
         hint: 'Filter by pupil characteristic',
@@ -597,90 +599,113 @@ export const dummyFootnoteMeta: FootnoteMeta = {
         },
       },
     },
-    subjectId: 1,
-    subjectName: 'Absence by characteristic',
   },
 };
 
 export const dummyFootnotes: Footnote[] = [
   {
     id: 1,
-    content:
-      'State-funded primary schools include all primary academies, including free schools.',
-    indicators: [1],
-    filters: [1],
-    filterGroups: [2],
-    filterItems: [3],
-    subjects: [1],
-  },
-  /*   {
-    id: 1,
-    content:
-      'State-funded primary schools include all primary academies, including free schools.',
-    indicators: [],
-    filters: [],
-    filterGroups: [],
-    filterItems: [57, 83, 88, 97, 101, 180],
-    subjects: [1, 2, 3, 4, 5, 6, 7],
+    content: 'State-funded primary schools',
+    subjects: {
+      1: {
+        selected: false,
+        indicatorGroups: {
+          1: {
+            selected: false,
+            indicators: [1],
+          },
+          2: {
+            selected: true,
+            indicators: [],
+          },
+          3: {
+            selected: false,
+            indicators: [16, 3],
+          },
+        },
+        filters: {
+          1: {
+            selected: false,
+            filterGroups: {
+              2: {
+                selected: false,
+                filterItems: [25],
+              },
+            },
+          },
+          2: {
+            selected: false,
+            filterGroups: {
+              11: {
+                selected: false,
+                filterItems: [56, 57, 58],
+              },
+            },
+          },
+          3: {
+            selected: true,
+            filterGroups: {},
+          },
+        },
+      },
+    },
   },
   {
     id: 2,
-    content:
-      'State-funded secondary schools include city technology colleges and all secondary academies, including all-through academies and free schools.',
-    indicators: [],
-    filters: [],
-    filterGroups: [],
-    filterItems: [56, 84, 89, 95, 102, 179],
-    subjects: [1, 2, 3, 4, 5, 6, 7],
+    content: 'selectedGroups',
+    subjects: {
+      1: {
+        selected: false,
+        indicatorGroups: {
+          1: {
+            selected: true,
+            indicators: [],
+          },
+        },
+        filters: {
+          1: {
+            selected: false,
+            filterGroups: {
+              2: {
+                selected: true,
+                filterItems: [],
+              },
+            },
+          },
+        },
+      },
+    },
   },
   {
     id: 3,
-    content:
-      'Special schools include maintained special schools, non-maintained special schools and special academies.  Excludes general hospital schools, independent special schools and independent schools approved for SEN pupils.',
-    indicators: [],
-    filters: [],
-    filterGroups: [],
-    filterItems: [55, 85, 90, 96, 103, 178],
-    subjects: [1, 2, 3, 4, 5, 6, 7],
+    content: 'selectedFilter',
+    subjects: {
+      1: {
+        selected: false,
+        indicatorGroups: {
+          1: {
+            selected: false,
+            indicators: [1],
+          },
+        },
+        filters: {
+          1: {
+            selected: true,
+            filterGroups: {},
+          },
+        },
+      },
+    },
   },
   {
     id: 4,
-    content:
-      'Totals may not appear to equal the sum of component parts because numbers have been rounded to the nearest 5.',
-    indicators: [],
-    filters: [],
-    filterGroups: [],
-    filterItems: [],
-    subjects: [1, 2, 3, 4, 5, 6, 7],
+    content: 'selectedSubject',
+    subjects: {
+      1: {
+        selected: true,
+        indicatorGroups: {},
+        filters: {},
+      },
+    },
   },
-  {
-    id: 5,
-    content:
-      'x - 1 or 2 enrolments, or a percentage based on 1 or 2 enrolments.',
-    indicators: [],
-    filters: [],
-    filterGroups: [],
-    filterItems: [],
-    subjects: [1, 2, 3, 4, 5, 6, 7],
-  },
-  {
-    id: 6,
-    content:
-      'There may be discrepancies between totals and the sum of constituent parts  as national and regional totals and totals across school types have been rounded to the nearest 5.',
-    indicators: [],
-    filters: [],
-    filterGroups: [],
-    filterItems: [],
-    subjects: [1, 2, 3, 4, 5, 6, 7],
-  },
-  {
-    id: 7,
-    content:
-      'Absence rates are the number of absence sessions expressed as a percentage of the total number of possible sessions.',
-    indicators: [23, 26, 28, 57, 59, 66, 83, 84, 85, 95, 113, 114, 115],
-    filters: [],
-    filterGroups: [],
-    filterItems: [],
-    subjects: [1, 2, 3, 4, 5, 6, 7],
-  }, */
 ];
