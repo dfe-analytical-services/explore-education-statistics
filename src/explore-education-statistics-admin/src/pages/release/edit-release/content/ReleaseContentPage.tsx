@@ -43,8 +43,6 @@ const ReleaseContentPage = () => {
     ]).then(([releaseSummary, theme, releaseData, releaseContent]) => {
       // <editor-fold desc="TODO - content population">
 
-      console.log(releaseContent);
-
       const unresolvedComments: Comment[] = [
         {
           message: 'Please resolve this.\nThank you.',
