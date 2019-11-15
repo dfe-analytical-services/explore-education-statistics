@@ -10,7 +10,7 @@ import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import RelatedAside from '@common/components/RelatedAside';
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {
   DragDropContext,
   Draggable,
@@ -18,7 +18,7 @@ import {
   Droppable,
   DropResult,
 } from 'react-beautiful-dnd';
-import { EditableRelease } from '@admin/services/publicationService';
+import {EditableRelease} from '@admin/services/publicationService';
 import {
   FormGroup,
   FormFieldset,
@@ -26,7 +26,7 @@ import {
 } from '@common/components/form';
 import AddComment from '@admin/pages/prototypes/components/PrototypeEditableContentAddComment';
 import ResolveComment from '@admin/pages/prototypes/components/PrototypeEditableContentResolveComment';
-import { ContentBlockType } from '@common/services/publicationService';
+import {ContentBlockType} from '@common/services/publicationService';
 
 interface State {
   reordering: boolean;
@@ -52,25 +52,25 @@ function getAccordionIndex(id: string | null | undefined) {
 }
 
 class EditablePublicationPage extends Component<Props, State> {
-  public static defaultProps = { editing: false };
+  public static defaultProps = {editing: false};
 
   public constructor(props: Props) {
     super(props);
 
-    this.state = { reordering: false, data: undefined };
+    this.state = {reordering: false, data: undefined};
   }
 
   public componentDidMount() {
-    const { data } = this.props;
-    this.setState({ data });
+    const {data} = this.props;
+    this.setState({data});
   }
 
   public onDragEnd = (result: DropResult) => {
     if (result.destination) {
-      const { source } = result;
+      const {source} = result;
       const target: DraggableLocation = result.destination;
 
-      const { data } = this.state;
+      const {data} = this.state;
 
       if (result.type === 'accordion') {
         const sourceAccordion = getAccordionIndex(source.droppableId);
@@ -88,7 +88,7 @@ class EditablePublicationPage extends Component<Props, State> {
 
               data.content = resultList;
 
-              this.setState({ data: release });
+              this.setState({data: release});
             }
           }
         }
@@ -98,7 +98,7 @@ class EditablePublicationPage extends Component<Props, State> {
 
   public addNewSection() {
     if (this.state.data) {
-      const { data } = this.state;
+      const {data} = this.state;
 
       data.content.push({
         heading: 'New section',
@@ -114,7 +114,7 @@ class EditablePublicationPage extends Component<Props, State> {
         ],
       });
 
-      this.setState({ data });
+      this.setState({data});
     }
   }
 
@@ -124,7 +124,7 @@ class EditablePublicationPage extends Component<Props, State> {
     reviewing: boolean | undefined,
     resolveComments: boolean | undefined,
   ) {
-    const { reordering } = this.state;
+    const {reordering} = this.state;
 
     if (reordering) {
       return this.renderDraggableSections(data);
@@ -148,7 +148,7 @@ class EditablePublicationPage extends Component<Props, State> {
         <h2 className="govuk-heading-l reorderable-relative">
           <button
             className="govuk-button govuk-button--secondary reorderable"
-            onClick={() => this.setState({ reordering: true })}
+            onClick={() => this.setState({reordering: true})}
             type="button"
           >
             Reorder sections
@@ -156,8 +156,8 @@ class EditablePublicationPage extends Component<Props, State> {
           Contents
         </h2>
 
-        <EditableAccordion id="contents-sections" index={0} >
-          {data.content.map(({ heading, caption, order, content }, index) => (
+        <EditableAccordion id="contents-sections" index={0}>
+          {data.content.map(({heading, caption, order, content}, index) => (
             <EditableAccordionSection
               heading={heading}
               caption={caption}
@@ -198,7 +198,7 @@ class EditablePublicationPage extends Component<Props, State> {
         <h2 className="govuk-heading-l reorderable-relative">
           <button
             className="govuk-button reorderable"
-            onClick={() => this.setState({ reordering: false })}
+            onClick={() => this.setState({reordering: false})}
             type="button"
           >
             Save reordering
@@ -215,36 +215,36 @@ class EditablePublicationPage extends Component<Props, State> {
               ref={droppableProvided.innerRef}
             >
               {data &&
-                data.content.map(({ heading, order }, index) => (
-                  <Draggable
-                    draggableId={`section(${order})`}
-                    index={index}
-                    key={`${order}`}
-                  >
-                    {draggableProvided => (
-                      <div
-                        className="govuk-accordion__section"
-                        ref={draggableProvided.innerRef}
-                        {...draggableProvided.draggableProps}
-                      >
-                        <div className="govuk-accordion__section-header">
-                          <h2 className="govuk-accordion__section-heading reorderable-relative">
-                            <span
-                              className="drag-handle"
-                              {...draggableProvided.dragHandleProps}
-                            />
-                            <button
-                              className="govuk-accordion__section-button"
-                              type="button"
-                            >
-                              {heading}
-                            </button>
-                          </h2>
-                        </div>
+              data.content.map(({heading, order}, index) => (
+                <Draggable
+                  draggableId={`section(${order})`}
+                  index={index}
+                  key={`${order}`}
+                >
+                  {draggableProvided => (
+                    <div
+                      className="govuk-accordion__section"
+                      ref={draggableProvided.innerRef}
+                      {...draggableProvided.draggableProps}
+                    >
+                      <div className="govuk-accordion__section-header">
+                        <h2 className="govuk-accordion__section-heading reorderable-relative">
+                          <span
+                            className="drag-handle"
+                            {...draggableProvided.dragHandleProps}
+                          />
+                          <button
+                            className="govuk-accordion__section-button"
+                            type="button"
+                          >
+                            {heading}
+                          </button>
+                        </h2>
                       </div>
-                    )}
-                  </Draggable>
-                ))}
+                    </div>
+                  )}
+                </Draggable>
+              ))}
 
               {droppableProvided.placeholder}
             </div>
@@ -255,11 +255,11 @@ class EditablePublicationPage extends Component<Props, State> {
   }
 
   public render() {
-    const { reviewing } = this.props;
-    const { higherReview } = this.props;
-    const { resolveComments } = this.props;
-    const { editing } = this.props;
-    const { data } = this.state;
+    const {reviewing} = this.props;
+    const {higherReview} = this.props;
+    const {resolveComments} = this.props;
+    const {editing} = this.props;
+    const {data} = this.state;
 
     return (
       <>
@@ -278,12 +278,12 @@ class EditablePublicationPage extends Component<Props, State> {
                   </span>
 
                   <dl className="dfe-meta-content">
-                    <dt className="govuk-caption-m">Publish date: </dt>
+                    <dt className="govuk-caption-m">Publish date:</dt>
                     <dd>
                       <strong>20 September 2019</strong>
                     </dd>
                     <div>
-                      <dt className="govuk-caption-m">Next update: </dt>
+                      <dt className="govuk-caption-m">Next update:</dt>
                       <dd>
                         <strong>20 September 2020</strong>
                       </dd>
@@ -418,7 +418,7 @@ class EditablePublicationPage extends Component<Props, State> {
                 </dl>
 
                 <dl className="dfe-meta-content">
-                  <dt className="govuk-caption-m">Last updated: </dt>
+                  <dt className="govuk-caption-m">Last updated:</dt>
                   <dd data-testid="last-updated">
                     <strong>19 April 2019</strong>
                   </dd>
@@ -572,13 +572,13 @@ class EditablePublicationPage extends Component<Props, State> {
             chartDataKeys={['unauthorised', 'authorised', 'overall']}
           />
           {data &&
-            data.content.length > 0 &&
-            this.renderContentSections(
-              data,
-              editing,
-              reviewing,
-              resolveComments,
-            )}
+          data.content.length > 0 &&
+          this.renderContentSections(
+            data,
+            editing,
+            reviewing,
+            resolveComments,
+          )}
           <h2 className="govuk-heading-m govuk-!-margin-top-9">
             Help and support
           </h2>
