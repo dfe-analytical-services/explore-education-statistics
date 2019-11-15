@@ -7,6 +7,7 @@ const footnoteFormValidation = ({
   filterGroups,
   filterItems,
 }: FootnoteProps) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const errors: { [key: string]: any } = {};
   const atLeastOneOption =
     [...subjects, ...indicators, ...filters, ...filterGroups, ...filterItems]

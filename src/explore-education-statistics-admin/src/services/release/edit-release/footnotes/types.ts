@@ -3,11 +3,11 @@ export interface FootnoteSubjectMeta {
   subjectName: string;
   indicators: {
     [key: number]: {
-      //indicator "group"
+      // indicator "group"
       label: string;
       options: {
         [key: number]: {
-          //indicator "item"
+          // indicator "item"
           label: string;
           unit: string;
           value: string;
@@ -17,16 +17,16 @@ export interface FootnoteSubjectMeta {
   };
   filters: {
     [key: number]: {
-      //filter
+      // filter
       hint: string;
       legend: string;
       options: {
         [key: number]: {
           label: string;
-          //filterGroup
+          // filterGroup
           options: {
             [key: number]: {
-              //filterItem
+              // filterItem
               label: string;
               value: string;
             };
@@ -36,6 +36,7 @@ export interface FootnoteSubjectMeta {
     };
   };
 }
+
 export interface FootnoteMeta {
   [key: number /* subjectId */]: FootnoteSubjectMeta;
 }
