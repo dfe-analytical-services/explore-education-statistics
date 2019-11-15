@@ -5,6 +5,10 @@ import {
   FootnoteMetaGetters,
 } from '@admin/services/release/edit-release/footnotes/types';
 import footnotesService from '@admin/services/release/edit-release/footnotes/service';
+import {
+  dummyFootnotes,
+  dummyFootnoteMeta,
+} from '@admin/services/release/edit-release/footnotes/dummyFootnoteData';
 import { generateFootnoteMetaMap } from '@admin/services/release/edit-release/footnotes/util';
 import Link from '@admin/components/Link';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -12,7 +16,6 @@ import ModalConfirm from '@common/components/ModalConfirm';
 import React, { useEffect, useState } from 'react';
 import FootnotesList from './FootnotesList';
 import FootnoteForm, { FootnoteFormConfig } from './FootnoteForm';
-import { dummyFootnotes, dummyFootnoteMeta } from './dummyFootnoteData';
 
 interface Props {
   publicationId: string;

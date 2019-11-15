@@ -13,6 +13,7 @@ import {
   Form,
   FormFieldset,
   FormFieldCheckboxGroup,
+  FormCheckbox,
 } from '@common/components/form';
 import Yup from '@common/lib/validation/yup';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
@@ -22,7 +23,7 @@ import { FormValues } from '@common/modules/table-tool/components/FiltersForm';
 import CollapsibleList from '@common/components/CollapsibleList';
 import React from 'react';
 import camelCase from 'lodash/camelCase';
-import { FormikProps } from 'formik';
+import { Field, FormikProps, FieldProps } from 'formik';
 import styles from './FootnoteForm.module.scss';
 
 export interface FootnoteFormConfig {
@@ -81,62 +82,67 @@ const FootnoteForm = ({
         render={(form: FormikProps<FootnoteProps>) => {
           const { getError } = createErrorHelper(form);
           return (
-            <Form {...form} id={formId}>
-              <p>Select either one or multiple subject areas from below</p>
-              <div className="govuk-grid-row govuk-heading-s govuk-!-margin-bottom-0">
-                <div className="govuk-grid-column-one-third">Subject</div>
-                <div className="govuk-grid-column-one-third">Indicator</div>
-                <div className="govuk-grid-column-one-third">Filter</div>
-              </div>
-              <hr className="govuk-!-margin-top-1 govuk-!-margin-bottom-2" />
-              <FormFieldset
-                id={`${formId}-allFieldsFieldset`}
-                legend={!footnote ? 'Create new footnote' : 'Edit footnote'}
-                legendHidden
-                error={getError('subjects')}
-              >
-                {Object.entries(footnoteMeta).map(
-                  ([subjectMetaId, subjectMeta]: [
-                    string,
-                    FootnoteSubjectMeta,
-                  ]) => (
-                    <div key={subjectMetaId}>
-                      <div key={subjectMetaId} className="govuk-grid-row">
-                        <div className="govuk-grid-column-one-third">
-                          <FormFieldCheckboxGroup
-                            name="subjects"
-                            id={`${formId}-subjects`}
-                            legend="Subject"
-                            legendHidden
-                            showError={false}
-                            options={[
-                              {
-                                label: subjectMeta.subjectName,
-                                value: `${subjectMeta.subjectId}`,
-                              },
-                            ]}
-                          />
-                        </div>
-                        <div className="govuk-grid-column-one-third">
-                          <FormFieldCheckboxGroupsMenu<FormValues>
-                            name="indicators"
-                            id="indicators"
-                            legend="Indicators"
-                            legendHidden
-                            error={getError('indicators')}
-                            selectAll
-                            options={Object.values(subjectMeta.indicators).map(
-                              indicatorGroup => {
+            <div className={styles.container}>
+              <Form {...form} id={formId}>
+                <p>Select either one or multiple subject areas from below</p>
+                <div className="govuk-grid-row govuk-heading-s govuk-!-margin-bottom-0">
+                  <div className="govuk-grid-column-one-third">Subject</div>
+                  <div className="govuk-grid-column-one-third">Indicator</div>
+                  <div className="govuk-grid-column-one-third">Filter</div>
+                </div>
+                <hr className="govuk-!-margin-top-1 govuk-!-margin-bottom-2" />
+                <FormFieldset
+                  id={`${formId}-allFieldsFieldset`}
+                  legend={!footnote ? 'Create new footnote' : 'Edit footnote'}
+                  legendHidden
+                  error={getError('subjects')}
+                >
+                  {Object.entries(footnoteMeta).map(
+                    ([subjectMetaId, subjectMeta]: [
+                      string,
+                      FootnoteSubjectMeta,
+                    ]) => (
+                      <div key={subjectMetaId}>
+                        <div key={subjectMetaId} className="govuk-grid-row">
+                          <div className="govuk-grid-column-one-third">
+                            <Field name={`subjects.${subjectMetaId}.selected`}>
+                              {({ field }: FieldProps) => {
+                                return (
+                                  <FormCheckbox
+                                    id={subjectMetaId}
+                                    label={subjectMeta.subjectName}
+                                    {...field}
+                                    defaultChecked={
+                                      form.values.subjects[
+                                        Number(subjectMetaId)
+                                      ].selected
+                                    }
+                                  />
+                                );
+                              }}
+                            </Field>
+                          </div>
+                          <div className="govuk-grid-column-one-third">
+                            <FormFieldCheckboxGroupsMenu<FormValues>
+                              name="indicators"
+                              id="indicators"
+                              legend="Indicators"
+                              legendHidden
+                              error={getError('indicators')}
+                              selectAll
+                              options={Object.values(
+                                subjectMeta.indicators,
+                              ).map(indicatorGroup => {
                                 return {
                                   legend: indicatorGroup.label,
                                   options: Object.values(
                                     indicatorGroup.options,
                                   ),
                                 };
-                              },
-                            )}
-                          />
-                        </div>
+                              })}
+                            />
+                          </div>
+                          {/*
                         <div className="govuk-grid-column-one-third">
                           <FormFieldset
                             id={`${formId}-filters`}
@@ -175,31 +181,33 @@ const FootnoteForm = ({
                             </CollapsibleList>
                           </FormFieldset>
                         </div>
+                       */}
+                        </div>
+                        <hr className="govuk-!-margin-0 govuk-!-margin-bottom-2" />
                       </div>
-                      <hr className="govuk-!-margin-0 govuk-!-margin-bottom-2" />
-                    </div>
-                  ),
-                )}
-              </FormFieldset>
-              <FormFieldTextArea<FootnoteProps>
-                id={`${formId}-content`}
-                name="content"
-                label="Footnote"
-              />
-              <Button
-                type="submit"
-                className="govuk-button govuk-!-margin-right-3"
-              >
-                {!footnote ? 'Create' : 'Update'} Footnote
-              </Button>
-              <Link
-                to="#"
-                className="govuk-button govuk-button--secondary"
-                onClick={onCancel}
-              >
-                Cancel
-              </Link>
-            </Form>
+                    ),
+                  )}
+                </FormFieldset>
+                <FormFieldTextArea<FootnoteProps>
+                  id={`${formId}-content`}
+                  name="content"
+                  label="Footnote"
+                />
+                <Button
+                  type="submit"
+                  className="govuk-button govuk-!-margin-right-3"
+                >
+                  {!footnote ? 'Create' : 'Update'} Footnote
+                </Button>
+                <Link
+                  to="#"
+                  className="govuk-button govuk-button--secondary"
+                  onClick={onCancel}
+                >
+                  Cancel
+                </Link>
+              </Form>
+            </div>
           );
         }}
       />
@@ -212,7 +220,7 @@ const FootnoteForm = ({
         Add {!isFirst && ` another `}footnote
       </Button>
     ) : (
-      <div className={styles.container}>{renderForm()}</div>
+      renderForm()
     );
   };
 
@@ -220,11 +228,7 @@ const FootnoteForm = ({
     if (state !== 'edit') {
       return null;
     }
-    return (
-      <td colSpan={5} className="govuk-body-m">
-        {renderForm()}
-      </td>
-    );
+    return renderForm();
   };
 
   return !footnote ? renderNewForm() : renderEditForm();

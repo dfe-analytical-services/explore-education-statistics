@@ -9,6 +9,7 @@ const footnoteFormValidation = ({ subjects }: FootnoteProps) => {
   if (atLeastOneOption) {
     errors.subjects = atLeastOneOption;
   }
+  console.log('subjects', subjects);
   return errors;
 };
 
