@@ -1,7 +1,7 @@
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Extensions
+namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
 {
     public class StringExtensionTests
     {
@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Extensi
             Assert.Equal("fooBar", "Foo_Bar".CamelCase());
             Assert.Equal("fOOBar", "FOO_Bar".CamelCase());
         }
-        
+
         [Fact]
         public void NullStringCanBePascalCased()
         {
