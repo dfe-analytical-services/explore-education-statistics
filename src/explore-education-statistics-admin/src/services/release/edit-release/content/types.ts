@@ -21,8 +21,8 @@ export interface ReleaseViewModel {
   id: string;
   typeId?: string;
   timePeriodCoverage: TimeIdentifier;
-  PublishScheduled?: Date;
-  NextReleaseDate: {
+  publishScheduled?: Date;
+  nextReleaseDate: {
     day: string;
     month: string;
     year: string;
@@ -49,7 +49,7 @@ export interface ManageContentPageViewModel {
 
   relatedInformation: BasicLink[];
 
-  introductionSection: ReleaseContentService;
+  introductionSection: ContentSectionViewModel;
 }
 
 export default {};
