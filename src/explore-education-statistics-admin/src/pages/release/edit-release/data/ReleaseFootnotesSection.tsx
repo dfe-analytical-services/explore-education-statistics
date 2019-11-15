@@ -14,8 +14,10 @@ import Link from '@admin/components/Link';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import React, { useEffect, useState } from 'react';
-import FootnotesList from './FootnotesList';
-import FootnoteForm, { FootnoteFormConfig } from './FootnoteForm';
+import FootnotesList from '@admin/components/footnotes/FootnotesList';
+import FootnoteForm, {
+  FootnoteFormConfig,
+} from '@admin/components/footnotes/FootnoteForm';
 
 interface Props {
   publicationId: string;
