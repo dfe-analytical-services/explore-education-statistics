@@ -209,6 +209,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .Property(r => r.TimePeriodCoverage)
                 .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>())
                 .HasMaxLength(6);
+            
+            modelBuilder.Entity<Release>()
+                .Property<List<BasicLink>>("RelatedInformation")
+                .HasConversion(
+                    v => JsonConvert.SerializeObject(v),
+                    v => JsonConvert.DeserializeObject<List<BasicLink>>(v));
 
             modelBuilder.Entity<IContentBlock>()
                 .ToTable("ContentBlock")
