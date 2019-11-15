@@ -91,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                                        "tables and download data files across a range of pupil absence subject " +
                                        "areas.</p>" + 
                                        "<p>You can also view a regional breakdown of statistics and data within the " +
-                                       "<a href=\"#\">local authorities section</a></p>    ",
+                                       "<a href=\"#\">local authorities section</a></p>",
                             }
                         }
                     },
@@ -109,14 +109,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                                 {
                                     Id = new Guid("fc2e623d-2d9b-4312-ac6a-1ca1bf5ad10c"),
                                     Type = "HtmlBlock",
-                                    Body = "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>    ",
+                                    Body = "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>",
                                 }
                             }
                         },
                         new ContentSectionViewModel()
                         {
                             Id = new Guid("7bce6d46-5dc3-431b-847d-a3f9fa447a55"),
-                            Order = 0,
+                            Order = 1,
                             Caption = "New content caption",
                             Heading = "New content",
                             Content = new List<IContentBlock>()
@@ -125,7 +125,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                                 {
                                     Id = new Guid("3a38fbf2-c4b4-4928-ba2e-139e32317f27"),
                                     Type = "HtmlBlock",
-                                    Body = "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>    ",
+                                    Body = "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>",
+                                },
+                                new HtmlBlock()
+                                {
+                                    Id = new Guid("3a72a162-689b-433c-9cf4-d2b963dc850e"),
+                                    Type = "HtmlBlock",
+                                    Body = "<p>Second content block.</p>",
                                 }
                             }
                         }
