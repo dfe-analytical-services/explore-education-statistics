@@ -1,8 +1,9 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Reflection;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
+namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 {
     [ExcludeFromCodeCoverage]
     public partial class UpdateFilteredObservationsStoredProc : Migration
@@ -23,7 +24,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Migrations
 
         private static void ExecuteFile(MigrationBuilder migrationBuilder, string filename)
         {
-            var file = Path.Combine(Directory.GetCurrentDirectory(), $"{MigrationsPath}/{filename}");
+            var file = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+                $"{MigrationsPath}{Path.DirectorySeparatorChar}{filename}");
+            
             migrationBuilder.Sql(File.ReadAllText(file));
         }
     }

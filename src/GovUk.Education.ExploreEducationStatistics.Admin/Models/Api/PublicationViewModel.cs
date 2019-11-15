@@ -18,6 +18,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         
         public Guid TopicId { get; set; }
         
+        public Guid ThemeId { get; set; }
+        
         public Contact Contact { get; set; }
     }
 }

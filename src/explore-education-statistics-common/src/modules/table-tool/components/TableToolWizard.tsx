@@ -344,7 +344,7 @@ const TableToolWizard = (props: Props) => {
                 />
               )}
             </WizardStep>
-            {finalStep && finalStep(tableToolState)}
+            {finalStep && finalStep({ ...tableToolState, publication })}
           </Wizard>
 
           <PreviousStepModalConfirm />

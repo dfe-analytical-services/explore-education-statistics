@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "bab82b99-ca8b-45bc-b52d-3ccc99902d13",
+		"_postman_id": "90eb0249-5913-4394-afa0-6c45131b3638",
 		"name": "DfE Admin API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -2034,7 +2034,7 @@
 									"    pm.expect(pm.response.to.have.jsonBody(\"status\"));",
 									"});",
 									"",
-									"pm.test(\"id should match request id\", function () {",
+									"pm.test(\"id should match release summary id (rather than release id)\", function () {",
 									"    pm.expect(respJson.id).to.equal(\"06c45b1e-533d-4c95-900b-62beb4620f59\");",
 									"});",
 									"",
@@ -2101,14 +2101,12 @@
 									"    pm.expect(pm.response.to.have.jsonBody(\"releaseName\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"slug\"));",
 									"    pm.expect(pm.response.to.have.jsonBody(\"status\"));",
+									"    pm.expect(pm.response.to.have.jsonBody(\"internalReleaseNote\"));",
 									"});",
 									"",
-									"pm.test(\"id should match request id\", function () {",
-									"    pm.expect(respJson.id).to.equal(\"e7774a74-1f62-4b76-b9b5-84f14dac7278\");",
-									"});",
-									"",
-									"pm.test(\"typeId should should be correct\", function () { ",
-									"    pm.expect(respJson.typeId).to.equal(\"9d333457-9132-4e55-ae78-c55cb3673d7c\"); ",
+									"pm.test(\"Status and Internal Release Note should be correct\", function () { ",
+									"   pm.expect(respJson.status).to.equal(\"Approved\");",
+									"   pm.expect(respJson.internalReleaseNote).to.equal(\"Test Note\");",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2142,7 +2140,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"releaseStatus\": \"Draft\",\n\t\"internalReleaseNote\": \"Test Note\"\n}"
+							"raw": "{\n\t\"releaseStatus\": \"Approved\",\n\t\"internalReleaseNote\": \"Test Note\"\n}"
 						},
 						"url": {
 							"raw": "{{admin_api_url}}/releases/E7774A74-1F62-4B76-B9B5-84F14DAC7278/status",
@@ -9013,6 +9011,266 @@
 						}
 					},
 					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Manage Content",
+			"item": [
+				{
+					"name": "Related Information",
+					"item": [
+						{
+							"name": "Add Related Information",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"exec": [
+											"var respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 201\", function () { ",
+											"    pm.response.to.have.status(201); ",
+											"});",
+											"",
+											"pm.test(\"Related Information array contains values\", function () {",
+											"    pm.expect(respJson.length).to.be.above(0);",
+											"});",
+											"",
+											"pm.test(\"Latest Related Information entry should contain the correct details\", function () { ",
+											"    const lastItem = respJson[respJson.length - 1];",
+											"    pm.expect(lastItem.title).to.equal(\"Related Information 1\");",
+											"    pm.expect(lastItem.url).to.equal(\"http://example.com/1\");",
+											"    pm.expect(lastItem.id).to.not.be.empty;",
+											"    pm.expect(lastItem.id).to.not.equal(\"00000000-0000-0000-0000-000000000000\");",
+											"});",
+											"",
+											"pm.test(\"Store variables for upcoming tests\", function () { ",
+											"    const lastItem = respJson[respJson.length - 1];",
+											"    pm.environment.set(\"latest_related_information_id\", lastItem.id);",
+											"    pm.environment.set(\"number_of_related_information_items\", respJson.length);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Cookie",
+										"type": "text",
+										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"url\": \"http://example.com/1\",\n    \"title\": \"Related Information 1\",\n}"
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/related-information",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"release",
+										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+										"content",
+										"related-information"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Edit Related Information",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"exec": [
+											"var respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () { ",
+											"    pm.response.to.have.status(200); ",
+											"});",
+											"",
+											"pm.test(\"Related Information array contains values\", function () {",
+											"    pm.expect(respJson.length).to.equal(pm.environment.get(\"number_of_related_information_items\"));",
+											"});",
+											"",
+											"pm.test(\"Latest Related Information entry should contain the updated details\", function () { ",
+											"    const lastItem = respJson[respJson.length - 1];",
+											"    pm.expect(lastItem.title).to.equal(\"Related Information updated\");",
+											"    pm.expect(lastItem.url).to.equal(\"http://example.com/updated\");",
+											"    pm.expect(lastItem.id).to.equal(pm.environment.get(\"latest_related_information_id\"));",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Cookie",
+										"type": "text",
+										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"url\": \"http://example.com/updated\",\n    \"title\": \"Related Information updated\",\n}"
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/related-information/{{latest_related_information_id}}",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"release",
+										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+										"content",
+										"related-information",
+										"{{latest_related_information_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Related Information",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"exec": [
+											"var respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () { ",
+											"    pm.response.to.have.status(200); ",
+											"});",
+											"",
+											"pm.test(\"Related Information array contains values\", function () {",
+											"    pm.expect(respJson.length).to.equal(pm.environment.get(\"number_of_related_information_items\"));",
+											"});",
+											"",
+											"pm.test(\"Latest Related Information entry should contain the latest details\", function () { ",
+											"    const lastItem = respJson[respJson.length - 1];",
+											"    pm.expect(lastItem.title).to.equal(\"Related Information 1\");",
+											"    pm.expect(lastItem.url).to.equal(\"http://example.com/1\");",
+											"    pm.expect(lastItem.id).to.equal(pm.environment.get(\"latest_related_information_id\"));",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Cookie",
+										"type": "text",
+										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/related-information",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"release",
+										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+										"content",
+										"related-information"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Related Information",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"exec": [
+											"var respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () { ",
+											"    pm.response.to.have.status(200); ",
+											"});",
+											"",
+											"pm.test(\"Related Information array contains one less value than before\", function () {",
+											"    pm.expect(respJson.length).to.equal(pm.environment.get(\"number_of_related_information_items\") - 1);",
+											"});",
+											"",
+											"pm.test(\"Related Information array should no longer contain the deleted item\", function () { ",
+											"    pm.expect(respJson.some(item => item.id === pm.environment.get(\"latest_related_information_id\"))).to.be.false;",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Cookie",
+										"type": "text",
+										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/related-information/{{latest_related_information_id}}",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"release",
+										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+										"content",
+										"related-information",
+										"{{latest_related_information_id}}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				}
 			],
 			"protocolProfileBehavior": {}
