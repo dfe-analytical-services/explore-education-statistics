@@ -35,7 +35,7 @@ class DownloadIndexPage extends Component<Props> {
   public render() {
     const { themes } = this.props;
     return (
-      <Page title="Download data files" breadcrumbLabel="Download">
+      <Page title="Download latest data files" breadcrumbLabel="Download">
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
             <p className="govuk-body-l">
