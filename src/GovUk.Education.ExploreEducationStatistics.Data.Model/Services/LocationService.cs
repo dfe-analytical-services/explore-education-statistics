@@ -48,27 +48,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         {
             switch (geographicLevel)
             {
-                case GeographicLevel.Local_Authority:
+                case GeographicLevel.LocalAuthority:
                     return location.LocalAuthority;
-                case GeographicLevel.Local_Authority_District:
+                case GeographicLevel.LocalAuthorityDistrict:
                     return location.LocalAuthorityDistrict;
-                case GeographicLevel.Local_Enterprise_Partnership:
+                case GeographicLevel.LocalEnterprisePartnership:
                     return location.LocalEnterprisePartnership;
                 case GeographicLevel.Institution:
                     return location.Institution;
-                case GeographicLevel.Mayoral_Combined_Authority:
+                case GeographicLevel.MayoralCombinedAuthority:
                     return location.MayoralCombinedAuthority;
-                case GeographicLevel.Multi_Academy_Trust:
+                case GeographicLevel.MultiAcademyTrust:
                     return location.MultiAcademyTrust;
                 case GeographicLevel.Country:
                     return location.Country;
-                case GeographicLevel.Opportunity_Area:
+                case GeographicLevel.OpportunityArea:
                     return location.OpportunityArea;
-                case GeographicLevel.Parliamentary_Constituency:
+                case GeographicLevel.ParliamentaryConstituency:
                     return location.ParliamentaryConstituency;
                 case GeographicLevel.Region:
                     return location.Region;
-                case GeographicLevel.RSC_Region:
+                case GeographicLevel.RscRegion:
                     return location.RscRegion;
                 case GeographicLevel.Sponsor:
                     return location.Sponsor;
