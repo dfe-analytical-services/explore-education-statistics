@@ -36,6 +36,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
+using IHostingEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
 
@@ -43,12 +44,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
         {
             Configuration = configuration;
+            HostingEnvironment = hostingEnvironment;
         }
 
         public IConfiguration Configuration { get; }
+        
+        private IHostingEnvironment HostingEnvironment{ get; set; } 
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -91,29 +95,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 .AddEntityFrameworkStores<UsersAndRolesDbContext>()
                 .AddDefaultTokenProviders();
 
-            services
-                .AddIdentityServer(options =>
-                {
-                    options.Events.RaiseErrorEvents = true;
-                    options.Events.RaiseInformationEvents = true;
-                    options.Events.RaiseFailureEvents = true;
-                    options.Events.RaiseSuccessEvents = true;
-                })
-                .AddApiAuthorization<ApplicationUser, UsersAndRolesDbContext>()
-                .AddProfileService<ApplicationUserProfileService>()
-                // TODO DW - this should be conditional based upon whether or not we're in dev mode
-                .AddSigningCredentials();
-
-            services.Configure<JwtBearerOptions>(
-                IdentityServerJwtConstants.IdentityServerJwtBearerScheme,
-                options =>
-                {
-                    options.TokenValidationParameters = new TokenValidationParameters
+            if (HostingEnvironment.IsDevelopment())
+            {
+                services
+                    .AddIdentityServer(options =>
                     {
-                        ValidateIssuerSigningKey = false,
-                        ValidateIssuer = false,
-                    };
-                });
+                        options.Events.RaiseErrorEvents = true;
+                        options.Events.RaiseInformationEvents = true;
+                        options.Events.RaiseFailureEvents = true;
+                        options.Events.RaiseSuccessEvents = true;
+                    })
+                    .AddApiAuthorization<ApplicationUser, UsersAndRolesDbContext>()
+                    .AddProfileService<ApplicationUserProfileService>()
+                    .AddDeveloperSigningCredential();
+            }
+            else
+            {
+                services
+                    .AddIdentityServer(options =>
+                    {
+                        options.Events.RaiseErrorEvents = true;
+                        options.Events.RaiseInformationEvents = true;
+                        options.Events.RaiseFailureEvents = true;
+                        options.Events.RaiseSuccessEvents = true;
+                    })
+                    .AddApiAuthorization<ApplicationUser, UsersAndRolesDbContext>()
+                    .AddProfileService<ApplicationUserProfileService>()
+                    // TODO DW - this should be conditional based upon whether or not we're in dev mode
+                    .AddSigningCredentials();
+
+                services.Configure<JwtBearerOptions>(
+                    IdentityServerJwtConstants.IdentityServerJwtBearerScheme,
+                    options =>
+                    {
+                        options.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            ValidateIssuerSigningKey = false,
+                            ValidateIssuer = false,
+                        };
+                    });
+            }
+          
 
             services
                 .AddAuthentication()
