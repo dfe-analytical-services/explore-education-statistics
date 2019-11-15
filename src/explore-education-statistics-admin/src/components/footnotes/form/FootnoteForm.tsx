@@ -12,7 +12,6 @@ import {
   Formik,
   Form,
   FormFieldset,
-  FormFieldCheckboxGroup,
   FormCheckbox,
 } from '@common/components/form';
 import Yup from '@common/lib/validation/yup';
@@ -20,11 +19,11 @@ import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import FormFieldCheckboxGroupsMenu from '@common/modules/table-tool/components/FormFieldCheckboxGroupsMenu';
 import { FormValues } from '@common/modules/table-tool/components/FiltersForm';
-import CollapsibleList from '@common/components/CollapsibleList';
 import React from 'react';
 import camelCase from 'lodash/camelCase';
 import { Field, FormikProps, FieldProps } from 'formik';
 import styles from './FootnoteForm.module.scss';
+import FieldSubjectCheckbox from './FieldSubjectCheckbox';
 
 export interface FootnoteFormConfig {
   state: 'create' | 'edit' | 'cancel';
@@ -105,22 +104,11 @@ const FootnoteForm = ({
                       <div key={subjectMetaId}>
                         <div key={subjectMetaId} className="govuk-grid-row">
                           <div className="govuk-grid-column-one-third">
-                            <Field name={`subjects.${subjectMetaId}.selected`}>
-                              {({ field }: FieldProps) => {
-                                return (
-                                  <FormCheckbox
-                                    id={subjectMetaId}
-                                    label={subjectMeta.subjectName}
-                                    {...field}
-                                    defaultChecked={
-                                      form.values.subjects[
-                                        Number(subjectMetaId)
-                                      ].selected
-                                    }
-                                  />
-                                );
-                              }}
-                            </Field>
+                            <FieldSubjectCheckbox
+                              id={subjectMetaId}
+                              label={subjectMeta.subjectName}
+                              name={`subjects.${subjectMetaId}.selected`}
+                            />
                           </div>
                           <div className="govuk-grid-column-one-third">
                             <FormFieldCheckboxGroupsMenu<FormValues>
