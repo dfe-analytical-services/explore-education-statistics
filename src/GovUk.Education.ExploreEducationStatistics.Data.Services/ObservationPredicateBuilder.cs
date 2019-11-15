@@ -140,21 +140,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private static Expression<Func<Observation, bool>> LocalAuthorityPredicate(SubjectMetaQueryContext query)
         {
-            return ObservationalUnitPredicate(query, GeographicLevel.Local_Authority,
+            return ObservationalUnitPredicate(query, GeographicLevel.LocalAuthority,
                 observation => query.LocalAuthority.Contains(observation.Location.LocalAuthority.Code));
         }
 
         private static Expression<Func<Observation, bool>> LocalAuthorityDistrictPredicate(
             SubjectMetaQueryContext query)
         {
-            return ObservationalUnitPredicate(query, GeographicLevel.Local_Authority_District,
+            return ObservationalUnitPredicate(query, GeographicLevel.LocalAuthorityDistrict,
                 observation => query.LocalAuthorityDistrict.Contains(observation.Location.LocalAuthorityDistrict.Code));
         }
 
         private static Expression<Func<Observation, bool>> LocalEnterprisePartnershipPredicate(
             SubjectMetaQueryContext query)
         {
-            return ObservationalUnitPredicate(query, GeographicLevel.Local_Enterprise_Partnership,
+            return ObservationalUnitPredicate(query, GeographicLevel.LocalEnterprisePartnership,
                 observation =>
                     query.LocalEnterprisePartnership.Contains(observation.Location.LocalEnterprisePartnership.Code));
         }
@@ -162,27 +162,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private static Expression<Func<Observation, bool>> MayoralCombinedAuthorityPredicate(
             SubjectMetaQueryContext query)
         {
-            return ObservationalUnitPredicate(query, GeographicLevel.Mayoral_Combined_Authority,
+            return ObservationalUnitPredicate(query, GeographicLevel.MayoralCombinedAuthority,
                 observation =>
                     query.MayoralCombinedAuthority.Contains(observation.Location.MayoralCombinedAuthority.Code));
         }
 
         private static Expression<Func<Observation, bool>> MultiAcademyTrustPredicate(SubjectMetaQueryContext query)
         {
-            return ObservationalUnitPredicate(query, GeographicLevel.Multi_Academy_Trust,
+            return ObservationalUnitPredicate(query, GeographicLevel.MultiAcademyTrust,
                 observation => query.MultiAcademyTrust.Contains(observation.Location.MultiAcademyTrust.Code));
         }
 
         private static Expression<Func<Observation, bool>> OpportunityAreaPredicate(SubjectMetaQueryContext query)
         {
-            return ObservationalUnitPredicate(query, GeographicLevel.Opportunity_Area,
+            return ObservationalUnitPredicate(query, GeographicLevel.OpportunityArea,
                 observation => query.OpportunityArea.Contains(observation.Location.OpportunityArea.Code));
         }
 
         private static Expression<Func<Observation, bool>> ParliamentaryConstituencyPredicate(
             SubjectMetaQueryContext query)
         {
-            return ObservationalUnitPredicate(query, GeographicLevel.Parliamentary_Constituency,
+            return ObservationalUnitPredicate(query, GeographicLevel.ParliamentaryConstituency,
                 observation =>
                     query.ParliamentaryConstituency.Contains(observation.Location.ParliamentaryConstituency.Code));
         }
@@ -195,7 +195,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private static Expression<Func<Observation, bool>> RscRegionPredicate(SubjectMetaQueryContext query)
         {
-            return ObservationalUnitPredicate(query, GeographicLevel.RSC_Region,
+            return ObservationalUnitPredicate(query, GeographicLevel.RscRegion,
                 observation => query.RscRegion.Contains(observation.Location.RscRegion.Code));
         }
 
