@@ -480,6 +480,7 @@ export default class PrototypePublicationService {
           caption: '',
           content: [
             {
+              id: '000000',
               type: 'MarkDownBlock',
               body: LOREM,
               comments: [
@@ -499,6 +500,7 @@ export default class PrototypePublicationService {
           caption: '',
           content: [
             {
+              id: '000001',
               type: 'MarkDownBlock',
               body: LOREM,
               comments: [
@@ -514,6 +516,7 @@ export default class PrototypePublicationService {
         },
       ],
       keyStatistics: {
+        id: '000002',
         type: 'DataBlock',
         body: '',
         dataBlockRequest: {
