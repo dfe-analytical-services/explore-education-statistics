@@ -7,7 +7,6 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
@@ -103,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 new ObservationalUnitMetaViewModel
                 {
                     Label = observationalUnit.Name,
-                    Level = pair.Key.ToString().CamelCase(),
+                    Level = pair.Key,
                     Value = observationalUnit.Code
                 }));
 

@@ -32,8 +32,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     {
         public Guid Id { get; set; }
 
-        public ContentSection ContentSection { get; set; }
-
         public Guid? ContentSectionId { get; set; }
 
         public abstract string Type { get; set; }
