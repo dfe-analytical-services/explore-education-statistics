@@ -17,7 +17,7 @@ import React, { useEffect, useState } from 'react';
 import FootnotesList from '@admin/components/footnotes/FootnotesList';
 import FootnoteForm, {
   FootnoteFormConfig,
-} from '@admin/components/footnotes/FootnoteForm';
+} from '@admin/components/footnotes/form/FootnoteForm';
 
 interface Props {
   publicationId: string;

@@ -7,7 +7,7 @@ import React from 'react';
 import classNames from 'classnames';
 import Button from '@common/components/Button';
 import Details from '@common/components/Details';
-import FootnoteForm, { FootnoteFormControls } from './FootnoteForm';
+import FootnoteForm, { FootnoteFormControls } from './form/FootnoteForm';
 import styles from './FootnotesList.module.scss';
 import FootnoteSubjectSelection from './FootnoteSubjectSelection';
 
