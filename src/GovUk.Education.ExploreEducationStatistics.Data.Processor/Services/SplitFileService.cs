@@ -29,16 +29,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             SubjectData subjectData,
             BatchSettings batchSettings)
         {
-            var lines = subjectData.GetCsvLines();
+            var csvLines = subjectData.GetCsvLines().ToList();
 
-            var csvLines = lines.ToList();
             if (csvLines.Count() > batchSettings.RowsPerBatch + 1)
             {
-                var result = await SplitFiles(message, csvLines, batchSettings.RowsPerBatch, subjectData);
-                foreach (var m in result)
-                {
-                    collector.Add(m);
-                }
+                await SplitFiles(message, csvLines, batchSettings.RowsPerBatch, subjectData, collector);
             }
             // Else perform any additional validation & pass on file to message queue for import
             else
@@ -52,7 +47,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             ImportMessage message,
             IEnumerable<string> csvLines,
             int rowsPerBatch,
-            SubjectData subjectData)
+            SubjectData subjectData,
+            ICollector<ImportMessage> collector)
         {
             var enumerable = csvLines.ToList();
             var header = enumerable.First();
@@ -86,8 +82,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     fileName,
                     "text/csv"
                     );
-
-                messages.Add(new ImportMessage
+                
+                var iMessage = new ImportMessage
                 {
                     DataFileName = fileName,
                     OrigDataFileName = message.DataFileName,
@@ -95,7 +91,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     BatchNo = batchCount++,
                     NumBatches = numBatches,
                     RowsPerBatch = rowsPerBatch
-                });
+                };
+
+                collector.Add(iMessage);
             }
 
             return messages;

@@ -4,13 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Importer.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Importer.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -37,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public async Task ImportObservations(ImportMessage message, StatisticsDbContext context)
         {
-            var subjectData = _fileStorageService.GetSubjectData(message).Result;
+            var subjectData = await _fileStorageService.GetSubjectData(message);
             var subject = GetSubject(message, subjectData.Name, context);
             var releaseId = message.Release.Id.ToString();
 
@@ -50,16 +48,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             // Potentially status could already be failed so don't continue
             if (await _batchService.UpdateStatus(message.Release.Id.ToString(), message.OrigDataFileName, IStatus.RUNNING_PHASE_2))
             {
-
                 try
                 {
-                    var batch = subjectData.GetCsvLines().ToList();
-                    var metaLines = subjectData.GetMetaLines().ToList();
-
                     _importerService.ImportObservations(
-                        batch,
+                        subjectData.GetCsvLines().ToList(),
                         subject,
-                        _importerService.GetMeta(metaLines, subject, context),
+                        _importerService.GetMeta(subjectData.GetMetaLines().ToList(), subject, context),
                         message.BatchNo,
                         message.RowsPerBatch,
                         context
@@ -73,16 +67,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                         _fileStorageService.Delete(message.Release.Id.ToString(), message.DataFileName);
                     }
 
-                    _batchService.UpdateBatchCount(
-                        message.Release.Id.ToString(), message.OrigDataFileName, message.BatchNo).Wait();
+                    await _batchService.UpdateBatchCount(
+                        message.Release.Id.ToString(), message.OrigDataFileName, message.BatchNo);
                 }
                 catch (Exception e)
                 {
-                    _batchService.LogErrors(
+                    await _batchService.LogErrors(
                         message.Release.Id.ToString(),
                         message.OrigDataFileName,
                         new List<String> {e.Message}
-                    ).Wait();
+                    );
 
                     _logger.LogError(
                         $"{GetType().Name} function FAILED: : Batch: " +
@@ -106,8 +100,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 _importerService.GetMeta(metaLines, subject, context),
                 subject,
                 context);
-
-            context.SaveChanges();
         }
 
         private Subject GetSubject(ImportMessage message, string subjectName, StatisticsDbContext context)

@@ -1,5 +1,4 @@
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Data.Importer.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.EntityFrameworkCore;
@@ -15,18 +14,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
         public FilterItem Find(string filterItemLabel, string filterGroupLabel, Filter filter, StatisticsDbContext context)
         {
+            if (filter.Label == "Month of birth")
+            {
+                var s = 1;
+            }
             var filterGroup = LookupOrCreateFilterGroup(filter, filterGroupLabel, context);
-            return LookupOrCreateFilterItem(filterGroup, filterItemLabel, context);
+            return LookupOrCreateFilterItem(filter, filterGroup, filterItemLabel, context);
         }
 
-        private FilterItem LookupOrCreateFilterItem(FilterGroup filterGroup, string label, StatisticsDbContext context)
+        private FilterItem LookupOrCreateFilterItem(Filter filter, FilterGroup filterGroup, string label, StatisticsDbContext context)
         {
             if (string.IsNullOrWhiteSpace(label))
             {
                 label = "Not specified";
             }
 
-            var cacheKey = GetFilterItemCacheKey(filterGroup, label);
+            var cacheKey = GetFilterItemCacheKey( filter.Label, filterGroup.Label, label);
             if (GetCache().TryGetValue(cacheKey, out FilterItem filterItem))
             {
                 return filterItem;
@@ -54,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             }
             
             filterGroup = context.FilterGroup.AsNoTracking()
-                          .FirstOrDefault(fg => fg.FilterId == filter.Id && fg.Label == label) 
+                          .FirstOrDefault(fg => fg.FilterId == filter.Id && fg.Label == label)
                           ?? context.FilterGroup.Add(new FilterGroup(filter, label)).Entity;
             
             GetCache().Set(cacheKey, filterGroup);
@@ -69,10 +72,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                    filterGroupLabel.ToLower().Replace(" ", "_");            
         } 
         
-        private static string GetFilterItemCacheKey(FilterGroup filterGroup, string filterItemLabel)
+        private static string GetFilterItemCacheKey(string filterName, string filterGroupLabel, string filterItemLabel)
         {
             return typeof(FilterItem).Name + "_" +
-                   filterGroup.Id + "_" +
+                   filterName + "_" + filterGroupLabel + "_" +
                    filterItemLabel.ToLower().Replace(" ", "_");
         }
     }

@@ -1,5 +1,4 @@
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Data.Importer.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.EntityFrameworkCore;

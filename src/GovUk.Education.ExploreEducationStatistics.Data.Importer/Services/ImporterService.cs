@@ -102,9 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
         public SubjectMeta ImportMeta(List<string> metaLines, Subject subject, StatisticsDbContext context)
         {
-            var subjectMeta = _importerMetaService.Import(metaLines, subject, context);
-            context.SaveChanges();
-            return subjectMeta;
+            return _importerMetaService.Import(metaLines, subject, context);
         }
         
         public SubjectMeta GetMeta(List<string> metaLines, Subject subject, StatisticsDbContext context)
@@ -114,6 +112,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
         public void ImportFiltersLocationsAndSchools(List<string> lines, SubjectMeta subjectMeta, Subject subject, StatisticsDbContext context)
         {
+            // Clearing the caches is required here as the seeder shares the cache with all subjects
+            _importerFilterService.ClearCache();
+            _importerLocationService.ClearCache();
+            _importerSchoolService.ClearCache();
+            
             var headers = lines.First().Split(',').ToList();
             lines.RemoveAt(0);
             lines.ToList().ForEach(line =>
@@ -125,6 +128,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         public void ImportObservations(List<string> lines, Subject subject, SubjectMeta subjectMeta, int batchNo,
             int rowsPerBatch, StatisticsDbContext context)
         {
+            _importerFilterService.ClearCache();
+            _importerLocationService.ClearCache();
+            _importerSchoolService.ClearCache();
+            
             var headers = lines.First().Split(',').ToList();
             lines.RemoveAt(0);
             var observations = GetObservations(context, lines, headers, subject, subjectMeta, batchNo, rowsPerBatch).ToList();
@@ -266,6 +273,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             {
                 var filterItemLabel = CsvUtil.Value(line, headers, filterMeta.Column);
                 var filterGroupLabel = CsvUtil.Value(line, headers, filterMeta.FilterGroupingColumn);
+                
                 _importerFilterService.Find(filterItemLabel, filterGroupLabel, filterMeta.Filter, context); 
             }
         }
@@ -327,10 +335,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
         private static Dictionary<long, string> GetMeasures(IReadOnlyList<string> line,
             List<string> headers, IEnumerable<(Indicator Indicator, string Column)> indicators)
         {
-            var columns = indicators.Select(tuple => tuple.Column);
+            var valueTuples = indicators.ToList();
+            var columns = valueTuples.Select(tuple => tuple.Column);
             var values = CsvUtil.Values(line, headers, columns);
 
-            return indicators.Zip(values, (tuple, value) => new {tuple, value})
+            return valueTuples.Zip(values, (tuple, value) => new {tuple, value})
                 .ToDictionary(item => item.tuple.Indicator.Id, item => item.value);
         }
 

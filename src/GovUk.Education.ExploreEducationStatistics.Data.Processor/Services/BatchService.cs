@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             try
             {
-                import = GetImport(releaseId, dataFileName).Result;
+                import = await GetImport(releaseId, dataFileName);
                 var bitArray = new BitArray(import.BatchesProcessed);
                 bitArray.Set(batchNo - 1, true);
                 bitArray.CopyTo(import.BatchesProcessed, 0);
@@ -57,7 +57,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 await cloudBlockBlob.ReleaseLeaseAsync(AccessCondition.GenerateLeaseCondition(leaseId));
             }
 
-            if (_importStatusService.GetImportStatus(releaseId, dataFileName).Result.PercentageComplete == 100)
+            var result = await _importStatusService.GetImportStatus(releaseId, dataFileName);
+            if (result.PercentageComplete == 100)
             {
                 await UpdateStatus(releaseId, dataFileName,
                     import.Errors.Equals("") ? IStatus.COMPLETE : IStatus.FAILED

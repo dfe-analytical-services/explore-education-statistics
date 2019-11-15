@@ -1,6 +1,5 @@
 using System.Linq;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Data.Importer.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
@@ -22,7 +21,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public ReleaseProcessorService(
             ILogger<IReleaseProcessorService> logger,
-            //StatisticsDbContext context,
             IMapper mapper)
         {
             _logger = logger;
@@ -32,9 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         public Subject CreateOrUpdateRelease(SubjectData subjectData, ImportMessage message, StatisticsDbContext context)
         {
             var release = CreateOrUpdateRelease(message, context);
-            var subject = RemoveAndCreateSubject(subjectData.Name, release, context);
-            context.SaveChanges();
-            return subject;
+            return RemoveAndCreateSubject(subjectData.Name, release, context);
         }
 
         private Subject RemoveAndCreateSubject(string name, Release release, StatisticsDbContext context)
