@@ -39,12 +39,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         [HttpPost]
         public ActionResult<FootnoteViewModel> CreateFootnote(CreateFootnoteViewModel footnote)
         {
-            return _mapper.Map<FootnoteViewModel>(_footnoteService.CreateFootnote(footnote.Content,
+            var created = _footnoteService.CreateFootnote(footnote.Content,
                 footnote.Filters,
                 footnote.FilterGroups,
                 footnote.FilterItems,
                 footnote.Indicators,
-                footnote.Subjects));
+                footnote.Subjects);
+
+            return BuildFootnoteViewModel(created);
         }
 
         [HttpDelete("{id}")]
@@ -60,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         [HttpGet("release/{releaseId}")]
         public ActionResult<FootnotesViewModel> GetFootnotes(Guid releaseId)
         {
-            var footnotes = _footnoteService.GetFootnotes(releaseId).ToList();
+            var footnotes = _footnoteService.GetFootnotes(releaseId).Select(BuildFootnoteViewModel);
             var subjects = _releaseMetaService.GetSubjects(releaseId).ToDictionary(subject => subject.Id, subject =>
                 new FootnotesSubjectMetaViewModel
                 {
@@ -72,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
 
             return new FootnotesViewModel
             {
-                Footnotes = _mapper.Map<IEnumerable<FootnoteViewModel>>(footnotes),
+                Footnotes = footnotes,
                 Meta = subjects
             };
         }
@@ -80,13 +82,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         [HttpPut("{id}")]
         public ActionResult<FootnoteViewModel> UpdateFootnote(long id, UpdateFootnoteViewModel footnote)
         {
-            return _mapper.Map<FootnoteViewModel>(_footnoteService.UpdateFootnote(id,
+            var updated = _footnoteService.UpdateFootnote(id,
                 footnote.Content,
                 footnote.Filters,
                 footnote.FilterGroups,
                 footnote.FilterItems,
                 footnote.Indicators,
-                footnote.Subjects));
+                footnote.Subjects);
+
+            return BuildFootnoteViewModel(updated);
         }
 
         private ActionResult CheckFootnoteExists(long id, Func<ActionResult> andThen)
@@ -120,11 +124,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                         Legend = filter.Label,
                         Options = filter.FilterGroups.ToDictionary(
                             filterGroup => filterGroup.Id,
-                            filterGroup => BuildFilterItemsViewModel(filterGroup, filterGroup.FilterItems))
+                            filterGroup => BuildFilterItemsMetaViewModel(filterGroup, filterGroup.FilterItems))
                     });
         }
 
-        private static FootnotesFilterItemsMetaViewModel BuildFilterItemsViewModel(FilterGroup filterGroup,
+        private static FootnotesFilterItemsMetaViewModel BuildFilterItemsMetaViewModel(FilterGroup filterGroup,
             IEnumerable<FilterItem> filterItems)
         {
             return new FootnotesFilterItemsMetaViewModel
@@ -137,6 +141,115 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                         Label = item.Label,
                         Value = item.Id.ToString()
                     })
+            };
+        }
+
+        private static IEnumerable<FootnoteViewModel> BuildFootnoteViewModel(IEnumerable<Footnote> footnotes)
+        {
+            return footnotes.Select(footnote =>
+            {
+                return new FootnoteViewModel
+                {
+                    Id = footnote.Id,
+                    Content = footnote.Content,
+                    Subjects = new Dictionary<long, FootnoteSubjectViewModel>
+                    {
+                        {
+                            1, new FootnoteSubjectViewModel
+                            {
+                                Filters = new Dictionary<long, FootnoteFilterViewModel>
+                                {
+                                    {
+                                        1, new FootnoteFilterViewModel
+                                        {
+                                            FilterGroups = new Dictionary<long, FootnoteFilterGroupViewModel>
+                                            {
+                                                {
+                                                    1, new FootnoteFilterGroupViewModel
+                                                    {
+                                                        FilterItems = new List<long>
+                                                        {
+                                                            56, 57, 58
+                                                        },
+                                                        Selected = false
+                                                    }
+                                                }
+                                            },
+                                            Selected = false
+                                        }
+                                    }
+                                },
+                                IndicatorGroups = new Dictionary<long, FootnoteIndicatorGroupViewModel>
+                                {
+                                    {
+                                        1, new FootnoteIndicatorGroupViewModel
+                                        {
+                                            Indicators = new List<long>
+                                            {
+                                                16, 3
+                                            },
+                                            Selected = false
+                                        }
+                                    }
+                                },
+                                Selected = false
+                            }
+                        }
+                    }
+                };
+            });
+        }
+
+        private static FootnoteViewModel BuildFootnoteViewModel(Footnote footnote)
+        {
+            return new FootnoteViewModel
+            {
+                Id = footnote.Id,
+                Content = footnote.Content,
+                Subjects = new Dictionary<long, FootnoteSubjectViewModel>
+                {
+                    {
+                        1, new FootnoteSubjectViewModel
+                        {
+                            Filters = new Dictionary<long, FootnoteFilterViewModel>
+                            {
+                                {
+                                    1, new FootnoteFilterViewModel
+                                    {
+                                        FilterGroups = new Dictionary<long, FootnoteFilterGroupViewModel>
+                                        {
+                                            {
+                                                1, new FootnoteFilterGroupViewModel
+                                                {
+                                                    FilterItems = new List<long>
+                                                    {
+                                                        56, 57, 58
+                                                    },
+                                                    Selected = false
+                                                }
+                                            }
+                                        },
+                                        Selected = false
+                                    }
+                                }
+                            },
+                            IndicatorGroups = new Dictionary<long, FootnoteIndicatorGroupViewModel>
+                            {
+                                {
+                                    1, new FootnoteIndicatorGroupViewModel
+                                    {
+                                        Indicators = new List<long>
+                                        {
+                                            16, 3
+                                        },
+                                        Selected = false
+                                    }
+                                }
+                            },
+                            Selected = false
+                        }
+                    }
+                }
             };
         }
     }

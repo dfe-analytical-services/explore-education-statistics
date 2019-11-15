@@ -6,10 +6,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.Statistics
     {
         public long Id { get; set; }
         public string Content { get; set; }
-        public IEnumerable<long> Indicators { get; set; }
-        public IEnumerable<long> Filters { get; set; }
-        public IEnumerable<long> FilterGroups { get; set; }
-        public IEnumerable<long> FilterItems { get; set; }
-        public IEnumerable<long> Subjects { get; set; }
+        public Dictionary<long, FootnoteSubjectViewModel> Subjects { get; set; }
     }
 }
