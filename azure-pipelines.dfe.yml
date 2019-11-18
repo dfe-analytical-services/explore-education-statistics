@@ -417,11 +417,11 @@ jobs:
         inputs:
           artifactName: 'newman-tests'
           targetPath: 'tests/newman'
-      # - task: PublishPipelineArtifact@0
-      #   displayName: 'Publish AzureADCookie script'
-      #   inputs:
-      #     artifactName: 'azure-ad-cookie-script'
-      #     targetPath: 'useful-scripts/azure-ad-cookie'
+      - task: PublishPipelineArtifact@0
+        displayName: 'Publish Auth Token script'
+        inputs:
+          artifactName: 'auth-token-script'
+          targetPath: 'useful-scripts/auth-tokens'
       - task: 'PublishPipelineArtifact@0'
         displayName: 'Publish ARM templates'
         inputs:
