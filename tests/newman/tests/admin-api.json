@@ -1923,6 +1923,66 @@
 							"response": []
 						},
 						{
+							"name": "Verify Related Information entry added",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "854b75f6-cbce-4351-a37f-1e73f657c407",
+										"exec": [
+											"var respJson = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () { ",
+											"    pm.response.to.have.status(200); ",
+											"});",
+											"",
+											"pm.test(\"Related Information array contains values\", function () {",
+											"    pm.expect(respJson.length).to.equal(pm.environment.get(\"number_of_related_information_items\"));",
+											"});",
+											"",
+											"pm.test(\"Latest Related Information entry should contain the latest details\", function () { ",
+											"    const lastItem = respJson[respJson.length - 1];",
+											"    pm.expect(lastItem.title).to.equal(\"Related Information 1\");",
+											"    pm.expect(lastItem.url).to.equal(\"http://example.com/1\");",
+											"    pm.expect(lastItem.id).to.equal(pm.environment.get(\"latest_related_information_id\"));",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Cookie",
+										"type": "text",
+										"value": ".AspNetCore.AzureADCookie={{azure_ad_cookie}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/related-information",
+									"host": [
+										"{{admin_api_url}}"
+									],
+									"path": [
+										"release",
+										"e7774a74-1f62-4b76-b9b5-84f14dac7278",
+										"content",
+										"related-information"
+									]
+								}
+							},
+							"response": []
+						},
+						{
 							"name": "Edit Related Information",
 							"event": [
 								{
@@ -1967,7 +2027,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"url\": \"http://example.com/updated\",\n    \"title\": \"Related Information updated\",\n}"
+									"raw": "{\n    \"url\": \"http://example.com/updated\",\n    \"title\": \"Related Information updated\"\n}\n"
 								},
 								"url": {
 									"raw": "{{admin_api_url}}/release/e7774a74-1f62-4b76-b9b5-84f14dac7278/content/related-information/{{latest_related_information_id}}",
@@ -1986,7 +2046,7 @@
 							"response": []
 						},
 						{
-							"name": "Get Related Information",
+							"name": "Verify Related Information entry updated",
 							"event": [
 								{
 									"listen": "test",
@@ -2005,8 +2065,8 @@
 											"",
 											"pm.test(\"Latest Related Information entry should contain the latest details\", function () { ",
 											"    const lastItem = respJson[respJson.length - 1];",
-											"    pm.expect(lastItem.title).to.equal(\"Related Information 1\");",
-											"    pm.expect(lastItem.url).to.equal(\"http://example.com/1\");",
+											"    pm.expect(lastItem.title).to.equal(\"Related Information updated\");",
+											"    pm.expect(lastItem.url).to.equal(\"http://example.com/updated\");",
 											"    pm.expect(lastItem.id).to.equal(pm.environment.get(\"latest_related_information_id\"));",
 											"});"
 										],
