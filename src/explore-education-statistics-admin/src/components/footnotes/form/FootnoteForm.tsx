@@ -1,29 +1,23 @@
+import Link from '@admin/components/Link';
 import {
   Footnote,
-  FootnoteProps,
   FootnoteMeta,
   FootnoteMetaGetters,
+  FootnoteProps,
   FootnoteSubjectMeta,
 } from '@admin/services/release/edit-release/footnotes/types';
 import footnoteFormValidation from '@admin/services/release/edit-release/footnotes/util';
-import Link from '@admin/components/Link';
 import Button from '@common/components/Button';
-import {
-  Formik,
-  Form,
-  FormFieldset,
-  FormCheckbox,
-} from '@common/components/form';
-import Yup from '@common/lib/validation/yup';
+import Details from '@common/components/Details';
+import { Form, FormFieldset, Formik } from '@common/components/form';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
-import FormFieldCheckboxGroupsMenu from '@common/modules/table-tool/components/FormFieldCheckboxGroupsMenu';
-import { FormValues } from '@common/modules/table-tool/components/FiltersForm';
-import React from 'react';
-import camelCase from 'lodash/camelCase';
-import { Field, FormikProps, FieldProps } from 'formik';
-import styles from './FootnoteForm.module.scss';
+import Yup from '@common/lib/validation/yup';
+import get from 'lodash/get';
+import { FormikProps } from 'formik';
+import React, { createContext } from 'react';
 import FieldSubjectCheckbox from './FieldSubjectCheckbox';
+import styles from './FootnoteForm.module.scss';
 
 export interface FootnoteFormConfig {
   state: 'create' | 'edit' | 'cancel';
@@ -84,11 +78,6 @@ const FootnoteForm = ({
             <div className={styles.container}>
               <Form {...form} id={formId}>
                 <p>Select either one or multiple subject areas from below</p>
-                <div className="govuk-grid-row govuk-heading-s govuk-!-margin-bottom-0">
-                  <div className="govuk-grid-column-one-third">Subject</div>
-                  <div className="govuk-grid-column-one-third">Indicator</div>
-                  <div className="govuk-grid-column-one-third">Filter</div>
-                </div>
                 <hr className="govuk-!-margin-top-1 govuk-!-margin-bottom-2" />
                 <FormFieldset
                   id={`${formId}-allFieldsFieldset`}
@@ -103,7 +92,13 @@ const FootnoteForm = ({
                     ]) => (
                       <div key={subjectMetaId}>
                         <div key={subjectMetaId} className="govuk-grid-row">
+                          <h4 className="govuk-visually-hidden">
+                            {subjectMeta.subjectName} footnote matching criteria
+                          </h4>
                           <div className="govuk-grid-column-one-third">
+                            <h5 className="govuk-!-margin-bottom-2 govuk-!-margin-top-0">
+                              Subject
+                            </h5>
                             <FieldSubjectCheckbox
                               id={subjectMetaId}
                               label={subjectMeta.subjectName}
@@ -111,27 +106,39 @@ const FootnoteForm = ({
                             />
                           </div>
                           <div className="govuk-grid-column-one-third">
-                            <FormFieldCheckboxGroupsMenu<FormValues>
-                              name="indicators"
-                              id="indicators"
-                              legend="Indicators"
-                              legendHidden
-                              error={getError('indicators')}
-                              selectAll
-                              options={Object.values(
-                                subjectMeta.indicators,
-                              ).map(indicatorGroup => {
-                                return {
-                                  legend: indicatorGroup.label,
-                                  options: Object.values(
-                                    indicatorGroup.options,
-                                  ),
-                                };
-                              })}
-                            />
+                            <h5 className="govuk-!-margin-bottom-2 govuk-!-margin-top-0">
+                              Indicators
+                            </h5>
+                            <Details
+                              summary={`Indicators ${null ? '(All)' : ''}`}
+                            >
+                              IndicatorGroups here..
+                              {/* <FormFieldCheckboxGroupsMenu<FormValues>
+                                        name="indicators"
+                                        id="indicators"
+                                        legend="Indicators"
+                                        legendHidden
+                                        error={getError('indicators')}
+                                        selectAll
+                                        options={Object.values(
+                                          subjectMeta.indicators,
+                                        ).map(indicatorGroup => {
+                                          return {
+                                            legend: indicatorGroup.label,
+                                            options: Object.values(
+                                              indicatorGroup.options,
+                                            ),
+                                          };
+                                        })}
+                                      />
+                                      */}
+                            </Details>
                           </div>
-                          {/*
-                        <div className="govuk-grid-column-one-third">
+                          <div className="govuk-grid-column-one-third">
+                            <h5 className="govuk-!-margin-bottom-2 govuk-!-margin-top-0">
+                              Filters
+                            </h5>
+                            {/*
                           <FormFieldset
                             id={`${formId}-filters`}
                             legend="Categories"
@@ -168,8 +175,8 @@ const FootnoteForm = ({
                               )}
                             </CollapsibleList>
                           </FormFieldset>
-                        </div>
-                       */}
+                        */}
+                          </div>
                         </div>
                         <hr className="govuk-!-margin-0 govuk-!-margin-bottom-2" />
                       </div>

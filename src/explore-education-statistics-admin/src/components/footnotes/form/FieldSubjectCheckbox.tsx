@@ -3,15 +3,19 @@ import { Field, FieldProps } from 'formik';
 import { get } from 'lodash';
 import { FormCheckbox } from '@common/components/form';
 
+export interface FieldCheckboxProps {
+  name: string;
+  id: string;
+  label: string;
+  disabled?: boolean;
+}
+
 const FieldSubjectCheckbox = ({
   id,
   name,
   label,
-}: {
-  name: string;
-  id: string;
-  label: string;
-}) => {
+  disabled = false,
+}: FieldCheckboxProps) => {
   return (
     <Field name={name}>
       {({ form, field }: FieldProps) => {
@@ -21,8 +25,9 @@ const FieldSubjectCheckbox = ({
             id={id}
             name={name}
             label={label}
-            value={field.value}
+            {...field}
             defaultChecked={defaultValue}
+            disabled={disabled}
           />
         );
       }}

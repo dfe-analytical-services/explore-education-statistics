@@ -19,6 +19,7 @@ export interface FormCheckboxProps {
   name: string;
   onChange?: CheckboxChangeEventHandler;
   value: string;
+  disabled?: boolean;
 }
 
 const FormCheckbox = ({
@@ -32,6 +33,7 @@ const FormCheckbox = ({
   name,
   onChange,
   value,
+  disabled = false,
 }: FormCheckboxProps) => {
   return (
     <>
@@ -50,6 +52,7 @@ const FormCheckbox = ({
           }}
           type="checkbox"
           value={value}
+          disabled={disabled}
         />
         <label className="govuk-label govuk-checkboxes__label" htmlFor={id}>
           {label}
