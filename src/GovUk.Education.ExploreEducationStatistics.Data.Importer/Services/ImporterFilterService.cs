@@ -14,10 +14,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
 
         public FilterItem Find(string filterItemLabel, string filterGroupLabel, Filter filter, StatisticsDbContext context)
         {
-            if (filter.Label == "Month of birth")
-            {
-                var s = 1;
-            }
             var filterGroup = LookupOrCreateFilterGroup(filter, filterGroupLabel, context);
             return LookupOrCreateFilterItem(filter, filterGroup, filterItemLabel, context);
         }
@@ -29,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 label = "Not specified";
             }
 
-            var cacheKey = GetFilterItemCacheKey( filter.Label, filterGroup.Label, label);
+            var cacheKey = GetFilterItemCacheKey( filterGroup, label, context);
             if (GetCache().TryGetValue(cacheKey, out FilterItem filterItem))
             {
                 return filterItem;
@@ -50,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                 label = "Default";
             }
             
-            var cacheKey = GetFilterGroupCacheKey(filter, label);
+            var cacheKey = GetFilterGroupCacheKey(filter, label, context);
             if (GetCache().TryGetValue(cacheKey, out FilterGroup filterGroup))
             {
                 return filterGroup;
@@ -65,17 +61,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
             return filterGroup;
         }
 
-        private static string GetFilterGroupCacheKey(Filter filter, string filterGroupLabel)
+        private static string GetFilterGroupCacheKey(Filter filter, string filterGroupLabel, StatisticsDbContext context)
         {
             return typeof(FilterGroup).Name + "_" +
-                   filter.Id + "_" +
+                   (filter.Id == 0 ? context.Entry(filter).Property(e => e.Id).CurrentValue : filter.Id) + "_" +
                    filterGroupLabel.ToLower().Replace(" ", "_");            
         } 
         
-        private static string GetFilterItemCacheKey(string filterName, string filterGroupLabel, string filterItemLabel)
+        private static string GetFilterItemCacheKey(FilterGroup filterGroup, string filterItemLabel, StatisticsDbContext context)
         {
             return typeof(FilterItem).Name + "_" +
-                   filterName + "_" + filterGroupLabel + "_" +
+                   (filterGroup.Id == 0 ? context.Entry(filterGroup).Property(e => e.Id).CurrentValue : filterGroup.Id) + "_" +
                    filterItemLabel.ToLower().Replace(" ", "_");
         }
     }
