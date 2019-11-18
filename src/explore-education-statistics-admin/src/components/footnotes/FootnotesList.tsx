@@ -49,7 +49,7 @@ const FootnotesList = ({
           <>
             <div className={styles.row}>
               <div className={styles.row__footnoteContent}>{content}</div>
-              <div>
+              <div className={styles.row__footnoteActions}>
                 <Button
                   type="button"
                   className="govuk-button govuk-!-margin-right-3 govuk-!-margin-bottom-0"

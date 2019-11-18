@@ -9,6 +9,11 @@
   display: flex;
   &__footnoteContent {
     flex-grow: 1;
+    flex-shrink: 1;
+  }
+  &__footnoteActions {
+    flex-shrink: 0;
+    flex-wrap: nowrap;
   }
 }
 
