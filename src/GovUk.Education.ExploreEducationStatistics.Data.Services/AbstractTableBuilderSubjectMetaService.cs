@@ -1,9 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
@@ -88,25 +89,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
               * Duplicates where the values are the same but the labels are different.
                 These don't need any action.
             */
-            
+
             var case1 = viewModels
                 .GroupBy(model => (model.Value, model.Label))
                 .Where(grouping => grouping.Count() > 1)
-                .SelectMany(grouping => grouping);
+                .SelectMany(grouping => grouping)
+                .ToList();
 
             var case2 = viewModels.Except(case1)
                 .GroupBy(model => model.Label)
                 .Where(grouping => grouping.Count() > 1)
-                .SelectMany(grouping => grouping);
+                .SelectMany(grouping => grouping)
+                .ToList();
+
+            if (!(case1.Any() || case2.Any()))
+            {
+                return viewModels;
+            }
 
             return viewModels.Select(value =>
             {
                 if (case1.Contains(value))
                 {
-                    // TODO EES-204 Append geographic level
-                    value.Label += "";
-                } 
-                
+                    if (value is ObservationalUnitMetaViewModel observationalUnitMetaViewModel)
+                    {
+                        observationalUnitMetaViewModel.Label +=
+                            $" ({observationalUnitMetaViewModel.Level.GetEnumLabel()})";
+                    }
+                }
+
                 if (case2.Contains(value))
                 {
                     value.Label += $" ({value.Value})";

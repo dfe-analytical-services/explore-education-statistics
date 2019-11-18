@@ -1,6 +1,10 @@
 import classNames from 'classnames';
 import Link from 'next/link';
 import React from 'react';
+import {
+  SetCommonButtonLink,
+  ButtonLinkType,
+} from '@common/components/ButtonLink';
 import { LinkProps } from './Link';
 
 type Props = {
@@ -35,5 +39,7 @@ const ButtonLink = ({
     </Link>
   );
 };
+
+SetCommonButtonLink(ButtonLink as ButtonLinkType);
 
 export default ButtonLink;

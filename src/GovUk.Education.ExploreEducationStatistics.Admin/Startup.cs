@@ -6,6 +6,8 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -190,6 +192,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IDataBlockService, DataBlockService>();
             services.AddTransient<IPreReleaseService, PreReleaseService>();
 
+            services.AddTransient<IManageContentPageService, ManageContentPageService>();
+            services.AddTransient<IRelatedInformationService, RelatedInformationService>();
+            
             services.AddTransient<IBoundaryLevelService, BoundaryLevelService>();
             services.AddTransient<IDataService<ResultWithMetaViewModel>, DataService>();
             services.AddTransient<IDataService<TableBuilderResultViewModel>, TableBuilderDataService>();
@@ -222,6 +227,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             {
                 c.SwaggerDoc("v1",
                     new OpenApiInfo {Title = "Explore education statistics - Admin API", Version = "v1"});
+                // c.SwaggerDoc("v1", new Info {Title = "Explore education statistics - Admin API", Version = "v1"});
+                // c.CustomSchemaIds((type) => type.FullName);
             });
         }
 

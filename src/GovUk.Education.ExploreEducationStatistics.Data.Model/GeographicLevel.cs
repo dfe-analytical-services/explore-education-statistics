@@ -5,35 +5,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
     public enum GeographicLevel
     {
         [EnumLabelValue("Local Authority", "LA")]
-        Local_Authority,
+        LocalAuthority,
 
         [EnumLabelValue("Local Authority District", "LAD")]
-        Local_Authority_District,
+        LocalAuthorityDistrict,
 
         [EnumLabelValue("Local Enterprise Partnership", "LEP")]
-        Local_Enterprise_Partnership,
+        LocalEnterprisePartnership,
 
         [EnumLabelValue("Institution", "INS")] Institution,
 
         [EnumLabelValue("Mayoral Combined Authority", "MCA")]
-        Mayoral_Combined_Authority,
+        MayoralCombinedAuthority,
 
         [EnumLabelValue("MAT", "MAT")]
-        Multi_Academy_Trust,
+        MultiAcademyTrust,
 
         [EnumLabelValue("National", "NAT")] Country,
 
         [EnumLabelValue("Opportunity Area", "OA")]
-        Opportunity_Area,
+        OpportunityArea,
 
         [EnumLabelValue("Parliamentary Constituency", "PC")]
-        Parliamentary_Constituency,
+        ParliamentaryConstituency,
 
         [EnumLabelValue("Provider", "PRO")] Provider,
 
         [EnumLabelValue("Regional", "REG")] Region,
 
-        [EnumLabelValue("RSC Region", "RSCR")] RSC_Region,
+        [EnumLabelValue("RSC Region", "RSCR")] RscRegion,
 
         [EnumLabelValue("School", "SCH")] School,
 

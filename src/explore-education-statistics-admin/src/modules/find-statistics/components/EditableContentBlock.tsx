@@ -1,17 +1,21 @@
-import { ContentBlock } from '@common/services/publicationService';
-import React, { Component } from 'react';
 import { EditableRelease } from '@admin/services/publicationService';
-import EditableContentSubBlockRenderer from './EditableContentSubBlockRenderer';
+import ContentBlock, {
+  ContentBlockProps,
+} from '@common/modules/find-statistics/components/ContentBlock';
+import { ContentBlock as ContentBlockData } from '@common/services/publicationService';
+import React, { Component } from 'react';
+import wrapEditableComponent from '@common/modules/find-statistics/util/wrapEditableComponent';
 import AddComment from '../../../pages/prototypes/components/PrototypeEditableContentAddComment';
 import ResolveComment from '../../../pages/prototypes/components/PrototypeEditableContentResolveComment';
+import EditableContentSubBlockRenderer from './EditableContentSubBlockRenderer';
 
-interface Props {
+export interface Props extends ContentBlockProps {
   content: EditableRelease['content'][0]['content'];
-  id?: string;
+
   editable?: boolean;
   reviewing?: boolean;
   resolveComments?: boolean;
-  onContentChange?: (block: ContentBlock, content: string) => void;
+  onContentChange?: (block: ContentBlockData, content: string) => void;
 }
 
 class EditableContentBlock extends Component<Props> {
@@ -56,4 +60,4 @@ class EditableContentBlock extends Component<Props> {
   }
 }
 
-export default EditableContentBlock;
+export default wrapEditableComponent(EditableContentBlock, ContentBlock);
