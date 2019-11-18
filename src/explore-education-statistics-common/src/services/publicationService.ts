@@ -1,3 +1,5 @@
+import { DayMonthYearValues } from '@admin/services/common/types';
+import { ReleaseStatus } from '@admin/services/dashboard/types';
 import { AxesConfiguration } from '@common/modules/find-statistics/components/charts/ChartFunctions';
 import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
 import {
@@ -204,6 +206,9 @@ export interface AbstractRelease<
   publicationId: string;
   publication: PublicationType;
   latestRelease: boolean;
+  publishScheduled: string;
+  nextReleaseDate: DayMonthYearValues;
+  status: ReleaseStatus;
   type: {
     id: string;
     title: ReleaseType;

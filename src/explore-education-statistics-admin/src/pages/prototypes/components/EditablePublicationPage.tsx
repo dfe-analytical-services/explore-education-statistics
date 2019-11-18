@@ -156,7 +156,7 @@ class EditablePublicationPage extends Component<Props, State> {
           Contents
         </h2>
 
-        <EditableAccordion id="contents-sections" index={0} >
+        <EditableAccordion id="contents-sections" index={0}>
           {data.content.map(({ heading, caption, order, content }, index) => (
             <EditableAccordionSection
               heading={heading}

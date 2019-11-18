@@ -4,8 +4,9 @@ import {
   dayMonthYearIsComplete,
   dayMonthYearToDate,
 } from '@admin/services/common/types';
-import { ReleaseSummaryDetails } from '@admin/services/release/types';
+import { EditableContentBlock } from '@admin/services/publicationService';
 import FormattedDate from '@common/components/FormattedDate';
+import { AbstractRelease } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import React, { useEffect, useState } from 'react';
 
@@ -20,7 +21,7 @@ const nationalStatisticsLogo: ReleaseTypeIcon = {
 };
 
 interface Props {
-  release: ReleaseSummaryDetails;
+  release: AbstractRelease<EditableContentBlock>;
 }
 
 const BasicReleaseSummary = ({ release }: Props) => {
