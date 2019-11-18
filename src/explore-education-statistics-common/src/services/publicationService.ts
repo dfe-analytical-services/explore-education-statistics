@@ -206,7 +206,7 @@ export interface AbstractRelease<
   publicationId: string;
   publication: PublicationType;
   latestRelease: boolean;
-  publishScheduled: string;
+  publishScheduled?: string;
   nextReleaseDate: DayMonthYearValues;
   status: ReleaseStatus;
   type: {

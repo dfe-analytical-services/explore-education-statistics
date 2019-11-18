@@ -59,9 +59,11 @@ const BasicReleaseSummary = ({ release }: Props) => {
             <dl className="dfe-meta-content">
               <dt className="govuk-caption-m">Publish date: </dt>
               <dd>
-                <strong>
-                  <FormattedDate>{release.publishScheduled}</FormattedDate>
-                </strong>
+                {release.publishScheduled && (
+                  <strong>
+                    <FormattedDate>{release.publishScheduled}</FormattedDate>
+                  </strong>
+                )}
               </dd>
               <div>
                 <dt className="govuk-caption-m">Next update: </dt>

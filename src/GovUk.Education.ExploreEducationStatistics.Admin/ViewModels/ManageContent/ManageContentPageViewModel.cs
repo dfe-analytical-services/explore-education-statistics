@@ -38,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
 
         public Guid PublicationId { get; set; }
 
-        public PublicationViewModel2 Publication { get; set; }
+        public PublicationViewModel Publication { get; set; }
         
         public bool LatestRelease { get; set; } 
         
@@ -67,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
     }
 
 // TODO
-    public class PublicationViewModel2
+    public class PublicationViewModel
     {
         public Guid Id { get; set; }
         
