@@ -6,7 +6,6 @@ import {
   FootnoteProps,
   FootnoteSubjectMeta,
 } from '@admin/services/release/edit-release/footnotes/types';
-import FieldCheckboxArray from '@common/components/form/FieldCheckboxArray';
 import { FormCheckbox } from '@common/components/form';
 import FieldSubjectCheckbox from './FieldSubjectCheckbox';
 
@@ -43,7 +42,7 @@ const IndicatorDetails = ({
               `${valuePath}.indicatorGroups[${indicatorGroupId}].indicators`,
             ) || [];
           return (
-            <>
+            <div key={indicatorGroupId}>
               {!hideGrouping && (
                 <FieldSubjectCheckbox
                   key={indicatorGroupId}
@@ -85,7 +84,7 @@ const IndicatorDetails = ({
                           if (!checked) {
                             form.setFieldValue(
                               `${valuePath}.indicatorGroups[${indicatorGroupId}].indicators`,
-                              [...indicators, Number(indicatorItem.value)],
+                              [...indicators, Number(e.target.value)],
                             );
                           } else {
                             form.setFieldValue(
@@ -94,7 +93,7 @@ const IndicatorDetails = ({
                                 ...indicators.filter(
                                   (selectedItem: string) =>
                                     String(selectedItem) !==
-                                    String(indicatorItemId),
+                                    String(e.target.value),
                                 ),
                               ],
                             );
@@ -105,7 +104,7 @@ const IndicatorDetails = ({
                   },
                 )}
               </div>
-            </>
+            </div>
           );
         })}
       </div>

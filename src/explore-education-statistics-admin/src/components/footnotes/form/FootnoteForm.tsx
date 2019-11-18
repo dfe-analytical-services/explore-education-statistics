@@ -8,7 +8,6 @@ import {
 } from '@admin/services/release/edit-release/footnotes/types';
 import footnoteFormValidation from '@admin/services/release/edit-release/footnotes/util';
 import Button from '@common/components/Button';
-import Details from '@common/components/Details';
 import { Form, FormFieldset, Formik } from '@common/components/form';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';

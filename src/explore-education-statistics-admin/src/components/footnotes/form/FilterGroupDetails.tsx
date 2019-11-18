@@ -6,7 +6,6 @@ import {
   FootnoteProps,
   FootnoteSubjectMeta,
 } from '@admin/services/release/edit-release/footnotes/types';
-import FieldCheckboxArray from '@common/components/form/FieldCheckboxArray';
 import { FormCheckbox } from '@common/components/form';
 import FieldSubjectCheckbox from './FieldSubjectCheckbox';
 
@@ -61,7 +60,7 @@ const FilterGroupDetails = ({
               `${groupPath}.filterGroups[${filterGroupId}].filterItems`,
             ) || [];
           return (
-            <>
+            <div key={filterGroupId}>
               {!hideGrouping && (
                 <FieldSubjectCheckbox
                   key={filterGroupId}
@@ -103,7 +102,7 @@ const FilterGroupDetails = ({
                           if (!checked) {
                             form.setFieldValue(
                               `${groupPath}.filterGroups[${filterGroupId}].filterItems`,
-                              [...filterItems, Number(filterItem.value)],
+                              [...filterItems, Number(e.target.value)],
                             );
                           } else {
                             form.setFieldValue(
@@ -112,7 +111,7 @@ const FilterGroupDetails = ({
                                 ...filterItems.filter(
                                   (selectedItem: string) =>
                                     String(selectedItem) !==
-                                    String(filterItemId),
+                                    String(e.target.value),
                                 ),
                               ],
                             );
@@ -123,7 +122,7 @@ const FilterGroupDetails = ({
                   },
                 )}
               </div>
-            </>
+            </div>
           );
         })}
       </div>
