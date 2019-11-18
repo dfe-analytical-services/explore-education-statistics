@@ -16,10 +16,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 {
     public class ManageContentPageService : IManageContentPageService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ContentDbContext _context;
         private readonly IMapper _mapper;
 
-        public ManageContentPageService(ApplicationDbContext context, IMapper mapper)
+        public ManageContentPageService(ContentDbContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
