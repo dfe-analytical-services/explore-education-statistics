@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models.Api
         public Guid Id { get; set; }
         
         [Required]
-        public Guid? TypeId { get; set; }
+        public ReleaseType Type { get; set; }
         
         [JsonConverter(typeof(TimeIdentifierJsonConverter))]
         [Required]

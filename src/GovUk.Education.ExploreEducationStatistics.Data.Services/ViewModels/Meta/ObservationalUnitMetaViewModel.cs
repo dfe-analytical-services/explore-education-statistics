@@ -1,10 +1,13 @@
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta
 {
     public class ObservationalUnitMetaViewModel : LabelValue
     {
-        public string Level { get; set; }
+        [JsonConverter(typeof(StringEnumConverter), true)]
+        public GeographicLevel Level { get; set; }
 
         protected bool Equals(ObservationalUnitMetaViewModel other)
         {
@@ -23,9 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Me
         {
             unchecked
             {
-                var hashCode = base.GetHashCode();
-                hashCode = (hashCode * 397) ^ (Level != null ? Level.GetHashCode() : 0);
-                return hashCode;
+                return (base.GetHashCode() * 397) ^ (int) Level;
             }
         }
     }

@@ -9,6 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels
     {
         public IEnumerable<string> Filters { get; set; }
 
+        // TODO could this be [JsonConverter(typeof(EnumToEnumValueJsonConverter<GeographicLevel>))]?
         [JsonConverter(typeof(StringEnumConverter))]
         public GeographicLevel GeographicLevel { get; set; }
 

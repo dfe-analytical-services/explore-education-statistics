@@ -23,7 +23,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     public class DataBlockRequest
     {
         public int SubjectId;
-        public string GeographicLevel;
+        [JsonConverter(typeof(StringEnumConverter))]
+        public GeographicLevel? GeographicLevel;
         public TimePeriod TimePeriod;
         public List<string> Filters;
         public List<string> Indicators;
