@@ -135,6 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info {Title = "Explore education statistics - Admin API", Version = "v1"});
+                c.CustomSchemaIds((type) => type.FullName);
             });
         }
 
