@@ -278,12 +278,12 @@ class EditablePublicationPage extends Component<Props, State> {
                   </span>
 
                   <dl className="dfe-meta-content">
-                    <dt className="govuk-caption-m">Publish date: </dt>
+                    <dt className="govuk-caption-m">Publish date:</dt>
                     <dd>
                       <strong>20 September 2019</strong>
                     </dd>
                     <div>
-                      <dt className="govuk-caption-m">Next update: </dt>
+                      <dt className="govuk-caption-m">Next update:</dt>
                       <dd>
                         <strong>20 September 2020</strong>
                       </dd>
@@ -418,7 +418,7 @@ class EditablePublicationPage extends Component<Props, State> {
                 </dl>
 
                 <dl className="dfe-meta-content">
-                  <dt className="govuk-caption-m">Last updated: </dt>
+                  <dt className="govuk-caption-m">Last updated:</dt>
                   <dd data-testid="last-updated">
                     <strong>19 April 2019</strong>
                   </dd>

@@ -21,6 +21,8 @@ export interface ManageContentPageViewModel {
   relatedInformation: BasicLink[];
 
   introductionSection: ContentSectionViewModel;
+
+  contentSections: ContentSectionViewModel[];
 }
 
 export default {};
