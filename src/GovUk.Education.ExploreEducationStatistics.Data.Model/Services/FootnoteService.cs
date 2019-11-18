@@ -141,6 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
                 .Select(footnote => footnote.Footnote)
                 .Distinct()
                 .Include(footnote => footnote.Filters)
+                .ThenInclude(footnote => footnote.Filter)
                 .Include(footnote => footnote.FilterGroups)
                 .Include(footnote => footnote.FilterItems)
                 .Include(footnote => footnote.Indicators)
