@@ -24,12 +24,13 @@ user signs in
   environment variable should be set   ADMIN_URL
   user goes to url  %{ADMIN_URL}
   user waits until page contains heading     Sign-in
-  user clicks link   Sign-in
+  user clicks button   Sign-in
 
   environment variable should be set   ADMIN_EMAIL
   environment variable should be set   ADMIN_PASSWORD
   user logs into microsoft online  %{ADMIN_EMAIL}   %{ADMIN_PASSWORD}
 
+  sleep 5
   user checks url contains  %{ADMIN_URL}
   user waits until page contains heading   User1 EESADMIN
   user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(1)     Home
@@ -128,7 +129,7 @@ user waits until page contains link
 
 user waits until page contains heading
   [Arguments]   ${text}
-  wait until page contains element   xpath://h1[text()="${text}"]
+  wait until page contains element   xpath://h1[contains(.,"${text}")]
 
 user checks element contains
   [Arguments]   ${element}    ${text}

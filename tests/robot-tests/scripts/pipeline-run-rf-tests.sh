@@ -11,4 +11,4 @@ google-chrome-stable --version
 python -m pip install --upgrade pip
 pip install pipenv
 pipenv install
-pipenv run python run_tests.py -e $2 --ci --chromedriver 76.0.3809.68 --admin-pass $1
+pipenv run python run_tests.py -e $2 --ci --chromedriver 78.0.3904.70 --admin-pass $1
