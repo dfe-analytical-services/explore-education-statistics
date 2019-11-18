@@ -17,7 +17,7 @@ const KeyIndicator = ({
   indicatorValue,
   trend,
 }: Props) => {
-  const [selectedKeyIndicator, setSelectedKeyIndicator] = useState(false);
+  const [selectedKeyIndicator, setSelectedKeyIndicator] = useState('');
   const [previewIndicator, setPreviewIndicator] = useState(false);
   const [removeIndicator, setRemoveIndicator] = useState(false);
 
@@ -190,7 +190,6 @@ const PrototypeDataTileHighlights = ({ editing }: Props) => {
             indicatorOrder="3"
             indicatorValue="1.3%"
             trend="Up from 1.1% in 2015/16"
-            remove="tester"
           />
         )}
       </div>
