@@ -179,12 +179,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                                 Description = legacy.Description,
                                 Url = legacy.Url
                             })
-                            .ToList()
+                            .ToList(),
+                        Methodology = new MethodologyViewModel
+                        {
+                            Id = r.Publication.Methodology.Id,
+                            Title = r.Publication.Methodology.Title
+                        }
                     }))
                 .ForMember(
                     dest => dest.LatestRelease,
-                    m => m.MapFrom(r => r.Publication.LatestRelease().Id == r.Id))
-                ;
+                    m => m.MapFrom(r => r.Publication.LatestRelease().Id == r.Id));
         }
     }
 }

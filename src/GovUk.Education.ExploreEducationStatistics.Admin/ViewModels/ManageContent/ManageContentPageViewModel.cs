@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -54,39 +55,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
         
         // downloadFiles
         
-        // others...
-        
-//        [JsonConverter(typeof(TimeIdentifierJsonConverter))]
-//        public TimeIdentifier TimePeriodCoverage { get; set; }
-        
-// TODO
         public DateTime? PublishScheduled { get; set; }
         
-// TODO
         public PartialDate NextReleaseDate { get; set; }
     }
 
-// TODO
     public class PublicationViewModel
     {
         public Guid Id { get; set; }
         
         public string Title { get; set; }
 
-        // needed?
-// TODO
+        // TODO - needed?
         public string Slug { get; set; }
 
-        // needed?
+        // TODO - needed?
         public string Description { get; set; }
         
-        // needed?
+        // TODO - needed?
         public string DataSource { get; set; }
         
-        // needed?
+        // TODO - needed?
         public string Summary { get; set; }
         
-        // needed?
+        // TODO - needed?
         public DateTime? NextUpdate { get; set; }
         
         public List<PreviousReleaseViewModel> Releases { get; set; }
@@ -96,6 +88,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
         public TopicViewModel Topic { get; set; }
         
         public Contact Contact { get; set; }
+        
+        public MethodologyViewModel Methodology { get; set; }
     }
 
     public class KeyStatisticsViewModel
