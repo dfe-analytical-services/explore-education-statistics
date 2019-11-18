@@ -151,11 +151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
         
         private void CreateSubjectLinks(Footnote footnote, IEnumerable<long> subjectIds)
         {
-            var subjects = _subjectService.FindMany(subject => subjectIds.Contains(subject.Id),
-                new List<Expression<Func<Subject, object>>>
-                {
-                    s => s.Footnotes
-                });
+            var subjects = _subjectService.FindMany(subject => subjectIds.Contains(subject.Id));
 
             var links = footnote.Subjects;
             foreach (var subject in subjects)
@@ -166,11 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
 
         private void CreateFilterLinks(Footnote footnote, IEnumerable<long> filterIds)
         {
-            var filters = _filterService.FindMany(filter => filterIds.Contains(filter.Id),
-                new List<Expression<Func<Filter, object>>>
-                {
-                    filter => filter.Footnotes
-                });
+            var filters = _filterService.FindMany(filter => filterIds.Contains(filter.Id));
 
             var links = footnote.Filters;
             foreach (var filter in filters)
@@ -184,7 +176,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             var filterGroups = _filterGroupService.FindMany(filterGroup => filterGroupIds.Contains(filterGroup.Id),
                 new List<Expression<Func<FilterGroup, object>>>
                 {
-                    filter => filter.Footnotes
+                    filterGroup => filterGroup.Filter 
                 });
 
             var links = footnote.FilterGroups;
@@ -199,7 +191,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             var filterItems = _filterItemService.FindMany(filterItem => filterItemIds.Contains(filterItem.Id),
                 new List<Expression<Func<FilterItem, object>>>
                 {
-                    filter => filter.Footnotes
+                    filterItem => filterItem.FilterGroup.Filter  
                 });
 
             var links = footnote.FilterItems;
@@ -214,7 +206,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Services
             var indicators = _indicatorService.FindMany(indicator => indicatorIds.Contains(indicator.Id),
                 new List<Expression<Func<Indicator, object>>>
                 {
-                    filter => filter.Footnotes
+                    indicator => indicator.IndicatorGroup
                 });
 
             var links = footnote.Indicators;
