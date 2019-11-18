@@ -51,8 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         }
 
         public IConfiguration Configuration { get; }
-        
-        private IHostingEnvironment HostingEnvironment{ get; set; } 
+        public IHostingEnvironment HostingEnvironment { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -123,7 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     .AddProfileService<ApplicationUserProfileService>()
                     // TODO DW - this should be conditional based upon whether or not we're in dev mode
                     .AddSigningCredentials();
-
+                
                 services.Configure<JwtBearerOptions>(
                     IdentityServerJwtConstants.IdentityServerJwtBearerScheme,
                     options =>
@@ -135,7 +134,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                         };
                     });
             }
-          
 
             services
                 .AddAuthentication()
