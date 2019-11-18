@@ -147,47 +147,9 @@ const FootnoteForm = ({
                                 />
                               ),
                             )}
-                            {/*
-                          <FormFieldset
-                            id={`${formId}-filters`}
-                            legend="Categories"
-                            legendHidden
-                            error={getError('filters')}
-                          >
-                            <CollapsibleList collapseAfter={5}>
-                              {Object.entries(subjectMeta.filters).map(
-                                ([filterId, filter]) => {
-                                  const filterName = `filterItems`;
-
-                                  return (
-                                    <FormFieldCheckboxGroupsMenu<FormValues>
-                                      key={filterId}
-                                      name={filterName}
-                                      id={`${formId}-${camelCase(filterName)}`}
-                                      legend={filter.legend}
-                                      hint={filter.hint}
-                                      error={getError(filterName)}
-                                      selectAll
-                                      options={Object.values(
-                                        filter.options,
-                                      ).map(filterGroup => {
-                                        return {
-                                          legend: filterGroup.label,
-                                          options: Object.values(
-                                            filterGroup.options,
-                                          ),
-                                        };
-                                      })}
-                                    />
-                                  );
-                                },
-                              )}
-                            </CollapsibleList>
-                          </FormFieldset>
-                        */}
                           </div>
                         </div>
-                        <hr className="govuk-!-margin-0 govuk-!-margin-bottom-2" />
+                        <hr className="govuk-!-margin-top-2 govuk-!-margin-bottom-2" />
                       </div>
                     ),
                   )}
