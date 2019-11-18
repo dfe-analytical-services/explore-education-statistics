@@ -15,7 +15,7 @@ export interface FormCheckboxProps {
   conditional?: ReactNode;
   id: string;
   hint?: string;
-  label: string;
+  label: string | ReactNode;
   name: string;
   onChange?: CheckboxChangeEventHandler;
   value: string;

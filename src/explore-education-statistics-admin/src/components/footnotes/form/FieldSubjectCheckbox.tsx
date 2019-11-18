@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { Field, FieldProps } from 'formik';
 import { get } from 'lodash';
 import { FormCheckbox } from '@common/components/form';
@@ -6,8 +6,9 @@ import { FormCheckbox } from '@common/components/form';
 export interface FieldCheckboxProps {
   name: string;
   id: string;
-  label: string;
+  label: string | ReactNode;
   disabled?: boolean;
+  className?: string;
 }
 
 const FieldSubjectCheckbox = ({
@@ -15,6 +16,7 @@ const FieldSubjectCheckbox = ({
   name,
   label,
   disabled = false,
+  className,
 }: FieldCheckboxProps) => {
   return (
     <Field name={name}>
@@ -22,6 +24,7 @@ const FieldSubjectCheckbox = ({
         const defaultValue = get(form.values, name);
         return (
           <FormCheckbox
+            className={className}
             id={id}
             name={name}
             label={label}

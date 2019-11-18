@@ -15,9 +15,11 @@ import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import Yup from '@common/lib/validation/yup';
 import get from 'lodash/get';
 import { FormikProps } from 'formik';
-import React, { createContext } from 'react';
+import React from 'react';
 import FieldSubjectCheckbox from './FieldSubjectCheckbox';
 import styles from './FootnoteForm.module.scss';
+import FilterGroupDetails from './FilterGroupDetails';
+import IndicatorDetails from './IndicatorDetails';
 
 export interface FootnoteFormConfig {
   state: 'create' | 'edit' | 'cancel';
@@ -77,14 +79,12 @@ const FootnoteForm = ({
           return (
             <div className={styles.container}>
               <Form {...form} id={formId}>
-                <p>Select either one or multiple subject areas from below</p>
-                <hr className="govuk-!-margin-top-1 govuk-!-margin-bottom-2" />
                 <FormFieldset
                   id={`${formId}-allFieldsFieldset`}
                   legend={!footnote ? 'Create new footnote' : 'Edit footnote'}
-                  legendHidden
                   error={getError('subjects')}
                 >
+                  <p>Select either one or multiple subject areas from below</p>
                   {Object.entries(footnoteMeta).map(
                     ([subjectMetaId, subjectMeta]: [
                       string,
@@ -100,7 +100,7 @@ const FootnoteForm = ({
                               Subject
                             </h5>
                             <FieldSubjectCheckbox
-                              id={subjectMetaId}
+                              id={`subject-${subjectMetaId}`}
                               label={subjectMeta.subjectName}
                               name={`subjects.${subjectMetaId}.selected`}
                             />
@@ -109,35 +109,45 @@ const FootnoteForm = ({
                             <h5 className="govuk-!-margin-bottom-2 govuk-!-margin-top-0">
                               Indicators
                             </h5>
-                            <Details
-                              summary={`Indicators ${null ? '(All)' : ''}`}
-                            >
-                              IndicatorGroups here..
-                              {/* <FormFieldCheckboxGroupsMenu<FormValues>
-                                        name="indicators"
-                                        id="indicators"
-                                        legend="Indicators"
-                                        legendHidden
-                                        error={getError('indicators')}
-                                        selectAll
-                                        options={Object.values(
-                                          subjectMeta.indicators,
-                                        ).map(indicatorGroup => {
-                                          return {
-                                            legend: indicatorGroup.label,
-                                            options: Object.values(
-                                              indicatorGroup.options,
-                                            ),
-                                          };
-                                        })}
-                                      />
-                                      */}
-                            </Details>
+                            <IndicatorDetails
+                              summary="Indicators"
+                              parentSelected={get(
+                                form.values,
+                                `subjects.${subjectMetaId}.selected`,
+                              )}
+                              valuePath={`subjects.${subjectMetaId}`}
+                              indicator={subjectMeta.indicators}
+                              form={form}
+                            />
                           </div>
                           <div className="govuk-grid-column-one-third">
                             <h5 className="govuk-!-margin-bottom-2 govuk-!-margin-top-0">
                               Filters
                             </h5>
+                            {Object.entries(subjectMeta.filters).map(
+                              ([filterId, filter]: [
+                                string,
+                                FootnoteSubjectMeta['filters'][0],
+                              ]) => (
+                                <FilterGroupDetails
+                                  key={filterId}
+                                  summary={filter.legend}
+                                  parentSelected={get(
+                                    form.values,
+                                    `subjects.${subjectMetaId}.selected`,
+                                  )}
+                                  valuePath={`subjects.${subjectMetaId}`}
+                                  groupId={filterId}
+                                  filter={filter}
+                                  selectAll
+                                  value={get(
+                                    form.values,
+                                    `subjects.${subjectMetaId}.filters.${filterId}.selected`,
+                                  )}
+                                  form={form}
+                                />
+                              ),
+                            )}
                             {/*
                           <FormFieldset
                             id={`${formId}-filters`}
