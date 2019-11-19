@@ -206,30 +206,6 @@ DECLARE @subject_absence_in_prus             NVARCHAR(max) = 'Absence in prus';
 DECLARE @subject_absence_number_missing      NVARCHAR(max) = 'Absence number missing at least one session by reason';
 DECLARE @subject_absence_rate_percent_bands  NVARCHAR(max) = 'Absence rate percent bands';
 
-EXEC InsertSubjectFootnote @subject_absence_by_characteristic, 1;
-EXEC InsertSubjectFootnote @subject_absence_by_geographic_level, 1;
-EXEC InsertSubjectFootnote @subject_absence_by_term, 1;
-EXEC InsertSubjectFootnote @subject_absence_for_four_year_olds, 1;
-EXEC InsertSubjectFootnote @subject_absence_in_prus, 1;
-EXEC InsertSubjectFootnote @subject_absence_number_missing, 1;
-EXEC InsertSubjectFootnote @subject_absence_rate_percent_bands, 1;
-
-EXEC InsertSubjectFootnote @subject_absence_by_characteristic, 2;
-EXEC InsertSubjectFootnote @subject_absence_by_geographic_level, 2;
-EXEC InsertSubjectFootnote @subject_absence_by_term, 2;
-EXEC InsertSubjectFootnote @subject_absence_for_four_year_olds, 2;
-EXEC InsertSubjectFootnote @subject_absence_in_prus, 2;
-EXEC InsertSubjectFootnote @subject_absence_number_missing, 2;
-EXEC InsertSubjectFootnote @subject_absence_rate_percent_bands, 2;
-
-EXEC InsertSubjectFootnote @subject_absence_by_characteristic, 3;
-EXEC InsertSubjectFootnote @subject_absence_by_geographic_level, 3;
-EXEC InsertSubjectFootnote @subject_absence_by_term, 3;
-EXEC InsertSubjectFootnote @subject_absence_for_four_year_olds, 3;
-EXEC InsertSubjectFootnote @subject_absence_in_prus, 3;
-EXEC InsertSubjectFootnote @subject_absence_number_missing, 3;
-EXEC InsertSubjectFootnote @subject_absence_rate_percent_bands, 3;
-
 EXEC InsertSubjectFootnote @subject_absence_by_characteristic, 4;
 EXEC InsertSubjectFootnote @subject_absence_by_geographic_level, 4;
 EXEC InsertSubjectFootnote @subject_absence_by_term, 4;
@@ -253,73 +229,6 @@ EXEC InsertSubjectFootnote @subject_absence_for_four_year_olds, 6;
 EXEC InsertSubjectFootnote @subject_absence_in_prus, 6;
 EXEC InsertSubjectFootnote @subject_absence_number_missing, 6;
 EXEC InsertSubjectFootnote @subject_absence_rate_percent_bands, 6;
-
-EXEC InsertSubjectFootnote @subject_absence_by_characteristic, 7;
-EXEC InsertSubjectFootnote @subject_absence_by_geographic_level, 7;
-EXEC InsertSubjectFootnote @subject_absence_by_term, 7;
-EXEC InsertSubjectFootnote @subject_absence_for_four_year_olds, 7;
-EXEC InsertSubjectFootnote @subject_absence_in_prus, 7;
-EXEC InsertSubjectFootnote @subject_absence_number_missing, 7;
-EXEC InsertSubjectFootnote @subject_absence_rate_percent_bands, 7;
-
-EXEC InsertSubjectFootnote @subject_absence_by_characteristic, 8;
-EXEC InsertSubjectFootnote @subject_absence_by_geographic_level, 8;
-EXEC InsertSubjectFootnote @subject_absence_by_term, 8;
-EXEC InsertSubjectFootnote @subject_absence_for_four_year_olds, 8;
-EXEC InsertSubjectFootnote @subject_absence_in_prus, 8;
-EXEC InsertSubjectFootnote @subject_absence_number_missing, 8;
-EXEC InsertSubjectFootnote @subject_absence_rate_percent_bands, 8;
-
-EXEC InsertSubjectFootnote @subject_absence_by_characteristic, 9;
-EXEC InsertSubjectFootnote @subject_absence_by_geographic_level, 9;
-EXEC InsertSubjectFootnote @subject_absence_by_term, 9;
-EXEC InsertSubjectFootnote @subject_absence_for_four_year_olds, 9;
-EXEC InsertSubjectFootnote @subject_absence_in_prus, 9;
-EXEC InsertSubjectFootnote @subject_absence_number_missing, 9;
-EXEC InsertSubjectFootnote @subject_absence_rate_percent_bands, 9;
-
-EXEC InsertSubjectFootnote @subject_absence_by_characteristic, 10;
-EXEC InsertSubjectFootnote @subject_absence_by_geographic_level, 10;
-EXEC InsertSubjectFootnote @subject_absence_by_term, 10;
-EXEC InsertSubjectFootnote @subject_absence_for_four_year_olds, 10;
-EXEC InsertSubjectFootnote @subject_absence_in_prus, 10;
-EXEC InsertSubjectFootnote @subject_absence_number_missing, 10;
-EXEC InsertSubjectFootnote @subject_absence_rate_percent_bands, 10;
-
-EXEC InsertSubjectFootnote @subject_absence_by_characteristic, 11;
-EXEC InsertSubjectFootnote @subject_absence_by_geographic_level, 11;
-EXEC InsertSubjectFootnote @subject_absence_by_term, 11;
-EXEC InsertSubjectFootnote @subject_absence_in_prus, 11;
-EXEC InsertSubjectFootnote @subject_absence_number_missing, 11;
-EXEC InsertSubjectFootnote @subject_absence_rate_percent_bands, 11;
-
-EXEC InsertSubjectFootnote @subject_absence_number_missing, 12;
-
-EXEC InsertSubjectFootnote @subject_absence_rate_percent_bands, 13;
-
-EXEC InsertSubjectFootnote @subject_absence_by_characteristic, 14;
-EXEC InsertSubjectFootnote @subject_absence_by_geographic_level, 14;
-EXEC InsertSubjectFootnote @subject_absence_by_term, 14;
-EXEC InsertSubjectFootnote @subject_absence_for_four_year_olds, 14;
-EXEC InsertSubjectFootnote @subject_absence_in_prus, 14;
-EXEC InsertSubjectFootnote @subject_absence_number_missing, 14;
-EXEC InsertSubjectFootnote @subject_absence_rate_percent_bands, 14;
-
-EXEC InsertSubjectFootnote @subject_absence_by_characteristic, 15;
-
-EXEC InsertSubjectFootnote @subject_absence_by_characteristic, 16;
-
-EXEC InsertSubjectFootnote @subject_absence_by_characteristic, 17;
-
-EXEC InsertSubjectFootnote @subject_absence_by_characteristic, 18;
-
-EXEC InsertSubjectFootnote @subject_absence_by_characteristic, 19;
-
-EXEC InsertSubjectFootnote @subject_absence_by_characteristic, 20;
-
-EXEC InsertSubjectFootnote @subject_absence_for_four_year_olds, 21;
-
-EXEC InsertSubjectFootnote @subject_absence_for_four_year_olds, 22;
 
 --
 -- Indicators
