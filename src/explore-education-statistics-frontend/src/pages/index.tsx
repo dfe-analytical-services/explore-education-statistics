@@ -35,8 +35,11 @@ function HomePage() {
             regional data.
           </p>
           <h2 className="govuk-heading-m govuk-!-margin-bottom-0">
-            <Link to="/download-data" data-testid="home--download-data-link">
-              Download data files
+            <Link
+              to="/download-latest-data"
+              data-testid="home--download-data-link"
+            >
+              Download latest data files
             </Link>
           </h2>
           <p className="govuk-caption-m govuk-!-margin-top-2">

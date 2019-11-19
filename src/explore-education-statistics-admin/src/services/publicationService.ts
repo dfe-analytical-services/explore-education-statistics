@@ -18,6 +18,7 @@ export interface ExtendedComment {
 }
 
 export interface EditableContentBlock {
+  id: string;
   type: ContentBlockType;
   body: string;
   heading?: string;

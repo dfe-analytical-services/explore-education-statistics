@@ -67,7 +67,7 @@ const CreatePublicationPage = ({
         topic,
       });
     });
-  }, []);
+  }, [topicId]);
 
   const submitFormHandler = async (values: FormValues) => {
     await service.createPublication({

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Converters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
@@ -208,6 +209,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .Property(r => r.TimePeriodCoverage)
                 .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>())
                 .HasMaxLength(6);
+            
+            modelBuilder.Entity<Release>()
+                .Property<List<BasicLink>>("RelatedInformation")
+                .HasConversion(
+                    v => JsonConvert.SerializeObject(v),
+                    v => JsonConvert.DeserializeObject<List<BasicLink>>(v));
 
             modelBuilder.Entity<IContentBlock>()
                 .ToTable("ContentBlock")
@@ -1987,7 +1994,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = 1,
-                        GeographicLevel = "Country",
+                        GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
                             StartYear = "2012",
@@ -2135,7 +2142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = 1,
-                        GeographicLevel = "Country",
+                        GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
                             StartYear = "2012",
@@ -2259,7 +2266,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = 1,
-                        GeographicLevel = "Local_Authority_District",
+                        GeographicLevel = GeographicLevel.LocalAuthorityDistrict,
                         TimePeriod = new TimePeriod
                         {
                             StartYear = "2016",
@@ -2369,7 +2376,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = 12,
-                        GeographicLevel = "Country",
+                        GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
                             StartYear = "2012",
@@ -2507,7 +2514,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = 12,
-                        GeographicLevel = "Country",
+                        GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
                             StartYear = "2012",
@@ -2592,7 +2599,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = 12,
-                        GeographicLevel = "Country",
+                        GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
                             StartYear = "2012",
@@ -2680,7 +2687,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = 17,
-                        GeographicLevel = "Country",
+                        GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
                             StartYear = "2014",
@@ -2762,7 +2769,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = 17,
-                        GeographicLevel = "Country",
+                        GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
                             StartYear = "2014",
@@ -2813,7 +2820,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     DataBlockRequest = new DataBlockRequest
                     {
                         SubjectId = 17,
-                        GeographicLevel = "Country",
+                        GeographicLevel = GeographicLevel.Country,
                         TimePeriod = new TimePeriod
                         {
                             StartYear = "2014",

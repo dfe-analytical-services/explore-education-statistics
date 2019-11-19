@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.Statistics;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Publication = GovUk.Education.ExploreEducationStatistics.Content.Model.Publication;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
+using ReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.Models.Api.ReleaseViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 {
@@ -17,14 +19,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
     {
         public MappingProfiles()
         {
-            CreateMap<Footnote, FootnoteViewModel>();
-
-            CreateMap<IndicatorFootnote, long>().ConvertUsing(footnote => footnote.IndicatorId);
-            CreateMap<FilterFootnote, long>().ConvertUsing(footnote => footnote.FilterId);
-            CreateMap<FilterGroupFootnote, long>().ConvertUsing(footnote => footnote.FilterGroupId);
-            CreateMap<FilterItemFootnote, long>().ConvertUsing(footnote => footnote.FilterItemId);
-            CreateMap<SubjectFootnote, long>().ConvertUsing(footnote => footnote.SubjectId);
-            
             CreateMap<Release, Data.Processor.Model.Release>().ForMember(dest => dest.Title,
                 opts => opts.MapFrom(release => release.ReleaseName));
             
@@ -69,11 +63,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 
             CreateMap<Methodology, MethodologyViewModel>();
 
-            CreateMap<Publication, PublicationViewModel>();
+            CreateMap<Publication, PublicationViewModel>()
+                .ForMember(
+                    dest => dest.ThemeId,
+                    m => m.MapFrom(p => p.Topic.ThemeId));    
 
             CreateMap<DataBlock, DataBlockViewModel>();
             CreateMap<CreateDataBlockViewModel, DataBlock>();
             CreateMap<UpdateDataBlockViewModel, DataBlock>();
+
+            CreateMap<Release, ViewModels.ManageContent.ReleaseViewModel>()
+                .ForMember(dest => dest.Contact, 
+                    m => m.MapFrom(r => r.Publication.Contact))
+                .ForMember(
+                    dest => dest.PublicationTitle,
+                    m => m.MapFrom(r => r.Publication.Title));
+
         }
     }
 }

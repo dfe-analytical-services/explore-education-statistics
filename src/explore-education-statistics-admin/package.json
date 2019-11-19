@@ -181,6 +181,8 @@
     "last 1 version"
   ],
   "dependencies": {
+    "history": "^4.10.1",
+    "i": "^0.3.6",
     "lodash": "^4.17.13",
     "whatwg-fetch": "^3.0.0"
   }

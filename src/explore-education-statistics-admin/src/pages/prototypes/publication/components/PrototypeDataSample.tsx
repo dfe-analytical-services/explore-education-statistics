@@ -1,4 +1,3 @@
-import Button from '@common/components/Button';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import PrototypeDataTilesHighlights from '@common/prototypes/publication/components/PrototypeDataTilesHighlights';
@@ -120,7 +119,6 @@ const PrototypeDataSample = ({
         {sectionId === 'headlines' && (
           <TabsSection id={`${sectionId}SummaryData`} title="Summary">
             <PrototypeDataTilesHighlights editing={editing} />
-            {editing && <Button>Add another key indicator</Button>}
             <PrototypeEditableContent
               editable={editing}
               reviewing={reviewing}

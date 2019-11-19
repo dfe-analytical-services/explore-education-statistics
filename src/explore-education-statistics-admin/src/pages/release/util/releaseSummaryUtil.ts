@@ -79,13 +79,6 @@ export const getSelectedTimePeriodCoverageLabel = (
   findTimePeriodCoverageOption(timePeriodCoverageCode, timePeriodCoverageGroups)
     .identifier.label;
 
-export const getSelectedReleaseType = (
-  releaseTypeId: string,
-  availableReleaseTypes: IdTitlePair[],
-) =>
-  availableReleaseTypes.find(type => type.id === releaseTypeId) ||
-  availableReleaseTypes[0];
-
 export const getReleaseStatusLabel = (approvalStatus: ReleaseStatus) => {
   switch (approvalStatus) {
     case 'Draft':

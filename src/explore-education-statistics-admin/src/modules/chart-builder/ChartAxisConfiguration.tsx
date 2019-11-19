@@ -348,12 +348,21 @@ const ChartAxisConfiguration = ({
                           type="number"
                           width={10}
                           label="Every nth value"
-                          defaultValue={axisConfiguration.tickSpacing}
-                          onChange={e =>
-                            updateAxisConfiguration({
-                              tickSpacing: e.target.value,
-                            })
-                          }
+                          defaultValue="1"
+                          onChange={e => {
+                            if (
+                              parseInt(e.target.value, 10) > 0 &&
+                              e.target.value !== ''
+                            ) {
+                              updateAxisConfiguration({
+                                tickSpacing: e.target.value,
+                              });
+                            } else if (e.target.value === '') {
+                              updateAxisConfiguration({
+                                tickSpacing: '1',
+                              });
+                            }
+                          }}
                         />
                       ),
                     },
