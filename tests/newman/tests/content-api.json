@@ -390,10 +390,6 @@
 									"",
 									"pm.test(\"Title should be correct\", function () {",
 									"    pm.expect(pm.response.json().title).to.equal(\"Pupil absence statistics: methodology\"); ",
-									"});",
-									"",
-									"pm.test(\"PublicationId should be correct\", function () {",
-									"    pm.expect(pm.response.json().publications[0].id).to.equal(\"cbbd299f-8297-44bc-92ac-558bcf51f8ad\");",
 									"});"
 								],
 								"type": "text/javascript"
