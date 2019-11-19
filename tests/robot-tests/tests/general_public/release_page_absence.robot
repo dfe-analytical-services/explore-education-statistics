@@ -105,8 +105,7 @@ Validate accordion sections order
     user checks accordion is in position  Pupil referral unit absence       8
     user checks accordion is in position  Regional and local authority (LA) breakdown  9
     user checks accordion is in position  Pupil absence in schools in England: methodology     10
-    user checks accordion is in position  National Statistics               11
-    user checks accordion is in position  Contact us                        12
+    user checks accordion is in position  Contact us                        11
 
 Clicking "Create tables" takes user to Table Tool page with absence publication selected
     [Documentation]  DFE-898
