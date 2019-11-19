@@ -36,5 +36,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
                 () => _contentService.ReorderContentSectionsAsync(releaseId, newSectionOrder),
                 Ok);
         }
+
+        [HttpPost("release/{releaseId}/content/sections/add")]
+        public Task<ActionResult<ContentSectionViewModel>> AddContentSection(Guid releaseId)
+        {
+            return this.HandlingValidationErrorsAsync(
+                () => _contentService.AddContentSectionAsync(releaseId),
+                Ok);
+        }
+
+        [HttpDelete("release/{releaseId}/content/section/{contentSectionId}")]
+        public Task<ActionResult<List<ContentSectionViewModel>>> RemoveContentSection(Guid releaseId, Guid contentSectionId)
+        {
+            return this.HandlingValidationErrorsAsync(
+                () => _contentService.RemoveContentSectionAsync(releaseId, contentSectionId),
+                Ok);
+        }
     }
 }
