@@ -94,7 +94,7 @@ const FootnoteForm = ({
                           <h4 className="govuk-visually-hidden">
                             {subjectMeta.subjectName} footnote matching criteria
                           </h4>
-                          <div className="govuk-grid-column-one-third">
+                          <div className="govuk-grid-column-one-third govuk-!-margin-bottom-2">
                             <h5 className="govuk-!-margin-bottom-2 govuk-!-margin-top-0">
                               Subject
                             </h5>
@@ -149,7 +149,7 @@ const FootnoteForm = ({
                             )}
                           </div>
                         </div>
-                        <hr className="govuk-!-margin-top-2 govuk-!-margin-bottom-2" />
+                        <hr className="govuk-!-margin-bottom-2" />
                       </div>
                     ),
                   )}
@@ -163,7 +163,7 @@ const FootnoteForm = ({
                   type="submit"
                   className="govuk-button govuk-!-margin-right-3"
                 >
-                  {!footnote ? 'Create' : 'Update'} Footnote
+                  {!footnote ? 'Create' : 'Update'} footnote
                 </Button>
                 <Link
                   to="#"
