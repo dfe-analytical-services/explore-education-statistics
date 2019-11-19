@@ -103,8 +103,8 @@
 											"script": {
 												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
 												"exec": [
-													"pm.globals.set(\"FILT_Char__Total\", \"66\");",
-													"pm.globals.set(\"FILT_SchoolType__Total\", \"70\");"
+													"pm.globals.set(\"FILT_Char__Total\", \"1\");",
+													"pm.globals.set(\"FILT_SchoolType__Total\", \"58\");"
 												],
 												"type": "text/javascript"
 											}
@@ -208,7 +208,7 @@
 											"script": {
 												"id": "ff0e67a8-97f3-414d-a136-e46252cfbacf",
 												"exec": [
-													"pm.globals.set(\"FILT_SchoolType__Total\", \"87\");"
+													"pm.globals.set(\"FILT_SchoolType__Total\", \"82\");"
 												],
 												"type": "text/javascript"
 											}
@@ -3239,18 +3239,18 @@
 										"id": "1b454eae-43c4-4e92-a06e-1a803aa8858b",
 										"type": "text/javascript",
 										"exec": [
-											"pm.globals.set(\"FILT_Char__Total\", \"66\");",
-											"pm.globals.set(\"FILT_Char__GenderMale\", \"72\");",
-											"pm.globals.set(\"FILT_Char__GenderFemale\", \"73\");",
-											"pm.globals.set(\"FILT_SchoolType__Total\", \"70\");",
-											"pm.globals.set(\"FILT_SchoolType__StateFundedPrimary\", \"69\");",
-											"pm.globals.set(\"FILT_SchoolType__StateFundedSecondary\", \"68\");",
-											"pm.globals.set(\"FILT_SchoolType__Special\", \"67\");",
+											"pm.globals.set(\"FILT_Char__Total\", \"1\");",
+											"pm.globals.set(\"FILT_Char__GenderMale\", \"53\");",
+											"pm.globals.set(\"FILT_Char__GenderFemale\", \"52\");",
+											"pm.globals.set(\"FILT_SchoolType__Total\", \"58\");",
+											"pm.globals.set(\"FILT_SchoolType__StateFundedPrimary\", \"57\");",
+											"pm.globals.set(\"FILT_SchoolType__StateFundedSecondary\", \"56\");",
+											"pm.globals.set(\"FILT_SchoolType__Special\", \"55\");",
 											"pm.globals.set(\"FILT_Char__FSMEligible\", \"18\");",
 											"pm.globals.set(\"FILT_Char__FSMNotEligible\", \"10\");",
 											"pm.globals.set(\"FILT_Char__FSMUnclassified\", \"8\");",
-											"pm.globals.set(\"FILT_Char__EthMinor_Irish\", \"51\");",
-											"pm.globals.set(\"FILT_YearBreakdown__SixHalfTerms\", \"71\");",
+											"pm.globals.set(\"FILT_Char__EthMinor_Irish\", \"50\");",
+											"pm.globals.set(\"FILT_YearBreakdown__SixHalfTerms\", \"54\");",
 											"",
 											"pm.globals.set(\"IND_AbsenceFields__NumberOfPupilEnrolments\", \"1\");",
 											"pm.globals.set(\"IND_AbsenceFields__NumberOfSessionsPossible\", \"25\");",
@@ -3846,13 +3846,13 @@
 										"id": "6354b6c5-34ad-43c1-b2d7-45f006621e28",
 										"type": "text/javascript",
 										"exec": [
-											"pm.globals.set(\"FILT_SchoolType__Total\", \"87\");",
-											"pm.globals.set(\"FILT_SchoolType__StateFundedPrimary\", \"86\");",
-											"pm.globals.set(\"FILT_SchoolType__StateFundedSecondary\", \"85\");",
-											"pm.globals.set(\"FILT_SchoolType__Special\", \"84\");",
+											"pm.globals.set(\"FILT_SchoolType__Total\", \"82\");",
+											"pm.globals.set(\"FILT_SchoolType__StateFundedPrimary\", \"83\");",
+											"pm.globals.set(\"FILT_SchoolType__StateFundedSecondary\", \"84\");",
+											"pm.globals.set(\"FILT_SchoolType__Special\", \"85\");",
 											"",
-											"pm.globals.set(\"FILT_YearBreakdown__SixHalfTerms\", \"82\");",
-											"pm.globals.set(\"FILT_YearBreakdown__FiveHalfTerms\", \"83\");",
+											"pm.globals.set(\"FILT_YearBreakdown__SixHalfTerms\", \"86\");",
+											"pm.globals.set(\"FILT_YearBreakdown__FiveHalfTerms\", \"87\");",
 											"",
 											"pm.globals.set(\"IND_AbsenceFields__OverallAbsenceRate\", \"57\");",
 											"pm.globals.set(\"IND_AbsenceFields__AuthorisedAbsenceRate\", \"59\");",
@@ -4204,9 +4204,9 @@
 										"id": "f28d57d5-c4a2-4c3c-a90c-e672993bec6d",
 										"type": "text/javascript",
 										"exec": [
-											"pm.globals.set(\"FILT_StateFundedPrimary\", \"94\");",
-											"pm.globals.set(\"FILT_StateFundedSecondary\", \"93\");",
-											"pm.globals.set(\"FILT_Special\", \"92\");",
+											"pm.globals.set(\"FILT_StateFundedPrimary\", \"88\");",
+											"pm.globals.set(\"FILT_StateFundedSecondary\", \"89\");",
+											"pm.globals.set(\"FILT_Special\", \"90\");",
 											"",
 											"pm.globals.set(\"IND_AbsenceFields__NumberOfSessionsPossible\", \"68\");",
 											"pm.globals.set(\"IND_AbsenceFields__NumberOfUnauthorisedAbsenceSessions\", \"86\");",
@@ -4496,9 +4496,9 @@
 										"id": "2cb67ee0-9a6d-4616-8d92-02a3aa5184e4",
 										"type": "text/javascript",
 										"exec": [
-											"pm.globals.set(\"FILT_SchoolType__Total\", \"95\");",
-											"pm.globals.set(\"FILT_SchoolType__StateFundedSecondary\", \"98\");",
-											"pm.globals.set(\"FILT_SchoolType__Special\", \"97\");",
+											"pm.globals.set(\"FILT_SchoolType__Total\", \"98\");",
+											"pm.globals.set(\"FILT_SchoolType__StateFundedSecondary\", \"95\");",
+											"pm.globals.set(\"FILT_SchoolType__Special\", \"96\");",
 											"",
 											"pm.globals.set(\"IND_AbsenceFields__NumberOfPupilEnrolments\", \"92\");",
 											"pm.globals.set(\"IND_AbsenceFields__OverallAbsenceRate\", \"95\");",
@@ -4889,9 +4889,9 @@
 										"id": "e04223f2-1e08-4ff6-9984-732c655dbcdf",
 										"type": "text/javascript",
 										"exec": [
-											"pm.globals.set(\"FILT_StateFundedPrimary\", \"102\");",
-											"pm.globals.set(\"FILT_StateFundedSecondary\", \"101\");",
-											"pm.globals.set(\"FILT_Special\", \"100\");",
+											"pm.globals.set(\"FILT_StateFundedPrimary\", \"101\");",
+											"pm.globals.set(\"FILT_StateFundedSecondary\", \"102\");",
+											"pm.globals.set(\"FILT_Special\", \"103\");",
 											"",
 											"pm.globals.set(\"IND_AbsenceFields__NumberOfEnrolmentsWithAtLeastOneUnauthorisedAbsenceSession\", \"135\");",
 											"pm.globals.set(\"IND_AbsenceFields__NumberOfEnrolmentsWithAtLeastOneAuthorisedAbsenceSession\", \"136\");",
@@ -4983,9 +4983,9 @@
 										"id": "49522da0-95a0-4ddf-9a8a-9ca103db1df2",
 										"type": "text/javascript",
 										"exec": [
-											"pm.globals.set(\"FILT_StateFundedPrimary\", \"182\");",
-											"pm.globals.set(\"FILT_StateFundedSecondary\", \"131\");",
-											"pm.globals.set(\"FILT_Special\", \"132\");",
+											"pm.globals.set(\"FILT_StateFundedPrimary\", \"180\");",
+											"pm.globals.set(\"FILT_StateFundedSecondary\", \"179\");",
+											"pm.globals.set(\"FILT_Special\", \"178\");",
 											"",
 											"pm.globals.set(\"IND_NumberOfAllPupilEnrolmentsThatFallIntoThatPerCentBandForOverallAbsence\", \"140\");",
 											"pm.globals.set(\"IND_NumberOfAllPupilEnrolmentsThatFallIntoThatPerCentBandForAuthorisedAbsence\", \"142\");",
@@ -5880,16 +5880,16 @@
 										"id": "ec9d2b73-2598-40e5-abd3-b8598bbf2497",
 										"type": "text/javascript",
 										"exec": [
-											"pm.globals.set(\"FILT_Char__Total\", \"66\");",
-											"pm.globals.set(\"FILT_Char__GenderMale\", \"72\");",
-											"pm.globals.set(\"FILT_Char__GenderFemale\", \"73\");",
-											"pm.globals.set(\"FILT_SchoolType__StateFundedPrimary\", \"69\");",
-											"pm.globals.set(\"FILT_SchoolType__StateFundedSecondary\", \"68\");",
-											"pm.globals.set(\"FILT_SchoolType__Special\", \"67\");",
+											"pm.globals.set(\"FILT_Char__Total\", \"1\");",
+											"pm.globals.set(\"FILT_Char__GenderMale\", \"53\");",
+											"pm.globals.set(\"FILT_Char__GenderFemale\", \"52\");",
+											"pm.globals.set(\"FILT_SchoolType__StateFundedPrimary\", \"57\");",
+											"pm.globals.set(\"FILT_SchoolType__StateFundedSecondary\", \"56\");",
+											"pm.globals.set(\"FILT_SchoolType__Special\", \"55\");",
 											"pm.globals.set(\"FILT_Char__FSMEligible\", \"18\");",
 											"pm.globals.set(\"FILT_Char__FSMNotEligible\", \"10\");",
 											"pm.globals.set(\"FILT_Char__FSMUnclassified\", \"8\");",
-											"pm.globals.set(\"FILT_Char__EthMinor_Irish\", \"51\");",
+											"pm.globals.set(\"FILT_Char__EthMinor_Irish\", \"50\");",
 											"",
 											"pm.globals.set(\"IND_AbsenceFields__NumberOfPupilEnrolments\", \"1\");",
 											"pm.globals.set(\"IND_AbsenceFields__NumberOfSessionsPossible\", \"25\");",
@@ -6054,9 +6054,9 @@
 										"id": "fda225ab-c571-4c3a-908a-d9d99051e238",
 										"type": "text/javascript",
 										"exec": [
-											"pm.globals.set(\"FILT_Char__Total\", \"244\");",
+											"pm.globals.set(\"FILT_Char__Total\", \"242\");",
 											"pm.globals.set(\"FILT_Char__GenderFemale\", \"243\");",
-											"pm.globals.set(\"FILT_Char__GenderMale\", \"242\");",
+											"pm.globals.set(\"FILT_Char__GenderMale\", \"244\");",
 											"pm.globals.set(\"INDI_TotalPointScoreBasedOnAssessmentRating\", \"161\");",
 											"pm.globals.set(\"INDI_AveragePointScore\", \"162\");"
 										]
@@ -6170,9 +6170,9 @@
 								"id": "06185e19-060d-44b4-9adf-3c424694ae9e",
 								"type": "text/javascript",
 								"exec": [
-									"pm.globals.set(\"FILT_Primary__R\", \"578\");",
-									"pm.globals.set(\"FILT_Secondary__9\", \"575\");",
-									"pm.globals.set(\"FILT_Secondary__7\", \"576\");",
+									"pm.globals.set(\"FILT_Primary__R\", \"576\");",
+									"pm.globals.set(\"FILT_Secondary__9\", \"579\");",
+									"pm.globals.set(\"FILT_Secondary__7\", \"578\");",
 									"",
 									"pm.globals.set(\"IND_Applications__NumberOfApplicationsReceived\", \"212\");",
 									"pm.globals.set(\"IND_Applications__NumberOfOnlineApplications\", \"213\");",
@@ -6267,18 +6267,18 @@
 							"script": {
 								"id": "2cec492a-fc8e-4e42-9663-af2f42ae27c7",
 								"exec": [
-									"pm.globals.set(\"FILT_Char__Total\", \"66\");",
-									"pm.globals.set(\"FILT_Char__GenderMale\", \"72\");",
-									"pm.globals.set(\"FILT_Char__GenderFemale\", \"73\");",
-									"pm.globals.set(\"FILT_SchoolType__Total\", \"70\");",
-									"pm.globals.set(\"FILT_SchoolType__StateFundedPrimary\", \"69\");",
-									"pm.globals.set(\"FILT_SchoolType__StateFundedSecondary\", \"68\");",
-									"pm.globals.set(\"FILT_SchoolType__Special\", \"67\");",
+									"pm.globals.set(\"FILT_Char__Total\", \"1\");",
+									"pm.globals.set(\"FILT_Char__GenderMale\", \"53\");",
+									"pm.globals.set(\"FILT_Char__GenderFemale\", \"52\");",
+									"pm.globals.set(\"FILT_SchoolType__Total\", \"58\");",
+									"pm.globals.set(\"FILT_SchoolType__StateFundedPrimary\", \"57\");",
+									"pm.globals.set(\"FILT_SchoolType__StateFundedSecondary\", \"56\");",
+									"pm.globals.set(\"FILT_SchoolType__Special\", \"55\");",
 									"pm.globals.set(\"FILT_Char__FSMEligible\", \"18\");",
 									"pm.globals.set(\"FILT_Char__FSMNotEligible\", \"10\");",
 									"pm.globals.set(\"FILT_Char__FSMUnclassified\", \"8\");",
-									"pm.globals.set(\"FILT_Char__EthMinor_Irish\", \"51\");",
-									"pm.globals.set(\"FILT_YearBreakdown__SixHalfTerms\", \"71\");",
+									"pm.globals.set(\"FILT_Char__EthMinor_Irish\", \"50\");",
+									"pm.globals.set(\"FILT_YearBreakdown__SixHalfTerms\", \"54\");",
 									"",
 									"pm.globals.set(\"IND_AbsenceFields__NumberOfPupilEnrolments\", \"1\");",
 									"pm.globals.set(\"IND_AbsenceFields__NumberOfSessionsPossible\", \"25\");",
@@ -6639,7 +6639,7 @@
 						"id": "ed583c2e-33b1-4e58-b324-6c75f5dd0180",
 						"type": "text/javascript",
 						"exec": [
-							"pm.globals.set(\"FILT_AbsenceForFourYearOlds__SchoolType__StateFundedPrimary\", \"96\");",
+							"pm.globals.set(\"FILT_AbsenceForFourYearOlds__SchoolType__StateFundedPrimary\", \"97\");",
 							"",
 							"pm.globals.set(\"IND_AbsenceForFourYearOlds__AbsenceFields__NumberOfOverallAbsenceSessions\", \"94\");"
 						]
