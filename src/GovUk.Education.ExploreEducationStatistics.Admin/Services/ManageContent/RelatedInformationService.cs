@@ -32,10 +32,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         {
             return CheckReleaseExists(_context, releaseId, async release =>
             {
-                release.RelatedInformation = release.RelatedInformation != null
-                    ? new List<BasicLink>(release.RelatedInformation)
-                    : new List<BasicLink>();
-
                 release.RelatedInformation.Add(new BasicLink
                 {
                     Id = Guid.NewGuid(),
@@ -43,6 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     Url = request.Url
                 });
 
+                _context.Releases.Update(release);
                 await _context.SaveChangesAsync();
                 return release.RelatedInformation;
             });
@@ -63,6 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 toUpdate.Title = request.Title;
                 toUpdate.Url = request.Url;
 
+                _context.Releases.Update(release);
                 await _context.SaveChangesAsync();
                 return new Either<ValidationResult, List<BasicLink>>(release.RelatedInformation);
             });
@@ -72,11 +70,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         {
             return CheckReleaseExists(_context, releaseId, async release =>
             {
-                release.RelatedInformation = release
-                    .RelatedInformation
-                    .Where(item => item.Id != relatedInformationId)
-                    .ToList();
+                release.RelatedInformation.Remove(
+                    release.RelatedInformation.Find(item => item.Id == relatedInformationId));
 
+                _context.Releases.Update(release);
                 await _context.SaveChangesAsync();
                 return release.RelatedInformation;
             });
