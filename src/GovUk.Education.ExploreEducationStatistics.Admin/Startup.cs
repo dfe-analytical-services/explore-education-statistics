@@ -103,6 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IDataBlockService, DataBlockService>();
             services.AddTransient<IPreReleaseService, PreReleaseService>();
             services.AddTransient<IManageContentPageService, ManageContentPageService>();
+            services.AddTransient<IContentService, ContentService>();
             services.AddTransient<IRelatedInformationService, RelatedInformationService>();
             
             services.AddTransient<IBoundaryLevelService, BoundaryLevelService>();
