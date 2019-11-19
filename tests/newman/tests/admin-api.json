@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "1266532e-8332-4f61-a146-0fc81f7c6539",
+		"_postman_id": "42cebec7-4835-4df8-8bde-72029b0ffcdf",
 		"name": "DfE Admin API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -2466,8 +2466,8 @@
 									"    pm.expect(respJson.id).to.equal(\"06c45b1e-533d-4c95-900b-62beb4620f59\");",
 									"});",
 									"",
-									"pm.test(\"typeId should should be correct\", function () { ",
-									"    pm.expect(respJson.typeId).to.equal(\"9d333457-9132-4e55-ae78-c55cb3673d7c\"); ",
+									"pm.test(\"type.id should should be correct\", function () { ",
+									"    pm.expect(respJson.type.id).to.equal(\"9d333457-9132-4e55-ae78-c55cb3673d7c\"); ",
 									"});"
 								],
 								"type": "text/javascript"
