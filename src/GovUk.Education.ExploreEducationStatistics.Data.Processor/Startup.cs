@@ -34,6 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 .AddTransient<IBatchService, BatchService>()
                 .AddTransient<IImportStatusService, ImportStatusService>()
                 .AddSingleton<IValidatorService, ValidatorService>()
+                .AddApplicationInsightsTelemetry()
                 .BuildServiceProvider();
         }
     }
