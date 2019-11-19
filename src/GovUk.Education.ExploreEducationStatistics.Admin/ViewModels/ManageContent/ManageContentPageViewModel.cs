@@ -87,6 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
             return model;
         }
 
+        // remove unwanted fields from the ContentBlock JSON structure
         private static void UnsetUnwantedFields(ContentSectionViewModel model)
         {
             model.Content.ForEach(contentBlock =>
