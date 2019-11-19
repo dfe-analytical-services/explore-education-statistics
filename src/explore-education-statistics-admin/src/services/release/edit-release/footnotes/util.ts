@@ -1,4 +1,30 @@
-import { FootnoteProps, FootnoteMeta, FootnoteMetaGetters } from './types';
+import {
+  FootnoteProps,
+  FootnoteMeta,
+  FootnoteMetaGetters,
+  FlatFootnoteProps,
+} from './types';
+
+export const footnoteToFlatFootnote = (
+  footnote: FootnoteProps,
+): FlatFootnoteProps => {
+  const subjects = [] as string[];
+  const indicatorGroups = [] as string[];
+  const filters = [] as string[];
+  const indicators = [] as string[];
+  const filterGroups = [] as string[];
+  const filterItems = [] as string[];
+
+  return {
+    ...footnote,
+    subjects,
+    indicatorGroups,
+    indicators,
+    filters,
+    filterGroups,
+    filterItems,
+  };
+};
 
 const footnoteFormValidation = ({ subjects }: FootnoteProps) => {
   const errors: { [key: string]: any } = {};
@@ -7,69 +33,60 @@ const footnoteFormValidation = ({ subjects }: FootnoteProps) => {
     //   .length === 0 &&
     'At least one Subject, Indicator or Filter must be selected';
   if (atLeastOneOption) {
-    errors.subjects = atLeastOneOption;
+    // errors.subjects = atLeastOneOption;
   }
-  console.log('subjects', subjects);
   return errors;
 };
 
 export const generateFootnoteMetaMap = (
   footnoteMeta: FootnoteMeta,
 ): FootnoteMetaGetters => {
-  const filtersToSubject: { [key: number]: number } = {};
-  const filterGroupsToFilters: { [key: number]: number } = {};
-  const filterItemsToFilterGroups: { [key: number]: number } = {};
-  const indicatorsToSubject: { [key: number]: number } = {};
-  const indicatorItemsToIndicators: { [key: number]: number } = {};
+  const filtersToSubject: { [key: string]: string } = {};
+  const filterGroupsToFilters: { [key: string]: string } = {};
+  const filterItemsToFilterGroups: { [key: string]: string } = {};
+  const indicatorsToSubject: { [key: string]: string } = {};
+  const indicatorItemsToIndicators: { [key: string]: string } = {};
 
   Object.keys(footnoteMeta).forEach(subjectId => {
-    Object.keys(footnoteMeta[Number(subjectId)].indicators).forEach(
-      indicatorId => {
-        indicatorsToSubject[Number(indicatorId)] = Number(subjectId);
-
-        Object.keys(
-          footnoteMeta[Number(subjectId)].indicators[Number(indicatorId)]
-            .options,
-        ).forEach(indicatorItemId => {
-          indicatorItemsToIndicators[Number(indicatorItemId)] = Number(
-            indicatorId,
-          );
-        });
-      },
-    );
-
-    Object.keys(footnoteMeta[Number(subjectId)].filters).forEach(filterId => {
-      filtersToSubject[Number(filterId)] = Number(subjectId);
+    Object.keys(footnoteMeta[subjectId].indicators).forEach(indicatorId => {
+      indicatorsToSubject[indicatorId] = subjectId;
 
       Object.keys(
-        footnoteMeta[Number(subjectId)].filters[Number(filterId)].options,
-      ).forEach(filterGroupId => {
-        filterGroupsToFilters[Number(filterGroupId)] = Number(filterId);
-
-        Object.keys(
-          footnoteMeta[Number(subjectId)].filters[Number(filterId)].options[
-            Number(filterGroupId)
-          ].options,
-        ).forEach(filterItemId => {
-          filterItemsToFilterGroups[Number(filterItemId)] = Number(
-            filterGroupId,
-          );
-        });
+        footnoteMeta[subjectId].indicators[indicatorId].options,
+      ).forEach(indicatorItemId => {
+        indicatorItemsToIndicators[indicatorItemId] = indicatorId;
       });
+    });
+
+    Object.keys(footnoteMeta[subjectId].filters).forEach(filterId => {
+      filtersToSubject[filterId] = subjectId;
+
+      Object.keys(footnoteMeta[subjectId].filters[filterId].options).forEach(
+        filterGroupId => {
+          filterGroupsToFilters[filterGroupId] = filterId;
+
+          Object.keys(
+            footnoteMeta[subjectId].filters[filterId].options[filterGroupId]
+              .options,
+          ).forEach(filterItemId => {
+            filterItemsToFilterGroups[filterItemId] = filterGroupId;
+          });
+        },
+      );
     });
   });
 
   const getItem = (
-    ids: number[],
+    ids: string[],
     itemType: 'subject' | 'indicator' | 'filter',
   ) => {
     if (
-      (ids as (number | undefined)[]).includes(undefined) ||
+      (ids as (string | undefined)[]).includes(undefined) ||
       ids.length === 0
     ) {
       return {
         label: 'A problem occurred',
-        value: -1,
+        value: '-1',
       };
     }
 
@@ -115,36 +132,36 @@ export const generateFootnoteMetaMap = (
 
     return {
       label: 'A problem occurred',
-      value: -1,
+      value: '-1',
     };
   };
 
-  const getSubject = (subjectId: number) => {
+  const getSubject = (subjectId: string) => {
     return getItem([subjectId], 'subject');
   };
-  const getIndicatorGroup = (indicatorId: number) => {
+  const getIndicatorGroup = (indicatorId: string) => {
     const subjectId = indicatorsToSubject[indicatorId];
 
     return getItem([subjectId, indicatorId], 'indicator');
   };
-  const getIndicator = (indicatorItemId: number) => {
+  const getIndicator = (indicatorItemId: string) => {
     const indicatorId = indicatorItemsToIndicators[indicatorItemId];
     const subjectId = indicatorsToSubject[indicatorId];
 
     return getItem([subjectId, indicatorId, indicatorItemId], 'indicator');
   };
-  const getFilter = (filterId: number) => {
+  const getFilter = (filterId: string) => {
     const subjectId = filtersToSubject[filterId];
 
     return getItem([subjectId, filterId], 'filter');
   };
-  const getFilterGroup = (filterGroupId: number) => {
+  const getFilterGroup = (filterGroupId: string) => {
     const filterId = filterGroupsToFilters[filterGroupId];
     const subjectId = filtersToSubject[filterId];
 
     return getItem([subjectId, filterId, filterGroupId], 'filter');
   };
-  const getFilterItem = (filterItemId: number) => {
+  const getFilterItem = (filterItemId: string) => {
     const filterGroupId = filterItemsToFilterGroups[filterItemId];
     const filterId = filterGroupsToFilters[filterGroupId];
     const subjectId = filtersToSubject[filterId];

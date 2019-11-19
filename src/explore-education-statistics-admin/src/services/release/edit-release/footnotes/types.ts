@@ -1,12 +1,12 @@
 export interface FootnoteSubjectMeta {
-  subjectId: number;
+  subjectId: string;
   subjectName: string;
   indicators: {
-    [key: number]: {
+    [key: string]: {
       // indicator "group"
       label: string;
       options: {
-        [key: number]: {
+        [key: string]: {
           // indicator "item"
           label: string;
           unit: string;
@@ -16,16 +16,16 @@ export interface FootnoteSubjectMeta {
     };
   };
   filters: {
-    [key: number]: {
+    [key: string]: {
       // filter
       hint: string;
       legend: string;
       options: {
-        [key: number]: {
+        [key: string]: {
           label: string;
           // filterGroup
           options: {
-            [key: number]: {
+            [key: string]: {
               // filterItem
               label: string;
               value: string;
@@ -38,43 +38,43 @@ export interface FootnoteSubjectMeta {
 }
 
 export interface FootnoteMeta {
-  [key: number /* subjectId */]: FootnoteSubjectMeta;
+  [key: string /* subjectId */]: FootnoteSubjectMeta;
 }
 
 export interface FootnoteMetaMap {
-  filterItemsToFilterGroups: { [key: number]: number };
-  filterGroupsToFilters: { [key: number]: number };
-  filtersToSubject: { [key: number]: number };
-  indicatorsToSubject: { [key: number]: number };
+  filterItemsToFilterGroups: { [key: string]: string };
+  filterGroupsToFilters: { [key: string]: string };
+  filtersToSubject: { [key: string]: string };
+  indicatorsToSubject: { [key: string]: string };
 }
 
 export interface FootnoteMetaGetters {
-  getSubject: (id: number) => { label: string; value: number };
-  getIndicatorGroup: (id: number) => { label: string; value: number };
-  getIndicator: (id: number) => { label: string; value: number };
-  getFilter: (id: number) => { label: string; value: number };
-  getFilterGroup: (id: number) => { label: string; value: number };
-  getFilterItem: (id: number) => { label: string; value: number };
+  getSubject: (id: string) => { label: string; value: string };
+  getIndicatorGroup: (id: string) => { label: string; value: string };
+  getIndicator: (id: string) => { label: string; value: string };
+  getFilter: (id: string) => { label: string; value: string };
+  getFilterGroup: (id: string) => { label: string; value: string };
+  getFilterItem: (id: string) => { label: string; value: string };
 }
 
 export interface FootnoteProps {
   content: string;
   subjects: {
-    [key: number]: {
+    [key: string]: {
       selected: boolean;
       indicatorGroups: {
-        [key: number]: {
+        [key: string]: {
           selected: boolean;
-          indicators: number[];
+          indicators: string[];
         };
       };
       filters: {
-        [key: number]: {
+        [key: string]: {
           selected: boolean;
           filterGroups: {
-            [key: number]: {
+            [key: string]: {
               selected: boolean;
-              filterItems: number[];
+              filterItems: string[];
             };
           };
         };
@@ -84,5 +84,19 @@ export interface FootnoteProps {
 }
 
 export interface Footnote extends FootnoteProps {
-  id: number;
+  id: string;
+}
+
+export interface FlatFootnoteProps {
+  content: string;
+  subjects: string[];
+  indicatorGroups: string[];
+  indicators: string[];
+  filters: string[];
+  filterGroups: string[];
+  filterItems: string[];
+}
+
+export interface FlatFootnote extends FlatFootnoteProps {
+  id: string;
 }

@@ -88,7 +88,7 @@ const FootnotesList = ({
                       return (
                         <FootnoteSubjectSelection
                           key={subjectId}
-                          subjectId={Number(subjectId)}
+                          subjectId={subjectId}
                           subject={selection}
                           footnoteMetaGetters={footnoteMetaGetters}
                         />

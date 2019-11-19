@@ -7,7 +7,6 @@ import {
   FootnoteSubjectMeta,
 } from '@admin/services/release/edit-release/footnotes/types';
 import { FormCheckbox } from '@common/components/form';
-import FieldSubjectCheckbox from './FieldSubjectCheckbox';
 
 interface Props {
   summary: string;
@@ -42,9 +41,14 @@ const IndicatorDetails = ({
               `${valuePath}.indicatorGroups[${indicatorGroupId}].indicators`,
             ) || [];
           return (
-            <div key={indicatorGroupId}>
+            <div key={indicatorGroupId} className="govuk-!-margin-bottom-2 ">
               {!hideGrouping && (
-                <FieldSubjectCheckbox
+                <div className="govuk-!-margin-top-1 govuk-!-margin-bottom-1">
+                  <strong>{indicatorGroup.label}</strong>
+                </div>
+                /* 
+                 // Disabling indicatorGroup selection for now
+                  <FieldSubjectCheckbox
                   key={indicatorGroupId}
                   className="govuk-checkboxes--small"
                   id={`indicatorGroup-${indicatorGroupId}`}
@@ -56,7 +60,7 @@ const IndicatorDetails = ({
                     </>
                   }
                   disabled={parentSelected}
-                />
+                /> */
               )}
               <div
                 className={

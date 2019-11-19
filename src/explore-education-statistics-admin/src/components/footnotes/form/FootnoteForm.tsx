@@ -31,7 +31,7 @@ interface Props extends FootnoteFormConfig {
   isFirst?: boolean;
   onOpen: () => void;
   onCancel: () => void;
-  onSubmit?: (values: FootnoteProps, id?: number) => void;
+  onSubmit?: (values: FootnoteProps, id?: string) => void;
 }
 
 export interface FootnoteFormControls {
@@ -39,7 +39,7 @@ export interface FootnoteFormControls {
   create: () => void;
   edit: (footnote: Footnote) => void;
   cancel: () => void;
-  save: (footnote: FootnoteProps, footnoteId?: number) => void;
+  save: (footnote: FootnoteProps, footnoteId?: string) => void;
   delete: (footnote: Footnote) => void;
 }
 

@@ -5,30 +5,30 @@ import {
 import React, { ReactNode } from 'react';
 
 interface Props {
-  subjectId: number;
-  subject: Footnote['subjects'][number];
+  subjectId: string;
+  subject: Footnote['subjects'][string];
   footnoteMetaGetters: FootnoteMetaGetters;
 }
 
 interface Item {
-  id: number;
+  id: string;
   label: string;
   selected: boolean;
 }
 
 interface Selection extends Item {
   indicatorGroups: {
-    id: number;
+    id: string;
     label: string;
     selected: boolean;
     indicators: Item[];
   }[];
   filters: {
-    id: number;
+    id: string;
     label: string;
     selected: boolean;
     filterGroups: {
-      id: number;
+      id: string;
       label: string;
       selected: boolean;
       filterItems: Item[];
@@ -50,7 +50,7 @@ const FootnoteSubjectSelection = ({
     getFilterItem,
   } = footnoteMetaGetters;
 
-  const selectedOption = { id: -1, label: '(All)', selected: false };
+  const selectedOption = { id: '-1', label: '(All)', selected: false };
 
   function getIndicatorGroups(): Selection['indicatorGroups'] {
     if (subject.selected) {
@@ -59,14 +59,14 @@ const FootnoteSubjectSelection = ({
     return Object.entries(subject.indicatorGroups).map(
       ([indicatorGroupid, indicatorGroup]) => {
         return {
-          id: Number(indicatorGroupid),
-          label: getIndicatorGroup(Number(indicatorGroupid)).label,
+          id: indicatorGroupid,
+          label: getIndicatorGroup(indicatorGroupid).label,
           selected: indicatorGroup.selected,
           indicators: indicatorGroup.selected
             ? [selectedOption]
             : indicatorGroup.indicators.map(indicatorId => {
                 return {
-                  id: Number(indicatorId),
+                  id: indicatorId,
                   label: getIndicator(indicatorId).label,
                   selected: true,
                 };
@@ -82,22 +82,22 @@ const FootnoteSubjectSelection = ({
     }
     return Object.entries(subject.filters).map(([filterId, filter]) => {
       return {
-        id: Number(filterId),
-        label: getFilter(Number(filterId)).label,
+        id: filterId,
+        label: getFilter(filterId).label,
         selected: filter.selected,
         filterGroups: filter.selected
           ? [{ ...selectedOption, filterItems: [] }]
           : Object.entries(filter.filterGroups).map(
               ([filterGroupId, filterGroup]) => {
                 return {
-                  id: Number(filterGroupId),
-                  label: getFilterGroup(Number(filterGroupId)).label,
+                  id: filterGroupId,
+                  label: getFilterGroup(filterGroupId).label,
                   selected: filterGroup.selected,
                   filterItems: filterGroup.selected
                     ? [selectedOption]
                     : filterGroup.filterItems.map(filterItemId => {
                         return {
-                          id: Number(filterItemId),
+                          id: filterItemId,
                           label: getFilterItem(filterItemId).label,
                           selected: true,
                         };

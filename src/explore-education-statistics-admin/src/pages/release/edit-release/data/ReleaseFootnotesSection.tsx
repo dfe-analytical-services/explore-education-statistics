@@ -5,10 +5,6 @@ import {
   FootnoteMetaGetters,
 } from '@admin/services/release/edit-release/footnotes/types';
 import footnotesService from '@admin/services/release/edit-release/footnotes/service';
-import {
-  dummyFootnotes,
-  dummyFootnoteMeta,
-} from '@admin/services/release/edit-release/footnotes/dummyFootnoteData';
 import { generateFootnoteMetaMap } from '@admin/services/release/edit-release/footnotes/util';
 import Link from '@admin/components/Link';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -40,22 +36,16 @@ const ReleaseFootnotesSection = ({ publicationId, releaseId }: Props) => {
   const [hasSufficientData, setHasSufficientData] = useState<boolean>(true);
 
   function getFootnoteData() {
-    // setLoading(true);
-    // footnotesService
-    //   .getReleaseFootnoteData(releaseId)
-    //   .then(({ meta, footnotes: footnotesList }) => {
-    //     setFootnoteMeta(meta);
-    //     setHasSufficientData(!!Object.keys(meta).length);
-    //     setFootnotes(footnotesList);
-    //     setFootnoteMetaGetters(generateFootnoteMetaMap(meta));
-    //     setLoading(false);
-    //   });
-
-    setFootnoteMetaGetters(generateFootnoteMetaMap(dummyFootnoteMeta));
-    setHasSufficientData(!!Object.keys(dummyFootnoteMeta).length);
-    setFootnoteMeta(dummyFootnoteMeta);
-    setFootnotes(dummyFootnotes);
-    setLoading(false);
+    setLoading(true);
+    footnotesService
+      .getReleaseFootnoteData(releaseId)
+      .then(({ meta, footnotes: footnotesList }) => {
+        setFootnoteMeta(meta);
+        setHasSufficientData(!!Object.keys(meta).length);
+        setFootnotes(footnotesList);
+        setFootnoteMetaGetters(generateFootnoteMetaMap(meta));
+        setLoading(false);
+      });
   }
 
   useEffect(() => {
@@ -69,7 +59,7 @@ const ReleaseFootnotesSection = ({ publicationId, releaseId }: Props) => {
       _setFootnoteForm({ state: 'edit', footnote });
     },
     cancel: () => _setFootnoteForm({ state: 'cancel' }),
-    save: (footnote: FootnoteProps, footnoteId?: number) => {
+    save: (footnote: FootnoteProps, footnoteId?: string) => {
       if (footnoteId) {
         setLoading(true);
         footnotesService.updateFootnote(footnoteId, footnote).then(() => {
