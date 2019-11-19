@@ -8,12 +8,42 @@ import {
 export const footnoteToFlatFootnote = (
   footnote: FootnoteProps,
 ): FlatFootnoteProps => {
-  const subjects = [] as string[];
-  const indicatorGroups = [] as string[];
-  const filters = [] as string[];
-  const indicators = [] as string[];
-  const filterGroups = [] as string[];
-  const filterItems = [] as string[];
+  const subjects: string[] = [];
+  const indicatorGroups: string[] = [];
+  let indicators: string[] = [];
+  const filters: string[] = [];
+  const filterGroups: string[] = [];
+  let filterItems: string[] = [];
+
+  Object.entries(footnote.subjects).map(([subjectId, subject]) => {
+    if (subject.selected) {
+      return subjects.push(subjectId);
+    }
+    Object.entries(subject.indicatorGroups).map(
+      ([indicatorGroupId, indicatorGroup]) => {
+        if (indicatorGroup.selected) {
+          return indicatorGroups.push(indicatorGroupId);
+        }
+        indicators = [...indicators, ...indicatorGroup.indicators];
+        return null;
+      },
+    );
+    return Object.entries(subject.filters).map(([filterId, filter]) => {
+      if (filter.selected) {
+        return filters.push(filterId);
+      }
+      return Object.entries(filter.filterGroups).map(
+        ([filterGroupId, filterGroup]) => {
+          if (filterGroup.selected) {
+            return filterGroups.push(filterGroupId);
+          }
+
+          filterItems = [...filterItems, ...filterGroup.filterItems];
+          return null;
+        },
+      );
+    });
+  });
 
   return {
     ...footnote,
@@ -29,11 +59,25 @@ export const footnoteToFlatFootnote = (
 const footnoteFormValidation = (footnote: FootnoteProps) => {
   const errors: { [key: string]: string } = {};
   if (footnote) {
+    const {
+      subjects,
+      indicatorGroups,
+      indicators,
+      filters,
+      filterGroups,
+      filterItems,
+    } = footnoteToFlatFootnote(footnote);
+
     const atLeastOneOption =
-      // [...subjects, ...indicators, ...filters, ...filterGroups, ...filterItems]
-      //   .length === 0 &&
-      // 'At least one Subject, Indicator or Filter must be selected';
-      '';
+      [
+        ...subjects,
+        ...indicators,
+        ...indicatorGroups,
+        ...filters,
+        ...filterGroups,
+        ...filterItems,
+      ].length === 0 &&
+      'At least one Subject, Indicator or Filter must be selected';
     if (atLeastOneOption) {
       errors.subjects = atLeastOneOption;
     }
