@@ -14,7 +14,10 @@ const service = {
   async getFootnote(id: string) {
     return client.get(`/data/footnote/${id}`);
   },
-  async updateFootnote(id: string, footnote: FootnoteProps | Footnote) {
+  async updateFootnote(
+    id: string,
+    footnote: FootnoteProps | Footnote,
+  ): Promise<Footnote> {
     return client.put(`/data/footnote/${id}`, footnoteToFlatFootnote(footnote));
   },
   async deleteFootnote(id: string): Promise<void> {
