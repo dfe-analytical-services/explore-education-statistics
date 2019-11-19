@@ -1296,7 +1296,7 @@
             },
             {
               "name": "FUNCTIONS_EXTENSION_VERSION",
-              "value": "2.0.12438.0"
+              "value": "~3"
             },
             {
               "name": "FUNCTIONS_WORKER_RUNTIME",
@@ -1452,7 +1452,7 @@
             },
             {
               "name": "FUNCTIONS_EXTENSION_VERSION",
-              "value": "2.0.12438.0"
+              "value": "~3"
             },
             {
               "name": "FUNCTIONS_WORKER_RUNTIME",
@@ -1589,7 +1589,7 @@
             },
             {
               "name": "FUNCTIONS_EXTENSION_VERSION",
-              "value": "2.0.12438.0"
+              "value": "~3"
             },
             {
               "name": "FUNCTIONS_WORKER_RUNTIME",
