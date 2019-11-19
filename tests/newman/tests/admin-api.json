@@ -1072,7 +1072,7 @@
 											"pm.test(\"All results should have correction geographicLevel\", function () {",
 											"    for(var i = 0; i < pm.response.json().result.length; i++) {",
 											"        pm.expect(respJson.result[i].geographicLevel).to.satisfy(function(geoLevel) {",
-											"           return geoLevel === \"Local_Authority\" || geoLevel === \"Local_Authority_District\"; ",
+											"           return geoLevel === \"LocalAuthority\" || geoLevel === \"LocalAuthorityDistrict\"; ",
 											"        });",
 											"    }",
 											"});"
