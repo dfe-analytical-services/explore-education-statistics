@@ -55,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Importer.Services
                     Columns.LOCAL_AUTH_COLS, new[]{"new_la_code", "old_la_code", "la_name"}
                 },
                 {
-                    Columns.LOCAL_AUTH_DISTRICT_COLS, new[]{"sch_lad_code", "sch_lad_name"}
+                    Columns.LOCAL_AUTH_DISTRICT_COLS, new[]{"lad_code", "lad_name"}
                 },
                 {
                     Columns.LOCAL_ENTERPRISE_PARTNERSHIP_COLS, new[]{"local_enterprise_partnership_code", "local_enterprise_partnership_name"}
