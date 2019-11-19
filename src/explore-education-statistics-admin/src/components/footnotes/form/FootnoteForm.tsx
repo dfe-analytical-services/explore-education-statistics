@@ -13,6 +13,7 @@ import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import createErrorHelper from '@common/lib/validation/createErrorHelper';
 import Yup from '@common/lib/validation/yup';
 import get from 'lodash/get';
+import merge from 'lodash/merge';
 import { FormikProps } from 'formik';
 import React from 'react';
 import FieldSubjectCheckbox from './FieldSubjectCheckbox';
@@ -52,18 +53,57 @@ const FootnoteForm = ({
   onSubmit,
   footnoteMeta,
 }: Props) => {
+  const generateInitialValues = () => {
+    /**
+     * This function can be removed once the id's of
+     * filters, filterItems etc. aren't numbers
+     * We can just use the initialValue below.
+     */
+    const initialValue: FootnoteProps = {
+      content: '',
+      subjects: {},
+    };
+
+    Object.entries(footnoteMeta).map(([subjectId, subject]) => {
+      initialValue.subjects[subjectId] = {
+        indicatorGroups: {},
+        filters: {},
+        selected: false,
+      };
+      Object.keys(subject.indicators).map(indicatorId => {
+        initialValue.subjects[subjectId].indicatorGroups[`${indicatorId}`] = {
+          selected: false,
+          indicators: [],
+        };
+        return null;
+      });
+      return Object.entries(subject.filters).map(([filterId, filter]) => {
+        initialValue.subjects[subjectId].filters[`${filterId}`] = {
+          selected: false,
+          filterGroups: {},
+        };
+        return Object.keys(filter.options).map(filterGroupId => {
+          initialValue.subjects[subjectId].filters[`${filterId}`].filterGroups[
+            `${filterGroupId}`
+          ] = {
+            selected: false,
+            filterItems: [],
+          };
+          return null;
+        });
+      });
+    });
+
+    return merge(initialValue, footnote);
+  };
+
   const renderForm = () => {
     const formId = `${(footnote && footnote.id) || 'create'}-footnote-form`;
 
     return (
       <Formik<FootnoteProps>
         // @ts-ignore
-        initialValues={
-          footnote || {
-            content: '',
-            subjects: {},
-          }
-        }
+        initialValues={generateInitialValues()}
         validate={footnoteFormValidation}
         validationSchema={Yup.object({
           content: Yup.string().required('Footnote content must be added.'),
@@ -88,70 +128,72 @@ const FootnoteForm = ({
                     ([subjectMetaId, subjectMeta]: [
                       string,
                       FootnoteSubjectMeta,
-                    ]) => (
-                      <div key={subjectMetaId}>
-                        <div key={subjectMetaId} className="govuk-grid-row">
-                          <h4 className="govuk-visually-hidden">
-                            {subjectMeta.subjectName} footnote matching criteria
-                          </h4>
-                          <div className="govuk-grid-column-one-third govuk-!-margin-bottom-2">
-                            <h5 className="govuk-!-margin-bottom-2 govuk-!-margin-top-0">
-                              Subject
-                            </h5>
-                            <FieldSubjectCheckbox
-                              id={`subject-${subjectMetaId}`}
-                              label={subjectMeta.subjectName}
-                              name={`subjects.${subjectMetaId}.selected`}
-                            />
-                          </div>
-                          <div className="govuk-grid-column-one-third">
-                            <h5 className="govuk-!-margin-bottom-2 govuk-!-margin-top-0">
-                              Indicators
-                            </h5>
-                            <IndicatorDetails
-                              summary="Indicators"
-                              parentSelected={get(
-                                form.values,
-                                `subjects.${subjectMetaId}.selected`,
+                    ]) => {
+                      const subjectSelected =
+                        get(
+                          form.values,
+                          `subjects.${subjectMetaId}.selected`,
+                        ) || false;
+                      return (
+                        <div key={subjectMetaId}>
+                          <div key={subjectMetaId} className="govuk-grid-row">
+                            <h4 className="govuk-visually-hidden">
+                              {subjectMeta.subjectName} footnote matching
+                              criteria
+                            </h4>
+                            <div className="govuk-grid-column-one-third govuk-!-margin-bottom-2">
+                              <h5 className="govuk-!-margin-bottom-2 govuk-!-margin-top-0">
+                                Subject
+                              </h5>
+                              <FieldSubjectCheckbox
+                                id={`subject-${subjectMetaId}`}
+                                label={subjectMeta.subjectName}
+                                name={`subjects.${subjectMetaId}.selected`}
+                              />
+                            </div>
+                            <div className="govuk-grid-column-one-third">
+                              <h5 className="govuk-!-margin-bottom-2 govuk-!-margin-top-0">
+                                Indicators
+                              </h5>
+                              <IndicatorDetails
+                                summary="Indicators"
+                                parentSelected={subjectSelected}
+                                valuePath={`subjects.${subjectMetaId}`}
+                                indicator={subjectMeta.indicators}
+                                form={form}
+                              />
+                            </div>
+                            <div className="govuk-grid-column-one-third">
+                              <h5 className="govuk-!-margin-bottom-2 govuk-!-margin-top-0">
+                                Filters
+                              </h5>
+                              {Object.entries(subjectMeta.filters).map(
+                                ([filterId, filter]: [
+                                  string,
+                                  FootnoteSubjectMeta['filters']['0'],
+                                ]) => (
+                                  <FilterGroupDetails
+                                    key={filterId}
+                                    summary={filter.legend}
+                                    parentSelected={subjectSelected}
+                                    valuePath={`subjects.${subjectMetaId}`}
+                                    groupId={filterId}
+                                    filter={filter}
+                                    selectAll
+                                    value={get(
+                                      form.values,
+                                      `subjects.${subjectMetaId}.filters.${filterId}.selected`,
+                                    )}
+                                    form={form}
+                                  />
+                                ),
                               )}
-                              valuePath={`subjects.${subjectMetaId}`}
-                              indicator={subjectMeta.indicators}
-                              form={form}
-                            />
+                            </div>
                           </div>
-                          <div className="govuk-grid-column-one-third">
-                            <h5 className="govuk-!-margin-bottom-2 govuk-!-margin-top-0">
-                              Filters
-                            </h5>
-                            {Object.entries(subjectMeta.filters).map(
-                              ([filterId, filter]: [
-                                string,
-                                FootnoteSubjectMeta['filters'][0],
-                              ]) => (
-                                <FilterGroupDetails
-                                  key={filterId}
-                                  summary={filter.legend}
-                                  parentSelected={get(
-                                    form.values,
-                                    `subjects.${subjectMetaId}.selected`,
-                                  )}
-                                  valuePath={`subjects.${subjectMetaId}`}
-                                  groupId={filterId}
-                                  filter={filter}
-                                  selectAll
-                                  value={get(
-                                    form.values,
-                                    `subjects.${subjectMetaId}.filters.${filterId}.selected`,
-                                  )}
-                                  form={form}
-                                />
-                              ),
-                            )}
-                          </div>
+                          <hr className="govuk-!-margin-bottom-2" />
                         </div>
-                        <hr className="govuk-!-margin-bottom-2" />
-                      </div>
-                    ),
+                      );
+                    },
                   )}
                 </FormFieldset>
                 <FormFieldTextArea<FootnoteProps>

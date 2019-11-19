@@ -26,14 +26,17 @@ export const footnoteToFlatFootnote = (
   };
 };
 
-const footnoteFormValidation = ({ subjects }: FootnoteProps) => {
-  const errors: { [key: string]: any } = {};
-  const atLeastOneOption =
-    // [...subjects, ...indicators, ...filters, ...filterGroups, ...filterItems]
-    //   .length === 0 &&
-    'At least one Subject, Indicator or Filter must be selected';
-  if (atLeastOneOption) {
-    // errors.subjects = atLeastOneOption;
+const footnoteFormValidation = (footnote: FootnoteProps) => {
+  const errors: { [key: string]: string } = {};
+  if (footnote) {
+    const atLeastOneOption =
+      // [...subjects, ...indicators, ...filters, ...filterGroups, ...filterItems]
+      //   .length === 0 &&
+      // 'At least one Subject, Indicator or Filter must be selected';
+      '';
+    if (atLeastOneOption) {
+      errors.subjects = atLeastOneOption;
+    }
   }
   return errors;
 };

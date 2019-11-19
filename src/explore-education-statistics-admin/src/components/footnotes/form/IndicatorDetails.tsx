@@ -32,13 +32,13 @@ const IndicatorDetails = ({
         {Object.entries(indicator).map(([indicatorGroupId, indicatorGroup]) => {
           const groupValue = get(
             form.values,
-            `${valuePath}.indicatorGroups[${indicatorGroupId}].selected`,
+            `${valuePath}.indicatorGroups.${indicatorGroupId}.selected`,
           );
           const hideGrouping = indicatorGroup.label === 'Default';
           const indicators =
             get(
               form.values,
-              `${valuePath}.indicatorGroups[${indicatorGroupId}].indicators`,
+              `${valuePath}.indicatorGroups.${indicatorGroupId}.indicators`,
             ) || [];
           return (
             <div key={indicatorGroupId} className="govuk-!-margin-bottom-2 ">
@@ -73,31 +73,34 @@ const IndicatorDetails = ({
                   ([indicatorItemId, indicatorItem]) => {
                     const checked =
                       (indicators &&
-                        indicators.includes(Number(indicatorItem.value))) ||
+                        indicators.includes(indicatorItem.value)) ||
                       false;
                     return (
                       <FormCheckbox
                         key={`indicatorItem-${indicatorItemId}`}
                         className="govuk-checkboxes--small"
-                        name={`${valuePath}.indicatorGroups[${indicatorGroupId}].indicators`}
+                        name={`${valuePath}.indicatorGroups.${indicatorGroupId}.indicators`}
                         id={indicatorItemId}
                         {...indicatorItem}
                         disabled={parentSelected || groupValue}
                         checked={checked}
                         onChange={e => {
+                          form.setFieldValue(
+                            `${valuePath}.indicatorGroups.${indicatorGroupId}.selected`,
+                            false,
+                          );
                           if (!checked) {
                             form.setFieldValue(
-                              `${valuePath}.indicatorGroups[${indicatorGroupId}].indicators`,
-                              [...indicators, Number(e.target.value)],
+                              `${valuePath}.indicatorGroups.${indicatorGroupId}.indicators`,
+                              [...indicators, e.target.value],
                             );
                           } else {
                             form.setFieldValue(
-                              `${valuePath}.indicatorGroups[${indicatorGroupId}].indicators`,
+                              `${valuePath}.indicatorGroups.${indicatorGroupId}.indicators`,
                               [
                                 ...indicators.filter(
                                   (selectedItem: string) =>
-                                    String(selectedItem) !==
-                                    String(e.target.value),
+                                    selectedItem !== e.target.value,
                                 ),
                               ],
                             );

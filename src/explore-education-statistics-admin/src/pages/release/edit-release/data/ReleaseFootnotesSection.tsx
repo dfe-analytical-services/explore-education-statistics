@@ -47,7 +47,6 @@ const ReleaseFootnotesSection = ({ publicationId, releaseId }: Props) => {
         setLoading(false);
       });
   }
-
   useEffect(() => {
     getFootnoteData();
   }, [publicationId, releaseId]);

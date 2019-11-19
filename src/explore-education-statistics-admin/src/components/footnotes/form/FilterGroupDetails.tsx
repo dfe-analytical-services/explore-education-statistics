@@ -44,7 +44,7 @@ const FilterGroupDetails = ({
           id={`select-all-${groupId}`}
           name={`${groupPath}.selected`}
           disabled={parentSelected}
-          label="Select All"
+          label="Select all groups"
         />
       )}
       <div className="dfe-filter-overflow">
@@ -86,8 +86,7 @@ const FilterGroupDetails = ({
                 {Object.entries(filterGroup.options).map(
                   ([filterItemId, filterItem]) => {
                     const checked =
-                      (filterItems &&
-                        filterItems.includes(Number(filterItem.value))) ||
+                      (filterItems && filterItems.includes(filterItem.value)) ||
                       false;
                     return (
                       <FormCheckbox
@@ -99,10 +98,14 @@ const FilterGroupDetails = ({
                         disabled={groupIsSelected || groupValue}
                         checked={checked}
                         onChange={e => {
+                          form.setFieldValue(
+                            `${groupPath}.filterGroups[${filterGroupId}].selected`,
+                            false,
+                          );
                           if (!checked) {
                             form.setFieldValue(
                               `${groupPath}.filterGroups[${filterGroupId}].filterItems`,
-                              [...filterItems, Number(e.target.value)],
+                              [...filterItems, e.target.value],
                             );
                           } else {
                             form.setFieldValue(
@@ -110,8 +113,7 @@ const FilterGroupDetails = ({
                               [
                                 ...filterItems.filter(
                                   (selectedItem: string) =>
-                                    String(selectedItem) !==
-                                    String(e.target.value),
+                                    selectedItem !== e.target.value,
                                 ),
                               ],
                             );
